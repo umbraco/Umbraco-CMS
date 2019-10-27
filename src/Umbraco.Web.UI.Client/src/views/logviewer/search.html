@@ -102,17 +102,17 @@
                             <table class="table table-hover" style="table-layout: fixed;" ng-if="vm.logItems.totalItems > 0">
                                 <thead>
                                     <tr>
-                                        <th style="width: 20%;" ng-click="vm.toggleOrderBy()">
+                                        <th style="width: 22ch;" ng-click="vm.toggleOrderBy()">
                                             Timestamp
                                             <ins class="icon-navigation-down" ng-class="{'icon-navigation-down': vm.logOptions.orderDirection === 'Descending', 'icon-navigation-up': vm.logOptions.orderDirection !== 'Descending'}">&nbsp;</ins>
                                         </th>
-                                        <th style="width: 15%;">Level</th>
-                                        <th style="width: 20%;">Machine</th>
+                                        <th style="width: 12ch;">Level</th>
+                                        <th style="width: 14ch;">Machine</th>
                                         <th>Message</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat-start="log in vm.logItems.items" ng-click="log.open = !log.open">
+                                    <tr ng-repeat-start="log in vm.logItems.items" ng-click="log.open = !log.open" style="vertical-align: top;">
                                         <td>{{ log.Timestamp | date:'medium' }}</td>
                                         <td><umb-badge size="s" color="{{ log.logTypeColor }}">{{ log.Level }}</umb-badge></td>
                                         <td><small>{{ log.Properties.MachineName.Value }}</small></td>
@@ -121,13 +121,12 @@
 
                                     <!-- Log Details (Exception & Properties) -->
                                     <tr ng-repeat-end ng-if="log.open">
-                                        <td colspan="4">
-                                            <div ng-if="log.Exception" style="border-left:4px solid #D42054; padding:0 10px 10px 10px; box-shadow:rgba(0,0,0,0.07) 2px 2px 10px">
-                                                <h3 class="text-error">Exception</h3>
-                                                <p style="white-space: pre-wrap;">{{ log.Exception }}</p>
+                                        <td colspan="4" style="padding: 0;background: none;">
+
+                                            <div ng-if="log.Exception" style="border-left:4px solid #D42054;">
+                                                <pre style="white-space: pre-wrap;">{{ log.Exception }}</pre>
                                             </div>
 
-                                            <h3>Properties</h3>
                                             <table class="table">
                                                 <tbody>
                                                     <tr>
@@ -151,49 +150,51 @@
                                                 </tbody>
                                             </table>
 
-                                            <div class="btn-group">
-                                                <a class="btn btn-info dropdown-toggle" data-toggle="dropdown" ng-href="" ng-click="log.searchDropdownOpen = !log.searchDropdownOpen">
-                                                    <i class="icon-search"></i> <localize key="general_search">Search</localize>
-                                                    <span class="caret"></span>
-                                                </a>
+                                            <div style="padding:0 0 20px;text-align:right;">
+                                                <div class="btn-group">
+                                                    <a class="btn btn-info dropdown-toggle" data-toggle="dropdown" ng-href="" ng-click="log.searchDropdownOpen = !log.searchDropdownOpen">
+                                                        <i class="icon-search"></i> <localize key="general_search">Search</localize>
+                                                        <span class="caret"></span>
+                                                    </a>
 
-                                                <umb-dropdown ng-if="log.searchDropdownOpen" on-close="log.searchDropdownOpen = false">
-                                                    <umb-dropdown-item>
-                                                        <a ng-href="https://www.google.com/search?q={{ log.RenderedMessage }}" target="_blank" title="Search this message with Google">
-                                                            <img src="https://www.google.com/favicon.ico" width="16" height="16" /> Search With Google
-                                                        </a>
-                                                    </umb-dropdown-item>
+                                                    <umb-dropdown ng-if="log.searchDropdownOpen" on-close="log.searchDropdownOpen = false">
+                                                        <umb-dropdown-item>
+                                                            <a ng-href="https://www.google.com/search?q={{ log.RenderedMessage }}" target="_blank" title="Search this message with Google">
+                                                                <img src="https://www.google.com/favicon.ico" width="16" height="16" /> Search With Google
+                                                            </a>
+                                                        </umb-dropdown-item>
 
-                                                    <umb-dropdown-item>
-                                                        <a ng-href="https://www.bing.com/search?q={{ log.RenderedMessage }}" target="_blank" title="Search this message with Bing">
-                                                            <img src="https://www.bing.com/favicon.ico" width="16" height="16" /> Search With Bing
-                                                        </a>
-                                                    </umb-dropdown-item>
+                                                        <umb-dropdown-item>
+                                                            <a ng-href="https://www.bing.com/search?q={{ log.RenderedMessage }}" target="_blank" title="Search this message with Bing">
+                                                                <img src="https://www.bing.com/favicon.ico" width="16" height="16" /> Search With Bing
+                                                            </a>
+                                                        </umb-dropdown-item>
 
-                                                    <umb-dropdown-item>
-                                                        <a ng-href="https://our.umbraco.com/search?q={{ log.RenderedMessage }}&content=wiki,forum,documentation" target="_blank" title="Search this message on Our Umbraco forums and docs">
-                                                            <img src="https://our.umbraco.com/assets/images/app-icons/favicon.png" width="16" height="16" /> Search Our Umbraco
-                                                        </a>
-                                                    </umb-dropdown-item>
+                                                        <umb-dropdown-item>
+                                                            <a ng-href="https://our.umbraco.com/search?q={{ log.RenderedMessage }}&content=wiki,forum,documentation" target="_blank" title="Search this message on Our Umbraco forums and docs">
+                                                                <img src="https://our.umbraco.com/assets/images/app-icons/favicon.png" width="16" height="16" /> Search Our Umbraco
+                                                            </a>
+                                                        </umb-dropdown-item>
 
-                                                    <umb-dropdown-item>
-                                                        <a ng-href="https://www.google.co.uk/?q=site:our.umbraco.com {{ log.RenderedMessage }}&safe=off#q=site:our.umbraco.com {{ log.RenderedMessage }} {{ log.Properties['SourceContext'].Value }}&safe=off" target="_blank" title="Search Our Umbraco forums using Google">
-                                                            <img src="https://www.google.com/favicon.ico" width="16" height="16" /> Search Our Umbraco with Google
-                                                        </a>
-                                                    </umb-dropdown-item>
+                                                        <umb-dropdown-item>
+                                                            <a ng-href="https://www.google.co.uk/?q=site:our.umbraco.com {{ log.RenderedMessage }}&safe=off#q=site:our.umbraco.com {{ log.RenderedMessage }} {{ log.Properties['SourceContext'].Value }}&safe=off" target="_blank" title="Search Our Umbraco forums using Google">
+                                                                <img src="https://www.google.com/favicon.ico" width="16" height="16" /> Search Our Umbraco with Google
+                                                            </a>
+                                                        </umb-dropdown-item>
 
-                                                    <umb-dropdown-item>
-                                                        <a ng-href="https://github.com/umbraco/Umbraco-CMS/search?q={{ log.Properties['SourceContext'].Value }}" target="_blank" title="Search within Umbraco source code on Github">
-                                                            <img src="https://www.github.com/favicon.ico" width="16" height="16" /> Search Umbraco Source
-                                                        </a>
-                                                    </umb-dropdown-item>
+                                                        <umb-dropdown-item>
+                                                            <a ng-href="https://github.com/umbraco/Umbraco-CMS/search?q={{ log.Properties['SourceContext'].Value }}" target="_blank" title="Search within Umbraco source code on Github">
+                                                                <img src="https://www.github.com/favicon.ico" width="16" height="16" /> Search Umbraco Source
+                                                            </a>
+                                                        </umb-dropdown-item>
 
-                                                    <umb-dropdown-item>
-                                                        <a ng-href="https://github.com/umbraco/Umbraco-CMS/issues?q={{ log.Properties['SourceContext'].Value }}" target="_blank" title="Search Umbraco Issues on Github">
-                                                            <img src="https://www.github.com/favicon.ico" width="16" height="16" /> Search Umbraco Issues
-                                                        </a>
-                                                    </umb-dropdown-item>
-                                                </umb-dropdown>
+                                                        <umb-dropdown-item>
+                                                            <a ng-href="https://github.com/umbraco/Umbraco-CMS/issues?q={{ log.Properties['SourceContext'].Value }}" target="_blank" title="Search Umbraco Issues on Github">
+                                                                <img src="https://www.github.com/favicon.ico" width="16" height="16" /> Search Umbraco Issues
+                                                            </a>
+                                                        </umb-dropdown-item>
+                                                    </umb-dropdown>
+                                                </div>
                                             </div>
 
                                         </td>
