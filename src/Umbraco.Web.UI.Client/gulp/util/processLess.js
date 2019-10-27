@@ -15,7 +15,9 @@ module.exports = function(files, out) {
         autoprefixer,
         cssnano({zindex: false})
     ];
-
+    
+    console.log("LESS: ", files, " -> ", config.root + config.targets.js + out)
+    
     var task = gulp.src(files)
         .pipe(less())
         .pipe(cleanCss())
