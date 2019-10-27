@@ -87,7 +87,8 @@
                         button-style="success"
                         label-key="general_submit"
                         state="vm.saveButtonState"
-                        action="vm.submit(model)">
+                        action="vm.submit(model)"
+                        disabled="!model.target">
                     </umb-button>
                 </umb-editor-footer-content-right>
             </umb-editor-footer>
