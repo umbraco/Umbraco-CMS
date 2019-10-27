@@ -3,7 +3,7 @@
 * @name umbraco.directives.directive:umbTree
 * @restrict E
 **/
-function umbTreeDirective($q, $rootScope, treeService, notificationsService, userService) {
+function umbTreeDirective($q, $rootScope, treeService, notificationsService, userService, localizationService) {
 
     return {
         restrict: 'E',
@@ -232,8 +232,12 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                 return $scope.activeTree;
             }
 
-            /** Method to load in the tree data */
             function loadTree() {
+                localizationService.localize("visuallyHiddenTexts_openContextMenu").then(function (value) {
+                    $scope.optionsText = value;
+                })
+
+            /** Method to load in the tree data */
                 if ($scope.section) {
 
                     //default args

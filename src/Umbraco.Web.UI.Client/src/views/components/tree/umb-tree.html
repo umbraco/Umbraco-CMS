@@ -8,7 +8,11 @@
                     {{tree.name}}
                 </a>
             </h5>
-            <button data-element="tree-item-options" class="umb-options btn-reset sr-only sr-only--focusable sr-only--hoverable" ng-hide="tree.root.isContainer || !tree.root.menuUrl" ng-click="options(tree.root, $event)" ng-swipe-right="options(tree.root, $event)">
+            <button data-element="tree-item-options"
+                    class="umb-options btn-reset sr-only sr-only--focusable sr-only--hoverable"
+                    aria-label="{{optionsText}} {{tree.name}}"
+                    ng-hide="tree.root.isContainer || !tree.root.menuUrl" ng-click="options(tree.root, $event)"
+                    ng-swipe-right="options(tree.root, $event)">
                 <i></i><i></i><i></i>
             </button>
         </div>
