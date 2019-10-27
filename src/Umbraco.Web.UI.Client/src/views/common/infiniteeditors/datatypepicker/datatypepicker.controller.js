@@ -10,7 +10,7 @@
 (function() {
     "use strict";
 
-    function DataTypePicker($scope, $filter, dataTypeResource, dataTypeHelper, contentTypeResource, localizationService, editorService) {
+    function DataTypePicker($scope, $filter, dataTypeResource, contentTypeResource, localizationService, editorService) {
 
         var vm = this;
 
@@ -122,10 +122,18 @@
                 vm.showTabs = false;
 
                 var regex = new RegExp(vm.searchTerm, "i");
+
+                var userConfigured = filterCollection(vm.userConfigured, regex),
+                    typesAndEditors = filterCollection(vm.typesAndEditors, regex);
+
+                var totalResults = _.reduce(_.pluck(_.union(userConfigured, typesAndEditors), 'count'), (m, n) => m + n, 0);
+
                 vm.filterResult = {
-                    userConfigured: filterCollection(vm.userConfigured, regex),
-                    typesAndEditors: filterCollection(vm.typesAndEditors, regex)
+                    userConfigured: userConfigured,
+                    typesAndEditors: typesAndEditors,
+                    totalResults: totalResults
                 };
+
             } else {
                 vm.filterResult = null;
                 vm.showTabs = true;
@@ -134,11 +142,15 @@
 
         function filterCollection(collection, regex) {
             return _.map(_.keys(collection), function (key) {
+
+                var filteredDataTypes = $filter('filter')(collection[key], function (dataType) {
+                    return regex.test(dataType.name) || regex.test(dataType.alias);
+                });
+
                 return {
                     group: key,
-                    dataTypes: $filter('filter')(collection[key], function (dataType) {
-                        return regex.test(dataType.name) || regex.test(dataType.alias);
-                    })
+                    count: filteredDataTypes.length,
+                    dataTypes: filteredDataTypes
                 }
             });
         }
@@ -150,7 +162,6 @@
             propertyDetails.title = property.name;
 
             $scope.model.itemDetails = propertyDetails;
-
         }
 
         function hideDetailsOverlay() {
@@ -177,7 +188,6 @@
             };
 
             editorService.open(dataTypeSettings);
-
         }
 
         function pickDataType(selectedDataType) {
@@ -205,7 +215,7 @@
         }
 
         function close() {
-            if($scope.model.close) {
+            if ($scope.model.close) {
                 $scope.model.close();
             }
         }

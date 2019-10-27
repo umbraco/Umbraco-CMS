@@ -29,11 +29,9 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
     
 
     //A list of query strings defined that when changed will not cause a reload of the route
-    var nonRoutingQueryStrings = ["mculture", "cculture", "lq"];
+    var nonRoutingQueryStrings = ["mculture", "cculture", "lq", "sr"];
     var retainedQueryStrings = ["mculture"];
-    //A list of trees that don't cause a route when creating new items (TODO: eventually all trees should do this!)
-    var nonRoutingTreesOnCreate = ["content", "contentblueprints"];
-        
+    
     function setMode(mode) {
         switch (mode) {
         case 'tree':
@@ -140,11 +138,8 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
                 nextUrlParams = pathToRouteParts(nextUrlParams);
             }
 
-            //first check if this is a ?create=true url being redirected to it's true url
-            if (currUrlParams.create === "true" && currUrlParams.id && currUrlParams.section && currUrlParams.tree && currUrlParams.method === "edit" && 
-                !nextUrlParams.create && nextUrlParams.id && nextUrlParams.section === currUrlParams.section && nextUrlParams.tree === currUrlParams.tree && nextUrlParams.method === currUrlParams.method &&
-                nonRoutingTreesOnCreate.indexOf(nextUrlParams.tree.toLowerCase()) >= 0) {
-                //this means we're coming from a path like /content/content/edit/1234?create=true to the created path like /content/content/edit/9999
+            //check if there is a query string to indicate that a "soft redirect" is taking place, if so we are not changing navigation
+            if (nextUrlParams.sr === true) {
                 return false;
             }
 
@@ -202,6 +197,18 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
                     $location.search(k, currentSearch[k]);
                 }
             });
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.navigationService#setSoftRedirect
+         * @methodOf umbraco.services.navigationService
+         *
+         * @description
+         * utility to set a special query string to indicate that the pending navigation change is a soft redirect
+         */
+        setSoftRedirect: function () {
+            $location.search("sr", true);
         },
 
         /**

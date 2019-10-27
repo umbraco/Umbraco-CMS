@@ -1,6 +1,6 @@
 <div ng-controller="Umbraco.Overlays.PublishController as vm">
 
-    <div style="margin-bottom: 15px;">
+    <div class="mb3">
         <p>{{vm.headline}}</p>
     </div>
 
@@ -48,14 +48,14 @@
     </div>
 
     <div class="umb-list umb-list--condensed" ng-if="!vm.loading && vm.hasPristineVariants">
-        <div style="margin-bottom: 15px; font-weight: bold;">
+        <div class="bold mb3">
             <p><localize key="content_publishedLanguages"></localize></p>
         </div>
 
         <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.pristineVariantFilter">
             <div>
                 <div style="margin-bottom: 2px;">
-                    <span>{{ variant.language.name }}</span>
+                    <span>{{variant.language.name}}</span>
                     <strong ng-if="variant.language.isMandatory" class="umb-control-required">*</strong>
                 </div>
 

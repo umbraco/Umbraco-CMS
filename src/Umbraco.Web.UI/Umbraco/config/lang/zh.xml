@@ -251,7 +251,6 @@
     <key alias="linkinternal">内部链接：</key>
     <key alias="linklocaltip">本地链接请用“#”号开头</key>
     <key alias="linknewwindow">在新窗口中打开？</key>
-    <key alias="macroContainerSettings">宏设置</key>
     <key alias="macroDoesNotHaveProperties"><![CDATA[该宏没有可编辑的属性]]></key>
     <key alias="paste">粘贴</key>
     <key alias="permissionsEdit">编辑权限</key>
