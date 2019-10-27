@@ -645,6 +645,9 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             unsubscribe();
         });
 
+        $scope.isCurrentNode = function (node) {
+            return $scope.realCurrentNode && $scope.realCurrentNode.key === node.key;
+        }
     }
 
 ]);
