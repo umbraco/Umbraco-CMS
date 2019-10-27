@@ -16,6 +16,7 @@
       var node = dialogOptions.currentNode;
 
       $scope.model.relateToOriginal = true;
+      $scope.model.includeDescendants = true;
       $scope.dialogTreeApi = {};
 
       vm.searchInfo = {
@@ -33,13 +34,15 @@
 
         var labelKeys = [
             "general_copy",
-            "defaultdialogs_relateToOriginalLabel"
+            "defaultdialogs_relateToOriginalLabel",
+            "defaultdialogs_includeDescendants"
         ];
 
         localizationService.localizeMany(labelKeys).then(function (data) {
 
             vm.labels.title = data[0];
             vm.labels.relateToOriginal = data[1]; 
+            vm.labels.includeDescendants = data[2]; 
 
             setTitle(vm.labels.title);
         });
