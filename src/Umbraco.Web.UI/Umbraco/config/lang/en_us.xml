@@ -280,7 +280,10 @@
     <key alias="nestedContentEditorNotSupported">Property %0% uses editor %1% which is not supported by Nested Content.</key>
     <key alias="nestedContentNoContentTypes">No content types are configured for this property.</key>
     <key alias="nestedContentAddElementType">Add element type</key>
-    <key alias="nestedContentSelectElementTypeModalTitle">Select element type</key>	
+    <key alias="nestedContentSelectElementTypeModalTitle">Select element type</key>
+    <key alias="nestedContentGroupHelpText">Select the group whose properties should be displayed. If left blank, the first group on the element type will be used.</key>
+    <key alias="nestedContentTemplateHelpTextPart1">Enter an angular expression to evaluate against each item for its name. Use</key>
+    <key alias="nestedContentTemplateHelpTextPart2">to display the item index</key>
     <key alias="addTextBox">Add another text box</key>
     <key alias="removeTextBox">Remove this text box</key>
     <key alias="contentRoot">Content root</key>
