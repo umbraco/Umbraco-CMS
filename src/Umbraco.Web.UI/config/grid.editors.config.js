@@ -7,12 +7,14 @@
     },
     {
         "name": "Image",
+        "nameTemplate": "{{ 'Image: ' + (value.udi | ncNodeName) }}",
         "alias": "media",
         "view": "media",
         "icon": "icon-picture"
     },
     {
         "name": "Macro",
+        "nameTemplate": "{{ 'Macro: ' + value.macroAlias }}",
         "alias": "macro",
         "view": "macro",
         "icon": "icon-settings-alt"
@@ -25,6 +27,7 @@
     },
     {
         "name": "Headline",
+        "nameTemplate": "{{ 'Headline: ' + value }}",
         "alias": "headline",
         "view": "textstring",
         "icon": "icon-coin",

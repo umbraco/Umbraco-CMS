@@ -118,6 +118,7 @@ ul.sections-tray {
             text-decoration: none;
             display: block;
             position: relative;
+            outline: none;
 
             &::after {
                 content: "";
@@ -130,6 +131,13 @@ ul.sections-tray {
                 transition: all .2s linear;
                 top: 0;
                 left: 0;
+            }
+
+            &:focus .section__name {
+                .tabbing-active & {
+                    border: 1px solid;
+                    border-color: @gray-9;
+                }
             }
         }
     }
