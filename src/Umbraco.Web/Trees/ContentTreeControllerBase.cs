@@ -468,5 +468,17 @@ namespace Umbraco.Web.Trees
         }
 
         private readonly ConcurrentDictionary<string, IUmbracoEntity> _entityCache = new ConcurrentDictionary<string, IUmbracoEntity>();
+
+        internal bool IsAncestorUnpublished(string path)
+        {
+            var ids = path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                .Where(x => x != Constants.System.RootString).Reverse();
+             
+            foreach (var id in ids)
+                if(Umbraco.TypedContent(id) == null)
+                    return true;
+
+            return false;
+        }
     }
 }

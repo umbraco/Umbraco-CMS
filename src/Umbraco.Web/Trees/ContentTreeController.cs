@@ -88,8 +88,7 @@ namespace Umbraco.Web.Trees
                     node.SetContainerStyle();
                 }
 
-
-                if (entity.IsPublished == false)
+                if (!entity.IsPublished || IsAncestorUnpublished(entity.Path))
                     node.SetNotPublishedStyle();
 
                 if (entity.HasPendingChanges)
