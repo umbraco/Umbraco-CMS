@@ -22,11 +22,14 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
         private void App_EndRequest(object sender, EventArgs e)
         {
+            if (((HttpApplication)sender).Request.Url.IsClientSideRequest())
+                return;
+
             // here we're using "Current." since we're in a module, it is possible in a round about way to inject into a module but for now we'll just use Current
             if (_liveModelsProvider == null)
-                _liveModelsProvider = Current.Factory.GetInstance<LiveModelsProvider>();
+                _liveModelsProvider = Current.Factory.TryGetInstance<LiveModelsProvider>(); // will be null in upgrade mode
 
-            if (_liveModelsProvider.IsEnabled)
+            if (_liveModelsProvider?.IsEnabled ?? false)
                 _liveModelsProvider.GenerateModelsIfRequested(sender, e);
         }
 

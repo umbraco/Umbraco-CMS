@@ -35,7 +35,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         private int _ver, _skipver;
         private readonly int _debugLevel;
         private BuildManager _theBuildManager;
-        private readonly Lazy<UmbracoServices> _umbracoServices;
+        private readonly Lazy<UmbracoServices> _umbracoServices; // fixme: this is because of circular refs :(
         private UmbracoServices UmbracoServices => _umbracoServices.Value;
 
         private static readonly Regex AssemblyVersionRegex = new Regex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
@@ -43,14 +43,14 @@ namespace Umbraco.ModelsBuilder.Umbraco
         private static readonly string[] OurFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err" };
 
         private readonly IModelsBuilderConfig _config;
-        private readonly ModelsGenerator _modelGenerator;
+        private readonly ModelsGenerationError _errors;
 
-        public PureLiveModelFactory(Lazy<UmbracoServices> umbracoServices, IProfilingLogger logger, IModelsBuilderConfig config, ModelsGenerator modelGenerator)
+        public PureLiveModelFactory(Lazy<UmbracoServices> umbracoServices, IProfilingLogger logger, IModelsBuilderConfig config)
         {
             _umbracoServices = umbracoServices;
             _logger = logger;
             _config = config;
-            _modelGenerator = modelGenerator;
+            _errors = new ModelsGenerationError(config);
             _ver = 1; // zero is for when we had no version
             _skipver = -1; // nothing to skip
 
@@ -294,7 +294,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
                         var types = assembly.ExportedTypes.Where(x => x.Inherits<PublishedContentModel>() || x.Inherits<PublishedElementModel>());
                         _infos = RegisterModels(types);
-                        _modelGenerator.ClearErrors();
+                        _errors.Clear();
                     }
                     catch (Exception e)
                     {
@@ -302,7 +302,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                         {
                             _logger.Error<PureLiveModelFactory>("Failed to build models.", e);
                             _logger.Warn<PureLiveModelFactory>("Running without models."); // be explicit
-                            _modelGenerator.ReportError("Failed to build PureLive models.", e);
+                            _errors.Report("Failed to build PureLive models.", e);
                         }
                         finally
                         {
@@ -536,6 +536,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                     throw new InvalidOperationException($"Both types {type.FullName} and {modelInfo.ModelType.FullName} want to be a model type for content type with alias \"{typeName}\".");
 
                 // fixme use Core's ReflectionUtilities.EmitCtor !!
+                // Yes .. DynamicMethod is uber slow
                 var meth = new DynamicMethod(string.Empty, typeof (IPublishedElement), ctorArgTypes, type.Module, true);
                 var gen = meth.GetILGenerator();
                 gen.Emit(OpCodes.Ldarg_0);

@@ -6,7 +6,7 @@ using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder.Umbraco
 {
-    internal class ModelsGenerationError
+    public sealed class ModelsGenerationError
     {
         private readonly IModelsBuilderConfig _config;
 

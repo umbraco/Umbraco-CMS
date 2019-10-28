@@ -22,11 +22,13 @@ namespace Umbraco.ModelsBuilder.Compose
 
         private readonly IModelsBuilderConfig _config;
         private readonly LiveModelsProvider _liveModelsProvider;
+        private readonly OutOfDateModelsStatus _outOfDateModels;
 
-        public ModelsBuilderComponent(IModelsBuilderConfig config, LiveModelsProvider liveModelsProvider)
+        public ModelsBuilderComponent(IModelsBuilderConfig config, LiveModelsProvider liveModelsProvider, OutOfDateModelsStatus outOfDateModels)
         {
             _config = config;
             _liveModelsProvider = liveModelsProvider;
+            _outOfDateModels = outOfDateModels;
         }
 
         public void Initialize()
@@ -39,13 +41,11 @@ namespace Umbraco.ModelsBuilder.Compose
 
             FileService.SavingTemplate += FileService_SavingTemplate;
 
-            // fixme LiveModelsProvider should not be static
             if (_config.ModelsMode.IsLiveNotPure())
                 _liveModelsProvider.Install();
 
-            // fixme OutOfDateModelsStatus should not be static
             if (_config.FlagOutOfDateModels)
-                OutOfDateModelsStatus.Install();
+                _outOfDateModels.Install();
         }
 
         public void Terminate()

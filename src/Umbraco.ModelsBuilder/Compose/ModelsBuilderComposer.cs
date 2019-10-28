@@ -20,6 +20,8 @@ namespace Umbraco.ModelsBuilder.Compose
             composition.Configs.Add<IModelsBuilderConfig>(() => new ModelsBuilderConfig());
             composition.RegisterUnique<ModelsGenerator>();
             composition.RegisterUnique<LiveModelsProvider>();
+            composition.RegisterUnique<OutOfDateModelsStatus>();
+            composition.RegisterUnique<ModelsGenerationError>();
 
             if (composition.Configs.ModelsBuilder().ModelsMode == ModelsMode.PureLive)
                 ComposeForLiveModels(composition);

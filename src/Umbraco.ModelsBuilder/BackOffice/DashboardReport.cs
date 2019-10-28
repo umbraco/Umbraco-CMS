@@ -8,19 +8,21 @@ namespace Umbraco.ModelsBuilder.BackOffice
     internal class DashboardReport
     {
         private readonly IModelsBuilderConfig _config;
-        private readonly ModelsGenerator _modelsGenerator;
+        private readonly OutOfDateModelsStatus _outOfDateModels;
+        private readonly ModelsGenerationError _mbErrors;
 
-        public DashboardReport(IModelsBuilderConfig config, ModelsGenerator modelsGenerator)
+        public DashboardReport(IModelsBuilderConfig config, OutOfDateModelsStatus outOfDateModels, ModelsGenerationError mbErrors)
         {
             _config = config;
-            _modelsGenerator = modelsGenerator;
+            _outOfDateModels = outOfDateModels;
+            _mbErrors = mbErrors;
         }
 
         public bool CanGenerate() => _config.ModelsMode.SupportsExplicitGeneration();
 
-        public bool AreModelsOutOfDate() => OutOfDateModelsStatus.IsOutOfDate;
+        public bool AreModelsOutOfDate() => _outOfDateModels.IsOutOfDate;
 
-        public string LastError() => _modelsGenerator.GetLastError();
+        public string LastError() => _mbErrors.GetLastError();
 
         public string Text()
         {

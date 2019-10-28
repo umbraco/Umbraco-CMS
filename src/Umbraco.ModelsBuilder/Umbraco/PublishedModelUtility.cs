@@ -41,14 +41,6 @@ namespace Umbraco.ModelsBuilder.Umbraco
             }
         }
 
-        [Obsolete("Use the overload taking IPublishedContentType instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static IPublishedPropertyType GetModelPropertyType<TModel, TValue>(PublishedContentType contentType,
-            Expression<Func<TModel, TValue>> selector)
-        {
-            return GetModelPropertyType((IPublishedContentType)contentType, selector);
-        }
-
         public static IPublishedPropertyType GetModelPropertyType<TModel, TValue>(IPublishedContentType contentType, Expression<Func<TModel, TValue>> selector)
             //where TModel : PublishedContentModel // fixme PublishedContentModel _or_ PublishedElementModel
         {

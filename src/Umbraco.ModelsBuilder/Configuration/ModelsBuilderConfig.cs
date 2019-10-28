@@ -25,7 +25,7 @@ namespace Umbraco.ModelsBuilder.Configuration
 
             // ensure defaults are initialized for tests
             ModelsNamespace = DefaultModelsNamespace;
-            ModelsDirectory = IOHelper.MapPath("~/");
+            ModelsDirectory = IOHelper.MapPath(DefaultModelsDirectory);
             DebugLevel = 0;
 
             // mode

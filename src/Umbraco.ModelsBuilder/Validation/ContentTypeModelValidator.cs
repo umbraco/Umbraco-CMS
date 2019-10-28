@@ -35,8 +35,6 @@ namespace Umbraco.ModelsBuilder.Validation
         where TModel: ContentTypeSave<TProperty>
         where TProperty: PropertyTypeBasic
     {
-        private static ModelsBuilderConfig Config => Current.Configs.ModelsBuilder();
-
         protected override IEnumerable<ValidationResult> Validate(TModel model)
         {
             var properties = model.Groups.SelectMany(x => x.Properties)

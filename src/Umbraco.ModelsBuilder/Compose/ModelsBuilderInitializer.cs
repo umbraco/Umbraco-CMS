@@ -6,7 +6,7 @@ using Umbraco.ModelsBuilder.Compose;
 
 namespace Umbraco.ModelsBuilder.Compose
 {
-    internal static class ModelsBuilderInitializer
+    public static class ModelsBuilderInitializer
     {
         public static void Initialize()
         {

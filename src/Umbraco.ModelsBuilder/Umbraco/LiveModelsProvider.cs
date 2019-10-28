@@ -19,15 +19,17 @@ namespace Umbraco.ModelsBuilder.Umbraco
         private readonly ILogger _logger;
         private readonly IModelsBuilderConfig _config;
         private readonly ModelsGenerator _modelGenerator;
+        private readonly ModelsGenerationError _mbErrors;
 
         // we do not manage pure live here
         internal bool IsEnabled => _config.ModelsMode.IsLiveNotPure();
 
-        public LiveModelsProvider(ILogger logger, IModelsBuilderConfig config, ModelsGenerator modelGenerator)
+        public LiveModelsProvider(ILogger logger, IModelsBuilderConfig config, ModelsGenerator modelGenerator, ModelsGenerationError mbErrors)
         {
             _logger = logger;
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _modelGenerator = modelGenerator;
+            _mbErrors = mbErrors;
         }
 
         internal void Install()
@@ -82,7 +84,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 _mutex.WaitOne(timeout); // wait until it is safe, and acquire
                 _logger.Info<LiveModelsProvider>("Generate models now.");
                 GenerateModels();
-                _modelGenerator.ClearErrors();
+                _mbErrors.Clear();
                 _logger.Info<LiveModelsProvider>("Generated.");
             }
             catch (TimeoutException)
@@ -91,7 +93,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             }
             catch (Exception e)
             {
-                _modelGenerator.ReportError("Failed to build Live models.", e);
+                _mbErrors.Report("Failed to build Live models.", e);
                 _logger.Error<LiveModelsProvider>("Failed to generate models.", e);
             }
             finally

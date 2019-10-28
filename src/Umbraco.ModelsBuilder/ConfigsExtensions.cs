@@ -14,7 +14,7 @@ namespace Umbraco.ModelsBuilder
         /// <remarks>Getting the models builder configuration freezes its state,
         /// and any attempt at modifying the configuration using the Setup method
         /// will be ignored.</remarks>
-        public static ModelsBuilderConfig ModelsBuilder(this Configs configs)
-            => configs.GetConfig<ModelsBuilderConfig>();
+        public static IModelsBuilderConfig ModelsBuilder(this Configs configs)
+            => configs.GetConfig<IModelsBuilderConfig>();
     }
 }

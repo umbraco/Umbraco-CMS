@@ -12,13 +12,13 @@ namespace Umbraco.ModelsBuilder.Umbraco
     {
         private readonly UmbracoServices _umbracoService;
         private readonly IModelsBuilderConfig _config;
-        private readonly ModelsGenerationError _errors;
+        private readonly OutOfDateModelsStatus _outOfDateModels;
 
-        public ModelsGenerator(UmbracoServices umbracoService, IModelsBuilderConfig config)
+        public ModelsGenerator(UmbracoServices umbracoService, IModelsBuilderConfig config, OutOfDateModelsStatus outOfDateModels)
         {
             _umbracoService = umbracoService;
             _config = config;
-            _errors = new ModelsGenerationError(config);
+            _outOfDateModels = outOfDateModels;
         }
 
         internal void GenerateModels()
@@ -52,12 +52,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 ";
             */
 
-            OutOfDateModelsStatus.Clear();
+            _outOfDateModels.Clear();
         }
-
-        internal void ClearErrors() => _errors.Clear();
-        internal void ReportError(string message, Exception e) => _errors.Report(message, e);
-        internal string GetLastError() => _errors.GetLastError();
-
     }
 }

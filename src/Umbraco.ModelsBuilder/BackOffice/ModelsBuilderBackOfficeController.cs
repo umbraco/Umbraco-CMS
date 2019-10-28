@@ -28,14 +28,18 @@ namespace Umbraco.ModelsBuilder.BackOffice
     {
         private readonly IModelsBuilderConfig _config;
         private readonly ModelsGenerator _modelGenerator;
+        private readonly OutOfDateModelsStatus _outOfDateModels;
+        private readonly ModelsGenerationError _mbErrors;
         private readonly DashboardReport _dashboardReport;
 
-        public ModelsBuilderBackOfficeController(IModelsBuilderConfig config, ModelsGenerator modelsGenerator)
+        public ModelsBuilderBackOfficeController(IModelsBuilderConfig config, ModelsGenerator modelsGenerator, OutOfDateModelsStatus outOfDateModels, ModelsGenerationError mbErrors)
         {
             //_umbracoServices = umbracoServices;
             _config = config;
             _modelGenerator = modelsGenerator;
-            _dashboardReport = new DashboardReport(config, modelsGenerator);
+            _outOfDateModels = outOfDateModels;
+            _mbErrors = mbErrors;
+            _dashboardReport = new DashboardReport(config, outOfDateModels, mbErrors);
         }
 
         // invoked by the dashboard
@@ -60,11 +64,11 @@ namespace Umbraco.ModelsBuilder.BackOffice
 
                 // EnableDllModels will recycle the app domain - but this request will end properly
                 _modelGenerator.GenerateModels();
-                _modelGenerator.ClearErrors();
+                _mbErrors.Clear();
             }
             catch (Exception e)
             {
-                _modelGenerator.ReportError("Failed to build models.", e);
+                _mbErrors.Report("Failed to build models.", e);
             }
 
             return Request.CreateResponse(HttpStatusCode.OK, GetDashboardResult(), Configuration.Formatters.JsonFormatter);
@@ -75,8 +79,8 @@ namespace Umbraco.ModelsBuilder.BackOffice
         [System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!
         public HttpResponseMessage GetModelsOutOfDateStatus()
         {
-            var status = OutOfDateModelsStatus.IsEnabled
-                ? OutOfDateModelsStatus.IsOutOfDate
+            var status = _outOfDateModels.IsEnabled
+                ? _outOfDateModels.IsOutOfDate
                     ? new OutOfDateStatus { Status = OutOfDateType.OutOfDate }
                     : new OutOfDateStatus { Status = OutOfDateType.Current }
                 : new OutOfDateStatus { Status = OutOfDateType.Unknown };
