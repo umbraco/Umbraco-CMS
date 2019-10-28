@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
-using Umbraco.ModelsBuilder.Building;
+using Umbraco.ModelsBuilder.Embedded;
+using Umbraco.ModelsBuilder.Embedded.Building;
 
-namespace Umbraco.ModelsBuilder.Tests
+namespace Umbraco.Tests.ModelsBuilder
 {
     [TestFixture]
     public class UmbracoApplicationTests

@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.CodeAnalysis;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.ModelsBuilder.Building;
-using Umbraco.ModelsBuilder.Configuration;
+using Umbraco.ModelsBuilder.Embedded;
+using Umbraco.ModelsBuilder.Embedded.Building;
+using Umbraco.ModelsBuilder.Embedded.Configuration;
 
-namespace Umbraco.ModelsBuilder.Tests
+namespace Umbraco.Tests.ModelsBuilder
 {
     [TestFixture]
     public class BuilderTests
@@ -246,7 +245,7 @@ namespace Umbraco.Web.PublishedModels
             {
                 Alias = "prop2",
                 ClrName = "Prop2",
-                ModelClrType = typeof(System.Text.StringBuilder),
+                ModelClrType = typeof(global::System.Text.StringBuilder),
             });
             type1.Properties.Add(new PropertyModel
             {
@@ -342,7 +341,7 @@ namespace Umbraco.Web.PublishedModels
             builder.Using.Add("Umbraco.ModelsBuilder.Tests");
             builder.ModelsNamespaceForTests = "SomeRandomNamespace";
             var sb = new StringBuilder();
-            builder.WriteClrType(sb, typeof(System.Text.ASCIIEncoding));
+            builder.WriteClrType(sb, typeof(global::System.Text.ASCIIEncoding));
 
             // note - these assertions differ from the original tests in MB because in the embedded version, the result of Builder.IsAmbiguousSymbol is always true
             // which means global:: syntax will be applied to most things
@@ -358,7 +357,7 @@ namespace Umbraco.Web.PublishedModels
             builder.Using.Add("Umbraco.ModelsBuilder.Tests");
             builder.ModelsNamespaceForTests = "SomeBorkedNamespace";
             var sb = new StringBuilder();
-            builder.WriteClrType(sb, typeof(System.Text.ASCIIEncoding));
+            builder.WriteClrType(sb, typeof(global::System.Text.ASCIIEncoding));
 
             // note - these assertions differ from the original tests in MB because in the embedded version, the result of Builder.IsAmbiguousSymbol is always true
             // which means global:: syntax will be applied to most things
@@ -417,7 +416,7 @@ namespace Umbraco.Web.PublishedModels
         public class Class1 { }
     }
 
-    // make it public to be ambiguous (see above)
+// make it public to be ambiguous (see above)
     public class ASCIIEncoding
     {
         // can we handle nested types?
@@ -425,9 +424,6 @@ namespace Umbraco.Web.PublishedModels
     }
 
     class BuilderTestsClass1 {}
-}
 
-namespace SomeBorkedNamespace
-{
     public class System { }
 }
