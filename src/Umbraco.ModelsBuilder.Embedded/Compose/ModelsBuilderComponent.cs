@@ -16,7 +16,8 @@ using Umbraco.Web.Mvc;
 
 namespace Umbraco.ModelsBuilder.Embedded.Compose
 {
-    public class ModelsBuilderComponent : IComponent
+
+    internal class ModelsBuilderComponent : IComponent
     {
 
         private readonly IModelsBuilderConfig _config;
@@ -71,7 +72,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
                 if (HttpContext.Current == null) throw new InvalidOperationException("HttpContext is null");
                 var urlHelper = new UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
 
-                umbracoUrls["modelsBuilderBaseUrl"] = urlHelper.GetUmbracoApiServiceBaseUrl<ModelsBuilderBackOfficeController>(controller => controller.BuildModels());
+                umbracoUrls["modelsBuilderBaseUrl"] = urlHelper.GetUmbracoApiServiceBaseUrl<ModelsBuilderDashboardController>(controller => controller.BuildModels());
                 umbracoPlugins["modelsBuilder"] = GetModelsBuilderSettings();
             };
         }

@@ -1,23 +1,33 @@
 ﻿using System.Linq;
+using System.Reflection;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded.Building;
 using Umbraco.ModelsBuilder.Embedded.Configuration;
 using Umbraco.Web.PublishedCache.NuCache;
+using Umbraco.Web.Features;
 
 namespace Umbraco.ModelsBuilder.Embedded.Compose
 {
+
+
     [ComposeBefore(typeof(NuCacheComposer))]
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
-    public sealed class ModelsBuilderComposer : ComponentComposer<ModelsBuilderComponent>, ICoreComposer
+    public sealed class ModelsBuilderComposer : ICoreComposer
     {
-        public override void Compose(Composition composition)
+        public void Compose(Composition composition)
         {
-            base.Compose(composition);
+            var isLegacyModelsBuilderInstalled = IsLegacyModelsBuilderInstalled();
 
-          
+            if (isLegacyModelsBuilderInstalled)
+            {
+                ComposeForLegacyModelsBuilder(composition);
+                return;
+            }
 
+            composition.Components().Append<ModelsBuilderComponent>();
             composition.Register<UmbracoServices>(Lifetime.Singleton);
             composition.Configs.Add<IModelsBuilderConfig>(() => new ModelsBuilderConfig());
             composition.RegisterUnique<ModelsGenerator>();
@@ -29,6 +39,28 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
                 ComposeForLiveModels(composition);
             else if (composition.Configs.ModelsBuilder().EnableFactory)
                 ComposeForDefaultModelsFactory(composition);
+        }
+
+        private static bool IsLegacyModelsBuilderInstalled()
+        {
+            Assembly legacyMbAssembly = null;
+            try
+            {
+                legacyMbAssembly = Assembly.Load("Umbraco.ModelsBuilder");
+            }
+            catch (System.Exception)
+            {
+                //swallow exception, DLL must not be there
+            }
+
+            return legacyMbAssembly != null;
+        }
+
+        private void ComposeForLegacyModelsBuilder(Composition composition)
+        {
+            composition.Logger.Info<ModelsBuilderComposer>("ModelsBuilder.Embedded is disabled, the legacy ModelsBuilder was detected.");
+            composition.Components().Append<DisabledModelsBuilderComponent>();
+            composition.ManifestFilters().Append<DisableModelsBuilderManifestFilter>();
         }
 
         private void ComposeForDefaultModelsFactory(Composition composition)

@@ -55,6 +55,8 @@
     <Compile Include="Building\TextBuilder.cs" />
     <Compile Include="Building\TextHeaderWriter.cs" />
     <Compile Include="Building\TypeModel.cs" />
+    <Compile Include="Compose\DisabledModelsBuilderComponent.cs" />
+    <Compile Include="Compose\DisableModelsBuilderManifestFilter.cs" />
     <Compile Include="ConfigsExtensions.cs" />
     <Compile Include="Configuration\IModelsBuilderConfig.cs" />
     <Compile Include="Configuration\ModelsBuilderConfig.cs" />
@@ -71,7 +73,7 @@
     <Compile Include="LiveModelsProvider.cs" />
     <Compile Include="LiveModelsProviderModule.cs" />
     <Compile Include="Building\ModelsGenerator.cs" />
-    <Compile Include="BackOffice\ModelsBuilderBackOfficeController.cs" />
+    <Compile Include="BackOffice\ModelsBuilderDashboardController.cs" />
     <Compile Include="Compose\ModelsBuilderComponent.cs" />
     <Compile Include="Compose\ModelsBuilderComposer.cs" />
     <Compile Include="Building\TypeModelHasher.cs" />

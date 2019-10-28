@@ -20,7 +20,7 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
     /// global WebApi formatters being changed since this is always forced to only return Angular JSON Specific formats.
     /// </remarks>
     [UmbracoApplicationAuthorize(Core.Constants.Applications.Settings)]
-    public class ModelsBuilderBackOfficeController : UmbracoAuthorizedJsonController
+    public class ModelsBuilderDashboardController : UmbracoAuthorizedJsonController
     {
         private readonly IModelsBuilderConfig _config;
         private readonly ModelsGenerator _modelGenerator;
@@ -28,7 +28,7 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
         private readonly ModelsGenerationError _mbErrors;
         private readonly DashboardReport _dashboardReport;
 
-        public ModelsBuilderBackOfficeController(IModelsBuilderConfig config, ModelsGenerator modelsGenerator, OutOfDateModelsStatus outOfDateModels, ModelsGenerationError mbErrors)
+        public ModelsBuilderDashboardController(IModelsBuilderConfig config, ModelsGenerator modelsGenerator, OutOfDateModelsStatus outOfDateModels, ModelsGenerationError mbErrors)
         {
             //_umbracoServices = umbracoServices;
             _config = config;
