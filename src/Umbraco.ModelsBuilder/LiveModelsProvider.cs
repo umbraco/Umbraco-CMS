@@ -104,10 +104,6 @@ namespace Umbraco.ModelsBuilder
 
         private void GenerateModels()
         {
-            var bin = IOHelper.MapPath("~/bin");
-            if (bin == null)
-                throw new PanicException("Panic: bin is null.");
-
             // EnableDllModels will recycle the app domain - but this request will end properly
             _modelGenerator.GenerateModels();
         }
