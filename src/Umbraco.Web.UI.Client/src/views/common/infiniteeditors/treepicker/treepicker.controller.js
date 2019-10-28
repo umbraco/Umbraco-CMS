@@ -573,25 +573,27 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                                     });
                                 _.each(listViewResults,
                                     function (item) {
-                                        var childExists = _.find(child.children,
-                                            function (c) {
-                                                return c.id == item.id;
-                                            });
-                                        if (!childExists) {
-                                            var parent = child;
-                                            child.children.unshift({
-                                                id: item.id,
-                                                name: item.name,
-                                                cssClass: "icon umb-tree-icon sprTree " + item.icon,
-                                                level: child.level + 1,
-                                                metaData: {
-                                                    isSearchResult: true
-                                                },
-                                                hasChildren: false,
-                                                parent: function () {
-                                                    return parent;
-                                                }
-                                            });
+                                        if (child.children) {
+                                            var childExists = _.find(child.children,
+                                                function (c) {
+                                                    return c.id == item.id;
+                                                });
+                                            if (!childExists) {
+                                                var parent = child;
+                                                child.children.unshift({
+                                                    id: item.id,
+                                                    name: item.name,
+                                                    cssClass: "icon umb-tree-icon sprTree " + item.icon,
+                                                    level: child.level + 1,
+                                                    metaData: {
+                                                        isSearchResult: true
+                                                    },
+                                                    hasChildren: false,
+                                                    parent: function () {
+                                                        return parent;
+                                                    }
+                                                });
+                                            }
                                         }
                                     });
                             }
