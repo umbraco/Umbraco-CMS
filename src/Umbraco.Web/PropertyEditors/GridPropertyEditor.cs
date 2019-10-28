@@ -60,7 +60,7 @@ namespace Umbraco.Web.PropertyEditors
             private readonly HtmlImageSourceParser _imageSourceParser;
             private readonly RichTextEditorPastedImages _pastedImages;
             private readonly RichTextPropertyEditor.RichTextPropertyValueEditor _richTextPropertyValueEditor;
-            private readonly MediaPickerPropertyValueEditor _mediaPickerPropertyValueEditor;
+            private readonly MediaPickerPropertyEditor.MediaPickerPropertyValueEditor _mediaPickerPropertyValueEditor;
 
             public GridPropertyValueEditor(DataEditorAttribute attribute,
                 IUmbracoContextAccessor umbracoContextAccessor,
@@ -73,7 +73,7 @@ namespace Umbraco.Web.PropertyEditors
                 _imageSourceParser = imageSourceParser;
                 _pastedImages = pastedImages;
                 _richTextPropertyValueEditor = new RichTextPropertyEditor.RichTextPropertyValueEditor(attribute, umbracoContextAccessor, imageSourceParser, localLinkParser, pastedImages);
-                _mediaPickerPropertyValueEditor = new MediaPickerPropertyValueEditor(attribute);
+                _mediaPickerPropertyValueEditor = new MediaPickerPropertyEditor.MediaPickerPropertyValueEditor(attribute);
             }
 
             /// <summary>
