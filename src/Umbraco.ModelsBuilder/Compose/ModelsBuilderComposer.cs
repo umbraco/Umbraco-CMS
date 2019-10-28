@@ -3,9 +3,10 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Configuration;
+using Umbraco.ModelsBuilder.Umbraco;
 using Umbraco.Web.PublishedCache.NuCache;
 
-namespace Umbraco.ModelsBuilder.Umbraco
+namespace Umbraco.ModelsBuilder.Compose
 {
     [ComposeBefore(typeof(NuCacheComposer))]
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
@@ -16,7 +17,9 @@ namespace Umbraco.ModelsBuilder.Umbraco
             base.Compose(composition);
 
             composition.Register<UmbracoServices>(Lifetime.Singleton);
-            composition.Configs.Add(() => new Config());
+            composition.Configs.Add<IModelsBuilderConfig>(() => new ModelsBuilderConfig());
+            composition.RegisterUnique<ModelsGenerator>();
+            composition.RegisterUnique<LiveModelsProvider>();
 
             if (composition.Configs.ModelsBuilder().ModelsMode == ModelsMode.PureLive)
                 ComposeForLiveModels(composition);

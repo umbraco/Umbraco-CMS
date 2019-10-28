@@ -2,43 +2,46 @@
 using System.Threading;
 using System.Web;
 using System.Web.Hosting;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.ModelsBuilder.Configuration;
 using Umbraco.ModelsBuilder.Umbraco;
 using Umbraco.Web.Cache;
-
-// will install only if configuration says it needs to be installed
-[assembly: PreApplicationStartMethod(typeof(LiveModelsProviderModule), "Install")]
 
 namespace Umbraco.ModelsBuilder.Umbraco
 {
     // supports LiveDll and LiveAppData - but not PureLive
     public sealed class LiveModelsProvider
     {
-        private static UmbracoServices _umbracoServices;
         private static Mutex _mutex;
         private static int _req;
-
-        private static Config Config => Current.Configs.ModelsBuilder();
+        private readonly ILogger _logger;
+        private readonly IModelsBuilderConfig _config;
+        private readonly ModelsGenerator _modelGenerator;
 
         // we do not manage pure live here
-        internal static bool IsEnabled => Config.ModelsMode.IsLiveNotPure();
+        internal bool IsEnabled => _config.ModelsMode.IsLiveNotPure();
 
-        internal static void Install(UmbracoServices umbracoServices)
+        public LiveModelsProvider(ILogger logger, IModelsBuilderConfig config, ModelsGenerator modelGenerator)
+        {
+            _logger = logger;
+            _config = config ?? throw new ArgumentNullException(nameof(config));
+            _modelGenerator = modelGenerator;
+        }
+
+        internal void Install()
         {
             // just be sure
             if (!IsEnabled)
                 return;
 
-            _umbracoServices = umbracoServices;
-
             // initialize mutex
             // ApplicationId will look like "/LM/W3SVC/1/Root/AppName"
             // name is system-wide and must be less than 260 chars
             var name = HostingEnvironment.ApplicationID + "/UmbracoLiveModelsProvider";
-            _mutex = new Mutex(false, name);
+
+            _mutex = new Mutex(false, name); //TODO: Replace this with MainDom? Seems we now have 2x implementations of almost the same thing
 
             // anything changes, and we want to re-generate models.
             ContentTypeCacheRefresher.CacheUpdated += RequestModelsGeneration;
@@ -57,14 +60,14 @@ namespace Umbraco.ModelsBuilder.Umbraco
         // need to be generated. Could be by another request. Anyway. We could
         // have collisions but... you know the risk.
 
-        private static void RequestModelsGeneration(object sender, EventArgs args)
+        private void RequestModelsGeneration(object sender, EventArgs args)
         {
             //HttpContext.Current.Items[this] = true;
-            Current.Logger.Debug<LiveModelsProvider>("Requested to generate models.");
+            _logger.Debug<LiveModelsProvider>("Requested to generate models.");
             Interlocked.Exchange(ref _req, 1);
         }
 
-        public static void GenerateModelsIfRequested(object sender, EventArgs args)
+        public void GenerateModelsIfRequested(object sender, EventArgs args)
         {
             //if (HttpContext.Current.Items[this] == null) return;
             if (Interlocked.Exchange(ref _req, 0) == 0) return;
@@ -74,22 +77,22 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
             try
             {
-                Current.Logger.Debug<LiveModelsProvider>("Generate models...");
+                _logger.Debug<LiveModelsProvider>("Generate models...");
                 const int timeout = 2*60*1000; // 2 mins
                 _mutex.WaitOne(timeout); // wait until it is safe, and acquire
-                Current.Logger.Info<LiveModelsProvider>("Generate models now.");
+                _logger.Info<LiveModelsProvider>("Generate models now.");
                 GenerateModels();
-                ModelsGenerationError.Clear();
-                Current.Logger.Info<LiveModelsProvider>("Generated.");
+                _modelGenerator.ClearErrors();
+                _logger.Info<LiveModelsProvider>("Generated.");
             }
             catch (TimeoutException)
             {
-                Current.Logger.Warn<LiveModelsProvider>("Timeout, models were NOT generated.");
+                _logger.Warn<LiveModelsProvider>("Timeout, models were NOT generated.");
             }
             catch (Exception e)
             {
-                ModelsGenerationError.Report("Failed to build Live models.", e);
-                Current.Logger.Error<LiveModelsProvider>("Failed to generate models.", e);
+                _modelGenerator.ReportError("Failed to build Live models.", e);
+                _logger.Error<LiveModelsProvider>("Failed to generate models.", e);
             }
             finally
             {
@@ -97,38 +100,16 @@ namespace Umbraco.ModelsBuilder.Umbraco
             }
         }
 
-        private static void GenerateModels()
+        private void GenerateModels()
         {
-            var modelsDirectory = Config.ModelsDirectory;
-            var modelsNamespace = Config.ModelsNamespace;
-
-            var bin = HostingEnvironment.MapPath("~/bin");
+            var bin = IOHelper.MapPath("~/bin");
             if (bin == null)
                 throw new PanicException("Panic: bin is null.");
 
             // EnableDllModels will recycle the app domain - but this request will end properly
-            ModelsBuilderBackOfficeController.GenerateModels(_umbracoServices, modelsDirectory, modelsNamespace);
-        }
-    }
-
-    // have to do this because it's the only way to subscribe to EndRequest,
-    // module is installed by assembly attribute at the top of this file
-    public class LiveModelsProviderModule : IHttpModule
-    {
-        public void Init(HttpApplication app)
-        {
-            app.EndRequest += LiveModelsProvider.GenerateModelsIfRequested;
+            _modelGenerator.GenerateModels();
         }
 
-        public void Dispose()
-        {
-            // nothing
-        }
-
-        public static void Install()
-        {
-            // always - don't read config in PreApplicationStartMethod
-            HttpApplication.RegisterModule(typeof(LiveModelsProviderModule));
-        }
+        
     }
 }

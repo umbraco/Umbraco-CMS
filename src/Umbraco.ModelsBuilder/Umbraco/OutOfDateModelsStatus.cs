@@ -7,7 +7,12 @@ namespace Umbraco.ModelsBuilder.Umbraco
 {
     public sealed class OutOfDateModelsStatus
     {
-        private static Config Config => Current.Configs.ModelsBuilder();
+        public OutOfDateModelsStatus()
+        {
+
+        }
+
+        private static ModelsBuilderConfig Config => Current.Configs.ModelsBuilder();
         
         internal static void Install()
         {

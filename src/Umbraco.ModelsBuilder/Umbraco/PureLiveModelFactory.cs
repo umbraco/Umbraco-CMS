@@ -42,13 +42,15 @@ namespace Umbraco.ModelsBuilder.Umbraco
         private const string ProjVirt = "~/App_Data/Models/all.generated.cs";
         private static readonly string[] OurFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err" };
 
-        private readonly Config _config;
+        private readonly IModelsBuilderConfig _config;
+        private readonly ModelsGenerator _modelGenerator;
 
-        public PureLiveModelFactory(Lazy<UmbracoServices> umbracoServices, IProfilingLogger logger, Config config)
+        public PureLiveModelFactory(Lazy<UmbracoServices> umbracoServices, IProfilingLogger logger, IModelsBuilderConfig config, ModelsGenerator modelGenerator)
         {
             _umbracoServices = umbracoServices;
             _logger = logger;
             _config = config;
+            _modelGenerator = modelGenerator;
             _ver = 1; // zero is for when we had no version
             _skipver = -1; // nothing to skip
 
@@ -292,7 +294,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
                         var types = assembly.ExportedTypes.Where(x => x.Inherits<PublishedContentModel>() || x.Inherits<PublishedElementModel>());
                         _infos = RegisterModels(types);
-                        ModelsGenerationError.Clear();
+                        _modelGenerator.ClearErrors();
                     }
                     catch (Exception e)
                     {
@@ -300,7 +302,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                         {
                             _logger.Error<PureLiveModelFactory>("Failed to build models.", e);
                             _logger.Warn<PureLiveModelFactory>("Running without models."); // be explicit
-                            ModelsGenerationError.Report("Failed to build PureLive models.", e);
+                            _modelGenerator.ReportError("Failed to build PureLive models.", e);
                         }
                         finally
                         {
@@ -333,7 +335,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 Directory.CreateDirectory(modelsDirectory);
 
             var typeModels = UmbracoServices.GetAllTypes();
-            var currentHash = HashHelper.Hash(typeModels);
+            var currentHash = ModelsBuilderHasher.Hash(typeModels);
             var modelsHashFile = Path.Combine(modelsDirectory, "models.hash");
             var modelsSrcFile = Path.Combine(modelsDirectory, "models.generated.cs");
             var projFile = Path.Combine(modelsDirectory, "all.generated.cs");
@@ -557,7 +559,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
                 File.Delete(file);
 
-            var builder = new TextBuilder(typeModels, _config.ModelsNamespace);
+            var builder = new TextBuilder(_config, typeModels);
 
             var codeBuilder = new StringBuilder();
             builder.Generate(codeBuilder, builder.GetModelsToGenerate());

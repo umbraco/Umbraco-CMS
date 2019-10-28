@@ -4,29 +4,28 @@ using System.IO;
 using System.Web.Configuration;
 using System.Web.Hosting;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 
 namespace Umbraco.ModelsBuilder.Configuration
 {
     /// <summary>
     /// Represents the models builder configuration.
     /// </summary>
-    public class Config
+    public class ModelsBuilderConfig : IModelsBuilderConfig
     {
-        internal const string DefaultModelsNamespace = "Umbraco.Web.PublishedModels";
-        internal const string DefaultModelsDirectory = "~/App_Data/Models";
+        public const string DefaultModelsNamespace = "Umbraco.Web.PublishedModels";
+        public const string DefaultModelsDirectory = "~/App_Data/Models";
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Config"/> class.
+        /// Initializes a new instance of the <see cref="ModelsBuilderConfig"/> class.
         /// </summary>
-        public Config()
+        public ModelsBuilderConfig()
         {
             const string prefix = "Umbraco.ModelsBuilder.";
 
             // ensure defaults are initialized for tests
             ModelsNamespace = DefaultModelsNamespace;
-            ModelsDirectory = HostingEnvironment.IsHosted
-                ? HostingEnvironment.MapPath(DefaultModelsDirectory)
-                : DefaultModelsDirectory.TrimStart("~/");
+            ModelsDirectory = IOHelper.MapPath("~/");
             DebugLevel = 0;
 
             // mode
@@ -69,9 +68,7 @@ namespace Umbraco.ModelsBuilder.Configuration
             value = ConfigurationManager.AppSettings[prefix + "ModelsDirectory"];
             if (!string.IsNullOrWhiteSpace(value))
             {
-                var root = HostingEnvironment.IsHosted
-                    ? HostingEnvironment.MapPath("~/")
-                    : Directory.GetCurrentDirectory();
+                var root = IOHelper.MapPath("~/");
                 if (root == null)
                     throw new ConfigurationErrorsException("Could not determine root directory.");
 
@@ -95,9 +92,9 @@ namespace Umbraco.ModelsBuilder.Configuration
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Config"/> class.
+        /// Initializes a new instance of the <see cref="ModelsBuilderConfig"/> class.
         /// </summary>
-        public Config(
+        public ModelsBuilderConfig(
             ModelsMode modelsMode = ModelsMode.Nothing,
             string modelsNamespace = null,
             bool enableFactory = true,
@@ -159,7 +156,7 @@ namespace Umbraco.ModelsBuilder.Configuration
         {
             get
             {
-                var section = (CompilationSection) ConfigurationManager.GetSection("system.web/compilation");
+                var section = (CompilationSection)ConfigurationManager.GetSection("system.web/compilation");
                 return section != null && section.Debug;
             }
         }

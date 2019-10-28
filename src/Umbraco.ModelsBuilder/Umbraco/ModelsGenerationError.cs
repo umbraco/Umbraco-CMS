@@ -6,11 +6,16 @@ using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder.Umbraco
 {
-    internal static class ModelsGenerationError
+    internal class ModelsGenerationError
     {
-        private static Config Config => Current.Configs.ModelsBuilder();
+        private readonly IModelsBuilderConfig _config;
 
-        public static void Clear()
+        public ModelsGenerationError(IModelsBuilderConfig config)
+        {
+            _config = config;
+        }
+
+        public void Clear()
         {
             var errFile = GetErrFile();
             if (errFile == null) return;
@@ -19,7 +24,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             File.Delete(errFile);
         }
 
-        public static void Report(string message, Exception e)
+        public void Report(string message, Exception e)
         {
             var errFile = GetErrFile();
             if (errFile == null) return;
@@ -35,7 +40,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             File.WriteAllText(errFile, sb.ToString());
         }
 
-        public static string GetLastError()
+        public string GetLastError()
         {
             var errFile = GetErrFile();
             if (errFile == null) return null;
@@ -50,9 +55,9 @@ namespace Umbraco.ModelsBuilder.Umbraco
             }
         }
 
-        private static string GetErrFile()
+        private string GetErrFile()
         {
-            var modelsDirectory = Config.ModelsDirectory;
+            var modelsDirectory = _config.ModelsDirectory;
             if (!Directory.Exists(modelsDirectory))
                 return null;
 

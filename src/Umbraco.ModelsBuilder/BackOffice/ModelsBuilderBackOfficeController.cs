@@ -9,11 +9,11 @@ using System.Web.Hosting;
 using Umbraco.Core.Exceptions;
 using Umbraco.ModelsBuilder.Building;
 using Umbraco.ModelsBuilder.Configuration;
-using Umbraco.ModelsBuilder.Dashboard;
+using Umbraco.ModelsBuilder.Umbraco;
 using Umbraco.Web.Editors;
 using Umbraco.Web.WebApi.Filters;
 
-namespace Umbraco.ModelsBuilder.Umbraco
+namespace Umbraco.ModelsBuilder.BackOffice
 {
     /// <summary>
     /// API controller for use in the Umbraco back office with Angular resources
@@ -26,13 +26,16 @@ namespace Umbraco.ModelsBuilder.Umbraco
     [UmbracoApplicationAuthorize(Core.Constants.Applications.Settings)]
     public class ModelsBuilderBackOfficeController : UmbracoAuthorizedJsonController
     {
-        private readonly UmbracoServices _umbracoServices;
-        private readonly Config _config;
+        private readonly IModelsBuilderConfig _config;
+        private readonly ModelsGenerator _modelGenerator;
+        private readonly DashboardReport _dashboardReport;
 
-        public ModelsBuilderBackOfficeController(UmbracoServices umbracoServices, Config config)
+        public ModelsBuilderBackOfficeController(IModelsBuilderConfig config, ModelsGenerator modelsGenerator)
         {
             //_umbracoServices = umbracoServices;
             _config = config;
+            _modelGenerator = modelsGenerator;
+            _dashboardReport = new DashboardReport(config, modelsGenerator);
         }
 
         // invoked by the dashboard
@@ -51,20 +54,17 @@ namespace Umbraco.ModelsBuilder.Umbraco
                     return Request.CreateResponse(HttpStatusCode.OK, result2, Configuration.Formatters.JsonFormatter);
                 }
 
-                var modelsDirectory = config.ModelsDirectory;
-
                 var bin = HostingEnvironment.MapPath("~/bin");
                 if (bin == null)
                     throw new PanicException("bin is null.");
 
                 // EnableDllModels will recycle the app domain - but this request will end properly
-                GenerateModels(modelsDirectory);
-
-                ModelsGenerationError.Clear();
+                _modelGenerator.GenerateModels();
+                _modelGenerator.ClearErrors();
             }
             catch (Exception e)
             {
-                ModelsGenerationError.Report("Failed to build models.", e);
+                _modelGenerator.ReportError("Failed to build models.", e);
             }
 
             return Request.CreateResponse(HttpStatusCode.OK, GetDashboardResult(), Configuration.Formatters.JsonFormatter);
@@ -76,9 +76,9 @@ namespace Umbraco.ModelsBuilder.Umbraco
         public HttpResponseMessage GetModelsOutOfDateStatus()
         {
             var status = OutOfDateModelsStatus.IsEnabled
-                ? (OutOfDateModelsStatus.IsOutOfDate
+                ? OutOfDateModelsStatus.IsOutOfDate
                     ? new OutOfDateStatus { Status = OutOfDateType.OutOfDate }
-                    : new OutOfDateStatus { Status = OutOfDateType.Current })
+                    : new OutOfDateStatus { Status = OutOfDateType.Current }
                 : new OutOfDateStatus { Status = OutOfDateType.Unknown };
 
             return Request.CreateResponse(HttpStatusCode.OK, status, Configuration.Formatters.JsonFormatter);
@@ -98,50 +98,11 @@ namespace Umbraco.ModelsBuilder.Umbraco
             return new Dashboard
             {
                 Enable = true,
-                Text = BuilderDashboardHelper.Text(),
-                CanGenerate = BuilderDashboardHelper.CanGenerate(),
-                OutOfDateModels = BuilderDashboardHelper.AreModelsOutOfDate(),
-                LastError = BuilderDashboardHelper.LastError(),
+                Text = _dashboardReport.Text(),
+                CanGenerate = _dashboardReport.CanGenerate(),
+                OutOfDateModels = _dashboardReport.AreModelsOutOfDate(),
+                LastError = _dashboardReport.LastError(),
             };
-        }
-
-        private void GenerateModels(string modelsDirectory)
-        {
-            GenerateModels(_umbracoServices, modelsDirectory, _config.ModelsNamespace);
-        }
-
-        internal static void GenerateModels(UmbracoServices umbracoServices, string modelsDirectory, string modelsNamespace)
-        {
-            if (!Directory.Exists(modelsDirectory))
-                Directory.CreateDirectory(modelsDirectory);
-
-            foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
-                File.Delete(file);
-
-            var typeModels = umbracoServices.GetAllTypes();
-
-            var builder = new TextBuilder(typeModels, modelsNamespace);
-
-            foreach (var typeModel in builder.GetModelsToGenerate())
-            {
-                var sb = new StringBuilder();
-                builder.Generate(sb, typeModel);
-                var filename = Path.Combine(modelsDirectory, typeModel.ClrName + ".generated.cs");
-                File.WriteAllText(filename, sb.ToString());
-            }
-
-            // the idea was to calculate the current hash and to add it as an extra file to the compilation,
-            // in order to be able to detect whether a DLL is consistent with an environment - however the
-            // environment *might not* contain the local partial files, and thus it could be impossible to
-            // calculate the hash. So... maybe that's not a good idea after all?
-            /*
-            var currentHash = HashHelper.Hash(ourFiles, typeModels);
-            ourFiles["models.hash.cs"] = $@"using Umbraco.ModelsBuilder;
-[assembly:ModelsBuilderAssembly(SourceHash = ""{currentHash}"")]
-";
-            */
-
-            OutOfDateModelsStatus.Clear();
         }
 
         [DataContract]

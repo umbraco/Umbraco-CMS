@@ -4,7 +4,7 @@ using Umbraco.ModelsBuilder.Building;
 
 namespace Umbraco.ModelsBuilder.Umbraco
 {
-    class HashHelper
+    internal class ModelsBuilderHasher
     {
         public static string Hash(IEnumerable<TypeModel> typeModels)
         {

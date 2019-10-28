@@ -8,23 +8,25 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
+using Umbraco.ModelsBuilder.BackOffice;
 using Umbraco.ModelsBuilder.Configuration;
+using Umbraco.ModelsBuilder.Umbraco;
 using Umbraco.Web;
 using Umbraco.Web.JavaScript;
 using Umbraco.Web.Mvc;
 
-namespace Umbraco.ModelsBuilder.Umbraco
+namespace Umbraco.ModelsBuilder.Compose
 {
     public class ModelsBuilderComponent : IComponent
     {
-        private readonly UmbracoServices _umbracoServices;
 
-        private readonly Config _config;
+        private readonly IModelsBuilderConfig _config;
+        private readonly LiveModelsProvider _liveModelsProvider;
 
-        public ModelsBuilderComponent(UmbracoServices umbracoServices, Config config)
+        public ModelsBuilderComponent(IModelsBuilderConfig config, LiveModelsProvider liveModelsProvider)
         {
-            _umbracoServices = umbracoServices;
             _config = config;
+            _liveModelsProvider = liveModelsProvider;
         }
 
         public void Initialize()
@@ -39,7 +41,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
             // fixme LiveModelsProvider should not be static
             if (_config.ModelsMode.IsLiveNotPure())
-                LiveModelsProvider.Install(_umbracoServices);
+                _liveModelsProvider.Install();
 
             // fixme OutOfDateModelsStatus should not be static
             if (_config.FlagOutOfDateModels)
@@ -105,7 +107,6 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 throw new InvalidOperationException("The additionalData key: ContentTypeAlias was not found");
 
             foreach (var template in e.SavedEntities)
-            {
                 // if it is in fact a new entity (not been saved yet) and the "CreateTemplateForContentType" key
                 // is found, then it means a new template is being created based on the creation of a document type
                 if (!template.HasIdentity && string.IsNullOrWhiteSpace(template.Content))
@@ -129,7 +130,6 @@ namespace Umbraco.ModelsBuilder.Umbraco
                     //set the template content to the new markup
                     template.Content = markup;
                 }
-            }
         }
 
         private void ContentModelBinder_ModelBindingException(object sender, ContentModelBinder.ModelBindingArgs args)
@@ -154,32 +154,30 @@ namespace Umbraco.ModelsBuilder.Umbraco
             }
 
             // both are ModelsBuilder types
-	        var pureSource = sourceAttr.PureLive;
-	        var pureModel = modelAttr.PureLive;
+            var pureSource = sourceAttr.PureLive;
+            var pureModel = modelAttr.PureLive;
 
-	        if (sourceAttr.PureLive || modelAttr.PureLive)
-	        {
-	            if (pureSource == false || pureModel == false)
-	            {
+            if (sourceAttr.PureLive || modelAttr.PureLive)
+                if (pureSource == false || pureModel == false)
+                {
                     // only one is pure - report, but better not restart (loops?)
-	                args.Message.Append(pureSource
-	                    ? " The content model is PureLive, but the view model is not."
-	                    : " The view model is PureLive, but the content model is not.");
-	                args.Message.Append(" The application is in an unstable state and should be restarted.");
-	            }
-	            else
-	            {
+                    args.Message.Append(pureSource
+                        ? " The content model is PureLive, but the view model is not."
+                        : " The view model is PureLive, but the content model is not.");
+                    args.Message.Append(" The application is in an unstable state and should be restarted.");
+                }
+                else
+                {
                     // both are pure - report, and if different versions, restart
                     // if same version... makes no sense... and better not restart (loops?)
-	                var sourceVersion = args.SourceType.Assembly.GetName().Version;
+                    var sourceVersion = args.SourceType.Assembly.GetName().Version;
                     var modelVersion = args.ModelType.Assembly.GetName().Version;
-	                args.Message.Append(" Both view and content models are PureLive, with ");
-	                args.Message.Append(sourceVersion == modelVersion
-	                    ? "same version. The application is in an unstable state and should be restarted."
-	                    : "different versions. The application is in an unstable state and is going to be restarted.");
-	                args.Restart = sourceVersion != modelVersion;
-	            }
-	        }
+                    args.Message.Append(" Both view and content models are PureLive, with ");
+                    args.Message.Append(sourceVersion == modelVersion
+                        ? "same version. The application is in an unstable state and should be restarted."
+                        : "different versions. The application is in an unstable state and is going to be restarted.");
+                    args.Restart = sourceVersion != modelVersion;
+                }
         }
     }
 }
