@@ -15,7 +15,7 @@ using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    public class MultiUrlPickerValueEditor : DataValueEditor
+    public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
     {
         private readonly IEntityService _entityService;
         private readonly ILogger _logger;
@@ -173,6 +173,18 @@ namespace Umbraco.Web.PropertyEditors
 
             [DataMember(Name = "queryString")]
             public string QueryString { get; set; }
+        }
+
+        public IEnumerable<UmbracoEntityReference> GetReferences(object value)
+        {
+            var asString = value == null ? string.Empty : value is string str ? str : value.ToString();
+
+            var links = JsonConvert.DeserializeObject<List<MultiUrlPickerValueEditor.LinkDto>>(asString);
+            foreach (var link in links)
+            {
+                yield return new UmbracoEntityReference(link.Udi);
+            }
+
         }
     }
 }
