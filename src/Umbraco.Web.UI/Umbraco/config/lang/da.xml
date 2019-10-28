@@ -448,7 +448,7 @@
     <key alias="linkToPage">Link til side</key>
     <key alias="openInNewWindow">Åben linket i et nyt vindue eller fane</key>
     <key alias="linkToMedia">Link til medie</key>
-    <key alias="selectContentStartNode">Vælg indhold startnode</key>
+    <key alias="selectContentStartNode">Vælg startnode for indhold</key>
     <key alias="selectMedia">Vælg medie</key>
     <key alias="selectMediaType">Vælg medietype</key>
     <key alias="selectIcon">Vælg ikon</key>
@@ -457,7 +457,7 @@
     <key alias="selectMacro">Vælg makro</key>
     <key alias="selectContent">Vælg indhold</key>
     <key alias="selectContentType">Vælg indholdstype</key>
-    <key alias="selectMediaStartNode">Vælg medie startnode</key>
+    <key alias="selectMediaStartNode">Vælg startnode for mediearkivet</key>
     <key alias="selectMember">Vælg medlem</key>
     <key alias="selectMemberGroup">Vælg medlemsgruppe</key>
     <key alias="selectMemberType">Vælg medlemstype</key>
@@ -1582,7 +1582,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="permissionSelectedPages">Du ændrer i øjeblikket rettigheder for siderne:</key>
     <key alias="permissionSelectPages">Vælg sider for at ændre deres rettigheder</key>
     <key alias="removePhoto">Fjern billede</key>
-    <key alias="permissionsDefault">Standard rettigheder</key>
+    <key alias="permissionsDefault">Standardrettigheder</key>
     <key alias="permissionsGranular">Granulære rettigheder</key>
     <key alias="permissionsGranularHelp">Sæt rettigheder for specifikke noder</key>
     <key alias="profile">Profil</key>
@@ -1721,6 +1721,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="openCloseBackofficeProfileOptions">Åben/Luk dine profil indstillinger</key>
     <key alias="currentLanguage">Aktivt sprog</key>
     <key alias="switchLanguage">Skift sprog til</key>
+    <key alias="createNewFolder">Opret ny mappe</key>
   </area>
   <area alias="references">
     <key alias="tabName">Referencer</key>
