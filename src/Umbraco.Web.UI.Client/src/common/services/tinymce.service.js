@@ -248,6 +248,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 var src = imgUrl + "?width=" + newSize.width + "&height=" + newSize.height;
                 editor.dom.setAttrib(imageDomElement, 'data-mce-src', src);
             }
+
+            editor.execCommand("mceAutoResize", false, null, null);
         }
     }
 
