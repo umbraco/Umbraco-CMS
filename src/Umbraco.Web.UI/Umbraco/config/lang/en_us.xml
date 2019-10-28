@@ -269,6 +269,8 @@
     <key alias="updateDate">Last edited</key>
     <key alias="updateDateDesc" version="7.0">Date/time this document was edited</key>
     <key alias="uploadClear">Remove file(s)</key>
+	<key alias="uploadClearImageContext">">Click here to remove the image from the media item</key>
+    <key alias="uploadClearFileContext">Click here to remove the file from the media item</key>
     <key alias="urls">Link to document</key>
     <key alias="memberof">Member of group(s)</key>
     <key alias="notmemberof">Not a member of group(s)</key>
