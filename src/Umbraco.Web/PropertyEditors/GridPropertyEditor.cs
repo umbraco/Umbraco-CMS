@@ -29,13 +29,19 @@ namespace Umbraco.Web.PropertyEditors
         private IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly HtmlImageSourceParser _imageSourceParser;
         private readonly RichTextEditorPastedImages _pastedImages;
+        private readonly HtmlLocalLinkParser _localLinkParser;
 
-        public GridPropertyEditor(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, HtmlImageSourceParser imageSourceParser, RichTextEditorPastedImages pastedImages)
+        public GridPropertyEditor(ILogger logger,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            HtmlImageSourceParser imageSourceParser,
+            RichTextEditorPastedImages pastedImages,
+            HtmlLocalLinkParser localLinkParser)
             : base(logger)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _imageSourceParser = imageSourceParser;
             _pastedImages = pastedImages;
+            _localLinkParser = localLinkParser;
         }
 
         public override IPropertyIndexValueFactory PropertyIndexValueFactory => new GridPropertyIndexValueFactory();
@@ -44,22 +50,30 @@ namespace Umbraco.Web.PropertyEditors
         /// Overridden to ensure that the value is validated
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute, _umbracoContextAccessor, _imageSourceParser, _pastedImages);
+        protected override IDataValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute, _umbracoContextAccessor, _imageSourceParser, _pastedImages, _localLinkParser);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new GridConfigurationEditor();
 
-        internal class GridPropertyValueEditor : DataValueEditor
+        internal class GridPropertyValueEditor : DataValueEditor, IDataValueReference
         {
-            private IUmbracoContextAccessor _umbracoContextAccessor;
+            private readonly IUmbracoContextAccessor _umbracoContextAccessor;
             private readonly HtmlImageSourceParser _imageSourceParser;
             private readonly RichTextEditorPastedImages _pastedImages;
+            private readonly RichTextPropertyEditor.RichTextPropertyValueEditor _richTextPropertyValueEditor;
+            private readonly MediaPickerPropertyValueEditor _mediaPickerPropertyValueEditor;
 
-            public GridPropertyValueEditor(DataEditorAttribute attribute, IUmbracoContextAccessor umbracoContextAccessor, HtmlImageSourceParser imageSourceParser, RichTextEditorPastedImages pastedImages)
+            public GridPropertyValueEditor(DataEditorAttribute attribute,
+                IUmbracoContextAccessor umbracoContextAccessor,
+                HtmlImageSourceParser imageSourceParser,
+                RichTextEditorPastedImages pastedImages,
+                HtmlLocalLinkParser localLinkParser)
                 : base(attribute)
             {
                 _umbracoContextAccessor = umbracoContextAccessor;
                 _imageSourceParser = imageSourceParser;
                 _pastedImages = pastedImages;
+                _richTextPropertyValueEditor = new RichTextPropertyEditor.RichTextPropertyValueEditor(attribute, umbracoContextAccessor, imageSourceParser, localLinkParser, pastedImages);
+                _mediaPickerPropertyValueEditor = new MediaPickerPropertyValueEditor(attribute);
             }
 
             /// <summary>
@@ -84,7 +98,7 @@ namespace Umbraco.Web.PropertyEditors
                 var mediaParent = config?.MediaParentId;
                 var mediaParentId = mediaParent == null ? Guid.Empty : mediaParent.Guid;
 
-                var grid = DeserializeGridValue(rawJson, out var rtes);
+                var grid = DeserializeGridValue(rawJson, out var rtes, out _);
 
                 var userId = _umbracoContextAccessor.UmbracoContext?.Security.CurrentUser.Id ?? Constants.Security.SuperUserId;
 
@@ -117,7 +131,7 @@ namespace Umbraco.Web.PropertyEditors
                 var val = property.GetValue(culture, segment);
                 if (val == null) return string.Empty;
 
-                var grid = DeserializeGridValue(val.ToString(), out var rtes);
+                var grid = DeserializeGridValue(val.ToString(), out var rtes, out _);
 
                 //process the rte values
                 foreach (var rte in rtes.ToList())
@@ -131,15 +145,40 @@ namespace Umbraco.Web.PropertyEditors
                 return grid;
             }
 
-            private GridValue DeserializeGridValue(string rawJson, out IEnumerable<GridValue.GridControl> richTextValues)
+            private GridValue DeserializeGridValue(string rawJson, out IEnumerable<GridValue.GridControl> richTextValues, out IEnumerable<GridValue.GridControl> mediaValues)
             {
                 var grid = JsonConvert.DeserializeObject<GridValue>(rawJson);
 
                 // Find all controls that use the RTE editor
-                var controls = grid.Sections.SelectMany(x => x.Rows.SelectMany(r => r.Areas).SelectMany(a => a.Controls));
+                var controls = grid.Sections.SelectMany(x => x.Rows.SelectMany(r => r.Areas).SelectMany(a => a.Controls)).ToArray();
                 richTextValues = controls.Where(x => x.Editor.Alias.ToLowerInvariant() == "rte");
+                mediaValues = controls.Where(x => x.Editor.Alias.ToLowerInvariant() == "media");
 
                 return grid;
+            }
+
+            /// <summary>
+            /// Resolve references from <see cref="IDataValueEditor"/> values
+            /// </summary>
+            /// <param name="value"></param>
+            /// <returns></returns>
+            public IEnumerable<UmbracoEntityReference> GetReferences(object value)
+            {
+                var rawJson = value == null ? string.Empty : value is string str ? str : value.ToString();
+
+                DeserializeGridValue(rawJson, out var richTextEditorValues, out var mediaValues);
+
+                foreach (var umbracoEntityReference in richTextEditorValues.SelectMany(x =>
+                    _richTextPropertyValueEditor.GetReferences(x.Value)))
+                {
+                    yield return umbracoEntityReference;
+                }
+
+                foreach (var umbracoEntityReference in mediaValues.SelectMany(x =>
+                    _mediaPickerPropertyValueEditor.GetReferences(x.Value["udi"])))
+                {
+                    yield return umbracoEntityReference;
+                }
             }
         }
     }
