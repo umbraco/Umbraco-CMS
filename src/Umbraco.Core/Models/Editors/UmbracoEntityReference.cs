@@ -16,6 +16,21 @@ namespace Umbraco.Core.Models.Editors
             RelationTypeAlias = relationTypeAlias ?? throw new ArgumentNullException(nameof(relationTypeAlias));
         }
 
+        public UmbracoEntityReference(Udi udi)
+        {
+            Udi = udi ?? throw new ArgumentNullException(nameof(udi));
+
+            switch (udi.EntityType)
+            {
+                case Constants.UdiEntityType.Media:
+                    RelationTypeAlias = Constants.Conventions.RelationTypes.RelatedMediaAlias;
+                    break;
+                default:
+                    RelationTypeAlias = Constants.Conventions.RelationTypes.RelatedDocumentAlias;
+                    break;
+            }
+        }
+
         public static UmbracoEntityReference Empty() => _empty;
 
         public static bool IsEmpty(UmbracoEntityReference reference) => reference == Empty();

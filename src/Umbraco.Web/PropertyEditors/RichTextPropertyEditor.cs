@@ -140,15 +140,11 @@ namespace Umbraco.Web.PropertyEditors
             {
                 var asString = value == null ? string.Empty : value is string str ? str : value.ToString();
 
-                //TODO: FindUdisFromDataAttributes will return UDIs of any type found, typically these will always be "media" but
-                // if the text is modified to be another type it will still be returned but we will always be relating these with the RelatedMediaAlias
                 foreach (var udi in _imageSourceParser.FindUdisFromDataAttributes(asString))
-                    yield return new UmbracoEntityReference(udi, Constants.Conventions.RelationTypes.RelatedMediaAlias);
+                    yield return new UmbracoEntityReference(udi);
 
-                //TODO: FindUdisFromLocalLinks will return UDIs of any type found, typically these will always be "document" but
-                // if the text is modified to be another type it will still be returned but we will always be relating these with the RelatedDocumentAlias
                 foreach (var udi in _localLinkParser.FindUdisFromLocalLinks(asString))
-                    yield return new UmbracoEntityReference(udi, Constants.Conventions.RelationTypes.RelatedDocumentAlias);
+                    yield return new UmbracoEntityReference(udi);
 
                 //TODO: Detect Macros too ... but we can save that for a later date, right now need to do media refs
             }
