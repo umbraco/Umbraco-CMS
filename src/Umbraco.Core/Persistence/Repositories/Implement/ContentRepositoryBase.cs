@@ -25,7 +25,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal sealed class ContentRepositoryBase
     {
         /// <summary>
-        /// 
+        ///
         /// This is used for unit tests ONLY
         /// </summary>
         public static bool ThrowOnWarning = false;
@@ -38,7 +38,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly Lazy<PropertyEditorCollection> _propertyEditors;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="scopeAccessor"></param>
         /// <param name="cache"></param>
@@ -842,6 +842,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             if (trackedRelations.Count == 0) return;
 
+            trackedRelations = trackedRelations.Distinct().ToList();
             var udiToGuids = trackedRelations.Select(x => x.Udi as GuidUdi)
                 .ToDictionary(x => (Udi)x, x => x.Guid);
 
@@ -862,7 +863,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 if (!keyToIds.TryGetValue(guid, out var id))
                     continue; // This shouldn't happen!
-                
+
                 //Create new relation
                 //TODO: This is N+1, we could do this all in one operation, just need a new method on the relations repo
                 RelationRepository.Save(new Relation(entity.Id, id, relationType));
