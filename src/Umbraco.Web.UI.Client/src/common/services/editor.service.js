@@ -359,6 +359,7 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @param {Object} editor rendering options
          * @param {Boolean} editor.multiPicker Pick one or multiple items
+         * @param {Int} editor.startNodeId Set the startnode of the picker (optional)
          * @param {Function} editor.submit Callback function when the submit button is clicked. Returns the editor model object
          * @param {Function} editor.close Callback function when the close button is clicked.
          *
