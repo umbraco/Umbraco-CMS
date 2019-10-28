@@ -234,7 +234,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             });
         }
 
-        var CopyAllEntriesAction = {
+        var copyAllEntriesAction = {
             labelKey: 'clipboard_labelForCopyAllEntries',
             labelTokens: [$scope.model.label],
             icon: 'documents',
@@ -694,7 +694,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         }
 
         function updatePropertyActionStates() {
-            CopyAllEntriesAction.isDisabled = $scope.model.value.length === 0;
+            copyAllEntriesAction.isDisabled = $scope.model.value.length === 0;
         }
 
         $scope.$watch("currentNode", function (newVal) {
@@ -705,7 +705,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         
         var api = {};
         api.propertyActions = [
-            CopyAllEntriesAction
+            copyAllEntriesAction
         ];
         
         propertyEditorService.exposeAPI($scope, api);// must be executed at a state where the API is set.
