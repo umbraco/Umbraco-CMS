@@ -42,6 +42,10 @@
 
 .umb-media-grid__item.-selectable {
     cursor: pointer;
+
+    .tabbing-active &:focus {
+        outline: 2px solid @inputBorderTabFocus;
+    }
 }
 
 .umb-media-grid__item.-file {
