@@ -7,7 +7,6 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.ModelsBuilder.Api;
 using Umbraco.ModelsBuilder.Building;
 using Umbraco.ModelsBuilder.Configuration;
 
@@ -77,7 +76,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web;
 using Umbraco.ModelsBuilder;
-using Umbraco.ModelsBuilder.Umbraco;
 
 namespace Umbraco.Web.PublishedModels
 {
@@ -193,7 +191,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web;
 using Umbraco.ModelsBuilder;
-using Umbraco.ModelsBuilder.Umbraco;
 
 namespace Umbraco.Web.PublishedModels
 {

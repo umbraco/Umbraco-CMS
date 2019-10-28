@@ -4,7 +4,7 @@ using System.Text;
 using Umbraco.Core.Composing;
 using Umbraco.ModelsBuilder.Configuration;
 
-namespace Umbraco.ModelsBuilder.Umbraco
+namespace Umbraco.ModelsBuilder
 {
     public sealed class ModelsGenerationError
     {

@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using Umbraco.Core.Composing;
 using Umbraco.ModelsBuilder.Configuration;
-using Umbraco.ModelsBuilder.Umbraco;
 
 namespace Umbraco.ModelsBuilder.BackOffice
 {
@@ -29,7 +28,7 @@ namespace Umbraco.ModelsBuilder.BackOffice
             var sb = new StringBuilder();
 
             sb.Append("Version: ");
-            sb.Append(Api.ApiVersion.Current.Version);
+            sb.Append(ApiVersion.Current.Version);
             sb.Append("<br />&nbsp;<br />");
 
             sb.Append("ModelsBuilder is enabled, with the following configuration:");

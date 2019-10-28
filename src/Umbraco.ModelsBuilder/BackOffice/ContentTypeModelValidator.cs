@@ -8,12 +8,12 @@ using Umbraco.ModelsBuilder.Configuration;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.ModelsBuilder.Validation
+namespace Umbraco.ModelsBuilder.BackOffice
 {
     /// <summary>
-   /// Used to validate the aliases for the content type when MB is enabled to ensure that
-   /// no illegal aliases are used
-   /// </summary>
+    /// Used to validate the aliases for the content type when MB is enabled to ensure that
+    /// no illegal aliases are used
+    /// </summary>
     public class ContentTypeModelValidator : ContentTypeModelValidatorBase<DocumentTypeSave, PropertyTypeBasic>
     { }
 
@@ -32,8 +32,8 @@ namespace Umbraco.ModelsBuilder.Validation
     { }
 
     public abstract class ContentTypeModelValidatorBase<TModel, TProperty> : EditorValidator<TModel>
-        where TModel: ContentTypeSave<TProperty>
-        where TProperty: PropertyTypeBasic
+        where TModel : ContentTypeSave<TProperty>
+        where TProperty : PropertyTypeBasic
     {
         protected override IEnumerable<ValidationResult> Validate(TModel model)
         {
@@ -57,9 +57,7 @@ namespace Umbraco.ModelsBuilder.Validation
 
                 var validationResult = ValidateProperty(prop, groupIndex, propertyIndex);
                 if (validationResult != null)
-                {
                     yield return validationResult;
-                }
             }
         }
 
@@ -73,13 +71,11 @@ namespace Umbraco.ModelsBuilder.Validation
             var alias = property.Alias;
 
             if (reservedProperties.InvariantContains(alias) || reservedMethods.InvariantContains(alias))
-            {
                 return new ValidationResult(
                     string.Format("The alias {0} is a reserved term and cannot be used", alias), new[]
                     {
                         string.Format("Groups[{0}].Properties[{1}].Alias", groupIndex, propertyIndex)
                     });
-            }
 
             return null;
         }

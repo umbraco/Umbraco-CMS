@@ -5,7 +5,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
-using Umbraco.ModelsBuilder.Api;
 using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder.Building

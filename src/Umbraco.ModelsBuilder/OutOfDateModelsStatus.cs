@@ -3,7 +3,7 @@ using Umbraco.Core.Composing;
 using Umbraco.ModelsBuilder.Configuration;
 using Umbraco.Web.Cache;
 
-namespace Umbraco.ModelsBuilder.Umbraco
+namespace Umbraco.ModelsBuilder
 {
     public sealed class OutOfDateModelsStatus
     {

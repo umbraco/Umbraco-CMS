@@ -5,13 +5,13 @@ using System.Web.Hosting;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.ModelsBuilder.Building;
 using Umbraco.ModelsBuilder.Configuration;
-using Umbraco.ModelsBuilder.Umbraco;
 using Umbraco.Web.Cache;
 
-namespace Umbraco.ModelsBuilder.Umbraco
+namespace Umbraco.ModelsBuilder
 {
-    // supports LiveDll and LiveAppData - but not PureLive
+    // supports LiveAppData - but not PureLive
     public sealed class LiveModelsProvider
     {
         private static Mutex _mutex;
@@ -80,7 +80,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             try
             {
                 _logger.Debug<LiveModelsProvider>("Generate models...");
-                const int timeout = 2*60*1000; // 2 mins
+                const int timeout = 2 * 60 * 1000; // 2 mins
                 _mutex.WaitOne(timeout); // wait until it is safe, and acquire
                 _logger.Info<LiveModelsProvider>("Generate models now.");
                 GenerateModels();
@@ -112,6 +112,6 @@ namespace Umbraco.ModelsBuilder.Umbraco
             _modelGenerator.GenerateModels();
         }
 
-        
+
     }
 }

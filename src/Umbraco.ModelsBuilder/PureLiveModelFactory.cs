@@ -21,7 +21,7 @@ using Umbraco.ModelsBuilder.Building;
 using Umbraco.ModelsBuilder.Configuration;
 using File = System.IO.File;
 
-namespace Umbraco.ModelsBuilder.Umbraco
+namespace Umbraco.ModelsBuilder
 {
     internal class PureLiveModelFactory : ILivePublishedModelFactory, IRegisteredObject
     {
@@ -101,7 +101,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             var contentTypeAlias = element.ContentType.Alias;
 
             // lookup model constructor (else null)
-            infos.TryGetValue(contentTypeAlias, out ModelInfo info);
+            infos.TryGetValue(contentTypeAlias, out var info);
 
             // create model
             return info == null ? element : info.Ctor(element);
@@ -234,10 +234,10 @@ namespace Umbraco.ModelsBuilder.Umbraco
             get
             {
                 if (_theBuildManager != null) return _theBuildManager;
-                var prop = typeof (BuildManager).GetProperty("TheBuildManager", BindingFlags.NonPublic | BindingFlags.Static);
+                var prop = typeof(BuildManager).GetProperty("TheBuildManager", BindingFlags.NonPublic | BindingFlags.Static);
                 if (prop == null)
                     throw new InvalidOperationException("Could not get BuildManager.TheBuildManager property.");
-                _theBuildManager = (BuildManager) prop.GetValue(null);
+                _theBuildManager = (BuildManager)prop.GetValue(null);
                 return _theBuildManager;
             }
         }
@@ -335,7 +335,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 Directory.CreateDirectory(modelsDirectory);
 
             var typeModels = UmbracoServices.GetAllTypes();
-            var currentHash = ModelsBuilderHasher.Hash(typeModels);
+            var currentHash = TypeModelHasher.Hash(typeModels);
             var modelsHashFile = Path.Combine(modelsDirectory, "models.hash");
             var modelsSrcFile = Path.Combine(modelsDirectory, "models.generated.cs");
             var projFile = Path.Combine(modelsDirectory, "all.generated.cs");
@@ -456,8 +456,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             //  AssemblyVersion is so that we have a different version for each rebuild
             var ver = _ver == _skipver ? ++_ver : _ver;
             _ver++;
-            code = code.Replace("//ASSATTR", $@"[assembly: PureLiveAssembly]
-[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = ""{currentHash}"")]
+            code = code.Replace("//ASSATTR", $@"[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = ""{currentHash}"")]
 [assembly:System.Reflection.AssemblyVersion(""0.0.0.{ver}"")]");
             File.WriteAllText(modelsSrcFile, code);
 
@@ -505,7 +504,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
         private static Infos RegisterModels(IEnumerable<Type> types)
         {
-            var ctorArgTypes = new[] { typeof (IPublishedElement) };
+            var ctorArgTypes = new[] { typeof(IPublishedElement) };
             var modelInfos = new Dictionary<string, ModelInfo>(StringComparer.InvariantCultureIgnoreCase);
             var map = new Dictionary<string, Type>();
 
@@ -517,7 +516,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 foreach (var ctor in type.GetConstructors())
                 {
                     var parms = ctor.GetParameters();
-                    if (parms.Length == 1 && typeof (IPublishedElement).IsAssignableFrom(parms[0].ParameterType))
+                    if (parms.Length == 1 && typeof(IPublishedElement).IsAssignableFrom(parms[0].ParameterType))
                     {
                         if (constructor != null)
                             throw new InvalidOperationException($"Type {type.FullName} has more than one public constructor with one argument of type, or implementing, IPropertySet.");
@@ -532,17 +531,17 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 var attribute = type.GetCustomAttribute<PublishedModelAttribute>(false);
                 var typeName = attribute == null ? type.Name : attribute.ContentTypeAlias;
 
-                if (modelInfos.TryGetValue(typeName, out ModelInfo modelInfo))
+                if (modelInfos.TryGetValue(typeName, out var modelInfo))
                     throw new InvalidOperationException($"Both types {type.FullName} and {modelInfo.ModelType.FullName} want to be a model type for content type with alias \"{typeName}\".");
 
                 // fixme use Core's ReflectionUtilities.EmitCtor !!
                 // Yes .. DynamicMethod is uber slow
-                var meth = new DynamicMethod(string.Empty, typeof (IPublishedElement), ctorArgTypes, type.Module, true);
+                var meth = new DynamicMethod(string.Empty, typeof(IPublishedElement), ctorArgTypes, type.Module, true);
                 var gen = meth.GetILGenerator();
                 gen.Emit(OpCodes.Ldarg_0);
                 gen.Emit(OpCodes.Newobj, constructor);
                 gen.Emit(OpCodes.Ret);
-                var func = (Func<IPublishedElement, IPublishedElement>) meth.CreateDelegate(typeof (Func<IPublishedElement, IPublishedElement>));
+                var func = (Func<IPublishedElement, IPublishedElement>)meth.CreateDelegate(typeof(Func<IPublishedElement, IPublishedElement>));
 
                 modelInfos[typeName] = new ModelInfo { ParameterType = parameterType, Ctor = func, ModelType = type };
                 map[typeName] = type;
@@ -663,9 +662,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             _logger.Info<PureLiveModelFactory>("Detected files changes.");
 
             lock (SyncRoot) // don't reset while being locked
-            {
                 ResetModels();
-            }
         }
 
         public void Stop(bool immediate)

@@ -49,7 +49,7 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="Api\ApiVersion.cs" />
+    <Compile Include="ApiVersion.cs" />
     <Compile Include="Building\Builder.cs" />
     <Compile Include="Building\PropertyModel.cs" />
     <Compile Include="Building\TextBuilder.cs" />
@@ -65,24 +65,23 @@
     <Compile Include="ModelsBuilderAssemblyAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PublishedElementExtensions.cs" />
-    <Compile Include="PureLiveAssemblyAttribute.cs" />
     <Compile Include="ReferencedAssemblies.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="HashCombiner.cs" />
-    <Compile Include="Umbraco\LiveModelsProvider.cs" />
-    <Compile Include="Umbraco\LiveModelsProviderModule.cs" />
-    <Compile Include="Umbraco\ModelsGenerator.cs" />
+    <Compile Include="LiveModelsProvider.cs" />
+    <Compile Include="LiveModelsProviderModule.cs" />
+    <Compile Include="Building\ModelsGenerator.cs" />
     <Compile Include="BackOffice\ModelsBuilderBackOfficeController.cs" />
     <Compile Include="Compose\ModelsBuilderComponent.cs" />
     <Compile Include="Compose\ModelsBuilderComposer.cs" />
-    <Compile Include="Umbraco\ModelsBuilderHasher.cs" />
+    <Compile Include="Building\TypeModelHasher.cs" />
     <Compile Include="Compose\ModelsBuilderInitializer.cs" />
-    <Compile Include="Umbraco\ModelsGenerationError.cs" />
-    <Compile Include="Umbraco\OutOfDateModelsStatus.cs" />
-    <Compile Include="Umbraco\PublishedModelUtility.cs" />
-    <Compile Include="Umbraco\PureLiveModelFactory.cs" />
-    <Compile Include="Umbraco\UmbracoServices.cs" />
-    <Compile Include="Validation\ContentTypeModelValidator.cs" />
+    <Compile Include="ModelsGenerationError.cs" />
+    <Compile Include="OutOfDateModelsStatus.cs" />
+    <Compile Include="PublishedModelUtility.cs" />
+    <Compile Include="PureLiveModelFactory.cs" />
+    <Compile Include="UmbracoServices.cs" />
+    <Compile Include="BackOffice\ContentTypeModelValidator.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp">

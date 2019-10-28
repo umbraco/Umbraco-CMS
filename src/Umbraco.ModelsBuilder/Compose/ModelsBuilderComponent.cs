@@ -10,7 +10,6 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.ModelsBuilder.BackOffice;
 using Umbraco.ModelsBuilder.Configuration;
-using Umbraco.ModelsBuilder.Umbraco;
 using Umbraco.Web;
 using Umbraco.Web.JavaScript;
 using Umbraco.Web.Mvc;

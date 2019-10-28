@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Umbraco.ModelsBuilder.Building;
-using Umbraco.ModelsBuilder.Umbraco;
 
 namespace Umbraco.ModelsBuilder.Tests
 {

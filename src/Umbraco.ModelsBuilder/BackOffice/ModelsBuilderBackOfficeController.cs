@@ -9,7 +9,6 @@ using System.Web.Hosting;
 using Umbraco.Core.Exceptions;
 using Umbraco.ModelsBuilder.Building;
 using Umbraco.ModelsBuilder.Configuration;
-using Umbraco.ModelsBuilder.Umbraco;
 using Umbraco.Web.Editors;
 using Umbraco.Web.WebApi.Filters;
 

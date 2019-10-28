@@ -2,12 +2,12 @@
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.ModelsBuilder.Umbraco;
+using Umbraco.ModelsBuilder;
 
 // will install only if configuration says it needs to be installed
 [assembly: PreApplicationStartMethod(typeof(LiveModelsProviderModule), "Install")]
 
-namespace Umbraco.ModelsBuilder.Umbraco
+namespace Umbraco.ModelsBuilder
 {
     // have to do this because it's the only way to subscribe to EndRequest,
     // module is installed by assembly attribute at the top of this file

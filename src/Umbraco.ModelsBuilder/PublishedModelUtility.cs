@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using Umbraco.Web.Composing;
 using Umbraco.Core.Models.PublishedContent;
 
-namespace Umbraco.ModelsBuilder.Umbraco
+namespace Umbraco.ModelsBuilder
 {
     /// <summary>
     /// This is called from within the generated model classes
@@ -48,7 +48,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         }
 
         public static IPublishedPropertyType GetModelPropertyType<TModel, TValue>(IPublishedContentType contentType, Expression<Func<TModel, TValue>> selector)
-            //where TModel : PublishedContentModel // fixme PublishedContentModel _or_ PublishedElementModel
+        //where TModel : PublishedContentModel // fixme PublishedContentModel _or_ PublishedElementModel
         {
             // fixme therefore, missing a check on TModel here
 
@@ -61,7 +61,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             // see note above : accepted risk...
 
             var attr = expr.Member
-                .GetCustomAttributes(typeof (ImplementPropertyTypeAttribute), false)
+                .GetCustomAttributes(typeof(ImplementPropertyTypeAttribute), false)
                 .OfType<ImplementPropertyTypeAttribute>()
                 .SingleOrDefault();
 

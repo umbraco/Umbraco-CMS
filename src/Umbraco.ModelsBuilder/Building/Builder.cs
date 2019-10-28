@@ -38,8 +38,7 @@ namespace Umbraco.ModelsBuilder.Building
             "Umbraco.Core.Models",
             "Umbraco.Core.Models.PublishedContent",
             "Umbraco.Web",
-            "Umbraco.ModelsBuilder",
-            "Umbraco.ModelsBuilder.Umbraco",
+            "Umbraco.ModelsBuilder"
         };
 
         /// <summary>

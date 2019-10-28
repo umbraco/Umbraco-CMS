@@ -2,11 +2,9 @@
 using System.IO;
 using System.Text;
 using System.Web;
-using Umbraco.ModelsBuilder.Building;
 using Umbraco.ModelsBuilder.Configuration;
-using Umbraco.ModelsBuilder.Umbraco;
 
-namespace Umbraco.ModelsBuilder.Umbraco
+namespace Umbraco.ModelsBuilder.Building
 {
     public class ModelsGenerator
     {

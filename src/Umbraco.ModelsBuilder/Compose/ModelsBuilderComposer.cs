@@ -2,8 +2,8 @@
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.ModelsBuilder.Building;
 using Umbraco.ModelsBuilder.Configuration;
-using Umbraco.ModelsBuilder.Umbraco;
 using Umbraco.Web.PublishedCache.NuCache;
 
 namespace Umbraco.ModelsBuilder.Compose
