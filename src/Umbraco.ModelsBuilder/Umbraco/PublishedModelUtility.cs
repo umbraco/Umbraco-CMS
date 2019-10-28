@@ -7,6 +7,12 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.ModelsBuilder.Umbraco
 {
+    /// <summary>
+    /// This is called from within the generated model classes
+    /// </summary>
+    /// <remarks>
+    /// DO NOT REMOVE - although there are not code references this is used directly by the generated models.
+    /// </remarks>
     public static class PublishedModelUtility
     {
         // looks safer but probably useless... ppl should not call these methods directly
