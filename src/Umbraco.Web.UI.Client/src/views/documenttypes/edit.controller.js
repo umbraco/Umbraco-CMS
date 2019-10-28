@@ -62,6 +62,8 @@
                 documentTypeId = $scope.model.id;
                 create = $scope.model.create;
                 noTemplate = $scope.model.notemplate;
+                isElement = $scope.model.iselement;
+                allowVaryByCulture = $scope.model.allowvarybyculture;
                 vm.submitButtonKey = "buttons_saveAndClose";
                 vm.generateModelsKey = "buttons_generateModelsAndClose";
             }
