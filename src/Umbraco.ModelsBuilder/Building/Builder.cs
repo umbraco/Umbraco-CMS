@@ -213,9 +213,10 @@ namespace Umbraco.ModelsBuilder.Building
             if (!string.IsNullOrWhiteSpace(ModelsNamespace))
                 return ModelsNamespace;
 
-            // default
-            // fixme - should NOT reference config here, should make ModelsNamespace mandatory
-            return string.IsNullOrWhiteSpace(Config.ModelsNamespace) ? ModelsBuilderConfig.DefaultModelsNamespace : Config.ModelsNamespace;
+            // use configured else fallback to default
+            return string.IsNullOrWhiteSpace(Config.ModelsNamespace)
+                ? ModelsBuilderConfig.DefaultModelsNamespace
+                : Config.ModelsNamespace;
         }
 
         protected string GetModelsBaseClassName(TypeModel type)

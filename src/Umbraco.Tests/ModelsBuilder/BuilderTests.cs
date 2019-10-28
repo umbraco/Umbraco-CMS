@@ -15,13 +15,6 @@ namespace Umbraco.ModelsBuilder.Tests
     [TestFixture]
     public class BuilderTests
     {
-    //    [SetUp]
-    //    public void Setup()
-    //    {
-    //        Current.Reset();
-    //        Current.UnlockConfigs();
-    //        Current.Configs.Add(() => new ModelsBuilderConfig());
-    //    }
 
         [Test]
         public void GenerateSimpleType()
