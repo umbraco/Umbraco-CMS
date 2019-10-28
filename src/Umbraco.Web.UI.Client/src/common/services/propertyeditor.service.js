@@ -10,12 +10,14 @@
          *
          * @param {object} scope An object containing API for the PropertyEditor
          */
-        function exposeAPI(scope) {
+        function exposeAPI(scope, api) {
             if (!scope) {
                 throw "scope cannot be null";
             }
-
-            scope.$emit("ExposePropertyEditorAPI", scope);
+            if (!api) {
+                throw "api cannot be null";
+            }
+            scope.$emit("ExposePropertyEditorAPI", api);
         }
 
         return {

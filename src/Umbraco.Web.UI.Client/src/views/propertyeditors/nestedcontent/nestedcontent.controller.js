@@ -211,6 +211,39 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             $scope.labels.content_createEmpty = data[1];
         });
 
+
+        
+        var copyAllEntries = function() {
+            
+            syncCurrentNode();
+
+            // list aliases
+            var aliases = $scope.nodes.map((node) => node.contentTypeAlias);
+
+            // remove dublicates
+            aliases = aliases.filter((item, index) => aliases.indexOf(item) === index);
+
+            // Retrive variant name
+            var culture = $routeParams.cculture ? $routeParams.cculture : $routeParams.mculture;
+            var activeVariant = _.find(editorState.current.variants, function (v) {
+                return !v.language || v.language.culture === culture;
+            });
+
+            localizationService.localize("clipboard_labelForArrayOfItemsFrom", [$scope.model.label, activeVariant.name]).then(function(data) {
+                clipboardService.copyArray("elementTypeArray", aliases, $scope.nodes, data, "icon-thumbnail-list", $scope.model.id);
+            });
+        }
+
+        var CopyAllEntriesAction = {
+            labelKey: 'clipboard_labelForCopyAllEntries',
+            labelTokens: [$scope.model.label],
+            icon: 'documents',
+            method: copyAllEntries,
+            isDisabled: true
+        }
+
+
+
         // helper to force the current form into the dirty state
         $scope.setDirty = function () {
             if ($scope.propertyForm) {
@@ -473,26 +506,6 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             $event.stopPropagation();
         }
         
-        var copyAllEntries = function() {
-            
-            syncCurrentNode();
-
-            // list aliases
-            var aliases = $scope.nodes.map((node) => node.contentTypeAlias);
-
-            // remove dublicates
-            aliases = aliases.filter((item, index) => aliases.indexOf(item) === index);
-
-            // Retrive variant name
-            var culture = $routeParams.cculture ? $routeParams.cculture : $routeParams.mculture;
-            var activeVariant = _.find(editorState.current.variants, function (v) {
-                return !v.language || v.language.culture === culture;
-            });
-
-            localizationService.localize("clipboard_labelForArrayOfItemsFrom", [$scope.model.label, activeVariant.name]).then(function(data) {
-                clipboardService.copyArray("elementTypeArray", aliases, $scope.nodes, data, "icon-thumbnail-list", $scope.model.id);
-            });
-        }
         
         $scope.pasteFromClipboard = function(newNode) {
             
@@ -600,6 +613,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
 
                 $scope.inited = true;
 
+                updatePropertyActionStates();
                 checkAbilityToPasteContent();
             }
         }
@@ -656,6 +670,9 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             return obj;
         }
 
+
+
+
         function syncCurrentNode() {
             if ($scope.realCurrentNode) {
                 $scope.$broadcast("ncSyncVal", { key: $scope.realCurrentNode.key });
@@ -672,6 +689,12 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 }
                 $scope.model.value = newValues;
             }
+
+            updatePropertyActionStates();
+        }
+
+        function updatePropertyActionStates() {
+            CopyAllEntriesAction.isDisabled = $scope.model.value.length === 0;
         }
 
         $scope.$watch("currentNode", function (newVal) {
@@ -680,18 +703,13 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         });
 
         
-        $scope.propertyActions = [
-            {
-                labelKey: 'clipboard_labelForCopyAllEntries',
-                labelTokens: [$scope.model.label],
-                icon: 'documents',
-                method: copyAllEntries
-            }
+        var api = {};
+        api.propertyActions = [
+            CopyAllEntriesAction
         ];
-
-        //$scope.$emit("ExposePropertyEditorAPI", $scope);// must be executed at a state where the API is set.
-        propertyEditorService.exposeAPI($scope);// must be executed at a state where the API is set.
-
+        
+        propertyEditorService.exposeAPI($scope, api);// must be executed at a state where the API is set.
+        
         var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
             updateModel();
         });

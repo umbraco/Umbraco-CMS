@@ -26,8 +26,6 @@
             margin: 0;
         }
     }
-}
-.umb-property-actions__toggle {
     &:hover {
         i {
             background: @ui-action-type-hover;
@@ -42,11 +40,12 @@
     top: -15px;
     border-radius: 3px 3px 0 0;
     
-    border-top: 1px solid @dropdownBorder;
-    border-left: 1px solid @dropdownBorder;
-    border-right: 1px solid @dropdownBorder;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
+
+    border: 1px solid @dropdownBorder;
+
+    border-bottom: 1px solid @gray-9;
 
     .box-shadow(0 5px 20px rgba(0,0,0,.3));
 
@@ -69,51 +68,25 @@
 
 .umb-property-actions__menu {
     
-    display: block;
-    border-radius: 3px;
-    
     position: absolute;
     z-index: 1000;
 
+    display: block;
+    
     float: left;
     min-width: 160px;
     list-style: none;
 
-    ul > {
+    .umb-contextmenu {
 
-        border: 1px solid @dropdownBorder;
-
-        border-top-right-radius: 3px;
-        border-bottom-left-radius: 3px;
-        border-bottom-right-radius: 3px;
-
-        overflow: hidden;
-
-        .box-shadow(0 5px 20px rgba(0,0,0,.3));
+        border-top-left-radius: 0;
+        margin-top:1px;
+        
     }
 
-    ul > li > button {
+    .umb-contextmenu-item > button {
         
-        position: relative;
         z-index:2;// need to stay on top of menu-toggle-open shadow.
 
-        display: block;
-        font-weight: normal;
-        line-height: @baseLineHeight;
-        white-space: nowrap;
-        cursor:pointer;
-
-        background: @ui-option;
-        border: 0;
-        padding: 8px 20px;
-        color: @ui-option-type;
-        width: 100%;
-        text-align: left;
-        
-        &:hover {
-            text-decoration: none;
-            color: @ui-option-type-hover;
-            background: @ui-option-hover;
-        }
     }
 }
