@@ -145,6 +145,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //default listview
             target.ListViewEditorName = Constants.Conventions.DataTypes.ListViewPrefix + "Media";
+            target.IsSystemMediaType = source.IsSystemMediaType();
 
             if (string.IsNullOrEmpty(source.Name)) return;
 
