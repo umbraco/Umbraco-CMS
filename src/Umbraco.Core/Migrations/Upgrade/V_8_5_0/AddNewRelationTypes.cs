@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.Migrations.Upgrade.V_8_5_0
+﻿using Umbraco.Core.Migrations.Install;
+
+namespace Umbraco.Core.Migrations.Upgrade.V_8_5_0
 {
     /// <summary>
     /// Ensures the new relation types are created
@@ -22,7 +24,7 @@
 
         private void CreateRelation(string alias, string name)
         {
-            var uniqueId = (alias + "____" + name).ToGuid(); //this is the same as how it installs so everything is consistent
+            var uniqueId = DatabaseDataCreator.CreateUniqueRelationTypeId(alias ,name); //this is the same as how it installs so everything is consistent
             Insert.IntoTable(Constants.DatabaseSchema.Tables.RelationType)
                .Row(new { typeUniqueId = uniqueId, dual = 0, name, alias })
                .Do();
