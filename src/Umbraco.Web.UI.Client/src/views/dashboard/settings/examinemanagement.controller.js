@@ -199,6 +199,7 @@ function ExamineManagementController($scope, $http, $q, $timeout, $location, umb
             view: "views/dashboard/settings/overlays/examinemanagement.rebuild.html",
             index: index,
             submitButtonLabelKey: "general_ok",
+            submitButtonStyle :"danger",
             submit: function (model) {
                 performRebuild(model.index);
                 overlayService.close();
