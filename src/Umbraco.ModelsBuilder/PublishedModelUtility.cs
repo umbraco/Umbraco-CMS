@@ -1,12 +1,17 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using Umbraco.Web.Composing;
 using Umbraco.Core.Models.PublishedContent;
 
-namespace Umbraco.ModelsBuilder.Umbraco
+namespace Umbraco.ModelsBuilder
 {
+    /// <summary>
+    /// This is called from within the generated model classes
+    /// </summary>
+    /// <remarks>
+    /// DO NOT REMOVE - although there are not code references this is used directly by the generated models.
+    /// </remarks>
     public static class PublishedModelUtility
     {
         // looks safer but probably useless... ppl should not call these methods directly
@@ -41,16 +46,8 @@ namespace Umbraco.ModelsBuilder.Umbraco
             }
         }
 
-        [Obsolete("Use the overload taking IPublishedContentType instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static IPublishedPropertyType GetModelPropertyType<TModel, TValue>(PublishedContentType contentType,
-            Expression<Func<TModel, TValue>> selector)
-        {
-            return GetModelPropertyType((IPublishedContentType)contentType, selector);
-        }
-
         public static IPublishedPropertyType GetModelPropertyType<TModel, TValue>(IPublishedContentType contentType, Expression<Func<TModel, TValue>> selector)
-            //where TModel : PublishedContentModel // fixme PublishedContentModel _or_ PublishedElementModel
+        //where TModel : PublishedContentModel // fixme PublishedContentModel _or_ PublishedElementModel
         {
             // fixme therefore, missing a check on TModel here
 
@@ -63,7 +60,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             // see note above : accepted risk...
 
             var attr = expr.Member
-                .GetCustomAttributes(typeof (ImplementPropertyTypeAttribute), false)
+                .GetCustomAttributes(typeof(ImplementPropertyTypeAttribute), false)
                 .OfType<ImplementPropertyTypeAttribute>()
                 .SingleOrDefault();
 

@@ -2,18 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.ModelsBuilder.Building;
-using Umbraco.ModelsBuilder.Configuration;
 
-namespace Umbraco.ModelsBuilder.Umbraco
+namespace Umbraco.ModelsBuilder
 {
-    public class UmbracoServices
+    public sealed class UmbracoServices
     {
         private readonly IContentTypeService _contentTypeService;
         private readonly IMediaTypeService _mediaTypeService;
@@ -27,8 +25,6 @@ namespace Umbraco.ModelsBuilder.Umbraco
             _memberTypeService = memberTypeService;
             _publishedContentTypeFactory = publishedContentTypeFactory;
         }
-
-        private static Config Config => Current.Configs.ModelsBuilder();
 
         #region Services
 
@@ -186,11 +182,9 @@ namespace Umbraco.ModelsBuilder.Umbraco
         {
             var groups = typeModels.GroupBy(x => x.Alias.ToLowerInvariant());
             foreach (var group in groups.Where(x => x.Count() > 1))
-            {
                 throw new NotSupportedException($"Alias \"{group.Key}\" is used by types"
                     + $" {string.Join(", ", group.Select(x => x.ItemType + ":\"" + x.Alias + "\""))}. Aliases have to be unique."
                     + " One of the aliases must be modified in order to use the ModelsBuilder.");
-            }
             return typeModels;
         }
 

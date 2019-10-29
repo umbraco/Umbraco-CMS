@@ -77,10 +77,10 @@ namespace Umbraco.ModelsBuilder.Building
         /// </summary>
         public readonly List<TypeModel> ImplementingInterfaces = new List<TypeModel>();
 
-        /// <summary>
-        /// Gets the list of existing static mixin method candidates.
-        /// </summary>
-        public readonly List<string> StaticMixinMethods = new List<string>();
+        ///// <summary>
+        ///// Gets the list of existing static mixin method candidates.
+        ///// </summary>
+        //public readonly List<string> StaticMixinMethods = new List<string>(); //TODO: Do we need this? it isn't used
 
         /// <summary>
         /// Gets a value indicating whether this model has a base class.

@@ -142,26 +142,6 @@ namespace Umbraco.ModelsBuilder
 
         // ----
 
-        private static IEnumerable<Assembly> GetDeepReferencedAssemblies(Assembly assembly)
-        {
-            var visiting = new Stack<Assembly>();
-            var visited = new HashSet<Assembly>();
-
-            visiting.Push(assembly);
-            visited.Add(assembly);
-            while (visiting.Count > 0)
-            {
-                var visAsm = visiting.Pop();
-                foreach (var refAsm in visAsm.GetReferencedAssemblies()
-                    .Select(TryLoad)
-                    .Where(x => x != null && visited.Contains(x) == false))
-                {
-                    yield return refAsm;
-                    visiting.Push(refAsm);
-                    visited.Add(refAsm);
-                }
-            }
-        }
 
         private static Assembly TryLoad(AssemblyName name)
         {

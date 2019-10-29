@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Umbraco.ModelsBuilder.Building;
 
-namespace Umbraco.ModelsBuilder.Umbraco
+namespace Umbraco.ModelsBuilder.Building
 {
-    class HashHelper
+    internal class TypeModelHasher
     {
         public static string Hash(IEnumerable<TypeModel> typeModels)
         {

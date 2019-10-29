@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
-using Umbraco.ModelsBuilder.Api;
 using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder.Building
@@ -19,32 +16,21 @@ namespace Umbraco.ModelsBuilder.Building
         /// Initializes a new instance of the <see cref="TextBuilder"/> class with a list of models to generate
         /// and the result of code parsing.
         /// </summary>
+        /// <param name="config"></param>
         /// <param name="typeModels">The list of models to generate.</param>
-        public TextBuilder(IList<TypeModel> typeModels)
-            : base(typeModels)
-        { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TextBuilder"/> class with a list of models to generate,
-        /// the result of code parsing, and a models namespace.
-        /// </summary>
-        /// <param name="typeModels">The list of models to generate.</param>
-        /// <param name="modelsNamespace">The models namespace.</param>
-        public TextBuilder(IList<TypeModel> typeModels, string modelsNamespace)
-            : base(typeModels, modelsNamespace)
+        public TextBuilder(IModelsBuilderConfig config, IList<TypeModel> typeModels)
+            : base(config, typeModels)
         { }
 
         // internal for unit tests only
         internal TextBuilder()
         { }
 
-        private static Config Config => Current.Configs.ModelsBuilder();
-
         /// <summary>
-                                                                               /// Outputs a generated model to a string builder.
-                                                                               /// </summary>
-                                                                               /// <param name="sb">The string builder.</param>
-                                                                               /// <param name="typeModel">The model to generate.</param>
+        /// Outputs a generated model to a string builder.
+        /// </summary>
+        /// <param name="sb">The string builder.</param>
+        /// <param name="typeModel">The model to generate.</param>
         public void Generate(StringBuilder sb, TypeModel typeModel)
         {
             WriteHeader(sb);
@@ -354,7 +340,7 @@ namespace Umbraco.ModelsBuilder.Building
 
             var mixinStaticGetterName = MixinStaticGetterName(property.ClrName);
 
-            if (type.StaticMixinMethods.Contains(mixinStaticGetterName)) return;
+            //if (type.StaticMixinMethods.Contains(mixinStaticGetterName)) return;
 
             sb.Append("\n");
 

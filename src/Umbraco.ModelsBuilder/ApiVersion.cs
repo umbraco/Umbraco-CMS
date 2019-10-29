@@ -2,7 +2,7 @@
 using System.Reflection;
 using Semver;
 
-namespace Umbraco.ModelsBuilder.Api
+namespace Umbraco.ModelsBuilder
 {
     /// <summary>
     /// Manages API version handshake between client and server.

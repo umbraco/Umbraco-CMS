@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Resources;
+using System.Runtime.CompilerServices;
 
 [assembly: AssemblyCompany("Umbraco")]
 [assembly: AssemblyCopyright("Copyright © Umbraco 2019")]
@@ -20,3 +21,5 @@ using System.Resources;
 // these are FYI and changed automatically
 [assembly: AssemblyFileVersion("8.3.0")]
 [assembly: AssemblyInformationalVersion("8.3.0")]
+
+[assembly: InternalsVisibleTo("Umbraco.Tests")]

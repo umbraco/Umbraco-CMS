@@ -13,15 +13,13 @@ using System.Web.Compilation;
 using System.Web.Hosting;
 using System.Web.WebPages.Razor;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web.Cache;
 using Umbraco.ModelsBuilder.Building;
 using Umbraco.ModelsBuilder.Configuration;
 using File = System.IO.File;
 
-namespace Umbraco.ModelsBuilder.Umbraco
+namespace Umbraco.ModelsBuilder
 {
     internal class PureLiveModelFactory : ILivePublishedModelFactory, IRegisteredObject
     {
@@ -35,20 +33,22 @@ namespace Umbraco.ModelsBuilder.Umbraco
         private int _ver, _skipver;
         private readonly int _debugLevel;
         private BuildManager _theBuildManager;
-        private readonly Lazy<UmbracoServices> _umbracoServices;
+        private readonly Lazy<UmbracoServices> _umbracoServices; // fixme: this is because of circular refs :(
         private UmbracoServices UmbracoServices => _umbracoServices.Value;
 
         private static readonly Regex AssemblyVersionRegex = new Regex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
         private const string ProjVirt = "~/App_Data/Models/all.generated.cs";
         private static readonly string[] OurFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err" };
 
-        private readonly Config _config;
+        private readonly IModelsBuilderConfig _config;
+        private readonly ModelsGenerationError _errors;
 
-        public PureLiveModelFactory(Lazy<UmbracoServices> umbracoServices, IProfilingLogger logger, Config config)
+        public PureLiveModelFactory(Lazy<UmbracoServices> umbracoServices, IProfilingLogger logger, IModelsBuilderConfig config)
         {
             _umbracoServices = umbracoServices;
             _logger = logger;
             _config = config;
+            _errors = new ModelsGenerationError(config);
             _ver = 1; // zero is for when we had no version
             _skipver = -1; // nothing to skip
 
@@ -99,7 +99,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             var contentTypeAlias = element.ContentType.Alias;
 
             // lookup model constructor (else null)
-            infos.TryGetValue(contentTypeAlias, out ModelInfo info);
+            infos.TryGetValue(contentTypeAlias, out var info);
 
             // create model
             return info == null ? element : info.Ctor(element);
@@ -232,10 +232,10 @@ namespace Umbraco.ModelsBuilder.Umbraco
             get
             {
                 if (_theBuildManager != null) return _theBuildManager;
-                var prop = typeof (BuildManager).GetProperty("TheBuildManager", BindingFlags.NonPublic | BindingFlags.Static);
+                var prop = typeof(BuildManager).GetProperty("TheBuildManager", BindingFlags.NonPublic | BindingFlags.Static);
                 if (prop == null)
                     throw new InvalidOperationException("Could not get BuildManager.TheBuildManager property.");
-                _theBuildManager = (BuildManager) prop.GetValue(null);
+                _theBuildManager = (BuildManager)prop.GetValue(null);
                 return _theBuildManager;
             }
         }
@@ -292,7 +292,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
                         var types = assembly.ExportedTypes.Where(x => x.Inherits<PublishedContentModel>() || x.Inherits<PublishedElementModel>());
                         _infos = RegisterModels(types);
-                        ModelsGenerationError.Clear();
+                        _errors.Clear();
                     }
                     catch (Exception e)
                     {
@@ -300,7 +300,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                         {
                             _logger.Error<PureLiveModelFactory>("Failed to build models.", e);
                             _logger.Warn<PureLiveModelFactory>("Running without models."); // be explicit
-                            ModelsGenerationError.Report("Failed to build PureLive models.", e);
+                            _errors.Report("Failed to build PureLive models.", e);
                         }
                         finally
                         {
@@ -333,7 +333,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 Directory.CreateDirectory(modelsDirectory);
 
             var typeModels = UmbracoServices.GetAllTypes();
-            var currentHash = HashHelper.Hash(typeModels);
+            var currentHash = TypeModelHasher.Hash(typeModels);
             var modelsHashFile = Path.Combine(modelsDirectory, "models.hash");
             var modelsSrcFile = Path.Combine(modelsDirectory, "models.generated.cs");
             var projFile = Path.Combine(modelsDirectory, "all.generated.cs");
@@ -454,8 +454,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             //  AssemblyVersion is so that we have a different version for each rebuild
             var ver = _ver == _skipver ? ++_ver : _ver;
             _ver++;
-            code = code.Replace("//ASSATTR", $@"[assembly: PureLiveAssembly]
-[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = ""{currentHash}"")]
+            code = code.Replace("//ASSATTR", $@"[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = ""{currentHash}"")]
 [assembly:System.Reflection.AssemblyVersion(""0.0.0.{ver}"")]");
             File.WriteAllText(modelsSrcFile, code);
 
@@ -503,7 +502,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
         private static Infos RegisterModels(IEnumerable<Type> types)
         {
-            var ctorArgTypes = new[] { typeof (IPublishedElement) };
+            var ctorArgTypes = new[] { typeof(IPublishedElement) };
             var modelInfos = new Dictionary<string, ModelInfo>(StringComparer.InvariantCultureIgnoreCase);
             var map = new Dictionary<string, Type>();
 
@@ -515,7 +514,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 foreach (var ctor in type.GetConstructors())
                 {
                     var parms = ctor.GetParameters();
-                    if (parms.Length == 1 && typeof (IPublishedElement).IsAssignableFrom(parms[0].ParameterType))
+                    if (parms.Length == 1 && typeof(IPublishedElement).IsAssignableFrom(parms[0].ParameterType))
                     {
                         if (constructor != null)
                             throw new InvalidOperationException($"Type {type.FullName} has more than one public constructor with one argument of type, or implementing, IPropertySet.");
@@ -530,16 +529,17 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 var attribute = type.GetCustomAttribute<PublishedModelAttribute>(false);
                 var typeName = attribute == null ? type.Name : attribute.ContentTypeAlias;
 
-                if (modelInfos.TryGetValue(typeName, out ModelInfo modelInfo))
+                if (modelInfos.TryGetValue(typeName, out var modelInfo))
                     throw new InvalidOperationException($"Both types {type.FullName} and {modelInfo.ModelType.FullName} want to be a model type for content type with alias \"{typeName}\".");
 
                 // fixme use Core's ReflectionUtilities.EmitCtor !!
-                var meth = new DynamicMethod(string.Empty, typeof (IPublishedElement), ctorArgTypes, type.Module, true);
+                // Yes .. DynamicMethod is uber slow
+                var meth = new DynamicMethod(string.Empty, typeof(IPublishedElement), ctorArgTypes, type.Module, true);
                 var gen = meth.GetILGenerator();
                 gen.Emit(OpCodes.Ldarg_0);
                 gen.Emit(OpCodes.Newobj, constructor);
                 gen.Emit(OpCodes.Ret);
-                var func = (Func<IPublishedElement, IPublishedElement>) meth.CreateDelegate(typeof (Func<IPublishedElement, IPublishedElement>));
+                var func = (Func<IPublishedElement, IPublishedElement>)meth.CreateDelegate(typeof(Func<IPublishedElement, IPublishedElement>));
 
                 modelInfos[typeName] = new ModelInfo { ParameterType = parameterType, Ctor = func, ModelType = type };
                 map[typeName] = type;
@@ -557,7 +557,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
                 File.Delete(file);
 
-            var builder = new TextBuilder(typeModels, _config.ModelsNamespace);
+            var builder = new TextBuilder(_config, typeModels);
 
             var codeBuilder = new StringBuilder();
             builder.Generate(codeBuilder, builder.GetModelsToGenerate());
@@ -660,9 +660,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             _logger.Info<PureLiveModelFactory>("Detected files changes.");
 
             lock (SyncRoot) // don't reset while being locked
-            {
                 ResetModels();
-            }
         }
 
         public void Stop(bool immediate)

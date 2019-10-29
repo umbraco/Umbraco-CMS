@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Globalization;
 
-namespace Umbraco.ModelsBuilder.Umbraco
+namespace Umbraco.ModelsBuilder
 {
     // because, of course, it's internal in Umbraco
     // see also System.Web.Util.HashCodeCombiner
-    class HashCombiner
+    internal class HashCombiner
     {
         private long _combinedHash = 5381L;
 
         public void Add(int i)
         {
-            _combinedHash = ((_combinedHash << 5) + _combinedHash) ^ i;
+            _combinedHash = (_combinedHash << 5) + _combinedHash ^ i;
         }
 
         public void Add(object o)
@@ -27,7 +27,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         public void Add(string s)
         {
             if (s == null) return;
-            Add((StringComparer.InvariantCulture).GetHashCode(s));
+            Add(StringComparer.InvariantCulture.GetHashCode(s));
         }
 
         public string GetCombinedHashCode()
