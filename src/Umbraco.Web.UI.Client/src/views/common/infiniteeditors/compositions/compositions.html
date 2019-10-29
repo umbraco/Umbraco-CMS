@@ -68,15 +68,16 @@
                             </li>
                             <li class="umb-checkbox-list__item"
                                 ng-repeat="compositeContentType in group.compositeContentTypes | orderBy:'contentType.name' | filter:searchTerm"
-                                ng-class="{'-disabled': compositeContentType.allowed===false || compositeContentType.inherited, '-selected': vm.isSelected(compositeContentType.contentType.alias)}">
+                                ng-class="{'-disabled': compositeContentType.allowed === false || compositeContentType.inherited, '-selected': compositeContentType.selected || vm.isSelected(compositeContentType.contentType.alias)}">
 
-                                <div class="umb-checkbox-list__item-checkbox"
-                                     ng-class="{ '-selected': model.compositeContentTypes.indexOf(compositeContentType.contentType.alias)+1 }">
+                                {{compositeContentType | json}}
+
+                                <div class="umb-checkbox-list__item-checkbox" ng-class="{ '-selected': model.compositeContentTypes.indexOf(compositeContentType.contentType.alias)+1 }">
                                     <umb-checkbox
                                         input-id="umb-overlay-comp-{{compositeContentType.contentType.key}}"
                                         model="compositeContentType.selected"
                                         on-change="vm.selectCompositeContentType(compositeContentType.contentType)"
-                                        disabled="!compositeContentType.allowed || compositeContentType.inherited">
+                                        disabled="compositeContentType.allowed === false || compositeContentType.inherited">
                                     </umb-checkbox>
 
                                     <input type="checkbox"
@@ -84,7 +85,7 @@
                                            checklist-model="model.compositeContentTypes"
                                            checklist-value="compositeContentType.contentType.alias"
                                            ng-change="model.selectCompositeContentType(compositeContentType.contentType)"
-                                           ng-disabled="compositeContentType.allowed===false || compositeContentType.inherited" />                                  
+                                           ng-disabled="compositeContentType.allowed === false || compositeContentType.inherited" />                                  
 
                                 </div>
 

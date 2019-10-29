@@ -28,6 +28,9 @@
             vm.availableGroups = $filter("orderBy")(
                 _.map(
                     _.groupBy($scope.model.availableCompositeContentTypes, function (compositeContentType) {
+                        console.log("compositeContentType", compositeContentType);
+                        compositeContentType.selected = isSelected(compositeContentType.contentType.alias);
+
                         return compositeContentType.contentType.metaData.containerPath;
                     }), function (group) {
                         return {
@@ -39,8 +42,6 @@
                     return group.containerPath.replace(/\//g, " ");
                 });
         }
-
-        
 
         function isSelected(alias) {
             if ($scope.model.contentType.compositeContentTypes.indexOf(alias) !== -1) {
