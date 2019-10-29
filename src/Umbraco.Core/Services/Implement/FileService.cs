@@ -556,7 +556,7 @@ namespace Umbraco.Core.Services.Implement
         {
             if (template.Name != null && template.Name.Length > 255)
             {
-                throw new InvalidOperationException("Name cannot be null, empty, white-space characters only or more than 255 characters in length.");
+                throw new InvalidOperationException("Name cannot be null, empty, contain only white-space characters or be more than 255 characters in length.");
             }
 
 
