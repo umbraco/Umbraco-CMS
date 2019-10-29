@@ -22,8 +22,6 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="parentId"></param>
         /// <param name="childId"></param>
-        /// <param name="parentObjectType"></param>
-        /// <param name="childObjectType"></param>
         /// <param name="relationType"></param>
         public Relation(int parentId, int childId, IRelationType relationType)
         {
@@ -48,7 +46,7 @@ namespace Umbraco.Core.Models
             ParentObjectType = parentObjectType;
             ChildObjectType = childObjectType;
         }
-        
+
 
         /// <summary>
         /// Gets or sets the Parent Id of the Relation (Source)

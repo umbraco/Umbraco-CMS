@@ -175,8 +175,16 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             var nodes = Database.Fetch<NodeDto>(Sql().Select<NodeDto>().From<NodeDto>().Where<NodeDto>(x => x.NodeId == entity.ChildId || x.NodeId == entity.ParentId))
                 .ToDictionary(x => x.NodeId, x => x.NodeObjectType);
-            entity.ParentObjectType = nodes[entity.ParentId].Value;
-            entity.ChildObjectType = nodes[entity.ChildId].Value;
+
+            if(nodes.TryGetValue(entity.ParentId, out var parentObjectType))
+            {
+                entity.ParentObjectType = parentObjectType.GetValueOrDefault();
+            }
+
+            if(nodes.TryGetValue(entity.ChildId, out var childObjectType))
+            {
+                entity.ChildObjectType = childObjectType.GetValueOrDefault();
+            }
         }
     }
 }
