@@ -41,9 +41,9 @@ namespace Umbraco.Web.PropertyEditors
 
             public IEnumerable<UmbracoEntityReference> GetReferences(object value)
             {
-                if (value == null) yield break;
+                var asString = value is string str ? str : value?.ToString();
 
-                var asString = value is string str ? str : value.ToString();
+                if (string.IsNullOrEmpty(asString)) yield break;
 
                 yield return new UmbracoEntityReference(Udi.Parse(asString));
             }
