@@ -137,8 +137,26 @@ namespace Umbraco.Web
 
             //is it strongly typed?
             var stronglyTyped = cropperValue as ImageCropperValue;
-            if (stronglyTyped != null)
+            if (stronglyTyped is ImageCropperValue imageCropperValue)
             {
+                //if a cropAlias was added after media items were created, those media items won't have any crops
+                //so we add in the crops from the dataType
+                var propertyDataTypeConfig = mediaItem.ContentType.GetPropertyType(propertyAlias).DataType.Configuration;
+                if (imageCropperValue.Crops == null && propertyDataTypeConfig is Umbraco.Core.PropertyEditors.ImageCropperConfiguration imageCropperConfig)
+                {
+                    var crops = new System.Collections.Generic.List<ImageCropperValue.ImageCropperCrop>();
+                    foreach (var configuredCrop in imageCropperConfig.Crops)
+                    {
+                        crops.Add(new ImageCropperValue.ImageCropperCrop
+                        {
+                            Alias = configuredCrop.Alias,
+                            Width = configuredCrop.Width,
+                            Height = configuredCrop.Height
+                        });
+                    }
+                    imageCropperValue.Crops = crops;
+                }
+
                 return GetCropUrl(
                     mediaItemUrl, stronglyTyped, width, height, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions,
                     cacheBusterValue, furtherOptions, ratioMode, upScale);
