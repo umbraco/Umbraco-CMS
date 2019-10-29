@@ -58,7 +58,7 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override IDataValueEditor CreateValueEditor() => new NestedContentPropertyValueEditor(Attribute, PropertyEditors);
 
-        internal class NestedContentPropertyValueEditor : DataValueEditor
+        internal class NestedContentPropertyValueEditor : DataValueEditor, IDataValueReference
         {
             private readonly PropertyEditorCollection _propertyEditors;
 
@@ -264,6 +264,45 @@ namespace Umbraco.Web.PropertyEditors
                 }
 
                 return JsonConvert.SerializeObject(value);
+            }
+
+            public IEnumerable<UmbracoEntityReference> GetReferences(object value)
+            {
+                var rawJson = value == null ? string.Empty : value is string str ? str : value.ToString();
+
+                var result = new List<UmbracoEntityReference>();
+
+                var list = JsonConvert.DeserializeObject<List<object>>(rawJson);
+                if (list == null)
+                    return result;
+
+                foreach (var o in list)
+                {
+                    var propValues = (JObject) o;
+
+                    var contentType = GetElementType(propValues);
+                    if (contentType == null)
+                        continue;
+
+                    var propAliases = propValues.Properties().Select(x => x.Name).ToArray();
+                    foreach (var propAlias in propAliases)
+                    {
+                        var propType = contentType.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == propAlias);
+                        if (propType == null) continue;
+
+                        var propEditor = _propertyEditors[propType.PropertyEditorAlias];
+
+                        var valueEditor = propEditor?.GetValueEditor();
+                        if (!(valueEditor is IDataValueReference reference)) continue;
+
+                        var val = propValues[propAlias]?.ToString();
+
+                        var refs = reference.GetReferences(val);
+
+                        result.AddRange(refs);
+                    }
+                }
+                return result;
             }
 
             #endregion
