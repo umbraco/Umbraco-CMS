@@ -290,6 +290,7 @@
                 subtitle: "Are you sure you wish to delete",
                 closeButtonLabel: "Cancel",
                 submitButtonLabel: "Delete Search",
+                submitButtonStyle: "danger",
                 view: "default",
                 submit: function (model) {
                     //Resource call with two params (name & query)
