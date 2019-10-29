@@ -61,6 +61,16 @@ function clipboardService(notificationsService, eventsService, localStorageServi
         
         return shallowCloneData;
     }
+
+    var isEntryCompatible = function(entry, type, allowedAliases) {
+        return entry.type === type
+        && 
+        (
+            (entry.alias && allowedAliases.filter(allowedAlias => allowedAlias === entry.alias).length > 0)
+            || 
+            (entry.aliases && entry.aliases.filter(entryAlias => allowedAliases.filter(allowedAlias => allowedAlias === entryAlias).length > 0).length === entry.aliases.length)
+        );
+    }
     
     
     var service = {};
@@ -195,15 +205,7 @@ function clipboardService(notificationsService, eventsService, localStorageServi
         // Find entries that are fulfilling the criteria for this nodeType and nodeTypesAliases.
         var filteretEntries = storage.entries.filter(
             (entry) => {
-                return (
-                    entry.type === type
-                    && 
-                    (
-                        (entry.alias && allowedAliases.filter(allowedAlias => allowedAlias === entry.alias).length > 0)
-                        || 
-                        (entry.aliases && entry.aliases.filter(entryAlias => allowedAliases.filter(allowedAlias => allowedAlias === entryAlias).length > 0).length > 0)
-                    )
-                );
+                return isEntryCompatible(entry, type, allowedAliases);
             }
         );
         
@@ -243,15 +245,7 @@ function clipboardService(notificationsService, eventsService, localStorageServi
         // Find entries that are NOT fulfilling the criteria for this nodeType and nodeTypesAliases.
         var filteretEntries = storage.entries.filter(
             (entry) => {
-                return !(
-                    entry.type === type
-                    && 
-                    (
-                        (entry.alias && allowedAliases.filter(allowedAlias => allowedAlias === entry.alias).length > 0)
-                        || 
-                        (entry.aliases && entry.aliases.filter(entryAlias => allowedAliases.filter(allowedAlias => allowedAlias === entryAlias).length > 0).length > 0)
-                    )
-                );
+                return !isEntryCompatible(entry, type, allowedAliases);
             }
         );
         
