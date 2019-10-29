@@ -1144,8 +1144,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="uploadAnother">Upload another package</key>
     <key alias="cancelAndUploadAnother">Cancel and upload another package</key>
     <key alias="accept">I accept</key>
-    <key alias="termsOfUse">terms of use</key>
-    
+    <key alias="termsOfUse">terms of use</key>  
+
     <key alias="pathToFile">Path to file</key>
     <key alias="pathToFileDescription">Absolute path to file (ie: /bin/umbraco.bin)</key>
     <key alias="installed">Installed</key>
@@ -2174,3 +2174,4 @@ To manage your website, simply open the Umbraco back office and start adding con
     </area>
 
 </language>
+

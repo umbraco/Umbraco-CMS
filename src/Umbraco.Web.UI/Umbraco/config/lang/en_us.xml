@@ -279,6 +279,8 @@
     <key alias="nestedContentDeleteItem">Are you sure you want to delete this item?</key>
     <key alias="nestedContentEditorNotSupported">Property %0% uses editor %1% which is not supported by Nested Content.</key>
     <key alias="nestedContentNoContentTypes">No content types are configured for this property.</key>
+    <key alias="nestedContentAddElementType">Add element type</key>
+    <key alias="nestedContentSelectElementTypeModalTitle">Select element type</key>	
     <key alias="addTextBox">Add another text box</key>
     <key alias="removeTextBox">Remove this text box</key>
     <key alias="contentRoot">Content root</key>
@@ -412,6 +414,7 @@
     <key alias="cut">Cut</key>
     <key alias="editdictionary">Edit Dictionary Item</key>
     <key alias="editlanguage">Edit Language</key>
+    <key alias="editSelectedMedia">Edit selected media</key>
     <key alias="insertAnchor">Insert local link</key>
     <key alias="insertCharacter">Insert character</key>
     <key alias="insertgraphicheadline">Insert graphic headline</key>
@@ -652,6 +655,7 @@
     <key alias="field">Field</key>
     <key alias="findDocument">Find</key>
     <key alias="first">First</key>
+    <key alias="focalPoint">Focal point</key>
     <key alias="general">General</key>
     <key alias="groups">Groups</key>
     <key alias="group">Group</key>
@@ -1507,6 +1511,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         </key>
     <key alias="queryBuilder">Query builder</key>
     <key alias="itemsReturned">items returned, in</key>
+    <key alias="copyToClipboard">copy to clipboard</key>
     <key alias="iWant">I want</key>
     <key alias="allContent">all content</key>
     <key alias="contentOfType">content of type "%0%"</key>
@@ -1595,6 +1600,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="compositionsDescription">Inherit tabs and properties from an existing document type. New tabs will be added to the current document type or merged if a tab with an identical name exists.</key>
     <key alias="compositionInUse">This content type is used in a composition, and therefore cannot be composed itself.</key>
     <key alias="noAvailableCompositions">There are no content types available to use as a composition.</key>
+    <key alias="compositionRemoveWarning">Removing a composition will delete all the associated property data. Once you save the document type there's no way back.</key>
     <key alias="availableEditors">Create new</key>
     <key alias="reuse">Use existing</key>
     <key alias="editorSettings">Editor settings</key>
