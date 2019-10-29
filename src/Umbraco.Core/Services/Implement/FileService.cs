@@ -405,7 +405,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns></returns>
         public ITemplate CreateTemplateWithIdentity(string name, string alias, string content, ITemplate masterTemplate = null, int userId = Constants.Security.SuperUserId)
         {
-            if(name == null)
+            if (name == null)
             {
                 throw new ArgumentNullException(nameof(name), "Name cannot be null or empty");
             }
