@@ -35,6 +35,9 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
                 }
             }
 
+            // Include the MB version in the hash so that if the MB version changes, models are rebuilt
+            hash.Add(ApiVersion.Current.Version.ToString());
+
             return hash.GetCombinedHashCode();
         }
     }
