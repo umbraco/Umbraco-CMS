@@ -79,13 +79,16 @@
 
           <umb-control-group hide-label="true">
 
-            <umb-checkbox
-                model="currentSection.allowAll"
-                on-change="toggleAllowed(currentSection)"
-                text="Allow all row configurations"
-                label-key="grid_allowAllRowConfigurations"
+            <umb-toggle
+                class="umb-toggle-group-item__toggle"
+                checked="currentSection.allowAll"
+                on-click="currentSection.allowAll = !currentSection.allowAll"
+                show-labels="true"
+                label-position="right"
+                label-off="Allow all row configurations"
+                label-on="Allow all row configurations"
                 style="margin-left: 18px">
-            </umb-checkbox>
+            </umb-toggle>
 
              <div ng-if="currentSection.allowAll === false">
                   <hr />
