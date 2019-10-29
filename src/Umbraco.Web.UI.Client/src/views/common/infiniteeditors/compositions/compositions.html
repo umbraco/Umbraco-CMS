@@ -68,15 +68,13 @@
                             </li>
                             <li class="umb-checkbox-list__item"
                                 ng-repeat="compositeContentType in group.compositeContentTypes | orderBy:'contentType.name' | filter:searchTerm"
-                                ng-class="{'-disabled': compositeContentType.allowed === false || compositeContentType.inherited, '-selected': compositeContentType.selected || vm.isSelected(compositeContentType.contentType.alias)}">
+                                ng-class="{'-disabled': compositeContentType.allowed === false || compositeContentType.inherited, '-selected': compositeContentType.selected}">
 
-                                {{compositeContentType | json}}
-
-                                <div class="umb-checkbox-list__item-checkbox" ng-class="{ '-selected': model.compositeContentTypes.indexOf(compositeContentType.contentType.alias)+1 }">
+                                <div class="umb-checkbox-list__item-checkbox" ng-class="{'-selected': compositeContentType.selected }">
                                     <umb-checkbox
                                         input-id="umb-overlay-comp-{{compositeContentType.contentType.key}}"
                                         model="compositeContentType.selected"
-                                        on-change="vm.selectCompositeContentType(compositeContentType.contentType)"
+                                        on-change="vm.selectCompositeContentType(compositeContentType)"
                                         disabled="compositeContentType.allowed === false || compositeContentType.inherited">
                                     </umb-checkbox>
 
@@ -85,11 +83,11 @@
                                            checklist-model="model.compositeContentTypes"
                                            checklist-value="compositeContentType.contentType.alias"
                                            ng-change="model.selectCompositeContentType(compositeContentType.contentType)"
-                                           ng-disabled="compositeContentType.allowed === false || compositeContentType.inherited" />                                  
+                                           ng-disabled="compositeContentType.allowed === false || compositeContentType.inherited" />                                
 
                                 </div>
 
-                                <label for="umb-overlay-comp-{{compositeContentType.contentType.key}}" class="umb-checkbox-list__item-text" ng-class="{'-faded': compositeContentType.allowed===false}">
+                                <label for="umb-overlay-comp-{{compositeContentType.contentType.key}}" class="umb-checkbox-list__item-text" ng-class="{'-faded': compositeContentType.allowed === false}">
                                     <i class="{{ compositeContentType.contentType.icon }} umb-checkbox-list__item-icon"></i>
                                     {{ compositeContentType.contentType.name }}
                                     <span class="umb-checkbox-list__item-caption" ng-if="compositeContentType.inherited">(inherited)</span>

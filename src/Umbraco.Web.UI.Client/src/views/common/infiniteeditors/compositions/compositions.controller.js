@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function CompositionsController($scope, $location, $filter, overlayService, localizationService) {
+    function CompositionsController($scope, $location, $filter, $timeout, overlayService, localizationService) {
 
         var vm = this;
         var oldModel = null;
@@ -47,6 +47,7 @@
             if ($scope.model.contentType.compositeContentTypes.indexOf(alias) !== -1) {
                 return true;
             }
+            return false;
         }
 
         function openContentType(contentType, section) {
@@ -54,10 +55,12 @@
             $location.path(url);
         }
 
-        function selectCompositeContentType(contentType) {  
+        function selectCompositeContentType(compositeContentType) {  
+            console.log("compositeContentType", compositeContentType);
 
-            console.log("selectCompositeContentType", contentType);
-            console.log("$scope.model.contentType.compositeContentTypes", $scope.model.contentType.compositeContentTypes);
+            var contentType = compositeContentType.contentType;
+
+            $scope.model.selectCompositeContentType(contentType);
 
             // Check if the template is already selected.
             var index = $scope.model.contentType.compositeContentTypes.indexOf(contentType.alias);
@@ -68,7 +71,19 @@
                 $scope.model.contentType.compositeContentTypes.splice(index, 1);
             }
 
-            $scope.model.selectCompositeContentType(contentType);
+            // Not ideal, but set short timeout to wait for selectCompositeContentType to run and update "allowed" property.
+            $timeout(function () {
+                angular.forEach(vm.availableGroups, function (group) {
+
+                    var notAllowed = _.filter(group.compositeContentTypes, function (obj) {
+                        return obj.allowed === false;
+                    });
+
+                    angular.forEach(notAllowed, function (obj) {
+                        obj.selected = false;
+                    });
+                });
+            }, 1000);
         }
 
         function submit() {
