@@ -24,6 +24,9 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
 
         public string Text()
         {
+            if (!_config.Enable)
+                return "Version: " + ApiVersion.Current.Version + "<br />&nbsp;<br />ModelsBuilder is disabled<br />(the .Enable key is missing, or its value is not 'true').";
+
             var sb = new StringBuilder();
 
             sb.Append("Version: ");

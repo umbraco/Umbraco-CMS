@@ -50,6 +50,9 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="ApiVersion.cs" />
+    <Compile Include="BackOffice\ContentTypeModelValidatorBase.cs" />
+    <Compile Include="BackOffice\MediaTypeModelValidator.cs" />
+    <Compile Include="BackOffice\MemberTypeModelValidator.cs" />
     <Compile Include="Building\Builder.cs" />
     <Compile Include="Building\PropertyModel.cs" />
     <Compile Include="Building\TextBuilder.cs" />

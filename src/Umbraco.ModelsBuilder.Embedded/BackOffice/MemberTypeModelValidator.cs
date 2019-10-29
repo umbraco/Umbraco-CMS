@@ -8,9 +8,9 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
     /// no illegal aliases are used
     /// </summary>
     // ReSharper disable once UnusedMember.Global - This is typed scanned
-    public class ContentTypeModelValidator : ContentTypeModelValidatorBase<DocumentTypeSave, PropertyTypeBasic>
+    public class MemberTypeModelValidator : ContentTypeModelValidatorBase<MemberTypeSave, MemberPropertyTypeBasic>
     {
-        public ContentTypeModelValidator(IModelsBuilderConfig config) : base(config)
+        public MemberTypeModelValidator(IModelsBuilderConfig config) : base(config)
         {
         }
     }

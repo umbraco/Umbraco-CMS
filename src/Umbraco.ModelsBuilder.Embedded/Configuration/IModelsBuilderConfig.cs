@@ -2,6 +2,7 @@
 {
     public interface IModelsBuilderConfig
     {
+        bool Enable { get; }
         bool AcceptUnsafeModelsDirectory { get; }
         int DebugLevel { get; }
         bool EnableFactory { get; }

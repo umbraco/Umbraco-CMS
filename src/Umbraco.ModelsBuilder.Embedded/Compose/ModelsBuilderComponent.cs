@@ -39,7 +39,8 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
 
             ContentModelBinder.ModelBindingException += ContentModelBinder_ModelBindingException;
 
-            FileService.SavingTemplate += FileService_SavingTemplate;
+            if (_config.Enable)
+                FileService.SavingTemplate += FileService_SavingTemplate;
 
             if (_config.ModelsMode.IsLiveNotPure())
                 _liveModelsProvider.Install();
@@ -81,7 +82,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
         {
             var settings = new Dictionary<string, object>
             {
-                {"enabled", true}
+                {"enabled", _config.Enable}
             };
 
             return settings;

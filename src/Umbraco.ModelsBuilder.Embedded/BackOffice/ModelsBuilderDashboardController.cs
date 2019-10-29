@@ -97,7 +97,7 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
         {
             return new Dashboard
             {
-                Enable = true,
+                Enable = _config.Enable,
                 Text = _dashboardReport.Text(),
                 CanGenerate = _dashboardReport.CanGenerate(),
                 OutOfDateModels = _dashboardReport.AreModelsOutOfDate(),

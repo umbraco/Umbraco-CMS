@@ -8,7 +8,7 @@
         /// <summary>
         /// Do not generate models.
         /// </summary>
-        Nothing = 0, // default value //TODO: This doesn't make sense since we cannot actualy disable MB since Umbraco would die
+        Nothing = 0, // default value 
 
         /// <summary>
         /// Generate models in memory.
