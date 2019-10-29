@@ -3,11 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Formatting;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Trees;
+using Umbraco.Web.Search;
 using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Trees
@@ -18,6 +24,13 @@ namespace Umbraco.Web.Trees
     [CoreTree]
     public class ContentTypeTreeController : TreeController, ISearchableTree
     {
+        private readonly UmbracoTreeSearcher _treeSearcher;
+
+        public ContentTypeTreeController(UmbracoTreeSearcher treeSearcher, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        {
+            _treeSearcher = treeSearcher;
+        }
+
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
         {
             var root = base.CreateRootNode(queryStrings);
@@ -49,8 +62,10 @@ namespace Umbraco.Web.Trees
             //if the request is for folders only then just return
             if (queryStrings["foldersonly"].IsNullOrWhiteSpace() == false && queryStrings["foldersonly"] == "1") return nodes;
 
+            var children = Services.EntityService.GetChildren(intId.Result, UmbracoObjectTypes.DocumentType).ToArray();
+            var contentTypes = Services.ContentTypeService.GetAll(children.Select(c => c.Id).ToArray()).ToDictionary(c => c.Id);
             nodes.AddRange(
-                Services.EntityService.GetChildren(intId.Result, UmbracoObjectTypes.DocumentType)
+                children
                     .OrderBy(entity => entity.Name)
                     .Select(dt =>
                     {
@@ -60,6 +75,12 @@ namespace Umbraco.Web.Trees
                         var node = CreateTreeNode(dt, Constants.ObjectTypes.DocumentType, id, queryStrings, Constants.Icons.ContentType, hasChildren);
 
                         node.Path = dt.Path;
+
+                        // enrich the result with content type data that's not available in the entity service output
+                        var contentType = contentTypes[dt.Id];
+                        node.Alias = contentType.Alias;
+                        node.AdditionalData["isElement"] = contentType.IsElement;
+
                         return node;
                     }));
 
@@ -135,10 +156,7 @@ namespace Umbraco.Web.Trees
         }
 
         public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
-        {
-            var results = Services.EntityService.GetPagedDescendants(UmbracoObjectTypes.DocumentType, pageIndex, pageSize, out totalFound,
-                filter: SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(query)));
-            return Mapper.MapEnumerable<IEntitySlim, SearchResultEntity>(results);
-        }
+            => _treeSearcher.EntitySearch(UmbracoObjectTypes.DocumentType, query, pageSize, pageIndex, out totalFound, searchFrom);
+
     }
 }

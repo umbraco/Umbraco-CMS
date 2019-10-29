@@ -26,7 +26,6 @@
                     <ng-form name="headerNameForm">
                         <input data-element="editor-name-field"
                                no-password-manager
-                               title="{{key}}"
                                type="text"
                                class="umb-editor-header__name-input"
                                localize="placeholder"
@@ -36,6 +35,7 @@
                                ng-model="name"
                                ng-class="{'name-is-empty': $parent.name===null || $parent.name===''}"
                                umb-auto-focus
+                               focus-on-filled="true"
                                val-server-field="Name"
                                required
                                autocomplete="off" />

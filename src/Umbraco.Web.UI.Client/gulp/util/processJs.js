@@ -11,6 +11,8 @@ var embedTemplates = require('gulp-angular-embed-templates');
 
 module.exports = function (files, out) {
 
+    console.log("JS: ", files, " -> ", config.root + config.targets.js + out)
+
     var task = gulp.src(files);
 
     // check for js errors

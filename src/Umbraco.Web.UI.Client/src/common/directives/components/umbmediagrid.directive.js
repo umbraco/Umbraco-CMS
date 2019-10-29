@@ -193,6 +193,9 @@ Use this directive to generate a thumbnail grid of media items.
             * Returns wether a item should be selectable or not.
             */
             function getSelectableState(item) {
+                if (item.filtered) {
+                    return false;
+                }
 
                 // check if item is a folder or image
                 if (item.isFolder === true) {
