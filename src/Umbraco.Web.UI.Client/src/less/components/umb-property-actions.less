@@ -65,6 +65,10 @@
 .umb-property .umb-property-actions__toggle:focus {
     opacity: 1;
 }
+// Revert-style-hack that ensures that we only show property-actions on properties that are directly begin hovered.
+.umb-property:hover .umb-property:not(:hover) .umb-property-actions__toggle {
+    opacity: 0;
+}
 
 .umb-property-actions__menu {
     
