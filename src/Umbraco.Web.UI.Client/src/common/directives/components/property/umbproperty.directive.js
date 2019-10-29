@@ -42,7 +42,6 @@ angular.module("umbraco.directives")
                     event.stopPropagation();
                     
                     $scope.propertyEditorAPI = api;
-                    //$scope.propertyActions = api.propertyActions;
                 });
 
                 $scope.$on("$destroy", function () {
