@@ -16,7 +16,7 @@ module.exports = function(files, out) {
         cssnano({zindex: false})
     ];
     
-    console.log("LESS: ", files, " -> ", config.root + config.targets.js + out)
+    console.log("LESS: ", files, " -> ", config.root + config.targets.css + out)
     
     var task = gulp.src(files)
         .pipe(less())
