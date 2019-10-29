@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Umbraco.ModelsBuilder.Tests
+﻿namespace Umbraco.Tests.ModelsBuilder
 {
     public static class StringExtensions
     {

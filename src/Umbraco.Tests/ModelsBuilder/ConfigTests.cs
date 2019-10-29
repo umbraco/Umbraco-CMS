@@ -1,8 +1,8 @@
 ﻿using System.Configuration;
 using NUnit.Framework;
-using Umbraco.ModelsBuilder.Configuration;
+using Umbraco.ModelsBuilder.Embedded.Configuration;
 
-namespace Umbraco.ModelsBuilder.Tests
+namespace Umbraco.Tests.ModelsBuilder
 {
     [TestFixture]
     public class ModelsBuilderConfigTests

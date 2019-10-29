@@ -14,6 +14,7 @@
   <appSettings xdt:Transform="InsertIfMissing" />
   <appSettings>
     <add key="owin:appStartup" value="UmbracoDefaultOwinStartup" xdt:Locator="Match(key)" xdt:Transform="InsertIfMissing" />
+	<add key="Umbraco.ModelsBuilder.Enable" value="false" xdt:Locator="Match(key)" xdt:Transform="InsertIfMissing" />
 	<add key="Umbraco.ModelsBuilder.ModelsMode" value="Nothing" xdt:Locator="Match(key)" xdt:Transform="InsertIfMissing" />
   </appSettings>
 
