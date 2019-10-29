@@ -97,7 +97,7 @@ function clipboardService(notificationsService, eventsService, localStorageServi
         if (saveStorage(storage) === true) {
             notificationsService.success("Clipboard", "Copied to clipboard.");
         } else {
-            notificationsService.success("Clipboard", "Couldnt copy this data to clipboard.");
+            notificationsService.error("Clipboard", "Couldnt copy this data to clipboard.");
         }
         
     };
@@ -134,14 +134,12 @@ function clipboardService(notificationsService, eventsService, localStorageServi
         
         var entry = {unique:uniqueKey, type:type, aliases:aliases, data:copiedDatas, label:displayLabel, icon:displayIcon};
 
-        console.log(entry);
-
         storage.entries.push(entry);
         
         if (saveStorage(storage) === true) {
             notificationsService.success("Clipboard", "Copied to clipboard.");
         } else {
-            notificationsService.success("Clipboard", "Couldnt copy this data to clipboard.");
+            notificationsService.error("Clipboard", "Couldnt copy this data to clipboard.");
         }
         
     };
@@ -241,8 +239,6 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     service.clearEntriesOfType = function(type, allowedAliases) {
         
         var storage = retriveStorage();
-        
-        console.log("BEFORE: ", storage.entries)
 
         // Find entries that are NOT fulfilling the criteria for this nodeType and nodeTypesAliases.
         var filteretEntries = storage.entries.filter(
@@ -260,8 +256,6 @@ function clipboardService(notificationsService, eventsService, localStorageServi
         );
         
         storage.entries = filteretEntries;
-        
-        console.log("AFTER: ", storage.entries)
 
         saveStorage(storage);
     };
