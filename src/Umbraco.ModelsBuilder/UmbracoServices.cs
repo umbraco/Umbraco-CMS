@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.ModelsBuilder.Building;
-using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder
 {

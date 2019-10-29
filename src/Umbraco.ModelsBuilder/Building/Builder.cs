@@ -1,12 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder.Building
@@ -71,8 +65,8 @@ namespace Umbraco.ModelsBuilder.Building
         /// Initializes a new instance of the <see cref="Builder"/> class with a list of models to generate,
         /// the result of code parsing, and a models namespace.
         /// </summary>
+        /// <param name="config"></param>
         /// <param name="typeModels">The list of models to generate.</param>
-        /// <param name="modelsNamespace">The models namespace.</param>
         protected Builder(IModelsBuilderConfig config, IList<TypeModel> typeModels)
         {
             _typeModels = typeModels ?? throw new ArgumentNullException(nameof(typeModels));

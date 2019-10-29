@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder.Building
@@ -18,6 +16,7 @@ namespace Umbraco.ModelsBuilder.Building
         /// Initializes a new instance of the <see cref="TextBuilder"/> class with a list of models to generate
         /// and the result of code parsing.
         /// </summary>
+        /// <param name="config"></param>
         /// <param name="typeModels">The list of models to generate.</param>
         public TextBuilder(IModelsBuilderConfig config, IList<TypeModel> typeModels)
             : base(config, typeModels)

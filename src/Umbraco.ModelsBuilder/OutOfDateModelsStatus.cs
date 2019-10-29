@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using Umbraco.Core.Composing;
 using Umbraco.ModelsBuilder.Configuration;
 using Umbraco.Web.Cache;
 

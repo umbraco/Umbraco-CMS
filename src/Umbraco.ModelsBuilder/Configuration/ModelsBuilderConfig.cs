@@ -2,7 +2,6 @@
 using System.Configuration;
 using System.IO;
 using System.Web.Configuration;
-using System.Web.Hosting;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 
