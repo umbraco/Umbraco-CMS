@@ -332,9 +332,11 @@
     <key alias="createContentBlueprint">Vælg den dokumenttype, du vil oprette en indholdsskabelon til</key>
     <key alias="enterFolderName">Angiv et navn for mappen</key>
     <key alias="updateData">Vælg en type og skriv en titel</key>
-    <key alias="noDocumentTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte dokument typer. Du skal tillade disse i indstillinger under <strong>"dokument typer"</strong>.]]></key>
+    <key alias="noDocumentTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte dokumenttyper. Du skal tillade disse i indstillinger under <strong>"dokumenttyper"</strong>.]]></key>
+    <key alias="noDocumentTypesAtRoot"><![CDATA[There are no document types available for creating content here. You must create these in <strong>Document Types</strong> within the <strong>Settings</strong> section.]]></key>
     <key alias="noDocumentTypesWithNoSettingsAccess">Den valgte side i træet tillader ikke at sider oprettes under den.</key>
     <key alias="noDocumentTypesEditPermissions">Rediger tilladelser for denne dokumenttype.</key>
+    <key alias="noDocumentTypesCreateNew">Opret en ny dokumenttype</key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte media typer. Du skal tillade disse i indstillinger under <strong>"media typer"</strong>.]]></key>
     <key alias="noMediaTypesWithNoSettingsAccess">Det valgte medie i træet tillader ikke at medier oprettes under det.</key>
     <key alias="noMediaTypesEditPermissions">Rediger tilladelser for denne medietype.</key>
@@ -406,6 +408,7 @@
     <key alias="cut">Klip</key>
     <key alias="editdictionary">Rediger ordbogsnøgle</key>
     <key alias="editlanguage">Rediger sprog</key>
+    <key alias="editSelectedMedia">Rediger det valgte medie</key>
     <key alias="insertAnchor">Indsæt lokalt link</key>
     <key alias="insertCharacter">Indsæt tegn</key>
     <key alias="insertgraphicheadline">Indsæt grafisk overskrift</key>
@@ -419,7 +422,6 @@
     <key alias="linkinternal">Internt link:</key>
     <key alias="linklocaltip">Ved lokalt link, indsæt da en "#" foran linket</key>
     <key alias="linknewwindow">Åben i nyt vindue?</key>
-    <key alias="macroContainerSettings">Makroindstillinger</key>
     <key alias="macroDoesNotHaveProperties">Denne makro har ingen egenskaber du kan redigere</key>
     <key alias="paste">Indsæt tekst</key>
     <key alias="permissionsEdit">Rediger rettigheder for</key>
@@ -446,7 +448,7 @@
     <key alias="linkToPage">Link til side</key>
     <key alias="openInNewWindow">Åben linket i et nyt vindue eller fane</key>
     <key alias="linkToMedia">Link til medie</key>
-    <key alias="selectContentStartNode">Vælg indhold startnode</key>
+    <key alias="selectContentStartNode">Vælg startnode for indhold</key>
     <key alias="selectMedia">Vælg medie</key>
     <key alias="selectMediaType">Vælg medietype</key>
     <key alias="selectIcon">Vælg ikon</key>
@@ -455,7 +457,7 @@
     <key alias="selectMacro">Vælg makro</key>
     <key alias="selectContent">Vælg indhold</key>
     <key alias="selectContentType">Vælg indholdstype</key>
-    <key alias="selectMediaStartNode">Vælg medie startnode</key>
+    <key alias="selectMediaStartNode">Vælg startnode for mediearkivet</key>
     <key alias="selectMember">Vælg medlem</key>
     <key alias="selectMemberGroup">Vælg medlemsgruppe</key>
     <key alias="selectMemberType">Vælg medlemstype</key>
@@ -511,6 +513,7 @@
     <key alias="searchDescription">Søg i indekset og se resultaterne</key>
     <key alias="tools">Værktøjer</key>
     <key alias="toolsDescription">Værktøjer til at administrere indekset</key>
+    <key alias="fields">felter</key>
   </area>
   <area alias="placeholders">
     <key alias="username">Indtast dit brugernavn</key>
@@ -523,7 +526,7 @@
     <key alias="label">Label...</key>
     <key alias="enterDescription">Indtast beskrivelse</key>
     <key alias="search">Søg...</key>
-    <key alias="filter">Filtrer...</key>
+    <key alias="filter">Filtrér...</key>
     <key alias="enterTags">Indtast nøgleord (tryk på Enter efter hvert nøgleord)...</key>
     <key alias="email">Indtast din e-mail</key>
     <key alias="enterMessage">Indtast en besked...</key>
@@ -564,6 +567,8 @@
     <key alias="selectFolder">Vælg den mappe, der skal flyttes</key>
     <key alias="inTheTree">til i træstrukturen nedenfor</key>
     <key alias="wasMoved">blev flyttet under</key>
+    <key alias="hasReferencesDeleteConsequence"><![CDATA[Ved sletning af <strong>%0%</strong> fjernes egnskaber og egnskabernes data fra følgende elementer]]></key>
+    <key alias="acceptDeleteConsequence">I understand this action will delete the properties and data based on this Data Type</key>
   </area>
   <area alias="errorHandling">
     <key alias="errorButDataWasSaved">Dine data er blevet gemt, men før du kan udgive denne side er der nogle fejl der skal rettes:</key>
@@ -639,6 +644,7 @@
     <key alias="field">Felt</key>
     <key alias="findDocument">Find</key>
     <key alias="first">Første</key>
+    <key alias="focalPoint">Fokuspunkt</key>
     <key alias="general">Generelt</key>
     <key alias="groups">Grupper</key>
     <key alias="group">Gruppe</key>
@@ -933,7 +939,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="pathToFile">Sti til fil</key>
     <key alias="pathToFileDescription">Absolut sti til fil (f.eks.: /bin/umbraco.bin)</key>
     <key alias="installed">Installeret</key>
-    <key alias="installedPackages">Installeret pakker</key>
+    <key alias="installedPackages">Installerede pakker</key>
     <key alias="installLocal">Installér lokal</key>
     <key alias="installFinish">Afslut</key>
     <key alias="noConfigurationView">Denne pakke har ingen konfigurationsvisning</key>
@@ -1356,6 +1362,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="compositionsDescription">Nedarv faner og egenskaber fra en anden dokumenttype. Nye faner vil blive tilføjet den nuværende dokumenttype eller sammenflettet hvis fanenavnene er ens.</key>
     <key alias="compositionInUse">Indholdstypen bliver brugt i en komposition og kan derfor ikke blive anvendt som komposition</key>
     <key alias="noAvailableCompositions">Der er ingen indholdstyper tilgængelige at bruge som komposition</key>
+    <key alias="compositionRemoveWarning">Når du fjerner en komposition vil alle associerede indholdsdata blive slettet. Når først dokumenttypen er gemt, er der ingen vej tilbage.</key>
     <key alias="availableEditors">Tilgængelige editors</key>
     <key alias="reuse">Genbrug</key>
     <key alias="editorSettings">Editor indstillinger</key>
@@ -1575,7 +1582,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="permissionSelectedPages">Du ændrer i øjeblikket rettigheder for siderne:</key>
     <key alias="permissionSelectPages">Vælg sider for at ændre deres rettigheder</key>
     <key alias="removePhoto">Fjern billede</key>
-    <key alias="permissionsDefault">Standard rettigheder</key>
+    <key alias="permissionsDefault">Standardrettigheder</key>
     <key alias="permissionsGranular">Granulære rettigheder</key>
     <key alias="permissionsGranularHelp">Sæt rettigheder for specifikke noder</key>
     <key alias="profile">Profil</key>
@@ -1712,5 +1719,20 @@ Mange hilsner fra Umbraco robotten
     <key alias="openBackofficeSearch">Åben backoffice søgning</key>
     <key alias="openCloseBackofficeHelp">Åben/Luk backoffice hjælp</key>
     <key alias="openCloseBackofficeProfileOptions">Åben/Luk dine profil indstillinger</key>
+    <key alias="currentLanguage">Aktivt sprog</key>
+    <key alias="switchLanguage">Skift sprog til</key>
+    <key alias="createNewFolder">Opret ny mappe</key>
   </area>
+  <area alias="references">
+    <key alias="tabName">Referencer</key>
+    <key alias="DataTypeNoReferences">Denne Data Type har ingen referencer.</key>
+    <key alias="labelsedByDocumentTypes">Brugt i Dokument Typer</key>
+    <key alias="noDocumentTypes">Ingen referencer til Dokument Typer.</key>
+    <key alias="labelUsedByMediaTypes">Brugt i Medie Typer</key>
+    <key alias="noMediaTypes">Ingen referencer til Medie Typer.</key>
+    <key alias="labelUsedByMemberTypes">Brugt i Medlems Typer</key>
+    <key alias="noMemberTypes">Ingen referencer til Medlems Typer.</key>
+    <key alias="usedByProperties">Brugt af</key>
+  </area>
+
 </language>

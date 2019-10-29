@@ -1143,6 +1143,14 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 prependToContext: true
             });
 
+            // the editor frame catches Ctrl+S and handles it with the system save dialog
+            // - we want to handle it in the content controller, so we'll emit an event instead
+            editor.addShortcut('Ctrl+S', '', function () {
+                angularHelper.safeApply($rootScope, function() {
+                    eventsService.emit("rte.shortcut.save");
+                });
+            });
+
         },
 
         insertLinkInEditor: function (editor, target, anchorElm) {
@@ -1346,8 +1354,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 var content = e.content;
 
                 // Upload BLOB images (dragged/pasted ones)
-                if(content.indexOf('<img src="blob:') > -1){
-
+                // find src attribute where value starts with `blob:`
+                // search is case-insensitive and allows single or double quotes 
+                if(content.search(/src=["']blob:.*?["']/gi) !== -1){
                     args.editor.uploadImages(function(data) {
                         // Once all images have been uploaded
                         data.forEach(function(item) {
@@ -1480,6 +1489,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     onlyImages: true,
                     showDetails: true,
                     disableFolderSelect: true,
+                    disableFocalPoint: true,
                     startNodeId: startNodeId,
                     startNodeIsVirtual: startNodeIsVirtual,
                     dataTypeKey: args.model.dataTypeKey,

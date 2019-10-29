@@ -26,6 +26,7 @@
 @param {string} value Set the value of the checkbox.
 @param {string} name Set the name of the checkbox.
 @param {string} text Set the text for the checkbox label.
+@param {string} labelKey Set a dictinary/localization string for the checkbox label
 @param {string} serverValidationField Set the <code>val-server-field</code> of the checkbox.
 @param {boolean} disabled Set the checkbox to be disabled.
 @param {boolean} required Set the checkbox to be required.
@@ -35,12 +36,24 @@
 
 (function () {
     'use strict';
-    
-    function UmbCheckboxController($timeout) {
-        
+
+    function UmbCheckboxController($timeout, localizationService) {
+
         var vm = this;
 
+        vm.$onInit = onInit;
         vm.change = change;
+
+        function onInit() {
+            // If a labelKey is passed let's update the returned text if it's does not contain an opening square bracket [
+            if (vm.labelKey) {
+                 localizationService.localize(vm.labelKey).then(function (data) {
+                      if(data.indexOf('[') === -1){
+                        vm.text = data;
+                      }
+                 });
+            }
+        }
 
         function change() {
             if (vm.onChange) {
@@ -50,7 +63,7 @@
             }
         }
     }
-    
+
     var component = {
         templateUrl: 'views/components/forms/umb-checkbox.html',
         controller: UmbCheckboxController,
@@ -61,6 +74,7 @@
             value: "@",
             name: "@",
             text: "@",
+            labelKey: "@?",
             serverValidationField: "@",
             disabled: "<",
             required: "<",
