@@ -26,19 +26,18 @@
 
                     <div>
                         {{template.name}} <br />
-                        <i class="icon-delete red"></i>
-                        <a class="btn btn-small btn-link"
-                           href
-                           ng-click="deleteTemplate($index)"><localize key="general_delete" /></a>
+                        <i class="icon-delete red" aria-hidden="true"></i>
+                        <button class="btn btn-small btn-link"                           
+                           ng-click="deleteTemplate($index)"><localize key="general_delete" /></button>
                     </div>
 
                 </li>
             </ul>
 
-            <button class="btn btn-small"
+            <button class="btn btn-small btn-info"
                     prevent-default
                     ng-click="configureTemplate()">
-                <i class="icon-add"></i> <localize key="grid_addGridLayout" />
+                <i class="icon-add" aria-hidden="true"></i> <localize key="grid_addGridLayout" />
             </button>
         </div>
     </div>
@@ -74,17 +73,17 @@
 
                         <div>
                             {{layout.label || layout.name}}<br />
-                            <i class="icon-delete red"></i>
-                            <a class="btn btn-small btn-link" href ng-click="deleteLayout($index)">
+                            <i class="icon-delete red" aria-hidden="true"></i>
+                            <button class="btn btn-small btn-link" ng-click="deleteLayout($index)">
                                 <localize key="general_delete" />
-                            </a>
+                            </button>
                         </div>
 
                     </li>
                 </ul>
 
                 <button class="btn btn-small" prevent-default ng-click="configureLayout()">
-                    <i class="icon-add"></i> <localize key="grid_addRowConfiguration" />
+                    <i class="icon-add" aria-hidden="true"></i> <localize key="grid_addRowConfiguration" />
                 </button>
 
             </div>
@@ -108,10 +107,10 @@
                 ng-model="model.value.config">
 
                 <li ng-repeat="configValue in model.value.config">
-                    <i class="icon icon-navigation handle"></i>
+                    <i class="icon icon-navigation handle" aria-hidden="true"></i>
 
                     <a href="#" prevent-default ng-click="removeConfigValue(model.value.config, $index)">
-                        <i class="icon icon-delete red"></i>
+                        <i class="icon icon-delete red" aria-hidden="true"></i>
                         {{configValue.label}}
                     </a>
                 </li>
@@ -119,7 +118,7 @@
 
             <ul class="unstyled list-icons">
                 <li>
-                    <i class="icon icon-settings-alt-2 turquoise"></i>
+                    <i class="icon icon-settings-alt-2 turquoise" aria-hidden="true"></i>
 
                     <a href="#" ng-click="editConfig()" prevent-default>
                         <localize key="general_edit" />
@@ -137,10 +136,10 @@
                 ng-model="model.value.styles">
 
                 <li ng-repeat="style in model.value.styles">
-                    <i class="icon icon-navigation handle"></i>
+                    <i class="icon icon-navigation handle" aria-hidden="true"></i>
 
                     <a href="#" prevent-default ng-click="removeConfigValue(model.value.styles, $index)">
-                        <i class="icon icon-delete red"></i>
+                        <i class="icon icon-delete red" aria-hidden="true"></i>
                         {{style.label}}
                     </a>
 
@@ -149,7 +148,7 @@
 
             <ul class="unstyled list-icons">
                 <li>
-                    <i class="icon icon-settings-alt-2 turquoise"></i>
+                    <i class="icon icon-settings-alt-2 turquoise" aria-hidden="true"></i>
                     <a href="#" ng-click="editStyles()" prevent-default>
                         <localize key="general_edit" />
                     </a>
