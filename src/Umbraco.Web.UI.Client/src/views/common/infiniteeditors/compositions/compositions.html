@@ -77,14 +77,6 @@
                                         on-change="vm.selectCompositeContentType(compositeContentType)"
                                         disabled="compositeContentType.allowed === false || compositeContentType.inherited">
                                     </umb-checkbox>
-
-                                    <input type="checkbox"
-                                           id="umb-overlay-comp-{{compositeContentType.contentType.key}}"
-                                           checklist-model="model.compositeContentTypes"
-                                           checklist-value="compositeContentType.contentType.alias"
-                                           ng-change="model.selectCompositeContentType(compositeContentType.contentType)"
-                                           ng-disabled="compositeContentType.allowed === false || compositeContentType.inherited" />                                
-
                                 </div>
 
                                 <label for="umb-overlay-comp-{{compositeContentType.contentType.key}}" class="umb-checkbox-list__item-text" ng-class="{'-faded': compositeContentType.allowed === false}">
