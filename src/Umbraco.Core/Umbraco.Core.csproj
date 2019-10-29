@@ -10,6 +10,7 @@
     <RootNamespace>Umbraco.Core</RootNamespace>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <TargetFrameworkProfile />
+    <AdditionalFileItemNames>$(AdditionalFileItemNames);Content</AdditionalFileItemNames>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -58,6 +59,11 @@
     <PackageReference Include="Microsoft.SourceLink.GitHub">
       <Version>1.0.0-beta2-19324-01</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="SecurityCodeScan">
+      <Version>3.3.0</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Serilog.Sinks.Async">
@@ -245,6 +251,8 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\RichTextPreValueMigrator.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\DropDownFlexiblePreValueMigrator.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\MergeDateAndDateTimePropertyEditor.cs" />
+    <Compile Include="Models\ContentEditing\ContentAppBadge.cs" />
+    <Compile Include="Models\ContentEditing\ContentAppBadgeType.cs" />
     <Compile Include="Models\Entities\EntityExtensions.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\PreValueMigratorBase.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\PreValueDto.cs" />

@@ -38,19 +38,6 @@
                         ngf-max-size="{{ maxFileSize }}">
                     -&nbsp;<localize key="media_orClickHereToUpload">or click here to choose files</localize>
                 </button>
-
-                <button type="button"
-                        prevent-default
-                        data-element="button-uploadMedia"
-                        class="file-select sr-only"
-                        ngf-select
-                        ng-model="filesHolder"
-                        ngf-change="handleFiles($newFiles, $event)"
-                        ngf-multiple="true"
-                        ngf-pattern="{{ accept }}"
-                        ngf-max-size="{{ maxFileSize }}">
-                    -&nbsp;<localize key="media_uploadFiles">Click here to upload files</localize>
-                </button>
             </div>
         </div>
 

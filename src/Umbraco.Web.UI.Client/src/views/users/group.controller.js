@@ -105,6 +105,7 @@
             var sectionPicker = {
                 selection: currentSelection,
                 submit: function (model) {
+                    vm.userGroup.sections = model.selection;
                     editorService.close();
                 },
                 close: function () {
@@ -168,7 +169,8 @@
             angular.copy(vm.userGroup.users, currentSelection);
             var userPicker = {
                 selection: currentSelection,
-                submit: function () {
+                submit: function (model) {
+                    vm.userGroup.users = model.selection;
                     editorService.close();
                 },
                 close: function () {
