@@ -405,9 +405,19 @@ namespace Umbraco.Core.Services.Implement
         /// <returns></returns>
         public ITemplate CreateTemplateWithIdentity(string name, string alias, string content, ITemplate masterTemplate = null, int userId = Constants.Security.SuperUserId)
         {
-            if (name != null && name.Length > 255)
+            if(name == null)
             {
-                throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+                throw new ArgumentNullException(nameof(name), "Name cannot be null or empty");
+            }
+
+            if (string.IsNullOrWhiteSpace(name)) 
+            {
+                throw new ArgumentException("Name cannot be empty or contain only white-space characters", nameof(name));
+            }
+
+            if (name.Length > 255)
+            {
+                throw new ArgumentOutOfRangeException(nameof(name), "Name cannot be more than 255 characters in length.");
             }
 
             // file might already be on disk, if so grab the content to avoid overwriting
