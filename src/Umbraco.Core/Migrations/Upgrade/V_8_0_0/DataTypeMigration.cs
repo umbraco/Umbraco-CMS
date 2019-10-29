@@ -74,9 +74,18 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                     .From<DataTypeDto>()
                     .Where<DataTypeDto>(x => x.NodeId == group.Key)).First();
 
+                // check for duplicate aliases
+                var aliases = group.Select(x => x.Alias).Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
+                if (aliases.Distinct().Count() != aliases.Length)
+                    throw new InvalidOperationException($"Cannot migrate prevalues for datatype id={dataType.NodeId}, editor={dataType.EditorAlias}: duplicate alias.");
+
+                // handle null/empty aliases
+                int index = 0;
+                var dictionary = group.ToDictionary(x => string.IsNullOrWhiteSpace(x.Alias) ? index++.ToString() : x.Alias);
+
                 // migrate the preValues to configuration
                 var migrator = _preValueMigrators.GetMigrator(dataType.EditorAlias) ?? new DefaultPreValueMigrator();
-                var config = migrator.GetConfiguration(dataType.NodeId, dataType.EditorAlias, group.ToDictionary(x => x.Alias, x => x));
+                var config = migrator.GetConfiguration(dataType.NodeId, dataType.EditorAlias, dictionary);
                 var json = JsonConvert.SerializeObject(config);
 
                 // validate - and kill the migration if it fails

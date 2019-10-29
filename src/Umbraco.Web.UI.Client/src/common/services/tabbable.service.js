@@ -15,7 +15,8 @@
             '[tabindex]',
             'audio[controls]',
             'video[controls]',
-            '[contenteditable]:not([contenteditable="false"])'
+            '[contenteditable]:not([contenteditable="false"])',
+            'iframe[data-mce-style]'
           ];
           var candidateSelector = candidateSelectors.join(',');
 

@@ -63,8 +63,9 @@
 }
 
 /* Special case to support helviticons for the tiny mce button controls */
-.umb-rte .mce-ico.mce-i-custom[class^="icon-"],
-.umb-rte .mce-ico.mce-i-custom[class*=" icon-"] {
+// Also used in Prevalue editor.
+.mce-ico.mce-i-custom[class^="icon-"],
+.mce-ico.mce-i-custom[class*=" icon-"] {
     font-family: icomoon;
     font-size: 16px !important;
 }
@@ -80,10 +81,6 @@
     .mce-ico {
         line-height: 20px;
     }
-}
-
-.umb-rte .mce-fullscreen {
-    position:absolute;
 }
 
 .umb-rte .mce-toolbar .mce-btn-group {
@@ -162,4 +159,9 @@
 
 .umb-grid .umb-rte {
     border: 1px solid #d8d7d9;
+    max-width: none;
+}
+
+.mce-fullscreen {
+    position: absolute;
 }
