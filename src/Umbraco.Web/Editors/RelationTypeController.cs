@@ -45,11 +45,8 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var relations = Services.RelationService.GetByRelationTypeId(relationType.Id);
-
             var display = Mapper.Map<IRelationType, RelationTypeDisplay>(relationType);
-            display.Relations = Mapper.MapEnumerable<IRelation, RelationDisplay>(relations);
-
+            
             return display;
         }
 
@@ -84,11 +81,7 @@ namespace Umbraco.Web.Editors
         /// <returns>A <see cref="HttpResponseMessage"/> containing the persisted relation type's ID.</returns>
         public HttpResponseMessage PostCreate(RelationTypeSave relationType)
         {
-            var relationTypePersisted = new RelationType(relationType.ChildObjectType, relationType.ParentObjectType, relationType.Name.ToSafeAlias(true))
-            {
-                Name = relationType.Name,
-                IsBidirectional = relationType.IsBidirectional
-            };
+            var relationTypePersisted = new RelationType(relationType.Name, relationType.Name.ToSafeAlias(true), relationType.IsBidirectional, relationType.ChildObjectType, relationType.ParentObjectType);
 
             try
             {

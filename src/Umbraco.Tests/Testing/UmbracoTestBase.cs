@@ -42,6 +42,7 @@ using Umbraco.Web.Sections;
 using Current = Umbraco.Core.Composing.Current;
 using FileSystems = Umbraco.Core.IO.FileSystems;
 using Umbraco.Web.Templates;
+using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.Testing
 {
@@ -234,6 +235,7 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique<HtmlLocalLinkParser>();
             Composition.RegisterUnique<HtmlUrlParser>();
             Composition.RegisterUnique<HtmlImageSourceParser>();
+            Composition.RegisterUnique<RichTextEditorPastedImages>();
 
         }
 

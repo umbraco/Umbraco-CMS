@@ -63,7 +63,7 @@ namespace Umbraco.Core.Compose
                 var documentObjectType = Constants.ObjectTypes.Document;
                 const string relationTypeName = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteName;
 
-                relationType = new RelationType(documentObjectType, documentObjectType, relationTypeAlias, relationTypeName);
+                relationType = new RelationType(relationTypeName, relationTypeAlias, false, documentObjectType, documentObjectType);
                 relationService.Save(relationType);
             }
 
@@ -106,7 +106,7 @@ namespace Umbraco.Core.Compose
             {
                 var documentObjectType = Constants.ObjectTypes.Document;
                 const string relationTypeName = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName;
-                relationType = new RelationType(documentObjectType, documentObjectType, relationTypeAlias, relationTypeName);
+                relationType = new RelationType(relationTypeName, relationTypeAlias, false, documentObjectType, documentObjectType);
                 relationService.Save(relationType);
             }
             foreach (var item in e.MoveInfoCollection)

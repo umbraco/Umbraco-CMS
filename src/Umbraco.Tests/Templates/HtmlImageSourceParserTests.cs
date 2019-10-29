@@ -13,13 +13,14 @@ using System;
 using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core;
+using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.Templates
 {
 
 
     [TestFixture]
-    public class ImageSourceParserTests
+    public class HtmlImageSourceParserTests
     {
         [Test]
         public void Returns_Udis_From_Data_Udi_Html_Attributes()
@@ -32,8 +33,8 @@ namespace Umbraco.Tests.Templates
 
             var logger = Mock.Of<ILogger>();
             var umbracoContextAccessor = new TestUmbracoContextAccessor();
-            var imageSourceParser = new HtmlImageSourceParser(umbracoContextAccessor, logger, Mock.Of<IMediaService>(), Mock.Of<IContentTypeBaseServiceProvider>());
-
+            var imageSourceParser = new HtmlImageSourceParser(umbracoContextAccessor);
+            
             var result = imageSourceParser.FindUdisFromDataAttributes(input).ToList();
             Assert.AreEqual(2, result.Count);
             Assert.AreEqual(Udi.Parse("umb://media/D4B18427A1544721B09AC7692F35C264"), result[0]);
@@ -45,7 +46,7 @@ namespace Umbraco.Tests.Templates
         {
             var logger = Mock.Of<ILogger>();
             var umbracoContextAccessor = new TestUmbracoContextAccessor();
-            var imageSourceParser = new HtmlImageSourceParser(umbracoContextAccessor, logger, Mock.Of<IMediaService>(), Mock.Of<IContentTypeBaseServiceProvider>());
+            var imageSourceParser = new HtmlImageSourceParser(umbracoContextAccessor);
 
             var result = imageSourceParser.RemoveImageSources(@"<p>
 <div>
@@ -87,7 +88,7 @@ namespace Umbraco.Tests.Templates
                 var mediaCache = Mock.Get(reference.UmbracoContext.Media);
                 mediaCache.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(media.Object);
 
-                var imageSourceParser = new HtmlImageSourceParser(umbracoContextAccessor, Mock.Of<ILogger>(), Mock.Of<IMediaService>(), Mock.Of<IContentTypeBaseServiceProvider>());
+                var imageSourceParser = new HtmlImageSourceParser(umbracoContextAccessor);
 
                 var result = imageSourceParser.EnsureImageSources(@"<p>
 <div>

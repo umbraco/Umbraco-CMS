@@ -41,6 +41,7 @@ using Umbraco.Web.Tour;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using Current = Umbraco.Web.Composing.Current;
+using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Web.Runtime
 {
@@ -110,6 +111,7 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<HtmlLocalLinkParser>();
             composition.RegisterUnique<HtmlUrlParser>();
             composition.RegisterUnique<HtmlImageSourceParser>();
+            composition.RegisterUnique<RichTextEditorPastedImages>();
 
             // register the umbraco helper - this is Transient! very important!
             // also, if not level.Run, we cannot really use the helper (during upgrade...)

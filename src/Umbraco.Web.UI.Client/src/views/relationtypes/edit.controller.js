@@ -46,7 +46,7 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
         });
 
         relationTypeResource.getById($routeParams.id)
-            .then(function(data) {
+            .then(function (data) {
                 bindRelationType(data);
                 vm.page.loading = false;
             });
@@ -54,7 +54,6 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
 
     function bindRelationType(relationType) {
         formatDates(relationType.relations);
-        getRelationNames(relationType);
 
         // Convert property value to string, since the umb-radiobutton component at the moment only handle string values.
         // Sometime later the umb-radiobutton might be able to handle value as boolean.
@@ -70,48 +69,13 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
     }
 
     function formatDates(relations) {
-        if(relations) {
+        if (relations) {
             userService.getCurrentUser().then(function (currentUser) {
                 angular.forEach(relations, function (relation) {
                     relation.timestampFormatted = dateHelper.getLocalDate(relation.createDate, currentUser.locale, 'LLL');
                 });
             });
         }
-    }
-
-    function getRelationNames(relationType) {
-        if (relationType.relations) {
-            // can we grab app entity types in one go?
-            if (relationType.parentObjectType === relationType.childObjectType) {
-                // yep, grab the distinct list of parent and child entities
-                var entityIds = _.uniq(_.union(_.pluck(relationType.relations, "parentId"), _.pluck(relationType.relations, "childId")));
-                entityResource.getByIds(entityIds, relationType.parentObjectTypeName).then(function (entities) {
-                    updateRelationNames(relationType, entities);
-                });
-            } else {
-                // nope, grab the parent and child entities individually
-                var parentEntityIds = _.uniq(_.pluck(relationType.relations, "parentId"));
-                var childEntityIds = _.uniq(_.pluck(relationType.relations, "childId"));
-                entityResource.getByIds(parentEntityIds, relationType.parentObjectTypeName).then(function (entities) {
-                    updateRelationNames(relationType, entities);
-                });
-                entityResource.getByIds(childEntityIds, relationType.childObjectTypeName).then(function (entities) {
-                    updateRelationNames(relationType, entities);
-                });
-            }
-        }
-    }
-
-    function updateRelationNames(relationType, entities) {
-        var entitiesById = _.indexBy(entities, "id");
-        _.each(relationType.relations, function(relation) {
-            if (entitiesById[relation.parentId]) {
-                relation.parentName = entitiesById[relation.parentId].name;
-            }
-            if (entitiesById[relation.childId]) {
-                relation.childName = entitiesById[relation.childId].name;
-            }
-        });
     }
 
     function saveRelationType() {

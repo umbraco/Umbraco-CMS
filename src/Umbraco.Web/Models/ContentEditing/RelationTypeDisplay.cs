@@ -24,7 +24,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         /// <remarks>Corresponds to the NodeObjectType in the umbracoNode table</remarks>
         [DataMember(Name = "parentObjectType", IsRequired = true)]
-        public Guid ParentObjectType { get; set; }
+        public Guid? ParentObjectType { get; set; }
 
         /// <summary>
         /// Gets or sets the Parent's object type name.
@@ -38,7 +38,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         /// <remarks>Corresponds to the NodeObjectType in the umbracoNode table</remarks>
         [DataMember(Name = "childObjectType", IsRequired = true)]
-        public Guid ChildObjectType { get; set; }
+        public Guid? ChildObjectType { get; set; }
 
         /// <summary>
         /// Gets or sets the Child's object type name.
