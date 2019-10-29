@@ -24,11 +24,11 @@
                 $scope.model.title = "Compositions";
             }
 
-            // group the content types by their container paths
+            // Group the content types by their container paths
             vm.availableGroups = $filter("orderBy")(
                 _.map(
                     _.groupBy($scope.model.availableCompositeContentTypes, function (compositeContentType) {
-                        console.log("compositeContentType", compositeContentType);
+                        
                         compositeContentType.selected = isSelected(compositeContentType.contentType.alias);
 
                         return compositeContentType.contentType.metaData.containerPath;
@@ -56,7 +56,6 @@
         }
 
         function selectCompositeContentType(compositeContentType) {  
-            console.log("compositeContentType", compositeContentType);
 
             var contentType = compositeContentType.contentType;
 
