@@ -80,6 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="App_Plugins" />
     <Folder Include="Views\MacroPartials\" />
   </ItemGroup>
   <ItemGroup>
@@ -104,9 +105,6 @@
     </PackageReference>
     <PackageReference Include="MiniProfiler" Version="4.0.138" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
-    <PackageReference Include="Umbraco.ModelsBuilder.Ui">
-      <Version>8.1.0</Version>
-    </PackageReference>
     <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
   </ItemGroup>
   <ItemGroup>
@@ -144,9 +142,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Content Include="App_Plugins\UmbModelsBuilder\modelsbuilder.controller.js" />
-    <Content Include="App_Plugins\UmbModelsBuilder\modelsbuilder.html" />
-    <Content Include="App_Plugins\UmbModelsBuilder\modelsbuilder.resource.js" />
     <Content Include="Config\grid.editors.config.js" />
     <Content Include="Config\Lang\cs-CZ.user.xml" />
     <Content Include="Config\Lang\da-DK.user.xml" />
@@ -172,7 +167,6 @@
     <Content Include="Umbraco\Config\Lang\zh_tw.xml" />
     <Content Include="Config\Splashes\noNodes.aspx" />
     <Content Include="Umbraco\Install\Views\Web.config" />
-    <Content Include="App_Plugins\UmbModelsBuilder\package.manifest" />
     <None Include="Config\ClientDependency.Release.config">
       <DependentUpon>ClientDependency.config</DependentUpon>
       <SubType>Designer</SubType>
