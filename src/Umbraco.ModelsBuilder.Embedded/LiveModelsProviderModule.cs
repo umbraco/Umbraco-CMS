@@ -27,7 +27,7 @@ namespace Umbraco.ModelsBuilder.Embedded
 
             // here we're using "Current." since we're in a module, it is possible in a round about way to inject into a module but for now we'll just use Current
             if (_liveModelsProvider == null)
-                _liveModelsProvider = Current.Factory.TryGetInstance<LiveModelsProvider>(); // will be null in upgrade mode
+                _liveModelsProvider = Current.Factory.TryGetInstance<LiveModelsProvider>(); // will be null in upgrade mode or if embedded MB is disabled
 
             if (_liveModelsProvider?.IsEnabled ?? false)
                 _liveModelsProvider.GenerateModelsIfRequested(sender, e);
