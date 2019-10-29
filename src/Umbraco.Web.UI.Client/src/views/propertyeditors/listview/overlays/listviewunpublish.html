@@ -24,21 +24,19 @@
 
                 <div class="umb-list-item" ng-repeat="language in vm.languages track by language.id">
                     <ng-form name="unpublishLanguageSelectorForm">
-                        <div class="flex">
+                        <div>
 
-                            <umb-checkbox input-id="unpublishLanguage_{{language.culture}}"
-                                          name="unpublishLanguageSelector"
+                            <umb-checkbox name="unpublishLanguageSelector"
                                           model="language.unpublish"
-                                          on-change="vm.changeSelection(language)" />
+                                          on-change="vm.changeSelection(language)"
+                                          text="{{language.name}}"
+                                          disabled="language.disabled"
+                                          />
 
                             <div>
-                                <label for="unpublishLanguage_{{language.culture}}" class="mb0">
-                                    <span>{{language.name}}</span>
-
-                                    <span class="db umb-list-item__description">
-                                        <span ng-if="language.isMandatory"><localize key="languages_mandatoryLanguage"></localize></span>
-                                    </span>
-                                </label>
+                                <span class="db umb-list-item__description umb-list-item__description--checkbox">
+                                    <span ng-if="language.isMandatory"><localize key="languages_mandatoryLanguage"></localize></span>
+                                </span>
                             </div>
 
                         </div>
