@@ -407,7 +407,7 @@ namespace Umbraco.Core.Services.Implement
         {
             if (name == null)
             {
-                throw new ArgumentNullException(nameof(name), "Name cannot be null or empty");
+                throw new ArgumentNullException(nameof(name));
             }
 
             if (string.IsNullOrWhiteSpace(name)) 
