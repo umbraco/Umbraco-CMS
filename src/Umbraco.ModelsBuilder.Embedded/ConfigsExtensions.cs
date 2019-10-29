@@ -4,7 +4,7 @@ using Umbraco.ModelsBuilder.Embedded.Configuration;
 namespace Umbraco.ModelsBuilder.Embedded
 {
     /// <summary>
-    /// Provides extension methods for the <see cref="UmbracoConfig"/> class.
+    /// Provides extension methods for the <see cref="Configs"/> class.
     /// </summary>
     public static class ConfigsExtensions
     {
