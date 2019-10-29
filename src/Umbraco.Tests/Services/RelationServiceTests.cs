@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -14,6 +15,38 @@ namespace Umbraco.Tests.Services
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class RelationServiceTests : TestWithSomeContentBase
     {
+        [Test]
+        public void Return_List_Of_Content_Items_Where_Media_Item_Referenced()
+        {
+            var mt = MockedContentTypes.CreateSimpleMediaType("testMediaType", "Test Media Type");
+            ServiceContext.MediaTypeService.Save(mt);
+            var m1 = MockedMedia.CreateSimpleMedia(mt, "hello 1", -1);
+            ServiceContext.MediaService.Save(m1);
+
+            var ct = MockedContentTypes.CreateTextPageContentType("richTextTest");
+            ct.AllowedTemplates = Enumerable.Empty<ITemplate>();
+            ServiceContext.ContentTypeService.Save(ct);
+
+            void createContentWithMediaRefs()
+            {
+                var content = MockedContent.CreateTextpageContent(ct, "my content 2", -1);
+                //'bodyText' is a property with a RTE property editor which we knows automatically tracks relations
+                content.Properties["bodyText"].SetValue(@"<p>
+        <img src='/media/12312.jpg' data-udi='umb://media/" + m1.Key.ToString("N") + @"' />
+</p>");
+                ServiceContext.ContentService.Save(content);
+            }
+
+            for (var i = 0; i < 6; i++) 
+                createContentWithMediaRefs(); //create 6 content items referencing the same media
+
+            var relations = ServiceContext.RelationService.GetByChildId(m1.Id, Constants.Conventions.RelationTypes.RelatedMediaAlias).ToList();
+            Assert.AreEqual(6, relations.Count);
+
+            var entities = ServiceContext.RelationService.GetParentEntitiesFromRelations(relations).ToList();
+            Assert.AreEqual(6, entities.Count);
+        }
+
         [Test]
         public void Can_Create_RelationType_Without_Name()
         {

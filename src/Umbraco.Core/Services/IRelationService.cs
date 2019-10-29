@@ -71,6 +71,14 @@ namespace Umbraco.Core.Services
         IEnumerable<IRelation> GetByParentId(int id);
 
         /// <summary>
+        /// Gets a list of <see cref="Relation"/> objects by their parent Id
+        /// </summary>
+        /// <param name="id">Id of the parent to retrieve relations for</param>
+        /// <param name="relationTypeAlias">Alias of the type of relation to retrieve</param>
+        /// <returns>An enumerable list of <see cref="Relation"/> objects</returns>
+        IEnumerable<IRelation> GetByParentId(int id, string relationTypeAlias);
+
+        /// <summary>
         /// Gets a list of <see cref="Relation"/> objects by their parent entity
         /// </summary>
         /// <param name="parent">Parent Entity to retrieve relations for</param>
@@ -91,6 +99,14 @@ namespace Umbraco.Core.Services
         /// <param name="id">Id of the child to retrieve relations for</param>
         /// <returns>An enumerable list of <see cref="Relation"/> objects</returns>
         IEnumerable<IRelation> GetByChildId(int id);
+
+        /// <summary>
+        /// Gets a list of <see cref="Relation"/> objects by their child Id
+        /// </summary>
+        /// <param name="id">Id of the child to retrieve relations for</param>
+        /// <param name="relationTypeAlias">Alias of the type of relation to retrieve</param>
+        /// <returns>An enumerable list of <see cref="Relation"/> objects</returns>
+        IEnumerable<IRelation> GetByChildId(int id, string relationTypeAlias);
 
         /// <summary>
         /// Gets a list of <see cref="Relation"/> objects by their child Entity
