@@ -225,8 +225,10 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
         retainQueryStrings: function (currRouteParams, nextRouteParams) {
             var toRetain = angular.copy(nextRouteParams);
             var updated = false;
+
             _.each(retainedQueryStrings, function (r) {
-                if (currRouteParams[r] && !nextRouteParams[r]) {
+                // if mculture is set to null in nextRouteParams, the value will be undefined and we will not retain any query string that has a value of "null"
+                if (currRouteParams[r] && nextRouteParams[r] !== undefined && !nextRouteParams[r]) {
                     toRetain[r] = currRouteParams[r];
                     updated = true;
                 }

@@ -408,6 +408,7 @@
     <key alias="cut">Klip</key>
     <key alias="editdictionary">Rediger ordbogsnøgle</key>
     <key alias="editlanguage">Rediger sprog</key>
+    <key alias="editSelectedMedia">Rediger det valgte medie</key>
     <key alias="insertAnchor">Indsæt lokalt link</key>
     <key alias="insertCharacter">Indsæt tegn</key>
     <key alias="insertgraphicheadline">Indsæt grafisk overskrift</key>
@@ -447,7 +448,7 @@
     <key alias="linkToPage">Link til side</key>
     <key alias="openInNewWindow">Åben linket i et nyt vindue eller fane</key>
     <key alias="linkToMedia">Link til medie</key>
-    <key alias="selectContentStartNode">Vælg indhold startnode</key>
+    <key alias="selectContentStartNode">Vælg startnode for indhold</key>
     <key alias="selectMedia">Vælg medie</key>
     <key alias="selectMediaType">Vælg medietype</key>
     <key alias="selectIcon">Vælg ikon</key>
@@ -456,7 +457,7 @@
     <key alias="selectMacro">Vælg makro</key>
     <key alias="selectContent">Vælg indhold</key>
     <key alias="selectContentType">Vælg indholdstype</key>
-    <key alias="selectMediaStartNode">Vælg medie startnode</key>
+    <key alias="selectMediaStartNode">Vælg startnode for mediearkivet</key>
     <key alias="selectMember">Vælg medlem</key>
     <key alias="selectMemberGroup">Vælg medlemsgruppe</key>
     <key alias="selectMemberType">Vælg medlemstype</key>
@@ -643,6 +644,7 @@
     <key alias="field">Felt</key>
     <key alias="findDocument">Find</key>
     <key alias="first">Første</key>
+    <key alias="focalPoint">Fokuspunkt</key>
     <key alias="general">Generelt</key>
     <key alias="groups">Grupper</key>
     <key alias="group">Gruppe</key>
@@ -1360,6 +1362,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="compositionsDescription">Nedarv faner og egenskaber fra en anden dokumenttype. Nye faner vil blive tilføjet den nuværende dokumenttype eller sammenflettet hvis fanenavnene er ens.</key>
     <key alias="compositionInUse">Indholdstypen bliver brugt i en komposition og kan derfor ikke blive anvendt som komposition</key>
     <key alias="noAvailableCompositions">Der er ingen indholdstyper tilgængelige at bruge som komposition</key>
+    <key alias="compositionRemoveWarning">Når du fjerner en komposition vil alle associerede indholdsdata blive slettet. Når først dokumenttypen er gemt, er der ingen vej tilbage.</key>
     <key alias="availableEditors">Tilgængelige editors</key>
     <key alias="reuse">Genbrug</key>
     <key alias="editorSettings">Editor indstillinger</key>
@@ -1579,7 +1582,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="permissionSelectedPages">Du ændrer i øjeblikket rettigheder for siderne:</key>
     <key alias="permissionSelectPages">Vælg sider for at ændre deres rettigheder</key>
     <key alias="removePhoto">Fjern billede</key>
-    <key alias="permissionsDefault">Standard rettigheder</key>
+    <key alias="permissionsDefault">Standardrettigheder</key>
     <key alias="permissionsGranular">Granulære rettigheder</key>
     <key alias="permissionsGranularHelp">Sæt rettigheder for specifikke noder</key>
     <key alias="profile">Profil</key>
@@ -1718,6 +1721,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="openCloseBackofficeProfileOptions">Åben/Luk dine profil indstillinger</key>
     <key alias="currentLanguage">Aktivt sprog</key>
     <key alias="switchLanguage">Skift sprog til</key>
+    <key alias="createNewFolder">Opret ny mappe</key>
   </area>
   <area alias="references">
     <key alias="tabName">Referencer</key>

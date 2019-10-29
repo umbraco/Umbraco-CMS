@@ -542,7 +542,7 @@ namespace Umbraco.Core
                 {
                     return "\"{0}\"".InvariantFormat(obj);
                 }
-                if (obj is int || obj is Int16 || obj is Int64 || obj is float || obj is double || obj is bool || obj is int? || obj is Int16? || obj is Int64? || obj is float? || obj is double? || obj is bool?)
+                if (obj is int || obj is short || obj is long || obj is float || obj is double || obj is bool || obj is int? || obj is float? || obj is double? || obj is bool?)
                 {
                     return "{0}".InvariantFormat(obj);
                 }
@@ -723,7 +723,7 @@ namespace Umbraco.Core
             {
                 return typeConverter;
             }
-            
+
             var converter = TypeDescriptor.GetConverter(target);
             if (converter.CanConvertFrom(source))
             {
@@ -788,6 +788,6 @@ namespace Umbraco.Core
             return BoolConvertCache[type] = false;
         }
 
-        
+
     }
 }
