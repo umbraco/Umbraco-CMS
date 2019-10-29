@@ -67,7 +67,7 @@ namespace Umbraco.Web.Search
 
             string type;
             var indexName = Constants.UmbracoIndexes.InternalIndexName;
-            var fields = new[] { "id", "__NodeId", "__Key" };
+            var fields = new List<string> { "id", "__NodeId", "__Key" };
 
             // TODO: WE should try to allow passing in a lucene raw query, however we will still need to do some manual string
             // manipulation for things like start paths, member types, etc...
@@ -87,7 +87,7 @@ namespace Umbraco.Web.Search
                 case UmbracoEntityTypes.Member:
                     indexName = Constants.UmbracoIndexes.MembersIndexName;
                     type = "member";
-                    fields = new[] { "id", "__NodeId", "__Key", "email", "loginName" };
+                    fields.AddRange(new[]{ "email", "loginName"});
                     if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId && searchFrom.Trim() != "-1")
                     {
                         sb.Append("+__NodeTypeAlias:");
@@ -97,7 +97,7 @@ namespace Umbraco.Web.Search
                     break;
                 case UmbracoEntityTypes.Media:
                     type = "media";
-                    fields = new[] { "id", "__NodeId", UmbracoExamineIndex.UmbracoFileFieldName};
+                    fields.AddRange(new[] { UmbracoExamineIndex.UmbracoFileFieldName });
                     var allMediaStartNodes = _umbracoContext.Security.CurrentUser.CalculateMediaStartNodeIds(_entityService);
                     AppendPath(sb, UmbracoObjectTypes.Media, allMediaStartNodes, searchFrom, ignoreUserStartNodes, _entityService);
                     break;
@@ -162,7 +162,7 @@ namespace Umbraco.Web.Search
             return _mapper.MapEnumerable<IEntitySlim, SearchResultEntity>(results);
         }
 
-        private bool BuildQuery(StringBuilder sb, string query, string searchFrom, string[] fields, string type)
+        private bool BuildQuery(StringBuilder sb, string query, string searchFrom, List<string> fields, string type)
         {
             //build a lucene query:
             // the nodeName will be boosted 10x without wildcards

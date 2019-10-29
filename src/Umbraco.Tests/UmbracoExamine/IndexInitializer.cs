@@ -54,7 +54,7 @@ namespace Umbraco.Tests.UmbracoExamine
         {
             var runtimeState = Mock.Of<IRuntimeState>();
             Mock.Get(runtimeState).Setup(x => x.Level).Returns(level);
-            Mock.Get(runtimeState).SetupGet(m => m.ApplicationUrl).Returns(new Uri("https://LocalHost/umbraco"));
+            Mock.Get(runtimeState).SetupGet(m => m.ApplicationUrl).Returns(new Uri("https://localhost/umbraco"));
 
             return runtimeState;
         }
