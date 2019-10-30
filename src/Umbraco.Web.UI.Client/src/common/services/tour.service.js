@@ -134,31 +134,33 @@
                 var groupedTours = [];
                 tours.forEach(function (item) {
                     
-                    var groupExists = false;
-                    var newGroup = {
-                        "group": "",
-                        "tours": []
-                    };
+                    if (item.contentType === null || item.contentType === '') {
+                        var groupExists = false;
+                        var newGroup = {
+                            "group": "",
+                            "tours": []
+                        };
 
-                    groupedTours.forEach(function(group){
-                        // extend existing group if it is already added
-                        if(group.group === item.group) {
-                            if(item.groupOrder) {
-                                group.groupOrder = item.groupOrder
+                        groupedTours.forEach(function (group) {
+                            // extend existing group if it is already added
+                            if (group.group === item.group) {
+                                if (item.groupOrder) {
+                                    group.groupOrder = item.groupOrder;
+                                }
+                                groupExists = true;
+                                group.tours.push(item);
                             }
-                            groupExists = true;
-                            group.tours.push(item)
-                        }
-                    });
+                        });
 
-                    // push new group to array if it doesn't exist
-                    if(!groupExists) {
-                        newGroup.group = item.group;
-                        if(item.groupOrder) {
-                            newGroup.groupOrder = item.groupOrder
+                        // push new group to array if it doesn't exist
+                        if (!groupExists) {
+                            newGroup.group = item.group;
+                            if (item.groupOrder) {
+                                newGroup.groupOrder = item.groupOrder;
+                            }
+                            newGroup.tours.push(item);
+                            groupedTours.push(newGroup);
                         }
-                        newGroup.tours.push(item);
-                        groupedTours.push(newGroup);
                     }
 
                 });
