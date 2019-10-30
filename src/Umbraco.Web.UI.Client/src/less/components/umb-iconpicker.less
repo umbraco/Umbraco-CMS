@@ -15,7 +15,10 @@
     overflow: hidden;
 }
 
-.umb-iconpicker-item a {
+.umb-iconpicker-item a,
+.umb-iconpicker-item button {
+    background: transparent;
+    border: 0 none;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -26,6 +29,8 @@
     border-radius: 3px;
 }
 
+.umb-iconpicker-item button:hover,
+.umb-iconpicker-item button:focus,
 .umb-iconpicker-item a:hover,
 .umb-iconpicker-item a:focus {
     background: @gray-10;
@@ -39,6 +44,7 @@
     box-sizing: border-box;
 }
 
+.umb-iconpicker-item button:active,
 .umb-iconpicker-item a:active {
     background: @gray-10;
 }
