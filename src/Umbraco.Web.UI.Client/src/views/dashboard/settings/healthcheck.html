@@ -144,8 +144,10 @@
                                         <ng-form name="healthCheckAction">
 
                                             <div ng-if="action.valueRequired">
-                                                <div><label class="bold">Set new value:</label></div>
-                                                <input name="providedValue" type="text" ng-model="action.providedValue" required val-email/>
+                                                <div>
+                                                    <label for="action-required-{{$index}}" class="bold">Set new value:</label>
+                                                </div>
+                                                <input name="providedValue" id="action-required-{{$index}}" type="text" ng-model="action.providedValue" required val-email/>
                                             </div>
 
                                             <umb-button
