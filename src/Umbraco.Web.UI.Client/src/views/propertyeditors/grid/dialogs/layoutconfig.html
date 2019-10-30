@@ -100,8 +100,9 @@
 
                           <li ng-repeat="row in rows">
 
-                              <label style="display: block">
+                              <label style="display: block" for="allow-section-{{$index}}">
                                  <input type="checkbox"
+                                     id="allow-section-{{$index}}"
                                      checklist-model="currentSection.allowed"
                                      checklist-value="row.name"
                                      style="float: left; margin-right: 10px;">
