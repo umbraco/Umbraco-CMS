@@ -429,7 +429,7 @@
     <key alias="linkinternal">Internal link:</key>
     <key alias="linklocaltip">When using local links, insert "#" in front of link</key>
     <key alias="linknewwindow">Open in new window?</key>
-    <key alias="macroContainerSettings">Macro Settings</key>
+	<key alias="macroContainerSettings">Macro Settings</key>
     <key alias="macroDoesNotHaveProperties">This macro does not contain any properties you can edit</key>
     <key alias="paste">Paste</key>
     <key alias="permissionsEdit">Edit permissions for</key>
@@ -485,7 +485,7 @@
     <key alias="account">account</key>
     <key alias="selectEditor">Select editor</key>
     <key alias="selectSnippet">Select snippet</key>
-    <key alias="variantdeletewarning">This will delete the node and all its languages. If you only want to delete one language go and unpublish it instead.</key>
+    <key alias="variantdeletewarning">This will delete the node and all its languages. If you only want to delete one language, you should unpublish the node in that language instead.</key>
   </area>
   <area alias="dictionary">
     <key alias="noItems">There are no dictionary items.</key>
@@ -521,8 +521,8 @@
     <key alias="searchers">Searchers</key>
     <key alias="searchDescription">Search the index and view the results</key>
     <key alias="tools">Tools</key>
-      <key alias="fields">fields</key>
-      <key alias="toolsDescription">Tools to manage the index</key>
+    <key alias="toolsDescription">Tools to manage the index</key>
+    <key alias="fields">fields</key>
   </area>
   <area alias="placeholders">
     <key alias="username">Enter your username</key>
@@ -544,7 +544,7 @@
     <key alias="enterAlias">Enter alias...</key>
     <key alias="generatingAlias">Generating alias...</key>
     <key alias="a11yCreateItem">Create item</key>
-      <key alias="a11yCreate">Create</key>
+	<key alias="a11yCreate">Create</key>
     <key alias="a11yEdit">Edit</key>
     <key alias="a11yName">Name</key>
   </area>
@@ -2180,10 +2180,10 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="openContextMenu">Open context menu for</key>
     <key alias="currentLanguage">Current language</key>
     <key alias="switchLanguage">Switch language to</key>
+    <key alias="createNewFolder">Create new folder</key>
     <key alias="newPartialView">Partial View</key>
     <key alias="newPartialViewMacro">Partial View Macro</key>
-    <key alias="newMember">Member</key>
-    <key alias="createNewFolder">Create new folder</key>
+    <key alias="newMember">Member</key>	
   </area>
   <area alias="references">
     <key alias="tabName">References</key>
