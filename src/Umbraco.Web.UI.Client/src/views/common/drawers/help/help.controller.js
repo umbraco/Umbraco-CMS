@@ -185,7 +185,8 @@
                     tourService.getToursForDoctype(node.contentTypeAlias).then(function (data) {
                         if (data && data.length > 0) {
                             vm.docTypeTours = data;
-                            vm.nodeName = node.name;
+                            var currentVariant = _.find(node.variants, (x) => x.active);                           
+                            vm.nodeName = currentVariant.name;
                             vm.showDocTypeTour = true;
                         }
                     });
