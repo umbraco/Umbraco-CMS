@@ -300,7 +300,8 @@ namespace Umbraco.Core.Persistence.Factories
                 && propertyEditors.TryGet(property.PropertyType.PropertyEditorAlias, out var editor)
                 && editor is IDataEditorWithMediaPath dataEditor)
             {
-                path = dataEditor.GetMediaPath(property);
+                var value = property.GetValue();
+                path = dataEditor.GetMediaPath(value);
             }
 
             var dto = new MediaVersionDto

@@ -43,8 +43,7 @@ namespace Umbraco.Web.PropertyEditors
             return editor;
         }
 
-        public string GetMediaPath(Property property, string culture = null, string segment = null) =>
-            property.GetValue(culture)?.ToString();
+        public string GetMediaPath(object value) => value?.ToString();
 
         /// <summary>
         /// Gets a value indicating whether a property is an upload field.
@@ -55,7 +54,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             return property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.UploadField;
         }
-        
+
         /// <summary>
         /// Ensures any files associated are removed
         /// </summary>
