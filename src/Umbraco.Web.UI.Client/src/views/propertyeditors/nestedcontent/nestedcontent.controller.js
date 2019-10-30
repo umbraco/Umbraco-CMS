@@ -138,6 +138,9 @@
                 event: $event,
                 submit: function (model) {
                     config.ncAlias = model.selectedItem.alias;
+                    if (model.selectedItem.tabs.length === 1) {
+                        config.ncTabAlias = model.selectedItem.tabs[0];
+                    }
                     overlayService.close();
                 },
                 close: function () {
