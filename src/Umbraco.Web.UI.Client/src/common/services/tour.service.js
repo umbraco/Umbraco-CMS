@@ -188,6 +188,24 @@
             return deferred.promise;
         }
 
+        /**
+        * @ngdoc method
+        * @name umbraco.services.tourService#getToursForDoctype
+        * @methodOf umbraco.services.tourService
+        *
+        * @description
+        * Returns a promise of the tours found by documenttype alias.
+        * @param {Object} doctypeAlias The doctype alias for which  the tours which should be returned
+        * @returns {Array} An array of tour objects for the doctype
+        */
+        function getToursForDoctype(doctypeAlias) {
+            var deferred = $q.defer();
+            tourResource.getToursForDoctype(doctypeAlias).then(function (tours) {
+                deferred.resolve(tours);
+            });
+            return deferred.promise;
+        }
+
         ///////////
 
         /**
@@ -269,7 +287,8 @@
             completeTour: completeTour,
             getCurrentTour: getCurrentTour,
             getGroupedTours: getGroupedTours,
-            getTourByAlias: getTourByAlias
+            getTourByAlias: getTourByAlias,
+            getToursForDoctype : getToursForDoctype
         };
 
         return service;
