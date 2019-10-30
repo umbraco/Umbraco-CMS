@@ -28,13 +28,14 @@ namespace Umbraco.Web.PropertyEditors
     public class NestedContentPropertyEditor : DataEditor
     {
         private readonly Lazy<PropertyEditorCollection> _propertyEditors;
-
+        private readonly IDataTypeService _dataTypeService;
         internal const string ContentTypeAliasPropertyKey = "ncContentTypeAlias";
 
-        public NestedContentPropertyEditor(ILogger logger, Lazy<PropertyEditorCollection> propertyEditors)
+        public NestedContentPropertyEditor(ILogger logger, Lazy<PropertyEditorCollection> propertyEditors, IDataTypeService dataTypeService)
             : base (logger)
         {
             _propertyEditors = propertyEditors;
+            _dataTypeService = dataTypeService;
         }
 
         // has to be lazy else circular dep in ctor
@@ -56,20 +57,20 @@ namespace Umbraco.Web.PropertyEditors
 
         #region Value Editor
 
-        protected override IDataValueEditor CreateValueEditor() => new NestedContentPropertyValueEditor(Attribute, PropertyEditors);
+        protected override IDataValueEditor CreateValueEditor() => new NestedContentPropertyValueEditor(Attribute, PropertyEditors, _dataTypeService);
 
         internal class NestedContentPropertyValueEditor : DataValueEditor, IDataValueReference
         {
             private readonly PropertyEditorCollection _propertyEditors;
+            private readonly IDataTypeService _dataTypeService;
 
-            public NestedContentPropertyValueEditor(DataEditorAttribute attribute, PropertyEditorCollection propertyEditors)
+            public NestedContentPropertyValueEditor(DataEditorAttribute attribute, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService)
                 : base(attribute)
             {
                 _propertyEditors = propertyEditors;
-                Validators.Add(new NestedContentValidator(propertyEditors));
+                _dataTypeService = dataTypeService;
+                Validators.Add(new NestedContentValidator(propertyEditors, dataTypeService));
             }
-
-            internal ServiceContext Services => Current.Services;
 
             /// <inheritdoc />
             public override object Configuration
@@ -87,59 +88,91 @@ namespace Umbraco.Web.PropertyEditors
                 }
             }
 
-            #region DB to String
-
-            public override string ConvertDbToString(PropertyType propertyType, object propertyValue, IDataTypeService dataTypeService)
+            /// <summary>
+            /// Method used to iterate over the deserialized property values
+            /// </summary>
+            /// <param name="propertyValue"></param>
+            /// <param name="onIteration"></param>
+            internal static List<JObject> IteratePropertyValues(object propertyValue, Action<string, PropertyType, JObject, int> onIteration)
             {
                 if (propertyValue == null || string.IsNullOrWhiteSpace(propertyValue.ToString()))
-                    return string.Empty;
+                    return null;
 
-                var value = JsonConvert.DeserializeObject<List<object>>(propertyValue.ToString());
-                if (value == null)
-                    return string.Empty;
+                var value = JsonConvert.DeserializeObject<List<JObject>>(propertyValue.ToString());
+
+                // There was a note here about checking if the result had zero items and if so it would return null, so we'll continue to do that
+                // The original note was: "Issue #38 - Keep recursive property lookups working"
+                // Which is from the original NC tracker: https://github.com/umco/umbraco-nested-content/issues/38
+                // This check should be used everywhere when iterating NC prop values, instead of just the one previous place so that
+                // empty values don't get persisted when there is nothing, it should actually be null.
+                if (value == null || value.Count == 0)
+                    return null;
+
+                var index = 0;
 
                 foreach (var o in value)
                 {
-                    var propValues = (JObject) o;
+                    var propValues = o;
 
+                    // TODO: This is N+1 (although we cache all doc types, it's still not pretty)
                     var contentType = GetElementType(propValues);
                     if (contentType == null)
                         continue;
 
-                    var propAliases = propValues.Properties().Select(x => x.Name).ToArray();
+                    var propertyTypes = contentType.CompositionPropertyTypes.ToDictionary(x => x.Alias, x => x);
+                    var propAliases = propValues.Properties().Select(x => x.Name);
                     foreach (var propAlias in propAliases)
                     {
-                        var propType = contentType.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == propAlias);
-                        if (propType == null)
+                        propertyTypes.TryGetValue(propAlias, out var propType);
+                        onIteration(propAlias, propType, propValues, index);                        
+                    }
+
+                    index++;
+                }
+
+                return value;
+            }
+
+            #region DB to String
+
+            public override string ConvertDbToString(PropertyType propertyType, object propertyValue, IDataTypeService dataTypeService)
+            {
+                var value = IteratePropertyValues(propertyValue, (string propAlias, PropertyType propType, JObject propValues, int index) =>
+                {
+                    if (propType == null)
+                    {
+                        // type not found, and property is not system: just delete the value
+                        if (IsSystemPropertyKey(propAlias) == false)
+                            propValues[propAlias] = null;
+                    }
+                    else
+                    {
+                        try
                         {
-                            // type not found, and property is not system: just delete the value
-                            if (IsSystemPropertyKey(propAlias) == false)
-                                propValues[propAlias] = null;
+                            // convert the value, and store the converted value
+                            var propEditor = _propertyEditors[propType.PropertyEditorAlias];
+                            var tempConfig = dataTypeService.GetDataType(propType.DataTypeId).Configuration;
+                            var valEditor = propEditor.GetValueEditor(tempConfig);
+                            var convValue = valEditor.ConvertDbToString(propType, propValues[propAlias]?.ToString(), dataTypeService);
+                            propValues[propAlias] = convValue;
                         }
-                        else
+                        catch (InvalidOperationException)
                         {
-                            try
-                            {
-                                // convert the value, and store the converted value
-                                var propEditor = _propertyEditors[propType.PropertyEditorAlias];
-                                var tempConfig = dataTypeService.GetDataType(propType.DataTypeId).Configuration;
-                                var valEditor = propEditor.GetValueEditor(tempConfig);
-                                var convValue = valEditor.ConvertDbToString(propType, propValues[propAlias]?.ToString(), dataTypeService);
-                                propValues[propAlias] = convValue;
-                            }
-                            catch (InvalidOperationException)
-                            {
-                                // deal with weird situations by ignoring them (no comment)
-                                propValues[propAlias] = null;
-                            }
+                            // deal with weird situations by ignoring them (no comment)
+                            propValues[propAlias] = null;
                         }
                     }
-                }
+                });
+
+                if (value == null)
+                    return string.Empty;
 
                 return JsonConvert.SerializeObject(value).ToXmlString<string>();
             }
 
             #endregion
+
+            
 
             #region Convert database // editor
 
@@ -148,57 +181,42 @@ namespace Umbraco.Web.PropertyEditors
             public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
             {
                 var val = property.GetValue(culture, segment);
-                if (val == null || string.IsNullOrWhiteSpace(val.ToString()))
-                    return string.Empty;
 
-                var value = JsonConvert.DeserializeObject<List<object>>(val.ToString());
+                var value = IteratePropertyValues(val, (string propAlias, PropertyType propType, JObject propValues, int index) =>
+                {
+                    if (propType == null)
+                    {
+                        // type not found, and property is not system: just delete the value
+                        if (IsSystemPropertyKey(propAlias) == false)
+                            propValues[propAlias] = null;
+                    }
+                    else
+                    {
+                        try
+                        {
+                            // create a temp property with the value
+                            // - force it to be culture invariant as NC can't handle culture variant element properties
+                            propType.Variations = ContentVariation.Nothing;
+                            var tempProp = new Property(propType);
+                            tempProp.SetValue(propValues[propAlias] == null ? null : propValues[propAlias].ToString());
+
+                            // convert that temp property, and store the converted value
+                            var propEditor = _propertyEditors[propType.PropertyEditorAlias];
+                            var tempConfig = dataTypeService.GetDataType(propType.DataTypeId).Configuration;
+                            var valEditor = propEditor.GetValueEditor(tempConfig);
+                            var convValue = valEditor.ToEditor(tempProp, dataTypeService);
+                            propValues[propAlias] = convValue == null ? null : JToken.FromObject(convValue);
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            // deal with weird situations by ignoring them (no comment)
+                            propValues[propAlias] = null;
+                        }
+                    }
+                });
+
                 if (value == null)
                     return string.Empty;
-
-                foreach (var o in value)
-                {
-                    var propValues = (JObject) o;
-
-                    var contentType = GetElementType(propValues);
-                    if (contentType == null)
-                        continue;
-
-                    var propAliases = propValues.Properties().Select(x => x.Name).ToArray();
-                    foreach (var propAlias in propAliases)
-                    {
-                        var propType = contentType.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == propAlias);
-                        if (propType == null)
-                        {
-                            // type not found, and property is not system: just delete the value
-                            if (IsSystemPropertyKey(propAlias) == false)
-                                propValues[propAlias] = null;
-                        }
-                        else
-                        {
-                            try
-                            {
-                                // create a temp property with the value
-                                // - force it to be culture invariant as NC can't handle culture variant element properties
-                                propType.Variations = ContentVariation.Nothing;
-                                var tempProp = new Property(propType);
-                                tempProp.SetValue(propValues[propAlias] == null ? null : propValues[propAlias].ToString());
-
-                                // convert that temp property, and store the converted value
-                                var propEditor = _propertyEditors[propType.PropertyEditorAlias];
-                                var tempConfig = dataTypeService.GetDataType(propType.DataTypeId).Configuration;
-                                var valEditor = propEditor.GetValueEditor(tempConfig);
-                                var convValue = valEditor.ToEditor(tempProp, dataTypeService);
-                                propValues[propAlias] = convValue == null ? null : JToken.FromObject(convValue);
-                            }
-                            catch (InvalidOperationException)
-                            {
-                                // deal with weird situations by ignoring them (no comment)
-                                propValues[propAlias] = null;
-                            }
-                        }
-
-                    }
-                }
 
                 // return json
                 return value;
@@ -209,60 +227,37 @@ namespace Umbraco.Web.PropertyEditors
                 if (editorValue.Value == null || string.IsNullOrWhiteSpace(editorValue.Value.ToString()))
                     return null;
 
-                var value = JsonConvert.DeserializeObject<List<object>>(editorValue.Value.ToString());
-                if (value == null)
-                    return null;
-
-                // Issue #38 - Keep recursive property lookups working
-                if (!value.Any())
-                    return null;
-
-                // Process value
-                for (var i = 0; i < value.Count; i++)
+                var value = IteratePropertyValues(editorValue.Value, (string propAlias, PropertyType propType, JObject propValues, int index) =>
                 {
-                    var o = value[i];
-                    var propValues = ((JObject)o);
-
-                    var contentType = GetElementType(propValues);
-                    if (contentType == null)
+                    if (propType == null)
                     {
-                        continue;
+                        // type not found, and property is not system: just delete the value
+                        if (IsSystemPropertyKey(propAlias) == false)
+                            propValues[propAlias] = null;
                     }
-
-                    var propValueKeys = propValues.Properties().Select(x => x.Name).ToArray();
-
-                    foreach (var propKey in propValueKeys)
+                    else
                     {
-                        var propType = contentType.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == propKey);
-                        if (propType == null)
-                        {
-                            if (IsSystemPropertyKey(propKey) == false)
-                            {
-                                // Property missing so just delete the value
-                                propValues[propKey] = null;
-                            }
-                        }
-                        else
-                        {
-                            // Fetch the property types prevalue
-                            var propConfiguration = Services.DataTypeService.GetDataType(propType.DataTypeId).Configuration;
+                        // Fetch the property types prevalue
+                        var propConfiguration = _dataTypeService.GetDataType(propType.DataTypeId).Configuration;
 
-                            // Lookup the property editor
-                            var propEditor = _propertyEditors[propType.PropertyEditorAlias];
+                        // Lookup the property editor
+                        var propEditor = _propertyEditors[propType.PropertyEditorAlias];
 
-                            // Create a fake content property data object
-                            var contentPropData = new ContentPropertyData(propValues[propKey], propConfiguration);
+                        // Create a fake content property data object
+                        var contentPropData = new ContentPropertyData(propValues[propAlias], propConfiguration);
 
-                            // Get the property editor to do it's conversion
-                            var newValue = propEditor.GetValueEditor().FromEditor(contentPropData, propValues[propKey]);
+                        // Get the property editor to do it's conversion
+                        var newValue = propEditor.GetValueEditor().FromEditor(contentPropData, propValues[propAlias]);
 
-                            // Store the value back
-                            propValues[propKey] = (newValue == null) ? null : JToken.FromObject(newValue);
-                        }
-
+                        // Store the value back
+                        propValues[propAlias] = (newValue == null) ? null : JToken.FromObject(newValue);
                     }
-                }
+                });
 
+                if (value == null)
+                    return string.Empty;
+
+                // return json
                 return JsonConvert.SerializeObject(value);
             }
 
@@ -272,36 +267,22 @@ namespace Umbraco.Web.PropertyEditors
 
                 var result = new List<UmbracoEntityReference>();
 
-                var list = JsonConvert.DeserializeObject<List<object>>(rawJson);
-                if (list == null)
-                    return result;
-
-                foreach (var o in list)
+                var json = IteratePropertyValues(rawJson, (string propAlias, PropertyType propType, JObject propValues, int index) =>
                 {
-                    var propValues = (JObject) o;
+                    if (propType == null) return;
 
-                    var contentType = GetElementType(propValues);
-                    if (contentType == null)
-                        continue;
+                    var propEditor = _propertyEditors[propType.PropertyEditorAlias];
 
-                    var propAliases = propValues.Properties().Select(x => x.Name).ToArray();
-                    foreach (var propAlias in propAliases)
-                    {
-                        var propType = contentType.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == propAlias);
-                        if (propType == null) continue;
+                    var valueEditor = propEditor?.GetValueEditor();
+                    if (!(valueEditor is IDataValueReference reference)) return;
 
-                        var propEditor = _propertyEditors[propType.PropertyEditorAlias];
+                    var val = propValues[propAlias]?.ToString();
 
-                        var valueEditor = propEditor?.GetValueEditor();
-                        if (!(valueEditor is IDataValueReference reference)) continue;
+                    var refs = reference.GetReferences(val);
 
-                        var val = propValues[propAlias]?.ToString();
+                    result.AddRange(refs);
+                });
 
-                        var refs = reference.GetReferences(val);
-
-                        result.AddRange(refs);
-                    }
-                }
                 return result;
             }
 
@@ -311,71 +292,56 @@ namespace Umbraco.Web.PropertyEditors
         internal class NestedContentValidator : IValueValidator
         {
             private readonly PropertyEditorCollection _propertyEditors;
+            private readonly IDataTypeService _dataTypeService;
 
-            public NestedContentValidator(PropertyEditorCollection propertyEditors)
+            public NestedContentValidator(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService)
             {
                 _propertyEditors = propertyEditors;
+                _dataTypeService = dataTypeService;
             }
 
             public IEnumerable<ValidationResult> Validate(object rawValue, string valueType, object dataTypeConfiguration)
             {
-                if (rawValue == null)
-                    yield break;
+                var validationResults = new List<ValidationResult>();
 
-                var value = JsonConvert.DeserializeObject<List<object>>(rawValue.ToString());
-                if (value == null)
-                    yield break;
-
-                var dataTypeService = Current.Services.DataTypeService;
-                for (var i = 0; i < value.Count; i++)
+                NestedContentPropertyValueEditor.IteratePropertyValues(rawValue, (string propKey, PropertyType propType, JObject propValues, int i) =>
                 {
-                    var o = value[i];
-                    var propValues = (JObject) o;
+                    if (propType == null) return;
 
-                    var contentType = GetElementType(propValues);
-                    if (contentType == null) continue;
+                    var config = _dataTypeService.GetDataType(propType.DataTypeId).Configuration;
+                    var propertyEditor = _propertyEditors[propType.PropertyEditorAlias];
 
-                    var propValueKeys = propValues.Properties().Select(x => x.Name).ToArray();
-
-                    foreach (var propKey in propValueKeys)
+                    foreach (var validator in propertyEditor.GetValueEditor().Validators)
                     {
-                        var propType = contentType.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == propKey);
-                        if (propType != null)
+                        foreach (var result in validator.Validate(propValues[propKey], propertyEditor.GetValueEditor().ValueType, config))
                         {
-                            var config = dataTypeService.GetDataType(propType.DataTypeId).Configuration;
-                            var propertyEditor = _propertyEditors[propType.PropertyEditorAlias];
-
-                            foreach (var validator in propertyEditor.GetValueEditor().Validators)
-                            {
-                                foreach (var result in validator.Validate(propValues[propKey], propertyEditor.GetValueEditor().ValueType, config))
-                                {
-                                    result.ErrorMessage = "Item " + (i + 1) + " '" + propType.Name + "' " + result.ErrorMessage;
-                                    yield return result;
-                                }
-                            }
-
-                            // Check mandatory
-                            if (propType.Mandatory)
-                            {
-                                if (propValues[propKey] == null)
-                                    yield return new ValidationResult("Item " + (i + 1) + " '" + propType.Name + "' cannot be null", new[] { propKey });
-                                else if (propValues[propKey].ToString().IsNullOrWhiteSpace() || (propValues[propKey].Type == JTokenType.Array && !propValues[propKey].HasValues))
-                                    yield return new ValidationResult("Item " + (i + 1) + " '" + propType.Name + "' cannot be empty", new[] { propKey });
-                            }
-
-                            // Check regex
-                            if (!propType.ValidationRegExp.IsNullOrWhiteSpace()
-                                && propValues[propKey] != null && !propValues[propKey].ToString().IsNullOrWhiteSpace())
-                            {
-                                var regex = new Regex(propType.ValidationRegExp);
-                                if (!regex.IsMatch(propValues[propKey].ToString()))
-                                {
-                                    yield return new ValidationResult("Item " + (i + 1) + " '" + propType.Name + "' is invalid, it does not match the correct pattern", new[] { propKey });
-                                }
-                            }
+                            result.ErrorMessage = "Item " + (i + 1) + " '" + propType.Name + "' " + result.ErrorMessage;
+                            validationResults.Add(result);
                         }
                     }
-                }
+
+                    // Check mandatory
+                    if (propType.Mandatory)
+                    {
+                        if (propValues[propKey] == null)
+                            validationResults.Add(new ValidationResult("Item " + (i + 1) + " '" + propType.Name + "' cannot be null", new[] { propKey }));
+                        else if (propValues[propKey].ToString().IsNullOrWhiteSpace() || (propValues[propKey].Type == JTokenType.Array && !propValues[propKey].HasValues))
+                            validationResults.Add(new ValidationResult("Item " + (i + 1) + " '" + propType.Name + "' cannot be empty", new[] { propKey }));
+                    }
+
+                    // Check regex
+                    if (!propType.ValidationRegExp.IsNullOrWhiteSpace()
+                        && propValues[propKey] != null && !propValues[propKey].ToString().IsNullOrWhiteSpace())
+                    {
+                        var regex = new Regex(propType.ValidationRegExp);
+                        if (!regex.IsMatch(propValues[propKey].ToString()))
+                        {
+                            validationResults.Add(new ValidationResult("Item " + (i + 1) + " '" + propType.Name + "' is invalid, it does not match the correct pattern", new[] { propKey }));
+                        }
+                    }
+                });
+
+                return validationResults;
             }
         }
 
