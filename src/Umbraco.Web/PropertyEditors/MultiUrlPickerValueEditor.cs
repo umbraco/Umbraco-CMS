@@ -179,11 +179,19 @@ namespace Umbraco.Web.PropertyEditors
         {
             var asString = value == null ? string.Empty : value is string str ? str : value.ToString();
 
+            if (string.IsNullOrEmpty(asString)) yield break;
+
             var links = JsonConvert.DeserializeObject<List<MultiUrlPickerValueEditor.LinkDto>>(asString);
             foreach (var link in links)
             {
-                yield return new UmbracoEntityReference(link.Udi);
+                if (link.Udi != null) // Links can be absolute links without a Udi
+                {
+                    yield return new UmbracoEntityReference(link.Udi);
+                }
+
             }
+
+
 
         }
     }
