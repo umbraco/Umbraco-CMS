@@ -30,6 +30,7 @@ function ExamineManagementController($scope, $http, $q, $timeout, $location, umb
                 editorService.open({
                     title: value,
                     searchResultValues: values,
+                    size: "medium",
                     view: "views/dashboard/settings/examinemanagementresults.html",
                     close: function () {
                         editorService.close();
