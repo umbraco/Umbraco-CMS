@@ -367,10 +367,6 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             updateModel();
         };
         $scope.requestDeleteNode = function (idx) {
-            if ($scope.nodes.length <= $scope.model.config.minItems) {
-                return;
-            }
-
             if ($scope.model.config.confirmDeletes === true) {
                 localizationService.localizeMany(["content_nestedContentDeleteItem", "general_delete", "general_cancel", "contentTypeEditor_yesDelete"]).then(function (data) {
                     const overlay = {
@@ -599,8 +595,8 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                     }
                 }
 
-                // Enforce min items
-                if ($scope.nodes.length < $scope.model.config.minItems) {
+                // Auto-fill with elementTypes, but only if we have one type to choose from, and if this property is empty.
+                if ($scope.singleMode === true && $scope.nodes.length === 0 && $scope.model.config.minItems > 0) {
                     for (var i = $scope.nodes.length; i < $scope.model.config.minItems; i++) {
                         $scope.addNode($scope.scaffolds[0].contentTypeAlias);
                     }
@@ -714,8 +710,31 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             updateModel();
         });
 
+        var watcher = $scope.$watch(
+            function () {
+                return $scope.nodes.length;
+            },
+            function () {
+                //Validate!
+                if ($scope.nodes.length < $scope.minItems) {
+                    $scope.nestedContentForm.minCount.$setValidity("minCount", false);
+                }
+                else {
+                    $scope.nestedContentForm.minCount.$setValidity("minCount", true);
+                }
+
+                if ($scope.nodes.length > $scope.maxItems) {
+                    $scope.nestedContentForm.maxCount.$setValidity("maxCount", false);
+                }
+                else {
+                    $scope.nestedContentForm.maxCount.$setValidity("maxCount", true);
+                }
+            }
+        );
+
         $scope.$on("$destroy", function () {
             unsubscribe();
+            watcher();
         });
 
     }

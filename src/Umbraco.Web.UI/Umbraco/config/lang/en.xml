@@ -276,7 +276,7 @@
     <key alias="nestedContentEditorNotSupported">Property %0% uses editor %1% which is not supported by Nested Content.</key>
     <key alias="nestedContentNoContentTypes">No content types are configured for this property.</key>
     <key alias="nestedContentAddElementType">Add element type</key>
-    <key alias="nestedContentSelectElementTypeModalTitle">Select element type</key>	
+    <key alias="nestedContentSelectElementTypeModalTitle">Select element type</key>
     <key alias="addTextBox">Add another text box</key>
     <key alias="removeTextBox">Remove this text box</key>
     <key alias="contentRoot">Content root</key>
@@ -1980,6 +1980,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="invalidNumber">Not a number</key>
     <key alias="invalidEmail">Invalid email</key>
     <key alias="customValidation">Custom validation</key>
+    <key alias="entriesShort"><![CDATA[Minimum %0% elementer, kræver <strong>%1%</strong> mere.]]></key>
+    <key alias="entriesExceed"><![CDATA[Maximum %0% elementer, <strong>%1%</strong> for mange.]]></key>
   </area>
   <area alias="healthcheck">
     <!-- The following keys get these tokens passed in:
