@@ -1172,7 +1172,7 @@ namespace Umbraco.Web.Editors
             var path = contentItem != null ? contentItem.Path : nodeId.ToString();
             var permission = userService.GetPermissionsForPath(user, path);
 
-            // users are allowed to delete their own stuff - see ContentTreeControllerBase.GetAllowedUserMenuItemsForNode()
+            // users are allowed to delete their own content - see ContentTreeControllerBase.GetAllowedUserMenuItemsForNode()
             if(contentItem != null && contentItem.CreatorId == user.Id)
             {
                 permission.PermissionsSet.Add(new EntityPermission(0, contentItem.Id, new [] { ActionDelete.Instance.Letter.ToString() } ));
