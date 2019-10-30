@@ -1,4 +1,4 @@
-﻿function modelsBuilderResource($q, $http, umbRequestHelper) {
+function modelsBuilderManagementResource($q, $http, umbRequestHelper) {
 
     return {
         getModelsOutOfDateStatus: function () {
@@ -20,4 +20,4 @@
         }
     };
 }
-angular.module("umbraco.resources").factory("modelsBuilderResource", modelsBuilderResource);
+angular.module("umbraco.resources").factory("modelsBuilderManagementResource", modelsBuilderManagementResource);

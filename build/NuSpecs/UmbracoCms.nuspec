@@ -42,7 +42,6 @@
         <file src="$BuildTmp$\WebApp\Global.asax" target="Content\Global.asax" />
         <file src="$BuildTmp$\WebApp\config\BackOfficeTours\**" target="Content\Config\BackOfficeTours" />
         <file src="$BuildTmp$\WebApp\Media\Web.config" target="Content\Media\Web.config" />
-        <file src="$BuildTmp$\WebApp\App_Plugins\UmbModelsBuilder\**" target="Content\App_Plugins\UmbModelsBuilder" />
 
         <!-- these files are copied by install.ps1 -->
         <file src="$BuildTmp$\WebApp\Web.config" target="UmbracoFiles\Web.config" />
