@@ -50,12 +50,12 @@
         <input type="hidden" name="maxCount" ng-model="nodes" />
 
         <div ng-messages="nestedContentForm.minCount.$error" show-validation-on-submit>
-            <div class="help-inline" ng-message="minCount">
+            <div class="help text-error" ng-message="minCount">
                 <localize key="validation_entriesShort" tokens="[minItems, minItems - nodes.length]" watch-tokens="true">Minimum %0% entries, needs <strong>%1%</strong> more.</localize>
             </div>
         </div>
-        <div ng-messages="nestedContentForm.maxCount.$error" show-validation-on-submit>
-            <div class="help-inline" ng-message="maxCount">
+        <div ng-if="nestedContentForm.minCount.$error === true || nodes.length > maxItems">
+            <div class="help text-error">
                 <localize key="validation_entriesExceed" tokens="[maxItems, nodes.length - maxItems]" watch-tokens="true">Maximum %0% entries, <strong>%1%</strong> too many.</localize>
             </div>
         </div>
