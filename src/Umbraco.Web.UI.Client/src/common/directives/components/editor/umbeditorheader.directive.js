@@ -223,7 +223,8 @@ Use this directive to construct a header inside the main editor window.
             if (editorState.current) {
                 //to do make work for user create/edit
                 // to do make it work for user group create/ edit
-                // to make it work for language edit/create
+                // to do make it work for language edit/create
+                // to do make it work for log viewer
                 scope.isNew = editorState.current.id === 0 ||
                     editorState.current.id === "0" ||
                     editorState.current.id === -1 ||
