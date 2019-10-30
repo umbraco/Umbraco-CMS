@@ -2167,7 +2167,10 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="createNewFolder">Create new folder</key>
     <key alias="newPartialView">Partial View</key>
     <key alias="newPartialViewMacro">Partial View Macro</key>
-    <key alias="newMember">Member</key>	
+    <key alias="newMember">Member</key>
+    <key alias="redirectDashboardSearchLabel">Search the redirect dashboard</key>
+    <key alias="userGroupSearchLabel">Search the user group section</key>
+    <key alias="userSearchLabel">Search the users section</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>
