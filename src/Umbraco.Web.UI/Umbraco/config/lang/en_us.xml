@@ -429,6 +429,7 @@
     <key alias="linkinternal">Internal link:</key>
     <key alias="linklocaltip">When using local links, insert "#" in front of link</key>
     <key alias="linknewwindow">Open in new window?</key>
+	<key alias="macroContainerSettings">Macro Settings</key>
     <key alias="macroDoesNotHaveProperties">This macro does not contain any properties you can edit</key>
     <key alias="paste">Paste</key>
     <key alias="permissionsEdit">Edit permissions for</key>
@@ -543,6 +544,7 @@
     <key alias="enterAlias">Enter alias...</key>
     <key alias="generatingAlias">Generating alias...</key>
     <key alias="a11yCreateItem">Create item</key>
+	<key alias="a11yCreate">Create</key>
     <key alias="a11yEdit">Edit</key>
     <key alias="a11yName">Name</key>
   </area>
@@ -1995,7 +1997,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="invalidEmpty">Value cannot be empty</key>
     <key alias="invalidPattern">Value is invalid, it does not match the correct pattern</key>
     <key alias="customValidation">Custom validation</key>
-    <key alias="entriesShort"><![CDATA[Minimum %0% entries, needs <strong>%1%</strong> more.]]></key>
+    <key alias="entriesShort"><![CDATA[Minimum %0% entries, requires <strong>%1%</strong> more.]]></key>
     <key alias="entriesExceed"><![CDATA[Maximum %0% entries, <strong>%1%</strong> too many.]]></key>
   </area>
   <area alias="healthcheck">
@@ -2181,6 +2183,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="currentLanguage">Current language</key>
     <key alias="switchLanguage">Switch language to</key>
     <key alias="createNewFolder">Create new folder</key>
+    <key alias="newPartialView">Partial View</key>
+    <key alias="newPartialViewMacro">Partial View Macro</key>
+    <key alias="newMember">Member</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>
