@@ -62,6 +62,11 @@
                     handleSectionChange();
                 }));
 
+                evts.push(eventsService.on("editorState.changed",
+                    function (e, args) {
+                        setDocTypeTour(args.entity);
+                    }));
+
                 findHelp(vm.section, vm.tree, vm.userType, vm.userLang);
 
             });
@@ -90,7 +95,7 @@
 
                     setSectionName();
                     findHelp(vm.section, vm.tree, vm.userType, vm.userLang);
-
+                    setDocTypeTour();
                 }
             });
         }
