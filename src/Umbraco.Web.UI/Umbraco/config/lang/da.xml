@@ -534,9 +534,6 @@
     <key alias="anchor">#value eller ?key=value</key>
     <key alias="enterAlias">Indtast alias...</key>
     <key alias="generatingAlias">Genererer alias...</key>
-    <key alias="a11yCreateItem">Opret element</key>
-    <key alias="a11yEdit">Rediger</key>
-    <key alias="a11yName">Navn</key>
   </area>
   <area alias="editcontenttype">
     <key alias="createListView" version="7.2">Opret brugerdefineret listevisning</key>
@@ -1722,6 +1719,9 @@ Mange hilsner fra Umbraco robotten
     <key alias="currentLanguage">Aktivt sprog</key>
     <key alias="switchLanguage">Skift sprog til</key>
     <key alias="createNewFolder">Opret ny mappe</key>
+    <key alias="createItem">Opret element</key>
+    <key alias="edit">Rediger</key>
+    <key alias="name">Navn</key>
   </area>
   <area alias="references">
     <key alias="tabName">Referencer</key>
