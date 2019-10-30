@@ -74,7 +74,7 @@ namespace Umbraco.Core
 
         }
 
-        
+
 
         /// <summary>
         /// This tries to detect a json string, this is not a fail safe way but it is quicker than doing
@@ -97,7 +97,7 @@ namespace Umbraco.Core
             return JsonEmpties.Contains(Whitespace.Value.Replace(input, string.Empty));
         }
 
-        
+
 
         public static string ReplaceNonAlphanumericChars(this string input, string replacement)
         {
@@ -186,9 +186,9 @@ namespace Umbraco.Core
             return url + string.Join("&", nonEmpty).EnsureStartsWith('?');
         }
 
-        
 
-        
+
+
 
         //this is from SqlMetal and just makes it a bit of fun to allow pluralization
         public static string MakePluralName(this string name)
@@ -610,6 +610,20 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Generate a hash of a string based on the specified hash algorithm.
+        /// </summary>
+        /// <typeparam name="T">The hash algorithm implementation to use.</typeparam>
+        /// <param name="str">The <see cref="string" /> to hash.</param>
+        /// <returns>
+        /// The hashed string.
+        /// </returns>
+        public static string GenerateHash<T>(this string str)
+            where T : HashAlgorithm
+        {
+            return str.GenerateHash(typeof(T).FullName);
+        }
+
+        /// <summary>
         /// Converts the string to MD5
         /// </summary>
         /// <param name="stringToConvert">Refers to itself</param>
@@ -931,9 +945,9 @@ namespace Umbraco.Core
             return text;
         }
 
-        
 
-        
+
+
 
         /// <summary>
         /// An extension method that returns a new string in which all occurrences of a

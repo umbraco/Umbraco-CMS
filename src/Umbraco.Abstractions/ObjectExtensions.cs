@@ -17,7 +17,7 @@ namespace Umbraco.Core
     /// </summary>
     public static class ObjectExtensions
     {
-        
+
         private static readonly ConcurrentDictionary<Type, Type> NullableGenericCache = new ConcurrentDictionary<Type, Type>();
         private static readonly ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter> InputTypeConverterCache = new ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter>();
         private static readonly ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter> DestinationTypeConverterCache = new ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter>();
@@ -499,7 +499,7 @@ namespace Umbraco.Core
             return new Dictionary<string, TVal>();
         }
 
-        
+
 
         internal static string ToDebugString(this object obj, int levels = 0)
         {
@@ -691,7 +691,7 @@ namespace Umbraco.Core
             {
                 return typeConverter;
             }
-            
+
             var converter = TypeDescriptor.GetConverter(target);
             if (converter.CanConvertFrom(source))
             {
@@ -756,6 +756,6 @@ namespace Umbraco.Core
             return BoolConvertCache[type] = false;
         }
 
-        
+
     }
 }

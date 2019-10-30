@@ -189,7 +189,7 @@ namespace Umbraco.Core.PropertyEditors
                 return json?.PropertyName ?? property.Name;
             }
 
-            return ObjectExtensions.ToObjectDictionary(configuration, FieldNamer);
+            return ObjectJsonExtensions.ToObjectDictionary(configuration, FieldNamer);
         }
     }
 }

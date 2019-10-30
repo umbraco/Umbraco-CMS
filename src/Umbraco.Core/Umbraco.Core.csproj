@@ -247,8 +247,10 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\RichTextPreValueMigrator.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\DropDownFlexiblePreValueMigrator.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\MergeDateAndDateTimePropertyEditor.cs" />
+    <Compile Include="Models\ContentEditing\ContentApp.cs" />
     <Compile Include="Models\ContentEditing\ContentAppBadge.cs" />
     <Compile Include="Models\ContentEditing\ContentAppBadgeType.cs" />
+    <Compile Include="Models\ContentEditing\IContentAppFactory.cs" />
     <Compile Include="Models\Entities\EntityExtensions.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\PreValueMigratorBase.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\PreValueDto.cs" />
@@ -720,7 +722,7 @@
     <Compile Include="Models\Validation\RequiredForPersistenceAttribute.cs" />
     <Compile Include="NamedUdiRange.cs" />
     <Compile Include="NameValueCollectionExtensions.cs" />
-    <Compile Include="ObjectExtensions.cs" />
+    <Compile Include="ObjectJsonExtensions.cs" />
     <Compile Include="Packaging\ConflictingPackageData.cs" />
     <Compile Include="Models\Packaging\UninstallationSummary.cs" />
     <Compile Include="Packaging\PackageExtraction.cs" />

@@ -518,7 +518,7 @@ namespace Umbraco.Tests.Clr
             // test object extensions
 
             Console.WriteLine("Getting object5D values...");
-            var values5D = object5.ToObjectDictionary();
+            var values5D = ObjectJsonExtensions.ToObjectDictionary(object5);
 
             Console.WriteLine("Writing object5D values...");
             foreach ((var name, var value) in values5)
