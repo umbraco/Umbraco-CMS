@@ -15,12 +15,16 @@
                     <div class="umb-nested-content__heading"><i ng-if="showIcons" class="icon" ng-class="$parent.getIcon($index)"></i><span class="umb-nested-content__item-name" ng-class="{'--has-icon': showIcons}" ng-bind="$parent.getName($index)"></span></div>
 
                     <div class="umb-nested-content__icons">
-                        <a class="umb-nested-content__icon umb-nested-content__icon--copy" title="{{copyIconTitle}}" ng-click="clickCopy($event, node);" ng-if="showCopy" prevent-default>
-                            <i class="icon icon-documents"></i>
-                        </a>
-                        <a class="umb-nested-content__icon umb-nested-content__icon--delete" localize="title" title="general_delete" ng-class="{ 'umb-nested-content__icon--disabled': $parent.nodes.length <= $parent.minItems }" ng-click="$parent.requestDeleteNode($index); $event.stopPropagation();" prevent-default>
-                            <i class="icon icon-trash"></i>
-                        </a>
+                        <button type="button" class="umb-nested-content__icon umb-nested-content__icon--copy" title="{{copyIconTitle}}" ng-click="clickCopy($event, node);" ng-if="showCopy">
+                            <i class="icon icon-documents" aria-hidden="true"></i>
+                            <span class="sr-only">{{copyTitle}}</span>
+                        </button>
+                        <button type="button" class="umb-nested-content__icon umb-nested-content__icon--delete" localize="title" title="general_delete" ng-class="{ 'umb-nested-content__icon--disabled': $parent.nodes.length <= $parent.minItems }" ng-click="$parent.requestDeleteNode($index); $event.stopPropagation();">
+                            <i class="icon icon-trash" aria-hidden="true"></i>
+                            <span class="sr-only">
+                                <localize key="general_delete">Delete</localize>
+                            </span>
+                        </button>
                     </div>
 
                 </div>
