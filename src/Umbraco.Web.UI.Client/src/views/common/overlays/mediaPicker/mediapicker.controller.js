@@ -251,7 +251,12 @@ angular.module("umbraco")
                     if (files.length === 1 && $scope.model.selectedImages.length === 0) {
                         var image = $scope.images[$scope.images.length - 1];
                         $scope.target = image;
-                        $scope.target.url = mediaHelper.resolveFile(image);
+                        // handle both entity and full media object
+                        if (image.image) {
+                            $scope.target.url = image.image;
+                        } else {
+                            $scope.target.url = mediaHelper.resolveFile(image);
+                        }
                         selectImage(image);
                     }
                 });
