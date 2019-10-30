@@ -137,6 +137,28 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Gets a dictionary item by key
+        /// </summary>
+        /// <param name="key">
+        /// The key.
+        /// </param>
+        /// <returns>
+        /// The <see cref="DictionaryDisplay"/>.
+        /// </returns>
+        /// <exception cref="HttpResponseException">
+        ///  Returrns a not found response when dictionary item does not exist
+        /// </exception>
+        public DictionaryDisplay GetByKey(string key)
+        {
+            var dictionary = Services.LocalizationService.GetDictionaryItemByKey(key);
+
+            if (dictionary == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            return Mapper.Map<IDictionaryItem, DictionaryDisplay>(dictionary);
+        }
+
+        /// <summary>
         /// Saves a dictionary item
         /// </summary>
         /// <param name="dictionary">

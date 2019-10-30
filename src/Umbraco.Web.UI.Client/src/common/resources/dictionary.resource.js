@@ -97,6 +97,36 @@ function dictionaryResource($q, $http, $location, umbRequestHelper, umbDataForma
     }
 
     /**
+     * @ngdoc method
+     * @name umbraco.resources.dictionaryResource#getByKey
+     * @methodOf umbraco.resources.dictionaryResource
+     *
+     * @description
+     * Gets a dictionary item with a given key
+     *
+     * ##usage
+     * <pre>
+     * dictionaryResource.getByKey('general_add')
+     *    .then(function() {
+     *        alert('Found it!');
+     *    });
+     * </pre>
+     *
+     * @param {String} key key of dictionary item to get
+     * @returns {Promise} resourcePromise object.
+     *
+     */
+    function getByKey(key) {
+        return umbRequestHelper.resourcePromise(
+            $http.get(
+                umbRequestHelper.getApiUrl(
+                    "dictionaryApiBaseUrl",
+                    "GetByKey",
+                    [{ key: key }])),
+            "Failed to get item " + key);
+    }
+
+    /**
         * @ngdoc method
         * @name umbraco.resources.dictionaryResource#save
         * @methodOf umbraco.resources.dictionaryResource
@@ -150,6 +180,7 @@ function dictionaryResource($q, $http, $location, umbRequestHelper, umbDataForma
     deleteById: deleteById,
     create: create,
     getById: getById,
+    getByKey: getByKey,
     save: save,
     getList : getList
   };
