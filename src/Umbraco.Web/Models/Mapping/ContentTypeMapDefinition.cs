@@ -224,11 +224,9 @@ namespace Umbraco.Web.Models.Mapping
             target.Mandatory = source.Validation.Mandatory;
             target.ValidationRegExp = source.Validation.Pattern;
             target.Variations = source.AllowCultureVariant
-                // Set culture flag
-                ? target.Variations | ContentVariation.Culture
-                // Unset culture flag
-                : target.Variations & ~ContentVariation.Culture;
-
+                ? target.Variations.SetFlag(ContentVariation.Culture)
+                : target.Variations.UnsetFlag(ContentVariation.Culture);
+            
             if (source.Id > 0)
                 target.Id = source.Id;
 
@@ -399,11 +397,9 @@ namespace Umbraco.Web.Models.Mapping
 
             if (!(target is IMemberType))
             {
-                target.Variations = source.AllowCultureVariant
-                    // Set culture flag
-                    ? target.Variations | ContentVariation.Culture
-                    // Unset culture flag
-                    : target.Variations & ~ContentVariation.Culture;
+                target.Variations = source.AllowCultureVariant                    
+                    ? target.Variations.SetFlag(ContentVariation.Culture)                    
+                    : target.Variations.UnsetFlag(ContentVariation.Culture);
             }
 
             // handle property groups and property types
