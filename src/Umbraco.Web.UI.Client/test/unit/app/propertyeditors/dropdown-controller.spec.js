@@ -37,7 +37,7 @@ describe('Drop down controller tests', function () {
                 $routeParams: routeParams
             });
              
-            //this should be the expected format based on the changes made to the sortable prevalues
+            // this should be the expected format based on the changes made to the sortable prevalues
             expect(scope.model.config.items[0].value).toBe("value0");
             expect(scope.model.config.items[1].value).toBe("value1");
             expect(scope.model.config.items[2].value).toBe("value2"); 
