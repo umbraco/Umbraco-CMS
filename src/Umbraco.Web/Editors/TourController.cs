@@ -113,6 +113,18 @@ namespace Umbraco.Web.Editors
         {
             var tourFiles = this.GetTours();
 
+            var doctypeAliasWithCompositions = new List<string>
+                                                   {
+                                                       doctypeAlias
+                                                   };
+
+            var contentType = this.Services.ContentTypeService.Get(doctypeAlias);
+
+            if (contentType != null)
+            {
+                doctypeAliasWithCompositions.AddRange(contentType.CompositionAliases());
+            }
+
             return tourFiles.SelectMany(x => x.Tours)
                 .Where(x =>
                     {
@@ -121,7 +133,7 @@ namespace Umbraco.Web.Editors
                             return false;
                         }
                         var contentTypes = x.ContentType.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(ct => ct.Trim());
-                        return contentTypes.Contains(doctypeAlias);
+                        return contentTypes.Intersect(doctypeAliasWithCompositions).Any();
                     });
         }
 
