@@ -181,7 +181,7 @@ namespace Umbraco.Web.PropertyEditors
 
             if (string.IsNullOrEmpty(asString)) yield break;
 
-            var links = JsonConvert.DeserializeObject<List<MultiUrlPickerValueEditor.LinkDto>>(asString);
+            var links = JsonConvert.DeserializeObject<List<LinkDto>>(asString);
             foreach (var link in links)
             {
                 if (link.Udi != null) // Links can be absolute links without a Udi

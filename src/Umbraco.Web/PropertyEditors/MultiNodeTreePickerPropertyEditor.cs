@@ -37,7 +37,8 @@ namespace Umbraco.Web.PropertyEditors
                 var udiPaths = asString.Split(',');
                 foreach (var udiPath in udiPaths)
                 {
-                    yield return new UmbracoEntityReference(Udi.Parse(udiPath));
+                    if (Udi.TryParse(udiPath, out var udi))
+                        yield return new UmbracoEntityReference(udi);
                 }
 
             }
