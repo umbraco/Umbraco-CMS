@@ -755,6 +755,7 @@
     <key alias="current">current</key>
     <key alias="embed">Embed</key>
     <key alias="selected">selected</key>
+    <key alias="clear">Clear</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blue</key>
