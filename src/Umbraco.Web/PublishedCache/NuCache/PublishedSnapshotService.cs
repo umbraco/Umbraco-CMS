@@ -127,9 +127,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     // stores need to be populated, happens in OnResolutionFrozen which uses _localDbExists to
                     // figure out whether it can read the databases or it should populate them from sql
 
-                    _logger.Info<PublishedSnapshotService>("Creating the content store, localContentDbExists? {LocalContentDbExists}", _localContentDb != null);
+                    _logger.Info<PublishedSnapshotService>("Creating the content store, localContentDbExists? {LocalContentDbExists}", _localDbExists);
                     _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, _localContentDb);
-                    _logger.Info<PublishedSnapshotService>("Creating the media store, localMediaDbExists? {LocalMediaDbExists}", _localMediaDb != null);
+                    _logger.Info<PublishedSnapshotService>("Creating the media store, localMediaDbExists? {LocalMediaDbExists}", _localDbExists);
                     _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, _localMediaDb);
                 }
                 else
