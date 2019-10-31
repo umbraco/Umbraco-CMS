@@ -286,10 +286,11 @@
         function deleteSavedSearch(searchItem) {
 
             var overlay = {
-                title: "Delete Search",
-                subtitle: "Are you sure you wish to delete",
+                title: "Delete Saved Search",
+                subtitle: "Are you sure you wish to delete?",
                 closeButtonLabel: "Cancel",
-                submitButtonLabel: "Delete Search",
+                submitButtonLabel: "Delete Saved Search",
+                submitButtonStyle: "danger",
                 view: "default",
                 submit: function (model) {
                     //Resource call with two params (name & query)

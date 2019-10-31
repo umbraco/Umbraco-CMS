@@ -6,6 +6,10 @@
         var vm = this;
         var currentPosition = null;
 
+        vm.header = {};
+        vm.header.editorfor = "settings_script";
+        vm.header.setPageTitle = true;
+
         vm.page = {};
         vm.page.loading = true;
         vm.page.menu = {};
