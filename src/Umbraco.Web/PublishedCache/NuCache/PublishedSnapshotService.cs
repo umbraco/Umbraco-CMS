@@ -1218,7 +1218,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var member = args.Entity;
 
             // refresh the edited data
-            OnRepositoryRefreshed(db, member, true);
+            OnRepositoryRefreshed(db, member, false);
         }
 
         private void OnRepositoryRefreshed(IUmbracoDatabase db, IContentBase content, bool published)
