@@ -609,7 +609,7 @@ When building a custom infinite editor view you can use the same components as a
          * Opens the document type editor in infinite editing, the submit callback returns the alias of the saved document type.
          * @param {Object} editor rendering options
          * @param {Number} editor.id Indicates the ID of the document type to be edited. Alternatively the ID may be set to `-1` in combination with `create` being set to `true` to open the document type editor for creating a new document type.
-         * @param {String} editor.create Set to `true` to open the document type editor for creating a new document type.
+         * @param {Boolean} editor.create Set to `true` to open the document type editor for creating a new document type.
          * @param {Boolean} editor.noTemplate If `true` and in combination with `create` being set to `true`, the document type editor will not create a corresponding template by default. This is similar to selecting the "Document Type without a template" in the Create dialog.
          * @param {Boolean} editor.isElement If `true` and in combination with `create` being set to `true`, the "Is an Element type" option will be selected by default in the document type editor.
          * @param {Boolean} editor.allowVaryByCulture If `true` and in combination with `create`, the "Allow varying by culture" option will be selected by default in the document type editor.
