@@ -378,7 +378,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 // IMPORTANT GetAllContentSources sorts kits by level + parentId + sortOrder
                 var kits = _dataSource.GetAllContentSources(scope);
-                return onStartup ? _contentStore.SetAllFastSorted(kits) : _contentStore.SetAll(kits);
+                return onStartup ? _contentStore.SetAllFastSorted(kits, true) : _contentStore.SetAll(kits);
             }
         }
 
@@ -393,34 +393,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // beware! at that point the cache is inconsistent,
                 // assuming we are going to SetAll content items!
 
-                var kits = _localContentDb.Select(x => x.Value)
-                    .OrderBy(x => x.Node.Level)
-                    .ThenBy(x => x.Node.ParentContentId)
-                    .ThenBy(x => x.Node.SortOrder) // IMPORTANT sort by level + parentId + sortOrder
-                    .ToList();
-
-                if (kits.Count == 0)
-                {
-                    // If there's nothing in the local cache file, we should return false? YES even though the site legitately might be empty.
-                    // Is it possible that the cache file is empty but the database is not? YES... (well, it used to be possible)
-                    // * A new file is created when one doesn't exist, this will only be done when MainDom is acquired
-                    // * The new file will be populated as soon as LoadCachesOnStartup is called
-                    // * If the appdomain is going down the moment after MainDom was acquired and we've created an empty cache file,
-                    //      then the MainDom release callback is triggered from on a different thread, which will close the file and
-                    //      set the cache file reference to null. At this moment, it is possible that the file is closed and the
-                    //      reference is set to null BEFORE LoadCachesOnStartup which would mean that the current appdomain would load
-                    //      in the in-mem cache via DB calls, BUT this now means that there is an empty cache file which will be
-                    //      loaded by the next appdomain and it won't check if it's empty, it just assumes that since the cache
-                    //      file is there, that is correct.
-
-                    // Update: We will still return false here even though the above mentioned race condition has been fixed since we now
-                    // lock the entire operation of creating/populating the cache file with the same lock as releasing/closing the cache file
-
-                    _logger.Info<PublishedSnapshotService>("Tried to load content from the local cache file but it was empty.");
-                    return false;
-                }
-
-                return onStartup ? _contentStore.SetAllFastSorted(kits) : _contentStore.SetAll(kits);
+                return LoadEntitiesFromLocalDbLocked(onStartup, _localContentDb, _contentStore, "content");
             }
         }
 
@@ -477,7 +450,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 _logger.Debug<PublishedSnapshotService>("Loading media from database...");
                 // IMPORTANT GetAllMediaSources sorts kits by level + parentId + sortOrder
                 var kits = _dataSource.GetAllMediaSources(scope);
-                return onStartup ? _mediaStore.SetAllFastSorted(kits) : _mediaStore.SetAll(kits);
+                return onStartup ? _mediaStore.SetAllFastSorted(kits, true) : _mediaStore.SetAll(kits);
             }
         }
 
@@ -492,13 +465,41 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // beware! at that point the cache is inconsistent,
                 // assuming we are going to SetAll content items!
 
-                var kits = _localMediaDb.Select(x => x.Value)
-                    .OrderBy(x => x.Node.Level)
-                    .ThenBy(x => x.Node.ParentContentId)
-                    .ThenBy(x => x.Node.SortOrder); // IMPORTANT sort by level + parentId + sortOrder
-                return onStartup ? _mediaStore.SetAllFastSorted(kits) : _mediaStore.SetAll(kits);
+                return LoadEntitiesFromLocalDbLocked(onStartup, _localMediaDb, _mediaStore, "media");
             }
 
+        }
+
+        private bool LoadEntitiesFromLocalDbLocked(bool onStartup, BPlusTree<int, ContentNodeKit> localDb, ContentStore store, string entityType)
+        {
+            var kits = localDb.Select(x => x.Value)
+                    .OrderBy(x => x.Node.Level)
+                    .ThenBy(x => x.Node.ParentContentId)
+                    .ThenBy(x => x.Node.SortOrder) // IMPORTANT sort by level + parentId + sortOrder
+                    .ToList();
+
+            if (kits.Count == 0)
+            {
+                // If there's nothing in the local cache file, we should return false? YES even though the site legitately might be empty.
+                // Is it possible that the cache file is empty but the database is not? YES... (well, it used to be possible)
+                // * A new file is created when one doesn't exist, this will only be done when MainDom is acquired
+                // * The new file will be populated as soon as LoadCachesOnStartup is called
+                // * If the appdomain is going down the moment after MainDom was acquired and we've created an empty cache file,
+                //      then the MainDom release callback is triggered from on a different thread, which will close the file and
+                //      set the cache file reference to null. At this moment, it is possible that the file is closed and the
+                //      reference is set to null BEFORE LoadCachesOnStartup which would mean that the current appdomain would load
+                //      in the in-mem cache via DB calls, BUT this now means that there is an empty cache file which will be
+                //      loaded by the next appdomain and it won't check if it's empty, it just assumes that since the cache
+                //      file is there, that is correct.
+
+                // Update: We will still return false here even though the above mentioned race condition has been fixed since we now
+                // lock the entire operation of creating/populating the cache file with the same lock as releasing/closing the cache file
+
+                _logger.Info<PublishedSnapshotService>($"Tried to load {entityType} from the local cache file but it was empty.");
+                return false;
+            }
+
+            return onStartup ? store.SetAllFastSorted(kits, false) : store.SetAll(kits);
         }
 
         // keep these around - might be useful
