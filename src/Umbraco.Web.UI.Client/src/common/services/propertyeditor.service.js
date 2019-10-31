@@ -1,3 +1,8 @@
+/**
+ @ngdoc service
+ * @name umbraco.services.propertyEditorService
+ */
+
 (function() {
     'use strict';
 
