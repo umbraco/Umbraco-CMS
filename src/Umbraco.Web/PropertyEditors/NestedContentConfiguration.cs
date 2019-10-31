@@ -37,5 +37,8 @@ namespace Umbraco.Web.PropertyEditors
             [JsonProperty("nameTemplate")]
             public string Template { get; set; }
         }
+
+        [ConfigurationField("helpText", "Help Text", "textstring", Description = "Set the help text visible while adding new element.")]
+        public string HelpText { get; set; }
     }
 }

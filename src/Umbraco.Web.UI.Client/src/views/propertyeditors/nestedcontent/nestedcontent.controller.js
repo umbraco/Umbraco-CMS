@@ -168,10 +168,14 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
     "localizationService",
     "iconHelper",
     "clipboardService",
+    "dictionaryResource",
     "eventsService",
     "overlayService",
+    "$routeParams",
+    "editorState",
+    "userService",
     
-    function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper, clipboardService, eventsService, overlayService, $routeParams, editorState) {
+    function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper, clipboardService, dictionaryResource, eventsService, overlayService, $routeParams, editorState, userService) {
         
         var contentTypeAliases = [];
         _.each($scope.model.config.contentTypes, function (contentType) {
@@ -207,6 +211,24 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             $scope.labels.grid_addElement = data[0];
             $scope.labels.content_createEmpty = data[1];
         });
+
+        var helpText = $scope.model.config.helpText;
+
+        if (helpText) {
+            $scope.labels.helpText = helpText;
+            if (helpText.startsWith("#")) {
+                dictionaryResource.getByKey(helpText.substring(1)).then(function (value) {
+                    userService.getCurrentUser().then(function (user) {
+                        if (value && value.translations && user.locale) {
+                            var translation = value.translations.filter(function (t) { return t.isoCode == user.locale });
+                            if (translation.length > 0) {
+                                $scope.labels.helpText = translation[0].translation;
+                            }
+                        }
+                    });
+                });
+            }
+        }
 
         // helper to force the current form into the dirty state
         $scope.setDirty = function () {
