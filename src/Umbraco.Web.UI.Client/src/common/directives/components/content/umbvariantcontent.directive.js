@@ -58,9 +58,9 @@
         /** Called when the component has linked all elements, this is when the form controller is available */
         function postLink() {
             //set the content to dirty if the header changes
-            unsubscribe.push($scope.$watch("contentHeaderForm.$dirty",
-                function(newValue, oldValue) {
-                    if (newValue === true) {
+            unsubscribe.push($scope.$watch("vm.editor.content.name",
+                function (newValue, oldValue) {
+                    if (newValue !== oldValue) {
                         vm.editor.content.isDirty = true;
                     }
                 }));
