@@ -14,6 +14,10 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
     var listName = infiniteMode ? $scope.model.listname : $routeParams.listName;
     var docType = infiniteMode ? $scope.model.doctype : $routeParams.doctype;
 
+    $scope.header = {};
+    $scope.header.editorfor = "visuallyHiddenTexts_newMember";
+    $scope.header.setPageTitle = true;
+
     //setup scope vars
     $scope.page = {};
     $scope.page.loading = true;

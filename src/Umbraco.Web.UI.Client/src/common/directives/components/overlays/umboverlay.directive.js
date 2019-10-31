@@ -1,5 +1,4 @@
 /**
-@ngdoc directive
 @name umbraco.directives.directive:umbOverlay*
 @deprecated
 @restrict E
