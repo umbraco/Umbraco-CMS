@@ -2,7 +2,7 @@
 
     <umb-load-indicator ng-show="vm.loading"></umb-load-indicator>
 
-    <form name="vm.domainForm" ng-submit="vm.save()" novalidate>
+    <form name="vm.domainForm" ng-submit="vm.save()" id="assignDomain" novalidate>
 
         <div ng-hide="vm.loading" class="umb-dialog-body">
 
@@ -24,11 +24,11 @@
                 </div>
 
                 <h5 class="umb-pane-title"><localize key="assignDomain_setDomains">Domains</localize></h5>
-                <small class="db" style="margin-bottom: 10px;">
+                <small class="db">
                     <localize key="assignDomain_domainHelpWithVariants"></localize>
                 </small>
                 <div class="umb-el-wrap  hidelabel">
-                    <table class="table table-condensed table-bordered domains" style="margin-bottom: 10px;" ng-if="vm.domains.length > 0">
+                    <table class="table table-condensed table-bordered domains" ng-if="vm.domains.length > 0">
                         <thead>
                             <tr>
                                 <th>
@@ -45,7 +45,7 @@
                         <tbody>
                             <tr ng-repeat="domain in vm.domains">
                                 <td>
-                                    <input style="width: 100%; margin-bottom: 0;" type="text" ng-model="domain.name" name="domain_name_{{$index}}" required />
+                                    <input type="text" ng-model="domain.name" name="domain_name_{{$index}}" required />
                                     <span ng-if="vm.domainForm.$submitted" ng-messages="vm.domainForm['domain_name_' + $index].$error">
                                         <span class="help-inline" ng-message="required"><localize key="validation_invalidEmpty"></localize></span>
                                     </span>
@@ -53,7 +53,6 @@
                                 </td>
                                 <td>
                                     <select
-                                        style="width: 100%; margin-bottom: 0;"
                                         name="domain_language_{{$index}}"
                                         class="language"
                                         ng-model="domain.lang"
