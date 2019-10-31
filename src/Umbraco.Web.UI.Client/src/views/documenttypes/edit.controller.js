@@ -64,7 +64,7 @@
             if (infiniteMode) {
                 documentTypeId = $scope.model.id;
                 create = $scope.model.create;
-                noTemplate = $scope.model.notemplate;
+                noTemplate = $scope.model.notemplate || $scope.model.noTemplate;
                 isElement = $scope.model.isElement;
                 allowVaryByCulture = $scope.model.allowVaryByCulture;
                 vm.submitButtonKey = "buttons_saveAndClose";
