@@ -14,26 +14,33 @@ function contentCreateController($scope,
     navigationService,
     blueprintConfig,
     authResource,
-    contentResource) {
+    contentResource,
+    $q) {
 
     var mainCulture = $routeParams.mculture ? $routeParams.mculture : null;
 
     function initialize() {
+        $scope.loading = true;
         $scope.allowedTypes = null;
-        contentTypeResource.getAllowedTypes($scope.currentNode.id).then(function (data) {
+        $scope.countTypes = contentTypeResource.getCount;
+        
+        var getAllowedTypes = contentTypeResource.getAllowedTypes($scope.currentNode.id).then(function (data) {
             $scope.allowedTypes = iconHelper.formatContentTypeIcons(data);
         });
-
-        if ($scope.currentNode.id > -1) {
-            authResource.getCurrentUser().then(function(currentUser) {
-                if (currentUser.allowedSections.indexOf("settings") > -1) {
-                    $scope.hasSettingsAccess = true;
-                    contentResource.getById($scope.currentNode.id).then(function(data) {
+        var getCurrentUser = authResource.getCurrentUser().then(function (currentUser) {
+            if (currentUser.allowedSections.indexOf("settings") > -1) {
+                $scope.hasSettingsAccess = true;
+                if ($scope.currentNode.id > -1) {
+                    contentResource.getById($scope.currentNode.id).then(function (data) {
                         $scope.contentTypeId = data.contentTypeId;
                     });
                 }
-            });
-        }
+            }
+        });
+
+        $q.all([getAllowedTypes, getCurrentUser]).then(function() {
+            $scope.loading = false;
+        });
 
         $scope.selectContentType = true;
         $scope.selectBlueprint = false;
@@ -91,16 +98,21 @@ function contentCreateController($scope,
 
     $scope.close = function() {
         close();
-    }
+    };
 
     $scope.closeDialog = function (showMenu) {
         navigationService.hideDialog(showMenu);
     };
 
-    $scope.editContentType = function() {
+    $scope.createContentType = function () {
+        $location.path("/settings/documenttypes/edit/-1").search("create", "true");
+        close();
+    };
+
+    $scope.editContentType = function () {
         $location.path("/settings/documenttypes/edit/" + $scope.contentTypeId).search("view", "permissions");
         close();
-    }
+    };
 
     $scope.createBlank = createBlank;
     $scope.createOrSelectBlueprintIfAny = createOrSelectBlueprintIfAny;
