@@ -402,7 +402,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 if (kits.Count == 0)
                 {
                     // If there's nothing in the local cache file, we should return false? YES even though the site legitately might be empty.
-                    // Is it possible that the cache file is empty but the database is not? YES...
+                    // Is it possible that the cache file is empty but the database is not? YES... (well, it used to be possible)
                     // * A new file is created when one doesn't exist, this will only be done when MainDom is acquired
                     // * The new file will be populated as soon as LoadCachesOnStartup is called
                     // * If the appdomain is going down the moment after MainDom was acquired and we've created an empty cache file,
@@ -412,6 +412,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     //      in the in-mem cache via DB calls, BUT this now means that there is an empty cache file which will be
                     //      loaded by the next appdomain and it won't check if it's empty, it just assumes that since the cache
                     //      file is there, that is correct.
+
+                    // Update: We will still return false here even though the above mentioned race condition has been fixed since we now
+                    // lock the entire operation of creating/populating the cache file with the same lock as releasing/closing the cache file
 
                     _logger.Info<PublishedSnapshotService>("Tried to load content from the local cache file but it was empty.");
                     return false;
