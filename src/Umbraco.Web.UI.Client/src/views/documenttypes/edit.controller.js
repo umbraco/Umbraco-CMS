@@ -64,6 +64,7 @@
             if (infiniteMode) {
                 documentTypeId = $scope.model.id;
                 create = $scope.model.create;
+                if (create && !documentTypeId) documentTypeId = -1;
                 noTemplate = $scope.model.notemplate || $scope.model.noTemplate;
                 isElement = $scope.model.isElement;
                 allowVaryByCulture = $scope.model.allowVaryByCulture;
