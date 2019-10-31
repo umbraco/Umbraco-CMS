@@ -128,10 +128,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
                         var path = GetLocalFilesPath();
                         var localContentDbPath = Path.Combine(path, "NuCache.Content.db");
                         var localMediaDbPath = Path.Combine(path, "NuCache.Media.db");
-                        _localDbExists = File.Exists(localContentDbPath) && File.Exists(localMediaDbPath);
+                        var localContentDbExists = File.Exists(localContentDbPath);
+                        var localMediaDbExists = File.Exists(localMediaDbPath);
+                        _localDbExists = localContentDbExists && localMediaDbExists;
                         // if both local databases exist then GetTree will open them, else new databases will be created
                         _localContentDb = BTree.GetTree(localContentDbPath, _localDbExists);
                         _localMediaDb = BTree.GetTree(localMediaDbPath, _localDbExists);
+
+                        _logger.Info<PublishedSnapshotService>("Registered with MainDom, localContentDbExists? {LocalContentDbExists}, localMediaDbExists? {LocalMediaDbExists}", localContentDbExists, localMediaDbExists);
                     },
                     () =>
                     {
@@ -143,18 +147,25 @@ namespace Umbraco.Web.PublishedCache.NuCache
                             _localContentDb = null;
                             _mediaStore?.ReleaseLocalDb(); //null check because we could shut down before being assigned
                             _localMediaDb = null;
+
+                            _logger.Info<PublishedSnapshotService>("Released from MainDom");
                         }
                     });
 
                 // stores are created with a db so they can write to it, but they do not read from it,
                 // stores need to be populated, happens in OnResolutionFrozen which uses _localDbExists to
                 // figure out whether it can read the databases or it should populate them from sql
+
+                _logger.Info<PublishedSnapshotService>("Creating the content store, localContentDbExists? {LocalContentDbExists}", _localContentDb != null);
                 _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, _localContentDb);
+                _logger.Info<PublishedSnapshotService>("Creating the media store, localMediaDbExists? {LocalMediaDbExists}", _localMediaDb != null);
                 _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, _localMediaDb);
             }
             else
             {
+                _logger.Info<PublishedSnapshotService>("Creating the content store (local db ignored)");
                 _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger);
+                _logger.Info<PublishedSnapshotService>("Creating the media store (local db ignored)");
                 _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger);
             }
 
@@ -371,7 +382,27 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 var kits = _localContentDb.Select(x => x.Value)
                     .OrderBy(x => x.Node.Level)
                     .ThenBy(x => x.Node.ParentContentId)
-                    .ThenBy(x => x.Node.SortOrder); // IMPORTANT sort by level + parentId + sortOrder
+                    .ThenBy(x => x.Node.SortOrder) // IMPORTANT sort by level + parentId + sortOrder
+                    .ToList();
+
+                if (kits.Count == 0)
+                {
+                    // If there's nothing in the local cache file, we should return false? YES even though the site legitately might be empty.
+                    // Is it possible that the cache file is empty but the database is not? YES...
+                    // * A new file is created when one doesn't exist, this will only be done when MainDom is acquired
+                    // * The new file will be populated as soon as LoadCachesOnStartup is called
+                    // * If the appdomain is going down the moment after MainDom was acquired and we've created an empty cache file,
+                    //      then the MainDom release callback is triggered from on a different thread, which will close the file and
+                    //      set the cache file reference to null. At this moment, it is possible that the file is closed and the
+                    //      reference is set to null BEFORE LoadCachesOnStartup which would mean that the current appdomain would load
+                    //      in the in-mem cache via DB calls, BUT this now means that there is an empty cache file which will be
+                    //      loaded by the next appdomain and it won't check if it's empty, it just assumes that since the cache
+                    //      file is there, that is correct.
+
+                    _logger.Info<PublishedSnapshotService>("Tried to load content from the local cache file but it was empty.");
+                    return false;
+                }
+
                 return onStartup ? _contentStore.SetAllFastSorted(kits) : _contentStore.SetAll(kits);
             }
         }
