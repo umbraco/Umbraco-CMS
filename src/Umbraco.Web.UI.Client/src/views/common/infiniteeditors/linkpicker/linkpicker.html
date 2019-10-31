@@ -14,7 +14,7 @@
             <umb-box>
                 <umb-box-content>
 
-                    <div class="flex">
+                    <div ng-class="{'flex': showAnchor}">
 
                         <umb-control-group label="@defaultdialogs_urlLinkPicker">
                             <input type="text"
@@ -27,7 +27,7 @@
                                     ng-disabled="model.target.id || model.target.udi" />
                         </umb-control-group>
 
-                        <umb-control-group label="@defaultdialogs_anchorLinkPicker">
+                        <umb-control-group label="@defaultdialogs_anchorLinkPicker" ng-if="showAnchor">
                             <input type="text"
                                     list="anchors"
                                     localize="placeholder"
