@@ -554,7 +554,12 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userId"></param>
         public void SaveTemplate(ITemplate template, int userId = Constants.Security.SuperUserId)
         {
-            if (template.Name != null && template.Name.Length > 255)
+            if (template == null)
+            {
+                throw new ArgumentNullException(nameof(template));
+            }
+            
+            if (string.IsNullOrWhiteSpace(template.Name) || template.Name.Length > 255)
             {
                 throw new InvalidOperationException("Name cannot be null, empty, contain only white-space characters or be more than 255 characters in length.");
             }
