@@ -6,6 +6,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded.Building;
 using Umbraco.ModelsBuilder.Embedded.Configuration;
+using Umbraco.Web;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.Features;
 
@@ -58,9 +59,9 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
 
         private void ComposeForLegacyModelsBuilder(Composition composition)
         {
-            composition.Logger.Info<ModelsBuilderComposer>("ModelsBuilder.Embedded is disabled, the legacy ModelsBuilder was detected.");
+            composition.Logger.Info<ModelsBuilderComposer>("ModelsBuilder.Embedded is disabled, the external ModelsBuilder was detected.");
             composition.Components().Append<DisabledModelsBuilderComponent>();
-            composition.ManifestFilters().Append<DisableModelsBuilderManifestFilter>();
+            composition.Dashboards().Remove<ModelsBuilderDashboard>();
         }
 
         private void ComposeForDefaultModelsFactory(Composition composition)
