@@ -2640,7 +2640,7 @@ namespace Umbraco.Core.Services
 
                     if (publishStatus.StatusType == PublishStatusType.Success)
                     {
-                        Audit(uow, AuditType.Publish, "Save and Publish performed by ContentService user", userId, content.Id);
+                        Audit(uow, AuditType.Publish, "Save and Publish performed by user", userId, content.Id);
                     }
                     else
                     {
