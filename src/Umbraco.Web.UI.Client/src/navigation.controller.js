@@ -515,7 +515,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
 
     $scope.onOutsideClick = function() {
         closeTree();
-    }
+    };
 
     function closeTree() {
         if (!appState.getGlobalState("touchDevice")) {
