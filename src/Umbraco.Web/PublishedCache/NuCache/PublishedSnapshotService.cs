@@ -113,65 +113,37 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (runtime.Level != RuntimeLevel.Run)
                 return;
 
-            if (options.IgnoreLocalDb == false)
+            // lock this entire call, we only want a single thread to be accessing the stores at once and within
+            // the call below to mainDom.Register, a callback may occur on a threadpool thread to MainDomRelease
+            // at the same time as we are trying to write to the stores. MainDomRelease also locks on _storesLock so
+            // it will not be able to close the stores until we are done populating (if the store is empty)
+            lock (_storesLock)
             {
-                var registered = mainDom.Register(
-                    () =>
-                    {
-                        //"install" phase of MainDom
-                        //this is inside of a lock in MainDom so this is guaranteed to run if MainDom was acquired and guaranteed
-                        //to not run if MainDom wasn't acquired.
-                        //If MainDom was not acquired, then _localContentDb and _localMediaDb will remain null which means this appdomain
-                        //will load in published content via the DB and in that case this appdomain will probably not exist long enough to
-                        //serve more than a page of content.
+                if (options.IgnoreLocalDb == false)
+                {
+                    var registered = mainDom.Register(MainDomRegister, MainDomRelease);
 
-                        var path = GetLocalFilesPath();
-                        var localContentDbPath = Path.Combine(path, "NuCache.Content.db");
-                        var localMediaDbPath = Path.Combine(path, "NuCache.Media.db");
-                        var localContentDbExists = File.Exists(localContentDbPath);
-                        var localMediaDbExists = File.Exists(localMediaDbPath);
-                        _localDbExists = localContentDbExists && localMediaDbExists;
-                        // if both local databases exist then GetTree will open them, else new databases will be created
-                        _localContentDb = BTree.GetTree(localContentDbPath, _localDbExists);
-                        _localMediaDb = BTree.GetTree(localMediaDbPath, _localDbExists);
+                    // stores are created with a db so they can write to it, but they do not read from it,
+                    // stores need to be populated, happens in OnResolutionFrozen which uses _localDbExists to
+                    // figure out whether it can read the databases or it should populate them from sql
 
-                        _logger.Info<PublishedSnapshotService>("Registered with MainDom, localContentDbExists? {LocalContentDbExists}, localMediaDbExists? {LocalMediaDbExists}", localContentDbExists, localMediaDbExists);
-                    },
-                    () =>
-                    {
-                        //"release" phase of MainDom
+                    _logger.Info<PublishedSnapshotService>("Creating the content store, localContentDbExists? {LocalContentDbExists}", _localContentDb != null);
+                    _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, _localContentDb);
+                    _logger.Info<PublishedSnapshotService>("Creating the media store, localMediaDbExists? {LocalMediaDbExists}", _localMediaDb != null);
+                    _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, _localMediaDb);
+                }
+                else
+                {
+                    _logger.Info<PublishedSnapshotService>("Creating the content store (local db ignored)");
+                    _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger);
+                    _logger.Info<PublishedSnapshotService>("Creating the media store (local db ignored)");
+                    _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger);
+                }
 
-                        lock (_storesLock)
-                        {
-                            _contentStore?.ReleaseLocalDb(); //null check because we could shut down before being assigned
-                            _localContentDb = null;
-                            _mediaStore?.ReleaseLocalDb(); //null check because we could shut down before being assigned
-                            _localMediaDb = null;
+                _domainStore = new SnapDictionary<int, Domain>();
 
-                            _logger.Info<PublishedSnapshotService>("Released from MainDom");
-                        }
-                    });
-
-                // stores are created with a db so they can write to it, but they do not read from it,
-                // stores need to be populated, happens in OnResolutionFrozen which uses _localDbExists to
-                // figure out whether it can read the databases or it should populate them from sql
-
-                _logger.Info<PublishedSnapshotService>("Creating the content store, localContentDbExists? {LocalContentDbExists}", _localContentDb != null);
-                _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, _localContentDb);
-                _logger.Info<PublishedSnapshotService>("Creating the media store, localMediaDbExists? {LocalMediaDbExists}", _localMediaDb != null);
-                _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, _localMediaDb);
+                LoadCachesOnStartup(); 
             }
-            else
-            {
-                _logger.Info<PublishedSnapshotService>("Creating the content store (local db ignored)");
-                _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger);
-                _logger.Info<PublishedSnapshotService>("Creating the media store (local db ignored)");
-                _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger);
-            }
-
-            _domainStore = new SnapDictionary<int, Domain>();
-
-            LoadCachesOnStartup();
 
             Guid GetUid(ContentStore store, int id) => store.LiveSnapshot.Get(id)?.Uid ?? default;
             int GetId(ContentStore store, Guid uid) => store.LiveSnapshot.Get(uid)?.Id ?? default;
@@ -183,45 +155,87 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        private void LoadCachesOnStartup()
+        /// <summary>
+        /// Install phase of <see cref="IMainDom"/>
+        /// </summary>
+        /// <remarks>
+        /// This is inside of a lock in MainDom so this is guaranteed to run if MainDom was acquired and guaranteed
+        /// to not run if MainDom wasn't acquired.
+        /// If MainDom was not acquired, then _localContentDb and _localMediaDb will remain null which means this appdomain
+        /// will load in published content via the DB and in that case this appdomain will probably not exist long enough to
+        /// serve more than a page of content. 
+        /// </remarks>
+        private void MainDomRegister()
+        {
+            var path = GetLocalFilesPath();
+            var localContentDbPath = Path.Combine(path, "NuCache.Content.db");
+            var localMediaDbPath = Path.Combine(path, "NuCache.Media.db");
+            var localContentDbExists = File.Exists(localContentDbPath);
+            var localMediaDbExists = File.Exists(localMediaDbPath);
+            _localDbExists = localContentDbExists && localMediaDbExists;
+            // if both local databases exist then GetTree will open them, else new databases will be created
+            _localContentDb = BTree.GetTree(localContentDbPath, _localDbExists);
+            _localMediaDb = BTree.GetTree(localMediaDbPath, _localDbExists);
+
+            _logger.Info<PublishedSnapshotService>("Registered with MainDom, localContentDbExists? {LocalContentDbExists}, localMediaDbExists? {LocalMediaDbExists}", localContentDbExists, localMediaDbExists);
+        }
+
+        /// <summary>
+        /// Release phase of MainDom
+        /// </summary>
+        /// <remarks>
+        /// This will execute on a threadpool thread
+        /// </remarks>
+        private void MainDomRelease()
         {
             lock (_storesLock)
             {
-                // populate the stores
+                _contentStore?.ReleaseLocalDb(); //null check because we could shut down before being assigned
+                _localContentDb = null;
+                _mediaStore?.ReleaseLocalDb(); //null check because we could shut down before being assigned
+                _localMediaDb = null;
 
-
-                var okContent = false;
-                var okMedia = false;
-
-                try
-                {
-                    if (_localDbExists)
-                    {
-                        okContent = LockAndLoadContent(scope => LoadContentFromLocalDbLocked(true));
-                        if (!okContent)
-                            _logger.Warn<PublishedSnapshotService>("Loading content from local db raised warnings, will reload from database.");
-                        okMedia = LockAndLoadMedia(scope => LoadMediaFromLocalDbLocked(true));
-                        if (!okMedia)
-                            _logger.Warn<PublishedSnapshotService>("Loading media from local db raised warnings, will reload from database.");
-                    }
-
-                    if (!okContent)
-                        LockAndLoadContent(scope => LoadContentFromDatabaseLocked(scope, true));
-
-                    if (!okMedia)
-                        LockAndLoadMedia(scope => LoadMediaFromDatabaseLocked(scope, true));
-
-                    LockAndLoadDomains();
-                }
-                catch (Exception ex)
-                {
-                    _logger.Fatal<PublishedSnapshotService>(ex, "Panic, exception while loading cache data.");
-                    throw;
-                }
-
-                // finally, cache is ready!
-                _isReady = true;
+                _logger.Info<PublishedSnapshotService>("Released from MainDom");
             }
+        }
+
+        /// <summary>
+        /// Populates the stores
+        /// </summary>
+        /// <remarks>This is called inside of a lock for _storesLock</remarks>
+        private void LoadCachesOnStartup()
+        {
+            var okContent = false;
+            var okMedia = false;
+
+            try
+            {
+                if (_localDbExists)
+                {
+                    okContent = LockAndLoadContent(scope => LoadContentFromLocalDbLocked(true));
+                    if (!okContent)
+                        _logger.Warn<PublishedSnapshotService>("Loading content from local db raised warnings, will reload from database.");
+                    okMedia = LockAndLoadMedia(scope => LoadMediaFromLocalDbLocked(true));
+                    if (!okMedia)
+                        _logger.Warn<PublishedSnapshotService>("Loading media from local db raised warnings, will reload from database.");
+                }
+
+                if (!okContent)
+                    LockAndLoadContent(scope => LoadContentFromDatabaseLocked(scope, true));
+
+                if (!okMedia)
+                    LockAndLoadMedia(scope => LoadMediaFromDatabaseLocked(scope, true));
+
+                LockAndLoadDomains();
+            }
+            catch (Exception ex)
+            {
+                _logger.Fatal<PublishedSnapshotService>(ex, "Panic, exception while loading cache data.");
+                throw;
+            }
+
+            // finally, cache is ready!
+            _isReady = true;
         }
 
         private void InitializeRepositoryEvents()
