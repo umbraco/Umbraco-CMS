@@ -89,7 +89,7 @@ namespace Umbraco.Web.PropertyEditors
 
             public override string ConvertDbToString(PropertyType propertyType, object propertyValue, IDataTypeService dataTypeService)
             {
-                var vals = _nestedContentValues.GetPropertyValues(propertyValue).ToList();
+                var vals = _nestedContentValues.GetPropertyValues(propertyValue, out var deserialized).ToList();
 
                 if (vals.Count == 0)
                     return string.Empty;
@@ -100,7 +100,7 @@ namespace Umbraco.Web.PropertyEditors
                     {
                         // type not found, and property is not system: just delete the value
                         if (IsSystemPropertyKey(row.PropKey) == false)
-                            row.PropValues[row.PropKey] = null;
+                            row.JsonRowValue[row.PropKey] = null;
                     }
                     else
                     {
@@ -112,18 +112,18 @@ namespace Umbraco.Web.PropertyEditors
 
                             var tempConfig = dataTypeService.GetDataType(row.PropType.DataTypeId).Configuration;
                             var valEditor = propEditor.GetValueEditor(tempConfig);
-                            var convValue = valEditor.ConvertDbToString(row.PropType, row.PropValues[row.PropKey]?.ToString(), dataTypeService);
-                            row.PropValues[row.PropKey] = convValue;
+                            var convValue = valEditor.ConvertDbToString(row.PropType, row.JsonRowValue[row.PropKey]?.ToString(), dataTypeService);
+                            row.JsonRowValue[row.PropKey] = convValue;
                         }
                         catch (InvalidOperationException)
                         {
                             // deal with weird situations by ignoring them (no comment)
-                            row.PropValues[row.PropKey] = null;
+                            row.JsonRowValue[row.PropKey] = null;
                         }
                     }
                 }
 
-                return JsonConvert.SerializeObject(vals).ToXmlString<string>();
+                return JsonConvert.SerializeObject(deserialized).ToXmlString<string>();
             }
 
             #endregion
@@ -138,7 +138,7 @@ namespace Umbraco.Web.PropertyEditors
             {
                 var val = property.GetValue(culture, segment);
 
-                var vals = _nestedContentValues.GetPropertyValues(val).ToList();
+                var vals = _nestedContentValues.GetPropertyValues(val, out var deserialized).ToList();
 
                 if (vals.Count == 0)
                     return string.Empty;
@@ -149,7 +149,7 @@ namespace Umbraco.Web.PropertyEditors
                     {
                         // type not found, and property is not system: just delete the value
                         if (IsSystemPropertyKey(row.PropKey) == false)
-                            row.PropValues[row.PropKey] = null;
+                            row.JsonRowValue[row.PropKey] = null;
                     }
                     else
                     {
@@ -159,31 +159,31 @@ namespace Umbraco.Web.PropertyEditors
                             // - force it to be culture invariant as NC can't handle culture variant element properties
                             row.PropType.Variations = ContentVariation.Nothing;
                             var tempProp = new Property(row.PropType);
-                            tempProp.SetValue(row.PropValues[row.PropKey] == null ? null : row.PropValues[row.PropKey].ToString());
+                            tempProp.SetValue(row.JsonRowValue[row.PropKey] == null ? null : row.JsonRowValue[row.PropKey].ToString());
 
                             // convert that temp property, and store the converted value
                             var propEditor = _propertyEditors[row.PropType.PropertyEditorAlias];
                             if (propEditor == null)
                             {
-                                row.PropValues[row.PropKey] = tempProp.GetValue()?.ToString();
+                                row.JsonRowValue[row.PropKey] = tempProp.GetValue()?.ToString();
                                 continue;
                             }
 
                             var tempConfig = dataTypeService.GetDataType(row.PropType.DataTypeId).Configuration;
                             var valEditor = propEditor.GetValueEditor(tempConfig);
                             var convValue = valEditor.ToEditor(tempProp, dataTypeService);
-                            row.PropValues[row.PropKey] = convValue == null ? null : JToken.FromObject(convValue);
+                            row.JsonRowValue[row.PropKey] = convValue == null ? null : JToken.FromObject(convValue);
                         }
                         catch (InvalidOperationException)
                         {
                             // deal with weird situations by ignoring them (no comment)
-                            row.PropValues[row.PropKey] = null;
+                            row.JsonRowValue[row.PropKey] = null;
                         }
                     }
                 }
 
                 // return json
-                return vals;
+                return deserialized;
             }
 
             public override object FromEditor(ContentPropertyData editorValue, object currentValue)
@@ -191,7 +191,7 @@ namespace Umbraco.Web.PropertyEditors
                 if (editorValue.Value == null || string.IsNullOrWhiteSpace(editorValue.Value.ToString()))
                     return null;
 
-                var vals = _nestedContentValues.GetPropertyValues(editorValue.Value).ToList();
+                var vals = _nestedContentValues.GetPropertyValues(editorValue.Value, out var deserialized).ToList();
 
                 if (vals.Count == 0)
                     return string.Empty;
@@ -202,7 +202,7 @@ namespace Umbraco.Web.PropertyEditors
                     {
                         // type not found, and property is not system: just delete the value
                         if (IsSystemPropertyKey(row.PropKey) == false)
-                            row.PropValues[row.PropKey] = null;
+                            row.JsonRowValue[row.PropKey] = null;
                     }
                     else
                     {
@@ -214,18 +214,18 @@ namespace Umbraco.Web.PropertyEditors
                         if (propEditor == null) continue;
 
                         // Create a fake content property data object
-                        var contentPropData = new ContentPropertyData(row.PropValues[row.PropKey], propConfiguration);
+                        var contentPropData = new ContentPropertyData(row.JsonRowValue[row.PropKey], propConfiguration);
 
                         // Get the property editor to do it's conversion
-                        var newValue = propEditor.GetValueEditor().FromEditor(contentPropData, row.PropValues[row.PropKey]);
+                        var newValue = propEditor.GetValueEditor().FromEditor(contentPropData, row.JsonRowValue[row.PropKey]);
 
                         // Store the value back
-                        row.PropValues[row.PropKey] = (newValue == null) ? null : JToken.FromObject(newValue);
+                        row.JsonRowValue[row.PropKey] = (newValue == null) ? null : JToken.FromObject(newValue);
                     }
                 }
 
                 // return json
-                return JsonConvert.SerializeObject(vals);
+                return JsonConvert.SerializeObject(deserialized);
             }
 
             public IEnumerable<UmbracoEntityReference> GetReferences(object value)
@@ -234,7 +234,7 @@ namespace Umbraco.Web.PropertyEditors
 
                 var result = new List<UmbracoEntityReference>();
 
-                foreach (var row in _nestedContentValues.GetPropertyValues(rawJson))
+                foreach (var row in _nestedContentValues.GetPropertyValues(rawJson, out _))
                 {
                     if (row.PropType == null) continue;
 
@@ -243,7 +243,7 @@ namespace Umbraco.Web.PropertyEditors
                     var valueEditor = propEditor?.GetValueEditor();
                     if (!(valueEditor is IDataValueReference reference)) continue;
 
-                    var val = row.PropValues[row.PropKey]?.ToString();
+                    var val = row.JsonRowValue[row.PropKey]?.ToString();
 
                     var refs = reference.GetReferences(val);
 
@@ -273,7 +273,7 @@ namespace Umbraco.Web.PropertyEditors
             {
                 var validationResults = new List<ValidationResult>();
 
-                foreach(var row in _nestedContentValues.GetPropertyValues(rawValue))
+                foreach(var row in _nestedContentValues.GetPropertyValues(rawValue, out _))
                 {
                     if (row.PropType == null) continue;
 
@@ -283,9 +283,9 @@ namespace Umbraco.Web.PropertyEditors
 
                     foreach (var validator in propertyEditor.GetValueEditor().Validators)
                     {
-                        foreach (var result in validator.Validate(row.PropValues[row.PropKey], propertyEditor.GetValueEditor().ValueType, config))
+                        foreach (var result in validator.Validate(row.JsonRowValue[row.PropKey], propertyEditor.GetValueEditor().ValueType, config))
                         {
-                            result.ErrorMessage = "Item " + (row.Index + 1) + " '" + row.PropType.Name + "' " + result.ErrorMessage;
+                            result.ErrorMessage = "Item " + (row.RowIndex + 1) + " '" + row.PropType.Name + "' " + result.ErrorMessage;
                             validationResults.Add(result);
                         }
                     }
@@ -293,20 +293,20 @@ namespace Umbraco.Web.PropertyEditors
                     // Check mandatory
                     if (row.PropType.Mandatory)
                     {
-                        if (row.PropValues[row.PropKey] == null)
-                            validationResults.Add(new ValidationResult("Item " + (row.Index + 1) + " '" + row.PropType.Name + "' cannot be null", new[] { row.PropKey }));
-                        else if (row.PropValues[row.PropKey].ToString().IsNullOrWhiteSpace() || (row.PropValues[row.PropKey].Type == JTokenType.Array && !row.PropValues[row.PropKey].HasValues))
-                            validationResults.Add(new ValidationResult("Item " + (row.Index + 1) + " '" + row.PropType.Name + "' cannot be empty", new[] { row.PropKey }));
+                        if (row.JsonRowValue[row.PropKey] == null)
+                            validationResults.Add(new ValidationResult("Item " + (row.RowIndex + 1) + " '" + row.PropType.Name + "' cannot be null", new[] { row.PropKey }));
+                        else if (row.JsonRowValue[row.PropKey].ToString().IsNullOrWhiteSpace() || (row.JsonRowValue[row.PropKey].Type == JTokenType.Array && !row.JsonRowValue[row.PropKey].HasValues))
+                            validationResults.Add(new ValidationResult("Item " + (row.RowIndex + 1) + " '" + row.PropType.Name + "' cannot be empty", new[] { row.PropKey }));
                     }
 
                     // Check regex
                     if (!row.PropType.ValidationRegExp.IsNullOrWhiteSpace()
-                        && row.PropValues[row.PropKey] != null && !row.PropValues[row.PropKey].ToString().IsNullOrWhiteSpace())
+                        && row.JsonRowValue[row.PropKey] != null && !row.JsonRowValue[row.PropKey].ToString().IsNullOrWhiteSpace())
                     {
                         var regex = new Regex(row.PropType.ValidationRegExp);
-                        if (!regex.IsMatch(row.PropValues[row.PropKey].ToString()))
+                        if (!regex.IsMatch(row.JsonRowValue[row.PropKey].ToString()))
                         {
-                            validationResults.Add(new ValidationResult("Item " + (row.Index + 1) + " '" + row.PropType.Name + "' is invalid, it does not match the correct pattern", new[] { row.PropKey }));
+                            validationResults.Add(new ValidationResult("Item " + (row.RowIndex + 1) + " '" + row.PropType.Name + "' is invalid, it does not match the correct pattern", new[] { row.PropKey }));
                         }
                     }
                 }
@@ -331,24 +331,28 @@ namespace Umbraco.Web.PropertyEditors
                 return contentType;
             }
 
-            public IEnumerable<RowValue> GetPropertyValues(object propertyValue)
+            public IEnumerable<RowValue> GetPropertyValues(object propertyValue, out List<JObject> deserialized)
             {
-                if (propertyValue == null || string.IsNullOrWhiteSpace(propertyValue.ToString()))
-                    yield break;
+                var rowValues = new List<RowValue>();
 
-                var value = JsonConvert.DeserializeObject<List<JObject>>(propertyValue.ToString());
+                deserialized = null;
+
+                if (propertyValue == null || string.IsNullOrWhiteSpace(propertyValue.ToString()))
+                    return Enumerable.Empty<RowValue>();
+
+                deserialized = JsonConvert.DeserializeObject<List<JObject>>(propertyValue.ToString());
 
                 // There was a note here about checking if the result had zero items and if so it would return null, so we'll continue to do that
                 // The original note was: "Issue #38 - Keep recursive property lookups working"
                 // Which is from the original NC tracker: https://github.com/umco/umbraco-nested-content/issues/38
                 // This check should be used everywhere when iterating NC prop values, instead of just the one previous place so that
                 // empty values don't get persisted when there is nothing, it should actually be null.
-                if (value == null || value.Count == 0)
-                    yield break;
+                if (deserialized == null || deserialized.Count == 0)
+                    return Enumerable.Empty<RowValue>();
 
                 var index = 0;
 
-                foreach (var o in value)
+                foreach (var o in deserialized)
                 {
                     var propValues = o;
 
@@ -361,10 +365,12 @@ namespace Umbraco.Web.PropertyEditors
                     foreach (var propAlias in propAliases)
                     {
                         propertyTypes.TryGetValue(propAlias, out var propType);
-                        yield return new RowValue(propAlias, propType, propValues, index);
+                        rowValues.Add(new RowValue(propAlias, propType, propValues, index));
                     }
                     index++;
                 }
+
+                return rowValues;
             }
 
             internal class RowValue
@@ -372,15 +378,30 @@ namespace Umbraco.Web.PropertyEditors
                 public RowValue(string propKey, PropertyType propType, JObject propValues, int index)
                 {
                     PropKey = propKey ?? throw new ArgumentNullException(nameof(propKey));
-                    PropType = propType ?? throw new ArgumentNullException(nameof(propType));
-                    PropValues = propValues ?? throw new ArgumentNullException(nameof(propValues));
-                    Index = index;
+                    PropType = propType;
+                    JsonRowValue = propValues ?? throw new ArgumentNullException(nameof(propValues));
+                    RowIndex = index;
                 }
 
+                /// <summary>
+                /// The current property key being iterated for the row value
+                /// </summary>
                 public string PropKey { get; }
+
+                /// <summary>
+                /// The <see cref="PropertyType"/> of the value (if any), this may be null
+                /// </summary>
                 public PropertyType PropType { get; }
-                public JObject PropValues { get; }
-                public int Index { get; }
+
+                /// <summary>
+                /// The json values for the current row
+                /// </summary>
+                public JObject JsonRowValue { get; }
+
+                /// <summary>
+                /// The Nested Content row index
+                /// </summary>
+                public int RowIndex { get; }
             }
         }
 
