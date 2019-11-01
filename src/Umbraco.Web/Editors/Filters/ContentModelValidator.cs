@@ -188,12 +188,12 @@ namespace Umbraco.Web.Editors.Filters
             foreach (var r in valueEditor.Validate(postedValue, property.IsRequired, property.ValidationRegExp))
             {
                 // If we've got custom error messages, we'll replace the default ones that will have been applied in the call to Validate().
-                if (property.IsRequired && !string.IsNullOrWhiteSpace(property.IsRequiredMessage) && requiredDefaultMessages.Contains(r.ErrorMessage))
+                if (property.IsRequired && !string.IsNullOrWhiteSpace(property.IsRequiredMessage) && requiredDefaultMessages.Contains(r.ErrorMessage, StringComparer.OrdinalIgnoreCase))
                 {
                     r.ErrorMessage = property.IsRequiredMessage;
                 }
 
-                if (!string.IsNullOrWhiteSpace(property.ValidationRegExp) && !string.IsNullOrWhiteSpace(property.ValidationRegExpMessage) && formatDefaultMessages.Contains(r.ErrorMessage))
+                if (!string.IsNullOrWhiteSpace(property.ValidationRegExp) && !string.IsNullOrWhiteSpace(property.ValidationRegExpMessage) && formatDefaultMessages.Contains(r.ErrorMessage, StringComparer.OrdinalIgnoreCase))
                 {
                     r.ErrorMessage = property.ValidationRegExpMessage;
                 }
