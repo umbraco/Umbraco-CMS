@@ -100,7 +100,7 @@ namespace Umbraco.Web.PropertyEditors
 
                 var grid = DeserializeGridValue(rawJson, out var rtes, out _);
 
-                var userId = _umbracoContextAccessor.UmbracoContext?.Security.CurrentUser.Id ?? Constants.Security.SuperUserId;
+                var userId = _umbracoContextAccessor.UmbracoContext?.Security?.CurrentUser?.Id ?? Constants.Security.SuperUserId;
 
                 // Process the rte values
                 foreach (var rte in rtes)

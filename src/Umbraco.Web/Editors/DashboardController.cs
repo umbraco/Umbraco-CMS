@@ -140,7 +140,7 @@ namespace Umbraco.Web.Editors
                     break;
 
                 case "OUR":
-                    urlPrefix = "https://our.umbraco.org/";
+                    urlPrefix = "https://our.umbraco.com/";
                     break;
 
                 case "COM":
