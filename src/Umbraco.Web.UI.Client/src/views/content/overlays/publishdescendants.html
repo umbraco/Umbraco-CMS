@@ -48,8 +48,6 @@
 
                         <div>
                             <span class="db umb-list-item__description umb-list-item__description--checkbox" ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
-                                <span>{{variant.language.name}}</span>
-
                                 <span class="db umb-list-item__description" ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
                                     <umb-variant-state variant="variant"></umb-variant-state>
                                     <span ng-if="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
@@ -60,6 +58,7 @@
                                 </span>
 
                                 <umb-variant-notification-list notifications="variant.notifications"></umb-variant-notification-list>
+                            </span>
                         </div>
                     </div>
 
