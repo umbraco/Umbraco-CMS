@@ -242,6 +242,18 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             isDisabled: true
         }
 
+        var removeAllEntries = function() {
+            alert("Not done jet");
+        }
+
+        var removeAllEntriesAction = {
+            labelKey: 'clipboard_labelForRemoveAllEntries',
+            labelTokens: [$scope.model.label],
+            icon: 'trash',
+            method: removeAllEntries,
+            isDisabled: true
+        }
+
 
 
         // helper to force the current form into the dirty state
@@ -691,6 +703,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
 
         function updatePropertyActionStates() {
             copyAllEntriesAction.isDisabled = $scope.model.value.length === 0;
+            removeAllEntriesAction.isDisabled = $scope.model.value.length === 0;
         }
 
         $scope.$watch("currentNode", function (newVal) {
@@ -701,7 +714,8 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         
         var api = {};
         api.propertyActions = [
-            copyAllEntriesAction
+            copyAllEntriesAction,
+            removeAllEntriesAction
         ];
         
         propertyEditorService.exposeAPI($scope, api);// must be executed at a state where the API is set.

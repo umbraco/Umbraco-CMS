@@ -2213,6 +2213,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   <area alias="clipboard">
     <key alias="labelForCopyAllEntries">Copy %0%</key>
     <key alias="labelForArrayOfItemsFrom">%0% from %1%</key>
+    <key alias="labelForRemoveAllEntries">Remove all %0%</key>
   </area>
   <area alias="propertyActions">
     <key alias="tooltipForPropertyActionsMenu">Open Property Actions</key>
