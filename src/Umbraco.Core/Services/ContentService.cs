@@ -2483,7 +2483,14 @@ namespace Umbraco.Core.Services
                         repository.AddOrUpdateContentXml(item.Result.ContentItem, c => _entitySerializer.Serialize(this, _dataTypeService, _userService, c));
                         updated.Add(item.Result.ContentItem);
 
-                        Audit(uow, AuditType.Publish, "Publish performed by user", userId, item.Result.ContentItem.Id);
+                        if(item.Result.ContentItem.Id == content.Id)
+                        {
+                            Audit(uow, AuditType.PublishWithChildren, "Publish with children performed by user", userId, item.Result.ContentItem.Id);
+                        }
+                        else
+                        {
+                            Audit(uow, AuditType.Publish, "Publish performed by user", userId, item.Result.ContentItem.Id);
+                        }
                     }
 
                     //Save xml to db and call following method to fire event:

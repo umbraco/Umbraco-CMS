@@ -26,6 +26,10 @@
         /// </summary>
         Publish,
         /// <summary>
+        /// Used when nodes are published with children
+        /// </summary>
+        PublishWithChildren,
+        /// <summary>
         /// Used when nodes are send to publishing
         /// </summary>
         SendToPublish,

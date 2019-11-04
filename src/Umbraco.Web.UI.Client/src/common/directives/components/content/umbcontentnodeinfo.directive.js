@@ -153,7 +153,8 @@
                 angular.forEach(auditTrail, function (item) {
 
                     switch (item.logType) {
-                        case "Publish":
+						case "Publish":
+						case "PublishWithChildren":
                             item.logTypeColor = "success";
                             break;
                         case "UnPublish":

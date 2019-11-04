@@ -151,6 +151,7 @@
         <key alias="delete">Delete Content performed by user</key>
         <key alias="unpublish">UnPublish performed by user</key>
         <key alias="publish">Save and Publish performed by user</key>
+        <key alias="publishwithchildren">Save and Publish with Children performed by user</key>
         <key alias="save">Save Content performed by user</key>
         <key alias="move">Move Content performed by user</key>
         <key alias="copy">Copy Content performed by user</key>
@@ -160,6 +161,7 @@
         <key alias="sort">Sort child items performed by user</key>
         <key alias="smallCopy">Copy</key>
         <key alias="smallPublish">Publish</key>
+        <key alias="smallPublishWithChildren">Publish with Children</key>
         <key alias="smallMove">Move</key>
         <key alias="smallSave">Save</key>
         <key alias="smallDelete">Delete</key>
