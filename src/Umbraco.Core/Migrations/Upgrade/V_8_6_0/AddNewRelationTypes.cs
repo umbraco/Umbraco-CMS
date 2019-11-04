@@ -1,6 +1,6 @@
 ﻿using Umbraco.Core.Migrations.Install;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_5_0
+namespace Umbraco.Core.Migrations.Upgrade.V_8_6_0
 {
     /// <summary>
     /// Ensures the new relation types are created
