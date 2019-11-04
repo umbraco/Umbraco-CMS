@@ -280,7 +280,7 @@
     <key alias="nestedContentEditorNotSupported">Property %0% uses editor %1% which is not supported by Nested Content.</key>
     <key alias="nestedContentNoContentTypes">No content types are configured for this property.</key>
     <key alias="nestedContentAddElementType">Add element type</key>
-    <key alias="nestedContentSelectElementTypeModalTitle">Select element type</key>	
+    <key alias="nestedContentSelectElementTypeModalTitle">Select element type</key>
     <key alias="addTextBox">Add another text box</key>
     <key alias="removeTextBox">Remove this text box</key>
     <key alias="contentRoot">Content root</key>
@@ -1997,6 +1997,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="invalidEmpty">Value cannot be empty</key>
     <key alias="invalidPattern">Value is invalid, it does not match the correct pattern</key>
     <key alias="customValidation">Custom validation</key>
+    <key alias="entriesShort"><![CDATA[Minimum %0% entries, requires <strong>%1%</strong> more.]]></key>
+    <key alias="entriesExceed"><![CDATA[Maximum %0% entries, <strong>%1%</strong> too many.]]></key>
   </area>
   <area alias="healthcheck">
     <!-- The following keys get these tokens passed in:
@@ -2183,7 +2185,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="createNewFolder">Create new folder</key>
     <key alias="newPartialView">Partial View</key>
     <key alias="newPartialViewMacro">Partial View Macro</key>
-    <key alias="newMember">Member</key>	
+    <key alias="newMember">Member</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>
@@ -2223,5 +2225,12 @@ To manage your website, simply open the Umbraco back office and start adding con
       <key alias="findLogsWithNamespace">Find Logs with Namespace</key>
       <key alias="findLogsWithMachineName">Find Logs with Machine Name</key>
       <key alias="open">Open</key>
+  </area>
+  <area alias="clipboard">
+    <key alias="labelForCopyAllEntries">Copy %0%</key>
+    <key alias="labelForArrayOfItemsFrom">%0% from %1%</key>
+  </area>
+  <area alias="propertyActions">
+    <key alias="tooltipForPropertyActionsMenu">Open Property Actions</key>
   </area>
 </language>
