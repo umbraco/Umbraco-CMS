@@ -4,6 +4,9 @@
     <name>The Umbraco community</name>
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
+  <area alias="apps">
+    <key alias="umbContent">Innehåll</key>
+  </area>
   <area alias="actions">
     <key alias="assignDomain">Hantera domännamn</key>
     <key alias="auditTrail">Hantera versioner</key>
@@ -121,6 +124,7 @@
     <key alias="saveAndPublish">Spara och publicera</key>
     <key alias="saveAndSchedule">Spara och schemalägg</key>
     <key alias="saveToPublish">Spara och skicka för godkännande</key>
+    <key alias="schedulePublish">Schemaläggning</key>
     <key alias="select">Välj</key>
     <key alias="showPage">Förhandsgranska</key>
     <key alias="showPageDisabled">Förhandsgranskning är avstängt på grund av att det inte finns någon mall tilldelad</key>
@@ -690,6 +694,7 @@
     <key alias="media">Media</key>
     <key alias="member">Medlemmar</key>
     <key alias="newsletters">Nyhetsbrev</key>
+    <key alias="packages">Paket</key>
     <key alias="settings">Inställningar</key>
     <key alias="statistics">Statistik</key>
     <key alias="translation">Översättning</key>
@@ -865,6 +870,7 @@
   </area>
   <area alias="treeHeaders">
     <key alias="cacheBrowser">Cacha webbläsare</key>
+    <key alias="content">Innehåll</key>
     <key alias="contentRecycleBin">Papperskorg</key>
     <key alias="createdPackages">Skapade paket</key>
     <key alias="dataTypes">Datatyper</key>
