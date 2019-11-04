@@ -428,6 +428,7 @@
     <key alias="properties">Egenskaper</key>
     <key alias="reciept">E-postadress för formulärsdata</key>
     <key alias="recycleBin">Papperskorg</key>
+    <key alias="recycleBinEmpty">Din papperskorg är tom</key>
     <key alias="remaining">Återstående</key>
     <key alias="remove">Ta bort</key>
     <key alias="rename">Döp om</key>
@@ -571,6 +572,7 @@
   <area alias="media">
     <key alias="clickToUpload">Klicka för att ladda upp</key>
     <key alias="orClickHereToUpload">eller klicka här för att välja filer</key>
+      <key alias="dragAndDropYourFilesIntoTheArea">Drag och släpp dina filer i denna yta</key>
   </area>
   <area alias="moveOrCopy">
     <key alias="choose">Välj sida ovan...</key>
