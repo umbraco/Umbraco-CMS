@@ -32,6 +32,7 @@ namespace Umbraco.Web.Mvc
                 //check if the controller is an instance of IRenderController and find the index
                 if (controllerContext.Controller is IRenderController)
                 {
+                    // ReSharper disable once Mvc.ActionNotResolved
                     return controllerDescriptor.FindAction(controllerContext, "Index");
                 }
             }

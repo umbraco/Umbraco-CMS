@@ -184,6 +184,7 @@ namespace Umbraco.Tests.Web.Mvc
 
             public ActionResult Index()
             {
+                // ReSharper disable once Mvc.ViewNotResolved
                 return View();
             }
 

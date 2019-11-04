@@ -225,6 +225,9 @@
     <Compile Include="Composing\TargetedServiceFactory.cs" />
     <Compile Include="Composing\TypeFinder.cs" />
     <Compile Include="Composing\TypeLoader.cs" />
+    <Compile Include="IO\IMediaFileSystem.cs" />
+    <Compile Include="IO\IMediaPathScheme.cs" />
+    <Compile Include="IO\IOHelper.cs" />
     <Compile Include="IO\MediaPathSchemes\UniqueMediaPathScheme.cs" />
     <Compile Include="Logging\Viewer\LogTimePeriod.cs" />
     <Compile Include="Manifest\IManifestFilter.cs" />
@@ -339,6 +342,7 @@
     <Compile Include="Services\Changes\TreeChange.cs" />
     <Compile Include="Services\Changes\TreeChangeExtensions.cs" />
     <Compile Include="Services\IDataTypeService.cs" />
+    <Compile Include="Services\IEntityService.cs" />
     <Compile Include="Services\IFileService.cs" />
     <Compile Include="Services\ILocalizationService.cs" />
     <Compile Include="Services\IMacroService.cs" />
@@ -408,11 +412,8 @@
     <Compile Include="Deploy\IDataTypeConfigurationConnector.cs" />
     <Compile Include="Events\CancellableObjectEventArgsOfTEventObject.cs" />
     <Compile Include="Events\RolesEventArgs.cs" />
-    <Compile Include="IO\IFileSystems.cs" />
-    <Compile Include="IO\IMediaFileSystem.cs" />
     <Compile Include="GuidUtils.cs" />
     <Compile Include="IO\MediaPathSchemes\CombinedGuidsMediaPathScheme.cs" />
-    <Compile Include="IO\IMediaPathScheme.cs" />
     <Compile Include="IO\MediaPathSchemes\OriginalMediaPathScheme.cs" />
     <Compile Include="IO\MediaPathSchemes\TwoGuidsMediaPathScheme.cs" />
     <Compile Include="IO\SupportingFileSystems.cs" />
@@ -594,8 +595,6 @@
     <Compile Include="IO\FileSystemExtensions.cs" />
     <Compile Include="IO\FileSystems.cs" />
     <Compile Include="IO\FileSystemWrapper.cs" />
-    <Compile Include="IO\IFileSystem.cs" />
-    <Compile Include="IO\IOHelper.cs" />
     <Compile Include="IO\MediaFileSystem.cs" />
     <Compile Include="IO\PhysicalFileSystem.cs" />
     <Compile Include="IO\ShadowFileSystem.cs" />
@@ -1160,7 +1159,6 @@
     <Compile Include="Services\IContentTypeService.cs" />
     <Compile Include="Services\IContentTypeServiceBase.cs" />
     <Compile Include="Services\IdkMap.cs" />
-    <Compile Include="Services\IEntityService.cs" />
     <Compile Include="Services\IExternalLoginService.cs" />
     <Compile Include="Services\IMediaService.cs" />
     <Compile Include="Services\IMediaTypeService.cs" />

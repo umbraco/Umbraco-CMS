@@ -196,6 +196,7 @@ namespace Umbraco.Tests.Routing
 
             public ActionResult HomePage(ContentModel model)
             {
+                // ReSharper disable once Mvc.ViewNotResolved
                 return View();
             }
 

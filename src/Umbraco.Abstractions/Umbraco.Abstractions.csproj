@@ -6,8 +6,4 @@
         <RootNamespace>Umbraco.Core</RootNamespace>
     </PropertyGroup>
 
-    <ItemGroup>
-      <Folder Include="Models\ContentEditing" />
-    </ItemGroup>
-
 </Project>
