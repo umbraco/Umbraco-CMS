@@ -2,13 +2,12 @@
     "use strict";
 
     function UsersController($scope, $timeout, $location, $routeParams, usersResource, 
-        userGroupsResource, userService, localizationService, contentEditingHelper, 
-        usersHelper, formHelper, notificationsService, dateHelper, editorService, 
+        userGroupsResource, userService, localizationService,  
+        usersHelper, formHelper, dateHelper, editorService, 
         listViewHelper) {
 
         var vm = this;
-        var localizeSaving = localizationService.localize("general_saving");
-
+        
         vm.page = {};
         vm.users = [];
         vm.userGroups = [];
@@ -113,6 +112,7 @@
         vm.selectAll = selectAll;
         vm.areAllSelected = areAllSelected;
         vm.searchUsers = searchUsers;
+        vm.freeTextFilterUsers = freeTextFilterUsers;
         vm.getFilterName = getFilterName;
         vm.setUserStatesFilter = setUserStatesFilter;
         vm.setUserGroupFilter = setUserGroupFilter;
@@ -412,6 +412,11 @@
         }, 500);
 
         function searchUsers() {
+            search();
+        }
+
+        function freeTextFilterUsers() {
+            vm.usersOptions.pageNumber = 1;
             search();
         }
 
