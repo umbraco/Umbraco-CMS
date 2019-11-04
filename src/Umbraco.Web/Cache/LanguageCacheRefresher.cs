@@ -46,7 +46,7 @@ namespace Umbraco.Web.Cache
             ClearAllIsolatedCacheByEntityType<ILanguage>();
 
             foreach (var payload in payloads)
-            {   
+            {
                 switch (payload.ChangeType)
                 {
                     case LanguageChangeType.Update:
@@ -72,8 +72,8 @@ namespace Umbraco.Web.Cache
                 RefreshDomains();
                 ContentCacheRefresher.RefreshContentTypes(AppCaches); // we need to evict all IContent items
                 //now refresh all nucache
-                var clearContentPayload = new[] { new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) };
-                ContentCacheRefresher.NotifyPublishedSnapshotService(_publishedSnapshotService, AppCaches, clearContentPayload);                
+                var clearContentPayload = new[] { new ContentCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) };
+                ContentCacheRefresher.NotifyPublishedSnapshotService(_publishedSnapshotService, AppCaches, clearContentPayload);
             }
 
             // then trigger event
