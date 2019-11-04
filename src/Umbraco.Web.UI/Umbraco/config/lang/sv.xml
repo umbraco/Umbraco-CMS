@@ -14,6 +14,7 @@
     <key alias="changeDocType">Ändra dokumenttyp</key>
     <key alias="copy">Kopiera</key>
     <key alias="create">Skapa</key>
+    <key alias="createGroup">Skapa grupp</key>
     <key alias="createPackage">Skapa paket</key>
     <key alias="createblueprint">Skapa innehållsmall</key>
     <key alias="defaultValue">Standardvärde</key>
@@ -606,6 +607,7 @@
     <key alias="packageOptions">Paketalternativ</key>
     <key alias="packageReadme">Paket läsmig</key>
     <key alias="packageRepository">Paketvalv</key>
+    <key alias="packageSearch">Sök efter paket</key>
     <key alias="packageUninstallConfirm">Bekräfta avinstallation</key>
     <key alias="packageUninstalledHeader">Paketet har avinstallerats</key>
     <key alias="packageUninstalledText">Paketet har avinstallerats utan problem</key>
@@ -922,6 +924,7 @@
     <key alias="editors">Redaktör</key>
     <key alias="excerptField">Fält för utdrag</key>
     <key alias="language">Språk</key>
+    <key alias="lastLogin">Senast inloggad</key>
     <key alias="loginname">Login</key>
     <key alias="mediastartnode">Startnod i mediabiblioteket</key>
     <key alias="modules">Sektioner</key>
@@ -946,6 +949,7 @@
     <key alias="sortNameDescending">Namn (Z-A)</key>
     <key alias="startnode">Startnod i innehåll</key>
     <key alias="username">Användarens namn</key>
+    <key alias="userManagement">Användarhantering</key>
     <key alias="userPermissions">Användarrättigheter</key>
     <key alias="usertype">Användartyp</key>
     <key alias="userTypes">Användartyper</key>
