@@ -2254,5 +2254,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     ]]>
     </key>
     <key alias="collect">Collect</key>
-  </area>  
+    <key alias="publishedCacheStatus">Published Cache Status</key>
+    <key alias="caches">Caches</key>
+  </area>
 </language>
