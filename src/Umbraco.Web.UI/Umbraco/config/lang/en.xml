@@ -2222,4 +2222,39 @@ To manage your website, simply open the Umbraco back office and start adding con
   <area alias="propertyActions">
     <key alias="tooltipForPropertyActionsMenu">Open Property Actions</key>
   </area>
+  <area alias="nuCache">
+    <key alias="wait">Wait</key>
+    <key alias="refreshStatus">Refresh status</key>
+    <key alias="memoryCache">Memory Cache</key>
+    <key alias="memoryCacheDescription">
+        <![CDATA[
+            This button lets you reload the in-memory cache, by entirely reloading it from the database
+    cache (but it does not rebuild that database cache). This is relatively fast.
+    Use it when you think that the memory cache has not been properly refreshed, after some events
+    triggered&mdash;which would indicate a minor Umbraco issue.
+    (note: triggers the reload on all servers in an LB environment).
+    ]]>
+    </key>
+    <key alias="reload">Reload</key>
+    <key alias="databaseCache">Database Cache</key>
+    <key alias="databaseCacheDescription">
+        <![CDATA[
+    This button lets you rebuild the database cache, ie the content of the cmsContentNu table.
+    <strong>Rebuilding can be expensive.</strong>
+    Use it when reloading is not enough, and you think that the database cache has not been
+    properly generated&mdash;which would indicate some critical Umbraco issue.
+    ]]>
+    </key>
+    <key alias="rebuild">Rebuild</key>
+    <key alias="internals">Internals</key>
+    <key alias="internalsDescription">
+        <![CDATA[
+    This button lets you trigger a NuCache snapshots collection (after running a fullCLR GC).
+    Unless you know what that means, you probably do <em>not</em> need to use it.
+    ]]>
+    </key>
+    <key alias="collect">Collect</key>
+    <key alias="publishedCacheStatus">Published Cache Status</key>
+    <key alias="caches">Caches</key>
+  </area>
 </language>
