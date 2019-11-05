@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Umbraco.Core.Models.Entities
 {
@@ -11,5 +12,7 @@ namespace Umbraco.Core.Models.Entities
     /// <para>An IUmbracoEntity can participate in notifications.</para>
     /// </remarks>
     public interface IUmbracoEntity : ITreeEntity, IRememberBeingDirty
-    { }
+    {
+        Guid NodeObjectType { get; }
+    }
 }
