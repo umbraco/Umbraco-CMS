@@ -11,7 +11,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
-using Constants = Umbraco.Core.ConstantsCore;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {

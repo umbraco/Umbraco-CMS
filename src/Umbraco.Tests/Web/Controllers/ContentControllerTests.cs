@@ -82,10 +82,10 @@ namespace Umbraco.Tests.Web.Controllers
                 {
                     switch (id)
                     {
-                        case ConstantsCore.DataTypes.Textbox:
-                            return Attempt.Succeed(ConstantsCore.DataTypes.Guids.TextstringGuid);
-                        case ConstantsCore.DataTypes.RichtextEditor:
-                            return Attempt.Succeed(ConstantsCore.DataTypes.Guids.RichtextEditorGuid);
+                        case Constants.DataTypes.Textbox:
+                            return Attempt.Succeed(Constants.DataTypes.Guids.TextstringGuid);
+                        case Constants.DataTypes.RichtextEditor:
+                            return Attempt.Succeed(Constants.DataTypes.Guids.RichtextEditorGuid);
                     }
                     return Attempt.Fail<Guid>();
                 });

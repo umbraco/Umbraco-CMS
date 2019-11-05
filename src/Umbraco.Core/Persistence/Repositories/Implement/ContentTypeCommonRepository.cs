@@ -84,11 +84,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 // create content type
                 IContentTypeComposition contentType;
-                if (contentTypeDto.NodeDto.NodeObjectType == ConstantsCore.ObjectTypes.MediaType)
+                if (contentTypeDto.NodeDto.NodeObjectType == Constants.ObjectTypes.MediaType)
                     contentType = ContentTypeFactory.BuildMediaTypeEntity(contentTypeDto);
-                else if (contentTypeDto.NodeDto.NodeObjectType == ConstantsCore.ObjectTypes.DocumentType)
+                else if (contentTypeDto.NodeDto.NodeObjectType == Constants.ObjectTypes.DocumentType)
                     contentType = ContentTypeFactory.BuildContentTypeEntity(contentTypeDto);
-                else if (contentTypeDto.NodeDto.NodeObjectType == ConstantsCore.ObjectTypes.MemberType)
+                else if (contentTypeDto.NodeDto.NodeObjectType == Constants.ObjectTypes.MemberType)
                     contentType = ContentTypeFactory.BuildMemberTypeEntity(contentTypeDto);
                 else throw new PanicException($"The node object type {contentTypeDto.NodeDto.NodeObjectType} is not supported");
                 contentTypes.Add(contentType.Id, contentType);
@@ -202,7 +202,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .AndBy<PropertyTypeDto>(x => x.SortOrder, x => x.Id);
 
             var propertyDtos = Database.Fetch<PropertyTypeCommonDto>(sql2);
-            var builtinProperties = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
+            var builtinProperties = ConventionsHelper.GetStandardPropertyTypeStubs();
 
             var groupIx = 0;
             var propertyIx = 0;

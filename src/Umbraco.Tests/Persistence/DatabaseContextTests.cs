@@ -56,7 +56,7 @@ namespace Umbraco.Tests.Persistence
                 File.Delete(filePath);
 
             // get the connectionstring settings from config
-            var settings = ConfigurationManager.ConnectionStrings[ConstantsCore.System.UmbracoConnectionName];
+            var settings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
 
             // by default the conn string is: Datasource=|DataDirectory|UmbracoNPocoTests.sdf;Flush Interval=1;
             // replace the SDF file with our own and create the sql ce database

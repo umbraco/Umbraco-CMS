@@ -329,7 +329,7 @@ namespace Umbraco.Web.Security
             var guidUdi = udi as GuidUdi;
             if (guidUdi == null) return null;
 
-            var umbracoType = Constants.UdiEntityType.ToUmbracoObjectType(udi.EntityType);
+            var umbracoType = UdiEntityTypeHelper.ToUmbracoObjectType(udi.EntityType);
 
             var entityService = Current.Services.EntityService;
             switch (umbracoType)
@@ -423,7 +423,7 @@ namespace Umbraco.Web.Security
 
                 var memberType = _memberTypeService.Get(member.ContentTypeId);
 
-                var builtIns = Constants.Conventions.Member.GetStandardPropertyTypeStubs().Select(x => x.Key).ToArray();
+                var builtIns = ConventionsHelper.GetStandardPropertyTypeStubs().Select(x => x.Key).ToArray();
 
                 model.MemberProperties = GetMemberPropertiesViewModel(memberType, builtIns, member).ToList();
 
@@ -450,7 +450,7 @@ namespace Umbraco.Web.Security
                 if (memberType == null)
                     throw new InvalidOperationException("Could not find a member type with alias " + memberTypeAlias);
 
-                var builtIns = Constants.Conventions.Member.GetStandardPropertyTypeStubs().Select(x => x.Key).ToArray();
+                var builtIns = ConventionsHelper.GetStandardPropertyTypeStubs().Select(x => x.Key).ToArray();
                 var model = RegisterModel.CreateModel();
                 model.MemberTypeAlias = memberTypeAlias;
                 model.MemberProperties = GetMemberPropertiesViewModel(memberType, builtIns).ToList();
@@ -497,7 +497,7 @@ namespace Umbraco.Web.Security
                 //// for a given property.
                 ////These are the default built-in MVC template types: “Boolean”, “Decimal”, “EmailAddress”, “HiddenInput”, “HTML”, “Object”, “String”, “Text”, and “Url”
                 //// by default we'll render a text box since we've defined that metadata on the UmbracoProperty.Value property directly.
-                //if (prop.DataTypeId == new Guid(Constants.PropertyEditors.TrueFalse))
+                //if (prop.DataTypeId == new Guid(ConstantsCore.PropertyEditors.TrueFalse))
                 //{
                 //    viewProperty.EditorTemplate = "UmbracoBoolean";
                 //}

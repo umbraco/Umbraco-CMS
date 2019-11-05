@@ -19,8 +19,8 @@ namespace Umbraco.Web.Dashboards
             {
                 var rules = new IAccessRule[]
                 {
-                    new AccessRule {Type = AccessRuleType.Deny, Value = ConstantsCore.Security.TranslatorGroupAlias},
-                    new AccessRule {Type = AccessRuleType.Grant, Value = ConstantsCore.Security.AdminGroupAlias}
+                    new AccessRule {Type = AccessRuleType.Deny, Value = Constants.Security.TranslatorGroupAlias},
+                    new AccessRule {Type = AccessRuleType.Grant, Value = Constants.Security.AdminGroupAlias}
                 };
                 return rules;
             }

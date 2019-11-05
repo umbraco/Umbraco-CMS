@@ -95,7 +95,7 @@ namespace Umbraco.Web.Models.Mapping
         private static void Map(IUser source, EntityBasic target, MapperContext context)
         {
             target.Alias = source.Username;
-            target.Icon = ConstantsCore.Icons.User;
+            target.Icon = Constants.Icons.User;
             target.Id = source.Id;
             target.Key = source.Key;
             target.Name = source.Name;
@@ -107,7 +107,7 @@ namespace Umbraco.Web.Models.Mapping
         private static void Map(ITemplate source, EntityBasic target, MapperContext context)
         {
             target.Alias = source.Alias;
-            target.Icon = ConstantsCore.Icons.Template;
+            target.Icon = Constants.Icons.Template;
             target.Id = source.Id;
             target.Key = source.Key;
             target.Name = source.Name;
@@ -149,16 +149,16 @@ namespace Umbraco.Web.Models.Mapping
 
             if (target.Icon.IsNullOrWhiteSpace())
             {
-                if (source.NodeObjectType == ConstantsCore.ObjectTypes.Member)
-                    target.Icon = ConstantsCore.Icons.Member;
-                else if (source.NodeObjectType == ConstantsCore.ObjectTypes.DataType)
-                    target.Icon = ConstantsCore.Icons.DataType;
-                else if (source.NodeObjectType == ConstantsCore.ObjectTypes.DocumentType)
-                    target.Icon = ConstantsCore.Icons.ContentType;
-                else if (source.NodeObjectType == ConstantsCore.ObjectTypes.MediaType)
-                    target.Icon = ConstantsCore.Icons.MediaType;
-                else if (source.NodeObjectType == ConstantsCore.ObjectTypes.TemplateType)
-                    target.Icon = ConstantsCore.Icons.Template;
+                if (source.NodeObjectType == Constants.ObjectTypes.Member)
+                    target.Icon = Constants.Icons.Member;
+                else if (source.NodeObjectType == Constants.ObjectTypes.DataType)
+                    target.Icon = Constants.Icons.DataType;
+                else if (source.NodeObjectType == Constants.ObjectTypes.DocumentType)
+                    target.Icon = Constants.Icons.ContentType;
+                else if (source.NodeObjectType == Constants.ObjectTypes.MediaType)
+                    target.Icon = Constants.Icons.MediaType;
+                else if (source.NodeObjectType == Constants.ObjectTypes.TemplateType)
+                    target.Icon = Constants.Icons.Template;
             }
         }
 
@@ -173,7 +173,7 @@ namespace Umbraco.Web.Models.Mapping
             //get the icon if there is one
             target.Icon = source.Values.ContainsKey(UmbracoExamineIndex.IconFieldName)
                 ? source.Values[UmbracoExamineIndex.IconFieldName]
-                : ConstantsCore.Icons.DefaultIcon;
+                : Constants.Icons.DefaultIcon;
 
             target.Name = source.Values.ContainsKey("nodeName") ? source.Values["nodeName"] : "[no name]";
 
@@ -230,7 +230,7 @@ namespace Umbraco.Web.Models.Mapping
                     // NOTE: this case covers both content and media entities
                     return contentEntity.ContentTypeIcon;
                 case MemberEntitySlim memberEntity:
-                    return memberEntity.ContentTypeIcon.IfNullOrWhiteSpace(ConstantsCore.Icons.Member);
+                    return memberEntity.ContentTypeIcon.IfNullOrWhiteSpace(Constants.Icons.Member);
             }
 
             return null;

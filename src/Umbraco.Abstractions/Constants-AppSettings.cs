@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core
 {
-    public static partial class ConstantsCore
+    public static partial class Constants
     {
         /// <summary>
         /// Specific web.config AppSetting keys for Umbraco.Core application

@@ -174,7 +174,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
                 Description = "Tags",
                 Mandatory = false,
                 SortOrder = 99,
-                DataTypeId = ConstantsCore.DataTypes.Tags
+                DataTypeId = Constants.DataTypes.Tags
             };
             contentType.AddPropertyType(propertyType);
 

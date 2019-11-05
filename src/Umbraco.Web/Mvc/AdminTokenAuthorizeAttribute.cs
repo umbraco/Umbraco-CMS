@@ -62,7 +62,7 @@ namespace Umbraco.Web.Mvc
 
         private static string GetAuthHeaderVal(IUserService userService)
         {
-            var admin = userService.GetUserById(Core.ConstantsCore.Security.SuperUserId);
+            var admin = userService.GetUserById(Core.Constants.Security.SuperUserId);
 
             var token = $"{admin.Email}u____u{admin.Username}u____u{admin.RawPasswordValue}";
 
@@ -94,7 +94,7 @@ namespace Umbraco.Web.Mvc
             if (keyVal.Count != 1) return false;
             if (keyVal[0].Groups.Count != 2) return false;
 
-            var admin = UserService.GetUserById(Core.ConstantsCore.Security.SuperUserId);
+            var admin = UserService.GetUserById(Core.Constants.Security.SuperUserId);
             if (admin == null) return false;
 
             try

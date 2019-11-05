@@ -79,8 +79,8 @@ namespace Umbraco.Web.Editors
             if(Security.IsAuthenticated())
             {
                 AuthenticationManager.SignOut(
-                    Core.ConstantsCore.Security.BackOfficeAuthenticationType,
-                    Core.ConstantsCore.Security.BackOfficeExternalAuthenticationType);
+                    Core.Constants.Security.BackOfficeAuthenticationType,
+                    Core.Constants.Security.BackOfficeExternalAuthenticationType);
             }
 
             if (invite == null)
@@ -319,7 +319,7 @@ namespace Umbraco.Web.Editors
         public async Task<ActionResult> ExternalLinkLoginCallback()
         {
             var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(
-                ConstantsCore.Security.BackOfficeExternalAuthenticationType,
+                Constants.Security.BackOfficeExternalAuthenticationType,
                 XsrfKey, User.Identity.GetUserId());
 
             if (loginInfo == null)
@@ -361,7 +361,7 @@ namespace Umbraco.Web.Editors
 
             //First check if there's external login info, if there's not proceed as normal
             var loginInfo = await OwinContext.Authentication.GetExternalLoginInfoAsync(
-                ConstantsCore.Security.BackOfficeExternalAuthenticationType);
+                Constants.Security.BackOfficeExternalAuthenticationType);
 
             if (loginInfo == null || loginInfo.ExternalIdentity.IsAuthenticated == false)
             {
@@ -426,9 +426,9 @@ namespace Umbraco.Web.Editors
                 }
 
                 //Remove the cookie otherwise this message will keep appearing
-                if (Response.Cookies[ConstantsCore.Security.BackOfficeExternalCookieName] != null)
+                if (Response.Cookies[Constants.Security.BackOfficeExternalCookieName] != null)
                 {
-                    Response.Cookies[ConstantsCore.Security.BackOfficeExternalCookieName].Expires = DateTime.MinValue;
+                    Response.Cookies[Constants.Security.BackOfficeExternalCookieName].Expires = DateTime.MinValue;
                 }
             }
 

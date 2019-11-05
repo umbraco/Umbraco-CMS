@@ -52,7 +52,7 @@ namespace Umbraco.Core.Persistence
         /// </summary>
         /// <remarks>Used by core runtime.</remarks>
         public UmbracoDatabaseFactory(ILogger logger, Lazy<IMapperCollection> mappers)
-            : this(ConstantsCore.System.UmbracoConnectionName, logger, mappers)
+            : this(Constants.System.UmbracoConnectionName, logger, mappers)
         { }
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace Umbraco.Core.Persistence
         {
             // replace NPoco database type by a more efficient one
 
-            var setting = ConfigurationManager.AppSettings[ConstantsCore.AppSettings.Debug.DatabaseFactoryServerVersion];
+            var setting = ConfigurationManager.AppSettings[Constants.AppSettings.Debug.DatabaseFactoryServerVersion];
             var fromSettings = false;
 
             if (setting.IsNullOrWhiteSpace() || !setting.StartsWith("SqlServer.")

@@ -149,7 +149,7 @@
 //                scope.Database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 99999, Trashed = false, ParentId = -1, UserId = -1, Level = 0, Path = "-1,99999", SortOrder = 0, UniqueId = new Guid("129241F0-D24E-4FC3-92D1-BC2D48B7C431"), Text = "Test Content Type", NodeObjectType = ConstantsCore.ObjectTypes.DocumentType, CreateDate = DateTime.Now });
 //                scope.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF ", SqlSyntax.GetQuotedTableName("umbracoNode"))));
 
-//                scope.Database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = 55555, EditorAlias = Constants.PropertyEditors.Aliases.TextBox, DbType = "Nvarchar" });
+//                scope.Database.Insert(ConstantsCore.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = 55555, EditorAlias = ConstantsCore.PropertyEditors.Aliases.TextBox, DbType = "Nvarchar" });
 
 //                scope.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SqlSyntax.GetQuotedTableName("cmsContentType"))));
 //                scope.Database.Insert("cmsContentType", "pk", false, new ContentTypeDto { PrimaryKey = 88888, NodeId = 99999, Alias = "TestContentType", Icon = "icon-folder", Thumbnail = "folder.png", IsContainer = false, AllowAtRoot = true });

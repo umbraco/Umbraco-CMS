@@ -30,7 +30,7 @@ namespace Umbraco.Web.Editors
     // ref: https://www.exceptionnotfound.net/the-asp-net-web-api-exception-handling-pipeline-a-guided-tour/
     [PluginController("UmbracoApi")]
     [PrefixlessBodyModelValidator]
-    [UmbracoApplicationAuthorize(Core.ConstantsCore.Applications.Settings)]
+    [UmbracoApplicationAuthorize(Core.Constants.Applications.Settings)]
     public class CodeFileController : BackOfficeNotificationsController
     {
         public CodeFileController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
@@ -52,19 +52,19 @@ namespace Umbraco.Web.Editors
 
             switch (type)
             {
-                case Core.ConstantsCore.Trees.PartialViews:
+                case Core.Constants.Trees.PartialViews:
                     var view = new PartialView(PartialViewType.PartialView, display.VirtualPath);
                     view.Content = display.Content;
                     var result = Services.FileService.CreatePartialView(view, display.Snippet, Security.CurrentUser.Id);
                     return result.Success == true ? Request.CreateResponse(HttpStatusCode.OK) : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
 
-                case Core.ConstantsCore.Trees.PartialViewMacros:
+                case Core.Constants.Trees.PartialViewMacros:
                     var viewMacro = new PartialView(PartialViewType.PartialViewMacro, display.VirtualPath);
                     viewMacro.Content = display.Content;
                     var resultMacro = Services.FileService.CreatePartialViewMacro(viewMacro, display.Snippet, Security.CurrentUser.Id);
                     return resultMacro.Success == true ? Request.CreateResponse(HttpStatusCode.OK) : Request.CreateNotificationValidationErrorResponse(resultMacro.Exception.Message);
 
-                case Core.ConstantsCore.Trees.Scripts:
+                case Core.Constants.Trees.Scripts:
                     var script = new Script(display.VirtualPath);
                     Services.FileService.SaveScript(script, Security.CurrentUser.Id);
                     return Request.CreateResponse(HttpStatusCode.OK);
@@ -93,7 +93,7 @@ namespace Umbraco.Web.Editors
 
             // if the parentId is root (-1) then we just need an empty string as we are
             // creating the path below and we don't want -1 in the path
-            if (parentId == Core.ConstantsCore.System.RootString)
+            if (parentId == Core.Constants.System.RootString)
             {
                 parentId = string.Empty;
             }
@@ -109,19 +109,19 @@ namespace Umbraco.Web.Editors
             var virtualPath = string.Empty;
             switch (type)
             {
-                case Core.ConstantsCore.Trees.PartialViews:
+                case Core.Constants.Trees.PartialViews:
                     virtualPath = NormalizeVirtualPath(name, SystemDirectories.PartialViews);
                     Services.FileService.CreatePartialViewFolder(virtualPath);
                     break;
-                case Core.ConstantsCore.Trees.PartialViewMacros:
+                case Core.Constants.Trees.PartialViewMacros:
                     virtualPath = NormalizeVirtualPath(name, SystemDirectories.MacroPartials);
                     Services.FileService.CreatePartialViewMacroFolder(virtualPath);
                     break;
-                case Core.ConstantsCore.Trees.Scripts:
+                case Core.Constants.Trees.Scripts:
                     virtualPath = NormalizeVirtualPath(name, SystemDirectories.Scripts);
                     Services.FileService.CreateScriptFolder(virtualPath);
                     break;
-                case Core.ConstantsCore.Trees.Stylesheets:
+                case Core.Constants.Trees.Stylesheets:
                     virtualPath = NormalizeVirtualPath(name, SystemDirectories.Css);
                     Services.FileService.CreateStyleSheetFolder(virtualPath);
                     break;
@@ -150,48 +150,48 @@ namespace Umbraco.Web.Editors
 
             switch (type)
             {
-                case Core.ConstantsCore.Trees.PartialViews:
+                case Core.Constants.Trees.PartialViews:
                     var view = Services.FileService.GetPartialView(virtualPath);
                     if (view != null)
                     {
                         var display = Mapper.Map<IPartialView, CodeFileDisplay>(view);
-                        display.FileType = Core.ConstantsCore.Trees.PartialViews;
+                        display.FileType = Core.Constants.Trees.PartialViews;
                         display.Path = Url.GetTreePathFromFilePath(view.Path);
                         display.Id = System.Web.HttpUtility.UrlEncode(view.Path);
                         return display;
                     }
                     throw new HttpResponseException(HttpStatusCode.NotFound);
 
-                case Core.ConstantsCore.Trees.PartialViewMacros:
+                case Core.Constants.Trees.PartialViewMacros:
                     var viewMacro = Services.FileService.GetPartialViewMacro(virtualPath);
                     if (viewMacro != null)
                     {
                         var display = Mapper.Map<IPartialView, CodeFileDisplay>(viewMacro);
-                        display.FileType = Core.ConstantsCore.Trees.PartialViewMacros;
+                        display.FileType = Core.Constants.Trees.PartialViewMacros;
                         display.Path = Url.GetTreePathFromFilePath(viewMacro.Path);
                         display.Id = System.Web.HttpUtility.UrlEncode(viewMacro.Path);
                         return display;
                     }
                     throw new HttpResponseException(HttpStatusCode.NotFound);
 
-                case Core.ConstantsCore.Trees.Scripts:
+                case Core.Constants.Trees.Scripts:
                     var script = Services.FileService.GetScriptByName(virtualPath);
                     if (script != null)
                     {
                         var display = Mapper.Map<Script, CodeFileDisplay>(script);
-                        display.FileType = Core.ConstantsCore.Trees.Scripts;
+                        display.FileType = Core.Constants.Trees.Scripts;
                         display.Path = Url.GetTreePathFromFilePath(script.Path);
                         display.Id = System.Web.HttpUtility.UrlEncode(script.Path);
                         return display;
                     }
                     throw new HttpResponseException(HttpStatusCode.NotFound);
 
-                case Core.ConstantsCore.Trees.Stylesheets:
+                case Core.Constants.Trees.Stylesheets:
                     var stylesheet = Services.FileService.GetStylesheetByName(virtualPath);
                     if (stylesheet != null)
                     {
                         var display = Mapper.Map<Stylesheet, CodeFileDisplay>(stylesheet);
-                        display.FileType = Core.ConstantsCore.Trees.Stylesheets;
+                        display.FileType = Core.Constants.Trees.Stylesheets;
                         display.Path = Url.GetTreePathFromFilePath(stylesheet.Path);
                         display.Id = System.Web.HttpUtility.UrlEncode(stylesheet.Path);
                         return display;
@@ -214,7 +214,7 @@ namespace Umbraco.Web.Editors
             IEnumerable<string> snippets;
             switch (type)
             {
-                case Core.ConstantsCore.Trees.PartialViews:
+                case Core.Constants.Trees.PartialViews:
                     snippets = Services.FileService.GetPartialViewSnippetNames(
                         //ignore these - (this is taken from the logic in "PartialView.ascx.cs")
                         "Gallery",
@@ -222,7 +222,7 @@ namespace Umbraco.Web.Editors
                         "ListChildPagesOrderedByProperty",
                         "ListImagesFromMediaFolder");
                     break;
-                case Core.ConstantsCore.Trees.PartialViewMacros:
+                case Core.Constants.Trees.PartialViewMacros:
                     snippets = Services.FileService.GetPartialViewSnippetNames();
                     break;
                 default:
@@ -248,23 +248,23 @@ namespace Umbraco.Web.Editors
 
             switch (type)
             {
-                case Core.ConstantsCore.Trees.PartialViews:
+                case Core.Constants.Trees.PartialViews:
                     codeFileDisplay = Mapper.Map<IPartialView, CodeFileDisplay>(new PartialView(PartialViewType.PartialView, string.Empty));
                     codeFileDisplay.VirtualPath = SystemDirectories.PartialViews;
                     if (snippetName.IsNullOrWhiteSpace() == false)
                         codeFileDisplay.Content = Services.FileService.GetPartialViewSnippetContent(snippetName);
                     break;
-                case Core.ConstantsCore.Trees.PartialViewMacros:
+                case Core.Constants.Trees.PartialViewMacros:
                     codeFileDisplay = Mapper.Map<IPartialView, CodeFileDisplay>(new PartialView(PartialViewType.PartialViewMacro, string.Empty));
                     codeFileDisplay.VirtualPath = SystemDirectories.MacroPartials;
                     if (snippetName.IsNullOrWhiteSpace() == false)
                         codeFileDisplay.Content = Services.FileService.GetPartialViewMacroSnippetContent(snippetName);
                     break;
-                case Core.ConstantsCore.Trees.Scripts:
+                case Core.Constants.Trees.Scripts:
                     codeFileDisplay = Mapper.Map<Script, CodeFileDisplay>(new Script(string.Empty));
                     codeFileDisplay.VirtualPath = SystemDirectories.Scripts;
                     break;
-                case Core.ConstantsCore.Trees.Stylesheets:
+                case Core.Constants.Trees.Stylesheets:
                     codeFileDisplay = Mapper.Map<Stylesheet, CodeFileDisplay>(new Stylesheet(string.Empty));
                     codeFileDisplay.VirtualPath = SystemDirectories.Css;
                     break;
@@ -275,7 +275,7 @@ namespace Umbraco.Web.Editors
             // Make sure that the root virtual path ends with '/'
             codeFileDisplay.VirtualPath = codeFileDisplay.VirtualPath.EnsureEndsWith("/");
 
-            if (id != Core.ConstantsCore.System.RootString)
+            if (id != Core.Constants.System.RootString)
             {
                 codeFileDisplay.VirtualPath += id.TrimStart("/").EnsureEndsWith("/");
                 //if it's not new then it will have a path, otherwise it won't
@@ -304,7 +304,7 @@ namespace Umbraco.Web.Editors
 
             switch (type)
             {
-                case Core.ConstantsCore.Trees.PartialViews:
+                case Core.Constants.Trees.PartialViews:
                     if (IsDirectory(virtualPath, SystemDirectories.PartialViews))
                     {
                         Services.FileService.DeletePartialViewFolder(virtualPath);
@@ -316,7 +316,7 @@ namespace Umbraco.Web.Editors
                     }
                     return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Partial View or folder found with the specified path");
 
-                case Core.ConstantsCore.Trees.PartialViewMacros:
+                case Core.Constants.Trees.PartialViewMacros:
                     if (IsDirectory(virtualPath, SystemDirectories.MacroPartials))
                     {
                         Services.FileService.DeletePartialViewMacroFolder(virtualPath);
@@ -328,7 +328,7 @@ namespace Umbraco.Web.Editors
                     }
                     return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Partial View Macro or folder found with the specified path");
 
-                case Core.ConstantsCore.Trees.Scripts:
+                case Core.Constants.Trees.Scripts:
                     if (IsDirectory(virtualPath, SystemDirectories.Scripts))
                     {
                         Services.FileService.DeleteScriptFolder(virtualPath);
@@ -341,7 +341,7 @@ namespace Umbraco.Web.Editors
                     }
                     return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Script or folder found with the specified path");
 
-                case Core.ConstantsCore.Trees.Stylesheets:
+                case Core.Constants.Trees.Stylesheets:
                     if (IsDirectory(virtualPath, SystemDirectories.Css))
                     {
                         Services.FileService.DeleteStyleSheetFolder(virtualPath);
@@ -377,7 +377,7 @@ namespace Umbraco.Web.Editors
 
             switch (display.FileType)
             {
-                case Core.ConstantsCore.Trees.PartialViews:
+                case Core.Constants.Trees.PartialViews:
                     var partialViewResult = CreateOrUpdatePartialView(display);
                     if (partialViewResult.Success)
                     {
@@ -392,7 +392,7 @@ namespace Umbraco.Web.Editors
                         Services.TextService.Localize("speechBubbles/partialViewErrorText"));
                     break;
 
-                case Core.ConstantsCore.Trees.PartialViewMacros:
+                case Core.Constants.Trees.PartialViewMacros:
                     var partialViewMacroResult = CreateOrUpdatePartialViewMacro(display);
                     if (partialViewMacroResult.Success)
                     {
@@ -407,7 +407,7 @@ namespace Umbraco.Web.Editors
                         Services.TextService.Localize("speechBubbles/partialViewErrorText"));
                     break;
 
-                case Core.ConstantsCore.Trees.Scripts:
+                case Core.Constants.Trees.Scripts:
 
                     var scriptResult = CreateOrUpdateScript(display);
                     display = Mapper.Map(scriptResult, display);
@@ -419,7 +419,7 @@ namespace Umbraco.Web.Editors
                 //    Services.TextService.Localize("speechBubbles/partialViewErrorHeader"),
                 //    Services.TextService.Localize("speechBubbles/partialViewErrorText"));
 
-                case Core.ConstantsCore.Trees.Stylesheets:
+                case Core.Constants.Trees.Stylesheets:
 
                     var stylesheetResult = CreateOrUpdateStylesheet(display);
                     display = Mapper.Map(stylesheetResult, display);

@@ -26,7 +26,7 @@ namespace Umbraco.Web.Models.Trees
     [DataContract(Name = "node", Namespace = "")]
     public sealed class TreeRootNode : TreeNode
     {
-        private static readonly string RootId = Core.ConstantsCore.System.RootString;
+        private static readonly string RootId = Core.Constants.System.RootString;
         private bool _isGroup;
         private bool _isSingleNodeTree;
 

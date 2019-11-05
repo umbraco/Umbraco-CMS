@@ -163,7 +163,7 @@ namespace Umbraco.Core.Persistence.Factories
 
                         if (entityVariesByCulture && !sameValues)
                         {
-                            if (isCultureValue) 
+                            if (isCultureValue)
                             {
                                 editedCultures.Add(propertyValue.Culture); // report culture as edited
                             }

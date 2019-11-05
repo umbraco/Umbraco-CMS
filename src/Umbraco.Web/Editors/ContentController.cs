@@ -27,7 +27,6 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Models.Validation;
 using Umbraco.Web.Composing;
-using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Actions;
 using Umbraco.Web.ContentApps;
@@ -37,6 +36,7 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Security;
 using Umbraco.Web.Routing;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
@@ -48,7 +48,7 @@ namespace Umbraco.Web.Editors
     /// access to ALL of the methods on this controller will need access to the content application.
     /// </remarks>
     [PluginController("UmbracoApi")]
-    [UmbracoApplicationAuthorize(ConstantsCore.Applications.Content)]
+    [UmbracoApplicationAuthorize(Constants.Applications.Content)]
     [ContentControllerConfiguration]
     public class ContentController : ContentControllerBase
     {
@@ -227,15 +227,15 @@ namespace Umbraco.Web.Editors
         public ContentItemDisplay GetRecycleBin()
         {
             var apps = new List<ContentApp>();
-            apps.Add(ListViewContentAppFactory.CreateContentApp(Services.DataTypeService, _propertyEditors, "recycleBin", "content", Core.ConstantsCore.DataTypes.DefaultMembersListView));
+            apps.Add(ListViewContentAppFactory.CreateContentApp(Services.DataTypeService, _propertyEditors, "recycleBin", "content", Core.Constants.DataTypes.DefaultMembersListView));
             apps[0].Active = true;
             var display = new ContentItemDisplay
             {
-                Id = ConstantsCore.System.RecycleBinContent,
+                Id = Constants.System.RecycleBinContent,
                 ParentId = -1,
                 ContentTypeAlias = "recycleBin",
                 IsContainer = true,
-                Path = "-1," + ConstantsCore.System.RecycleBinContent,
+                Path = "-1," + Constants.System.RecycleBinContent,
                 Variants = new List<ContentVariantDisplay>
                 {
                     new ContentVariantDisplay
@@ -1484,10 +1484,10 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         [HttpDelete]
         [HttpPost]
-        [EnsureUserPermissionForContent(ConstantsCore.System.RecycleBinContent, ActionDelete.ActionLetter)]
+        [EnsureUserPermissionForContent(Constants.System.RecycleBinContent, ActionDelete.ActionLetter)]
         public HttpResponseMessage EmptyRecycleBin()
         {
-            Services.ContentService.EmptyRecycleBin(Security.GetUserId().ResultOr(ConstantsCore.Security.SuperUserId));
+            Services.ContentService.EmptyRecycleBin(Security.GetUserId().ResultOr(Constants.Security.SuperUserId));
 
             return Request.CreateNotificationSuccessResponse(Services.TextService.Localize("defaultdialogs/recycleBinIsEmpty"));
         }

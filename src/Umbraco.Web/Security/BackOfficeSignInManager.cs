@@ -30,7 +30,7 @@ namespace Umbraco.Web.Security
             _logger = logger;
             _request = request;
             _globalSettings = globalSettings;
-            AuthenticationType = ConstantsCore.Security.BackOfficeAuthenticationType;
+            AuthenticationType = Constants.Security.BackOfficeAuthenticationType;
         }
 
         public override Task<ClaimsIdentity> CreateUserIdentityAsync(BackOfficeIdentityUser user)
@@ -160,7 +160,7 @@ namespace Umbraco.Web.Security
             if (await UserManager.GetTwoFactorEnabledAsync(user.Id)
                 && (await UserManager.GetValidTwoFactorProvidersAsync(user.Id)).Count > 0)
             {
-                var identity = new ClaimsIdentity(ConstantsCore.Security.BackOfficeTwoFactorAuthenticationType);
+                var identity = new ClaimsIdentity(Constants.Security.BackOfficeTwoFactorAuthenticationType);
                 identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, id));
                 identity.AddClaim(new Claim(ClaimsIdentity.DefaultNameClaimType, user.UserName));
                 AuthenticationManager.SignIn(identity);
@@ -183,8 +183,8 @@ namespace Umbraco.Web.Security
 
             // Clear any partial cookies from external or two factor partial sign ins
             AuthenticationManager.SignOut(
-                ConstantsCore.Security.BackOfficeExternalAuthenticationType,
-                ConstantsCore.Security.BackOfficeTwoFactorAuthenticationType);
+                Constants.Security.BackOfficeExternalAuthenticationType,
+                Constants.Security.BackOfficeTwoFactorAuthenticationType);
 
             var nowUtc = DateTime.Now.ToUniversalTime();
 
@@ -236,7 +236,7 @@ namespace Umbraco.Web.Security
         /// </remarks>
         public new async Task<int> GetVerifiedUserIdAsync()
         {
-            var result = await AuthenticationManager.AuthenticateAsync(ConstantsCore.Security.BackOfficeTwoFactorAuthenticationType);
+            var result = await AuthenticationManager.AuthenticateAsync(Constants.Security.BackOfficeTwoFactorAuthenticationType);
             if (result != null && result.Identity != null && string.IsNullOrEmpty(result.Identity.GetUserId()) == false)
             {
                 return ConvertIdFromString(result.Identity.GetUserId());
@@ -250,7 +250,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public async Task<string> GetVerifiedUserNameAsync()
         {
-            var result = await AuthenticationManager.AuthenticateAsync(ConstantsCore.Security.BackOfficeTwoFactorAuthenticationType);
+            var result = await AuthenticationManager.AuthenticateAsync(Constants.Security.BackOfficeTwoFactorAuthenticationType);
             if (result != null && result.Identity != null && string.IsNullOrEmpty(result.Identity.GetUserName()) == false)
             {
                 return result.Identity.GetUserName();

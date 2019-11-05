@@ -7,8 +7,8 @@ using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
 {
-    [UmbracoTreeAuthorize(ConstantsCore.Trees.Users)]
-    [Tree(ConstantsCore.Applications.Users, ConstantsCore.Trees.Users, SortOrder = 0, IsSingleNodeTree = true)]
+    [UmbracoTreeAuthorize(Constants.Trees.Users)]
+    [Tree(Constants.Applications.Users, Constants.Trees.Users, SortOrder = 0, IsSingleNodeTree = true)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
     public class UserTreeController : TreeController
@@ -22,8 +22,8 @@ namespace Umbraco.Web.Trees
             var root = base.CreateRootNode(queryStrings);
 
             //this will load in a custom UI instead of the dashboard for the root node
-            root.RoutePath = $"{ConstantsCore.Applications.Users}/{ConstantsCore.Trees.Users}/users";
-            root.Icon = ConstantsCore.Icons.UserGroup;
+            root.RoutePath = $"{Constants.Applications.Users}/{Constants.Trees.Users}/users";
+            root.Icon = Constants.Icons.UserGroup;
 
             root.HasChildren = false;
             return root;

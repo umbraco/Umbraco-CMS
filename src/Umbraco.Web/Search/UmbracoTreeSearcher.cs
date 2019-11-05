@@ -66,7 +66,7 @@ namespace Umbraco.Web.Search
             var sb = new StringBuilder();
 
             string type;
-            var indexName = ConstantsCore.UmbracoIndexes.InternalIndexName;
+            var indexName = Constants.UmbracoIndexes.InternalIndexName;
             var fields = new[] { "id", "__NodeId", "__Key" };
 
             // TODO: WE should try to allow passing in a lucene raw query, however we will still need to do some manual string
@@ -85,7 +85,7 @@ namespace Umbraco.Web.Search
             switch (entityType)
             {
                 case UmbracoEntityTypes.Member:
-                    indexName = ConstantsCore.UmbracoIndexes.MembersIndexName;
+                    indexName = Constants.UmbracoIndexes.MembersIndexName;
                     type = "member";
                     fields = new[] { "id", "__NodeId", "__Key", "email", "loginName" };
                     if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId && searchFrom.Trim() != "-1")
@@ -389,9 +389,9 @@ namespace Umbraco.Web.Search
                 var m = _mapper.Map<SearchResultEntity>(result);
 
                 //if no icon could be mapped, it will be set to document, so change it to picture
-                if (m.Icon == ConstantsCore.Icons.DefaultIcon)
+                if (m.Icon == Constants.Icons.DefaultIcon)
                 {
-                    m.Icon = ConstantsCore.Icons.Member;
+                    m.Icon = Constants.Icons.Member;
                 }
 
                 if (result.Values.ContainsKey("email") && result.Values["email"] != null)

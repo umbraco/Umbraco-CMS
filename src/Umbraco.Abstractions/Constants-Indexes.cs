@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core
 {
-    public static partial class ConstantsCore
+    public static partial class Constants
     {
         public static class UmbracoIndexes
         {

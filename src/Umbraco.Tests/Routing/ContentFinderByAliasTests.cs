@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Routing
 
             var properties = new[]
             {
-                new PublishedPropertyType("umbracoUrlAlias", ConstantsCore.DataTypes.Textbox, false, ContentVariation.Nothing,
+                new PublishedPropertyType("umbracoUrlAlias", Constants.DataTypes.Textbox, false, ContentVariation.Nothing,
                     new PropertyValueConverterCollection(Enumerable.Empty<IPropertyValueConverter>()),
                     Mock.Of<IPublishedModelFactory>(),
                     Mock.Of<IPublishedContentTypeFactory>()),

@@ -174,11 +174,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var sut = repository.Get(member.Id);
 
                 Assert.That(memberType.CompositionPropertyGroups.Count(), Is.EqualTo(2));
-                Assert.That(memberType.CompositionPropertyTypes.Count(), Is.EqualTo(3 + Constants.Conventions.Member.GetStandardPropertyTypeStubs().Count));
-                Assert.That(sut.Properties.Count(), Is.EqualTo(3 + Constants.Conventions.Member.GetStandardPropertyTypeStubs().Count));
+                Assert.That(memberType.CompositionPropertyTypes.Count(), Is.EqualTo(3 + ConventionsHelper.GetStandardPropertyTypeStubs().Count));
+                Assert.That(sut.Properties.Count(), Is.EqualTo(3 + ConventionsHelper.GetStandardPropertyTypeStubs().Count));
                 var grp = memberType.CompositionPropertyGroups.FirstOrDefault(x => x.Name == Constants.Conventions.Member.StandardPropertiesGroupName);
                 Assert.IsNotNull(grp);
-                var aliases = Constants.Conventions.Member.GetStandardPropertyTypeStubs().Select(x => x.Key).ToArray();
+                var aliases = ConventionsHelper.GetStandardPropertyTypeStubs().Select(x => x.Key).ToArray();
                 foreach (var p in memberType.CompositionPropertyTypes.Where(x => aliases.Contains(x.Alias)))
                 {
                     Assert.AreEqual(grp.Id, p.PropertyGroupId.Value);
@@ -366,6 +366,6 @@ namespace Umbraco.Tests.Persistence.Repositories
             return sql;
         }
 
-        private Guid NodeObjectTypeId => ConstantsCore.ObjectTypes.Member;
+        private Guid NodeObjectTypeId => Constants.ObjectTypes.Member;
     }
 }

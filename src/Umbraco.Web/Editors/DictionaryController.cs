@@ -29,7 +29,7 @@ namespace Umbraco.Web.Editors
     /// Dictionary
     /// </remarks>
     [PluginController("UmbracoApi")]
-    [UmbracoTreeAuthorize(ConstantsCore.Trees.Dictionary)]
+    [UmbracoTreeAuthorize(Constants.Trees.Dictionary)]
     [EnableOverrideAuthorization]
     public class DictionaryController : BackOfficeNotificationsController
     {

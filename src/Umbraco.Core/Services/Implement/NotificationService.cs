@@ -84,13 +84,13 @@ namespace Umbraco.Core.Services.Implement
             var prevVersionDictionary = new Dictionary<int, IContentBase>();
 
             // see notes above
-            var id = ConstantsCore.Security.SuperUserId;
+            var id = Constants.Security.SuperUserId;
             const int pagesz = 400; // load batches of 400 users
             do
             {
                 // users are returned ordered by id, notifications are returned ordered by user id
                 var users = ((UserService)_userService).GetNextUsers(id, pagesz).Where(x => x.IsApproved).ToList();
-                var notifications = GetUsersNotifications(users.Select(x => x.Id), action, Enumerable.Empty<int>(), ConstantsCore.ObjectTypes.Document).ToList();
+                var notifications = GetUsersNotifications(users.Select(x => x.Id), action, Enumerable.Empty<int>(), Constants.ObjectTypes.Document).ToList();
                 if (notifications.Count == 0) break;
 
                 var i = 0;

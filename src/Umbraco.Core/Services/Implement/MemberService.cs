@@ -331,7 +331,7 @@ namespace Umbraco.Core.Services.Implement
                 saveEventArgs.CanCancel = false;
                 scope.Events.Dispatch(Saved, this, saveEventArgs);
             }
-            
+
             if (withIdentity == false)
                 return;
 
@@ -1241,7 +1241,7 @@ namespace Umbraco.Core.Services.Implement
         /// Exports a member.
         /// </summary>
         /// <remarks>
-        /// This is internal for now and is used to export a member in the member editor, 
+        /// This is internal for now and is used to export a member in the member editor,
         /// it will raise an event so that auditing logs can be created.
         /// </remarks>
         internal MemberExportModel ExportMember(Guid key)

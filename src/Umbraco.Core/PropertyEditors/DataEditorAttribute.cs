@@ -115,7 +115,7 @@ namespace Umbraco.Core.PropertyEditors
         /// Gets or sets an optional icon.
         /// </summary>
         /// <remarks>The icon can be used for example when presenting datatypes based upon the editor.</remarks>
-        public string Icon { get; set; } = ConstantsCore.Icons.PropertyEditor;
+        public string Icon { get; set; } = Constants.Icons.PropertyEditor;
 
         /// <summary>
         /// Gets or sets an optional group.

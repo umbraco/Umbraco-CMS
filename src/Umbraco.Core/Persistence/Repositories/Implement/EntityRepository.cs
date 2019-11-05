@@ -39,9 +39,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         public IEnumerable<IEntitySlim> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid objectType, long pageIndex, int pageSize, out long totalRecords,
             IQuery<IUmbracoEntity> filter, Ordering ordering)
         {
-            var isContent = objectType == ConstantsCore.ObjectTypes.Document || objectType == ConstantsCore.ObjectTypes.DocumentBlueprint;
-            var isMedia = objectType == ConstantsCore.ObjectTypes.Media;
-            var isMember = objectType == ConstantsCore.ObjectTypes.Member;
+            var isContent = objectType == Constants.ObjectTypes.Document || objectType == Constants.ObjectTypes.DocumentBlueprint;
+            var isMedia = objectType == Constants.ObjectTypes.Media;
+            var isMember = objectType == Constants.ObjectTypes.Member;
 
             var sql = GetBaseWhere(isContent, isMedia, isMember, false, x =>
             {
@@ -133,9 +133,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         public IEntitySlim Get(Guid key, Guid objectTypeId)
         {
-            var isContent = objectTypeId == ConstantsCore.ObjectTypes.Document || objectTypeId == ConstantsCore.ObjectTypes.DocumentBlueprint;
-            var isMedia = objectTypeId == ConstantsCore.ObjectTypes.Media;
-            var isMember = objectTypeId == ConstantsCore.ObjectTypes.Member;
+            var isContent = objectTypeId == Constants.ObjectTypes.Document || objectTypeId == Constants.ObjectTypes.DocumentBlueprint;
+            var isMedia = objectTypeId == Constants.ObjectTypes.Media;
+            var isMember = objectTypeId == Constants.ObjectTypes.Member;
 
             var sql = GetFullSqlForEntityType(isContent, isMedia, isMember, objectTypeId, key);
             return GetEntity(sql, isContent, isMedia, isMember);
@@ -150,9 +150,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         public IEntitySlim Get(int id, Guid objectTypeId)
         {
-            var isContent = objectTypeId == ConstantsCore.ObjectTypes.Document || objectTypeId == ConstantsCore.ObjectTypes.DocumentBlueprint;
-            var isMedia = objectTypeId == ConstantsCore.ObjectTypes.Media;
-            var isMember = objectTypeId == ConstantsCore.ObjectTypes.Member;
+            var isContent = objectTypeId == Constants.ObjectTypes.Document || objectTypeId == Constants.ObjectTypes.DocumentBlueprint;
+            var isMedia = objectTypeId == Constants.ObjectTypes.Media;
+            var isMember = objectTypeId == Constants.ObjectTypes.Member;
 
             var sql = GetFullSqlForEntityType(isContent, isMedia, isMember, objectTypeId, id);
             return GetEntity(sql, isContent, isMedia, isMember);
@@ -195,9 +195,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private IEnumerable<IEntitySlim> PerformGetAll(Guid objectType, Action<Sql<ISqlContext>> filter = null)
         {
-            var isContent = objectType == ConstantsCore.ObjectTypes.Document || objectType == ConstantsCore.ObjectTypes.DocumentBlueprint;
-            var isMedia = objectType == ConstantsCore.ObjectTypes.Media;
-            var isMember = objectType == ConstantsCore.ObjectTypes.Member;
+            var isContent = objectType == Constants.ObjectTypes.Document || objectType == Constants.ObjectTypes.DocumentBlueprint;
+            var isMedia = objectType == Constants.ObjectTypes.Media;
+            var isMember = objectType == Constants.ObjectTypes.Member;
 
             var sql = GetFullSqlForEntityType(isContent, isMedia, isMember, objectType, filter);
             return GetEntities(sql, isContent, isMedia, isMember);
@@ -237,9 +237,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         public IEnumerable<IEntitySlim> GetByQuery(IQuery<IUmbracoEntity> query, Guid objectType)
         {
-            var isContent = objectType == ConstantsCore.ObjectTypes.Document || objectType == ConstantsCore.ObjectTypes.DocumentBlueprint;
-            var isMedia = objectType == ConstantsCore.ObjectTypes.Media;
-            var isMember = objectType == ConstantsCore.ObjectTypes.Member;
+            var isContent = objectType == Constants.ObjectTypes.Document || objectType == Constants.ObjectTypes.DocumentBlueprint;
+            var isMedia = objectType == Constants.ObjectTypes.Media;
+            var isMember = objectType == Constants.ObjectTypes.Member;
 
             var sql = GetBaseWhere(isContent, isMedia, isMember, false, null, objectType);
 
@@ -607,7 +607,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             entity.Trashed = dto.Trashed;
             entity.CreateDate = dto.CreateDate;
-            entity.CreatorId = dto.UserId ?? ConstantsCore.Security.UnknownUserId;
+            entity.CreatorId = dto.UserId ?? Constants.Security.UnknownUserId;
             entity.Id = dto.NodeId;
             entity.Key = dto.UniqueId;
             entity.Level = dto.Level;

@@ -78,9 +78,9 @@ namespace Umbraco.Web.Security
             if (string.IsNullOrEmpty(options.AuthenticationType)) throw new ArgumentNullOrEmptyException("options.AuthenticationType");
 
             //Ensure the prefix is set
-            if (options.AuthenticationType.StartsWith(ConstantsCore.Security.BackOfficeExternalAuthenticationTypePrefix) == false)
+            if (options.AuthenticationType.StartsWith(Constants.Security.BackOfficeExternalAuthenticationTypePrefix) == false)
             {
-                options.AuthenticationType = ConstantsCore.Security.BackOfficeExternalAuthenticationTypePrefix + options.AuthenticationType;
+                options.AuthenticationType = Constants.Security.BackOfficeExternalAuthenticationTypePrefix + options.AuthenticationType;
             }
 
             options.Description.Properties["SocialStyle"] = style;

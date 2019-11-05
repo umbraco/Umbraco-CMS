@@ -99,7 +99,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return Array.Empty<string>();
         }
 
-        protected override Guid NodeObjectTypeId => ConstantsCore.ObjectTypes.DataType;
+        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.DataType;
 
         #endregion
 

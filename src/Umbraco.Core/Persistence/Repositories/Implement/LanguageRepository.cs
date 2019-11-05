@@ -186,7 +186,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 //if the iso code is changing, ensure there's not another lang with the same code already assigned
                 var sameCode = Sql()
-                   .SelectCount()                   
+                   .SelectCount()
                    .From<LanguageDto>()
                    .Where<LanguageDto>(x => x.IsoCode == entity.IsoCode && x.Id != entity.Id);
 
@@ -269,7 +269,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             return null;
         }
-        
+
         // fast way of getting an isoCode for an id - avoiding cloning
         // _idCodeMap is rebuilt whenever PerformGetAll runs
         public string GetIsoCodeById(int? id, bool throwOnNotFound = true)

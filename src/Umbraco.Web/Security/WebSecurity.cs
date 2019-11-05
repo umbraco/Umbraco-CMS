@@ -86,7 +86,7 @@ namespace Umbraco.Web.Security
         {
             var owinCtx = _httpContext.GetOwinContext();
             //ensure it's done for owin too
-            owinCtx.Authentication.SignOut(ConstantsCore.Security.BackOfficeExternalAuthenticationType);
+            owinCtx.Authentication.SignOut(Constants.Security.BackOfficeExternalAuthenticationType);
 
             var user = UserManager.FindByIdAsync(userId).Result;
 
@@ -104,8 +104,8 @@ namespace Umbraco.Web.Security
         {
             _httpContext.UmbracoLogout();
             _httpContext.GetOwinContext().Authentication.SignOut(
-                Core.ConstantsCore.Security.BackOfficeAuthenticationType,
-                Core.ConstantsCore.Security.BackOfficeExternalAuthenticationType);
+                Core.Constants.Security.BackOfficeAuthenticationType,
+                Core.Constants.Security.BackOfficeExternalAuthenticationType);
         }
 
         /// <summary>

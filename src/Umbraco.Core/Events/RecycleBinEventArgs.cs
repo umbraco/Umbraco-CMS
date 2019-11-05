@@ -35,12 +35,12 @@ namespace Umbraco.Core.Events
         /// <summary>
         /// Boolean indicating whether this event was fired for the Content's Recycle Bin.
         /// </summary>
-        public bool IsContentRecycleBin => NodeObjectType == ConstantsCore.ObjectTypes.Document;
+        public bool IsContentRecycleBin => NodeObjectType == Constants.ObjectTypes.Document;
 
         /// <summary>
         /// Boolean indicating whether this event was fired for the Media's Recycle Bin.
         /// </summary>
-        public bool IsMediaRecycleBin => NodeObjectType == ConstantsCore.ObjectTypes.Media;
+        public bool IsMediaRecycleBin => NodeObjectType == Constants.ObjectTypes.Media;
 
         public bool Equals(RecycleBinEventArgs other)
         {

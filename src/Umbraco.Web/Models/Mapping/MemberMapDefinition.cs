@@ -128,7 +128,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             target.CreateDate = source.CreationDate;
             target.Email = source.Email;
-            target.Icon = ConstantsCore.Icons.Member;
+            target.Icon = Constants.Icons.Member;
             target.Id = int.MaxValue;
             target.Key = source.ProviderUserKey.TryConvertTo<Guid>().Result;
             target.Name = source.UserName;

@@ -376,7 +376,7 @@ namespace Umbraco.Core.Services.Implement
 
         #region Save
 
-        public void Save(TItem item, int userId = ConstantsCore.Security.SuperUserId)
+        public void Save(TItem item, int userId = Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -419,7 +419,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public void Save(IEnumerable<TItem> items, int userId = ConstantsCore.Security.SuperUserId)
+        public void Save(IEnumerable<TItem> items, int userId = Constants.Security.SuperUserId)
         {
             var itemsA = items.ToArray();
 
@@ -465,7 +465,7 @@ namespace Umbraco.Core.Services.Implement
 
         #region Delete
 
-        public void Delete(TItem item, int userId = ConstantsCore.Security.SuperUserId)
+        public void Delete(TItem item, int userId = Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -519,7 +519,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public void Delete(IEnumerable<TItem> items, int userId = ConstantsCore.Security.SuperUserId)
+        public void Delete(IEnumerable<TItem> items, int userId = Constants.Security.SuperUserId)
         {
             var itemsA = items.ToArray();
 
@@ -740,7 +740,7 @@ namespace Umbraco.Core.Services.Implement
 
         protected Guid ContainerObjectType => EntityContainer.GetContainerObjectType(ContainedObjectType);
 
-        public Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, string name, int userId = ConstantsCore.Security.SuperUserId)
+        public Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, string name, int userId = Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (var scope = ScopeProvider.CreateScope())
@@ -780,7 +780,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = ConstantsCore.Security.SuperUserId)
+        public Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -874,7 +874,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public Attempt<OperationResult> DeleteContainer(int containerId, int userId = ConstantsCore.Security.SuperUserId)
+        public Attempt<OperationResult> DeleteContainer(int containerId, int userId = Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (var scope = ScopeProvider.CreateScope())
@@ -911,7 +911,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public Attempt<OperationResult<OperationResultType, EntityContainer>> RenameContainer(int id, string name, int userId = ConstantsCore.Security.SuperUserId)
+        public Attempt<OperationResult<OperationResultType, EntityContainer>> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (var scope = ScopeProvider.CreateScope())

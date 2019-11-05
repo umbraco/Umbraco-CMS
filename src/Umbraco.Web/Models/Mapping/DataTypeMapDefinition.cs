@@ -24,9 +24,9 @@ namespace Umbraco.Web.Models.Mapping
 
         private static readonly int[] SystemIds =
         {
-            ConstantsCore.DataTypes.DefaultContentListView,
-            ConstantsCore.DataTypes.DefaultMediaListView,
-            ConstantsCore.DataTypes.DefaultMembersListView
+            Constants.DataTypes.DefaultContentListView,
+            Constants.DataTypes.DefaultMediaListView,
+            Constants.DataTypes.DefaultMembersListView
         };
 
         public void DefineMaps(UmbracoMapper mapper)
@@ -160,7 +160,7 @@ namespace Umbraco.Web.Models.Mapping
             foreach (var field in fields.ToList())
             {
                 //filter out the not-supported pre-values for built-in data types
-                if (dataType != null && dataType.IsBuildInDataType() && field.Key.InvariantEquals(ConstantsCore.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes))
+                if (dataType != null && dataType.IsBuildInDataType() && field.Key.InvariantEquals(Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes))
                 {
                     fields.Remove(field);
                     continue;

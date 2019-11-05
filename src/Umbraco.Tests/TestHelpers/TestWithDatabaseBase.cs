@@ -175,9 +175,9 @@ namespace Umbraco.Tests.TestHelpers
             var path = TestHelper.CurrentAssemblyDirectory;
 
             //Get the connectionstring settings from config
-            var settings = ConfigurationManager.ConnectionStrings[ConstantsCore.System.UmbracoConnectionName];
+            var settings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
             ConfigurationManager.AppSettings.Set(
-                ConstantsCore.System.UmbracoConnectionName,
+                Constants.System.UmbracoConnectionName,
                 GetDbConnectionString());
 
             _databasePath = string.Concat(path, "\\UmbracoNPocoTests.sdf");

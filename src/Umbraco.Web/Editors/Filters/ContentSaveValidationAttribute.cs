@@ -121,7 +121,7 @@ namespace Umbraco.Web.Editors.Filters
 
                     permissionToCheck.Add(ActionNew.ActionLetter);
 
-                    if (contentItem.ParentId != ConstantsCore.System.Root)
+                    if (contentItem.ParentId != Constants.System.Root)
                     {
                         contentToCheck = _contentService.GetById(contentItem.ParentId);
                         contentIdToCheck = contentToCheck.Id;
@@ -136,7 +136,7 @@ namespace Umbraco.Web.Editors.Filters
 
                     permissionToCheck.Add(ActionNew.ActionLetter);
                     permissionToCheck.Add(ActionToPublish.ActionLetter);
-                    if (contentItem.ParentId != ConstantsCore.System.Root)
+                    if (contentItem.ParentId != Constants.System.Root)
                     {
                         contentToCheck = _contentService.GetById(contentItem.ParentId);
                         contentIdToCheck = contentToCheck.Id;
@@ -155,7 +155,7 @@ namespace Umbraco.Web.Editors.Filters
                     permissionToCheck.Add(ActionNew.ActionLetter);
                     permissionToCheck.Add(ActionPublish.ActionLetter);
 
-                    if (contentItem.ParentId != ConstantsCore.System.Root)
+                    if (contentItem.ParentId != Constants.System.Root)
                     {
                         contentToCheck = _contentService.GetById(contentItem.ParentId);
                         contentIdToCheck = contentToCheck.Id;
@@ -171,7 +171,7 @@ namespace Umbraco.Web.Editors.Filters
                     permissionToCheck.Add(ActionUpdate.ActionLetter);
                     permissionToCheck.Add(ActionPublish.ActionLetter);
 
-                    if (contentItem.ParentId != ConstantsCore.System.Root)
+                    if (contentItem.ParentId != Constants.System.Root)
                     {
                         contentToCheck = _contentService.GetById(contentItem.ParentId);
                         contentIdToCheck = contentToCheck.Id;

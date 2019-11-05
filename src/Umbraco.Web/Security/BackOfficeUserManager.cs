@@ -158,7 +158,7 @@ namespace Umbraco.Web.Security
         {
             // NOTE the authenticationType must match the umbraco one
             // defined in CookieAuthenticationOptions.AuthenticationType
-            var userIdentity = await CreateIdentityAsync(user, Core.ConstantsCore.Security.BackOfficeAuthenticationType);
+            var userIdentity = await CreateIdentityAsync(user, Core.Constants.Security.BackOfficeAuthenticationType);
             return userIdentity;
         }
 

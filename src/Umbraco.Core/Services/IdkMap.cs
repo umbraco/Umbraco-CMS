@@ -174,7 +174,7 @@ namespace Umbraco.Core.Services
                     else
                     {
                         val = scope.Database.ExecuteScalar<int?>("SELECT id FROM umbracoNode WHERE uniqueId=@id AND (nodeObjectType=@type OR nodeObjectType=@reservation)",
-                            new { id = key, type = GetNodeObjectTypeGuid(umbracoObjectType), reservation = ConstantsCore.ObjectTypes.IdReservation });
+                            new { id = key, type = GetNodeObjectTypeGuid(umbracoObjectType), reservation = Constants.ObjectTypes.IdReservation });
                     }
                     scope.Complete();
                 }
@@ -207,7 +207,7 @@ namespace Umbraco.Core.Services
             if (guidUdi == null)
                 return Attempt<int>.Fail();
 
-            var umbracoType = Constants.UdiEntityType.ToUmbracoObjectType(guidUdi.EntityType);
+            var umbracoType = UdiEntityTypeHelper.ToUmbracoObjectType(guidUdi.EntityType);
             return GetIdForKey(guidUdi.Guid, umbracoType);
         }
 
@@ -215,7 +215,7 @@ namespace Umbraco.Core.Services
         {
             var keyAttempt = GetKeyForId(id, umbracoObjectType);
             return keyAttempt
-                ? Attempt.Succeed<Udi>(new GuidUdi(Constants.UdiEntityType.FromUmbracoObjectType(umbracoObjectType), keyAttempt.Result))
+                ? Attempt.Succeed<Udi>(new GuidUdi(UdiEntityTypeHelper.FromUmbracoObjectType(umbracoObjectType), keyAttempt.Result))
                 : Attempt<Udi>.Fail();
         }
 
@@ -262,7 +262,7 @@ namespace Umbraco.Core.Services
                     else
                     {
                         val = scope.Database.ExecuteScalar<Guid?>("SELECT uniqueId FROM umbracoNode WHERE id=@id AND (nodeObjectType=@type OR nodeObjectType=@reservation)",
-                            new { id, type = GetNodeObjectTypeGuid(umbracoObjectType), reservation = ConstantsCore.ObjectTypes.IdReservation });
+                            new { id, type = GetNodeObjectTypeGuid(umbracoObjectType), reservation = Constants.ObjectTypes.IdReservation });
                     }
                     scope.Complete();
                 }

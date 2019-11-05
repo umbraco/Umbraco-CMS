@@ -8,7 +8,7 @@ namespace Umbraco.Web.Sections
     /// </summary>
     public class MediaSection : ISection
     {
-        public string Alias => ConstantsCore.Applications.Media;
+        public string Alias => Constants.Applications.Media;
         public string Name => "Media";
     }
 }

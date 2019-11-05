@@ -19,7 +19,7 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
     /// correct CSRF security is adhered to for angular and it also ensures that this controller is not subseptipal to
     /// global WebApi formatters being changed since this is always forced to only return Angular JSON Specific formats.
     /// </remarks>
-    [UmbracoApplicationAuthorize(Core.ConstantsCore.Applications.Settings)]
+    [UmbracoApplicationAuthorize(Core.Constants.Applications.Settings)]
     public class ModelsBuilderDashboardController : UmbracoAuthorizedJsonController
     {
         private readonly IModelsBuilderConfig _config;

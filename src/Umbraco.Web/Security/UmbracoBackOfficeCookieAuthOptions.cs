@@ -25,7 +25,7 @@ namespace Umbraco.Web.Security
         {
             var secureDataFormat1 = secureDataFormat ?? throw new ArgumentNullException(nameof(secureDataFormat));
             LoginTimeoutMinutes = globalSettings.TimeOutInMinutes;
-            AuthenticationType = ConstantsCore.Security.BackOfficeAuthenticationType;
+            AuthenticationType = Constants.Security.BackOfficeAuthenticationType;
 
             SlidingExpiration = true;
             ExpireTimeSpan = TimeSpan.FromMinutes(LoginTimeoutMinutes);

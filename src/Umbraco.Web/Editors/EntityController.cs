@@ -29,8 +29,8 @@ using Umbraco.Web.Services;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
-
 using Constants = Umbraco.Core.Constants;
+
 namespace Umbraco.Web.Editors
 {
     /// <summary>
@@ -449,7 +449,7 @@ namespace Umbraco.Web.Editors
                 var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(dataTypeKey);
 
                 // root is special: we reduce it to start nodes if the user's start node is not the default, then we need to return their start nodes
-                if (id == ConstantsCore.System.Root && startNodes.Length > 0 && startNodes.Contains(ConstantsCore.System.Root) == false && !ignoreUserStartNodes)
+                if (id == Constants.System.Root && startNodes.Length > 0 && startNodes.Contains(Constants.System.Root) == false && !ignoreUserStartNodes)
                 {
                     var nodes = Services.EntityService.GetAll(objectType.Value, startNodes).ToArray();
                     if (nodes.Length == 0)
@@ -574,7 +574,7 @@ namespace Umbraco.Web.Editors
                 var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(dataTypeKey);
 
                 // root is special: we reduce it to start nodes if the user's start node is not the default, then we need to return their start nodes
-                if (id == ConstantsCore.System.Root && startNodes.Length > 0 && startNodes.Contains(ConstantsCore.System.Root) == false && !ignoreUserStartNodes)
+                if (id == Constants.System.Root && startNodes.Length > 0 && startNodes.Contains(Constants.System.Root) == false && !ignoreUserStartNodes)
                 {
                     if (pageNumber > 0)
                         return new PagedResult<EntityBasic>(0, 0, 0);
@@ -668,14 +668,14 @@ namespace Umbraco.Web.Editors
                 IEnumerable<IUmbracoEntity> entities;
                 long totalRecords;
 
-                if (id == ConstantsCore.System.Root)
+                if (id == Constants.System.Root)
                 {
                     // root is special: we reduce it to start nodes
 
                     int[] aids = GetStartNodes(type);
 
                     var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(dataTypeKey);
-                    entities = aids == null || aids.Contains(ConstantsCore.System.Root) || ignoreUserStartNodes
+                    entities = aids == null || aids.Contains(Constants.System.Root) || ignoreUserStartNodes
                         ? Services.EntityService.GetPagedDescendants(objectType.Value, pageNumber - 1, pageSize, out totalRecords,
                             SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(filter)),
                             Ordering.By(orderBy, orderDirection), includeTrashed: false)

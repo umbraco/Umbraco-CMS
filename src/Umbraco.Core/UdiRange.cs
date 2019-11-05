@@ -19,19 +19,19 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="udi">A <see cref="Udi"/>.</param>
         /// <param name="selector">An optional selector.</param>
-        public UdiRange(Udi udi, string selector = ConstantsCore.DeploySelector.This)
+        public UdiRange(Udi udi, string selector = Constants.DeploySelector.This)
         {
             Udi = udi;
             switch (selector)
             {
-                case ConstantsCore.DeploySelector.This:
+                case Constants.DeploySelector.This:
                     Selector = selector;
                     _uriValue = udi.UriValue;
                     break;
-                case ConstantsCore.DeploySelector.ChildrenOfThis:
-                case ConstantsCore.DeploySelector.DescendantsOfThis:
-                case ConstantsCore.DeploySelector.ThisAndChildren:
-                case ConstantsCore.DeploySelector.ThisAndDescendants:
+                case Constants.DeploySelector.ChildrenOfThis:
+                case Constants.DeploySelector.DescendantsOfThis:
+                case Constants.DeploySelector.ThisAndChildren:
+                case Constants.DeploySelector.ThisAndDescendants:
                     Selector = selector;
                     _uriValue = new Uri(Udi + "?" + selector);
                     break;

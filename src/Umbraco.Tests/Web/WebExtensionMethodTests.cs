@@ -36,10 +36,10 @@ namespace Umbraco.Tests.Web
                 TestObjects.GetGlobalSettings(),
                 new TestVariationContextAccessor());
             var r1 = new RouteData();
-            r1.DataTokens.Add(Core.ConstantsCore.Web.UmbracoContextDataToken, umbCtx);
+            r1.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx);
 
-            Assert.IsTrue(r1.DataTokens.ContainsKey(Core.ConstantsCore.Web.UmbracoContextDataToken));
-            Assert.AreSame(umbCtx, r1.DataTokens[Core.ConstantsCore.Web.UmbracoContextDataToken]);
+            Assert.IsTrue(r1.DataTokens.ContainsKey(Core.Constants.Web.UmbracoContextDataToken));
+            Assert.AreSame(umbCtx, r1.DataTokens[Core.Constants.Web.UmbracoContextDataToken]);
         }
 
         [Test]
@@ -56,7 +56,7 @@ namespace Umbraco.Tests.Web
                 new TestVariationContextAccessor());
 
             var r1 = new RouteData();
-            r1.DataTokens.Add(Core.ConstantsCore.Web.UmbracoContextDataToken, umbCtx);
+            r1.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx);
             var ctx1 = CreateViewContext(new ControllerContext(Mock.Of<HttpContextBase>(), r1, new MyController()));
             var r2 = new RouteData();
             r2.DataTokens.Add("ParentActionViewContext", ctx1);

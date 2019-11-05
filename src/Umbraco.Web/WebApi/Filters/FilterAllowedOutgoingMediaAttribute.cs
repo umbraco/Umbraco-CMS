@@ -42,7 +42,7 @@ namespace Umbraco.Web.WebApi.Filters
             return user.CalculateMediaStartNodeIds(Current.Services.EntityService);
         }
 
-        protected virtual int RecycleBinId => ConstantsCore.System.RecycleBinMedia;
+        protected virtual int RecycleBinId => Constants.System.RecycleBinMedia;
 
         public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
         {

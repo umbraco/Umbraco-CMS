@@ -26,7 +26,7 @@ namespace Umbraco.Web.Editors
     /// An API controller used for dealing with member types
     /// </summary>
     [PluginController("UmbracoApi")]
-    [UmbracoTreeAuthorize(new string[] { ConstantsCore.Trees.MemberTypes, ConstantsCore.Trees.Members})]
+    [UmbracoTreeAuthorize(new string[] { Constants.Trees.MemberTypes, Constants.Trees.Members})]
     public class MemberTypeController : ContentTypeControllerBase<IMemberType>
     {
         public MemberTypeController(ICultureDictionaryFactory cultureDictionaryFactory, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
@@ -36,7 +36,7 @@ namespace Umbraco.Web.Editors
 
         private readonly MembershipProvider _provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
 
-        [UmbracoTreeAuthorize(ConstantsCore.Trees.MemberTypes)]
+        [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
         public MemberTypeDisplay GetById(int id)
         {
             var ct = Services.MemberTypeService.Get(id);
@@ -56,7 +56,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [HttpDelete]
         [HttpPost]
-        [UmbracoTreeAuthorize(ConstantsCore.Trees.MemberTypes)]
+        [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
         public HttpResponseMessage DeleteById(int id)
         {
             var foundType = Services.MemberTypeService.Get(id);
@@ -84,7 +84,7 @@ namespace Umbraco.Web.Editors
         /// </param>
         /// <returns></returns>
 
-        [UmbracoTreeAuthorize(ConstantsCore.Trees.MemberTypes)]
+        [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
         public HttpResponseMessage GetAvailableCompositeMemberTypes(int contentTypeId,
             [FromUri]string[] filterContentTypes,
             [FromUri]string[] filterPropertyTypes)
@@ -98,11 +98,11 @@ namespace Umbraco.Web.Editors
             return Request.CreateResponse(result);
         }
 
-        [UmbracoTreeAuthorize(ConstantsCore.Trees.MemberTypes)]
+        [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
         public MemberTypeDisplay GetEmpty()
         {
             var ct = new MemberType(-1);
-            ct.Icon = ConstantsCore.Icons.Member;
+            ct.Icon = Constants.Icons.Member;
 
             var dto = Mapper.Map<IMemberType, MemberTypeDisplay>(ct);
             return dto;
@@ -122,7 +122,7 @@ namespace Umbraco.Web.Editors
             return Enumerable.Empty<ContentTypeBasic>();
         }
 
-        [UmbracoTreeAuthorize(ConstantsCore.Trees.MemberTypes)]
+        [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
         public MemberTypeDisplay PostSave(MemberTypeSave contentTypeSave)
         {
             //get the persisted member type

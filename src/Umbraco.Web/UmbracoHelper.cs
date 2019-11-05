@@ -12,7 +12,6 @@ using Umbraco.Core.Xml;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Security;
-using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web
 {
@@ -241,7 +240,7 @@ namespace Umbraco.Web
             var guidUdi = udi as GuidUdi;
             if (guidUdi == null) return null;
 
-            var umbracoType = Constants.UdiEntityType.ToUmbracoObjectType(udi.EntityType);
+            var umbracoType = UdiEntityTypeHelper.ToUmbracoObjectType(udi.EntityType);
 
             switch (umbracoType)
             {

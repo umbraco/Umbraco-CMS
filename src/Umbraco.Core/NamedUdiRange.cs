@@ -10,7 +10,7 @@
         /// </summary>
         /// <param name="udi">A <see cref="Udi"/>.</param>
         /// <param name="selector">An optional selector.</param>
-        public NamedUdiRange(Udi udi, string selector = ConstantsCore.DeploySelector.This)
+        public NamedUdiRange(Udi udi, string selector = Constants.DeploySelector.This)
             : base(udi, selector)
         { }
 
@@ -20,7 +20,7 @@
         /// <param name="udi">A <see cref="Udi"/>.</param>
         /// <param name="name">A name.</param>
         /// <param name="selector">An optional selector.</param>
-        public NamedUdiRange(Udi udi, string name, string selector = ConstantsCore.DeploySelector.This)
+        public NamedUdiRange(Udi udi, string name, string selector = Constants.DeploySelector.This)
             : base(udi, selector)
         {
             Name = name;

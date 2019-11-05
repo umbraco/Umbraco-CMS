@@ -41,8 +41,8 @@ namespace Umbraco.Core.Persistence.Factories
                 content.SortOrder = nodeDto.SortOrder;
                 content.Trashed = nodeDto.Trashed;
 
-                content.CreatorId = nodeDto.UserId ?? ConstantsCore.Security.UnknownUserId;
-                content.WriterId = contentVersionDto.UserId ?? ConstantsCore.Security.UnknownUserId;
+                content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
+                content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
                 content.CreateDate = nodeDto.CreateDate;
                 content.UpdateDate = contentVersionDto.VersionDate;
 
@@ -97,8 +97,8 @@ namespace Umbraco.Core.Persistence.Factories
                 content.SortOrder = nodeDto.SortOrder;
                 content.Trashed = nodeDto.Trashed;
 
-                content.CreatorId = nodeDto.UserId ?? ConstantsCore.Security.UnknownUserId;
-                content.WriterId = contentVersionDto.UserId ?? ConstantsCore.Security.UnknownUserId;
+                content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
+                content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
                 content.CreateDate = nodeDto.CreateDate;
                 content.UpdateDate = contentVersionDto.VersionDate;
 
@@ -138,8 +138,8 @@ namespace Umbraco.Core.Persistence.Factories
                 content.SortOrder = nodeDto.SortOrder;
                 content.Trashed = nodeDto.Trashed;
 
-                content.CreatorId = nodeDto.UserId ?? ConstantsCore.Security.UnknownUserId;
-                content.WriterId = contentVersionDto.UserId ?? ConstantsCore.Security.UnknownUserId;
+                content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
+                content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
                 content.CreateDate = nodeDto.CreateDate;
                 content.UpdateDate = contentVersionDto.VersionDate;
 
@@ -191,7 +191,7 @@ namespace Umbraco.Core.Persistence.Factories
         /// </summary>
         public static MediaDto BuildDto(IMedia entity)
         {
-            var contentDto = BuildContentDto(entity, ConstantsCore.ObjectTypes.Media);
+            var contentDto = BuildContentDto(entity, Constants.ObjectTypes.Media);
 
             var dto = new MediaDto
             {
@@ -208,7 +208,7 @@ namespace Umbraco.Core.Persistence.Factories
         /// </summary>
         public static MemberDto BuildDto(IMember entity)
         {
-            var contentDto = BuildContentDto(entity, ConstantsCore.ObjectTypes.Member);
+            var contentDto = BuildContentDto(entity, Constants.ObjectTypes.Member);
 
             var dto = new MemberDto
             {

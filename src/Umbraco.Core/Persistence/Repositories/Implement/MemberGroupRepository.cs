@@ -87,7 +87,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return list;
         }
 
-        protected override Guid NodeObjectTypeId => ConstantsCore.ObjectTypes.MemberGroup;
+        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.MemberGroup;
 
         protected override void PersistNewItem(IMemberGroup entity)
         {
@@ -185,7 +185,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         public int[] GetMemberIds(string[] usernames)
         {
-            var memberObjectType = ConstantsCore.ObjectTypes.Member;
+            var memberObjectType = Constants.ObjectTypes.Member;
 
             var memberSql = Sql()
                 .Select("umbracoNode.id")

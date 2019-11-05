@@ -33,7 +33,7 @@ namespace Umbraco.Core.Models
         public static bool IsSuper(this IUser user)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
-            return user.Id == ConstantsCore.Security.SuperUserId;
+            return user.Id == Constants.Security.SuperUserId;
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace Umbraco.Core.Models
         public static bool IsAdmin(this IUser user)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
-            return user.Groups != null && user.Groups.Any(x => x.Alias == ConstantsCore.Security.AdminGroupAlias);
+            return user.Groups != null && user.Groups.Any(x => x.Alias == Constants.Security.AdminGroupAlias);
         }
 
         /// <summary>
@@ -151,46 +151,46 @@ namespace Umbraco.Core.Models
 
         internal static bool HasContentRootAccess(this IUser user, IEntityService entityService)
         {
-            return ContentPermissionsHelper.HasPathAccess(ConstantsCore.System.RootString, user.CalculateContentStartNodeIds(entityService), ConstantsCore.System.RecycleBinContent);
+            return ContentPermissionsHelper.HasPathAccess(Constants.System.RootString, user.CalculateContentStartNodeIds(entityService), Constants.System.RecycleBinContent);
         }
 
         internal static bool HasContentBinAccess(this IUser user, IEntityService entityService)
         {
-            return ContentPermissionsHelper.HasPathAccess(ConstantsCore.System.RecycleBinContentString, user.CalculateContentStartNodeIds(entityService), ConstantsCore.System.RecycleBinContent);
+            return ContentPermissionsHelper.HasPathAccess(Constants.System.RecycleBinContentString, user.CalculateContentStartNodeIds(entityService), Constants.System.RecycleBinContent);
         }
 
         internal static bool HasMediaRootAccess(this IUser user, IEntityService entityService)
         {
-            return ContentPermissionsHelper.HasPathAccess(ConstantsCore.System.RootString, user.CalculateMediaStartNodeIds(entityService), ConstantsCore.System.RecycleBinMedia);
+            return ContentPermissionsHelper.HasPathAccess(Constants.System.RootString, user.CalculateMediaStartNodeIds(entityService), Constants.System.RecycleBinMedia);
         }
 
         internal static bool HasMediaBinAccess(this IUser user, IEntityService entityService)
         {
-            return ContentPermissionsHelper.HasPathAccess(ConstantsCore.System.RecycleBinMediaString, user.CalculateMediaStartNodeIds(entityService), ConstantsCore.System.RecycleBinMedia);
+            return ContentPermissionsHelper.HasPathAccess(Constants.System.RecycleBinMediaString, user.CalculateMediaStartNodeIds(entityService), Constants.System.RecycleBinMedia);
         }
 
         internal static bool HasPathAccess(this IUser user, IContent content, IEntityService entityService)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
-            return ContentPermissionsHelper.HasPathAccess(content.Path, user.CalculateContentStartNodeIds(entityService), ConstantsCore.System.RecycleBinContent);
+            return ContentPermissionsHelper.HasPathAccess(content.Path, user.CalculateContentStartNodeIds(entityService), Constants.System.RecycleBinContent);
         }
 
         internal static bool HasPathAccess(this IUser user, IMedia media, IEntityService entityService)
         {
             if (media == null) throw new ArgumentNullException(nameof(media));
-            return ContentPermissionsHelper.HasPathAccess(media.Path, user.CalculateMediaStartNodeIds(entityService), ConstantsCore.System.RecycleBinMedia);
+            return ContentPermissionsHelper.HasPathAccess(media.Path, user.CalculateMediaStartNodeIds(entityService), Constants.System.RecycleBinMedia);
         }
 
         internal static bool HasContentPathAccess(this IUser user, IUmbracoEntity entity, IEntityService entityService)
         {
             if (entity == null) throw new ArgumentNullException(nameof(entity));
-            return ContentPermissionsHelper.HasPathAccess(entity.Path, user.CalculateContentStartNodeIds(entityService), ConstantsCore.System.RecycleBinContent);
+            return ContentPermissionsHelper.HasPathAccess(entity.Path, user.CalculateContentStartNodeIds(entityService), Constants.System.RecycleBinContent);
         }
 
         internal static bool HasMediaPathAccess(this IUser user, IUmbracoEntity entity, IEntityService entityService)
         {
             if (entity == null) throw new ArgumentNullException(nameof(entity));
-            return ContentPermissionsHelper.HasPathAccess(entity.Path, user.CalculateMediaStartNodeIds(entityService), ConstantsCore.System.RecycleBinMedia);
+            return ContentPermissionsHelper.HasPathAccess(entity.Path, user.CalculateMediaStartNodeIds(entityService), Constants.System.RecycleBinMedia);
         }
 
         /// <summary>
@@ -200,7 +200,7 @@ namespace Umbraco.Core.Models
         public static bool HasAccessToSensitiveData(this IUser user)
         {
             if (user == null) throw new ArgumentNullException("user");
-            return user.Groups != null && user.Groups.Any(x => x.Alias == ConstantsCore.Security.SensitiveDataGroupAlias);
+            return user.Groups != null && user.Groups.Any(x => x.Alias == Constants.Security.SensitiveDataGroupAlias);
         }
 
         // calc. start nodes, combining groups' and user's, and excluding what's in the bin
@@ -290,14 +290,14 @@ namespace Umbraco.Core.Models
 
         private static string GetBinPath(UmbracoObjectTypes objectType)
         {
-            var binPath = ConstantsCore.System.Root + ",";
+            var binPath = Constants.System.Root + ",";
             switch (objectType)
             {
                 case UmbracoObjectTypes.Document:
-                    binPath += ConstantsCore.System.RecycleBinContent;
+                    binPath += Constants.System.RecycleBinContent;
                     break;
                 case UmbracoObjectTypes.Media:
-                    binPath += ConstantsCore.System.RecycleBinMedia;
+                    binPath += Constants.System.RecycleBinMedia;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(objectType));
@@ -314,7 +314,7 @@ namespace Umbraco.Core.Models
                 ? entityService.GetAllPaths(objectType, asn).ToDictionary(x => x.Id, x => x.Path)
                 : new Dictionary<int, string>();
 
-            paths[ConstantsCore.System.Root] = ConstantsCore.System.RootString; // entityService does not get that one
+            paths[Constants.System.Root] = Constants.System.RootString; // entityService does not get that one
 
             var binPath = GetBinPath(objectType);
 

@@ -29,7 +29,7 @@ namespace Umbraco.Core.Services.Implement
 
         private IContentService ContentService { get; }
 
-        protected override Guid ContainedObjectType => ConstantsCore.ObjectTypes.DocumentType;
+        protected override Guid ContainedObjectType => Constants.ObjectTypes.DocumentType;
 
         protected override void DeleteItemsOfTypes(IEnumerable<int> typeIds)
         {

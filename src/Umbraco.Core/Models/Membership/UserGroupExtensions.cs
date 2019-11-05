@@ -31,9 +31,9 @@ namespace Umbraco.Core.Models.Membership
 
         private static bool IsSystemUserGroup(this string groupAlias)
         {
-            return groupAlias == ConstantsCore.Security.AdminGroupAlias
-                   || groupAlias == ConstantsCore.Security.SensitiveDataGroupAlias
-                   || groupAlias == ConstantsCore.Security.TranslatorGroupAlias;
+            return groupAlias == Constants.Security.AdminGroupAlias
+                   || groupAlias == Constants.Security.SensitiveDataGroupAlias
+                   || groupAlias == Constants.Security.TranslatorGroupAlias;
         }
     }
 }

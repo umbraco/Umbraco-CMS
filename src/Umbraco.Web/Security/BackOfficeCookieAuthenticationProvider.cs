@@ -52,7 +52,7 @@ namespace Umbraco.Web.Security
             if (context?.OwinContext?.Authentication?.User?.Identity != null)
             {
                 var claimsIdentity = context.OwinContext.Authentication.User.Identity as ClaimsIdentity;
-                var sessionId = claimsIdentity.FindFirstValue(Core.ConstantsCore.Security.SessionIdClaimType);
+                var sessionId = claimsIdentity.FindFirstValue(Core.Constants.Security.SessionIdClaimType);
                 if (sessionId.IsNullOrWhiteSpace() == false && Guid.TryParse(sessionId, out var guidSession))
                 {
                     _userService.ClearLoginSession(guidSession);
@@ -72,12 +72,12 @@ namespace Umbraco.Web.Security
                 Expires = DateTime.Now.AddYears(-1),
                 Path = "/"
             });
-            context.Response.Cookies.Append(Core.ConstantsCore.Web.PreviewCookieName, "", new CookieOptions
+            context.Response.Cookies.Append(Core.Constants.Web.PreviewCookieName, "", new CookieOptions
             {
                 Expires = DateTime.Now.AddYears(-1),
                 Path = "/"
             });
-            context.Response.Cookies.Append(Core.ConstantsCore.Security.BackOfficeExternalCookieName, "", new CookieOptions
+            context.Response.Cookies.Append(Core.Constants.Security.BackOfficeExternalCookieName, "", new CookieOptions
             {
                 Expires = DateTime.Now.AddYears(-1),
                 Path = "/"

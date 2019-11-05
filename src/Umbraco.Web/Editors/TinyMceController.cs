@@ -20,9 +20,9 @@ namespace Umbraco.Web.Editors
 {
     [PluginController("UmbracoApi")]
     [UmbracoApplicationAuthorize(
-        ConstantsCore.Applications.Content,
-        ConstantsCore.Applications.Media,
-        ConstantsCore.Applications.Members)]
+        Constants.Applications.Content,
+        Constants.Applications.Media,
+        Constants.Applications.Members)]
     public class TinyMceController : UmbracoAuthorizedApiController
     {
         private IMediaService _mediaService;

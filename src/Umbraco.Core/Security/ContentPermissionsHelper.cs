@@ -99,9 +99,9 @@ namespace Umbraco.Core.Security
             bool? hasPathAccess = null;
             entity = null;
 
-            if (nodeId == ConstantsCore.System.Root)
+            if (nodeId == Constants.System.Root)
                 hasPathAccess = user.HasContentRootAccess(entityService);
-            else if (nodeId == ConstantsCore.System.RecycleBinContent)
+            else if (nodeId == Constants.System.RecycleBinContent)
                 hasPathAccess = user.HasContentBinAccess(entityService);
 
             if (hasPathAccess.HasValue)
@@ -151,9 +151,9 @@ namespace Umbraco.Core.Security
             bool? hasPathAccess = null;
             contentItem = null;
 
-            if (nodeId == ConstantsCore.System.Root)
+            if (nodeId == Constants.System.Root)
                 hasPathAccess = user.HasContentRootAccess(entityService);
-            else if (nodeId == ConstantsCore.System.RecycleBinContent)
+            else if (nodeId == Constants.System.RecycleBinContent)
                 hasPathAccess = user.HasContentBinAccess(entityService);
 
             if (hasPathAccess.HasValue)
@@ -202,7 +202,7 @@ namespace Umbraco.Core.Security
                 return false;
 
             // check for root access
-            if (startNodeIds.Contains(ConstantsCore.System.Root))
+            if (startNodeIds.Contains(Constants.System.Root))
                 return true;
 
             var formattedPath = string.Concat(",", path, ",");
@@ -227,7 +227,7 @@ namespace Umbraco.Core.Security
                 return false;
 
             // check for root access
-            if (startNodeIds.Contains(ConstantsCore.System.Root))
+            if (startNodeIds.Contains(Constants.System.Root))
             {
                 hasPathAccess = true;
                 return true;

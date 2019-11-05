@@ -15,7 +15,7 @@ namespace Umbraco.Web.Security
     {
         public BackOfficeClaimsIdentityFactory()
         {
-            SecurityStampClaimType = ConstantsCore.Security.SessionIdClaimType;
+            SecurityStampClaimType = Constants.Security.SessionIdClaimType;
             UserNameClaimType = ClaimTypes.Name;
         }
 

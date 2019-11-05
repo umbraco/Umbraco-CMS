@@ -86,7 +86,7 @@ namespace Umbraco.Tests.Services
             var initProps = member.Properties.Count;
 
             //remove a property (NOT ONE OF THE DEFAULTS)
-            var standardProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
+            var standardProps = ConventionsHelper.GetStandardPropertyTypeStubs();
             memberType.RemovePropertyType(memberType.PropertyTypes.First(x => standardProps.ContainsKey(x.Alias) == false).Alias);
             ServiceContext.MemberTypeService.Save(memberType);
 
@@ -132,7 +132,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Rebuild_Member_Xml_On_Property_Removal()
         {
-            var standardProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
+            var standardProps = ConventionsHelper.GetStandardPropertyTypeStubs();
 
             var contentType1 = MockedContentTypes.CreateSimpleMemberType("test1", "Test1");
             ServiceContext.MemberTypeService.Save(contentType1);
@@ -208,7 +208,7 @@ namespace Umbraco.Tests.Services
         //    ctBase.AddPropertyType(new PropertyType(dtdYesNo)
         //        {
         //            Name = "Hide From Navigation",
-        //            Alias = Constants.Conventions.Content.NaviHide
+        //            Alias = ConstantsCore.Conventions.Content.NaviHide
         //        }
         //        /*,"Navigation"*/);
         //    cts.Save(ctBase);

@@ -310,9 +310,9 @@ namespace Umbraco.Web.Security
 
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
-                AuthenticationType = ConstantsCore.Security.BackOfficeExternalAuthenticationType,
+                AuthenticationType = Constants.Security.BackOfficeExternalAuthenticationType,
                 AuthenticationMode = AuthenticationMode.Passive,
-                CookieName = ConstantsCore.Security.BackOfficeExternalCookieName,
+                CookieName = Constants.Security.BackOfficeExternalCookieName,
                 ExpireTimeSpan = TimeSpan.FromMinutes(5),
                 //Custom cookie manager so we can filter requests
                 CookieManager = new BackOfficeCookieManager(umbracoContextAccessor, runtimeState, globalSettings),
@@ -400,7 +400,7 @@ namespace Umbraco.Web.Security
             //this is how aspnet wires up the default AuthenticationTicket protector so we'll use the same code
             var ticketDataFormat = new TicketDataFormat(
                 app.CreateDataProtector(typeof (CookieAuthenticationMiddleware).FullName,
-                    ConstantsCore.Security.BackOfficeAuthenticationType,
+                    Constants.Security.BackOfficeAuthenticationType,
                     "v1"));
 
             var authOptions = new UmbracoBackOfficeCookieAuthOptions(

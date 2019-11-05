@@ -1456,7 +1456,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private void RebuildContentDbCacheLocked(IScope scope, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
-            var contentObjectType = ConstantsCore.ObjectTypes.Document;
+            var contentObjectType = Constants.ObjectTypes.Document;
             var db = scope.Database;
 
             // remove all - if anything fails the transaction will rollback
@@ -1528,7 +1528,7 @@ WHERE cmsContentNu.nodeId IN (
         public void RebuildMediaDbCacheLocked(IScope scope, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
-            var mediaObjectType = ConstantsCore.ObjectTypes.Media;
+            var mediaObjectType = Constants.ObjectTypes.Media;
             var db = scope.Database;
 
             // remove all - if anything fails the transaction will rollback
@@ -1587,7 +1587,7 @@ WHERE cmsContentNu.nodeId IN (
         public void RebuildMemberDbCacheLocked(IScope scope, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
-            var memberObjectType = ConstantsCore.ObjectTypes.Member;
+            var memberObjectType = Constants.ObjectTypes.Member;
             var db = scope.Database;
 
             // remove all - if anything fails the transaction will rollback
@@ -1648,7 +1648,7 @@ WHERE cmsContentNu.nodeId IN (
             // every document should have a corresponding row for edited properties
             // and if published, may have a corresponding row for published properties
 
-            var contentObjectType = ConstantsCore.ObjectTypes.Document;
+            var contentObjectType = Constants.ObjectTypes.Document;
             var db = scope.Database;
 
             var count = db.ExecuteScalar<int>($@"SELECT COUNT(*)
@@ -1679,7 +1679,7 @@ AND nuEdited.nodeId IS NULL OR ({Constants.DatabaseSchema.Tables.Document}.publi
         {
             // every media item should have a corresponding row for edited properties
 
-            var mediaObjectType = ConstantsCore.ObjectTypes.Media;
+            var mediaObjectType = Constants.ObjectTypes.Media;
             var db = scope.Database;
 
             var count = db.ExecuteScalar<int>(@"SELECT COUNT(*)
@@ -1708,7 +1708,7 @@ AND cmsContentNu.nodeId IS NULL
         {
             // every member item should have a corresponding row for edited properties
 
-            var memberObjectType = ConstantsCore.ObjectTypes.Member;
+            var memberObjectType = Constants.ObjectTypes.Member;
             var db = scope.Database;
 
             var count = db.ExecuteScalar<int>(@"SELECT COUNT(*)

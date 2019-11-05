@@ -79,7 +79,7 @@ namespace Umbraco.Tests.Membership
         {
             IMember createdMember = null;
             var memberType = MockedContentTypes.CreateSimpleMemberType();
-            foreach (var p in Constants.Conventions.Member.GetStandardPropertyTypeStubs())
+            foreach (var p in ConventionsHelper.GetStandardPropertyTypeStubs())
             {
                 memberType.AddPropertyType(p.Value);
             }
@@ -111,7 +111,7 @@ namespace Umbraco.Tests.Membership
         {
             IMember createdMember = null;
             var memberType = MockedContentTypes.CreateSimpleMemberType();
-            foreach (var p in Constants.Conventions.Member.GetStandardPropertyTypeStubs())
+            foreach (var p in ConventionsHelper.GetStandardPropertyTypeStubs())
             {
                 memberType.AddPropertyType(p.Value);
             }
@@ -145,7 +145,7 @@ namespace Umbraco.Tests.Membership
         {
             IMember createdMember = null;
             var memberType = MockedContentTypes.CreateSimpleMemberType();
-            foreach (var p in Constants.Conventions.Member.GetStandardPropertyTypeStubs())
+            foreach (var p in ConventionsHelper.GetStandardPropertyTypeStubs())
             {
                 memberType.AddPropertyType(p.Value);
             }

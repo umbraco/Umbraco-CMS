@@ -29,7 +29,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private EntityContainerRepository CreateContainerRepository(IScopeProvider provider)
         {
-            return new EntityContainerRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, ConstantsCore.ObjectTypes.MediaTypeContainer);
+            return new EntityContainerRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, Constants.ObjectTypes.MediaTypeContainer);
 
         }
 
@@ -42,11 +42,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var containerRepository = CreateContainerRepository(provider);
                 var repository = CreateRepository(provider);
 
-                var container1 = new EntityContainer(ConstantsCore.ObjectTypes.MediaType) { Name = "blah1" };
+                var container1 = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah1" };
                 containerRepository.Save(container1);
 
 
-                var container2 = new EntityContainer(ConstantsCore.ObjectTypes.MediaType) { Name = "blah2", ParentId = container1.Id };
+                var container2 = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah2", ParentId = container1.Id };
                 containerRepository.Save(container2);
 
 
@@ -88,7 +88,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var containerRepository = CreateContainerRepository(provider);
 
-                var container = new EntityContainer(ConstantsCore.ObjectTypes.MediaType) { Name = "blah" };
+                var container = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah" };
                 containerRepository.Save(container);
 
                 Assert.That(container.Id, Is.GreaterThan(0));
@@ -106,7 +106,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var containerRepository = CreateContainerRepository(provider);
 
-                var container = new EntityContainer(ConstantsCore.ObjectTypes.MediaType) { Name = "blah" };
+                var container = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah" };
                 containerRepository.Save(container);
 
                 Assert.That(container.Id, Is.GreaterThan(0));
@@ -129,7 +129,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var containerRepository = CreateContainerRepository(provider);
                 var repository = CreateRepository(provider);
 
-                var container = new EntityContainer(ConstantsCore.ObjectTypes.MediaType) { Name = "blah" };
+                var container = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah" };
                 containerRepository.Save(container);
 
 
@@ -151,7 +151,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var containerRepository = CreateContainerRepository(provider);
                 var repository = CreateRepository(provider);
 
-                var container = new EntityContainer(ConstantsCore.ObjectTypes.MediaType) { Name = "blah" };
+                var container = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah" };
                 containerRepository.Save(container);
 
 
@@ -318,7 +318,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 int count =
                     scope.Database.ExecuteScalar<int>(
                         "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
-                        new { NodeObjectType = ConstantsCore.ObjectTypes.MediaType });
+                        new { NodeObjectType = Constants.ObjectTypes.MediaType });
 
                 // Assert
                 Assert.That(mediaTypes.Any(), Is.True);
@@ -344,7 +344,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 int count =
                     scope.Database.ExecuteScalar<int>(
                         "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
-                        new { NodeObjectType = ConstantsCore.ObjectTypes.MediaType });
+                        new { NodeObjectType = Constants.ObjectTypes.MediaType });
 
                 // Assert
                 Assert.That(mediaTypes.Any(), Is.True);

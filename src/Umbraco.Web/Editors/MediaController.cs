@@ -24,7 +24,6 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.WebApi.Filters;
-using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Persistence.Querying;
 using Notification = Umbraco.Web.Models.ContentEditing.Notification;
 using Umbraco.Core.Persistence;
@@ -36,6 +35,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Editors.Binders;
 using Umbraco.Web.Editors.Filters;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
@@ -44,7 +44,7 @@ namespace Umbraco.Web.Editors
     /// access to ALL of the methods on this controller will need access to the media application.
     /// </remarks>
     [PluginController("UmbracoApi")]
-    [UmbracoApplicationAuthorize(ConstantsCore.Applications.Media)]
+    [UmbracoApplicationAuthorize(Constants.Applications.Media)]
     [MediaControllerControllerConfiguration]
     public class MediaController : ContentControllerBase
     {
@@ -82,7 +82,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var emptyContent = Services.MediaService.CreateMedia("", parentId, contentType.Alias, Security.GetUserId().ResultOr(ConstantsCore.Security.SuperUserId));
+            var emptyContent = Services.MediaService.CreateMedia("", parentId, contentType.Alias, Security.GetUserId().ResultOr(Constants.Security.SuperUserId));
             var mapped = Mapper.Map<MediaItemDisplay>(emptyContent);
 
             //remove the listview app if it exists
@@ -98,18 +98,18 @@ namespace Umbraco.Web.Editors
         public MediaItemDisplay GetRecycleBin()
         {
             var apps = new List<ContentApp>();
-            apps.Add(ListViewContentAppFactory.CreateContentApp(Services.DataTypeService, _propertyEditors, "recycleBin", "media", Core.ConstantsCore.DataTypes.DefaultMediaListView));
+            apps.Add(ListViewContentAppFactory.CreateContentApp(Services.DataTypeService, _propertyEditors, "recycleBin", "media", Core.Constants.DataTypes.DefaultMediaListView));
             apps[0].Active = true;
             var display = new MediaItemDisplay
             {
-                Id = ConstantsCore.System.RecycleBinMedia,
+                Id = Constants.System.RecycleBinMedia,
                 Alias = "recycleBin",
                 ParentId = -1,
                 Name = Services.TextService.Localize("general/recycleBin"),
                 ContentTypeAlias = "recycleBin",
                 CreateDate = DateTime.Now,
                 IsContainer = true,
-                Path = "-1," + ConstantsCore.System.RecycleBinMedia,
+                Path = "-1," + Constants.System.RecycleBinMedia,
                 ContentApps = apps
             };
 
@@ -255,7 +255,7 @@ namespace Umbraco.Web.Editors
         {
             //if a request is made for the root node data but the user's start node is not the default, then
             // we need to return their start nodes
-            if (id == ConstantsCore.System.Root && UserStartNodes.Length > 0 && UserStartNodes.Contains(ConstantsCore.System.Root) == false)
+            if (id == Constants.System.Root && UserStartNodes.Length > 0 && UserStartNodes.Contains(Constants.System.Root) == false)
             {
                 if (pageNumber > 0)
                     return new PagedResult<ContentItemBasic<ContentPropertyBasic>>(0, 0, 0);
@@ -392,7 +392,7 @@ namespace Umbraco.Web.Editors
             //if the current item is in the recycle bin
             if (foundMedia.Trashed == false)
             {
-                var moveResult = Services.MediaService.MoveToRecycleBin(foundMedia, Security.GetUserId().ResultOr(ConstantsCore.Security.SuperUserId));
+                var moveResult = Services.MediaService.MoveToRecycleBin(foundMedia, Security.GetUserId().ResultOr(Constants.Security.SuperUserId));
                 if (moveResult == false)
                 {
                     //returning an object of INotificationModel will ensure that any pending
@@ -402,7 +402,7 @@ namespace Umbraco.Web.Editors
             }
             else
             {
-                var deleteResult = Services.MediaService.Delete(foundMedia, Security.GetUserId().ResultOr(ConstantsCore.Security.SuperUserId));
+                var deleteResult = Services.MediaService.Delete(foundMedia, Security.GetUserId().ResultOr(Constants.Security.SuperUserId));
                 if (deleteResult == false)
                 {
                     //returning an object of INotificationModel will ensure that any pending
@@ -426,7 +426,7 @@ namespace Umbraco.Web.Editors
             var destinationParentID = move.ParentId;
             var sourceParentID = toMove.ParentId;
 
-            var moveResult = Services.MediaService.Move(toMove, move.ParentId, Security.GetUserId().ResultOr(ConstantsCore.Security.SuperUserId));
+            var moveResult = Services.MediaService.Move(toMove, move.ParentId, Security.GetUserId().ResultOr(Constants.Security.SuperUserId));
 
             if (sourceParentID == destinationParentID)
             {
@@ -502,7 +502,7 @@ namespace Umbraco.Web.Editors
             }
 
             //save the item
-            var saveStatus = Services.MediaService.Save(contentItem.PersistedContent, Security.GetUserId().ResultOr(ConstantsCore.Security.SuperUserId));
+            var saveStatus = Services.MediaService.Save(contentItem.PersistedContent, Security.GetUserId().ResultOr(Constants.Security.SuperUserId));
 
             //return the updated model
             var display = Mapper.Map<MediaItemDisplay>(contentItem.PersistedContent);
@@ -548,7 +548,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public HttpResponseMessage EmptyRecycleBin()
         {
-            Services.MediaService.EmptyRecycleBin(Security.GetUserId().ResultOr(ConstantsCore.Security.SuperUserId));
+            Services.MediaService.EmptyRecycleBin(Security.GetUserId().ResultOr(Constants.Security.SuperUserId));
 
             return Request.CreateNotificationSuccessResponse(Services.TextService.Localize("defaultdialogs/recycleBinIsEmpty"));
         }
@@ -922,7 +922,7 @@ namespace Umbraco.Web.Editors
             if (mediaService == null) throw new ArgumentNullException("mediaService");
             if (entityService == null) throw new ArgumentNullException("entityService");
 
-            if (media == null && nodeId != ConstantsCore.System.Root && nodeId != ConstantsCore.System.RecycleBinMedia)
+            if (media == null && nodeId != Constants.System.Root && nodeId != Constants.System.RecycleBinMedia)
             {
                 media = mediaService.GetById(nodeId);
                 //put the content item into storage so it can be retrieved
@@ -930,14 +930,14 @@ namespace Umbraco.Web.Editors
                 storage[typeof(IMedia).ToString()] = media;
             }
 
-            if (media == null && nodeId != ConstantsCore.System.Root && nodeId != ConstantsCore.System.RecycleBinMedia)
+            if (media == null && nodeId != Constants.System.Root && nodeId != Constants.System.RecycleBinMedia)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var hasPathAccess = (nodeId == ConstantsCore.System.Root)
+            var hasPathAccess = (nodeId == Constants.System.Root)
                 ? user.HasMediaRootAccess(entityService)
-                : (nodeId == ConstantsCore.System.RecycleBinMedia)
+                : (nodeId == Constants.System.RecycleBinMedia)
                     ? user.HasMediaBinAccess(entityService)
                     : user.HasPathAccess(media, entityService);
 

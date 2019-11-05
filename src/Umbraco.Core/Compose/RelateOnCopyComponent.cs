@@ -26,8 +26,8 @@ namespace Umbraco.Core.Compose
 
             if (relationType == null)
             {
-                relationType = new RelationType(ConstantsCore.ObjectTypes.Document,
-                    ConstantsCore.ObjectTypes.Document,
+                relationType = new RelationType(Constants.ObjectTypes.Document,
+                    Constants.ObjectTypes.Document,
                     Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias,
                     Constants.Conventions.RelationTypes.RelateDocumentOnCopyName) { IsBidirectional = true };
 

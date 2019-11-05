@@ -166,7 +166,7 @@ namespace Umbraco.Web.Security
         public static bool RenewUmbracoAuthTicket(this HttpContextBase http)
         {
             if (http == null) throw new ArgumentNullException("http");
-            http.Items[ConstantsCore.Security.ForceReAuthFlag] = true;
+            http.Items[Constants.Security.ForceReAuthFlag] = true;
             return true;
         }
 
@@ -178,7 +178,7 @@ namespace Umbraco.Web.Security
         internal static bool RenewUmbracoAuthTicket(this HttpContext http)
         {
             if (http == null) throw new ArgumentNullException("http");
-            http.Items[ConstantsCore.Security.ForceReAuthFlag] = true;
+            http.Items[Constants.Security.ForceReAuthFlag] = true;
             return true;
         }
 
@@ -244,7 +244,7 @@ namespace Umbraco.Web.Security
                 var claimsIdentity = http.User.Identity as ClaimsIdentity;
                 if (claimsIdentity != null)
                 {
-                    var sessionId = claimsIdentity.FindFirstValue(ConstantsCore.Security.SessionIdClaimType);
+                    var sessionId = claimsIdentity.FindFirstValue(Constants.Security.SessionIdClaimType);
                     Guid guidSession;
                     if (sessionId.IsNullOrWhiteSpace() == false && Guid.TryParse(sessionId, out guidSession))
                     {
@@ -255,7 +255,7 @@ namespace Umbraco.Web.Security
 
             if (http == null) throw new ArgumentNullException("http");
             // clear the preview cookie and external login
-            var cookies = new[] { cookieName, ConstantsCore.Web.PreviewCookieName, ConstantsCore.Security.BackOfficeExternalCookieName };
+            var cookies = new[] { cookieName, Constants.Web.PreviewCookieName, Constants.Security.BackOfficeExternalCookieName };
             foreach (var c in cookies)
             {
                 // remove from the request
@@ -296,8 +296,8 @@ namespace Umbraco.Web.Security
             catch (Exception)
             {
                 owinCtx.Authentication.SignOut(
-                    ConstantsCore.Security.BackOfficeAuthenticationType,
-                    ConstantsCore.Security.BackOfficeExternalAuthenticationType);
+                    Constants.Security.BackOfficeAuthenticationType,
+                    Constants.Security.BackOfficeExternalAuthenticationType);
                 return null;
             }
         }

@@ -102,11 +102,11 @@ namespace Umbraco.Core
             if (entity == null) throw new ArgumentNullException("entity");
 
             string entityType;
-            if (entity.ContainedObjectType == ConstantsCore.ObjectTypes.DataType)
+            if (entity.ContainedObjectType == Constants.ObjectTypes.DataType)
                 entityType = Constants.UdiEntityType.DataTypeContainer;
-            else if (entity.ContainedObjectType == ConstantsCore.ObjectTypes.DocumentType)
+            else if (entity.ContainedObjectType == Constants.ObjectTypes.DocumentType)
                 entityType = Constants.UdiEntityType.DocumentTypeContainer;
-            else if (entity.ContainedObjectType == ConstantsCore.ObjectTypes.MediaType)
+            else if (entity.ContainedObjectType == Constants.ObjectTypes.MediaType)
                 entityType = Constants.UdiEntityType.MediaTypeContainer;
             else
                 throw new NotSupportedException(string.Format("Contained object type {0} is not supported.", entity.ContainedObjectType));

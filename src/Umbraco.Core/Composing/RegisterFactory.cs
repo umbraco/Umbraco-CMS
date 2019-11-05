@@ -25,7 +25,7 @@ namespace Umbraco.Core.Composing
         {
             Type type;
 
-            var configuredTypeName = ConfigurationManager.AppSettings[ConstantsCore.AppSettings.RegisterType];
+            var configuredTypeName = ConfigurationManager.AppSettings[Constants.AppSettings.RegisterType];
             if (configuredTypeName.IsNullOrWhiteSpace())
             {
                 // try to get the web LightInject container type,

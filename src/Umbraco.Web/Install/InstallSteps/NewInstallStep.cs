@@ -54,16 +54,16 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public override Task<InstallSetupResult> ExecuteAsync(UserModel user)
         {
-            var admin = _userService.GetUserById(ConstantsCore.Security.SuperUserId);
+            var admin = _userService.GetUserById(Constants.Security.SuperUserId);
             if (admin == null)
             {
                 throw new InvalidOperationException("Could not find the super user!");
             }
 
-            var membershipUser = CurrentProvider.GetUser(ConstantsCore.Security.SuperUserId, true);
+            var membershipUser = CurrentProvider.GetUser(Constants.Security.SuperUserId, true);
             if (membershipUser == null)
             {
-                throw new InvalidOperationException($"No user found in membership provider with id of {ConstantsCore.Security.SuperUserId}.");
+                throw new InvalidOperationException($"No user found in membership provider with id of {Constants.Security.SuperUserId}.");
             }
 
             try
@@ -135,7 +135,7 @@ namespace Umbraco.Web.Install.InstallSteps
         public override bool RequiresExecution(UserModel model)
         {
             //now we have to check if this is really a new install, the db might be configured and might contain data
-            var databaseSettings = ConfigurationManager.ConnectionStrings[ConstantsCore.System.UmbracoConnectionName];
+            var databaseSettings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
 
             //if there's already a version then there should def be a user but in some cases someone may have
             // left a version number in there but cleared out their db conn string, in that case, it's really a new install.

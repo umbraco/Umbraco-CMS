@@ -18,14 +18,14 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Root
         /// </summary>
-        [UmbracoObjectType(ConstantsCore.ObjectTypes.Strings.SystemRoot)]
+        [UmbracoObjectType(Constants.ObjectTypes.Strings.SystemRoot)]
         [FriendlyName("Root")]
         ROOT,
 
         /// <summary>
         /// Document
         /// </summary>
-        [UmbracoObjectType(ConstantsCore.ObjectTypes.Strings.Document, typeof(IContent))]
+        [UmbracoObjectType(Constants.ObjectTypes.Strings.Document, typeof(IContent))]
         [FriendlyName("Document")]
         [UmbracoUdiType(Constants.UdiEntityType.Document)]
         Document,
@@ -33,7 +33,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Media
         /// </summary>
-        [UmbracoObjectType(ConstantsCore.ObjectTypes.Strings.Media, typeof(IMedia))]
+        [UmbracoObjectType(Constants.ObjectTypes.Strings.Media, typeof(IMedia))]
         [FriendlyName("Media")]
         [UmbracoUdiType(Constants.UdiEntityType.Media)]
         Media,
@@ -41,7 +41,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Member Type
         /// </summary>
-        [UmbracoObjectType(ConstantsCore.ObjectTypes.Strings.MemberType, typeof(IMemberType))]
+        [UmbracoObjectType(Constants.ObjectTypes.Strings.MemberType, typeof(IMemberType))]
         [FriendlyName("Member Type")]
         [UmbracoUdiType(Constants.UdiEntityType.MemberType)]
         MemberType,
@@ -49,7 +49,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Template
         /// </summary>
-        [UmbracoObjectType(ConstantsCore.ObjectTypes.Strings.Template, typeof(ITemplate))]
+        [UmbracoObjectType(Constants.ObjectTypes.Strings.Template, typeof(ITemplate))]
         [FriendlyName("Template")]
         [UmbracoUdiType(Constants.UdiEntityType.Template)]
         Template,
@@ -57,7 +57,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Member Group
         /// </summary>
-        [UmbracoObjectType(ConstantsCore.ObjectTypes.Strings.MemberGroup)]
+        [UmbracoObjectType(Constants.ObjectTypes.Strings.MemberGroup)]
         [FriendlyName("Member Group")]
         [UmbracoUdiType(Constants.UdiEntityType.MemberGroup)]
         MemberGroup,
@@ -65,7 +65,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// "Media Type
         /// </summary>
-        [UmbracoObjectType(ConstantsCore.ObjectTypes.Strings.MediaType, typeof(IMediaType))]
+        [UmbracoObjectType(Constants.ObjectTypes.Strings.MediaType, typeof(IMediaType))]
         [FriendlyName("Media Type")]
         [UmbracoUdiType(Constants.UdiEntityType.MediaType)]
         MediaType,
@@ -73,7 +73,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Document Type
         /// </summary>
-        [UmbracoObjectType(ConstantsCore.ObjectTypes.Strings.DocumentType, typeof(IContentType))]
+        [UmbracoObjectType(Constants.ObjectTypes.Strings.DocumentType, typeof(IContentType))]
         [FriendlyName("Document Type")]
         [UmbracoUdiType(Constants.UdiEntityType.DocumentType)]
         DocumentType,
@@ -81,14 +81,14 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Recycle Bin
         /// </summary>
-        [UmbracoObjectType(ConstantsCore.ObjectTypes.Strings.ContentRecycleBin)]
+        [UmbracoObjectType(Constants.ObjectTypes.Strings.ContentRecycleBin)]
         [FriendlyName("Recycle Bin")]
         RecycleBin,
 
         /// <summary>
         /// Stylesheet
         /// </summary>
-        [UmbracoObjectType(ConstantsCore.ObjectTypes.Strings.Stylesheet)]
+        [UmbracoObjectType(Constants.ObjectTypes.Strings.Stylesheet)]
         [FriendlyName("Stylesheet")]
         [UmbracoUdiType(Constants.UdiEntityType.Stylesheet)]
         Stylesheet,
@@ -96,7 +96,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Member
         /// </summary>
-        [UmbracoObjectType(ConstantsCore.ObjectTypes.Strings.Member, typeof(IMember))]
+        [UmbracoObjectType(Constants.ObjectTypes.Strings.Member, typeof(IMember))]
         [FriendlyName("Member")]
         [UmbracoUdiType(Constants.UdiEntityType.Member)]
         Member,
@@ -104,7 +104,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Data Type
         /// </summary>
-        [UmbracoObjectType(ConstantsCore.ObjectTypes.Strings.DataType, typeof(IDataType))]
+        [UmbracoObjectType(Constants.ObjectTypes.Strings.DataType, typeof(IDataType))]
         [FriendlyName("Data Type")]
         [UmbracoUdiType(Constants.UdiEntityType.DataType)]
         DataType,
@@ -112,7 +112,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Document type container
         /// </summary>
-        [UmbracoObjectType(ConstantsCore.ObjectTypes.Strings.DocumentTypeContainer)]
+        [UmbracoObjectType(Constants.ObjectTypes.Strings.DocumentTypeContainer)]
         [FriendlyName("Document Type Container")]
         [UmbracoUdiType(Constants.UdiEntityType.DocumentTypeContainer)]
         DocumentTypeContainer,
@@ -120,7 +120,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Media type container
         /// </summary>
-        [UmbracoObjectType(ConstantsCore.ObjectTypes.Strings.MediaTypeContainer)]
+        [UmbracoObjectType(Constants.ObjectTypes.Strings.MediaTypeContainer)]
         [FriendlyName("Media Type Container")]
         [UmbracoUdiType(Constants.UdiEntityType.MediaTypeContainer)]
         MediaTypeContainer,
@@ -128,7 +128,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Media type container
         /// </summary>
-        [UmbracoObjectType(ConstantsCore.ObjectTypes.Strings.DataTypeContainer)]
+        [UmbracoObjectType(Constants.ObjectTypes.Strings.DataTypeContainer)]
         [FriendlyName("Data Type Container")]
         [UmbracoUdiType(Constants.UdiEntityType.DataTypeContainer)]
         DataTypeContainer,
@@ -136,7 +136,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Relation type
         /// </summary>
-        [UmbracoObjectType(ConstantsCore.ObjectTypes.Strings.RelationType)]
+        [UmbracoObjectType(Constants.ObjectTypes.Strings.RelationType)]
         [FriendlyName("Relation Type")]
         [UmbracoUdiType(Constants.UdiEntityType.RelationType)]
         RelationType,
@@ -144,35 +144,35 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Forms Form
         /// </summary>
-        [UmbracoObjectType(ConstantsCore.ObjectTypes.Strings.FormsForm)]
+        [UmbracoObjectType(Constants.ObjectTypes.Strings.FormsForm)]
         [FriendlyName("Form")]
         FormsForm,
 
         /// <summary>
         /// Forms PreValue
         /// </summary>
-        [UmbracoObjectType(ConstantsCore.ObjectTypes.Strings.FormsPreValue)]
+        [UmbracoObjectType(Constants.ObjectTypes.Strings.FormsPreValue)]
         [FriendlyName("PreValue")]
         FormsPreValue,
 
         /// <summary>
         /// Forms DataSource
         /// </summary>
-        [UmbracoObjectType(ConstantsCore.ObjectTypes.Strings.FormsDataSource)]
+        [UmbracoObjectType(Constants.ObjectTypes.Strings.FormsDataSource)]
         [FriendlyName("DataSource")]
         FormsDataSource,
 
         /// <summary>
         /// Language
         /// </summary>
-        [UmbracoObjectType(ConstantsCore.ObjectTypes.Strings.Language)]
+        [UmbracoObjectType(Constants.ObjectTypes.Strings.Language)]
         [FriendlyName("Language")]
         Language,
 
         /// <summary>
         /// Document Blueprint
         /// </summary>
-        [UmbracoObjectType(ConstantsCore.ObjectTypes.Strings.DocumentBlueprint, typeof(IContent))]
+        [UmbracoObjectType(Constants.ObjectTypes.Strings.DocumentBlueprint, typeof(IContent))]
         [FriendlyName("DocumentBlueprint")]
         [UmbracoUdiType(Constants.UdiEntityType.DocumentBlueprint)]
         DocumentBlueprint,
@@ -180,7 +180,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Reserved Identifier
         /// </summary>
-        [UmbracoObjectType(ConstantsCore.ObjectTypes.Strings.IdReservation)]
+        [UmbracoObjectType(Constants.ObjectTypes.Strings.IdReservation)]
         [FriendlyName("Identifier Reservation")]
         IdReservation
 

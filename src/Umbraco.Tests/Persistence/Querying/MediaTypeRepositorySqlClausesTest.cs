@@ -15,7 +15,7 @@ namespace Umbraco.Tests.Persistence.Querying
         [Test]
         public void Can_Verify_Base_Clause()
         {
-            var NodeObjectTypeId = ConstantsCore.ObjectTypes.MediaType;
+            var NodeObjectTypeId = Constants.ObjectTypes.MediaType;
 
             var expected = new Sql();
             expected.Select("*")

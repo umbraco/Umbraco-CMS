@@ -24,10 +24,10 @@ namespace Umbraco.Web.Trees
     //We will not allow the tree to render unless the user has access to any of the sections that the tree gets rendered
     // this is not ideal but until we change permissions to be tree based (not section) there's not much else we can do here.
     [UmbracoApplicationAuthorize(
-        ConstantsCore.Applications.Content,
-        ConstantsCore.Applications.Media,
-        ConstantsCore.Applications.Members)]
-    [Tree(ConstantsCore.Applications.Members, ConstantsCore.Trees.Members, SortOrder = 0)]
+        Constants.Applications.Content,
+        Constants.Applications.Media,
+        Constants.Applications.Members)]
+    [Tree(Constants.Applications.Members, Constants.Trees.Members, SortOrder = 0)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
     [SearchableTree("searchResultFormatter", "configureMemberResult")]
@@ -80,10 +80,10 @@ namespace Umbraco.Web.Trees
                     "-1",
                     queryStrings,
                     member.Name,
-                    ConstantsCore.Icons.Member,
+                    Constants.Icons.Member,
                     false,
                     "",
-                    Udi.Create(ObjectTypes.GetUdiType(ConstantsCore.ObjectTypes.Member), member.Key));
+                    Udi.Create(ObjectTypes.GetUdiType(Constants.ObjectTypes.Member), member.Key));
 
                 node.AdditionalData.Add("contentType", member.ContentTypeAlias);
                 node.AdditionalData.Add("isContainer", true);
@@ -110,7 +110,7 @@ namespace Umbraco.Web.Trees
                     "-1",
                     queryStrings,
                     member.UserName,
-                    ConstantsCore.Icons.Member,
+                    Constants.Icons.Member,
                     false);
 
                 return node;
@@ -121,17 +121,17 @@ namespace Umbraco.Web.Trees
         {
             var nodes = new TreeNodeCollection();
 
-            if (id == ConstantsCore.System.RootString)
+            if (id == Constants.System.RootString)
             {
                 nodes.Add(
-                        CreateTreeNode(Constants.Conventions.MemberTypes.AllMembersListId, id, queryStrings, Services.TextService.Localize("member/allMembers"), ConstantsCore.Icons.MemberType, true,
+                        CreateTreeNode(Constants.Conventions.MemberTypes.AllMembersListId, id, queryStrings, Services.TextService.Localize("member/allMembers"), Constants.Icons.MemberType, true,
                             queryStrings.GetRequiredValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/list/" + Constants.Conventions.MemberTypes.AllMembersListId));
 
                 if (_isUmbracoProvider)
                 {
                     nodes.AddRange(Services.MemberTypeService.GetAll()
                         .Select(memberType =>
-                            CreateTreeNode(memberType.Alias, id, queryStrings, memberType.Name, memberType.Icon.IfNullOrWhiteSpace(ConstantsCore.Icons.Member), true,
+                            CreateTreeNode(memberType.Alias, id, queryStrings, memberType.Name, memberType.Icon.IfNullOrWhiteSpace(Constants.Icons.Member), true,
                                 queryStrings.GetRequiredValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/list/" + memberType.Alias)));
                 }
             }
@@ -148,7 +148,7 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
 
-            if (id == ConstantsCore.System.RootString)
+            if (id == Constants.System.RootString)
             {
                 // root actions
                 if (_provider.IsUmbracoMembershipProvider())

@@ -79,7 +79,7 @@ namespace Umbraco.Web.Editors
                 }
 
                 //if the current user has access to reset/manually change the password
-                if (currentUser.HasSectionAccess(Umbraco.Core.ConstantsCore.Applications.Users) == false)
+                if (currentUser.HasSectionAccess(Umbraco.Core.Constants.Applications.Users) == false)
                 {
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("The current user is not authorized", new[] { "resetPassword" }) });
                 }

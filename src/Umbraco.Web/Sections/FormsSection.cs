@@ -8,7 +8,7 @@ namespace Umbraco.Web.Sections
     /// </summary>
     public class FormsSection : ISection
     {
-        public string Alias => ConstantsCore.Applications.Forms;
+        public string Alias => Constants.Applications.Forms;
         public string Name => "Forms";
     }
 }

@@ -52,8 +52,8 @@ namespace Umbraco.Web.Search
         private IIndex CreateInternalIndex()
         {
             var index = new UmbracoContentIndex(
-                ConstantsCore.UmbracoIndexes.InternalIndexName,
-                CreateFileSystemLuceneDirectory(ConstantsCore.UmbracoIndexes.InternalIndexPath),
+                Constants.UmbracoIndexes.InternalIndexName,
+                CreateFileSystemLuceneDirectory(Constants.UmbracoIndexes.InternalIndexPath),
                 new UmbracoFieldDefinitionCollection(),
                 new CultureInvariantWhitespaceAnalyzer(),
                 ProfilingLogger,
@@ -66,8 +66,8 @@ namespace Umbraco.Web.Search
         private IIndex CreateExternalIndex()
         {
             var index = new UmbracoContentIndex(
-                ConstantsCore.UmbracoIndexes.ExternalIndexName,
-                CreateFileSystemLuceneDirectory(ConstantsCore.UmbracoIndexes.ExternalIndexPath),
+                Constants.UmbracoIndexes.ExternalIndexName,
+                CreateFileSystemLuceneDirectory(Constants.UmbracoIndexes.ExternalIndexPath),
                 new UmbracoFieldDefinitionCollection(),
                 new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_30),
                 ProfilingLogger,
@@ -79,9 +79,9 @@ namespace Umbraco.Web.Search
         private IIndex CreateMemberIndex()
         {
             var index = new UmbracoMemberIndex(
-                ConstantsCore.UmbracoIndexes.MembersIndexName,
+                Constants.UmbracoIndexes.MembersIndexName,
                 new UmbracoFieldDefinitionCollection(),
-                CreateFileSystemLuceneDirectory(ConstantsCore.UmbracoIndexes.MembersIndexPath),
+                CreateFileSystemLuceneDirectory(Constants.UmbracoIndexes.MembersIndexPath),
                 new CultureInvariantWhitespaceAnalyzer(),
                 ProfilingLogger,
                 GetMemberValueSetValidator()

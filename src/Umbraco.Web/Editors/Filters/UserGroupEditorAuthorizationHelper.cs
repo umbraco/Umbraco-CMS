@@ -59,7 +59,7 @@ namespace Umbraco.Web.Editors.Filters
             {
                 // We're dealing with new groups,
                 // so authorization should be given to any user with access to Users section
-                if (currentUser.AllowedSections.Contains(ConstantsCore.Applications.Users))
+                if (currentUser.AllowedSections.Contains(Constants.Applications.Users))
                     return Attempt<string>.Succeed();
             }
 

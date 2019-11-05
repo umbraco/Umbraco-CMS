@@ -14,24 +14,24 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Search;
-using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
 {
     //We will not allow the tree to render unless the user has access to any of the sections that the tree gets rendered
     // this is not ideal but until we change permissions to be tree based (not section) there's not much else we can do here.
     [UmbracoApplicationAuthorize(
-        ConstantsCore.Applications.Content,
-        ConstantsCore.Applications.Media,
-        ConstantsCore.Applications.Settings,
-        ConstantsCore.Applications.Packages,
-        ConstantsCore.Applications.Members)]
-    [Tree(ConstantsCore.Applications.Media, ConstantsCore.Trees.Media)]
+        Constants.Applications.Content,
+        Constants.Applications.Media,
+        Constants.Applications.Settings,
+        Constants.Applications.Packages,
+        Constants.Applications.Members)]
+    [Tree(Constants.Applications.Media, Constants.Trees.Media)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
     [SearchableTree("searchResultFormatter", "configureMediaResult", 20)]
@@ -44,7 +44,7 @@ namespace Umbraco.Web.Trees
             _treeSearcher = treeSearcher;
         }
 
-        protected override int RecycleBinId => ConstantsCore.System.RecycleBinMedia;
+        protected override int RecycleBinId => Constants.System.RecycleBinMedia;
 
         protected override bool RecycleBinSmells => Services.MediaService.RecycleBinSmells();
 
@@ -63,7 +63,7 @@ namespace Umbraco.Web.Trees
         {
             var node = CreateTreeNode(
                 entity,
-                ConstantsCore.ObjectTypes.Media,
+                Constants.ObjectTypes.Media,
                 parentId,
                 queryStrings,
                 entity.HasChildren);
@@ -90,10 +90,10 @@ namespace Umbraco.Web.Trees
             //set the default
             menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
-            if (id == ConstantsCore.System.RootString)
+            if (id == Constants.System.RootString)
             {
                 // if the user's start node is not the root then the only menu item to display is refresh
-                if (UserStartNodes.Contains(ConstantsCore.System.Root) == false)
+                if (UserStartNodes.Contains(Constants.System.Root) == false)
                 {
                     menu.Items.Add(new RefreshNode(Services.TextService, true));
                     return menu;

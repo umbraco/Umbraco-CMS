@@ -183,7 +183,7 @@ namespace Umbraco.Web.Models.Mapping
             target.DefaultPermissions = MapUserGroupDefaultPermissions(source);
 
             if (target.Icon.IsNullOrWhiteSpace())
-                target.Icon = ConstantsCore.Icons.UserGroup;
+                target.Icon = Constants.Icons.UserGroup;
         }
 
         // Umbraco.Code.MapAll -Trashed -Alias -AssignedPermissions
@@ -197,8 +197,8 @@ namespace Umbraco.Web.Models.Mapping
             target.Path = source.Path;
             target.Udi = Udi.Create(ObjectTypes.GetUdiType(source.NodeObjectType), source.Key);
 
-            if (source.NodeObjectType == ConstantsCore.ObjectTypes.Member && target.Icon.IsNullOrWhiteSpace())
-                target.Icon = ConstantsCore.Icons.Member;
+            if (source.NodeObjectType == Constants.ObjectTypes.Member && target.Icon.IsNullOrWhiteSpace())
+                target.Icon = Constants.Icons.Member;
         }
 
         // Umbraco.Code.MapAll -ContentStartNode -MediaStartNode -Sections -Notifications -Udi
@@ -355,7 +355,7 @@ namespace Umbraco.Web.Models.Mapping
                 target.ContentStartNode = CreateRootNode(_textService.Localize("content/contentRoot"));
 
             if (target.Icon.IsNullOrWhiteSpace())
-                target.Icon = ConstantsCore.Icons.UserGroup;
+                target.Icon = Constants.Icons.UserGroup;
         }
 
         private IDictionary<string, IEnumerable<Permission>> MapUserGroupDefaultPermissions(IUserGroup source)

@@ -67,7 +67,7 @@ namespace Umbraco.Web.Services
 
         private bool CheckUserAccessByRules(IUser user, ISectionService sectionService, IEnumerable<IAccessRule> rules)
         {
-            if (user.Id == ConstantsCore.Security.SuperUserId)
+            if (user.Id == Constants.Security.SuperUserId)
                 return true;
 
             var (denyRules, grantRules, grantBySectionRules) = GroupRules(rules);

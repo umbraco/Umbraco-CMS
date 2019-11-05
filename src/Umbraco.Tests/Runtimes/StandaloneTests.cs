@@ -52,7 +52,7 @@ namespace Umbraco.Tests.Runtimes
 
             // settings
             // reset the current version to 0.0.0, clear connection strings
-            ConfigurationManager.AppSettings[ConstantsCore.AppSettings.ConfigurationStatus] = "";
+            ConfigurationManager.AppSettings[Constants.AppSettings.ConfigurationStatus] = "";
             // FIXME: we need a better management of settings here (and, true config files?)
 
             // create the very basic and essential things we need
@@ -141,7 +141,7 @@ namespace Umbraco.Tests.Runtimes
                 }
 
                 //var databaseBuilder = factory.GetInstance<DatabaseBuilder>();
-                //databaseFactory.Configure(DatabaseBuilder.EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe);
+                //databaseFactory.Configure(DatabaseBuilder.EmbeddedDatabaseConnectionString, ConstantsCore.DbProviderNames.SqlCe);
                 //databaseBuilder.CreateDatabaseSchemaAndData();
 
                 if (!databaseFactory.Configured)

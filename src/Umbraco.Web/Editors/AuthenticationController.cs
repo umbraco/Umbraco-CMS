@@ -96,8 +96,8 @@ namespace Umbraco.Web.Editors
             }
 
             Request.TryGetOwinContext().Result.Authentication.SignOut(
-                Core.ConstantsCore.Security.BackOfficeAuthenticationType,
-                Core.ConstantsCore.Security.BackOfficeExternalAuthenticationType);
+                Core.Constants.Security.BackOfficeAuthenticationType,
+                Core.Constants.Security.BackOfficeExternalAuthenticationType);
 
             await SignInManager.SignInAsync(identityUser, false, false);
 
@@ -468,8 +468,8 @@ namespace Umbraco.Web.Editors
             var owinContext = Request.TryGetOwinContext().Result;
 
             owinContext.Authentication.SignOut(
-                Core.ConstantsCore.Security.BackOfficeAuthenticationType,
-                Core.ConstantsCore.Security.BackOfficeExternalAuthenticationType);
+                Core.Constants.Security.BackOfficeAuthenticationType,
+                Core.Constants.Security.BackOfficeExternalAuthenticationType);
 
             Logger.Info<AuthenticationController>("User {UserName} from IP address {RemoteIpAddress} has logged out", User.Identity == null ? "UNKNOWN" : User.Identity.Name, owinContext.Request.RemoteIpAddress);
 

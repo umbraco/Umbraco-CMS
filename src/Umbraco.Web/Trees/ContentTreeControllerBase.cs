@@ -81,7 +81,7 @@ namespace Umbraco.Web.Trees
         {
             var node = base.CreateRootNode(queryStrings);
 
-            if (IsDialog(queryStrings) && UserStartNodes.Contains(ConstantsCore.System.Root) == false && IgnoreUserStartNodes(queryStrings) == false)
+            if (IsDialog(queryStrings) && UserStartNodes.Contains(Constants.System.Root) == false && IgnoreUserStartNodes(queryStrings) == false)
             {
                 node.AdditionalData["noAccess"] = true;
             }
@@ -125,11 +125,11 @@ namespace Umbraco.Web.Trees
         {
             switch (RecycleBinId)
             {
-                case ConstantsCore.System.RecycleBinMedia:
+                case Constants.System.RecycleBinMedia:
                     startNodeIds = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
                     startNodePaths = Security.CurrentUser.GetMediaStartNodePaths(Services.EntityService);
                     break;
-                case ConstantsCore.System.RecycleBinContent:
+                case Constants.System.RecycleBinContent:
                     startNodeIds = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService);
                     startNodePaths = Security.CurrentUser.GetContentStartNodePaths(Services.EntityService);
                     break;
@@ -157,8 +157,8 @@ namespace Umbraco.Web.Trees
         {
             var nodes = new TreeNodeCollection();
 
-            var rootIdString = ConstantsCore.System.RootString;
-            var hasAccessToRoot = UserStartNodes.Contains(ConstantsCore.System.Root);
+            var rootIdString = Constants.System.RootString;
+            var hasAccessToRoot = UserStartNodes.Contains(Constants.System.Root);
 
             var startNodeId = queryStrings.HasKey(TreeQueryStringParameters.StartNodeId)
                 ? queryStrings.GetValue<string>(TreeQueryStringParameters.StartNodeId)
@@ -245,7 +245,7 @@ namespace Umbraco.Web.Trees
 
             // if a request is made for the root node but user has no access to
             // root node, return start nodes instead
-            if (!ignoreUserStartNodes && entityId == ConstantsCore.System.Root && UserStartNodes.Contains(ConstantsCore.System.Root) == false)
+            if (!ignoreUserStartNodes && entityId == Constants.System.Root && UserStartNodes.Contains(Constants.System.Root) == false)
             {
                 result = UserStartNodes.Length > 0
                     ? Services.EntityService.GetAll(UmbracoObjectType, UserStartNodes).ToArray()
@@ -280,7 +280,7 @@ namespace Umbraco.Web.Trees
         protected bool HasPathAccess(IUmbracoEntity entity, FormDataCollection queryStrings)
         {
             if (entity == null) return false;
-            return RecycleBinId == ConstantsCore.System.RecycleBinContent
+            return RecycleBinId == Constants.System.RecycleBinContent
                 ? Security.CurrentUser.HasContentPathAccess(entity, Services.EntityService)
                 : Security.CurrentUser.HasMediaPathAccess(entity, Services.EntityService);
         }
@@ -297,7 +297,7 @@ namespace Umbraco.Web.Trees
         protected sealed override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
             //check if we're rendering the root
-            if (id == ConstantsCore.System.RootString && UserStartNodes.Contains(ConstantsCore.System.Root))
+            if (id == Constants.System.RootString && UserStartNodes.Contains(Constants.System.Root))
             {
                 var altStartId = string.Empty;
 
@@ -305,7 +305,7 @@ namespace Umbraco.Web.Trees
                     altStartId = queryStrings.GetValue<string>(TreeQueryStringParameters.StartNodeId);
 
                 //check if a request has been made to render from a specific start node
-                if (string.IsNullOrEmpty(altStartId) == false && altStartId != "undefined" && altStartId != ConstantsCore.System.RootString)
+                if (string.IsNullOrEmpty(altStartId) == false && altStartId != "undefined" && altStartId != Constants.System.RootString)
                 {
                     id = altStartId;
                 }
@@ -313,7 +313,7 @@ namespace Umbraco.Web.Trees
                 var nodes = GetTreeNodesInternal(id, queryStrings);
 
                 //only render the recycle bin if we are not in dialog and the start id id still the root
-                if (IsDialog(queryStrings) == false && id == ConstantsCore.System.RootString)
+                if (IsDialog(queryStrings) == false && id == Constants.System.RootString)
                 {
                     nodes.Add(CreateTreeNode(
                         RecycleBinId.ToInvariantString(),
@@ -349,7 +349,7 @@ namespace Umbraco.Web.Trees
 
             //Here we need to figure out if the node is a container and if so check if the user has a custom start node, then check if that start node is a child
             // of this container node. If that is true, the HasChildren must be true so that the tree node still renders even though this current node is a container/list view.
-            if (isContainer && UserStartNodes.Length > 0 && UserStartNodes.Contains(ConstantsCore.System.Root) == false)
+            if (isContainer && UserStartNodes.Length > 0 && UserStartNodes.Contains(Constants.System.Root) == false)
             {
                 var startNodes = Services.EntityService.GetAll(UmbracoObjectType, UserStartNodes);
                 //if any of these start nodes' parent is current, then we need to render children normally so we need to switch some logic and tell
@@ -403,7 +403,7 @@ namespace Umbraco.Web.Trees
                 var deleteAction = Current.Actions.FirstOrDefault(y => y.Letter == ActionDelete.ActionLetter);
                 if (deleteAction != null)
                 {
-                    var perms = Security.CurrentUser.GetPermissions(ConstantsCore.System.RecycleBinContentString, Services.UserService);
+                    var perms = Security.CurrentUser.GetPermissions(Constants.System.RecycleBinContentString, Services.UserService);
                     deleteAllowed = perms.FirstOrDefault(x => x.Contains(deleteAction.Letter)) != null;
                 }
 

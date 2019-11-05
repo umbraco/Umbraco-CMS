@@ -51,13 +51,13 @@ namespace Umbraco.Web.Install.InstallSteps
                 if (userIdAttempt && userIdAttempt.Result == 0)
                 {
                     security.ClearCurrentLogin();
-                    security.PerformLogin(ConstantsCore.Security.SuperUserId);
+                    security.PerformLogin(Constants.Security.SuperUserId);
                 }
             }
             else if (_globalSettings.ConfigurationStatus.IsNullOrWhiteSpace())
             {
                 // for installs, we need to log the super user in
-                security.PerformLogin(ConstantsCore.Security.SuperUserId);
+                security.PerformLogin(Constants.Security.SuperUserId);
             }
 
             // Update configurationStatus

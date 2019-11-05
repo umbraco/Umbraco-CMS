@@ -17,7 +17,7 @@ namespace Umbraco.Tests.Services
         public void Can_Create_RelationType_Without_Name()
         {
             var rs = ServiceContext.RelationService;
-            var rt = new RelationType(ConstantsCore.ObjectTypes.Document, ConstantsCore.ObjectTypes.Document, "repeatedEventOccurence");
+            var rt = new RelationType(Constants.ObjectTypes.Document, Constants.ObjectTypes.Document, "repeatedEventOccurence");
 
             Assert.DoesNotThrow(() => rs.Save(rt));
 

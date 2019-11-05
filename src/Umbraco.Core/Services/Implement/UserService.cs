@@ -17,7 +17,7 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Security; 
+using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Services.Implement
 {
@@ -209,7 +209,7 @@ namespace Umbraco.Core.Services.Implement
                         //NOTE: this will not be cached
                         return _userRepository.GetByUsername(username, includeSecurityData: false);
                     }
-                    
+
                     throw;
                 }
             }
@@ -486,14 +486,14 @@ namespace Umbraco.Core.Services.Implement
                     //query =
                     //    Query<IMember>.Builder.Where(
                     //        x =>
-                    //        ((Member)x).PropertyTypeAlias == Constants.Conventions.Member.LastLoginDate &&
+                    //        ((Member)x).PropertyTypeAlias == ConstantsCore.Conventions.Member.LastLoginDate &&
                     //        ((Member)x).DateTimePropertyValue > fromDate);
                     //return repository.GetCountByQuery(query);
                     //var fromDate = DateTime.Now.AddMinutes(-Membership.UserIsOnlineTimeWindow);
                     //query =
                     //    Query<IMember>.Builder.Where(
                     //        x =>
-                    //        ((Member)x).PropertyTypeAlias == Constants.Conventions.Member.LastLoginDate &&
+                    //        ((Member)x).PropertyTypeAlias == ConstantsCore.Conventions.Member.LastLoginDate &&
                     //        ((Member)x).DateTimePropertyValue > fromDate);
                     //return repository.GetCountByQuery(query);
                     case MemberCountType.LockedOut:
@@ -714,7 +714,7 @@ namespace Umbraco.Core.Services.Implement
                         //NOTE: this will not be cached
                         return _userRepository.Get(id, includeSecurityData: false);
                     }
-                    
+
                     throw;
                 }
             }

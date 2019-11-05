@@ -45,7 +45,7 @@ namespace Umbraco.Core.Security
         public UmbracoBackOfficeIdentity(int userId, string username, string realName,
             IEnumerable<int> startContentNodes, IEnumerable<int> startMediaNodes, string culture,
             string sessionId, string securityStamp, IEnumerable<string> allowedApps, IEnumerable<string> roles)
-            : base(Enumerable.Empty<Claim>(), ConstantsCore.Security.BackOfficeAuthenticationType) //this ctor is used to ensure the IsAuthenticated property is true
+            : base(Enumerable.Empty<Claim>(), Constants.Security.BackOfficeAuthenticationType) //this ctor is used to ensure the IsAuthenticated property is true
         {
             if (allowedApps == null) throw new ArgumentNullException(nameof(allowedApps));
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(username));
@@ -76,7 +76,7 @@ namespace Umbraco.Core.Security
             int userId, string username, string realName,
             IEnumerable<int> startContentNodes, IEnumerable<int> startMediaNodes, string culture,
             string sessionId, string securityStamp, IEnumerable<string> allowedApps, IEnumerable<string> roles)
-        : base(childIdentity.Claims, ConstantsCore.Security.BackOfficeAuthenticationType)
+        : base(childIdentity.Claims, Constants.Security.BackOfficeAuthenticationType)
         {
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(username));
             if (string.IsNullOrWhiteSpace(realName)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(realName));
@@ -92,7 +92,7 @@ namespace Umbraco.Core.Security
         /// </summary>
         /// <param name="identity"></param>
         private UmbracoBackOfficeIdentity(ClaimsIdentity identity)
-            : base(identity.Claims, ConstantsCore.Security.BackOfficeAuthenticationType)
+            : base(identity.Claims, Constants.Security.BackOfficeAuthenticationType)
         {
             Actor = identity;
 
@@ -107,7 +107,7 @@ namespace Umbraco.Core.Security
             }
         }
 
-        public const string Issuer = ConstantsCore.Security.BackOfficeAuthenticationType;
+        public const string Issuer = Constants.Security.BackOfficeAuthenticationType;
 
         /// <summary>
         /// Returns the required claim types for a back office identity
@@ -120,10 +120,10 @@ namespace Umbraco.Core.Security
             ClaimTypes.NameIdentifier, //id
             ClaimTypes.Name,  //username
             ClaimTypes.GivenName,
-            ConstantsCore.Security.StartContentNodeIdClaimType,
-            ConstantsCore.Security.StartMediaNodeIdClaimType,
+            Constants.Security.StartContentNodeIdClaimType,
+            Constants.Security.StartMediaNodeIdClaimType,
             ClaimTypes.Locality,
-            ConstantsCore.Security.SessionIdClaimType,
+            Constants.Security.SessionIdClaimType,
             Microsoft.AspNet.Identity.Constants.DefaultSecurityStampClaimType
         };
 
@@ -144,27 +144,27 @@ namespace Umbraco.Core.Security
             if (HasClaim(x => x.Type == ClaimTypes.GivenName) == false)
                 AddClaim(new Claim(ClaimTypes.GivenName, realName, ClaimValueTypes.String, Issuer, Issuer, this));
 
-            if (HasClaim(x => x.Type == ConstantsCore.Security.StartContentNodeIdClaimType) == false && startContentNodes != null)
+            if (HasClaim(x => x.Type == Constants.Security.StartContentNodeIdClaimType) == false && startContentNodes != null)
             {
                 foreach (var startContentNode in startContentNodes)
                 {
-                    AddClaim(new Claim(ConstantsCore.Security.StartContentNodeIdClaimType, startContentNode.ToInvariantString(), ClaimValueTypes.Integer32, Issuer, Issuer, this));
+                    AddClaim(new Claim(Constants.Security.StartContentNodeIdClaimType, startContentNode.ToInvariantString(), ClaimValueTypes.Integer32, Issuer, Issuer, this));
                 }
             }
 
-            if (HasClaim(x => x.Type == ConstantsCore.Security.StartMediaNodeIdClaimType) == false && startMediaNodes != null)
+            if (HasClaim(x => x.Type == Constants.Security.StartMediaNodeIdClaimType) == false && startMediaNodes != null)
             {
                 foreach (var startMediaNode in startMediaNodes)
                 {
-                    AddClaim(new Claim(ConstantsCore.Security.StartMediaNodeIdClaimType, startMediaNode.ToInvariantString(), ClaimValueTypes.Integer32, Issuer, Issuer, this));
+                    AddClaim(new Claim(Constants.Security.StartMediaNodeIdClaimType, startMediaNode.ToInvariantString(), ClaimValueTypes.Integer32, Issuer, Issuer, this));
                 }
             }
 
             if (HasClaim(x => x.Type == ClaimTypes.Locality) == false)
                 AddClaim(new Claim(ClaimTypes.Locality, culture, ClaimValueTypes.String, Issuer, Issuer, this));
 
-            if (HasClaim(x => x.Type == ConstantsCore.Security.SessionIdClaimType) == false && SessionId.IsNullOrWhiteSpace() == false)
-                AddClaim(new Claim(ConstantsCore.Security.SessionIdClaimType, sessionId, ClaimValueTypes.String, Issuer, Issuer, this));
+            if (HasClaim(x => x.Type == Constants.Security.SessionIdClaimType) == false && SessionId.IsNullOrWhiteSpace() == false)
+                AddClaim(new Claim(Constants.Security.SessionIdClaimType, sessionId, ClaimValueTypes.String, Issuer, Issuer, this));
 
             //The security stamp claim is also required... this is because this claim type is hard coded
             // by the SecurityStampValidator, see: https://katanaproject.codeplex.com/workitem/444
@@ -172,11 +172,11 @@ namespace Umbraco.Core.Security
                 AddClaim(new Claim(Microsoft.AspNet.Identity.Constants.DefaultSecurityStampClaimType, securityStamp, ClaimValueTypes.String, Issuer, Issuer, this));
 
             //Add each app as a separate claim
-            if (HasClaim(x => x.Type == ConstantsCore.Security.AllowedApplicationsClaimType) == false && allowedApps != null)
+            if (HasClaim(x => x.Type == Constants.Security.AllowedApplicationsClaimType) == false && allowedApps != null)
             {
                 foreach (var application in allowedApps)
                 {
-                    AddClaim(new Claim(ConstantsCore.Security.AllowedApplicationsClaimType, application, ClaimValueTypes.String, Issuer, Issuer, this));
+                    AddClaim(new Claim(Constants.Security.AllowedApplicationsClaimType, application, ClaimValueTypes.String, Issuer, Issuer, this));
                 }
             }
 
@@ -203,13 +203,13 @@ namespace Umbraco.Core.Security
         public override string AuthenticationType => Issuer;
 
         private int[] _startContentNodes;
-        public int[] StartContentNodes => _startContentNodes ?? (_startContentNodes = FindAll(x => x.Type == ConstantsCore.Security.StartContentNodeIdClaimType).Select(app => int.TryParse(app.Value, out var i) ? i : default).Where(x => x != default).ToArray());
+        public int[] StartContentNodes => _startContentNodes ?? (_startContentNodes = FindAll(x => x.Type == Constants.Security.StartContentNodeIdClaimType).Select(app => int.TryParse(app.Value, out var i) ? i : default).Where(x => x != default).ToArray());
 
         private int[] _startMediaNodes;
-        public int[] StartMediaNodes => _startMediaNodes ?? (_startMediaNodes = FindAll(x => x.Type == ConstantsCore.Security.StartMediaNodeIdClaimType).Select(app => int.TryParse(app.Value, out var i) ? i : default).Where(x => x != default).ToArray());
+        public int[] StartMediaNodes => _startMediaNodes ?? (_startMediaNodes = FindAll(x => x.Type == Constants.Security.StartMediaNodeIdClaimType).Select(app => int.TryParse(app.Value, out var i) ? i : default).Where(x => x != default).ToArray());
 
         private string[] _allowedApplications;
-        public string[] AllowedApplications => _allowedApplications ?? (_allowedApplications = FindAll(x => x.Type == ConstantsCore.Security.AllowedApplicationsClaimType).Select(app => app.Value).ToArray());
+        public string[] AllowedApplications => _allowedApplications ?? (_allowedApplications = FindAll(x => x.Type == Constants.Security.AllowedApplicationsClaimType).Select(app => app.Value).ToArray());
 
         public int Id => int.Parse(this.FindFirstValue(ClaimTypes.NameIdentifier));
 
@@ -221,13 +221,13 @@ namespace Umbraco.Core.Security
 
         public string SessionId
         {
-            get => this.FindFirstValue(ConstantsCore.Security.SessionIdClaimType);
+            get => this.FindFirstValue(Constants.Security.SessionIdClaimType);
             set
             {
-                var existing = FindFirst(ConstantsCore.Security.SessionIdClaimType);
+                var existing = FindFirst(Constants.Security.SessionIdClaimType);
                 if (existing != null)
                     TryRemoveClaim(existing);
-                AddClaim(new Claim(ConstantsCore.Security.SessionIdClaimType, value, ClaimValueTypes.String, Issuer, Issuer, this));
+                AddClaim(new Claim(Constants.Security.SessionIdClaimType, value, ClaimValueTypes.String, Issuer, Issuer, this));
             }
         }
 

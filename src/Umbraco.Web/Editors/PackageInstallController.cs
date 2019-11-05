@@ -31,7 +31,7 @@ namespace Umbraco.Web.Editors
     /// A controller used for installing packages and managing all of the data in the packages section in the back office
     /// </summary>
     [PluginController("UmbracoApi")]
-    [UmbracoApplicationAuthorize(Core.ConstantsCore.Applications.Packages)]
+    [UmbracoApplicationAuthorize(Core.Constants.Applications.Packages)]
     public class PackageInstallController : UmbracoAuthorizedJsonController
     {
         public PackageInstallController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor,

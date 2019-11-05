@@ -79,7 +79,7 @@ namespace Umbraco.Tests.Services
             contentType.PropertyGroups.First().PropertyTypes.Add(
                 new PropertyType(Constants.PropertyEditors.Aliases.Tags, ValueStorageType.Ntext, "tags")
                 {
-                    DataTypeId = ConstantsCore.DataTypes.Tags
+                    DataTypeId = Constants.DataTypes.Tags
                 });
             contentTypeService.Save(contentType);
 

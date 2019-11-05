@@ -102,16 +102,16 @@ namespace Umbraco.Core.Models.PublishedContent
         // TODO: this list somehow also exists in constants, see memberTypeRepository => remove duplicate!
         private static readonly Dictionary<string, int> BuiltinMemberProperties = new Dictionary<string, int>
         {
-            { "Email", ConstantsCore.DataTypes.Textbox },
-            { "Username", ConstantsCore.DataTypes.Textbox },
-            { "PasswordQuestion", ConstantsCore.DataTypes.Textbox },
-            { "Comments", ConstantsCore.DataTypes.Textbox },
-            { "IsApproved", ConstantsCore.DataTypes.Boolean },
-            { "IsLockedOut", ConstantsCore.DataTypes.Boolean },
-            { "LastLockoutDate", ConstantsCore.DataTypes.DateTime },
-            { "CreateDate", ConstantsCore.DataTypes.DateTime },
-            { "LastLoginDate", ConstantsCore.DataTypes.DateTime },
-            { "LastPasswordChangeDate", ConstantsCore.DataTypes.DateTime },
+            { "Email", Constants.DataTypes.Textbox },
+            { "Username", Constants.DataTypes.Textbox },
+            { "PasswordQuestion", Constants.DataTypes.Textbox },
+            { "Comments", Constants.DataTypes.Textbox },
+            { "IsApproved", Constants.DataTypes.Boolean },
+            { "IsLockedOut", Constants.DataTypes.Boolean },
+            { "LastLockoutDate", Constants.DataTypes.DateTime },
+            { "CreateDate", Constants.DataTypes.DateTime },
+            { "LastLoginDate", Constants.DataTypes.DateTime },
+            { "LastPasswordChangeDate", Constants.DataTypes.DateTime },
         };
 
         #region Content type

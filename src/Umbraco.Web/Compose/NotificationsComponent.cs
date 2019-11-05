@@ -123,7 +123,7 @@ namespace Umbraco.Web.Compose
 
             // for any items being moved from the recycle bin (restored), explicitly notify about that too
             var restoredEntities = args.MoveInfoCollection
-                .Where(m => m.OriginalPath.Contains(ConstantsCore.System.RecycleBinContentString))
+                .Where(m => m.OriginalPath.Contains(Constants.System.RecycleBinContentString))
                 .Select(m => m.Entity)
                 .ToArray();
             if(restoredEntities.Any())
@@ -190,10 +190,10 @@ namespace Umbraco.Web.Compose
                 if (user == null)
                 {
                     _logger.Debug(typeof(Notifier), "There is no current Umbraco user logged in, the notifications will be sent from the administrator");
-                    user = _userService.GetUserById(ConstantsCore.Security.SuperUserId);
+                    user = _userService.GetUserById(Constants.Security.SuperUserId);
                     if (user == null)
                     {
-                        _logger.Warn(typeof(Notifier), "Notifications can not be sent, no admin user with id {SuperUserId} could be resolved", ConstantsCore.Security.SuperUserId);
+                        _logger.Warn(typeof(Notifier), "Notifications can not be sent, no admin user with id {SuperUserId} could be resolved", Constants.Security.SuperUserId);
                         return;
                     }
                 }

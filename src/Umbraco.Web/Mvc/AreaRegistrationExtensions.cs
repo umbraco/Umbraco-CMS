@@ -124,7 +124,7 @@ namespace Umbraco.Web.Mvc
 
             //match this area
             controllerPluginRoute.DataTokens.Add("area", area.AreaName);
-            controllerPluginRoute.DataTokens.Add(Core.ConstantsCore.Web.UmbracoDataToken, umbracoTokenValue); //ensure the umbraco token is set
+            controllerPluginRoute.DataTokens.Add(Core.Constants.Web.UmbracoDataToken, umbracoTokenValue); //ensure the umbraco token is set
 
             return controllerPluginRoute;
         }

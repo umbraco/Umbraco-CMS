@@ -189,7 +189,7 @@ namespace Umbraco.Tests.Packaging
             string strXml = ImportResources.StandardMvc_Package;
             var xml = XElement.Parse(strXml);
             var element = xml.Descendants("Templates").First();
-            
+
             var init = ServiceContext.FileService.GetTemplates().Count();
 
             // Act
@@ -213,7 +213,7 @@ namespace Umbraco.Tests.Packaging
             string strXml = ImportResources.StandardMvc_Package;
             var xml = XElement.Parse(strXml);
             var element = xml.Descendants("Templates").First();
-            
+
 
             // Act
             var templates = PackageDataInstallation.ImportTemplate(element.Elements("Template").First(), 0);
@@ -233,7 +233,7 @@ namespace Umbraco.Tests.Packaging
             var dataTypeElement = xml.Descendants("DataTypes").First();
             var templateElement = xml.Descendants("Templates").First();
             var docTypeElement = xml.Descendants("DocumentTypes").First();
-            
+
 
             // Act
             var dataTypeDefinitions = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
@@ -387,7 +387,7 @@ namespace Umbraco.Tests.Packaging
             string strXml = ImportResources.XsltSearch_Package;
             var xml = XElement.Parse(strXml);
             var templateElement = xml.Descendants("Templates").First();
-            
+
 
             // Act
             var templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
@@ -404,7 +404,7 @@ namespace Umbraco.Tests.Packaging
             // Arrange
             string strXml = ImportResources.SingleDocType;
             var docTypeElement = XElement.Parse(strXml);
-            
+
 
             // Act
             var contentTypes = PackageDataInstallation.ImportDocumentType(docTypeElement, 0);
@@ -421,7 +421,7 @@ namespace Umbraco.Tests.Packaging
             // Arrange
             string strXml = ImportResources.SingleDocType;
             var docTypeElement = XElement.Parse(strXml);
-            
+
             var serializer = Factory.GetInstance<IEntityXmlSerializer>();
 
             // Act
@@ -470,7 +470,7 @@ namespace Umbraco.Tests.Packaging
 
             var templateElement = newPackageXml.Descendants("Templates").First();
             var templateElementUpdated = updatedPackageXml.Descendants("Templates").First();
-            
+
             var fileService = ServiceContext.FileService;
 
             // kill default test data
@@ -616,7 +616,7 @@ namespace Umbraco.Tests.Packaging
             string strXml = ImportResources.uBlogsy_Package;
             var xml = XElement.Parse(strXml);
             var macrosElement = xml.Descendants("Macros").First();
-            
+
 
             // Act
             var macros = PackageDataInstallation.ImportMacros(macrosElement.Elements("macro"), 0).ToList();
@@ -638,7 +638,7 @@ namespace Umbraco.Tests.Packaging
             string strXml = ImportResources.XsltSearch_Package;
             var xml = XElement.Parse(strXml);
             var macrosElement = xml.Descendants("Macros").First();
-            
+
 
             // Act
             var macros = PackageDataInstallation.ImportMacros(macrosElement.Elements("macro"), 0).ToList();
@@ -662,7 +662,7 @@ namespace Umbraco.Tests.Packaging
             var xml = XElement.Parse(strXml);
             var templateElement = xml.Descendants("Templates").First();
             var docTypeElement = xml.Descendants("DocumentTypes").First();
-            
+
 
             // Act
             var templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
@@ -690,7 +690,7 @@ namespace Umbraco.Tests.Packaging
             string strXml = ImportResources.CompositionsTestPackage_Random;
             var xml = XElement.Parse(strXml);
             var docTypeElement = xml.Descendants("DocumentTypes").First();
-            
+
 
             // Act
             var contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);

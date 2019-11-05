@@ -23,7 +23,7 @@ namespace Umbraco.Web.Editors
     /// </summary>
     [PluginController("UmbracoApi")]
     [SerializeVersion]
-    [UmbracoApplicationAuthorize(Core.ConstantsCore.Applications.Packages)]
+    [UmbracoApplicationAuthorize(Core.Constants.Applications.Packages)]
     public class PackageController : UmbracoAuthorizedJsonController
     {
         public IEnumerable<PackageDefinition> GetCreatedPackages()

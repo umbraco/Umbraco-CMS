@@ -54,7 +54,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #region Repository Base
 
-        protected override Guid NodeObjectTypeId => ConstantsCore.ObjectTypes.Document;
+        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.Document;
 
         protected override IContent PerformGet(int id)
         {
@@ -471,12 +471,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             entity.ResetDirtyProperties();
 
             // troubleshooting
-            //if (Database.ExecuteScalar<int>($"SELECT COUNT(*) FROM {Constants.DatabaseSchema.Tables.DocumentVersion} JOIN {Constants.DatabaseSchema.Tables.ContentVersion} ON {Constants.DatabaseSchema.Tables.DocumentVersion}.id={Constants.DatabaseSchema.Tables.ContentVersion}.id WHERE published=1 AND nodeId=" + content.Id) > 1)
+            //if (Database.ExecuteScalar<int>($"SELECT COUNT(*) FROM {ConstantsCore.DatabaseSchema.Tables.DocumentVersion} JOIN {ConstantsCore.DatabaseSchema.Tables.ContentVersion} ON {ConstantsCore.DatabaseSchema.Tables.DocumentVersion}.id={ConstantsCore.DatabaseSchema.Tables.ContentVersion}.id WHERE published=1 AND nodeId=" + content.Id) > 1)
             //{
             //    Debugger.Break();
             //    throw new Exception("oops");
             //}
-            //if (Database.ExecuteScalar<int>($"SELECT COUNT(*) FROM {Constants.DatabaseSchema.Tables.DocumentVersion} JOIN {Constants.DatabaseSchema.Tables.ContentVersion} ON {Constants.DatabaseSchema.Tables.DocumentVersion}.id={Constants.DatabaseSchema.Tables.ContentVersion}.id WHERE [current]=1 AND nodeId=" + content.Id) > 1)
+            //if (Database.ExecuteScalar<int>($"SELECT COUNT(*) FROM {ConstantsCore.DatabaseSchema.Tables.DocumentVersion} JOIN {ConstantsCore.DatabaseSchema.Tables.ContentVersion} ON {ConstantsCore.DatabaseSchema.Tables.DocumentVersion}.id={ConstantsCore.DatabaseSchema.Tables.ContentVersion}.id WHERE [current]=1 AND nodeId=" + content.Id) > 1)
             //{
             //    Debugger.Break();
             //    throw new Exception("oops");
@@ -676,12 +676,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             entity.ResetDirtyProperties();
 
             // troubleshooting
-            //if (Database.ExecuteScalar<int>($"SELECT COUNT(*) FROM {Constants.DatabaseSchema.Tables.DocumentVersion} JOIN {Constants.DatabaseSchema.Tables.ContentVersion} ON {Constants.DatabaseSchema.Tables.DocumentVersion}.id={Constants.DatabaseSchema.Tables.ContentVersion}.id WHERE published=1 AND nodeId=" + content.Id) > 1)
+            //if (Database.ExecuteScalar<int>($"SELECT COUNT(*) FROM {ConstantsCore.DatabaseSchema.Tables.DocumentVersion} JOIN {ConstantsCore.DatabaseSchema.Tables.ContentVersion} ON {ConstantsCore.DatabaseSchema.Tables.DocumentVersion}.id={ConstantsCore.DatabaseSchema.Tables.ContentVersion}.id WHERE published=1 AND nodeId=" + content.Id) > 1)
             //{
             //    Debugger.Break();
             //    throw new Exception("oops");
             //}
-            //if (Database.ExecuteScalar<int>($"SELECT COUNT(*) FROM {Constants.DatabaseSchema.Tables.DocumentVersion} JOIN {Constants.DatabaseSchema.Tables.ContentVersion} ON {Constants.DatabaseSchema.Tables.DocumentVersion}.id={Constants.DatabaseSchema.Tables.ContentVersion}.id WHERE [current]=1 AND nodeId=" + content.Id) > 1)
+            //if (Database.ExecuteScalar<int>($"SELECT COUNT(*) FROM {ConstantsCore.DatabaseSchema.Tables.DocumentVersion} JOIN {ConstantsCore.DatabaseSchema.Tables.ContentVersion} ON {ConstantsCore.DatabaseSchema.Tables.DocumentVersion}.id={ConstantsCore.DatabaseSchema.Tables.ContentVersion}.id WHERE [current]=1 AND nodeId=" + content.Id) > 1)
             //{
             //    Debugger.Break();
             //    throw new Exception("oops");
@@ -863,7 +863,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #region Recycle Bin
 
-        public override int RecycleBinId => ConstantsCore.System.RecycleBinContent;
+        public override int RecycleBinId => Constants.System.RecycleBinContent;
 
         #endregion
 

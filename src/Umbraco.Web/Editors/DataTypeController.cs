@@ -12,7 +12,6 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
-using Constants = Umbraco.Core.Constants;
 using System.Net.Http;
 using System.Text;
 using Umbraco.Core.Cache;
@@ -20,6 +19,7 @@ using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
@@ -32,7 +32,7 @@ namespace Umbraco.Web.Editors
     /// Content Types, Member Types or Media Types ... and of course to Data Types
     /// </remarks>
     [PluginController("UmbracoApi")]
-    [UmbracoTreeAuthorize(ConstantsCore.Trees.DataTypes, ConstantsCore.Trees.DocumentTypes, ConstantsCore.Trees.MediaTypes, ConstantsCore.Trees.MemberTypes)]
+    [UmbracoTreeAuthorize(Constants.Trees.DataTypes, Constants.Trees.DocumentTypes, Constants.Trees.MediaTypes, Constants.Trees.MemberTypes)]
     [EnableOverrideAuthorization]
     public class DataTypeController : BackOfficeNotificationsController
     {
@@ -346,8 +346,8 @@ namespace Umbraco.Web.Editors
         /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
         /// </remarks>
         [UmbracoApplicationAuthorize(
-            ConstantsCore.Applications.Content, ConstantsCore.Applications.Media, ConstantsCore.Applications.Members,
-            ConstantsCore.Applications.Settings, ConstantsCore.Applications.Packages)]
+            Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
+            Constants.Applications.Settings, Constants.Applications.Packages)]
         public IEnumerable<DataTypeBasic> GetAll()
         {
             return Services.DataTypeService
@@ -363,8 +363,8 @@ namespace Umbraco.Web.Editors
         /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
         /// </remarks>
         [UmbracoTreeAuthorize(
-            ConstantsCore.Applications.Content, ConstantsCore.Applications.Media, ConstantsCore.Applications.Members,
-            ConstantsCore.Applications.Settings, ConstantsCore.Applications.Packages)]
+            Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
+            Constants.Applications.Settings, Constants.Applications.Packages)]
         public IDictionary<string, IEnumerable<DataTypeBasic>> GetGroupedDataTypes()
         {
             var dataTypes = Services.DataTypeService
@@ -396,8 +396,8 @@ namespace Umbraco.Web.Editors
         /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
         /// </remarks>
         [UmbracoTreeAuthorize(
-            ConstantsCore.Applications.Content, ConstantsCore.Applications.Media, ConstantsCore.Applications.Members,
-            ConstantsCore.Applications.Settings, ConstantsCore.Applications.Packages)]
+            Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
+            Constants.Applications.Settings, Constants.Applications.Packages)]
         public IDictionary<string, IEnumerable<DataTypeBasic>> GetGroupedPropertyEditors()
         {
             var datatypes = new List<DataTypeBasic>();
@@ -429,8 +429,8 @@ namespace Umbraco.Web.Editors
         /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
         /// </remarks>
         [UmbracoTreeAuthorize(
-            ConstantsCore.Applications.Content, ConstantsCore.Applications.Media, ConstantsCore.Applications.Members,
-            ConstantsCore.Applications.Settings, ConstantsCore.Applications.Packages)]
+            Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
+            Constants.Applications.Settings, Constants.Applications.Packages)]
         public IEnumerable<PropertyEditorBasic> GetAllPropertyEditors()
         {
             return Current.PropertyEditors

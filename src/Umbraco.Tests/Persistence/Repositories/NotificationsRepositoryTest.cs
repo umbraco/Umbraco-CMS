@@ -31,14 +31,14 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     CreateDate = DateTime.Now,
                     Level = 1,
-                    NodeObjectType = ConstantsCore.ObjectTypes.ContentItem,
+                    NodeObjectType = Constants.ObjectTypes.ContentItem,
                     ParentId = -1,
                     Path = "-1,123",
                     SortOrder = 1,
                     Text = "hello",
                     Trashed = false,
                     UniqueId = Guid.NewGuid(),
-                    UserId = ConstantsCore.Security.SuperUserId
+                    UserId = Constants.Security.SuperUserId
                 };
                 var result = scope.Database.Insert(node);
                 var entity = Mock.Of<IEntity>(e => e.Id == node.NodeId);
@@ -66,11 +66,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 scope.Database.Insert(userDto);
 
                 var userNew = Mock.Of<IUser>(e => e.Id == userDto.Id);
-                var userAdmin = Mock.Of<IUser>(e => e.Id == ConstantsCore.Security.SuperUserId);
+                var userAdmin = Mock.Of<IUser>(e => e.Id == Constants.Security.SuperUserId);
 
                 for (var i = 0; i < 10; i++)
                 {
-                    var node = new NodeDto { CreateDate = DateTime.Now, Level = 1, NodeObjectType = ConstantsCore.ObjectTypes.ContentItem, ParentId = -1, Path = "-1," + i, SortOrder = 1, Text = "hello" + i, Trashed = false, UniqueId = Guid.NewGuid(), UserId = -1 };
+                    var node = new NodeDto { CreateDate = DateTime.Now, Level = 1, NodeObjectType = Constants.ObjectTypes.ContentItem, ParentId = -1, Path = "-1," + i, SortOrder = 1, Text = "hello" + i, Trashed = false, UniqueId = Guid.NewGuid(), UserId = -1 };
                     var result = scope.Database.Insert(node);
                     var entity = Mock.Of<IEntity>(e => e.Id == node.NodeId);
                     var notification = repo.CreateNotification((i%2 == 0) ? userAdmin : userNew, entity, i.ToString(CultureInfo.InvariantCulture));
@@ -91,10 +91,10 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var repo = new NotificationsRepository((IScopeAccessor) provider);
 
-                var node1 = new NodeDto { CreateDate = DateTime.Now, Level = 1, NodeObjectType = ConstantsCore.ObjectTypes.ContentItem, ParentId = -1, Path = "-1,1", SortOrder = 1, Text = "hello1", Trashed = false, UniqueId = Guid.NewGuid(), UserId = -1 };
+                var node1 = new NodeDto { CreateDate = DateTime.Now, Level = 1, NodeObjectType = Constants.ObjectTypes.ContentItem, ParentId = -1, Path = "-1,1", SortOrder = 1, Text = "hello1", Trashed = false, UniqueId = Guid.NewGuid(), UserId = -1 };
                 scope.Database.Insert(node1);
                 var entity1 = Mock.Of<IEntity>(e => e.Id == node1.NodeId);
-                var node2 = new NodeDto { CreateDate = DateTime.Now, Level = 1, NodeObjectType = ConstantsCore.ObjectTypes.ContentItem, ParentId = -1, Path = "-1,2", SortOrder = 1, Text = "hello2", Trashed = false, UniqueId = Guid.NewGuid(), UserId = -1 };
+                var node2 = new NodeDto { CreateDate = DateTime.Now, Level = 1, NodeObjectType = Constants.ObjectTypes.ContentItem, ParentId = -1, Path = "-1,2", SortOrder = 1, Text = "hello2", Trashed = false, UniqueId = Guid.NewGuid(), UserId = -1 };
                 scope.Database.Insert(node2);
                 var entity2 = Mock.Of<IEntity>(e => e.Id == node2.NodeId);
 
@@ -121,10 +121,10 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var repo = new NotificationsRepository((IScopeAccessor) provider);
 
-                var node1 = new NodeDto { CreateDate = DateTime.Now, Level = 1, NodeObjectType = ConstantsCore.ObjectTypes.ContentItem, ParentId = -1, Path = "-1,1", SortOrder = 1, Text = "hello1", Trashed = false, UniqueId = Guid.NewGuid(), UserId = -1 };
+                var node1 = new NodeDto { CreateDate = DateTime.Now, Level = 1, NodeObjectType = Constants.ObjectTypes.ContentItem, ParentId = -1, Path = "-1,1", SortOrder = 1, Text = "hello1", Trashed = false, UniqueId = Guid.NewGuid(), UserId = -1 };
                 scope.Database.Insert(node1);
                 var entity1 = Mock.Of<IEntity>(e => e.Id == node1.NodeId);
-                var node2 = new NodeDto { CreateDate = DateTime.Now, Level = 1, NodeObjectType = ConstantsCore.ObjectTypes.ContentItem, ParentId = -1, Path = "-1,2", SortOrder = 1, Text = "hello2", Trashed = false, UniqueId = Guid.NewGuid(), UserId = -1 };
+                var node2 = new NodeDto { CreateDate = DateTime.Now, Level = 1, NodeObjectType = Constants.ObjectTypes.ContentItem, ParentId = -1, Path = "-1,2", SortOrder = 1, Text = "hello2", Trashed = false, UniqueId = Guid.NewGuid(), UserId = -1 };
                 scope.Database.Insert(node2);
                 var entity2 = Mock.Of<IEntity>(e => e.Id == node2.NodeId);
 
@@ -155,11 +155,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 scope.Database.Insert(userDto);
 
                 var userNew = Mock.Of<IUser>(e => e.Id == userDto.Id);
-                var userAdmin = Mock.Of<IUser>(e => e.Id == ConstantsCore.Security.SuperUserId);
+                var userAdmin = Mock.Of<IUser>(e => e.Id == Constants.Security.SuperUserId);
 
                 for (var i = 0; i < 10; i++)
                 {
-                    var node = new NodeDto { CreateDate = DateTime.Now, Level = 1, NodeObjectType = ConstantsCore.ObjectTypes.ContentItem, ParentId = -1, Path = "-1," + i, SortOrder = 1, Text = "hello" + i, Trashed = false, UniqueId = Guid.NewGuid(), UserId = -1 };
+                    var node = new NodeDto { CreateDate = DateTime.Now, Level = 1, NodeObjectType = Constants.ObjectTypes.ContentItem, ParentId = -1, Path = "-1," + i, SortOrder = 1, Text = "hello" + i, Trashed = false, UniqueId = Guid.NewGuid(), UserId = -1 };
                     var result = scope.Database.Insert(node);
                     var entity = Mock.Of<IEntity>(e => e.Id == node.NodeId);
                     var notification = repo.CreateNotification((i%2 == 0) ? userAdmin : userNew, entity, i.ToString(CultureInfo.InvariantCulture));

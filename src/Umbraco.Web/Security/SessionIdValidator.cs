@@ -96,7 +96,7 @@ namespace Umbraco.Web.Security
             if (user == null)
                 return false;
 
-            var sessionId = currentIdentity.FindFirstValue(ConstantsCore.Security.SessionIdClaimType);
+            var sessionId = currentIdentity.FindFirstValue(Constants.Security.SessionIdClaimType);
             if (await manager.ValidateSessionIdAsync(userId, sessionId) == false)
                 return false;
 

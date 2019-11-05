@@ -11,7 +11,7 @@ namespace Umbraco.Web.PropertyEditors
         [ConfigurationField("maxNumber", "Maximum number of items", "number")]
         public int MaxNumber { get; set; }
 
-        [ConfigurationField(Core.ConstantsCore.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes,
+        [ConfigurationField(Core.Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes,
             "Ignore User Start Nodes", "boolean",
             Description = "Selecting this option allows a user to choose nodes that they normally don't have access to.")]
         public bool IgnoreUserStartNodes { get; set; }

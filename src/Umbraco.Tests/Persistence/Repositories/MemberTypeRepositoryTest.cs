@@ -41,7 +41,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var sut = repository.Get(memberType.Id);
 
-                var standardProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
+                var standardProps = ConventionsHelper.GetStandardPropertyTypeStubs();
 
                 Assert.That(sut, Is.Not.Null);
                 Assert.That(sut.PropertyGroups.Count, Is.EqualTo(2));
@@ -236,7 +236,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Bug_Changing_Built_In_Member_Type_Property_Type_Aliases_Results_In_Exception()
         {
-            var stubs = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
+            var stubs = ConventionsHelper.GetStandardPropertyTypeStubs();
 
             var provider = TestObjects.GetScopeProvider(Logger);
             using (provider.CreateScope())
@@ -281,7 +281,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Built_In_Member_Type_Properties_Are_Automatically_Added_When_Creating()
         {
-            var stubs = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
+            var stubs = ConventionsHelper.GetStandardPropertyTypeStubs();
 
             var provider = TestObjects.GetScopeProvider(Logger);
             using (provider.CreateScope())
@@ -312,7 +312,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Built_In_Member_Type_Properties_Missing_Are_Automatically_Added_When_Creating()
         {
-            var stubs = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
+            var stubs = ConventionsHelper.GetStandardPropertyTypeStubs();
 
             var provider = TestObjects.GetScopeProvider(Logger);
             using (provider.CreateScope())

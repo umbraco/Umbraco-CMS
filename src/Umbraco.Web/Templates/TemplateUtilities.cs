@@ -226,7 +226,7 @@ namespace Umbraco.Web.Templates
                 if (uploadedImages.ContainsKey(tmpImgPath) == false)
                 {
                     if (mediaParentFolder == Guid.Empty)
-                        mediaFile = mediaService.CreateMedia(mediaItemName, ConstantsCore.System.Root, Constants.Conventions.MediaTypes.Image, userId);
+                        mediaFile = mediaService.CreateMedia(mediaItemName, Constants.System.Root, Constants.Conventions.MediaTypes.Image, userId);
                     else
                         mediaFile = mediaService.CreateMedia(mediaItemName, mediaParentFolder, Constants.Conventions.MediaTypes.Image, userId);
 

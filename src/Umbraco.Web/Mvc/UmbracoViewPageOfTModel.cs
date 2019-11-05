@@ -58,7 +58,7 @@ namespace Umbraco.Web.Mvc
         {
             get
             {
-                const string token = Core.ConstantsCore.Web.PublishedDocumentRequestDataToken;
+                const string token = Core.Constants.Web.PublishedDocumentRequestDataToken;
 
                 // we should always try to return the object from the data tokens just in case its a custom object and not
                 // the one from UmbracoContext. Fallback to UmbracoContext if necessary.

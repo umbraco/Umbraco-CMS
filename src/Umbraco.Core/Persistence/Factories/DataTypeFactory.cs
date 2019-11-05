@@ -38,7 +38,7 @@ namespace Umbraco.Core.Persistence.Factories
                 dataType.Path = dto.NodeDto.Path;
                 dataType.SortOrder = dto.NodeDto.SortOrder;
                 dataType.Trashed = dto.NodeDto.Trashed;
-                dataType.CreatorId = dto.NodeDto.UserId ?? ConstantsCore.Security.UnknownUserId;
+                dataType.CreatorId = dto.NodeDto.UserId ?? Constants.Security.UnknownUserId;
 
                 dataType.SetLazyConfiguration(dto.Configuration);
 
@@ -73,7 +73,7 @@ namespace Umbraco.Core.Persistence.Factories
                 CreateDate = entity.CreateDate,
                 NodeId = entity.Id,
                 Level = Convert.ToInt16(entity.Level),
-                NodeObjectType = ConstantsCore.ObjectTypes.DataType,
+                NodeObjectType = Constants.ObjectTypes.DataType,
                 ParentId = entity.ParentId,
                 Path = entity.Path,
                 SortOrder = entity.SortOrder,

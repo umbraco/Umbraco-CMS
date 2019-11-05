@@ -15,7 +15,7 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class LogController : UmbracoAuthorizedJsonController
     {
-        [UmbracoApplicationAuthorize(Core.ConstantsCore.Applications.Content, Core.ConstantsCore.Applications.Media)]
+        [UmbracoApplicationAuthorize(Core.Constants.Applications.Content, Core.Constants.Applications.Media)]
         public PagedResult<AuditLog> GetPagedEntityLog(int id,
             int pageNumber = 1,
             int pageSize = 10,

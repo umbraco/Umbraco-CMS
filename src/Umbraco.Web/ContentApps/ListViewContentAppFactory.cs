@@ -36,14 +36,14 @@ namespace Umbraco.Web.ContentApps
                 case IContent content:
                     contentTypeAlias = content.ContentType.Alias;
                     entityType = "content";
-                    dtdId = Core.ConstantsCore.DataTypes.DefaultContentListView;
+                    dtdId = Core.Constants.DataTypes.DefaultContentListView;
                     break;
                 case IMedia media when !media.ContentType.IsContainer && media.ContentType.Alias != Core.Constants.Conventions.MediaTypes.Folder:
                     return null;
                 case IMedia media:
                     contentTypeAlias = media.ContentType.Alias;
                     entityType = "media";
-                    dtdId = Core.ConstantsCore.DataTypes.DefaultMediaListView;
+                    dtdId = Core.Constants.DataTypes.DefaultMediaListView;
                     break;
                 default:
                     throw new NotSupportedException($"Object type {o.GetType()} is not supported here.");

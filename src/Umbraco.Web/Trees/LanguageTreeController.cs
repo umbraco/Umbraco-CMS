@@ -3,7 +3,7 @@ using Umbraco.Core;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
-using Constants = Umbraco.Core.ConstantsCore;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
 {
@@ -34,7 +34,7 @@ namespace Umbraco.Web.Trees
             var root = base.CreateRootNode(queryStrings);
 
             //this will load in a custom UI instead of the dashboard for the root node
-            root.RoutePath = $"{ConstantsCore.Applications.Settings}/{ConstantsCore.Trees.Languages}/overview";
+            root.RoutePath = $"{Constants.Applications.Settings}/{Constants.Trees.Languages}/overview";
             root.Icon = "icon-globe";
             root.HasChildren = false;
             root.MenuUrl = null;

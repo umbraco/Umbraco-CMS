@@ -36,7 +36,7 @@ namespace Umbraco.Web.Security.Providers
         private volatile bool _hasDefaultMember = false;
         private static readonly object Locker = new object();
 
-        public override string ProviderName => ConstantsCore.Security.UserMembershipProviderName;
+        public override string ProviderName => Constants.Security.UserMembershipProviderName;
 
         protected override MembershipUser ConvertToMembershipUser(IUser entity)
         {

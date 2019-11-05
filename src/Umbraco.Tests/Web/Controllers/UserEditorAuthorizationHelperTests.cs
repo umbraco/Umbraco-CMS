@@ -419,7 +419,7 @@ namespace Umbraco.Tests.Web.Controllers
         {
             var admin = Mock.Of<IUser>(user => user.Groups == new[]
             {
-                new ReadOnlyUserGroup(1, "Admin", "icon-user", null, null, ConstantsCore.Security.AdminGroupAlias, new string[0], new string[0])
+                new ReadOnlyUserGroup(1, "Admin", "icon-user", null, null, Constants.Security.AdminGroupAlias, new string[0], new string[0])
             });
             return admin;
         }

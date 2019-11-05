@@ -86,7 +86,7 @@ namespace Umbraco.Web.Editors.Binders
                     //{
                     //    //if there's a 'Member' type then we should be able to just go get it from the db since it was created with a link
                     //    // to our data.
-                    //    var memberType = ApplicationContext.Services.MemberTypeService.GetMemberType(Constants.Conventions.MemberTypes.Member);
+                    //    var memberType = ApplicationContext.Services.MemberTypeService.GetMemberType(ConstantsCore.Conventions.MemberTypes.Member);
                     //    if (memberType != null)
                     //    {
                     //        var existing = GetExisting(model.Key);
@@ -182,7 +182,7 @@ namespace Umbraco.Web.Editors.Binders
         /// <param name="contentType"></param>
         private void FilterMembershipProviderProperties(IContentTypeBase contentType)
         {
-            var defaultProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
+            var defaultProps = ConventionsHelper.GetStandardPropertyTypeStubs();
             //remove all membership properties, these values are set with the membership provider.
             var exclude = defaultProps.Select(x => x.Value.Alias).ToArray();
             FilterContentTypeProperties(contentType, exclude);
@@ -199,6 +199,6 @@ namespace Umbraco.Web.Editors.Binders
                 }
             }
         }
-        
+
     }
 }

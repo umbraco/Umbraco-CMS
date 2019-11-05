@@ -9,7 +9,7 @@ namespace Umbraco.Web.Sections
     public class SettingsSection : ISection
     {
         /// <inheritdoc />
-        public string Alias => ConstantsCore.Applications.Settings;
+        public string Alias => Constants.Applications.Settings;
 
         /// <inheritdoc />
         public string Name => "Settings";

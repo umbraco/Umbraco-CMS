@@ -20,7 +20,6 @@ using Umbraco.Web.WebApi;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
-using Constants = Umbraco.Core.Constants;
 using System.Collections.Generic;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -30,6 +29,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Editors.Binders;
 using Umbraco.Web.Editors.Filters;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
@@ -38,7 +38,7 @@ namespace Umbraco.Web.Editors
     /// access to ALL of the methods on this controller will need access to the member application.
     /// </remarks>
     [PluginController("UmbracoApi")]
-    [UmbracoApplicationAuthorizeAttribute(ConstantsCore.Applications.Members)]
+    [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Members)]
     [OutgoingNoHyphenGuidFormat]
     public class MemberController : ContentControllerBase
     {
@@ -139,7 +139,7 @@ namespace Umbraco.Web.Editors
             var name = foundType != null ? foundType.Name : listName;
 
             var apps = new List<ContentApp>();
-            apps.Add(ListViewContentAppFactory.CreateContentApp(Services.DataTypeService, _propertyEditors, listName, "member", Core.ConstantsCore.DataTypes.DefaultMembersListView));
+            apps.Add(ListViewContentAppFactory.CreateContentApp(Services.DataTypeService, _propertyEditors, listName, "member", Core.Constants.DataTypes.DefaultMembersListView));
             apps[0].Active = true;
 
             var display = new MemberListDisplay
@@ -586,7 +586,7 @@ namespace Umbraco.Web.Editors
             UpdateName(contentItem);
 
             // re-assign the mapped values that are not part of the membership provider properties.
-            var builtInAliases = Constants.Conventions.Member.GetStandardPropertyTypeStubs().Select(x => x.Key).ToArray();
+            var builtInAliases = ConventionsHelper.GetStandardPropertyTypeStubs().Select(x => x.Key).ToArray();
             foreach (var p in contentItem.PersistedContent.Properties)
             {
                 var valueMapped = currProps.FirstOrDefault(x => x.Alias == p.Alias);

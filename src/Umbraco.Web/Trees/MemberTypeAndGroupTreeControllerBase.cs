@@ -21,7 +21,7 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
 
-            if (id == ConstantsCore.System.RootString)
+            if (id == Constants.System.RootString)
             {
                 // root actions
                 menu.Items.Add(new CreateChildEntity(Services.TextService));

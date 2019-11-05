@@ -177,9 +177,7 @@
     <Compile Include="CompositionExtensions_FileSystems.cs" />
     <Compile Include="CompositionExtensions_Uniques.cs" />
     <Compile Include="Configuration\UmbracoVersion.cs" />
-    <Compile Include="Constants-Conventions.cs" />
-    <Compile Include="Constants-PropertyEditors.cs" />
-    <Compile Include="Constants.cs" />
+    <Compile Include="ConventionsHelper.cs" />
     <Compile Include="Events\CancellableEnumerableObjectEventArgs.cs" />
     <Compile Include="Events\ContentPublishedEventArgs.cs" />
     <Compile Include="Events\ContentPublishingEventArgs.cs" />
@@ -701,9 +699,6 @@
     <Compile Include="Packaging\PackageExtraction.cs" />
     <Compile Include="Packaging\PackageInstallation.cs" />
     <Compile Include="Persistence\BulkDataReader.cs" />
-    <Compile Include="Persistence\Constants-DatabaseSchema.cs" />
-    <Compile Include="Persistence\Constants-DbProviderNames.cs" />
-    <Compile Include="Persistence\Constants-Locks.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\ConstraintAttribute.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\ForeignKeyAttribute.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\IndexAttribute.cs" />
@@ -1178,7 +1173,7 @@
     <Compile Include="Sync\ServerMessengerBase.cs" />
     <Compile Include="Udi.cs" />
     <Compile Include="UdiDefinitionAttribute.cs" />
-    <Compile Include="UdiEntityType.cs" />
+    <Compile Include="UdiEntityTypeHelper.cs" />
     <Compile Include="UdiGetterExtensions.cs" />
     <Compile Include="UdiRange.cs" />
     <Compile Include="UdiTypeConverter.cs" />

@@ -83,7 +83,7 @@ namespace Umbraco.Web.WebApi.Filters
 
         protected override int RecycleBinId
         {
-            get { return ConstantsCore.System.RecycleBinContent; }
+            get { return Constants.System.RecycleBinContent; }
         }
 
         internal void FilterBasedOnPermissions(IList items, IUser user)

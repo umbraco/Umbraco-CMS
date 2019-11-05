@@ -11,17 +11,17 @@ using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Models.ContentEditing;
-using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Web.Search;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
 {
-    [UmbracoTreeAuthorize(ConstantsCore.Trees.DataTypes)]
-    [Tree(ConstantsCore.Applications.Settings, ConstantsCore.Trees.DataTypes, SortOrder = 3, TreeGroup = ConstantsCore.Trees.Groups.Settings)]
+    [UmbracoTreeAuthorize(Constants.Trees.DataTypes)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.DataTypes, SortOrder = 3, TreeGroup = Constants.Trees.Groups.Settings)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
     public class DataTypeTreeController : TreeController, ISearchableTree
@@ -46,7 +46,7 @@ namespace Umbraco.Web.Trees
                    .OrderBy(entity => entity.Name)
                    .Select(dt =>
                    {
-                       var node = CreateTreeNode(dt, ConstantsCore.ObjectTypes.DataType, id, queryStrings, "icon-folder", dt.HasChildren);
+                       var node = CreateTreeNode(dt, Constants.ObjectTypes.DataType, id, queryStrings, "icon-folder", dt.HasChildren);
                        node.Path = dt.Path;
                        node.NodeType = "container";
                        // TODO: This isn't the best way to ensure a no operation process for clicking a node but it works for now.
@@ -65,11 +65,11 @@ namespace Umbraco.Web.Trees
                     .OrderBy(entity => entity.Name)
                     .Select(dt =>
                     {
-                        var node = CreateTreeNode(dt.Id.ToInvariantString(), id, queryStrings, dt.Name, ConstantsCore.Icons.DataType, false);
+                        var node = CreateTreeNode(dt.Id.ToInvariantString(), id, queryStrings, dt.Name, Constants.Icons.DataType, false);
                         node.Path = dt.Path;
                         if (systemListViewDataTypeIds.Contains(dt.Id))
                         {
-                            node.Icon = ConstantsCore.Icons.ListView;
+                            node.Icon = Constants.Icons.ListView;
                         }
                         return node;
                     }));
@@ -84,15 +84,15 @@ namespace Umbraco.Web.Trees
         {
             var systemIds = new[]
             {
-                ConstantsCore.DataTypes.Boolean, // Used by the Member Type: "Member"
-                ConstantsCore.DataTypes.Textarea, // Used by the Member Type: "Member"
-                ConstantsCore.DataTypes.LabelBigint, // Used by the Media Type: "Image"; Used by the Media Type: "File"
-                ConstantsCore.DataTypes.LabelDateTime, // Used by the Member Type: "Member"
-                ConstantsCore.DataTypes.LabelDecimal, // Used by the Member Type: "Member"
-                ConstantsCore.DataTypes.LabelInt, // Used by the Media Type: "Image"; Used by the Member Type: "Member"
-                ConstantsCore.DataTypes.LabelString, // Used by the Media Type: "Image"; Used by the Media Type: "File"
-                ConstantsCore.DataTypes.ImageCropper, // Used by the Media Type: "Image"
-                ConstantsCore.DataTypes.Upload, // Used by the Media Type: "File"
+                Constants.DataTypes.Boolean, // Used by the Member Type: "Member"
+                Constants.DataTypes.Textarea, // Used by the Member Type: "Member"
+                Constants.DataTypes.LabelBigint, // Used by the Media Type: "Image"; Used by the Media Type: "File"
+                Constants.DataTypes.LabelDateTime, // Used by the Member Type: "Member"
+                Constants.DataTypes.LabelDecimal, // Used by the Member Type: "Member"
+                Constants.DataTypes.LabelInt, // Used by the Media Type: "Image"; Used by the Member Type: "Member"
+                Constants.DataTypes.LabelString, // Used by the Media Type: "Image"; Used by the Media Type: "File"
+                Constants.DataTypes.ImageCropper, // Used by the Media Type: "Image"
+                Constants.DataTypes.Upload, // Used by the Media Type: "File"
             };
 
             return systemIds.Concat(GetNonDeletableSystemListViewDataTypeIds());
@@ -105,9 +105,9 @@ namespace Umbraco.Web.Trees
         {
             return new[]
             {
-                ConstantsCore.DataTypes.DefaultContentListView,
-                ConstantsCore.DataTypes.DefaultMediaListView,
-                ConstantsCore.DataTypes.DefaultMembersListView
+                Constants.DataTypes.DefaultContentListView,
+                Constants.DataTypes.DefaultMediaListView,
+                Constants.DataTypes.DefaultMembersListView
             };
         }
 
@@ -115,7 +115,7 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
 
-            if (id == ConstantsCore.System.RootString)
+            if (id == Constants.System.RootString)
             {
                 //set the default to create
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;

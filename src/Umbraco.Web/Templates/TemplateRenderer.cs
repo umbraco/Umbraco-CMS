@@ -39,7 +39,7 @@ namespace Umbraco.Web.Templates
             _languageService = textService ?? throw new ArgumentNullException(nameof(textService));
             _webRoutingSection = webRoutingSection ?? throw new ArgumentNullException(nameof(webRoutingSection));
         }
-        
+
         public void Render(int pageId, int? altTemplateId, StringWriter writer)
         {
             if (writer == null) throw new ArgumentNullException(nameof(writer));

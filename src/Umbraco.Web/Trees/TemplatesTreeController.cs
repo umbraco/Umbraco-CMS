@@ -20,8 +20,8 @@ using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
 {
-    [UmbracoTreeAuthorize(ConstantsCore.Trees.Templates)]
-    [Tree(ConstantsCore.Applications.Settings, ConstantsCore.Trees.Templates, SortOrder = 6, TreeGroup = ConstantsCore.Trees.Groups.Templating)]
+    [UmbracoTreeAuthorize(Constants.Trees.Templates)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.Templates, SortOrder = 6, TreeGroup = Constants.Trees.Groups.Templating)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
     public class TemplatesTreeController : TreeController, ISearchableTree
@@ -56,7 +56,7 @@ namespace Umbraco.Web.Trees
         {
             var nodes = new TreeNodeCollection();
 
-            var found = id == ConstantsCore.System.RootString
+            var found = id == Constants.System.RootString
                 ? Services.FileService.GetTemplates(-1)
                 : Services.FileService.GetTemplates(int.Parse(id));
 
@@ -69,7 +69,7 @@ namespace Umbraco.Web.Trees
                 template.IsMasterTemplate ? "icon-newspaper" : "icon-newspaper-alt",
                 template.IsMasterTemplate,
                 null,
-                Udi.Create(ObjectTypes.GetUdiType(ConstantsCore.ObjectTypes.TemplateType), template.Key)
+                Udi.Create(ObjectTypes.GetUdiType(Constants.ObjectTypes.TemplateType), template.Key)
             )));
 
             return nodes;
@@ -89,7 +89,7 @@ namespace Umbraco.Web.Trees
             var item = menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
             item.NavigateToRoute($"{queryStrings.GetRequiredValue<string>("application")}/templates/edit/{id}?create=true");
 
-            if (id == ConstantsCore.System.RootString)
+            if (id == Constants.System.RootString)
             {
                 //refresh action
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
@@ -123,7 +123,7 @@ namespace Umbraco.Web.Trees
                 Id = template.Id,
                 Key = template.Key,
                 Name = template.Name,
-                NodeObjectType = ConstantsCore.ObjectTypes.Template,
+                NodeObjectType = Constants.ObjectTypes.Template,
                 // TODO: Fix parent/paths on templates
                 ParentId = -1,
                 Path = template.Path,

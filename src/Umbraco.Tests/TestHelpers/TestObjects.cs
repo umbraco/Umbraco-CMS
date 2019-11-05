@@ -238,7 +238,7 @@ namespace Umbraco.Tests.TestHelpers
                 // mappersBuilder.AddCore();
                 // var mappers = mappersBuilder.CreateCollection();
                 var mappers = Current.Factory.GetInstance<IMapperCollection>();
-                databaseFactory = new UmbracoDatabaseFactory(ConstantsCore.System.UmbracoConnectionName, logger, new Lazy<IMapperCollection>(() => mappers));
+                databaseFactory = new UmbracoDatabaseFactory(Constants.System.UmbracoConnectionName, logger, new Lazy<IMapperCollection>(() => mappers));
             }
 
             fileSystems = fileSystems ?? new FileSystems(Current.Factory, logger);

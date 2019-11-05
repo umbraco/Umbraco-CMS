@@ -86,12 +86,12 @@ namespace Umbraco.Web
 
         public static string GetPreviewCookieValue(this HttpRequestMessage request)
         {
-            var cookie = request.Headers.GetCookies(ConstantsCore.Web.PreviewCookieName).FirstOrDefault();
+            var cookie = request.Headers.GetCookies(Constants.Web.PreviewCookieName).FirstOrDefault();
             if (cookie != null)
             {
-                if (cookie[ConstantsCore.Web.PreviewCookieName] != null)
+                if (cookie[Constants.Web.PreviewCookieName] != null)
                 {
-                    return cookie[ConstantsCore.Web.PreviewCookieName].Value;
+                    return cookie[Constants.Web.PreviewCookieName].Value;
                 }
             }
             return null;
@@ -99,7 +99,7 @@ namespace Umbraco.Web
 
         public static string GetPreviewCookieValue(this HttpRequestBase request)
         {
-            return request.GetCookieValue(ConstantsCore.Web.PreviewCookieName);
+            return request.GetCookieValue(Constants.Web.PreviewCookieName);
         }
 
         public static string GetPreviewCookieValue(this HttpRequest request)
@@ -114,7 +114,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static bool HasPreviewCookie(this HttpRequestBase request)
         {
-            return request.Cookies[ConstantsCore.Web.PreviewCookieName] != null;
+            return request.Cookies[Constants.Web.PreviewCookieName] != null;
         }
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static bool HasPreviewCookie(this IOwinRequest request)
         {
-            return request.Cookies[ConstantsCore.Web.PreviewCookieName] != null;
+            return request.Cookies[Constants.Web.PreviewCookieName] != null;
         }
 
         /// <summary>

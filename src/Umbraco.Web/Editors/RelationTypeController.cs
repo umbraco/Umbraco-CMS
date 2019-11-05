@@ -22,7 +22,7 @@ namespace Umbraco.Web.Editors
     /// The API controller for editing relation types.
     /// </summary>
     [PluginController("UmbracoApi")]
-    [UmbracoTreeAuthorize(ConstantsCore.Trees.RelationTypes)]
+    [UmbracoTreeAuthorize(Constants.Trees.RelationTypes)]
     [EnableOverrideAuthorization]
     public class RelationTypeController : BackOfficeNotificationsController
     {

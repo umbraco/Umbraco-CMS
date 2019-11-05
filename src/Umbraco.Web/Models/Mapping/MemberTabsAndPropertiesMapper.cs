@@ -82,7 +82,7 @@ namespace Umbraco.Web.Models.Mapping
             var umbracoContext = _umbracoContextAccessor.UmbracoContext;
             if (umbracoContext != null
                 && umbracoContext.Security.CurrentUser != null
-                && umbracoContext.Security.CurrentUser.AllowedSections.Any(x => x.Equals(ConstantsCore.Applications.Settings)))
+                && umbracoContext.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
             {
                 var memberTypeLink = string.Format("#/member/memberTypes/edit/{0}", source.ContentTypeId);
 
@@ -96,7 +96,7 @@ namespace Umbraco.Web.Models.Mapping
                         linkText = source.ContentType.Name,
                         url = memberTypeLink,
                         target = "_self",
-                        icon = ConstantsCore.Icons.ContentType
+                        icon = Constants.Icons.ContentType
                     }
                 };
                 docTypeProperty.View = "urllist";

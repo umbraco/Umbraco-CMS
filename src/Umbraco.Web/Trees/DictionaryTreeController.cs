@@ -11,14 +11,14 @@ namespace Umbraco.Web.Trees
 {
 
     [UmbracoTreeAuthorize(
-        ConstantsCore.Trees.Dictionary,
-        ConstantsCore.Trees.Templates
+        Constants.Trees.Dictionary,
+        Constants.Trees.Templates
         // We are allowed to see the dictionary tree, if we are allowed to manage templates, such that se can use the
         // dictionary items in templates, even when we dont have authorization to manage the dictionary items
         )]
     [Mvc.PluginController("UmbracoTrees")]
     [CoreTree]
-    [Tree(ConstantsCore.Applications.Translation, ConstantsCore.Trees.Dictionary, TreeGroup = ConstantsCore.Trees.Groups.Settings)]
+    [Tree(Constants.Applications.Translation, Constants.Trees.Dictionary, TreeGroup = Constants.Trees.Groups.Settings)]
     public class DictionaryTreeController : TreeController
     {
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
@@ -27,12 +27,12 @@ namespace Umbraco.Web.Trees
 
             // the default section is settings, falling back to this if we can't
             // figure out where we are from the querystring parameters
-            var section = ConstantsCore.Applications.Translation;
+            var section = Constants.Applications.Translation;
             if (queryStrings["application"] != null)
                 section = queryStrings["application"];
 
             // this will load in a custom UI instead of the dashboard for the root node
-            root.RoutePath = $"{section}/{ConstantsCore.Trees.Dictionary}/list";
+            root.RoutePath = $"{section}/{Constants.Trees.Dictionary}/list";
 
             return root;
         }
@@ -58,7 +58,7 @@ namespace Umbraco.Web.Trees
 
             Func<IDictionaryItem, string> ItemSort() => item => item.ItemKey;
 
-            if (id == ConstantsCore.System.RootString)
+            if (id == Constants.System.RootString)
             {
                 nodes.AddRange(
                     Services.LocalizationService.GetRootDictionaryItems().OrderBy(ItemSort()).Select(
@@ -104,7 +104,7 @@ namespace Umbraco.Web.Trees
 
             menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
 
-            if (id != ConstantsCore.System.RootString)
+            if (id != Constants.System.RootString)
                 menu.Items.Add<ActionDelete>(Services.TextService, true, opensDialog: true);
 
             menu.Items.Add(new RefreshNode(Services.TextService, true));

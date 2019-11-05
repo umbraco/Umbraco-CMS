@@ -7,8 +7,8 @@ using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Trees
 {
-    [UmbracoTreeAuthorize(ConstantsCore.Trees.MemberGroups)]
-    [Tree(ConstantsCore.Applications.Members, ConstantsCore.Trees.MemberGroups, SortOrder = 1)]
+    [UmbracoTreeAuthorize(Constants.Trees.MemberGroups)]
+    [Tree(Constants.Applications.Members, Constants.Trees.MemberGroups, SortOrder = 1)]
     [Mvc.PluginController("UmbracoTrees")]
     [CoreTree]
     public class MemberGroupTreeController : MemberTypeAndGroupTreeControllerBase
@@ -17,7 +17,7 @@ namespace Umbraco.Web.Trees
         {
             return Services.MemberGroupService.GetAll()
                 .OrderBy(x => x.Name)
-                .Select(dt => CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, ConstantsCore.Icons.MemberGroup, false));
+                .Select(dt => CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, Constants.Icons.MemberGroup, false));
         }
 
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)

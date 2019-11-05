@@ -22,7 +22,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         public EntityContainerRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, Guid containerObjectType)
             : base(scopeAccessor, cache, logger)
         {
-            var allowedContainers = new[] { ConstantsCore.ObjectTypes.DocumentTypeContainer, ConstantsCore.ObjectTypes.MediaTypeContainer, ConstantsCore.ObjectTypes.DataTypeContainer };
+            var allowedContainers = new[] { Constants.ObjectTypes.DocumentTypeContainer, Constants.ObjectTypes.MediaTypeContainer, Constants.ObjectTypes.DataTypeContainer };
             _containerObjectType = containerObjectType;
             if (allowedContainers.Contains(_containerObjectType) == false)
                 throw new InvalidOperationException("No container type exists with ID: " + _containerObjectType);
@@ -93,7 +93,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var entity = new EntityContainer(nodeDto.NodeId, nodeDto.UniqueId,
                 nodeDto.ParentId, nodeDto.Path, nodeDto.Level, nodeDto.SortOrder,
                 containedObjectType,
-                nodeDto.Text, nodeDto.UserId ?? ConstantsCore.Security.UnknownUserId);
+                nodeDto.Text, nodeDto.UserId ?? Constants.Security.UnknownUserId);
 
             // reset dirty initial properties (U4-1946)
             entity.ResetDirtyProperties(false);
