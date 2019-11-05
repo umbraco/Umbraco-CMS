@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlServerCe;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
@@ -51,6 +53,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         {
             return "(" + string.Join("+", args) + ")";
         }
+
+        public override System.Data.IsolationLevel DefaultIsolationLevel => System.Data.IsolationLevel.RepeatableRead;
 
         public override string FormatColumnRename(string tableName, string oldName, string newName)
         {
@@ -150,6 +154,39 @@ where table_name=@0 and column_name=@1", tableName, columnName).FirstOrDefault()
                                        new { TableName = tableName });
 
             return result > 0;
+        }
+
+        public override void WriteLock(IDatabase db, params int[] lockIds)
+        {
+            // soon as we get Database, a transaction is started
+
+            if (db.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
+                throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
+
+            db.Execute(@"SET LOCK_TIMEOUT 1800;");
+            // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
+            foreach (var lockId in lockIds)
+            {
+                var i = db.Execute(@"UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id", new { id = lockId });
+                if (i == 0) // ensure we are actually locking!
+                    throw new ArgumentException($"LockObject with id={lockId} does not exist.");
+            }
+        }
+
+        public override void ReadLock(IDatabase db, params int[] lockIds)
+        {
+            // soon as we get Database, a transaction is started
+
+            if (db.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
+                throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
+
+            // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
+            foreach (var lockId in lockIds)
+            {
+                var i = db.ExecuteScalar<int?>("SELECT value FROM umbracoLock WHERE id=@id", new { id = lockId });
+                if (i == null) // ensure we are actually locking!
+                    throw new ArgumentException($"LockObject with id={lockId} does not exist.");
+            }
         }
 
         protected override string FormatIdentity(ColumnDefinition column)

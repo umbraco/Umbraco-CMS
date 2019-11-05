@@ -5,7 +5,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
         
         vm.configItems = [];
         vm.viewItems = [];
-        vm.changed = changed;
+        vm.change = change;
         
         function init() {
             
@@ -20,7 +20,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
                     sortedItems.push({ key: keys[i], sortOrder: vals[i].sortOrder, value: vals[i].value});
                 }
 
-                //ensure the items are sorted by the provided sort order
+                // ensure the items are sorted by the provided sort order
                 sortedItems.sort(function (a, b) { return (a.sortOrder > b.sortOrder) ? 1 : ((b.sortOrder > a.sortOrder) ? -1 : 0); });
                 
                 vm.configItems = sortedItems;
@@ -74,7 +74,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
             
         }
 
-        function changed(model, value) {
+        function change(model, value) {
             
             var index = $scope.model.value.indexOf(value);
             

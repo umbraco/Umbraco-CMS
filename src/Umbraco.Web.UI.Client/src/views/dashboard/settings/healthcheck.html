@@ -1,30 +1,28 @@
 <div ng-controller="Umbraco.Dashboard.HealthCheckController as vm">
 
     <div ng-if="vm.viewState === 'list'">
-        
+
         <umb-box>
             <umb-box-content>
-                <div class="flex justify-between items-center">
-                    <h3 class="bold">Health Check</h3>
-                    <umb-button
-                        type="button"
-                        button-style="success" 
-                        label="Check All Groups"
-                        action="vm.checkAllGroups(vm.groups)">
-                    </umb-button>
-                </div>
-        
                 <div class="umb-healthcheck-help-text">
-                    <p>The health checker evaluates various areas of your site for best practice settings, configuration, potential problems, etc. You can easily fix problems by pressing a button.
-                    You can add your own health checks, have a look at <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" class="btn-link -underline">the documentation for more information</a> about custom health checks.</p>
+                    <p>
+                        The health checker evaluates various areas of your site for best practice settings, configuration, potential problems, etc. You can easily fix problems by pressing a button.
+                        You can add your own health checks, have a look at <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" class="btn-link -underline">the documentation for more information</a> about custom health checks.
+                    </p>
+                </div>
+                <div class="umb-panel-group__details-status-actions">
+                        <umb-button type="button"
+                                    button-style="success"
+                                    label="Check All Groups"
+                                    action="vm.checkAllGroups(vm.groups)">
+                        </umb-button>                    
                 </div>
             </umb-box-content>
         </umb-box>
 
         <div class="umb-healthcheck">
-
-            <div class="umb-air" ng-repeat="group in vm.groups" ng-click="vm.openGroup(group);">
-                <div class="umb-healthcheck-group">
+            <div class="umb-air" ng-repeat="group in vm.groups">
+                <button type="button" class="umb-healthcheck-group" ng-click="vm.openGroup(group);">
 
                     <div class="umb-healthcheck-title">{{group.name}}</div>
 
@@ -32,71 +30,76 @@
                         <umb-load-indicator></umb-load-indicator>
                     </div>
 
-                    <div class="umb-healthcheck-messages" ng-hide="group.loading || !group.totalSuccess && !group.totalWarning && !group.totalError && !group.totalInfo">
+                    <div class="umb-healthcheck-messages"
+                         ng-hide="group.loading || !group.totalSuccess && !group.totalWarning && !group.totalError && !group.totalInfo">
 
                         <div class="umb-healthcheck-message" ng-if="group.totalSuccess > 0">
-                            <i class="icon-check color-green"></i>
+                            <i class="icon-check color-green" aria-hidden="true"></i>
                             {{ group.totalSuccess }}
+                            <span class="sr-only">
+                                <localize key="visuallyHiddenTexts_passed">passed</localize>
+                            </span>
                         </div>
 
                         <div class="umb-healthcheck-message" ng-if="group.totalWarning > 0">
-                            <i class="icon-alert color-orange"></i>
+                            <i class="icon-alert color-orange" aria-hidden="true"></i>
                             {{ group.totalWarning }}
+                            <span class="sr-only">
+                                <localize key="visuallyHiddenTexts_warning">warning</localize>
+                            </span>
                         </div>
 
                         <div class="umb-healthcheck-message" ng-if="group.totalError > 0">
-                            <i class="icon-delete color-red"></i>
+                            <i class="icon-delete color-red" aria-hidden="true"></i>
                             {{ group.totalError }}
+                            <span class="sr-only">
+                                <localize key="visuallyHiddenTexts_failed">failed</localize>
+                            </span>
                         </div>
 
                         <div class="umb-healthcheck-message" ng-if="group.totalInfo > 0">
-                            <i class="umb-healthcheck-status-icon icon-info"></i>
+                            <i class="umb-healthcheck-status-icon icon-info" aria-hidden="true"></i>
                             {{ group.totalInfo }}
+                            <span class="sr-only">
+                                <localize key="visuallyHiddenTexts_suggestion">suggestion</localize>
+                            </span>
                         </div>
-
                     </div>
-
-                </div>
+                </button>
             </div>
-
         </div>
-
     </div>
 
     <div ng-if="vm.viewState === 'details'">
 
         <umb-editor-sub-header>
             <umb-editor-sub-header-content-left>
-                <a class="umb-healthcheck-back-link" href="" ng-click="vm.setViewState('list');">&larr; Back to overview</a>
+                <button type="button" class="umb-healthcheck-back-link" ng-click="vm.setViewState('list');">
+                    <span aria-hidden="true">&larr;</span> Back to overview
+                </button>
             </umb-editor-sub-header-content-left>
         </umb-editor-sub-header>
-
 
         <div class="umb-panel-group__details">
 
             <div class="umb-panel-group__details-group">
-
                 <div class="umb-panel-group__details-group-title">
                     <div class="umb-panel-group__details-group-name">{{ vm.selectedGroup.name }}</div>
-                    <umb-button
-                        type="button" 
-                        action="vm.checkAllInGroup(vm.selectedGroup, vm.selectedGroup.checks)"
-                        label="Check group">
+                    <umb-button type="button" button-style="success"
+                                action="vm.checkAllInGroup(vm.selectedGroup, vm.selectedGroup.checks)"
+                                label="Check group">
                     </umb-button>
                 </div>
 
                 <div class="umb-panel-group__details-checks">
-
                     <div class="umb-panel-group__details-check" ng-repeat="check in vm.selectedGroup.checks">
-
                         <div class="umb-panel-group__details-check-title">
                             <div class="umb-panel-group__details-check-name">{{ check.name }}</div>
                             <div class="umb-panel-group__details-check-description">{{ check.description }}</div>
                         </div>
 
                         <div class="umb-panel-group__details-status" ng-repeat="status in check.status">
-
-                            <div class="umb-panel-group__details-status-icon-container">
+                            <div class="umb-panel-group__details-status-icon-container" aria-hidden="true">
                                 <i class="umb-healthcheck-status-icon icon-check color-green" ng-if="status.resultType === 0"></i>
                                 <i class="umb-healthcheck-status-icon icon-alert icon-alert color-yellow" ng-if="status.resultType === 1"></i>
                                 <i class="umb-healthcheck-status-icon icon-delete icon-delete color-red" ng-if="status.resultType === 2"></i>
@@ -104,8 +107,19 @@
                             </div>
 
                             <div class="umb-panel-group__details-status-content">
-
                                 <div class="umb-panel-group__details-status-text">
+                                    <span class="sr-only" ng-if="status.resultType === 0">
+                                        <localize key="visuallyHiddenTexts_checkPassed">Check passed</localize>:
+                                    </span>
+                                    <span class="sr-only" ng-if="status.resultType === 1">
+                                        <localize key="visuallyHiddenTexts_warning">warning</localize>:
+                                    </span>
+                                    <span class="sr-only" ng-if="status.resultType === 2">
+                                        <localize key="visuallyHiddenTexts_checkFailed">Check failed</localize>:
+                                    </span>
+                                    <span class="sr-only" ng-if="status.resultType === 3">
+                                        <localize key="visuallyHiddenTexts_suggestion">suggestion</localize>:
+                                    </span>
                                     <div ng-bind-html="status.message"></div>
                                     <div ng-if="status.description" ng-bind-html="status.description"></div>
                                 </div>
@@ -116,16 +130,15 @@
 
                                             <div ng-if="action.valueRequired">
                                                 <div><label class="bold">Set new value:</label></div>
-                                                <input name="providedValue" type="text" ng-model="action.providedValue" required val-email/>
+                                                <input name="providedValue" type="text" ng-model="action.providedValue" required val-email />
                                             </div>
 
-                                            <umb-button
-                                                type="button"
-                                                button-style="success"
-                                                size="s"
-                                                disabled="healthCheckAction.providedValue.$invalid"
-                                                action="vm.executeAction(check, $parent.$index, action)"
-                                                label="{{action.name}}">
+                                            <umb-button type="button"
+                                                        button-style="success"
+                                                        size="s"
+                                                        disabled="healthCheckAction.providedValue.$invalid"
+                                                        action="vm.executeAction(check, $parent.$index, action)"
+                                                        label="{{action.name}}">
                                             </umb-button>
 
                                         </ng-form>
@@ -133,9 +146,7 @@
                                         <div class="umb-panel-group__details-status-action-description" ng-if="action.description" ng-bind-html="action.description"></div>
                                     </div>
                                 </div>
-
                             </div>
-
                         </div>
 
                         <div ng-show="check.loading">
@@ -144,13 +155,8 @@
                         </div>
 
                     </div>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
 </div>

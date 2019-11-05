@@ -63,12 +63,12 @@
         <input type="hidden" name="minCount" ng-model="renderModel" />
         <input type="hidden" name="maxCount" ng-model="renderModel" />
 
-        <div ng-messages="contentPickerForm.minCount.$error" show-validation-on-submit>
+        <div ng-messages="multiUrlPickerForm.minCount.$error" show-validation-on-submit>
             <div class="help-inline" ng-message="minCount">
                 <localize key="validation_minCount">You need to add at least</localize> {{model.config.minNumber}} <localize key="validation_items">items</localize>
             </div>
         </div>
-        <div ng-messages="contentPickerForm.maxCount.$error" show-validation-on-submit>
+        <div ng-messages="multiUrlPickerForm.maxCount.$error" show-validation-on-submit>
             <div class="help-inline" ng-message="maxCount">
                 <localize key="validation_maxCount">You can only have</localize> {{model.config.maxNumber}} <localize key="validation_itemsSelected">items selected</localize>
             </div>

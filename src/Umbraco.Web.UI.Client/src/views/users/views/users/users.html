@@ -285,7 +285,7 @@
 
         <umb-editor-sub-header>
             <umb-editor-sub-header-content-left>
-                <a class="umb-package-details__back-link" href="" ng-click="vm.setUsersViewState('overview');">&larr; <localize key="user_backToUsers">Back to users</localize></a>
+                <button type="button" class="umb-package-details__back-action" ng-click="vm.setUsersViewState('overview');"><span aria-hidden="true">&larr;</span> <localize key="user_backToUsers">Back to users</localize></button>
             </umb-editor-sub-header-content-left>
         </umb-editor-sub-header>
 
@@ -359,6 +359,8 @@
                                 <localize key="general_add">Add</localize>
                             </a>
 
+                            <input type="hidden" ng-model="vm.newUser.userGroupsValidation" ng-required="!vm.newUser.userGroups.length" />
+
                         </umb-control-group>
 
                         <umb-control-group label="@general_message" ng-if="vm.usersViewState === 'inviteUser'" label-for="message" required="true">
@@ -408,7 +410,7 @@
 
         <umb-editor-sub-header>
             <umb-editor-sub-header-content-left>
-                <a class="umb-package-details__back-link" href="" ng-click="vm.setUsersViewState('overview');">&larr; <localize key="user_backToUsers">Back to users</localize></a>
+                <button type="button" class="umb-package-details__back-action" ng-click="vm.setUsersViewState('overview');"><span aria-hidden="true">&larr;</span> <localize key="user_backToUsers">Back to users</localize></button>
             </umb-editor-sub-header-content-left>
         </umb-editor-sub-header>
 
@@ -490,7 +492,7 @@
     <div ng-if="vm.usersViewState === 'inviteUserSuccess'">
         <umb-editor-sub-header>
             <umb-editor-sub-header-content-left>
-                <a class="umb-package-details__back-link" href="" ng-click="vm.setUsersViewState('overview');">&larr; <localize key="user_backToUsers">Back to users</localize></a>
+                <button type="button" class="umb-package-details__back-action" ng-click="vm.setUsersViewState('overview');"><span aria-hidden="true">&larr;</span> <localize key="user_backToUsers">Back to users</localize></button>
             </umb-editor-sub-header-content-left>
         </umb-editor-sub-header>
 

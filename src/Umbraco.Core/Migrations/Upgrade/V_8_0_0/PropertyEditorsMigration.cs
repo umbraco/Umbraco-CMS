@@ -12,12 +12,12 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
         public override void Migrate()
         {
-            RenameDataType(Constants.PropertyEditors.Aliases.ContentPicker + "2", Constants.PropertyEditors.Aliases.ContentPicker);
-            RenameDataType(Constants.PropertyEditors.Aliases.MediaPicker + "2", Constants.PropertyEditors.Aliases.MediaPicker);
-            RenameDataType(Constants.PropertyEditors.Aliases.MemberPicker + "2", Constants.PropertyEditors.Aliases.MemberPicker);
-            RenameDataType(Constants.PropertyEditors.Aliases.MultiNodeTreePicker + "2", Constants.PropertyEditors.Aliases.MultiNodeTreePicker);
-            RenameDataType("Umbraco.TextboxMultiple", Constants.PropertyEditors.Aliases.TextArea, false);
-            RenameDataType("Umbraco.Textbox", Constants.PropertyEditors.Aliases.TextBox, false);
+            RenameDataType(Constants.PropertyEditors.Legacy.Aliases.ContentPicker2, Constants.PropertyEditors.Aliases.ContentPicker);
+            RenameDataType(Constants.PropertyEditors.Legacy.Aliases.MediaPicker2, Constants.PropertyEditors.Aliases.MediaPicker);
+            RenameDataType(Constants.PropertyEditors.Legacy.Aliases.MemberPicker2, Constants.PropertyEditors.Aliases.MemberPicker);
+            RenameDataType(Constants.PropertyEditors.Legacy.Aliases.MultiNodeTreePicker2, Constants.PropertyEditors.Aliases.MultiNodeTreePicker);
+            RenameDataType(Constants.PropertyEditors.Legacy.Aliases.TextboxMultiple, Constants.PropertyEditors.Aliases.TextArea, false);
+            RenameDataType(Constants.PropertyEditors.Legacy.Aliases.Textbox, Constants.PropertyEditors.Aliases.TextBox, false);
         }
 
         private void RenameDataType(string fromAlias, string toAlias, bool checkCollision = true)
@@ -43,7 +43,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                         $"Property Editors. Before upgrading to v8, any Data Types using property editors that are named with the prefix '(Obsolete)' must be migrated " +
                         $"to the non-obsolete v7 property editors of the same type.");
                 }
-                    
+
             }
 
             Database.Execute(Sql()
