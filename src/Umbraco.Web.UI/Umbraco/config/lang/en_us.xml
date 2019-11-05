@@ -2224,7 +2224,7 @@ To manage your website, simply open the Umbraco back office and start adding con
       <key alias="findLogsWithMachineName">Find Logs with Machine Name</key>
       <key alias="open">Open</key>
   </area>
-   <area alias="settingsDashboard">
+  <area alias="settingsDashboard">
     <key alias="start">Start here</key>
     <key alias="startDescription">This section contains the building blocks for your Umbraco site. Follow the below links to find out more about working with the items in the Settings section</key>
     <key alias="more">Find out more</key>
