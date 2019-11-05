@@ -381,7 +381,7 @@ namespace Umbraco.Core.Models
         private static string SanitizeAlias(string value)
         {
             //NOTE: WE are doing this because we don't want to do a ToSafeAlias when the alias is the special case of
-            // being prefixed with ConstantsCore.PropertyEditors.InternalGenericPropertiesPrefix
+            // being prefixed with Constants.PropertyEditors.InternalGenericPropertiesPrefix
             // which is used internally
 
             return value.StartsWith(Constants.PropertyEditors.InternalGenericPropertiesPrefix)

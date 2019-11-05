@@ -8,7 +8,7 @@
     //{
     //    public char Letter => '7';
     //    public string Alias => "changeDocType";
-    //    public string Category => ConstantsCore.Conventions.PermissionCategories.AdministrationCategory;
+    //    public string Category => Constants.Conventions.PermissionCategories.AdministrationCategory;
     //    public string Icon => "axis-rotation-2";
     //    public bool ShowInNotifier => true;
     //    public bool CanBePermissionAssigned => true;

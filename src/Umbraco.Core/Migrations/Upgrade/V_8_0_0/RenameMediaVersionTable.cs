@@ -13,7 +13,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             Rename.Table("cmsMedia").To(Constants.DatabaseSchema.Tables.MediaVersion).Do();
 
             // that is not supported on SqlCE
-            //Rename.Column("versionId").OnTable(ConstantsCore.DatabaseSchema.Tables.MediaVersion).To("id").Do();
+            //Rename.Column("versionId").OnTable(Constants.DatabaseSchema.Tables.MediaVersion).To("id").Do();
 
             AddColumn<MediaVersionDto>("id", out var sqls);
 

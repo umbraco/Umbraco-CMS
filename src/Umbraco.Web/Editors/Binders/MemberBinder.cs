@@ -86,7 +86,7 @@ namespace Umbraco.Web.Editors.Binders
                     //{
                     //    //if there's a 'Member' type then we should be able to just go get it from the db since it was created with a link
                     //    // to our data.
-                    //    var memberType = ApplicationContext.Services.MemberTypeService.GetMemberType(ConstantsCore.Conventions.MemberTypes.Member);
+                    //    var memberType = ApplicationContext.Services.MemberTypeService.GetMemberType(Constants.Conventions.MemberTypes.Member);
                     //    if (memberType != null)
                     //    {
                     //        var existing = GetExisting(model.Key);

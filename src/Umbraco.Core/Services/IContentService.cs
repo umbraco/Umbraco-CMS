@@ -423,7 +423,7 @@ namespace Umbraco.Core.Services
         //IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force,
         //    Func<IContent, HashSet<string>> shouldPublish,
         //    Func<IContent, HashSet<string>, bool> publishCultures,
-        //    int userId = ConstantsCore.Security.SuperUserId);
+        //    int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Unpublishes a document.

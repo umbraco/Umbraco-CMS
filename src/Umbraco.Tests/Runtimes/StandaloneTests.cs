@@ -141,7 +141,7 @@ namespace Umbraco.Tests.Runtimes
                 }
 
                 //var databaseBuilder = factory.GetInstance<DatabaseBuilder>();
-                //databaseFactory.Configure(DatabaseBuilder.EmbeddedDatabaseConnectionString, ConstantsCore.DbProviderNames.SqlCe);
+                //databaseFactory.Configure(DatabaseBuilder.EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe);
                 //databaseBuilder.CreateDatabaseSchemaAndData();
 
                 if (!databaseFactory.Configured)

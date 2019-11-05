@@ -486,14 +486,14 @@ namespace Umbraco.Core.Services.Implement
                     //query =
                     //    Query<IMember>.Builder.Where(
                     //        x =>
-                    //        ((Member)x).PropertyTypeAlias == ConstantsCore.Conventions.Member.LastLoginDate &&
+                    //        ((Member)x).PropertyTypeAlias == Constants.Conventions.Member.LastLoginDate &&
                     //        ((Member)x).DateTimePropertyValue > fromDate);
                     //return repository.GetCountByQuery(query);
                     //var fromDate = DateTime.Now.AddMinutes(-Membership.UserIsOnlineTimeWindow);
                     //query =
                     //    Query<IMember>.Builder.Where(
                     //        x =>
-                    //        ((Member)x).PropertyTypeAlias == ConstantsCore.Conventions.Member.LastLoginDate &&
+                    //        ((Member)x).PropertyTypeAlias == Constants.Conventions.Member.LastLoginDate &&
                     //        ((Member)x).DateTimePropertyValue > fromDate);
                     //return repository.GetCountByQuery(query);
                     case MemberCountType.LockedOut:

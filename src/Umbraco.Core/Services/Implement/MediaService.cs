@@ -812,12 +812,12 @@ namespace Umbraco.Core.Services.Implement
                 //    return;
                 //}
 
-                //uow.WriteLock(ConstantsCore.Locks.MediaTree);
+                //uow.WriteLock(Constants.Locks.MediaTree);
                 //var repository = uow.CreateRepository<IMediaRepository>();
                 //repository.DeleteVersions(id, versionDate);
 
                 //uow.Events.Dispatch(DeletedVersions, this, new DeleteRevisionsEventArgs(id, false, dateToRetain: versionDate));
-                //Audit(uow, AuditType.Delete, "Delete Media by version date, userId, ConstantsCore.System.Root);
+                //Audit(uow, AuditType.Delete, "Delete Media by version date, userId, Constants.System.Root);
 
                 //uow.Complete();
             }

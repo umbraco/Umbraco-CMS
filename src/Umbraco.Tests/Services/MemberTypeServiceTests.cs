@@ -208,7 +208,7 @@ namespace Umbraco.Tests.Services
         //    ctBase.AddPropertyType(new PropertyType(dtdYesNo)
         //        {
         //            Name = "Hide From Navigation",
-        //            Alias = ConstantsCore.Conventions.Content.NaviHide
+        //            Alias = Constants.Conventions.Content.NaviHide
         //        }
         //        /*,"Navigation"*/);
         //    cts.Save(ctBase);

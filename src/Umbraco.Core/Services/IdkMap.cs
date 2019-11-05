@@ -80,7 +80,7 @@ namespace Umbraco.Core.Services
             using (var scope = _scopeProvider.CreateScope())
             {
                 // populate content and media items
-                var types = new[] { ConstantsCore.ObjectTypes.Document, ConstantsCore.ObjectTypes.Media };
+                var types = new[] { Constants.ObjectTypes.Document, Constants.ObjectTypes.Media };
                 var values = scope.Database.Query<TypedIdDto>("SELECT id, uniqueId, nodeObjectType FROM umbracoNode WHERE nodeObjectType IN @types", new { types });
                 foreach (var value in values)
                 {

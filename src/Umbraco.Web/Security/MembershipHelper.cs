@@ -497,7 +497,7 @@ namespace Umbraco.Web.Security
                 //// for a given property.
                 ////These are the default built-in MVC template types: “Boolean”, “Decimal”, “EmailAddress”, “HiddenInput”, “HTML”, “Object”, “String”, “Text”, and “Url”
                 //// by default we'll render a text box since we've defined that metadata on the UmbracoProperty.Value property directly.
-                //if (prop.DataTypeId == new Guid(ConstantsCore.PropertyEditors.TrueFalse))
+                //if (prop.DataTypeId == new Guid(Constants.PropertyEditors.TrueFalse))
                 //{
                 //    viewProperty.EditorTemplate = "UmbracoBoolean";
                 //}

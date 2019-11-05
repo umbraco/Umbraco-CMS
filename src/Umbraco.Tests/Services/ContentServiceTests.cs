@@ -36,7 +36,7 @@ namespace Umbraco.Tests.Services
         Logger = UmbracoTestOptions.Logger.Console)]
     public class ContentServiceTests : TestWithSomeContentBase
     {
-        // TODO: Add test to verify there is only ONE newest document/content in {ConstantsCore.DatabaseSchema.Tables.Document} table after updating.
+        // TODO: Add test to verify there is only ONE newest document/content in {Constants.DatabaseSchema.Tables.Document} table after updating.
         // TODO: Add test to delete specific version (with and without deleting prior versions) and versions by date.
 
         public override void SetUp()

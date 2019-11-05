@@ -1723,9 +1723,9 @@ WHERE cmsContentXml.nodeId IN (
                 //                    db.Execute(@"DELETE cmsContentXml
                 //FROM cmsContentXml
                 //JOIN umbracoNode ON (cmsContentXml.nodeId=umbracoNode.Id)
-                //JOIN {ConstantsCore.DatabaseSchema.Tables.Content} ON (cmsContentXml.nodeId={ConstantsCore.DatabaseSchema.Tables.Content}.nodeId)
+                //JOIN {Constants.DatabaseSchema.Tables.Content} ON (cmsContentXml.nodeId={Constants.DatabaseSchema.Tables.Content}.nodeId)
                 //WHERE umbracoNode.nodeObjectType=@objType
-                //AND {ConstantsCore.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)",
+                //AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)",
                 db.Execute($@"DELETE FROM cmsContentXml
 WHERE cmsContentXml.nodeId IN (
     SELECT id FROM umbracoNode
@@ -1794,9 +1794,9 @@ WHERE cmsPreviewXml.nodeId IN (
                 //                    db.Execute(@"DELETE cmsPreviewXml
                 //FROM cmsPreviewXml
                 //JOIN umbracoNode ON (cmsPreviewXml.nodeId=umbracoNode.Id)
-                //JOIN {ConstantsCore.DatabaseSchema.Tables.Content} ON (cmsPreviewXml.nodeId={ConstantsCore.DatabaseSchema.Tables.Content}.nodeId)
+                //JOIN {Constants.DatabaseSchema.Tables.Content} ON (cmsPreviewXml.nodeId={Constants.DatabaseSchema.Tables.Content}.nodeId)
                 //WHERE umbracoNode.nodeObjectType=@objType
-                //AND {ConstantsCore.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)",
+                //AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)",
                 db.Execute($@"DELETE FROM cmsPreviewXml
 WHERE cmsPreviewXml.nodeId IN (
     SELECT id FROM umbracoNode
@@ -1817,7 +1817,7 @@ WHERE cmsPreviewXml.nodeId IN (
             long total;
             do
             {
-                // .GetPagedResultsByQuery implicitly adds ({ConstantsCore.DatabaseSchema.Tables.Document}.newest = 1) which
+                // .GetPagedResultsByQuery implicitly adds ({Constants.DatabaseSchema.Tables.Document}.newest = 1) which
                 // is what we want for preview (ie latest version of a content, published or not)
                 var descendants = _documentRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
                 const bool published = true; // previewXml contains edit content!
@@ -1869,9 +1869,9 @@ WHERE cmsContentXml.nodeId IN (
                 //                    db.Execute(@"DELETE cmsContentXml
                 //FROM cmsContentXml
                 //JOIN umbracoNode ON (cmsContentXml.nodeId=umbracoNode.Id)
-                //JOIN {ConstantsCore.DatabaseSchema.Tables.Content} ON (cmsContentXml.nodeId={ConstantsCore.DatabaseSchema.Tables.Content}.nodeId)
+                //JOIN {Constants.DatabaseSchema.Tables.Content} ON (cmsContentXml.nodeId={Constants.DatabaseSchema.Tables.Content}.nodeId)
                 //WHERE umbracoNode.nodeObjectType=@objType
-                //AND {ConstantsCore.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)",
+                //AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)",
                 db.Execute($@"DELETE FROM cmsContentXml
 WHERE cmsContentXml.nodeId IN (
     SELECT id FROM umbracoNode
@@ -1938,9 +1938,9 @@ WHERE cmsContentXml.nodeId IN (
                 //                    db.Execute(@"DELETE cmsContentXml
                 //FROM cmsContentXml
                 //JOIN umbracoNode ON (cmsContentXml.nodeId=umbracoNode.Id)
-                //JOIN {ConstantsCore.DatabaseSchema.Tables.Content} ON (cmsContentXml.nodeId={ConstantsCore.DatabaseSchema.Tables.Content}.nodeId)
+                //JOIN {Constants.DatabaseSchema.Tables.Content} ON (cmsContentXml.nodeId={Constants.DatabaseSchema.Tables.Content}.nodeId)
                 //WHERE umbracoNode.nodeObjectType=@objType
-                //AND {ConstantsCore.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)",
+                //AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)",
                 db.Execute($@"DELETE FROM cmsContentXml
 WHERE cmsContentXml.nodeId IN (
     SELECT id FROM umbracoNode
