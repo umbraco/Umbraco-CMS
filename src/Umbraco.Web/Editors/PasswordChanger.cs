@@ -246,7 +246,7 @@ namespace Umbraco.Web.Editors
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Cannot set an empty password", new[] { "value" }) });
             }
 
-            //without being able to retrieve the original password, 
+            //without being able to retrieve the original password,
             //we cannot arbitrarily change the password without knowing the old one and no old password was supplied - need to return an error
             if (passwordModel.OldPassword.IsNullOrWhiteSpace() && membershipProvider.EnablePasswordRetrieval == false)
             {

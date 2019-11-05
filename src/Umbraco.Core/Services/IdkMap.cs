@@ -207,7 +207,7 @@ namespace Umbraco.Core.Services
             if (guidUdi == null)
                 return Attempt<int>.Fail();
 
-            var umbracoType = Constants.UdiEntityType.ToUmbracoObjectType(guidUdi.EntityType);
+            var umbracoType = UdiEntityTypeHelper.ToUmbracoObjectType(guidUdi.EntityType);
             return GetIdForKey(guidUdi.Guid, umbracoType);
         }
 
@@ -215,7 +215,7 @@ namespace Umbraco.Core.Services
         {
             var keyAttempt = GetKeyForId(id, umbracoObjectType);
             return keyAttempt
-                ? Attempt.Succeed<Udi>(new GuidUdi(Constants.UdiEntityType.FromUmbracoObjectType(umbracoObjectType), keyAttempt.Result))
+                ? Attempt.Succeed<Udi>(new GuidUdi(UdiEntityTypeHelper.FromUmbracoObjectType(umbracoObjectType), keyAttempt.Result))
                 : Attempt<Udi>.Fail();
         }
 

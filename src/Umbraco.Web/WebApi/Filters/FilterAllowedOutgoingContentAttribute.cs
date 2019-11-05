@@ -110,7 +110,7 @@ namespace Umbraco.Web.WebApi.Filters
                     if (nodePermission.Contains(_permissionToCheck.ToString(CultureInfo.InvariantCulture)) == false)
                     {
                         toRemove.Add(item);
-                    }                    
+                    }
                 }
                 foreach (var item in toRemove)
                 {

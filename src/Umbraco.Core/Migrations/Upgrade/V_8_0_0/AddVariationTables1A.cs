@@ -37,7 +37,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
             // name, languageId are now non-nullable
             AlterColumn<ContentVersionCultureVariationDto>(Constants.DatabaseSchema.Tables.ContentVersionCultureVariation, "name");
-            AlterColumn<ContentVersionCultureVariationDto>(Constants.DatabaseSchema.Tables.ContentVersionCultureVariation, "languageId");           
+            AlterColumn<ContentVersionCultureVariationDto>(Constants.DatabaseSchema.Tables.ContentVersionCultureVariation, "languageId");
 
             Create.Table<DocumentCultureVariationDto>().Do();
         }

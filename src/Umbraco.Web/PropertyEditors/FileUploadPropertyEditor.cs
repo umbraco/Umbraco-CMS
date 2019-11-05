@@ -52,7 +52,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             return property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.UploadField;
         }
-        
+
         /// <summary>
         /// Ensures any files associated are removed
         /// </summary>

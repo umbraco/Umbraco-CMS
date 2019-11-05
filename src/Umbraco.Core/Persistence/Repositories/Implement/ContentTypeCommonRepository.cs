@@ -202,7 +202,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .AndBy<PropertyTypeDto>(x => x.SortOrder, x => x.Id);
 
             var propertyDtos = Database.Fetch<PropertyTypeCommonDto>(sql2);
-            var builtinProperties = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
+            var builtinProperties = ConventionsHelper.GetStandardPropertyTypeStubs();
 
             var groupIx = 0;
             var propertyIx = 0;

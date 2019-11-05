@@ -94,7 +94,7 @@ namespace Umbraco.Web.Mvc
 
                 if (content != null)
                     _helper.AssignedContentItem = content;
-                
+
                 return _helper;
             }
         }

@@ -65,7 +65,7 @@ namespace Umbraco.Web.Models
         /// </summary>
         [Required]
         public string Password { get; set; }
-        
+
         /// <summary>
         /// The username of the model, if UsernameIsEmail is true then this is ignored.
         /// </summary>

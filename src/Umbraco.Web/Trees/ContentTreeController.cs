@@ -14,11 +14,11 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Search;
-using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
 {
@@ -172,8 +172,8 @@ namespace Umbraco.Web.Trees
                 return menu;
             }
 
-            var nodeMenu = GetAllNodeMenuItems(item);            
-            
+            var nodeMenu = GetAllNodeMenuItems(item);
+
             //if the content node is in the recycle bin, don't have a default menu, just show the regular menu
             if (item.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Contains(RecycleBinId.ToInvariantString()))
             {
@@ -274,7 +274,7 @@ namespace Umbraco.Web.Trees
 
             return menu;
         }
-        
+
         /// <summary>
         /// set name according to variations
         /// </summary>

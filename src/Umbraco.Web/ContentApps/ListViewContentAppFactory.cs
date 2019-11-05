@@ -73,7 +73,7 @@ namespace Umbraco.Web.ContentApps
             };
 
             var customDtdName = Core.Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias;
-            
+
             //first try to get the custom one if there is one
             var dt = dataTypeService.GetDataType(customDtdName)
                      ?? dataTypeService.GetDataType(defaultListViewDataType);

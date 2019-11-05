@@ -35,7 +35,7 @@ namespace Umbraco.Core.Models
 
             throw new InvalidCastException($"Cannot cast dataType configuration, of type {configuration.GetType().Name}, to {typeof(T).Name}.");
         }
-        
+
         private static readonly ISet<Guid> IdsOfBuildInDataTypes = new HashSet<Guid>()
         {
             Constants.DataTypes.Guids.ContentPickerGuid,

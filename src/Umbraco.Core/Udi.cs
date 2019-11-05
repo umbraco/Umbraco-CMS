@@ -52,13 +52,13 @@ namespace Umbraco.Core
         {
             // initialize with known (built-in) Udi types
             // we will add scanned types later on
-            _udiTypes = new ConcurrentDictionary<string, UdiType>(Constants.UdiEntityType.GetTypes());
+            _udiTypes = new ConcurrentDictionary<string, UdiType>(UdiEntityTypeHelper.GetTypes());
         }
 
         // for tests, totally unsafe
         internal static void ResetUdiTypes()
         {
-            _udiTypes = new ConcurrentDictionary<string, UdiType>(Constants.UdiEntityType.GetTypes());
+            _udiTypes = new ConcurrentDictionary<string, UdiType>(UdiEntityTypeHelper.GetTypes());
             _scanned = false;
         }
 

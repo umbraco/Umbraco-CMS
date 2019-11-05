@@ -11,7 +11,7 @@ namespace Umbraco.Core
         /// </summary>
         public static class Conventions
         {
-            internal static class PermissionCategories
+            public static class PermissionCategories
             {
                 public const string ContentCategory = "content";
                 public const string AdministrationCategory = "administration";
@@ -204,77 +204,7 @@ namespace Umbraco.Core
                 /// <summary>
                 /// Group name to put the membership properties on
                 /// </summary>
-                internal const string StandardPropertiesGroupName = "Membership";
-
-                public static Dictionary<string, PropertyType> GetStandardPropertyTypeStubs()
-                {
-                    return new Dictionary<string, PropertyType>
-                    {
-                        {
-                            Comments,
-                            new PropertyType(PropertyEditors.Aliases.TextArea, ValueStorageType.Ntext, true, Comments)
-                            {
-                                Name = CommentsLabel
-                            }
-                        },
-                        {
-                            FailedPasswordAttempts,
-                            new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Integer, true, FailedPasswordAttempts)
-                            {
-                                Name = FailedPasswordAttemptsLabel
-                            }
-                        },
-                        {
-                            IsApproved,
-                            new PropertyType(PropertyEditors.Aliases.Boolean, ValueStorageType.Integer, true, IsApproved)
-                            {
-                                Name = IsApprovedLabel
-                            }
-                        },
-                        {
-                            IsLockedOut,
-                            new PropertyType(PropertyEditors.Aliases.Boolean, ValueStorageType.Integer, true, IsLockedOut)
-                            {
-                                Name = IsLockedOutLabel
-                            }
-                        },
-                        {
-                            LastLockoutDate,
-                            new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Date, true, LastLockoutDate)
-                            {
-                                Name = LastLockoutDateLabel
-                            }
-                        },
-                        {
-                            LastLoginDate,
-                            new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Date, true, LastLoginDate)
-                            {
-                                Name = LastLoginDateLabel
-                            }
-                        },
-                        {
-                            LastPasswordChangeDate,
-                            new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Date, true, LastPasswordChangeDate)
-                            {
-                                Name = LastPasswordChangeDateLabel
-                            }
-                        },
-                        {
-                            PasswordAnswer,
-                            new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Nvarchar, true, PasswordAnswer)
-                            {
-                                Name = PasswordAnswerLabel
-                            }
-                        },
-                        {
-                            PasswordQuestion,
-                            new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Nvarchar, true, PasswordQuestion)
-                            {
-                                Name = PasswordQuestionLabel
-                            }
-                        }
-                    };
-                }
+                public const string StandardPropertiesGroupName = "Membership";
             }
 
             /// <summary>

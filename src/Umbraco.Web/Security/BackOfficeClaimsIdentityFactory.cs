@@ -3,6 +3,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
+using Umbraco.Core;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
 using Constants = Umbraco.Core.Constants;
@@ -26,7 +27,7 @@ namespace Umbraco.Web.Security
         public override async Task<ClaimsIdentity> CreateAsync(UserManager<T, int> manager, T user, string authenticationType)
         {
             var baseIdentity = await base.CreateAsync(manager, user, authenticationType);
-            
+
             var umbracoIdentity = new UmbracoBackOfficeIdentity(baseIdentity,
                 user.Id,
                 user.UserName,

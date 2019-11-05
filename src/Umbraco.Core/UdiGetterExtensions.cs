@@ -206,7 +206,7 @@ namespace Umbraco.Core
 
             return new StringUdi(entityType, entity.Path.TrimStart('/')).EnsureClosed();
         }
-        
+
         /// <summary>
         /// Gets the entity identifier of the entity.
         /// </summary>

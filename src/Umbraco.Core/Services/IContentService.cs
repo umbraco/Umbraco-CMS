@@ -323,7 +323,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Empties the Recycle Bin by deleting all <see cref="IContent"/> that resides in the bin
         /// </summary>
-        /// <param name="userId">Optional Id of the User emptying the Recycle Bin</param>        
+        /// <param name="userId">Optional Id of the User emptying the Recycle Bin</param>
         OperationResult EmptyRecycleBin(int userId = Constants.Security.SuperUserId);
 
         /// <summary>
@@ -526,6 +526,6 @@ namespace Umbraco.Core.Services
         OperationResult Rollback(int id, int versionId, string culture = "*", int userId = Constants.Security.SuperUserId);
 
         #endregion
-      
+
     }
 }

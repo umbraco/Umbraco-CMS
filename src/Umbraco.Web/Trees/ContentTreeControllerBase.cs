@@ -541,7 +541,7 @@ namespace Umbraco.Web.Trees
 
         private bool? _ignoreUserStartNodes;
 
-        
+
 
         /// <summary>
         /// If the request should allows a user to choose nodes that they normally don't have access to

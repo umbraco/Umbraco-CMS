@@ -85,13 +85,13 @@ namespace Umbraco.Web.Editors.Filters
         public override bool ValidateProperties(MemberSave model, IContentProperties<ContentPropertyBasic> modelWithProperties, HttpActionContext actionContext)
         {
             var propertiesToValidate = model.Properties.ToList();
-            var defaultProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
+            var defaultProps = ConventionsHelper.GetStandardPropertyTypeStubs();
             var exclude = defaultProps.Select(x => x.Value.Alias).ToArray();
             foreach (var remove in exclude)
             {
                 propertiesToValidate.RemoveAll(property => property.Alias == remove);
             }
-            
+
             //if the user doesn't have access to sensitive values, then we need to validate the incoming properties to check
             //if a sensitive value is being submitted.
             if (UmbracoContextAccessor.UmbracoContext.Security.CurrentUser.HasAccessToSensitiveData() == false)
@@ -169,7 +169,7 @@ namespace Umbraco.Web.Editors.Filters
             {
                 return true;
             }
-            
+
             int totalRecs;
             var existingByEmail = membershipProvider.FindUsersByEmail(model.Email.Trim(), 0, int.MaxValue, out totalRecs);
             switch (model.Action)

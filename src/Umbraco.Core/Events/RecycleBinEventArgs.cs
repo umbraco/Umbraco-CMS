@@ -20,13 +20,13 @@ namespace Umbraco.Core.Events
             NodeObjectType = nodeObjectType;
 
         }
-        
+
         /// <summary>
         /// Gets the Id of the node object type of the items
         /// being deleted from the Recycle Bin.
         /// </summary>
         public Guid NodeObjectType { get; }
-        
+
         /// <summary>
         /// Boolean indicating whether the Recycle Bin was emptied successfully
         /// </summary>

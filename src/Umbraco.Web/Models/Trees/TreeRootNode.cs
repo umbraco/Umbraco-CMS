@@ -95,7 +95,7 @@ namespace Umbraco.Web.Models.Trees
             return new TreeRootNode(nodeId, getChildNodesUrl, menuUrl)
             {
                 Children = children,
-                Name = title,               
+                Name = title,
                 _isSingleNodeTree = isSingleNodeTree
             };
         }

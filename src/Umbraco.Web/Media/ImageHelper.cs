@@ -17,7 +17,7 @@ namespace Umbraco.Web.Media
         /// in memory. Fallback to GDI which means loading the image in memory and thus
         /// use potentially large amounts of memory.</remarks>
         public static Size GetDimensions(Stream stream)
-        {   
+        {
             //Try to load with exif
             try
             {
@@ -56,7 +56,7 @@ namespace Umbraco.Web.Media
                 //We will just swallow, just means we can't read via GDI, we don't want to log an error either
             }
 
-            return new Size(Constants.Conventions.Media.DefaultSize, Constants.Conventions.Media.DefaultSize);            
+            return new Size(Constants.Conventions.Media.DefaultSize, Constants.Conventions.Media.DefaultSize);
         }
     }
 }

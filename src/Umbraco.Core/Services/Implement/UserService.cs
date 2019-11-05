@@ -17,7 +17,7 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Security; 
+using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Services.Implement
 {
@@ -209,7 +209,7 @@ namespace Umbraco.Core.Services.Implement
                         //NOTE: this will not be cached
                         return _userRepository.GetByUsername(username, includeSecurityData: false);
                     }
-                    
+
                     throw;
                 }
             }
@@ -714,7 +714,7 @@ namespace Umbraco.Core.Services.Implement
                         //NOTE: this will not be cached
                         return _userRepository.Get(id, includeSecurityData: false);
                     }
-                    
+
                     throw;
                 }
             }

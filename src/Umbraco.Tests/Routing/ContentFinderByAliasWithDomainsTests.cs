@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Routing
                 new PublishedPropertyType("umbracoUrlAlias", Constants.DataTypes.Textbox, false, ContentVariation.Nothing,
                     new PropertyValueConverterCollection(Enumerable.Empty<IPropertyValueConverter>()),
                     Mock.Of<IPublishedModelFactory>(),
-                    Mock.Of<IPublishedContentTypeFactory>()), 
+                    Mock.Of<IPublishedContentTypeFactory>()),
             };
             _publishedContentType = new PublishedContentType(0, "Doc", PublishedItemType.Content, Enumerable.Empty<string>(), properties, ContentVariation.Nothing);
         }

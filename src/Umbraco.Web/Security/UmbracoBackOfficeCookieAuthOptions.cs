@@ -14,7 +14,7 @@ namespace Umbraco.Web.Security
     public sealed class UmbracoBackOfficeCookieAuthOptions : CookieAuthenticationOptions
     {
         public int LoginTimeoutMinutes { get; }
-        
+
         public UmbracoBackOfficeCookieAuthOptions(
             string[] explicitPaths,
             IUmbracoContextAccessor umbracoContextAccessor,
@@ -26,7 +26,7 @@ namespace Umbraco.Web.Security
             var secureDataFormat1 = secureDataFormat ?? throw new ArgumentNullException(nameof(secureDataFormat));
             LoginTimeoutMinutes = globalSettings.TimeOutInMinutes;
             AuthenticationType = Constants.Security.BackOfficeAuthenticationType;
-            
+
             SlidingExpiration = true;
             ExpireTimeSpan = TimeSpan.FromMinutes(LoginTimeoutMinutes);
             CookieDomain = securitySection.AuthCookieDomain;
@@ -40,7 +40,7 @@ namespace Umbraco.Web.Security
             //Custom cookie manager so we can filter requests
             CookieManager = new BackOfficeCookieManager(umbracoContextAccessor, runtimeState, globalSettings, explicitPaths);
         }
-        
+
         /// <summary>
         /// Creates the cookie options for saving the auth cookie
         /// </summary>

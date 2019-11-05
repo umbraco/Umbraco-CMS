@@ -18,7 +18,7 @@ namespace Umbraco.Web.Services
     internal class DashboardService : IDashboardService
     {
         // TODO: Unit test all this!!! :/
-	
+
         private readonly ISectionService _sectionService;
         private readonly DashboardCollection _dashboardCollection;
         private readonly ILocalizedTextService _localizedText;

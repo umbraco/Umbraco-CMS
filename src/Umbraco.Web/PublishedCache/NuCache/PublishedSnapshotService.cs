@@ -142,7 +142,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 _domainStore = new SnapDictionary<int, Domain>();
 
-                LoadCachesOnStartup(); 
+                LoadCachesOnStartup();
             }
 
             Guid GetUid(ContentStore store, int id) => store.LiveSnapshot.Get(id)?.Uid ?? default;
@@ -163,7 +163,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// to not run if MainDom wasn't acquired.
         /// If MainDom was not acquired, then _localContentDb and _localMediaDb will remain null which means this appdomain
         /// will load in published content via the DB and in that case this appdomain will probably not exist long enough to
-        /// serve more than a page of content. 
+        /// serve more than a page of content.
         /// </remarks>
         private void MainDomRegister()
         {
@@ -972,7 +972,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        //Methods used to prevent allocations of lists        
+        //Methods used to prevent allocations of lists
         private void AddToList(ref List<int> list, int val) => GetOrCreateList(ref list).Add(val);
         private List<int> GetOrCreateList(ref List<int> list) => list ?? (list = new List<int>());
 

@@ -14,12 +14,12 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Search;
-using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
 {
@@ -133,7 +133,7 @@ namespace Umbraco.Web.Trees
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
 
                 menu.DefaultMenuAlias = null;
-                
+
             }
             else
             {
@@ -170,6 +170,6 @@ namespace Umbraco.Web.Trees
         {
             return _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Media, pageSize, pageIndex, out totalFound, searchFrom);
         }
-    
+
     }
 }

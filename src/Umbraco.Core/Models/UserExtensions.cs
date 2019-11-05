@@ -56,7 +56,7 @@ namespace Umbraco.Core.Models
         /// </returns>
         internal static string[] GetUserAvatarUrls(this IUser user, IAppCache cache)
         {
-            // If FIPS is required, never check the Gravatar service as it only supports MD5 hashing.  
+            // If FIPS is required, never check the Gravatar service as it only supports MD5 hashing.
             // Unfortunately, if the FIPS setting is enabled on Windows, using MD5 will throw an exception
             // and the website will not run.
             // Also, check if the user has explicitly removed all avatars including a Gravatar, this will be possible and the value will be "none"

@@ -20,4 +20,8 @@
       <PackageReference Include="Serilog.Sinks.Map" Version="1.0.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_UnmanagedRegistrationCache Remove="obj\Umbraco.Infrastructure.csproj.UnmanagedRegistration.cache" />
+    </ItemGroup>
+
 </Project>

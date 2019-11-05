@@ -371,7 +371,7 @@ namespace Umbraco.Core.Services.Implement
                 template.Content = content;
             }
 
-            
+
 
 
             using (var scope = ScopeProvider.CreateScope())
@@ -410,7 +410,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 Content = GetViewContent(alias) ?? content
             };
-            
+
             if (masterTemplate != null)
             {
                 template.SetMasterTemplate(masterTemplate);
@@ -652,7 +652,7 @@ namespace Umbraco.Core.Services.Implement
                 return _templateRepository.GetFileSize(filepath);
             }
         }
-        
+
         private string GetViewContent(string fileName)
         {
             if (fileName.IsNullOrWhiteSpace())
@@ -805,7 +805,7 @@ namespace Umbraco.Core.Services.Implement
             }
 
             return Attempt<IPartialView>.Succeed(partialView);
-        }        
+        }
 
         public bool DeletePartialView(string path, int userId = Constants.Security.SuperUserId)
         {
@@ -1056,7 +1056,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         #endregion
-        
+
         private void Audit(AuditType type, int userId, int objectId, string entityType)
         {
             _auditRepository.Save(new AuditItem(objectId, type, userId, entityType));

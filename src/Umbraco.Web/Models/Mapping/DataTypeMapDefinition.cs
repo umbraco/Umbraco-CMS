@@ -150,7 +150,7 @@ namespace Umbraco.Web.Models.Mapping
 
             return fields;
         }
-        
+
         private void MapConfigurationFields(IDataType dataType, List<DataTypeConfigurationFieldDisplay> fields, IDictionary<string, object> configuration)
         {
             if (fields == null) throw new ArgumentNullException(nameof(fields));

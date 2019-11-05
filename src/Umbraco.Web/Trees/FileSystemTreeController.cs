@@ -8,8 +8,6 @@ using Umbraco.Core.IO;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Models.Trees;
 
-using Constants = Umbraco.Core.Constants;
-
 namespace Umbraco.Web.Trees
 {
     public abstract class FileSystemTreeController : TreeController
@@ -61,7 +59,7 @@ namespace Umbraco.Web.Trees
 
                 if (Extensions.Contains("*"))
                     return true;
-                
+
                 return extension != null && Extensions.Contains(extension.Trim('.'), StringComparer.InvariantCultureIgnoreCase);
             });
 

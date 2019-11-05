@@ -49,7 +49,7 @@ namespace Umbraco.Web.Editors.Filters
             if (!ValidateAtLeastOneVariantIsBeingSaved(model, actionContext)) return;
             if (!contentItemValidator.ValidateExistingContent(model, actionContext)) return;
             if (!ValidateUserAccess(model, actionContext, _umbracoContextAccessor.UmbracoContext.Security)) return;
-            
+
             //validate for each variant that is being updated
             foreach (var variant in model.Variants.Where(x => x.Save))
             {
@@ -82,7 +82,7 @@ namespace Umbraco.Web.Editors.Filters
         /// <param name="contentItem"></param>
         /// <param name="webSecurity"></param>
         private bool ValidateUserAccess(ContentItemSave contentItem, HttpActionContext actionContext, WebSecurity webSecurity)
-        {  
+        {
 
             //We now need to validate that the user is allowed to be doing what they are doing.
             //Based on the action we need to check different permissions.
@@ -166,7 +166,7 @@ namespace Umbraco.Web.Editors.Filters
                     }
                     break;
                 case ContentSaveAction.ScheduleNew:
-                    
+
                     permissionToCheck.Add(ActionNew.ActionLetter);
                     permissionToCheck.Add(ActionUpdate.ActionLetter);
                     permissionToCheck.Add(ActionPublish.ActionLetter);

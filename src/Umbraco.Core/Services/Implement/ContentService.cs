@@ -30,7 +30,7 @@ namespace Umbraco.Core.Services.Implement
         private IQuery<IContent> _queryNotTrashed;
         //TODO: The non-lazy object should be injected
         private readonly Lazy<PropertyValidationService> _propertyValidationService = new Lazy<PropertyValidationService>(() => new PropertyValidationService());
-        
+
 
         #region Constructors
 
@@ -1084,7 +1084,7 @@ namespace Umbraco.Core.Services.Implement
         /// <remarks>
         /// <para>
         /// Business logic cases such: as unpublishing a mandatory culture, or unpublishing the last culture, checking for pending scheduled publishing, etc... is dealt with in this method.
-        /// There is quite a lot of cases to take into account along with logic that needs to deal with scheduled saving/publishing, branch saving/publishing, etc...       
+        /// There is quite a lot of cases to take into account along with logic that needs to deal with scheduled saving/publishing, branch saving/publishing, etc...
         /// </para>
         /// </remarks>
         private PublishResult CommitDocumentChangesInternal(IScope scope, IContent content,
@@ -1243,7 +1243,7 @@ namespace Umbraco.Core.Services.Implement
                     if (culturesUnpublishing != null)
                     {
                         // This will mean that that we unpublished a mandatory culture or we unpublished the last culture.
-                        
+
                         var langs = string.Join(", ", allLangs
                                     .Where(x => culturesUnpublishing.InvariantContains(x.IsoCode))
                                     .Select(x => x.CultureName));
@@ -1266,7 +1266,7 @@ namespace Umbraco.Core.Services.Implement
                                 Audit(AuditType.Unpublish, userId, content.Id, "Unpublished (last language unpublished)");
                                 return new PublishResult(PublishResultType.SuccessUnpublishLastCulture, evtMsgs, content);
                         }
-                        
+
                     }
 
                     Audit(AuditType.Unpublish, userId, content.Id);
@@ -1286,7 +1286,7 @@ namespace Umbraco.Core.Services.Implement
                         changeType = TreeChangeTypes.RefreshBranch; // whole branch
                     else if (isNew == false && previouslyPublished)
                         changeType = TreeChangeTypes.RefreshNode; // single node
-                    
+
 
                     // invalidate the node/branch
                     if (!branchOne) // for branches, handled by SaveAndPublishBranch
@@ -2623,7 +2623,7 @@ namespace Umbraco.Core.Services.Implement
                     // there will be nothing to publish/unpublish.
                     return new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
                 }
-                
+
 
                 // missing mandatory culture = cannot be published
                 var mandatoryCultures = allLangs.Where(x => x.IsMandatory).Select(x => x.IsoCode);
@@ -3134,6 +3134,6 @@ namespace Umbraco.Core.Services.Implement
         #endregion
 
 
-        
+
     }
 }

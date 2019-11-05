@@ -63,7 +63,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// Gets a value indicating whether a property is an image cropper field.
         /// </summary>
-        /// <param name="property">The property.</param>        
+        /// <param name="property">The property.</param>
         /// <returns>A value indicating whether a property is an image cropper field, and (optionally) has a non-empty value.</returns>
         private static bool IsCropperField(Property property)
         {

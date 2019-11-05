@@ -236,7 +236,7 @@ namespace Umbraco.Web.Routing
             // assign the legacy page back to the docrequest
             // handlers like default.aspx will want it and most macros currently need it
             request.LegacyContentHashTable = new PublishedContentHashtableConverter(request);
-            
+
         }
 
         #endregion

@@ -779,15 +779,15 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(PublishedState.Published, content.PublishedState);
             Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
             Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
-            
+
             content = ServiceContext.ContentService.GetById(content.Id); //reget
             Assert.AreEqual(PublishedState.Published, content.PublishedState);
             Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
             Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
-            
+
         }
 
-        
+
 
         [Test]
         public void Unpublish_All_Cultures_Has_Unpublished_State()
@@ -828,7 +828,7 @@ namespace Umbraco.Tests.Services
             //re-get
             content = ServiceContext.ContentService.GetById(content.Id);
             Assert.AreEqual(PublishedState.Unpublished, content.PublishedState); //just double checking
-            Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));          
+            Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
             Assert.IsFalse(content.IsCulturePublished(langUk.IsoCode));
         }
 
@@ -857,13 +857,13 @@ namespace Umbraco.Tests.Services
 
             //re-get
             content = ServiceContext.ContentService.GetById(content.Id);
-            
+
             var unpublished = ServiceContext.ContentService.Unpublish(content, langUk.IsoCode); //unpublish mandatory lang
             Assert.IsTrue(unpublished.Success);
-            Assert.AreEqual(PublishResultType.SuccessUnpublishMandatoryCulture, unpublished.Result);            
+            Assert.AreEqual(PublishResultType.SuccessUnpublishMandatoryCulture, unpublished.Result);
             Assert.IsFalse(content.IsCulturePublished(langUk.IsoCode));
             Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode)); //remains published
-            Assert.AreEqual(PublishedState.Unpublished, content.PublishedState); 
+            Assert.AreEqual(PublishedState.Unpublished, content.PublishedState);
         }
 
         [Test]
@@ -880,7 +880,7 @@ namespace Umbraco.Tests.Services
             //re-get
             content = ServiceContext.ContentService.GetById(content.Id);
 
-            var unpublished = ServiceContext.ContentService.Unpublish(content, langUk.IsoCode); 
+            var unpublished = ServiceContext.ContentService.Unpublish(content, langUk.IsoCode);
             Assert.IsTrue(unpublished.Success);
             Assert.AreEqual(PublishResultType.SuccessUnpublishCulture, unpublished.Result);
             Assert.IsFalse(content.IsCulturePublished(langUk.IsoCode));
@@ -917,7 +917,7 @@ namespace Umbraco.Tests.Services
             //Change some data since SaveAndPublish should always Save
             content.SetCultureName("content-en-updated", langUk.IsoCode);
 
-            var saved = ServiceContext.ContentService.SaveAndPublish(content, new string [] { }); //save without cultures            
+            var saved = ServiceContext.ContentService.SaveAndPublish(content, new string [] { }); //save without cultures
             Assert.AreEqual(PublishResultType.FailedPublishNothingToPublish, saved.Result);
 
             //re-get
@@ -1141,7 +1141,7 @@ namespace Umbraco.Tests.Services
             const int parentId = NodeDto.NodeIdSeed + 2;
 
             var contentService = ServiceContext.ContentService;
-            
+
             var parent = contentService.GetById(parentId);
 
             var parentPublished = contentService.SaveAndPublish(parent);
@@ -1172,7 +1172,7 @@ namespace Umbraco.Tests.Services
             Assert.Greater(content.Id, 0);
             Assert.IsTrue(content.HasIdentity);
         }
-        
+
 
         [Test]
         public void Can_Publish_And_Unpublish_Cultures_In_Single_Operation()

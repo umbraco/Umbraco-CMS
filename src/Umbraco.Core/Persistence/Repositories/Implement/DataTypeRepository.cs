@@ -314,7 +314,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return SimilarNodeName.GetUniqueName(names, id, nodeName);
         }
 
-        
+
         [TableName(Constants.DatabaseSchema.Tables.ContentType)]
         private class ContentTypeReferenceDto : ContentTypeDto
         {

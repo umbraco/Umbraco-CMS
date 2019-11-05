@@ -148,7 +148,7 @@ namespace Umbraco.Core.Security
             {
                 foreach (var startContentNode in startContentNodes)
                 {
-                    AddClaim(new Claim(Constants.Security.StartContentNodeIdClaimType, startContentNode.ToInvariantString(), ClaimValueTypes.Integer32, Issuer, Issuer, this));    
+                    AddClaim(new Claim(Constants.Security.StartContentNodeIdClaimType, startContentNode.ToInvariantString(), ClaimValueTypes.Integer32, Issuer, Issuer, this));
                 }
             }
 
@@ -192,7 +192,7 @@ namespace Umbraco.Core.Security
             }
 
         }
-        
+
         /// <inheritdoc />
         /// <summary>
         /// Gets the type of authenticated identity.
@@ -202,7 +202,7 @@ namespace Umbraco.Core.Security
         /// </returns>
         public override string AuthenticationType => Issuer;
 
-        private int[] _startContentNodes;   
+        private int[] _startContentNodes;
         public int[] StartContentNodes => _startContentNodes ?? (_startContentNodes = FindAll(x => x.Type == Constants.Security.StartContentNodeIdClaimType).Select(app => int.TryParse(app.Value, out var i) ? i : default).Where(x => x != default).ToArray());
 
         private int[] _startMediaNodes;
@@ -234,6 +234,6 @@ namespace Umbraco.Core.Security
         public string SecurityStamp => this.FindFirstValue(Microsoft.AspNet.Identity.Constants.DefaultSecurityStampClaimType);
 
         public string[] Roles => this.FindAll(x => x.Type == DefaultRoleClaimType).Select(role => role.Value).ToArray();
-        
+
     }
 }

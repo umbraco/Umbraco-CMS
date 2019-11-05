@@ -96,7 +96,7 @@ namespace Umbraco.Tests.Security
         public void Create_With_Claims_And_User_Data()
         {
             var sessionId = Guid.NewGuid().ToString();
-            
+
             var claimsIdentity = new ClaimsIdentity(new[]
             {
                 new Claim("TestClaim1", "test", ClaimValueTypes.Integer32, TestIssuer, TestIssuer),

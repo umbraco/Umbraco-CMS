@@ -7,7 +7,6 @@ using Umbraco.Core.IO;
 using Umbraco.Web.Media;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
-using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
@@ -64,6 +63,6 @@ namespace Umbraco.Web.Editors
             response.Headers.Location = new Uri($"{imagePath}?rnd={imageLastModified:yyyyMMddHHmmss}&upscale=false&width={width}&animationprocessmode=first&mode=max", UriKind.Relative);
             return response;
         }
-        
+
     }
 }

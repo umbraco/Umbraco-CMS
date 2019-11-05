@@ -289,7 +289,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     .InnerJoin<DocumentVersionDto>()
                     .On<ContentVersionDto, DocumentVersionDto>((c, d) => c.Id == d.Id)
                     .Where<ContentVersionDto>(x => x.NodeId == SqlTemplate.Arg<int>("nodeId") && !x.Current && x.VersionDate < SqlTemplate.Arg<DateTime>("versionDate"))
-                    .Where<DocumentVersionDto>( x => !x.Published)                    
+                    .Where<DocumentVersionDto>( x => !x.Published)
             );
             var versionDtos = Database.Fetch<ContentVersionDto>(template.Sql(new { nodeId, versionDate }));
             foreach (var versionDto in versionDtos)
@@ -560,7 +560,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 entity.VersionId = documentVersionDto.Id = contentVersionDto.Id; // get the new id
 
                 documentVersionDto.Published = false; // non-published version
-                Database.Insert(documentVersionDto); 
+                Database.Insert(documentVersionDto);
             }
 
             // replace the property data (rather than updating)
@@ -1367,7 +1367,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 yield return dto;
             }
-                
+
         }
 
         private class ContentVariation

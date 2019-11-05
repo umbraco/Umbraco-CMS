@@ -182,7 +182,7 @@ namespace Umbraco.Web.Editors.Binders
         /// <param name="contentType"></param>
         private void FilterMembershipProviderProperties(IContentTypeBase contentType)
         {
-            var defaultProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
+            var defaultProps = ConventionsHelper.GetStandardPropertyTypeStubs();
             //remove all membership properties, these values are set with the membership provider.
             var exclude = defaultProps.Select(x => x.Value.Alias).ToArray();
             FilterContentTypeProperties(contentType, exclude);
@@ -199,6 +199,6 @@ namespace Umbraco.Web.Editors.Binders
                 }
             }
         }
-        
+
     }
 }

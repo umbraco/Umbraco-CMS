@@ -53,7 +53,7 @@ namespace Umbraco.Tests.Services
             Assert.IsTrue(contentType.IsElement);
         }
 
-        
+
 
         [Test]
         public void Deleting_Content_Type_With_Hierarchy_Of_Content_Items_Moves_Orphaned_Content_To_Recycle_Bin()

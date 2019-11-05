@@ -262,7 +262,7 @@ namespace Umbraco.Tests.CoreThings
         [Test]
         public void ValidateUdiEntityType()
         {
-            var types = Constants.UdiEntityType.GetTypes();
+            var types = UdiEntityTypeHelper.GetTypes();
 
             foreach (var fi in typeof(Constants.UdiEntityType).GetFields(BindingFlags.Public | BindingFlags.Static))
             {

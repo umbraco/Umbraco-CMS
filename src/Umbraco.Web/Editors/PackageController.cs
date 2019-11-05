@@ -65,7 +65,7 @@ namespace Umbraco.Web.Editors
 
             Services.PackagingService.ExportCreatedPackage(model);
 
-            //the packagePath will be on the model 
+            //the packagePath will be on the model
             return model;
         }
 

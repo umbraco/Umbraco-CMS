@@ -85,7 +85,7 @@ namespace Umbraco.Core
                 /// ListView.
                 /// </summary>
                 public const string ListView = "Umbraco.ListView";
-                
+
                 /// <summary>
                 /// Media Picker.
                 /// </summary>

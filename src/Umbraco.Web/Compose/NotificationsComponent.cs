@@ -51,16 +51,16 @@ namespace Umbraco.Web.Compose
 
             //Send notifications for the delete action when content is moved to the recycle bin
             ContentService.Trashed += (sender, args) => _notifier.Notify(_actions.GetAction<ActionDelete>(), args.MoveInfoCollection.Select(m => m.Entity).ToArray());
-            
+
             //Send notifications for the copy action
             ContentService.Copied += (sender, args) => _notifier.Notify(_actions.GetAction<ActionCopy>(), args.Original);
-			
+
             //Send notifications for the rollback action
-            ContentService.RolledBack += (sender, args) => _notifier.Notify(_actions.GetAction<ActionRollback>(), args.Entity);	
-			
+            ContentService.RolledBack += (sender, args) => _notifier.Notify(_actions.GetAction<ActionRollback>(), args.Entity);
+
             //Send notifications for the public access changed action
             PublicAccessService.Saved += (sender, args) => PublicAccessServiceSaved(_notifier, sender, args, _contentService, _actions);
-			
+
             UserService.UserGroupPermissionsAssigned += (sender, args) => UserServiceUserGroupPermissionsAssigned(_notifier, sender, args, _contentService, _actions);
         }
 
@@ -115,7 +115,7 @@ namespace Umbraco.Web.Compose
             }
             notifier.Notify(actions.GetAction<ActionRights>(), entities);
         }
-                
+
         private void ContentServiceMoved(Notifier notifier, IContentService sender, Core.Events.MoveEventArgs<IContent> args, ActionCollection actions)
         {
             // notify about the move for all moved items
@@ -141,7 +141,7 @@ namespace Umbraco.Web.Compose
             }
             notifier.Notify(actions.GetAction<ActionProtect>(), entities);
         }
-		
+
         /// <summary>
         /// This class is used to send the notifications
         /// </summary>

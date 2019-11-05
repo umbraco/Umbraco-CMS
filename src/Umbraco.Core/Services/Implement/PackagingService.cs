@@ -208,7 +208,7 @@ namespace Umbraco.Core.Services.Implement
             if (packageName == null) throw new ArgumentNullException(nameof(packageName));
             if (packageVersion == null) throw new ArgumentNullException(nameof(packageVersion));
 
-            //get the latest version installed 
+            //get the latest version installed
             alreadyInstalled = GetInstalledPackageByName(packageName)?.OrderByDescending(x => SemVersion.Parse(x.Version)).FirstOrDefault();
             if (alreadyInstalled == null) return PackageInstallType.NewInstall;
 

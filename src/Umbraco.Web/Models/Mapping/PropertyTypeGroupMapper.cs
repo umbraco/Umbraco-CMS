@@ -150,7 +150,7 @@ namespace Umbraco.Web.Models.Mapping
             // handle locked properties
             var lockedPropertyAliases = new List<string>();
             // add built-in member property aliases to list of aliases to be locked
-            foreach (var propertyAlias in Constants.Conventions.Member.GetStandardPropertyTypeStubs().Keys)
+            foreach (var propertyAlias in ConventionsHelper.GetStandardPropertyTypeStubs().Keys)
             {
                 lockedPropertyAliases.Add(propertyAlias);
             }

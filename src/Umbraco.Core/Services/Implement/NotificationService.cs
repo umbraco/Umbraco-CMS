@@ -335,7 +335,7 @@ namespace Umbraco.Core.Services.Implement
                     }
                     summary.Append("</table>");
                 }
-                
+
             }
             else if (content.ContentType.VariesByCulture())
             {
@@ -462,7 +462,7 @@ namespace Umbraco.Core.Services.Implement
             oldString = oldString.Replace("&rdquo;", "”");
             oldString = oldString.Replace("&quot;", "\"");
         }
-        
+
         // manage notifications
         // ideally, would need to use IBackgroundTasks - but they are not part of Core!
 
