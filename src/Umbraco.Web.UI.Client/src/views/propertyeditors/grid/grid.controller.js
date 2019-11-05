@@ -681,8 +681,15 @@ angular.module("umbraco")
             };
 
             $scope.getTemplateName = function (control) {
-                if (control.editor.nameExp) return control.editor.nameExp(control)
-                return control.editor.name;
+                var templateName = control.editor.name;
+                if (control.editor.nameExp) {
+                    var valueOfTemplate = control.editor.nameExp(control);
+                    if (valueOfTemplate != "") {
+                        templateName += ": ";
+                        templateName += valueOfTemplate;
+                    }
+                }
+                return templateName;
             }
 
             // *********************************************
