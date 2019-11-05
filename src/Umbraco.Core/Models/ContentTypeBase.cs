@@ -113,6 +113,9 @@ namespace Umbraco.Core.Models
             OnPropertyChanged(nameof(PropertyTypes));
         }
 
+        [DataMember]
+        public Guid NodeObjectType { get; internal set; }
+
         /// <summary>
         /// The Alias of the ContentType
         /// </summary>

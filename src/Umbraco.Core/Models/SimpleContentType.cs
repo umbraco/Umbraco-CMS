@@ -44,10 +44,13 @@ namespace Umbraco.Core.Models
             Name = contentType.Name;
             AllowedAsRoot = contentType.AllowedAsRoot;
             IsElement = contentType.IsElement;
+            NodeObjectType = contentType.NodeObjectType;
         }
 
         /// <inheritdoc />
         public string Alias { get; }
+
+        public Guid NodeObjectType { get; }
 
         public int Id { get; }
 

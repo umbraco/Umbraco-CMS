@@ -34,7 +34,7 @@ namespace Umbraco.Core.Persistence.Factories
                 content.VersionId = contentVersionDto.Id;
 
                 content.Name = contentVersionDto.Text;
-
+                content.NodeObjectType = nodeDto.NodeObjectType ?? Guid.Empty;
                 content.Path = nodeDto.Path;
                 content.Level = nodeDto.Level;
                 content.ParentId = nodeDto.ParentId;
