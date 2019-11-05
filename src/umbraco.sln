@@ -106,7 +106,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IssueTemplates", "IssueTemp
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Abstractions", "Umbraco.Abstractions\Umbraco.Abstractions.csproj", "{29AA69D9-B597-4395-8D42-43B1263C240A}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.ModelsBuilder.Embedded", "Umbraco.ModelsBuilder.Embedded\Umbraco.ModelsBuilder.Embedded.csproj", "{52AC0BA8-A60E-4E36-897B-E8B97A54ED1C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Infrastructure", "Umbraco.Infrastructure\Umbraco.Infrastructure.csproj", "{3AE7BF57-966B-45A5-910A-954D7C554441}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -148,6 +151,10 @@ Global
 		{52AC0BA8-A60E-4E36-897B-E8B97A54ED1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{52AC0BA8-A60E-4E36-897B-E8B97A54ED1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{52AC0BA8-A60E-4E36-897B-E8B97A54ED1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3AE7BF57-966B-45A5-910A-954D7C554441}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AE7BF57-966B-45A5-910A-954D7C554441}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AE7BF57-966B-45A5-910A-954D7C554441}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AE7BF57-966B-45A5-910A-954D7C554441}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
