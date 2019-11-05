@@ -197,10 +197,8 @@
     <Compile Include="Events\RollbackEventArgs.cs" />
     <Compile Include="Events\SendToPublishEventArgs.cs" />
     <Compile Include="Composing\Current.cs" />
-    <Compile Include="Composing\LazyCollectionBuilderBase.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="Composing\LightInject\MixedLightInjectScopeManagerProvider.cs" />
-    <Compile Include="Composing\OrderedCollectionBuilderBase.cs" />
     <Compile Include="Composing\TargetedServiceFactory.cs" />
     <Compile Include="Composing\TypeFinder.cs" />
     <Compile Include="Composing\TypeLoader.cs" />
@@ -325,7 +323,6 @@
     <Compile Include="Services\LocalizedTextServiceExtensions.cs" />
     <Compile Include="Services\DateTypeServiceExtensions.cs" />
     <Compile Include="Services\PropertyValidationService.cs" />
-    <Compile Include="Composing\TypeCollectionBuilderBase.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="Strings\DefaultUrlSegmentProvider.cs" />
     <Compile Include="Strings\IUrlSegmentProvider.cs" />
@@ -333,7 +330,6 @@
     <Compile Include="Sync\RefreshInstructionEnvelope.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />
-    <Compile Include="Composing\WeightedCollectionBuilderBase.cs" />
     <Compile Include="Configuration\CaseInsensitiveEnumConfigConverter.cs" />
     <Compile Include="Configuration\CommaDelimitedConfigurationElement.cs" />
     <Compile Include="ConfigsExtensions.cs" />
