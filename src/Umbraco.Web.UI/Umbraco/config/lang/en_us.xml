@@ -2253,6 +2253,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     </key>
     <key alias="reload">Reload</key>
     <key alias="databaseCache">Database Cache</key>
+    <key alias="databaseCacheDescription">
         <![CDATA[
     This button lets you rebuild the database cache, ie the content of the cmsContentNu table.
     <strong>Rebuilding can be expensive.</strong>
@@ -2273,8 +2274,11 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="caches">Caches</key>
   </area>
   <area alias="profiling">
+    <key alias="performanceProfiling">Performance profiling</key>
+    <key alias="performanceProfilingDescription">
         <![CDATA[
                 <p>
+                    Umbraco currently runs in debug mode. This means you can use the built-in performance profiler to assess the performance when rendering pages.
                 </p>
                 <p>
                     If you want to activate the profiler for a specific page rendering, simply add <b>umbDebug=true</b> to the querystring when requesting the page.
@@ -2286,6 +2290,7 @@ To manage your website, simply open the Umbraco back office and start adding con
                 </p>
         ]]>
     </key>
+    <key alias="activateByDefault">Activate the profiler by default</key>
     <key alias="reminder">Friendly reminder</key>
     <key alias="reminderDescription">
         <![CDATA[
