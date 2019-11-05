@@ -280,7 +280,7 @@ ul.sections {
     margin:0;
     padding:0;
     margin-left: -80px;
-    overflow: scroll;
+    overflow: auto;
     overflow-x: hidden;
     height: calc(100% - 91px);
 
@@ -316,35 +316,40 @@ ul.sections li a {
     &:hover {
         span, i {
             opacity: 1;
+            color:#fff;
         }
     }
 }
 
 ul.sections li a i {
     font-size: 30px;
+    opacity: 0.8;
 }
 
 ul.sections li a span {
-    display:block;
+    display: block;
     font-size: 10px;
     line-height: 1.4em;
-    opacity: 0.4;
+    opacity: 0.8;
 }
 
 ul.sections li.current {
-    background-color: #2E2246;
-}
-
-ul.sections li.current a i {
-    color: #ffffff;
-}
-
-ul.sections li.current, ul.sections li:hover {
     border-left: 4px #f5c1bc solid;
 }
 
-.fix-left-menu:hover ul.sections li a span,
-.fix-left-menu:hover ul.sections li a i,
+ul.sections li.current a i {
+    color: #f5c1bc;
+}
+
+ul.sections li.current {
+    border-left: 4px #f5c1bc solid;
+}
+
+ul.sections li:hover a i,
+ul.sections li:hover a span {
+    opacity: 1;
+}
+
 .fix-left-menu:hover .help {
     opacity: 1;
 }
