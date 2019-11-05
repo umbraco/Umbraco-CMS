@@ -2273,4 +2273,41 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="publishedCacheStatus">Published Cache Status</key>
     <key alias="caches">Caches</key>
   </area>
+  <area alias="profiling">
+    <key alias="performanceProfiling">Performance profiling</key>
+    <key alias="performanceProfilingDescription">
+        <![CDATA[
+                <p>
+                    Umbraco currently runs in debug mode. This means you can use the built-in performance profiler to assess the performance when rendering pages.
+                </p>
+                <p>
+                    If you want to activate the profiler for a specific page rendering, simply add <b>umbDebug=true</b> to the querystring when requesting the page.
+                </p>
+                <p>
+                    If you want the profiler to be activated by default for all page renderings, you can use the toggle below.
+                    It will set a cookie in your browser, which then activates the profiler automatically.
+                    In other words, the profiler will only be active by default in <i>your</i> browser - not everyone else's.
+                </p>
+        ]]>
+    </key>
+    <key alias="activateByDefault">Activate the profiler by default</key>
+    <key alias="reminder">Friendly reminder</key>
+    <key alias="reminderDescription">
+        <![CDATA[
+            <p>
+                You should never let a production site run in debug mode. Debug mode is turned off by setting <b>debug="false"</b> on the <b>&lt;compilation /&gt;</b> element in web.config.
+            </p>
+        ]]>
+    </key>
+    <key alias="profilerEnabledDescription">
+        <![CDATA[
+            <p>
+                Umbraco currently does not run in debug mode, so you can't use the built-in profiler. This is how it should be for a production site.
+            </p>
+            <p>
+                Debug mode is turned on by setting <b>debug="true"</b> on the <b>&lt;compilation /&gt;</b> element in web.config.
+            </p>
+        ]]>
+    </key>
+  </area>
 </language>
