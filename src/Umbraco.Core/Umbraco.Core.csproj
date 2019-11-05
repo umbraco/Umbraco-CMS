@@ -153,7 +153,6 @@
     <Compile Include="Cache\DictionaryAppCache.cs" />
     <Compile Include="Cache\TypedCacheRefresherBase.cs" />
     <Compile Include="Compose\AuditEventsComposer.cs" />
-    <Compile Include="Composing\CollectionBuilderBase.cs" />
     <Compile Include="Composing\ComponentComposer.cs" />
     <Compile Include="Composing\ComposeAfterAttribute.cs" />
     <Compile Include="Composing\ComposeBeforeAttribute.cs" />
@@ -161,7 +160,6 @@
     <Compile Include="Composing\Composition.cs" />
     <Compile Include="Composing\IComposer.cs" />
     <Compile Include="Composing\RegisterFactory.cs" />
-    <Compile Include="Composing\SetCollectionBuilderBase.cs" />
     <Compile Include="CompositionExtensions.cs" />
     <Compile Include="Composing\ICoreComposer.cs" />
     <Compile Include="Composing\IUserComposer.cs" />
@@ -214,7 +212,6 @@
     <Compile Include="Events\RecycleBinEventArgs.cs" />
     <Compile Include="Events\RollbackEventArgs.cs" />
     <Compile Include="Events\SendToPublishEventArgs.cs" />
-    <Compile Include="FactoryExtensions.cs" />
     <Compile Include="Composing\Current.cs" />
     <Compile Include="Composing\LazyCollectionBuilderBase.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
@@ -231,7 +228,7 @@
     <Compile Include="Manifest\IManifestFilter.cs" />
     <Compile Include="Manifest\ManifestFilterCollection.cs" />
     <Compile Include="Manifest\ManifestFilterCollectionBuilder.cs" />
-    <Compile Include="Mapping\MapperContext.cs" />
+    <Compile Include="Migrations\IMigrationBuilder.cs" />
     <Compile Include="Migrations\Upgrade\Common\DeleteKeysAndIndexes.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\ContentPickerPreValueMigrator.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\DecimalPreValueMigrator.cs" />
@@ -262,10 +259,6 @@
     <Compile Include="Migrations\Upgrade\V_8_1_0\FixContentNuCascade.cs" />
     <Compile Include="Migrations\Upgrade\V_8_1_0\RenameUserLoginDtoDateIndex.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_1\ChangeNuCacheJsonFormat.cs" />
-    <Compile Include="Mapping\MapDefinitionCollection.cs" />
-    <Compile Include="Mapping\MapDefinitionCollectionBuilder.cs" />
-    <Compile Include="Mapping\IMapDefinition.cs" />
-    <Compile Include="Mapping\UmbracoMapper.cs" />
     <Compile Include="Migrations\Upgrade\V_8_1_0\ConvertTinyMceAndGridMediaUrlsToLocalLink.cs" />
     <Compile Include="Models\ContentBaseExtensions.cs" />
     <Compile Include="Models\IContent.cs" />
@@ -440,7 +433,6 @@
     <Compile Include="Manifest\ManifestContentAppDefinition.cs" />
     <Compile Include="Manifest\ManifestContentAppFactory.cs" />
     <Compile Include="Manifest\ManifestDashboard.cs" />
-    <Compile Include="Migrations\IncompleteMigrationExpressionException.cs" />
     <Compile Include="Migrations\MergeBuilder.cs" />
     <Compile Include="Migrations\MigrationBase_Extra.cs" />
     <Compile Include="Migrations\PostMigrations\IPublishedSnapshotRebuilder.cs" />
@@ -554,7 +546,6 @@
     <Compile Include="Migrations\Expressions\Create\KeysAndIndexes\CreateKeysAndIndexesBuilder.cs" />
     <Compile Include="Migrations\Expressions\Create\Table\CreateTableOfDtoBuilder.cs" />
     <Compile Include="Migrations\Expressions\Delete\KeysAndIndexes\DeleteKeysAndIndexesBuilder.cs" />
-    <Compile Include="Migrations\IMigrationBuilder.cs" />
     <Compile Include="Migrations\Install\DatabaseBuilder.cs" />
     <Compile Include="Deploy\ArtifactBase.cs" />
     <Compile Include="Deploy\ArtifactDependency.cs" />
@@ -616,7 +607,6 @@
     <Compile Include="Manifest\DataEditorConverter.cs" />
     <Compile Include="Migrations\MigrationBuilder.cs" />
     <Compile Include="Migrations\MigrationPlan.cs" />
-    <Compile Include="Migrations\NoopMigration.cs" />
     <Compile Include="Migrations\Upgrade\UmbracoPlan.cs" />
     <Compile Include="Migrations\Upgrade\Upgrader.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DropMigrationsTable.cs" />
@@ -824,8 +814,6 @@
     <Compile Include="Persistence\Mappers\UserGroupMapper.cs" />
     <Compile Include="Persistence\Mappers\UserMapper.cs" />
     <Compile Include="Persistence\Mappers\UserSectionMapper.cs" />
-    <Compile Include="Migrations\DataLossException.cs" />
-    <Compile Include="Migrations\IMigration.cs" />
     <Compile Include="Migrations\IMigrationContext.cs" />
     <Compile Include="Migrations\IMigrationExpression.cs" />
     <Compile Include="Migrations\Install\DatabaseDataCreator.cs" />
