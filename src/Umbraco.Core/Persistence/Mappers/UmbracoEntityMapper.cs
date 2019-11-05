@@ -24,7 +24,6 @@ namespace Umbraco.Core.Persistence.Mappers
             DefineMap<IUmbracoEntity, NodeDto>(nameof(IUmbracoEntity.Trashed), nameof(NodeDto.Trashed));
             DefineMap<IUmbracoEntity, NodeDto>(nameof(IUmbracoEntity.Key), nameof(NodeDto.UniqueId));
             DefineMap<IUmbracoEntity, NodeDto>(nameof(IUmbracoEntity.CreatorId), nameof(NodeDto.UserId));
-            DefineMap<IUmbracoEntity, NodeDto>(nameof(IUmbracoEntity.NodeObjectType), nameof(NodeDto.NodeObjectType));
         }
     }
 }

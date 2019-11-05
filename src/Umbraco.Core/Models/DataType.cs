@@ -65,9 +65,6 @@ namespace Umbraco.Core.Models
         [DataMember]
         public string EditorAlias => _editor.Alias;
 
-        [DataMember]
-        public Guid NodeObjectType { get; internal set; }
-
         /// <inheritdoc />
         [DataMember]
         public ValueStorageType DatabaseType

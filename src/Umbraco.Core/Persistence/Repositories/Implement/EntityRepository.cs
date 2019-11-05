@@ -36,70 +36,26 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #region Repository
 
-        //public IEnumerable<IEntitySlim> GetPagedResults(IDictionary<Guid, IEnumerable<int>> typesAndIds, long pageIndex, int pageSize, out long totalRecords, Ordering ordering)
-        //{
-        //    var isContent = typesAndIds.Keys.Any(objectType => objectType == Constants.ObjectTypes.Document || objectType == Constants.ObjectTypes.DocumentBlueprint);
-        //    var isMedia = typesAndIds.Keys.Any(objectType => objectType == Constants.ObjectTypes.Media);
-        //    var isMember = typesAndIds.Keys.Any(objectType => objectType == Constants.ObjectTypes.Member);
-
-        //    var sql = GetBase(isContent, isMedia, isMember, null, false)
-        //        .WhereIn<NodeDto>(x => x.NodeObjectType, typesAndIds.Keys);
-
-        //    ordering = ordering ?? Ordering.ByDefault();
-
-        //    sql = AddGroupBy(isContent, isMedia, isMember, sql, ordering.IsEmpty);
-
-        //    if (!ordering.IsEmpty)
-        //    {
-        //        // apply ordering
-        //        ApplyOrdering(ref sql, ordering);
-        //    }
-
-        //    // TODO: we should be able to do sql = sql.OrderBy(x => Alias(x.NodeId, "NodeId")); but we can't because the OrderBy extension don't support Alias currently
-        //    //no matter what we always must have node id ordered at the end
-        //    sql = ordering.Direction == Direction.Ascending ? sql.OrderBy("NodeId") : sql.OrderByDescending("NodeId");
-
-        //    // for content we must query for ContentEntityDto entities to produce the correct culture variant entity names
-        //    var pageIndexToFetch = pageIndex + 1;
-        //    IEnumerable<BaseDto> dtos;
-        //    var page = Database.Page<GenericContentEntityDto>(pageIndexToFetch, pageSize, sql);
-        //    dtos = page.Items;
-        //    totalRecords = page.TotalItems;
-
-        //    var entities = dtos.Select(BuildEntity).ToArray();
-
-        //    BuildVariants(entities.OfType<DocumentEntitySlim>());
-
-        //    return entities;
-        //}
-
+        // get a page of entities
         public IEnumerable<IEntitySlim> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid objectType, long pageIndex, int pageSize, out long totalRecords,
             IQuery<IUmbracoEntity> filter, Ordering ordering)
         {
-            query = query.Where(x => x.NodeObjectType == objectType);
-            return GetPagedResultsByQuery(query, new[] { objectType }, pageIndex, pageSize, out totalRecords, filter, ordering);
-        }
-
-        // get a page of entities
-        public IEnumerable<IEntitySlim> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid[] objectTypes, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IUmbracoEntity> filter, Ordering ordering)
-        {
-            var isContent = objectTypes.Any(objectType => objectType == Constants.ObjectTypes.Document || objectType == Constants.ObjectTypes.DocumentBlueprint);
-            var isMedia = objectTypes.Any(objectType => objectType == Constants.ObjectTypes.Media);
-            var isMember = objectTypes.Any(objectType => objectType == Constants.ObjectTypes.Member);
+            var isContent = objectType == Constants.ObjectTypes.Document || objectType == Constants.ObjectTypes.DocumentBlueprint;
+            var isMedia = objectType == Constants.ObjectTypes.Media;
+            var isMember = objectType == Constants.ObjectTypes.Member;
 
             var sql = GetBaseWhere(isContent, isMedia, isMember, false, x =>
             {
                 if (filter == null) return;
                 foreach (var filterClause in filter.GetWhereClauses())
                     x.Where(filterClause.Item1, filterClause.Item2);
-            }, objectTypes);
+            }, objectType);
 
             ordering = ordering ?? Ordering.ByDefault();
 
             var translator = new SqlTranslator<IUmbracoEntity>(sql, query);
             sql = translator.Translate();
-            sql = AddGroupBy(true, true, true, sql, ordering.IsEmpty);
+            sql = AddGroupBy(isContent, isMedia, isMember, sql, ordering.IsEmpty);
 
             if (!ordering.IsEmpty)
             {
@@ -114,13 +70,35 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // for content we must query for ContentEntityDto entities to produce the correct culture variant entity names
             var pageIndexToFetch = pageIndex + 1;
             IEnumerable<BaseDto> dtos;
-            var page = Database.Page<GenericContentEntityDto>(pageIndexToFetch, pageSize, sql);
-            dtos = page.Items;
-            totalRecords = page.TotalItems;
+            if(isContent)
+            {
+                var page = Database.Page<ContentEntityDto>(pageIndexToFetch, pageSize, sql);
+                dtos = page.Items;
+                totalRecords = page.TotalItems;
+            }
+            else if (isMedia)
+            {
+                var page = Database.Page<MediaEntityDto>(pageIndexToFetch, pageSize, sql);
+                dtos = page.Items;
+                totalRecords = page.TotalItems;
+            }
+            else if (isMember)
+            {
+                var page = Database.Page<MemberEntityDto>(pageIndexToFetch, pageSize, sql);
+                dtos = page.Items;
+                totalRecords = page.TotalItems;
+            }
+            else
+            {
+                var page = Database.Page<BaseDto>(pageIndexToFetch, pageSize, sql);
+                dtos = page.Items;
+                totalRecords = page.TotalItems;
+            }
 
-            var entities = dtos.Select(BuildEntity).ToArray();
+            var entities = dtos.Select(x => BuildEntity(isContent, isMedia, isMember, x)).ToArray();
 
-            BuildVariants(entities.OfType<DocumentEntitySlim>());
+            if (isContent)
+                BuildVariants(entities.Cast<DocumentEntitySlim>());
 
             return entities;
         }
@@ -129,7 +107,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             var sql = GetBaseWhere(false, false, false, false, key);
             var dto = Database.FirstOrDefault<BaseDto>(sql);
-            return dto == null ? null : BuildEntity(dto);
+            return dto == null ? null : BuildEntity(false, false, false, dto);
         }
 
 
@@ -138,7 +116,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             //isContent is going to return a 1:M result now with the variants so we need to do different things
             if (isContent)
             {
-                var cdtos = Database.Fetch<DocumentEntityDto>(sql);
+                var cdtos = Database.Fetch<ContentEntityDto>(sql);
 
                 return cdtos.Count == 0 ? null : BuildVariants(BuildDocumentEntity(cdtos[0]));
             }
@@ -149,7 +127,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             if (dto == null) return null;
 
-            var entity = BuildEntity(dto);
+            var entity = BuildEntity(false, isMedia, isMember, dto);
 
             return entity;
         }
@@ -168,7 +146,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             var sql = GetBaseWhere(false, false, false, false, id);
             var dto = Database.FirstOrDefault<BaseDto>(sql);
-            return dto == null ? null : BuildEntity(dto);
+            return dto == null ? null : BuildEntity(false, false, false, dto);
         }
 
         public IEntitySlim Get(int id, Guid objectTypeId)
@@ -200,7 +178,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             //isContent is going to return a 1:M result now with the variants so we need to do different things
             if (isContent)
             {
-                var cdtos = Database.Fetch<DocumentEntityDto>(sql);
+                var cdtos = Database.Fetch<ContentEntityDto>(sql);
 
                 return cdtos.Count == 0
                     ? Enumerable.Empty<IEntitySlim>()
@@ -211,7 +189,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     ? (IEnumerable<BaseDto>)Database.Fetch<MediaEntityDto>(sql)
                     : Database.Fetch<BaseDto>(sql);
 
-            var entities = dtos.Select(BuildEntity).ToArray();
+            var entities = dtos.Select(x => BuildEntity(false, isMedia, isMember, x)).ToArray();
 
             return entities;
         }
@@ -255,7 +233,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var sql = translator.Translate();
             sql = AddGroupBy(false, false, false, sql, true);
             var dtos = Database.Fetch<BaseDto>(sql);
-            return dtos.Select(BuildEntity).ToList();
+            return dtos.Select(x => BuildEntity(false, false, false, x)).ToList();
         }
 
         public IEnumerable<IEntitySlim> GetByQuery(IQuery<IUmbracoEntity> query, Guid objectType)
@@ -264,7 +242,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var isMedia = objectType == Constants.ObjectTypes.Media;
             var isMember = objectType == Constants.ObjectTypes.Member;
 
-            var sql = GetBaseWhere(isContent, isMedia, isMember, false, null, new[] { objectType });
+            var sql = GetBaseWhere(isContent, isMedia, isMember, false, null, objectType);
 
             var translator = new SqlTranslator<IUmbracoEntity>(sql, query);
             sql = translator.Translate();
@@ -378,14 +356,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         // gets the full sql for a given object type, with a given filter
         protected Sql<ISqlContext> GetFullSqlForEntityType(bool isContent, bool isMedia, bool isMember, Guid objectType, Action<Sql<ISqlContext>> filter)
         {
-            var sql = GetBaseWhere(isContent, isMedia, isMember, false, filter, new[] { objectType });
+            var sql = GetBaseWhere(isContent, isMedia, isMember, false, filter, objectType);
             return AddGroupBy(isContent, isMedia, isMember, sql, true);
         }
 
         // gets the base SELECT + FROM [+ filter] sql
         // always from the 'current' content version
         protected Sql<ISqlContext> GetBase(bool isContent, bool isMedia, bool isMember, Action<Sql<ISqlContext>> filter, bool isCount = false)
-        {
+         {
             var sql = Sql();
 
             if (isCount)
@@ -423,15 +401,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (isContent || isMedia || isMember)
             {
                 sql
-                    .LeftJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
-                    .LeftJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
-                    .LeftJoin<ContentTypeDto>().On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId);
+                    .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
+                    .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
+                    .InnerJoin<ContentTypeDto>().On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId);
             }
 
             if (isContent)
             {
                 sql
-                    .LeftJoin<DocumentDto>().On<NodeDto, DocumentDto>((left, right) => left.NodeId == right.NodeId);
+                    .InnerJoin<DocumentDto>().On<NodeDto, DocumentDto>((left, right) => left.NodeId == right.NodeId);
             }
 
             if (isMedia)
@@ -455,10 +433,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         // gets the base SELECT + FROM [+ filter] + WHERE sql
         // for a given object type, with a given filter
-        protected Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isMember, bool isCount, Action<Sql<ISqlContext>> filter, Guid[] objectTypes)
+        protected Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isMember, bool isCount, Action<Sql<ISqlContext>> filter, Guid objectType)
         {
             return GetBase(isContent, isMedia, isMember, filter, isCount)
-                .WhereIn<NodeDto>(x => x.NodeObjectType, objectTypes);
+                .Where<NodeDto>(x => x.NodeObjectType == objectType);
         }
 
         // gets the base SELECT + FROM + WHERE sql
@@ -532,13 +510,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (sql == null) throw new ArgumentNullException(nameof(sql));
             if (ordering == null) throw new ArgumentNullException(nameof(ordering));
 
-            // TODO: although the default ordering string works for name, it wont work for others without a table or an alias of some sort
-            // As more things are attempted to be sorted we'll prob have to add more expressions here
-            var orderBy = ordering.OrderBy.ToUpperInvariant() switch
-            {
-                "PATH" => SqlSyntax.GetQuotedColumn(NodeDto.TableName, "path"),
-                _ => ordering.OrderBy
-            };
+            // TODO: although this works for name, it probably doesn't work for others without an alias of some sort
+            var orderBy = ordering.OrderBy;
 
             if (ordering.Direction == Direction.Ascending)
                 sql.OrderBy(orderBy);
@@ -551,17 +524,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         #region Classes
 
         /// <summary>
-        /// The DTO used to fetch results for a generic content item which could be either a document, media or a member
+        /// The DTO used to fetch results for a content item with its variation info
         /// </summary>
-        private class GenericContentEntityDto : DocumentEntityDto
-        {
-            public string MediaPath { get; set; }
-        }
-
-        /// <summary>
-        /// The DTO used to fetch results for a document item with its variation info
-        /// </summary>
-        private class DocumentEntityDto : BaseDto
+        private class ContentEntityDto : BaseDto
         {
             public ContentVariation Variations { get; set; }
 
@@ -569,17 +534,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             public bool Edited { get; set; }
         }
 
-        /// <summary>
-        /// The DTO used to fetch results for a media item with its media path info
-        /// </summary>
         private class MediaEntityDto : BaseDto
         {
             public string MediaPath { get; set; }
         }
 
-        /// <summary>
-        /// The DTO used to fetch results for a member item
-        /// </summary>
         private class MemberEntityDto : BaseDto
         {
         }
@@ -630,13 +589,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #region Factory
 
-        private EntitySlim BuildEntity(BaseDto dto)
+        private EntitySlim BuildEntity(bool isContent, bool isMedia, bool isMember, BaseDto dto)
         {
-            if (dto.NodeObjectType == Constants.ObjectTypes.Document)
+            if (isContent)
                 return BuildDocumentEntity(dto);
-            if (dto.NodeObjectType == Constants.ObjectTypes.Media)
+            if (isMedia)
                 return BuildMediaEntity(dto);
-            if (dto.NodeObjectType == Constants.ObjectTypes.Member)
+            if (isMember)
                 return BuildMemberEntity(dto);
 
             // EntitySlim does not track changes
@@ -691,7 +650,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var entity = new DocumentEntitySlim();
             BuildContentEntity(entity, dto);
 
-            if (dto is DocumentEntityDto contentDto)
+            if (dto is ContentEntityDto contentDto)
             {
                 // fill in the invariant info
                 entity.Edited = contentDto.Edited;
