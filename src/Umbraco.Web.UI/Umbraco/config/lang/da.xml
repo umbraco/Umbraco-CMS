@@ -1415,6 +1415,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="noFallbackLanguageOption">Intet fallback-sprog</key>
     <key alias="fallbackLanguageDescription">For at tillade flersproget indhold, som ikke er tilgængeligt i det anmodede sprog, skal du her vælge et sprog at falde tilbage på.</key>
     <key alias="fallbackLanguage">Fallback-sprog</key>
+    <key alias="none">ingen</key>
   </area>
   <area alias="macro">
     <key alias="addParameter">Tilføj parameter</key>
