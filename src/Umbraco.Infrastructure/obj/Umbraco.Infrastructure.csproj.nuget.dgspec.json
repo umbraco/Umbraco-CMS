@@ -1,0 +1,124 @@
+{
+  "format": 1,
+  "restore": {
+    "D:\\Projects\\Umbraco-CMS-netcore\\src\\Umbraco.Infrastructure\\Umbraco.Infrastructure.csproj": {}
+  },
+  "projects": {
+    "D:\\Projects\\Umbraco-CMS-netcore\\src\\Umbraco.Infrastructure\\Umbraco.Infrastructure.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\Projects\\Umbraco-CMS-netcore\\src\\Umbraco.Infrastructure\\Umbraco.Infrastructure.csproj",
+        "projectName": "Umbraco.Infrastructure",
+        "projectPath": "D:\\Projects\\Umbraco-CMS-netcore\\src\\Umbraco.Infrastructure\\Umbraco.Infrastructure.csproj",
+        "packagesPath": "C:\\Users\\Bjarke\\.nuget\\packages\\",
+        "outputPath": "D:\\Projects\\Umbraco-CMS-netcore\\src\\Umbraco.Infrastructure\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "D:\\Projects\\Umbraco-CMS-netcore\\NuGet.Config",
+          "C:\\Users\\Bjarke\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "netstandard2.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "D:\\Projects\\Umbraco-CMS\\build.out": {},
+          "https://api.nuget.org/v3/index.json": {},
+          "https://ci.appveyor.com/nuget/examine-f73l6qv0oqfh/": {},
+          "https://www.myget.org/F/formsnightly/api/v3/index.json": {},
+          "https://www.myget.org/F/umbracocore/api/v2": {},
+          "https://www.myget.org/F/umbracocore/api/v3/index.json": {}
+        },
+        "frameworks": {
+          "netstandard2.0": {
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netstandard2.0": {
+          "dependencies": {
+            "LightInject": {
+              "target": "Package",
+              "version": "[6.2.0, )"
+            },
+            "LightInject.Annotation": {
+              "target": "Package",
+              "version": "[1.1.0, )"
+            },
+            "Microsoft.SourceLink.GitHub": {
+              "target": "Package",
+              "version": "[1.0.0-beta2-19554-01, )"
+            },
+            "NETStandard.Library": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[2.0.3, )",
+              "autoReferenced": true
+            },
+            "NPoco": {
+              "target": "Package",
+              "version": "[4.0.2, )"
+            },
+            "Serilog": {
+              "target": "Package",
+              "version": "[2.9.0, )"
+            },
+            "Serilog.Enrichers.Process": {
+              "target": "Package",
+              "version": "[2.0.1, )"
+            },
+            "Serilog.Enrichers.Thread": {
+              "target": "Package",
+              "version": "[3.1.0, )"
+            },
+            "Serilog.Filters.Expressions": {
+              "target": "Package",
+              "version": "[2.0.0, )"
+            },
+            "Serilog.Formatting.Compact": {
+              "target": "Package",
+              "version": "[1.1.0, )"
+            },
+            "Serilog.Formatting.Compact.Reader": {
+              "target": "Package",
+              "version": "[1.0.3, )"
+            },
+            "Serilog.Sinks.Async": {
+              "target": "Package",
+              "version": "[1.4.0, )"
+            },
+            "Serilog.Sinks.File": {
+              "target": "Package",
+              "version": "[4.1.0, )"
+            },
+            "Serilog.Sinks.Map": {
+              "target": "Package",
+              "version": "[1.0.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.100-preview1-014459\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
