@@ -73,7 +73,7 @@ namespace Umbraco.Web.Macros
             var routeVals = new RouteData();
             routeVals.Values.Add("controller", "PartialViewMacro");
             routeVals.Values.Add("action", "Index");
-            routeVals.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx); //required for UmbracoViewPage
+            routeVals.DataTokens.Add(Core.ConstantsCore.Web.UmbracoContextDataToken, umbCtx); //required for UmbracoViewPage
 
             //lets render this controller as a child action
             var viewContext = new ViewContext { ViewData = new ViewDataDictionary() };

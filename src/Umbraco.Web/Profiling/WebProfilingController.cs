@@ -6,7 +6,7 @@ namespace Umbraco.Web.Profiling
     /// <summary>
     /// The API controller used to display the state of the web profiler
     /// </summary>
-    [UmbracoApplicationAuthorize(Core.Constants.Applications.Settings)]
+    [UmbracoApplicationAuthorize(Core.ConstantsCore.Applications.Settings)]
     public class WebProfilingController : UmbracoAuthorizedJsonController
     {
         public object GetStatus()

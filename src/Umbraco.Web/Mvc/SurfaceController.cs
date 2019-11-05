@@ -170,8 +170,8 @@ namespace Umbraco.Web.Mvc
             while (currentContext != null)
             {
                 var currentRouteData = currentContext.RouteData;
-                if (currentRouteData.DataTokens.ContainsKey(Core.Constants.Web.UmbracoRouteDefinitionDataToken))
-                    return Attempt.Succeed((RouteDefinition)currentRouteData.DataTokens[Core.Constants.Web.UmbracoRouteDefinitionDataToken]);
+                if (currentRouteData.DataTokens.ContainsKey(Core.ConstantsCore.Web.UmbracoRouteDefinitionDataToken))
+                    return Attempt.Succeed((RouteDefinition)currentRouteData.DataTokens[Core.ConstantsCore.Web.UmbracoRouteDefinitionDataToken]);
 
                 currentContext = currentContext.IsChildAction
                     ? currentContext.ParentActionViewContext

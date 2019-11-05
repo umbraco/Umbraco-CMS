@@ -44,7 +44,7 @@ namespace Umbraco.Core.Compose
         public void Terminate()
         { }
 
-        internal static IUser UnknownUser => new User { Id = Constants.Security.UnknownUserId, Name = Constants.Security.UnknownUserName, Email = "" };
+        internal static IUser UnknownUser => new User { Id = ConstantsCore.Security.UnknownUserId, Name = ConstantsCore.Security.UnknownUserName, Email = "" };
 
         private IUser CurrentPerformingUser
         {

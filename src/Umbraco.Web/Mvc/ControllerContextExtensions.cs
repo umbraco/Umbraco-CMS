@@ -12,7 +12,7 @@ namespace Umbraco.Web.Mvc
         /// <returns>The Umbraco context.</returns>
         public static UmbracoContext GetUmbracoContext(this ControllerContext controllerContext)
         {
-            var o = controllerContext.GetDataTokenInViewContextHierarchy(Core.Constants.Web.UmbracoContextDataToken);
+            var o = controllerContext.GetDataTokenInViewContextHierarchy(Core.ConstantsCore.Web.UmbracoContextDataToken);
             return o != null ? o as UmbracoContext : Current.UmbracoContext;
         }
 

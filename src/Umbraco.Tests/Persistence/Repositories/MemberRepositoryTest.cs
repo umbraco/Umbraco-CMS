@@ -366,6 +366,6 @@ namespace Umbraco.Tests.Persistence.Repositories
             return sql;
         }
 
-        private Guid NodeObjectTypeId => Constants.ObjectTypes.Member;
+        private Guid NodeObjectTypeId => ConstantsCore.ObjectTypes.Member;
     }
 }

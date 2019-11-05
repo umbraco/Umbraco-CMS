@@ -8,8 +8,8 @@ using Umbraco.Web.Actions;
 
 namespace Umbraco.Web.Trees
 {
-    [UmbracoTreeAuthorize(Constants.Trees.RelationTypes)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.RelationTypes, SortOrder = 5, TreeGroup = Constants.Trees.Groups.Settings)]
+    [UmbracoTreeAuthorize(ConstantsCore.Trees.RelationTypes)]
+    [Tree(ConstantsCore.Applications.Settings, ConstantsCore.Trees.RelationTypes, SortOrder = 5, TreeGroup = ConstantsCore.Trees.Groups.Settings)]
     [Mvc.PluginController("UmbracoTrees")]
     [CoreTree]
     public class RelationTypeTreeController : TreeController
@@ -18,7 +18,7 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
 
-            if (id == Constants.System.RootString)
+            if (id == ConstantsCore.System.RootString)
             {
                 //Create the normal create action
                 menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.ActionAlias));
@@ -41,7 +41,7 @@ namespace Umbraco.Web.Trees
         {
             var nodes = new TreeNodeCollection();
 
-            if (id == Constants.System.RootString)
+            if (id == ConstantsCore.System.RootString)
             {
                 nodes.AddRange(Services.RelationService.GetAllRelationTypes()
                     .Select(rt => CreateTreeNode(rt.Id.ToString(), id, queryStrings, rt.Name,

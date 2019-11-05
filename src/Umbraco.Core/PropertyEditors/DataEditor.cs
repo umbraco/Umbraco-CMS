@@ -29,7 +29,7 @@ namespace Umbraco.Core.PropertyEditors
 
             // defaults
             Type = type;
-            Icon = Constants.Icons.PropertyEditor;
+            Icon = ConstantsCore.Icons.PropertyEditor;
             Group = Constants.PropertyEditors.Groups.Common;
 
             // assign properties based on the attribute, if it is found

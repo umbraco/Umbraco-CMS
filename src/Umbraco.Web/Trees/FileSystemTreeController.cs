@@ -35,7 +35,7 @@ namespace Umbraco.Web.Trees
 
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
-            var path = string.IsNullOrEmpty(id) == false && id != Constants.System.RootString
+            var path = string.IsNullOrEmpty(id) == false && id != ConstantsCore.System.RootString
                 ? HttpUtility.UrlDecode(id).TrimStart("/")
                 : "";
 
@@ -61,7 +61,7 @@ namespace Umbraco.Web.Trees
 
                 if (Extensions.Contains("*"))
                     return true;
-                
+
                 return extension != null && Extensions.Contains(extension.Trim('.'), StringComparer.InvariantCultureIgnoreCase);
             });
 
@@ -84,7 +84,7 @@ namespace Umbraco.Web.Trees
         {
             var root = base.CreateRootNode(queryStrings);
             //check if there are any children
-            root.HasChildren = GetTreeNodes(Constants.System.RootString, queryStrings).Any();
+            root.HasChildren = GetTreeNodes(ConstantsCore.System.RootString, queryStrings).Any();
             return root;
         }
 
@@ -139,14 +139,14 @@ namespace Umbraco.Web.Trees
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
             //if root node no need to visit the filesystem so lets just create the menu and return it
-            if (id == Constants.System.RootString)
+            if (id == ConstantsCore.System.RootString)
             {
                 return GetMenuForRootNode(queryStrings);
             }
 
             var menu = new MenuItemCollection();
 
-            var path = string.IsNullOrEmpty(id) == false && id != Constants.System.RootString
+            var path = string.IsNullOrEmpty(id) == false && id != ConstantsCore.System.RootString
                 ? HttpUtility.UrlDecode(id).TrimStart("/")
                 : "";
 

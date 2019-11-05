@@ -24,7 +24,7 @@ namespace Umbraco.Web.ContentApps
                     {
                         Alias = "umbContent",
                         Name = "Content",
-                        Icon = Constants.Icons.Content,
+                        Icon = ConstantsCore.Icons.Content,
                         View = "views/content/apps/content/content.html",
                         Weight = Weight
                     });
@@ -37,7 +37,7 @@ namespace Umbraco.Web.ContentApps
                     {
                         Alias = "umbContent",
                         Name = "Content",
-                        Icon = Constants.Icons.Content,
+                        Icon = ConstantsCore.Icons.Content,
                         View = "views/media/apps/content/content.html",
                         Weight = Weight
                     });

@@ -1087,7 +1087,7 @@ namespace Umbraco.Tests.Integration
         [Test]
         public void EmptyRecycleBinContent()
         {
-            ServiceContext.ContentService.EmptyRecycleBin(Constants.Security.SuperUserId);
+            ServiceContext.ContentService.EmptyRecycleBin(ConstantsCore.Security.SuperUserId);
 
             var content = CreateContent();
             Assert.IsNotNull(content);
@@ -1095,7 +1095,7 @@ namespace Umbraco.Tests.Integration
             ServiceContext.ContentService.MoveToRecycleBin(content);
 
             ResetEvents();
-            ServiceContext.ContentService.EmptyRecycleBin(Constants.Security.SuperUserId);
+            ServiceContext.ContentService.EmptyRecycleBin(ConstantsCore.Security.SuperUserId);
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -1109,7 +1109,7 @@ namespace Umbraco.Tests.Integration
         [Test]
         public void EmptyRecycleBinContents()
         {
-            ServiceContext.ContentService.EmptyRecycleBin(Constants.Security.SuperUserId);
+            ServiceContext.ContentService.EmptyRecycleBin(ConstantsCore.Security.SuperUserId);
 
             var content1 = CreateContent();
             Assert.IsNotNull(content1);
@@ -1120,7 +1120,7 @@ namespace Umbraco.Tests.Integration
             ServiceContext.ContentService.MoveToRecycleBin(content2);
 
             ResetEvents();
-            ServiceContext.ContentService.EmptyRecycleBin(Constants.Security.SuperUserId);
+            ServiceContext.ContentService.EmptyRecycleBin(ConstantsCore.Security.SuperUserId);
 
             Assert.AreEqual(3, _msgCount);
             Assert.AreEqual(4, _events.Count);
@@ -1136,7 +1136,7 @@ namespace Umbraco.Tests.Integration
         [Test]
         public void EmptyRecycleBinBranch()
         {
-            ServiceContext.ContentService.EmptyRecycleBin(Constants.Security.SuperUserId);
+            ServiceContext.ContentService.EmptyRecycleBin(ConstantsCore.Security.SuperUserId);
 
             var content1 = CreateBranch();
             Assert.IsNotNull(content1);
@@ -1151,7 +1151,7 @@ namespace Umbraco.Tests.Integration
             var content4C = Children(content1C[2]).ToArray();
             var content5C = Children(content1C[3]).ToArray();
 
-            ServiceContext.ContentService.EmptyRecycleBin(Constants.Security.SuperUserId);
+            ServiceContext.ContentService.EmptyRecycleBin(ConstantsCore.Security.SuperUserId);
 
             Assert.AreEqual(14, _msgCount);
             Assert.AreEqual(14, _events.Count);
@@ -2020,7 +2020,7 @@ namespace Umbraco.Tests.Integration
             Assert.IsNotNull(content);
 
             ResetEvents();
-            var copy = ServiceContext.ContentService.Copy(content, Constants.System.Root, false);
+            var copy = ServiceContext.ContentService.Copy(content, ConstantsCore.System.Root, false);
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -2039,7 +2039,7 @@ namespace Umbraco.Tests.Integration
             ServiceContext.ContentService.SaveAndPublish(content);
 
             ResetEvents();
-            var copy = ServiceContext.ContentService.Copy(content, Constants.System.Root, false);
+            var copy = ServiceContext.ContentService.Copy(content, ConstantsCore.System.Root, false);
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -2061,7 +2061,7 @@ namespace Umbraco.Tests.Integration
             ServiceContext.ContentService.Move(content, content2.Id);
 
             ResetEvents();
-            var copy = ServiceContext.ContentService.Copy(content, Constants.System.Root, false);
+            var copy = ServiceContext.ContentService.Copy(content, ConstantsCore.System.Root, false);
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -2080,7 +2080,7 @@ namespace Umbraco.Tests.Integration
             ServiceContext.ContentService.SaveAndPublish(content);
 
             ResetEvents();
-            var copy = ServiceContext.ContentService.Copy(content, Constants.System.Root, false);
+            var copy = ServiceContext.ContentService.Copy(content, ConstantsCore.System.Root, false);
 
             var copyC = Children(copy).ToArray();
             var copy2C = Children(copyC[0]).ToArray();

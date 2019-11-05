@@ -15,7 +15,7 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class LogController : UmbracoAuthorizedJsonController
     {
-        [UmbracoApplicationAuthorize(Core.Constants.Applications.Content, Core.Constants.Applications.Media)]
+        [UmbracoApplicationAuthorize(Core.ConstantsCore.Applications.Content, Core.ConstantsCore.Applications.Media)]
         public PagedResult<AuditLog> GetPagedEntityLog(int id,
             int pageNumber = 1,
             int pageSize = 10,
@@ -30,7 +30,7 @@ namespace Umbraco.Web.Editors
             long totalRecords;
             var dateQuery = sinceDate.HasValue ? SqlContext.Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
             var result = Services.AuditService.GetPagedItemsByEntity(id, pageNumber - 1, pageSize, out totalRecords, orderDirection, customFilter: dateQuery);
-            var mapped = result.Select(item => Mapper.Map<AuditLog>(item));        
+            var mapped = result.Select(item => Mapper.Map<AuditLog>(item));
 
             var page = new PagedResult<AuditLog>(totalRecords, pageNumber, pageSize)
             {
@@ -61,7 +61,7 @@ namespace Umbraco.Web.Editors
                 Items = MapAvatarsAndNames(mapped)
             };
         }
-        
+
         private IEnumerable<AuditLog> MapAvatarsAndNames(IEnumerable<AuditLog> items)
         {
             var mappedItems = items.ToList();
@@ -79,7 +79,7 @@ namespace Umbraco.Web.Editors
                 {
                     item.UserName = name;
                 }
-                
+
 
             }
             return mappedItems;

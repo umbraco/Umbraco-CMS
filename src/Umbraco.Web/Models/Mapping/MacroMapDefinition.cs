@@ -31,7 +31,7 @@ namespace Umbraco.Web.Models.Mapping
         private static void Map(IMacro source, EntityBasic target, MapperContext context)
         {
             target.Alias = source.Alias;
-            target.Icon = Constants.Icons.Macro;
+            target.Icon = ConstantsCore.Icons.Macro;
             target.Id = source.Id;
             target.Key = source.Key;
             target.Name = source.Name;

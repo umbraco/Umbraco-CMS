@@ -18,7 +18,7 @@ namespace Umbraco.Web.Security
     /// Static helper class used to configure a CookieAuthenticationProvider to validate a cookie against a user's session id
     /// </summary>
     /// <remarks>
-    /// This uses another cookie to track the last checked time which is done for a few reasons:    
+    /// This uses another cookie to track the last checked time which is done for a few reasons:
     /// * We can't use the user's auth ticket to do this because we'd be re-issuing the auth ticket all of the time and it would never expire
     ///     plus the auth ticket size is much larger than this small value
     /// * This will execute quite often (every minute per user) and in some cases there might be several requests that end up re-issuing the cookie so the cookie value should be small
@@ -27,12 +27,12 @@ namespace Umbraco.Web.Security
     internal static class SessionIdValidator
     {
         public const string CookieName = "UMB_UCONTEXT_C";
-        
+
         public static async Task ValidateSessionAsync(TimeSpan validateInterval, CookieValidateIdentityContext context, IGlobalSettings globalSettings)
         {
             if (context.Request.Uri.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath, globalSettings) == false)
                 return;
-            
+
             var valid = await ValidateSessionAsync(validateInterval, context.OwinContext, context.Options.CookieManager, context.Options.SystemClock, context.Properties.IssuedUtc, context.Identity, globalSettings);
 
             if (valid == false)
@@ -65,7 +65,7 @@ namespace Umbraco.Web.Security
             {
                 DateTimeOffset parsed;
                 if (DateTimeOffset.TryParse(lastCheckedCookie, out parsed))
-                {                    
+                {
                     issuedUtc = parsed;
                 }
             }
@@ -87,7 +87,7 @@ namespace Umbraco.Web.Security
             if (validate == false)
                 return true;
 
-            var manager = owinCtx.GetUserManager<BackOfficeUserManager>();            
+            var manager = owinCtx.GetUserManager<BackOfficeUserManager>();
             if (manager == null)
                 return false;
 
@@ -96,7 +96,7 @@ namespace Umbraco.Web.Security
             if (user == null)
                 return false;
 
-            var sessionId = currentIdentity.FindFirstValue(Constants.Security.SessionIdClaimType);
+            var sessionId = currentIdentity.FindFirstValue(ConstantsCore.Security.SessionIdClaimType);
             if (await manager.ValidateSessionIdAsync(userId, sessionId) == false)
                 return false;
 
@@ -114,6 +114,6 @@ namespace Umbraco.Web.Security
 
             return true;
         }
-        
+
     }
 }

@@ -454,7 +454,7 @@ AND (umbracoNode.id=@id)";
                 var xmlDtos = scope.Database.Query<XmlDto>(sql,
                     new
                     {
-                        nodeObjectType = Constants.ObjectTypes.Media,
+                        nodeObjectType = ConstantsCore.ObjectTypes.Media,
                         id = mediaId
                     });
                 xmlDto = xmlDtos.FirstOrDefault();
@@ -486,7 +486,7 @@ AND (umbracoNode.id=@id)";
                 var xmlDtos = scope.Database.Query<XmlDto>(sql,
                     new
                     {
-                        nodeObjectType = Constants.ObjectTypes.Member,
+                        nodeObjectType = ConstantsCore.ObjectTypes.Member,
                         id = memberId
                     });
                 xmlDto = xmlDtos.FirstOrDefault();
@@ -519,7 +519,7 @@ AND (umbracoNode.id=@id)";
                 var xmlDtos = scope.Database.Query<XmlDto>(sql,
                     new
                     {
-                        nodeObjectType = Constants.ObjectTypes.Document,
+                        nodeObjectType = ConstantsCore.ObjectTypes.Document,
                         id = contentId
                     });
                 xmlDto = xmlDtos.FirstOrDefault();
@@ -542,7 +542,7 @@ AND (umbracoNode.id=@id)";
             // just here to replicate what uQuery was doing and show it can be done
             // but really - should not be used
 
-            return LoadMoreXmlFromDatabase(Constants.ObjectTypes.Media);
+            return LoadMoreXmlFromDatabase(ConstantsCore.ObjectTypes.Media);
         }
 
         public XmlDocument GetMemberXml()
@@ -551,7 +551,7 @@ AND (umbracoNode.id=@id)";
             // just here to replicate what uQuery was doing and show it can be done
             // but really - should not be used
 
-            return LoadMoreXmlFromDatabase(Constants.ObjectTypes.Member);
+            return LoadMoreXmlFromDatabase(ConstantsCore.ObjectTypes.Member);
         }
 
         public XmlDocument GetPreviewXml(int contentId, bool includeSubs)
@@ -574,7 +574,7 @@ AND (umbracoNode.id=@id)";
                 var xmlDtos = scope.Database.Query<XmlDto>(sql,
                     new
                     {
-                        nodeObjectType = Constants.ObjectTypes.Document,
+                        nodeObjectType = ConstantsCore.ObjectTypes.Document,
                         path = content.Path,
                     });
 
@@ -929,7 +929,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
                 // get xml
                 var xmlDtos = scope.Database.Query<XmlDto>(ReadTreeCmsContentXmlSql,
-                    new { nodeObjectType = Constants.ObjectTypes.Document });
+                    new { nodeObjectType = ConstantsCore.ObjectTypes.Document });
 
                 foreach (var xmlDto in xmlDtos)
                 {
@@ -961,11 +961,11 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
             using (var scope = _scopeProvider.CreateScope())
             {
-                if (nodeObjectType == Constants.ObjectTypes.Document)
+                if (nodeObjectType == ConstantsCore.ObjectTypes.Document)
                     scope.ReadLock(Constants.Locks.ContentTree);
-                else if (nodeObjectType == Constants.ObjectTypes.Media)
+                else if (nodeObjectType == ConstantsCore.ObjectTypes.Media)
                     scope.ReadLock(Constants.Locks.MediaTree);
-                else if (nodeObjectType == Constants.ObjectTypes.Member)
+                else if (nodeObjectType == ConstantsCore.ObjectTypes.Member)
                     scope.ReadLock(Constants.Locks.MemberTree);
 
                 var xmlDtos = scope.Database.Query<XmlDto>(ReadMoreCmsContentXmlSql,
@@ -1095,7 +1095,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                         var xmlDtos = scope.Database.Query<XmlDto>(ReadBranchCmsContentXmlSql,
                             new
                             {
-                                nodeObjectType = Constants.ObjectTypes.Document,
+                                nodeObjectType = ConstantsCore.ObjectTypes.Document,
                                 path = content.Path + ",%",
                                 id = content.Id
                             });
@@ -1273,7 +1273,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 var xmlDtos = scope.Database.Query<XmlDto>(ReadCmsContentXmlForContentTypesSql,
-                    new { nodeObjectType = Constants.ObjectTypes.Document, /*@ids =*/ ids });
+                    new { nodeObjectType = ConstantsCore.ObjectTypes.Document, /*@ids =*/ ids });
 
                 foreach (var xmlDto in xmlDtos)
                 {
@@ -1699,7 +1699,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
         private void RebuildContentXmlLocked(IScope scope, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
-            var contentObjectType = Constants.ObjectTypes.Document;
+            var contentObjectType = ConstantsCore.ObjectTypes.Document;
             var db = scope.Database;
 
             // remove all - if anything fails the transaction will rollback
@@ -1770,7 +1770,7 @@ WHERE cmsContentXml.nodeId IN (
         private void RebuildPreviewXmlLocked(IScope scope, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
-            var contentObjectType = Constants.ObjectTypes.Document;
+            var contentObjectType = ConstantsCore.ObjectTypes.Document;
             var db = scope.Database;
 
             // remove all - if anything fails the transaction will rollback
@@ -1845,7 +1845,7 @@ WHERE cmsPreviewXml.nodeId IN (
         public void RebuildMediaXmlLocked(IScope scope, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
-            var mediaObjectType = Constants.ObjectTypes.Media;
+            var mediaObjectType = ConstantsCore.ObjectTypes.Media;
             var db = scope.Database;
 
             // remove all - if anything fails the transaction will rollback
@@ -1914,7 +1914,7 @@ WHERE cmsContentXml.nodeId IN (
         public void RebuildMemberXmlLocked(IScope scope, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
-            var memberObjectType = Constants.ObjectTypes.Member;
+            var memberObjectType = ConstantsCore.ObjectTypes.Member;
             var db = scope.Database;
 
             // remove all - if anything fails the transaction will rollback
@@ -1986,7 +1986,7 @@ WHERE cmsContentXml.nodeId IN (
             // every content item should have a corresponding row in cmsPreviewXml
             // and that row should have the key="..." attribute
 
-            var contentObjectType = Constants.ObjectTypes.Document;
+            var contentObjectType = ConstantsCore.ObjectTypes.Document;
             var db = scope.Database;
 
             var count = db.ExecuteScalar<int>($@"SELECT COUNT(*)
@@ -2027,7 +2027,7 @@ AND cmsPreviewXml.nodeId IS NULL OR cmsPreviewXml.xml NOT LIKE '% key=""'
             // and that row should have the key="..." attribute
             // TODO: where's the trashed test here?
 
-            var mediaObjectType = Constants.ObjectTypes.Media;
+            var mediaObjectType = ConstantsCore.ObjectTypes.Media;
             var db = scope.Database;
 
             var count = db.ExecuteScalar<int>($@"SELECT COUNT(*)
@@ -2057,7 +2057,7 @@ AND cmsContentXml.nodeId IS NULL OR cmsContentXml.xml NOT LIKE '% key=""'
         {
             // every member item should have a corresponding row in cmsContentXml
 
-            var memberObjectType = Constants.ObjectTypes.Member;
+            var memberObjectType = ConstantsCore.ObjectTypes.Member;
             var db = scope.Database;
 
             var count = db.ExecuteScalar<int>(@"SELECT COUNT(*)

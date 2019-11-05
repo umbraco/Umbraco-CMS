@@ -13,7 +13,7 @@ using Constants = Umbraco.Core.Constants;
 namespace Umbraco.Web.Editors
 {
     [PluginController("UmbracoApi")]
-    [UmbracoApplicationAuthorize(Constants.Applications.Content)]
+    [UmbracoApplicationAuthorize(ConstantsCore.Applications.Content)]
     public class RelationController : UmbracoAuthorizedJsonController
     {
         public RelationDisplay GetById(int id)

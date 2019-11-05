@@ -20,13 +20,13 @@ namespace Umbraco.Core.Events
             NodeObjectType = nodeObjectType;
 
         }
-        
+
         /// <summary>
         /// Gets the Id of the node object type of the items
         /// being deleted from the Recycle Bin.
         /// </summary>
         public Guid NodeObjectType { get; }
-        
+
         /// <summary>
         /// Boolean indicating whether the Recycle Bin was emptied successfully
         /// </summary>
@@ -35,12 +35,12 @@ namespace Umbraco.Core.Events
         /// <summary>
         /// Boolean indicating whether this event was fired for the Content's Recycle Bin.
         /// </summary>
-        public bool IsContentRecycleBin => NodeObjectType == Constants.ObjectTypes.Document;
+        public bool IsContentRecycleBin => NodeObjectType == ConstantsCore.ObjectTypes.Document;
 
         /// <summary>
         /// Boolean indicating whether this event was fired for the Media's Recycle Bin.
         /// </summary>
-        public bool IsMediaRecycleBin => NodeObjectType == Constants.ObjectTypes.Media;
+        public bool IsMediaRecycleBin => NodeObjectType == ConstantsCore.ObjectTypes.Media;
 
         public bool Equals(RecycleBinEventArgs other)
         {

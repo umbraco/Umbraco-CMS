@@ -174,7 +174,7 @@ namespace Umbraco.Web.Trees
         /// <returns></returns>
         protected virtual TreeNode CreateRootNode(FormDataCollection queryStrings)
         {
-            var rootNodeAsString = Constants.System.RootString;
+            var rootNodeAsString = ConstantsCore.System.RootString;
             var currApp = queryStrings.GetValue<string>(TreeQueryStringParameters.Application);
 
             var node = new TreeNode(

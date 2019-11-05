@@ -9,7 +9,7 @@ namespace Umbraco.Web.Sections
     public class UsersSection : ISection
     {
         /// <inheritdoc />
-        public string Alias => Constants.Applications.Users;
+        public string Alias => ConstantsCore.Applications.Users;
 
         /// <inheritdoc />
         public string Name => "Users";

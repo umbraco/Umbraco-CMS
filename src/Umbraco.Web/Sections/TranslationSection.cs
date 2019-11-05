@@ -9,7 +9,7 @@ namespace Umbraco.Web.Sections
     public class TranslationSection : ISection
     {
         /// <inheritdoc />
-        public string Alias => Constants.Applications.Translation;
+        public string Alias => ConstantsCore.Applications.Translation;
 
         /// <inheritdoc />
         public string Name => "Translation";

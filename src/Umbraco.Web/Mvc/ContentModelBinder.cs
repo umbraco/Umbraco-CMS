@@ -31,7 +31,7 @@ namespace Umbraco.Web.Mvc
         public override object BindModel(ControllerContext controllerContext, ModelBindingContext bindingContext)
         {
             object model;
-            if (controllerContext.RouteData.DataTokens.TryGetValue(Core.Constants.Web.UmbracoDataToken, out model) == false)
+            if (controllerContext.RouteData.DataTokens.TryGetValue(Core.ConstantsCore.Web.UmbracoDataToken, out model) == false)
                 return null;
 
             // this model binder deals with IContentModel and IPublishedContent by extracting the model from the route's

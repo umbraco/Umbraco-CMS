@@ -25,13 +25,13 @@ namespace Umbraco.Web.Trees
     //We will not allow the tree to render unless the user has access to any of the sections that the tree gets rendered
     // this is not ideal but until we change permissions to be tree based (not section) there's not much else we can do here.
     [UmbracoApplicationAuthorize(
-        Constants.Applications.Content,
-        Constants.Applications.Media,
-        Constants.Applications.Users,
-        Constants.Applications.Settings,
-        Constants.Applications.Packages,
-        Constants.Applications.Members)]
-    [Tree(Constants.Applications.Content, Constants.Trees.Content)]
+        ConstantsCore.Applications.Content,
+        ConstantsCore.Applications.Media,
+        ConstantsCore.Applications.Users,
+        ConstantsCore.Applications.Settings,
+        ConstantsCore.Applications.Packages,
+        ConstantsCore.Applications.Members)]
+    [Tree(ConstantsCore.Applications.Content, ConstantsCore.Trees.Content)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
     [SearchableTree("searchResultFormatter", "configureContentResult", 10)]
@@ -40,7 +40,7 @@ namespace Umbraco.Web.Trees
         private readonly UmbracoTreeSearcher _treeSearcher;
         private readonly ActionCollection _actions;
 
-        protected override int RecycleBinId => Constants.System.RecycleBinContent;
+        protected override int RecycleBinId => ConstantsCore.System.RecycleBinContent;
 
         protected override bool RecycleBinSmells => Services.ContentService.RecycleBinSmells();
 
@@ -68,7 +68,7 @@ namespace Umbraco.Web.Trees
 
                 var node = CreateTreeNode(
                     entity,
-                    Constants.ObjectTypes.Document,
+                    ConstantsCore.ObjectTypes.Document,
                     parentId,
                     queryStrings,
                     entity.HasChildren);
@@ -114,12 +114,12 @@ namespace Umbraco.Web.Trees
 
         protected override MenuItemCollection PerformGetMenuForNode(string id, FormDataCollection queryStrings)
         {
-            if (id == Constants.System.RootString)
+            if (id == ConstantsCore.System.RootString)
             {
                 var menu = new MenuItemCollection();
 
                 // if the user's start node is not the root then the only menu item to display is refresh
-                if (UserStartNodes.Contains(Constants.System.Root) == false)
+                if (UserStartNodes.Contains(ConstantsCore.System.Root) == false)
                 {
                     menu.Items.Add(new RefreshNode(Services.TextService, true));
                     return menu;
@@ -129,7 +129,7 @@ namespace Umbraco.Web.Trees
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
                 // we need to get the default permissions as you can't set permissions on the very root node
-                var permission = Services.UserService.GetPermissions(Security.CurrentUser, Constants.System.Root).First();
+                var permission = Services.UserService.GetPermissions(Security.CurrentUser, ConstantsCore.System.Root).First();
                 var nodeActions = _actions.FromEntityPermission(permission)
                     .Select(x => new MenuItem(x));
 
@@ -172,8 +172,8 @@ namespace Umbraco.Web.Trees
                 return menu;
             }
 
-            var nodeMenu = GetAllNodeMenuItems(item);            
-            
+            var nodeMenu = GetAllNodeMenuItems(item);
+
             //if the content node is in the recycle bin, don't have a default menu, just show the regular menu
             if (item.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Contains(RecycleBinId.ToInvariantString()))
             {
@@ -274,7 +274,7 @@ namespace Umbraco.Web.Trees
 
             return menu;
         }
-        
+
         /// <summary>
         /// set name according to variations
         /// </summary>

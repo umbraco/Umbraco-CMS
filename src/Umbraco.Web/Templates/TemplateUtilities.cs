@@ -214,7 +214,7 @@ namespace Umbraco.Web.Templates
 
                 if (string.IsNullOrEmpty(tmpImgPath))
                     continue;
-                                
+
                 var absoluteTempImagePath = IOHelper.MapPath(tmpImgPath);
                 var fileName = Path.GetFileName(absoluteTempImagePath);
                 var safeFileName = fileName.ToSafeFileName();
@@ -226,7 +226,7 @@ namespace Umbraco.Web.Templates
                 if (uploadedImages.ContainsKey(tmpImgPath) == false)
                 {
                     if (mediaParentFolder == Guid.Empty)
-                        mediaFile = mediaService.CreateMedia(mediaItemName, Constants.System.Root, Constants.Conventions.MediaTypes.Image, userId);
+                        mediaFile = mediaService.CreateMedia(mediaItemName, ConstantsCore.System.Root, Constants.Conventions.MediaTypes.Image, userId);
                     else
                         mediaFile = mediaService.CreateMedia(mediaItemName, mediaParentFolder, Constants.Conventions.MediaTypes.Image, userId);
 
@@ -247,7 +247,7 @@ namespace Umbraco.Web.Templates
                 {
                     // Already been uploaded & we have it's UDI
                     udi = uploadedImages[tmpImgPath];
-                }                
+                }
 
                 // Add the UDI to the img element as new data attribute
                 img.SetAttributeValue("data-udi", udi.ToString());
@@ -264,7 +264,7 @@ namespace Umbraco.Web.Templates
                 {
                     location = $"{location}?width={width}&height={height}&mode=max";
                 }
-                
+
                 img.SetAttributeValue("src", location);
 
                 // Remove the data attribute (so we do not re-process this)

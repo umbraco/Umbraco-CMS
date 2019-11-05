@@ -42,7 +42,7 @@ namespace Umbraco.Web.Editors
     /// An API controller used for dealing with content types
     /// </summary>
     [PluginController("UmbracoApi")]
-    [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
+    [UmbracoTreeAuthorize(ConstantsCore.Trees.DocumentTypes)]
     [EnableOverrideAuthorization]
     public class ContentTypeController : ContentTypeControllerBase<IContentType>
     {
@@ -106,9 +106,9 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [UmbracoTreeAuthorize(
-            Constants.Trees.DocumentTypes, Constants.Trees.Content,
-            Constants.Trees.MediaTypes, Constants.Trees.Media,
-            Constants.Trees.MemberTypes, Constants.Trees.Members)]
+            ConstantsCore.Trees.DocumentTypes, ConstantsCore.Trees.Content,
+            ConstantsCore.Trees.MediaTypes, ConstantsCore.Trees.Media,
+            ConstantsCore.Trees.MemberTypes, ConstantsCore.Trees.Members)]
         public IEnumerable<string> GetAllPropertyTypeAliases()
         {
             return Services.ContentTypeService.GetAllPropertyTypeAliases();
@@ -119,9 +119,9 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [UmbracoTreeAuthorize(
-            Constants.Trees.DocumentTypes, Constants.Trees.Content,
-            Constants.Trees.MediaTypes, Constants.Trees.Media,
-            Constants.Trees.MemberTypes, Constants.Trees.Members)]
+            ConstantsCore.Trees.DocumentTypes, ConstantsCore.Trees.Content,
+            ConstantsCore.Trees.MediaTypes, ConstantsCore.Trees.Media,
+            ConstantsCore.Trees.MemberTypes, ConstantsCore.Trees.Members)]
         public IEnumerable<string> GetAllStandardFields()
         {
             string[] preValuesSource = { "createDate", "creatorName", "level", "nodeType", "nodeTypeAlias", "pageID", "pageName", "parentID", "path", "template", "updateDate", "writerID", "writerName" };
@@ -163,9 +163,9 @@ namespace Umbraco.Web.Editors
         }
 
         [UmbracoTreeAuthorize(
-            Constants.Trees.DocumentTypes, Constants.Trees.Content,
-            Constants.Trees.MediaTypes, Constants.Trees.Media,
-            Constants.Trees.MemberTypes, Constants.Trees.Members)]
+            ConstantsCore.Trees.DocumentTypes, ConstantsCore.Trees.Content,
+            ConstantsCore.Trees.MediaTypes, ConstantsCore.Trees.Media,
+            ConstantsCore.Trees.MemberTypes, ConstantsCore.Trees.Members)]
         public ContentPropertyDisplay GetPropertyTypeScaffold(int id)
         {
             var dataTypeDiff = Services.DataTypeService.GetDataType(id);
@@ -370,7 +370,7 @@ namespace Umbraco.Web.Editors
         public DocumentTypeDisplay GetEmpty(int parentId)
         {
             IContentType ct;
-            if (parentId != Constants.System.Root)
+            if (parentId != ConstantsCore.System.Root)
             {
                 var parent = Services.ContentTypeService.Get(parentId);
                 ct = parent != null ? new ContentType(parent, string.Empty) : new ContentType(parentId);
@@ -378,7 +378,7 @@ namespace Umbraco.Web.Editors
             else
                 ct = new ContentType(parentId);
 
-            ct.Icon = Constants.Icons.Content;
+            ct.Icon = ConstantsCore.Icons.Content;
 
             var dto = Mapper.Map<IContentType, DocumentTypeDisplay>(ct);
             return dto;
@@ -405,14 +405,14 @@ namespace Umbraco.Web.Editors
         /// Returns the allowed child content type objects for the content item id passed in
         /// </summary>
         /// <param name="contentId"></param>
-        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes, Constants.Trees.Content)]
+        [UmbracoTreeAuthorize(ConstantsCore.Trees.DocumentTypes, ConstantsCore.Trees.Content)]
         public IEnumerable<ContentTypeBasic> GetAllowedChildren(int contentId)
         {
-            if (contentId == Constants.System.RecycleBinContent)
+            if (contentId == ConstantsCore.System.RecycleBinContent)
                 return Enumerable.Empty<ContentTypeBasic>();
 
             IEnumerable<IContentType> types;
-            if (contentId == Constants.System.Root)
+            if (contentId == ConstantsCore.System.Root)
             {
                 types = Services.ContentTypeService.GetAll().Where(x => x.AllowedAsRoot).ToList();
             }

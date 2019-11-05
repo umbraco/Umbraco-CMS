@@ -1,9 +1,6 @@
-﻿using System;
-using System.ComponentModel;
-
-namespace Umbraco.Core
+﻿namespace Umbraco.Core
 {
-    public static partial class Constants
+    public static partial class ConstantsCore
     {
         public static class Security
         {
@@ -37,8 +34,8 @@ namespace Umbraco.Core
             public const string BackOfficeTokenAuthenticationType = "UmbracoBackOfficeToken";
             public const string BackOfficeTwoFactorAuthenticationType = "UmbracoTwoFactorCookie";
 
-            internal const string EmptyPasswordPrefix = "___UIDEMPTYPWORD__";
-            internal const string ForceReAuthFlag = "umbraco-force-auth";
+            public const string EmptyPasswordPrefix = "___UIDEMPTYPWORD__";
+            public const string ForceReAuthFlag = "umbraco-force-auth";
 
             /// <summary>
             /// The prefix used for external identity providers for their authentication type

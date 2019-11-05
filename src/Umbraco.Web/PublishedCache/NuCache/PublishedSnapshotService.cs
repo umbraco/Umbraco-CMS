@@ -142,7 +142,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 _domainStore = new SnapDictionary<int, Domain>();
 
-                LoadCachesOnStartup(); 
+                LoadCachesOnStartup();
             }
 
             Guid GetUid(ContentStore store, int id) => store.LiveSnapshot.Get(id)?.Uid ?? default;
@@ -163,7 +163,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// to not run if MainDom wasn't acquired.
         /// If MainDom was not acquired, then _localContentDb and _localMediaDb will remain null which means this appdomain
         /// will load in published content via the DB and in that case this appdomain will probably not exist long enough to
-        /// serve more than a page of content. 
+        /// serve more than a page of content.
         /// </remarks>
         private void MainDomRegister()
         {
@@ -972,7 +972,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        //Methods used to prevent allocations of lists        
+        //Methods used to prevent allocations of lists
         private void AddToList(ref List<int> list, int val) => GetOrCreateList(ref list).Add(val);
         private List<int> GetOrCreateList(ref List<int> list) => list ?? (list = new List<int>());
 
@@ -1456,7 +1456,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private void RebuildContentDbCacheLocked(IScope scope, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
-            var contentObjectType = Constants.ObjectTypes.Document;
+            var contentObjectType = ConstantsCore.ObjectTypes.Document;
             var db = scope.Database;
 
             // remove all - if anything fails the transaction will rollback
@@ -1528,7 +1528,7 @@ WHERE cmsContentNu.nodeId IN (
         public void RebuildMediaDbCacheLocked(IScope scope, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
-            var mediaObjectType = Constants.ObjectTypes.Media;
+            var mediaObjectType = ConstantsCore.ObjectTypes.Media;
             var db = scope.Database;
 
             // remove all - if anything fails the transaction will rollback
@@ -1587,7 +1587,7 @@ WHERE cmsContentNu.nodeId IN (
         public void RebuildMemberDbCacheLocked(IScope scope, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
-            var memberObjectType = Constants.ObjectTypes.Member;
+            var memberObjectType = ConstantsCore.ObjectTypes.Member;
             var db = scope.Database;
 
             // remove all - if anything fails the transaction will rollback
@@ -1648,7 +1648,7 @@ WHERE cmsContentNu.nodeId IN (
             // every document should have a corresponding row for edited properties
             // and if published, may have a corresponding row for published properties
 
-            var contentObjectType = Constants.ObjectTypes.Document;
+            var contentObjectType = ConstantsCore.ObjectTypes.Document;
             var db = scope.Database;
 
             var count = db.ExecuteScalar<int>($@"SELECT COUNT(*)
@@ -1679,7 +1679,7 @@ AND nuEdited.nodeId IS NULL OR ({Constants.DatabaseSchema.Tables.Document}.publi
         {
             // every media item should have a corresponding row for edited properties
 
-            var mediaObjectType = Constants.ObjectTypes.Media;
+            var mediaObjectType = ConstantsCore.ObjectTypes.Media;
             var db = scope.Database;
 
             var count = db.ExecuteScalar<int>(@"SELECT COUNT(*)
@@ -1708,7 +1708,7 @@ AND cmsContentNu.nodeId IS NULL
         {
             // every member item should have a corresponding row for edited properties
 
-            var memberObjectType = Constants.ObjectTypes.Member;
+            var memberObjectType = ConstantsCore.ObjectTypes.Member;
             var db = scope.Database;
 
             var count = db.ExecuteScalar<int>(@"SELECT COUNT(*)

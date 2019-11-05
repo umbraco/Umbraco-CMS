@@ -33,7 +33,7 @@ namespace Umbraco.Web.Security
             _userService = userService;
             _globalSettings = globalSettings;
         }
-        
+
         private IUser _currentUser;
 
         /// <summary>
@@ -86,17 +86,17 @@ namespace Umbraco.Web.Security
         {
             var owinCtx = _httpContext.GetOwinContext();
             //ensure it's done for owin too
-            owinCtx.Authentication.SignOut(Constants.Security.BackOfficeExternalAuthenticationType);
+            owinCtx.Authentication.SignOut(ConstantsCore.Security.BackOfficeExternalAuthenticationType);
 
             var user = UserManager.FindByIdAsync(userId).Result;
 
             SignInManager.SignInAsync(user, isPersistent: true, rememberBrowser: false).Wait();
-            
+
             _httpContext.SetPrincipalForRequest(owinCtx.Request.User);
-            
+
             return TimeSpan.FromMinutes(_globalSettings.TimeOutInMinutes).TotalSeconds;
         }
-        
+
         /// <summary>
         /// Clears the current login for the currently logged in user
         /// </summary>
@@ -104,8 +104,8 @@ namespace Umbraco.Web.Security
         {
             _httpContext.UmbracoLogout();
             _httpContext.GetOwinContext().Authentication.SignOut(
-                Core.Constants.Security.BackOfficeAuthenticationType,
-                Core.Constants.Security.BackOfficeExternalAuthenticationType);
+                Core.ConstantsCore.Security.BackOfficeAuthenticationType,
+                Core.ConstantsCore.Security.BackOfficeExternalAuthenticationType);
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace Umbraco.Web.Security
             var user = UserManager.FindByNameAsync(username).Result;
             return user != null && UserManager.CheckPasswordAsync(user, password).Result;
         }
-        
+
         /// <summary>
         /// Validates the current user to see if they have access to the specified app
         /// </summary>
@@ -166,7 +166,7 @@ namespace Umbraco.Web.Security
             var identity = _httpContext.GetCurrentIdentity(false);
             return identity?.SessionId;
         }
-        
+
         /// <summary>
         /// Validates the currently logged in user and ensures they are not timed out
         /// </summary>
@@ -263,6 +263,6 @@ namespace Umbraco.Web.Security
         {
             return _httpContext.User != null && _httpContext.User.Identity.IsAuthenticated && _httpContext.GetCurrentIdentity(false) != null;
         }
-        
+
     }
 }

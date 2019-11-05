@@ -2,7 +2,7 @@ using System;
 
 namespace Umbraco.Core
 {
-    public static partial class Constants
+    public static partial class ConstantsCore
     {
         public static class DataTypes
         {
@@ -42,7 +42,7 @@ namespace Umbraco.Core
             /// Defines the identifiers for Umbraco data types as constants for easy centralized access/management.
             /// </summary>
             public static class Guids
-            {   
+            {
 
                 /// <summary>
                 /// Guid for Content Picker as string
@@ -367,8 +367,8 @@ namespace Umbraco.Core
                 /// Guid for Label decimal
                 /// </summary>
                 public static readonly Guid LabelDecimalGuid = new Guid(LabelDecimal);
-                
-                
+
+
             }
         }
     }

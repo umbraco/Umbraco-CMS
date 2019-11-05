@@ -37,7 +37,7 @@ using Task = System.Threading.Tasks.Task;
 namespace Umbraco.Web.Editors
 {
     [PluginController("UmbracoApi")]
-    [UmbracoApplicationAuthorize(Constants.Applications.Users)]
+    [UmbracoApplicationAuthorize(ConstantsCore.Applications.Users)]
     [PrefixlessBodyModelValidator]
     [IsCurrentUserModelFilter]
     public class UsersController : UmbracoAuthorizedJsonController
@@ -208,7 +208,7 @@ namespace Umbraco.Web.Editors
             if (isAdmin == false)
             {
                 //this user is not an admin so in that case we need to exclude all admin users
-                excludeUserGroups = new[] {Constants.Security.AdminGroupAlias};
+                excludeUserGroups = new[] {ConstantsCore.Security.AdminGroupAlias};
             }
 
             var filterQuery = Current.SqlContext.Query<IUser>();
@@ -217,7 +217,7 @@ namespace Umbraco.Web.Editors
             {
                 // only super can see super - but don't use IsSuper, cannot be mapped to SQL
                 //filterQuery.Where(x => !x.IsSuper());
-                filterQuery.Where(x => x.Id != Constants.Security.SuperUserId);
+                filterQuery.Where(x => x.Id != ConstantsCore.Security.SuperUserId);
             }
 
             if (filter.IsNullOrWhiteSpace() == false)

@@ -39,7 +39,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         public IEnumerable<MoveEventInfo<TEntity>> Move(TEntity moving, EntityContainer container)
         {
-            var parentId = Constants.System.Root;
+            var parentId = ConstantsCore.System.Root;
             if (container != null)
             {
                 // check path
@@ -64,7 +64,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // move to parent (or -1), update path, save
             moving.ParentId = parentId;
             var movingPath = moving.Path + ","; // save before changing
-            moving.Path = (container == null ? Constants.System.RootString : container.Path) + "," + moving.Id;
+            moving.Path = (container == null ? ConstantsCore.System.RootString : container.Path) + "," + moving.Id;
             moving.Level = container == null ? 1 : container.Level + 1;
             Save(moving);
 
@@ -266,7 +266,7 @@ AND umbracoNode.id <> @id",
                     .SelectAll()
                     .From<ContentDto>()
                     .InnerJoin<NodeDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                    .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document)
+                    .Where<NodeDto>(x => x.NodeObjectType == ConstantsCore.ObjectTypes.Document)
                     .Where<ContentDto>(x => x.ContentTypeId == entity.Id);
                 var contentDtos = Database.Fetch<ContentDto>(sql);
 

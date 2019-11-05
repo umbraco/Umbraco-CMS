@@ -28,7 +28,7 @@ namespace Umbraco.Core.Services.Implement
 
         private IMemberService MemberService { get; }
 
-        protected override Guid ContainedObjectType => Constants.ObjectTypes.MemberType;
+        protected override Guid ContainedObjectType => ConstantsCore.ObjectTypes.MemberType;
 
         protected override void DeleteItemsOfTypes(IEnumerable<int> typeIds)
         {

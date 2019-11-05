@@ -100,7 +100,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return l;
         }
 
-        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.MediaType;
+        protected override Guid NodeObjectTypeId => ConstantsCore.ObjectTypes.MediaType;
 
         protected override void PersistNewItem(IMediaType entity)
         {

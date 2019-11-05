@@ -3,7 +3,7 @@
     /// <summary>
     /// Defines constants.
     /// </summary>
-    public static partial class Constants
+    public static partial class ConstantsCore
     {
         /// <summary>
         /// Defines constants for composition.

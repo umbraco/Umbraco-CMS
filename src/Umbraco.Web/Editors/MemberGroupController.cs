@@ -4,13 +4,14 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Security;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
-using Constants = Umbraco.Core.Constants;
+using Constants = Umbraco.Core.ConstantsCore;
 
 namespace Umbraco.Web.Editors
 {

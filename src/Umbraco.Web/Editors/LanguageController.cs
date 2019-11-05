@@ -62,7 +62,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Deletes a language with a given ID
         /// </summary>
-        [UmbracoTreeAuthorize(Core.Constants.Trees.Languages)]
+        [UmbracoTreeAuthorize(Core.ConstantsCore.Trees.Languages)]
         [HttpDelete]
         [HttpPost]
         public IHttpActionResult DeleteLanguage(int id)
@@ -91,7 +91,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Creates or saves a language
         /// </summary>
-        [UmbracoTreeAuthorize(Core.Constants.Trees.Languages)]
+        [UmbracoTreeAuthorize(Core.ConstantsCore.Trees.Languages)]
         [HttpPost]
         public Language SaveLanguage(Language language)
         {

@@ -39,7 +39,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #region Repository Base
 
-        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.Media;
+        protected override Guid NodeObjectTypeId => ConstantsCore.ObjectTypes.Media;
 
         protected override IMedia PerformGet(int id)
         {
@@ -358,7 +358,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #region Recycle Bin
 
-        public override int RecycleBinId => Constants.System.RecycleBinMedia;
+        public override int RecycleBinId => ConstantsCore.System.RecycleBinMedia;
 
         #endregion
 
@@ -541,6 +541,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             media.ResetDirtyProperties(false);
             return media;
         }
-        
+
     }
 }

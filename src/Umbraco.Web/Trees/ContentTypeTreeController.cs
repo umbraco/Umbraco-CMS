@@ -18,8 +18,8 @@ using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Trees
 {
-    [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.DocumentTypes, SortOrder = 0, TreeGroup = Constants.Trees.Groups.Settings)]
+    [UmbracoTreeAuthorize(ConstantsCore.Trees.DocumentTypes)]
+    [Tree(ConstantsCore.Applications.Settings, ConstantsCore.Trees.DocumentTypes, SortOrder = 0, TreeGroup = ConstantsCore.Trees.Groups.Settings)]
     [Mvc.PluginController("UmbracoTrees")]
     [CoreTree]
     public class ContentTypeTreeController : TreeController, ISearchableTree
@@ -72,7 +72,7 @@ namespace Umbraco.Web.Trees
                         // since 7.4+ child type creation is enabled by a config option. It defaults to on, but can be disabled if we decide to.
                         // need this check to keep supporting sites where children have already been created.
                         var hasChildren = dt.HasChildren;
-                        var node = CreateTreeNode(dt, Constants.ObjectTypes.DocumentType, id, queryStrings, Constants.Icons.ContentType, hasChildren);
+                        var node = CreateTreeNode(dt, ConstantsCore.ObjectTypes.DocumentType, id, queryStrings, ConstantsCore.Icons.ContentType, hasChildren);
 
                         node.Path = dt.Path;
 
@@ -91,7 +91,7 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
 
-            if (id == Constants.System.RootString)
+            if (id == ConstantsCore.System.RootString)
             {
                 //set the default to create
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;

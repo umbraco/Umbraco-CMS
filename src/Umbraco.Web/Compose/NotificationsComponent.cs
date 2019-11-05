@@ -51,16 +51,16 @@ namespace Umbraco.Web.Compose
 
             //Send notifications for the delete action when content is moved to the recycle bin
             ContentService.Trashed += (sender, args) => _notifier.Notify(_actions.GetAction<ActionDelete>(), args.MoveInfoCollection.Select(m => m.Entity).ToArray());
-            
+
             //Send notifications for the copy action
             ContentService.Copied += (sender, args) => _notifier.Notify(_actions.GetAction<ActionCopy>(), args.Original);
-			
+
             //Send notifications for the rollback action
-            ContentService.RolledBack += (sender, args) => _notifier.Notify(_actions.GetAction<ActionRollback>(), args.Entity);	
-			
+            ContentService.RolledBack += (sender, args) => _notifier.Notify(_actions.GetAction<ActionRollback>(), args.Entity);
+
             //Send notifications for the public access changed action
             PublicAccessService.Saved += (sender, args) => PublicAccessServiceSaved(_notifier, sender, args, _contentService, _actions);
-			
+
             UserService.UserGroupPermissionsAssigned += (sender, args) => UserServiceUserGroupPermissionsAssigned(_notifier, sender, args, _contentService, _actions);
         }
 
@@ -115,7 +115,7 @@ namespace Umbraco.Web.Compose
             }
             notifier.Notify(actions.GetAction<ActionRights>(), entities);
         }
-                
+
         private void ContentServiceMoved(Notifier notifier, IContentService sender, Core.Events.MoveEventArgs<IContent> args, ActionCollection actions)
         {
             // notify about the move for all moved items
@@ -123,7 +123,7 @@ namespace Umbraco.Web.Compose
 
             // for any items being moved from the recycle bin (restored), explicitly notify about that too
             var restoredEntities = args.MoveInfoCollection
-                .Where(m => m.OriginalPath.Contains(Constants.System.RecycleBinContentString))
+                .Where(m => m.OriginalPath.Contains(ConstantsCore.System.RecycleBinContentString))
                 .Select(m => m.Entity)
                 .ToArray();
             if(restoredEntities.Any())
@@ -141,7 +141,7 @@ namespace Umbraco.Web.Compose
             }
             notifier.Notify(actions.GetAction<ActionProtect>(), entities);
         }
-		
+
         /// <summary>
         /// This class is used to send the notifications
         /// </summary>
@@ -190,10 +190,10 @@ namespace Umbraco.Web.Compose
                 if (user == null)
                 {
                     _logger.Debug(typeof(Notifier), "There is no current Umbraco user logged in, the notifications will be sent from the administrator");
-                    user = _userService.GetUserById(Constants.Security.SuperUserId);
+                    user = _userService.GetUserById(ConstantsCore.Security.SuperUserId);
                     if (user == null)
                     {
-                        _logger.Warn(typeof(Notifier), "Notifications can not be sent, no admin user with id {SuperUserId} could be resolved", Constants.Security.SuperUserId);
+                        _logger.Warn(typeof(Notifier), "Notifications can not be sent, no admin user with id {SuperUserId} could be resolved", ConstantsCore.Security.SuperUserId);
                         return;
                     }
                 }

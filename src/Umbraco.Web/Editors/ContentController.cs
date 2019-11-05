@@ -48,7 +48,7 @@ namespace Umbraco.Web.Editors
     /// access to ALL of the methods on this controller will need access to the content application.
     /// </remarks>
     [PluginController("UmbracoApi")]
-    [UmbracoApplicationAuthorize(Constants.Applications.Content)]
+    [UmbracoApplicationAuthorize(ConstantsCore.Applications.Content)]
     [ContentControllerConfiguration]
     public class ContentController : ContentControllerBase
     {
@@ -227,15 +227,15 @@ namespace Umbraco.Web.Editors
         public ContentItemDisplay GetRecycleBin()
         {
             var apps = new List<ContentApp>();
-            apps.Add(ListViewContentAppFactory.CreateContentApp(Services.DataTypeService, _propertyEditors, "recycleBin", "content", Core.Constants.DataTypes.DefaultMembersListView));
+            apps.Add(ListViewContentAppFactory.CreateContentApp(Services.DataTypeService, _propertyEditors, "recycleBin", "content", Core.ConstantsCore.DataTypes.DefaultMembersListView));
             apps[0].Active = true;
             var display = new ContentItemDisplay
             {
-                Id = Constants.System.RecycleBinContent,
+                Id = ConstantsCore.System.RecycleBinContent,
                 ParentId = -1,
                 ContentTypeAlias = "recycleBin",
                 IsContainer = true,
-                Path = "-1," + Constants.System.RecycleBinContent,
+                Path = "-1," + ConstantsCore.System.RecycleBinContent,
                 Variants = new List<ContentVariantDisplay>
                 {
                     new ContentVariantDisplay
@@ -813,7 +813,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         /// <remarks>
         /// For invariant, the variants collection count will be 1 and this will check if that invariant item has the critical values for persistence (i.e. Name)
-        /// 
+        ///
         /// For variant, each variant will be checked for critical data for persistence and if it's not there then it's flags will be reset and it will not
         /// be persisted. However, we also need to deal with the case where all variants don't pass this check and then there is nothing to save. This also deals
         /// with removing the Name validation keys based on data annotations validation for items that haven't been marked to be saved.
@@ -869,7 +869,7 @@ namespace Umbraco.Web.Editors
             return true;
         }
 
-        
+
 
         /// <summary>
         /// Helper method to perform the saving of the content and add the notifications to the result
@@ -1161,14 +1161,14 @@ namespace Umbraco.Web.Editors
             //validate if we can publish based on the mandatory language requirements
             var canPublish = ValidatePublishingMandatoryLanguages(
                 cultureErrors,
-                contentItem, cultureVariants, mandatoryCultures, 
+                contentItem, cultureVariants, mandatoryCultures,
                 mandatoryVariant => mandatoryVariant.Publish);
 
             //Now check if there are validation errors on each variant.
             //If validation errors are detected on a variant and it's state is set to 'publish', then we
             //need to change it to 'save'.
             //It is a requirement that this is performed AFTER ValidatePublishingMandatoryLanguages.
-            
+
             foreach (var variant in contentItem.Variants)
             {
                 if (cultureErrors.Contains(variant.Culture))
@@ -1242,7 +1242,7 @@ namespace Umbraco.Web.Editors
             //Now check if there are validation errors on each variant.
             //If validation errors are detected on a variant and it's state is set to 'publish', then we
             //need to change it to 'save'.
-            //It is a requirement that this is performed AFTER ValidatePublishingMandatoryLanguages.            
+            //It is a requirement that this is performed AFTER ValidatePublishingMandatoryLanguages.
             foreach (var variant in contentItem.Variants)
             {
                 if (cultureErrors.Contains(variant.Culture))
@@ -1372,7 +1372,7 @@ namespace Umbraco.Web.Editors
         /// <param name="culture">Culture to assign the error to</param>
         /// <param name="localizationKey"></param>
         /// <param name="cultureToken">
-        /// The culture used in the localization message, null by default which means <see cref="culture"/> will be used. 
+        /// The culture used in the localization message, null by default which means <see cref="culture"/> will be used.
         /// </param>
         private void AddCultureValidationError(string culture, string localizationKey, string cultureToken = null)
         {
@@ -1484,10 +1484,10 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         [HttpDelete]
         [HttpPost]
-        [EnsureUserPermissionForContent(Constants.System.RecycleBinContent, ActionDelete.ActionLetter)]
+        [EnsureUserPermissionForContent(ConstantsCore.System.RecycleBinContent, ActionDelete.ActionLetter)]
         public HttpResponseMessage EmptyRecycleBin()
         {
-            Services.ContentService.EmptyRecycleBin(Security.GetUserId().ResultOr(Constants.Security.SuperUserId));
+            Services.ContentService.EmptyRecycleBin(Security.GetUserId().ResultOr(ConstantsCore.Security.SuperUserId));
 
             return Request.CreateNotificationSuccessResponse(Services.TextService.Localize("defaultdialogs/recycleBinIsEmpty"));
         }
@@ -1663,7 +1663,7 @@ namespace Umbraco.Web.Editors
                     var uri = DomainUtilities.ParseUriFromDomainName(domain.Name, Request.RequestUri);
                 }
                 catch (UriFormatException)
-                {                    
+                {
                     var response = Request.CreateValidationErrorResponse(Services.TextService.Localize("assignDomain/invalidDomain"));
                     throw new HttpResponseException(response);
                 }
@@ -1829,7 +1829,7 @@ namespace Umbraco.Web.Editors
             base.HandleInvalidModelState(display);
 
         }
-        
+
         /// <summary>
         /// Maps the dto property values and names to the persisted model
         /// </summary>

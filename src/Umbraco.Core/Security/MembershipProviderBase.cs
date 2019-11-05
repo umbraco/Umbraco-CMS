@@ -332,7 +332,7 @@ namespace Umbraco.Core.Security
                 //we need to lookup the member since this could be a brand new member without a password set
                 var rawPassword = GetRawPassword(username);
                 rawPasswordValue = rawPassword.Success ? rawPassword.Result : string.Empty;
-                if (rawPassword.Success == false || rawPasswordValue.StartsWith(Constants.Security.EmptyPasswordPrefix) == false)
+                if (rawPassword.Success == false || rawPasswordValue.StartsWith(ConstantsCore.Security.EmptyPasswordPrefix) == false)
                 {
                     //If the old password is empty and AllowManuallyChangingPassword is false, than this provider cannot just arbitrarily change the password
                     throw new NotSupportedException("This provider does not support manually changing the password");
@@ -354,7 +354,7 @@ namespace Umbraco.Core.Security
             // * during installation to set the admin password
             var installing = Current.RuntimeState.Level == RuntimeLevel.Install;
             if (AllowManuallyChangingPassword == false
-                && (rawPasswordValue.StartsWith(Constants.Security.EmptyPasswordPrefix)
+                && (rawPasswordValue.StartsWith(ConstantsCore.Security.EmptyPasswordPrefix)
                     || (installing && oldPassword == "default")))
             {
                 return PerformChangePassword(username, oldPassword, newPassword);

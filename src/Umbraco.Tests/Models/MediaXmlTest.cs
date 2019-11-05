@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Models
 
             var media = MockedMedia.CreateMediaImage(mediaType, -1);
             media.WriterId = -1; // else it's zero and that's not a user and it breaks the tests
-            ServiceContext.MediaService.Save(media, Constants.Security.SuperUserId);
+            ServiceContext.MediaService.Save(media, ConstantsCore.Security.SuperUserId);
 
             // so we have to force-reset these values because the property editor has cleared them
             media.SetValue(Constants.Conventions.Media.Width, "200");

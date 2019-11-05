@@ -17,7 +17,7 @@ namespace Umbraco.Web.HealthCheck
     /// <summary>
     /// The API controller used to display the health check info and execute any actions
     /// </summary>
-    [UmbracoApplicationAuthorize(Core.Constants.Applications.Settings)]
+    [UmbracoApplicationAuthorize(Core.ConstantsCore.Applications.Settings)]
     public class HealthCheckController : UmbracoAuthorizedJsonController
     {
         private readonly HealthCheckCollection _checks;

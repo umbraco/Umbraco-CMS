@@ -50,7 +50,7 @@ namespace Umbraco.Web.Install
                 // Check for current install Id
                 var installId = Guid.NewGuid();
 
-                var installCookie = _httpContext.Request.GetCookieValue(Constants.Web.InstallerCookieName);
+                var installCookie = _httpContext.Request.GetCookieValue(ConstantsCore.Web.InstallerCookieName);
                 if (string.IsNullOrEmpty(installCookie) == false)
                 {
                     if (Guid.TryParse(installCookie, out installId))
@@ -60,7 +60,7 @@ namespace Umbraco.Web.Install
                             installId = Guid.NewGuid();
                     }
                 }
-                _httpContext.Response.Cookies.Set(new HttpCookie(Constants.Web.InstallerCookieName, "1"));
+                _httpContext.Response.Cookies.Set(new HttpCookie(ConstantsCore.Web.InstallerCookieName, "1"));
 
                 var dbProvider = string.Empty;
                 if (IsBrandNewInstall == false)
@@ -113,7 +113,7 @@ namespace Umbraco.Web.Install
         {
             get
             {
-                var databaseSettings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
+                var databaseSettings = ConfigurationManager.ConnectionStrings[ConstantsCore.System.UmbracoConnectionName];
                 if (_globalSettings.ConfigurationStatus.IsNullOrWhiteSpace()
                     && _databaseBuilder.IsConnectionStringConfigured(databaseSettings) == false)
                 {

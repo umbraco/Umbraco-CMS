@@ -9,8 +9,8 @@ using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
 {
-    [UmbracoTreeAuthorize(Constants.Trees.Macros)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.Macros, TreeTitle = "Macros", SortOrder = 4, TreeGroup = Constants.Trees.Groups.Settings)]
+    [UmbracoTreeAuthorize(ConstantsCore.Trees.Macros)]
+    [Tree(ConstantsCore.Applications.Settings, ConstantsCore.Trees.Macros, TreeTitle = "Macros", SortOrder = 4, TreeGroup = ConstantsCore.Trees.Groups.Settings)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
     public class MacrosTreeController : TreeController
@@ -27,7 +27,7 @@ namespace Umbraco.Web.Trees
         {
             var nodes = new TreeNodeCollection();
 
-            if (id == Constants.System.RootString)
+            if (id == ConstantsCore.System.RootString)
             {
                 foreach (var macro in Services.MacroService.GetAll().OrderBy(m => m.Name))
                 {
@@ -36,7 +36,7 @@ namespace Umbraco.Web.Trees
                         id,
                         queryStrings,
                         macro.Name,
-                        Constants.Icons.Macro,
+                        ConstantsCore.Icons.Macro,
                         false));
                 }
             }
@@ -48,7 +48,7 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
 
-            if (id == Constants.System.RootString)
+            if (id == ConstantsCore.System.RootString)
             {
                 //Create the normal create action
                 menu.Items.Add<ActionNew>(Services.TextService);

@@ -42,8 +42,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(provider);
 
                 // Act
-                var relateMemberToContent = new RelationType(Constants.ObjectTypes.Member,
-                                                            Constants.ObjectTypes.Document,
+                var relateMemberToContent = new RelationType(ConstantsCore.ObjectTypes.Member,
+                                                            ConstantsCore.ObjectTypes.Document,
                                                             "relateMemberToContent") { IsBidirectional = true, Name = "Relate Member to Content" };
 
                 repository.Save(relateMemberToContent);
@@ -206,7 +206,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(provider);
 
                 // Act
-                var childObjType = Constants.ObjectTypes.DocumentType;
+                var childObjType = ConstantsCore.ObjectTypes.DocumentType;
                 var query = scope.SqlContext.Query<IRelationType>().Where(x => x.ChildObjectType == childObjType);
                 var result = repository.Get(query);
 
@@ -226,8 +226,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         public void CreateTestData()
         {
-            var relateContent = new RelationType(Constants.ObjectTypes.Document, new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"), "relateContentOnCopy") { IsBidirectional = true, Name = "Relate Content on Copy" };
-            var relateContentType = new RelationType(Constants.ObjectTypes.DocumentType, new Guid("A2CB7800-F571-4787-9638-BC48539A0EFB"), "relateContentTypeOnCopy") { IsBidirectional = true, Name = "Relate ContentType on Copy" };
+            var relateContent = new RelationType(ConstantsCore.ObjectTypes.Document, new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"), "relateContentOnCopy") { IsBidirectional = true, Name = "Relate Content on Copy" };
+            var relateContentType = new RelationType(ConstantsCore.ObjectTypes.DocumentType, new Guid("A2CB7800-F571-4787-9638-BC48539A0EFB"), "relateContentTypeOnCopy") { IsBidirectional = true, Name = "Relate ContentType on Copy" };
 
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = ScopeProvider.CreateScope())

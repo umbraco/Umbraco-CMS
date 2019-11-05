@@ -30,7 +30,7 @@ namespace Umbraco.Tests.Benchmarks
             var l = new Lazy<IScopeProvider>(() => f);
             var factory = new UmbracoDatabaseFactory(
                 "server=.\\SQLExpress;database=YOURDB;user id=YOURUSER;password=YOURPASS",
-                Constants.DatabaseProviders.SqlServer,
+                ConstantsCore.DatabaseProviders.SqlServer,
                 logger,
                 new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())));
             return factory.CreateDatabase();
@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Benchmarks
         {
             var f = new UmbracoDatabaseFactory(
                 cstr,
-                Constants.DatabaseProviders.SqlCe,
+                ConstantsCore.DatabaseProviders.SqlCe,
                 logger,
                 new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())));
             return f.CreateDatabase();

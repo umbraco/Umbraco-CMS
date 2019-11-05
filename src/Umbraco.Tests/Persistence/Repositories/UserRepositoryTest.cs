@@ -362,7 +362,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                     // Act
                     var result = repository.GetPagedResultsByQuery(query, 0, 10, out var totalRecs, user => user.Id, Direction.Ascending,
-                            excludeUserGroups: new[] { Constants.Security.TranslatorGroupAlias },
+                            excludeUserGroups: new[] { ConstantsCore.Security.TranslatorGroupAlias },
                             filter: provider.SqlContext.Query<IUser>().Where(x => x.Id > -1));
 
                     // Assert
@@ -394,8 +394,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                     // Act
                     var result = repository.GetPagedResultsByQuery(null, 0, 10, out var totalRecs, user => user.Id, Direction.Ascending,
-                        includeUserGroups: new[] { Constants.Security.AdminGroupAlias, Constants.Security.SensitiveDataGroupAlias },
-                        excludeUserGroups: new[] { Constants.Security.TranslatorGroupAlias },
+                        includeUserGroups: new[] { ConstantsCore.Security.AdminGroupAlias, ConstantsCore.Security.SensitiveDataGroupAlias },
+                        excludeUserGroups: new[] { ConstantsCore.Security.TranslatorGroupAlias },
                         filter: provider.SqlContext.Query<IUser>().Where(x => x.Id == -1));
 
                     // Assert

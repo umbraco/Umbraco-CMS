@@ -17,8 +17,8 @@ namespace Umbraco.Web.Trees
     /// <remarks>
     /// This authorizes based on access to the content section even though it exists in the settings
     /// </remarks>
-    [UmbracoApplicationAuthorize(Constants.Applications.Content)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.ContentBlueprints, SortOrder = 12, TreeGroup = Constants.Trees.Groups.Settings)]
+    [UmbracoApplicationAuthorize(ConstantsCore.Applications.Content)]
+    [Tree(ConstantsCore.Applications.Settings, ConstantsCore.Trees.ContentBlueprints, SortOrder = 12, TreeGroup = ConstantsCore.Trees.Groups.Settings)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
     public class ContentBlueprintTreeController : TreeController
@@ -29,7 +29,7 @@ namespace Umbraco.Web.Trees
             var root = base.CreateRootNode(queryStrings);
 
             //this will load in a custom UI instead of the dashboard for the root node
-            root.RoutePath = $"{Constants.Applications.Settings}/{Constants.Trees.ContentBlueprints}/intro";
+            root.RoutePath = $"{ConstantsCore.Applications.Settings}/{ConstantsCore.Trees.ContentBlueprints}/intro";
 
             //check if there are any content blueprints
             root.HasChildren = Services.ContentService.GetBlueprintsForContentTypes().Any();
@@ -41,10 +41,10 @@ namespace Umbraco.Web.Trees
             var nodes = new TreeNodeCollection();
 
             //get all blueprints
-            var entities = Services.EntityService.GetChildren(Constants.System.Root, UmbracoObjectTypes.DocumentBlueprint).ToArray();
+            var entities = Services.EntityService.GetChildren(ConstantsCore.System.Root, UmbracoObjectTypes.DocumentBlueprint).ToArray();
 
             //check if we're rendering the root in which case we'll render the content types that have blueprints
-            if (id == Constants.System.RootString)
+            if (id == ConstantsCore.System.RootString)
             {
                 //get all blueprint content types
                 var contentTypeAliases = entities.Select(x => ((ContentEntitySlim) x).ContentTypeAlias).Distinct();
@@ -59,7 +59,7 @@ namespace Umbraco.Web.Trees
                 nodes.AddRange(docTypeEntities
                     .Select(entity =>
                     {
-                        var treeNode = CreateTreeNode(entity, Constants.ObjectTypes.DocumentBlueprint, id, queryStrings, Constants.Icons.ContentType, true);
+                        var treeNode = CreateTreeNode(entity, ConstantsCore.ObjectTypes.DocumentBlueprint, id, queryStrings, ConstantsCore.Icons.ContentType, true);
                         treeNode.Path = $"-1,{entity.Id}";
                         treeNode.NodeType = "document-type-blueprints";
                         // TODO: This isn't the best way to ensure a no operation process for clicking a node but it works for now.
@@ -79,7 +79,7 @@ namespace Umbraco.Web.Trees
             nodes.AddRange(blueprintsForDocType
                 .Select(entity =>
                 {
-                    var treeNode = CreateTreeNode(entity, Constants.ObjectTypes.DocumentBlueprint, id, queryStrings, "icon-blueprint", false);
+                    var treeNode = CreateTreeNode(entity, ConstantsCore.ObjectTypes.DocumentBlueprint, id, queryStrings, "icon-blueprint", false);
                     treeNode.Path = $"-1,{ct.Id},{entity.Id}";
                     return treeNode;
                 }));
@@ -91,7 +91,7 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
 
-            if (id == Constants.System.RootString)
+            if (id == ConstantsCore.System.RootString)
             {
                 // root actions
                 menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);

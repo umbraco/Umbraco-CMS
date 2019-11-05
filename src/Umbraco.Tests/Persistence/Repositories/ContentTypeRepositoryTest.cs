@@ -106,13 +106,13 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var containerRepository = CreateContainerRepository((IScopeAccessor) provider, Constants.ObjectTypes.DocumentTypeContainer);
+                var containerRepository = CreateContainerRepository((IScopeAccessor) provider, ConstantsCore.ObjectTypes.DocumentTypeContainer);
                 var repository = CreateRepository((IScopeAccessor) provider);
-                var container1 = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "blah1" };
+                var container1 = new EntityContainer(ConstantsCore.ObjectTypes.DocumentType) { Name = "blah1" };
                 containerRepository.Save(container1);
 
 
-                var container2 = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "blah2", ParentId = container1.Id };
+                var container2 = new EntityContainer(ConstantsCore.ObjectTypes.DocumentType) { Name = "blah2", ParentId = container1.Id };
                 containerRepository.Save(container2);
 
 
@@ -152,8 +152,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var containerRepository = CreateContainerRepository((IScopeAccessor) provider, Constants.ObjectTypes.DocumentTypeContainer);
-                var container = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "blah" };
+                var containerRepository = CreateContainerRepository((IScopeAccessor) provider, ConstantsCore.ObjectTypes.DocumentTypeContainer);
+                var container = new EntityContainer(ConstantsCore.ObjectTypes.DocumentType) { Name = "blah" };
                 containerRepository.Save(container);
 
                 Assert.That(container.Id, Is.GreaterThan(0));
@@ -171,13 +171,13 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var containerRepository = CreateContainerRepository((IScopeAccessor) provider, Constants.ObjectTypes.DocumentTypeContainer);
+                var containerRepository = CreateContainerRepository((IScopeAccessor) provider, ConstantsCore.ObjectTypes.DocumentTypeContainer);
 
-                container1 = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "container1" };
+                container1 = new EntityContainer(ConstantsCore.ObjectTypes.DocumentType) { Name = "container1" };
                 containerRepository.Save(container1);
-                container2 = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "container2" };
+                container2 = new EntityContainer(ConstantsCore.ObjectTypes.DocumentType) { Name = "container2" };
                 containerRepository.Save(container2);
-                container3 = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "container3" };
+                container3 = new EntityContainer(ConstantsCore.ObjectTypes.DocumentType) { Name = "container3" };
                 containerRepository.Save(container3);
 
                 Assert.That(container1.Id, Is.GreaterThan(0));
@@ -201,8 +201,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var containerRepository = CreateContainerRepository((IScopeAccessor) provider, Constants.ObjectTypes.DocumentTypeContainer);
-                var container = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "blah" };
+                var containerRepository = CreateContainerRepository((IScopeAccessor) provider, ConstantsCore.ObjectTypes.DocumentTypeContainer);
+                var container = new EntityContainer(ConstantsCore.ObjectTypes.DocumentType) { Name = "blah" };
                 containerRepository.Save(container);
 
 
@@ -221,9 +221,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var containerRepository = CreateContainerRepository((IScopeAccessor) provider, Constants.ObjectTypes.MediaTypeContainer);
+                var containerRepository = CreateContainerRepository((IScopeAccessor) provider, ConstantsCore.ObjectTypes.MediaTypeContainer);
                 var repository = CreateRepository((IScopeAccessor) provider);
-                var container = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah" };
+                var container = new EntityContainer(ConstantsCore.ObjectTypes.MediaType) { Name = "blah" };
                 containerRepository.Save(container);
 
 
@@ -242,9 +242,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var containerRepository = CreateContainerRepository((IScopeAccessor) provider, Constants.ObjectTypes.MediaTypeContainer);
+                var containerRepository = CreateContainerRepository((IScopeAccessor) provider, ConstantsCore.ObjectTypes.MediaTypeContainer);
                 var repository = CreateMediaTypeRepository((IScopeAccessor) provider);
-                var container = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah" };
+                var container = new EntityContainer(ConstantsCore.ObjectTypes.MediaType) { Name = "blah" };
                 containerRepository.Save(container);
 
 
@@ -653,7 +653,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 int count =
                     scope.Database.ExecuteScalar<int>(
                         "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
-                        new {NodeObjectType = Constants.ObjectTypes.DocumentType});
+                        new {NodeObjectType = ConstantsCore.ObjectTypes.DocumentType});
 
                 // Assert
                 Assert.That(contentTypes.Any(), Is.True);
@@ -676,7 +676,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 int count =
                     scope.Database.ExecuteScalar<int>(
                         "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
-                        new { NodeObjectType = Constants.ObjectTypes.DocumentType });
+                        new { NodeObjectType = ConstantsCore.ObjectTypes.DocumentType });
 
                 // Assert
                 Assert.That(contentTypes.Any(), Is.True);

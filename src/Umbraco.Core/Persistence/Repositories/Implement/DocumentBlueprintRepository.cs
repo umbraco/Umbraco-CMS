@@ -24,6 +24,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override bool EnsureUniqueNaming => false; // duplicates are allowed
 
-        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.DocumentBlueprint;
+        protected override Guid NodeObjectTypeId => ConstantsCore.ObjectTypes.DocumentBlueprint;
     }
 }

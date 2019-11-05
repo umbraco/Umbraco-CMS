@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Persistence.SyntaxProvider
         [Test]
         public void Can_Generate_Delete_SubQuery_Statement()
         {
-            var mediaObjectType = Constants.ObjectTypes.Media;
+            var mediaObjectType = ConstantsCore.ObjectTypes.Media;
             var subQuery = Sql()
                             .Select("DISTINCT cmsContentXml.nodeId")
                             .From<ContentXmlDto>()

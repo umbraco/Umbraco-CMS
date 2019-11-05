@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core
 {
-    public static partial class Constants
+    public static partial class ConstantsCore
     {
         /// <summary>
         /// Defines the constants used for the Umbraco package repository

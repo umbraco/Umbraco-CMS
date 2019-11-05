@@ -88,11 +88,11 @@ namespace Umbraco.Core.Security
         /// <returns></returns>
         public static MembershipProvider GetUsersMembershipProvider()
         {
-            if (Membership.Providers[Constants.Security.UserMembershipProviderName] == null)
+            if (Membership.Providers[ConstantsCore.Security.UserMembershipProviderName] == null)
             {
-                throw new InvalidOperationException("No membership provider found with name " + Constants.Security.UserMembershipProviderName);
+                throw new InvalidOperationException("No membership provider found with name " + ConstantsCore.Security.UserMembershipProviderName);
             }
-            return Membership.Providers[Constants.Security.UserMembershipProviderName];
+            return Membership.Providers[ConstantsCore.Security.UserMembershipProviderName];
         }
 
         /// <summary>

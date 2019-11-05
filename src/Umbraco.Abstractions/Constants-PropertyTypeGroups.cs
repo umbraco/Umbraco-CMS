@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core
 {
-    public static partial class Constants
+    public static partial class ConstantsCore
     {
         /// <summary>
         /// Defines the identifiers for property-type groups conventions that are used within the Umbraco core.

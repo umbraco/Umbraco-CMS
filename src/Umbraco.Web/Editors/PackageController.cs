@@ -23,7 +23,7 @@ namespace Umbraco.Web.Editors
     /// </summary>
     [PluginController("UmbracoApi")]
     [SerializeVersion]
-    [UmbracoApplicationAuthorize(Core.Constants.Applications.Packages)]
+    [UmbracoApplicationAuthorize(Core.ConstantsCore.Applications.Packages)]
     public class PackageController : UmbracoAuthorizedJsonController
     {
         public IEnumerable<PackageDefinition> GetCreatedPackages()
@@ -65,7 +65,7 @@ namespace Umbraco.Web.Editors
 
             Services.PackagingService.ExportCreatedPackage(model);
 
-            //the packagePath will be on the model 
+            //the packagePath will be on the model
             return model;
         }
 

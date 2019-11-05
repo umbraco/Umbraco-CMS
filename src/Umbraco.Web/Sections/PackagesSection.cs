@@ -9,7 +9,7 @@ namespace Umbraco.Web.Sections
     public class PackagesSection : ISection
     {
         /// <inheritdoc />
-        public string Alias => Constants.Applications.Packages;
+        public string Alias => ConstantsCore.Applications.Packages;
 
         /// <inheritdoc />
         public string Name => "Packages";

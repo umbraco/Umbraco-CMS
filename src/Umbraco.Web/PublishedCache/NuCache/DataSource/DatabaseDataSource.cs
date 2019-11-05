@@ -66,7 +66,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         public ContentNodeKit GetContentSource(IScope scope, int id)
         {
             var sql = ContentSourcesSelect(scope)
-                .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document && x.NodeId == id && !x.Trashed)
+                .Where<NodeDto>(x => x.NodeObjectType == ConstantsCore.ObjectTypes.Document && x.NodeId == id && !x.Trashed)
                 .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
             var dto = scope.Database.Fetch<ContentSourceDto>(sql).FirstOrDefault();
@@ -76,7 +76,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         public IEnumerable<ContentNodeKit> GetAllContentSources(IScope scope)
         {
             var sql = ContentSourcesSelect(scope)
-                .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document && !x.Trashed)
+                .Where<NodeDto>(x => x.NodeObjectType == ConstantsCore.ObjectTypes.Document && !x.Trashed)
                 .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
             return scope.Database.Query<ContentSourceDto>(sql).Select(CreateContentNodeKit);
@@ -89,7 +89,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
                     .InnerJoin<NodeDto>("x").On<NodeDto, NodeDto>((left, right) => left.NodeId == right.NodeId || SqlText<bool>(left.Path, right.Path, (lp, rp) => $"({lp} LIKE {syntax.GetConcat(rp, "',%'")})"), aliasRight: "x"))
 
-                .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document && !x.Trashed)
+                .Where<NodeDto>(x => x.NodeObjectType == ConstantsCore.ObjectTypes.Document && !x.Trashed)
                 .Where<NodeDto>(x => x.NodeId == id, "x")
                 .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
@@ -101,7 +101,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             if (!ids.Any()) return Enumerable.Empty<ContentNodeKit>();
 
             var sql = ContentSourcesSelect(scope)
-                .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document && !x.Trashed)
+                .Where<NodeDto>(x => x.NodeObjectType == ConstantsCore.ObjectTypes.Document && !x.Trashed)
                 .WhereIn<ContentDto>(x => x.ContentTypeId, ids)
                 .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
@@ -139,7 +139,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         public ContentNodeKit GetMediaSource(IScope scope, int id)
         {
             var sql = MediaSourcesSelect(scope)
-                .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Media && x.NodeId == id && !x.Trashed)
+                .Where<NodeDto>(x => x.NodeObjectType == ConstantsCore.ObjectTypes.Media && x.NodeId == id && !x.Trashed)
                 .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
             var dto = scope.Database.Fetch<ContentSourceDto>(sql).FirstOrDefault();
@@ -149,7 +149,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         public IEnumerable<ContentNodeKit> GetAllMediaSources(IScope scope)
         {
             var sql = MediaSourcesSelect(scope)
-                .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Media && !x.Trashed)
+                .Where<NodeDto>(x => x.NodeObjectType == ConstantsCore.ObjectTypes.Media && !x.Trashed)
                 .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
             return scope.Database.Query<ContentSourceDto>(sql).Select(CreateMediaNodeKit);
@@ -162,7 +162,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
                     .InnerJoin<NodeDto>("x").On<NodeDto, NodeDto>((left, right) => left.NodeId == right.NodeId || SqlText<bool>(left.Path, right.Path, (lp, rp) => $"({lp} LIKE {syntax.GetConcat(rp, "',%'")})"), aliasRight: "x"))
 
-                .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Media && !x.Trashed)
+                .Where<NodeDto>(x => x.NodeObjectType == ConstantsCore.ObjectTypes.Media && !x.Trashed)
                 .Where<NodeDto>(x => x.NodeId == id, "x")
                 .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 
@@ -174,7 +174,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             if (!ids.Any()) return Enumerable.Empty<ContentNodeKit>();
 
             var sql = MediaSourcesSelect(scope)
-                    .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Media && !x.Trashed)
+                    .Where<NodeDto>(x => x.NodeObjectType == ConstantsCore.ObjectTypes.Media && !x.Trashed)
                     .WhereIn<ContentDto>(x => x.ContentTypeId, ids)
                     .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
 

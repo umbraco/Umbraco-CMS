@@ -12,7 +12,7 @@ namespace Umbraco.Web.PropertyEditors
         "entitypicker",
         ValueType = ValueTypes.Integer,
         Group = Constants.PropertyEditors.Groups.People,
-        Icon = Constants.Icons.User)]
+        Icon = ConstantsCore.Icons.User)]
     public class UserPickerPropertyEditor : DataEditor
     {
         public UserPickerPropertyEditor(ILogger logger)

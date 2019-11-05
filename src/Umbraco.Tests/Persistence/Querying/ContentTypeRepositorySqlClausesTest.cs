@@ -16,7 +16,7 @@ namespace Umbraco.Tests.Persistence.Querying
         [Test]
         public void Can_Verify_Base_Clause()
         {
-            var nodeObjectType = Constants.ObjectTypes.DocumentType;
+            var nodeObjectType = ConstantsCore.ObjectTypes.DocumentType;
 
             var expected = Sql();
             expected.Select("*")
@@ -52,7 +52,7 @@ namespace Umbraco.Tests.Persistence.Querying
         [Test]
         public void Can_Verify_Base_Where_Clause()
         {
-            var nodeObjectType = Constants.ObjectTypes.DocumentType;
+            var nodeObjectType = ConstantsCore.ObjectTypes.DocumentType;
 
             var expected = Sql();
             expected.SelectAll()

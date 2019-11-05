@@ -16,9 +16,9 @@ namespace Umbraco.Core.Models
 
         private static readonly Dictionary<Guid, Guid> ObjectTypeMap = new Dictionary<Guid, Guid>
         {
-            { Constants.ObjectTypes.DataType, Constants.ObjectTypes.DataTypeContainer },
-            { Constants.ObjectTypes.DocumentType, Constants.ObjectTypes.DocumentTypeContainer },
-            { Constants.ObjectTypes.MediaType, Constants.ObjectTypes.MediaTypeContainer }
+            { ConstantsCore.ObjectTypes.DataType, ConstantsCore.ObjectTypes.DataTypeContainer },
+            { ConstantsCore.ObjectTypes.DocumentType, ConstantsCore.ObjectTypes.DocumentTypeContainer },
+            { ConstantsCore.ObjectTypes.MediaType, ConstantsCore.ObjectTypes.MediaTypeContainer }
         };
 
         /// <summary>

@@ -486,7 +486,7 @@ namespace Umbraco.Tests.Services
         {
             var service = ServiceContext.EntityService;
 
-            var objectTypeId = Constants.ObjectTypes.Document;
+            var objectTypeId = ConstantsCore.ObjectTypes.Document;
             var entities = service.GetAll(objectTypeId).ToArray();
 
             Assert.That(entities.Any(), Is.True);
@@ -623,7 +623,7 @@ namespace Umbraco.Tests.Services
         public void EntityService_Throws_When_Getting_All_With_Invalid_Type()
         {
             var service = ServiceContext.EntityService;
-            var objectTypeId = Constants.ObjectTypes.ContentItem;
+            var objectTypeId = ConstantsCore.ObjectTypes.ContentItem;
 
             Assert.Throws<NotSupportedException>(() => service.GetAll<IContentBase>());
             Assert.Throws<NotSupportedException>(() => service.GetAll(objectTypeId));
@@ -645,7 +645,7 @@ namespace Umbraco.Tests.Services
         {
             var service = ServiceContext.EntityService;
 
-            var objectTypeId = Constants.ObjectTypes.DocumentType;
+            var objectTypeId = ConstantsCore.ObjectTypes.DocumentType;
             var entities = service.GetAll(objectTypeId).ToArray();
 
             Assert.That(entities.Any(), Is.True);

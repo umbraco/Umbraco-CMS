@@ -84,11 +84,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 // create content type
                 IContentTypeComposition contentType;
-                if (contentTypeDto.NodeDto.NodeObjectType == Constants.ObjectTypes.MediaType)
+                if (contentTypeDto.NodeDto.NodeObjectType == ConstantsCore.ObjectTypes.MediaType)
                     contentType = ContentTypeFactory.BuildMediaTypeEntity(contentTypeDto);
-                else if (contentTypeDto.NodeDto.NodeObjectType == Constants.ObjectTypes.DocumentType)
+                else if (contentTypeDto.NodeDto.NodeObjectType == ConstantsCore.ObjectTypes.DocumentType)
                     contentType = ContentTypeFactory.BuildContentTypeEntity(contentTypeDto);
-                else if (contentTypeDto.NodeDto.NodeObjectType == Constants.ObjectTypes.MemberType)
+                else if (contentTypeDto.NodeDto.NodeObjectType == ConstantsCore.ObjectTypes.MemberType)
                     contentType = ContentTypeFactory.BuildMemberTypeEntity(contentTypeDto);
                 else throw new PanicException($"The node object type {contentTypeDto.NodeDto.NodeObjectType} is not supported");
                 contentTypes.Add(contentType.Id, contentType);

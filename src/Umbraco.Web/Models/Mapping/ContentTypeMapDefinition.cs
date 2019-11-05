@@ -541,7 +541,7 @@ namespace Umbraco.Web.Models.Mapping
         private IEnumerable<string> MapLockedCompositions(IContentTypeComposition source)
         {
             // get ancestor ids from path of parent if not root
-            if (source.ParentId == Constants.System.Root)
+            if (source.ParentId == ConstantsCore.System.Root)
                 return Enumerable.Empty<string>();
 
             var parent = _contentTypeService.Get(source.ParentId);

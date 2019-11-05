@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
@@ -17,7 +18,7 @@ using Constants = Umbraco.Core.Constants;
 namespace Umbraco.Web.Editors
 {
     [PluginController("UmbracoApi")]
-    [UmbracoApplicationAuthorize(Constants.Applications.Users)]
+    [UmbracoApplicationAuthorize(ConstantsCore.Applications.Users)]
     [PrefixlessBodyModelValidator]
     public class UserGroupsController : UmbracoAuthorizedJsonController
     {
@@ -123,7 +124,7 @@ namespace Umbraco.Web.Editors
             if (onlyCurrentUserGroups == false)
             {
                 //this user is not an admin so in that case we need to exclude all admin users
-                allGroups.RemoveAt(allGroups.IndexOf(allGroups.Find(basic => basic.Alias == Constants.Security.AdminGroupAlias)));
+                allGroups.RemoveAt(allGroups.IndexOf(allGroups.Find(basic => basic.Alias == ConstantsCore.Security.AdminGroupAlias)));
                 return allGroups;
             }
 

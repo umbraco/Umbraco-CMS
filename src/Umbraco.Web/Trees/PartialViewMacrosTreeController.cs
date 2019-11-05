@@ -1,9 +1,10 @@
-﻿using Umbraco.Core.IO;
+﻿using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
-using Constants = Umbraco.Core.Constants;
+using Constants = Umbraco.Core.ConstantsCore;
 
 namespace Umbraco.Web.Trees
 {

@@ -106,7 +106,7 @@ namespace Umbraco.Tests.Web.Mvc
         {
             var binder = ContentModelBinder.Instance;
             var routeData = new RouteData();
-            routeData.DataTokens[Core.Constants.Web.UmbracoDataToken] = "hello";
+            routeData.DataTokens[Core.ConstantsCore.Web.UmbracoDataToken] = "hello";
 
             //the value provider is the default implementation
             var valueProvider = new Mock<IValueProvider>();
@@ -136,7 +136,7 @@ namespace Umbraco.Tests.Web.Mvc
             var content = new MyContent(Mock.Of<IPublishedContent>());
             var binder = ContentModelBinder.Instance;
             var routeData = new RouteData();
-            routeData.DataTokens[Core.Constants.Web.UmbracoDataToken] = content;
+            routeData.DataTokens[Core.ConstantsCore.Web.UmbracoDataToken] = content;
 
             //the value provider is the default implementation
             var valueProvider = new Mock<IValueProvider>();

@@ -71,7 +71,7 @@ namespace Umbraco.Core.Services
         /// <param name="contentTypeAlias"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public static IContent CreateContent(this IContentService contentService, string name, Udi parentId, string contentTypeAlias, int userId = Constants.Security.SuperUserId)
+        public static IContent CreateContent(this IContentService contentService, string name, Udi parentId, string contentTypeAlias, int userId = ConstantsCore.Security.SuperUserId)
         {
             var guidUdi = parentId as GuidUdi;
             if (guidUdi == null)
@@ -97,7 +97,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public static bool RecycleBinSmells(this IContentService contentService)
         {
-            return contentService.CountChildren(Constants.System.RecycleBinContent) > 0;
+            return contentService.CountChildren(ConstantsCore.System.RecycleBinContent) > 0;
         }
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public static bool RecycleBinSmells(this IMediaService mediaService)
         {
-            return mediaService.CountChildren(Constants.System.RecycleBinMedia) > 0;
+            return mediaService.CountChildren(ConstantsCore.System.RecycleBinMedia) > 0;
         }
     }
 }

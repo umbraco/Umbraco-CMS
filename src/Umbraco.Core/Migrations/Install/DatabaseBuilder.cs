@@ -98,7 +98,7 @@ namespace Umbraco.Core.Migrations.Install
                 var sql = scope.Database.SqlContext.Sql()
                     .SelectCount()
                     .From<UserDto>()
-                    .Where<UserDto>(x => x.Id == Constants.Security.SuperUserId && x.Password == "default");
+                    .Where<UserDto>(x => x.Id == ConstantsCore.Security.SuperUserId && x.Password == "default");
                 var result = scope.Database.ExecuteScalar<int>(sql);
                 var has = result != 1;
                 if (has == false)
@@ -308,11 +308,11 @@ namespace Umbraco.Core.Migrations.Install
             }
 
             // create or update connection string
-            var setting = connectionStrings.Descendants("add").FirstOrDefault(s => s.Attribute("name")?.Value == Constants.System.UmbracoConnectionName);
+            var setting = connectionStrings.Descendants("add").FirstOrDefault(s => s.Attribute("name")?.Value == ConstantsCore.System.UmbracoConnectionName);
             if (setting == null)
             {
                 connectionStrings.Add(new XElement("add",
-                    new XAttribute("name", Constants.System.UmbracoConnectionName),
+                    new XAttribute("name", ConstantsCore.System.UmbracoConnectionName),
                     new XAttribute("connectionString", connectionString),
                     new XAttribute("providerName", providerName)));
             }

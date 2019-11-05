@@ -517,11 +517,11 @@ WHERE r.tagId IS NULL";
             switch (type)
             {
                 case TaggableObjectTypes.Content:
-                    return Constants.ObjectTypes.Document;
+                    return ConstantsCore.ObjectTypes.Document;
                 case TaggableObjectTypes.Media:
-                    return Constants.ObjectTypes.Media;
+                    return ConstantsCore.ObjectTypes.Media;
                 case TaggableObjectTypes.Member:
-                    return Constants.ObjectTypes.Member;
+                    return ConstantsCore.ObjectTypes.Member;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type));
             }

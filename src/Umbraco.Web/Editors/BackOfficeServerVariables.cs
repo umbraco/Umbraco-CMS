@@ -120,7 +120,7 @@ namespace Umbraco.Web.Editors
                         {"serverVarsJs", _urlHelper.Action("Application", "BackOffice")},
                         //API URLs
                         {
-                            "packagesRestApiBaseUrl", Constants.PackageRepository.RestApiBaseUrl
+                            "packagesRestApiBaseUrl", ConstantsCore.PackageRepository.RestApiBaseUrl
                         },
                         {
                             "redirectUrlManagementApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RedirectUrlManagementController>(

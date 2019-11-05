@@ -40,7 +40,7 @@ namespace Umbraco.Examine
 
         public bool ValidateRecycleBin(string path, string category)
         {
-            var recycleBinId = category == IndexTypes.Content ? Constants.System.RecycleBinContent : Constants.System.RecycleBinMedia;
+            var recycleBinId = category == IndexTypes.Content ? ConstantsCore.System.RecycleBinContent : ConstantsCore.System.RecycleBinMedia;
 
             //check for recycle bin
             if (PublishedValuesOnly)

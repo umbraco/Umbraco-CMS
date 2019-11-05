@@ -225,7 +225,7 @@ namespace Umbraco.Tests.CoreThings
             Assert.AreEqual(Guid.Empty, ((GuidUdi)guidUdi).Guid);
 
             // can create a range
-            var range = new UdiRange(stringUdi, Constants.DeploySelector.ChildrenOfThis);
+            var range = new UdiRange(stringUdi, ConstantsCore.DeploySelector.ChildrenOfThis);
 
             // cannot create invalid ranges
             Assert.Throws<ArgumentException>(() => new UdiRange(guidUdi, "x"));
@@ -249,14 +249,14 @@ namespace Umbraco.Tests.CoreThings
             Assert.AreEqual(Constants.UdiEntityType.AnyGuid, dudi.EntityType);
             Assert.AreEqual(guid, ((GuidUdi)dudi).Guid);
 
-            var range = new UdiRange(udi, Constants.DeploySelector.ChildrenOfThis);
+            var range = new UdiRange(udi, ConstantsCore.DeploySelector.ChildrenOfThis);
             json = JsonConvert.SerializeObject(range, settings);
             Assert.AreEqual(string.Format("\"umb://any-guid/{0:N}?children\"", guid), json);
 
             var drange = JsonConvert.DeserializeObject<UdiRange>(json, settings);
             Assert.AreEqual(udi, drange.Udi);
             Assert.AreEqual(string.Format("umb://any-guid/{0:N}", guid), drange.Udi.UriValue.ToString());
-            Assert.AreEqual(Constants.DeploySelector.ChildrenOfThis, drange.Selector);
+            Assert.AreEqual(ConstantsCore.DeploySelector.ChildrenOfThis, drange.Selector);
         }
 
         [Test]

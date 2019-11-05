@@ -105,7 +105,7 @@ namespace Umbraco.Core.Services.Implement
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
 
-            if (entityId == Constants.System.Root || entityId <= 0)
+            if (entityId == ConstantsCore.System.Root || entityId <= 0)
             {
                 totalRecords = 0;
                 return Enumerable.Empty<IAuditItem>();
@@ -159,7 +159,7 @@ namespace Umbraco.Core.Services.Implement
         /// <inheritdoc />
         public IAuditEntry Write(int performingUserId, string perfomingDetails, string performingIp, DateTime eventDateUtc, int affectedUserId, string affectedDetails, string eventType, string eventDetails)
         {
-            if (performingUserId < 0 && performingUserId != Constants.Security.SuperUserId) throw new ArgumentOutOfRangeException(nameof(performingUserId));
+            if (performingUserId < 0 && performingUserId != ConstantsCore.Security.SuperUserId) throw new ArgumentOutOfRangeException(nameof(performingUserId));
             if (string.IsNullOrWhiteSpace(perfomingDetails)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(perfomingDetails));
             if (string.IsNullOrWhiteSpace(eventType)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(eventType));
             if (string.IsNullOrWhiteSpace(eventDetails)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(eventDetails));

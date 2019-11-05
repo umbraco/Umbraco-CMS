@@ -318,7 +318,7 @@ namespace Umbraco.Core.Services.Implement
                 var objectTypeGuid = objectType.GetGuid();
                 var query = Query<IUmbracoEntity>();
 
-                if (id != Constants.System.Root)
+                if (id != ConstantsCore.System.Root)
                 {
                     // lookup the path so we can use it in the prefix query below
                     var paths = _entityRepository.GetAllPaths(objectTypeGuid, id).ToArray();
@@ -350,7 +350,7 @@ namespace Umbraco.Core.Services.Implement
                 var objectTypeGuid = objectType.GetGuid();
                 var query = Query<IUmbracoEntity>();
 
-                if (idsA.All(x => x != Constants.System.Root))
+                if (idsA.All(x => x != ConstantsCore.System.Root))
                 {
                     var paths = _entityRepository.GetAllPaths(objectTypeGuid, idsA).ToArray();
                     if (paths.Length == 0)
@@ -362,7 +362,7 @@ namespace Umbraco.Core.Services.Implement
                     foreach (var id in idsA)
                     {
                         // if the id is root then don't add any clauses
-                        if (id == Constants.System.Root) continue;
+                        if (id == ConstantsCore.System.Root) continue;
 
                         var entityPath = paths.FirstOrDefault(x => x.Id == id);
                         if (entityPath == null) continue;
@@ -488,7 +488,7 @@ namespace Umbraco.Core.Services.Implement
                 var sql = scope.SqlContext.Sql()
                     .Select<NodeDto>()
                     .From<NodeDto>()
-                    .Where<NodeDto>(x => x.UniqueId == key && x.NodeObjectType == Constants.ObjectTypes.IdReservation);
+                    .Where<NodeDto>(x => x.UniqueId == key && x.NodeObjectType == ConstantsCore.ObjectTypes.IdReservation);
 
                 node = scope.Database.SingleOrDefault<NodeDto>(sql);
                 if (node != null)
@@ -498,7 +498,7 @@ namespace Umbraco.Core.Services.Implement
                 {
                     UniqueId = key,
                     Text = "RESERVED.ID",
-                    NodeObjectType = Constants.ObjectTypes.IdReservation,
+                    NodeObjectType = ConstantsCore.ObjectTypes.IdReservation,
 
                     CreateDate = DateTime.Now,
                     UserId = null,

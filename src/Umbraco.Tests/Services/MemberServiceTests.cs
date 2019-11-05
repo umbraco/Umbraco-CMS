@@ -111,14 +111,14 @@ namespace Umbraco.Tests.Services
             var member = MockedMember.CreateSimpleMember(memberType, "test", "test@test.com", "test");
             ServiceContext.MemberService.Save(member);
 
-            Assert.IsTrue(member.RawPasswordValue.StartsWith(Constants.Security.EmptyPasswordPrefix));
+            Assert.IsTrue(member.RawPasswordValue.StartsWith(ConstantsCore.Security.EmptyPasswordPrefix));
 
             ServiceContext.MemberService.SavePassword(member, "hello123456$!");
 
             var foundMember = ServiceContext.MemberService.GetById(member.Id);
             Assert.IsNotNull(foundMember);
             Assert.AreNotEqual("hello123456$!", foundMember.RawPasswordValue);
-            Assert.IsFalse(member.RawPasswordValue.StartsWith(Constants.Security.EmptyPasswordPrefix));
+            Assert.IsFalse(member.RawPasswordValue.StartsWith(ConstantsCore.Security.EmptyPasswordPrefix));
         }
 
         [Test]
@@ -130,7 +130,7 @@ namespace Umbraco.Tests.Services
             var member = MockedMember.CreateSimpleMember(memberType, "test", "test@test.com", "hello123456$!", "test");
             ServiceContext.MemberService.Save(member);
 
-            Assert.IsFalse(member.RawPasswordValue.StartsWith(Constants.Security.EmptyPasswordPrefix));
+            Assert.IsFalse(member.RawPasswordValue.StartsWith(ConstantsCore.Security.EmptyPasswordPrefix));
 
             Assert.Throws<NotSupportedException>(() => ServiceContext.MemberService.SavePassword(member, "HELLO123456$!"));
         }

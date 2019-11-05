@@ -192,7 +192,7 @@ namespace Umbraco.Web
         public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = null)
         {
             indexName = string.IsNullOrEmpty(indexName)
-                ? Constants.UmbracoIndexes.ExternalIndexName
+                ? ConstantsCore.UmbracoIndexes.ExternalIndexName
                 : indexName;
 
             if (!_examineManager.TryGetIndex(indexName, out var index) || !(index is IUmbracoIndex umbIndex))

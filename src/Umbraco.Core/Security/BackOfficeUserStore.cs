@@ -85,7 +85,7 @@ namespace Umbraco.Core.Security
             // prefix will help us determine if the password hasn't actually been specified yet.
             //this will hash the guid with a salt so should be nicely random
             var aspHasher = new PasswordHasher();
-            var emptyPasswordValue = Constants.Security.EmptyPasswordPrefix +
+            var emptyPasswordValue = ConstantsCore.Security.EmptyPasswordPrefix +
                                       aspHasher.HashPassword(Guid.NewGuid().ToString("N"));
 
             var userEntity = new User(user.Name, user.Email, user.UserName, emptyPasswordValue)

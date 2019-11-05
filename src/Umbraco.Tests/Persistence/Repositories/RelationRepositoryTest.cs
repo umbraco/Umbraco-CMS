@@ -49,7 +49,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var relationType = repositoryType.Get(1);
                 var relation = new Relation(NodeDto.NodeIdSeed + 2, NodeDto.NodeIdSeed + 3, relationType);
                 repository.Save(relation);
-                
+
 
                 // Assert
                 Assert.That(relation, Is.Not.Null);
@@ -71,7 +71,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var relation = repository.Get(1);
                 relation.Comment = "This relation has been updated";
                 repository.Save(relation);
-                
+
 
                 var relationUpdated = repository.Get(1);
 
@@ -95,7 +95,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var relation = repository.Get(2);
                 repository.Delete(relation);
-                
+
 
                 var exists = repository.Exists(2);
 
@@ -260,8 +260,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         public void CreateTestData()
         {
-            var relateContent = new RelationType(Constants.ObjectTypes.Document, new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"), "relateContentOnCopy") { IsBidirectional = true, Name = "Relate Content on Copy" };
-            var relateContentType = new RelationType(Constants.ObjectTypes.DocumentType, new Guid("A2CB7800-F571-4787-9638-BC48539A0EFB"), "relateContentTypeOnCopy") { IsBidirectional = true, Name = "Relate ContentType on Copy" };
+            var relateContent = new RelationType(ConstantsCore.ObjectTypes.Document, new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"), "relateContentOnCopy") { IsBidirectional = true, Name = "Relate Content on Copy" };
+            var relateContentType = new RelationType(ConstantsCore.ObjectTypes.DocumentType, new Guid("A2CB7800-F571-4787-9638-BC48539A0EFB"), "relateContentTypeOnCopy") { IsBidirectional = true, Name = "Relate ContentType on Copy" };
 
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
@@ -270,7 +270,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var relationRepository = new RelationRepository((IScopeAccessor) provider, Mock.Of<ILogger>(), relationTypeRepository);
 
                 relationTypeRepository.Save(relateContent);
-                relationTypeRepository.Save(relateContentType);                
+                relationTypeRepository.Save(relateContentType);
 
                 //Create and Save ContentType "umbTextpage" -> (NodeDto.NodeIdSeed)
                 ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");

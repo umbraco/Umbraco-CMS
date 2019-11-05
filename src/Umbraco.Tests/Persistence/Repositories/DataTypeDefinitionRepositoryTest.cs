@@ -25,7 +25,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private EntityContainerRepository CreateContainerRepository(IScopeAccessor scopeAccessor)
         {
-            return new EntityContainerRepository(scopeAccessor, AppCaches.Disabled, Logger, Constants.ObjectTypes.DataTypeContainer);
+            return new EntityContainerRepository(scopeAccessor, AppCaches.Disabled, Logger, ConstantsCore.ObjectTypes.DataTypeContainer);
         }
 
         [Test]
@@ -100,10 +100,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var containerRepository = CreateContainerRepository(accessor);
                 var repository = CreateRepository();
-                var container1 = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah1" };
+                var container1 = new EntityContainer(ConstantsCore.ObjectTypes.DataType) { Name = "blah1" };
                 containerRepository.Save(container1);
 
-                var container2 = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah2", ParentId = container1.Id };
+                var container2 = new EntityContainer(ConstantsCore.ObjectTypes.DataType) { Name = "blah2", ParentId = container1.Id };
                 containerRepository.Save(container2);
 
                 var dataType = (IDataType) new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService), container2.Id)
@@ -142,7 +142,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (provider.CreateScope())
             {
                 var containerRepository = CreateContainerRepository(accessor);
-                var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
+                var container = new EntityContainer(ConstantsCore.ObjectTypes.DataType) { Name = "blah" };
                 containerRepository.Save(container);
 
                 Assert.That(container.Id, Is.GreaterThan(0));
@@ -161,7 +161,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (provider.CreateScope())
             {
                 var containerRepository = CreateContainerRepository(accessor);
-                var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
+                var container = new EntityContainer(ConstantsCore.ObjectTypes.DataType) { Name = "blah" };
                 containerRepository.Save(container);
 
                 // Act
@@ -182,7 +182,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var containerRepository = CreateContainerRepository(accessor);
                 var repository = CreateRepository();
-                var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
+                var container = new EntityContainer(ConstantsCore.ObjectTypes.DataType) { Name = "blah" };
                 containerRepository.Save(container);
 
                 var dataTypeDefinition = new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService), container.Id) { Name = "test" };
@@ -202,7 +202,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var containerRepository = CreateContainerRepository(accessor);
                 var repository = CreateRepository();
-                var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
+                var container = new EntityContainer(ConstantsCore.ObjectTypes.DataType) { Name = "blah" };
                 containerRepository.Save(container);
 
                 IDataType dataType = new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService), container.Id) { Name = "test" };
@@ -254,7 +254,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository();
                 // Act
-                var dataTypeDefinition = repository.Get(Constants.DataTypes.DropDownSingle);
+                var dataTypeDefinition = repository.Get(ConstantsCore.DataTypes.DropDownSingle);
 
                 // Assert
                 Assert.That(dataTypeDefinition, Is.Not.Null);

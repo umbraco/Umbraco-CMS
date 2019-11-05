@@ -21,7 +21,7 @@ namespace Umbraco.Core.Migrations.Upgrade
         /// Initializes a new instance of the <see cref="UmbracoPlan"/> class.
         /// </summary>
         public UmbracoPlan()
-            : base(Constants.System.UmbracoUpgradePlanName)
+            : base(ConstantsCore.System.UmbracoUpgradePlanName)
         {
             DefinePlan();
         }
@@ -61,8 +61,8 @@ namespace Umbraco.Core.Migrations.Upgrade
             get
             {
                 // no state in database yet - assume we have something in web.config that makes some sense
-                if (!SemVersion.TryParse(ConfigurationManager.AppSettings[Constants.AppSettings.ConfigurationStatus], out var currentVersion))
-                    throw new InvalidOperationException($"Could not get current version from web.config {Constants.AppSettings.ConfigurationStatus} appSetting.");
+                if (!SemVersion.TryParse(ConfigurationManager.AppSettings[ConstantsCore.AppSettings.ConfigurationStatus], out var currentVersion))
+                    throw new InvalidOperationException($"Could not get current version from web.config {ConstantsCore.AppSettings.ConfigurationStatus} appSetting.");
 
                 // cannot go back in time
                 if (currentVersion > UmbracoVersion.SemanticVersion)

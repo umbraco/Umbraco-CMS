@@ -127,7 +127,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return l;
         }
 
-        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.MemberType;
+        protected override Guid NodeObjectTypeId => ConstantsCore.ObjectTypes.MemberType;
 
         protected override void PersistNewItem(IMemberType entity)
         {
@@ -138,7 +138,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             //set a default icon if one is not specified
             if (entity.Icon.IsNullOrWhiteSpace())
             {
-                entity.Icon = Constants.Icons.Member;
+                entity.Icon = ConstantsCore.Icons.Member;
             }
 
             //By Convention we add 9 standard PropertyTypes to an Umbraco MemberType

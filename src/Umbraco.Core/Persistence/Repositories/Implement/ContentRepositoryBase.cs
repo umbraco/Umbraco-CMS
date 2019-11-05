@@ -778,7 +778,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected virtual int GetReservedId(Guid uniqueId)
         {
             var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetReservedId", tsql =>
-                tsql.Select<NodeDto>(x => x.NodeId).From<NodeDto>().Where<NodeDto>(x => x.UniqueId == SqlTemplate.Arg<Guid>("uniqueId") && x.NodeObjectType == Constants.ObjectTypes.IdReservation)
+                tsql.Select<NodeDto>(x => x.NodeId).From<NodeDto>().Where<NodeDto>(x => x.UniqueId == SqlTemplate.Arg<Guid>("uniqueId") && x.NodeObjectType == ConstantsCore.ObjectTypes.IdReservation)
             );
             var id = Database.ExecuteScalar<int?>(template.Sql(new { uniqueId = uniqueId }));
             return id ?? 0;

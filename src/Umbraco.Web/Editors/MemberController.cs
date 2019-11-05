@@ -38,7 +38,7 @@ namespace Umbraco.Web.Editors
     /// access to ALL of the methods on this controller will need access to the member application.
     /// </remarks>
     [PluginController("UmbracoApi")]
-    [UmbracoApplicationAuthorizeAttribute(Constants.Applications.Members)]
+    [UmbracoApplicationAuthorizeAttribute(ConstantsCore.Applications.Members)]
     [OutgoingNoHyphenGuidFormat]
     public class MemberController : ContentControllerBase
     {
@@ -139,7 +139,7 @@ namespace Umbraco.Web.Editors
             var name = foundType != null ? foundType.Name : listName;
 
             var apps = new List<ContentApp>();
-            apps.Add(ListViewContentAppFactory.CreateContentApp(Services.DataTypeService, _propertyEditors, listName, "member", Core.Constants.DataTypes.DefaultMembersListView));
+            apps.Add(ListViewContentAppFactory.CreateContentApp(Services.DataTypeService, _propertyEditors, listName, "member", Core.ConstantsCore.DataTypes.DefaultMembersListView));
             apps[0].Active = true;
 
             var display = new MemberListDisplay

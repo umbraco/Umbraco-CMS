@@ -53,7 +53,7 @@ namespace Umbraco.Tests.Services
             Assert.IsTrue(contentType.IsElement);
         }
 
-        
+
 
         [Test]
         public void Deleting_Content_Type_With_Hierarchy_Of_Content_Items_Moves_Orphaned_Content_To_Recycle_Bin()
@@ -524,7 +524,7 @@ namespace Umbraco.Tests.Services
             var cts = ServiceContext.ContentTypeService;
 
             // Act
-            var container = new EntityContainer(Constants.ObjectTypes.DocumentType);
+            var container = new EntityContainer(ConstantsCore.ObjectTypes.DocumentType);
             container.Name = "container1";
             cts.SaveContainer(container);
 
@@ -540,11 +540,11 @@ namespace Umbraco.Tests.Services
             var cts = ServiceContext.ContentTypeService;
 
             // Act
-            var container1 = new EntityContainer(Constants.ObjectTypes.DocumentType);
+            var container1 = new EntityContainer(ConstantsCore.ObjectTypes.DocumentType);
             container1.Name = "container1";
             cts.SaveContainer(container1);
 
-            var container2 = new EntityContainer(Constants.ObjectTypes.DocumentType);
+            var container2 = new EntityContainer(ConstantsCore.ObjectTypes.DocumentType);
             container2.Name = "container2";
             cts.SaveContainer(container2);
 

@@ -249,7 +249,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
             try
             {
-                return eMgr.TryGetIndex(Constants.UmbracoIndexes.InternalIndexName, out var index) ? index.GetSearcher() : null;
+                return eMgr.TryGetIndex(ConstantsCore.UmbracoIndexes.InternalIndexName, out var index) ? index.GetSearcher() : null;
             }
             catch (FileNotFoundException)
             {
@@ -649,7 +649,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         private static void InitializeCacheConfig()
         {
-            var value = ConfigurationManager.AppSettings[Constants.AppSettings.PublishedMediaCacheSeconds];
+            var value = ConfigurationManager.AppSettings[ConstantsCore.AppSettings.PublishedMediaCacheSeconds];
             int seconds;
             if (int.TryParse(value, out seconds) == false)
                 seconds = PublishedMediaCacheTimespanSeconds;

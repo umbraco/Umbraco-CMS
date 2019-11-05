@@ -18,7 +18,7 @@ namespace Umbraco.Web.Services
     internal class DashboardService : IDashboardService
     {
         // TODO: Unit test all this!!! :/
-	
+
         private readonly ISectionService _sectionService;
         private readonly DashboardCollection _dashboardCollection;
         private readonly ILocalizedTextService _localizedText;
@@ -67,7 +67,7 @@ namespace Umbraco.Web.Services
 
         private bool CheckUserAccessByRules(IUser user, ISectionService sectionService, IEnumerable<IAccessRule> rules)
         {
-            if (user.Id == Constants.Security.SuperUserId)
+            if (user.Id == ConstantsCore.Security.SuperUserId)
                 return true;
 
             var (denyRules, grantRules, grantBySectionRules) = GroupRules(rules);

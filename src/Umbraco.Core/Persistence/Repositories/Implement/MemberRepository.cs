@@ -39,7 +39,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #region Repository Base
 
-        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.Member;
+        protected override Guid NodeObjectTypeId => ConstantsCore.ObjectTypes.Member;
 
         protected override IMember PerformGet(int id)
         {
@@ -308,7 +308,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (entity.RawPasswordValue.IsNullOrWhiteSpace())
             {
                 var aspHasher = new PasswordHasher();
-                dto.Password = Constants.Security.EmptyPasswordPrefix + aspHasher.HashPassword(Guid.NewGuid().ToString("N"));
+                dto.Password = ConstantsCore.Security.EmptyPasswordPrefix + aspHasher.HashPassword(Guid.NewGuid().ToString("N"));
                 entity.RawPasswordValue = dto.Password;
             }
 

@@ -4,7 +4,7 @@ using Umbraco.Web.Models.Trees;
 
 namespace Umbraco.Web.Trees
 {
-    [Tree(Constants.Applications.Settings, "files", TreeTitle = "Files", TreeUse = TreeUse.Dialog)]
+    [Tree(ConstantsCore.Applications.Settings, "files", TreeTitle = "Files", TreeUse = TreeUse.Dialog)]
     [CoreTree]
     public class FilesTreeController : FileSystemTreeController
     {
@@ -14,6 +14,6 @@ namespace Umbraco.Web.Trees
 
         protected override string[] Extensions => ExtensionsStatic;
 
-        protected override string FileIcon => Constants.Icons.MediaFile;
+        protected override string FileIcon => ConstantsCore.Icons.MediaFile;
     }
 }

@@ -31,7 +31,7 @@ namespace Umbraco.Web.Editors
     /// An API controller used for dealing with content types
     /// </summary>
     [PluginController("UmbracoApi")]
-    [UmbracoTreeAuthorize(Constants.Trees.MediaTypes)]
+    [UmbracoTreeAuthorize(ConstantsCore.Trees.MediaTypes)]
     [EnableOverrideAuthorization]
     [MediaTypeControllerControllerConfiguration]
     public class MediaTypeController : ContentTypeControllerBase<IMediaType>
@@ -58,7 +58,7 @@ namespace Umbraco.Web.Editors
             return Services.ContentTypeService.Count();
         }
 
-        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
+        [UmbracoTreeAuthorize(ConstantsCore.Trees.MediaTypes, ConstantsCore.Trees.Media)]
         public MediaTypeDisplay GetById(int id)
         {
             var ct = Services.MediaTypeService.Get(id);
@@ -137,7 +137,7 @@ namespace Umbraco.Web.Editors
         public MediaTypeDisplay GetEmpty(int parentId)
         {
             IMediaType mt;
-            if (parentId != Constants.System.Root)
+            if (parentId != ConstantsCore.System.Root)
             {
                 var parent = Services.MediaTypeService.Get(parentId);
                 mt = parent != null ? new MediaType(parent, string.Empty) : new MediaType(parentId);
@@ -145,7 +145,7 @@ namespace Umbraco.Web.Editors
             else
                 mt = new MediaType(parentId);
 
-            mt.Icon = Constants.Icons.MediaImage;
+            mt.Icon = ConstantsCore.Icons.MediaImage;
 
             var dto = Mapper.Map<IMediaType, MediaTypeDisplay>(mt);
             return dto;
@@ -216,14 +216,14 @@ namespace Umbraco.Web.Editors
         /// Returns the allowed child content type objects for the content item id passed in - based on an INT id
         /// </summary>
         /// <param name="contentId"></param>
-        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
+        [UmbracoTreeAuthorize(ConstantsCore.Trees.MediaTypes, ConstantsCore.Trees.Media)]
         public IEnumerable<ContentTypeBasic> GetAllowedChildren(int contentId)
         {
-            if (contentId == Constants.System.RecycleBinContent)
+            if (contentId == ConstantsCore.System.RecycleBinContent)
                 return Enumerable.Empty<ContentTypeBasic>();
 
             IEnumerable<IMediaType> types;
-            if (contentId == Constants.System.Root)
+            if (contentId == ConstantsCore.System.Root)
             {
                 types = Services.MediaTypeService.GetAll().ToList();
 
@@ -262,7 +262,7 @@ namespace Umbraco.Web.Editors
         /// Returns the allowed child content type objects for the content item id passed in - based on a GUID id
         /// </summary>
         /// <param name="contentId"></param>
-        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
+        [UmbracoTreeAuthorize(ConstantsCore.Trees.MediaTypes, ConstantsCore.Trees.Media)]
         public IEnumerable<ContentTypeBasic> GetAllowedChildren(Guid contentId)
         {
             var entity = Current.Services.EntityService.Get(contentId);
@@ -278,7 +278,7 @@ namespace Umbraco.Web.Editors
         /// Returns the allowed child content type objects for the content item id passed in - based on a UDI id
         /// </summary>
         /// <param name="contentId"></param>
-        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
+        [UmbracoTreeAuthorize(ConstantsCore.Trees.MediaTypes, ConstantsCore.Trees.Media)]
         public IEnumerable<ContentTypeBasic> GetAllowedChildren(Udi contentId)
         {
             var guidUdi = contentId as GuidUdi;

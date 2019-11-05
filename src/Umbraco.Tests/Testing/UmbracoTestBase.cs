@@ -346,7 +346,7 @@ namespace Umbraco.Tests.Testing
 
             Composition.RegisterUnique<IEventMessagesFactory>(_ => new TransientEventMessagesFactory());
             Composition.RegisterUnique<IUmbracoDatabaseFactory>(f => new UmbracoDatabaseFactory(
-                Constants.System.UmbracoConnectionName,
+                ConstantsCore.System.UmbracoConnectionName,
                 Logger,
                 new Lazy<IMapperCollection>(f.GetInstance<IMapperCollection>)));
             Composition.RegisterUnique(f => f.TryGetInstance<IUmbracoDatabaseFactory>().SqlContext);

@@ -80,7 +80,7 @@ namespace Umbraco.Core.Services
             using (var scope = _scopeProvider.CreateScope())
             {
                 // populate content and media items
-                var types = new[] { Constants.ObjectTypes.Document, Constants.ObjectTypes.Media };
+                var types = new[] { ConstantsCore.ObjectTypes.Document, ConstantsCore.ObjectTypes.Media };
                 var values = scope.Database.Query<TypedIdDto>("SELECT id, uniqueId, nodeObjectType FROM umbracoNode WHERE nodeObjectType IN @types", new { types });
                 foreach (var value in values)
                 {
@@ -174,7 +174,7 @@ namespace Umbraco.Core.Services
                     else
                     {
                         val = scope.Database.ExecuteScalar<int?>("SELECT id FROM umbracoNode WHERE uniqueId=@id AND (nodeObjectType=@type OR nodeObjectType=@reservation)",
-                            new { id = key, type = GetNodeObjectTypeGuid(umbracoObjectType), reservation = Constants.ObjectTypes.IdReservation });
+                            new { id = key, type = GetNodeObjectTypeGuid(umbracoObjectType), reservation = ConstantsCore.ObjectTypes.IdReservation });
                     }
                     scope.Complete();
                 }
@@ -262,7 +262,7 @@ namespace Umbraco.Core.Services
                     else
                     {
                         val = scope.Database.ExecuteScalar<Guid?>("SELECT uniqueId FROM umbracoNode WHERE id=@id AND (nodeObjectType=@type OR nodeObjectType=@reservation)",
-                            new { id, type = GetNodeObjectTypeGuid(umbracoObjectType), reservation = Constants.ObjectTypes.IdReservation });
+                            new { id, type = GetNodeObjectTypeGuid(umbracoObjectType), reservation = ConstantsCore.ObjectTypes.IdReservation });
                     }
                     scope.Complete();
                 }

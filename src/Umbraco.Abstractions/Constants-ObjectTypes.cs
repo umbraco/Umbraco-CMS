@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core
 {
-    public static partial class Constants
+    public static partial class ConstantsCore
     {
         /// <summary>
         /// Defines the Umbraco object type unique identifiers.
@@ -69,7 +69,7 @@ namespace Umbraco.Core
                 public const string IdReservation = "92849B1E-3904-4713-9356-F646F87C25F4";
 
                 [Obsolete("This no longer exists in the database")]
-                internal const string Stylesheet = "9F68DA4F-A3A8-44C2-8226-DCBD125E4840";
+                public const string Stylesheet = "9F68DA4F-A3A8-44C2-8226-DCBD125E4840";
 
                 // ReSharper restore MemberHidesStaticFromOuterClass
             }

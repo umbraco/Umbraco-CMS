@@ -117,7 +117,7 @@ namespace Umbraco.Core.Persistence.Factories
             entity.UpdateDate = dto.NodeDto.CreateDate;
             entity.Path = dto.NodeDto.Path;
             entity.Level = dto.NodeDto.Level;
-            entity.CreatorId = dto.NodeDto.UserId ?? Constants.Security.UnknownUserId;
+            entity.CreatorId = dto.NodeDto.UserId ?? ConstantsCore.Security.UnknownUserId;
             entity.AllowedAsRoot = dto.AllowAtRoot;
             entity.IsContainer = dto.IsContainer;
             entity.IsElement = dto.IsElement;
@@ -131,11 +131,11 @@ namespace Umbraco.Core.Persistence.Factories
         {
             Guid nodeObjectType;
             if (entity is IContentType)
-                nodeObjectType = Constants.ObjectTypes.DocumentType;
+                nodeObjectType = ConstantsCore.ObjectTypes.DocumentType;
             else if (entity is IMediaType)
-                nodeObjectType = Constants.ObjectTypes.MediaType;
+                nodeObjectType = ConstantsCore.ObjectTypes.MediaType;
             else if (entity is IMemberType)
-                nodeObjectType = Constants.ObjectTypes.MemberType;
+                nodeObjectType = ConstantsCore.ObjectTypes.MemberType;
             else
                 throw new Exception("Invalid entity.");
 

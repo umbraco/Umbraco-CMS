@@ -21,7 +21,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             var temp2 = Database.Fetch<dynamic>($@"SELECT v.versionId, v.id
 FROM cmsContentVersion v
 JOIN umbracoNode n on v.contentId=n.id
-WHERE n.nodeObjectType='{Constants.ObjectTypes.Media}'");
+WHERE n.nodeObjectType='{ConstantsCore.ObjectTypes.Media}'");
             foreach (var t in temp2)
                 Execute.Sql($"UPDATE {Constants.DatabaseSchema.Tables.MediaVersion} SET id={t.id} WHERE versionId='{t.versionId}'").Do();
 

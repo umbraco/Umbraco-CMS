@@ -196,7 +196,7 @@ namespace Umbraco.Web
         {
             // TODO: inject examine manager
 
-            indexName = string.IsNullOrEmpty(indexName) ? Constants.UmbracoIndexes.ExternalIndexName : indexName;
+            indexName = string.IsNullOrEmpty(indexName) ? ConstantsCore.UmbracoIndexes.ExternalIndexName : indexName;
             if (!ExamineManager.Instance.TryGetIndex(indexName, out var index))
                 throw new InvalidOperationException("No index found with name " + indexName);
 
@@ -217,7 +217,7 @@ namespace Umbraco.Web
         {
             // TODO: inject examine manager
 
-            indexName = string.IsNullOrEmpty(indexName) ? Constants.UmbracoIndexes.ExternalIndexName : indexName;
+            indexName = string.IsNullOrEmpty(indexName) ? ConstantsCore.UmbracoIndexes.ExternalIndexName : indexName;
             if (!ExamineManager.Instance.TryGetIndex(indexName, out var index))
                 throw new InvalidOperationException("No index found with name " + indexName);
 

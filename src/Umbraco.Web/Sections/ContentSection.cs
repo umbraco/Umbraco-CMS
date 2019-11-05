@@ -9,7 +9,7 @@ namespace Umbraco.Web.Sections
     public class ContentSection : ISection
     {
         /// <inheritdoc />
-        public string Alias => Constants.Applications.Content;
+        public string Alias => ConstantsCore.Applications.Content;
 
         /// <inheritdoc />
         public string Name => "Content";

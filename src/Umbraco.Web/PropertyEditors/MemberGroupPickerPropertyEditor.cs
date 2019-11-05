@@ -10,7 +10,7 @@ namespace Umbraco.Web.PropertyEditors
         "membergrouppicker",
         ValueType = ValueTypes.Text,
         Group = Constants.PropertyEditors.Groups.People,
-        Icon = Constants.Icons.MemberGroup)]
+        Icon = ConstantsCore.Icons.MemberGroup)]
     public class MemberGroupPickerPropertyEditor : DataEditor
     {
          public MemberGroupPickerPropertyEditor(ILogger logger)

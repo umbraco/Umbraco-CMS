@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core
 {
-    public static partial class Constants
+    public static partial class ConstantsCore
     {
         /// <summary>
         /// Defines the alias identifiers for Umbraco's core application sections.

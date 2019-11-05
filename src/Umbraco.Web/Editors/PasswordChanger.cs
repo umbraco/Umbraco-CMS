@@ -79,7 +79,7 @@ namespace Umbraco.Web.Editors
                 }
 
                 //if the current user has access to reset/manually change the password
-                if (currentUser.HasSectionAccess(Umbraco.Core.Constants.Applications.Users) == false)
+                if (currentUser.HasSectionAccess(Umbraco.Core.ConstantsCore.Applications.Users) == false)
                 {
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("The current user is not authorized", new[] { "resetPassword" }) });
                 }
@@ -246,7 +246,7 @@ namespace Umbraco.Web.Editors
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Cannot set an empty password", new[] { "value" }) });
             }
 
-            //without being able to retrieve the original password, 
+            //without being able to retrieve the original password,
             //we cannot arbitrarily change the password without knowing the old one and no old password was supplied - need to return an error
             if (passwordModel.OldPassword.IsNullOrWhiteSpace() && membershipProvider.EnablePasswordRetrieval == false)
             {

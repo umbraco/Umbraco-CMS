@@ -19,7 +19,7 @@ using Constants = Umbraco.Core.Constants;
 namespace Umbraco.Web.Editors
 {
     [PluginController("UmbracoApi")]
-    [UmbracoTreeAuthorize(Constants.Trees.Templates)]
+    [UmbracoTreeAuthorize(ConstantsCore.Trees.Templates)]
     public class TemplateController : BackOfficeNotificationsController
     {
         public TemplateController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)

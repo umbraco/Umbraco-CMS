@@ -70,7 +70,7 @@ namespace Umbraco.Web.Editors.Filters
                 case ContentSaveAction.SaveNew:
                     contentToCheck = _mediaService.GetById(mediaItem.ParentId);
 
-                    if (mediaItem.ParentId != Constants.System.Root)
+                    if (mediaItem.ParentId != ConstantsCore.System.Root)
                     {
                         contentToCheck = _mediaService.GetById(mediaItem.ParentId);
                         contentIdToCheck = contentToCheck.Id;

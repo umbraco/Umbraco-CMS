@@ -86,7 +86,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="dictionaryItem"><see cref="IDictionaryItem"/> to save</param>
         /// <param name="userId">Optional id of the user saving the dictionary item</param>
-        void Save(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId);
+        void Save(IDictionaryItem dictionaryItem, int userId = ConstantsCore.Security.SuperUserId);
 
         /// <summary>
         /// Deletes a <see cref="IDictionaryItem"/> object and its related translations
@@ -94,7 +94,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="dictionaryItem"><see cref="IDictionaryItem"/> to delete</param>
         /// <param name="userId">Optional id of the user deleting the dictionary item</param>
-        void Delete(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId);
+        void Delete(IDictionaryItem dictionaryItem, int userId = ConstantsCore.Security.SuperUserId);
 
         /// <summary>
         /// Gets a <see cref="ILanguage"/> by its id
@@ -102,7 +102,7 @@ namespace Umbraco.Core.Services
         /// <param name="id">Id of the <see cref="ILanguage"/></param>
         /// <returns><see cref="ILanguage"/></returns>
         ILanguage GetLanguageById(int id);
-        
+
         /// <summary>
         /// Gets a <see cref="Language"/> by its iso code
         /// </summary>
@@ -153,14 +153,14 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="language"><see cref="ILanguage"/> to save</param>
         /// <param name="userId">Optional id of the user saving the language</param>
-        void Save(ILanguage language, int userId = Constants.Security.SuperUserId);
+        void Save(ILanguage language, int userId = ConstantsCore.Security.SuperUserId);
 
         /// <summary>
         /// Deletes a <see cref="ILanguage"/> by removing it and its usages from the db
         /// </summary>
         /// <param name="language"><see cref="ILanguage"/> to delete</param>
         /// <param name="userId">Optional id of the user deleting the language</param>
-        void Delete(ILanguage language, int userId = Constants.Security.SuperUserId);
+        void Delete(ILanguage language, int userId = ConstantsCore.Security.SuperUserId);
 
         /// <summary>
         /// Gets the full dictionary key map.

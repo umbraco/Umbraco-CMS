@@ -14,7 +14,7 @@ namespace Umbraco.Web.PropertyEditors
         "listview",
         HideLabel = true,
         Group = Constants.PropertyEditors.Groups.Lists,
-        Icon = Constants.Icons.ListView)]
+        Icon = ConstantsCore.Icons.ListView)]
     public class ListViewPropertyEditor : DataEditor
     {
         /// <summary>
