@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
@@ -20,7 +21,22 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
         public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object source, bool preview)
         {
-            return source?.ToString() ?? "";
+            var sourceValue = source?.ToString();
+
+            if (sourceValue?.DetectIsJson() == true)
+            {
+                // this may be an image cropper value - let's try to convert it
+                try
+                {
+                    return JsonConvert.DeserializeObject<ImageCropperValue>(sourceValue)?.Src;
+                }
+                catch
+                {
+                    // ignore, this can't be converted
+                }
+            }
+
+            return sourceValue;
         }
     }
 }

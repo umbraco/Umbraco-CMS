@@ -1,12 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.ValueConverters;
+using Umbraco.Core.Services;
+using File = System.IO.File;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -21,6 +22,22 @@ namespace Umbraco.Web.PropertyEditors
             : base(attribute)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
+        }
+
+        public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
+        {
+            if (!(property.GetValue(culture, segment) is string val))
+            {
+                return null;
+            }
+
+            // if the property editor was changed from image cropper to file upload, the current property value will be the previous image cropper value
+            if (val.DetectIsJson())
+            {
+                return GetSrcFromImageCropper(val);
+            }
+
+            return base.ToEditor(property, dataTypeService, culture, segment);
         }
 
         /// <summary>
@@ -44,8 +61,18 @@ namespace Umbraco.Web.PropertyEditors
         public override object FromEditor(ContentPropertyData editorValue, object currentValue)
         {
             var currentPath = currentValue as string;
+
+            // if the property editor was changed from image cropper to file upload, the current property value will be the previous image cropper value
+            if (currentPath?.DetectIsJson() == true)
+            {
+                currentPath = GetSrcFromImageCropper(currentPath);
+                currentValue = currentPath;
+            }
+
             if (!currentPath.IsNullOrWhiteSpace())
+            {
                 currentPath = _mediaFileSystem.GetRelativePath(currentPath);
+            }
 
             string editorFile = null;
             if (editorValue.Value != null)
@@ -115,6 +142,18 @@ namespace Umbraco.Web.PropertyEditors
             }
 
             return filepath;
+        }
+
+        private string GetSrcFromImageCropper(string value)
+        {
+            try
+            {
+                return JsonConvert.DeserializeObject<ImageCropperValue>(value)?.Src;
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }
