@@ -1,15 +1,5 @@
 <div id="examineManagement" class="examine-management" ng-controller="Umbraco.Dashboard.ExamineManagementController as vm">
 
-    <div ng-if="vm.viewState === 'list'">
-        <umb-box>
-            <umb-box-content>
-                <h3 class="bold">
-                    <localize key="dashboardTabs_settingsExamine">Examine Management</localize>
-                </h3>
-            </umb-box-content>
-        </umb-box>
-    </div>
-
     <div ng-show="vm.loading">
         <umb-load-indicator></umb-load-indicator>
     </div>
@@ -91,7 +81,7 @@
 
             <umb-editor-sub-header>
                 <umb-editor-sub-header-content-left>
-                        <button type="button" class="umb-package-details__back-action" ng-click="vm.setViewState('list');"><span aria-hidden="true">&larr;</span> <localize key="general_backToOverview">Back to overview</localize></button>
+                    <button type="button" class="umb-package-details__back-action" ng-click="vm.setViewState('list');"><span aria-hidden="true">&larr;</span> <localize key="general_backToOverview">Back to overview</localize></button>
                 </umb-editor-sub-header-content-left>
             </umb-editor-sub-header>
 
@@ -379,7 +369,7 @@
                                                 <umb-button ng-show="!vm.selectedIndex.isProcessing && (!vm.selectedIndex.processingAttempts || vm.selectedIndex.processingAttempts < 100)"
                                                             disabled="!vm.selectedIndex.canRebuild"
                                                             type="button"
-                                                            button-style="success"
+                                                            button-style="danger"
                                                             action="vm.rebuildIndex(vm.selectedIndex, $event)"
                                                             label="Rebuild index"
                                                             label-key="examineManagement_rebuildIndex">
