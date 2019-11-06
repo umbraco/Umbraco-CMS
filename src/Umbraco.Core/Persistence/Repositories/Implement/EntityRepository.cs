@@ -35,44 +35,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected ISqlSyntaxProvider SqlSyntax => _scopeAccessor.AmbientScope.SqlContext.SqlSyntax;
 
         #region Repository
-
-        //public IEnumerable<IEntitySlim> GetPagedResults(IDictionary<Guid, IEnumerable<int>> typesAndIds, long pageIndex, int pageSize, out long totalRecords, Ordering ordering)
-        //{
-        //    var isContent = typesAndIds.Keys.Any(objectType => objectType == Constants.ObjectTypes.Document || objectType == Constants.ObjectTypes.DocumentBlueprint);
-        //    var isMedia = typesAndIds.Keys.Any(objectType => objectType == Constants.ObjectTypes.Media);
-        //    var isMember = typesAndIds.Keys.Any(objectType => objectType == Constants.ObjectTypes.Member);
-
-        //    var sql = GetBase(isContent, isMedia, isMember, null, false)
-        //        .WhereIn<NodeDto>(x => x.NodeObjectType, typesAndIds.Keys);
-
-        //    ordering = ordering ?? Ordering.ByDefault();
-
-        //    sql = AddGroupBy(isContent, isMedia, isMember, sql, ordering.IsEmpty);
-
-        //    if (!ordering.IsEmpty)
-        //    {
-        //        // apply ordering
-        //        ApplyOrdering(ref sql, ordering);
-        //    }
-
-        //    // TODO: we should be able to do sql = sql.OrderBy(x => Alias(x.NodeId, "NodeId")); but we can't because the OrderBy extension don't support Alias currently
-        //    //no matter what we always must have node id ordered at the end
-        //    sql = ordering.Direction == Direction.Ascending ? sql.OrderBy("NodeId") : sql.OrderByDescending("NodeId");
-
-        //    // for content we must query for ContentEntityDto entities to produce the correct culture variant entity names
-        //    var pageIndexToFetch = pageIndex + 1;
-        //    IEnumerable<BaseDto> dtos;
-        //    var page = Database.Page<GenericContentEntityDto>(pageIndexToFetch, pageSize, sql);
-        //    dtos = page.Items;
-        //    totalRecords = page.TotalItems;
-
-        //    var entities = dtos.Select(BuildEntity).ToArray();
-
-        //    BuildVariants(entities.OfType<DocumentEntitySlim>());
-
-        //    return entities;
-        //}
-
+        
         public IEnumerable<IEntitySlim> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid objectType, long pageIndex, int pageSize, out long totalRecords,
             IQuery<IUmbracoEntity> filter, Ordering ordering)
         {
