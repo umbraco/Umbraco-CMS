@@ -38,7 +38,7 @@ namespace Umbraco.Core.Composing
             }
         }
 
-        internal static bool HasFactory => _factory != null;
+        public static bool HasFactory => _factory != null;
 
         #region Getters
 

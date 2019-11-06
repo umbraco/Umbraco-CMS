@@ -3,7 +3,7 @@
     /// <summary>
     /// A simple/default transient messages factory
     /// </summary>
-    internal class TransientEventMessagesFactory : IEventMessagesFactory
+    public class TransientEventMessagesFactory : IEventMessagesFactory
     {
         public EventMessages Get()
         {

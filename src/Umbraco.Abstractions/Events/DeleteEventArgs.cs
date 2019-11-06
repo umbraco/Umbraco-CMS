@@ -100,7 +100,7 @@ namespace Umbraco.Core.Events
         public IEnumerable<TEntity> DeletedEntities
         {
             get => EventObject;
-            internal set => EventObject = value;
+            set => EventObject = value;
         }
 
         /// <summary>

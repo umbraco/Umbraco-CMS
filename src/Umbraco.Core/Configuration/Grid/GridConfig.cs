@@ -7,7 +7,7 @@ namespace Umbraco.Core.Configuration.Grid
 {
     class GridConfig : IGridConfig
     {
-        public GridConfig(ILogger logger, AppCaches appCaches, DirectoryInfo configFolder, ManifestParser manifestParser, bool isDebug)
+        public GridConfig(ILogger logger, AppCaches appCaches, DirectoryInfo configFolder, IManifestParser manifestParser, bool isDebug)
         {
             EditorsConfig = new GridEditorsConfig(logger, appCaches, configFolder, manifestParser, isDebug);
         }
