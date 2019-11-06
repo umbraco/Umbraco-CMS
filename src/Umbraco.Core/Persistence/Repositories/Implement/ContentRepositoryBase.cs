@@ -853,21 +853,22 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var allRelationTypes = RelationTypeRepository.GetMany(Array.Empty<int>())
                 .ToDictionary(x => x.Alias, x => x);
 
-            foreach(var rel in trackedRelations)
-            {
-                if (!allRelationTypes.TryGetValue(rel.RelationTypeAlias, out var relationType))
-                    throw new InvalidOperationException($"The relation type {rel.RelationTypeAlias} does not exist");
+            var toSave = trackedRelations.Select(rel =>
+                {
+                    if (!allRelationTypes.TryGetValue(rel.RelationTypeAlias, out var relationType))
+                        throw new InvalidOperationException($"The relation type {rel.RelationTypeAlias} does not exist");
 
-                if (!udiToGuids.TryGetValue(rel.Udi, out var guid))
-                    continue; // This shouldn't happen!
+                    if (!udiToGuids.TryGetValue(rel.Udi, out var guid))
+                        return null; // This shouldn't happen!
 
-                if (!keyToIds.TryGetValue(guid, out var id))
-                    continue; // This shouldn't happen!
+                    if (!keyToIds.TryGetValue(guid, out var id))
+                        return null; // This shouldn't happen!
 
-                //Create new relation
-                //TODO: This is N+1, we could do this all in one operation, just need a new method on the relations repo
-                RelationRepository.Save(new Relation(entity.Id, id, relationType));
-            }
+                    return new Relation(entity.Id, id, relationType);
+                }).WhereNotNull();
+
+            // Save bulk relations
+            RelationRepository.Save(toSave);
 
         }
 
