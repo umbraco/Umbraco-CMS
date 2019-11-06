@@ -89,7 +89,7 @@ namespace Umbraco.Tests.Runtimes
         // test runtime
         public class TestRuntime : CoreRuntime
         {
-            protected override ILogger GetLogger() => new DebugDiagnosticsLogger();
+            protected override ILogger GetLogger() => new DebugDiagnosticsLogger(new MessageTemplates());
             protected override IProfiler GetProfiler() => new TestProfiler();
 
             // must override the database factory

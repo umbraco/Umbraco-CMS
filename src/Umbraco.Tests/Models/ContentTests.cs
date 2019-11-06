@@ -55,7 +55,7 @@ namespace Umbraco.Tests.Models
             var mediaTypeService = Mock.Of<IMediaTypeService>();
             var memberTypeService = Mock.Of<IMemberTypeService>();
             Composition.Register(_ => ServiceContext.CreatePartial(dataTypeService: dataTypeService, contentTypeBaseServiceProvider: new ContentTypeBaseServiceProvider(_contentTypeService, mediaTypeService, memberTypeService)));
-            
+
         }
 
         [Test]
@@ -236,7 +236,7 @@ namespace Umbraco.Tests.Models
 
         private static IProfilingLogger GetTestProfilingLogger()
         {
-            var logger = new DebugDiagnosticsLogger();
+            var logger = new DebugDiagnosticsLogger(new MessageTemplates());
             var profiler = new TestProfiler();
             return new ProfilingLogger(logger, profiler);
         }

@@ -113,7 +113,7 @@ namespace Umbraco.Core.Composing
 
         public static ILogger Logger
             => _logger ?? (_logger = _factory?.TryGetInstance<ILogger>()
-                                     ?? new DebugDiagnosticsLogger());
+                                     ?? new DebugDiagnosticsLogger(new MessageTemplates()));
 
         public static IProfiler Profiler
             => _profiler ?? (_profiler = _factory?.TryGetInstance<IProfiler>()

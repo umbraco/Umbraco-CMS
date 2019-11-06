@@ -190,7 +190,7 @@ namespace Umbraco.Tests.Testing
                     profiler = new LogProfiler(logger);
                     break;
                 case UmbracoTestOptions.Logger.Console:
-                    logger = new ConsoleLogger();
+                    logger = new ConsoleLogger(new MessageTemplates());
                     profiler = new LogProfiler(logger);
                     break;
                 default:

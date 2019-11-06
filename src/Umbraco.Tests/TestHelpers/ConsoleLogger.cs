@@ -5,6 +5,13 @@ namespace Umbraco.Tests.TestHelpers
 {
     public class ConsoleLogger : ILogger
     {
+        private readonly IMessageTemplates _messageTemplates;
+
+        public ConsoleLogger(IMessageTemplates messageTemplates)
+        {
+            _messageTemplates = messageTemplates;
+        }
+
         public bool IsEnabled(Type reporting, LogLevel level)
             => true;
 
@@ -27,13 +34,13 @@ namespace Umbraco.Tests.TestHelpers
 
         public void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
         {
-            Console.WriteLine("FATAL {0} - {1}", reporting.Name, MessageTemplates.Render(messageTemplate, propertyValues));
+            Console.WriteLine("FATAL {0} - {1}", reporting.Name, _messageTemplates.Render(messageTemplate, propertyValues));
             Console.WriteLine(exception);
         }
 
         public void Fatal(Type reporting, string messageTemplate, params object[] propertyValues)
         {
-            Console.WriteLine("FATAL {0} - {1}", reporting.Name, MessageTemplates.Render(messageTemplate, propertyValues));
+            Console.WriteLine("FATAL {0} - {1}", reporting.Name, _messageTemplates.Render(messageTemplate, propertyValues));
         }
 
         public void Error(Type reporting, Exception exception, string message)
@@ -55,13 +62,13 @@ namespace Umbraco.Tests.TestHelpers
 
         public void Error(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
         {
-            Console.WriteLine("ERROR {0} - {1}", reporting.Name, MessageTemplates.Render(messageTemplate, propertyValues));
+            Console.WriteLine("ERROR {0} - {1}", reporting.Name, _messageTemplates.Render(messageTemplate, propertyValues));
             Console.WriteLine(exception);
         }
 
         public void Error(Type reporting, string messageTemplate, params object[] propertyValues)
         {
-            Console.WriteLine("ERROR {0} - {1}", reporting.Name, MessageTemplates.Render(messageTemplate, propertyValues));
+            Console.WriteLine("ERROR {0} - {1}", reporting.Name, _messageTemplates.Render(messageTemplate, propertyValues));
         }
 
         public void Warn(Type reporting, string message)
@@ -71,7 +78,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public void Warn(Type reporting, string message, params object[] propertyValues)
         {
-            Console.WriteLine("WARN {0} - {1}", reporting.Name, MessageTemplates.Render(message, propertyValues));
+            Console.WriteLine("WARN {0} - {1}", reporting.Name, _messageTemplates.Render(message, propertyValues));
         }
 
         public void Warn(Type reporting, Exception exception, string message)
@@ -82,13 +89,13 @@ namespace Umbraco.Tests.TestHelpers
 
         public void Warn(Type reporting, Exception exception, string message, params object[] propertyValues)
         {
-            Console.WriteLine("WARN {0} - {1}", reporting.Name, MessageTemplates.Render(message, propertyValues));
+            Console.WriteLine("WARN {0} - {1}", reporting.Name, _messageTemplates.Render(message, propertyValues));
             Console.WriteLine(exception);
         }
 
         public void Info(Type reporting, string messageTemplate, params object[] propertyValues)
         {
-            Console.WriteLine("INFO {0} - {1}", reporting.Name, MessageTemplates.Render(messageTemplate, propertyValues));
+            Console.WriteLine("INFO {0} - {1}", reporting.Name, _messageTemplates.Render(messageTemplate, propertyValues));
         }
 
         public void Info(Type reporting, string message)
@@ -103,7 +110,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public void Debug(Type reporting, string messageTemplate, params object[] propertyValues)
         {
-            Console.WriteLine("DEBUG {0} - {1}", reporting.Name, MessageTemplates.Render(messageTemplate, propertyValues));
+            Console.WriteLine("DEBUG {0} - {1}", reporting.Name, _messageTemplates.Render(messageTemplate, propertyValues));
         }
 
         public void Verbose(Type reporting, string message)
@@ -113,7 +120,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public void Verbose(Type reporting, string messageTemplate, params object[] propertyValues)
         {
-            Console.WriteLine("VERBOSE {0} - {1}", reporting.Name, MessageTemplates.Render(messageTemplate, propertyValues));
+            Console.WriteLine("VERBOSE {0} - {1}", reporting.Name, _messageTemplates.Render(messageTemplate, propertyValues));
         }
     }
 }

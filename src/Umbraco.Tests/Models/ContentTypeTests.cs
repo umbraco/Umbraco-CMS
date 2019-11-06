@@ -129,7 +129,7 @@ namespace Umbraco.Tests.Models
 
         private static IProfilingLogger GetTestProfilingLogger()
         {
-            var logger = new DebugDiagnosticsLogger();
+            var logger = new DebugDiagnosticsLogger(new MessageTemplates());
             var profiler = new TestProfiler();
             return new ProfilingLogger(logger, profiler);
         }

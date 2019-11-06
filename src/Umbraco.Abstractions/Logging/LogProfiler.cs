@@ -6,7 +6,7 @@ namespace Umbraco.Core.Logging
     /// <summary>
     /// Implements <see cref="IProfiler"/> by writing profiling results to an <see cref="ILogger"/>.
     /// </summary>
-    internal class LogProfiler : IProfiler
+    public class LogProfiler : IProfiler
     {
         private readonly ILogger _logger;
 
