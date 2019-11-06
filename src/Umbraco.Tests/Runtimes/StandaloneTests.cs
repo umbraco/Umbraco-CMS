@@ -56,7 +56,7 @@ namespace Umbraco.Tests.Runtimes
             // FIXME: we need a better management of settings here (and, true config files?)
 
             // create the very basic and essential things we need
-            var logger = new ConsoleLogger();
+            var logger = new ConsoleLogger(new MessageTemplates());
             var profiler = new LogProfiler(logger);
             var profilingLogger = new ProfilingLogger(logger, profiler);
             var appCaches = new AppCaches(); // FIXME: has HttpRuntime stuff?
@@ -244,7 +244,7 @@ namespace Umbraco.Tests.Runtimes
             // - assigning the factory to Current.Factory
 
             // create the very basic and essential things we need
-            var logger = new ConsoleLogger();
+            var logger = new ConsoleLogger(new MessageTemplates());
             var profiler = Mock.Of<IProfiler>();
             var profilingLogger = new ProfilingLogger(logger, profiler);
             var appCaches = AppCaches.Disabled;

@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Logging
 {
-    internal class VoidProfiler : IProfiler
+    public class VoidProfiler : IProfiler
     {
         private readonly VoidDisposable _disposable = new VoidDisposable();
 

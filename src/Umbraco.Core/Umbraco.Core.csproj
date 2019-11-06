@@ -572,13 +572,9 @@
     <Compile Include="IO\SystemDirectories.cs" />
     <Compile Include="IO\SystemFiles.cs" />
     <Compile Include="IO\ViewHelper.cs" />
-    <Compile Include="Logging\DebugDiagnosticsLogger.cs" />
     <Compile Include="Logging\Serilog\SerilogLogger.cs" />
-    <Compile Include="Logging\LoggingTaskExtension.cs" />
-    <Compile Include="Logging\LogProfiler.cs" />
     <Compile Include="Logging\OwinLogger.cs" />
     <Compile Include="Logging\OwinLoggerFactory.cs" />
-    <Compile Include="Logging\VoidProfiler.cs" />
     <Compile Include="MainDom.cs" />
     <Compile Include="Manifest\ManifestParser.cs" />
     <Compile Include="Manifest\ValueValidatorConverter.cs" />
