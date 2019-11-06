@@ -552,8 +552,31 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                         "Search",
                         args)),
                 'Failed to retrieve media items for search: ' + query);
-        }
+        },
 
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.mediaResource#getReferences
+         * @methodOf umbraco.resources.mediaResource
+         *
+         * @description
+         * Retrieves references of a given media item.
+         *
+         * @param {Int} id id of media node to retrieve references for
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        getReferences: function (id) {
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "mediaApiBaseUrl",
+                        "GetReferences",
+                        { id: id })),
+                "Failed to retrieve usages for media of id " + id);
+
+        }
     };
 }
 
