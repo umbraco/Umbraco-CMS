@@ -2,16 +2,15 @@
 
 namespace Umbraco.Core.Models.Entities
 {
-    internal static class EntityExtensions
+    public static class EntityExtensions
     {
         /// <summary>
         /// Updates the entity when it is being saved.
         /// </summary>
-        internal static void UpdatingEntity(this IEntity entity)
+        public static void UpdatingEntity(this IEntity entity)
         {
             var now = DateTime.Now;
 
-            // just in case
             if (entity.CreateDate == default)
             {
                 entity.CreateDate = now;
@@ -27,7 +26,7 @@ namespace Umbraco.Core.Models.Entities
         /// <summary>
         /// Updates the entity when it is being saved for the first time.
         /// </summary>
-        internal static void AddingEntity(this IEntity entity)
+        public static void AddingEntity(this IEntity entity)
         {
             var now = DateTime.Now;
             var canBeDirty = entity as ICanBeDirty;
