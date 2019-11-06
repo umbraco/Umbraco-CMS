@@ -208,6 +208,16 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
+        public IEnumerable<IRelation> GetPagedByRelationTypeId(int relationTypeId, long pageIndex, int pageSize, out long totalRecords, Ordering ordering = null)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                var query = Query<IRelation>().Where(x => x.RelationTypeId == relationTypeId);
+                return _relationRepository.GetPagedRelationsByQuery(query, pageIndex, pageSize, out totalRecords, ordering);
+            }
+        }
+
+        /// <inheritdoc />
         public IUmbracoEntity GetChildEntityFromRelation(IRelation relation)
         {
             var objectType = ObjectTypes.GetUmbracoObjectType(relation.ChildObjectType);

@@ -6,11 +6,13 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Services;
 using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
@@ -156,6 +158,37 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #endregion
 
+        public IEnumerable<IRelation> GetPagedRelationsByQuery(IQuery<IRelation> query, long pageIndex, int pageSize, out long totalRecords, Ordering ordering)
+        {
+            var sql = GetBaseQuery(false);
+
+            if (ordering == null || ordering.IsEmpty)
+                ordering = Ordering.By(SqlSyntax.GetQuotedColumn(Constants.DatabaseSchema.Tables.Relation, "id"));
+
+            var translator = new SqlTranslator<IRelation>(sql, query);
+            sql = translator.Translate();
+
+            // apply ordering
+            ApplyOrdering(ref sql, ordering);
+
+            var pageIndexToFetch = pageIndex + 1;
+            var page = Database.Page<RelationDto>(pageIndexToFetch, pageSize, sql);
+            var dtos = page.Items;
+            totalRecords = page.TotalItems;
+
+            var relTypes = _relationTypeRepository.GetMany(dtos.Select(x => x.RelationType).Distinct().ToArray())
+                .ToDictionary(x => x.Id, x => x);
+
+            var result = dtos.Select(r =>
+            {
+                if (!relTypes.TryGetValue(r.RelationType, out var relType))
+                    throw new InvalidOperationException(string.Format("RelationType with Id: {0} doesn't exist", r.RelationType));
+                return DtoToEntity(r, relType);
+            }).ToList();
+
+            return result;
+        }
+
         public void DeleteByParent(int parentId, params string[] relationTypeAliases)
         {
             var subQuery = Sql().Select<RelationDto>(x => x.Id)
@@ -185,6 +218,20 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 entity.ChildObjectType = childObjectType.GetValueOrDefault();
             }
+        }
+
+        private void ApplyOrdering(ref Sql<ISqlContext> sql, Ordering ordering)
+        {
+            if (sql == null) throw new ArgumentNullException(nameof(sql));
+            if (ordering == null) throw new ArgumentNullException(nameof(ordering));
+
+            // TODO: although this works for name, it probably doesn't work for others without an alias of some sort
+            var orderBy = ordering.OrderBy;
+
+            if (ordering.Direction == Direction.Ascending)
+                sql.OrderBy(orderBy);
+            else
+                sql.OrderByDescending(orderBy);
         }
     }
 }

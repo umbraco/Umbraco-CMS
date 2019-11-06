@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
@@ -15,6 +16,54 @@ namespace Umbraco.Tests.Services
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class RelationServiceTests : TestWithSomeContentBase
     {
+        
+        [Test]
+        public void Get_Paged_Relations_By_Relation_Type()
+        {
+            //Create content
+            var createdContent = new List<IContent>();
+            var contentType = MockedContentTypes.CreateBasicContentType("blah");
+            ServiceContext.ContentTypeService.Save(contentType);
+            for (int i = 0; i < 10; i++)
+            {
+                var c1 = MockedContent.CreateBasicContent(contentType);
+                ServiceContext.ContentService.Save(c1);
+                createdContent.Add(c1);
+            }
+
+            //Create media
+            var createdMedia = new List<IMedia>();
+            var imageType = MockedContentTypes.CreateImageMediaType("myImage");
+            ServiceContext.MediaTypeService.Save(imageType);
+            for (int i = 0; i < 10; i++)
+            {
+                var c1 = MockedMedia.CreateMediaImage(imageType, -1);
+                ServiceContext.MediaService.Save(c1);
+                createdMedia.Add(c1);
+            }
+
+            var relType = ServiceContext.RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMediaAlias);
+
+            // Relate content to media
+            foreach (var content in createdContent)
+                foreach (var media in createdMedia)
+                    ServiceContext.RelationService.Relate(content.Id, media.Id, relType);
+
+            var paged = ServiceContext.RelationService.GetPagedByRelationTypeId(relType.Id, 0, 51, out var totalRecs).ToList();
+
+            Assert.AreEqual(100, totalRecs);
+            Assert.AreEqual(51, paged.Count);
+
+            //next page
+            paged.AddRange(ServiceContext.RelationService.GetPagedByRelationTypeId(relType.Id, 1, 51, out totalRecs));
+
+            Assert.AreEqual(100, totalRecs);
+            Assert.AreEqual(100, paged.Count);
+
+            Assert.IsTrue(createdContent.Select(x => x.Id).ContainsAll(paged.Select(x => x.ParentId)));
+            Assert.IsTrue(createdMedia.Select(x => x.Id).ContainsAll(paged.Select(x => x.ChildId)));
+        }
+
         [Test]
         public void Return_List_Of_Content_Items_Where_Media_Item_Referenced()
         {

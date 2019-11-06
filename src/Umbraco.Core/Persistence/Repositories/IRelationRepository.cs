@@ -1,10 +1,14 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
     public interface IRelationRepository : IReadWriteQueryRepository<int, IRelation>
     {
+        IEnumerable<IRelation> GetPagedRelationsByQuery(IQuery<IRelation> query, long pageIndex, int pageSize, out long totalRecords, Ordering ordering);
+
         /// <summary>
         /// Deletes all relations for a parent for any specified relation type alias
         /// </summary>
