@@ -168,6 +168,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // a clause to filter out the child entity from being returned from the results
             var entityQuery = Query<IUmbracoEntity>().Where(e => e.Id != childId);
 
+            // var contentObjectTypes = new[] { Constants.ObjectTypes.Document, Constants.ObjectTypes.Media, Constants.ObjectTypes.Member }
+            // we could pass in the contentObjectTypes so that the entity repository sql is configured to do full entity lookups so that we get the full data
+            // required to populate content, media or members, else we get the bare minimum data needed to populate an entity. BUT if we do this it
+            // means that the SQL is less efficient and returns data that is probably not needed for what we need this lookup for. For the time being we
+            // will just return the bare minimum entity data.
+
             return _entityRepository.GetPagedResultsByQuery(entityQuery, Array.Empty<Guid>(), pageIndex, pageSize, out totalRecords, null, null, relQuery);
         }
 
@@ -179,6 +185,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // Because of the way that the entity repository joins relations (on both child or parent) we need to add
             // a clause to filter out the child entity from being returned from the results
             var entityQuery = Query<IUmbracoEntity>().Where(e => e.Id != parentId);
+
+            // var contentObjectTypes = new[] { Constants.ObjectTypes.Document, Constants.ObjectTypes.Media, Constants.ObjectTypes.Member }
+            // we could pass in the contentObjectTypes so that the entity repository sql is configured to do full entity lookups so that we get the full data
+            // required to populate content, media or members, else we get the bare minimum data needed to populate an entity. BUT if we do this it
+            // means that the SQL is less efficient and returns data that is probably not needed for what we need this lookup for. For the time being we
+            // will just return the bare minimum entity data.
 
             return _entityRepository.GetPagedResultsByQuery(entityQuery, Array.Empty<Guid>(), pageIndex, pageSize, out totalRecords, null, null, relQuery);
         }
