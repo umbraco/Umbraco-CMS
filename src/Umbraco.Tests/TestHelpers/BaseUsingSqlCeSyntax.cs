@@ -42,7 +42,7 @@ namespace Umbraco.Tests.TestHelpers
                 logger,
                 false);
 
-            var composition = new Composition(container, typeLoader, Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run));
+            var composition = new Composition(container, typeLoader, Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), new ConfigsFactory().Create());
 
             composition.RegisterUnique<ILogger>(_ => Mock.Of<ILogger>());
             composition.RegisterUnique<IProfiler>(_ => Mock.Of<IProfiler>());

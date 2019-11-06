@@ -54,7 +54,7 @@ namespace Umbraco.Tests.PublishedContent
             var factory = Mock.Of<IFactory>();
             Current.Factory = factory;
 
-            var configs = new Configs();
+            var configs = new ConfigsFactory().Create();
             Mock.Get(factory).Setup(x => x.GetInstance(typeof(Configs))).Returns(configs);
             var globalSettings = new GlobalSettings();
             configs.Add(SettingsForTests.GenerateMockUmbracoSettings);
@@ -1114,7 +1114,7 @@ namespace Umbraco.Tests.PublishedContent
 
             _snapshotService.Notify(new[]
             {
-                new ContentCacheRefresher.JsonPayload(1, Guid.Empty, TreeChangeTypes.RefreshNode) 
+                new ContentCacheRefresher.JsonPayload(1, Guid.Empty, TreeChangeTypes.RefreshNode)
             }, out _, out _);
 
             Assert.AreEqual(2, contentStore.Test.LiveGen);
@@ -1134,7 +1134,7 @@ namespace Umbraco.Tests.PublishedContent
         ///  2) Save and publish it
         ///  3) Publish it with descendants
         ///  4) Repeat steps 2 and 3
-        ///  
+        ///
         /// Which has caused an exception. To replicate this test:
         ///  1) RefreshBranch with kits for a branch where the top most node is unpublished
         ///  2) RefreshBranch with kits for the branch where the top most node is published
@@ -1162,7 +1162,7 @@ namespace Umbraco.Tests.PublishedContent
 
                 //children of 1
                 yield return CreateInvariantKit(20, 1, 1, paths);
-                yield return CreateInvariantKit(30, 1, 2, paths); 
+                yield return CreateInvariantKit(30, 1, 2, paths);
                 yield return CreateInvariantKit(40, 1, 3, paths);
             }
 
@@ -1199,12 +1199,12 @@ namespace Umbraco.Tests.PublishedContent
                 var (gen, contentNode) = contentStore.Test.GetValues(1)[0];
                 Assert.AreEqual(assertGen, gen);
                 //even when unpublishing/re-publishing/etc... the linked list is always maintained
-                AssertLinkedNode(contentNode, 100, 2, 3, 20, 40); 
+                AssertLinkedNode(contentNode, 100, 2, 3, 20, 40);
             }
 
             //unpublish the root
             ChangePublishFlagOfRoot(false, 2, TreeChangeTypes.RefreshBranch);
-            
+
             //publish the root (since it's not published, it will cause a RefreshBranch)
             ChangePublishFlagOfRoot(true, 3, TreeChangeTypes.RefreshBranch);
 

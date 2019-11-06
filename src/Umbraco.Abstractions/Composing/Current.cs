@@ -1,5 +1,6 @@
 ﻿using System;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Composing
 {
@@ -41,6 +42,7 @@ namespace Umbraco.Core.Composing
         public static bool HasFactory => _factory != null;
 
         #region Getters
+
 
         public static ILogger Logger
             => _logger ?? (_logger = _factory?.TryGetInstance<ILogger>() ?? throw new Exception("TODO Fix")); //?? new DebugDiagnosticsLogger(new MessageTemplates()));

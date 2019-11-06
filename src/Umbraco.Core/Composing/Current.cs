@@ -93,11 +93,11 @@ namespace Umbraco.Core.Composing
         /// <para>Unlocks <see cref="Configs"/> so that it is possible to add configurations
         /// directly to <see cref="Current"/> without having to wire composition.</para>
         /// </remarks>
-        public static void UnlockConfigs()
+        public static void UnlockConfigs(IConfigsFactory configsFactory)
         {
             if (_factory != null)
                 throw new InvalidOperationException("Cannot unlock configs when a factory has been set.");
-            _configs = new Configs();
+            _configs = configsFactory.Create();
         }
 
         internal static event EventHandler Resetted;

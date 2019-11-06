@@ -104,7 +104,7 @@ namespace Umbraco.Tests.Runtimes
 
             protected override Configs GetConfigs()
             {
-                var configs = new Configs();
+                var configs = new ConfigsFactory().Create();
                 configs.Add(SettingsForTests.GetDefaultGlobalSettings);
                 configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
                 return configs;

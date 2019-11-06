@@ -27,19 +27,12 @@ namespace Umbraco.Core.Composing
         /// <param name="logger">A logger.</param>
         /// <param name="runtimeState">The runtime state.</param>
         /// <param name="configs">Optional configs.</param>
-        public Composition(IRegister register, TypeLoader typeLoader, IProfilingLogger logger, IRuntimeState runtimeState, Configs configs = null)
+        public Composition(IRegister register,  TypeLoader typeLoader, IProfilingLogger logger, IRuntimeState runtimeState, Configs configs)
         {
             _register = register;
             TypeLoader = typeLoader;
             Logger = logger;
             RuntimeState = runtimeState;
-
-            if (configs == null)
-            {
-                configs = new Configs();
-                configs.AddCoreConfigs();
-            }
-
             Configs = configs;
         }
 

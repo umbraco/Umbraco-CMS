@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Composing
             Current.Reset();
 
             var register = RegisterFactory.Create();
-            _composition = new Composition(register, new TypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run));
+            _composition = new Composition(register, new TypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), new ConfigsFactory().Create());
         }
 
         [TearDown]
