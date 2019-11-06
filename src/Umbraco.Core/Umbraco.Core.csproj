@@ -220,7 +220,6 @@
     <Compile Include="Models\ContentEditing\ContentAppBadge.cs" />
     <Compile Include="Models\ContentEditing\ContentAppBadgeType.cs" />
     <Compile Include="Models\ContentEditing\IContentAppFactory.cs" />
-    <Compile Include="Models\Entities\EntityExtensions.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\PreValueMigratorBase.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\PreValueDto.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\PropertyEditorsMigrationBase.cs" />
@@ -258,10 +257,6 @@
     <Compile Include="Models\PublicAccessEntry.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\FixLanguageIsoCodeLength.cs" />
     <Compile Include="Models\CultureImpact.cs" />
-    <Compile Include="Models\Entities\IMediaEntitySlim.cs" />
-    <Compile Include="Models\Entities\IMemberEntitySlim.cs" />
-    <Compile Include="Models\Entities\MediaEntitySlim.cs" />
-    <Compile Include="Models\Entities\MemberEntitySlim.cs" />
     <Compile Include="Models\PublishedContent\ILivePublishedModelFactory.cs" />
     <Compile Include="Models\PublishedContent\IndexedArrayItem.cs" />
     <Compile Include="Models\PublishedContent\IPublishedContent.cs" />
@@ -274,10 +269,10 @@
     <Compile Include="Models\PublishedContent\PublishedElementModel.cs" />
     <Compile Include="Models\PublishedContent\PublishedElementWrapped.cs" />
     <Compile Include="Models\PublishedContent\VariationContextAccessorExtensions.cs" />
-    <Compile Include="Models\Template.cs" />
-    <Compile Include="Models\TemplateOnDisk.cs" />
     <Compile Include="Models\PublishedContent\IPublishedContentType.cs" />
     <Compile Include="Models\PublishedContent\IPublishedPropertyType.cs" />
+    <Compile Include="Models\Template.cs" />
+    <Compile Include="Models\TemplateOnDisk.cs" />
     <Compile Include="PropertyEditors\ConfigurationField.cs" />
     <Compile Include="PropertyEditors\ConfigurationFieldAttribute.cs" />
     <Compile Include="PropertyEditors\ConfigurationFieldsExtensions.cs" />
