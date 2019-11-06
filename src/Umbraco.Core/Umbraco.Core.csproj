@@ -158,7 +158,9 @@
     <Compile Include="Composing\ComposeBeforeAttribute.cs" />
     <Compile Include="Composing\Composers.cs" />
     <Compile Include="Composing\Composition.cs" />
+    <Compile Include="Composing\ConfigsFactory.cs" />
     <Compile Include="Composing\IComposer.cs" />
+    <Compile Include="Composing\IConfigsFactory.cs" />
     <Compile Include="Composing\RegisterFactory.cs" />
     <Compile Include="CompositionExtensions.cs" />
     <Compile Include="Composing\ICoreComposer.cs" />
@@ -254,6 +256,7 @@
     <Compile Include="Models\Packaging\PackageDefinition.cs" />
     <Compile Include="Models\Property.cs" />
     <Compile Include="Models\PropertyCollection.cs" />
+    <Compile Include="Models\PropertyType.cs" />
     <Compile Include="Models\PublicAccessEntry.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\FixLanguageIsoCodeLength.cs" />
     <Compile Include="Models\CultureImpact.cs" />
@@ -316,7 +319,6 @@
     <Compile Include="Configuration\CaseInsensitiveEnumConfigConverter.cs" />
     <Compile Include="Configuration\CommaDelimitedConfigurationElement.cs" />
     <Compile Include="ConfigsExtensions.cs" />
-    <Compile Include="Configuration\Configs.cs" />
     <Compile Include="Configuration\CoreDebug.cs" />
     <Compile Include="Configuration\GlobalSettings.cs" />
     <Compile Include="Configuration\GlobalSettingsExtensions.cs" />
@@ -361,7 +363,6 @@
     <Compile Include="Configuration\UmbracoSettings\UmbracoSettingsSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\UrlReplacingElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\WebRoutingElement.cs" />
-    <Compile Include="RegisterExtensions.cs" />
     <Compile Include="ContentVariationExtensions.cs" />
     <Compile Include="Deploy\IDataTypeConfigurationConnector.cs" />
     <Compile Include="GuidUtils.cs" />
@@ -596,7 +597,6 @@
     <Compile Include="Models\Packaging\PreInstallWarnings.cs" />
     <Compile Include="Models\PropertyGroup.cs" />
     <Compile Include="Models\PropertyGroupCollection.cs" />
-    <Compile Include="Models\PropertyType.cs" />
     <Compile Include="Models\PropertyTypeCollection.cs" />
     <Compile Include="Models\PublishedContent\NoopPublishedModelFactory.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentTypeFactory.cs" />

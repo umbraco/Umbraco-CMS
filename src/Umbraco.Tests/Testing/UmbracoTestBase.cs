@@ -134,7 +134,7 @@ namespace Umbraco.Tests.Testing
 
             var register = RegisterFactory.Create();
 
-            Composition = new Composition(register, typeLoader, proflogger, ComponentTests.MockRuntimeState(RuntimeLevel.Run));
+            Composition = new Composition(register, typeLoader, proflogger, ComponentTests.MockRuntimeState(RuntimeLevel.Run), new ConfigsFactory().Create());
 
             Composition.RegisterUnique(typeLoader);
             Composition.RegisterUnique(logger);

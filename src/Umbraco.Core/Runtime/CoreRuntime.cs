@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Web;
 using System.Web.Hosting;
@@ -345,8 +346,8 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         protected virtual Configs GetConfigs()
         {
-            var configs = new Configs();
-            configs.AddCoreConfigs();
+            var configs = new ConfigsFactory().Create();
+
             return configs;
         }
 

@@ -49,7 +49,7 @@ namespace Umbraco.Tests.PublishedContent
             var factory = Mock.Of<IFactory>();
             Current.Factory = factory;
 
-            var configs = new Configs();
+            var configs = new ConfigsFactory().Create();
             Mock.Get(factory).Setup(x => x.GetInstance(typeof(Configs))).Returns(configs);
             var globalSettings = new GlobalSettings();
             configs.Add(SettingsForTests.GenerateMockUmbracoSettings);
