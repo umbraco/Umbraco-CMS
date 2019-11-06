@@ -46,7 +46,7 @@ namespace Umbraco.Core
                 factory.GetInstance<ILogger>(),
                 factory.GetInstance<AppCaches>(),
                 configDir,
-                factory.GetInstance<ManifestParser>(),
+                factory.GetInstance<IManifestParser>(),
                 factory.GetInstance<IRuntimeState>().Debug));
         }
     }

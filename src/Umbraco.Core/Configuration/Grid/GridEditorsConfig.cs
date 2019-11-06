@@ -13,10 +13,10 @@ namespace Umbraco.Core.Configuration.Grid
         private readonly ILogger _logger;
         private readonly AppCaches _appCaches;
         private readonly DirectoryInfo _configFolder;
-        private readonly ManifestParser _manifestParser;
+        private readonly IManifestParser _manifestParser;
         private readonly bool _isDebug;
 
-        public GridEditorsConfig(ILogger logger, AppCaches appCaches, DirectoryInfo configFolder, ManifestParser manifestParser, bool isDebug)
+        public GridEditorsConfig(ILogger logger, AppCaches appCaches, DirectoryInfo configFolder, IManifestParser manifestParser, bool isDebug)
         {
             _logger = logger;
             _appCaches = appCaches;

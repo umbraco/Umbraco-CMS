@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Manifest
     [TestFixture]
     public class ManifestParserTests
     {
-        private ManifestParser _parser;
+        private IManifestParser _parser;
 
         [SetUp]
         public void Setup()
