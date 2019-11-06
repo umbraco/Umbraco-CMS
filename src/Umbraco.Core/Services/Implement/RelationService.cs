@@ -264,6 +264,17 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
+        public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int id, long pageIndex, int pageSize, out long totalChildren)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                //var query = Query<IRelation>().Where(x => x.ChildId == id);
+                return _relationRepository.GetPagedParentEntitiesByChildId(id, pageIndex, pageSize, out totalChildren);
+            }
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
         public IEnumerable<Tuple<IUmbracoEntity, IUmbracoEntity>> GetEntitiesFromRelations(IEnumerable<IRelation> relations)
         {
             //TODO: Argh! N+1 

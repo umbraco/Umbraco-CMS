@@ -82,24 +82,40 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         // get a page of entities
         public IEnumerable<IEntitySlim> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid[] objectTypes, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IUmbracoEntity> filter, Ordering ordering)
+            IQuery<IUmbracoEntity> filter, Ordering ordering, IQuery<IRelation> relationQuery = null)
         {
             var isContent = objectTypes.Any(objectType => objectType == Constants.ObjectTypes.Document || objectType == Constants.ObjectTypes.DocumentBlueprint);
             var isMedia = objectTypes.Any(objectType => objectType == Constants.ObjectTypes.Media);
             var isMember = objectTypes.Any(objectType => objectType == Constants.ObjectTypes.Member);
 
-            var sql = GetBaseWhere(isContent, isMedia, isMember, false, x =>
+            var sql = GetBaseWhere(isContent, isMedia, isMember, false, s =>
             {
-                if (filter == null) return;
-                foreach (var filterClause in filter.GetWhereClauses())
-                    x.Where(filterClause.Item1, filterClause.Item2);
+                if (relationQuery != null)
+                {
+                    // add left joins for relation tables (this joins on both child or parent, so beware that this will normally return entities for
+                    // both sides of the relation type unless the IUmbracoEntity query passed in filters one side out).
+                    s.LeftJoin<RelationDto>().On<NodeDto, RelationDto>((left, right) => left.NodeId == right.ChildId || left.NodeId == right.ParentId);
+                    s.LeftJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>((left, right) => left.RelationType == right.Id);
+
+                    // append the relations wheres
+                    foreach (var relClause in relationQuery.GetWhereClauses())
+                        s.Where(relClause.Item1, relClause.Item2);
+                }
+
+                if (filter != null)
+                {
+                    foreach (var filterClause in filter.GetWhereClauses())
+                        s.Where(filterClause.Item1, filterClause.Item2);
+                }
+                
+
             }, objectTypes);
 
             ordering = ordering ?? Ordering.ByDefault();
 
             var translator = new SqlTranslator<IUmbracoEntity>(sql, query);
             sql = translator.Translate();
-            sql = AddGroupBy(true, true, true, sql, ordering.IsEmpty);
+            sql = AddGroupBy(isContent, isMedia, isMember, sql, ordering.IsEmpty);
 
             if (!ordering.IsEmpty)
             {
@@ -457,8 +473,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         // for a given object type, with a given filter
         protected Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isMember, bool isCount, Action<Sql<ISqlContext>> filter, Guid[] objectTypes)
         {
-            return GetBase(isContent, isMedia, isMember, filter, isCount)
-                .WhereIn<NodeDto>(x => x.NodeObjectType, objectTypes);
+            var sql = GetBase(isContent, isMedia, isMember, filter, isCount);
+            if (objectTypes.Length > 0)
+            {
+                sql.WhereIn<NodeDto>(x => x.NodeObjectType, objectTypes);
+            }
+            return sql;
         }
 
         // gets the base SELECT + FROM + WHERE sql

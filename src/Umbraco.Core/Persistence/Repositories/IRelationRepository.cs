@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -13,5 +15,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// A list of relation types to match for deletion, if none are specified then all relations for this parent id are deleted
         /// </param>
         void DeleteByParent(int parentId, params string[] relationTypeAliases);
+
+        IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int childId, long pageIndex, int pageSize, out long totalRecords);
     }
 }

@@ -55,8 +55,9 @@ namespace Umbraco.Core.Persistence.Repositories
         /// A collection of mixed entity types which would be of type <see cref="IEntitySlim"/>, <see cref="IDocumentEntitySlim"/>, <see cref="IMediaEntitySlim"/>,
         /// <see cref="IMemberEntitySlim"/>
         /// </returns>
-        IEnumerable<IEntitySlim> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid[] objectTypes, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IUmbracoEntity> filter, Ordering ordering);
+        IEnumerable<IEntitySlim> GetPagedResultsByQuery(
+            IQuery<IUmbracoEntity> query, Guid[] objectTypes, long pageIndex, int pageSize, out long totalRecords,
+            IQuery<IUmbracoEntity> filter, Ordering ordering, IQuery<IRelation> relationQuery = null);
 
         /// <summary>
         /// Gets paged entities for a query and a specific object type

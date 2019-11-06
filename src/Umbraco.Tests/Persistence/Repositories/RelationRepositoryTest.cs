@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
@@ -6,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
@@ -31,7 +33,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var accessor = (IScopeAccessor) provider;
             relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, Mock.Of<ILogger>());
-            var repository = new RelationRepository(accessor, Mock.Of<ILogger>(), relationTypeRepository);
+            var entityRepository = new EntityRepository(accessor);
+            var repository = new RelationRepository(accessor, Mock.Of<ILogger>(), relationTypeRepository, entityRepository);
             return repository;
         }
 
@@ -169,6 +172,73 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Get_Paged_Parent_Entities_By_Child_Id()
+        {
+            //Create content
+            var createdContent = new List<IContent>();
+            var contentType = MockedContentTypes.CreateBasicContentType("blah");
+            ServiceContext.ContentTypeService.Save(contentType);
+            for (int i = 0; i < 10; i++)
+            {
+                var c1 = MockedContent.CreateBasicContent(contentType);
+                ServiceContext.ContentService.Save(c1);
+                createdContent.Add(c1);
+            }
+
+            //Create media
+            var createdMedia = new List<IMedia>();
+            var imageType = MockedContentTypes.CreateImageMediaType("myImage");
+            ServiceContext.MediaTypeService.Save(imageType);
+            for (int i = 0; i < 10; i++)
+            {
+                var c1 = MockedMedia.CreateMediaImage(imageType, -1);
+                ServiceContext.MediaService.Save(c1);
+                createdMedia.Add(c1);
+            }
+
+            // Create members
+            var memberType = MockedContentTypes.CreateSimpleMemberType("simple");
+            ServiceContext.MemberTypeService.Save(memberType);
+            var createdMembers = MockedMember.CreateSimpleMember(memberType, 10).ToList();
+            ServiceContext.MemberService.Save(createdMembers);
+
+            var relType = ServiceContext.RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMediaAlias);
+
+            // Relate content to media
+            foreach(var content in createdContent)
+                foreach(var media in createdMedia)
+                    ServiceContext.RelationService.Relate(content.Id, media.Id, relType);
+            // Relate members to media
+            foreach (var member in createdMembers)
+                foreach (var media in createdMedia)
+                    ServiceContext.RelationService.Relate(member.Id, media.Id, relType);
+
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
+            {
+                var repository = CreateRepository(provider, out var relationTypeRepository);
+
+                // Get parent entities for child id
+                var parents = repository.GetPagedParentEntitiesByChildId(createdMedia[0].Id, 0, 11, out var totalRecords).ToList();
+                Assert.AreEqual(20, totalRecords);
+                Assert.AreEqual(11, parents.Count);
+
+                //add the next page
+                parents.AddRange(repository.GetPagedParentEntitiesByChildId(createdMedia[0].Id, 1, 11, out totalRecords));
+                Assert.AreEqual(20, totalRecords);
+                Assert.AreEqual(20, parents.Count);
+
+                var contentEntities = parents.OfType<IDocumentEntitySlim>().ToList();
+                var mediaEntities = parents.OfType<IMediaEntitySlim>().ToList();
+                var memberEntities = parents.OfType<IMemberEntitySlim>().ToList();
+
+                Assert.AreEqual(10, contentEntities.Count);
+                Assert.AreEqual(0, mediaEntities.Count);
+                Assert.AreEqual(10, memberEntities.Count);
+            }
+        }
+
+        [Test]
         public void Can_Perform_Exists_On_RelationRepository()
         {
             // Arrange
@@ -274,8 +344,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var relationTypeRepository = new RelationTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Mock.Of<ILogger>());
-                var relationRepository = new RelationRepository((IScopeAccessor) provider, Mock.Of<ILogger>(), relationTypeRepository);
+                var accessor = (IScopeAccessor)provider;
+                var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, Mock.Of<ILogger>());
+                var entityRepository = new EntityRepository(accessor);
+                var relationRepository = new RelationRepository(accessor, Mock.Of<ILogger>(), relationTypeRepository, entityRepository);
 
                 relationTypeRepository.Save(relateContent);
                 relationTypeRepository.Save(relateContentType);                
