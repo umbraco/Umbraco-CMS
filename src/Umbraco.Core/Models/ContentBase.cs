@@ -108,9 +108,6 @@ namespace Umbraco.Core.Models
         [IgnoreDataMember]
         public int VersionId { get; set; }
 
-        [DataMember]
-        public Guid NodeObjectType { get; internal set; }
-
         /// <summary>
         /// Integer Id of the default ContentType
         /// </summary>

@@ -76,7 +76,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         public IEnumerable<IEntitySlim> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid objectType, long pageIndex, int pageSize, out long totalRecords,
             IQuery<IUmbracoEntity> filter, Ordering ordering)
         {
-            query = query.Where(x => x.NodeObjectType == objectType);
             return GetPagedResultsByQuery(query, new[] { objectType }, pageIndex, pageSize, out totalRecords, filter, ordering);
         }
 

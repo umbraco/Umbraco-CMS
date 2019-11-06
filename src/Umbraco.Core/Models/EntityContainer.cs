@@ -62,8 +62,6 @@ namespace Umbraco.Core.Models
         /// </summary>
         public Guid ContainerObjectType => ObjectTypeMap[_containedObjectType];
 
-        Guid IUmbracoEntity.NodeObjectType => ContainerObjectType;
-
         /// <summary>
         /// Gets the container object type corresponding to a contained object type.
         /// </summary>

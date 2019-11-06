@@ -107,7 +107,6 @@ namespace Umbraco.Core.Persistence.Factories
         {
             entity.Id = dto.NodeDto.NodeId;
             entity.Key = dto.NodeDto.UniqueId;
-            entity.NodeObjectType = dto.NodeDto.NodeObjectType ?? Guid.Empty;
             entity.Alias = dto.Alias;
             entity.Name = dto.NodeDto.Text;
             entity.Icon = dto.Icon;
