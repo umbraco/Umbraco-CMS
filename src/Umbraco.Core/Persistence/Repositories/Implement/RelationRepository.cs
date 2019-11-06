@@ -169,7 +169,18 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var entityQuery = Query<IUmbracoEntity>().Where(e => e.Id != childId);
 
             return _entityRepository.GetPagedResultsByQuery(entityQuery, Array.Empty<Guid>(), pageIndex, pageSize, out totalRecords, null, null, relQuery);
+        }
 
+        public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int parentId, long pageIndex, int pageSize, out long totalRecords)
+        {
+            // Create a query to match the parent id
+            var relQuery = Query<IRelation>().Where(r => r.ParentId == parentId);
+
+            // Because of the way that the entity repository joins relations (on both child or parent) we need to add
+            // a clause to filter out the child entity from being returned from the results
+            var entityQuery = Query<IUmbracoEntity>().Where(e => e.Id != parentId);
+
+            return _entityRepository.GetPagedResultsByQuery(entityQuery, Array.Empty<Guid>(), pageIndex, pageSize, out totalRecords, null, null, relQuery);
         }
 
         public void DeleteByParent(int parentId, params string[] relationTypeAliases)

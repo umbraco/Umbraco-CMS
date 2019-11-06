@@ -268,10 +268,17 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                //var query = Query<IRelation>().Where(x => x.ChildId == id);
                 return _relationRepository.GetPagedParentEntitiesByChildId(id, pageIndex, pageSize, out totalChildren);
             }
-            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int id, long pageIndex, int pageSize, out long totalChildren)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                return _relationRepository.GetPagedChildEntitiesByParentId(id, pageIndex, pageSize, out totalChildren);
+            }
         }
 
         /// <inheritdoc />

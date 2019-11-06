@@ -17,5 +17,7 @@ namespace Umbraco.Core.Persistence.Repositories
         void DeleteByParent(int parentId, params string[] relationTypeAliases);
 
         IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int childId, long pageIndex, int pageSize, out long totalRecords);
+
+        IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int parentId, long pageIndex, int pageSize, out long totalRecords);
     }
 }
