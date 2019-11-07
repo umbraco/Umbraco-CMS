@@ -47,6 +47,13 @@ function IconPickerController($scope, $http, $sce, localizationService, iconHelp
             .then(icons => {
                 vm.icons = icons;
                 vm.loading = false;
+
+                iconHelper.getLegacyIcons()
+                    .then(icons => {
+                        if(icons && icons.length > 0) {
+                            vm.icons = icons.concat(vm.icons);
+                        }
+                    });
             });
 
         // set a default color if nothing is passed in

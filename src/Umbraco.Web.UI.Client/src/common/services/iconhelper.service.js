@@ -85,6 +85,8 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
         { oldIcon: ".sprTreeDeveloperPython", newIcon: "icon-linux" }
     ];
 
+    var collectedIcons;
+
     var imageConverter = [
             {oldImage: "contour.png", newIcon: "icon-umb-contour"}
             ];
@@ -255,6 +257,59 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
                     resolve(iconCache);
                 }
             });
+        },
+
+        /** LEGACY - Return a list of icons from icon fonts, optionally filter them */
+        /** It fetches them directly from the active stylesheets in the browser */
+        getLegacyIcons: function(){
+            var deferred = $q.defer();
+            $timeout(function(){
+                if(collectedIcons){
+                    deferred.resolve(collectedIcons);
+                }else{
+                    collectedIcons = [];
+                    var c = ".icon-";
+
+                    for (var i = document.styleSheets.length - 1; i >= 0; i--) {
+                        var classes = null;
+                        try {
+                            classes = document.styleSheets[i].rules || document.styleSheets[i].cssRules;
+                        } catch (e) {
+                            console.warn("Can't read the css rules of: " + document.styleSheets[i].href, e);
+                            continue;
+                        }
+                        
+                        if (classes !== null) {
+                            for(var x=0;x<classes.length;x++) {
+                                var cur = classes[x];
+                                if(cur.selectorText && cur.selectorText.indexOf(c) === 0) {
+                                    var s = cur.selectorText.substring(1);
+                                    var hasSpace = s.indexOf(" ");
+                                    if(hasSpace>0){
+                                        s = s.substring(0, hasSpace);
+                                    }
+                                    var hasPseudo = s.indexOf(":");
+                                    if(hasPseudo>0){
+                                        s = s.substring(0, hasPseudo);
+                                    }
+
+                                    var icon = {
+                                        name: s,
+                                        svgString: undefined
+                                    };
+
+                                    if(collectedIcons.indexOf(icon) < 0 && s !== "icon-chevron-up" && s !== "icon-chevron-down"){
+                                        collectedIcons.push(icon);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    deferred.resolve(collectedIcons);
+                }
+            }, 100);
+
+            return deferred.promise;
         },
 
         /** A simple cache to ensure that the icon is only requested from the server if is isn't already in memory */

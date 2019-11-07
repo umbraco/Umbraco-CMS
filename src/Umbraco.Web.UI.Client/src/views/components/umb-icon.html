@@ -1,1 +1,5 @@
-<span ng-bind-html="svgString" aria-hidden="true"></span>
+
+<span aria-hidden="true">
+    <span ng-if="svgString" ng-bind-html="svgString"></span>
+    <i ng-if="!svgString && iconName" class="{{iconName}}"></i>
+</span>
