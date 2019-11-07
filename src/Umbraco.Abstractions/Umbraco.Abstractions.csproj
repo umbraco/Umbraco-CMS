@@ -4,6 +4,10 @@
         <TargetFramework>netstandard2.0</TargetFramework>
         <LangVersion>7.3</LangVersion>
         <RootNamespace>Umbraco.Core</RootNamespace>
+        <AssemblyVersion>9.0.0</AssemblyVersion>
+        <InformationalVersion>9.0.0</InformationalVersion>
+        <FileVersion>9.0.0</FileVersion>
+        <Product>Umbraco CMS</Product>
     </PropertyGroup>
 
 </Project>

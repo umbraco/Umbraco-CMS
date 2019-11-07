@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class ImagingAutoFillUploadFieldElement : UmbracoConfigurationElement, IImagingAutoFillUploadField
+    public class ImagingAutoFillUploadFieldElement : UmbracoConfigurationElement, IImagingAutoFillUploadField
     {
         /// <summary>
         /// Allow setting internally so we can create a default

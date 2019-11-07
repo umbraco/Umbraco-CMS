@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class UrlReplacingElement : ConfigurationElement
+    public class UrlReplacingElement : ConfigurationElement
     {
         [ConfigurationProperty("removeDoubleDashes", DefaultValue = true)]
         internal bool RemoveDoubleDashes => (bool) base["removeDoubleDashes"];

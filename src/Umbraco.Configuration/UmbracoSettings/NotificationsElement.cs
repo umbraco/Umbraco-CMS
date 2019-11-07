@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class NotificationsElement : UmbracoConfigurationElement
+    public class NotificationsElement : UmbracoConfigurationElement
     {
         [ConfigurationProperty("email")]
         internal InnerTextConfigurationElement<string> NotificationEmailAddress => (InnerTextConfigurationElement<string>)this["email"];

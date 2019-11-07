@@ -6,7 +6,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
     /// <summary>
     /// Base class with shared helper methods
     /// </summary>
-    internal class UmbracoConfigurationElement : ConfigurationElement
+    public class UmbracoConfigurationElement : ConfigurationElement
     {
         /// <summary>
         /// Used so the RawElement types are not re-created every time they are accessed

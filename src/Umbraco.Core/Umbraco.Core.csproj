@@ -174,8 +174,11 @@
     <Compile Include="CompositionExtensions_Essentials.cs" />
     <Compile Include="CompositionExtensions_FileSystems.cs" />
     <Compile Include="CompositionExtensions_Uniques.cs" />
-    <Compile Include="Configuration\ConfigsFactory.cs" />
-    <Compile Include="Configuration\UmbracoVersion.cs" />
+    <Compile Include="Configuration\ConfigsExtensions.cs" />
+    <Compile Include="Configuration\GlobalSettings.cs" />
+    <Compile Include="Configuration\GlobalSettingsExtensions.cs" />
+    <Compile Include="Configuration\Grid\GridConfig.cs" />
+    <Compile Include="Configuration\Grid\GridEditorsConfig.cs" />
     <Compile Include="ConventionsHelper.cs" />
     <Compile Include="Events\ContentPublishedEventArgs.cs" />
     <Compile Include="Events\ContentPublishingEventArgs.cs" />
@@ -275,6 +278,7 @@
     <Compile Include="Models\PublishedContent\IPublishedPropertyType.cs" />
     <Compile Include="Models\Template.cs" />
     <Compile Include="Models\TemplateOnDisk.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyEditors\ConfigurationField.cs" />
     <Compile Include="PropertyEditors\ConfigurationFieldAttribute.cs" />
     <Compile Include="PropertyEditors\ConfigurationFieldsExtensions.cs" />
@@ -315,53 +319,6 @@
     <Compile Include="Sync\RefreshInstructionEnvelope.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />
-    <Compile Include="Configuration\CaseInsensitiveEnumConfigConverter.cs" />
-    <Compile Include="Configuration\CommaDelimitedConfigurationElement.cs" />
-    <Compile Include="ConfigsExtensions.cs" />
-    <Compile Include="Configuration\CoreDebug.cs" />
-    <Compile Include="Configuration\GlobalSettings.cs" />
-    <Compile Include="Configuration\GlobalSettingsExtensions.cs" />
-    <Compile Include="Configuration\Grid\GridConfig.cs" />
-    <Compile Include="Configuration\Grid\GridEditorsConfig.cs" />
-    <Compile Include="Configuration\HealthChecks\DisabledHealthCheckElement.cs" />
-    <Compile Include="Configuration\HealthChecks\DisabledHealthChecksElementCollection.cs" />
-    <Compile Include="Configuration\HealthChecks\HealthCheckNotificationSettingsElement.cs" />
-    <Compile Include="Configuration\HealthChecks\HealthCheckNotificationVerbosity.cs" />
-    <Compile Include="Configuration\HealthChecks\HealthChecksSection.cs" />
-    <Compile Include="Configuration\HealthChecks\IDisabledHealthCheck.cs" />
-    <Compile Include="Configuration\HealthChecks\IHealthCheckNotificationSettings.cs" />
-    <Compile Include="Configuration\HealthChecks\IHealthChecks.cs" />
-    <Compile Include="Configuration\HealthChecks\INotificationMethod.cs" />
-    <Compile Include="Configuration\HealthChecks\INotificationMethodSettings.cs" />
-    <Compile Include="Configuration\HealthChecks\NotificationMethodElement.cs" />
-    <Compile Include="Configuration\HealthChecks\NotificationMethodsElementCollection.cs" />
-    <Compile Include="Configuration\HealthChecks\NotificationMethodSettingsElement.cs" />
-    <Compile Include="Configuration\HealthChecks\NotificationMethodSettingsElementCollection.cs" />
-    <Compile Include="Configuration\InnerTextConfigurationElement.cs" />
-    <Compile Include="Configuration\OptionalCommaDelimitedConfigurationElement.cs" />
-    <Compile Include="Configuration\OptionalInnerTextConfigurationElement.cs" />
-    <Compile Include="Configuration\RawXmlConfigurationElement.cs" />
-    <Compile Include="Configuration\UmbracoConfigurationSection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\BackOfficeElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\CharCollection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\CharElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ContentElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ContentError404Collection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ContentErrorPageElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ContentErrorsElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ContentImagingElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ContentSectionExtensions.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ImagingAutoFillPropertiesCollection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ImagingAutoFillUploadFieldElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\LoggingElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\NotificationsElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\RequestHandlerElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\SecurityElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\TourConfigElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\UmbracoConfigurationElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\UmbracoSettingsSection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\UrlReplacingElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\WebRoutingElement.cs" />
     <Compile Include="ContentVariationExtensions.cs" />
     <Compile Include="Deploy\IDataTypeConfigurationConnector.cs" />
     <Compile Include="GuidUtils.cs" />
@@ -991,7 +948,6 @@
     <Compile Include="Persistence\UmbracoDatabase.cs" />
     <Compile Include="Persistence\UmbracoDatabaseExtensions.cs" />
     <Compile Include="Persistence\UmbracoDatabaseFactory.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyEditors\Validators\DecimalValidator.cs" />
     <Compile Include="PropertyEditors\DefaultPropertyValueConverterAttribute.cs" />
     <Compile Include="PropertyEditors\Validators\DelimitedValueValidator.cs" />
@@ -1182,6 +1138,10 @@
     <ProjectReference Include="..\Umbraco.Abstractions\Umbraco.Abstractions.csproj">
       <Project>{29aa69d9-b597-4395-8d42-43b1263c240a}</Project>
       <Name>Umbraco.Abstractions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Umbraco.Configuration\Umbraco.Configuration.csproj">
+      <Project>{fbe7c065-dac0-4025-a78b-63b24d3ab00b}</Project>
+      <Name>Umbraco.Configuration</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

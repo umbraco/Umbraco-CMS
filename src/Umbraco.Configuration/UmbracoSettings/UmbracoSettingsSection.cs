@@ -5,23 +5,23 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
     public class UmbracoSettingsSection : ConfigurationSection, IUmbracoSettingsSection
     {
         [ConfigurationProperty("backOffice")]
-        internal BackOfficeElement BackOffice => (BackOfficeElement)this["backOffice"];
+        public BackOfficeElement BackOffice => (BackOfficeElement)this["backOffice"];
 
         [ConfigurationProperty("content")]
-        internal ContentElement Content => (ContentElement)this["content"];
+        public ContentElement Content => (ContentElement)this["content"];
 
         [ConfigurationProperty("security")]
-        internal SecurityElement Security => (SecurityElement)this["security"];
+        public SecurityElement Security => (SecurityElement)this["security"];
 
         [ConfigurationProperty("requestHandler")]
-        internal RequestHandlerElement RequestHandler => (RequestHandlerElement)this["requestHandler"];
+        public RequestHandlerElement RequestHandler => (RequestHandlerElement)this["requestHandler"];
 
         [ConfigurationProperty("logging")]
-        internal LoggingElement Logging => (LoggingElement)this["logging"];
+        public LoggingElement Logging => (LoggingElement)this["logging"];
 
 
         [ConfigurationProperty("web.routing")]
-        internal WebRoutingElement WebRouting => (WebRoutingElement)this["web.routing"];
+        public WebRoutingElement WebRouting => (WebRoutingElement)this["web.routing"];
 
         IContentSection IUmbracoSettingsSection.Content => Content;
 
