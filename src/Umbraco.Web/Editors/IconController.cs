@@ -9,6 +9,7 @@ using System.IO;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Ganss.XSS;
+using Umbraco.Core.Cache;
 
 namespace Umbraco.Web.Editors
 {
@@ -87,19 +88,19 @@ namespace Umbraco.Web.Editors
 
             try
             {
-                //var svg = Util.Cache(content.Url, 60 * 60 * 24, delegate
-                //{
-                var svgContent = File.ReadAllText(iconPath);
-                var sanitizedString = sanitizer.Sanitize(svgContent);
-
-                var svg = new IconModel
+                return AppCaches.RuntimeCache.GetCacheItem<IconModel>($"{iconName}_{iconPath}", () =>
                 {
-                    Name = iconName,
-                    SvgString = sanitizedString
-                };
+                    var svgContent = File.ReadAllText(iconPath);
+                    var sanitizedString = sanitizer.Sanitize(svgContent);
 
-                return svg;
-                //});
+                    var svg = new IconModel
+                    {
+                        Name = iconName,
+                        SvgString = sanitizedString
+                    };
+
+                    return svg;
+                }, new TimeSpan(0, 5, 0));
             }
             catch (Exception ex)
             {
