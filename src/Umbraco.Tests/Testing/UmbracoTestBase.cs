@@ -145,7 +145,7 @@ namespace Umbraco.Tests.Testing
 
             TestObjects = new TestObjects(register);
             Compose();
-            Current.Factory = Factory = Composition.CreateFactory();
+            Current.Factory = CurrentCore.Factory = Factory = Composition.CreateFactory();
             Initialize();
         }
 

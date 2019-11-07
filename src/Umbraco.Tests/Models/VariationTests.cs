@@ -34,6 +34,7 @@ namespace Umbraco.Tests.Models
 
             var factory = Mock.Of<IFactory>();
             Current.Factory = factory;
+            CurrentCore.Factory = factory;
 
             var dataEditors = new DataEditorCollection(new IDataEditor[]
             {

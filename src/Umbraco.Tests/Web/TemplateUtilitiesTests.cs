@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Web
             var settings = SettingsForTests.GetDefaultUmbracoSettings();
             factory.Setup(x => x.GetInstance(typeof(IUmbracoSettingsSection))).Returns(settings);
 
-            Current.Factory = factory.Object;
+            Current.Factory = CurrentCore.Factory = factory.Object;
 
             Umbraco.Web.Composing.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
 

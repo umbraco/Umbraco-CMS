@@ -31,6 +31,7 @@ namespace Umbraco.Tests.PropertyEditors
                 => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefaultUmbracoSettings())));
 
             Current.Factory = composition.CreateFactory();
+            CurrentCore.Factory = composition.CreateFactory();
         }
 
         [TearDown]

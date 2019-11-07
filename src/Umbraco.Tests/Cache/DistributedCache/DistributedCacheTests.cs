@@ -35,6 +35,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
                 .Add<TestCacheRefresher>();
 
             Current.Factory = composition.CreateFactory();
+            CurrentCore.Factory = composition.CreateFactory();
 
             _distributedCache = new Umbraco.Web.Cache.DistributedCache();
         }

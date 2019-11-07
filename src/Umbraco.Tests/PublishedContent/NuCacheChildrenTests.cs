@@ -53,6 +53,7 @@ namespace Umbraco.Tests.PublishedContent
 
             var factory = Mock.Of<IFactory>();
             Current.Factory = factory;
+            CurrentCore.Factory = factory;
 
             var configs = new ConfigsFactory().Create();
             Mock.Get(factory).Setup(x => x.GetInstance(typeof(Configs))).Returns(configs);

@@ -44,7 +44,7 @@ namespace Umbraco.Tests.Scoping
             composition.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
 
             Current.Reset();
-            Current.Factory = composition.CreateFactory();
+            Current.Factory = CurrentCore.Factory = composition.CreateFactory();
 
             SettingsForTests.Reset(); // ensure we have configuration
         }

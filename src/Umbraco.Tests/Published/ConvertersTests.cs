@@ -193,6 +193,7 @@ namespace Umbraco.Tests.Published
             register.Register(f => factory);
 
             Current.Factory = composition.CreateFactory();
+            CurrentCore.Factory = composition.CreateFactory();
 
             var cacheMock = new Mock<IPublishedContentCache>();
             var cacheContent = new Dictionary<int, IPublishedContent>();

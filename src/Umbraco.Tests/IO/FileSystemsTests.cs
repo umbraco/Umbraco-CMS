@@ -47,6 +47,7 @@ namespace Umbraco.Tests.IO
 
             Current.Reset();
             Current.Factory = _factory;
+            CurrentCore.Factory = _factory;
 
             // make sure we start clean
             // because some tests will create corrupt or weird filesystems

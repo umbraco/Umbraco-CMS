@@ -270,7 +270,7 @@ namespace Umbraco.Tests.Web
                     )
                 );
 
-            Current.Factory = container.Object;
+            Current.Factory = CurrentCore.Factory = container.Object;
         }
     }
 }

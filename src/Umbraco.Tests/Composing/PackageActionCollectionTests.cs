@@ -27,6 +27,7 @@ namespace Umbraco.Tests.Composing
                 .Add(() => TypeLoader.GetPackageActions());
 
             Current.Factory = composition.CreateFactory();
+            CurrentCore.Factory = composition.CreateFactory();
 
             var actions = Current.PackageActions;
             Assert.AreEqual(2, actions.Count());

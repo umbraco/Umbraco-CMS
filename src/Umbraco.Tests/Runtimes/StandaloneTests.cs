@@ -59,7 +59,7 @@ namespace Umbraco.Tests.Runtimes
             var logger = new ConsoleLogger(new MessageTemplates());
             var profiler = new LogProfiler(logger);
             var profilingLogger = new ProfilingLogger(logger, profiler);
-            var appCaches = AppCaches.Disabled; 
+            var appCaches = AppCaches.Disabled;
             var databaseFactory = new UmbracoDatabaseFactory(logger, new Lazy<IMapperCollection>(() => factory.GetInstance<IMapperCollection>()));
             var typeLoader = new TypeLoader(appCaches.RuntimeCache, IOHelper.MapPath("~/App_Data/TEMP"), profilingLogger);
             var mainDom = new SimpleMainDom();
@@ -116,7 +116,7 @@ namespace Umbraco.Tests.Runtimes
             composition.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
 
             // create and register the factory
-            Current.Factory = factory = composition.CreateFactory();
+            Current.Factory = CurrentCore.Factory = factory = composition.CreateFactory();
 
             // instantiate and initialize components
             var components = factory.GetInstance<ComponentCollection>();
