@@ -13,25 +13,27 @@ namespace Umbraco.Core.Cache
         /// <summary>
         /// Gets the internal items dictionary, for tests only!
         /// </summary>
-        internal readonly ConcurrentDictionary<string, object> Items = new ConcurrentDictionary<string, object>();
+        private readonly ConcurrentDictionary<string, object> _items = new ConcurrentDictionary<string, object>();
+
+        public int Count => _items.Count;
 
         /// <inheritdoc />
         public virtual object Get(string key)
         {
-            return Items.TryGetValue(key, out var value) ? value : null;
+            return _items.TryGetValue(key, out var value) ? value : null;
         }
 
         /// <inheritdoc />
         public virtual object Get(string key, Func<object> factory)
         {
-            return Items.GetOrAdd(key, _ => factory());
+            return _items.GetOrAdd(key, _ => factory());
         }
 
         /// <inheritdoc />
         public virtual IEnumerable<object> SearchByKey(string keyStartsWith)
         {
             var items = new List<object>();
-            foreach (var (key, value) in Items)
+            foreach (var (key, value) in _items)
                 if (key.InvariantStartsWith(keyStartsWith))
                     items.Add(value);
             return items;
@@ -42,7 +44,7 @@ namespace Umbraco.Core.Cache
         {
             var compiled = new Regex(regex, RegexOptions.Compiled);
             var items = new List<object>();
-            foreach (var (key, value) in Items)
+            foreach (var (key, value) in _items)
                 if (compiled.IsMatch(key))
                     items.Add(value);
             return items;
@@ -51,46 +53,46 @@ namespace Umbraco.Core.Cache
         /// <inheritdoc />
         public virtual void Clear()
         {
-            Items.Clear();
+            _items.Clear();
         }
 
         /// <inheritdoc />
         public virtual void Clear(string key)
         {
-            Items.TryRemove(key, out _);
+            _items.TryRemove(key, out _);
         }
 
         /// <inheritdoc />
         public virtual void ClearOfType(string typeName)
         {
-            Items.RemoveAll(kvp => kvp.Value != null && kvp.Value.GetType().ToString().InvariantEquals(typeName));
+            _items.RemoveAll(kvp => kvp.Value != null && kvp.Value.GetType().ToString().InvariantEquals(typeName));
         }
 
         /// <inheritdoc />
         public virtual void ClearOfType<T>()
         {
             var typeOfT = typeof(T);
-            Items.RemoveAll(kvp => kvp.Value != null && kvp.Value.GetType() == typeOfT);
+            _items.RemoveAll(kvp => kvp.Value != null && kvp.Value.GetType() == typeOfT);
         }
 
         /// <inheritdoc />
         public virtual void ClearOfType<T>(Func<string, T, bool> predicate)
         {
             var typeOfT = typeof(T);
-            Items.RemoveAll(kvp => kvp.Value != null && kvp.Value.GetType() == typeOfT && predicate(kvp.Key, (T)kvp.Value));
+            _items.RemoveAll(kvp => kvp.Value != null && kvp.Value.GetType() == typeOfT && predicate(kvp.Key, (T)kvp.Value));
         }
 
         /// <inheritdoc />
         public virtual void ClearByKey(string keyStartsWith)
         {
-            Items.RemoveAll(kvp => kvp.Key.InvariantStartsWith(keyStartsWith));
+            _items.RemoveAll(kvp => kvp.Key.InvariantStartsWith(keyStartsWith));
         }
 
         /// <inheritdoc />
         public virtual void ClearByRegex(string regex)
         {
             var compiled = new Regex(regex, RegexOptions.Compiled);
-            Items.RemoveAll(kvp => compiled.IsMatch(kvp.Key));
+            _items.RemoveAll(kvp => compiled.IsMatch(kvp.Key));
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Serialization;
@@ -61,8 +62,6 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Serialize_Without_Error()
         {
-            var ss = new SerializationService(new JsonNetSerializer());
-
             var item = new Template("Test", "test")
             {
                 Id = 3,
@@ -74,8 +73,7 @@ namespace Umbraco.Tests.Models
                 MasterTemplateId = new Lazy<int>(() => 88)
             };
 
-            var result = ss.ToStream(item);
-            var json = result.ResultStream.ToJsonString();
+            var json = JsonConvert.SerializeObject(item);
             Debug.Print(json);
         }
 

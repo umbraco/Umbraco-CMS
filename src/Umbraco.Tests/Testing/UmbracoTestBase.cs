@@ -37,6 +37,7 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.Trees;
 using Umbraco.Core.Composing.CompositionExtensions;
 using Umbraco.Core.Mapping;
+using Umbraco.Core.Serialization;
 using Umbraco.Web.Composing.CompositionExtensions;
 using Umbraco.Web.Sections;
 using Current = Umbraco.Core.Composing.Current;
@@ -326,6 +327,8 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().WebRouting);
 
             Composition.RegisterUnique<IExamineManager>(factory => ExamineManager.Instance);
+
+            Composition.RegisterUnique<IJsonSerializer, JsonNetSerializer>();
 
             // register filesystems
             Composition.RegisterUnique(factory => TestObjects.GetFileSystemsMock());

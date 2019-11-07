@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.Caching;
 
 namespace Umbraco.Core.Cache
 {
@@ -15,11 +14,9 @@ namespace Umbraco.Core.Cache
             Func<T> getCacheItem,
             TimeSpan? timeout,
             bool isSliding = false,
-            CacheItemPriority priority = CacheItemPriority.Normal,
-            CacheItemRemovedCallback removedCallback = null,
             string[] dependentFiles = null)
         {
-            var result = provider.Get(cacheKey, () => getCacheItem(), timeout, isSliding, priority, removedCallback, dependentFiles);
+            var result = provider.Get(cacheKey, () => getCacheItem(), timeout, isSliding, dependentFiles);
             return result == null ? default(T) : result.TryConvertTo<T>().Result;
         }
 
@@ -28,11 +25,9 @@ namespace Umbraco.Core.Cache
             Func<T> getCacheItem,
             TimeSpan? timeout = null,
             bool isSliding = false,
-            CacheItemPriority priority = CacheItemPriority.Normal,
-            CacheItemRemovedCallback removedCallback = null,
             string[] dependentFiles = null)
         {
-            provider.Insert(cacheKey, () => getCacheItem(), timeout, isSliding, priority, removedCallback, dependentFiles);
+            provider.Insert(cacheKey, () => getCacheItem(), timeout, isSliding, dependentFiles);
         }
 
         public static IEnumerable<T> GetCacheItemsByKeySearch<T>(this IAppCache provider, string keyStartsWith)

@@ -59,7 +59,7 @@ namespace Umbraco.Tests.Runtimes
             var logger = new ConsoleLogger(new MessageTemplates());
             var profiler = new LogProfiler(logger);
             var profilingLogger = new ProfilingLogger(logger, profiler);
-            var appCaches = new AppCaches(); // FIXME: has HttpRuntime stuff?
+            var appCaches = AppCaches.Disabled; 
             var databaseFactory = new UmbracoDatabaseFactory(logger, new Lazy<IMapperCollection>(() => factory.GetInstance<IMapperCollection>()));
             var typeLoader = new TypeLoader(appCaches.RuntimeCache, IOHelper.MapPath("~/App_Data/TEMP"), profilingLogger);
             var mainDom = new SimpleMainDom();

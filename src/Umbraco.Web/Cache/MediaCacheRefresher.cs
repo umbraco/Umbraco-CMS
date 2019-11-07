@@ -6,6 +6,7 @@ using Umbraco.Core.Persistence.Repositories;
 using System.Linq;
 using System.Xml.Linq;
 using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Web.Composing;
@@ -18,8 +19,8 @@ namespace Umbraco.Web.Cache
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly IdkMap _idkMap;
 
-        public MediaCacheRefresher(AppCaches appCaches, IPublishedSnapshotService publishedSnapshotService, IdkMap idkMap)
-            : base(appCaches)
+        public MediaCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IPublishedSnapshotService publishedSnapshotService, IdkMap idkMap)
+            : base(appCaches, serializer)
         {
             _publishedSnapshotService = publishedSnapshotService;
             _idkMap = idkMap;

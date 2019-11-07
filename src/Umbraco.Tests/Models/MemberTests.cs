@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
@@ -114,8 +115,6 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Serialize_Without_Error()
         {
-            var ss = new SerializationService(new JsonNetSerializer());
-
             var memberType = MockedContentTypes.CreateSimpleMemberType("memberType", "Member Type");
             memberType.Id = 99;
             var member = MockedMember.CreateSimpleMember(memberType, "Name", "email@email.com", "pass", "user", Guid.NewGuid());
@@ -148,8 +147,7 @@ namespace Umbraco.Tests.Models
             member.AdditionalData.Add("test1", 123);
             member.AdditionalData.Add("test2", "hello");
 
-            var result = ss.ToStream(member);
-            var json = result.ResultStream.ToJsonString();
+            var json = JsonConvert.SerializeObject(member);
             Debug.Print(json);
         }
     }

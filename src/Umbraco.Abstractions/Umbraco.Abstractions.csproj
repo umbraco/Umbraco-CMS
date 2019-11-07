@@ -10,4 +10,8 @@
         <Product>Umbraco CMS</Product>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="System.Runtime.Caching" Version="4.6.0" />
+    </ItemGroup>
+
 </Project>

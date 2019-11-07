@@ -5,6 +5,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Web.PublishedCache;
@@ -18,8 +19,8 @@ namespace Umbraco.Web.Cache
         private readonly IContentTypeCommonRepository _contentTypeCommonRepository;
         private readonly IdkMap _idkMap;
 
-        public ContentTypeCacheRefresher(AppCaches appCaches, IPublishedSnapshotService publishedSnapshotService, IPublishedModelFactory publishedModelFactory, IdkMap idkMap, IContentTypeCommonRepository contentTypeCommonRepository)
-            : base(appCaches)
+        public ContentTypeCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IPublishedSnapshotService publishedSnapshotService, IPublishedModelFactory publishedModelFactory, IdkMap idkMap, IContentTypeCommonRepository contentTypeCommonRepository)
+            : base(appCaches, serializer)
         {
             _publishedSnapshotService = publishedSnapshotService;
             _publishedModelFactory = publishedModelFactory;
