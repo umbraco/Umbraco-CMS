@@ -98,7 +98,7 @@ namespace Umbraco.Web.Models.Trees
             if (item == null) return null;
 
             var values = textService.GetAllStoredValues(Thread.CurrentThread.CurrentUICulture);
-            values.TryGetValue($"visuallyHiddenTexts/{item.Alias}_description", out var textDescription);
+            values.TryGetValue($"visuallyHiddenTexts/{item.Alias}Description", out var textDescription);
 
             var menuItem = new MenuItem(item, textService.Localize($"actions/{item.Alias}"))
             {
