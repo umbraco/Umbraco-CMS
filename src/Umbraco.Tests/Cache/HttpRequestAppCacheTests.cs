@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Cache
 
         protected override int GetTotalItemCount
         {
-            get { return _appCache.Items.Count; }
+            get { return _appCache.Count; }
         }
     }
 }

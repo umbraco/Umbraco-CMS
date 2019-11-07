@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using Moq;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -58,8 +59,6 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Serialize_Without_Error()
         {
-            var ss = new SerializationService(new JsonNetSerializer());
-
             var dtd = new DataType(new VoidEditor(Mock.Of<ILogger>()), 9)
             {
                 CreateDate = DateTime.Now,
@@ -76,8 +75,7 @@ namespace Umbraco.Tests.Models
                 UpdateDate = DateTime.Now
             };
 
-            var result = ss.ToStream(dtd);
-            var json = result.ResultStream.ToJsonString();
+            var json = JsonConvert.SerializeObject(dtd);
             Debug.Print(json);
         }
 

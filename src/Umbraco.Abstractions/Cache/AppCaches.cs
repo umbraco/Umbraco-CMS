@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Web;
 
 namespace Umbraco.Core.Cache
 {
@@ -8,23 +7,6 @@ namespace Umbraco.Core.Cache
     /// </summary>
     public class AppCaches
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AppCaches"/> for use in a web application.
-        /// </summary>
-        public AppCaches()
-            : this(HttpRuntime.Cache)
-        { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AppCaches"/> for use in a web application.
-        /// </summary>
-        public AppCaches(System.Web.Caching.Cache cache)
-            : this(
-                new WebCachingAppCache(cache),
-                new HttpRequestAppCache(),
-                new IsolatedCaches(t => new ObjectCacheAppCache()))
-        { }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="AppCaches"/> with cache providers.
         /// </summary>

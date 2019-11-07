@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using Moq;
+using Newtonsoft.Json;
 using Umbraco.Core;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
@@ -476,8 +477,6 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Serialize_Without_Error()
         {
-            var ss = new SerializationService(new JsonNetSerializer());
-
             // Arrange
             var contentType = MockedContentTypes.CreateTextPageContentType();
             contentType.Id = 99;
@@ -503,8 +502,7 @@ namespace Umbraco.Tests.Models
             content.UpdateDate = DateTime.Now;
             content.WriterId = 23;
 
-            var result = ss.ToStream(content);
-            var json = result.ResultStream.ToJsonString();
+            var json = JsonConvert.SerializeObject(content);
             Debug.Print(json);
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Serialization;
@@ -88,8 +89,6 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Serialize_Without_Error()
         {
-            var ss = new SerializationService(new JsonNetSerializer());
-
             var pg = new PropertyGroup(
                 new PropertyTypeCollection(false, new[]
                 {
@@ -135,8 +134,7 @@ namespace Umbraco.Tests.Models
                 UpdateDate = DateTime.Now
             };
 
-            var result = ss.ToStream(pg);
-            var json = result.ResultStream.ToJsonString();
+            var json = JsonConvert.SerializeObject(pg);
             Debug.Print(json);
         }
     }

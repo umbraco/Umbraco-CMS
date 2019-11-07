@@ -124,34 +124,17 @@
       <DependentUpon>Constants.cs</DependentUpon>
     </Compile>
     -->
-    <Compile Include="Cache\AppPolicedCacheDictionary.cs" />
-    <Compile Include="Compose\AuditEventsComponent.cs" />
-    <Compile Include="Cache\AppCaches.cs" />
-    <Compile Include="Cache\AppCacheExtensions.cs" />
-    <Compile Include="Cache\CacheRefresherBase.cs" />
-    <Compile Include="Cache\CacheRefresherCollection.cs" />
-    <Compile Include="Cache\CacheRefresherCollectionBuilder.cs" />
-    <Compile Include="Cache\CacheRefresherEventArgs.cs" />
-    <Compile Include="Cache\DeepCloneAppCache.cs" />
     <Compile Include="Cache\DefaultRepositoryCachePolicy.cs" />
-    <Compile Include="Cache\FastDictionaryAppCache.cs" />
     <Compile Include="Cache\FastDictionaryAppCacheBase.cs" />
+    <Compile Include="Cache\ObjectCacheAppCache.cs" />
+    <Compile Include="Compose\AuditEventsComponent.cs" />
+    <Compile Include="Cache\CacheRefresherCollectionBuilder.cs" />
+    <Compile Include="Cache\FastDictionaryAppCache.cs" />
     <Compile Include="Cache\FullDataSetRepositoryCachePolicy.cs" />
     <Compile Include="Cache\HttpRequestAppCache.cs" />
     <Compile Include="Cache\WebCachingAppCache.cs" />
-    <Compile Include="Cache\IRepositoryCachePolicy.cs" />
-    <Compile Include="Cache\IAppPolicyCache.cs" />
-    <Compile Include="Cache\IsolatedCaches.cs" />
-    <Compile Include="Cache\JsonCacheRefresherBase.cs" />
-    <Compile Include="Cache\NoCacheRepositoryCachePolicy.cs" />
-    <Compile Include="Cache\NoAppCache.cs" />
-    <Compile Include="Cache\ObjectCacheAppCache.cs" />
-    <Compile Include="Cache\PayloadCacheRefresherBase.cs" />
     <Compile Include="Cache\RepositoryCachePolicyBase.cs" />
-    <Compile Include="Cache\RepositoryCachePolicyOptions.cs" />
     <Compile Include="Cache\SingleItemsOnlyRepositoryCachePolicy.cs" />
-    <Compile Include="Cache\DictionaryAppCache.cs" />
-    <Compile Include="Cache\TypedCacheRefresherBase.cs" />
     <Compile Include="Compose\AuditEventsComposer.cs" />
     <Compile Include="Composing\ComponentComposer.cs" />
     <Compile Include="Composing\ComposeAfterAttribute.cs" />
@@ -309,7 +292,7 @@
     <Compile Include="PropertyEditors\PropertyValueConverterCollectionBuilder.cs" />
     <Compile Include="PropertyEditors\VoidEditor.cs" />
     <Compile Include="PublishedModelFactoryExtensions.cs" />
-    <Compile Include="Serialization\SerializationExtensions.cs" />
+    <Compile Include="Serialization\JsonNetSerializer.cs" />
     <Compile Include="Services\Changes\ContentTypeChange.cs" />
     <Compile Include="Services\Changes\ContentTypeChangeExtensions.cs" />
     <Compile Include="Services\Changes\TreeChange.cs" />
@@ -1090,7 +1073,6 @@
     <Compile Include="Serialization\CaseInsensitiveDictionaryConverter.cs" />
     <Compile Include="Serialization\ForceInt32Converter.cs" />
     <Compile Include="Serialization\JsonReadConverter.cs" />
-    <Compile Include="Serialization\JsonNetSerializer.cs" />
     <Compile Include="Serialization\JsonToStringConverter.cs" />
     <Compile Include="Serialization\KnownTypeUdiJsonConverter.cs" />
     <Compile Include="Serialization\NoTypeConverterJsonConverter.cs" />

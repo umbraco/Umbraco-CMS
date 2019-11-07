@@ -17,6 +17,7 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
@@ -49,6 +50,8 @@ namespace Umbraco.Core.Runtime
             composition.RegisterUnique<ScopeProvider>(); // implements both IScopeProvider and IScopeAccessor
             composition.RegisterUnique<IScopeProvider>(f => f.GetInstance<ScopeProvider>());
             composition.RegisterUnique<IScopeAccessor>(f => f.GetInstance<ScopeProvider>());
+
+            composition.RegisterUnique<IJsonSerializer, JsonNetSerializer>();
 
             // register database builder
             // *not* a singleton, don't want to keep it around

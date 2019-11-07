@@ -7,6 +7,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Web.Composing;
@@ -20,8 +21,8 @@ namespace Umbraco.Web.Cache
         private readonly IdkMap _idkMap;
         private readonly IDomainService _domainService;
 
-        public ContentCacheRefresher(AppCaches appCaches, IPublishedSnapshotService publishedSnapshotService, IdkMap idkMap, IDomainService domainService)
-            : base(appCaches)
+        public ContentCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IPublishedSnapshotService publishedSnapshotService, IdkMap idkMap, IDomainService domainService)
+            : base(appCaches, serializer)
         {
             _publishedSnapshotService = publishedSnapshotService;
             _idkMap = idkMap;
