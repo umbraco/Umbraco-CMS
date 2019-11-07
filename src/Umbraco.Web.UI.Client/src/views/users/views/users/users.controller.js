@@ -714,6 +714,7 @@
             vm.newUser.message = "";
             // clear button state
             vm.page.createButtonState = "init";
+            $scope.$emit("$setAccessibleHeader", true, "general_user", false,"", "", true);
         }
 
         init();
