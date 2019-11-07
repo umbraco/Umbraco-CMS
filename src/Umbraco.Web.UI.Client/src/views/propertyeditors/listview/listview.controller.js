@@ -186,7 +186,9 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
 
         // Another special case for members, only fields on the base table (cmsMember) can be used for sorting
         if (e.isSystem && $scope.entityType == "member") {
-            e.allowSorting = e.alias == 'username' || e.alias == 'email';
+            e.allowSorting = e.alias == 'username' ||
+                             e.alias == 'email' ||
+                             e.alias == 'updateDate';
         }
 
         if (e.isSystem) {
