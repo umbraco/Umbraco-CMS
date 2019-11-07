@@ -19,7 +19,7 @@ namespace Umbraco.Core.Cache
             CacheItemRemovedCallback removedCallback = null,
             string[] dependentFiles = null)
         {
-            var result = provider.Get(cacheKey, () => getCacheItem(), timeout, isSliding, priority, removedCallback, dependentFiles);
+            var result = provider.Get(cacheKey, () => getCacheItem(), timeout, isSliding, priority, dependentFiles);
             return result == null ? default(T) : result.TryConvertTo<T>().Result;
         }
 
@@ -32,7 +32,7 @@ namespace Umbraco.Core.Cache
             CacheItemRemovedCallback removedCallback = null,
             string[] dependentFiles = null)
         {
-            provider.Insert(cacheKey, () => getCacheItem(), timeout, isSliding, priority, removedCallback, dependentFiles);
+            provider.Insert(cacheKey, () => getCacheItem(), timeout, isSliding, priority, dependentFiles);
         }
 
         public static IEnumerable<T> GetCacheItemsByKeySearch<T>(this IAppCache provider, string keyStartsWith)

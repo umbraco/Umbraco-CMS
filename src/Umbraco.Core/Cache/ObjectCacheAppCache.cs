@@ -103,7 +103,7 @@ namespace Umbraco.Core.Cache
         }
 
         /// <inheritdoc />
-        public object Get(string key, Func<object> factory, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
+        public object Get(string key, Func<object> factory, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, string[] dependentFiles = null)
         {
             // see notes in HttpRuntimeAppCache
 
@@ -115,7 +115,7 @@ namespace Umbraco.Core.Cache
                 if (result == null || FastDictionaryAppCacheBase.GetSafeLazyValue(result, true) == null) // get non-created as NonCreatedValue & exceptions as null
                 {
                     result = FastDictionaryAppCacheBase.GetSafeLazy(factory);
-                    var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
+                    var policy = GetPolicy(timeout, isSliding, dependentFiles);
 
                     lck.UpgradeToWriteLock();
                     //NOTE: This does an add or update
@@ -131,7 +131,7 @@ namespace Umbraco.Core.Cache
         }
 
         /// <inheritdoc />
-        public void Insert(string key, Func<object> factory, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
+        public void Insert(string key, Func<object> factory, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, string[] dependentFiles = null)
         {
             // NOTE - here also we must insert a Lazy<object> but we can evaluate it right now
             // and make sure we don't store a null value.
@@ -140,7 +140,7 @@ namespace Umbraco.Core.Cache
             var value = result.Value; // force evaluation now
             if (value == null) return; // do not store null values (backward compat)
 
-            var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
+            var policy = GetPolicy(timeout, isSliding, dependentFiles);
             //NOTE: This does an add or update
             MemoryCache.Set(key, result, policy);
         }
@@ -314,7 +314,7 @@ namespace Umbraco.Core.Cache
             }
         }
 
-        private static CacheItemPolicy GetPolicy(TimeSpan? timeout = null, bool isSliding = false, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
+        private static CacheItemPolicy GetPolicy(TimeSpan? timeout = null, bool isSliding = false, string[] dependentFiles = null)
         {
             var absolute = isSliding ? ObjectCache.InfiniteAbsoluteExpiration : (timeout == null ? ObjectCache.InfiniteAbsoluteExpiration : DateTime.Now.Add(timeout.Value));
             var sliding = isSliding == false ? ObjectCache.NoSlidingExpiration : (timeout ?? ObjectCache.NoSlidingExpiration);
@@ -330,34 +330,6 @@ namespace Umbraco.Core.Cache
                 policy.ChangeMonitors.Add(new HostFileChangeMonitor(dependentFiles.ToList()));
             }
 
-            if (removedCallback != null)
-            {
-                policy.RemovedCallback = arguments =>
-                {
-                    //convert the reason
-                    var reason = CacheItemRemovedReason.Removed;
-                    switch (arguments.RemovedReason)
-                    {
-                        case CacheEntryRemovedReason.Removed:
-                            reason = CacheItemRemovedReason.Removed;
-                            break;
-                        case CacheEntryRemovedReason.Expired:
-                            reason = CacheItemRemovedReason.Expired;
-                            break;
-                        case CacheEntryRemovedReason.Evicted:
-                            reason = CacheItemRemovedReason.Underused;
-                            break;
-                        case CacheEntryRemovedReason.ChangeMonitorChanged:
-                            reason = CacheItemRemovedReason.Expired;
-                            break;
-                        case CacheEntryRemovedReason.CacheSpecificEviction:
-                            reason = CacheItemRemovedReason.Underused;
-                            break;
-                    }
-                    //call the callback
-                    removedCallback(arguments.CacheItem.Key, arguments.CacheItem.Value, reason);
-                };
-            }
             return policy;
         }
     }

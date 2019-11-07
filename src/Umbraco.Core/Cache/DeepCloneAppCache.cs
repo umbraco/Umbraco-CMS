@@ -67,7 +67,7 @@ namespace Umbraco.Core.Cache
         }
 
         /// <inheritdoc />
-        public object Get(string key, Func<object> factory, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
+        public object Get(string key, Func<object> factory, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, string[] dependentFiles = null)
         {
             var cached = InnerCache.Get(key, () =>
             {
@@ -77,14 +77,14 @@ namespace Umbraco.Core.Cache
                 return value == null ? null : CheckCloneableAndTracksChanges(value); 
 
                 // clone / reset to go into the cache
-            }, timeout, isSliding, priority, removedCallback, dependentFiles);
+            }, timeout, isSliding, priority, dependentFiles);
 
             // clone / reset to go into the cache
             return CheckCloneableAndTracksChanges(cached);
         }
 
         /// <inheritdoc />
-        public void Insert(string key, Func<object> factory, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
+        public void Insert(string key, Func<object> factory, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, string[] dependentFiles = null)
         {
             InnerCache.Insert(key, () =>
             {
@@ -92,7 +92,7 @@ namespace Umbraco.Core.Cache
                 var value = result.Value; // force evaluation now - this may throw if cacheItem throws, and then nothing goes into cache
                 // do not store null values (backward compat), clone / reset to go into the cache
                 return value == null ? null : CheckCloneableAndTracksChanges(value);
-            }, timeout, isSliding, priority, removedCallback, dependentFiles);
+            }, timeout, isSliding, priority, dependentFiles);
         }
 
         /// <inheritdoc />
