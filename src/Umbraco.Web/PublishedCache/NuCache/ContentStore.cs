@@ -601,13 +601,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// <param name="kits">
         /// All kits sorted by Level + Parent Id + Sort order
         /// </param>
+        /// <param name="fromDb">True if the data is coming from the database (not the local cache db)</param>
         /// <returns></returns>
         /// <remarks>
         /// This requires that the collection is sorted by Level + ParentId + Sort Order. 
         /// This should be used only on a site startup as the first generations.
         /// This CANNOT be used after startup since it bypasses all checks for Generations.
         /// </remarks>
-        internal bool SetAllFastSorted(IEnumerable<ContentNodeKit> kits)
+        internal bool SetAllFastSorted(IEnumerable<ContentNodeKit> kits, bool fromDb)
         {
             var lockInfo = new WriteLockInfo();
             var ok = true;
@@ -653,6 +654,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                     _logger.Debug<ContentStore>($"Set {thisNode.Id} with parent {thisNode.ParentContentId}");
                     SetValueLocked(_contentNodes, thisNode.Id, thisNode);
+
+                    // if we are initializing from the database source ensure the local db is updated
+                    if (fromDb && _localDb != null) RegisterChange(thisNode.Id, kit);
 
                     // this node is always the last child
                     parent.LastChildContentId = thisNode.Id;
