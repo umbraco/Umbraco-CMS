@@ -392,7 +392,6 @@
     <Compile Include="Logging\Viewer\MessageTemplateFilter.cs" />
     <Compile Include="Logging\Viewer\SavedLogSearch.cs" />
     <Compile Include="Manifest\DashboardAccessRuleConverter.cs" />
-    <Compile Include="Manifest\ManifestSection.cs" />
     <Compile Include="Manifest\ManifestContentAppDefinition.cs" />
     <Compile Include="Manifest\ManifestContentAppFactory.cs" />
     <Compile Include="Manifest\ManifestDashboard.cs" />
