@@ -19,7 +19,7 @@ namespace Umbraco.Core.Manifest
         /// Filters package manifests.
         /// </summary>
         /// <param name="manifests">The package manifests.</param>
-        public void Filter(List<PackageManifest> manifests)
+        public void Filter(List<IPackageManifest> manifests)
         {
             foreach (var filter in this)
                 filter.Filter(manifests);
