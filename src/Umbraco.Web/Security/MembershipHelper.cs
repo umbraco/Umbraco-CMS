@@ -486,7 +486,8 @@ namespace Umbraco.Web.Security
                 {
                     Alias = prop.Alias,
                     Name = prop.Name,
-                    Value = value
+                    Value = value,
+                    Required = prop.Mandatory,
                 };
 
                 // TODO: Perhaps one day we'll ship with our own EditorTempates but for now developers

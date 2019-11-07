@@ -28,6 +28,9 @@ namespace Umbraco.Web.Models
         [ReadOnly(true)]
         public string Name { get; set; }
 
+        [ReadOnly(true)]
+        public bool Required { get; set; }
+
         // TODO: Perhaps one day we'll ship with our own EditorTempates but for now developers can just render their own inside the view
 
         ///// <summary>
