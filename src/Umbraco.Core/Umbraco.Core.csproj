@@ -143,7 +143,6 @@
     <Compile Include="Cache\RepositoryCachePolicyBase.cs" />
     <Compile Include="Cache\RepositoryCachePolicyOptions.cs" />
     <Compile Include="Cache\SingleItemsOnlyRepositoryCachePolicy.cs" />
-    <Compile Include="Cache\DictionaryAppCache.cs" />
     <Compile Include="Cache\TypedCacheRefresherBase.cs" />
     <Compile Include="Compose\AuditEventsComposer.cs" />
     <Compile Include="Composing\ComponentComposer.cs" />
