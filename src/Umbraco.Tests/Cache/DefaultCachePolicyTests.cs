@@ -59,7 +59,7 @@ namespace Umbraco.Tests.Cache
             var cached = new List<string>();
             var cache = new Mock<IAppPolicyCache>();
             cache.Setup(x => x.Insert(It.IsAny<string>(), It.IsAny<Func<object>>(), It.IsAny<TimeSpan?>(), It.IsAny<bool>(), It.IsAny<string[]>()))
-                .Callback((string cacheKey, Func<object> o, TimeSpan? t, bool b, CacheItemPriority cip, CacheItemRemovedCallback circ, string[] s) =>
+                .Callback((string cacheKey, Func<object> o, TimeSpan? t, bool b, string[] s) =>
                 {
                     cached.Add(cacheKey);
                 });
