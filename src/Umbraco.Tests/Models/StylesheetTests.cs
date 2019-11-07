@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Linq;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Serialization;
@@ -101,8 +102,6 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Serialize_Without_Error()
         {
-            var ss = new SerializationService(new JsonNetSerializer());
-
             var stylesheet = new Stylesheet("/css/styles.css");
             stylesheet.Content = @"@media screen and (min-width: 600px) and (min-width: 900px) {
                                       .class {
@@ -110,8 +109,7 @@ namespace Umbraco.Tests.Models
                                       }
                                     }";
 
-            var result = ss.ToStream(stylesheet);
-            var json = result.ResultStream.ToJsonString();
+            var json = JsonConvert.SerializeObject(stylesheet);
             Debug.Print(json);
         }
     }

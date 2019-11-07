@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Sync;
 
 namespace Umbraco.Core.Cache
@@ -12,12 +13,17 @@ namespace Umbraco.Core.Cache
     public abstract class PayloadCacheRefresherBase<TInstanceType, TPayload> : JsonCacheRefresherBase<TInstanceType>, IPayloadCacheRefresher<TPayload>
         where TInstanceType : class, ICacheRefresher
     {
+        private readonly IJsonSerializer _serializer;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="PayloadCacheRefresherBase{TInstanceType, TPayload}"/>.
         /// </summary>
         /// <param name="appCaches">A cache helper.</param>
-        protected PayloadCacheRefresherBase(AppCaches appCaches) : base(appCaches)
-        { }
+        /// <param name="serializer"></param>
+        protected PayloadCacheRefresherBase(AppCaches appCaches, IJsonSerializer serializer) : base(appCaches)
+        {
+            _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+        }
 
         #region Json
 
@@ -28,7 +34,7 @@ namespace Umbraco.Core.Cache
         /// <returns>The deserialized object payload.</returns>
         protected virtual TPayload[] Deserialize(string json)
         {
-            return JsonConvert.DeserializeObject<TPayload[]>(json);
+            return _serializer.Deserialize<TPayload[]>(json);
         }
 
         #endregion

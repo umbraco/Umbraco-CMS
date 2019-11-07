@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             base.SetUp();
 
-            _appCaches = new AppCaches();
+            _appCaches = AppCaches.Disabled;
             CreateTestData();
         }
 
