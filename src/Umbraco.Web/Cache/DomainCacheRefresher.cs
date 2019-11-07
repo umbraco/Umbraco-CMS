@@ -1,6 +1,7 @@
 ﻿using System;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Web.PublishedCache;
 
@@ -10,8 +11,8 @@ namespace Umbraco.Web.Cache
     {
         private readonly IPublishedSnapshotService _publishedSnapshotService;
 
-        public DomainCacheRefresher(AppCaches appCaches, IPublishedSnapshotService publishedSnapshotService)
-            : base(appCaches)
+        public DomainCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IPublishedSnapshotService publishedSnapshotService)
+            : base(appCaches, serializer)
         {
             _publishedSnapshotService = publishedSnapshotService;
         }
