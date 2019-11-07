@@ -139,7 +139,6 @@
     <Compile Include="Cache\FullDataSetRepositoryCachePolicy.cs" />
     <Compile Include="Cache\HttpRequestAppCache.cs" />
     <Compile Include="Cache\WebCachingAppCache.cs" />
-    <Compile Include="Cache\IRepositoryCachePolicy.cs" />
     <Compile Include="Cache\IsolatedCaches.cs" />
     <Compile Include="Cache\JsonCacheRefresherBase.cs" />
     <Compile Include="Cache\NoCacheRepositoryCachePolicy.cs" />
