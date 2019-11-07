@@ -120,7 +120,7 @@ namespace Umbraco.Tests.Web.Mvc
                 Mock.Of<ICultureDictionaryFactory>(),
                 Mock.Of<IUmbracoComponentRenderer>(),
                 Mock.Of<IPublishedContentQuery>(query => query.Content(2) == content.Object),
-                new MembershipHelper(umbracoContext.HttpContext, Mock.Of<IPublishedMemberCache>(), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), Mock.Of<AppCaches>(), Mock.Of<ILogger>()));
+                new MembershipHelper(umbracoContext.HttpContext, Mock.Of<IPublishedMemberCache>(), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), AppCaches.Disabled, Mock.Of<ILogger>()));
 
             var ctrl = new TestSurfaceController(umbracoContextAccessor, helper);
             var result = ctrl.GetContent(2) as PublishedContentResult;
@@ -178,7 +178,7 @@ namespace Umbraco.Tests.Web.Mvc
         public class TestSurfaceController : SurfaceController
         {
             public TestSurfaceController(IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper = null)
-                : base(umbracoContextAccessor, null, ServiceContext.CreatePartial(), Mock.Of<AppCaches>(), null, null, helper)
+                : base(umbracoContextAccessor, null, ServiceContext.CreatePartial(), AppCaches.Disabled, null, null, helper)
             {
             }
 
