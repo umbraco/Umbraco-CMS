@@ -124,19 +124,16 @@
       <DependentUpon>Constants.cs</DependentUpon>
     </Compile>
     -->
-    <Compile Include="Cache\CacheRefresherBase.cs" />
     <Compile Include="Cache\DefaultRepositoryCachePolicy.cs" />
     <Compile Include="Cache\FastDictionaryAppCacheBase.cs" />
     <Compile Include="Cache\ObjectCacheAppCache.cs" />
     <Compile Include="Compose\AuditEventsComponent.cs" />
-    <Compile Include="Cache\AppCaches.cs" />
     <Compile Include="Cache\CacheRefresherCollection.cs" />
     <Compile Include="Cache\CacheRefresherCollectionBuilder.cs" />
     <Compile Include="Cache\FastDictionaryAppCache.cs" />
     <Compile Include="Cache\FullDataSetRepositoryCachePolicy.cs" />
     <Compile Include="Cache\HttpRequestAppCache.cs" />
     <Compile Include="Cache\WebCachingAppCache.cs" />
-    <Compile Include="Cache\JsonCacheRefresherBase.cs" />
     <Compile Include="Cache\PayloadCacheRefresherBase.cs" />
     <Compile Include="Cache\RepositoryCachePolicyBase.cs" />
     <Compile Include="Cache\SingleItemsOnlyRepositoryCachePolicy.cs" />

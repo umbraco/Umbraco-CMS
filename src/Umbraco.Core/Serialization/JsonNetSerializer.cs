@@ -31,7 +31,7 @@ namespace Umbraco.Core.Serialization
 
             _settings.NullValueHandling = NullValueHandling.Include;
             _settings.ReferenceLoopHandling = ReferenceLoopHandling.Serialize;
-            _settings.TypeNameHandling = TypeNameHandling.Objects;
+            _settings.TypeNameHandling = TypeNameHandling.Objects; // FIXME: Is this intended?? This is a security issue
             _settings.ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor;
         }
 
