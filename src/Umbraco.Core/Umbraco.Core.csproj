@@ -254,6 +254,7 @@
     <Compile Include="Models\Entities\IMediaEntitySlim.cs" />
     <Compile Include="Models\Entities\IMemberEntitySlim.cs" />
     <Compile Include="Models\Entities\MediaEntitySlim.cs" />
+    <Compile Include="Models\PagedResult.cs" />
     <Compile Include="Models\Entities\MemberEntitySlim.cs" />
     <Compile Include="Models\PublishedContent\ILivePublishedModelFactory.cs" />
     <Compile Include="Models\PublishedContent\IndexedArrayItem.cs" />
@@ -603,6 +604,11 @@
     <Compile Include="Models\MemberTypePropertyProfileAccess.cs" />
     <Compile Include="Models\Packaging\InstallationSummary.cs" />
     <Compile Include="Models\Packaging\PreInstallWarnings.cs" />
+    <Compile Include="Models\PagedResultOfT.cs" />
+    <Compile Include="Models\PartialView.cs" />
+    <Compile Include="Models\PartialViewType.cs" />
+    <Compile Include="Models\Property.cs" />
+    <Compile Include="Models\PropertyCollection.cs" />
     <Compile Include="Models\PropertyGroup.cs" />
     <Compile Include="Models\PropertyGroupCollection.cs" />
     <Compile Include="Models\PropertyType.cs" />
