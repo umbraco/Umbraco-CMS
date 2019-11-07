@@ -10,6 +10,7 @@ using Umbraco.Core.Manifest;
 using Umbraco.Core.Migrations;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Migrations.PostMigrations;
+using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PackageActions;
 using Umbraco.Core.Persistence;
@@ -53,6 +54,8 @@ namespace Umbraco.Core.Runtime
             // register database builder
             // *not* a singleton, don't want to keep it around
             composition.Register<DatabaseBuilder>();
+
+            composition.RegisterUnique<UmbracoPlan>();
 
             // register manifest parser, will be injected in collection builders where needed
             composition.RegisterUnique<ManifestParser>();
