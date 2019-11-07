@@ -28,7 +28,7 @@ namespace Umbraco.Web.Editors
         {
             if (string.IsNullOrWhiteSpace(iconName) == false)
             {
-                return _GetIcon(iconName.StripFileExtension(), IOHelper.MapPath($"{GlobalSettings.Path}/assets/icons/{iconName}.svg"));
+                return CreateIconModel(iconName.StripFileExtension(), IOHelper.MapPath($"{GlobalSettings.Path}/assets/icons/{iconName}.svg"));
             }
 
             return null;
@@ -43,7 +43,7 @@ namespace Umbraco.Web.Editors
         {
             if (fileInfo != null && string.IsNullOrWhiteSpace(fileInfo.Name) == false)
             {
-                return _GetIcon(fileInfo.Name.StripFileExtension(), fileInfo.FullName);
+                return CreateIconModel(fileInfo.Name.StripFileExtension(), fileInfo.FullName);
             }
 
             return null;
@@ -77,7 +77,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="iconName"></param>
         /// <returns></returns>
-        private IconModel _GetIcon(string iconName, string iconPath)
+        private IconModel CreateIconModel(string iconName, string iconPath)
         {
             // TODO - HtmlSanitizer is a package used for sanitizering HTML and can be extended to sanitize SVGs. This is commented out as I'm not sure if this will/should be used, and if i can be, how to get it set up in the project correctly.
 
