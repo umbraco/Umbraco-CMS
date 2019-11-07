@@ -43,7 +43,7 @@ namespace Umbraco.Core.Cache
         {
             var cached = InnerCache.Get(key, () =>
             {
-                var result = FastDictionaryAppCacheBase.GetSafeLazy(factory);
+                var result = SafeLazy.GetSafeLazy(factory);
                 var value = result.Value; // force evaluation now - this may throw if cacheItem throws, and then nothing goes into cache
                 // do not store null values (backward compat), clone / reset to go into the cache
                 return value == null ? null : CheckCloneableAndTracksChanges(value);
@@ -70,7 +70,7 @@ namespace Umbraco.Core.Cache
         {
             var cached = InnerCache.Get(key, () =>
             {
-                var result = FastDictionaryAppCacheBase.GetSafeLazy(factory);
+                var result = SafeLazy.GetSafeLazy(factory);
                 var value = result.Value; // force evaluation now - this may throw if cacheItem throws, and then nothing goes into cache
                 // do not store null values (backward compat), clone / reset to go into the cache
                 return value == null ? null : CheckCloneableAndTracksChanges(value); 
@@ -87,7 +87,7 @@ namespace Umbraco.Core.Cache
         {
             InnerCache.Insert(key, () =>
             {
-                var result = FastDictionaryAppCacheBase.GetSafeLazy(factory);
+                var result = SafeLazy.GetSafeLazy(factory);
                 var value = result.Value; // force evaluation now - this may throw if cacheItem throws, and then nothing goes into cache
                 // do not store null values (backward compat), clone / reset to go into the cache
                 return value == null ? null : CheckCloneableAndTracksChanges(value);

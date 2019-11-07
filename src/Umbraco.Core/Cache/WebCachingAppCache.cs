@@ -145,7 +145,7 @@ namespace Umbraco.Core.Cache
                 if (_locker.IsReadLockHeld)
                     _locker.ExitReadLock();
             }
-            var value = result == null ? null : GetSafeLazyValue(result);
+            var value = result == null ? null : SafeLazy.GetSafeLazyValue(result);
             if (value != null) return value;
 
             using (var lck = new UpgradeableReadLock(_locker))
@@ -156,9 +156,9 @@ namespace Umbraco.Core.Cache
                 // do nothing here - means that if creation throws, a race condition could cause
                 // more than one thread to reach the return statement below and throw - accepted.
 
-                if (result == null || GetSafeLazyValue(result, true) == null) // get non-created as NonCreatedValue & exceptions as null
+                if (result == null || SafeLazy.GetSafeLazyValue(result, true) == null) // get non-created as NonCreatedValue & exceptions as null
                 {
-                    result = GetSafeLazy(factory);
+                    result = SafeLazy.GetSafeLazy(factory);
                     var absolute = isSliding ? System.Web.Caching.Cache.NoAbsoluteExpiration : (timeout == null ? System.Web.Caching.Cache.NoAbsoluteExpiration : DateTime.Now.Add(timeout.Value));
                     var sliding = isSliding == false ? System.Web.Caching.Cache.NoSlidingExpiration : (timeout ?? System.Web.Caching.Cache.NoSlidingExpiration);
 
@@ -176,7 +176,7 @@ namespace Umbraco.Core.Cache
             //return result.Value;
 
             value = result.Value; // will not throw (safe lazy)
-            if (value is ExceptionHolder eh) eh.Exception.Throw(); // throw once!
+            if (value is SafeLazy.ExceptionHolder eh) eh.Exception.Throw(); // throw once!
             return value;
         }
 
@@ -185,7 +185,7 @@ namespace Umbraco.Core.Cache
             // NOTE - here also we must insert a Lazy<object> but we can evaluate it right now
             // and make sure we don't store a null value.
 
-            var result = GetSafeLazy(getCacheItem);
+            var result = SafeLazy.GetSafeLazy(getCacheItem);
             var value = result.Value; // force evaluation now - this may throw if cacheItem throws, and then nothing goes into cache
             if (value == null) return; // do not store null values (backward compat)
 

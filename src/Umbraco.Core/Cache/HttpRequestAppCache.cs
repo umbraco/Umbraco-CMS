@@ -60,9 +60,9 @@ namespace Umbraco.Core.Cache
                 // do nothing here - means that if creation throws, a race condition could cause
                 // more than one thread to reach the return statement below and throw - accepted.
 
-                if (result == null || GetSafeLazyValue(result, true) == null) // get non-created as NonCreatedValue & exceptions as null
+                if (result == null || SafeLazy.GetSafeLazyValue(result, true) == null) // get non-created as NonCreatedValue & exceptions as null
                 {
-                    result = GetSafeLazy(factory);
+                    result = SafeLazy.GetSafeLazy(factory);
                     ContextItems[key] = result;
                 }
             }
@@ -79,7 +79,7 @@ namespace Umbraco.Core.Cache
             //return result.Value;
 
             var value = result.Value; // will not throw (safe lazy)
-            if (value is ExceptionHolder eh) eh.Exception.Throw(); // throw once!
+            if (value is SafeLazy.ExceptionHolder eh) eh.Exception.Throw(); // throw once!
             return value;
         }
 
