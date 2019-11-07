@@ -11,6 +11,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Components;

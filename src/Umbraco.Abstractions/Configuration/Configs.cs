@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Configuration
 {
@@ -15,6 +13,13 @@ namespace Umbraco.Core.Configuration
     /// </remarks>
     public class Configs
     {
+        private readonly Func<string, object> _configGetter;
+
+        public Configs(Func<string, object> configGetter)
+        {
+            _configGetter = configGetter;
+        }
+
         private readonly Dictionary<Type, Lazy<object>> _configs = new Dictionary<Type, Lazy<object>>();
         private Dictionary<Type, Action<IRegister>> _registerings = new Dictionary<Type, Action<IRegister>>();
 
@@ -60,7 +65,7 @@ namespace Umbraco.Core.Configuration
 
             _configs[typeOfConfig] = new Lazy<object>(() =>
             {
-                if (Current.HasFactory) return Current.Factory.GetInstance<TConfig>();
+                if (CurrentCore.HasFactory) return CurrentCore.Factory.GetInstance<TConfig>();
                 throw new InvalidOperationException($"Cannot get configuration of type {typeOfConfig} during composition.");
             });
             _registerings[typeOfConfig] = register => register.Register(configFactory, Lifetime.Singleton);
@@ -75,7 +80,7 @@ namespace Umbraco.Core.Configuration
             Add(() => GetConfig<TConfig>(sectionName));
         }
 
-        private static TConfig GetConfig<TConfig>(string sectionName)
+        private TConfig GetConfig<TConfig>(string sectionName)
             where TConfig : class
         {
             // note: need to use SafeCallContext here because ConfigurationManager.GetSection ends up getting AppDomain.Evidence
@@ -83,10 +88,11 @@ namespace Umbraco.Core.Configuration
 
             using (new SafeCallContext())
             {
-                if ((ConfigurationManager.GetSection(sectionName) is TConfig config))
+                if ((_configGetter(sectionName) is TConfig config))
                     return config;
-                var ex = new ConfigurationErrorsException($"Could not get configuration section \"{sectionName}\" from config files.");
-                Current.Logger.Error<Configs>(ex, "Config error");
+//                var ex = new ConfigurationErrorsException($"Could not get configuration section \"{sectionName}\" from config files.");
+                var ex = new Exception($"Could not get configuration section \"{sectionName}\" from config files.");
+//                Current.Logger.Error<Configs>(ex, "Config error");
                 throw ex;
             }
         }

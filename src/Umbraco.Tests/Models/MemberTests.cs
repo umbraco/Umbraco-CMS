@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Serialization;
 using Umbraco.Tests.TestHelpers;

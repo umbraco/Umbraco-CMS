@@ -47,7 +47,7 @@ namespace Umbraco.Core.Runtime
         public IRuntimeState State => _state;
 
         /// <inheritdoc/>
-        public virtual IFactory Boot(IRegister register)
+        public virtual IFactory Boot(IRegister register, IConfigsFactory configsFactory)
         {
             // create and register the essential services
             // ie the bare minimum required to boot
@@ -82,7 +82,7 @@ namespace Umbraco.Core.Runtime
                 ConfigureUnhandledException();
                 ConfigureApplicationRootPath();
 
-                Boot(register, timer);
+                Boot(register, timer, configsFactory);
             }
 
             return _factory;
@@ -91,7 +91,7 @@ namespace Umbraco.Core.Runtime
         /// <summary>
         /// Boots the runtime within a timer.
         /// </summary>
-        protected virtual IFactory Boot(IRegister register, DisposableTimer timer)
+        protected virtual IFactory Boot(IRegister register, DisposableTimer timer, IConfigsFactory configsFactory)
         {
             Composition composition = null;
 
@@ -110,7 +110,7 @@ namespace Umbraco.Core.Runtime
                 var databaseFactory = GetDatabaseFactory();
 
                 // configs
-                var configs = GetConfigs();
+                var configs = GetConfigs(configsFactory);
 
                 // type loader
                 var typeLoader = new TypeLoader(appCaches.RuntimeCache, configs.Global().LocalTempPath, ProfilingLogger);
@@ -344,9 +344,9 @@ namespace Umbraco.Core.Runtime
         /// <summary>
         /// Gets the configurations.
         /// </summary>
-        protected virtual Configs GetConfigs()
+        protected virtual Configs GetConfigs(IConfigsFactory configsFactory)
         {
-            var configs = new ConfigsFactory().Create();
+            var configs = configsFactory.Create();
 
             return configs;
         }

@@ -13,6 +13,7 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Core.Composing.CompositionExtensions;
+using Umbraco.Core.Configuration;
 using FileSystems = Umbraco.Core.IO.FileSystems;
 
 namespace Umbraco.Tests.IO
