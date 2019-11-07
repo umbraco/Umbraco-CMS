@@ -5,7 +5,7 @@ namespace Umbraco.Core.Cache
     /// <summary>
     /// Specifies how a repository cache policy should cache entities.
     /// </summary>
-    internal class RepositoryCachePolicyOptions
+    public class RepositoryCachePolicyOptions
     {
         /// <summary>
         /// Ctor - sets GetAllCacheValidateCount = true

@@ -11,7 +11,7 @@ namespace Umbraco.Core.Cache
     /// instance, and ensuring that all inserts and returns are deep cloned copies of the cache item,
     /// when the item is deep-cloneable.
     /// </summary>
-    internal class DeepCloneAppCache : IAppPolicyCache
+    public class DeepCloneAppCache : IAppPolicyCache
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DeepCloneAppCache"/> class.
@@ -29,7 +29,7 @@ namespace Umbraco.Core.Cache
         /// <summary>
         /// Gets the inner cache.
         /// </summary>
-        public IAppPolicyCache InnerCache { get; }
+        private IAppPolicyCache InnerCache { get; }
 
         /// <inheritdoc />
         public object Get(string key)

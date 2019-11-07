@@ -17,7 +17,7 @@ namespace Umbraco.Core.Cache
     /// <para>If options.GetAllCacheAllowZeroCount then a 'zero-count' array is cached when GetAll finds nothing.</para>
     /// <para>If options.GetAllCacheValidateCount then we check against the db when getting many entities.</para>
     /// </remarks>
-    internal class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyBase<TEntity, TId>
+    public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyBase<TEntity, TId>
         where TEntity : class, IEntity
     {
         private static readonly TEntity[] EmptyEntities = new TEntity[0]; // const
