@@ -17,24 +17,24 @@ namespace Umbraco.Core.Cache
         /// <param name="cacheFactory"></param>
         protected AppPolicedCacheDictionary(Func<TKey, IAppPolicyCache> cacheFactory)
         {
-            CacheFactory = cacheFactory;
+            _cacheFactory = cacheFactory;
         }
 
         /// <summary>
         /// Gets the internal cache factory, for tests only!
         /// </summary>
-        internal readonly Func<TKey, IAppPolicyCache> CacheFactory;
+        private readonly Func<TKey, IAppPolicyCache> _cacheFactory;
 
         /// <summary>
         /// Gets or creates a cache.
         /// </summary>
         public IAppPolicyCache GetOrCreate(TKey key)
-            => _caches.GetOrAdd(key, k => CacheFactory(k));
+            => _caches.GetOrAdd(key, k => _cacheFactory(k));
 
         /// <summary>
         /// Tries to get a cache.
         /// </summary>
-        public Attempt<IAppPolicyCache> Get(TKey key)
+        protected Attempt<IAppPolicyCache> Get(TKey key)
             => _caches.TryGetValue(key, out var cache) ? Attempt.Succeed(cache) : Attempt.Fail<IAppPolicyCache>();
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace Umbraco.Core.Cache
         /// <summary>
         /// Clears a cache.
         /// </summary>
-        public void ClearCache(TKey key)
+        protected void ClearCache(TKey key)
         {
             if (_caches.TryGetValue(key, out var cache))
                 cache.Clear();

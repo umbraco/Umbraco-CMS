@@ -5,7 +5,7 @@ using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Cache
 {
-    internal class NoCacheRepositoryCachePolicy<TEntity, TId> : IRepositoryCachePolicy<TEntity, TId>
+    public class NoCacheRepositoryCachePolicy<TEntity, TId> : IRepositoryCachePolicy<TEntity, TId>
         where TEntity : class, IEntity
     {
         private NoCacheRepositoryCachePolicy() { }
