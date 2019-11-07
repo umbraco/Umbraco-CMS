@@ -21,16 +21,16 @@ namespace Umbraco.Core.Cache
         public object Get(string cacheKey)
         {
             Items.TryGetValue(cacheKey, out var result); // else null
-            return result == null ? null : FastDictionaryAppCacheBase.GetSafeLazyValue(result); // return exceptions as null
+            return result == null ? null : SafeLazy.GetSafeLazyValue(result); // return exceptions as null
         }
 
         /// <inheritdoc />
         public object Get(string cacheKey, Func<object> getCacheItem)
         {
-            var result = Items.GetOrAdd(cacheKey, k => FastDictionaryAppCacheBase.GetSafeLazy(getCacheItem));
+            var result = Items.GetOrAdd(cacheKey, k => SafeLazy.GetSafeLazy(getCacheItem));
 
             var value = result.Value; // will not throw (safe lazy)
-            if (!(value is FastDictionaryAppCacheBase.ExceptionHolder eh))
+            if (!(value is SafeLazy.ExceptionHolder eh))
                 return value;
 
             // and... it's in the cache anyway - so contrary to other cache providers,
@@ -47,7 +47,7 @@ namespace Umbraco.Core.Cache
         {
             return Items
                 .Where(kvp => kvp.Key.InvariantStartsWith(keyStartsWith))
-                .Select(kvp => FastDictionaryAppCacheBase.GetSafeLazyValue(kvp.Value))
+                .Select(kvp => SafeLazy.GetSafeLazyValue(kvp.Value))
                 .Where(x => x != null);
         }
 
@@ -57,7 +57,7 @@ namespace Umbraco.Core.Cache
             var compiled = new Regex(regex, RegexOptions.Compiled);
             return Items
                 .Where(kvp => compiled.IsMatch(kvp.Key))
-                .Select(kvp => FastDictionaryAppCacheBase.GetSafeLazyValue(kvp.Value))
+                .Select(kvp => SafeLazy.GetSafeLazyValue(kvp.Value))
                 .Where(x => x != null);
         }
 
@@ -86,7 +86,7 @@ namespace Umbraco.Core.Cache
                     // entry.Value is Lazy<object> and not null, its value may be null
                     // remove null values as well, does not hurt
                     // get non-created as NonCreatedValue & exceptions as null
-                    var value = FastDictionaryAppCacheBase.GetSafeLazyValue(x.Value, true);
+                    var value = SafeLazy.GetSafeLazyValue(x.Value, true);
 
                     // if T is an interface remove anything that implements that interface
                     // otherwise remove exact types (not inherited types)
@@ -108,7 +108,7 @@ namespace Umbraco.Core.Cache
                     // remove null values as well, does not hurt
                     // compare on exact type, don't use "is"
                     // get non-created as NonCreatedValue & exceptions as null
-                    var value = FastDictionaryAppCacheBase.GetSafeLazyValue(x.Value, true);
+                    var value = SafeLazy.GetSafeLazyValue(x.Value, true);
 
                     // if T is an interface remove anything that implements that interface
                     // otherwise remove exact types (not inherited types)
@@ -130,7 +130,7 @@ namespace Umbraco.Core.Cache
                     // remove null values as well, does not hurt
                     // compare on exact type, don't use "is"
                     // get non-created as NonCreatedValue & exceptions as null
-                    var value = FastDictionaryAppCacheBase.GetSafeLazyValue(x.Value, true);
+                    var value = SafeLazy.GetSafeLazyValue(x.Value, true);
                     if (value == null) return true;
 
                     // if T is an interface remove anything that implements that interface
