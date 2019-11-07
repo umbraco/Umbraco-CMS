@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core.PropertyEditors
 {
-    public interface IDataEditorWithMediaPath : IDataEditor
+    public interface IDataEditorWithMediaPath
     {
         string GetMediaPath(object value);
     }
