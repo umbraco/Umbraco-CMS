@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Web;
-using System.Web.Caching;
 using System.Web.Mvc;
 using System.Web.Mvc.Html;
 using Umbraco.Core.Cache;
@@ -46,7 +45,6 @@ namespace Umbraco.Web
             return appCaches.RuntimeCache.GetCacheItem<IHtmlString>(
                 PartialViewCacheKey + cacheKey,
                 () => htmlHelper.Partial(partialViewName, model, viewData),
-                priority: CacheItemPriority.NotRemovable, //not removable, the same as macros (apparently issue #27610)
                 timeout: new TimeSpan(0, 0, 0, cachedSeconds));
         }
 

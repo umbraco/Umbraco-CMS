@@ -5,7 +5,7 @@ using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Cache
 {
-    internal interface IRepositoryCachePolicy<TEntity, TId>
+    public interface IRepositoryCachePolicy<TEntity, TId>
         where TEntity : class, IEntity
     {
         /// <summary>
