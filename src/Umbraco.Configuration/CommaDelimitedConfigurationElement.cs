@@ -8,7 +8,7 @@ namespace Umbraco.Core.Configuration
     /// <summary>
     /// Defines a configuration section that contains inner text that is comma delimited
     /// </summary>
-    internal class CommaDelimitedConfigurationElement : InnerTextConfigurationElement<CommaDelimitedStringCollection>, IEnumerable<string>
+    public class CommaDelimitedConfigurationElement : InnerTextConfigurationElement<CommaDelimitedStringCollection>, IEnumerable<string>
     {
         public override CommaDelimitedStringCollection Value
         {

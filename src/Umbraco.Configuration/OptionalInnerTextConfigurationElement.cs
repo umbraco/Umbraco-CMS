@@ -4,7 +4,7 @@
     /// This is used to supply optional/default values when using InnerTextConfigurationElement
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    internal class OptionalInnerTextConfigurationElement<T> : InnerTextConfigurationElement<T>
+    public class OptionalInnerTextConfigurationElement<T> : InnerTextConfigurationElement<T>
     {
         private readonly InnerTextConfigurationElement<T> _wrapped;
         private readonly T _defaultValue;

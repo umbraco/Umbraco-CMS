@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class SecurityElement : UmbracoConfigurationElement, ISecuritySection
+    public class SecurityElement : UmbracoConfigurationElement, ISecuritySection
     {
         [ConfigurationProperty("keepUserLoggedIn")]
         internal InnerTextConfigurationElement<bool> KeepUserLoggedIn => GetOptionalTextElement("keepUserLoggedIn", true);

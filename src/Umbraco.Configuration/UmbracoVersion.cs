@@ -12,7 +12,7 @@ namespace Umbraco.Core.Configuration
     {
         static UmbracoVersion()
         {
-            var umbracoCoreAssembly = typeof(UmbracoVersion).Assembly;
+            var umbracoCoreAssembly = typeof(SemVersion).Assembly;
 
             // gets the value indicated by the AssemblyVersion attribute
             AssemblyVersion = umbracoCoreAssembly.GetName().Version;
