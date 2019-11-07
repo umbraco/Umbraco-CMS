@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
@@ -13,8 +14,6 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Serialize_Without_Error()
         {
-            var ss = new SerializationService(new JsonNetSerializer());
-
             var item = new DocumentEntitySlim()
             {
                 Id = 3,
@@ -38,8 +37,7 @@ namespace Umbraco.Tests.Models
             item.AdditionalData.Add("test1", 3);
             item.AdditionalData.Add("test2", "valuie");
             
-            var result = ss.ToStream(item);
-            var json = result.ResultStream.ToJsonString();
+            var json = JsonConvert.SerializeObject(item);
             Debug.Print(json); // FIXME: compare with v7
         }
     }
