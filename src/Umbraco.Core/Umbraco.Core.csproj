@@ -125,6 +125,7 @@
     </Compile>
     -->
     <Compile Include="Cache\AppPolicedCacheDictionary.cs" />
+    <Compile Include="Cache\IAppPolicyCache.cs" />
     <Compile Include="Compose\AuditEventsComponent.cs" />
     <Compile Include="Cache\AppCaches.cs" />
     <Compile Include="Cache\AppCacheExtensions.cs" />
@@ -140,7 +141,6 @@
     <Compile Include="Cache\HttpRequestAppCache.cs" />
     <Compile Include="Cache\WebCachingAppCache.cs" />
     <Compile Include="Cache\IRepositoryCachePolicy.cs" />
-    <Compile Include="Cache\IAppPolicyCache.cs" />
     <Compile Include="Cache\IsolatedCaches.cs" />
     <Compile Include="Cache\JsonCacheRefresherBase.cs" />
     <Compile Include="Cache\NoCacheRepositoryCachePolicy.cs" />

@@ -35,25 +35,25 @@ namespace Umbraco.Core.Cache
         }
 
         /// <inheritdoc />
-        public object Get(string key, Func<object> factory, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
+        public object Get(string key, Func<object> factory, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, string[] dependentFiles = null)
         {
             CacheDependency dependency = null;
             if (dependentFiles != null && dependentFiles.Any())
             {
                 dependency = new CacheDependency(dependentFiles);
             }
-            return Get(key, factory, timeout, isSliding, priority, removedCallback, dependency);
+            return GetImpl(key, factory, timeout, isSliding, priority, dependency);
         }
 
         /// <inheritdoc />
-        public void Insert(string key, Func<object> factory, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
+        public void Insert(string key, Func<object> factory, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, string[] dependentFiles = null)
         {
             CacheDependency dependency = null;
             if (dependentFiles != null && dependentFiles.Any())
             {
                 dependency = new CacheDependency(dependentFiles);
             }
-            Insert(key, factory, timeout, isSliding, priority, removedCallback, dependency);
+            InsertImpl(key, factory, timeout, isSliding, priority, dependency);
         }
 
         #region Dictionary
@@ -103,7 +103,7 @@ namespace Umbraco.Core.Cache
 
         #endregion
 
-        private object Get(string key, Func<object> factory, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, CacheDependency dependency = null)
+        private object GetImpl(string key, Func<object> factory, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheDependency dependency = null)
         {
             key = GetCacheKey(key);
 
@@ -164,7 +164,7 @@ namespace Umbraco.Core.Cache
 
                     lck.UpgradeToWriteLock();
                     //NOTE: 'Insert' on System.Web.Caching.Cache actually does an add or update!
-                    _cache.Insert(key, result, dependency, absolute, sliding, priority, removedCallback);
+                    _cache.Insert(key, result, dependency, absolute, sliding, priority, null);
                 }
             }
 
@@ -180,7 +180,7 @@ namespace Umbraco.Core.Cache
             return value;
         }
 
-        private void Insert(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, CacheDependency dependency = null)
+        private void InsertImpl(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheDependency dependency = null)
         {
             // NOTE - here also we must insert a Lazy<object> but we can evaluate it right now
             // and make sure we don't store a null value.
@@ -198,7 +198,7 @@ namespace Umbraco.Core.Cache
             {
                 _locker.EnterWriteLock();
                 //NOTE: 'Insert' on System.Web.Caching.Cache actually does an add or update!
-                _cache.Insert(cacheKey, result, dependency, absolute, sliding, priority, removedCallback);
+                _cache.Insert(cacheKey, result, dependency, absolute, sliding, priority, null);
             }
             finally
             {
