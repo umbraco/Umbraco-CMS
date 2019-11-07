@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Web.Caching;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -139,8 +138,7 @@ namespace Umbraco.Web.Macros
             cache.Insert(
                 CacheKeys.MacroContentCacheKey + model.CacheIdentifier,
                 () => macroContent,
-                new TimeSpan(0, 0, model.CacheDuration),
-                priority: CacheItemPriority.NotRemovable
+                new TimeSpan(0, 0, model.CacheDuration)
                 );
 
             _plogger.Debug<MacroRenderer>("Macro content saved to cache '{MacroCacheId}'", model.CacheIdentifier);

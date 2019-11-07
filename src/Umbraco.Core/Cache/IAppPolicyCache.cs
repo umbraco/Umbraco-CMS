@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Web.Caching;
 
 namespace Umbraco.Core.Cache
 {
@@ -17,7 +16,6 @@ namespace Umbraco.Core.Cache
         /// <param name="factory">A factory function that can create the item.</param>
         /// <param name="timeout">An optional cache timeout.</param>
         /// <param name="isSliding">An optional value indicating whether the cache timeout is sliding (default is false).</param>
-        /// <param name="priority">An optional cache priority (default is Normal).</param>
         /// <param name="dependentFiles">Files the cache entry depends on.</param>
         /// <returns>The item.</returns>
         object Get(
@@ -25,7 +23,6 @@ namespace Umbraco.Core.Cache
             Func<object> factory,
             TimeSpan? timeout,
             bool isSliding = false,
-            CacheItemPriority priority = CacheItemPriority.Normal,
             string[] dependentFiles = null);
 
         /// <summary>
@@ -35,14 +32,12 @@ namespace Umbraco.Core.Cache
         /// <param name="factory">A factory function that can create the item.</param>
         /// <param name="timeout">An optional cache timeout.</param>
         /// <param name="isSliding">An optional value indicating whether the cache timeout is sliding (default is false).</param>
-        /// <param name="priority">An optional cache priority (default is Normal).</param>
         /// <param name="dependentFiles">Files the cache entry depends on.</param>
         void Insert(
             string key,
             Func<object> factory,
             TimeSpan? timeout = null,
             bool isSliding = false,
-            CacheItemPriority priority = CacheItemPriority.Normal,
             string[] dependentFiles = null);
     }
 }
