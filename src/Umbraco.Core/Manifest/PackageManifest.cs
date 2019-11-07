@@ -7,7 +7,7 @@ namespace Umbraco.Core.Manifest
     /// <summary>
     /// Represents the content of a package manifest.
     /// </summary>
-    public class PackageManifest
+    public class PackageManifest : IPackageManifest
     {
         /// <summary>
         /// Gets the source path of the manifest.

@@ -14,6 +14,6 @@ namespace Umbraco.Core.Manifest
         /// <remarks>
         /// <para>It is possible to remove, change, or add manifests.</para>
         /// </remarks>
-        void Filter(List<PackageManifest> manifests);
+        void Filter(List<IPackageManifest> manifests);
     }
 }

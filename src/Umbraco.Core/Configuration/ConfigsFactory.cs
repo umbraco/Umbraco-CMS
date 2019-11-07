@@ -13,7 +13,6 @@ namespace Umbraco.Core.Configuration
             configs.Add<IHealthChecks>("umbracoConfiguration/HealthChecks");
 
             configs.Add(() => new CoreDebug());
-            configs.Add<IHealthChecks>("umbracoConfiguration/HealthChecks");
             configs.AddCoreConfigs();
             return configs;
         }

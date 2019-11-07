@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -57,8 +58,8 @@ namespace Umbraco.Core.Manifest
         /// Gets all manifests, merged into a single manifest object.
         /// </summary>
         /// <returns></returns>
-        public PackageManifest Manifest
-            => _cache.GetCacheItem<PackageManifest>("Umbraco.Core.Manifest.ManifestParser::Manifests", () =>
+        public IPackageManifest Manifest
+            => _cache.GetCacheItem<IPackageManifest>("Umbraco.Core.Manifest.ManifestParser::Manifests", () =>
             {
                 var manifests = GetManifests();
                 return MergeManifests(manifests);
@@ -67,9 +68,9 @@ namespace Umbraco.Core.Manifest
         /// <summary>
         /// Gets all manifests.
         /// </summary>
-        private IEnumerable<PackageManifest> GetManifests()
+        private IEnumerable<IPackageManifest> GetManifests()
         {
-            var manifests = new List<PackageManifest>();
+            var manifests = new List<IPackageManifest>();
 
             foreach (var path in GetManifestFiles())
             {
@@ -97,7 +98,7 @@ namespace Umbraco.Core.Manifest
         /// <summary>
         /// Merges all manifests into one.
         /// </summary>
-        private static PackageManifest MergeManifests(IEnumerable<PackageManifest> manifests)
+        private static IPackageManifest MergeManifests(IEnumerable<IPackageManifest> manifests)
         {
             var scripts = new HashSet<string>();
             var stylesheets = new HashSet<string>();
@@ -153,7 +154,7 @@ namespace Umbraco.Core.Manifest
         /// <summary>
         /// Parses a manifest.
         /// </summary>
-        public PackageManifest ParseManifest(string text)
+        public IPackageManifest ParseManifest(string text)
         {
             if (string.IsNullOrWhiteSpace(text))
                 throw new ArgumentNullOrEmptyException(nameof(text));
@@ -179,7 +180,7 @@ namespace Umbraco.Core.Manifest
         }
 
         // purely for tests
-        public IEnumerable<GridEditor> ParseGridEditors(string text)
+        public IEnumerable<IGridEditorConfig> ParseGridEditors(string text)
         {
             return JsonConvert.DeserializeObject<IEnumerable<GridEditor>>(text);
         }

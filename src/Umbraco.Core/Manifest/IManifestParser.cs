@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Manifest
@@ -11,13 +12,13 @@ namespace Umbraco.Core.Manifest
         /// Gets all manifests, merged into a single manifest object.
         /// </summary>
         /// <returns></returns>
-        PackageManifest Manifest { get; }
+        IPackageManifest Manifest { get; }
 
         /// <summary>
         /// Parses a manifest.
         /// </summary>
-        PackageManifest ParseManifest(string text);
+        IPackageManifest ParseManifest(string text);
 
-        IEnumerable<GridEditor> ParseGridEditors(string text);
+        IEnumerable<IGridEditorConfig> ParseGridEditors(string text);
     }
 }

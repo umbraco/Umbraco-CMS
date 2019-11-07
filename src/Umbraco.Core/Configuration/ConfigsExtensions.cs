@@ -16,8 +16,6 @@ namespace Umbraco.Core
     public static class ConfigsExtensions
     {
 
-
-
         public static void AddCoreConfigs(this Configs configs)
         {
             var configDir = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Config));

@@ -158,6 +158,7 @@
     <Compile Include="CompositionExtensions_FileSystems.cs" />
     <Compile Include="CompositionExtensions_Uniques.cs" />
     <Compile Include="Configuration\ConfigsExtensions.cs" />
+    <Compile Include="Configuration\ConfigsFactory.cs" />
     <Compile Include="Configuration\GlobalSettings.cs" />
     <Compile Include="Configuration\GlobalSettingsExtensions.cs" />
     <Compile Include="Configuration\Grid\GridConfig.cs" />
@@ -184,6 +185,7 @@
     <Compile Include="Logging\Viewer\LogTimePeriod.cs" />
     <Compile Include="Manifest\IManifestFilter.cs" />
     <Compile Include="Manifest\IManifestParser.cs" />
+    <Compile Include="Manifest\IPackageManifest.cs" />
     <Compile Include="Manifest\ManifestFilterCollection.cs" />
     <Compile Include="Manifest\ManifestFilterCollectionBuilder.cs" />
     <Compile Include="Migrations\IMigrationBuilder.cs" />

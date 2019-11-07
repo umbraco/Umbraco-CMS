@@ -29,9 +29,9 @@ namespace Umbraco.Core.Configuration.Grid
         {
             get
             {
-                List<GridEditor> GetResult()
+                List<IGridEditorConfig> GetResult()
                 {
-                    var editors = new List<GridEditor>();
+                    var editors = new List<IGridEditorConfig>();
                     var gridConfig = Path.Combine(_configFolder.FullName, "grid.editors.config.js");
                     if (File.Exists(gridConfig))
                     {
@@ -59,7 +59,7 @@ namespace Umbraco.Core.Configuration.Grid
                 //cache the result if debugging is disabled
                 var result = _isDebug
                     ? GetResult()
-                    : _appCaches.RuntimeCache.GetCacheItem<List<GridEditor>>(typeof(GridEditorsConfig) + ".Editors",GetResult, TimeSpan.FromMinutes(10));
+                    : _appCaches.RuntimeCache.GetCacheItem<List<IGridEditorConfig>>(typeof(GridEditorsConfig) + ".Editors",GetResult, TimeSpan.FromMinutes(10));
 
                 return result;
             }
