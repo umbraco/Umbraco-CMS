@@ -8,6 +8,7 @@ using Umbraco.Web.Models;
 using System.IO;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Ganss.XSS;
 
 namespace Umbraco.Web.Editors
 {
@@ -79,28 +80,26 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         private IconModel CreateIconModel(string iconName, string iconPath)
         {
-            // TODO - HtmlSanitizer is a package used for sanitizering HTML and can be extended to sanitize SVGs. This is commented out as I'm not sure if this will/should be used, and if i can be, how to get it set up in the project correctly.
-
-            //var sanitizer = new HtmlSanitizer();
-            //sanitizer.AllowedAttributes.UnionWith(Svg.Attributes);
-            //sanitizer.AllowedTags.UnionWith(Svg.Tags);
+            var sanitizer = new HtmlSanitizer();
+            sanitizer.AllowedAttributes.UnionWith(Core.Constants.SvgSanitizer.Attributes);
+            sanitizer.AllowedCssProperties.UnionWith(Core.Constants.SvgSanitizer.Attributes);
+            sanitizer.AllowedTags.UnionWith(Core.Constants.SvgSanitizer.Tags);
 
             try
             {
                 //var svg = Util.Cache(content.Url, 60 * 60 * 24, delegate
                 //{
                 var svgContent = File.ReadAllText(iconPath);
-                //string sanitizedString = sanitizer.Sanitize(svgContent);
+                var sanitizedString = sanitizer.Sanitize(svgContent);
 
                 var svg = new IconModel
                 {
                     Name = iconName,
-                    SvgString = svgContent
+                    SvgString = sanitizedString
                 };
 
                 return svg;
                 //});
-
             }
             catch (Exception ex)
             {
