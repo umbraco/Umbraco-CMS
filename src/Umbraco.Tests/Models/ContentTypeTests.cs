@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -287,8 +288,6 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Serialize_Content_Type_Without_Error()
         {
-            var ss = new SerializationService(new JsonNetSerializer());
-
             // Arrange
             var contentType = MockedContentTypes.CreateTextPageContentType();
             contentType.Id = 99;
@@ -318,8 +317,7 @@ namespace Umbraco.Tests.Models
             contentType.Trashed = false;
             contentType.UpdateDate = DateTime.Now;
 
-            var result = ss.ToStream(contentType);
-            var json = result.ResultStream.ToJsonString();
+            var json = JsonConvert.SerializeObject(contentType);
             Debug.Print(json);
         }
 
@@ -391,8 +389,6 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Serialize_Media_Type_Without_Error()
         {
-            var ss = new SerializationService(new JsonNetSerializer());
-
             // Arrange
             var contentType = MockedContentTypes.CreateImageMediaType();
             contentType.Id = 99;
@@ -416,8 +412,7 @@ namespace Umbraco.Tests.Models
             contentType.Trashed = false;
             contentType.UpdateDate = DateTime.Now;
 
-            var result = ss.ToStream(contentType);
-            var json = result.ResultStream.ToJsonString();
+            var json = JsonConvert.SerializeObject(contentType);
             Debug.Print(json);
         }
 
@@ -492,8 +487,6 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Serialize_Member_Type_Without_Error()
         {
-            var ss = new SerializationService(new JsonNetSerializer());
-
             // Arrange
             var contentType = MockedContentTypes.CreateSimpleMemberType();
             contentType.Id = 99;
@@ -519,8 +512,7 @@ namespace Umbraco.Tests.Models
             contentType.SetMemberCanEditProperty("title", true);
             contentType.SetMemberCanViewProperty("bodyText", true);
 
-            var result = ss.ToStream(contentType);
-            var json = result.ResultStream.ToJsonString();
+            var json = JsonConvert.SerializeObject(contentType);
             Debug.Print(json);
         }
     }
