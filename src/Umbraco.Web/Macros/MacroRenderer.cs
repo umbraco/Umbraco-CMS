@@ -197,7 +197,8 @@ namespace Umbraco.Web.Macros
 
         public MacroContent Render(string macroAlias, IPublishedContent content, IDictionary<string, object> macroParams)
         {
-            var m = _macroService.GetByAlias(macroAlias);
+            var m = _appCaches.RuntimeCache.GetCacheItem(CacheKeys.MacroFromAliasCacheKey + macroAlias, () => _macroService.GetByAlias(macroAlias));
+
             if (m == null)
                 throw new InvalidOperationException("No macro found by alias " + macroAlias);
 

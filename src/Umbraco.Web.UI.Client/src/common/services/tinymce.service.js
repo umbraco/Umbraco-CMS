@@ -588,12 +588,15 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
 
                     var selectedElm = editor.selection.getNode(),
-                        currentTarget;
+                        currentTarget,
+                        imgDomElement;
 
                     if (selectedElm.nodeName === 'IMG') {
                         var img = $(selectedElm);
+                        imgDomElement = selectedElm;
 
                         var hasUdi = img.attr("data-udi") ? true : false;
+                        var hasDataTmpImg = img.attr("data-tmpimg") ? true : false;
 
                         currentTarget = {
                             altText: img.attr("alt"),
@@ -605,12 +608,16 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         } else {
                             currentTarget["id"] = img.attr("rel");
                         }
+
+                        if(hasDataTmpImg){
+                            currentTarget["tmpimg"] = img.attr("data-tmpimg");
+                        }
                     }
 
                     userService.getCurrentUser().then(function (userData) {
                         if (callback) {
                             angularHelper.safeApply($rootScope, function() {
-                                callback(currentTarget, userData);
+                                callback(currentTarget, userData, imgDomElement);
                             });
                         }
                     });
@@ -618,25 +625,77 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             });
         },
 
-        insertMediaInEditor: function (editor, img) {
+        insertMediaInEditor: function (editor, img, imgDomElement) {
             if (img) {
+                // imgElement is only definied if updating an image
+                // if null/undefinied then its a BRAND new image
+                if(imgDomElement){
+                    // Check if the img src has changed
+                    // If it has we will need to do some resizing/recalc again
+                    var hasImageSrcChanged = false;
 
-                var data = {
-                    alt: img.altText || "",
-                    src: (img.url) ? img.url : "nothing.jpg",
-                    id: '__mcenew',
-                    'data-udi': img.udi
-                };
+                    if(img.url !==  editor.dom.getAttrib(imgDomElement, "src")){
+                        hasImageSrcChanged = true;
+                    }
 
-                editor.selection.setContent(editor.dom.createHTML('img', data));
+                    // If null/undefinied it will remove the attribute
+                    editor.dom.setAttrib(imgDomElement, "alt", img.altText);
 
-                $timeout(function () {
-                    var imgElm = editor.dom.get('__mcenew');
-                    sizeImageInEditor(editor, imgElm, img.url);
-                    editor.dom.setAttrib(imgElm, 'id', null);
-                    editor.fire('Change');
+                    // It's possible to pick a NEW image - so need to ensure this gets updated
+                    if(img.udi){
+                        editor.dom.setAttrib(imgDomElement, "data-udi", img.udi);
+                    }
 
-                }, 500);
+                    // It's possible to pick a NEW image - so need to ensure this gets updated
+                    if(img.url){
+                        editor.dom.setAttrib(imgDomElement, "src", img.url);
+                    }
+
+                    // Remove width & height attributes (ONLY if imgSrc changed)
+                    // So native image size is used as this needed to re-calc width & height
+                    // For the function sizeImageInEditor() & apply the image resizing querystrings etc..
+                    if(hasImageSrcChanged){
+                        editor.dom.setAttrib(imgDomElement, "width", null);
+                        editor.dom.setAttrib(imgDomElement, "height", null);
+
+                        //Re-calc the image dimensions
+                        sizeImageInEditor(editor, imgDomElement, img.url);
+                    }
+
+                } else{
+                    // We need to create a NEW DOM <img> element to insert
+                    // setting an attribute of ID to __mcenew, so we can gather a reference to the node, to be able to update its size accordingly to the size of the image.
+                    var data = {
+                        alt: img.altText || "",
+                        src: (img.url) ? img.url : "nothing.jpg",
+                        id: "__mcenew",
+                        "data-udi": img.udi
+                    };
+                    
+                    editor.selection.setContent(editor.dom.createHTML('img', data));
+                    
+                    // Using settimeout to wait for a DoM-render, so we can find the new element by ID.
+                    $timeout(function () {
+
+                        var imgElm = editor.dom.get("__mcenew");
+                        editor.dom.setAttrib(imgElm, "id", null);
+
+                        // When image is loaded we are ready to call sizeImageInEditor.
+                        var onImageLoaded = function() {
+                            sizeImageInEditor(editor, imgElm, img.url);
+                            editor.fire("Change");
+                        }
+
+                        // Check if image already is loaded.
+                        if(imgElm.complete === true) {
+                            onImageLoaded();
+                        } else {
+                            imgElm.onload = onImageLoaded;
+                        }
+
+                    });
+                    
+                }
             }
         },
 
@@ -676,7 +735,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                 //get all macro divs and load their content
                 $(editor.dom.select(".umb-macro-holder.mceNonEditable")).each(function () {
-                    self.loadMacroContent($(this), null);
+                    self.loadMacroContent($(this), null, editor);
                 });
 
             });
@@ -791,14 +850,15 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             }
 
             var $macroDiv = $(editor.dom.select("div.umb-macro-holder." + uniqueId));
+            editor.setDirty(true);
 
             //async load the macro content
-            this.loadMacroContent($macroDiv, macroObject);
+            this.loadMacroContent($macroDiv, macroObject, editor);
 
         },
 
         /** loads in the macro content async from the server */
-        loadMacroContent: function ($macroDiv, macroData) {
+        loadMacroContent: function ($macroDiv, macroData, editor) {
 
             //if we don't have the macroData, then we'll need to parse it from the macro div
             if (!macroData) {
@@ -834,7 +894,11 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         $macroDiv.removeClass("loading");
                         htmlResult = htmlResult.trim();
                         if (htmlResult !== "") {
+                            var wasDirty = editor.isDirty();
                             $ins.html(htmlResult);
+                            if (!wasDirty) {
+                                editor.undoManager.clear();
+                            }
                         }
                     });
             });
@@ -1084,6 +1148,14 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 prependToContext: true
             });
 
+            // the editor frame catches Ctrl+S and handles it with the system save dialog
+            // - we want to handle it in the content controller, so we'll emit an event instead
+            editor.addShortcut('Ctrl+S', '', function () {
+                angularHelper.safeApply($rootScope, function() {
+                    eventsService.emit("rte.shortcut.save");
+                });
+            });
+
         },
 
         insertLinkInEditor: function (editor, target, anchorElm) {
@@ -1287,8 +1359,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 var content = e.content;
 
                 // Upload BLOB images (dragged/pasted ones)
-                if(content.indexOf('<img src="blob:') > -1){
-
+                // find src attribute where value starts with `blob:`
+                // search is case-insensitive and allows single or double quotes 
+                if(content.search(/src=["']blob:.*?["']/gi) !== -1){
                     args.editor.uploadImages(function(data) {
                         // Once all images have been uploaded
                         data.forEach(function(item) {
@@ -1402,7 +1475,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             });
 
             //Create the insert media plugin
-            self.createMediaPicker(args.editor, function (currentTarget, userData) {
+            self.createMediaPicker(args.editor, function (currentTarget, userData, imgDomElement) {
 
                 var startNodeId, startNodeIsVirtual;
                 if (!args.model.config.startNodeId) {
@@ -1421,11 +1494,12 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     onlyImages: true,
                     showDetails: true,
                     disableFolderSelect: true,
+                    disableFocalPoint: true,
                     startNodeId: startNodeId,
                     startNodeIsVirtual: startNodeIsVirtual,
                     dataTypeKey: args.model.dataTypeKey,
                     submit: function (model) {
-                        self.insertMediaInEditor(args.editor, model.selection[0]);
+                        self.insertMediaInEditor(args.editor, model.selection[0], imgDomElement);
                         editorService.close();
                     },
                     close: function () {

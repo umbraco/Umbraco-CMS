@@ -47,7 +47,11 @@ app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 
         var originalTitle = "";
 
         $rootScope.$on('$changeTitle', function (event, titlePrefix) {
-            $rootScope.locationTitle = titlePrefix + " - " + originalTitle;
+            if (titlePrefix) {
+                $rootScope.locationTitle = titlePrefix + " - " + originalTitle;
+            } else {
+                $rootScope.locationTitle = originalTitle;
+            }
         });
 
         /** execute code on each successful route */
@@ -134,14 +138,14 @@ app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 
 
                 var toRetain = navigationService.retainQueryStrings(currentRouteParams, next.params);
 
-                //if toRetain is not null it means that there are missing query strings and we need to update the current params
+                //if toRetain is not null it means that there are missing query strings and we need to update the current params.
                 if (toRetain) {
                     $route.updateParams(toRetain);
                 }
 
                 //check if the location being changed is only due to global/state query strings which means the location change
                 //isn't actually going to cause a route change.
-                if (!toRetain && navigationService.isRouteChangingNavigation(currentRouteParams, next.params)) {
+                if (navigationService.isRouteChangingNavigation(currentRouteParams, next.params)) {
 
                     //The location change will cause a route change, continue the route if the query strings haven't been updated.
                     $route.reload();
