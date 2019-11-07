@@ -27,7 +27,7 @@ namespace Umbraco.Web.Runtime
         }
 
         /// <inheritdoc/>
-        public override IFactory Boot(IRegister register)
+        public override IFactory Boot(IRegister register, IConfigsFactory configsFactory)
         {
             // create and start asap to profile boot
             var debug = GlobalSettings.DebugMode;
@@ -43,7 +43,7 @@ namespace Umbraco.Web.Runtime
                 _webProfiler = new VoidProfiler();
             }
 
-            var factory = base.Boot(register);
+            var factory = base.Boot(register, configsFactory);
 
             // now (and only now) is the time to switch over to perWebRequest scopes.
             // up until that point we may not have a request, and scoped services would

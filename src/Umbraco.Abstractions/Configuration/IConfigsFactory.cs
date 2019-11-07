@@ -1,6 +1,4 @@
-using Umbraco.Core.Configuration;
-
-namespace Umbraco.Core.Composing
+namespace Umbraco.Core.Configuration
 {
     public interface IConfigsFactory
     {

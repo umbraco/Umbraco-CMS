@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Hosting;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
 
@@ -62,7 +63,7 @@ namespace Umbraco.Web
             // the boot manager is responsible for registrations
             var register = GetRegister();
             _runtime = GetRuntime();
-            _runtime.Boot(register);
+            _runtime.Boot(register, new ConfigsFactory());
         }
 
         // called by ASP.NET (auto event wireup) once per app domain

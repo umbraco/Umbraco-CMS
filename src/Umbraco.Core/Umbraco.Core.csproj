@@ -158,9 +158,7 @@
     <Compile Include="Composing\ComposeBeforeAttribute.cs" />
     <Compile Include="Composing\Composers.cs" />
     <Compile Include="Composing\Composition.cs" />
-    <Compile Include="Composing\ConfigsFactory.cs" />
     <Compile Include="Composing\IComposer.cs" />
-    <Compile Include="Composing\IConfigsFactory.cs" />
     <Compile Include="Composing\RegisterFactory.cs" />
     <Compile Include="CompositionExtensions.cs" />
     <Compile Include="Composing\ICoreComposer.cs" />
@@ -176,6 +174,7 @@
     <Compile Include="CompositionExtensions_Essentials.cs" />
     <Compile Include="CompositionExtensions_FileSystems.cs" />
     <Compile Include="CompositionExtensions_Uniques.cs" />
+    <Compile Include="Configuration\ConfigsFactory.cs" />
     <Compile Include="Configuration\UmbracoVersion.cs" />
     <Compile Include="ConventionsHelper.cs" />
     <Compile Include="Events\ContentPublishedEventArgs.cs" />

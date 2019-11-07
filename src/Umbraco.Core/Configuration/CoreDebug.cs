@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 
 namespace Umbraco.Core.Configuration
 {
@@ -6,7 +7,7 @@ namespace Umbraco.Core.Configuration
     {
         public CoreDebug()
         {
-            var appSettings = System.Configuration.ConfigurationManager.AppSettings;
+            var appSettings = ConfigurationManager.AppSettings;
             LogUncompletedScopes = string.Equals("true", appSettings[Constants.AppSettings.Debug.LogUncompletedScopes], StringComparison.OrdinalIgnoreCase);
             DumpOnTimeoutThreadAbort = string.Equals("true", appSettings[Constants.AppSettings.Debug.DumpOnTimeoutThreadAbort], StringComparison.OrdinalIgnoreCase);
         }

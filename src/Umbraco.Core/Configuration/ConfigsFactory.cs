@@ -1,7 +1,6 @@
 using System.Configuration;
-using Umbraco.Core.Configuration;
 
-namespace Umbraco.Core.Composing
+namespace Umbraco.Core.Configuration
 {
     public class ConfigsFactory : IConfigsFactory
     {

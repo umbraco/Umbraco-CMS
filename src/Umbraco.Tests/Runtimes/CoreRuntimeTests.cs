@@ -102,9 +102,9 @@ namespace Umbraco.Tests.Runtimes
                 return mock.Object;
             }
 
-            protected override Configs GetConfigs()
+            protected override Configs GetConfigs(IConfigsFactory configsFactory)
             {
-                var configs = new ConfigsFactory().Create();
+                var configs = configsFactory.Create();
                 configs.Add(SettingsForTests.GetDefaultGlobalSettings);
                 configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
                 return configs;
@@ -142,9 +142,9 @@ namespace Umbraco.Tests.Runtimes
 
             private IMainDom _mainDom;
 
-            public override IFactory Boot(IRegister container)
+            public override IFactory Boot(IRegister container, IConfigsFactory configsFactory)
             {
-                var factory = base.Boot(container);
+                var factory = base.Boot(container, configsFactory);
                 _mainDom = factory.GetInstance<IMainDom>();
                 return factory;
             }
