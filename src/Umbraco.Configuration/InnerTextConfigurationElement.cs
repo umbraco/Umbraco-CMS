@@ -9,7 +9,7 @@ namespace Umbraco.Core.Configuration
     /// {element}MyValue{/element} instead of as attribute values.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    internal class InnerTextConfigurationElement<T> : RawXmlConfigurationElement
+    public class InnerTextConfigurationElement<T> : RawXmlConfigurationElement
     {
         public InnerTextConfigurationElement()
         {

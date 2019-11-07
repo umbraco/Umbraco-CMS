@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class ContentImagingElement : ConfigurationElement
+    public class ContentImagingElement : ConfigurationElement
     {
 
         [ConfigurationProperty("imageFileTypes")]
@@ -12,7 +12,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                 //set the default
                 GetDefaultImageFileTypes());
 
-        internal static string[] GetDefaultImageFileTypes()
+        public static string[] GetDefaultImageFileTypes()
         {
             return new[] {"jpeg", "jpg", "gif", "bmp", "png", "tiff", "tif"};
         }
@@ -49,7 +49,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
-        internal static ImagingAutoFillPropertiesCollection GetDefaultImageAutoFillProperties()
+        public static ImagingAutoFillPropertiesCollection GetDefaultImageAutoFillProperties()
         {
             return new ImagingAutoFillPropertiesCollection
                         {
