@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class RequestHandlerElement : UmbracoConfigurationElement, IRequestHandlerSection
+    public class RequestHandlerElement : UmbracoConfigurationElement, IRequestHandlerSection
     {
         [ConfigurationProperty("addTrailingSlash")]
         public InnerTextConfigurationElement<bool> AddTrailingSlash => GetOptionalTextElement("addTrailingSlash", true);
@@ -38,7 +38,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
-        internal static CharCollection GetDefaultCharReplacements()
+        public static CharCollection GetDefaultCharReplacements()
         {
             var dictionary = new Dictionary<char, string>()
                         {
