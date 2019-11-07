@@ -94,15 +94,14 @@
                                        <i class="icon icon-settings" title="@grid_settings" localize="title" ng-click="editGridItemSettings(row, 'row')"></i>
                                    </div>
 
-                                    <div class="cell-tools-remove row-tool">
-                                        <i class="icon-trash" ng-click="togglePrompt(row)"></i>
-                                        <umb-confirm-action
-                                            ng-if="row.deletePrompt"
-                                            direction="left"
-                                            on-confirm="removeRow(section, $index)"
-                                            on-cancel="hidePrompt(row)">
-                                        </umb-confirm-action>
-                                    </div>
+                                   <div class="cell-tools-remove row-tool">
+                                       <umb-confirm-action ng-if="row.deletePrompt"
+                                                           direction="left"
+                                                           on-confirm="removeRow(section, $index)"
+                                                           on-cancel="hidePrompt(row)">
+                                       </umb-confirm-action>
+                                       <i class="icon-trash" ng-click="togglePrompt(row)"></i>
+                                   </div>
 
                                </div>
 
@@ -200,12 +199,13 @@
                                                                           </div>
 
                                                                           <div class="umb-control-tool">
-                                                                              <i class="umb-control-tool-icon icon-trash" ng-click="togglePrompt(control)"></i>
                                                                               <umb-confirm-action ng-if="control.deletePrompt"
                                                                                                   direction="left"
                                                                                                   on-confirm="removeControl(area, $index)"
                                                                                                   on-cancel="hidePrompt(control)">
                                                                               </umb-confirm-action>
+                                                                              <i class="umb-control-tool-icon icon-trash" ng-click="togglePrompt(control)"></i>
+
                                                                           </div>
 
                                                                       </div>

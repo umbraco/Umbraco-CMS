@@ -76,20 +76,19 @@ The prompt can be opened in four direction up, down, left or right.</p>
               scope.onConfirm();
             }
         
-        }
-        
+        }        
 
-      scope.clickCancel = function(keyEvent) {
+      scope.clickCancel = function() {
           if (scope.onCancel) {
               scope.onCancel();
           }
           
       };
-    scope.keyClick = function (keyEvent) {
-            if (keyEvent.which === 13 && scope.onConfirm) {
+    scope.keyClick = function (event) {
+            if (event.keyCode === 13 && scope.onConfirm) {
                 scope.onConfirm();
             }
-            if (keyEvent.which === 13 && scope.onCancel) {
+            if (event.keyCode === 13 && scope.onCancel) {
                 scope.onCancel()
             }
         };
