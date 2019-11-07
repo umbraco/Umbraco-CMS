@@ -71,18 +71,28 @@ The prompt can be opened in four direction up, down, left or right.</p>
 
     function link(scope, el, attr, ctrl) {
 
-      scope.clickConfirm = function() {
-          if(scope.onConfirm) {
+        scope.clickConfirm = function () {
+          if (scope.onConfirm) {
               scope.onConfirm();
-          }
-      };
+            }
+        
+        }
+        
 
-      scope.clickCancel = function() {
-          if(scope.onCancel) {
+      scope.clickCancel = function(keyEvent) {
+          if (scope.onCancel) {
               scope.onCancel();
           }
+          
       };
-
+    scope.keyClick = function (keyEvent) {
+            if (keyEvent.which === 13 && scope.onConfirm) {
+                scope.onConfirm();
+            }
+            if (keyEvent.which === 13 && scope.onCancel) {
+                scope.onCancel()
+            }
+        };
     }
 
     var directive = {
