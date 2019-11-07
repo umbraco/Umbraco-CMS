@@ -54,8 +54,14 @@
                                 <input class="form-control search-input" type="text" ng-model="vm.logOptions.filterExpression" placeholder="Search logs..." />
 
                                 <!-- Save Search & Clear Search icon buttons -->
-                                <umb-icon icon-name="icon-rate" class="icon-rate" ng-show="vm.checkForSavedSearch()" ng-click="vm.addToSavedSearches()">&nbsp;</umb-icon>
-                                <umb-icon icon-name="icon-wrong" class="icon-wrong" ng-show="vm.logOptions.filterExpression" ng-click="vm.resetSearch()">&nbsp;</umb-icon>
+                                <button class="save-search btn-reset" type="button" ng-show="vm.checkForSavedSearch()" ng-click="vm.addToSavedSearches()">
+                                    <umb-icon icon-name="icon-rate" class="icon-rate" aria-hidden="true" />
+                                    <localize class="sr-only" key="logViewer_saveSearch">Save Search</localize>
+                                </button>
+                                <button class="filter-search btn-reset" ng-show="vm.logOptions.filterExpression" ng-click="vm.resetSearch()">
+                                    <umb-icon icon-name="icon-wrong" class="icon-wrong" aria-hidden="true" />
+                                    <localize class="sr-only" key="logViewer_filterSearch">Filter Search</localize>
+                                </button>
 
                                 <!-- Saved Searches -->
                                 <a class="umb-variant-switcher__toggle ng-scope" href="" ng-click="vm.dropdownOpen = !vm.dropdownOpen">
@@ -112,7 +118,7 @@
                                     <tr>
                                         <th ng-click="vm.toggleOrderBy()">
                                             <localize key="logViewer_timestamp">Timestamp</localize>
-                                            <umb-icon icon-name="{{vm.logOptions.orderDirection === 'Descending ? 'icon-navigation-down' : 'icon-navigation-up'}}" class="icon-navigation-down" ng-class="{'icon-navigation-down': vm.logOptions.orderDirection === 'Descending', 'icon-navigation-up': vm.logOptions.orderDirection !== 'Descending'}">&nbsp;</umb-icon>
+                                            <umb-icon icon-name="{{vm.logOptions.orderDirection === 'Descending' ? 'icon-navigation-down' : 'icon-navigation-up'}}" class="icon-navigation-down" ng-class="{'icon-navigation-down': vm.logOptions.orderDirection === 'Descending', 'icon-navigation-up': vm.logOptions.orderDirection !== 'Descending'}">&nbsp;</umb-icon>
                                         </th>
                                         <th><localize key="logViewer_level">Level</localize></th>
                                         <th><localize key="logViewer_machine">Machine</localize></th>
