@@ -4,6 +4,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Runtime;
+using Umbraco.Web.Cache;
 using Umbraco.Web.Logging;
 
 namespace Umbraco.Web.Runtime

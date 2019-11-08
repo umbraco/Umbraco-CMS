@@ -9,6 +9,7 @@ using Umbraco.Core.Collections;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Tests.Collections;
+using Umbraco.Web.Cache;
 
 namespace Umbraco.Tests.Cache
 {

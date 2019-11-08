@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Web;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
+using Umbraco.Web.Cache;
 
 namespace Umbraco.Tests.Cache
 {

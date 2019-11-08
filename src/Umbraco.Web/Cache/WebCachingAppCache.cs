@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Web.Caching;
+using Umbraco.Core;
+using Umbraco.Core.Cache;
 
-namespace Umbraco.Core.Cache
+namespace Umbraco.Web.Cache
 {
     /// <summary>
     /// Implements <see cref="IAppPolicyCache"/> on top of a <see cref="System.Web.Caching.Cache"/>.
