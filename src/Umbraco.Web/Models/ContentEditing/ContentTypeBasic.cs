@@ -109,7 +109,7 @@ namespace Umbraco.Web.Models.ContentEditing
             {
                 return ThumbnailIsClass
                            ? string.Empty
-                           : IOHelper.ResolveUrl("~/umbraco/images/thumbnails/" + Thumbnail);
+                           : Current.IOHelper.ResolveUrl("~/umbraco/images/thumbnails/" + Thumbnail);
             }
         }
 

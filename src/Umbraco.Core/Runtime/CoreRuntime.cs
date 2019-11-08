@@ -216,7 +216,7 @@ namespace Umbraco.Core.Runtime
         {
             var path = GetApplicationRootPath();
             if (string.IsNullOrWhiteSpace(path) == false)
-                IOHelper.SetRootDirectory(path);
+                Current.IOHelper.SetRootDirectory(path);
         }
 
         private bool AcquireMainDom(MainDom mainDom)

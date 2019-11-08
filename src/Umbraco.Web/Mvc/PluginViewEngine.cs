@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Web.Mvc;
 using Lucene.Net.Util;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Mvc
@@ -74,7 +75,7 @@ namespace Umbraco.Web.Mvc
             var razorResult = result.View as RazorView;
             if (razorResult == null) return;
 
-            var folder = Path.GetDirectoryName(IOHelper.MapPath(razorResult.ViewPath));
+            var folder = Path.GetDirectoryName(Current.IOHelper.MapPath(razorResult.ViewPath));
             //now we need to get the /View/ folder
             var viewFolder = folder.Substring(0, folder.LastIndexOf("\\Views\\")) + "\\Views";
 

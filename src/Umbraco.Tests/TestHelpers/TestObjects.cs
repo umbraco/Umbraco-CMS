@@ -118,9 +118,9 @@ namespace Umbraco.Tests.TestHelpers
             var localizedTextService = GetLazyService<ILocalizedTextService>(factory, c => new LocalizedTextService(
                     new Lazy<LocalizedTextServiceFileSources>(() =>
                     {
-                        var mainLangFolder = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Umbraco + "/config/lang/"));
-                        var appPlugins = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.AppPlugins));
-                        var configLangFolder = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Config + "/lang/"));
+                        var mainLangFolder = new DirectoryInfo(Current.IOHelper.MapPath(SystemDirectories.Umbraco + "/config/lang/"));
+                        var appPlugins = new DirectoryInfo(Current.IOHelper.MapPath(SystemDirectories.AppPlugins));
+                        var configLangFolder = new DirectoryInfo(Current.IOHelper.MapPath(SystemDirectories.Config + "/lang/"));
 
                         var pluginLangFolders = appPlugins.Exists == false
                             ? Enumerable.Empty<LocalizedTextServiceSupplementaryFileSource>()
@@ -181,7 +181,7 @@ namespace Umbraco.Tests.TestHelpers
                         new PackageDataInstallation(logger, fileService.Value, macroService.Value, localizationService.Value, dataTypeService.Value, entityService.Value, contentTypeService.Value, contentService.Value, propertyEditorCollection, scopeProvider),
                         new PackageFileInstallation(compiledPackageXmlParser, new ProfilingLogger(logger, new TestProfiler())),
                         compiledPackageXmlParser, Mock.Of<IPackageActionRunner>(),
-                        new DirectoryInfo(IOHelper.GetRootDirectorySafe())));
+                        new DirectoryInfo(Current.IOHelper.GetRootDirectorySafe())));
             });
             var relationService = GetLazyService<IRelationService>(factory, c => new RelationService(scopeProvider, logger, eventMessagesFactory, entityService.Value, GetRepo<IRelationRepository>(c), GetRepo<IRelationTypeRepository>(c)));
             var tagService = GetLazyService<ITagService>(factory, c => new TagService(scopeProvider, logger, eventMessagesFactory, GetRepo<ITagRepository>(c)));

@@ -6,6 +6,7 @@ using System.Text;
 using Newtonsoft.Json;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.Grid;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -51,7 +52,7 @@ namespace Umbraco.Core.Manifest
         public string Path
         {
             get => _path;
-            set => _path = value.StartsWith("~/") ? IOHelper.MapPath(value) : value;
+            set => _path = value.StartsWith("~/") ? Current.IOHelper.MapPath(value) : value;
         }
 
         /// <summary>
@@ -166,9 +167,9 @@ namespace Umbraco.Core.Manifest
 
             // scripts and stylesheets are raw string, must process here
             for (var i = 0; i < manifest.Scripts.Length; i++)
-                manifest.Scripts[i] = IOHelper.ResolveVirtualUrl(manifest.Scripts[i]);
+                manifest.Scripts[i] = Current.IOHelper.ResolveVirtualUrl(manifest.Scripts[i]);
             for (var i = 0; i < manifest.Stylesheets.Length; i++)
-                manifest.Stylesheets[i] = IOHelper.ResolveVirtualUrl(manifest.Stylesheets[i]);
+                manifest.Stylesheets[i] = Current.IOHelper.ResolveVirtualUrl(manifest.Stylesheets[i]);
 
             // add property editors that are also parameter editors, to the parameter editors list
             // (the manifest format is kinda legacy)

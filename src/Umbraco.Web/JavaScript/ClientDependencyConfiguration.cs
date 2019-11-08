@@ -9,6 +9,7 @@ using System.Xml.Linq;
 using ClientDependency.Core.CompositeFiles.Providers;
 using ClientDependency.Core.Config;
 using Semver;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 
@@ -26,9 +27,9 @@ namespace Umbraco.Web.JavaScript
         {
             if (logger == null) throw new ArgumentNullException("logger");
             _logger = logger;
-            _fileName = IOHelper.MapPath(string.Format("{0}/ClientDependency.config", SystemDirectories.Config));
+            _fileName = Current.IOHelper.MapPath(string.Format("{0}/ClientDependency.config", SystemDirectories.Config));
         }
-        
+
         /// <summary>
         /// Changes the version number in ClientDependency.config to a hashed value for the version and the DateTime.Day
         /// </summary>
@@ -39,7 +40,7 @@ namespace Umbraco.Web.JavaScript
         public bool UpdateVersionNumber(SemVersion version, DateTime date, string dateFormat)
         {
             var byteContents = Encoding.Unicode.GetBytes(version + date.ToString(dateFormat));
-            
+
             //This is a way to convert a string to a long
             //see https://www.codeproject.com/Articles/34309/Convert-String-to-bit-Integer
             //We could much more easily use MD5 which would create us an INT but since that is not compliant with
@@ -106,7 +107,7 @@ namespace Umbraco.Web.JavaScript
             }
 
             try
-            {               
+            {
                 var fullPath = XmlFileMapper.FileMapDefaultFolder.StartsWith("~/")
                     ? currentHttpContext.Server.MapPath(XmlFileMapper.FileMapDefaultFolder)
                     : XmlFileMapper.FileMapDefaultFolder;

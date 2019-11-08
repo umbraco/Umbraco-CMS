@@ -86,7 +86,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             _memberRepository = memberRepository;
             _globalSettings = globalSettings;
             _entitySerializer = entitySerializer;
-            _xmlFileName = IOHelper.MapPath(SystemFiles.GetContentCacheXml(_globalSettings));
+            _xmlFileName = Current.IOHelper.MapPath(SystemFiles.GetContentCacheXml(_globalSettings));
 
             if (testing)
             {
@@ -110,7 +110,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             _mediaRepository = mediaRepository;
             _memberRepository = memberRepository;
             _xmlFileEnabled = false;
-            _xmlFileName = IOHelper.MapPath(SystemFiles.GetContentCacheXml(Current.Configs.Global()));
+            _xmlFileName = Current.IOHelper.MapPath(SystemFiles.GetContentCacheXml(Current.Configs.Global()));
             // do not plug events, we may not have what it takes to handle them
         }
 
@@ -124,7 +124,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             _memberRepository = memberRepository;
             GetXmlDocument = getXmlDocument ?? throw new ArgumentNullException(nameof(getXmlDocument));
             _xmlFileEnabled = false;
-            _xmlFileName = IOHelper.MapPath(SystemFiles.GetContentCacheXml(Current.Configs.Global()));
+            _xmlFileName = Current.IOHelper.MapPath(SystemFiles.GetContentCacheXml(Current.Configs.Global()));
             // do not plug events, we may not have what it takes to handle them
         }
 

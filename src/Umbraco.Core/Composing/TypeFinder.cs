@@ -78,7 +78,7 @@ namespace Umbraco.Core.Composing
             HashSet<Assembly> assemblies = null;
             try
             {
-                var isHosted = IOHelper.IsHosted;
+                var isHosted = Current.IOHelper.IsHosted;
 
                 try
                 {
@@ -97,7 +97,7 @@ namespace Umbraco.Core.Composing
                 {
                     //NOTE: we cannot use AppDomain.CurrentDomain.GetAssemblies() because this only returns assemblies that have
                     // already been loaded in to the app domain, instead we will look directly into the bin folder and load each one.
-                    var binFolder = IOHelper.GetRootDirectoryBinFolder();
+                    var binFolder = Current.IOHelper.GetRootDirectoryBinFolder();
                     var binAssemblyFiles = Directory.GetFiles(binFolder, "*.dll", SearchOption.TopDirectoryOnly).ToList();
                     //var binFolder = Assembly.GetExecutingAssembly().GetAssemblyFile().Directory;
                     //var binAssemblyFiles = Directory.GetFiles(binFolder.FullName, "*.dll", SearchOption.TopDirectoryOnly).ToList();
@@ -135,7 +135,7 @@ namespace Umbraco.Core.Composing
 
                 //here we are trying to get the App_Code assembly
                 var fileExtensions = new[] { ".cs", ".vb" }; //only vb and cs files are supported
-                var appCodeFolder = new DirectoryInfo(IOHelper.MapPath(IOHelper.ResolveUrl("~/App_code")));
+                var appCodeFolder = new DirectoryInfo(Current.IOHelper.MapPath(Current.IOHelper.ResolveUrl("~/App_code")));
                 //check if the folder exists and if there are any files in it with the supported file extensions
                 if (appCodeFolder.Exists && fileExtensions.Any(x => appCodeFolder.GetFiles("*" + x).Any()))
                 {

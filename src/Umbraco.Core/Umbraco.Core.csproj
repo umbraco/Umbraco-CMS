@@ -178,6 +178,7 @@
     <Compile Include="Composing\TargetedServiceFactory.cs" />
     <Compile Include="Composing\TypeFinder.cs" />
     <Compile Include="Composing\TypeLoader.cs" />
+    <Compile Include="IO\IIOHelper.cs" />
     <Compile Include="IO\IMediaFileSystem.cs" />
     <Compile Include="IO\IMediaPathScheme.cs" />
     <Compile Include="IO\IOHelper.cs" />
@@ -536,6 +537,9 @@
     <Compile Include="Models\MemberTypePropertyProfileAccess.cs" />
     <Compile Include="Models\Packaging\InstallationSummary.cs" />
     <Compile Include="Models\Packaging\PreInstallWarnings.cs" />
+    <Compile Include="Models\PagedResultOfT.cs" />
+    <Compile Include="Models\Property.cs" />
+    <Compile Include="Models\PropertyCollection.cs" />
     <Compile Include="Models\PropertyGroup.cs" />
     <Compile Include="Models\PropertyGroupCollection.cs" />
     <Compile Include="Models\PropertyTypeCollection.cs" />

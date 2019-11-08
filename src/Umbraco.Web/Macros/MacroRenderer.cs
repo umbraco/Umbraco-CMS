@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
@@ -171,7 +172,7 @@ namespace Umbraco.Web.Macros
             var filename = GetMacroFileName(model);
             if (filename == null) return null;
 
-            var mapped = IOHelper.MapPath(filename);
+            var mapped = Current.IOHelper.MapPath(filename);
             if (mapped == null) return null;
 
             var file = new FileInfo(mapped);
@@ -188,7 +189,7 @@ namespace Umbraco.Web.Macros
                     ? macroParams[key]?.ToString() ?? string.Empty
                     : string.Empty;
             }
-        } 
+        }
         #endregion
 
         #region Render/Execute
@@ -315,7 +316,7 @@ namespace Umbraco.Web.Macros
         private Attempt<MacroContent> ExecuteMacroOfType(MacroModel model, IPublishedContent content)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
-            
+
             // ensure that we are running against a published node (ie available in XML)
             // that may not be the case if the macro is embedded in a RTE of an unpublished document
 
@@ -451,9 +452,9 @@ namespace Umbraco.Web.Macros
 
             return value;
         }
-        
+
         #endregion
-        
+
     }
 
 }

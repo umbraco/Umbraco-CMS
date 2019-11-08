@@ -170,7 +170,7 @@ namespace Umbraco.Web.Scheduling
             // temp file cleanup, will run on all servers - even though file upload should only be handled on the master, this will
             // ensure that in the case it happes on replicas that they are cleaned up.
             var task = new TempFileCleanup(_fileCleanupRunner, DefaultDelayMilliseconds, OneHourMilliseconds,
-                new[] { new DirectoryInfo(IOHelper.MapPath(SystemDirectories.TempFileUploads)) },
+                new[] { new DirectoryInfo(Current.IOHelper.MapPath(SystemDirectories.TempFileUploads)) },
                 TimeSpan.FromDays(1), //files that are over a day old
                 _runtime, _logger);
             _scrubberRunner.TryAdd(task);

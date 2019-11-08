@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Composing
         public void Initialize()
         {
             // this ensures it's reset
-            _typeLoader = new TypeLoader(NoAppCache.Instance, IOHelper.MapPath("~/App_Data/TEMP"), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()), false);
+            _typeLoader = new TypeLoader(NoAppCache.Instance, Current.IOHelper.MapPath("~/App_Data/TEMP"), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()), false);
 
             // for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
             // TODO: Should probably update this so it only searches this assembly and add custom types to be found

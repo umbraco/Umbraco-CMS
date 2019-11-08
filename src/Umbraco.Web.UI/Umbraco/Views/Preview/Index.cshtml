@@ -1,6 +1,7 @@
 ﻿@using Umbraco.Core
 @using ClientDependency.Core
 @using ClientDependency.Core.Mvc
+@using Umbraco.Core.Composing
 @using Umbraco.Core.IO
 @using Umbraco.Web
 @using Umbraco.Core.Configuration
@@ -21,7 +22,7 @@
     <meta name="pinterest" content="nopin" />
 
     @Html.RenderCssHere(
-        new BasicPath("Umbraco", IOHelper.ResolveUrl(SystemDirectories.Umbraco)))
+        new BasicPath("Umbraco", Current.IOHelper.ResolveUrl(SystemDirectories.Umbraco)))
 
 </head>
 <body id="canvasdesignerPanel" ng-mouseover="outlinePositionHide()" ng-controller="previewController">

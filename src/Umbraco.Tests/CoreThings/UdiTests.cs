@@ -27,7 +27,7 @@ namespace Umbraco.Tests.CoreThings
             var container = new Mock<IFactory>();
             var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
             container.Setup(x => x.GetInstance(typeof(TypeLoader))).Returns(
-                new TypeLoader(NoAppCache.Instance, IOHelper.MapPath("~/App_Data/TEMP"), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
+                new TypeLoader(NoAppCache.Instance, Current.IOHelper.MapPath("~/App_Data/TEMP"), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
             Current.Factory = container.Object;
             CurrentCore.Factory = container.Object;
 

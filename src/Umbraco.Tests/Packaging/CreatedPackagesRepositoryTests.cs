@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Packaging
             base.TearDown();
 
             //clear out files/folders
-            Directory.Delete(IOHelper.MapPath("~/" + _testBaseFolder), true);
+            Directory.Delete(Current.IOHelper.MapPath("~/" + _testBaseFolder), true);
         }
 
         public ICreatedPackagesRepository PackageBuilder => new PackagesRepository(
@@ -146,8 +146,8 @@ namespace Umbraco.Tests.Packaging
         {
             var file1 = $"~/{_testBaseFolder}/App_Plugins/MyPlugin/package.manifest";
             var file2 = $"~/{_testBaseFolder}/App_Plugins/MyPlugin/styles.css";
-            var mappedFile1 = IOHelper.MapPath(file1);
-            var mappedFile2 = IOHelper.MapPath(file2);
+            var mappedFile1 = Current.IOHelper.MapPath(file1);
+            var mappedFile2 = Current.IOHelper.MapPath(file2);
             Directory.CreateDirectory(Path.GetDirectoryName(mappedFile1));
             Directory.CreateDirectory(Path.GetDirectoryName(mappedFile2));
             File.WriteAllText(mappedFile1, "hello world");
@@ -171,7 +171,7 @@ namespace Umbraco.Tests.Packaging
             def = PackageBuilder.GetById(def.Id); //re-get
             Assert.IsNotNull(def.PackagePath);
 
-            using (var archive = ZipFile.OpenRead(IOHelper.MapPath(zip)))
+            using (var archive = ZipFile.OpenRead(Current.IOHelper.MapPath(zip)))
             {
                 Assert.AreEqual(3, archive.Entries.Count);
 

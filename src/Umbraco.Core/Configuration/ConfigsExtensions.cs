@@ -18,7 +18,7 @@ namespace Umbraco.Core
 
         public static void AddCoreConfigs(this Configs configs)
         {
-            var configDir = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Config));
+            var configDir = new DirectoryInfo(Current.IOHelper.MapPath(SystemDirectories.Config));
 
             // GridConfig depends on runtime caches, manifest parsers... and cannot be available during composition
             configs.Add<IGridConfig>(factory => new GridConfig(

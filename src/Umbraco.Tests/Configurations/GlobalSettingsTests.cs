@@ -49,15 +49,15 @@ namespace Umbraco.Tests.Configurations
             var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
 
             var globalSettingsMock = Mock.Get(globalSettings);
-            globalSettingsMock.Setup(x => x.Path).Returns(() => IOHelper.ResolveUrl(path));
+            globalSettingsMock.Setup(x => x.Path).Returns(() => Current.IOHelper.ResolveUrl(path));
 
             SystemDirectories.Root = rootPath;
             Assert.AreEqual(outcome, globalSettings.GetUmbracoMvcAreaNoCache());
         }
 
-        
 
 
-        
+
+
     }
 }

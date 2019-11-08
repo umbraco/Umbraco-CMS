@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web.Mvc;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Web.Models;
 
@@ -42,7 +43,7 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         private static void EnsureFoldersAndFiles()
         {
-            var viewFolder = IOHelper.MapPath(Constants.ViewLocation);
+            var viewFolder = Current.IOHelper.MapPath(Constants.ViewLocation);
 
             // ensure the web.config file is in the ~/Views folder
             Directory.CreateDirectory(viewFolder);

@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging.Viewer;
 
@@ -42,8 +43,8 @@ namespace Umbraco.Tests.Logging
             _newSearchfilePath = Path.Combine(_newSearchfileDirPath, _searchfileName);
 
             //Create/ensure Directory exists
-            IOHelper.EnsurePathExists(_newLogfileDirPath);
-            IOHelper.EnsurePathExists(_newSearchfileDirPath);
+            Current.IOHelper.EnsurePathExists(_newLogfileDirPath);
+            Current.IOHelper.EnsurePathExists(_newSearchfileDirPath);
 
             //Copy the sample files
             File.Copy(exampleLogfilePath, _newLogfilePath, true);

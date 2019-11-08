@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Collections;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Web.Install.Models;
 
@@ -24,7 +25,7 @@ namespace Umbraco.Web.Install
 
         private static string GetFile(Guid installId)
         {
-            var file = IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "Install/"
+            var file = Current.IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "Install/"
                                         + "install_"
                                         + installId.ToString("N")
                                         + ".txt");
@@ -39,7 +40,7 @@ namespace Umbraco.Web.Install
 
         public static void ClearFiles()
         {
-            var dir = IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "Install/");
+            var dir = Current.IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "Install/");
             if (Directory.Exists(dir))
             {
                 var files = Directory.GetFiles(dir);
