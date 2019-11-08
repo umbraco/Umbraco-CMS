@@ -39,6 +39,22 @@ namespace Umbraco.Core.Composing
             }
         }
 
+        /// <summary>
+        /// Resets <see cref="Current"/>. Indented for testing only, and not supported in production code.
+        /// </summary>
+        /// <remarks>
+        /// <para>For UNIT TESTS exclusively.</para>
+        /// <para>Resets everything that is 'current'.</para>
+        /// </remarks>
+        public static void Reset()
+        {
+            _factory.DisposeIfDisposable();
+            _factory = null;
+
+            _logger = null;
+            _profiler = null;
+            _profilingLogger = null;
+        }
         public static bool HasFactory => _factory != null;
 
         #region Getters
