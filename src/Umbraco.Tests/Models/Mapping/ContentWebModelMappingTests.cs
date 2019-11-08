@@ -261,7 +261,7 @@ namespace Umbraco.Tests.Models.Mapping
 
         #region Assertions
 
-        private void AssertDisplayProperty<T>(IContentProperties<T> result, Property p)
+        private void AssertDisplayProperty<T>(IContentProperties<T> result, IProperty p)
             where T : ContentPropertyBasic
         {
             var pDto = result.Properties.SingleOrDefault(x => x.Alias == p.Alias);
@@ -325,7 +325,7 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(content.Properties.Count(), result.Properties.Count(x => x.Alias.StartsWith("_umb_") == false));
         }
 
-        private void AssertBasicProperty<T>(IContentProperties<T> result, Property p)
+        private void AssertBasicProperty<T>(IContentProperties<T> result, IProperty p)
             where T : ContentPropertyBasic
         {
             var pDto = result.Properties.SingleOrDefault(x => x.Alias == p.Alias);
@@ -341,7 +341,7 @@ namespace Umbraco.Tests.Models.Mapping
                 Assert.AreEqual(pDto.Value, p.GetValue().ToString());
         }
 
-        private void AssertProperty(IContentProperties<ContentPropertyDto> result, Property p)
+        private void AssertProperty(IContentProperties<ContentPropertyDto> result, IProperty p)
         {
             AssertBasicProperty(result, p);
 

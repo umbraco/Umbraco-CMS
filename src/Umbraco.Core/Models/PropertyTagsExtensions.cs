@@ -20,7 +20,7 @@ namespace Umbraco.Core.Models
 
         // gets the tag configuration for a property
         // from the datatype configuration, and the editor tag configuration attribute
-        internal static TagConfiguration GetTagConfiguration(this Property property)
+        internal static TagConfiguration GetTagConfiguration(this IProperty property)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
 
@@ -44,7 +44,7 @@ namespace Umbraco.Core.Models
         /// <param name="tags">The tags.</param>
         /// <param name="merge">A value indicating whether to merge the tags with existing tags instead of replacing them.</param>
         /// <param name="culture">A culture, for multi-lingual properties.</param>
-        public static void AssignTags(this Property property, IEnumerable<string> tags, bool merge = false, string culture = null)
+        public static void AssignTags(this IProperty property, IEnumerable<string> tags, bool merge = false, string culture = null)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
 
@@ -56,7 +56,7 @@ namespace Umbraco.Core.Models
         }
 
         // assumes that parameters are consistent with the datatype configuration
-        private static void AssignTags(this Property property, IEnumerable<string> tags, bool merge, TagsStorageType storageType, char delimiter, string culture)
+        private static void AssignTags(this IProperty property, IEnumerable<string> tags, bool merge, TagsStorageType storageType, char delimiter, string culture)
         {
             // set the property value
             var trimmedTags = tags.Select(x => x.Trim()).ToArray();
@@ -97,7 +97,7 @@ namespace Umbraco.Core.Models
         /// <param name="property">The property.</param>
         /// <param name="tags">The tags.</param>
         /// <param name="culture">A culture, for multi-lingual properties.</param>
-        public static void RemoveTags(this Property property, IEnumerable<string> tags, string culture = null)
+        public static void RemoveTags(this IProperty property, IEnumerable<string> tags, string culture = null)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
 
@@ -109,7 +109,7 @@ namespace Umbraco.Core.Models
         }
 
         // assumes that parameters are consistent with the datatype configuration
-        private static void RemoveTags(this Property property, IEnumerable<string> tags, TagsStorageType storageType, char delimiter, string culture)
+        private static void RemoveTags(this IProperty property, IEnumerable<string> tags, TagsStorageType storageType, char delimiter, string culture)
         {
             // already empty = nothing to do
             var value = property.GetValue(culture)?.ToString();
@@ -131,7 +131,7 @@ namespace Umbraco.Core.Models
         }
 
         // used by ContentRepositoryBase
-        internal static IEnumerable<string> GetTagsValue(this Property property, string culture = null)
+        internal static IEnumerable<string> GetTagsValue(this IProperty property, string culture = null)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
 
@@ -142,7 +142,7 @@ namespace Umbraco.Core.Models
             return property.GetTagsValue(configuration.StorageType, configuration.Delimiter, culture);
         }
 
-        private static IEnumerable<string> GetTagsValue(this Property property, TagsStorageType storageType, char delimiter, string culture = null)
+        private static IEnumerable<string> GetTagsValue(this IProperty property, TagsStorageType storageType, char delimiter, string culture = null)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
 
@@ -182,7 +182,7 @@ namespace Umbraco.Core.Models
         /// <para>This is used both by the content repositories to initialize a property with some tag values, and by the
         /// content controllers to update a property with values received from the property editor.</para>
         /// </remarks>
-        internal static void SetTagsValue(this Property property, object value, TagConfiguration tagConfiguration, string culture)
+        internal static void SetTagsValue(this IProperty property, object value, TagConfiguration tagConfiguration, string culture)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
             if (tagConfiguration == null) throw new ArgumentNullException(nameof(tagConfiguration));
@@ -195,7 +195,7 @@ namespace Umbraco.Core.Models
 
         // assumes that parameters are consistent with the datatype configuration
         // value can be an enumeration of string, or a serialized value using storageType format
-        private static void SetTagsValue(Property property, object value, TagsStorageType storageType, char delimiter, string culture)
+        private static void SetTagsValue(IProperty property, object value, TagsStorageType storageType, char delimiter, string culture)
         {
             if (value == null) value = Enumerable.Empty<string>();
 

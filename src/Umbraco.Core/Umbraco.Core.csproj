@@ -241,6 +241,7 @@
     <Compile Include="Models\IMediaType.cs" />
     <Compile Include="Models\IMember.cs" />
     <Compile Include="Models\IMemberType.cs" />
+    <Compile Include="Models\IPropertyCollection.cs" />
     <Compile Include="Models\Language.cs" />
     <Compile Include="Models\Macro.cs" />
     <Compile Include="Models\MacroProperty.cs" />

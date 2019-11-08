@@ -50,8 +50,8 @@ namespace Umbraco.Web.Editors
         internal void MapPropertyValuesForPersistence<TPersisted, TSaved>(
             TSaved contentItem,
             ContentPropertyCollectionDto dto,
-            Func<TSaved, Property, object> getPropertyValue,
-            Action<TSaved, Property, object> savePropertyValue,
+            Func<TSaved, IProperty, object> getPropertyValue,
+            Action<TSaved, IProperty, object> savePropertyValue,
             string culture)
             where TPersisted : IContentBase
             where TSaved : IContentSave<TPersisted>

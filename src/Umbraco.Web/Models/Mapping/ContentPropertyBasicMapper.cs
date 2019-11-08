@@ -33,7 +33,7 @@ namespace Umbraco.Web.Models.Mapping
         /// Assigns the PropertyEditor, Id, Alias and Value to the property
         /// </summary>
         /// <returns></returns>
-        public virtual void Map(Property property, TDestination dest, MapperContext context)
+        public virtual void Map(IProperty property, TDestination dest, MapperContext context)
         {
             var editor = _propertyEditors[property.PropertyType.PropertyEditorAlias];
             if (editor == null)

@@ -34,7 +34,7 @@ namespace Umbraco.Core.Models
         }
 
         // gets and validates the property
-        private static Property GetTagProperty(this IContentBase content, string propertyTypeAlias)
+        private static IProperty GetTagProperty(this IContentBase content, string propertyTypeAlias)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
 

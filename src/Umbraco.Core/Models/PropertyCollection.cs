@@ -12,10 +12,10 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class PropertyCollection : KeyedCollection<string, Property>, INotifyCollectionChanged, IDeepCloneable
+    public class PropertyCollection : KeyedCollection<string, IProperty>, INotifyCollectionChanged, IDeepCloneable, IPropertyCollection
     {
         private readonly object _addLocker = new object();
-        
+
         internal Func<Property, bool> AdditionValidator { get; set; }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Replaces the property at the specified index with the specified property.
         /// </summary>
-        protected override void SetItem(int index, Property property)
+        protected override void SetItem(int index, IProperty property)
         {
             var oldItem = index >= 0 ? this[index] : property;
             base.SetItem(index, property);
@@ -80,7 +80,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Inserts the specified property at the specified index.
         /// </summary>
-        protected override void InsertItem(int index, Property property)
+        protected override void InsertItem(int index, IProperty property)
         {
             base.InsertItem(index, property);
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, property));
@@ -98,7 +98,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Adds or updates a property.
         /// </summary>
-        internal new void Add(Property property)
+        public new void Add(IProperty property)
         {
             lock (_addLocker) // TODO: why are we locking here and not everywhere else?!
             {
@@ -141,7 +141,7 @@ namespace Umbraco.Core.Models
             return -1;
         }
 
-        protected override string GetKeyForItem(Property item)
+        protected override string GetKeyForItem(IProperty item)
         {
             return item.Alias;
         }
@@ -149,7 +149,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets the property with the specified PropertyType.
         /// </summary>
-        internal Property this[PropertyType propertyType]
+        internal IProperty this[IPropertyType propertyType]
         {
             get
             {
@@ -157,7 +157,7 @@ namespace Umbraco.Core.Models
             }
         }
 
-        public bool TryGetValue(string propertyTypeAlias, out Property property)
+        public bool TryGetValue(string propertyTypeAlias, out IProperty property)
         {
             property = this.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
             return property != null;
@@ -176,7 +176,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Ensures that the collection contains properties for the specified property types.
         /// </summary>
-        protected internal void EnsurePropertyTypes(IEnumerable<PropertyType> propertyTypes)
+        public void EnsurePropertyTypes(IEnumerable<IPropertyType> propertyTypes)
         {
             if (propertyTypes == null)
                 return;
@@ -188,7 +188,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Ensures that the collection does not contain properties not in the specified property types.
         /// </summary>
-        protected internal void EnsureCleanPropertyTypes(IEnumerable<PropertyType> propertyTypes)
+        public void EnsureCleanPropertyTypes(IEnumerable<PropertyType> propertyTypes)
         {
             if (propertyTypes == null)
                 return;

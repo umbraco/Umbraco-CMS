@@ -33,7 +33,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="Property"/> class.
         /// </summary>
-        public Property(PropertyType propertyType)
+        public Property(IPropertyType propertyType)
         {
             PropertyType = propertyType;
         }
@@ -41,7 +41,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="Property"/> class.
         /// </summary>
-        public Property(int id, PropertyType propertyType)
+        public Property(int id, IPropertyType propertyType)
         {
             Id = id;
             PropertyType = propertyType;
@@ -152,7 +152,7 @@ namespace Umbraco.Core.Models
         /// Returns the Id of the PropertyType, which this Property is based on
         /// </summary>
         [IgnoreDataMember]
-        internal int PropertyTypeId => PropertyType.Id;
+        public int PropertyTypeId => PropertyType.Id;
 
         /// <summary>
         /// Returns the DatabaseType that the underlaying DataType is using to store its values
@@ -161,7 +161,7 @@ namespace Umbraco.Core.Models
         /// Only used internally when saving the property value.
         /// </remarks>
         [IgnoreDataMember]
-        internal ValueStorageType ValueStorageType => PropertyType.ValueStorageType;
+        public ValueStorageType ValueStorageType => PropertyType.ValueStorageType;
 
         /// <summary>
         /// Gets the value.
@@ -191,7 +191,7 @@ namespace Umbraco.Core.Models
 
         // internal - must be invoked by the content item
         // does *not* validate the value - content item must validate first
-        internal void PublishValues(string culture = "*", string segment = "*")
+        public void PublishValues(string culture = "*", string segment = "*")
         {
             culture = culture.NullOrWhiteSpaceAsNull();
             segment = segment.NullOrWhiteSpaceAsNull();
@@ -216,7 +216,7 @@ namespace Umbraco.Core.Models
         }
 
         // internal - must be invoked by the content item
-        internal void UnpublishValues(string culture = "*", string segment = "*")
+        public void UnpublishValues(string culture = "*", string segment = "*")
         {
             culture = culture.NullOrWhiteSpaceAsNull();
             segment = segment.NullOrWhiteSpaceAsNull();

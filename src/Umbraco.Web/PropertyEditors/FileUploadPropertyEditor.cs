@@ -48,7 +48,7 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         /// <param name="property">The property.</param>
         /// <returns>A value indicating whether a property is an upload field, and (optionally) has a non-empty value.</returns>
-        private static bool IsUploadField(Property property)
+        private static bool IsUploadField(IProperty property)
         {
             return property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.UploadField;
         }
@@ -70,7 +70,7 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         /// <param name="prop"></param>
         /// <returns></returns>
-        private IEnumerable<string> GetFilePathsFromPropertyValues(Property prop)
+        private IEnumerable<string> GetFilePathsFromPropertyValues(IProperty prop)
         {
             var propVals = prop.Values;
             foreach (var propertyValue in propVals)

@@ -6,6 +6,8 @@ namespace Umbraco.Core.Models
 {
     public interface IProperty
     {
+
+        ValueStorageType ValueStorageType { get; }
         /// <summary>
         /// Returns the PropertyType, which this Property is based on
         /// </summary>
@@ -96,5 +98,9 @@ namespace Umbraco.Core.Models
         /// Enables change tracking.
         /// </summary>
         void EnableChangeTracking();
+
+        int PropertyTypeId { get; }
+        void PublishValues(string culture = "*", string segment = "*");
+        void UnpublishValues(string culture = "*", string segment = "*");
     }
 }

@@ -77,7 +77,7 @@ namespace Umbraco.Core.Services.Implement
                     var children = _contentService.GetPagedChildren(content.Id, page++, pageSize, out total);
                     SerializeChildren(children, xml, published);
                 }
-                
+
             }
 
             return xml;
@@ -552,7 +552,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         // exports a property as XElements.
-        private IEnumerable<XElement> SerializeProperty(Property property, bool published)
+        private IEnumerable<XElement> SerializeProperty(IProperty property, bool published)
         {
             var propertyType = property.PropertyType;
 
