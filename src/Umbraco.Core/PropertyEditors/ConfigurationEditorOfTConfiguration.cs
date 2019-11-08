@@ -35,6 +35,7 @@ namespace Umbraco.Core.PropertyEditors
 
                 ConfigurationField field;
 
+                var attributeView = Current.IOHelper.ResolveVirtualUrl(attribute.View);
                 // if the field does not have its own type, use the base type
                 if (attribute.Type == null)
                 {
@@ -47,7 +48,7 @@ namespace Umbraco.Core.PropertyEditors
                         PropertyType = property.PropertyType,
                         Description = attribute.Description,
                         HideLabel = attribute.HideLabel,
-                        View = attribute.View
+                        View = attributeView
                     };
 
                     fields.Add(field);
@@ -81,7 +82,7 @@ namespace Umbraco.Core.PropertyEditors
                     field.Name = attribute.Name;
 
                 if (!string.IsNullOrWhiteSpace(attribute.View))
-                    field.View = attribute.View;
+                    field.View = attributeView;
 
                 if (!string.IsNullOrWhiteSpace(attribute.Description))
                     field.Description = attribute.Description;

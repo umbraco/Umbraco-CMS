@@ -130,7 +130,7 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class RichTextPropertyIndexValueFactory : IPropertyIndexValueFactory
         {
-            public IEnumerable<KeyValuePair<string, IEnumerable<object>>> GetIndexValues(Property property, string culture, string segment, bool published)
+            public IEnumerable<KeyValuePair<string, IEnumerable<object>>> GetIndexValues(IProperty property, string culture, string segment, bool published)
             {
                 var val = property.GetValue(culture, segment, published);
 

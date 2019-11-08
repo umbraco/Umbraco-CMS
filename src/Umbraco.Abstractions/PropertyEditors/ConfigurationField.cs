@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
-using Umbraco.Core.Composing;
-using Umbraco.Core.IO;
+using System.Reflection;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Core.PropertyEditors
 {
     /// <summary>
     /// Represents a datatype configuration field for editing.
     /// </summary>
+    [DataContract]
     public class ConfigurationField
     {
         private string _view;
@@ -50,37 +50,35 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Gets or sets the key of the field.
         /// </summary>
-        [JsonProperty("key", Required = Required.Always)]
+        [DataMember(Name = "key", IsRequired = true)]
         public string Key { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the field.
         /// </summary>
-        [JsonProperty("label", Required = Required.Always)]
+        [DataMember(Name = "label", IsRequired = true)]
         public string Name { get; set; }
 
         /// <summary>
         /// Gets or sets the property name of the field.
         /// </summary>
-        [JsonIgnore]
         public string PropertyName { get; set; }
 
         /// <summary>
         /// Gets or sets the property CLR type of the field.
         /// </summary>
-        [JsonIgnore]
         public Type PropertyType { get; set; }
 
         /// <summary>
         /// Gets or sets the description of the field.
         /// </summary>
-        [JsonProperty("description")]
+        [DataMember(Name = "description")]
         public string Description { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether to hide the label of the field.
         /// </summary>
-        [JsonProperty("hideLabel")]
+        [DataMember(Name = "hideLabel")]
         public bool HideLabel { get; set; }
 
         /// <summary>
@@ -90,23 +88,19 @@ namespace Umbraco.Core.PropertyEditors
         /// <para>Can be the full virtual path, or the relative path to the Umbraco folder,
         /// or a simple view name which will map to ~/Views/PreValueEditors/{view}.html.</para>
         /// </remarks>
-        [JsonProperty("view", Required = Required.Always)]
-        public string View
-        {
-            get => _view;
-            set => _view = Current.IOHelper.ResolveVirtualUrl(value);
-        }
+        [DataMember(Name = "view", IsRequired = true)]
+        public string View { get; set; }
 
         /// <summary>
         /// Gets the validators of the field.
         /// </summary>
-        [JsonProperty("validation")]
+        [DataMember(Name = "validation")]
         public List<IValueValidator> Validators { get; }
 
         /// <summary>
         /// Gets or sets extra configuration properties for the editor.
         /// </summary>
-        [JsonProperty("config")]
+        [DataMember(Name = "config")]
         public IDictionary<string, object> Config { get; set; }
     }
 }
