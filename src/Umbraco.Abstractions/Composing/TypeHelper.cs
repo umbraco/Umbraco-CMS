@@ -19,6 +19,8 @@ namespace Umbraco.Core.Composing
             = new ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]>();
         private static readonly ConcurrentDictionary<Type, FieldInfo[]> GetFieldsCache
             = new ConcurrentDictionary<Type, FieldInfo[]>();
+        private static readonly ConcurrentDictionary<string, Type> TypeNamesCache
+            = new ConcurrentDictionary<string, Type>();
 
         private static readonly Assembly[] EmptyAssemblies  = new Assembly[0];
 
@@ -29,57 +31,15 @@ namespace Umbraco.Core.Composing
         /// <returns></returns>
         public static Type GetTypeByName(string name)
         {
+            // First try using the basic functionality
             var type = Type.GetType(name);
             if (type != null) return type;
 
-            // now try fall back procedures. null may be returned because Type.GetName only returns types that have already been loaded in the appdomain
-            // and this type might not be there yet, so we need to parse the type name and then try to load in via assembly.
-
-            var typeName = TypeName.Parse(name);
-            try
-            {
-                var assembly = Assembly.Load(typeName.AssemblyName);
-                type = assembly.GetType(typeName.Name);
-                return type;
-            }
-            catch (NotSupportedException)
-            {
-                throw;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Used to parse a fully qualified type name
-        /// </summary>
-        /// <remarks>
-        /// Does not support generics.
-        /// This is a simple utility class and is not an exhaustive type name parser (which doesn't exist in .net strangely)
-        /// </remarks>
-        private class TypeName
-        {
-            private TypeName(string name, AssemblyName assemblyName)
-            {
-                Name = name;
-                AssemblyName = assemblyName;
-            }
-
-            public static TypeName Parse(string name)
-            {
-                if (name.Contains("[["))
-                    throw new NotSupportedException($"{nameof(TypeName)} does not support generic types");
-
-                var index = name.IndexOf(',');
-                return index > 0
-                    ? new TypeName(name.Substring(0, index).Trim(), new AssemblyName(name.Substring(index + 1).Trim()))
-                    : new TypeName(name, null);
-            }
-
-            public string Name { get; }
-            public AssemblyName AssemblyName { get; }
+            // It didn't parse, so try loading from each already loaded assembly and cache it
+            return TypeNamesCache.GetOrAdd(name, s =>
+                AppDomain.CurrentDomain.GetAssemblies()
+                    .Select(x => x.GetType(s))
+                    .FirstOrDefault(x => x != null));
         }
 
         /// <summary>
