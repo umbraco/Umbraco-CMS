@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Web.Configuration;
 using System.Xml.Linq;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Security;
 using Umbraco.Web.Install.Models;
@@ -36,10 +37,11 @@ namespace Umbraco.Web.Install.InstallSteps
             if (model.HasValue && model.Value == false) return Task.FromResult<InstallSetupResult>(null);
 
             //install the machine key
-            var fileName = IOHelper.MapPath($"{SystemDirectories.Root}/web.config");
+            var fileName = Current.IOHelper.MapPath($"{SystemDirectories.Root}/web.config");
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
 
-            var systemWeb = xml.Root.DescendantsAndSelf("system.web").Single();
+            // we only want to get the element that is under the root, (there may be more under <location> tags we don't want them)
+            var systemWeb = xml.Root.Element("system.web");
 
             // Update appSetting if it exists, or else create a new appSetting for the given key and value
             var machineKey = systemWeb.Descendants("machineKey").FirstOrDefault();

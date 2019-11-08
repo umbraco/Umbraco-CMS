@@ -11,6 +11,7 @@ using System.Linq;
 using Umbraco.Core.IO;
 using System.Collections.Concurrent;
 using Umbraco.Core.Collections;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Web
 {
@@ -104,7 +105,7 @@ namespace Umbraco.Web
                     .Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)
                     .Select(x => x.Trim().ToLowerInvariant())
                     .Where(x => x.IsNullOrWhiteSpace() == false)
-                    .Select(reservedUrl => IOHelper.ResolveUrl(reservedUrl).Trim().EnsureStartsWith("/"))
+                    .Select(reservedUrl => Current.IOHelper.ResolveUrl(reservedUrl).Trim().EnsureStartsWith("/"))
                     .Where(reservedUrlTrimmed => reservedUrlTrimmed.IsNullOrWhiteSpace() == false))
                 {
                     newReservedList.Add(reservedUrlTrimmed);
@@ -142,7 +143,7 @@ namespace Umbraco.Web
             return paths
                 .Select(x => x.Trim().ToLowerInvariant())
                 .Where(x => x.IsNullOrWhiteSpace() == false)
-                .Select(reservedPath => IOHelper.ResolveUrl(reservedPath).Trim().EnsureStartsWith("/").EnsureEndsWith("/"))
+                .Select(reservedPath => Current.IOHelper.ResolveUrl(reservedPath).Trim().EnsureStartsWith("/").EnsureEndsWith("/"))
                 .Where(reservedPathTrimmed => reservedPathTrimmed.IsNullOrWhiteSpace() == false);
         }
 
@@ -170,7 +171,7 @@ namespace Umbraco.Web
                 {
                     //the counts are not set or have changed, need to reset
                     changed = true;
-                }   
+                }
             }
             if (changed)
             {

@@ -635,7 +635,7 @@ namespace Umbraco.Web.Editors
 
         private bool IsDirectory(string virtualPath, string systemDirectory)
         {
-            var path = IOHelper.MapPath(systemDirectory + "/" + virtualPath);
+            var path = Current.IOHelper.MapPath(systemDirectory + "/" + virtualPath);
             var dirInfo = new DirectoryInfo(path);
             return dirInfo.Attributes == FileAttributes.Directory;
         }

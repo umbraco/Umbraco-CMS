@@ -46,6 +46,7 @@
                 title="{{historyLabel}}">
                 
                 <umb-button
+                    ng-hide="node.trashed"
                     type="button"
                     button-style="outline"
                     action="openRollback()"

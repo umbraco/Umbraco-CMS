@@ -1,4 +1,5 @@
 <%@ Page Language="C#" AutoEventWireup="True" Inherits="Umbraco.Web.UI.Config.Splashes.NoNodes" CodeBehind="NoNodes.aspx.cs" %>
+<%@ Import Namespace="Umbraco.Core.Composing" %>
 <%@ Import Namespace="Umbraco.Core.Configuration" %>
 <%@ Import Namespace="Umbraco.Core.IO" %>
 
@@ -11,7 +12,7 @@
  <meta charset="utf-8">
  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
- 	
+
  <title></title>
  <meta name="description" content="">
  <meta name="author" content="">
@@ -30,7 +31,7 @@
 			<h3>You're seeing this wonderful page because your website doesn't contain any published content yet.</h3>
 
 			<div class="cta">
-				<a href="<%= IOHelper.ResolveUrl(SystemDirectories.Umbraco) %>" class="button">Open Umbraco</a>
+				<a href="<%= Current.IOHelper.ResolveUrl(SystemDirectories.Umbraco) %>" class="button">Open Umbraco</a>
 			</div>
 
 
@@ -38,14 +39,14 @@
 				<div class="col">
 					<h2>Easy start with Umbraco.tv</h2>
 					<p>We have created a bunch of 'how-to' videos, to get you easily started with Umbraco. Learn how to build projects in just a couple of minutes. Easiest CMS in the world.</p>
-					
+
 					<a href="https://umbraco.tv?ref=tvFromInstaller" target="_blank">Umbraco.tv &rarr;</a>
 				</div>
 
 				<div class="col">
 					<h2>Be a part of the community</h2>
 					<p>The Umbraco community is the best of its kind, be sure to visit, and if you have any questions, we're sure that you can get your answers from the community.</p>
-					
+
 					<a href="https://our.umbraco.com/?ref=ourFromInstaller" target="_blank">our.Umbraco &rarr;</a>
 				</div>
 			</div>

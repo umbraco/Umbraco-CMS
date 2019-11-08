@@ -185,6 +185,7 @@
     <Compile Include="Composing\TargetedServiceFactory.cs" />
     <Compile Include="Composing\TypeFinder.cs" />
     <Compile Include="Composing\TypeLoader.cs" />
+    <Compile Include="IO\IIOHelper.cs" />
     <Compile Include="IO\IMediaFileSystem.cs" />
     <Compile Include="IO\IMediaPathScheme.cs" />
     <Compile Include="IO\IOHelper.cs" />
@@ -246,8 +247,6 @@
     <Compile Include="Models\Membership\UserGroupExtensions.cs" />
     <Compile Include="Models\ObjectTypes.cs" />
     <Compile Include="Models\Packaging\PackageDefinition.cs" />
-    <Compile Include="Models\Property.cs" />
-    <Compile Include="Models\PropertyCollection.cs" />
     <Compile Include="Models\PublicAccessEntry.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\FixLanguageIsoCodeLength.cs" />
     <Compile Include="Models\CultureImpact.cs" />
@@ -602,6 +601,9 @@
     <Compile Include="Models\MemberTypePropertyProfileAccess.cs" />
     <Compile Include="Models\Packaging\InstallationSummary.cs" />
     <Compile Include="Models\Packaging\PreInstallWarnings.cs" />
+    <Compile Include="Models\PagedResultOfT.cs" />
+    <Compile Include="Models\Property.cs" />
+    <Compile Include="Models\PropertyCollection.cs" />
     <Compile Include="Models\PropertyGroup.cs" />
     <Compile Include="Models\PropertyGroupCollection.cs" />
     <Compile Include="Models\PropertyType.cs" />

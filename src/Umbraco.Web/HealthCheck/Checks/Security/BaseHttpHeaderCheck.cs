@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 
@@ -168,7 +169,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             {
                 // There don't look to be any useful classes defined in https://msdn.microsoft.com/en-us/library/system.web.configuration(v=vs.110).aspx
                 // for working with the customHeaders section, so working with the XML directly.
-                var configFile = IOHelper.MapPath("~/Web.config");
+                var configFile = Current.IOHelper.MapPath("~/Web.config");
                 var doc = XDocument.Load(configFile);
                 var systemWebServerElement = doc.XPathSelectElement("/configuration/system.webServer");
                 var httpProtocolElement = systemWebServerElement.Element("httpProtocol");

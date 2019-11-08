@@ -28,8 +28,8 @@ namespace Umbraco.Examine
         /// <returns></returns>
         public virtual Lucene.Net.Store.Directory CreateFileSystemLuceneDirectory(string folderName)
         {
-            
-            var dirInfo = new DirectoryInfo(Path.Combine(IOHelper.MapPath(SystemDirectories.TempData), "ExamineIndexes", folderName));
+
+            var dirInfo = new DirectoryInfo(Path.Combine(Current.IOHelper.MapPath(SystemDirectories.TempData), "ExamineIndexes", folderName));
             if (!dirInfo.Exists)
                 System.IO.Directory.CreateDirectory(dirInfo.FullName);
 

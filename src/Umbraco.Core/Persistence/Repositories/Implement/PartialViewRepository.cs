@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 
@@ -103,8 +104,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             // validate path & extension
             var validDir = SystemDirectories.MvcViews;
-            var isValidPath = IOHelper.VerifyEditPath(fullPath, validDir);
-            var isValidExtension = IOHelper.VerifyFileExtension(fullPath, ValidExtensions);
+            var isValidPath = Current.IOHelper.VerifyEditPath(fullPath, validDir);
+            var isValidExtension = Current.IOHelper.VerifyFileExtension(fullPath, ValidExtensions);
             return isValidPath && isValidExtension;
         }
 

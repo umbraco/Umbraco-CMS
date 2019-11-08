@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 
@@ -65,7 +66,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         /// <summary>
         /// Gets the absolute file path.
         /// </summary>
-        private string AbsoluteFilePath => IOHelper.MapPath(FilePath);
+        private string AbsoluteFilePath => Current.IOHelper.MapPath(FilePath);
 
         /// <summary>
         /// Gets the message for when the check has succeeded.

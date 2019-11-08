@@ -33,7 +33,7 @@ namespace Umbraco.Core
 
         public static void AddCoreConfigs(this Configs configs)
         {
-            var configDir = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Config));
+            var configDir = new DirectoryInfo(Current.IOHelper.MapPath(SystemDirectories.Config));
 
             configs.Add<IGlobalSettings>(() => new GlobalSettings());
             configs.Add<IUmbracoSettingsSection>("umbracoConfiguration/settings");

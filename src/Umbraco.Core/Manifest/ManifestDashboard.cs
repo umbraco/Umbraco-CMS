@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using Newtonsoft.Json;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Dashboards;
 using Umbraco.Core.IO;
 
@@ -21,7 +22,7 @@ namespace Umbraco.Core.Manifest
         public string View
         {
             get => _view;
-            set => _view = IOHelper.ResolveVirtualUrl(value);
+            set => _view = Current.IOHelper.ResolveVirtualUrl(value);
         }
 
         [JsonProperty("sections")]

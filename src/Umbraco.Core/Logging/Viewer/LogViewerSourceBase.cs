@@ -5,6 +5,7 @@ using System.Xml;
 using Newtonsoft.Json;
 using Serilog;
 using Serilog.Events;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -18,7 +19,7 @@ namespace Umbraco.Core.Logging.Viewer
         {
             if (string.IsNullOrEmpty(pathToSearches))
                 // ReSharper disable once StringLiteralTypo
-                pathToSearches = IOHelper.MapPath("~/Config/logviewer.searches.config.js");
+                pathToSearches = Current.IOHelper.MapPath("~/Config/logviewer.searches.config.js");
 
             _searchesConfigPath = pathToSearches;
         }
@@ -93,7 +94,7 @@ namespace Umbraco.Core.Logging.Viewer
         }
 
         /// <summary>
-        /// Get the Serilog minimum-level value from the config file. 
+        /// Get the Serilog minimum-level value from the config file.
         /// </summary>
         /// <returns></returns>
         public string GetLogLevel()
@@ -181,7 +182,7 @@ namespace Umbraco.Core.Logging.Viewer
 
         private static void EnsureFileExists(string path, string contents)
         {
-            var absolutePath = IOHelper.MapPath(path);
+            var absolutePath = Current.IOHelper.MapPath(path);
             if (System.IO.File.Exists(absolutePath)) return;
 
             using (var writer = System.IO.File.CreateText(absolutePath))

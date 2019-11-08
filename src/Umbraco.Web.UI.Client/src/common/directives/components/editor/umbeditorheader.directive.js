@@ -239,12 +239,13 @@ Use this directive to construct a header inside the main editor window.
                 if (scope.editorfor) {
                     localizeVars.push(scope.editorfor);
                 }
-                localizationService.localizeMany(localizeVars).then(function (data) {
+                localizationService.localizeMany(localizeVars).then(function(data) {
                     setAccessibilityForEditor(data);
                     scope.loading = false;
                 });
+            } else {
+                scope.loading = false;
             }
-
             scope.goBack = function () {
                 if (scope.onBack) {
                     scope.onBack();

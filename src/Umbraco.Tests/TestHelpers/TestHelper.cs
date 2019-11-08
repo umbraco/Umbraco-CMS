@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
@@ -67,9 +68,9 @@ namespace Umbraco.Tests.TestHelpers
         {
             foreach (var directory in directories)
             {
-                var directoryInfo = new DirectoryInfo(IOHelper.MapPath(directory));
+                var directoryInfo = new DirectoryInfo(Current.IOHelper.MapPath(directory));
                 if (directoryInfo.Exists == false)
-                    Directory.CreateDirectory(IOHelper.MapPath(directory));
+                    Directory.CreateDirectory(Current.IOHelper.MapPath(directory));
             }
         }
 
@@ -81,7 +82,7 @@ namespace Umbraco.Tests.TestHelpers
             };
             foreach (var directory in directories)
             {
-                var directoryInfo = new DirectoryInfo(IOHelper.MapPath(directory));
+                var directoryInfo = new DirectoryInfo(Current.IOHelper.MapPath(directory));
                 var preserve = preserves.ContainsKey(directory) ? preserves[directory] : null;
                 if (directoryInfo.Exists)
                     foreach (var x in directoryInfo.GetFiles().Where(x => preserve == null || preserve.Contains(x.Name) == false))

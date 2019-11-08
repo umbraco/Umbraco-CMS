@@ -148,7 +148,7 @@ namespace Umbraco.Core
             if (filename == null || filestream == null) return;
 
             // get a safe & clean filename
-            filename = IOHelper.SafeFileName(filename);
+            filename = Current.IOHelper.SafeFileName(filename);
             if (string.IsNullOrWhiteSpace(filename)) return;
             filename = filename.ToLower();
 

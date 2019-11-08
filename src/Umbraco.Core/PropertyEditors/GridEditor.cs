@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.IO;
 
@@ -28,14 +29,14 @@ namespace Umbraco.Core.PropertyEditors
         public string View
         {
             get => _view;
-            set => _view = IOHelper.ResolveVirtualUrl(value);
+            set => _view = Current.IOHelper.ResolveVirtualUrl(value);
         }
 
         [JsonProperty("render")]
         public string Render
         {
             get => _render;
-            set => _render = IOHelper.ResolveVirtualUrl(value);
+            set => _render = Current.IOHelper.ResolveVirtualUrl(value);
         }
 
         [JsonProperty("icon", Required = Required.Always)]
