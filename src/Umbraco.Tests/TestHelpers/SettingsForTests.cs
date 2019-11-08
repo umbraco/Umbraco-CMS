@@ -2,6 +2,7 @@
 using System.Configuration;
 using Moq;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
@@ -17,11 +18,11 @@ namespace Umbraco.Tests.TestHelpers
                     settings.ConfigurationStatus == UmbracoVersion.SemanticVersion.ToSemanticString() &&
                     settings.UseHttps == false &&
                     settings.HideTopLevelNodeFromPath == false &&
-                    settings.Path == IOHelper.ResolveUrl("~/umbraco") &&
+                    settings.Path == Current.IOHelper.ResolveUrl("~/umbraco") &&
                     settings.TimeOutInMinutes == 20 &&
                     settings.DefaultUILanguage == "en" &&
                     settings.LocalTempStorageLocation == LocalTempStorage.Default &&
-                    settings.LocalTempPath == IOHelper.MapPath("~/App_Data/TEMP") &&
+                    settings.LocalTempPath == Current.IOHelper.MapPath("~/App_Data/TEMP") &&
                     settings.ReservedPaths == (GlobalSettings.StaticReservedPaths + "~/umbraco") &&
                     settings.ReservedUrls == GlobalSettings.StaticReservedUrls);
             return config;

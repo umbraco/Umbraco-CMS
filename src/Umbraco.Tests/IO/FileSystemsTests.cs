@@ -105,7 +105,7 @@ namespace Umbraco.Tests.IO
             fs.AddFile(virtPath, ms);
 
             // ~/media/1234/file.txt exists
-            var physPath = IOHelper.MapPath(Path.Combine("media", virtPath));
+            var physPath = Current.IOHelper.MapPath(Path.Combine("media", virtPath));
             Assert.IsTrue(File.Exists(physPath));
 
             // ~/media/1234/file.txt is gone

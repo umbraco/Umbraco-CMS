@@ -112,7 +112,7 @@ namespace Umbraco.Core
 
                 if (isValid)
                 {
-                    var resolvedUrlResult = IOHelper.TryResolveUrl(input);
+                    var resolvedUrlResult = Current.IOHelper.TryResolveUrl(input);
                     //if the resolution was success, return it, otherwise just return the path, we've detected
                     // it's a path but maybe it's relative and resolution has failed, etc... in which case we're just
                     // returning what was given to us.
@@ -1475,5 +1475,35 @@ namespace Umbraco.Core
 //        /// </summary>
 //        public static string NullOrWhiteSpaceAsNull(this string text)
 //            => string.IsNullOrWhiteSpace(text) ? null : text;
+
+        /// <summary>
+        /// Checks if a given path is a full path including drive letter
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        // From: http://stackoverflow.com/a/35046453/5018
+        internal static bool IsFullPath(this string path)
+        {
+            return string.IsNullOrWhiteSpace(path) == false
+                   && path.IndexOfAny(Path.GetInvalidPathChars().ToArray()) == -1
+                   && Path.IsPathRooted(path)
+                   && Path.GetPathRoot(path).Equals(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal) == false;
+        }
+
+        /// <summary>
+        /// Ensures that a path has `~/` as prefix
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        internal static string EnsurePathIsApplicationRootPrefixed(this string path)
+        {
+            if (path.StartsWith("~/"))
+                return path;
+            if (path.StartsWith("/") == false && path.StartsWith("\\") == false)
+                path = string.Format("/{0}", path);
+            if (path.StartsWith("~") == false)
+                path = string.Format("~{0}", path);
+            return path;
+        }
     }
 }

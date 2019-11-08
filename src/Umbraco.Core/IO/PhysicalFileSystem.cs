@@ -32,9 +32,9 @@ namespace Umbraco.Core.IO
             if (virtualRoot.StartsWith("~/") == false)
                 throw new ArgumentException("The virtualRoot argument must be a virtual path and start with '~/'");
 
-            _rootPath = EnsureDirectorySeparatorChar(IOHelper.MapPath(virtualRoot)).TrimEnd(Path.DirectorySeparatorChar);
+            _rootPath = EnsureDirectorySeparatorChar(Current.IOHelper.MapPath(virtualRoot)).TrimEnd(Path.DirectorySeparatorChar);
             _rootPathFwd = EnsureUrlSeparatorChar(_rootPath);
-            _rootUrl = EnsureUrlSeparatorChar(IOHelper.ResolveUrl(virtualRoot)).TrimEnd('/');
+            _rootUrl = EnsureUrlSeparatorChar(Current.IOHelper.ResolveUrl(virtualRoot)).TrimEnd('/');
         }
 
         public PhysicalFileSystem(string rootPath, string rootUrl)
@@ -47,7 +47,7 @@ namespace Umbraco.Core.IO
             if (Path.IsPathRooted(rootPath) == false)
             {
                 // but the test suite App.config cannot really "root" anything so we have to do it here
-                var localRoot = IOHelper.GetRootDirectorySafe();
+                var localRoot = Current.IOHelper.GetRootDirectorySafe();
                 rootPath = Path.Combine(localRoot, rootPath);
             }
 
@@ -257,12 +257,12 @@ namespace Umbraco.Core.IO
 
             // if it starts with the root url, strip it and trim the starting slash to make it relative
             // eg "/Media/1234/img.jpg" => "1234/img.jpg"
-            if (IOHelper.PathStartsWith(path, _rootUrl, '/'))
+            if (Current.IOHelper.PathStartsWith(path, _rootUrl, '/'))
                 return path.Substring(_rootUrl.Length).TrimStart('/');
 
             // if it starts with the root path, strip it and trim the starting slash to make it relative
             // eg "c:/websites/test/root/Media/1234/img.jpg" => "1234/img.jpg"
-            if (IOHelper.PathStartsWith(path, _rootPathFwd, '/'))
+            if (Current.IOHelper.PathStartsWith(path, _rootPathFwd, '/'))
                 return path.Substring(_rootPathFwd.Length).TrimStart('/');
 
             // unchanged - what else?
@@ -292,7 +292,7 @@ namespace Umbraco.Core.IO
                 path = GetRelativePath(path);
 
             // if not already rooted, combine with the root path
-            if (IOHelper.PathStartsWith(path, _rootPath, Path.DirectorySeparatorChar) == false)
+            if (Current.IOHelper.PathStartsWith(path, _rootPath, Path.DirectorySeparatorChar) == false)
                 path = Path.Combine(_rootPath, path);
 
             // sanitize - GetFullPath will take care of any relative
@@ -303,7 +303,7 @@ namespace Umbraco.Core.IO
             // at that point, path is within legal parts of the filesystem, ie we have
             // permissions to reach that path, but it may nevertheless be outside of
             // our root path, due to relative segments, so better check
-            if (IOHelper.PathStartsWith(path, _rootPath, Path.DirectorySeparatorChar))
+            if (Current.IOHelper.PathStartsWith(path, _rootPath, Path.DirectorySeparatorChar))
             {
                 // this says that 4.7.2 supports long paths - but Windows does not
                 // https://docs.microsoft.com/en-us/dotnet/api/system.io.pathtoolongexception?view=netframework-4.7.2

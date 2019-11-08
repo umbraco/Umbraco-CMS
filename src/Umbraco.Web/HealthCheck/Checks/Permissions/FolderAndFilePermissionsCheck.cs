@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 using Umbraco.Web.Install;
@@ -124,7 +125,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
         {
             return pathsToCheck
                 .Where(x => x.Value == requirement)
-                .Select(x => IOHelper.MapPath(x.Key))
+                .Select(x => Current.IOHelper.MapPath(x.Key))
                 .OrderBy(x => x)
                 .ToArray();
         }
@@ -164,7 +165,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
 
         private string GetMessageForPathCheckFailure(string messageKey, IEnumerable<string> failedPaths)
         {
-            var rootFolder = IOHelper.MapPath("/");
+            var rootFolder = Current.IOHelper.MapPath("/");
             var failedFolders = failedPaths
                 .Select(x => ParseFolderFromFullPath(rootFolder, x));
             return _textService.Localize(messageKey,

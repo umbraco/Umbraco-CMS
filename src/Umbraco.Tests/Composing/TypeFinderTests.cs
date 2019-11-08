@@ -207,7 +207,7 @@ namespace Umbraco.Tests.Composing
 
                             //here we are trying to get the App_Code assembly
                             var fileExtensions = new[] { ".cs", ".vb" }; //only vb and cs files are supported
-                            var appCodeFolder = new DirectoryInfo(IOHelper.MapPath(IOHelper.ResolveUrl("~/App_code")));
+                            var appCodeFolder = new DirectoryInfo(Current.IOHelper.MapPath(Current.IOHelper.ResolveUrl("~/App_code")));
                             //check if the folder exists and if there are any files in it with the supported file extensions
                             if (appCodeFolder.Exists && (fileExtensions.Any(x => appCodeFolder.GetFiles("*" + x).Any())))
                             {

@@ -181,11 +181,11 @@ namespace Umbraco.Core.Composing
                 _currentAssembliesHash = GetFileHash(new List<Tuple<FileSystemInfo, bool>>
                     {
                         // the bin folder and everything in it
-                        new Tuple<FileSystemInfo, bool>(new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Bin)), false),
+                        new Tuple<FileSystemInfo, bool>(new DirectoryInfo(Current.IOHelper.MapPath(SystemDirectories.Bin)), false),
                         // the app code folder and everything in it
-                        new Tuple<FileSystemInfo, bool>(new DirectoryInfo(IOHelper.MapPath("~/App_Code")), false),
+                        new Tuple<FileSystemInfo, bool>(new DirectoryInfo(Current.IOHelper.MapPath("~/App_Code")), false),
                         // global.asax (the app domain also monitors this, if it changes will do a full restart)
-                        new Tuple<FileSystemInfo, bool>(new FileInfo(IOHelper.MapPath("~/global.asax")), false)
+                        new Tuple<FileSystemInfo, bool>(new FileInfo(Current.IOHelper.MapPath("~/global.asax")), false)
                     }, _logger);
 
                 return _currentAssembliesHash;

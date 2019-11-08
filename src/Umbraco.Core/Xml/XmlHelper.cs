@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 
@@ -210,14 +211,14 @@ namespace Umbraco.Core.Xml
         /// <returns>Returns a XmlDocument class</returns>
         public static XmlDocument OpenAsXmlDocument(string filePath)
         {
-            using (var reader = new XmlTextReader(IOHelper.MapPath(filePath)) {WhitespaceHandling = WhitespaceHandling.All})
+            using (var reader = new XmlTextReader(Current.IOHelper.MapPath(filePath)) {WhitespaceHandling = WhitespaceHandling.All})
             {
                 var xmlDoc = new XmlDocument();
                 //Load the file into the XmlDocument
                 xmlDoc.Load(reader);
-                
+
                 return xmlDoc;
-            }   
+            }
         }
 
         /// <summary>

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Mail;
 using System.Text;
 using System.Threading;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
@@ -383,7 +384,7 @@ namespace Umbraco.Core.Services.Implement
             var protocol = _globalSettings.UseHttps ? "https" : "http";
 
             var subjectVars = new NotificationEmailSubjectParams(
-                string.Concat(siteUri.Authority, IOHelper.ResolveUrl(SystemDirectories.Umbraco)),
+                string.Concat(siteUri.Authority, Current.IOHelper.ResolveUrl(SystemDirectories.Umbraco)),
                 actionName,
                 content.Name);
 
@@ -399,7 +400,7 @@ namespace Umbraco.Core.Services.Implement
                     string.Concat(content.Id, ".aspx"),
                     protocol),
                 performingUser.Name,
-                string.Concat(siteUri.Authority, IOHelper.ResolveUrl(SystemDirectories.Umbraco)),
+                string.Concat(siteUri.Authority, Current.IOHelper.ResolveUrl(SystemDirectories.Umbraco)),
                 summary.ToString());
 
             // create the mail message
