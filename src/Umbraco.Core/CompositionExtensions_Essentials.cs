@@ -1,5 +1,6 @@
 ﻿using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 
@@ -30,6 +31,7 @@ namespace Umbraco.Core
             composition.RegisterUnique(factory => factory.GetInstance<IUmbracoDatabaseFactory>().SqlContext);
             composition.RegisterUnique(typeLoader);
             composition.RegisterUnique(state);
+            composition.RegisterUnique<IIOHelper, IOHelper>();
         }
     }
 }

@@ -74,7 +74,7 @@ namespace Umbraco.Core.Services
             culture = culture.NullOrWhiteSpaceAsNull();
             segment = segment.NullOrWhiteSpaceAsNull();
 
-            Property.PropertyValue pvalue = null;
+            IPropertyValue pvalue = null;
 
             // if validating invariant/neutral, and it is supported, validate
             // (including ensuring that the value exists, if mandatory)
@@ -120,7 +120,7 @@ namespace Umbraco.Core.Services
         /// <param name="property"></param>
         /// <param name="value"></param>
         /// <returns>True is property value is valid, otherwise false</returns>
-        private bool IsValidPropertyValue(Property property, object value)
+        private bool IsValidPropertyValue(IProperty property, object value)
         {
             return IsPropertyValueValid(property.PropertyType, value);
         }
@@ -128,7 +128,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Determines whether a value is valid for this property type.
         /// </summary>
-        private bool IsPropertyValueValid(PropertyType propertyType, object value)
+        private bool IsPropertyValueValid(IPropertyType propertyType, object value)
         {
             var editor = _propertyEditors[propertyType.PropertyEditorAlias];
             if (editor == null)

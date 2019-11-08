@@ -52,7 +52,7 @@ namespace Umbraco.Core.IO
         /// <para>If an <paramref name="oldpath"/> is provided then that file (and associated thumbnails if any) is deleted
         /// before the new file is saved, and depending on the media path scheme, the folder may be reused for the new file.</para>
         /// </remarks>
-        string StoreFile(IContentBase content, PropertyType propertyType, string filename, Stream filestream, string oldpath);
+        string StoreFile(IContentBase content, IPropertyType propertyType, string filename, Stream filestream, string oldpath);
 
         /// <summary>
         /// Copies a media file as a new media file, associated to a property of a content item.
@@ -61,6 +61,6 @@ namespace Umbraco.Core.IO
         /// <param name="propertyType">The property type owning the copy of the media file.</param>
         /// <param name="sourcepath">The filesystem-relative path to the source media file.</param>
         /// <returns>The filesystem-relative path to the copy of the media file.</returns>
-        string CopyFile(IContentBase content, PropertyType propertyType, string sourcepath);
+        string CopyFile(IContentBase content, IPropertyType propertyType, string sourcepath);
     }
 }

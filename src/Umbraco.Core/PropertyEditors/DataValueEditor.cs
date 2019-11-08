@@ -7,7 +7,6 @@ using System.Xml.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Composing;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
@@ -72,11 +71,7 @@ namespace Umbraco.Core.PropertyEditors
         /// folder, or (3) a view name which maps to views/propertyeditors/{view}/{view}.html.</para>
         /// </remarks>
         [JsonProperty("view", Required = Required.Always)]
-        public string View
-        {
-            get => _view;
-            set => _view = Current.IOHelper.ResolveVirtualUrl(value);
-        }
+        public string View { get; set; }
 
         /// <summary>
         /// The value type which reflects how it is validated and stored in the database
@@ -237,7 +232,7 @@ namespace Umbraco.Core.PropertyEditors
         /// The object returned will automatically be serialized into json notation. For most property editors
         /// the value returned is probably just a string but in some cases a json structure will be returned.
         /// </remarks>
-        public virtual object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
+        public virtual object ToEditor(IProperty property, IDataTypeService dataTypeService, string culture = null, string segment = null)
         {
             var val = property.GetValue(culture, segment);
             if (val == null) return string.Empty;
@@ -288,7 +283,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Converts a property to Xml fragments.
         /// </summary>
-        public IEnumerable<XElement> ConvertDbToXml(Property property, IDataTypeService dataTypeService, ILocalizationService localizationService, bool published)
+        public IEnumerable<XElement> ConvertDbToXml(IProperty property, IDataTypeService dataTypeService, ILocalizationService localizationService, bool published)
         {
             published &= property.PropertyType.SupportsPublishing;
 
@@ -322,7 +317,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <para>Returns an XText or XCData instance which must be wrapped in a element.</para>
         /// <para>If the value is empty we will not return as CDATA since that will just take up more space in the file.</para>
         /// </remarks>
-        public XNode ConvertDbToXml(PropertyType propertyType, object value, IDataTypeService dataTypeService)
+        public XNode ConvertDbToXml(IPropertyType propertyType, object value, IDataTypeService dataTypeService)
         {
             //check for null or empty value, we don't want to return CDATA if that is the case
             if (value == null || value.ToString().IsNullOrWhiteSpace())
@@ -348,7 +343,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Converts a property value to a string.
         /// </summary>
-        public virtual string ConvertDbToString(PropertyType propertyType, object value, IDataTypeService dataTypeService)
+        public virtual string ConvertDbToString(IPropertyType propertyType, object value, IDataTypeService dataTypeService)
         {
             if (value == null)
                 return string.Empty;

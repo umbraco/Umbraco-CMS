@@ -92,7 +92,7 @@ namespace Umbraco.Web.PropertyEditors
 
             #region DB to String
 
-            public override string ConvertDbToString(PropertyType propertyType, object propertyValue, IDataTypeService dataTypeService)
+            public override string ConvertDbToString(IPropertyType propertyType, object propertyValue, IDataTypeService dataTypeService)
             {
                 if (propertyValue == null || string.IsNullOrWhiteSpace(propertyValue.ToString()))
                     return string.Empty;
@@ -152,7 +152,7 @@ namespace Umbraco.Web.PropertyEditors
 
             // note: there is NO variant support here
 
-            public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
+            public override object ToEditor(IProperty property, IDataTypeService dataTypeService, string culture = null, string segment = null)
             {
                 var val = property.GetValue(culture, segment);
                 if (val == null || string.IsNullOrWhiteSpace(val.ToString()))

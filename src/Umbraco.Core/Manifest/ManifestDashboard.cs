@@ -9,8 +9,6 @@ namespace Umbraco.Core.Manifest
 {
     public class ManifestDashboard : IDashboard
     {
-        private string _view;
-
         [JsonProperty("alias", Required = Required.Always)]
         public string Alias { get; set; }
 
@@ -19,11 +17,7 @@ namespace Umbraco.Core.Manifest
         public int Weight { get; set; }
 
         [JsonProperty("view", Required = Required.Always)]
-        public string View
-        {
-            get => _view;
-            set => _view = Current.IOHelper.ResolveVirtualUrl(value);
-        }
+        public string View { get; set; }
 
         [JsonProperty("sections")]
         public string[] Sections { get; set; } = Array.Empty<string>();

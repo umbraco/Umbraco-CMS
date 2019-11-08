@@ -1,6 +1,8 @@
 ﻿using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Core.Composing;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
@@ -13,13 +15,15 @@ namespace Umbraco.Core.Manifest
     internal class DataEditorConverter : JsonReadConverter<IDataEditor>
     {
         private readonly ILogger _logger;
+        private readonly IIOHelper _ioHelper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataEditorConverter"/> class.
         /// </summary>
-        public DataEditorConverter(ILogger logger)
+        public DataEditorConverter(ILogger logger, IIOHelper ioHelper)
         {
             _logger = logger;
+            _ioHelper = ioHelper;
         }
 
         /// <inheritdoc />
@@ -62,11 +66,11 @@ namespace Umbraco.Core.Manifest
                 PrepareForPropertyEditor(jobject, dataEditor);
             else
                 PrepareForParameterEditor(jobject, dataEditor);
- 
+
             base.Deserialize(jobject, target, serializer);
         }
 
-        private static void PrepareForPropertyEditor(JObject jobject, DataEditor target)
+        private void PrepareForPropertyEditor(JObject jobject, DataEditor target)
         {
             if (jobject["editor"] == null)
                 throw new InvalidOperationException("Missing 'editor' value.");
@@ -86,6 +90,9 @@ namespace Umbraco.Core.Manifest
             if (jobject["editor"]["validation"] is JObject validation)
                 jobject["editor"]["validation"] = RewriteValidators(validation);
 
+            if(jobject["editor"]["view"] is JValue view)
+                jobject["editor"]["view"] = RewriteVirtualUrl(view);
+
             if (jobject["prevalues"] is JObject config)
             {
                 // explicitly assign a configuration editor of type ConfigurationEditor
@@ -100,6 +107,9 @@ namespace Umbraco.Core.Manifest
                     {
                         if (field["validation"] is JObject fvalidation)
                             field["validation"] = RewriteValidators(fvalidation);
+
+                        if(field["view"] is JValue fview)
+                            field["view"] = RewriteVirtualUrl(fview);
                     }
                 }
 
@@ -118,7 +128,12 @@ namespace Umbraco.Core.Manifest
             }
         }
 
-        private static void PrepareForParameterEditor(JObject jobject, DataEditor target)
+        private string RewriteVirtualUrl(JValue view)
+        {
+            return _ioHelper.ResolveVirtualUrl(view.Value as string);
+        }
+
+        private void PrepareForParameterEditor(JObject jobject, DataEditor target)
         {
             // in a manifest, a parameter editor looks like:
             //
@@ -148,6 +163,9 @@ namespace Umbraco.Core.Manifest
                 jobject["defaultConfig"] = config;
                 jobject.Remove("config");
             }
+
+            if(jobject["editor"]?["view"] is JValue view) // We need to null check, if view do not exists, then editor do not exists
+                jobject["editor"]["view"] = RewriteVirtualUrl(view);
         }
 
         private static JArray RewriteValidators(JObject validation)

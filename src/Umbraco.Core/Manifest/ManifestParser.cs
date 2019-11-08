@@ -163,7 +163,7 @@ namespace Umbraco.Core.Manifest
                 throw new ArgumentNullOrEmptyException(nameof(text));
 
             var manifest = JsonConvert.DeserializeObject<PackageManifest>(text,
-                new DataEditorConverter(_logger),
+                new DataEditorConverter(_logger, _ioHelper),
                 new ValueValidatorConverter(_validators),
                 new DashboardAccessRuleConverter());
 
@@ -172,6 +172,19 @@ namespace Umbraco.Core.Manifest
                 manifest.Scripts[i] = _ioHelper.ResolveVirtualUrl(manifest.Scripts[i]);
             for (var i = 0; i < manifest.Stylesheets.Length; i++)
                 manifest.Stylesheets[i] = _ioHelper.ResolveVirtualUrl(manifest.Stylesheets[i]);
+            foreach (var contentApp in manifest.ContentApps)
+            {
+                contentApp.View = _ioHelper.ResolveVirtualUrl(contentApp.View);
+            }
+            foreach (var dashboard in manifest.Dashboards)
+            {
+                dashboard.View = _ioHelper.ResolveVirtualUrl(dashboard.View);
+            }
+            foreach (var gridEditor in manifest.GridEditors)
+            {
+                gridEditor.View = _ioHelper.ResolveVirtualUrl(gridEditor.View);
+                gridEditor.Render = _ioHelper.ResolveVirtualUrl(gridEditor.Render);
+            }
 
             // add property editors that are also parameter editors, to the parameter editors list
             // (the manifest format is kinda legacy)

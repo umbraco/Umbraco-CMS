@@ -32,7 +32,7 @@ namespace Umbraco.Web.PropertyEditors
         /// This is called to merge in the prevalue crops with the value that is saved - similar to the property value converter for the front-end
         /// </summary>
 
-        public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
+        public override object ToEditor(IProperty property, IDataTypeService dataTypeService, string culture = null, string segment = null)
         {
             var val = property.GetValue(culture, segment);
             if (val == null) return null;
@@ -161,7 +161,7 @@ namespace Umbraco.Web.PropertyEditors
         }
 
 
-        public override string ConvertDbToString(PropertyType propertyType, object value, IDataTypeService dataTypeService)
+        public override string ConvertDbToString(IPropertyType propertyType, object value, IDataTypeService dataTypeService)
         {
             if (value == null || string.IsNullOrEmpty(value.ToString()))
                 return null;
