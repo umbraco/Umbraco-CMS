@@ -15,21 +15,21 @@ namespace Umbraco.Core.Cache
         /// <summary>
         /// Gets the internal items dictionary, for tests only!
         /// </summary>
-        internal readonly ConcurrentDictionary<string, Lazy<object>> Items = new ConcurrentDictionary<string, Lazy<object>>();
+        private readonly ConcurrentDictionary<string, Lazy<object>> _items = new ConcurrentDictionary<string, Lazy<object>>();
 
-        public int Count => Items.Count;
+        public int Count => _items.Count;
 
         /// <inheritdoc />
         public object Get(string cacheKey)
         {
-            Items.TryGetValue(cacheKey, out var result); // else null
+            _items.TryGetValue(cacheKey, out var result); // else null
             return result == null ? null : SafeLazy.GetSafeLazyValue(result); // return exceptions as null
         }
 
         /// <inheritdoc />
         public object Get(string cacheKey, Func<object> getCacheItem)
         {
-            var result = Items.GetOrAdd(cacheKey, k => SafeLazy.GetSafeLazy(getCacheItem));
+            var result = _items.GetOrAdd(cacheKey, k => SafeLazy.GetSafeLazy(getCacheItem));
 
             var value = result.Value; // will not throw (safe lazy)
             if (!(value is SafeLazy.ExceptionHolder eh))
@@ -39,7 +39,7 @@ namespace Umbraco.Core.Cache
             // which would trick with GetSafeLazyValue, we need to remove by ourselves,
             // in order NOT to cache exceptions
 
-            Items.TryRemove(cacheKey, out result);
+            _items.TryRemove(cacheKey, out result);
             eh.Exception.Throw(); // throw once!
             return null; // never reached
         }
@@ -47,7 +47,7 @@ namespace Umbraco.Core.Cache
         /// <inheritdoc />
         public IEnumerable<object> SearchByKey(string keyStartsWith)
         {
-            return Items
+            return _items
                 .Where(kvp => kvp.Key.InvariantStartsWith(keyStartsWith))
                 .Select(kvp => SafeLazy.GetSafeLazyValue(kvp.Value))
                 .Where(x => x != null);
@@ -57,7 +57,7 @@ namespace Umbraco.Core.Cache
         public IEnumerable<object> SearchByRegex(string regex)
         {
             var compiled = new Regex(regex, RegexOptions.Compiled);
-            return Items
+            return _items
                 .Where(kvp => compiled.IsMatch(kvp.Key))
                 .Select(kvp => SafeLazy.GetSafeLazyValue(kvp.Value))
                 .Where(x => x != null);
@@ -66,13 +66,13 @@ namespace Umbraco.Core.Cache
         /// <inheritdoc />
         public void Clear()
         {
-            Items.Clear();
+            _items.Clear();
         }
 
         /// <inheritdoc />
         public void Clear(string key)
         {
-            Items.TryRemove(key, out _);
+            _items.TryRemove(key, out _);
         }
 
         /// <inheritdoc />
@@ -82,7 +82,7 @@ namespace Umbraco.Core.Cache
             if (type == null) return;
             var isInterface = type.IsInterface;
 
-            foreach (var kvp in Items
+            foreach (var kvp in _items
                 .Where(x =>
                 {
                     // entry.Value is Lazy<object> and not null, its value may be null
@@ -94,7 +94,7 @@ namespace Umbraco.Core.Cache
                     // otherwise remove exact types (not inherited types)
                     return value == null || (isInterface ? (type.IsInstanceOfType(value)) : (value.GetType() == type));
                 }))
-                Items.TryRemove(kvp.Key, out _);
+                _items.TryRemove(kvp.Key, out _);
         }
 
         /// <inheritdoc />
@@ -103,7 +103,7 @@ namespace Umbraco.Core.Cache
             var typeOfT = typeof(T);
             var isInterface = typeOfT.IsInterface;
 
-            foreach (var kvp in Items
+            foreach (var kvp in _items
                 .Where(x =>
                 {
                     // entry.Value is Lazy<object> and not null, its value may be null
@@ -116,7 +116,7 @@ namespace Umbraco.Core.Cache
                     // otherwise remove exact types (not inherited types)
                     return value == null || (isInterface ? (value is T) : (value.GetType() == typeOfT));
                 }))
-                Items.TryRemove(kvp.Key, out _);
+                _items.TryRemove(kvp.Key, out _);
         }
 
         /// <inheritdoc />
@@ -125,7 +125,7 @@ namespace Umbraco.Core.Cache
             var typeOfT = typeof(T);
             var isInterface = typeOfT.IsInterface;
 
-            foreach (var kvp in Items
+            foreach (var kvp in _items
                 .Where(x =>
                 {
                     // entry.Value is Lazy<object> and not null, its value may be null
@@ -141,24 +141,24 @@ namespace Umbraco.Core.Cache
                             // run predicate on the 'public key' part only, ie without prefix
                             && predicate(x.Key, (T)value);
                 }))
-                Items.TryRemove(kvp.Key, out _);
+                _items.TryRemove(kvp.Key, out _);
         }
 
         /// <inheritdoc />
         public void ClearByKey(string keyStartsWith)
         {
-            foreach (var ikvp in Items
+            foreach (var ikvp in _items
                 .Where(kvp => kvp.Key.InvariantStartsWith(keyStartsWith)))
-                Items.TryRemove(ikvp.Key, out _);
+                _items.TryRemove(ikvp.Key, out _);
         }
 
         /// <inheritdoc />
         public void ClearByRegex(string regex)
         {
             var compiled = new Regex(regex, RegexOptions.Compiled);
-            foreach (var ikvp in Items
+            foreach (var ikvp in _items
                 .Where(kvp => compiled.IsMatch(kvp.Key)))
-                Items.TryRemove(ikvp.Key, out _);
+                _items.TryRemove(ikvp.Key, out _);
         }
     }
 }
