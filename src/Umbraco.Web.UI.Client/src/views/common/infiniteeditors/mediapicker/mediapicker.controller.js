@@ -28,6 +28,7 @@ angular.module("umbraco")
             var dialogOptions = $scope.model;
             
             $scope.disableFolderSelect = (dialogOptions.disableFolderSelect && dialogOptions.disableFolderSelect !== "0") ? true : false;
+            $scope.disableFocalPoint = (dialogOptions.disableFocalPoint && dialogOptions.disableFocalPoint !== "0") ? true : false;
             $scope.onlyImages = (dialogOptions.onlyImages && dialogOptions.onlyImages !== "0") ? true : false;
             $scope.onlyFolders = (dialogOptions.onlyFolders && dialogOptions.onlyFolders !== "0") ? true : false;
             $scope.showDetails = (dialogOptions.showDetails && dialogOptions.showDetails !== "0") ? true : false;
@@ -137,7 +138,8 @@ angular.module("umbraco")
                             $scope.target = node;
                             if (ensureWithinStartNode(node)) {
                                 selectMedia(node);
-                                $scope.target.url = mediaHelper.resolveFile(node);
+                                $scope.target.url = mediaHelper.resolveFileFromEntity(node);
+                                $scope.target.thumbnail = mediaHelper.resolveFileFromEntity(node, true);
                                 $scope.target.altText = altText;
                                 openDetailsDialog();
                             }
@@ -333,22 +335,26 @@ angular.module("umbraco")
             }
 
             function openDetailsDialog() {
+                localizationService.localize("defaultdialogs_editSelectedMedia").then(function (data) {
+                    vm.mediaPickerDetailsOverlay = {
+                        show: true,
+                        title: data,
+                        disableFocalPoint: $scope.disableFocalPoint,
+                        submit: function (model) {
+                            $scope.model.selection.push($scope.target);
+                            $scope.model.submit($scope.model);
 
-                vm.mediaPickerDetailsOverlay = {
-                    show: true,
-                    submit: function (model) {
+                            vm.mediaPickerDetailsOverlay.show = false;
+                            vm.mediaPickerDetailsOverlay = null;
+                        },
+                        close: function (oldModel) {
+                            vm.mediaPickerDetailsOverlay.show = false;
+                            vm.mediaPickerDetailsOverlay = null;
 
-                        $scope.model.selection.push($scope.target);
-                        $scope.model.submit($scope.model);
-
-                        vm.mediaPickerDetailsOverlay.show = false;
-                        vm.mediaPickerDetailsOverlay = null;
-                    },
-                    close: function (oldModel) {
-                        vm.mediaPickerDetailsOverlay.show = false;
-                        vm.mediaPickerDetailsOverlay = null;
-                    }
-                };
+                            close();
+                        }
+                    };
+                });
             };
 
             var debounceSearchMedia = _.debounce(function () {
