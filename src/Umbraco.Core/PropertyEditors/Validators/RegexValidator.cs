@@ -11,7 +11,7 @@ namespace Umbraco.Core.PropertyEditors.Validators
     /// <summary>
     /// A validator that validates that the value against a regular expression.
     /// </summary>
-    internal sealed class RegexValidator : IValueFormatValidator, IManifestValueValidator
+    public sealed class RegexValidator : IValueFormatValidator, IManifestValueValidator
     {
         private readonly ILocalizedTextService _textService;
         private string _regex;

@@ -6,7 +6,7 @@ namespace Umbraco.Core.PropertyEditors.Validators
     /// <summary>
     /// A validator that validates that the value is a valid integer
     /// </summary>
-    internal sealed class IntegerValidator : IManifestValueValidator
+    public sealed class IntegerValidator : IManifestValueValidator
     {
         /// <inheritdoc />
         public string ValidationName => "Integer";

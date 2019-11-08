@@ -8,7 +8,7 @@ namespace Umbraco.Core.PropertyEditors.Validators
     /// <summary>
     /// A validator that validates that the value is not null or empty (if it is a string)
     /// </summary>
-    internal sealed class RequiredValidator : IValueRequiredValidator, IManifestValueValidator
+    public sealed class RequiredValidator : IValueRequiredValidator, IManifestValueValidator
     {
         private readonly ILocalizedTextService _textService;
 

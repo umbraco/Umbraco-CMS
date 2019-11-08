@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -22,6 +21,7 @@ namespace Umbraco.Core.Manifest
 
         private readonly IAppPolicyCache _cache;
         private readonly ILogger _logger;
+        private readonly IIOHelper _ioHelper;
         private readonly ManifestValueValidatorCollection _validators;
         private readonly ManifestFilterCollection _filters;
 
@@ -30,28 +30,31 @@ namespace Umbraco.Core.Manifest
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        public ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, ILogger logger)
-            : this(appCaches, validators, filters, "~/App_Plugins", logger)
+        public ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, ILogger logger, IIOHelper ioHelper)
+            : this(appCaches, validators, filters, "~/App_Plugins", logger, ioHelper)
         { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        private ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, string path, ILogger logger)
+        private ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, string path, ILogger logger, IIOHelper ioHelper)
         {
             if (appCaches == null) throw new ArgumentNullException(nameof(appCaches));
             _cache = appCaches.RuntimeCache;
+            _ioHelper = ioHelper;
             _validators = validators ?? throw new ArgumentNullException(nameof(validators));
             _filters = filters ?? throw new ArgumentNullException(nameof(filters));
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullOrEmptyException(nameof(path));
+
             Path = path;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
         }
 
         public string Path
         {
             get => _path;
-            set => _path = value.StartsWith("~/") ? Current.IOHelper.MapPath(value) : value;
+            set => _path = value.StartsWith("~/") ? _ioHelper.MapPath(value) : value;
         }
 
         /// <summary>
@@ -166,9 +169,9 @@ namespace Umbraco.Core.Manifest
 
             // scripts and stylesheets are raw string, must process here
             for (var i = 0; i < manifest.Scripts.Length; i++)
-                manifest.Scripts[i] = Current.IOHelper.ResolveVirtualUrl(manifest.Scripts[i]);
+                manifest.Scripts[i] = _ioHelper.ResolveVirtualUrl(manifest.Scripts[i]);
             for (var i = 0; i < manifest.Stylesheets.Length; i++)
-                manifest.Stylesheets[i] = Current.IOHelper.ResolveVirtualUrl(manifest.Stylesheets[i]);
+                manifest.Stylesheets[i] = _ioHelper.ResolveVirtualUrl(manifest.Stylesheets[i]);
 
             // add property editors that are also parameter editors, to the parameter editors list
             // (the manifest format is kinda legacy)

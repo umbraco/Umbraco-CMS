@@ -193,6 +193,7 @@
     <Compile Include="Manifest\IManifestFilter.cs" />
     <Compile Include="Manifest\ManifestFilterCollection.cs" />
     <Compile Include="Manifest\ManifestFilterCollectionBuilder.cs" />
+    <Compile Include="Manifest\ManifestParser.cs" />
     <Compile Include="Migrations\IMigrationBuilder.cs" />
     <Compile Include="Migrations\Upgrade\Common\DeleteKeysAndIndexes.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\ContentPickerPreValueMigrator.cs" />
@@ -271,6 +272,9 @@
     <Compile Include="Models\PublishedContent\IPublishedPropertyType.cs" />
     <Compile Include="PropertyEditors\ConfigurationFieldsExtensions.cs" />
     <Compile Include="PropertyEditors\IIgnoreUserStartNodesConfig.cs" />
+    <Compile Include="PropertyEditors\Validators\DelimitedValueValidator.cs" />
+    <Compile Include="PropertyEditors\Validators\RegexValidator.cs" />
+    <Compile Include="PropertyEditors\Validators\RequiredValidator.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="Models\PublishedContent\UrlMode.cs" />
     <Compile Include="Persistence\Dtos\PropertyTypeCommonDto.cs" />
@@ -285,7 +289,6 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\RenameLabelAndRichTextPropertyEditorAliases.cs" />
     <Compile Include="PropertyEditors\IDataEditor.cs" />
     <Compile Include="PropertyEditors\IPropertyIndexValueFactory.cs" />
-    <Compile Include="PropertyEditors\IValueValidator.cs" />
     <Compile Include="PropertyEditors\PropertyValueConverterCollection.cs" />
     <Compile Include="PropertyEditors\PropertyValueConverterCollectionBuilder.cs" />
     <Compile Include="PropertyEditors\VoidEditor.cs" />
@@ -390,7 +393,6 @@
     <Compile Include="Logging\Viewer\MessageTemplateFilter.cs" />
     <Compile Include="Logging\Viewer\SavedLogSearch.cs" />
     <Compile Include="Manifest\DashboardAccessRuleConverter.cs" />
-    <Compile Include="Manifest\ManifestContentAppDefinition.cs" />
     <Compile Include="Manifest\ManifestContentAppFactory.cs" />
     <Compile Include="Manifest\ManifestDashboard.cs" />
     <Compile Include="Migrations\MergeBuilder.cs" />
@@ -483,9 +485,6 @@
     <Compile Include="PropertyEditors\DropDownFlexibleConfiguration.cs" />
     <Compile Include="PropertyEditors\IConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\ImageCropperConfiguration.cs" />
-    <Compile Include="PropertyEditors\IManifestValueValidator.cs" />
-    <Compile Include="PropertyEditors\IValueFormatValidator.cs" />
-    <Compile Include="PropertyEditors\IValueRequiredValidator.cs" />
     <Compile Include="PropertyEditors\LabelConfiguration.cs" />
     <Compile Include="PropertyEditors\LabelConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\LabelPropertyEditor.cs" />
@@ -560,7 +559,6 @@
     <Compile Include="Logging\OwinLoggerFactory.cs" />
     <Compile Include="Logging\VoidProfiler.cs" />
     <Compile Include="MainDom.cs" />
-    <Compile Include="Manifest\ManifestParser.cs" />
     <Compile Include="Manifest\ValueValidatorConverter.cs" />
     <Compile Include="Manifest\ManifestWatcher.cs" />
     <Compile Include="Manifest\PackageManifest.cs" />
@@ -582,7 +580,6 @@
     <Compile Include="Models\DictionaryItem.cs" />
     <Compile Include="Models\DictionaryItemExtensions.cs" />
     <Compile Include="Models\DictionaryTranslation.cs" />
-    <Compile Include="Models\EntityContainer.cs" />
     <Compile Include="Models\EntityExtensions.cs" />
     <Compile Include="Models\GridValue.cs" />
     <Compile Include="Models\Identity\BackOfficeIdentityUser.cs" />
@@ -1002,22 +999,14 @@
     <Compile Include="Persistence\UmbracoDatabaseExtensions.cs" />
     <Compile Include="Persistence\UmbracoDatabaseFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PropertyEditors\Validators\DecimalValidator.cs" />
     <Compile Include="PropertyEditors\DefaultPropertyValueConverterAttribute.cs" />
-    <Compile Include="PropertyEditors\Validators\DelimitedValueValidator.cs" />
-    <Compile Include="PropertyEditors\Validators\EmailValidator.cs" />
     <Compile Include="PropertyEditors\GridEditor.cs" />
-    <Compile Include="PropertyEditors\Validators\IntegerValidator.cs" />
     <Compile Include="PropertyEditors\IPropertyValueConverter.cs" />
     <Compile Include="PropertyEditors\DataEditor.cs" />
     <Compile Include="PropertyEditors\DataEditorCollection.cs" />
     <Compile Include="PropertyEditors\DataEditorCollectionBuilder.cs" />
     <Compile Include="PropertyEditors\PropertyValueConverterBase.cs" />
     <Compile Include="PropertyEditors\DataValueEditor.cs" />
-    <Compile Include="PropertyEditors\Validators\RegexValidator.cs" />
-    <Compile Include="PropertyEditors\Validators\RequiredValidator.cs" />
-    <Compile Include="PropertyEditors\ManifestValueValidatorCollection.cs" />
-    <Compile Include="PropertyEditors\ManifestValueValidatorCollectionBuilder.cs" />
     <Compile Include="PropertyEditors\ValueConverters\CheckboxListValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ColorPickerValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\DatePickerValueConverter.cs" />
