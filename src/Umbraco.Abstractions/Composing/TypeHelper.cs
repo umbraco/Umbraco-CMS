@@ -8,6 +8,7 @@ using System.Reflection;
 
 namespace Umbraco.Core.Composing
 {
+    
     /// <summary>
     /// A utility class for type checking, this provides internal caching so that calls to these methods will be faster
     /// than doing a manual type check in c#
@@ -20,6 +21,66 @@ namespace Umbraco.Core.Composing
             = new ConcurrentDictionary<Type, FieldInfo[]>();
 
         private static readonly Assembly[] EmptyAssemblies  = new Assembly[0];
+
+        /// <summary>
+        /// Returns a Type for the string type name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static Type GetTypeByName(string name)
+        {
+            var type = Type.GetType(name);
+            if (type != null) return type;
+
+            // now try fall back procedures. null may be returned because Type.GetName only returns types that have already been loaded in the appdomain
+            // and this type might not be there yet, so we need to parse the type name and then try to load in via assembly.
+
+            var typeName = TypeName.Parse(name);
+            try
+            {
+                var assembly = Assembly.Load(typeName.AssemblyName);
+                type = assembly.GetType(typeName.Name);
+                return type;
+            }
+            catch (NotSupportedException)
+            {
+                throw;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Used to parse a fully qualified type name
+        /// </summary>
+        /// <remarks>
+        /// Does not support generics.
+        /// This is a simple utility class and is not an exhaustive type name parser (which doesn't exist in .net strangely)
+        /// </remarks>
+        private class TypeName
+        {
+            private TypeName(string name, AssemblyName assemblyName)
+            {
+                Name = name;
+                AssemblyName = assemblyName;
+            }
+
+            public static TypeName Parse(string name)
+            {
+                if (name.Contains("[["))
+                    throw new NotSupportedException($"{nameof(TypeName)} does not support generic types");
+
+                var index = name.IndexOf(',');
+                return index > 0
+                    ? new TypeName(name.Substring(0, index).Trim(), new AssemblyName(name.Substring(index + 1).Trim()))
+                    : new TypeName(name, null);
+            }
+
+            public string Name { get; }
+            public AssemblyName AssemblyName { get; }
+        }
 
         /// <summary>
         /// Based on a type we'll check if it is IEnumerable{T} (or similar) and if so we'll return a List{T}, this will also deal with array types and return List{T} for those too.

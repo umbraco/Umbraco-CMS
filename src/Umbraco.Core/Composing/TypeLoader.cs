@@ -20,7 +20,7 @@ namespace Umbraco.Core.Composing
     /// Provides methods to find and instantiate types.
     /// </summary>
     /// <remarks>
-    /// <para>This class should be used to get all types, the <see cref="TypeFinder"/> class should never be used directly.</para>
+    /// <para>This class should be used to get all types, the <see cref="Composing.TypeFinder"/> class should never be used directly.</para>
     /// <para>In most cases this class is not used directly but through extension methods that retrieve specific types.</para>
     /// <para>This class caches the types it knows to avoid excessive assembly scanning and shorten startup times, relying
     /// on a hash of the DLLs in the ~/bin folder to check for cache expiration.</para>
@@ -48,22 +48,25 @@ namespace Umbraco.Core.Composing
         /// <summary>
         /// Initializes a new instance of the <see cref="TypeLoader"/> class.
         /// </summary>
+        /// <param name="typeFinder"></param>
         /// <param name="runtimeCache">The application runtime cache.</param>
         /// <param name="localTempPath">Files storage location.</param>
         /// <param name="logger">A profiling logger.</param>
-        public TypeLoader(IAppPolicyCache runtimeCache, string localTempPath, IProfilingLogger logger)
-            : this(runtimeCache, localTempPath, logger, true)
+        public TypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, string localTempPath, IProfilingLogger logger)
+            : this(typeFinder, runtimeCache, localTempPath, logger, true)
         { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TypeLoader"/> class.
         /// </summary>
+        /// <param name="typeFinder"></param>
         /// <param name="runtimeCache">The application runtime cache.</param>
         /// <param name="localTempPath">Files storage location.</param>
         /// <param name="logger">A profiling logger.</param>
         /// <param name="detectChanges">Whether to detect changes using hashes.</param>
-        internal TypeLoader(IAppPolicyCache runtimeCache, string localTempPath, IProfilingLogger logger, bool detectChanges)
+        internal TypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, string localTempPath, IProfilingLogger logger, bool detectChanges)
         {
+            TypeFinder = typeFinder ?? throw new ArgumentNullException(nameof(typeFinder));
             _runtimeCache = runtimeCache ?? throw new ArgumentNullException(nameof(runtimeCache));
             _localTempPath = localTempPath;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -106,6 +109,12 @@ namespace Umbraco.Core.Composing
         { }
 
         /// <summary>
+        /// Returns the underlying <see cref="ITypeFinder"/>
+        /// </summary>
+        // ReSharper disable once MemberCanBePrivate.Global
+        public ITypeFinder TypeFinder { get; }
+
+        /// <summary>
         /// Gets or sets the set of assemblies to scan.
         /// </summary>
         /// <remarks>
@@ -117,7 +126,7 @@ namespace Umbraco.Core.Composing
         // internal for tests
         internal IEnumerable<Assembly> AssembliesToScan
         {
-            get => _assemblies ?? (_assemblies = TypeFinder.GetAssembliesWithKnownExclusions());
+            get => _assemblies ?? (_assemblies = TypeFinder.AssembliesToScan);
             set => _assemblies = value;
         }
 

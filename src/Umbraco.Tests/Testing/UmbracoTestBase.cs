@@ -288,7 +288,8 @@ namespace Umbraco.Tests.Testing
         // common to all tests = cannot be overriden
         private static TypeLoader CreateCommonTypeLoader(IAppPolicyCache runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
         {
-            return new TypeLoader(runtimeCache, globalSettings.LocalTempPath, logger, false)
+            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            return new TypeLoader(typeFinder, runtimeCache, globalSettings.LocalTempPath, logger, false)
             {
                 AssembliesToScan = new[]
                 {

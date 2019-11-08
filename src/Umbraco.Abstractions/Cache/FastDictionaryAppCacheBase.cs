@@ -10,7 +10,7 @@ namespace Umbraco.Core.Cache
     /// <summary>
     /// Provides a base class to fast, dictionary-based <see cref="IAppCache"/> implementations.
     /// </summary>
-    internal abstract class FastDictionaryAppCacheBase : IAppCache
+    public abstract class FastDictionaryAppCacheBase : IAppCache
     {
         // prefix cache keys so we know which one are ours
         protected const string CacheItemPrefix = "umbrtmche";
@@ -116,7 +116,7 @@ namespace Umbraco.Core.Cache
         /// <inheritdoc />
         public virtual void ClearOfType(string typeName)
         {
-            var type = TypeFinder.GetTypeByName(typeName);
+            var type = TypeHelper.GetTypeByName(typeName);
             if (type == null) return;
             var isInterface = type.IsInterface;
             try

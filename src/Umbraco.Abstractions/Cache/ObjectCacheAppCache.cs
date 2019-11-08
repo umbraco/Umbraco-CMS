@@ -29,7 +29,7 @@ namespace Umbraco.Core.Cache
         /// <summary>
         /// Gets the internal memory cache, for tests only!
         /// </summary>
-        internal ObjectCache MemoryCache { get; private set; }
+        public ObjectCache MemoryCache { get; private set; }
 
         /// <inheritdoc />
         public object Get(string key)
@@ -178,7 +178,7 @@ namespace Umbraco.Core.Cache
         /// <inheritdoc />
         public virtual void ClearOfType(string typeName)
         {
-            var type = TypeFinder.GetTypeByName(typeName);
+            var type = TypeHelper.GetTypeByName(typeName);
             if (type == null) return;
             var isInterface = type.IsInterface;
             try

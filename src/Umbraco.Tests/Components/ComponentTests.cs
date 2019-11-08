@@ -361,7 +361,8 @@ namespace Umbraco.Tests.Components
         [Test]
         public void AllComposers()
         {
-            var typeLoader = new TypeLoader(AppCaches.Disabled.RuntimeCache, IOHelper.MapPath("~/App_Data/TEMP"), Mock.Of<IProfilingLogger>());
+            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var typeLoader = new TypeLoader(typeFinder, AppCaches.Disabled.RuntimeCache, IOHelper.MapPath("~/App_Data/TEMP"), Mock.Of<IProfilingLogger>());
 
             var register = MockRegister();
             var composition = new Composition(register, typeLoader, Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Run));

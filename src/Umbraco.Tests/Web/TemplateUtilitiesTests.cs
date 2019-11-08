@@ -39,8 +39,9 @@ namespace Umbraco.Tests.Web
 
             // FIXME: bad in a unit test - but Udi has a static ctor that wants it?!
             var factory = new Mock<IFactory>();
+            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
             factory.Setup(x => x.GetInstance(typeof(TypeLoader))).Returns(
-                new TypeLoader(NoAppCache.Instance, IOHelper.MapPath("~/App_Data/TEMP"), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
+                new TypeLoader(typeFinder, NoAppCache.Instance, IOHelper.MapPath("~/App_Data/TEMP"), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
             factory.Setup(x => x.GetInstance(typeof (ServiceContext))).Returns(serviceContext);
 
             var settings = SettingsForTests.GetDefaultUmbracoSettings();

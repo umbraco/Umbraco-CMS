@@ -38,7 +38,7 @@ namespace Umbraco.Examine
             if (!configuredDirectoryFactory.IsNullOrWhiteSpace())
             {
                 //this should be a fully qualified type
-                var factoryType = TypeFinder.GetTypeByName(configuredDirectoryFactory);
+                var factoryType = TypeHelper.GetTypeByName(configuredDirectoryFactory);
                 if (factoryType == null) throw new NullReferenceException("No directory type found for value: " + configuredDirectoryFactory);
                 var directoryFactory = (IDirectoryFactory)Activator.CreateInstance(factoryType);
                 return directoryFactory.CreateDirectory(dirInfo);

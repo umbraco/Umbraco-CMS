@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.SessionState;
+using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Composing;
@@ -38,7 +39,8 @@ namespace Umbraco.Tests.TestHelpers.Stubs
         {
             if (_factory != null) return _factory(requestContext);
 
-            var types = TypeFinder.FindClassesOfType<ControllerBase>(new[] { Assembly.GetExecutingAssembly() });
+            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var types = typeFinder.FindClassesOfType<ControllerBase>(new[] { Assembly.GetExecutingAssembly() });
 
             var controllerTypes = types.Where(x => x.Name.Equals(controllerName + "Controller", StringComparison.InvariantCultureIgnoreCase));
             var t = controllerTypes.SingleOrDefault();

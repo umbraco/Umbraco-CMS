@@ -111,8 +111,9 @@ namespace Umbraco.Core.Runtime
                 // configs
                 var configs = GetConfigs();
 
-                // type loader
-                var typeLoader = new TypeLoader(appCaches.RuntimeCache, configs.Global().LocalTempPath, ProfilingLogger);
+                // type finder/loader
+                var typeFinder = new TypeFinder(Logger);
+                var typeLoader = new TypeLoader(typeFinder, appCaches.RuntimeCache, configs.Global().LocalTempPath, ProfilingLogger);
 
                 // runtime state
                 // beware! must use '() => _factory.GetInstance<T>()' and NOT '_factory.GetInstance<T>'

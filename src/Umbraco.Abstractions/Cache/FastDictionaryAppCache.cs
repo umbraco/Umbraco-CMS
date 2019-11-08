@@ -10,12 +10,14 @@ namespace Umbraco.Core.Cache
     /// <summary>
     /// Implements a fast <see cref="IAppCache"/> on top of a concurrent dictionary.
     /// </summary>
-    internal class FastDictionaryAppCache : IAppCache
+    public class FastDictionaryAppCache : IAppCache
     {
         /// <summary>
         /// Gets the internal items dictionary, for tests only!
         /// </summary>
         internal readonly ConcurrentDictionary<string, Lazy<object>> Items = new ConcurrentDictionary<string, Lazy<object>>();
+
+        public int Count => Items.Count;
 
         /// <inheritdoc />
         public object Get(string cacheKey)
@@ -76,7 +78,7 @@ namespace Umbraco.Core.Cache
         /// <inheritdoc />
         public void ClearOfType(string typeName)
         {
-            var type = TypeFinder.GetTypeByName(typeName);
+            var type = TypeHelper.GetTypeByName(typeName);
             if (type == null) return;
             var isInterface = type.IsInterface;
 

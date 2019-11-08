@@ -125,11 +125,8 @@
     </Compile>
     -->
     <Compile Include="Cache\DefaultRepositoryCachePolicy.cs" />
-    <Compile Include="Cache\FastDictionaryAppCacheBase.cs" />
-    <Compile Include="Cache\ObjectCacheAppCache.cs" />
     <Compile Include="Compose\AuditEventsComponent.cs" />
     <Compile Include="Cache\CacheRefresherCollectionBuilder.cs" />
-    <Compile Include="Cache\FastDictionaryAppCache.cs" />
     <Compile Include="Cache\FullDataSetRepositoryCachePolicy.cs" />
     <Compile Include="Cache\HttpRequestAppCache.cs" />
     <Compile Include="Cache\WebCachingAppCache.cs" />
@@ -142,7 +139,9 @@
     <Compile Include="Composing\Composers.cs" />
     <Compile Include="Composing\Composition.cs" />
     <Compile Include="Composing\IComposer.cs" />
+    <Compile Include="Composing\ITypeFinder.cs" />
     <Compile Include="Composing\RegisterFactory.cs" />
+    <Compile Include="Composing\TypeFinderExtensions.cs" />
     <Compile Include="CompositionExtensions.cs" />
     <Compile Include="Composing\ICoreComposer.cs" />
     <Compile Include="Composing\IUserComposer.cs" />

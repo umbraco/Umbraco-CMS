@@ -37,7 +37,8 @@ namespace Umbraco.Tests.TestHelpers
             var container = RegisterFactory.Create();
 
             var logger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
-            var typeLoader = new TypeLoader(NoAppCache.Instance,
+            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var typeLoader = new TypeLoader(typeFinder, NoAppCache.Instance,
                 IOHelper.MapPath("~/App_Data/TEMP"),
                 logger,
                 false);
