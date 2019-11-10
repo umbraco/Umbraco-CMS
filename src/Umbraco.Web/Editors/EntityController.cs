@@ -734,7 +734,8 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         private IEnumerable<SearchResultEntity> ExamineSearch(string query, UmbracoEntityTypes entityType, string searchFrom = null, bool ignoreUserStartNodes = false)
         {
-            return _treeSearcher.ExamineSearch(query, entityType, 200, 0, out _, searchFrom, ignoreUserStartNodes);
+            var culture = ClientCulture();
+            return _treeSearcher.ExamineSearch(query, entityType, 200, 0, culture, out _, searchFrom, ignoreUserStartNodes);
         }
 
         private IEnumerable<EntityBasic> GetResultForChildren(int id, UmbracoEntityTypes entityType)

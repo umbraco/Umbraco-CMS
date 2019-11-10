@@ -12,6 +12,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Examine;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Search
@@ -62,6 +63,16 @@ namespace Umbraco.Web.Search
             UmbracoEntityTypes entityType,
             int pageSize,
             long pageIndex, out long totalFound, string searchFrom = null, bool ignoreUserStartNodes = false)
+        {
+            return ExamineSearch(query, entityType, pageSize, pageIndex, culture: null, out totalFound, searchFrom, ignoreUserStartNodes);
+        }
+
+        public IEnumerable<SearchResultEntity> ExamineSearch(
+            string query,
+            UmbracoEntityTypes entityType,
+            int pageSize,
+            long pageIndex, string culture,
+            out long totalFound, string searchFrom = null, bool ignoreUserStartNodes = false)
         {
             var sb = new StringBuilder();
 
@@ -135,7 +146,7 @@ namespace Umbraco.Web.Search
                 case UmbracoEntityTypes.Media:
                     return MediaFromSearchResults(pagedResult);
                 case UmbracoEntityTypes.Document:
-                    return ContentFromSearchResults(pagedResult);
+                    return ContentFromSearchResults(pagedResult, culture);
                 default:
                     throw new NotSupportedException("The " + typeof(UmbracoTreeSearcher) + " currently does not support searching against object type " + entityType);
             }
@@ -423,13 +434,17 @@ namespace Umbraco.Web.Search
         /// </summary>
         /// <param name="results"></param>
         /// <returns></returns>
-        private IEnumerable<SearchResultEntity> ContentFromSearchResults(IEnumerable<ISearchResult> results)
+        private IEnumerable<SearchResultEntity> ContentFromSearchResults(IEnumerable<ISearchResult> results, string culture = null)
         {
             var defaultLang = _languageService.GetDefaultLanguageIsoCode();
-
             foreach (var result in results)
             {
-                var entity = _mapper.Map<SearchResultEntity>(result);
+                var entity = _mapper.Map<SearchResultEntity>(result, context => {
+                        if(culture != null) {
+                            context.SetCulture(culture);
+                        }
+                    }
+                );
 
                 var intId = entity.Id.TryConvertTo<int>();
                 if (intId.Success)
@@ -437,7 +452,7 @@ namespace Umbraco.Web.Search
                     //if it varies by culture, return the default language URL
                     if (result.Values.TryGetValue(UmbracoContentIndex.VariesByCultureFieldName, out var varies) && varies == "y")
                     {
-                        entity.AdditionalData["Url"] = _umbracoContext.Url(intId.Result, defaultLang);
+                        entity.AdditionalData["Url"] = _umbracoContext.Url(intId.Result, culture ?? defaultLang);
                     }
                     else
                     {
