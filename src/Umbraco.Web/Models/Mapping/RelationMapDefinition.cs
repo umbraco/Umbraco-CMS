@@ -51,28 +51,6 @@ namespace Umbraco.Web.Models.Mapping
                 var objType = ObjectTypes.GetUmbracoObjectType(source.ChildObjectType.Value);
                 target.ChildObjectTypeName = objType.GetFriendlyName();
             }
-
-            // Load the relations
-
-            var relations = _relationService.GetByRelationTypeId(source.Id);
-            var displayRelations = context.MapEnumerable<IRelation, RelationDisplay>(relations);
-
-            // Load the entities
-            var entities = _relationService.GetEntitiesFromRelations(relations)
-                .ToDictionary(x => (x.Item1.Id, x.Item2.Id), x => x);
-
-            foreach(var r in displayRelations)
-            {
-                var pair = entities[(r.ParentId, r.ChildId)];
-                var parent = pair.Item1;
-                var child = pair.Item2;
-
-                r.ChildName = child.Name;
-                r.ParentName = parent.Name;
-            }
-
-            target.Relations = displayRelations;
-
         }
 
         // Umbraco.Code.MapAll -ParentName -ChildName
