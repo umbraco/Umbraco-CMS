@@ -243,7 +243,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var languageRepository = new LanguageRepository(ScopeProvider, AppCaches.Disabled, Logger);
                 var contentTypeRepository = new ContentTypeRepository(ScopeProvider, AppCaches.Disabled, Logger, commonRepository, languageRepository);
                 var relationTypeRepository = new RelationTypeRepository(ScopeProvider, AppCaches.Disabled, Logger);
-                var relationRepository = new RelationRepository(ScopeProvider, Logger, relationTypeRepository);
+                var entityRepository = new EntityRepository(ScopeProvider);
+                var relationRepository = new RelationRepository(ScopeProvider, Logger, relationTypeRepository, entityRepository);
                 var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
                 var contentRepo = new DocumentRepository(ScopeProvider, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors);
 
