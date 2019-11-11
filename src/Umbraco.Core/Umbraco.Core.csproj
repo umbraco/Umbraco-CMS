@@ -229,7 +229,6 @@
     <Compile Include="Migrations\Upgrade\V_8_0_1\ChangeNuCacheJsonFormat.cs" />
     <Compile Include="Migrations\Upgrade\V_8_1_0\ConvertTinyMceAndGridMediaUrlsToLocalLink.cs" />
     <Compile Include="Models\ContentBaseExtensions.cs" />
-    <Compile Include="Models\IContent.cs" />
     <Compile Include="Models\IContentType.cs" />
     <Compile Include="Models\IContentTypeBase.cs" />
     <Compile Include="Models\IContentTypeComposition.cs" />
@@ -425,9 +424,6 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\UserForeignKeys.cs" />
     <Compile Include="Migrations\Upgrade\Common\CreateKeysAndIndexes.cs" />
     <Compile Include="Models\ContentRepositoryExtensions.cs" />
-    <Compile Include="Models\ContentSchedule.cs" />
-    <Compile Include="Models\ContentScheduleAction.cs" />
-    <Compile Include="Models\ContentScheduleCollection.cs" />
     <Compile Include="Models\ContentTagsExtensions.cs" />
     <Compile Include="Models\ContentTypeBaseExtensions.cs" />
     <Compile Include="Models\DataTypeExtensions.cs" />

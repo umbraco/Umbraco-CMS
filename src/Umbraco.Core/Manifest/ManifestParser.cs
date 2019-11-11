@@ -9,6 +9,7 @@ using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Core.Manifest
 {
@@ -17,6 +18,7 @@ namespace Umbraco.Core.Manifest
     /// </summary>
     public class ManifestParser
     {
+        private readonly IJsonSerializer _jsonSerializer;
         private static readonly string Utf8Preamble = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
 
         private readonly IAppPolicyCache _cache;
@@ -30,9 +32,11 @@ namespace Umbraco.Core.Manifest
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        public ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, ILogger logger, IIOHelper ioHelper)
+        public ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, ILogger logger, IIOHelper ioHelper, IJsonSerializer jsonSerializer)
             : this(appCaches, validators, filters, "~/App_Plugins", logger, ioHelper)
-        { }
+        {
+            _jsonSerializer = jsonSerializer;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
@@ -198,7 +202,7 @@ namespace Umbraco.Core.Manifest
         // purely for tests
         internal IEnumerable<GridEditor> ParseGridEditors(string text)
         {
-            return JsonConvert.DeserializeObject<IEnumerable<GridEditor>>(text);
+            return _jsonSerializer.Deserialize<IEnumerable<GridEditor>>(text);
         }
     }
 }
