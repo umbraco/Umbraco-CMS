@@ -27,6 +27,9 @@ namespace Umbraco.Web.Composing
         
         public BuildManagerTypeFinder(IIOHelper ioHelper, ILogger logger, ITypeFinderConfig typeFinderConfig = null) : base(logger, typeFinderConfig)
         {
+            if (ioHelper == null) throw new ArgumentNullException(nameof(ioHelper));
+            if (logger == null) throw new ArgumentNullException(nameof(logger));
+
             _allAssemblies = new Lazy<HashSet<Assembly>>(() =>
             {
                 var isHosted = ioHelper.IsHosted;

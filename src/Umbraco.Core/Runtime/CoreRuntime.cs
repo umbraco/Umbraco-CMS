@@ -72,13 +72,13 @@ namespace Umbraco.Core.Runtime
 
             var profilingLogger = ProfilingLogger = new ProfilingLogger(logger, profiler);
 
-            TypeFinder = GetTypeFinder();
-            if (TypeFinder == null)
-                throw new InvalidOperationException($"The object returned from {nameof(GetTypeFinder)} cannot be null");
-
             IOHelper = GetIOHelper();
             if (IOHelper == null)
                 throw new InvalidOperationException($"The object returned from {nameof(GetIOHelper)} cannot be null");
+
+            TypeFinder = GetTypeFinder();
+            if (TypeFinder == null)
+                throw new InvalidOperationException($"The object returned from {nameof(GetTypeFinder)} cannot be null");
 
             // the boot loader boots using a container scope, so anything that is PerScope will
             // be disposed after the boot loader has booted, and anything else will remain.
