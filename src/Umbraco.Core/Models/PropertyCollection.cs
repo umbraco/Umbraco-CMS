@@ -188,7 +188,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Ensures that the collection does not contain properties not in the specified property types.
         /// </summary>
-        public void EnsureCleanPropertyTypes(IEnumerable<PropertyType> propertyTypes)
+        public void EnsureCleanPropertyTypes(IEnumerable<IPropertyType> propertyTypes)
         {
             if (propertyTypes == null)
                 return;

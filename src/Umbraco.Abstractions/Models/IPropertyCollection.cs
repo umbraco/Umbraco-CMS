@@ -11,7 +11,7 @@ namespace Umbraco.Core.Models
         event NotifyCollectionChangedEventHandler CollectionChanged;
 
         void EnsurePropertyTypes(IEnumerable<IPropertyType> propertyTypes);
-        void EnsureCleanPropertyTypes(IEnumerable<PropertyType> propertyTypes);
+        void EnsureCleanPropertyTypes(IEnumerable<IPropertyType> propertyTypes);
         object DeepClone();
 
         IProperty this[string name] { get; }
