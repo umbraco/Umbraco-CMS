@@ -8,6 +8,12 @@ namespace Umbraco.Core.Persistence.Repositories
     public interface IRelationRepository : IReadWriteQueryRepository<int, IRelation>
     {
         /// <summary>
+        /// Persist multiple <see cref="IRelation"/> at once
+        /// </summary>
+        /// <param name="relations"></param>
+        void Save(IEnumerable<IRelation> relations);
+
+        /// <summary>
         /// Deletes all relations for a parent for any specified relation type alias
         /// </summary>
         /// <param name="parentId"></param>

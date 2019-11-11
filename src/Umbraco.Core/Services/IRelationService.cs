@@ -306,6 +306,8 @@ namespace Umbraco.Core.Services
         /// <param name="relation">Relation to save</param>
         void Save(IRelation relation);
 
+        void Save(IEnumerable<IRelation> relations);
+
         /// <summary>
         /// Saves a <see cref="RelationType"/>
         /// </summary>

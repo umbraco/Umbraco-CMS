@@ -435,6 +435,24 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        public void Save(IEnumerable<IRelation> relations)
+        {
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                var saveEventArgs = new SaveEventArgs<IRelation>(relations);
+                if (scope.Events.DispatchCancelable(SavingRelation, this, saveEventArgs))
+                {
+                    scope.Complete();
+                    return;
+                }
+
+                _relationRepository.Save(relations);
+                scope.Complete();
+                saveEventArgs.CanCancel = false;
+                scope.Events.Dispatch(SavedRelation, this, saveEventArgs);
+            }
+        }
+
         /// <inheritdoc />
         public void Save(IRelationType relationType)
         {
