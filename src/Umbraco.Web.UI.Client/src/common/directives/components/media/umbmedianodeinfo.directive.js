@@ -1,13 +1,15 @@
 (function () {
     'use strict';
 
-    function MediaNodeInfoDirective($timeout, $location, eventsService, userService, dateHelper, editorService, mediaHelper) {
+    function MediaNodeInfoDirective($timeout, $location, eventsService, userService, dateHelper, editorService, mediaHelper, mediaResource, $routeParams) {
 
         function link(scope, element, attrs, ctrl) {
 
             var evts = [];
+            var referencesLoaded = false;
 
             scope.allowChangeMediaType = false;
+            scope.loading = true;
 
             function onInit() {
 
@@ -94,6 +96,19 @@
                 setMediaExtension();
             });
 
+            /** Loads in the media references one time */
+            function loadRelations() {
+                if (!referencesLoaded) {
+                    referencesLoaded = true;
+                    mediaResource.getReferences($routeParams.id)
+                        .then(function (data) {
+                            scope.loading = false;
+                            scope.references = data;
+                            scope.hasReferences = data.content.length > 0 || data.members.length > 0;
+                        });
+                }
+            }
+
             //ensure to unregister from all events!
             scope.$on('$destroy', function () {
                 for (var e in evts) {
@@ -102,6 +117,15 @@
             });
 
             onInit();
+
+            // load media type references when the 'info' tab is first activated/switched to
+            evts.push(eventsService.on("app.tabChange", function (event, args) {
+                $timeout(function () {
+                    if (args.alias === "umbInfo") {
+                        loadRelations();
+                    }
+                });
+            }));
         }
 
         var directive = {

@@ -158,6 +158,50 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #endregion
 
+        public void Save(IEnumerable<IRelation> relations)
+        {
+            foreach (var hasIdentityGroup in relations.GroupBy(r => r.HasIdentity))
+            {
+                if (hasIdentityGroup.Key)
+                {
+                    // Do updates, we can't really do a bulk update so this is still a 1 by 1 operation
+                    // however we can bulk populate the object types. It might be possible to bulk update
+                    // with SQL but would be pretty ugly and we're not really too worried about that for perf,
+                    // it's the bulk inserts we care about.
+                    var asArray = hasIdentityGroup.ToArray();
+                    foreach (var relation in hasIdentityGroup)
+                    {
+                        relation.UpdatingEntity();
+                        var dto = RelationFactory.BuildDto(relation);
+                        Database.Update(dto);
+                    }
+                    PopulateObjectTypes(asArray);
+                }
+                else
+                {
+                    // Do bulk inserts
+                    var entitiesAndDtos = hasIdentityGroup.ToDictionary(
+                        r =>                        // key = entity
+                        {
+                            r.AddingEntity();
+                            return r;
+                        },
+                        RelationFactory.BuildDto);  // value = DTO
+
+                    Database.InsertBulk(entitiesAndDtos.Values);
+
+                    // All dtos now have IDs assigned
+                    foreach (var de in entitiesAndDtos)
+                    {
+                        // re-assign ID to the entity
+                        de.Key.Id = de.Value.Id;
+                    }
+
+                    PopulateObjectTypes(entitiesAndDtos.Keys.ToArray());
+                }
+            }
+        }
+
         public IEnumerable<IRelation> GetPagedRelationsByQuery(IQuery<IRelation> query, long pageIndex, int pageSize, out long totalRecords, Ordering ordering)
         {
             var sql = GetBaseQuery(false);
@@ -189,6 +233,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return result;
         }
 
+        
         public void DeleteByParent(int parentId, params string[] relationTypeAliases)
         {
             var subQuery = Sql().Select<RelationDto>(x => x.Id)
@@ -204,19 +249,28 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Database.Execute(Sql().Delete<RelationDto>().WhereIn<RelationDto>(x => x.Id, subQuery));
         }
 
-        private void PopulateObjectTypes(IRelation entity)
+        /// <summary>
+        /// Used to populate the object types after insert/update
+        /// </summary>
+        /// <param name="entities"></param>
+        private void PopulateObjectTypes(params IRelation[] entities)
         {
-            var nodes = Database.Fetch<NodeDto>(Sql().Select<NodeDto>().From<NodeDto>().Where<NodeDto>(x => x.NodeId == entity.ChildId || x.NodeId == entity.ParentId))
+            var entityIds = entities.Select(x => x.ParentId).Concat(entities.Select(y => y.ChildId)).Distinct();
+
+            var nodes = Database.Fetch<NodeDto>(Sql().Select<NodeDto>().From<NodeDto>()
+                    .WhereIn<NodeDto>(x => x.NodeId, entityIds))
                 .ToDictionary(x => x.NodeId, x => x.NodeObjectType);
 
-            if(nodes.TryGetValue(entity.ParentId, out var parentObjectType))
+            foreach (var e in entities)
             {
-                entity.ParentObjectType = parentObjectType.GetValueOrDefault();
-            }
-
-            if(nodes.TryGetValue(entity.ChildId, out var childObjectType))
-            {
-                entity.ChildObjectType = childObjectType.GetValueOrDefault();
+                if (nodes.TryGetValue(e.ParentId, out var parentObjectType))
+                {
+                    e.ParentObjectType = parentObjectType.GetValueOrDefault();
+                }
+                if (nodes.TryGetValue(e.ChildId, out var childObjectType))
+                {
+                    e.ChildObjectType = childObjectType.GetValueOrDefault();
+                }
             }
         }
 
