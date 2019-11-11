@@ -59,7 +59,7 @@ namespace Umbraco.Web.Runtime
 
         #region Getters
 
-        protected override ITypeFinder GetTypeFinder() => _typeFinder ??= new BuildManagerTypeFinder(IOHelper, Logger, new BuildManagerTypeFinder.TypeFinderConfig());
+        protected override ITypeFinder GetTypeFinder() => _typeFinder ?? (_typeFinder = new BuildManagerTypeFinder(IOHelper, Logger, new BuildManagerTypeFinder.TypeFinderConfig()));
 
         protected override IProfiler GetProfiler() => _webProfiler;
 
