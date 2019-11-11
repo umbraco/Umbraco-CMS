@@ -140,6 +140,16 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
         if ($scope.model.validation && $scope.model.validation.mandatory && !$scope.model.config.minNumber) {
             $scope.model.config.minNumber = 1;
         }
+
+        _.each($scope.model.value, function (item){
+            // we must reload the "document" link URLs to match the current editor culture
+            if (item.udi.indexOf("/document/") > 0) {
+                item.url = null;
+                entityResource.getUrlByUdi(item.udi).then(function (data) {
+                    item.url = data;
+                });
+            }
+        });
     }
 
     init();
