@@ -7,70 +7,51 @@ using System.Linq;
 using System.Reflection;
 using System.Security;
 using System.Text;
-using System.Web.Compilation;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Composing
 {
-    /// <summary>
-    /// A utility class to find all classes of a certain type by reflection in the current bin folder
-    /// of the web application.
-    /// </summary>
+    /// <inheritdoc cref="ITypeFinder"/>
     public class TypeFinder : ITypeFinder
     {
         private readonly ILogger _logger;
 
-        public TypeFinder(ILogger logger)
+        public TypeFinder(ILogger logger, ITypeFinderConfig typeFinderConfig = null)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _assembliesAcceptingLoadExceptions = typeFinderConfig?.AssembliesAcceptingLoadExceptions.Where(x => !x.IsNullOrWhiteSpace()).ToArray() ?? Array.Empty<string>();
             _allAssemblies = new Lazy<HashSet<Assembly>>(() =>
             {
                 HashSet<Assembly> assemblies = null;
                 try
                 {
-                    var isHosted = IOHelper.IsHosted;
-
-                    try
+                    //NOTE: we cannot use AppDomain.CurrentDomain.GetAssemblies() because this only returns assemblies that have
+                    // already been loaded in to the app domain, instead we will look directly into the bin folder and load each one.
+                    var binFolder = GetRootDirectorySafe();
+                    var binAssemblyFiles = Directory.GetFiles(binFolder, "*.dll", SearchOption.TopDirectoryOnly).ToList();
+                    //var binFolder = Assembly.GetExecutingAssembly().GetAssemblyFile().Directory;
+                    //var binAssemblyFiles = Directory.GetFiles(binFolder.FullName, "*.dll", SearchOption.TopDirectoryOnly).ToList();
+                    assemblies = new HashSet<Assembly>();
+                    foreach (var a in binAssemblyFiles)
                     {
-                        if (isHosted)
+                        try
                         {
-                            assemblies = new HashSet<Assembly>(BuildManager.GetReferencedAssemblies().Cast<Assembly>());
+                            var assName = AssemblyName.GetAssemblyName(a);
+                            var ass = Assembly.Load(assName);
+                            assemblies.Add(ass);
                         }
-                    }
-                    catch (InvalidOperationException e)
-                    {
-                        if (e.InnerException is SecurityException == false)
-                            throw;
-                    }
-
-                    if (assemblies == null)
-                    {
-                        //NOTE: we cannot use AppDomain.CurrentDomain.GetAssemblies() because this only returns assemblies that have
-                        // already been loaded in to the app domain, instead we will look directly into the bin folder and load each one.
-                        var binFolder = IOHelper.GetRootDirectoryBinFolder();
-                        var binAssemblyFiles = Directory.GetFiles(binFolder, "*.dll", SearchOption.TopDirectoryOnly).ToList();
-                        //var binFolder = Assembly.GetExecutingAssembly().GetAssemblyFile().Directory;
-                        //var binAssemblyFiles = Directory.GetFiles(binFolder.FullName, "*.dll", SearchOption.TopDirectoryOnly).ToList();
-                        assemblies = new HashSet<Assembly>();
-                        foreach (var a in binAssemblyFiles)
+                        catch (Exception e)
                         {
-                            try
+                            if (e is SecurityException || e is BadImageFormatException)
                             {
-                                var assName = AssemblyName.GetAssemblyName(a);
-                                var ass = Assembly.Load(assName);
-                                assemblies.Add(ass);
+                                //swallow these exceptions
                             }
-                            catch (Exception e)
+                            else
                             {
-                                if (e is SecurityException || e is BadImageFormatException)
-                                {
-                                    //swallow these exceptions
-                                }
-                                else
-                                {
-                                    throw;
-                                }
+                                throw;
                             }
                         }
                     }
@@ -79,25 +60,6 @@ namespace Umbraco.Core.Composing
                     foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
                     {
                         assemblies.Add(a);
-                    }
-
-                    //here we are trying to get the App_Code assembly
-                    var fileExtensions = new[] { ".cs", ".vb" }; //only vb and cs files are supported
-                    var appCodeFolder = new DirectoryInfo(IOHelper.MapPath(IOHelper.ResolveUrl("~/App_code")));
-                    //check if the folder exists and if there are any files in it with the supported file extensions
-                    if (appCodeFolder.Exists && fileExtensions.Any(x => appCodeFolder.GetFiles("*" + x).Any()))
-                    {
-                        try
-                        {
-                            var appCodeAssembly = Assembly.Load("App_Code");
-                            if (assemblies.Contains(appCodeAssembly) == false) // BuildManager will find App_Code already
-                                assemblies.Add(appCodeAssembly);
-                        }
-                        catch (FileNotFoundException ex)
-                        {
-                            //this will occur if it cannot load the assembly
-                            _logger.Error(typeof(TypeFinder), ex, "Could not load assembly App_Code");
-                        }
                     }
                 }
                 catch (InvalidOperationException e)
@@ -115,31 +77,40 @@ namespace Umbraco.Core.Composing
         private volatile HashSet<Assembly> _localFilteredAssemblyCache;
         private readonly object _localFilteredAssemblyCacheLocker = new object();
         private readonly List<string> _notifiedLoadExceptionAssemblies = new List<string>();
-        private string[] _assembliesAcceptingLoadExceptions;
         private static readonly ConcurrentDictionary<string, Type> TypeNamesCache= new ConcurrentDictionary<string, Type>();
+        private string _rootDir = "";
+        private readonly string[] _assembliesAcceptingLoadExceptions;
 
-        private string[] AssembliesAcceptingLoadExceptions
+        // FIXME - this is only an interim change, once the IIOHelper stuff is merged we should use IIOHelper here
+        private string GetRootDirectorySafe()
         {
-            get
+            if (string.IsNullOrEmpty(_rootDir) == false)
             {
-                if (_assembliesAcceptingLoadExceptions != null)
-                    return _assembliesAcceptingLoadExceptions;
-
-                var s = ConfigurationManager.AppSettings[Constants.AppSettings.AssembliesAcceptingLoadExceptions];
-                return _assembliesAcceptingLoadExceptions = string.IsNullOrWhiteSpace(s)
-                    ? Array.Empty<string>()
-                    : s.Split(',').Select(x => x.Trim()).ToArray();
+                return _rootDir;
             }
+
+            var codeBase = Assembly.GetExecutingAssembly().CodeBase;
+            var uri = new Uri(codeBase);
+            var path = uri.LocalPath;
+            var baseDirectory = Path.GetDirectoryName(path);
+            if (string.IsNullOrEmpty(baseDirectory))
+                throw new PanicException("No root directory could be resolved.");
+
+            _rootDir = baseDirectory.Contains("bin")
+                ? baseDirectory.Substring(0, baseDirectory.LastIndexOf("bin", StringComparison.OrdinalIgnoreCase) - 1)
+                : baseDirectory;
+
+            return _rootDir;
         }
 
         private bool AcceptsLoadExceptions(Assembly a)
         {
-            if (AssembliesAcceptingLoadExceptions.Length == 0)
+            if (_assembliesAcceptingLoadExceptions.Length == 0)
                 return false;
-            if (AssembliesAcceptingLoadExceptions.Length == 1 && AssembliesAcceptingLoadExceptions[0] == "*")
+            if (_assembliesAcceptingLoadExceptions.Length == 1 && _assembliesAcceptingLoadExceptions[0] == "*")
                 return true;
             var name = a.GetName().Name; // simple name of the assembly
-            return AssembliesAcceptingLoadExceptions.Any(pattern =>
+            return _assembliesAcceptingLoadExceptions.Any(pattern =>
             {
                 if (pattern.Length > name.Length) return false; // pattern longer than name
                 if (pattern.Length == name.Length) return pattern.InvariantEquals(name); // same length, must be identical

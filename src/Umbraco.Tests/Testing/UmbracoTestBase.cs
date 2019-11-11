@@ -292,15 +292,12 @@ namespace Umbraco.Tests.Testing
         private static TypeLoader CreateCommonTypeLoader(IAppPolicyCache runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
         {
             var typeFinder = new TypeFinder(Mock.Of<ILogger>());
-            return new TypeLoader(typeFinder, runtimeCache, globalSettings.LocalTempPath, logger, false)
+            return new TypeLoader(typeFinder, runtimeCache, globalSettings.LocalTempPath, logger, false, new[]
             {
-                AssembliesToScan = new[]
-                {
-                    Assembly.Load("Umbraco.Core"),
-                    Assembly.Load("Umbraco.Web"),
-                    Assembly.Load("Umbraco.Tests")
-                }
-            };
+                Assembly.Load("Umbraco.Core"),
+                Assembly.Load("Umbraco.Web"),
+                Assembly.Load("Umbraco.Tests")
+            });
         }
 
         protected virtual void ComposeDatabase(UmbracoTestOptions.Database option)

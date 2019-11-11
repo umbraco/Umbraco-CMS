@@ -4,6 +4,9 @@ using System.Reflection;
 
 namespace Umbraco.Core.Composing
 {
+    /// <summary>
+    /// Used to find objects by implemented types, names and/or attributes
+    /// </summary>
     public interface ITypeFinder
     {
         Type GetTypeByName(string name);

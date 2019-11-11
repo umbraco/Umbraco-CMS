@@ -5,6 +5,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Runtime;
 using Umbraco.Web.Cache;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Logging;
 
 namespace Umbraco.Web.Runtime
@@ -17,6 +18,7 @@ namespace Umbraco.Web.Runtime
     {
         private readonly UmbracoApplicationBase _umbracoApplication;
         private IProfiler _webProfiler;
+        private BuildManagerTypeFinder _typeFinder;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WebRuntime"/> class.
@@ -56,6 +58,8 @@ namespace Umbraco.Web.Runtime
         }
 
         #region Getters
+
+        protected override ITypeFinder GetTypeFinder() => _typeFinder ??= new BuildManagerTypeFinder(Logger, new BuildManagerTypeFinder.TypeFinderConfig());
 
         protected override IProfiler GetProfiler() => _webProfiler;
 

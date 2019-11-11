@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
-using System.Web.Compilation;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Collections;
 using Umbraco.Core.IO;
@@ -50,8 +49,9 @@ namespace Umbraco.Core.Composing
         /// <param name="runtimeCache">The application runtime cache.</param>
         /// <param name="localTempPath">Files storage location.</param>
         /// <param name="logger">A profiling logger.</param>
-        public TypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, string localTempPath, IProfilingLogger logger)
-            : this(typeFinder, runtimeCache, localTempPath, logger, true)
+        /// <param name="assembliesToScan"></param>
+        public TypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, string localTempPath, IProfilingLogger logger, IEnumerable<Assembly> assembliesToScan = null)
+            : this(typeFinder, runtimeCache, localTempPath, logger, true, assembliesToScan)
         { }
 
         /// <summary>
@@ -62,12 +62,14 @@ namespace Umbraco.Core.Composing
         /// <param name="localTempPath">Files storage location.</param>
         /// <param name="logger">A profiling logger.</param>
         /// <param name="detectChanges">Whether to detect changes using hashes.</param>
-        internal TypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, string localTempPath, IProfilingLogger logger, bool detectChanges)
+        /// <param name="assembliesToScan"></param>
+        public TypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, string localTempPath, IProfilingLogger logger, bool detectChanges, IEnumerable<Assembly> assembliesToScan = null)
         {
             TypeFinder = typeFinder ?? throw new ArgumentNullException(nameof(typeFinder));
             _runtimeCache = runtimeCache ?? throw new ArgumentNullException(nameof(runtimeCache));
             _localTempPath = localTempPath;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _assemblies = assembliesToScan;
 
             if (detectChanges)
             {
@@ -100,13 +102,6 @@ namespace Umbraco.Core.Composing
         }
 
         /// <summary>
-        /// Initializes a new, test/blank, instance of the <see cref="TypeLoader"/> class.
-        /// </summary>
-        /// <remarks>The initialized instance cannot get types.</remarks>
-        internal TypeLoader()
-        { }
-
-        /// <summary>
         /// Returns the underlying <see cref="ITypeFinder"/>
         /// </summary>
         // ReSharper disable once MemberCanBePrivate.Global
@@ -122,7 +117,7 @@ namespace Umbraco.Core.Composing
         /// <para>This is for unit tests.</para>
         /// </remarks>
         // internal for tests
-        internal IEnumerable<Assembly> AssembliesToScan
+        protected IEnumerable<Assembly> AssembliesToScan
         {
             get => _assemblies ?? (_assemblies = TypeFinder.AssembliesToScan);
             set => _assemblies = value;

@@ -52,7 +52,7 @@ namespace Umbraco.Tests.Components
 
         private static TypeLoader MockTypeLoader()
         {
-            return new TypeLoader();
+            return new TypeLoader(Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), IOHelper.MapPath("~/App_Data/TEMP"), Mock.Of<IProfilingLogger>());
         }
 
         public static IRuntimeState MockRuntimeState(RuntimeLevel level)

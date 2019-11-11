@@ -177,8 +177,6 @@
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="Composing\LightInject\MixedLightInjectScopeManagerProvider.cs" />
     <Compile Include="Composing\TargetedServiceFactory.cs" />
-    <Compile Include="Composing\TypeFinder.cs" />
-    <Compile Include="Composing\TypeLoader.cs" />
     <Compile Include="IO\IMediaFileSystem.cs" />
     <Compile Include="IO\IMediaPathScheme.cs" />
     <Compile Include="IO\IOHelper.cs" />
