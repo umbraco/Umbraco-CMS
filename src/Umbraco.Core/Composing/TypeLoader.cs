@@ -5,11 +5,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
-using System.Web;
 using System.Web.Compilation;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Collections;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using File = System.IO.File;
@@ -729,18 +727,13 @@ namespace Umbraco.Core.Composing
                     // successfully retrieved types from the file cache: load
                     foreach (var type in cacheResult.Result)
                     {
-                        try
-                        {
-                            // we use the build manager to ensure we get all types loaded, this is slightly slower than
-                            // Type.GetType but if the types in the assembly aren't loaded yet it would fail whereas
-                            // BuildManager will load them - this is how eg MVC loads types, etc - no need to make it
-                            // more complicated
-                            typeList.Add(BuildManager.GetType(type, true));
-                        }
-                        catch (Exception ex)
+                        var resolvedType = TypeFinder.GetTypeByName(type);
+                        if (resolvedType != null)
+                            typeList.Add(resolvedType);
+                        else
                         {
                             // in case of any exception, we have to exit, and revert to scanning
-                            _logger.Error<TypeLoader>(ex, "Getting {TypeName}: failed to load cache file type {CacheType}, reverting to scanning assemblies.", GetName(baseType, attributeType), type);
+                            _logger.Warn<TypeLoader>("Getting {TypeName}: failed to load cache file type {CacheType}, reverting to scanning assemblies.", GetName(baseType, attributeType), type);
                             scan = true;
                             break;
                         }

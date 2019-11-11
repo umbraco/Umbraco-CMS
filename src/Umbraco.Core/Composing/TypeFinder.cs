@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
@@ -115,6 +116,7 @@ namespace Umbraco.Core.Composing
         private readonly object _localFilteredAssemblyCacheLocker = new object();
         private readonly List<string> _notifiedLoadExceptionAssemblies = new List<string>();
         private string[] _assembliesAcceptingLoadExceptions;
+        private static readonly ConcurrentDictionary<string, Type> TypeNamesCache= new ConcurrentDictionary<string, Type>();
 
         private string[] AssembliesAcceptingLoadExceptions
         {
@@ -310,7 +312,46 @@ namespace Umbraco.Core.Composing
             return GetClassesWithAttribute(attributeType, assemblyList, onlyConcreteClasses);
         }
 
+        /// <summary>
+        /// Returns a Type for the string type name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public virtual Type GetTypeByName(string name)
+        {
+            // This is exactly what the BuildManager does, if the type is an assembly qualified type
+            // name it will find it.
+            if (TypeNameContainsAssembly(name))
+            {
+                return Type.GetType(name);
+            }
+
+            // It didn't parse, so try loading from each already loaded assembly and cache it
+            return TypeNamesCache.GetOrAdd(name, s =>
+                AppDomain.CurrentDomain.GetAssemblies()
+                    .Select(x => x.GetType(s))
+                    .FirstOrDefault(x => x != null));
+        }
+
         #region Private methods
+
+        // borrowed from aspnet System.Web.UI.Util
+        private static bool TypeNameContainsAssembly(string typeName)
+        {
+            return CommaIndexInTypeName(typeName) > 0;
+        }
+
+        // borrowed from aspnet System.Web.UI.Util
+        private static int CommaIndexInTypeName(string typeName)
+        {
+            var num1 = typeName.LastIndexOf(',');
+            if (num1 < 0)
+                return -1;
+            var num2 = typeName.LastIndexOf(']');
+            if (num2 > num1)
+                return -1;
+            return typeName.IndexOf(',', num2 + 1);
+        }
 
         private IEnumerable<Type> GetClassesWithAttribute(
             Type attributeType,
@@ -509,6 +550,7 @@ namespace Umbraco.Core.Composing
         }
 
         #endregion
+
 
     }
 }

@@ -2,10 +2,13 @@
 using System.Diagnostics;
 using System.Reflection;
 using System.Web;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Collections;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Tests.Collections;
@@ -23,7 +26,8 @@ namespace Umbraco.Tests.Cache
         public override void Setup()
         {
             base.Setup();
-            _provider = new DeepCloneAppCache(new WebCachingAppCache(HttpRuntime.Cache));
+            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            _provider = new DeepCloneAppCache(new WebCachingAppCache(HttpRuntime.Cache, typeFinder));
         }
 
         internal override IAppCache AppCache => _provider;

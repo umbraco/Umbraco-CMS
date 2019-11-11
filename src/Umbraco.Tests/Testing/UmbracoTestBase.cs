@@ -99,6 +99,8 @@ namespace Umbraco.Tests.Testing
 
         protected ILogger Logger => Factory.GetInstance<ILogger>();
 
+        protected ITypeFinder TypeFinder => Factory.GetInstance<ITypeFinder>();
+
         protected IProfiler Profiler => Factory.GetInstance<IProfiler>();
 
         protected virtual IProfilingLogger ProfilingLogger => Factory.GetInstance<IProfilingLogger>();
@@ -137,6 +139,7 @@ namespace Umbraco.Tests.Testing
 
             Composition = new Composition(register, typeLoader, proflogger, ComponentTests.MockRuntimeState(RuntimeLevel.Run));
 
+            Composition.RegisterUnique(typeLoader.TypeFinder);
             Composition.RegisterUnique(typeLoader);
             Composition.RegisterUnique(logger);
             Composition.RegisterUnique(profiler);
@@ -358,7 +361,7 @@ namespace Umbraco.Tests.Testing
             Composition.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty
 
             Composition.RegisterUnique(factory
-                => TestObjects.GetScopeProvider(factory.TryGetInstance<ILogger>(), factory.TryGetInstance<FileSystems>(), factory.TryGetInstance<IUmbracoDatabaseFactory>()));
+                => TestObjects.GetScopeProvider(factory.TryGetInstance<ILogger>(), factory.TryGetInstance<ITypeFinder>(), factory.TryGetInstance<FileSystems>(), factory.TryGetInstance<IUmbracoDatabaseFactory>()));
             Composition.RegisterUnique(factory => (IScopeAccessor) factory.GetInstance<IScopeProvider>());
 
             Composition.ComposeServices();

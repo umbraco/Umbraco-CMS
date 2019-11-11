@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Web;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
 using Umbraco.Web.Cache;
 
 namespace Umbraco.Tests.Cache
@@ -17,7 +20,8 @@ namespace Umbraco.Tests.Cache
         public override void Setup()
         {
             base.Setup();
-            _appCache = new WebCachingAppCache(HttpRuntime.Cache);
+            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            _appCache = new WebCachingAppCache(HttpRuntime.Cache, typeFinder);
         }
 
         internal override IAppCache AppCache => _appCache;

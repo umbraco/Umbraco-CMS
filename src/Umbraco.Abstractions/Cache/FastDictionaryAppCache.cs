@@ -12,6 +12,13 @@ namespace Umbraco.Core.Cache
     /// </summary>
     public class FastDictionaryAppCache : IAppCache
     {
+        private readonly ITypeFinder _typeFinder;
+
+        public FastDictionaryAppCache(ITypeFinder typeFinder)
+        {
+            _typeFinder = typeFinder ?? throw new ArgumentNullException(nameof(typeFinder));
+        }
+
         /// <summary>
         /// Gets the internal items dictionary, for tests only!
         /// </summary>
@@ -78,7 +85,7 @@ namespace Umbraco.Core.Cache
         /// <inheritdoc />
         public void ClearOfType(string typeName)
         {
-            var type = TypeHelper.GetTypeByName(typeName);
+            var type = _typeFinder.GetTypeByName(typeName);
             if (type == null) return;
             var isInterface = type.IsInterface;
 

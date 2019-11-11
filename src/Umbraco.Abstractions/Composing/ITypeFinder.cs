@@ -6,6 +6,8 @@ namespace Umbraco.Core.Composing
 {
     public interface ITypeFinder
     {
+        Type GetTypeByName(string name);
+
         /// <summary>
         /// Return a list of found local Assemblies that Umbraco should scan for type finding
         /// </summary>

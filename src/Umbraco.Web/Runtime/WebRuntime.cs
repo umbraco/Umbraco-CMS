@@ -62,13 +62,13 @@ namespace Umbraco.Web.Runtime
         protected override AppCaches GetAppCaches() => new AppCaches(
                 // we need to have the dep clone runtime cache provider to ensure
                 // all entities are cached properly (cloned in and cloned out)
-                new DeepCloneAppCache(new WebCachingAppCache(HttpRuntime.Cache)),
+                new DeepCloneAppCache(new WebCachingAppCache(HttpRuntime.Cache, TypeFinder)),
                 // we need request based cache when running in web-based context
-                new HttpRequestAppCache(() => HttpContext.Current?.Items),
+                new HttpRequestAppCache(() => HttpContext.Current?.Items, TypeFinder),
                 new IsolatedCaches(type =>
                     // we need to have the dep clone runtime cache provider to ensure
                     // all entities are cached properly (cloned in and cloned out)
-                    new DeepCloneAppCache(new ObjectCacheAppCache())));
+                    new DeepCloneAppCache(new ObjectCacheAppCache(TypeFinder))));
 
         #endregion
     }

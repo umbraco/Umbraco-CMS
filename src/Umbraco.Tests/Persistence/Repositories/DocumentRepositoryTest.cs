@@ -77,9 +77,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void CacheActiveForIntsAndGuids()
         {
             var realCache = new AppCaches(
-                new ObjectCacheAppCache(),
+                new ObjectCacheAppCache(TypeFinder),
                 new DictionaryAppCache(),
-                new IsolatedCaches(t => new ObjectCacheAppCache()));
+                new IsolatedCaches(t => new ObjectCacheAppCache(TypeFinder)));
 
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())

@@ -31,9 +31,10 @@ namespace Umbraco.Tests.Components
             var mock = new Mock<IFactory>();
 
             var logger = Mock.Of<ILogger>();
+            var typeFinder = new TypeFinder(logger);
             var f = new UmbracoDatabaseFactory(logger, new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())));
             var fs = new FileSystems(mock.Object, logger);
-            var p = new ScopeProvider(f, fs, logger);
+            var p = new ScopeProvider(f, fs, logger, typeFinder);
 
             mock.Setup(x => x.GetInstance(typeof (ILogger))).Returns(logger);
             mock.Setup(x => x.GetInstance(typeof (IProfilingLogger))).Returns(new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));

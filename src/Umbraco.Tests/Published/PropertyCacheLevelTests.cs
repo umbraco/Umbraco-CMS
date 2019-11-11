@@ -4,6 +4,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -124,8 +125,9 @@ namespace Umbraco.Tests.Published
 
             var setType1 = publishedContentTypeFactory.CreateContentType(1000, "set1", CreatePropertyTypes);
 
-            var elementsCache = new FastDictionaryAppCache();
-            var snapshotCache = new FastDictionaryAppCache();
+            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var elementsCache = new FastDictionaryAppCache(typeFinder);
+            var snapshotCache = new FastDictionaryAppCache(typeFinder);
 
             var publishedSnapshot = new Mock<IPublishedSnapshot>();
             publishedSnapshot.Setup(x => x.SnapshotCache).Returns(snapshotCache);

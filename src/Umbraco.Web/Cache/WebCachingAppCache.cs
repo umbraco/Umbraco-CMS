@@ -6,6 +6,7 @@ using System.Threading;
 using System.Web.Caching;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.Cache
 {
@@ -25,7 +26,7 @@ namespace Umbraco.Web.Cache
         /// <summary>
         /// Initializes a new instance of the <see cref="WebCachingAppCache"/> class.
         /// </summary>
-        public WebCachingAppCache(System.Web.Caching.Cache cache)
+        public WebCachingAppCache(System.Web.Caching.Cache cache, ITypeFinder typeFinder) : base(typeFinder)
         {
             _cache = cache;
         }

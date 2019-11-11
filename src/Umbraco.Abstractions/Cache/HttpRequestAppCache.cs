@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Web;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Cache
 {
@@ -20,7 +21,7 @@ namespace Umbraco.Core.Cache
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpRequestAppCache"/> class with a context, for unit tests!
         /// </summary>
-        public HttpRequestAppCache(Func<IDictionary> requestItems)
+        public HttpRequestAppCache(Func<IDictionary> requestItems, ITypeFinder typeFinder) : base(typeFinder)
         {
             ContextItems = requestItems;
         }

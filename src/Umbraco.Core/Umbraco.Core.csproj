@@ -136,9 +136,7 @@
     <Compile Include="Composing\Composers.cs" />
     <Compile Include="Composing\Composition.cs" />
     <Compile Include="Composing\IComposer.cs" />
-    <Compile Include="Composing\ITypeFinder.cs" />
     <Compile Include="Composing\RegisterFactory.cs" />
-    <Compile Include="Composing\TypeFinderExtensions.cs" />
     <Compile Include="CompositionExtensions.cs" />
     <Compile Include="Composing\ICoreComposer.cs" />
     <Compile Include="Composing\IUserComposer.cs" />

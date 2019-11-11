@@ -19,28 +19,10 @@ namespace Umbraco.Core.Composing
             = new ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]>();
         private static readonly ConcurrentDictionary<Type, FieldInfo[]> GetFieldsCache
             = new ConcurrentDictionary<Type, FieldInfo[]>();
-        private static readonly ConcurrentDictionary<string, Type> TypeNamesCache
-            = new ConcurrentDictionary<string, Type>();
-
+        
         private static readonly Assembly[] EmptyAssemblies  = new Assembly[0];
 
-        /// <summary>
-        /// Returns a Type for the string type name
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public static Type GetTypeByName(string name)
-        {
-            // First try using the basic functionality
-            var type = Type.GetType(name);
-            if (type != null) return type;
-
-            // It didn't parse, so try loading from each already loaded assembly and cache it
-            return TypeNamesCache.GetOrAdd(name, s =>
-                AppDomain.CurrentDomain.GetAssemblies()
-                    .Select(x => x.GetType(s))
-                    .FirstOrDefault(x => x != null));
-        }
+        
 
         /// <summary>
         /// Based on a type we'll check if it is IEnumerable{T} (or similar) and if so we'll return a List{T}, this will also deal with array types and return List{T} for those too.
