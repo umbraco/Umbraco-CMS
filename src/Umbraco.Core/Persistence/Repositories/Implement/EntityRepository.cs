@@ -516,11 +516,17 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             // TODO: although the default ordering string works for name, it wont work for others without a table or an alias of some sort
             // As more things are attempted to be sorted we'll prob have to add more expressions here
-            var orderBy = ordering.OrderBy.ToUpperInvariant() switch
+            string orderBy;
+            switch (ordering.OrderBy.ToUpperInvariant())
             {
-                "PATH" => SqlSyntax.GetQuotedColumn(NodeDto.TableName, "path"),
-                _ => ordering.OrderBy
-            };
+                case "PATH":
+                    orderBy = SqlSyntax.GetQuotedColumn(NodeDto.TableName, "path");
+                    break;
+
+                default:
+                    orderBy = ordering.OrderBy;
+                    break;
+            }            
 
             if (ordering.Direction == Direction.Ascending)
                 sql.OrderBy(orderBy);

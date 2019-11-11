@@ -2,11 +2,14 @@
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
     public interface IRelationRepository : IReadWriteQueryRepository<int, IRelation>
     {
+        IEnumerable<IRelation> GetPagedRelationsByQuery(IQuery<IRelation> query, long pageIndex, int pageSize, out long totalRecords, Ordering ordering);
+
         /// <summary>
         /// Persist multiple <see cref="IRelation"/> at once
         /// </summary>
