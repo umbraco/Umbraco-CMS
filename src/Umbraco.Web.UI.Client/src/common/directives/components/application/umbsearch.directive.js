@@ -13,7 +13,7 @@
         }
     };
     
-    function umbSearchController($timeout, backdropService, searchService, focusService) {
+    function umbSearchController($timeout, backdropService, searchService, focusService, localizationService) {
 
         var vm = this;
 
@@ -32,6 +32,10 @@
         vm.activeResult = null;
         vm.activeResultGroup = null;
 
+        localizationService.localize("placeholders_search").then(function (value) {
+            vm.searchPlaceholderText = value;
+        });
+        
         function onInit() {
             vm.searchQuery = "";
             vm.searchResults = [];
