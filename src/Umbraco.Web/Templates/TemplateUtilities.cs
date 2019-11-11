@@ -129,7 +129,7 @@ namespace Umbraco.Web.Templates
                     //                else
                     if (String.IsNullOrEmpty(url) == false)
                     {
-                        var resolvedUrl = (url.Substring(0, 1) == "/") ? IOHelper.ResolveUrl(url.Substring(1)) : IOHelper.ResolveUrl(url);
+                        var resolvedUrl = (url.Substring(0, 1) == "/") ? Current.IOHelper.ResolveUrl(url.Substring(1)) : Current.IOHelper.ResolveUrl(url);
                         text = text.Replace(url, resolvedUrl);
                     }
                 }
@@ -215,7 +215,7 @@ namespace Umbraco.Web.Templates
                 if (string.IsNullOrEmpty(tmpImgPath))
                     continue;
 
-                var absoluteTempImagePath = IOHelper.MapPath(tmpImgPath);
+                var absoluteTempImagePath = Current.IOHelper.MapPath(tmpImgPath);
                 var fileName = Path.GetFileName(absoluteTempImagePath);
                 var safeFileName = fileName.ToSafeFileName();
 

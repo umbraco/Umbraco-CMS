@@ -67,7 +67,7 @@ namespace Umbraco.Web
             {
                 var htmlBadge =
                     String.Format(Current.Configs.Settings().Content.PreviewBadge,
-                                  IOHelper.ResolveUrl(SystemDirectories.Umbraco),
+                                  Current.IOHelper.ResolveUrl(SystemDirectories.Umbraco),
                                   Current.UmbracoContext.HttpContext.Server.UrlEncode(Current.UmbracoContext.HttpContext.Request.Path));
                 return new MvcHtmlString(htmlBadge);
             }

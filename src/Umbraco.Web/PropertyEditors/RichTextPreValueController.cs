@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Xml;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
@@ -50,7 +51,7 @@ namespace Umbraco.Web.PropertyEditors
                     {
                         // Load config
                         XmlDocument xd = new XmlDocument();
-                        xd.Load(IOHelper.MapPath(SystemFiles.TinyMceConfig));
+                        xd.Load(Current.IOHelper.MapPath(SystemFiles.TinyMceConfig));
 
                         foreach (XmlNode n in xd.DocumentElement.SelectNodes("//command"))
                         {

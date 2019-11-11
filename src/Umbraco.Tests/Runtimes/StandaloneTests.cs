@@ -47,7 +47,7 @@ namespace Umbraco.Tests.Runtimes
             IFactory factory = null;
 
             // clear
-            foreach (var file in Directory.GetFiles(Path.Combine(IOHelper.MapPath("~/App_Data")), "NuCache.*"))
+            foreach (var file in Directory.GetFiles(Path.Combine(Current.IOHelper.MapPath("~/App_Data")), "NuCache.*"))
                 File.Delete(file);
 
             // settings
@@ -59,7 +59,7 @@ namespace Umbraco.Tests.Runtimes
             var logger = new ConsoleLogger();
             var profiler = new LogProfiler(logger);
             var profilingLogger = new ProfilingLogger(logger, profiler);
-            var appCaches = AppCaches.Disabled; 
+            var appCaches = AppCaches.Disabled;
             var databaseFactory = new UmbracoDatabaseFactory(logger, new Lazy<IMapperCollection>(() => factory.GetInstance<IMapperCollection>()));
             var typeFinder = new TypeFinder(logger);
             var typeLoader = new TypeLoader(typeFinder, appCaches.RuntimeCache, IOHelper.MapPath("~/App_Data/TEMP"), profilingLogger);

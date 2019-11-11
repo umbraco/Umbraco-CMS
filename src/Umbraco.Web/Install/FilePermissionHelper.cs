@@ -127,7 +127,7 @@ namespace Umbraco.Web.Install
         {
             try
             {
-                var path = IOHelper.MapPath(dir + "/" + CreateRandomName());
+                var path = Current.IOHelper.MapPath(dir + "/" + CreateRandomName());
                 Directory.CreateDirectory(path);
                 Directory.Delete(path);
                 return true;
@@ -145,7 +145,7 @@ namespace Umbraco.Web.Install
         {
             try
             {
-                var dirPath = IOHelper.MapPath(dir);
+                var dirPath = Current.IOHelper.MapPath(dir);
 
                 if (Directory.Exists(dirPath) == false)
                     Directory.CreateDirectory(dirPath);
@@ -173,7 +173,7 @@ namespace Umbraco.Web.Install
         {
             try
             {
-                var dirPath = IOHelper.MapPath(dir);
+                var dirPath = Current.IOHelper.MapPath(dir);
 
                 if (Directory.Exists(dirPath) == false)
                     return true;
@@ -238,7 +238,7 @@ namespace Umbraco.Web.Install
         {
             try
             {
-                var path = IOHelper.MapPath(file);
+                var path = Current.IOHelper.MapPath(file);
                 File.AppendText(path).Close();
                 return true;
             }

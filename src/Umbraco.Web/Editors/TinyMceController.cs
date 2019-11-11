@@ -45,10 +45,10 @@ namespace Umbraco.Web.Editors
             }
 
             // Create an unique folder path to help with concurrent users to avoid filename clash
-            var imageTempPath = IOHelper.MapPath(SystemDirectories.TempImageUploads + "/" + Guid.NewGuid().ToString());
+            var imageTempPath = Current.IOHelper.MapPath(SystemDirectories.TempImageUploads + "/" + Guid.NewGuid().ToString());
 
             // Temp folderpath (Files come in as bodypart & will need to move/saved into imgTempPath
-            var folderPath = IOHelper.MapPath(SystemDirectories.TempFileUploads);
+            var folderPath = Current.IOHelper.MapPath(SystemDirectories.TempFileUploads);
 
             // Ensure image temp path exists
             if(Directory.Exists(imageTempPath) == false)
@@ -86,8 +86,8 @@ namespace Umbraco.Web.Editors
 
             //var mediaItemName = fileName.ToFriendlyName();
             var currentFile = file.LocalFileName;
-            var newFilePath = imageTempPath +  IOHelper.DirSepChar + safeFileName;
-            var relativeNewFilePath = IOHelper.GetRelativePath(newFilePath);
+            var newFilePath = imageTempPath +  Current.IOHelper.DirSepChar + safeFileName;
+            var relativeNewFilePath = Current.IOHelper.GetRelativePath(newFilePath);
 
             try
             {

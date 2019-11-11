@@ -9,6 +9,7 @@ using System.Text;
 using System.Web;
 using System.Web.Http;
 using Semver;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Web.Models.ContentEditing;
@@ -90,7 +91,7 @@ namespace Umbraco.Web.Editors
             if (package == null)
                 return Request.CreateResponse(HttpStatusCode.NotFound);
 
-            var fullPath = IOHelper.MapPath(package.PackagePath);
+            var fullPath = Current.IOHelper.MapPath(package.PackagePath);
             if (!File.Exists(fullPath))
                 return Request.CreateNotificationValidationErrorResponse("No file found for path " + package.PackagePath);
 

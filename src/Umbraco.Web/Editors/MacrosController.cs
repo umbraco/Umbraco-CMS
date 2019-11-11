@@ -311,7 +311,7 @@ namespace Umbraco.Web.Editors
         /// </returns>
         private IEnumerable<string> FindPartialViewFilesInViewsFolder()
         {
-            var partialsDir = IOHelper.MapPath(SystemDirectories.MacroPartials);
+            var partialsDir = Current.IOHelper.MapPath(SystemDirectories.MacroPartials);
 
             return this.FindPartialViewFilesInFolder(
                  partialsDir,
@@ -329,7 +329,7 @@ namespace Umbraco.Web.Editors
         {
             var files = new List<string>();
 
-            var appPluginsFolder = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.AppPlugins));
+            var appPluginsFolder = new DirectoryInfo(Current.IOHelper.MapPath(SystemDirectories.AppPlugins));
 
             if (!appPluginsFolder.Exists)
             {

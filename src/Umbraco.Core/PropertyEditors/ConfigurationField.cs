@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core.PropertyEditors
@@ -93,7 +94,7 @@ namespace Umbraco.Core.PropertyEditors
         public string View
         {
             get => _view;
-            set => _view = IOHelper.ResolveVirtualUrl(value);
+            set => _view = Current.IOHelper.ResolveVirtualUrl(value);
         }
 
         /// <summary>

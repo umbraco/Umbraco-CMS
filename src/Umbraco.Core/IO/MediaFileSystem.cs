@@ -68,7 +68,7 @@ namespace Umbraco.Core.IO
         {
             filename = Path.GetFileName(filename);
             if (filename == null) throw new ArgumentException("Cannot become a safe filename.", nameof(filename));
-            filename = IOHelper.SafeFileName(filename.ToLowerInvariant());
+            filename = Current.IOHelper.SafeFileName(filename.ToLowerInvariant());
 
             return _mediaPathScheme.GetFilePath(this, cuid, puid, filename);
         }
@@ -78,7 +78,7 @@ namespace Umbraco.Core.IO
         {
             filename = Path.GetFileName(filename);
             if (filename == null) throw new ArgumentException("Cannot become a safe filename.", nameof(filename));
-            filename = IOHelper.SafeFileName(filename.ToLowerInvariant());
+            filename = Current.IOHelper.SafeFileName(filename.ToLowerInvariant());
 
             return _mediaPathScheme.GetFilePath(this, cuid, puid, filename, prevpath);
         }

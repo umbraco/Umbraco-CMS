@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Web.Install.Models;
 
@@ -26,7 +27,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
         private void CleanupInstallation(int packageId, string packageFile)
         {
-            var zipFile = new FileInfo(Path.Combine(IOHelper.MapPath(SystemDirectories.Packages), HttpUtility.UrlDecode(packageFile)));
+            var zipFile = new FileInfo(Path.Combine(Current.IOHelper.MapPath(SystemDirectories.Packages), HttpUtility.UrlDecode(packageFile)));
 
             if (zipFile.Exists)
                 zipFile.Delete();

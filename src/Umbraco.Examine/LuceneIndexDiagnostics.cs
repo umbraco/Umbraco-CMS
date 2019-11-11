@@ -5,6 +5,7 @@ using Umbraco.Core.Logging;
 using Lucene.Net.Store;
 using Umbraco.Core.IO;
 using System.Linq;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Examine
 {
@@ -66,18 +67,18 @@ namespace Umbraco.Examine
                 {
                     [nameof(UmbracoExamineIndex.CommitCount)] = Index.CommitCount,
                     [nameof(UmbracoExamineIndex.DefaultAnalyzer)] = Index.DefaultAnalyzer.GetType().Name,
-                    ["LuceneDirectory"] = luceneDir.GetType().Name                    
+                    ["LuceneDirectory"] = luceneDir.GetType().Name
                 };
 
                 if (luceneDir is FSDirectory fsDir)
                 {
-                    d[nameof(UmbracoExamineIndex.LuceneIndexFolder)] = fsDir.Directory.ToString().ToLowerInvariant().TrimStart(IOHelper.MapPath(SystemDirectories.Root).ToLowerInvariant()).Replace("\\", "/").EnsureStartsWith('/');
+                    d[nameof(UmbracoExamineIndex.LuceneIndexFolder)] = fsDir.Directory.ToString().ToLowerInvariant().TrimStart(Current.IOHelper.MapPath(SystemDirectories.Root).ToLowerInvariant()).Replace("\\", "/").EnsureStartsWith('/');
                 }
 
                 return d;
             }
         }
 
-        
+
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -65,7 +66,7 @@ namespace Umbraco.Web.Install.Controllers
             ViewData.SetInstallApiBaseUrl(Url.GetUmbracoApiService("GetSetup", "InstallApi", "UmbracoInstall").TrimEnd("GetSetup"));
 
             // get the base umbraco folder
-            ViewData.SetUmbracoBaseFolder(IOHelper.ResolveUrl(SystemDirectories.Umbraco));
+            ViewData.SetUmbracoBaseFolder(Current.IOHelper.ResolveUrl(SystemDirectories.Umbraco));
 
             _installHelper.InstallStatus(false, "");
 

@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Publishing
         {
             base.SetUp();
 
-            //LegacyUmbracoSettings.SettingsFilePath = IOHelper.MapPath(SystemDirectories.Config + Path.DirectorySeparatorChar, false);
+            //LegacyUmbracoSettings.SettingsFilePath = Current.IOHelper.MapPath(SystemDirectories.Config + Path.DirectorySeparatorChar, false);
         }
 
         private IContent _homePage;

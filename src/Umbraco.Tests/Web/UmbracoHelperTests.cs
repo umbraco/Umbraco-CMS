@@ -266,7 +266,7 @@ namespace Umbraco.Tests.Web
                 .Returns(new TypeLoader(
                     typeFinder,
                     NoAppCache.Instance,
-                    IOHelper.MapPath("~/App_Data/TEMP"),
+                    Current.IOHelper.MapPath("~/App_Data/TEMP"),
                     new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())
                     )
                 );

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Manifest
@@ -67,7 +68,7 @@ namespace Umbraco.Core.Manifest
         public string View
         {
             get => _view;
-            set => _view = IOHelper.ResolveVirtualUrl(value);
+            set => _view = Current.IOHelper.ResolveVirtualUrl(value);
         }
 
         /// <summary>

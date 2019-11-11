@@ -41,7 +41,7 @@ namespace Umbraco.Web.Editors
             var nonPluginFilters = _filters.Where(x => x.PluginName == null).ToList();
 
             //add core tour files
-            var coreToursPath = Path.Combine(IOHelper.MapPath(SystemDirectories.Config), "BackOfficeTours");
+            var coreToursPath = Path.Combine(Current.IOHelper.MapPath(SystemDirectories.Config), "BackOfficeTours");
             if (Directory.Exists(coreToursPath))
             {
                 foreach (var tourFile in Directory.EnumerateFiles(coreToursPath, "*.json"))
@@ -51,7 +51,7 @@ namespace Umbraco.Web.Editors
             }
 
             //collect all tour files in packages
-            var appPlugins = IOHelper.MapPath(SystemDirectories.AppPlugins);
+            var appPlugins = Current.IOHelper.MapPath(SystemDirectories.AppPlugins);
             if (Directory.Exists(appPlugins))
             {
                 foreach (var plugin in Directory.EnumerateDirectories(appPlugins))

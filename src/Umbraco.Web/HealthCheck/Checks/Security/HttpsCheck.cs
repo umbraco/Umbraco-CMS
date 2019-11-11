@@ -4,6 +4,7 @@ using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Web;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
@@ -182,7 +183,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
 
         private HealthCheckStatus FixHttpsSetting()
         {
-            var configFile = IOHelper.MapPath("~/Web.config");
+            var configFile = Current.IOHelper.MapPath("~/Web.config");
             const string xPath = "/configuration/appSettings/add[@key='Umbraco.Core.UseHttps']/@value";
             var configurationService = new ConfigurationService(configFile, xPath, _textService);
             var updateConfigFile = configurationService.UpdateConfigFile("true");

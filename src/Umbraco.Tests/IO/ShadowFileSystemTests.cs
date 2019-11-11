@@ -40,8 +40,8 @@ namespace Umbraco.Tests.IO
 
         private static void ClearFiles()
         {
-            TestHelper.DeleteDirectory(IOHelper.MapPath("FileSysTests"));
-            TestHelper.DeleteDirectory(IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs"));
+            TestHelper.DeleteDirectory(Current.IOHelper.MapPath("FileSysTests"));
+            TestHelper.DeleteDirectory(Current.IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs"));
         }
 
         private static string NormPath(string path)
@@ -52,7 +52,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void ShadowDeleteDirectory()
         {
-            var path = IOHelper.MapPath("FileSysTests");
+            var path = Current.IOHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -86,7 +86,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void ShadowDeleteDirectoryInDir()
         {
-            var path = IOHelper.MapPath("FileSysTests");
+            var path = Current.IOHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -135,7 +135,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void ShadowDeleteFile()
         {
-            var path = IOHelper.MapPath("FileSysTests");
+            var path = Current.IOHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -174,7 +174,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void ShadowDeleteFileInDir()
         {
-            var path = IOHelper.MapPath("FileSysTests");
+            var path = Current.IOHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -229,7 +229,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void ShadowCantCreateFile()
         {
-            var path = IOHelper.MapPath("FileSysTests");
+            var path = Current.IOHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -248,7 +248,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void ShadowCreateFile()
         {
-            var path = IOHelper.MapPath("FileSysTests");
+            var path = Current.IOHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -287,7 +287,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void ShadowCreateFileInDir()
         {
-            var path = IOHelper.MapPath("FileSysTests");
+            var path = Current.IOHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -327,7 +327,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void ShadowAbort()
         {
-            var path = IOHelper.MapPath("FileSysTests");
+            var path = Current.IOHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -349,7 +349,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void ShadowComplete()
         {
-            var path = IOHelper.MapPath("FileSysTests");
+            var path = Current.IOHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -387,8 +387,8 @@ namespace Umbraco.Tests.IO
         {
             var logger = Mock.Of<ILogger>();
 
-            var path = IOHelper.MapPath("FileSysTests");
-            var shadowfs = IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs");
+            var path = Current.IOHelper.MapPath("FileSysTests");
+            var shadowfs = Current.IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(shadowfs);
 
@@ -482,8 +482,8 @@ namespace Umbraco.Tests.IO
         {
             var logger = Mock.Of<ILogger>();
 
-            var path = IOHelper.MapPath("FileSysTests");
-            var shadowfs = IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs");
+            var path = Current.IOHelper.MapPath("FileSysTests");
+            var shadowfs = Current.IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs");
             Directory.CreateDirectory(path);
 
             var scopedFileSystems = false;
@@ -535,8 +535,8 @@ namespace Umbraco.Tests.IO
         {
             var logger = Mock.Of<ILogger>();
 
-            var path = IOHelper.MapPath("FileSysTests");
-            var shadowfs = IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs");
+            var path = Current.IOHelper.MapPath("FileSysTests");
+            var shadowfs = Current.IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs");
             Directory.CreateDirectory(path);
 
             var scopedFileSystems = false;
@@ -603,7 +603,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void GetFilesReturnsChildrenOnly()
         {
-            var path = IOHelper.MapPath("FileSysTests");
+            var path = Current.IOHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             File.WriteAllText(path + "/f1.txt", "foo");
             Directory.CreateDirectory(path + "/test");
@@ -625,7 +625,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void DeleteDirectoryAndFiles()
         {
-            var path = IOHelper.MapPath("FileSysTests");
+            var path = Current.IOHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             File.WriteAllText(path + "/f1.txt", "foo");
             Directory.CreateDirectory(path + "/test");
@@ -646,7 +646,7 @@ namespace Umbraco.Tests.IO
         public void ShadowGetFiles()
         {
             // Arrange
-            var path = IOHelper.MapPath("FileSysTests");
+            var path = Current.IOHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -678,7 +678,7 @@ namespace Umbraco.Tests.IO
         public void ShadowGetFilesUsingEmptyFilter()
         {
             // Arrange
-            var path = IOHelper.MapPath("FileSysTests");
+            var path = Current.IOHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -713,7 +713,7 @@ namespace Umbraco.Tests.IO
         public void ShadowGetFilesUsingNullFilter()
         {
             // Arrange
-            var path = IOHelper.MapPath("FileSysTests");
+            var path = Current.IOHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -745,7 +745,7 @@ namespace Umbraco.Tests.IO
         public void ShadowGetFilesUsingWildcardFilter()
         {
             // Arrange
-            var path = IOHelper.MapPath("FileSysTests");
+            var path = Current.IOHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -780,7 +780,7 @@ namespace Umbraco.Tests.IO
         public void ShadowGetFilesUsingSingleCharacterFilter()
         {
             // Arrange
-            var path = IOHelper.MapPath("FileSysTests");
+            var path = Current.IOHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -827,7 +827,7 @@ namespace Umbraco.Tests.IO
         public void ShadowGetFullPath()
         {
             // Arrange
-            var path = IOHelper.MapPath("FileSysTests");
+            var path = Current.IOHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -861,7 +861,7 @@ namespace Umbraco.Tests.IO
         public void ShadowGetRelativePath()
         {
             // Arrange
-            var path = IOHelper.MapPath("FileSysTests");
+            var path = Current.IOHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
@@ -900,7 +900,7 @@ namespace Umbraco.Tests.IO
         public void ShadowGetUrl()
         {
             // Arrange
-            var path = IOHelper.MapPath("FileSysTests");
+            var path = Current.IOHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
