@@ -242,13 +242,27 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             isDisabled: true
         }
 
-        var removeAllEntries = function() {
-            alert("Not done jet");
+        var removeAllEntries = function () {
+            localizationService.localizeMany(["content_nestedContentDeleteAllItems", "general_delete"]).then(function (data) {
+                overlayService.confirmDelete({
+                    title: data[1],
+                    content: data[0],
+                    close: function () {
+                        overlayService.close();
+                    },
+                    submit: function () {
+                        $scope.nodes = [];
+                        $scope.setDirty();
+                        updateModel();
+                        overlayService.close();
+                    }
+                });
+            });
         }
 
         var removeAllEntriesAction = {
             labelKey: 'clipboard_labelForRemoveAllEntries',
-            labelTokens: [$scope.model.label],
+            labelTokens: [],
             icon: 'trash',
             method: removeAllEntries,
             isDisabled: true
