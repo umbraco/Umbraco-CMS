@@ -274,6 +274,24 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
+        public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int id, long pageIndex, int pageSize, out long totalChildren)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                return _relationRepository.GetPagedParentEntitiesByChildId(id, pageIndex, pageSize, out totalChildren);
+            }
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int id, long pageIndex, int pageSize, out long totalChildren)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                return _relationRepository.GetPagedChildEntitiesByParentId(id, pageIndex, pageSize, out totalChildren);
+            }
+        }
+
+        /// <inheritdoc />
         public IEnumerable<Tuple<IUmbracoEntity, IUmbracoEntity>> GetEntitiesFromRelations(IEnumerable<IRelation> relations)
         {
             //TODO: Argh! N+1 

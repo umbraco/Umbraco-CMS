@@ -23,11 +23,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal class RelationRepository : NPocoRepositoryBase<int, IRelation>, IRelationRepository
     {
         private readonly IRelationTypeRepository _relationTypeRepository;
+        private readonly IEntityRepository _entityRepository;
 
-        public RelationRepository(IScopeAccessor scopeAccessor, ILogger logger, IRelationTypeRepository relationTypeRepository)
+        public RelationRepository(IScopeAccessor scopeAccessor, ILogger logger, IRelationTypeRepository relationTypeRepository, IEntityRepository entityRepository)
             : base(scopeAccessor, AppCaches.NoCache, logger)
         {
             _relationTypeRepository = relationTypeRepository;
+            _entityRepository = entityRepository;
         }
 
         #region Overrides of RepositoryBase<int,Relation>
@@ -157,6 +159,42 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         }
 
         #endregion
+
+        public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int childId, long pageIndex, int pageSize, out long totalRecords)
+        {
+            // Create a query to match the child id
+            var relQuery = Query<IRelation>().Where(r => r.ChildId == childId);
+
+            // Because of the way that the entity repository joins relations (on both child or parent) we need to add
+            // a clause to filter out the child entity from being returned from the results
+            var entityQuery = Query<IUmbracoEntity>().Where(e => e.Id != childId);
+
+            // var contentObjectTypes = new[] { Constants.ObjectTypes.Document, Constants.ObjectTypes.Media, Constants.ObjectTypes.Member }
+            // we could pass in the contentObjectTypes so that the entity repository sql is configured to do full entity lookups so that we get the full data
+            // required to populate content, media or members, else we get the bare minimum data needed to populate an entity. BUT if we do this it
+            // means that the SQL is less efficient and returns data that is probably not needed for what we need this lookup for. For the time being we
+            // will just return the bare minimum entity data.
+
+            return _entityRepository.GetPagedResultsByQuery(entityQuery, Array.Empty<Guid>(), pageIndex, pageSize, out totalRecords, null, null, relQuery);
+        }
+
+        public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int parentId, long pageIndex, int pageSize, out long totalRecords)
+        {
+            // Create a query to match the parent id
+            var relQuery = Query<IRelation>().Where(r => r.ParentId == parentId);
+
+            // Because of the way that the entity repository joins relations (on both child or parent) we need to add
+            // a clause to filter out the child entity from being returned from the results
+            var entityQuery = Query<IUmbracoEntity>().Where(e => e.Id != parentId);
+
+            // var contentObjectTypes = new[] { Constants.ObjectTypes.Document, Constants.ObjectTypes.Media, Constants.ObjectTypes.Member }
+            // we could pass in the contentObjectTypes so that the entity repository sql is configured to do full entity lookups so that we get the full data
+            // required to populate content, media or members, else we get the bare minimum data needed to populate an entity. BUT if we do this it
+            // means that the SQL is less efficient and returns data that is probably not needed for what we need this lookup for. For the time being we
+            // will just return the bare minimum entity data.
+
+            return _entityRepository.GetPagedResultsByQuery(entityQuery, Array.Empty<Guid>(), pageIndex, pageSize, out totalRecords, null, null, relQuery);
+        }
 
         public void Save(IEnumerable<IRelation> relations)
         {
