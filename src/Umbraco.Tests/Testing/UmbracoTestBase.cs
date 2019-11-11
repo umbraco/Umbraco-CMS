@@ -99,9 +99,9 @@ namespace Umbraco.Tests.Testing
 
         protected ILogger Logger => Factory.GetInstance<ILogger>();
 
-        protected IIOHelper IOHelper => Factory.GetInstance<IIOHelper>();
+        protected IIOHelper IOHelper { get; private set; }
 
-        protected ITypeFinder TypeFinder => Factory.GetInstance<ITypeFinder>();
+        protected ITypeFinder TypeFinder { get; private set; }
 
         protected IProfiler Profiler => Factory.GetInstance<IProfiler>();
 
@@ -133,19 +133,19 @@ namespace Umbraco.Tests.Testing
 
             var (logger, profiler) = GetLoggers(Options.Logger);
             var proflogger = new ProfilingLogger(logger, profiler);
+            IOHelper = Umbraco.Core.IO.IOHelper.Default;
+            TypeFinder = new TypeFinder(logger);
             var appCaches = GetAppCaches();
-            var ioHelper = Umbraco.Core.IO.IOHelper.Default;
-            var typeFinder = new TypeFinder(logger);
             var globalSettings = SettingsForTests.GetDefaultGlobalSettings();
-            var typeLoader = GetTypeLoader(ioHelper, typeFinder, appCaches.RuntimeCache, globalSettings, proflogger, Options.TypeLoader);
+            var typeLoader = GetTypeLoader(IOHelper, TypeFinder, appCaches.RuntimeCache, globalSettings, proflogger, Options.TypeLoader);
 
             var register = RegisterFactory.Create();
 
             Composition = new Composition(register, typeLoader, proflogger, ComponentTests.MockRuntimeState(RuntimeLevel.Run));
 
 
-            Composition.RegisterUnique(ioHelper);
-            Composition.RegisterUnique(typeLoader.TypeFinder);
+            Composition.RegisterUnique(IOHelper);
+            Composition.RegisterUnique(TypeFinder);
             Composition.RegisterUnique(typeLoader);
             Composition.RegisterUnique(logger);
             Composition.RegisterUnique(profiler);
