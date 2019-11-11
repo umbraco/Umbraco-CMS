@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Web;
 using System.Web.Hosting;
 using Umbraco.Core.Cache;
@@ -47,6 +48,11 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         protected ITypeFinder TypeFinder { get; private set; }
 
+        /// <summary>
+        /// Gets the <see cref="IIOHelper"/>
+        /// </summary>
+        protected IIOHelper IOHelper { get; private set; }
+
         /// <inheritdoc />
         public IRuntimeState State => _state;
 
@@ -66,10 +72,13 @@ namespace Umbraco.Core.Runtime
 
             var profilingLogger = ProfilingLogger = new ProfilingLogger(logger, profiler);
 
-            // type finder
             TypeFinder = GetTypeFinder();
             if (TypeFinder == null)
                 throw new InvalidOperationException($"The object returned from {nameof(GetTypeFinder)} cannot be null");
+
+            IOHelper = GetIOHelper();
+            if (IOHelper == null)
+                throw new InvalidOperationException($"The object returned from {nameof(GetIOHelper)} cannot be null");
 
             // the boot loader boots using a container scope, so anything that is PerScope will
             // be disposed after the boot loader has booted, and anything else will remain.
@@ -127,7 +136,7 @@ namespace Umbraco.Core.Runtime
                 var configs = GetConfigs();
 
                 // type finder/loader
-                var typeLoader = new TypeLoader(TypeFinder, appCaches.RuntimeCache, configs.Global().LocalTempPath, ProfilingLogger);
+                var typeLoader = new TypeLoader(IOHelper, TypeFinder, appCaches.RuntimeCache, new DirectoryInfo(configs.Global().LocalTempPath), ProfilingLogger);
 
                 // runtime state
                 // beware! must use '() => _factory.GetInstance<T>()' and NOT '_factory.GetInstance<T>'
@@ -333,6 +342,13 @@ namespace Umbraco.Core.Runtime
         /// <returns></returns>
         protected virtual ITypeFinder GetTypeFinder()
             => new TypeFinder(Logger);
+
+        /// <summary>
+        /// Gets a <see cref="IIOHelper"/>
+        /// </summary>
+        /// <returns></returns>
+        protected virtual IIOHelper GetIOHelper()
+            => Umbraco.Core.IO.IOHelper.Default;
 
         /// <summary>
         /// Gets the application caches.

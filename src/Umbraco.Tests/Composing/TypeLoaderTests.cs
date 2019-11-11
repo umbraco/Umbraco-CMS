@@ -28,24 +28,29 @@ namespace Umbraco.Tests.Composing
         {
             // this ensures it's reset
             var typeFinder = new TypeFinder(Mock.Of<ILogger>());
-            _typeLoader = new TypeLoader(typeFinder, NoAppCache.Instance, IOHelper.MapPath("~/App_Data/TEMP"), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()), false);
+            _typeLoader = new TypeLoader(IOHelper.Default, typeFinder, NoAppCache.Instance,
+                new DirectoryInfo(IOHelper.Default.MapPath("~/App_Data/TEMP")),
+                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()), false,
 
-            // for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
-            // TODO: Should probably update this so it only searches this assembly and add custom types to be found
-            _typeLoader.AssembliesToScan = new[]
-            {
-                this.GetType().Assembly,
-                typeof(System.Guid).Assembly,
-                typeof(NUnit.Framework.Assert).Assembly,
-                typeof(Microsoft.CSharp.CSharpCodeProvider).Assembly,
-                typeof(System.Xml.NameTable).Assembly,
-                typeof(System.Configuration.GenericEnumConverter).Assembly,
-                typeof(System.Web.SiteMap).Assembly,
-                //typeof(TabPage).Assembly,
-                typeof(System.Web.Mvc.ActionResult).Assembly,
-                typeof(TypeFinder).Assembly,
-                typeof(UmbracoContext).Assembly
-            };
+                // for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
+                // TODO: Should probably update this so it only searches this assembly and add custom types to be found
+                new[]
+                {
+                    this.GetType().Assembly,
+                    typeof(System.Guid).Assembly,
+                    typeof(NUnit.Framework.Assert).Assembly,
+                    typeof(Microsoft.CSharp.CSharpCodeProvider).Assembly,
+                    typeof(System.Xml.NameTable).Assembly,
+                    typeof(System.Configuration.GenericEnumConverter).Assembly,
+                    typeof(System.Web.SiteMap).Assembly,
+                    //typeof(TabPage).Assembly,
+                    typeof(System.Web.Mvc.ActionResult).Assembly,
+                    typeof(TypeFinder).Assembly,
+                    typeof(UmbracoContext).Assembly
+                });
+
+
+
         }
 
         [TearDown]
@@ -190,15 +195,15 @@ AnotherContentFinder
         [Test]
         public void Create_Cached_Plugin_File()
         {
-            var types = new[] { typeof (TypeLoader), typeof (TypeLoaderTests), typeof (UmbracoContext) };
+            var types = new[] { typeof(TypeLoader), typeof(TypeLoaderTests), typeof(UmbracoContext) };
 
-            var typeList1 = new TypeLoader.TypeList(typeof (object), null);
+            var typeList1 = new TypeLoader.TypeList(typeof(object), null);
             foreach (var type in types) typeList1.Add(type);
             _typeLoader.AddTypeList(typeList1);
             _typeLoader.WriteCache();
 
-            var plugins = _typeLoader.TryGetCached(typeof (object), null);
-            var diffType = _typeLoader.TryGetCached(typeof (object), typeof (ObsoleteAttribute));
+            var plugins = _typeLoader.TryGetCached(typeof(object), null);
+            var diffType = _typeLoader.TryGetCached(typeof(object), typeof(ObsoleteAttribute));
 
             Assert.IsTrue(plugins.Success);
             //this will be false since there is no cache of that type resolution kind
@@ -281,16 +286,16 @@ AnotherContentFinder
         {
             var types = new HashSet<TypeLoader.TypeList>();
 
-            var propEditors = new TypeLoader.TypeList(typeof (DataEditor), null);
+            var propEditors = new TypeLoader.TypeList(typeof(DataEditor), null);
             propEditors.Add(typeof(LabelPropertyEditor));
             types.Add(propEditors);
 
-            var found = types.SingleOrDefault(x => x.BaseType == typeof (DataEditor) && x.AttributeType == null);
+            var found = types.SingleOrDefault(x => x.BaseType == typeof(DataEditor) && x.AttributeType == null);
 
             Assert.IsNotNull(found);
 
             //This should not find a type list of this type
-            var shouldNotFind = types.SingleOrDefault(x => x.BaseType == typeof (IDataEditor) && x.AttributeType == null);
+            var shouldNotFind = types.SingleOrDefault(x => x.BaseType == typeof(IDataEditor) && x.AttributeType == null);
 
             Assert.IsNull(shouldNotFind);
         }

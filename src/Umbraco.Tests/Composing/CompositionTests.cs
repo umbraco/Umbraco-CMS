@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -37,7 +38,8 @@ namespace Umbraco.Tests.Composing
 
             var logger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
             var typeFinder = new TypeFinder(Mock.Of<ILogger>());
-            var typeLoader = new TypeLoader(typeFinder, Mock.Of<IAppPolicyCache>(), IOHelper.MapPath("~/App_Data/TEMP"), logger);
+            var ioHelper = IOHelper.Default;
+            var typeLoader = new TypeLoader(ioHelper, typeFinder, Mock.Of<IAppPolicyCache>(), new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), logger);
             var composition = new Composition(mockedRegister, typeLoader, logger, Mock.Of<IRuntimeState>());
 
             // create the factory, ensure it is the mocked factory

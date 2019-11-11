@@ -13,6 +13,8 @@ namespace Umbraco.Core.IO
 {
     public class IOHelper : IIOHelper
     {
+        internal static IIOHelper Default { get; } = new IOHelper();
+
         /// <summary>
         /// Gets or sets a value forcing Umbraco to consider it is non-hosted.
         /// </summary>

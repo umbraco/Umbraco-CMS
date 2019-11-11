@@ -25,11 +25,11 @@ namespace Umbraco.Web.Composing
     internal class BuildManagerTypeFinder : TypeFinder, ITypeFinder
     {
         
-        public BuildManagerTypeFinder(ILogger logger, ITypeFinderConfig typeFinderConfig = null) : base(logger, typeFinderConfig)
+        public BuildManagerTypeFinder(IIOHelper ioHelper, ILogger logger, ITypeFinderConfig typeFinderConfig = null) : base(logger, typeFinderConfig)
         {
             _allAssemblies = new Lazy<HashSet<Assembly>>(() =>
             {
-                var isHosted = IOHelper.IsHosted;
+                var isHosted = ioHelper.IsHosted;
                 try
                 {
                     if (isHosted)
@@ -38,7 +38,7 @@ namespace Umbraco.Web.Composing
 
                         //here we are trying to get the App_Code assembly
                         var fileExtensions = new[] { ".cs", ".vb" }; //only vb and cs files are supported
-                        var appCodeFolder = new DirectoryInfo(IOHelper.MapPath(IOHelper.ResolveUrl("~/App_code")));
+                        var appCodeFolder = new DirectoryInfo(ioHelper.MapPath(ioHelper.ResolveUrl("~/App_code")));
                         //check if the folder exists and if there are any files in it with the supported file extensions
                         if (appCodeFolder.Exists && fileExtensions.Any(x => appCodeFolder.GetFiles("*" + x).Any()))
                         {

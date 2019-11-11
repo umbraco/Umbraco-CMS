@@ -13,19 +13,22 @@ using File = System.IO.File;
 
 namespace Umbraco.Core.Composing
 {
+    
+
     /// <summary>
     /// Provides methods to find and instantiate types.
     /// </summary>
     /// <remarks>
-    /// <para>This class should be used to get all types, the <see cref="Composing.TypeFinder"/> class should never be used directly.</para>
+    /// <para>This class should be used to get all types, the <see cref="ITypeFinder"/> class should never be used directly.</para>
     /// <para>In most cases this class is not used directly but through extension methods that retrieve specific types.</para>
     /// <para>This class caches the types it knows to avoid excessive assembly scanning and shorten startup times, relying
     /// on a hash of the DLLs in the ~/bin folder to check for cache expiration.</para>
     /// </remarks>
-    public class TypeLoader
+    public sealed class TypeLoader
     {
         private const string CacheKey = "umbraco-types.list";
 
+        private readonly IIOHelper _ioHelper;
         private readonly IAppPolicyCache _runtimeCache;
         private readonly IProfilingLogger _logger;
 
@@ -39,33 +42,36 @@ namespace Umbraco.Core.Composing
         private string _currentAssembliesHash;
         private IEnumerable<Assembly> _assemblies;
         private bool _reportedChange;
-        private readonly string _localTempPath;
+        private readonly DirectoryInfo _localTempPath;
         private string _fileBasePath;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TypeLoader"/> class.
         /// </summary>
+        /// <param name="ioHelper"></param>
         /// <param name="typeFinder"></param>
         /// <param name="runtimeCache">The application runtime cache.</param>
         /// <param name="localTempPath">Files storage location.</param>
         /// <param name="logger">A profiling logger.</param>
         /// <param name="assembliesToScan"></param>
-        public TypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, string localTempPath, IProfilingLogger logger, IEnumerable<Assembly> assembliesToScan = null)
-            : this(typeFinder, runtimeCache, localTempPath, logger, true, assembliesToScan)
+        public TypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, DirectoryInfo localTempPath, IProfilingLogger logger, IEnumerable<Assembly> assembliesToScan = null)
+            : this(ioHelper, typeFinder, runtimeCache, localTempPath, logger, true, assembliesToScan)
         { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TypeLoader"/> class.
         /// </summary>
+        /// <param name="ioHelper"></param>
         /// <param name="typeFinder"></param>
         /// <param name="runtimeCache">The application runtime cache.</param>
         /// <param name="localTempPath">Files storage location.</param>
         /// <param name="logger">A profiling logger.</param>
         /// <param name="detectChanges">Whether to detect changes using hashes.</param>
         /// <param name="assembliesToScan"></param>
-        public TypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, string localTempPath, IProfilingLogger logger, bool detectChanges, IEnumerable<Assembly> assembliesToScan = null)
+        public TypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, DirectoryInfo localTempPath, IProfilingLogger logger, bool detectChanges, IEnumerable<Assembly> assembliesToScan = null)
         {
             TypeFinder = typeFinder ?? throw new ArgumentNullException(nameof(typeFinder));
+            _ioHelper = ioHelper;
             _runtimeCache = runtimeCache ?? throw new ArgumentNullException(nameof(runtimeCache));
             _localTempPath = localTempPath;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -117,25 +123,21 @@ namespace Umbraco.Core.Composing
         /// <para>This is for unit tests.</para>
         /// </remarks>
         // internal for tests
-        protected IEnumerable<Assembly> AssembliesToScan
-        {
-            get => _assemblies ?? (_assemblies = TypeFinder.AssembliesToScan);
-            set => _assemblies = value;
-        }
+        public IEnumerable<Assembly> AssembliesToScan => _assemblies ?? (_assemblies = TypeFinder.AssembliesToScan);
 
         /// <summary>
         /// Gets the type lists.
         /// </summary>
         /// <remarks>For unit tests.</remarks>
         // internal for tests
-        internal IEnumerable<TypeList> TypeLists => _types.Values;
+        public IEnumerable<TypeList> TypeLists => _types.Values;
 
         /// <summary>
         /// Sets a type list.
         /// </summary>
         /// <remarks>For unit tests.</remarks>
         // internal for tests
-        internal void AddTypeList(TypeList typeList)
+        public void AddTypeList(TypeList typeList)
         {
             var tobject = typeof(object); // CompositeTypeTypeKey does not support null values
             _types[new CompositeTypeTypeKey(typeList.BaseType ?? tobject, typeList.AttributeType ?? tobject)] = typeList;
@@ -182,12 +184,16 @@ namespace Umbraco.Core.Composing
 
                 _currentAssembliesHash = GetFileHash(new List<Tuple<FileSystemInfo, bool>>
                     {
+                        // TODO: Would be nicer to abstract this logic out into IAssemblyHash
+
+                        // TODO: Use constants from SystemDirectories when we can (once it's ported to netstandard lib)
+
                         // the bin folder and everything in it
-                        new Tuple<FileSystemInfo, bool>(new DirectoryInfo(Current.IOHelper.MapPath(SystemDirectories.Bin)), false),
+                        new Tuple<FileSystemInfo, bool>(new DirectoryInfo(_ioHelper.MapPath("~/bin")), false),
                         // the app code folder and everything in it
-                        new Tuple<FileSystemInfo, bool>(new DirectoryInfo(Current.IOHelper.MapPath("~/App_Code")), false),
+                        new Tuple<FileSystemInfo, bool>(new DirectoryInfo(_ioHelper.MapPath("~/App_Code")), false),
                         // global.asax (the app domain also monitors this, if it changes will do a full restart)
-                        new Tuple<FileSystemInfo, bool>(new FileInfo(Current.IOHelper.MapPath("~/global.asax")), false)
+                        new Tuple<FileSystemInfo, bool>(new FileInfo(_ioHelper.MapPath("~/global.asax")), false)
                     }, _logger);
 
                 return _currentAssembliesHash;
@@ -269,7 +275,7 @@ namespace Umbraco.Core.Composing
         /// <param name="logger">A profiling logger.</param>
         /// <returns>The hash.</returns>
         // internal for tests
-        internal static string GetFileHash(IEnumerable<FileSystemInfo> filesAndFolders, IProfilingLogger logger)
+        public static string GetFileHash(IEnumerable<FileSystemInfo> filesAndFolders, IProfilingLogger logger)
         {
             using (logger.DebugDuration<TypeLoader>("Determining hash of code files on disk", "Hash determined"))
             {
@@ -300,7 +306,7 @@ namespace Umbraco.Core.Composing
         private const int FileDeleteTimeout = 4000; // milliseconds
 
         // internal for tests
-        internal Attempt<IEnumerable<string>> TryGetCached(Type baseType, Type attributeType)
+        public Attempt<IEnumerable<string>> TryGetCached(Type baseType, Type attributeType)
         {
             var cache = _runtimeCache.GetCacheItem<Dictionary<Tuple<string, string>, IEnumerable<string>>>(CacheKey, ReadCacheSafe, TimeSpan.FromSeconds(ListFileCacheDuration));
 
@@ -333,7 +339,7 @@ namespace Umbraco.Core.Composing
         }
 
         // internal for tests
-        internal Dictionary<Tuple<string, string>, IEnumerable<string>> ReadCache()
+        public Dictionary<Tuple<string, string>, IEnumerable<string>> ReadCache()
         {
             var cache = new Dictionary<Tuple<string, string>, IEnumerable<string>>();
 
@@ -379,7 +385,7 @@ namespace Umbraco.Core.Composing
         }
 
         // internal for tests
-        internal string GetTypesListFilePath() => GetFileBasePath() + ".list";
+        public string GetTypesListFilePath() => GetFileBasePath() + ".list";
 
         private string GetTypesHashFilePath() => GetFileBasePath() + ".hash";
 
@@ -390,7 +396,7 @@ namespace Umbraco.Core.Composing
                 if (_fileBasePath != null)
                     return _fileBasePath;
 
-                _fileBasePath = Path.Combine(_localTempPath, "TypesCache", "umbraco-types." + NetworkHelper.FileSafeMachineName);
+                _fileBasePath = Path.Combine(_localTempPath.FullName, "TypesCache", "umbraco-types." + NetworkHelper.FileSafeMachineName);
 
                 // ensure that the folder exists
                 var directory = Path.GetDirectoryName(_fileBasePath);
@@ -404,7 +410,7 @@ namespace Umbraco.Core.Composing
         }
 
         // internal for tests
-        internal void WriteCache()
+        public void WriteCache()
         {
             _logger.Debug<TypeLoader>("Writing cache file.");
             var typesListFilePath = GetTypesListFilePath();
@@ -780,7 +786,7 @@ namespace Umbraco.Core.Composing
         /// Represents a list of types obtained by looking for types inheriting/implementing a
         /// specified type, and/or marked with a specified attribute type.
         /// </summary>
-        internal class TypeList
+        public sealed class TypeList
         {
             private readonly HashSet<Type> _types = new HashSet<Type>();
 

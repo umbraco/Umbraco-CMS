@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 using Examine.LuceneEngine;
 using Lucene.Net.Analysis;
@@ -259,14 +260,15 @@ namespace Umbraco.Tests.Web
         {
             // FIXME: bad in a unit test - but Udi has a static ctor that wants it?!
             var container = new Mock<IFactory>();
-            var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
             var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var ioHelper = IOHelper.Default;
             container
                 .Setup(x => x.GetInstance(typeof(TypeLoader)))
                 .Returns(new TypeLoader(
+                    ioHelper,
                     typeFinder,
                     NoAppCache.Instance,
-                    Current.IOHelper.MapPath("~/App_Data/TEMP"),
+                    new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")),
                     new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())
                     )
                 );

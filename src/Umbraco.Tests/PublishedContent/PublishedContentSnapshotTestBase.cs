@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Web.Routing;
 using Moq;
 using Umbraco.Core;
@@ -12,6 +14,7 @@ using Umbraco.Core.Composing;
 using Current = Umbraco.Core.Composing.Current;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -41,16 +44,15 @@ namespace Umbraco.Tests.PublishedContent
             Composition.RegisterUnique<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
         }
 
-        protected override TypeLoader CreateTypeLoader(IAppPolicyCache runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
+        protected override TypeLoader CreateTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
         {
-            var pluginManager = base.CreateTypeLoader(runtimeCache, globalSettings, logger);
+            var baseLoader = base.CreateTypeLoader(ioHelper, typeFinder, runtimeCache, globalSettings, logger);
 
-            // this is so the model factory looks into the test assembly
-            pluginManager.AssembliesToScan = pluginManager.AssembliesToScan
-                .Union(new[] { typeof (PublishedContentMoreTests).Assembly })
-                .ToList();
-
-            return pluginManager;
+            return new TypeLoader(ioHelper, typeFinder, runtimeCache, new DirectoryInfo(globalSettings.LocalTempPath), logger, false,
+                // this is so the model factory looks into the test assembly
+                baseLoader.AssembliesToScan
+                    .Union(new[] {typeof(PublishedContentMoreTests).Assembly})
+                    .ToList());
         }
 
         private UmbracoContext GetUmbracoContext()
