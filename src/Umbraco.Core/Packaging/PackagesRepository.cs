@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Xml.Linq;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -139,7 +140,7 @@ namespace Umbraco.Core.Packaging
                 var updatedXml = _parser.ToXml(definition);
                 packageXml.ReplaceWith(updatedXml);
             }
-            
+
             packagesXml.Save(packagesFile);
 
             return true;
@@ -154,7 +155,7 @@ namespace Umbraco.Core.Packaging
             ValidatePackage(definition);
 
             //Create a folder for building this package
-            var temporaryPath = IOHelper.MapPath(_tempFolderPath.EnsureEndsWith('/') + Guid.NewGuid());
+            var temporaryPath = Current.IOHelper.MapPath(_tempFolderPath.EnsureEndsWith('/') + Guid.NewGuid());
             if (Directory.Exists(temporaryPath) == false)
                 Directory.CreateDirectory(temporaryPath);
 
@@ -212,12 +213,12 @@ namespace Umbraco.Core.Packaging
                 compiledPackageXml.Save(packageXmlFileName);
 
                 // check if there's a packages directory below media
-                
-                if (Directory.Exists(IOHelper.MapPath(_mediaFolderPath)) == false)
-                    Directory.CreateDirectory(IOHelper.MapPath(_mediaFolderPath));
+
+                if (Directory.Exists(Current.IOHelper.MapPath(_mediaFolderPath)) == false)
+                    Directory.CreateDirectory(Current.IOHelper.MapPath(_mediaFolderPath));
 
                 var packPath = _mediaFolderPath.EnsureEndsWith('/') + (definition.Name + "_" + definition.Version).Replace(' ', '_') + ".zip";
-                ZipPackage(temporaryPath, IOHelper.MapPath(packPath));
+                ZipPackage(temporaryPath, Current.IOHelper.MapPath(packPath));
 
                 //we need to update the package path and save it
                 definition.PackagePath = packPath;
@@ -448,7 +449,7 @@ namespace Umbraco.Core.Packaging
             if (!path.StartsWith("~/") && !path.StartsWith("/"))
                 path = "~/" + path;
 
-            var serverPath = IOHelper.MapPath(path);
+            var serverPath = Current.IOHelper.MapPath(path);
 
             if (File.Exists(serverPath))
                 AppendFileXml(new FileInfo(serverPath), path, packageDirectory, filesXml);
@@ -562,7 +563,7 @@ namespace Umbraco.Core.Packaging
             package.Add(new XElement("url", definition.Url));
 
             var requirements = new XElement("requirements");
-            
+
             requirements.Add(new XElement("major", definition.UmbracoVersion == null ? UmbracoVersion.SemanticVersion.Major.ToInvariantString() : definition.UmbracoVersion.Major.ToInvariantString()));
             requirements.Add(new XElement("minor", definition.UmbracoVersion == null ? UmbracoVersion.SemanticVersion.Minor.ToInvariantString() : definition.UmbracoVersion.Minor.ToInvariantString()));
             requirements.Add(new XElement("patch", definition.UmbracoVersion == null ? UmbracoVersion.SemanticVersion.Patch.ToInvariantString() : definition.UmbracoVersion.Build.ToInvariantString()));
@@ -589,7 +590,7 @@ namespace Umbraco.Core.Packaging
                     contributors.Add(new XElement("contributor", contributor));
                 }
             }
-            
+
             info.Add(contributors);
 
             info.Add(new XElement("readme", new XCData(definition.Readme)));
@@ -607,11 +608,11 @@ namespace Umbraco.Core.Packaging
 
         private XDocument EnsureStorage(out string packagesFile)
         {
-            var packagesFolder = IOHelper.MapPath(_packagesFolderPath);
+            var packagesFolder = Current.IOHelper.MapPath(_packagesFolderPath);
             //ensure it exists
             Directory.CreateDirectory(packagesFolder);
 
-            packagesFile = IOHelper.MapPath(CreatedPackagesFile);
+            packagesFile = Current.IOHelper.MapPath(CreatedPackagesFile);
             if (!File.Exists(packagesFile))
             {
                 var xml = new XDocument(new XElement("packages"));

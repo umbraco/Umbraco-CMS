@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
@@ -97,7 +98,7 @@ namespace Umbraco.Core.Sync
                 : "";
 
             var ssl = globalSettings.UseHttps ? "s" : ""; // force, whatever the first request
-            var url = "http" + ssl + "://" + request.ServerVariables["SERVER_NAME"] + port + IOHelper.ResolveUrl(SystemDirectories.Umbraco);
+            var url = "http" + ssl + "://" + request.ServerVariables["SERVER_NAME"] + port + Current.IOHelper.ResolveUrl(SystemDirectories.Umbraco);
 
             return url.TrimEnd('/');
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -410,7 +411,7 @@ namespace Umbraco.Core.Services.Implement
                 throw new ArgumentNullException(nameof(name));
             }
 
-            if (string.IsNullOrWhiteSpace(name)) 
+            if (string.IsNullOrWhiteSpace(name))
             {
                 throw new ArgumentException("Name cannot be empty or contain only white-space characters", nameof(name));
             }
@@ -558,7 +559,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 throw new ArgumentNullException(nameof(template));
             }
-            
+
             if (string.IsNullOrWhiteSpace(template.Name) || template.Name.Length > 255)
             {
                 throw new InvalidOperationException("Name cannot be null, empty, contain only white-space characters or be more than 255 characters in length.");
@@ -701,7 +702,7 @@ namespace Umbraco.Core.Services.Implement
 
         public IEnumerable<string> GetPartialViewSnippetNames(params string[] filterNames)
         {
-            var snippetPath = IOHelper.MapPath($"{SystemDirectories.Umbraco}/PartialViewMacros/Templates/");
+            var snippetPath = Current.IOHelper.MapPath($"{SystemDirectories.Umbraco}/PartialViewMacros/Templates/");
             var files = Directory.GetFiles(snippetPath, "*.cshtml")
                 .Select(Path.GetFileNameWithoutExtension)
                 .Except(filterNames, StringComparer.InvariantCultureIgnoreCase)
@@ -935,7 +936,7 @@ namespace Umbraco.Core.Services.Implement
                 fileName += ".cshtml";
             }
 
-            var snippetPath = IOHelper.MapPath($"{SystemDirectories.Umbraco}/PartialViewMacros/Templates/{fileName}");
+            var snippetPath = Current.IOHelper.MapPath($"{SystemDirectories.Umbraco}/PartialViewMacros/Templates/{fileName}");
             return System.IO.File.Exists(snippetPath)
                 ? Attempt<string>.Succeed(snippetPath)
                 : Attempt<string>.Fail();

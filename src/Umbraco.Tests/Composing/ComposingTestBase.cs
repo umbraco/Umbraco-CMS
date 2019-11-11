@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Composing
         {
             ProfilingLogger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
 
-            TypeLoader = new TypeLoader(NoAppCache.Instance, IOHelper.MapPath("~/App_Data/TEMP"), ProfilingLogger, detectChanges: false)
+            TypeLoader = new TypeLoader(NoAppCache.Instance, Current.IOHelper.MapPath("~/App_Data/TEMP"), ProfilingLogger, detectChanges: false)
             {
                 AssembliesToScan = AssembliesToScan
             };

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -28,7 +29,7 @@ namespace Umbraco.Core.Packaging
             _logger = logger;
             _packageExtraction = new PackageExtraction();
         }
-        
+
         /// <summary>
         /// Returns a list of all installed file paths
         /// </summary>
@@ -59,15 +60,15 @@ namespace Umbraco.Core.Packaging
 
             foreach (var item in package.Files.ToArray())
             {
-                removedFiles.Add(item.GetRelativePath());
+                removedFiles.Add(Current.IOHelper.GetRelativePath(item));
 
                 //here we need to try to find the file in question as most packages does not support the tilde char
-                var file = IOHelper.FindFile(item);
+                var file = Current.IOHelper.FindFile(item);
                 if (file != null)
                 {
                     // TODO: Surely this should be ~/ ?
                     file = file.EnsureStartsWith("/");
-                    var filePath = IOHelper.MapPath(file);
+                    var filePath = Current.IOHelper.MapPath(file);
 
                     if (File.Exists(filePath))
                         File.Delete(filePath);

@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Diagnostics
@@ -109,7 +110,7 @@ namespace Umbraco.Core.Diagnostics
                 // filter everywhere in our code = not!
                 var stacktrace = withException ? Environment.StackTrace : string.Empty;
 
-                var filepath = IOHelper.MapPath("~/App_Data/MiniDump");
+                var filepath = Current.IOHelper.MapPath("~/App_Data/MiniDump");
                 if (Directory.Exists(filepath) == false)
                     Directory.CreateDirectory(filepath);
 
@@ -125,7 +126,7 @@ namespace Umbraco.Core.Diagnostics
         {
             lock (LockO)
             {
-                var filepath = IOHelper.MapPath("~/App_Data/MiniDump");
+                var filepath = Current.IOHelper.MapPath("~/App_Data/MiniDump");
                 if (Directory.Exists(filepath) == false) return true;
                 var count = Directory.GetFiles(filepath, "*.dmp").Length;
                 return count < 8;

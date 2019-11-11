@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.IO
 {
@@ -37,7 +38,7 @@ namespace Umbraco.Core.IO
                 var id = GuidUtils.ToBase32String(Guid.NewGuid(), idLength);
 
                 var virt = ShadowFsPath + "/" + id;
-                var shadowDir = IOHelper.MapPath(virt);
+                var shadowDir = Current.IOHelper.MapPath(virt);
                 if (Directory.Exists(shadowDir))
                     continue;
 
@@ -55,7 +56,7 @@ namespace Umbraco.Core.IO
             // in a single thread anyways
 
             var virt = ShadowFsPath + "/" + id + "/" + _shadowPath;
-            _shadowDir = IOHelper.MapPath(virt);
+            _shadowDir = Current.IOHelper.MapPath(virt);
             Directory.CreateDirectory(_shadowDir);
             var tempfs = new PhysicalFileSystem(virt);
             _shadowFileSystem = new ShadowFileSystem(_innerFileSystem, tempfs);
@@ -82,7 +83,7 @@ namespace Umbraco.Core.IO
 
                     // shadowPath make be path/to/dir, remove each
                     dir = dir.Replace("/", "\\");
-                    var min = IOHelper.MapPath(ShadowFsPath).Length;
+                    var min = Current.IOHelper.MapPath(ShadowFsPath).Length;
                     var pos = dir.LastIndexOf("\\", StringComparison.OrdinalIgnoreCase);
                     while (pos > min)
                     {

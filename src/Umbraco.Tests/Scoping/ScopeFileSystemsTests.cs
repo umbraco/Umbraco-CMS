@@ -44,16 +44,16 @@ namespace Umbraco.Tests.Scoping
 
         private static void ClearFiles()
         {
-            TestHelper.DeleteDirectory(IOHelper.MapPath("media"));
-            TestHelper.DeleteDirectory(IOHelper.MapPath("FileSysTests"));
-            TestHelper.DeleteDirectory(IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs"));
+            TestHelper.DeleteDirectory(Current.IOHelper.MapPath("media"));
+            TestHelper.DeleteDirectory(Current.IOHelper.MapPath("FileSysTests"));
+            TestHelper.DeleteDirectory(Current.IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs"));
         }
 
         [TestCase(true)]
         [TestCase(false)]
         public void CreateMediaTest(bool complete)
         {
-            var physMediaFileSystem = new PhysicalFileSystem(IOHelper.MapPath("media"), "ignore");
+            var physMediaFileSystem = new PhysicalFileSystem(Current.IOHelper.MapPath("media"), "ignore");
             var mediaFileSystem = Current.MediaFileSystem;
 
             Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
@@ -86,7 +86,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void MultiThread()
         {
-            var physMediaFileSystem = new PhysicalFileSystem(IOHelper.MapPath("media"), "ignore");
+            var physMediaFileSystem = new PhysicalFileSystem(Current.IOHelper.MapPath("media"), "ignore");
             var mediaFileSystem = Current.MediaFileSystem;
 
             var scopeProvider = ScopeProvider;

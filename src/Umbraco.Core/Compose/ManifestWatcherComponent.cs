@@ -22,13 +22,13 @@ namespace Umbraco.Core.Compose
         }
 
         public void Initialize()
-        { 
+        {
             if (_runtimeState.Debug == false) return;
 
             //if (ApplicationContext.Current.IsConfigured == false || GlobalSettings.DebugMode == false)
             //    return;
 
-            var appPlugins = IOHelper.MapPath("~/App_Plugins/");
+            var appPlugins = Current.IOHelper.MapPath("~/App_Plugins/");
             if (Directory.Exists(appPlugins) == false) return;
 
             _mw = new ManifestWatcher(_logger);

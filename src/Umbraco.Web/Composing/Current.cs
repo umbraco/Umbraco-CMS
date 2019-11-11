@@ -226,6 +226,8 @@ namespace Umbraco.Web.Composing
 
         public static IVariationContextAccessor VariationContextAccessor => CoreCurrent.VariationContextAccessor;
 
+        public static IIOHelper IOHelper => CoreCurrent.IOHelper;
+
         #endregion
     }
 }

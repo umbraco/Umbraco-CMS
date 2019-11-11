@@ -3,6 +3,7 @@ using System.Configuration;
 using System.IO;
 using System.Web.Configuration;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 
 namespace Umbraco.ModelsBuilder.Embedded.Configuration
@@ -28,7 +29,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Configuration
 
             // ensure defaults are initialized for tests
             ModelsNamespace = DefaultModelsNamespace;
-            ModelsDirectory = IOHelper.MapPath(DefaultModelsDirectory);
+            ModelsDirectory = Current.IOHelper.MapPath(DefaultModelsDirectory);
             DebugLevel = 0;
 
             // stop here, everything is false
@@ -74,7 +75,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Configuration
             value = ConfigurationManager.AppSettings[prefix + "ModelsDirectory"];
             if (!string.IsNullOrWhiteSpace(value))
             {
-                var root = IOHelper.MapPath("~/");
+                var root = Current.IOHelper.MapPath("~/");
                 if (root == null)
                     throw new ConfigurationErrorsException("Could not determine root directory.");
 

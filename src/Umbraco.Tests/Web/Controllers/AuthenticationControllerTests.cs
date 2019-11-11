@@ -70,10 +70,10 @@ namespace Umbraco.Tests.Web.Controllers
                 }
                 else
                 {
-                    var baseDir = IOHelper.MapPath("", false).TrimEnd(IOHelper.DirSepChar);
+                    var baseDir = Current.IOHelper.MapPath("", false).TrimEnd(Current.IOHelper.DirSepChar);
                     HttpContext.Current = new HttpContext(new SimpleWorkerRequest("/", baseDir, "", "", new StringWriter()));
                 }
-                IOHelper.ForceNotHosted = true;
+                Current.IOHelper.ForceNotHosted = true;
                 var usersController = new AuthenticationController(
                     Factory.GetInstance<IGlobalSettings>(),
                     umbracoContextAccessor,

@@ -7,6 +7,7 @@
 @using Microsoft.Owin.Security
 @using Newtonsoft.Json
 @using Newtonsoft.Json.Linq
+@using Umbraco.Core.Composing
 @using Umbraco.Core.IO
 @using Umbraco.Web
 @using Umbraco.Web.Editors
@@ -32,7 +33,7 @@
     <title>Umbraco</title>
 
     @Html.RenderCssHere(
-        new BasicPath("Umbraco", IOHelper.ResolveUrl(SystemDirectories.Umbraco)))
+        new BasicPath("Umbraco", Current.IOHelper.ResolveUrl(SystemDirectories.Umbraco)))
 
     @*Because we're lazy loading angular js, the embedded cloak style will not be loaded initially, but we need it*@
     <style>

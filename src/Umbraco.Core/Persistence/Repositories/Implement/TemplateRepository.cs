@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using NPoco;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -592,8 +593,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             validExts.Add("vbhtml");
 
             // validate path and extension
-            var validFile = IOHelper.VerifyEditPath(path, validDirs);
-            var validExtension = IOHelper.VerifyFileExtension(path, validExts);
+            var validFile = Current.IOHelper.VerifyEditPath(path, validDirs);
+            var validExtension = Current.IOHelper.VerifyFileExtension(path, validExts);
             return validFile && validExtension;
         }
 

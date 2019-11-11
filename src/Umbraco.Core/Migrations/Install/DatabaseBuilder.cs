@@ -4,6 +4,7 @@ using System.Data.SqlServerCe;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
@@ -131,7 +132,7 @@ namespace Umbraco.Core.Migrations.Install
         {
             SaveConnectionString(EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe, logger);
 
-            var path = Path.Combine(IOHelper.GetRootDirectorySafe(), "App_Data", "Umbraco.sdf");
+            var path = Path.Combine(Current.IOHelper.GetRootDirectorySafe(), "App_Data", "Umbraco.sdf");
             if (File.Exists(path) == false)
             {
                 // this should probably be in a "using (new SqlCeEngine)" clause but not sure
@@ -282,7 +283,7 @@ namespace Umbraco.Core.Migrations.Install
             if (string.IsNullOrWhiteSpace(providerName)) throw new ArgumentNullOrEmptyException(nameof(providerName));
 
             var fileSource = "web.config";
-            var fileName = IOHelper.MapPath(SystemDirectories.Root +"/" + fileSource);
+            var fileName = Current.IOHelper.MapPath(SystemDirectories.Root +"/" + fileSource);
 
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
             if (xml.Root == null) throw new Exception($"Invalid {fileSource} file (no root).");
@@ -295,7 +296,7 @@ namespace Umbraco.Core.Migrations.Install
             if (configSourceAttribute != null)
             {
                 fileSource = configSourceAttribute.Value;
-                fileName = IOHelper.MapPath(SystemDirectories.Root + "/" + fileSource);
+                fileName = Current.IOHelper.MapPath(SystemDirectories.Root + "/" + fileSource);
 
                 if (!File.Exists(fileName))
                     throw new Exception($"Invalid configSource \"{fileSource}\" (no such file).");
