@@ -29,7 +29,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public static TypeLoader GetMockedTypeLoader()
         {
-            return new TypeLoader(Mock.Of<IIOHelper>(), Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(IOHelper.Default.MapPath("~/App_Data/TEMP")), Mock.Of<IProfilingLogger>());
+            return new TypeLoader(IOHelper.Default, Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(IOHelper.Default.MapPath("~/App_Data/TEMP")), Mock.Of<IProfilingLogger>());
         }
 
         /// <summary>
