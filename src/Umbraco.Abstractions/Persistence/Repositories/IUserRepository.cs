@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -43,7 +42,6 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="pageSize"></param>
         /// <param name="totalRecords"></param>
         /// <param name="orderBy"></param>
-        /// <param name="customFilter"></param>
         /// <param name="orderDirection"></param>
         /// <param name="includeUserGroups">
         /// A filter to only include user that belong to these user groups
@@ -52,6 +50,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// A filter to only include users that do not belong to these user groups
         /// </param>
         /// <param name="userState">Optional parameter to filter by specified user state</param>
+        /// <param name="filter"></param>
         /// <returns></returns>
         IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords,
             Expression<Func<IUser, object>> orderBy, Direction orderDirection = Direction.Ascending,

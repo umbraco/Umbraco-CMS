@@ -931,12 +931,7 @@
     <Compile Include="Persistence\Repositories\IMemberTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\INotificationsRepository.cs" />
     <Compile Include="Persistence\Repositories\IPublicAccessRepository.cs" />
-    <Compile Include="Persistence\Repositories\IRelationRepository.cs" />
-    <Compile Include="Persistence\Repositories\IRelationTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\IContentRepository.cs" />
-    <Compile Include="Persistence\Repositories\ITagRepository.cs" />
-    <Compile Include="Persistence\Repositories\IUserGroupRepository.cs" />
-    <Compile Include="Persistence\Repositories\IUserRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\LanguageRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\MacroRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\MediaRepository.cs" />
