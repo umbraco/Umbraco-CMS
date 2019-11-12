@@ -13,7 +13,13 @@ namespace Umbraco.Core.IO
 {
     public class IOHelper : IIOHelper
     {
-        internal static IIOHelper Default { get; } = new IOHelper();
+        private readonly ISystemDirectories _systemDirectories;
+        internal static IIOHelper Default { get; } = new IOHelper(new SystemDirectories());
+
+        public IOHelper(ISystemDirectories systemDirectories)
+        {
+            _systemDirectories = systemDirectories;
+        }
 
         /// <summary>
         /// Gets or sets a value forcing Umbraco to consider it is non-hosted.
@@ -39,10 +45,10 @@ namespace Umbraco.Core.IO
             string retval = virtualPath;
 
             if (virtualPath.StartsWith("~"))
-                retval = virtualPath.Replace("~", SystemDirectories.Root);
+                retval = virtualPath.Replace("~", _systemDirectories.Root);
 
-            if (virtualPath.StartsWith("/") && virtualPath.StartsWith(SystemDirectories.Root) == false)
-                retval = SystemDirectories.Root + "/" + virtualPath.TrimStart('/');
+            if (virtualPath.StartsWith("/") && virtualPath.StartsWith(_systemDirectories.Root) == false)
+                retval = _systemDirectories.Root + "/" + virtualPath.TrimStart('/');
 
             return retval;
         }
@@ -57,11 +63,11 @@ namespace Umbraco.Core.IO
         public string ResolveUrl(string virtualPath)
         {
             if (virtualPath.StartsWith("~"))
-                return virtualPath.Replace("~", SystemDirectories.Root).Replace("//", "/");
+                return virtualPath.Replace("~", _systemDirectories.Root).Replace("//", "/");
             else if (Uri.IsWellFormedUriString(virtualPath, UriKind.Absolute))
                 return virtualPath;
             else
-                return VirtualPathUtility.ToAbsolute(virtualPath, SystemDirectories.Root);
+                return VirtualPathUtility.ToAbsolute(virtualPath, _systemDirectories.Root);
         }
 
         public Attempt<string> TryResolveUrl(string virtualPath)
@@ -69,10 +75,10 @@ namespace Umbraco.Core.IO
             try
             {
                 if (virtualPath.StartsWith("~"))
-                    return Attempt.Succeed(virtualPath.Replace("~", SystemDirectories.Root).Replace("//", "/"));
+                    return Attempt.Succeed(virtualPath.Replace("~", _systemDirectories.Root).Replace("//", "/"));
                 if (Uri.IsWellFormedUriString(virtualPath, UriKind.Absolute))
                     return Attempt.Succeed(virtualPath);
-                return Attempt.Succeed(VirtualPathUtility.ToAbsolute(virtualPath, SystemDirectories.Root));
+                return Attempt.Succeed(VirtualPathUtility.ToAbsolute(virtualPath, _systemDirectories.Root));
             }
             catch (Exception ex)
             {
@@ -97,7 +103,7 @@ namespace Umbraco.Core.IO
             if (useHttpContext && HttpContext.Current != null)
             {
                 //string retval;
-                if (String.IsNullOrEmpty(path) == false && (path.StartsWith("~") || path.StartsWith(SystemDirectories.Root)))
+                if (String.IsNullOrEmpty(path) == false && (path.StartsWith("~") || path.StartsWith(_systemDirectories.Root)))
                     return HostingEnvironment.MapPath(path);
                 else
                     return HostingEnvironment.MapPath("~/" + path.TrimStart('/'));
@@ -160,7 +166,7 @@ namespace Umbraco.Core.IO
             // TODO: what's below is dirty, there are too many ways to get the root dir, etc.
             // not going to fix everything today
 
-            var mappedRoot = MapPath(SystemDirectories.Root);
+            var mappedRoot = MapPath(_systemDirectories.Root);
             if (filePath.StartsWith(mappedRoot) == false)
                 filePath = MapPath(filePath);
 

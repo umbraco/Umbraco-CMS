@@ -9,6 +9,8 @@ namespace Umbraco.Tests.IO
     [TestFixture]
     public class IoHelperTests
     {
+        private ISystemDirectories SystemDirectories => Current.SystemDirectories;
+
         [TestCase("~/Scripts", "/Scripts", null)]
         [TestCase("/Scripts", "/Scripts", null)]
         [TestCase("../Scripts", "/Scripts", typeof(ArgumentException))]

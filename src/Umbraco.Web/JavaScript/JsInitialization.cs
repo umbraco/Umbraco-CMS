@@ -58,7 +58,7 @@ namespace Umbraco.Web.JavaScript
             }
             jarray.Append("]");
 
-            return WriteScript(jarray.ToString(), Current.IOHelper.ResolveUrl(SystemDirectories.Umbraco), angularModule);
+            return WriteScript(jarray.ToString(), Current.IOHelper.ResolveUrl(Current.SystemDirectories.Umbraco), angularModule);
         }
 
         /// <summary>

@@ -4,50 +4,50 @@ using Umbraco.Core.Composing;
 namespace Umbraco.Core.IO
 {
     //all paths has a starting but no trailing /
-    public class SystemDirectories
+    public class SystemDirectories : ISystemDirectories
     {
-        public static string Bin => "~/bin";
+        public string Bin => "~/bin";
 
-        public static string Config => "~/config";
+        public string Config => "~/config";
 
-        public static string Data => "~/App_Data";
+        public string Data => "~/App_Data";
 
-        public static string TempData => Data + "/TEMP";
+        public string TempData => Data + "/TEMP";
 
-        public static string TempFileUploads => TempData + "/FileUploads";
+        public string TempFileUploads => TempData + "/FileUploads";
 
-        public static string TempImageUploads => TempFileUploads + "/rte";
+        public string TempImageUploads => TempFileUploads + "/rte";
 
-        public static string Install => "~/install";
+        public string Install => "~/install";
 
-        public static string AppCode => "~/App_Code";
+        public string AppCode => "~/App_Code";
 
-        public static string AppPlugins => "~/App_Plugins";
+        public string AppPlugins => "~/App_Plugins";
 
-        public static string MvcViews => "~/Views";
+        public string MvcViews => "~/Views";
 
-        public static string PartialViews => MvcViews + "/Partials/";
+        public string PartialViews => MvcViews + "/Partials/";
 
-        public static string MacroPartials => MvcViews + "/MacroPartials/";
+        public string MacroPartials => MvcViews + "/MacroPartials/";
 
-        public static string Media => Current.IOHelper.ReturnPath("umbracoMediaPath", "~/media");
+        public string Media => Current.IOHelper.ReturnPath("umbracoMediaPath", "~/media");
 
-        public static string Scripts => Current.IOHelper.ReturnPath("umbracoScriptsPath", "~/scripts");
+        public string Scripts => Current.IOHelper.ReturnPath("umbracoScriptsPath", "~/scripts");
 
-        public static string Css => Current.IOHelper.ReturnPath("umbracoCssPath", "~/css");
+        public string Css => Current.IOHelper.ReturnPath("umbracoCssPath", "~/css");
 
-        public static string Umbraco => Current.IOHelper.ReturnPath("umbracoPath", "~/umbraco");
+        public string Umbraco => Current.IOHelper.ReturnPath("umbracoPath", "~/umbraco");
 
-        public static string Packages => Data + "/packages";
+        public string Packages => Data + "/packages";
 
-        public static string Preview => Data + "/preview";
+        public string Preview => Data + "/preview";
 
-        private static string _root;
+        private string _root;
 
         /// <summary>
         /// Gets the root path of the application
         /// </summary>
-        public static string Root
+        public string Root
         {
             get
             {
@@ -62,7 +62,7 @@ namespace Umbraco.Core.IO
                 return _root;
             }
             //Only required for unit tests
-            internal set => _root = value;
+            set => _root = value;
         }
     }
 }

@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Scoping
         {
             TestHelper.DeleteDirectory(Current.IOHelper.MapPath("media"));
             TestHelper.DeleteDirectory(Current.IOHelper.MapPath("FileSysTests"));
-            TestHelper.DeleteDirectory(Current.IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs"));
+            TestHelper.DeleteDirectory(Current.IOHelper.MapPath(Current.SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs"));
         }
 
         [TestCase(true)]

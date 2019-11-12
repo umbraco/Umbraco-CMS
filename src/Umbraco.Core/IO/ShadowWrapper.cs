@@ -8,7 +8,7 @@ namespace Umbraco.Core.IO
 {
     internal class ShadowWrapper : IFileSystem
     {
-        private static readonly string ShadowFsPath = SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs";
+        private static readonly string ShadowFsPath = Current.SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs";
 
         private readonly Func<bool> _isScoped;
         private readonly IFileSystem _innerFileSystem;

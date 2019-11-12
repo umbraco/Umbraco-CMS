@@ -69,12 +69,12 @@ namespace Umbraco.Tests.TestHelpers
 
         public static void InitializeContentDirectories()
         {
-            CreateDirectories(new[] { SystemDirectories.MvcViews, SystemDirectories.Media, SystemDirectories.AppPlugins });
+            CreateDirectories(new[] { Current.SystemDirectories.MvcViews, Current.SystemDirectories.Media, Current.SystemDirectories.AppPlugins });
         }
 
         public static void CleanContentDirectories()
         {
-            CleanDirectories(new[] { SystemDirectories.MvcViews, SystemDirectories.Media });
+            CleanDirectories(new[] { Current.SystemDirectories.MvcViews, Current.SystemDirectories.Media });
         }
 
         public static void CreateDirectories(string[] directories)
@@ -91,7 +91,7 @@ namespace Umbraco.Tests.TestHelpers
         {
             var preserves = new Dictionary<string, string[]>
             {
-                { SystemDirectories.MvcViews, new[] {"dummy.txt"} }
+                { Current.SystemDirectories.MvcViews, new[] {"dummy.txt"} }
             };
             foreach (var directory in directories)
             {

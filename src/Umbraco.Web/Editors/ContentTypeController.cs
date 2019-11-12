@@ -515,7 +515,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public HttpResponseMessage Import(string file)
         {
-            var filePath = Path.Combine(Current.IOHelper.MapPath(SystemDirectories.Data), file);
+            var filePath = Path.Combine(Current.IOHelper.MapPath(Current.SystemDirectories.Data), file);
             if (string.IsNullOrEmpty(file) || !System.IO.File.Exists(filePath))
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -553,7 +553,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
-            var root = Current.IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "FileUploads");
+            var root = Current.IOHelper.MapPath(Current.SystemDirectories.TempData.EnsureEndsWith('/') + "FileUploads");
             //ensure it exists
             Directory.CreateDirectory(root);
             var provider = new MultipartFormDataStreamProvider(root);

@@ -45,10 +45,10 @@ namespace Umbraco.Web.Editors
             }
 
             // Create an unique folder path to help with concurrent users to avoid filename clash
-            var imageTempPath = Current.IOHelper.MapPath(SystemDirectories.TempImageUploads + "/" + Guid.NewGuid().ToString());
+            var imageTempPath = Current.IOHelper.MapPath(Current.SystemDirectories.TempImageUploads + "/" + Guid.NewGuid().ToString());
 
             // Temp folderpath (Files come in as bodypart & will need to move/saved into imgTempPath
-            var folderPath = Current.IOHelper.MapPath(SystemDirectories.TempFileUploads);
+            var folderPath = Current.IOHelper.MapPath(Current.SystemDirectories.TempFileUploads);
 
             // Ensure image temp path exists
             if(Directory.Exists(imageTempPath) == false)

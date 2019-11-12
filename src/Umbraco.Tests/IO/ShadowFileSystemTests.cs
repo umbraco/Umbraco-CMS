@@ -41,7 +41,7 @@ namespace Umbraco.Tests.IO
         private static void ClearFiles()
         {
             TestHelper.DeleteDirectory(Current.IOHelper.MapPath("FileSysTests"));
-            TestHelper.DeleteDirectory(Current.IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs"));
+            TestHelper.DeleteDirectory(Current.IOHelper.MapPath(Current.SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs"));
         }
 
         private static string NormPath(string path)
@@ -388,7 +388,7 @@ namespace Umbraco.Tests.IO
             var logger = Mock.Of<ILogger>();
 
             var path = Current.IOHelper.MapPath("FileSysTests");
-            var shadowfs = Current.IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs");
+            var shadowfs = Current.IOHelper.MapPath(Current.SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(shadowfs);
 
@@ -483,7 +483,7 @@ namespace Umbraco.Tests.IO
             var logger = Mock.Of<ILogger>();
 
             var path = Current.IOHelper.MapPath("FileSysTests");
-            var shadowfs = Current.IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs");
+            var shadowfs = Current.IOHelper.MapPath(Current.SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs");
             Directory.CreateDirectory(path);
 
             var scopedFileSystems = false;
@@ -536,7 +536,7 @@ namespace Umbraco.Tests.IO
             var logger = Mock.Of<ILogger>();
 
             var path = Current.IOHelper.MapPath("FileSysTests");
-            var shadowfs = Current.IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs");
+            var shadowfs = Current.IOHelper.MapPath(Current.SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs");
             Directory.CreateDirectory(path);
 
             var scopedFileSystems = false;
