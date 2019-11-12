@@ -60,6 +60,11 @@ namespace Umbraco.Web.Models.Mapping
             target.Comment = source.Comment;
             target.CreateDate = source.CreateDate;
             target.ParentId = source.ParentId;
+
+            var entities = _relationService.GetEntitiesFromRelation(source);
+
+            target.ParentName = entities.Item1.Name;
+            target.ChildName = entities.Item2.Name;
         }
 
         // Umbraco.Code.MapAll -CreateDate -UpdateDate -DeleteDate
