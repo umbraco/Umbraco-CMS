@@ -16,7 +16,7 @@ namespace Umbraco.Core.Manifest
     /// <summary>
     /// Parses the Main.js file and replaces all tokens accordingly.
     /// </summary>
-    public class ManifestParser
+    public class ManifestParser : IManifestParser
     {
         private readonly IJsonSerializer _jsonSerializer;
         private static readonly string Utf8Preamble = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
@@ -161,7 +161,7 @@ namespace Umbraco.Core.Manifest
         /// <summary>
         /// Parses a manifest.
         /// </summary>
-        internal PackageManifest ParseManifest(string text)
+        public PackageManifest ParseManifest(string text)
         {
             if (string.IsNullOrWhiteSpace(text))
                 throw new ArgumentNullOrEmptyException(nameof(text));
@@ -200,7 +200,7 @@ namespace Umbraco.Core.Manifest
         }
 
         // purely for tests
-        internal IEnumerable<GridEditor> ParseGridEditors(string text)
+        public IEnumerable<GridEditor> ParseGridEditors(string text)
         {
             return _jsonSerializer.Deserialize<IEnumerable<GridEditor>>(text);
         }
