@@ -184,9 +184,6 @@
     <Compile Include="IO\IOHelper.cs" />
     <Compile Include="IO\MediaPathSchemes\UniqueMediaPathScheme.cs" />
     <Compile Include="Logging\Viewer\LogTimePeriod.cs" />
-    <Compile Include="Manifest\IManifestFilter.cs" />
-    <Compile Include="Manifest\ManifestFilterCollection.cs" />
-    <Compile Include="Manifest\ManifestFilterCollectionBuilder.cs" />
     <Compile Include="Manifest\ManifestParser.cs" />
     <Compile Include="Migrations\IMigrationBuilder.cs" />
     <Compile Include="Migrations\Upgrade\Common\DeleteKeysAndIndexes.cs" />
@@ -225,7 +222,6 @@
     <Compile Include="Models\IContentTypeBase.cs" />
     <Compile Include="Models\IContentTypeComposition.cs" />
     <Compile Include="Models\IDataType.cs" />
-    <Compile Include="Models\IDataValueEditor.cs" />
     <Compile Include="Models\Identity\IdentityMapDefinition.cs" />
     <Compile Include="Models\Identity\UserLoginInfoWrapper.cs" />
     <Compile Include="Models\IMediaType.cs" />
@@ -276,7 +272,6 @@
     <Compile Include="PropertyEditors\DataEditorAttribute.cs" />
     <Compile Include="PropertyEditors\DateTimeConfiguration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RenameLabelAndRichTextPropertyEditorAliases.cs" />
-    <Compile Include="PropertyEditors\IDataEditor.cs" />
     <Compile Include="PropertyEditors\PropertyValueConverterCollection.cs" />
     <Compile Include="PropertyEditors\PropertyValueConverterCollectionBuilder.cs" />
     <Compile Include="PropertyEditors\VoidEditor.cs" />
@@ -379,7 +374,6 @@
     <Compile Include="Logging\Viewer\SavedLogSearch.cs" />
     <Compile Include="Manifest\DashboardAccessRuleConverter.cs" />
     <Compile Include="Manifest\ManifestContentAppFactory.cs" />
-    <Compile Include="Manifest\ManifestDashboard.cs" />
     <Compile Include="Migrations\MergeBuilder.cs" />
     <Compile Include="Migrations\MigrationBase_Extra.cs" />
     <Compile Include="Migrations\PostMigrations\IPublishedSnapshotRebuilder.cs" />
@@ -540,7 +534,6 @@
     <Compile Include="MainDom.cs" />
     <Compile Include="Manifest\ValueValidatorConverter.cs" />
     <Compile Include="Manifest\ManifestWatcher.cs" />
-    <Compile Include="Manifest\PackageManifest.cs" />
     <Compile Include="Manifest\DataEditorConverter.cs" />
     <Compile Include="Migrations\MigrationBuilder.cs" />
     <Compile Include="Migrations\MigrationPlan.cs" />

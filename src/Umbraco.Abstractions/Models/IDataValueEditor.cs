@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Xml.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Core.PropertyEditors
 {

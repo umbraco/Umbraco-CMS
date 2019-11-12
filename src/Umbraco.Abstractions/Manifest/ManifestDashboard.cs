@@ -1,28 +1,28 @@
 ﻿using System;
 using System.ComponentModel;
-using Newtonsoft.Json;
-using Umbraco.Core.Composing;
+using System.Runtime.Serialization;
 using Umbraco.Core.Dashboards;
-using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Manifest
 {
+    [DataContract]
     public class ManifestDashboard : IDashboard
     {
-        [JsonProperty("alias", Required = Required.Always)]
+        [DataMember(Name = "alias", IsRequired = true)]
         public string Alias { get; set; }
 
-        [JsonProperty("weight", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        //TODO this needs to be tested manually!
+        //[JsonProperty("weight", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         [DefaultValue(100)] // must be equal to DashboardCollectionBuilder.DefaultWeight
         public int Weight { get; set; }
 
-        [JsonProperty("view", Required = Required.Always)]
+        [DataMember(Name = "view", IsRequired = true)]
         public string View { get; set; }
 
-        [JsonProperty("sections")]
+        [DataMember(Name = "sections")]
         public string[] Sections { get; set; } = Array.Empty<string>();
 
-        [JsonProperty("access")]
+        [DataMember(Name = "access")]
         public IAccessRule[] AccessRules { get; set; } = Array.Empty<IAccessRule>();
     }
 }
