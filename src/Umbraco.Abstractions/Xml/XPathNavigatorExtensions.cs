@@ -5,7 +5,7 @@ namespace Umbraco.Core.Xml
     /// <summary>
     /// Provides extensions to XPathNavigator.
     /// </summary>
-    internal static class XPathNavigatorExtensions
+    public static class XPathNavigatorExtensions
     {
         /// <summary>
         /// Selects a node set, using the specified XPath expression.

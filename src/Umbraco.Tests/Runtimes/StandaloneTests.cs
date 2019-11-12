@@ -70,7 +70,7 @@ namespace Umbraco.Tests.Runtimes
             // create the register and the composition
             var register = RegisterFactory.Create();
             var composition = new Composition(register, typeLoader, profilingLogger, runtimeState);
-            composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder);
+            composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper);
 
             // create the core runtime and have it compose itself
             var coreRuntime = new CoreRuntime();
@@ -262,7 +262,7 @@ namespace Umbraco.Tests.Runtimes
             // create the register and the composition
             var register = RegisterFactory.Create();
             var composition = new Composition(register, typeLoader, profilingLogger, runtimeState);
-            composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder);
+            composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper);
 
             // create the core runtime and have it compose itself
             var coreRuntime = new CoreRuntime();

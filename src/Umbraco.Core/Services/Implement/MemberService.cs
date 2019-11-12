@@ -28,14 +28,13 @@ namespace Umbraco.Core.Services.Implement
         private readonly IAuditRepository _auditRepository;
 
         private readonly IMemberGroupService _memberGroupService;
-        private readonly IMediaFileSystem _mediaFileSystem;
 
         //only for unit tests!
         internal MembershipProviderBase MembershipProvider { get; set; }
 
         #region Constructor
 
-        public MemberService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IMemberGroupService memberGroupService,  IMediaFileSystem mediaFileSystem,
+        public MemberService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IMemberGroupService memberGroupService, 
             IMemberRepository memberRepository, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, IAuditRepository auditRepository)
             : base(provider, logger, eventMessagesFactory)
         {
@@ -44,7 +43,6 @@ namespace Umbraco.Core.Services.Implement
             _memberGroupRepository = memberGroupRepository;
             _auditRepository = auditRepository;
             _memberGroupService = memberGroupService ?? throw new ArgumentNullException(nameof(memberGroupService));
-            _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
         }
 
         #endregion

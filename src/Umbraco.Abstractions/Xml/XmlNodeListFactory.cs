@@ -7,7 +7,7 @@ using System.Xml.XPath;
 
 namespace Umbraco.Core.Xml
 {
-    class XmlNodeListFactory
+    public class XmlNodeListFactory
     {
         private XmlNodeListFactory() { }
 
