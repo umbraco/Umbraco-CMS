@@ -540,7 +540,7 @@ namespace Umbraco.Core.Services.Implement
 
                 scope.Events.Dispatch(SavedTemplate, this, new SaveEventArgs<ITemplate>(template, false));
 
-                Audit(AuditType.Save, userId, template.Id, ObjectTypes.GetName(UmbracoObjectTypes.Template));
+                Audit(AuditType.Save, userId, template.Id, UmbracoObjectTypes.Template.GetName());
                 scope.Complete();
             }
         }
@@ -566,7 +566,7 @@ namespace Umbraco.Core.Services.Implement
 
                 scope.Events.Dispatch(SavedTemplate, this, new SaveEventArgs<ITemplate>(templatesA, false));
 
-                Audit(AuditType.Save, userId, -1, ObjectTypes.GetName(UmbracoObjectTypes.Template));
+                Audit(AuditType.Save, userId, -1, UmbracoObjectTypes.Template.GetName());
                 scope.Complete();
             }
         }
