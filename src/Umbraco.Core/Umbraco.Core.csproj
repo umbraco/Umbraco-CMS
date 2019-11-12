@@ -1169,18 +1169,9 @@
     <Compile Include="XmlExtensions.cs" />
     <Compile Include="Xml\DynamicContext.cs" />
     <Compile Include="Xml\UmbracoXPathPathSyntaxParser.cs" />
-    <Compile Include="Xml\XmlHelper.cs" />
     <Compile Include="Xml\XmlNamespaces.cs" />
     <Compile Include="Xml\XmlNodeListFactory.cs" />
     <Compile Include="Xml\XPathNavigatorExtensions.cs" />
-    <Compile Include="Xml\XPathVariable.cs" />
-    <Compile Include="Xml\XPath\INavigableContent.cs" />
-    <Compile Include="Xml\XPath\INavigableContentType.cs" />
-    <Compile Include="Xml\XPath\INavigableFieldType.cs" />
-    <Compile Include="Xml\XPath\INavigableSource.cs" />
-    <Compile Include="Xml\XPath\MacroNavigator.cs" />
-    <Compile Include="Xml\XPath\NavigableNavigator.cs" />
-    <Compile Include="Xml\XPath\RenamedRootNavigator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="FileResources\BlockingWeb.config" />
@@ -1194,5 +1185,6 @@
       <Name>Umbraco.Abstractions</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
