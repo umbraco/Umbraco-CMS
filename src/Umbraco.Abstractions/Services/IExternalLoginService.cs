@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Microsoft.AspNet.Identity;
 using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Core.Services

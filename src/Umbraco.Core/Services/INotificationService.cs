@@ -19,7 +19,7 @@ namespace Umbraco.Core.Services
         /// <param name="operatingUser"></param>
         /// <param name="action"></param>
         /// <param name="actionName"></param>
-        /// <param name="http"></param>
+        /// <param name="siteUri"></param>
         /// <param name="createSubject"></param>
         /// <param name="createBody"></param>
         void SendNotifications(IUser operatingUser, IEnumerable<IContent> entities, string action, string actionName, Uri siteUri,
