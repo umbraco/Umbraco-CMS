@@ -24,26 +24,26 @@ namespace Umbraco.Core.Services
         bool DeletePartialViewMacro(string path, int userId = Constants.Security.SuperUserId);
         Attempt<IPartialView> SavePartialView(IPartialView partialView, int userId = Constants.Security.SuperUserId);
         Attempt<IPartialView> SavePartialViewMacro(IPartialView partialView, int userId = Constants.Security.SuperUserId);
-        bool ValidatePartialView(PartialView partialView);
-        bool ValidatePartialViewMacro(PartialView partialView);
+        bool ValidatePartialView(IPartialView partialView);
+        bool ValidatePartialViewMacro(IPartialView partialView);
 
         /// <summary>
-        /// Gets a list of all <see cref="Stylesheet"/> objects
+        /// Gets a list of all <see cref="IStylesheet"/> objects
         /// </summary>
-        /// <returns>An enumerable list of <see cref="Stylesheet"/> objects</returns>
+        /// <returns>An enumerable list of <see cref="IStylesheet"/> objects</returns>
         IEnumerable<IStylesheet> GetStylesheets(params string[] names);
 
         /// <summary>
-        /// Gets a <see cref="Stylesheet"/> object by its name
+        /// Gets a <see cref="IStylesheet"/> object by its name
         /// </summary>
         /// <param name="name">Name of the stylesheet incl. extension</param>
-        /// <returns>A <see cref="Stylesheet"/> object</returns>
+        /// <returns>A <see cref="IStylesheet"/> object</returns>
         IStylesheet GetStylesheetByName(string name);
 
         /// <summary>
-        /// Saves a <see cref="Stylesheet"/>
+        /// Saves a <see cref="IStylesheet"/>
         /// </summary>
-        /// <param name="stylesheet"><see cref="Stylesheet"/> to save</param>
+        /// <param name="stylesheet"><see cref="IStylesheet"/> to save</param>
         /// <param name="userId">Optional id of the user saving the stylesheet</param>
         void SaveStylesheet(IStylesheet stylesheet, int userId = Constants.Security.SuperUserId);
 
@@ -55,31 +55,31 @@ namespace Umbraco.Core.Services
         void DeleteStylesheet(string path, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
-        /// Validates a <see cref="Stylesheet"/>
+        /// Validates a <see cref="IStylesheet"/>
         /// </summary>
-        /// <param name="stylesheet"><see cref="Stylesheet"/> to validate</param>
+        /// <param name="stylesheet"><see cref="IStylesheet"/> to validate</param>
         /// <returns>True if Stylesheet is valid, otherwise false</returns>
         bool ValidateStylesheet(IStylesheet stylesheet);
 
         /// <summary>
-        /// Gets a list of all <see cref="Script"/> objects
+        /// Gets a list of all <see cref="IScript"/> objects
         /// </summary>
-        /// <returns>An enumerable list of <see cref="Script"/> objects</returns>
-        IEnumerable<Script> GetScripts(params string[] names);
+        /// <returns>An enumerable list of <see cref="IScript"/> objects</returns>
+        IEnumerable<IScript> GetScripts(params string[] names);
 
         /// <summary>
-        /// Gets a <see cref="Script"/> object by its name
+        /// Gets a <see cref="IScript"/> object by its name
         /// </summary>
         /// <param name="name">Name of the script incl. extension</param>
-        /// <returns>A <see cref="Script"/> object</returns>
-        Script GetScriptByName(string name);
+        /// <returns>A <see cref="IScript"/> object</returns>
+        IScript GetScriptByName(string name);
 
         /// <summary>
         /// Saves a <see cref="Script"/>
         /// </summary>
-        /// <param name="script"><see cref="Script"/> to save</param>
+        /// <param name="script"><see cref="IScript"/> to save</param>
         /// <param name="userId">Optional id of the user saving the script</param>
-        void SaveScript(Script script, int userId = Constants.Security.SuperUserId);
+        void SaveScript(IScript script, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Deletes a script by its name
@@ -89,11 +89,11 @@ namespace Umbraco.Core.Services
         void DeleteScript(string path, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
-        /// Validates a <see cref="Script"/>
+        /// Validates a <see cref="IScript"/>
         /// </summary>
-        /// <param name="script"><see cref="Script"/> to validate</param>
+        /// <param name="script"><see cref="IScript"/> to validate</param>
         /// <returns>True if Script is valid, otherwise false</returns>
-        bool ValidateScript(Script script);
+        bool ValidateScript(IScript script);
 
         /// <summary>
         /// Creates a folder for scripts
@@ -213,7 +213,7 @@ namespace Umbraco.Core.Services
         /// Validates a <see cref="ITemplate"/>
         /// </summary>
         /// <param name="template"><see cref="ITemplate"/> to validate</param>
-        /// <returns>True if Script is valid, otherwise false</returns>
+        /// <returns>True if template is valid, otherwise false</returns>
         bool ValidateTemplate(ITemplate template);
 
         /// <summary>

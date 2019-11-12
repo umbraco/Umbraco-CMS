@@ -45,10 +45,7 @@ namespace Umbraco.Core.Services.Implement
 
         #region Stylesheets
 
-        /// <summary>
-        /// Gets a list of all <see cref="Stylesheet"/> objects
-        /// </summary>
-        /// <returns>An enumerable list of <see cref="Stylesheet"/> objects</returns>
+        /// <inheritdoc />
         public IEnumerable<IStylesheet> GetStylesheets(params string[] names)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
@@ -57,11 +54,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        /// <summary>
-        /// Gets a <see cref="Stylesheet"/> object by its name
-        /// </summary>
-        /// <param name="name">Name of the stylesheet incl. extension</param>
-        /// <returns>A <see cref="Stylesheet"/> object</returns>
+        /// <inheritdoc />
         public IStylesheet GetStylesheetByName(string name)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
@@ -70,11 +63,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        /// <summary>
-        /// Saves a <see cref="Stylesheet"/>
-        /// </summary>
-        /// <param name="stylesheet"><see cref="Stylesheet"/> to save</param>
-        /// <param name="userId"></param>
+        /// <inheritdoc />
         public void SaveStylesheet(IStylesheet stylesheet, int userId = Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
@@ -96,11 +85,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        /// <summary>
-        /// Deletes a stylesheet by its name
-        /// </summary>
-        /// <param name="path">Name incl. extension of the Stylesheet to delete</param>
-        /// <param name="userId"></param>
+        /// <inheritdoc />
         public void DeleteStylesheet(string path, int userId = Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
@@ -128,11 +113,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        /// <summary>
-        /// Validates a <see cref="Stylesheet"/>
-        /// </summary>
-        /// <param name="stylesheet"><see cref="Stylesheet"/> to validate</param>
-        /// <returns>True if Stylesheet is valid, otherwise false</returns>
+        /// <inheritdoc />
         public bool ValidateStylesheet(IStylesheet stylesheet)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
@@ -145,7 +126,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                ((StylesheetRepository) _stylesheetRepository).AddFolder(folderPath);
+                _stylesheetRepository.AddFolder(folderPath);
                 scope.Complete();
             }
         }
@@ -154,7 +135,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                ((StylesheetRepository) _stylesheetRepository).DeleteFolder(folderPath);
+                _stylesheetRepository.DeleteFolder(folderPath);
                 scope.Complete();
             }
         }
@@ -188,11 +169,8 @@ namespace Umbraco.Core.Services.Implement
 
         #region Scripts
 
-        /// <summary>
-        /// Gets a list of all <see cref="Script"/> objects
-        /// </summary>
-        /// <returns>An enumerable list of <see cref="Script"/> objects</returns>
-        public IEnumerable<Script> GetScripts(params string[] names)
+        /// <inheritdoc />
+        public IEnumerable<IScript> GetScripts(params string[] names)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -200,12 +178,8 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        /// <summary>
-        /// Gets a <see cref="Script"/> object by its name
-        /// </summary>
-        /// <param name="name">Name of the script incl. extension</param>
-        /// <returns>A <see cref="Script"/> object</returns>
-        public Script GetScriptByName(string name)
+        /// <inheritdoc />
+        public IScript GetScriptByName(string name)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -213,16 +187,12 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        /// <summary>
-        /// Saves a <see cref="Script"/>
-        /// </summary>
-        /// <param name="script"><see cref="Script"/> to save</param>
-        /// <param name="userId"></param>
-        public void SaveScript(Script script, int userId = Constants.Security.SuperUserId)
+        /// <inheritdoc />
+        public void SaveScript(IScript script, int userId = Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<Script>(script);
+                var saveEventArgs = new SaveEventArgs<IScript>(script);
                 if (scope.Events.DispatchCancelable(SavingScript, this, saveEventArgs))
                 {
                     scope.Complete();
@@ -238,11 +208,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        /// <summary>
-        /// Deletes a script by its name
-        /// </summary>
-        /// <param name="path">Name incl. extension of the Script to delete</param>
-        /// <param name="userId"></param>
+        /// <inheritdoc />
         public void DeleteScript(string path, int userId = Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
@@ -254,7 +220,7 @@ namespace Umbraco.Core.Services.Implement
                     return;
                 }
 
-                var deleteEventArgs = new DeleteEventArgs<Script>(script);
+                var deleteEventArgs = new DeleteEventArgs<IScript>(script);
                 if (scope.Events.DispatchCancelable(DeletingScript, this, deleteEventArgs))
                 {
                     scope.Complete();
@@ -270,12 +236,8 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        /// <summary>
-        /// Validates a <see cref="Script"/>
-        /// </summary>
-        /// <param name="script"><see cref="Script"/> to validate</param>
-        /// <returns>True if Script is valid, otherwise false</returns>
-        public bool ValidateScript(Script script)
+        /// <inheritdoc />
+        public bool ValidateScript(IScript script)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -287,7 +249,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                ((ScriptRepository) _scriptRepository).AddFolder(folderPath);
+                _scriptRepository.AddFolder(folderPath);
                 scope.Complete();
             }
         }
@@ -296,7 +258,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                ((ScriptRepository) _scriptRepository).DeleteFolder(folderPath);
+                _scriptRepository.DeleteFolder(folderPath);
                 scope.Complete();
             }
         }
@@ -907,7 +869,7 @@ namespace Umbraco.Core.Services.Implement
             return Attempt.Succeed(partialView);
         }
 
-        public bool ValidatePartialView(PartialView partialView)
+        public bool ValidatePartialView(IPartialView partialView)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -915,7 +877,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public bool ValidatePartialViewMacro(PartialView partialView)
+        public bool ValidatePartialViewMacro(IPartialView partialView)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -1106,12 +1068,12 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Occurs before Delete
         /// </summary>
-        public static event TypedEventHandler<IFileService, DeleteEventArgs<Script>> DeletingScript;
+        public static event TypedEventHandler<IFileService, DeleteEventArgs<IScript>> DeletingScript;
 
         /// <summary>
         /// Occurs after Delete
         /// </summary>
-        public static event TypedEventHandler<IFileService, DeleteEventArgs<Script>> DeletedScript;
+        public static event TypedEventHandler<IFileService, DeleteEventArgs<IScript>> DeletedScript;
 
         /// <summary>
         /// Occurs before Delete
@@ -1136,12 +1098,12 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Occurs before Save
         /// </summary>
-        public static event TypedEventHandler<IFileService, SaveEventArgs<Script>> SavingScript;
+        public static event TypedEventHandler<IFileService, SaveEventArgs<IScript>> SavingScript;
 
         /// <summary>
         /// Occurs after Save
         /// </summary>
-        public static event TypedEventHandler<IFileService, SaveEventArgs<Script>> SavedScript;
+        public static event TypedEventHandler<IFileService, SaveEventArgs<IScript>> SavedScript;
 
         /// <summary>
         /// Occurs before Save

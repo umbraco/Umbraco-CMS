@@ -57,7 +57,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         public override void Save(IStylesheet entity)
         {
-            // TODO: Casting :/ Do we need GetFileContent below? Need to look into it later
+            // TODO: Casting :/ Review GetFileContent and it's usages, need to look into it later
             var stylesheet = (Stylesheet)entity;
 
             base.Save(stylesheet);

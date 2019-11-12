@@ -178,7 +178,7 @@ namespace Umbraco.Web.Editors
                     var script = Services.FileService.GetScriptByName(virtualPath);
                     if (script != null)
                     {
-                        var display = Mapper.Map<Script, CodeFileDisplay>(script);
+                        var display = Mapper.Map<IScript, CodeFileDisplay>(script);
                         display.FileType = Core.Constants.Trees.Scripts;
                         display.Path = Url.GetTreePathFromFilePath(script.Path);
                         display.Id = System.Web.HttpUtility.UrlEncode(script.Path);
@@ -503,7 +503,7 @@ namespace Umbraco.Web.Editors
         /// It's important to note that Scripts are DIFFERENT from cshtml files since scripts use IFileSystem and cshtml files
         /// use a normal file system because they must exist on a real file system for ASP.NET to work.
         /// </remarks>
-        private Script CreateOrUpdateScript(CodeFileDisplay display)
+        private IScript CreateOrUpdateScript(CodeFileDisplay display)
         {
             return CreateOrUpdateFile(display, ".js", Current.FileSystems.ScriptsFileSystem,
                 name => Services.FileService.GetScriptByName(name),

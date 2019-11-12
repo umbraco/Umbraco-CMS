@@ -9,5 +9,8 @@ namespace Umbraco.Core.Persistence.Repositories
         Stream GetFileContentStream(string filepath);
         void SetFileContent(string filepath, Stream content);
         long GetFileSize(string filepath);
+
+        void AddFolder(string folderPath);
+        void DeleteFolder(string folderPath);
     }
 }
