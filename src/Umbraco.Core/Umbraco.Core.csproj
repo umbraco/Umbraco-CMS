@@ -471,7 +471,6 @@
     <Compile Include="Persistence\Mappers\ConsentMapper.cs" />
     <Compile Include="Persistence\Mappers\SimpleContentTypeMapper.cs" />
     <Compile Include="Persistence\Repositories\IAuditEntryRepository.cs" />
-    <Compile Include="Persistence\Repositories\IConsentRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\AuditEntryRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\ConsentRepository.cs" />
     <Compile Include="Persistence\SqlContextExtensions.cs" />
@@ -920,14 +919,10 @@
     <Compile Include="Persistence\Repositories\IContentTypeRepositoryBase.cs" />
     <Compile Include="Persistence\Repositories\IDataTypeContainerRepository.cs" />
     <Compile Include="Persistence\Repositories\IDataTypeRepository.cs" />
-    <Compile Include="Persistence\Repositories\IDictionaryRepository.cs" />
     <Compile Include="Persistence\Repositories\IDocumentTypeContainerRepository.cs" />
-    <Compile Include="Persistence\Repositories\IDomainRepository.cs" />
     <Compile Include="Persistence\Repositories\IEntityContainerRepository.cs" />
     <Compile Include="Persistence\Repositories\IEntityRepository.cs" />
     <Compile Include="Persistence\Repositories\IExternalLoginRepository.cs" />
-    <Compile Include="Persistence\Repositories\ILanguageRepository.cs" />
-    <Compile Include="Persistence\Repositories\IMacroRepository.cs" />
     <Compile Include="Persistence\Repositories\IMediaRepository.cs" />
     <Compile Include="Persistence\Repositories\IMediaTypeContainerRepository.cs" />
     <Compile Include="Persistence\Repositories\IMediaTypeRepository.cs" />
@@ -936,11 +931,9 @@
     <Compile Include="Persistence\Repositories\IMemberTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\INotificationsRepository.cs" />
     <Compile Include="Persistence\Repositories\IPublicAccessRepository.cs" />
-    <Compile Include="Persistence\Repositories\IRedirectUrlRepository.cs" />
     <Compile Include="Persistence\Repositories\IRelationRepository.cs" />
     <Compile Include="Persistence\Repositories\IRelationTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\IContentRepository.cs" />
-    <Compile Include="Persistence\Repositories\IServerRegistrationRepository.cs" />
     <Compile Include="Persistence\Repositories\ITagRepository.cs" />
     <Compile Include="Persistence\Repositories\IUserGroupRepository.cs" />
     <Compile Include="Persistence\Repositories\IUserRepository.cs" />
