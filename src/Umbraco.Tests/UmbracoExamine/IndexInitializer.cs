@@ -45,21 +45,10 @@ namespace Umbraco.Tests.UmbracoExamine
 
         public static MediaIndexPopulator GetMediaIndexRebuilder(PropertyEditorCollection propertyEditors, IMediaService mediaService)
         {
-            var mediaValueSetBuilder = new MediaValueSetBuilder(propertyEditors, new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }), GetMockUserService(), MockRuntimeState(RuntimeLevel.Run));
+            var mediaValueSetBuilder = new MediaValueSetBuilder(propertyEditors, new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }), GetMockUserService());
             var mediaIndexDataSource = new MediaIndexPopulator(null, mediaService, mediaValueSetBuilder);
             return mediaIndexDataSource;
         }
-
-        public static IRuntimeState MockRuntimeState(RuntimeLevel level)
-        {
-            var runtimeState = Mock.Of<IRuntimeState>();
-            Mock.Get(runtimeState).Setup(x => x.Level).Returns(level);
-            Mock.Get(runtimeState).SetupGet(m => m.ApplicationUrl).Returns(new Uri("https://localhost/umbraco"));
-
-            return runtimeState;
-        }
-
-
         public static IContentService GetMockContentService()
         {
             long longTotalRecs;

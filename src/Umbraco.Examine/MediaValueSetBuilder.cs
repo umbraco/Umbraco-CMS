@@ -16,16 +16,14 @@ namespace Umbraco.Examine
     {
         private readonly UrlSegmentProviderCollection _urlSegmentProviders;
         private readonly IUserService _userService;
-        private readonly IRuntimeState _runtimeState;
 
         public MediaValueSetBuilder(PropertyEditorCollection propertyEditors,
             UrlSegmentProviderCollection urlSegmentProviders,
-            IUserService userService, IRuntimeState runtimeState)
+            IUserService userService)
             : base(propertyEditors, false)
         {
             _urlSegmentProviders = urlSegmentProviders;
             _userService = userService;
-            _runtimeState = runtimeState;
         }
 
         /// <inheritdoc />
@@ -55,8 +53,9 @@ namespace Umbraco.Examine
 
                 if (!string.IsNullOrEmpty(umbracoFilePath))
                 {
-                var uri = new Uri(_runtimeState.ApplicationUrl.GetLeftPart(UriPartial.Authority) + umbracoFilePath);
-                umbracoFile = uri.Segments.Last();
+                    // intentional dummy Uri
+                    var uri = new Uri("https://localhost/" + umbracoFilePath);
+                    umbracoFile = uri.Segments.Last();
                 }
 
                 var values = new Dictionary<string, IEnumerable<object>>
