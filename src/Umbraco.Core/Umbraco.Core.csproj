@@ -1166,12 +1166,6 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="XmlExtensions.cs" />
-    <Compile Include="Xml\DynamicContext.cs" />
-    <Compile Include="Xml\UmbracoXPathPathSyntaxParser.cs" />
-    <Compile Include="Xml\XmlNamespaces.cs" />
-    <Compile Include="Xml\XmlNodeListFactory.cs" />
-    <Compile Include="Xml\XPathNavigatorExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="FileResources\BlockingWeb.config" />
