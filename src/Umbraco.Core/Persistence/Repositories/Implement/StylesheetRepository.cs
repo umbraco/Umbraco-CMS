@@ -10,15 +10,19 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// <summary>
     /// Represents the Stylesheet Repository
     /// </summary>
-    internal class StylesheetRepository : FileRepository<string, Stylesheet>, IStylesheetRepository
+    internal class StylesheetRepository : FileRepository<string, IStylesheet>, IStylesheetRepository
     {
-        public StylesheetRepository(IFileSystems fileSystems)
+        private readonly IIOHelper _ioHelper;
+
+        public StylesheetRepository(IFileSystems fileSystems, IIOHelper ioHelper)
             : base(fileSystems.StylesheetsFileSystem)
-        { }
+        {
+            _ioHelper = ioHelper;
+        }
 
         #region Overrides of FileRepository<string,Stylesheet>
 
-        public override Stylesheet Get(string id)
+        public override IStylesheet Get(string id)
         {
             // get the relative path within the filesystem
             // (though... id should be relative already)
@@ -51,16 +55,19 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         }
 
-        public override void Save(Stylesheet entity)
+        public override void Save(IStylesheet entity)
         {
-            base.Save(entity);
+            // TODO: Casting :/ Do we need GetFileContent below? Need to look into it later
+            var stylesheet = (Stylesheet)entity;
+
+            base.Save(stylesheet);
 
             // ensure that from now on, content is lazy-loaded
-            if (entity.GetFileContent == null)
-                entity.GetFileContent = file => GetFileContent(file.OriginalPath);
+            if (stylesheet.GetFileContent == null)
+                stylesheet.GetFileContent = file => GetFileContent(file.OriginalPath);
         }
 
-        public override IEnumerable<Stylesheet> GetMany(params string[] ids)
+        public override IEnumerable<IStylesheet> GetMany(params string[] ids)
         {
             //ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
             ids = ids
@@ -92,14 +99,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// If null or not specified, will return the stylesheets at the root path relative to the IFileSystem
         /// </param>
         /// <returns></returns>
-        public IEnumerable<Stylesheet> GetStylesheetsAtPath(string rootPath = null)
+        public IEnumerable<IStylesheet> GetStylesheetsAtPath(string rootPath = null)
         {
             return FileSystem.GetFiles(rootPath ?? string.Empty, "*.css").Select(Get);
         }
 
         private static readonly List<string> ValidExtensions = new List<string> { "css" };
 
-        public bool ValidateStylesheet(Stylesheet stylesheet)
+        public bool ValidateStylesheet(IStylesheet stylesheet)
         {
             // get full path
             string fullPath;
@@ -115,8 +122,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             // validate path and extension
             var validDir = SystemDirectories.Css;
-            var isValidPath = Current.IOHelper.VerifyEditPath(fullPath, validDir);
-            var isValidExtension = Current.IOHelper.VerifyFileExtension(stylesheet.Path, ValidExtensions);
+            var isValidPath = _ioHelper.VerifyEditPath(fullPath, validDir);
+            var isValidExtension = _ioHelper.VerifyFileExtension(stylesheet.Path, ValidExtensions);
             return isValidPath && isValidExtension;
         }
 

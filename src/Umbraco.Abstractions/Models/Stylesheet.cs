@@ -13,7 +13,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class Stylesheet : File
+    public class Stylesheet : File, IStylesheet
     {
         public Stylesheet(string path)
             : this(path, null)
@@ -120,7 +120,7 @@ namespace Umbraco.Core.Models
         /// /** umb_name: MyPropertyName */ p { font-size: 1em; }
         /// </remarks>
         [IgnoreDataMember]
-        public IEnumerable<StylesheetProperty> Properties
+        public IEnumerable<IStylesheetProperty> Properties
         {
             get { return _properties.Value; }
         }
@@ -129,7 +129,7 @@ namespace Umbraco.Core.Models
         /// Adds an Umbraco stylesheet property for use in the back office
         /// </summary>
         /// <param name="property"></param>
-        public void AddProperty(StylesheetProperty property)
+        public void AddProperty(IStylesheetProperty property)
         {
             if (Properties.Any(x => x.Name.InvariantEquals(property.Name)))
             {

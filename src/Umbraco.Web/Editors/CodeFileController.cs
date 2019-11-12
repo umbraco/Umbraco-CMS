@@ -190,7 +190,7 @@ namespace Umbraco.Web.Editors
                     var stylesheet = Services.FileService.GetStylesheetByName(virtualPath);
                     if (stylesheet != null)
                     {
-                        var display = Mapper.Map<Stylesheet, CodeFileDisplay>(stylesheet);
+                        var display = Mapper.Map<IStylesheet, CodeFileDisplay>(stylesheet);
                         display.FileType = Core.Constants.Trees.Stylesheets;
                         display.Path = Url.GetTreePathFromFilePath(stylesheet.Path);
                         display.Id = System.Web.HttpUtility.UrlEncode(stylesheet.Path);
@@ -511,7 +511,7 @@ namespace Umbraco.Web.Editors
                 name => new Script(name));
         }
 
-        private Stylesheet CreateOrUpdateStylesheet(CodeFileDisplay display)
+        private IStylesheet CreateOrUpdateStylesheet(CodeFileDisplay display)
         {
             return CreateOrUpdateFile(display, ".css", Current.FileSystems.StylesheetsFileSystem,
                 name => Services.FileService.GetStylesheetByName(name),
@@ -521,7 +521,7 @@ namespace Umbraco.Web.Editors
         }
 
         private T CreateOrUpdateFile<T>(CodeFileDisplay display, string extension, IFileSystem fileSystem,
-            Func<string, T> getFileByName, Action<T, int> saveFile, Func<string, T> createFile) where T : Core.Models.File
+            Func<string, T> getFileByName, Action<T, int> saveFile, Func<string, T> createFile) where T : Core.Models.IFile
         {
             //must always end with the correct extension
             display.Name = EnsureCorrectFileExtension(display.Name, extension);

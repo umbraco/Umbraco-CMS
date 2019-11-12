@@ -3,9 +3,9 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface IStylesheetRepository : IReadRepository<string, Stylesheet>, IWriteRepository<Stylesheet>
+    public interface IStylesheetRepository : IReadRepository<string, IStylesheet>, IWriteRepository<IStylesheet>
     {
-        bool ValidateStylesheet(Stylesheet stylesheet);
+        bool ValidateStylesheet(IStylesheet stylesheet);
         Stream GetFileContentStream(string filepath);
         void SetFileContent(string filepath, Stream content);
         long GetFileSize(string filepath);

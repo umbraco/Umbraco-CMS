@@ -49,7 +49,7 @@ namespace Umbraco.Core.Services.Implement
         /// Gets a list of all <see cref="Stylesheet"/> objects
         /// </summary>
         /// <returns>An enumerable list of <see cref="Stylesheet"/> objects</returns>
-        public IEnumerable<Stylesheet> GetStylesheets(params string[] names)
+        public IEnumerable<IStylesheet> GetStylesheets(params string[] names)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -62,7 +62,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="name">Name of the stylesheet incl. extension</param>
         /// <returns>A <see cref="Stylesheet"/> object</returns>
-        public Stylesheet GetStylesheetByName(string name)
+        public IStylesheet GetStylesheetByName(string name)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -75,11 +75,11 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="stylesheet"><see cref="Stylesheet"/> to save</param>
         /// <param name="userId"></param>
-        public void SaveStylesheet(Stylesheet stylesheet, int userId = Constants.Security.SuperUserId)
+        public void SaveStylesheet(IStylesheet stylesheet, int userId = Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<Stylesheet>(stylesheet);
+                var saveEventArgs = new SaveEventArgs<IStylesheet>(stylesheet);
                 if (scope.Events.DispatchCancelable(SavingStylesheet, this, saveEventArgs))
                 {
                     scope.Complete();
@@ -91,7 +91,7 @@ namespace Umbraco.Core.Services.Implement
                 saveEventArgs.CanCancel = false;
                 scope.Events.Dispatch(SavedStylesheet, this, saveEventArgs);
 
-                Audit(AuditType.Save, userId, -1, ObjectTypes.GetName(UmbracoObjectTypes.Stylesheet));
+                Audit(AuditType.Save, userId, -1, UmbracoObjectTypes.Stylesheet.GetName());
                 scope.Complete();
             }
         }
@@ -112,7 +112,7 @@ namespace Umbraco.Core.Services.Implement
                     return;
                 }
 
-                var deleteEventArgs = new DeleteEventArgs<Stylesheet>(stylesheet);
+                var deleteEventArgs = new DeleteEventArgs<IStylesheet>(stylesheet);
                 if (scope.Events.DispatchCancelable(DeletingStylesheet, this, deleteEventArgs))
                 {
                     scope.Complete();
@@ -123,7 +123,7 @@ namespace Umbraco.Core.Services.Implement
                 deleteEventArgs.CanCancel = false;
                 scope.Events.Dispatch(DeletedStylesheet, this, deleteEventArgs);
 
-                Audit(AuditType.Delete, userId, -1, ObjectTypes.GetName(UmbracoObjectTypes.Stylesheet));
+                Audit(AuditType.Delete, userId, -1, UmbracoObjectTypes.Stylesheet.GetName());
                 scope.Complete();
             }
         }
@@ -133,7 +133,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="stylesheet"><see cref="Stylesheet"/> to validate</param>
         /// <returns>True if Stylesheet is valid, otherwise false</returns>
-        public bool ValidateStylesheet(Stylesheet stylesheet)
+        public bool ValidateStylesheet(IStylesheet stylesheet)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -1116,12 +1116,12 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Occurs before Delete
         /// </summary>
-        public static event TypedEventHandler<IFileService, DeleteEventArgs<Stylesheet>> DeletingStylesheet;
+        public static event TypedEventHandler<IFileService, DeleteEventArgs<IStylesheet>> DeletingStylesheet;
 
         /// <summary>
         /// Occurs after Delete
         /// </summary>
-        public static event TypedEventHandler<IFileService, DeleteEventArgs<Stylesheet>> DeletedStylesheet;
+        public static event TypedEventHandler<IFileService, DeleteEventArgs<IStylesheet>> DeletedStylesheet;
 
         /// <summary>
         /// Occurs before Save
@@ -1146,12 +1146,12 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Occurs before Save
         /// </summary>
-        public static event TypedEventHandler<IFileService, SaveEventArgs<Stylesheet>> SavingStylesheet;
+        public static event TypedEventHandler<IFileService, SaveEventArgs<IStylesheet>> SavingStylesheet;
 
         /// <summary>
         /// Occurs after Save
         /// </summary>
-        public static event TypedEventHandler<IFileService, SaveEventArgs<Stylesheet>> SavedStylesheet;
+        public static event TypedEventHandler<IFileService, SaveEventArgs<IStylesheet>> SavedStylesheet;
 
         /// <summary>
         /// Occurs before Save

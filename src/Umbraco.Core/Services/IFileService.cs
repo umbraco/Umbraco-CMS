@@ -31,21 +31,21 @@ namespace Umbraco.Core.Services
         /// Gets a list of all <see cref="Stylesheet"/> objects
         /// </summary>
         /// <returns>An enumerable list of <see cref="Stylesheet"/> objects</returns>
-        IEnumerable<Stylesheet> GetStylesheets(params string[] names);
+        IEnumerable<IStylesheet> GetStylesheets(params string[] names);
 
         /// <summary>
         /// Gets a <see cref="Stylesheet"/> object by its name
         /// </summary>
         /// <param name="name">Name of the stylesheet incl. extension</param>
         /// <returns>A <see cref="Stylesheet"/> object</returns>
-        Stylesheet GetStylesheetByName(string name);
+        IStylesheet GetStylesheetByName(string name);
 
         /// <summary>
         /// Saves a <see cref="Stylesheet"/>
         /// </summary>
         /// <param name="stylesheet"><see cref="Stylesheet"/> to save</param>
         /// <param name="userId">Optional id of the user saving the stylesheet</param>
-        void SaveStylesheet(Stylesheet stylesheet, int userId = Constants.Security.SuperUserId);
+        void SaveStylesheet(IStylesheet stylesheet, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Deletes a stylesheet by its name
@@ -59,7 +59,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="stylesheet"><see cref="Stylesheet"/> to validate</param>
         /// <returns>True if Stylesheet is valid, otherwise false</returns>
-        bool ValidateStylesheet(Stylesheet stylesheet);
+        bool ValidateStylesheet(IStylesheet stylesheet);
 
         /// <summary>
         /// Gets a list of all <see cref="Script"/> objects
