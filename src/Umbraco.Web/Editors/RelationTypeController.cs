@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
@@ -48,6 +50,23 @@ namespace Umbraco.Web.Editors
             var display = Mapper.Map<IRelationType, RelationTypeDisplay>(relationType);
             
             return display;
+        }
+
+        public PagedResult<RelationDisplay> GetPagedResults(int id, int pageNumber = 1, int pageSize = 100)
+        {
+
+            if (pageNumber <= 0 || pageSize <= 0)
+            {
+                throw new NotSupportedException("Both pageNumber and pageSize must be greater than zero");
+            }
+
+            // Ordering do we need to pass through?
+            var relations = Services.RelationService.GetPagedByRelationTypeId(id, pageNumber, pageSize, out long totalRecords);
+
+            return new PagedResult<RelationDisplay>(totalRecords, pageNumber, pageSize)
+            {
+                Items = relations.Select(x => Mapper.Map<RelationDisplay>(x))
+            };
         }
 
         /// <summary>
