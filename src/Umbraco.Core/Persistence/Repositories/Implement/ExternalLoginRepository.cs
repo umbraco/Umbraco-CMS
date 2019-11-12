@@ -25,7 +25,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Database.Execute("DELETE FROM ExternalLogins WHERE UserId=@userId", new { userId = memberId });
         }
 
-        public void SaveUserLogins(int memberId, IEnumerable<UserLoginInfo> logins)
+        public void SaveUserLogins(int memberId, IEnumerable<IUserLoginInfo> logins)
         {
             //clear out logins for member
             Database.Execute("DELETE FROM umbracoExternalLogin WHERE userId=@userId", new { userId = memberId });

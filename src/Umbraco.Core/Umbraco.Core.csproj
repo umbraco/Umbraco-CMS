@@ -234,6 +234,7 @@
     <Compile Include="Models\IDataType.cs" />
     <Compile Include="Models\IDataValueEditor.cs" />
     <Compile Include="Models\Identity\IdentityMapDefinition.cs" />
+    <Compile Include="Models\Identity\UserLoginInfoWrapper.cs" />
     <Compile Include="Models\IMedia.cs" />
     <Compile Include="Models\IMediaType.cs" />
     <Compile Include="Models\IMember.cs" />
@@ -922,7 +923,6 @@
     <Compile Include="Persistence\Repositories\IDocumentTypeContainerRepository.cs" />
     <Compile Include="Persistence\Repositories\IEntityContainerRepository.cs" />
     <Compile Include="Persistence\Repositories\IEntityRepository.cs" />
-    <Compile Include="Persistence\Repositories\IExternalLoginRepository.cs" />
     <Compile Include="Persistence\Repositories\IMediaRepository.cs" />
     <Compile Include="Persistence\Repositories\IMediaTypeContainerRepository.cs" />
     <Compile Include="Persistence\Repositories\IMediaTypeRepository.cs" />

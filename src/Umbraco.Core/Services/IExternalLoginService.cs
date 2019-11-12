@@ -22,14 +22,14 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="login"></param>
         /// <returns></returns>
-        IEnumerable<IIdentityUserLogin> Find(UserLoginInfo login);
+        IEnumerable<IIdentityUserLogin> Find(IUserLoginInfo login);
 
         /// <summary>
         /// Save user logins
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="logins"></param>
-        void SaveUserLogins(int userId, IEnumerable<UserLoginInfo> logins);
+        void SaveUserLogins(int userId, IEnumerable<IUserLoginInfo> logins);
 
         /// <summary>
         /// Deletes all user logins - normally used when a member is deleted
