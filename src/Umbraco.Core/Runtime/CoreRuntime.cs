@@ -137,7 +137,7 @@ namespace Umbraco.Core.Runtime
                 // main dom
                 var mainDom = new MainDom(Logger);
 
-                // create the composition
+                // create the composition   
                 composition = new Composition(register, typeLoader, ProfilingLogger, _state, configs);
                 composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, mainDom, appCaches, databaseFactory, typeLoader, _state, IOHelper);
 
