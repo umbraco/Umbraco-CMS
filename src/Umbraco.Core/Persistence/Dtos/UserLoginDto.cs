@@ -17,6 +17,7 @@ namespace Umbraco.Core.Persistence.Dtos
 
         [Column("userId")]
         [ForeignKey(typeof(UserDto), Name = "FK_" + TableName + "_umbracoUser_id")]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_UserId")]
         public int UserId { get; set; }
 
         /// <summary>

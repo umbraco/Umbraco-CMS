@@ -6,11 +6,13 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.UserGroup)]
+    [TableName(TableName)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class UserGroupDto
     {
+        public const string TableName = Constants.DatabaseSchema.Tables.UserGroup;
+
         public UserGroupDto()
         {
             UserGroup2AppDtos = new List<UserGroup2AppDto>();
@@ -52,11 +54,13 @@ namespace Umbraco.Core.Persistence.Dtos
         [Column("startContentId")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [ForeignKey(typeof(NodeDto), Name = "FK_startContentId_umbracoNode_id")]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_StartContentId")]
         public int? StartContentId { get; set; }
 
         [Column("startMediaId")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [ForeignKey(typeof(NodeDto), Name = "FK_startMediaId_umbracoNode_id")]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_StartMediaId")]
         public int? StartMediaId { get; set; }
 
         [ResultColumn]

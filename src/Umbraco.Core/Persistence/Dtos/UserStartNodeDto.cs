@@ -4,11 +4,13 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.UserStartNode)]
+    [TableName(TableName)]
     [PrimaryKey("id", AutoIncrement = true)]
     [ExplicitColumns]
     internal class UserStartNodeDto : IEquatable<UserStartNodeDto>
     {
+        public const string TableName = Constants.DatabaseSchema.Tables.UserStartNode;
+
         [Column("id")]
         [PrimaryKeyColumn(Name = "PK_userStartNode")]
         public int Id { get; set; }
@@ -16,11 +18,13 @@ namespace Umbraco.Core.Persistence.Dtos
         [Column("userId")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
         [ForeignKey(typeof(UserDto))]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_UserId")]
         public int UserId { get; set; }
 
         [Column("startNode")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
         [ForeignKey(typeof(NodeDto))]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_StartNode")]
         public int StartNode { get; set; }
 
         [Column("startNodeType")]

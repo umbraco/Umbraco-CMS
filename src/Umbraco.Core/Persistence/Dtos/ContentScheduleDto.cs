@@ -17,6 +17,7 @@ namespace Umbraco.Core.Persistence.Dtos
 
         [Column("nodeId")]
         [ForeignKey(typeof(ContentDto))]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_NodeId")]
         public int NodeId { get; set; }
 
         [Column("languageId")]
