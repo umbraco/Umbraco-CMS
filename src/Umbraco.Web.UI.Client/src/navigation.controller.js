@@ -249,6 +249,8 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
 
     //when a user logs out or timesout
     evts.push(eventsService.on("app.notAuthenticated", function () {
+        // reset the isInit flag to ensure we initialize the user culture again after next login
+        isInit = false;
         $scope.authenticated = false;
     }));
 
