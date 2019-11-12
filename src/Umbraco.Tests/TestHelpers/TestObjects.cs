@@ -230,7 +230,7 @@ namespace Umbraco.Tests.TestHelpers
             return container?.TryGetInstance<T>() ?? Mock.Of<T>();
         }
 
-        public IScopeProvider GetScopeProvider(ILogger logger, FileSystems fileSystems = null, IUmbracoDatabaseFactory databaseFactory = null)
+        public IScopeProvider GetScopeProvider(ILogger logger, ITypeFinder typeFinder = null, FileSystems fileSystems = null, IUmbracoDatabaseFactory databaseFactory = null)
         {
             if (databaseFactory == null)
             {
@@ -241,8 +241,9 @@ namespace Umbraco.Tests.TestHelpers
                 databaseFactory = new UmbracoDatabaseFactory(Constants.System.UmbracoConnectionName, logger, new Lazy<IMapperCollection>(() => mappers));
             }
 
+            typeFinder = typeFinder ?? new TypeFinder(logger);
             fileSystems = fileSystems ?? new FileSystems(Current.Factory, logger);
-            var scopeProvider = new ScopeProvider(databaseFactory, fileSystems, logger);
+            var scopeProvider = new ScopeProvider(databaseFactory, fileSystems, logger, typeFinder);
             return scopeProvider;
         }
     }

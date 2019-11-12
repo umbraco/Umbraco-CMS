@@ -486,6 +486,7 @@ namespace Umbraco.Web.Editors
         /// <param name="orderBy"></param>
         /// <param name="orderDirection"></param>
         /// <param name="filter"></param>
+        /// <param name="dataTypeKey"></param>
         /// <returns></returns>
         public PagedResult<EntityBasic> GetPagedChildren(
             string id,

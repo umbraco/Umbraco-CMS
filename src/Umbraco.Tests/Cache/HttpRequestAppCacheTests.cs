@@ -1,5 +1,8 @@
-﻿using NUnit.Framework;
+﻿using Moq;
+using NUnit.Framework;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Cache
@@ -13,8 +16,9 @@ namespace Umbraco.Tests.Cache
         public override void Setup()
         {
             base.Setup();
+            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
             _ctx = new FakeHttpContextFactory("http://localhost/test");
-            _appCache = new HttpRequestAppCache(_ctx.HttpContext);
+            _appCache = new HttpRequestAppCache(() => _ctx.HttpContext.Items, typeFinder);
         }
 
         internal override IAppCache AppCache

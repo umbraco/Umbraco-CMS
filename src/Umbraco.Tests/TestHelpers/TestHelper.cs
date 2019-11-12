@@ -7,10 +7,13 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.PropertyEditors;
@@ -24,13 +27,16 @@ namespace Umbraco.Tests.TestHelpers
     public static class TestHelper
     {
 
-
+        public static TypeLoader GetMockedTypeLoader()
+        {
+            return new TypeLoader(IOHelper.Default, Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(IOHelper.Default.MapPath("~/App_Data/TEMP")), Mock.Of<IProfilingLogger>());
+        }
 
         /// <summary>
         /// Gets the current assembly directory.
         /// </summary>
         /// <value>The assembly directory.</value>
-        static public string CurrentAssemblyDirectory
+        public static string CurrentAssemblyDirectory
         {
             get
             {

@@ -4,8 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Web.Caching;
+using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 
-namespace Umbraco.Core.Cache
+namespace Umbraco.Web.Cache
 {
     /// <summary>
     /// Implements <see cref="IAppPolicyCache"/> on top of a <see cref="System.Web.Caching.Cache"/>.
@@ -23,7 +26,7 @@ namespace Umbraco.Core.Cache
         /// <summary>
         /// Initializes a new instance of the <see cref="WebCachingAppCache"/> class.
         /// </summary>
-        public WebCachingAppCache(System.Web.Caching.Cache cache)
+        public WebCachingAppCache(System.Web.Caching.Cache cache, ITypeFinder typeFinder) : base(typeFinder)
         {
             _cache = cache;
         }

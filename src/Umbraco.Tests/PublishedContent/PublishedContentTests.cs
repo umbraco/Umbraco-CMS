@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 using NUnit.Framework;
@@ -14,6 +15,7 @@ using Moq;
 using Newtonsoft.Json;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -83,16 +85,16 @@ namespace Umbraco.Tests.PublishedContent
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => alias.InvariantEquals("home") ? homeType : anythingType;
         }
 
-        protected override TypeLoader CreateTypeLoader(IAppPolicyCache runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
+
+        protected override TypeLoader CreateTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
         {
-            var pluginManager = base.CreateTypeLoader(runtimeCache, globalSettings, logger);
+            var baseLoader = base.CreateTypeLoader(ioHelper, typeFinder, runtimeCache, globalSettings, logger);
 
-            // this is so the model factory looks into the test assembly
-            pluginManager.AssembliesToScan = pluginManager.AssembliesToScan
-                .Union(new[] { typeof(PublishedContentTests).Assembly })
-                .ToList();
-
-            return pluginManager;
+            return new TypeLoader(ioHelper, typeFinder, runtimeCache, new DirectoryInfo(globalSettings.LocalTempPath), logger, false,
+                // this is so the model factory looks into the test assembly
+                baseLoader.AssembliesToScan
+                    .Union(new[] { typeof(PublishedContentTests).Assembly })
+                    .ToList());
         }
 
         private readonly Guid _node1173Guid = Guid.NewGuid();

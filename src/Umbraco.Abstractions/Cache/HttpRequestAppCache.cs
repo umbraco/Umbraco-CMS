@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Web;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Cache
 {
@@ -15,37 +16,29 @@ namespace Umbraco.Core.Cache
     /// or no Items...) then this cache acts as a pass-through and does not cache
     /// anything.</para>
     /// </remarks>
-    internal class HttpRequestAppCache : FastDictionaryAppCacheBase
+    public class HttpRequestAppCache : FastDictionaryAppCacheBase
     {
-        private readonly HttpContextBase _context;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpRequestAppCache"/> class with a context, for unit tests!
         /// </summary>
-        public HttpRequestAppCache(HttpContextBase context)
+        public HttpRequestAppCache(Func<IDictionary> requestItems, ITypeFinder typeFinder) : base(typeFinder)
         {
-            _context = context;
+            ContextItems = requestItems;
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="HttpRequestAppCache"/> class.
-        /// </summary>
-        /// <remarks>
-        /// <para>Will use HttpContext.Current.</para>
-        /// TODO: https://github.com/umbraco/Umbraco-CMS/issues/4239 - use IHttpContextAccessor NOT HttpContext.Current
-        /// </remarks>
-        public HttpRequestAppCache()
-        { }
+        private Func<IDictionary> ContextItems { get; }
 
-        private IDictionary ContextItems => _context?.Items ?? HttpContext.Current?.Items;
-
-        private bool HasContextItems => _context?.Items != null || HttpContext.Current != null;
+        private bool TryGetContextItems(out IDictionary items)
+        {
+            items = ContextItems?.Invoke();
+            return items != null;
+        }
 
         /// <inheritdoc />
         public override object Get(string key, Func<object> factory)
         {
             //no place to cache so just return the callback result
-            if (HasContextItems == false) return factory();
+            if (!TryGetContextItems(out var items)) return factory();
 
             key = GetCacheKey(key);
 
@@ -54,7 +47,7 @@ namespace Umbraco.Core.Cache
             try
             {
                 EnterWriteLock();
-                result = ContextItems[key] as Lazy<object>; // null if key not found
+                result = items[key] as Lazy<object>; // null if key not found
 
                 // cannot create value within the lock, so if result.IsValueCreated is false, just
                 // do nothing here - means that if creation throws, a race condition could cause
@@ -63,7 +56,7 @@ namespace Umbraco.Core.Cache
                 if (result == null || SafeLazy.GetSafeLazyValue(result, true) == null) // get non-created as NonCreatedValue & exceptions as null
                 {
                     result = SafeLazy.GetSafeLazy(factory);
-                    ContextItems[key] = result;
+                    items[key] = result;
                 }
             }
             finally
@@ -89,22 +82,22 @@ namespace Umbraco.Core.Cache
         {
             const string prefix = CacheItemPrefix + "-";
 
-            if (HasContextItems == false) return Enumerable.Empty<DictionaryEntry>();
+            if (!TryGetContextItems(out var items)) return Enumerable.Empty<DictionaryEntry>();
 
-            return ContextItems.Cast<DictionaryEntry>()
+            return items.Cast<DictionaryEntry>()
                 .Where(x => x.Key is string s && s.StartsWith(prefix));
         }
 
         protected override void RemoveEntry(string key)
         {
-            if (HasContextItems == false) return;
+            if (!TryGetContextItems(out var items)) return;
 
-            ContextItems.Remove(key);
+            items.Remove(key);
         }
 
         protected override object GetEntry(string key)
         {
-            return HasContextItems ? ContextItems[key] : null;
+            return !TryGetContextItems(out var items) ? null : items[key];
         }
 
         #endregion
@@ -117,26 +110,27 @@ namespace Umbraco.Core.Cache
 
         protected override void EnterWriteLock()
         {
-            if (HasContextItems)
-            {
-                // note: cannot keep 'entered' as a class variable here,
-                // since there is one per request - so storing it within
-                // ContextItems - which is locked, so this should be safe
+            if (!TryGetContextItems(out var items)) return;
 
-                var entered = false;
-                Monitor.Enter(ContextItems.SyncRoot, ref entered);
-                ContextItems[ContextItemsLockKey] = entered;
-            }
+            // note: cannot keep 'entered' as a class variable here,
+            // since there is one per request - so storing it within
+            // ContextItems - which is locked, so this should be safe
+
+            var entered = false;
+            Monitor.Enter(items.SyncRoot, ref entered);
+            items[ContextItemsLockKey] = entered;
         }
 
         protected override void ExitReadLock() => ExitWriteLock();
 
         protected override void ExitWriteLock()
         {
-            var entered = (bool?) ContextItems[ContextItemsLockKey] ?? false;
+            if (!TryGetContextItems(out var items)) return;
+
+            var entered = (bool?)items[ContextItemsLockKey] ?? false;
             if (entered)
-                Monitor.Exit(ContextItems.SyncRoot);
-            ContextItems.Remove(ContextItemsLockKey);
+                Monitor.Exit(items.SyncRoot);
+            items.Remove(ContextItemsLockKey);
         }
 
         #endregion

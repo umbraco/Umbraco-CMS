@@ -127,14 +127,8 @@
     </Compile>
     -->
     <Compile Include="Cache\DefaultRepositoryCachePolicy.cs" />
-    <Compile Include="Cache\FastDictionaryAppCacheBase.cs" />
-    <Compile Include="Cache\ObjectCacheAppCache.cs" />
     <Compile Include="Compose\AuditEventsComponent.cs" />
-    <Compile Include="Cache\CacheRefresherCollectionBuilder.cs" />
-    <Compile Include="Cache\FastDictionaryAppCache.cs" />
     <Compile Include="Cache\FullDataSetRepositoryCachePolicy.cs" />
-    <Compile Include="Cache\HttpRequestAppCache.cs" />
-    <Compile Include="Cache\WebCachingAppCache.cs" />
     <Compile Include="Cache\RepositoryCachePolicyBase.cs" />
     <Compile Include="Cache\SingleItemsOnlyRepositoryCachePolicy.cs" />
     <Compile Include="Compose\AuditEventsComposer.cs" />
@@ -185,8 +179,6 @@
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="Composing\LightInject\MixedLightInjectScopeManagerProvider.cs" />
     <Compile Include="Composing\TargetedServiceFactory.cs" />
-    <Compile Include="Composing\TypeFinder.cs" />
-    <Compile Include="Composing\TypeLoader.cs" />
     <Compile Include="IO\IMediaFileSystem.cs" />
     <Compile Include="IO\IMediaPathScheme.cs" />
     <Compile Include="IO\IOHelper.cs" />

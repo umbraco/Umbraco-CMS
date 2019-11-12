@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using Moq;
@@ -25,9 +26,10 @@ namespace Umbraco.Tests.CoreThings
         {
             // FIXME: bad in a unit test - but Udi has a static ctor that wants it?!
             var container = new Mock<IFactory>();
-            var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
+            var ioHelper = IOHelper.Default;
+            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
             container.Setup(x => x.GetInstance(typeof(TypeLoader))).Returns(
-                new TypeLoader(NoAppCache.Instance, Current.IOHelper.MapPath("~/App_Data/TEMP"), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
+                new TypeLoader(ioHelper, typeFinder, NoAppCache.Instance, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
             Current.Factory = container.Object;
 
             Udi.ResetUdiTypes();
