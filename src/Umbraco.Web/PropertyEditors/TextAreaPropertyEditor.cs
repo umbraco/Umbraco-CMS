@@ -1,6 +1,7 @@
 ﻿using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -16,15 +17,21 @@ namespace Umbraco.Web.PropertyEditors
         Icon = "icon-application-window-alt")]
     public class TextAreaPropertyEditor : DataEditor
     {
+        private readonly IDataTypeService _dataTypeService;
+        private readonly ILocalizationService _localizationService;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TextAreaPropertyEditor"/> class.
         /// </summary>
-        public TextAreaPropertyEditor(ILogger logger)
+        public TextAreaPropertyEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService)
             : base(logger)
-        { }
+        {
+            _dataTypeService = dataTypeService;
+            _localizationService = localizationService;
+        }
 
         /// <inheritdoc />
-        protected override IDataValueEditor CreateValueEditor() => new TextOnlyValueEditor(Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new TextOnlyValueEditor(_dataTypeService, _localizationService, Attribute);
 
         /// <inheritdoc />
         protected override IConfigurationEditor CreateConfigurationEditor() => new TextAreaConfigurationEditor();

@@ -24,6 +24,7 @@ namespace Umbraco.Tests.Models.Mapping
         private readonly Mock<IDataTypeService> _dataTypeService = new Mock<IDataTypeService>();
         private readonly Mock<IEntityService> _entityService = new Mock<IEntityService>();
         private readonly Mock<IFileService> _fileService = new Mock<IFileService>();
+        private readonly Mock<ILocalizationService> _localizationService = new Mock<ILocalizationService>();
         private Mock<PropertyEditorCollection> _editorsMock;
 
         protected override void Compose()
@@ -31,7 +32,7 @@ namespace Umbraco.Tests.Models.Mapping
             base.Compose();
 
             // create and register a fake property editor collection to return fake property editors
-            var editors = new DataEditor[] { new TextboxPropertyEditor(Mock.Of<ILogger>()), };
+            var editors = new DataEditor[] { new TextboxPropertyEditor(Mock.Of<ILogger>(), _dataTypeService.Object, _localizationService.Object), };
             var dataEditors = new DataEditorCollection(editors);
             _editorsMock = new Mock<PropertyEditorCollection>(dataEditors);
             _editorsMock.Setup(x => x[It.IsAny<string>()]).Returns(editors[0]);

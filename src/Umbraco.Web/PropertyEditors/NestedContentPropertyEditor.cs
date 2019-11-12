@@ -28,13 +28,17 @@ namespace Umbraco.Web.PropertyEditors
     public class NestedContentPropertyEditor : DataEditor
     {
         private readonly Lazy<PropertyEditorCollection> _propertyEditors;
+        private readonly IDataTypeService _dataTypeService;
+        private readonly ILocalizationService _localizationService;
 
         internal const string ContentTypeAliasPropertyKey = "ncContentTypeAlias";
 
-        public NestedContentPropertyEditor(ILogger logger, Lazy<PropertyEditorCollection> propertyEditors)
+        public NestedContentPropertyEditor(ILogger logger, Lazy<PropertyEditorCollection> propertyEditors, IDataTypeService dataTypeService, ILocalizationService localizationService)
             : base (logger)
         {
             _propertyEditors = propertyEditors;
+            _dataTypeService = dataTypeService;
+            _localizationService = localizationService;
         }
 
         // has to be lazy else circular dep in ctor
@@ -48,7 +52,7 @@ namespace Umbraco.Web.PropertyEditors
 
         #region Value Editor
 
-        protected override IDataValueEditor CreateValueEditor() => new NestedContentPropertyValueEditor(Attribute, PropertyEditors);
+        protected override IDataValueEditor CreateValueEditor() => new NestedContentPropertyValueEditor(_dataTypeService, _localizationService, Attribute, PropertyEditors);
 
         internal class NestedContentPropertyValueEditor : DataValueEditor
         {
@@ -58,8 +62,8 @@ namespace Umbraco.Web.PropertyEditors
                     Current.Services.ContentTypeService.GetAll().ToDictionary(c => c.Alias)
             );
 
-            public NestedContentPropertyValueEditor(DataEditorAttribute attribute, PropertyEditorCollection propertyEditors)
-                : base(attribute)
+            public NestedContentPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute, PropertyEditorCollection propertyEditors)
+                : base(dataTypeService, localizationService, attribute)
             {
                 _propertyEditors = propertyEditors;
                 Validators.Add(new NestedContentValidator(propertyEditors, GetElementType));

@@ -6,6 +6,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Manifest
 {
@@ -16,14 +17,18 @@ namespace Umbraco.Core.Manifest
     {
         private readonly ILogger _logger;
         private readonly IIOHelper _ioHelper;
+        private readonly IDataTypeService _dataTypeService;
+        private readonly ILocalizationService _localizationService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataEditorConverter"/> class.
         /// </summary>
-        public DataEditorConverter(ILogger logger, IIOHelper ioHelper)
+        public DataEditorConverter(ILogger logger, IIOHelper ioHelper, IDataTypeService dataTypeService, ILocalizationService localizationService)
         {
             _logger = logger;
             _ioHelper = ioHelper;
+            _dataTypeService = dataTypeService;
+            _localizationService = localizationService;
         }
 
         /// <inheritdoc />
@@ -78,7 +83,7 @@ namespace Umbraco.Core.Manifest
             // explicitly assign a value editor of type ValueEditor
             // (else the deserializer will try to read it before setting it)
             // (and besides it's an interface)
-            target.ExplicitValueEditor = new DataValueEditor();
+            target.ExplicitValueEditor = new DataValueEditor(_dataTypeService, _localizationService);
 
             // in the manifest, validators are a simple dictionary eg
             // {
@@ -150,7 +155,7 @@ namespace Umbraco.Core.Manifest
             if (jobject.Property("view") != null)
             {
                 // explicitly assign a value editor of type ParameterValueEditor
-                target.ExplicitValueEditor = new DataValueEditor();
+                target.ExplicitValueEditor = new DataValueEditor(_dataTypeService, _localizationService);
 
                 // move the 'view' property
                 jobject["editor"] = new JObject { ["view"] = jobject["view"] };

@@ -10,6 +10,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Manifest
 {
@@ -24,6 +25,8 @@ namespace Umbraco.Core.Manifest
         private readonly IAppPolicyCache _cache;
         private readonly ILogger _logger;
         private readonly IIOHelper _ioHelper;
+        private readonly IDataTypeService _dataTypeService;
+        private readonly ILocalizationService _localizationService;
         private readonly ManifestValueValidatorCollection _validators;
         private readonly ManifestFilterCollection _filters;
 
@@ -32,8 +35,8 @@ namespace Umbraco.Core.Manifest
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        public ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, ILogger logger, IIOHelper ioHelper, IJsonSerializer jsonSerializer)
-            : this(appCaches, validators, filters, "~/App_Plugins", logger, ioHelper)
+        public ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, ILogger logger, IIOHelper ioHelper, IDataTypeService dataTypeService, ILocalizationService localizationService, IJsonSerializer jsonSerializer)
+            : this(appCaches, validators, filters, "~/App_Plugins", logger, ioHelper, dataTypeService, localizationService)
         {
             _jsonSerializer = jsonSerializer;
         }
@@ -41,11 +44,13 @@ namespace Umbraco.Core.Manifest
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        private ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, string path, ILogger logger, IIOHelper ioHelper)
+        private ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, string path, ILogger logger, IIOHelper ioHelper, IDataTypeService dataTypeService, ILocalizationService localizationService)
         {
             if (appCaches == null) throw new ArgumentNullException(nameof(appCaches));
             _cache = appCaches.RuntimeCache;
             _ioHelper = ioHelper;
+            _dataTypeService = dataTypeService;
+            _localizationService = localizationService;
             _validators = validators ?? throw new ArgumentNullException(nameof(validators));
             _filters = filters ?? throw new ArgumentNullException(nameof(filters));
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullOrEmptyException(nameof(path));
@@ -167,7 +172,7 @@ namespace Umbraco.Core.Manifest
                 throw new ArgumentNullOrEmptyException(nameof(text));
 
             var manifest = JsonConvert.DeserializeObject<PackageManifest>(text,
-                new DataEditorConverter(_logger, _ioHelper),
+                new DataEditorConverter(_logger, _ioHelper, _dataTypeService, _localizationService),
                 new ValueValidatorConverter(_validators),
                 new DashboardAccessRuleConverter());
 

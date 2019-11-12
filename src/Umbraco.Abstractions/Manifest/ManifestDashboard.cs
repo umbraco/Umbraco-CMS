@@ -11,10 +11,8 @@ namespace Umbraco.Core.Manifest
         [DataMember(Name = "alias", IsRequired = true)]
         public string Alias { get; set; }
 
-        //TODO this needs to be tested manually!
-        //[JsonProperty("weight", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        [DefaultValue(100)] // must be equal to DashboardCollectionBuilder.DefaultWeight
-        public int Weight { get; set; }
+        [DataMember(Name = "weight")]
+        public int Weight { get; set; } = 100;
 
         [DataMember(Name = "view", IsRequired = true)]
         public string View { get; set; }

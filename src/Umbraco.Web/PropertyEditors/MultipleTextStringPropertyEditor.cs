@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -34,7 +35,7 @@ namespace Umbraco.Web.PropertyEditors
         { }
 
         /// <inheritdoc />
-        protected override IDataValueEditor CreateValueEditor() => new MultipleTextStringPropertyValueEditor(Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new MultipleTextStringPropertyValueEditor(Current.Services.DataTypeService, Current.Services.LocalizationService,Attribute);
 
         /// <inheritdoc />
         protected override IConfigurationEditor CreateConfigurationEditor() => new MultipleTextStringConfigurationEditor();
@@ -44,8 +45,8 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         internal class MultipleTextStringPropertyValueEditor : DataValueEditor
         {
-            public MultipleTextStringPropertyValueEditor(DataEditorAttribute attribute)
-                : base(attribute)
+            public MultipleTextStringPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute)
+                : base(dataTypeService, localizationService, attribute)
             { }
 
             /// <summary>

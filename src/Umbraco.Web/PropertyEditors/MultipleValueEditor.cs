@@ -19,8 +19,8 @@ namespace Umbraco.Web.PropertyEditors
     {
         private readonly ILogger _logger;
 
-        internal MultipleValueEditor(ILogger logger, DataEditorAttribute attribute)
-            : base(attribute)
+        internal MultipleValueEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute)
+            : base(dataTypeService, localizationService, attribute)
         {
             _logger = logger;
         }

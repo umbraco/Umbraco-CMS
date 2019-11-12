@@ -27,31 +27,18 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Initializes a new instance of the <see cref="DataValueEditor"/> class.
         /// </summary>
-        public DataValueEditor() // for tests, and manifest
+        public DataValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService) // for tests, and manifest
         {
             ValueType = ValueTypes.String;
             Validators = new List<IValueValidator>();
-            _dataTypeService = Current.Services.DataTypeService;
-            _localizationService = Current.Services.LocalizationService;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DataValueEditor"/> class.
-        /// </summary>
-        public DataValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, string view, params IValueValidator[] validators) // not used
-            : this()
-        {
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
-            View = view;
-            Validators.AddRange(validators);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataValueEditor"/> class.
         /// </summary>
-        public DataValueEditor(DataEditorAttribute attribute)
-            : this()
+        public DataValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute)
         {
             if (attribute == null) throw new ArgumentNullException(nameof(attribute));
 
@@ -62,6 +49,9 @@ namespace Umbraco.Core.PropertyEditors
             View = view;
             ValueType = attribute.ValueType;
             HideLabel = attribute.HideLabel;
+
+            _dataTypeService = dataTypeService;
+            _localizationService = localizationService;
         }
 
         /// <summary>
@@ -116,7 +106,7 @@ namespace Umbraco.Core.PropertyEditors
         /// A collection of validators for the pre value editor
         /// </summary>
         [JsonProperty("validation")]
-        public List<IValueValidator> Validators { get; private set; }
+        public List<IValueValidator> Validators { get; private set; } = new List<IValueValidator>();
 
         /// <summary>
         /// Gets the validator used to validate the special property type -level "required".

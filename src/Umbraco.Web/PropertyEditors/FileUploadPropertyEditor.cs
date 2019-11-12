@@ -8,6 +8,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Web.Media;
 
 namespace Umbraco.Web.PropertyEditors
@@ -23,12 +24,16 @@ namespace Umbraco.Web.PropertyEditors
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly IContentSection _contentSection;
         private readonly UploadAutoFillProperties _uploadAutoFillProperties;
+        private readonly IDataTypeService _dataTypeService;
+        private readonly ILocalizationService _localizationService;
 
-        public FileUploadPropertyEditor(ILogger logger, IMediaFileSystem mediaFileSystem, IContentSection contentSection)
+        public FileUploadPropertyEditor(ILogger logger, IMediaFileSystem mediaFileSystem, IContentSection contentSection, IDataTypeService dataTypeService, ILocalizationService localizationService)
             : base(logger)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
             _contentSection = contentSection;
+            _dataTypeService = dataTypeService;
+            _localizationService = localizationService;
             _uploadAutoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, logger, contentSection);
         }
 
@@ -38,7 +43,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <returns>The corresponding property value editor.</returns>
         protected override IDataValueEditor CreateValueEditor()
         {
-            var editor = new FileUploadPropertyValueEditor(Attribute, _mediaFileSystem);
+            var editor = new FileUploadPropertyValueEditor(Attribute, _mediaFileSystem, _dataTypeService, _localizationService);
             editor.Validators.Add(new UploadFileTypeValidator());
             return editor;
         }

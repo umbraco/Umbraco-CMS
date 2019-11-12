@@ -11,8 +11,8 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     public class TextOnlyValueEditor : DataValueEditor
     {
-        public TextOnlyValueEditor(DataEditorAttribute attribute)
-            : base(attribute)
+        public TextOnlyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute)
+            : base(dataTypeService, localizationService, attribute)
         { }
 
         /// <summary>

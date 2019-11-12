@@ -12,8 +12,8 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     internal class DateValueEditor : DataValueEditor
     {
-        public DateValueEditor(DataEditorAttribute attribute)
-            : base(attribute)
+        public DateValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute)
+            : base(dataTypeService, localizationService, attribute)
         {
             Validators.Add(new DateTimeValidator());
         }

@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Models.Mapping
             Composition.Register(_ => Mock.Of<IContentSection>());
 
             // all this is required so we can validate properties...
-            var editor = new TextboxPropertyEditor(Mock.Of<ILogger>()) { Alias = "test" };
+            var editor = new TextboxPropertyEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>()) { Alias = "test" };
             Composition.Register(_ => new DataEditorCollection(new[] { editor }));
             Composition.Register<PropertyEditorCollection>();
             var dataType = Mock.Of<IDataType>();
