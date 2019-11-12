@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Moq;
 using NPoco;
 using NUnit.Framework;
@@ -36,9 +37,11 @@ namespace Umbraco.Tests.TestHelpers
 
             var container = RegisterFactory.Create();
 
+            var ioHelper = IOHelper.Default;
             var logger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
-            var typeLoader = new TypeLoader(NoAppCache.Instance,
-                Current.IOHelper.MapPath("~/App_Data/TEMP"),
+            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var typeLoader = new TypeLoader(ioHelper, typeFinder, NoAppCache.Instance,
+                new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")),
                 logger,
                 false);
 
@@ -54,7 +57,7 @@ namespace Umbraco.Tests.TestHelpers
 
             composition.RegisterUnique<ISqlContext>(_ => SqlContext);
 
-            var factory = Current.Factory = CurrentCore.Factory = composition.CreateFactory();
+            var factory = Current.Factory = composition.CreateFactory();
 
             var pocoMappers = new NPoco.MapperCollection { new PocoMapper() };
             var pocoDataFactory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, pocoMappers).Init());

@@ -285,10 +285,10 @@ namespace Umbraco.Tests.Mapping
         {
             public void DefineMaps(UmbracoMapper mapper)
             {
-                mapper.Define<Property, ContentPropertyDto>((source, context) => new ContentPropertyDto(), Map);
+                mapper.Define<IProperty, ContentPropertyDto>((source, context) => new ContentPropertyDto(), Map);
             }
 
-            private static void Map(Property source, ContentPropertyDto target, MapperContext context)
+            private static void Map(IProperty source, ContentPropertyDto target, MapperContext context)
             { }
         }
 

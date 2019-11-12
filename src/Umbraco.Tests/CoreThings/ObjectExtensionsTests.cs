@@ -7,6 +7,7 @@ using System.Web.UI.WebControls;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.CoreThings
 {
@@ -300,10 +301,7 @@ namespace Umbraco.Tests.CoreThings
         [Test]
         public void Value_Editor_Can_Convert_Decimal_To_Decimal_Clr_Type()
         {
-            var valueEditor = new DataValueEditor
-            {
-                ValueType = ValueTypes.Decimal
-            };
+            var valueEditor = TestHelper.CreateDataValueEditor(ValueTypes.Decimal);
 
             var result = valueEditor.TryConvertValueToCrlType(12.34d);
             Assert.IsTrue(result.Success);

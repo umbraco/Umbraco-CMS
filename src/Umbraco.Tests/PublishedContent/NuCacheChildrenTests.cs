@@ -53,7 +53,6 @@ namespace Umbraco.Tests.PublishedContent
 
             var factory = Mock.Of<IFactory>();
             Current.Factory = factory;
-            CurrentCore.Factory = factory;
 
             var configs = new ConfigsFactory().Create();
             Mock.Get(factory).Setup(x => x.GetInstance(typeof(Configs))).Returns(configs);
@@ -139,6 +138,8 @@ namespace Umbraco.Tests.PublishedContent
             // create a data source for NuCache
             _source = new TestDataSource(kits);
 
+            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
             _snapshotService = new PublishedSnapshotService(options,
@@ -159,7 +160,8 @@ namespace Umbraco.Tests.PublishedContent
                 globalSettings,
                 Mock.Of<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
-                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }));
+                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }),
+                typeFinder);
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();

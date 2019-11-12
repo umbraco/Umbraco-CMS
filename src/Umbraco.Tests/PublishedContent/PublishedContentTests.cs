@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 using NUnit.Framework;
@@ -14,6 +15,7 @@ using Moq;
 using Newtonsoft.Json;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -45,13 +47,14 @@ namespace Umbraco.Tests.PublishedContent
             var mediaService = Mock.Of<IMediaService>();
             var contentTypeBaseServiceProvider = Mock.Of<IContentTypeBaseServiceProvider>();
             var umbracoContextAccessor = Mock.Of<IUmbracoContextAccessor>();
+            var localizationService = Mock.Of<ILocalizationService>();
 
             var dataTypeService = new TestObjects.TestDataTypeService(
                 new DataType(new VoidEditor(logger)) { Id = 1 },
                 new DataType(new TrueFalsePropertyEditor(logger)) { Id = 1001 },
-                new DataType(new RichTextPropertyEditor(logger, mediaService, contentTypeBaseServiceProvider, umbracoContextAccessor)) { Id = 1002 },
+                new DataType(new RichTextPropertyEditor(logger, mediaService, contentTypeBaseServiceProvider, umbracoContextAccessor, Mock.Of<IDataTypeService>(), localizationService)) { Id = 1002 },
                 new DataType(new IntegerPropertyEditor(logger)) { Id = 1003 },
-                new DataType(new TextboxPropertyEditor(logger)) { Id = 1004 },
+                new DataType(new TextboxPropertyEditor(logger, Mock.Of<IDataTypeService>(), localizationService)) { Id = 1004 },
                 new DataType(new MediaPickerPropertyEditor(logger)) { Id = 1005 });
             Composition.RegisterUnique<IDataTypeService>(f => dataTypeService);
         }
@@ -83,16 +86,16 @@ namespace Umbraco.Tests.PublishedContent
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => alias.InvariantEquals("home") ? homeType : anythingType;
         }
 
-        protected override TypeLoader CreateTypeLoader(IAppPolicyCache runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
+
+        protected override TypeLoader CreateTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
         {
-            var pluginManager = base.CreateTypeLoader(runtimeCache, globalSettings, logger);
+            var baseLoader = base.CreateTypeLoader(ioHelper, typeFinder, runtimeCache, globalSettings, logger);
 
-            // this is so the model factory looks into the test assembly
-            pluginManager.AssembliesToScan = pluginManager.AssembliesToScan
-                .Union(new[] { typeof(PublishedContentTests).Assembly })
-                .ToList();
-
-            return pluginManager;
+            return new TypeLoader(ioHelper, typeFinder, runtimeCache, new DirectoryInfo(globalSettings.LocalTempPath), logger, false,
+                // this is so the model factory looks into the test assembly
+                baseLoader.AssembliesToScan
+                    .Union(new[] { typeof(PublishedContentTests).Assembly })
+                    .ToList());
         }
 
         private readonly Guid _node1173Guid = Guid.NewGuid();

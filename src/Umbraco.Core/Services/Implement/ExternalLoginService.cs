@@ -40,7 +40,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="login"></param>
         /// <returns></returns>
-        public IEnumerable<IIdentityUserLogin> Find(UserLoginInfo login)
+        public IEnumerable<IIdentityUserLogin> Find(IUserLoginInfo login)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -54,7 +54,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="logins"></param>
-        public void SaveUserLogins(int userId, IEnumerable<UserLoginInfo> logins)
+        public void SaveUserLogins(int userId, IEnumerable<IUserLoginInfo> logins)
         {
             using (var scope = ScopeProvider.CreateScope())
             {

@@ -13,7 +13,6 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Core.Composing.CompositionExtensions;
-using Umbraco.Core.Configuration;
 using FileSystems = Umbraco.Core.IO.FileSystems;
 
 namespace Umbraco.Tests.IO
@@ -29,7 +28,7 @@ namespace Umbraco.Tests.IO
         {
             _register = RegisterFactory.Create();
 
-            var composition = new Composition(_register, new TypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), new ConfigsFactory().Create());
+            var composition = new Composition(_register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs());
 
             composition.Register(_ => Mock.Of<ILogger>());
             composition.Register(_ => Mock.Of<IDataTypeService>());
@@ -47,7 +46,6 @@ namespace Umbraco.Tests.IO
 
             Current.Reset();
             Current.Factory = _factory;
-            CurrentCore.Factory = _factory;
 
             // make sure we start clean
             // because some tests will create corrupt or weird filesystems

@@ -46,7 +46,7 @@ namespace Umbraco.Core.Persistence.Factories
             return properties;
         }
 
-        private static PropertyDataDto BuildDto(int versionId, Property property, int? languageId, string segment, object value)
+        private static PropertyDataDto BuildDto(int versionId, IProperty property, int? languageId, string segment, object value)
         {
             var dto = new PropertyDataDto { VersionId = versionId, PropertyTypeId = property.PropertyTypeId };
 
@@ -109,7 +109,7 @@ namespace Umbraco.Core.Persistence.Factories
         /// The value of this will be used to populate the edited cultures in the umbracoDocumentCultureVariation table.
         /// </param>
         /// <returns></returns>
-        public static IEnumerable<PropertyDataDto> BuildDtos(ContentVariation contentVariation, int currentVersionId, int publishedVersionId, IEnumerable<Property> properties,
+        public static IEnumerable<PropertyDataDto> BuildDtos(ContentVariation contentVariation, int currentVersionId, int publishedVersionId, IEnumerable<IProperty> properties,
             ILanguageRepository languageRepository, out bool edited,
             out HashSet<string> editedCultures)
         {

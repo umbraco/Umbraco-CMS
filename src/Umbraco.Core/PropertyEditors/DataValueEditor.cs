@@ -7,7 +7,6 @@ using System.Xml.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Composing;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
@@ -21,32 +20,25 @@ namespace Umbraco.Core.PropertyEditors
     /// </summary>
     public class DataValueEditor : IDataValueEditor
     {
+        protected readonly IDataTypeService _dataTypeService;
+        protected readonly ILocalizationService _localizationService;
         private string _view;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataValueEditor"/> class.
         /// </summary>
-        public DataValueEditor() // for tests, and manifest
+        public DataValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService) // for tests, and manifest
         {
             ValueType = ValueTypes.String;
             Validators = new List<IValueValidator>();
+            _dataTypeService = dataTypeService;
+            _localizationService = localizationService;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataValueEditor"/> class.
         /// </summary>
-        public DataValueEditor(string view, params IValueValidator[] validators) // not used
-            : this()
-        {
-            View = view;
-            Validators.AddRange(validators);
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DataValueEditor"/> class.
-        /// </summary>
-        public DataValueEditor(DataEditorAttribute attribute)
-            : this()
+        public DataValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute)
         {
             if (attribute == null) throw new ArgumentNullException(nameof(attribute));
 
@@ -57,6 +49,9 @@ namespace Umbraco.Core.PropertyEditors
             View = view;
             ValueType = attribute.ValueType;
             HideLabel = attribute.HideLabel;
+
+            _dataTypeService = dataTypeService;
+            _localizationService = localizationService;
         }
 
         /// <summary>
@@ -72,11 +67,7 @@ namespace Umbraco.Core.PropertyEditors
         /// folder, or (3) a view name which maps to views/propertyeditors/{view}/{view}.html.</para>
         /// </remarks>
         [JsonProperty("view", Required = Required.Always)]
-        public string View
-        {
-            get => _view;
-            set => _view = Current.IOHelper.ResolveVirtualUrl(value);
-        }
+        public string View { get; set; }
 
         /// <summary>
         /// The value type which reflects how it is validated and stored in the database
@@ -115,7 +106,7 @@ namespace Umbraco.Core.PropertyEditors
         /// A collection of validators for the pre value editor
         /// </summary>
         [JsonProperty("validation")]
-        public List<IValueValidator> Validators { get; private set; }
+        public List<IValueValidator> Validators { get; private set; } = new List<IValueValidator>();
 
         /// <summary>
         /// Gets the validator used to validate the special property type -level "required".
@@ -237,7 +228,7 @@ namespace Umbraco.Core.PropertyEditors
         /// The object returned will automatically be serialized into json notation. For most property editors
         /// the value returned is probably just a string but in some cases a json structure will be returned.
         /// </remarks>
-        public virtual object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
+        public virtual object ToEditor(IProperty property, string culture = null, string segment = null)
         {
             var val = property.GetValue(culture, segment);
             if (val == null) return string.Empty;
@@ -288,7 +279,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Converts a property to Xml fragments.
         /// </summary>
-        public IEnumerable<XElement> ConvertDbToXml(Property property, IDataTypeService dataTypeService, ILocalizationService localizationService, bool published)
+        public IEnumerable<XElement> ConvertDbToXml(IProperty property, bool published)
         {
             published &= property.PropertyType.SupportsPublishing;
 
@@ -306,7 +297,7 @@ namespace Umbraco.Core.PropertyEditors
                 if (pvalue.Segment != null)
                     xElement.Add(new XAttribute("segment", pvalue.Segment));
 
-                var xValue = ConvertDbToXml(property.PropertyType, value, dataTypeService);
+                var xValue = ConvertDbToXml(property.PropertyType, value);
                 xElement.Add(xValue);
 
                 yield return xElement;
@@ -322,12 +313,12 @@ namespace Umbraco.Core.PropertyEditors
         /// <para>Returns an XText or XCData instance which must be wrapped in a element.</para>
         /// <para>If the value is empty we will not return as CDATA since that will just take up more space in the file.</para>
         /// </remarks>
-        public XNode ConvertDbToXml(PropertyType propertyType, object value, IDataTypeService dataTypeService)
+        public XNode ConvertDbToXml(IPropertyType propertyType, object value)
         {
             //check for null or empty value, we don't want to return CDATA if that is the case
             if (value == null || value.ToString().IsNullOrWhiteSpace())
             {
-                return new XText(ConvertDbToString(propertyType, value, dataTypeService));
+                return new XText(ConvertDbToString(propertyType, value));
             }
 
             switch (ValueTypes.ToStorageType(ValueType))
@@ -335,11 +326,11 @@ namespace Umbraco.Core.PropertyEditors
                 case ValueStorageType.Date:
                 case ValueStorageType.Integer:
                 case ValueStorageType.Decimal:
-                    return new XText(ConvertDbToString(propertyType, value, dataTypeService));
+                    return new XText(ConvertDbToString(propertyType, value));
                 case ValueStorageType.Nvarchar:
                 case ValueStorageType.Ntext:
                     //put text in cdata
-                    return new XCData(ConvertDbToString(propertyType, value, dataTypeService));
+                    return new XCData(ConvertDbToString(propertyType, value));
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -348,7 +339,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Converts a property value to a string.
         /// </summary>
-        public virtual string ConvertDbToString(PropertyType propertyType, object value, IDataTypeService dataTypeService)
+        public virtual string ConvertDbToString(IPropertyType propertyType, object value)
         {
             if (value == null)
                 return string.Empty;

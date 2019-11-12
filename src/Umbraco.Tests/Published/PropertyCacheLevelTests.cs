@@ -4,6 +4,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -124,8 +125,9 @@ namespace Umbraco.Tests.Published
 
             var setType1 = publishedContentTypeFactory.CreateContentType(1000, "set1", CreatePropertyTypes);
 
-            var elementsCache = new FastDictionaryAppCache();
-            var snapshotCache = new FastDictionaryAppCache();
+            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var elementsCache = new FastDictionaryAppCache(typeFinder);
+            var snapshotCache = new FastDictionaryAppCache(typeFinder);
 
             var publishedSnapshot = new Mock<IPublishedSnapshot>();
             publishedSnapshot.Setup(x => x.SnapshotCache).Returns(snapshotCache);
@@ -144,39 +146,39 @@ namespace Umbraco.Tests.Published
             Assert.AreEqual(1, converter.SourceConverts);
             Assert.AreEqual(1, converter.InterConverts);
 
-            Assert.AreEqual(elementsCount1, elementsCache.Items.Count);
-            Assert.AreEqual(snapshotCount1, snapshotCache.Items.Count);
+            Assert.AreEqual(elementsCount1, elementsCache.Count);
+            Assert.AreEqual(snapshotCount1, snapshotCache.Count);
 
             Assert.AreEqual(1234, set1.Value("prop1"));
             Assert.AreEqual(1, converter.SourceConverts);
             Assert.AreEqual(interConverts, converter.InterConverts);
 
-            Assert.AreEqual(elementsCount2, elementsCache.Items.Count);
-            Assert.AreEqual(snapshotCount2, snapshotCache.Items.Count);
+            Assert.AreEqual(elementsCount2, elementsCache.Count);
+            Assert.AreEqual(snapshotCount2, snapshotCache.Count);
 
             var oldSnapshotCache = snapshotCache;
-            snapshotCache.Items.Clear();
+            snapshotCache.Clear();
 
             Assert.AreEqual(1234, set1.Value("prop1"));
             Assert.AreEqual(1, converter.SourceConverts);
 
-            Assert.AreEqual(elementsCount2, elementsCache.Items.Count);
-            Assert.AreEqual(snapshotCount2, snapshotCache.Items.Count);
-            Assert.AreEqual(snapshotCount2, oldSnapshotCache.Items.Count);
+            Assert.AreEqual(elementsCount2, elementsCache.Count);
+            Assert.AreEqual(snapshotCount2, snapshotCache.Count);
+            Assert.AreEqual(snapshotCount2, oldSnapshotCache.Count);
 
-            Assert.AreEqual((interConverts == 1 ? 1 : 3) + snapshotCache.Items.Count, converter.InterConverts);
+            Assert.AreEqual((interConverts == 1 ? 1 : 3) + snapshotCache.Count, converter.InterConverts);
 
             var oldElementsCache = elementsCache;
-            elementsCache.Items.Clear();
+            elementsCache.Clear();
 
             Assert.AreEqual(1234, set1.Value("prop1"));
             Assert.AreEqual(1, converter.SourceConverts);
 
-            Assert.AreEqual(elementsCount2, elementsCache.Items.Count);
-            Assert.AreEqual(elementsCount2, oldElementsCache.Items.Count);
-            Assert.AreEqual(snapshotCount2, snapshotCache.Items.Count);
+            Assert.AreEqual(elementsCount2, elementsCache.Count);
+            Assert.AreEqual(elementsCount2, oldElementsCache.Count);
+            Assert.AreEqual(snapshotCount2, snapshotCache.Count);
 
-            Assert.AreEqual((interConverts == 1 ? 1 : 4) + snapshotCache.Items.Count + elementsCache.Items.Count, converter.InterConverts);
+            Assert.AreEqual((interConverts == 1 ? 1 : 4) + snapshotCache.Count + elementsCache.Count, converter.InterConverts);
         }
 
         [Test]

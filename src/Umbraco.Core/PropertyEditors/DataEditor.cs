@@ -165,7 +165,7 @@ namespace Umbraco.Core.PropertyEditors
             if (Attribute == null)
                 throw new InvalidOperationException("The editor does not specify a view.");
 
-            return new DataValueEditor(Attribute);
+            return new DataValueEditor(Current.Services.DataTypeService, Current.Services.LocalizationService, Attribute);
         }
 
         /// <summary>

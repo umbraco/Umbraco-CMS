@@ -21,14 +21,14 @@ namespace Umbraco.Web.PropertyEditors
         private readonly ILogger _logger;
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
-        public MultiUrlPickerValueEditor(IEntityService entityService, IPublishedSnapshotAccessor publishedSnapshotAccessor, ILogger logger, DataEditorAttribute attribute) : base(attribute)
+        public MultiUrlPickerValueEditor(IEntityService entityService, IPublishedSnapshotAccessor publishedSnapshotAccessor, ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute) : base(dataTypeService, localizationService, attribute)
         {
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
             _publishedSnapshotAccessor = publishedSnapshotAccessor ?? throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
+        public override object ToEditor(IProperty property, string culture = null, string segment = null)
         {
             var value = property.GetValue(culture, segment)?.ToString();
 
@@ -118,7 +118,7 @@ namespace Umbraco.Web.PropertyEditors
                 _logger.Error<MultiUrlPickerValueEditor>("Error getting links", ex);
             }
 
-            return base.ToEditor(property, dataTypeService, culture, segment);
+            return base.ToEditor(property, culture, segment);
         }
 
 

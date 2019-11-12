@@ -6,10 +6,10 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PackageActions;
 using Umbraco.Tests.Components;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Composing
 {
@@ -21,13 +21,12 @@ namespace Umbraco.Tests.Composing
         {
             var container = RegisterFactory.Create();
 
-            var composition = new Composition(container, new TypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), new ConfigsFactory().Create());
+            var composition = new Composition(container, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs());
 
             composition.WithCollectionBuilder<PackageActionCollectionBuilder>()
                 .Add(() => TypeLoader.GetPackageActions());
 
             Current.Factory = composition.CreateFactory();
-            CurrentCore.Factory = composition.CreateFactory();
 
             var actions = Current.PackageActions;
             Assert.AreEqual(2, actions.Count());

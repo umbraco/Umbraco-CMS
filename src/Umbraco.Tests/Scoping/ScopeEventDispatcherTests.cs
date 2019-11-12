@@ -11,7 +11,6 @@ using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Components;
@@ -33,7 +32,7 @@ namespace Umbraco.Tests.Scoping
 
             var register = RegisterFactory.Create();
 
-            var composition = new Composition(register, new TypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), new ConfigsFactory().Create());
+            var composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs());
 
             _testObjects = new TestObjects(register);
 
@@ -44,7 +43,7 @@ namespace Umbraco.Tests.Scoping
             composition.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
 
             Current.Reset();
-            Current.Factory = CurrentCore.Factory = composition.CreateFactory();
+            Current.Factory = composition.CreateFactory();
 
             SettingsForTests.Reset(); // ensure we have configuration
         }

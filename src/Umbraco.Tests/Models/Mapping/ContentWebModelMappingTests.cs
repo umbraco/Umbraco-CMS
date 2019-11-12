@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Models.Mapping
             Composition.Register(_ => Mock.Of<IContentSection>());
 
             // all this is required so we can validate properties...
-            var editor = new TextboxPropertyEditor(Mock.Of<ILogger>()) { Alias = "test" };
+            var editor = new TextboxPropertyEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>()) { Alias = "test" };
             Composition.Register(_ => new DataEditorCollection(new[] { editor }));
             Composition.Register<PropertyEditorCollection>();
             var dataType = Mock.Of<IDataType>();
@@ -261,7 +261,7 @@ namespace Umbraco.Tests.Models.Mapping
 
         #region Assertions
 
-        private void AssertDisplayProperty<T>(IContentProperties<T> result, Property p)
+        private void AssertDisplayProperty<T>(IContentProperties<T> result, IProperty p)
             where T : ContentPropertyBasic
         {
             var pDto = result.Properties.SingleOrDefault(x => x.Alias == p.Alias);
@@ -325,7 +325,7 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(content.Properties.Count(), result.Properties.Count(x => x.Alias.StartsWith("_umb_") == false));
         }
 
-        private void AssertBasicProperty<T>(IContentProperties<T> result, Property p)
+        private void AssertBasicProperty<T>(IContentProperties<T> result, IProperty p)
             where T : ContentPropertyBasic
         {
             var pDto = result.Properties.SingleOrDefault(x => x.Alias == p.Alias);
@@ -341,7 +341,7 @@ namespace Umbraco.Tests.Models.Mapping
                 Assert.AreEqual(pDto.Value, p.GetValue().ToString());
         }
 
-        private void AssertProperty(IContentProperties<ContentPropertyDto> result, Property p)
+        private void AssertProperty(IContentProperties<ContentPropertyDto> result, IProperty p)
         {
             AssertBasicProperty(result, p);
 

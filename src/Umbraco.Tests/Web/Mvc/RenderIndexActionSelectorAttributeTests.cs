@@ -34,7 +34,6 @@ namespace Umbraco.Tests.Web.Mvc
         {
             Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
             Core.Composing.Current.Factory = Mock.Of<IFactory>();
-            Core.Composing.CurrentCore.Factory = Mock.Of<IFactory>();
         }
 
         [TearDown]

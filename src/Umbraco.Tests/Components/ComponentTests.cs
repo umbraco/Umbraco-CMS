@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
@@ -33,9 +34,10 @@ namespace Umbraco.Tests.Components
             var mock = new Mock<IFactory>();
 
             var logger = Mock.Of<ILogger>();
+            var typeFinder = new TypeFinder(logger);
             var f = new UmbracoDatabaseFactory(logger, new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())));
             var fs = new FileSystems(mock.Object, logger);
-            var p = new ScopeProvider(f, fs, logger);
+            var p = new ScopeProvider(f, fs, logger, typeFinder);
 
             mock.Setup(x => x.GetInstance(typeof (ILogger))).Returns(logger);
             mock.Setup(x => x.GetInstance(typeof (IProfilingLogger))).Returns(new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
@@ -53,7 +55,8 @@ namespace Umbraco.Tests.Components
 
         private static TypeLoader MockTypeLoader()
         {
-            return new TypeLoader();
+            var ioHelper = IOHelper.Default;
+            return new TypeLoader(ioHelper, Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), Mock.Of<IProfilingLogger>());
         }
 
         public static IRuntimeState MockRuntimeState(RuntimeLevel level)
@@ -363,7 +366,9 @@ namespace Umbraco.Tests.Components
         [Test]
         public void AllComposers()
         {
-            var typeLoader = new TypeLoader(AppCaches.Disabled.RuntimeCache, Current.IOHelper.MapPath("~/App_Data/TEMP"), Mock.Of<IProfilingLogger>());
+            var ioHelper = IOHelper.Default;
+            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var typeLoader = new TypeLoader(ioHelper, typeFinder, AppCaches.Disabled.RuntimeCache, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), Mock.Of<IProfilingLogger>());
 
             var register = MockRegister();
             var composition = new Composition(register, typeLoader, Mock.Of<IProfilingLogger>(), MockRuntimeState(RuntimeLevel.Run), Configs);

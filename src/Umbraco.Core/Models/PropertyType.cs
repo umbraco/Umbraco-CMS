@@ -13,7 +13,7 @@ namespace Umbraco.Core.Models
     [Serializable]
     [DataContract(IsReference = true)]
     [DebuggerDisplay("Id: {Id}, Name: {Name}, Alias: {Alias}")]
-    public class PropertyType : EntityBase, IEquatable<PropertyType>
+    public class PropertyType : EntityBase, IPropertyType, IEquatable<PropertyType>
     {
         private readonly bool _forceValueStorageType;
         private string _name;
@@ -160,7 +160,7 @@ namespace Umbraco.Core.Models
         /// Gets or sets the database type for storing value for this property type.
         /// </summary>
         [DataMember]
-        internal ValueStorageType ValueStorageType
+        public ValueStorageType ValueStorageType
         {
             get => _valueStorageType;
             set
@@ -175,7 +175,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <remarks>For generic properties, the value is <c>null</c>.</remarks>
         [DataMember]
-        internal Lazy<int> PropertyGroupId
+        public Lazy<int> PropertyGroupId
         {
             get => _propertyGroupId;
             set => SetPropertyValueAndDetectChanges(value, ref _propertyGroupId, nameof(PropertyGroupId));

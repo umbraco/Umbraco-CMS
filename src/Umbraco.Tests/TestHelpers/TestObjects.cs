@@ -157,7 +157,7 @@ namespace Umbraco.Tests.TestHelpers
             var notificationService = GetLazyService<INotificationService>(factory, c => new NotificationService(scopeProvider, userService.Value, contentService.Value, localizationService.Value, logger, GetRepo<INotificationsRepository>(c), globalSettings, umbracoSettings.Content));
             var serverRegistrationService = GetLazyService<IServerRegistrationService>(factory, c => new ServerRegistrationService(scopeProvider, logger, eventMessagesFactory, GetRepo<IServerRegistrationRepository>(c)));
             var memberGroupService = GetLazyService<IMemberGroupService>(factory, c => new MemberGroupService(scopeProvider, logger, eventMessagesFactory, GetRepo<IMemberGroupRepository>(c)));
-            var memberService = GetLazyService<IMemberService>(factory, c => new MemberService(scopeProvider, logger, eventMessagesFactory, memberGroupService.Value, mediaFileSystem, GetRepo<IMemberRepository>(c), GetRepo<IMemberTypeRepository>(c), GetRepo<IMemberGroupRepository>(c), GetRepo<IAuditRepository>(c)));
+            var memberService = GetLazyService<IMemberService>(factory, c => new MemberService(scopeProvider, logger, eventMessagesFactory, memberGroupService.Value, GetRepo<IMemberRepository>(c), GetRepo<IMemberTypeRepository>(c), GetRepo<IMemberGroupRepository>(c), GetRepo<IAuditRepository>(c)));
             var mediaService = GetLazyService<IMediaService>(factory, c => new MediaService(scopeProvider, mediaFileSystem, logger, eventMessagesFactory, GetRepo<IMediaRepository>(c), GetRepo<IAuditRepository>(c), GetRepo<IMediaTypeRepository>(c), GetRepo<IEntityRepository>(c)));
             var contentTypeService = GetLazyService<IContentTypeService>(factory, c => new ContentTypeService(scopeProvider, logger, eventMessagesFactory, contentService.Value, GetRepo<IContentTypeRepository>(c), GetRepo<IAuditRepository>(c), GetRepo<IDocumentTypeContainerRepository>(c), GetRepo<IEntityRepository>(c)));
             var mediaTypeService = GetLazyService<IMediaTypeService>(factory, c => new MediaTypeService(scopeProvider, logger, eventMessagesFactory, mediaService.Value, GetRepo<IMediaTypeRepository>(c), GetRepo<IAuditRepository>(c), GetRepo<IMediaTypeContainerRepository>(c), GetRepo<IEntityRepository>(c)));
@@ -230,7 +230,7 @@ namespace Umbraco.Tests.TestHelpers
             return container?.TryGetInstance<T>() ?? Mock.Of<T>();
         }
 
-        public IScopeProvider GetScopeProvider(ILogger logger, FileSystems fileSystems = null, IUmbracoDatabaseFactory databaseFactory = null)
+        public IScopeProvider GetScopeProvider(ILogger logger, ITypeFinder typeFinder = null, FileSystems fileSystems = null, IUmbracoDatabaseFactory databaseFactory = null)
         {
             if (databaseFactory == null)
             {
@@ -241,8 +241,9 @@ namespace Umbraco.Tests.TestHelpers
                 databaseFactory = new UmbracoDatabaseFactory(Constants.System.UmbracoConnectionName, logger, new Lazy<IMapperCollection>(() => mappers));
             }
 
+            typeFinder = typeFinder ?? new TypeFinder(logger);
             fileSystems = fileSystems ?? new FileSystems(Current.Factory, logger);
-            var scopeProvider = new ScopeProvider(databaseFactory, fileSystems, logger);
+            var scopeProvider = new ScopeProvider(databaseFactory, fileSystems, logger, typeFinder);
             return scopeProvider;
         }
     }

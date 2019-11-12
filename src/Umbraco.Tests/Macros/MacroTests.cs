@@ -1,8 +1,10 @@
-﻿using NUnit.Framework;
+﻿using Moq;
+using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Macros;
@@ -16,11 +18,12 @@ namespace Umbraco.Tests.Macros
         [SetUp]
         public void Setup()
         {
+            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
             //we DO want cache enabled for these tests
             var cacheHelper = new AppCaches(
-                new ObjectCacheAppCache(),
+                new ObjectCacheAppCache(typeFinder),
                 NoAppCache.Instance,
-                new IsolatedCaches(type => new ObjectCacheAppCache()));
+                new IsolatedCaches(type => new ObjectCacheAppCache(typeFinder)));
             //Current.ApplicationContext = new ApplicationContext(cacheHelper, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             Current.Reset();

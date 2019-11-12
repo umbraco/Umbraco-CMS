@@ -54,7 +54,15 @@ namespace Umbraco.Tests.Models
             var allProps = clone.GetType().GetProperties();
             foreach (var propertyInfo in allProps)
             {
-                Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(pt, null));
+                var expected = propertyInfo.GetValue(pt, null);
+                var actual = propertyInfo.GetValue(clone, null);
+                if (propertyInfo.PropertyType == typeof(Lazy<int>))
+                {
+                    expected = ((Lazy<int>) expected).Value;
+                    actual = ((Lazy<int>) actual).Value;
+                }
+
+                Assert.AreEqual(expected, actual, $"Value of propery: '{propertyInfo.Name}': {expected} != {actual}");
             }
         }
 

@@ -13,23 +13,21 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
 using Umbraco.Core.Services;
 using Umbraco.Core.Dashboards;
-using Umbraco.Core.IO;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Tests.Manifest
 {
     [TestFixture]
     public class ManifestParserTests
     {
-        private IManifestParser _parser;
+        private ManifestParser _parser;
 
         [SetUp]
         public void Setup()
         {
             Current.Reset();
-            CurrentCore.Reset();
             var factory = Mock.Of<IFactory>();
             Current.Factory = factory;
-            CurrentCore.Factory = factory;
 
             var serviceContext = ServiceContext.CreatePartial(
                 localizedTextService: Mock.Of<ILocalizedTextService>());
@@ -47,7 +45,7 @@ namespace Umbraco.Tests.Manifest
                 new RequiredValidator(Mock.Of<ILocalizedTextService>()),
                 new RegexValidator(Mock.Of<ILocalizedTextService>(), null)
             };
-            _parser = new ManifestParser(AppCaches.Disabled, new ManifestValueValidatorCollection(validators), new ManifestFilterCollection(Array.Empty<IManifestFilter>()),  Mock.Of<ILogger>(), Mock.Of<IIOHelper>());
+            _parser = new ManifestParser(AppCaches.Disabled, new ManifestValueValidatorCollection(validators), new ManifestFilterCollection(Array.Empty<IManifestFilter>()),  Mock.Of<ILogger>(), Current.IOHelper, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), new JsonNetSerializer());
         }
 
         [Test]

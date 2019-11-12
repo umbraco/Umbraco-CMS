@@ -64,7 +64,7 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll
         private static void Map(IContent source, ContentPropertyCollectionDto target, MapperContext context)
         {
-            target.Properties = context.MapEnumerable<Property, ContentPropertyDto>(source.Properties);
+            target.Properties = context.MapEnumerable<IProperty, ContentPropertyDto>(source.Properties);
         }
 
         // Umbraco.Code.MapAll -AllowPreview -Errors -PersistedContent
@@ -99,7 +99,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Variants = _contentVariantMapper.Map(source, context);
 
             target.ContentDto = new ContentPropertyCollectionDto();
-            target.ContentDto.Properties = context.MapEnumerable<Property, ContentPropertyDto>(source.Properties);
+            target.ContentDto.Properties = context.MapEnumerable<IProperty, ContentPropertyDto>(source.Properties);
         }
 
         // Umbraco.Code.MapAll -Segment -Language
@@ -129,7 +129,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Owner = _commonMapper.GetOwner(source, context);
             target.ParentId = source.ParentId;
             target.Path = source.Path;
-            target.Properties = context.MapEnumerable<Property, ContentPropertyBasic>(source.Properties);
+            target.Properties = context.MapEnumerable<IProperty, ContentPropertyBasic>(source.Properties);
             target.SortOrder = source.SortOrder;
             target.State = _basicStateMapper.Map(source, context);
             target.Trashed = source.Trashed;

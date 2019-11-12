@@ -6,10 +6,10 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
 using Umbraco.Tests.Components;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Cache.DistributedCache
 {
@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
         {
             var register = RegisterFactory.Create();
 
-            var composition = new Composition(register, new TypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), new ConfigsFactory().Create());
+            var composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs());
 
             composition.RegisterUnique<IServerRegistrar>(_ => new TestServerRegistrar());
             composition.RegisterUnique<IServerMessenger>(_ => new TestServerMessenger());
@@ -35,7 +35,6 @@ namespace Umbraco.Tests.Cache.DistributedCache
                 .Add<TestCacheRefresher>();
 
             Current.Factory = composition.CreateFactory();
-            CurrentCore.Factory = composition.CreateFactory();
 
             _distributedCache = new Umbraco.Web.Cache.DistributedCache();
         }

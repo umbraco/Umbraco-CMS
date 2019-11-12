@@ -6,6 +6,7 @@ using NUnit.Framework;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
@@ -33,6 +34,11 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
+        private IScriptRepository CreateRepository()
+        {
+            return new ScriptRepository(_fileSystems, new IOHelper());
+        }
+
         protected override void Compose()
         {
             base.Compose();
@@ -48,7 +54,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var scope = ScopeProvider.CreateScope())
             {
                 // Act
-                var repository = new ScriptRepository(_fileSystems, Mock.Of<IContentSection>());
+                var repository = CreateRepository();
 
                 // Assert
                 Assert.That(repository, Is.Not.Null);
@@ -62,7 +68,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = ScopeProvider.CreateScope())
             {
-                var repository = new ScriptRepository(_fileSystems, Mock.Of<IContentSection>());
+                var repository = CreateRepository();
 
                 // Act
                 var script = new Script("test-add-script.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
@@ -81,7 +87,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = ScopeProvider.CreateScope())
             {
-                var repository = new ScriptRepository(_fileSystems, Mock.Of<IContentSection>());
+                var repository = CreateRepository();
 
                 // Act
                 var script = new Script("test-updated-script.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
@@ -107,7 +113,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = ScopeProvider.CreateScope())
             {
-                var repository = new ScriptRepository(_fileSystems, Mock.Of<IContentSection>());
+                var repository = CreateRepository();
 
                 // Act
                 var script = repository.Get("test-script.js");
@@ -127,7 +133,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = ScopeProvider.CreateScope())
             {
-                var repository = new ScriptRepository(_fileSystems, Mock.Of<IContentSection>());
+                var repository = CreateRepository();
 
                 // Act
                 var exists = repository.Get("test-script.js");
@@ -146,7 +152,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = ScopeProvider.CreateScope())
             {
-                var repository = new ScriptRepository(_fileSystems, Mock.Of<IContentSection>());
+                var repository = CreateRepository();
 
                 var script = new Script("test-script1.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
                 repository.Save(script);
@@ -174,7 +180,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = ScopeProvider.CreateScope())
             {
-                var repository = new ScriptRepository(_fileSystems, Mock.Of<IContentSection>());
+                var repository = CreateRepository();
 
                 var script = new Script("test-script1.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
                 repository.Save(script);
@@ -202,7 +208,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = ScopeProvider.CreateScope())
             {
-                var repository = new ScriptRepository(_fileSystems, Mock.Of<IContentSection>());
+                var repository = CreateRepository();
 
                 // Act
                 var exists = repository.Exists("test-script.js");
@@ -221,9 +227,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = ScopeProvider.CreateScope())
             {
-                var repository = new ScriptRepository(_fileSystems, Mock.Of<IContentSection>());
+                var repository = CreateRepository();
 
-                var script = new Script("test-move-script.js") { Content = content };
+                IScript script = new Script("test-move-script.js") { Content = content };
                 repository.Save(script);
 
 
@@ -254,9 +260,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = ScopeProvider.CreateScope())
             {
-                var repository = new ScriptRepository(_fileSystems, Mock.Of<IContentSection>());
+                var repository = CreateRepository();
 
-                var script = new Script("test-path-1.js") { Content = "// script" };
+                IScript script = new Script("test-path-1.js") { Content = "// script" };
                 repository.Save(script);
 
                 Assert.IsTrue(_fileSystem.FileExists("test-path-1.js"));

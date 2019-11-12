@@ -5,11 +5,12 @@ using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Manifest
 {
@@ -18,11 +19,14 @@ namespace Umbraco.Core.Manifest
     /// </summary>
     public class ManifestParser : IManifestParser
     {
+        private readonly IJsonSerializer _jsonSerializer;
         private static readonly string Utf8Preamble = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
 
         private readonly IAppPolicyCache _cache;
         private readonly ILogger _logger;
         private readonly IIOHelper _ioHelper;
+        private readonly IDataTypeService _dataTypeService;
+        private readonly ILocalizationService _localizationService;
         private readonly ManifestValueValidatorCollection _validators;
         private readonly ManifestFilterCollection _filters;
 
@@ -31,21 +35,26 @@ namespace Umbraco.Core.Manifest
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        public ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, ILogger logger, IIOHelper ioHelper)
-            : this(appCaches, validators, filters, SystemDirectories.AppPlugins, logger, ioHelper)
-        { }
+        public ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, ILogger logger, IIOHelper ioHelper, IDataTypeService dataTypeService, ILocalizationService localizationService, IJsonSerializer jsonSerializer)
+            : this(appCaches, validators, filters, "~/App_Plugins", logger, ioHelper, dataTypeService, localizationService)
+        {
+            _jsonSerializer = jsonSerializer;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        private ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, string path, ILogger logger, IIOHelper ioHelper)
+        private ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, string path, ILogger logger, IIOHelper ioHelper, IDataTypeService dataTypeService, ILocalizationService localizationService)
         {
             if (appCaches == null) throw new ArgumentNullException(nameof(appCaches));
             _cache = appCaches.RuntimeCache;
+            _ioHelper = ioHelper;
+            _dataTypeService = dataTypeService;
+            _localizationService = localizationService;
             _validators = validators ?? throw new ArgumentNullException(nameof(validators));
             _filters = filters ?? throw new ArgumentNullException(nameof(filters));
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullOrEmptyException(nameof(path));
-            _ioHelper = ioHelper;
+
             Path = path;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
@@ -61,8 +70,8 @@ namespace Umbraco.Core.Manifest
         /// Gets all manifests, merged into a single manifest object.
         /// </summary>
         /// <returns></returns>
-        public IPackageManifest Manifest
-            => _cache.GetCacheItem<IPackageManifest>("Umbraco.Core.Manifest.ManifestParser::Manifests", () =>
+        public PackageManifest Manifest
+            => _cache.GetCacheItem<PackageManifest>("Umbraco.Core.Manifest.ManifestParser::Manifests", () =>
             {
                 var manifests = GetManifests();
                 return MergeManifests(manifests);
@@ -71,9 +80,9 @@ namespace Umbraco.Core.Manifest
         /// <summary>
         /// Gets all manifests.
         /// </summary>
-        private IEnumerable<IPackageManifest> GetManifests()
+        private IEnumerable<PackageManifest> GetManifests()
         {
-            var manifests = new List<IPackageManifest>();
+            var manifests = new List<PackageManifest>();
 
             foreach (var path in GetManifestFiles())
             {
@@ -101,7 +110,7 @@ namespace Umbraco.Core.Manifest
         /// <summary>
         /// Merges all manifests into one.
         /// </summary>
-        private static IPackageManifest MergeManifests(IEnumerable<IPackageManifest> manifests)
+        private static PackageManifest MergeManifests(IEnumerable<PackageManifest> manifests)
         {
             var scripts = new HashSet<string>();
             var stylesheets = new HashSet<string>();
@@ -157,13 +166,13 @@ namespace Umbraco.Core.Manifest
         /// <summary>
         /// Parses a manifest.
         /// </summary>
-        public IPackageManifest ParseManifest(string text)
+        public PackageManifest ParseManifest(string text)
         {
             if (string.IsNullOrWhiteSpace(text))
                 throw new ArgumentNullOrEmptyException(nameof(text));
 
             var manifest = JsonConvert.DeserializeObject<PackageManifest>(text,
-                new DataEditorConverter(_logger),
+                new DataEditorConverter(_logger, _ioHelper, _dataTypeService, _localizationService),
                 new ValueValidatorConverter(_validators),
                 new DashboardAccessRuleConverter());
 
@@ -172,6 +181,19 @@ namespace Umbraco.Core.Manifest
                 manifest.Scripts[i] = _ioHelper.ResolveVirtualUrl(manifest.Scripts[i]);
             for (var i = 0; i < manifest.Stylesheets.Length; i++)
                 manifest.Stylesheets[i] = _ioHelper.ResolveVirtualUrl(manifest.Stylesheets[i]);
+            foreach (var contentApp in manifest.ContentApps)
+            {
+                contentApp.View = _ioHelper.ResolveVirtualUrl(contentApp.View);
+            }
+            foreach (var dashboard in manifest.Dashboards)
+            {
+                dashboard.View = _ioHelper.ResolveVirtualUrl(dashboard.View);
+            }
+            foreach (var gridEditor in manifest.GridEditors)
+            {
+                gridEditor.View = _ioHelper.ResolveVirtualUrl(gridEditor.View);
+                gridEditor.Render = _ioHelper.ResolveVirtualUrl(gridEditor.Render);
+            }
 
             // add property editors that are also parameter editors, to the parameter editors list
             // (the manifest format is kinda legacy)
@@ -183,9 +205,9 @@ namespace Umbraco.Core.Manifest
         }
 
         // purely for tests
-        public IEnumerable<IGridEditorConfig> ParseGridEditors(string text)
+        public IEnumerable<GridEditor> ParseGridEditors(string text)
         {
-            return JsonConvert.DeserializeObject<IEnumerable<GridEditor>>(text);
+            return _jsonSerializer.Deserialize<IEnumerable<GridEditor>>(text);
         }
     }
 }

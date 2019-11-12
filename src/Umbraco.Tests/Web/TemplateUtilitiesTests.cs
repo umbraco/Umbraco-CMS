@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Web;
 using Moq;
@@ -39,14 +40,16 @@ namespace Umbraco.Tests.Web
 
             // FIXME: bad in a unit test - but Udi has a static ctor that wants it?!
             var factory = new Mock<IFactory>();
+            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var ioHelper = IOHelper.Default;
             factory.Setup(x => x.GetInstance(typeof(TypeLoader))).Returns(
-                new TypeLoader(NoAppCache.Instance, Current.IOHelper.MapPath("~/App_Data/TEMP"), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
+                new TypeLoader(ioHelper, typeFinder, NoAppCache.Instance, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
             factory.Setup(x => x.GetInstance(typeof (ServiceContext))).Returns(serviceContext);
 
             var settings = SettingsForTests.GetDefaultUmbracoSettings();
             factory.Setup(x => x.GetInstance(typeof(IUmbracoSettingsSection))).Returns(settings);
 
-            Current.Factory = CurrentCore.Factory = factory.Object;
+            Current.Factory = factory.Object;
 
             Umbraco.Web.Composing.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
 

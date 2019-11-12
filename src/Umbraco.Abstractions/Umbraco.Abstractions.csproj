@@ -11,6 +11,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="System.ComponentModel.Annotations" Version="4.6.0" />
       <PackageReference Include="System.Runtime.Caching" Version="4.6.0" />
     </ItemGroup>
 

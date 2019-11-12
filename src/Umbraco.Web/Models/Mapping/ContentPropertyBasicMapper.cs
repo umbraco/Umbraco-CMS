@@ -33,7 +33,7 @@ namespace Umbraco.Web.Models.Mapping
         /// Assigns the PropertyEditor, Id, Alias and Value to the property
         /// </summary>
         /// <returns></returns>
-        public virtual void Map(Property property, TDestination dest, MapperContext context)
+        public virtual void Map(IProperty property, TDestination dest, MapperContext context)
         {
             var editor = _propertyEditors[property.PropertyType.PropertyEditorAlias];
             if (editor == null)
@@ -71,7 +71,7 @@ namespace Umbraco.Web.Models.Mapping
             dest.Culture = culture;
 
             // if no 'IncludeProperties' were specified or this property is set to be included - we will map the value and return.
-            dest.Value = editor.GetValueEditor().ToEditor(property, DataTypeService, culture);
+            dest.Value = editor.GetValueEditor().ToEditor(property, culture);
         }
     }
 }

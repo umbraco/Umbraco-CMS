@@ -50,18 +50,18 @@ namespace Umbraco.Core
         /// Determines whether the property type varies by culture.
         /// </summary>
         /// <remarks>And then it could also vary by segment.</remarks>
-        public static bool VariesByCulture(this PropertyType propertyType) => propertyType.Variations.VariesByCulture();
+        public static bool VariesByCulture(this IPropertyType propertyType) => propertyType.Variations.VariesByCulture();
 
         /// <summary>
         /// Determines whether the property type varies by segment.
         /// </summary>
         /// <remarks>And then it could also vary by culture.</remarks>
-        public static bool VariesBySegment(this PropertyType propertyType) => propertyType.Variations.VariesBySegment();
+        public static bool VariesBySegment(this IPropertyType propertyType) => propertyType.Variations.VariesBySegment();
 
         /// <summary>
         /// Determines whether the property type varies by culture and segment.
         /// </summary>
-        public static bool VariesByCultureAndSegment(this PropertyType propertyType) => propertyType.Variations.VariesByCultureAndSegment();
+        public static bool VariesByCultureAndSegment(this IPropertyType propertyType) => propertyType.Variations.VariesByCultureAndSegment();
 
         /// <summary>
         /// Determines whether the content type is invariant.
@@ -161,13 +161,13 @@ namespace Umbraco.Core
             if (variation.VariesByCulture())
             {
                 // varies by culture
-                // in exact mode, the culture cannot be null                
+                // in exact mode, the culture cannot be null
                 if (exact && culture == null)
                 {
                     if (throwIfInvalid)
                         throw new NotSupportedException($"Culture may not be null because culture variation is enabled.");
                     return false;
-                }    
+                }
             }
             else
             {
@@ -180,7 +180,7 @@ namespace Umbraco.Core
                         throw new NotSupportedException($"Culture \"{culture}\" is invalid because culture variation is disabled.");
                     return false;
                 }
-            }          
+            }
 
             // if it does not vary by segment
             // the segment cannot have a value
