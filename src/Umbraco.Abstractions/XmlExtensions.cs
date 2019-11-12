@@ -14,7 +14,7 @@ namespace Umbraco.Core
     /// <summary>
     /// Extension methods for xml objects
     /// </summary>
-    internal static class XmlExtensions
+    public static class XmlExtensions
     {
         public static bool HasAttribute(this XmlAttributeCollection attributes, string attributeName)
         {

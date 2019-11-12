@@ -104,10 +104,10 @@ namespace Umbraco.Core.Services
         ILanguage GetLanguageById(int id);
 
         /// <summary>
-        /// Gets a <see cref="Language"/> by its iso code
+        /// Gets a <see cref="ILanguage"/> by its iso code
         /// </summary>
         /// <param name="isoCode">Iso Code of the language (ie. en-US)</param>
-        /// <returns><see cref="Language"/></returns>
+        /// <returns><see cref="ILanguage"/></returns>
         ILanguage GetLanguageByIsoCode(string isoCode);
 
         /// <summary>

@@ -3,7 +3,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Services.Changes
 {
-    internal static class ContentTypeChangeExtensions
+    public static class ContentTypeChangeExtensions
     {
         public static ContentTypeChange<TItem>.EventArgs ToEventArgs<TItem>(this IEnumerable<ContentTypeChange<TItem>> changes)
             where TItem : class, IContentTypeComposition

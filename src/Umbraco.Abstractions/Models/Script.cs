@@ -9,7 +9,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class Script : File
+    public class Script : File, IScript
     {
         public Script(string path)
             : this(path, (Func<File, string>) null)
@@ -25,9 +25,6 @@ namespace Umbraco.Core.Models
         /// <remarks>
         /// Overrides the default Entity identity check.
         /// </remarks>
-        public override bool HasIdentity
-        {
-            get { return string.IsNullOrEmpty(Path) == false; }
-        }
+        public override bool HasIdentity => string.IsNullOrEmpty(Path) == false;
     }
 }

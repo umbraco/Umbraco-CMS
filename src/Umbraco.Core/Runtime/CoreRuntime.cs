@@ -42,6 +42,11 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         protected IProfilingLogger ProfilingLogger { get; private set; }
 
+        /// <summary>
+        /// Gets the <see cref="IIOHelper"/>
+        /// </summary>
+        protected IIOHelper IOHelper { get; private set; }
+
         /// <inheritdoc />
         public IRuntimeState State => _state;
 
@@ -55,6 +60,10 @@ namespace Umbraco.Core.Runtime
             var logger = Logger = GetLogger();
             var profiler = Profiler = GetProfiler();
             var profilingLogger = ProfilingLogger = new ProfilingLogger(logger, profiler);
+
+            IOHelper = GetIOHelper();
+            if (IOHelper == null)
+                throw new InvalidOperationException($"The object returned from {nameof(GetIOHelper)} cannot be null");
 
             // the boot loader boots using a container scope, so anything that is PerScope will
             // be disposed after the boot loader has booted, and anything else will remain.
@@ -128,9 +137,9 @@ namespace Umbraco.Core.Runtime
                 // main dom
                 var mainDom = new MainDom(Logger);
 
-                // create the composition
+                // create the composition   
                 composition = new Composition(register, typeLoader, ProfilingLogger, _state, configs);
-                composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, mainDom, appCaches, databaseFactory, typeLoader, _state);
+                composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, mainDom, appCaches, databaseFactory, typeLoader, _state, IOHelper);
 
                 // run handlers
                 RuntimeOptions.DoRuntimeEssentials(composition, appCaches, typeLoader, databaseFactory);
@@ -312,6 +321,13 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         protected virtual IProfiler GetProfiler()
             => new LogProfiler(Logger);
+
+        /// <summary>
+        /// Gets a <see cref="IIOHelper"/>
+        /// </summary>
+        /// <returns></returns>
+        protected virtual IIOHelper GetIOHelper()
+            => new Umbraco.Core.IO.IOHelper();
 
         /// <summary>
         /// Gets the application caches.

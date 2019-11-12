@@ -141,7 +141,7 @@ namespace Umbraco.Core.Security
                 if (isLoginsPropertyDirty)
                 {
                     var logins = await GetLoginsAsync(user);
-                    _externalLoginService.SaveUserLogins(found.Id, logins);
+                    _externalLoginService.SaveUserLogins(found.Id, logins.Select(UserLoginInfoWrapper.Wrap));
                 }
             }
         }
@@ -382,7 +382,7 @@ namespace Umbraco.Core.Security
             if (login == null) throw new ArgumentNullException("login");
 
             //get all logins associated with the login id
-            var result = _externalLoginService.Find(login).ToArray();
+            var result = _externalLoginService.Find(UserLoginInfoWrapper.Wrap(login)).ToArray();
             if (result.Any())
             {
                 //return the first user that matches the result

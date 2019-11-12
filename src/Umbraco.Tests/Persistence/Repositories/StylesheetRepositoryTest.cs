@@ -6,6 +6,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
@@ -30,6 +31,11 @@ namespace Umbraco.Tests.Persistence.Repositories
             _fileSystem.AddFile("styles.css", stream);
         }
 
+        private IStylesheetRepository CreateRepository()
+        {
+            return new StylesheetRepository(_fileSystems, new IOHelper());
+        }
+
         [Test]
         public void Can_Instantiate_Repository()
         {
@@ -37,7 +43,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (ScopeProvider.CreateScope())
             {
                 // Act
-                var repository = new StylesheetRepository(_fileSystems);
+                var repository = CreateRepository();
 
 
                 // Assert
@@ -51,7 +57,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             using (ScopeProvider.CreateScope())
             {
-                var repository = new StylesheetRepository(_fileSystems);
+                var repository = CreateRepository();
 
                 // Act
                 var stylesheet = new Stylesheet("test-add.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
@@ -69,7 +75,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             using (ScopeProvider.CreateScope())
             {
-                var repository = new StylesheetRepository(_fileSystems);
+                var repository = CreateRepository();
 
                 // Act
                 var stylesheet = new Stylesheet("test-update.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
@@ -96,10 +102,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             using (ScopeProvider.CreateScope())
             {
-                var repository = new StylesheetRepository(_fileSystems);
+                var repository = CreateRepository();
 
                 // Act
-                var stylesheet = new Stylesheet("test-update.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
+                IStylesheet stylesheet = new Stylesheet("test-update.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
                 repository.Save(stylesheet);
 
 
@@ -123,7 +129,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             using (ScopeProvider.CreateScope())
             {
-                var repository = new StylesheetRepository(_fileSystems);
+                var repository = CreateRepository();
 
                 // Act
                 var stylesheet = new Stylesheet("test-update.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
@@ -142,7 +148,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             using (ScopeProvider.CreateScope())
             {
-                var repository = new StylesheetRepository(_fileSystems);
+                var repository = CreateRepository();
 
                 // Act
                 var stylesheet = new Stylesheet("test-delete.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
@@ -163,7 +169,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             using (ScopeProvider.CreateScope())
             {
-                var repository = new StylesheetRepository(_fileSystems);
+                var repository = CreateRepository();
 
                 // Act
                 var stylesheet = repository.Get("styles.css");
@@ -182,7 +188,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             using (ScopeProvider.CreateScope())
             {
-                var repository = new StylesheetRepository(_fileSystems);
+                var repository = CreateRepository();
 
                 var stylesheet = new Stylesheet("styles-v2.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
                 repository.Save(stylesheet);
@@ -205,7 +211,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             using (ScopeProvider.CreateScope())
             {
-                var repository = new StylesheetRepository(_fileSystems);
+                var repository = CreateRepository();
 
                 var stylesheet = new Stylesheet("styles-v2.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
                 repository.Save(stylesheet);
@@ -228,7 +234,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             using (ScopeProvider.CreateScope())
             {
-                var repository = new StylesheetRepository(_fileSystems);
+                var repository = CreateRepository();
 
                 // Act
                 var exists = repository.Exists("styles.css");
@@ -245,9 +251,9 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             using (ScopeProvider.CreateScope())
             {
-                var repository = new StylesheetRepository(_fileSystems);
+                var repository = CreateRepository();
 
-                var stylesheet = new Stylesheet("test-path-1.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
+                IStylesheet stylesheet = new Stylesheet("test-path-1.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
                 repository.Save(stylesheet);
 
                 Assert.IsTrue(_fileSystem.FileExists("test-path-1.css"));

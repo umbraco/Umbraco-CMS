@@ -9,7 +9,7 @@ namespace Umbraco.Core.Xml.XPath
     /// Represents the type of a field of a content that can be navigated via XPath.
     /// </summary>
     /// <remarks>A field can be an attribute or a property.</remarks>
-    interface INavigableFieldType
+    public interface INavigableFieldType
     {
         /// <summary>
         /// Gets the name of the field type.

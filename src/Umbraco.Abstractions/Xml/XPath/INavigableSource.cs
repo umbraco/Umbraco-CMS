@@ -8,7 +8,7 @@ namespace Umbraco.Core.Xml.XPath
     /// <summary>
     /// Represents a source of content that can be navigated via XPath.
     /// </summary>
-    interface INavigableSource
+    public interface INavigableSource
     {
         /// <summary>
         /// Gets a content identified by its unique identifier.

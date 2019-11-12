@@ -12,19 +12,19 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// <summary>
     /// Represents the Script Repository
     /// </summary>
-    internal class ScriptRepository : FileRepository<string, Script>, IScriptRepository
+    internal class ScriptRepository : FileRepository<string, IScript>, IScriptRepository
     {
-        private readonly IContentSection _contentConfig;
+        private readonly IIOHelper _ioHelper;
 
-        public ScriptRepository(IFileSystems fileSystems, IContentSection contentConfig)
+        public ScriptRepository(IFileSystems fileSystems, IIOHelper ioHelper)
             : base(fileSystems.ScriptsFileSystem)
         {
-            _contentConfig = contentConfig ?? throw new ArgumentNullException(nameof(contentConfig));
+            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
         }
 
         #region Implementation of IRepository<string,Script>
 
-        public override Script Get(string id)
+        public override IScript Get(string id)
         {
             // get the relative path within the filesystem
             // (though... id should be relative already)
@@ -55,16 +55,19 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return script;
         }
 
-        public override void Save(Script entity)
+        public override void Save(IScript entity)
         {
-            base.Save(entity);
+            // TODO: Casting :/ Review GetFileContent and it's usages, need to look into it later
+            var script = (Script) entity;
+
+            base.Save(script);
 
             // ensure that from now on, content is lazy-loaded
-            if (entity.GetFileContent == null)
-                entity.GetFileContent = file => GetFileContent(file.OriginalPath);
+            if (script.GetFileContent == null)
+                script.GetFileContent = file => GetFileContent(file.OriginalPath);
         }
 
-        public override IEnumerable<Script> GetMany(params string[] ids)
+        public override IEnumerable<IScript> GetMany(params string[] ids)
         {
             //ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
             ids = ids.Distinct().ToArray();
@@ -86,7 +89,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
         }
 
-        public bool ValidateScript(Script script)
+        public bool ValidateScript(IScript script)
         {
             // get full path
             string fullPath;
@@ -102,9 +105,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             // validate path & extension
             var validDir = SystemDirectories.Scripts;
-            var isValidPath = Current.IOHelper.VerifyEditPath(fullPath, validDir);
+            var isValidPath = _ioHelper.VerifyEditPath(fullPath, validDir);
             var validExts = new[] {"js"};
-            var isValidExtension = Current.IOHelper.VerifyFileExtension(script.Path, validExts);
+            var isValidExtension = _ioHelper.VerifyFileExtension(script.Path, validExts);
             return isValidPath && isValidExtension;
         }
 

@@ -99,6 +99,8 @@ namespace Umbraco.Tests.Testing
 
         protected ILogger Logger => Factory.GetInstance<ILogger>();
 
+        protected IIOHelper IOHelper { get; private set; }
+
         protected IProfiler Profiler => Factory.GetInstance<IProfiler>();
 
         protected virtual IProfilingLogger ProfilingLogger => Factory.GetInstance<IProfilingLogger>();
@@ -129,6 +131,7 @@ namespace Umbraco.Tests.Testing
 
             var (logger, profiler) = GetLoggers(Options.Logger);
             var proflogger = new ProfilingLogger(logger, profiler);
+            IOHelper = new IOHelper();
             var appCaches = GetAppCaches();
             var globalSettings = SettingsForTests.GetDefaultGlobalSettings();
             var typeLoader = GetTypeLoader(appCaches.RuntimeCache, globalSettings, proflogger, Options.TypeLoader);
@@ -137,6 +140,7 @@ namespace Umbraco.Tests.Testing
 
             Composition = new Composition(register, typeLoader, proflogger, ComponentTests.MockRuntimeState(RuntimeLevel.Run));
 
+            Composition.RegisterUnique(IOHelper);
             Composition.RegisterUnique(typeLoader);
             Composition.RegisterUnique(logger);
             Composition.RegisterUnique(profiler);

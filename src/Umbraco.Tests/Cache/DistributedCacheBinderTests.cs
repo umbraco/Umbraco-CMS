@@ -60,8 +60,8 @@ namespace Umbraco.Tests.Cache
                 new EventDefinition<IDataTypeService, SaveEventArgs<IDataType>>(null, serviceContext.DataTypeService, new SaveEventArgs<IDataType>(Enumerable.Empty<IDataType>())),
                 new EventDefinition<IDataTypeService, DeleteEventArgs<IDataType>>(null, serviceContext.DataTypeService, new DeleteEventArgs<IDataType>(Enumerable.Empty<IDataType>())),
 
-                new EventDefinition<IFileService, SaveEventArgs<Stylesheet>>(null, serviceContext.FileService, new SaveEventArgs<Stylesheet>(Enumerable.Empty<Stylesheet>())),
-                new EventDefinition<IFileService, DeleteEventArgs<Stylesheet>>(null, serviceContext.FileService, new DeleteEventArgs<Stylesheet>(Enumerable.Empty<Stylesheet>())),
+                new EventDefinition<IFileService, SaveEventArgs<IStylesheet>>(null, serviceContext.FileService, new SaveEventArgs<IStylesheet>(Enumerable.Empty<IStylesheet>())),
+                new EventDefinition<IFileService, DeleteEventArgs<IStylesheet>>(null, serviceContext.FileService, new DeleteEventArgs<IStylesheet>(Enumerable.Empty<IStylesheet>())),
 
                 new EventDefinition<IDomainService, SaveEventArgs<IDomain>>(null, serviceContext.DomainService, new SaveEventArgs<IDomain>(Enumerable.Empty<IDomain>())),
                 new EventDefinition<IDomainService, DeleteEventArgs<IDomain>>(null, serviceContext.DomainService, new DeleteEventArgs<IDomain>(Enumerable.Empty<IDomain>())),
