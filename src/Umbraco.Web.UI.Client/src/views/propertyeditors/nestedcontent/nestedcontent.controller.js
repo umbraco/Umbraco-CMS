@@ -690,7 +690,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         }
 
         function updatePropertyActionStates() {
-            copyAllEntriesAction.isDisabled = $scope.model.value.length === 0;
+            copyAllEntriesAction.isDisabled = !$scope.model.value || !$scope.model.value.length;
         }
 
         $scope.$watch("currentNode", function (newVal) {
