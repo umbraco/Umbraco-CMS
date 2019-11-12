@@ -71,7 +71,7 @@ namespace Umbraco.Web.Models.Mapping
             dest.Culture = culture;
 
             // if no 'IncludeProperties' were specified or this property is set to be included - we will map the value and return.
-            dest.Value = editor.GetValueEditor().ToEditor(property, DataTypeService, culture);
+            dest.Value = editor.GetValueEditor().ToEditor(property, culture);
         }
     }
 }

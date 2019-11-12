@@ -25,7 +25,7 @@ namespace Umbraco.Tests.PropertyEditors
     /// to cache. Now we always just deal with strings and we'll keep the tests that show that.
     /// </remarks>
     [TestFixture]
-    public class MultiValuePropertyEditorTests 
+    public class MultiValuePropertyEditorTests
     {
         [Test]
         public void DropDownMultipleValueEditor_Format_Data_For_Cache()
@@ -51,7 +51,7 @@ namespace Umbraco.Tests.PropertyEditors
 
             var valueEditor = dataType.Editor.GetValueEditor();
             ((DataValueEditor) valueEditor).Configuration = dataType.Configuration;
-            var result = valueEditor.ConvertDbToString(prop.PropertyType, prop.GetValue(), dataTypeService);
+            var result = valueEditor.ConvertDbToString(prop.PropertyType, prop.GetValue());
 
             Assert.AreEqual("Value 1,Value 2,Value 3", result);
         }
@@ -78,7 +78,7 @@ namespace Umbraco.Tests.PropertyEditors
             var prop = new Property(1, new PropertyType(dataType));
             prop.SetValue("Value 2");
 
-            var result = dataType.Editor.GetValueEditor().ConvertDbToString(prop.PropertyType, prop.GetValue(), dataTypeService);
+            var result = dataType.Editor.GetValueEditor().ConvertDbToString(prop.PropertyType, prop.GetValue());
 
             Assert.AreEqual("Value 2", result);
         }

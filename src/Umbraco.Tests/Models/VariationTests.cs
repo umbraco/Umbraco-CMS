@@ -8,6 +8,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Models
@@ -35,9 +36,12 @@ namespace Umbraco.Tests.Models
             var factory = Mock.Of<IFactory>();
             Current.Factory = factory;
 
+            var dataTypeService = Mock.Of<IDataTypeService>();
+            var localizationService = Mock.Of<ILocalizationService>();
+
             var dataEditors = new DataEditorCollection(new IDataEditor[]
             {
-                new DataEditor(Mock.Of<ILogger>()) { Alias = "editor", ExplicitValueEditor = new DataValueEditor("view") }
+                new DataEditor(Mock.Of<ILogger>()) { Alias = "editor", ExplicitValueEditor = new DataValueEditor(dataTypeService, localizationService, "view") }
             });
             var propertyEditors = new PropertyEditorCollection(dataEditors);
 
@@ -46,7 +50,6 @@ namespace Umbraco.Tests.Models
                 .Setup(x => x.Configuration)
                 .Returns(null);
 
-            var dataTypeService = Mock.Of<IDataTypeService>();
             Mock.Get(dataTypeService)
                 .Setup(x => x.GetDataType(It.IsAny<int>()))
                 .Returns<int>(x => dataType);
@@ -75,7 +78,7 @@ namespace Umbraco.Tests.Models
             // 1. if exact is set to true: culture cannot be null when the ContentVariation.Culture flag is set
             // 2. if wildcards is set to false: fail when "*" is passed in as either culture or segment.
             // 3. ContentVariation flag is ignored when wildcards are used.
-            // 4. Empty string is considered the same as null            
+            // 4. Empty string is considered the same as null
 
             #region Nothing
 
@@ -141,7 +144,7 @@ namespace Umbraco.Tests.Models
             #endregion
 
             #region CultureAndSegment
-            
+
             Assert4B(ContentVariation.CultureAndSegment, null, null, false, true, false, true);
             Assert4B(ContentVariation.CultureAndSegment, null, "", false, true, false, true);
             Assert4B(ContentVariation.CultureAndSegment, null, "*", false, false, false, true);
@@ -163,7 +166,7 @@ namespace Umbraco.Tests.Models
         }
 
         /// <summary>
-        /// Asserts the result of <see cref="ContentVariationExtensions.ValidateVariation(ContentVariation, string, string, bool, bool, bool)"/> 
+        /// Asserts the result of <see cref="ContentVariationExtensions.ValidateVariation(ContentVariation, string, string, bool, bool, bool)"/>
         /// </summary>
         /// <param name="variation"></param>
         /// <param name="culture"></param>

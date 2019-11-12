@@ -59,12 +59,12 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Converts a property value to a value for the editor.
         /// </summary>
-        object ToEditor(IProperty property, IDataTypeService dataTypeService, string culture = null, string segment = null);
+        object ToEditor(IProperty property, string culture = null, string segment = null);
 
         // TODO: / deal with this when unplugging the xml cache
         // why property vs propertyType? services should be injected! etc...
-        IEnumerable<XElement> ConvertDbToXml(IProperty property, IDataTypeService dataTypeService, ILocalizationService localizationService, bool published);
-        XNode ConvertDbToXml(IPropertyType propertyType, object value, IDataTypeService dataTypeService);
-        string ConvertDbToString(IPropertyType propertyType, object value, IDataTypeService dataTypeService);
+        IEnumerable<XElement> ConvertDbToXml(IProperty property, bool published);
+        XNode ConvertDbToXml(IPropertyType propertyType, object value);
+        string ConvertDbToString(IPropertyType propertyType, object value);
     }
 }

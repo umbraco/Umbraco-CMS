@@ -28,7 +28,7 @@ namespace Umbraco.Web.PropertyEditors
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public override object ToEditor(IProperty property, IDataTypeService dataTypeService, string culture = null, string segment = null)
+        public override object ToEditor(IProperty property, string culture = null, string segment = null)
         {
             var value = property.GetValue(culture, segment)?.ToString();
 
@@ -118,7 +118,7 @@ namespace Umbraco.Web.PropertyEditors
                 _logger.Error<MultiUrlPickerValueEditor>("Error getting links", ex);
             }
 
-            return base.ToEditor(property, dataTypeService, culture, segment);
+            return base.ToEditor(property, culture, segment);
         }
 
 

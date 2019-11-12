@@ -92,7 +92,7 @@ namespace Umbraco.Web.PropertyEditors
 
             #region DB to String
 
-            public override string ConvertDbToString(IPropertyType propertyType, object propertyValue, IDataTypeService dataTypeService)
+            public override string ConvertDbToString(IPropertyType propertyType, object propertyValue)
             {
                 if (propertyValue == null || string.IsNullOrWhiteSpace(propertyValue.ToString()))
                     return string.Empty;
@@ -129,9 +129,9 @@ namespace Umbraco.Web.PropertyEditors
                                 {
                                     continue;
                                 }
-                                var tempConfig = dataTypeService.GetDataType(propType.DataTypeId).Configuration;
+                                var tempConfig = _dataTypeService.GetDataType(propType.DataTypeId).Configuration;
                                 var valEditor = propEditor.GetValueEditor(tempConfig);
-                                var convValue = valEditor.ConvertDbToString(propType, propValues[propAlias]?.ToString(), dataTypeService);
+                                var convValue = valEditor.ConvertDbToString(propType, propValues[propAlias]?.ToString());
                                 propValues[propAlias] = convValue;
                             }
                             catch (InvalidOperationException)
@@ -152,7 +152,7 @@ namespace Umbraco.Web.PropertyEditors
 
             // note: there is NO variant support here
 
-            public override object ToEditor(IProperty property, IDataTypeService dataTypeService, string culture = null, string segment = null)
+            public override object ToEditor(IProperty property, string culture = null, string segment = null)
             {
                 var val = property.GetValue(culture, segment);
                 if (val == null || string.IsNullOrWhiteSpace(val.ToString()))
@@ -197,9 +197,9 @@ namespace Umbraco.Web.PropertyEditors
                                     propValues[propAlias] = tempProp.GetValue()?.ToString();
                                     continue;
                                 }
-                                var tempConfig = dataTypeService.GetDataType(propType.DataTypeId).Configuration;
+                                var tempConfig = _dataTypeService.GetDataType(propType.DataTypeId).Configuration;
                                 var valEditor = propEditor.GetValueEditor(tempConfig);
-                                var convValue = valEditor.ToEditor(tempProp, dataTypeService);
+                                var convValue = valEditor.ToEditor(tempProp);
                                 propValues[propAlias] = convValue == null ? null : JToken.FromObject(convValue);
                             }
                             catch (InvalidOperationException)

@@ -236,7 +236,6 @@
     <Compile Include="Models\IDataValueEditor.cs" />
     <Compile Include="Models\Identity\IdentityMapDefinition.cs" />
     <Compile Include="Models\Identity\UserLoginInfoWrapper.cs" />
-    <Compile Include="Models\IMedia.cs" />
     <Compile Include="Models\IMediaType.cs" />
     <Compile Include="Models\IMember.cs" />
     <Compile Include="Models\IMemberType.cs" />
@@ -295,8 +294,6 @@
     <Compile Include="Services\Changes\ContentTypeChangeExtensions.cs" />
     <Compile Include="Services\IDataTypeService.cs" />
     <Compile Include="Services\IEntityService.cs" />
-    <Compile Include="Services\IFileService.cs" />
-    <Compile Include="Services\IMacroService.cs" />
     <Compile Include="Services\IMembershipMemberService.cs" />
     <Compile Include="Services\INotificationService.cs" />
     <Compile Include="Services\IPackagingService.cs" />
