@@ -157,8 +157,6 @@
     <Compile Include="Configuration\ConfigsFactory.cs" />
     <Compile Include="Configuration\GlobalSettings.cs" />
     <Compile Include="Configuration\GlobalSettingsExtensions.cs" />
-    <Compile Include="Configuration\Grid\GridConfig.cs" />
-    <Compile Include="Configuration\Grid\GridEditorsConfig.cs" />
     <Compile Include="ConventionsHelper.cs" />
     <Compile Include="Events\ContentPublishedEventArgs.cs" />
     <Compile Include="Events\ContentPublishingEventArgs.cs" />
@@ -1035,6 +1033,5 @@
       <Name>Umbraco.Configuration</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

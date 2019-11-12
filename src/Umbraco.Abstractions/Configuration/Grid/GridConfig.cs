@@ -5,7 +5,7 @@ using Umbraco.Core.Manifest;
 
 namespace Umbraco.Core.Configuration.Grid
 {
-    class GridConfig : IGridConfig
+    public class GridConfig : IGridConfig
     {
         public GridConfig(ILogger logger, AppCaches appCaches, DirectoryInfo configFolder, IManifestParser manifestParser, bool isDebug)
         {
