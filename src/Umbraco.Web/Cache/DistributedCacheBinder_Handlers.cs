@@ -380,8 +380,8 @@ namespace Umbraco.Web.Cache
         }
 
         // TODO: our weird events handling wants this for now
-        private void FileService_DeletedStylesheet(IFileService sender, DeleteEventArgs<Stylesheet> e) { }
-        private void FileService_SavedStylesheet(IFileService sender, SaveEventArgs<Stylesheet> e) { }
+        private void FileService_DeletedStylesheet(IFileService sender, DeleteEventArgs<IStylesheet> e) { }
+        private void FileService_SavedStylesheet(IFileService sender, SaveEventArgs<IStylesheet> e) { }
 
         #endregion
 
