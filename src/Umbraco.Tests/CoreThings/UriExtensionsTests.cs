@@ -1,6 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Tests.TestHelpers;
 
@@ -14,13 +15,13 @@ namespace Umbraco.Tests.CoreThings
         [SetUp]
         public void SetUp()
         {
-            _root = SystemDirectories.Root;
+            _root = Current.SystemDirectories.Root;
         }
 
         [TearDown]
         public void TearDown()
         {
-            SystemDirectories.Root = _root;
+            Current.SystemDirectories.Root = _root;
         }
 
         [TestCase("http://www.domain.com/umbraco", "", true)]
@@ -32,7 +33,7 @@ namespace Umbraco.Tests.CoreThings
         [TestCase("http://www.domain.com/umbraco/test/test.js", "", true)]
         [TestCase("http://www.domain.com/umbrac", "", false)]
         [TestCase("http://www.domain.com/test", "", false)]
-        [TestCase("http://www.domain.com/test/umbraco", "", false)]        
+        [TestCase("http://www.domain.com/test/umbraco", "", false)]
         [TestCase("http://www.domain.com/Umbraco/Backoffice/blah", "", true)]
         [TestCase("http://www.domain.com/Umbraco/anything", "", true)]
         [TestCase("http://www.domain.com/Umbraco/anything/", "", true)]
@@ -44,7 +45,7 @@ namespace Umbraco.Tests.CoreThings
         [TestCase("http://www.domain.com/umbraco/test/legacyAjaxCalls.ashx?some=query&blah=js", "", true)]
         public void Is_Back_Office_Request(string input, string virtualPath, bool expected)
         {
-            SystemDirectories.Root = virtualPath;
+            Current.SystemDirectories.Root = virtualPath;
             var globalConfig = SettingsForTests.GenerateMockGlobalSettings();
             var source = new Uri(input);
             Assert.AreEqual(expected, source.IsBackOfficeRequest(virtualPath, globalConfig));
@@ -58,7 +59,7 @@ namespace Umbraco.Tests.CoreThings
         [TestCase("http://www.domain.com/install/test/test.js", true)]
         [TestCase("http://www.domain.com/instal", false)]
         [TestCase("http://www.domain.com/umbraco", false)]
-        [TestCase("http://www.domain.com/umbraco/umbraco", false)]        
+        [TestCase("http://www.domain.com/umbraco/umbraco", false)]
         public void Is_Installer_Request(string input, bool expected)
         {
             var source = new Uri(input);

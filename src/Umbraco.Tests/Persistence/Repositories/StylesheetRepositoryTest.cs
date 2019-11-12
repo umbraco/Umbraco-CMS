@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
@@ -25,7 +26,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.SetUp();
 
             _fileSystems = Mock.Of<IFileSystems>();
-            _fileSystem = new PhysicalFileSystem(SystemDirectories.Css);
+            _fileSystem = new PhysicalFileSystem(Current.SystemDirectories.Css);
             Mock.Get(_fileSystems).Setup(x => x.StylesheetsFileSystem).Returns(_fileSystem);
             var stream = CreateStream("body {background:#EE7600; color:#FFF;}");
             _fileSystem.AddFile("styles.css", stream);
@@ -33,7 +34,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private IStylesheetRepository CreateRepository()
         {
-            return new StylesheetRepository(_fileSystems, new IOHelper());
+            return new StylesheetRepository(_fileSystems, IOHelper);
         }
 
         [Test]

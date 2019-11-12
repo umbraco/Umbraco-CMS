@@ -90,7 +90,7 @@ namespace Umbraco.Web.Editors
 
         private void PopulateFromPackageData(LocalPackageInstallModel model)
         {
-            var zipFile = new FileInfo(Path.Combine(Current.IOHelper.MapPath(SystemDirectories.Packages), model.ZipFileName));
+            var zipFile = new FileInfo(Path.Combine(Current.IOHelper.MapPath(Current.SystemDirectories.Packages), model.ZipFileName));
 
             var ins = Services.PackagingService.GetCompiledPackageInfo(zipFile);
 
@@ -132,7 +132,7 @@ namespace Umbraco.Web.Editors
             if (Request.Content.IsMimeMultipartContent() == false)
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
 
-            var root = Current.IOHelper.MapPath(SystemDirectories.TempFileUploads);
+            var root = Current.IOHelper.MapPath(Current.SystemDirectories.TempFileUploads);
             //ensure it exists
             Directory.CreateDirectory(root);
             var provider = new MultipartFormDataStreamProvider(root);
@@ -159,7 +159,7 @@ namespace Umbraco.Web.Editors
                 {
                     //we always save package files to /App_Data/packages/package-guid.umb for processing as a standard so lets copy.
 
-                    var packagesFolder = Current.IOHelper.MapPath(SystemDirectories.Packages);
+                    var packagesFolder = Current.IOHelper.MapPath(Current.SystemDirectories.Packages);
                     Directory.CreateDirectory(packagesFolder);
                     var packageFile = Path.Combine(packagesFolder, model.PackageGuid + ".umb");
                     File.Copy(file.LocalFileName, packageFile);
@@ -211,7 +211,7 @@ namespace Umbraco.Web.Editors
         {
             //Default path
             string fileName = packageGuid + ".umb";
-            if (File.Exists(Path.Combine(Current.IOHelper.MapPath(SystemDirectories.Packages), fileName)) == false)
+            if (File.Exists(Path.Combine(Current.IOHelper.MapPath(Current.SystemDirectories.Packages), fileName)) == false)
             {
                 var packageFile = await Services.PackagingService.FetchPackageFileAsync(
                     Guid.Parse(packageGuid),
@@ -251,7 +251,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public PackageInstallModel Import(PackageInstallModel model)
         {
-            var zipFile = new FileInfo(Path.Combine(Current.IOHelper.MapPath(SystemDirectories.Packages), model.ZipFileName));
+            var zipFile = new FileInfo(Path.Combine(Current.IOHelper.MapPath(Current.SystemDirectories.Packages), model.ZipFileName));
 
             var packageInfo = Services.PackagingService.GetCompiledPackageInfo(zipFile);
 

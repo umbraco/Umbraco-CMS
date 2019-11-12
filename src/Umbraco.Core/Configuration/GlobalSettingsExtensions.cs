@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Web;
 using System.Web.Routing;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Configuration
@@ -42,8 +43,8 @@ namespace Umbraco.Core.Configuration
             }
 
             var path = globalSettings.Path;
-            if (path.StartsWith(SystemDirectories.Root)) // beware of TrimStart, see U4-2518
-                path = path.Substring(SystemDirectories.Root.Length);
+            if (path.StartsWith(Current.SystemDirectories.Root)) // beware of TrimStart, see U4-2518
+                path = path.Substring(Current.SystemDirectories.Root.Length);
             return path.TrimStart('~').TrimStart('/').Replace('/', '-').Trim().ToLower();
         }
 

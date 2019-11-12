@@ -118,9 +118,9 @@ namespace Umbraco.Tests.TestHelpers
             var localizedTextService = GetLazyService<ILocalizedTextService>(factory, c => new LocalizedTextService(
                     new Lazy<LocalizedTextServiceFileSources>(() =>
                     {
-                        var mainLangFolder = new DirectoryInfo(Current.IOHelper.MapPath(SystemDirectories.Umbraco + "/config/lang/"));
-                        var appPlugins = new DirectoryInfo(Current.IOHelper.MapPath(SystemDirectories.AppPlugins));
-                        var configLangFolder = new DirectoryInfo(Current.IOHelper.MapPath(SystemDirectories.Config + "/lang/"));
+                        var mainLangFolder = new DirectoryInfo(Current.IOHelper.MapPath(Current.SystemDirectories.Umbraco + "/config/lang/"));
+                        var appPlugins = new DirectoryInfo(Current.IOHelper.MapPath(Current.SystemDirectories.AppPlugins));
+                        var configLangFolder = new DirectoryInfo(Current.IOHelper.MapPath(Current.SystemDirectories.Config + "/lang/"));
 
                         var pluginLangFolders = appPlugins.Exists == false
                             ? Enumerable.Empty<LocalizedTextServiceSupplementaryFileSource>()

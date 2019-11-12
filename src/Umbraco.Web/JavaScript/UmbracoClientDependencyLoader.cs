@@ -18,7 +18,7 @@ namespace Umbraco.Web.JavaScript
         public UmbracoClientDependencyLoader()
             : base()
         {
-            this.AddPath("UmbracoRoot", Current.IOHelper.ResolveUrl(SystemDirectories.Umbraco));
+            this.AddPath("UmbracoRoot", Current.IOHelper.ResolveUrl(Current.SystemDirectories.Umbraco));
             this.ProviderName = LoaderControlProvider.DefaultName;
 
         }

@@ -180,7 +180,7 @@ namespace Umbraco.Web
             return Attempt.If(reason == EnsureRoutableOutcome.IsRoutable, reason);
         }
 
-        
+
 
         private bool EnsureRuntime(HttpContextBase httpContext, Uri uri)
         {
@@ -205,7 +205,7 @@ namespace Umbraco.Web
                 case RuntimeLevel.Upgrade:
                     // redirect to install
                     ReportRuntime(level, "Umbraco must install or upgrade.");
-                    var installPath = UriUtility.ToAbsolute(SystemDirectories.Install);
+                    var installPath = UriUtility.ToAbsolute(Current.SystemDirectories.Install);
                     var installUrl = $"{installPath}/?redir=true&url={HttpUtility.UrlEncode(uri.ToString())}";
                     httpContext.Response.Redirect(installUrl, true);
                     return false; // cannot serve content
@@ -436,6 +436,6 @@ namespace Umbraco.Web
 
         #endregion
 
-        
+
     }
 }

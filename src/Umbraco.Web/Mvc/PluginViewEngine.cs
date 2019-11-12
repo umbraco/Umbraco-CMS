@@ -35,16 +35,16 @@ namespace Umbraco.Web.Mvc
 
             var viewLocationsArray = new[]
                 {
-                    string.Concat(SystemDirectories.AppPlugins, "/{2}/Views/{1}/{0}.cshtml"),
-                    string.Concat(SystemDirectories.AppPlugins, "/{2}/Views/{1}/{0}.vbhtml")
+                    string.Concat(Current.SystemDirectories.AppPlugins, "/{2}/Views/{1}/{0}.cshtml"),
+                    string.Concat(Current.SystemDirectories.AppPlugins, "/{2}/Views/{1}/{0}.vbhtml")
                 };
 
             //set all of the area view locations to the plugin folder
             AreaViewLocationFormats = viewLocationsArray
                 .Concat(new[]
                     {
-                        string.Concat(SystemDirectories.AppPlugins, "/{2}/Views/Shared/{0}.cshtml"),
-                        string.Concat(SystemDirectories.AppPlugins, "/{2}/Views/Shared/{0}.vbhtml")
+                        string.Concat(Current.SystemDirectories.AppPlugins, "/{2}/Views/Shared/{0}.cshtml"),
+                        string.Concat(Current.SystemDirectories.AppPlugins, "/{2}/Views/Shared/{0}.vbhtml")
                     })
                 .ToArray();
 
@@ -53,15 +53,15 @@ namespace Umbraco.Web.Mvc
             AreaPartialViewLocationFormats = new[]
                 {
                     //will be used when we have partial view and child action macros
-                    string.Concat(SystemDirectories.AppPlugins, "/{2}/Views/Partials/{0}.cshtml"),
-                    string.Concat(SystemDirectories.AppPlugins, "/{2}/Views/Partials/{0}.vbhtml"),
-                    string.Concat(SystemDirectories.AppPlugins, "/{2}/Views/MacroPartials/{0}.cshtml"),
-                    string.Concat(SystemDirectories.AppPlugins, "/{2}/Views/MacroPartials/{0}.vbhtml"),
-                    //for partials
-                    string.Concat(SystemDirectories.AppPlugins, "/{2}/Views/{1}/{0}.cshtml"),
-                    string.Concat(SystemDirectories.AppPlugins, "/{2}/Views/{1}/{0}.vbhtml"),
-                    string.Concat(SystemDirectories.AppPlugins, "/{2}/Views/Shared/{0}.cshtml"),
-                    string.Concat(SystemDirectories.AppPlugins, "/{2}/Views/Shared/{0}.vbhtml")
+                    string.Concat(Current.SystemDirectories.AppPlugins, "/{2}/Views/Partials/{0}.cshtml"),
+                    string.Concat(Current.SystemDirectories.AppPlugins, "/{2}/Views/Partials/{0}.vbhtml"),
+                    string.Concat(Current.SystemDirectories.AppPlugins, "/{2}/Views/MacroPartials/{0}.cshtml"),
+                    string.Concat(Current.SystemDirectories.AppPlugins, "/{2}/Views/MacroPartials/{0}.vbhtml"),
+                    //for partialsCurrent.
+                    string.Concat(Current.SystemDirectories.AppPlugins, "/{2}/Views/{1}/{0}.cshtml"),
+                    string.Concat(Current.SystemDirectories.AppPlugins, "/{2}/Views/{1}/{0}.vbhtml"),
+                    string.Concat(Current.SystemDirectories.AppPlugins, "/{2}/Views/Shared/{0}.cshtml"),
+                    string.Concat(Current.SystemDirectories.AppPlugins, "/{2}/Views/Shared/{0}.vbhtml")
                 };
 
         }

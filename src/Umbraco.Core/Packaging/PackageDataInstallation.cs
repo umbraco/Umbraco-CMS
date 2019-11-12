@@ -6,6 +6,7 @@ using System.Web;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Umbraco.Core.Collections;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -1317,7 +1318,7 @@ namespace Umbraco.Core.Packaging
 
         private string ViewPath(string alias)
         {
-            return SystemDirectories.MvcViews + "/" + alias.Replace(" ", "") + ".cshtml";
+            return Current.SystemDirectories.MvcViews + "/" + alias.Replace(" ", "") + ".cshtml";
         }
 
         #endregion

@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -20,7 +21,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             base.SetUp();
 
-            _fileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews + "/Partials/");
+            _fileSystem = new PhysicalFileSystem(Current.SystemDirectories.MvcViews + "/Partials/");
         }
 
         protected override void Compose()

@@ -10,10 +10,10 @@ namespace Umbraco.Core.Runtime
             // ensure we have some essential directories
             // every other component can then initialize safely
             Current.IOHelper.EnsurePathExists("~/App_Data");
-            Current.IOHelper.EnsurePathExists(SystemDirectories.Media);
-            Current.IOHelper.EnsurePathExists(SystemDirectories.MvcViews);
-            Current.IOHelper.EnsurePathExists(SystemDirectories.MvcViews + "/Partials");
-            Current.IOHelper.EnsurePathExists(SystemDirectories.MvcViews + "/MacroPartials");
+            Current.IOHelper.EnsurePathExists(Current.SystemDirectories.Media);
+            Current.IOHelper.EnsurePathExists(Current.SystemDirectories.MvcViews);
+            Current.IOHelper.EnsurePathExists(Current.SystemDirectories.MvcViews + "/Partials");
+            Current.IOHelper.EnsurePathExists(Current.SystemDirectories.MvcViews + "/MacroPartials");
         }
 
         public void Terminate()

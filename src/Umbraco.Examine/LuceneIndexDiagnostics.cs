@@ -72,7 +72,7 @@ namespace Umbraco.Examine
 
                 if (luceneDir is FSDirectory fsDir)
                 {
-                    d[nameof(UmbracoExamineIndex.LuceneIndexFolder)] = fsDir.Directory.ToString().ToLowerInvariant().TrimStart(Current.IOHelper.MapPath(SystemDirectories.Root).ToLowerInvariant()).Replace("\\", "/").EnsureStartsWith('/');
+                    d[nameof(UmbracoExamineIndex.LuceneIndexFolder)] = fsDir.Directory.ToString().ToLowerInvariant().TrimStart(Current.IOHelper.MapPath(Current.SystemDirectories.Root).ToLowerInvariant()).Replace("\\", "/").EnsureStartsWith('/');
                 }
 
                 return d;
