@@ -6,6 +6,7 @@ namespace Umbraco.Core.Events
 {
     /// <summary>
     /// Represents event data, for events that support cancellation, and expose impacted objects.
+    /// </summary>
     /// <typeparam name="TEventObject">The type of the exposed, impacted objects.</typeparam>
     public class CancellableEnumerableObjectEventArgs<TEventObject> : CancellableObjectEventArgs<IEnumerable<TEventObject>>, IEquatable<CancellableEnumerableObjectEventArgs<TEventObject>>
     {
