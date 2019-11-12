@@ -15,8 +15,6 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
     vm.page.saveButtonState = "init";
     vm.page.menu = {}
 
-    //var referencesLoaded = false;
-
     vm.save = saveRelationType;
 
     init();
@@ -52,13 +50,14 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
             ];
         });
 
-        // load media type references when the 'info' tab is first activated/switched to
+        // load references when the 'relations' tab is first activated/switched to
         eventsService.on("app.tabChange", function (event, args) {
             if (args.alias === "relations") {
                 loadRelations();
             }
         });
 
+        // Inital page/overview API call of relation type
         relationTypeResource.getById($routeParams.id)
             .then(function (data) {
                 bindRelationType(data);
@@ -67,7 +66,6 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
     }
 
     function changePageNumber(pageNumber) {
-        alert('pagenumber' + pageNumber);
         vm.options.pageNumber = pageNumber;
         loadRelations();
     } 
@@ -77,9 +75,7 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
     function loadRelations() {
         relationTypeResource.getPagedResults($routeParams.id, vm.options)
             .then(function (data) {
-                console.log('paged data', data);
                 formatDates(data.items);
-
                 vm.relationsLoading = false;
                 vm.relations = data;
             });
