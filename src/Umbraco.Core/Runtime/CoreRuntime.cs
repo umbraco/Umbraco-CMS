@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Web;
 using System.Web.Hosting;
 using Umbraco.Core.Cache;
@@ -43,6 +44,11 @@ namespace Umbraco.Core.Runtime
         protected IProfilingLogger ProfilingLogger { get; private set; }
 
         /// <summary>
+        /// Gets the <see cref="ITypeFinder"/>
+        /// </summary>
+        protected ITypeFinder TypeFinder { get; private set; }
+
+        /// <summary>
         /// Gets the <see cref="IIOHelper"/>
         /// </summary>
         protected IIOHelper IOHelper { get; private set; }
@@ -58,12 +64,21 @@ namespace Umbraco.Core.Runtime
 
             // loggers
             var logger = Logger = GetLogger();
+            if (logger == null)
+                throw new InvalidOperationException($"The object returned from {nameof(GetLogger)} cannot be null");
             var profiler = Profiler = GetProfiler();
+            if (profiler == null)
+                throw new InvalidOperationException($"The object returned from {nameof(GetProfiler)} cannot be null");
+
             var profilingLogger = ProfilingLogger = new ProfilingLogger(logger, profiler);
 
             IOHelper = GetIOHelper();
             if (IOHelper == null)
                 throw new InvalidOperationException($"The object returned from {nameof(GetIOHelper)} cannot be null");
+
+            TypeFinder = GetTypeFinder();
+            if (TypeFinder == null)
+                throw new InvalidOperationException($"The object returned from {nameof(GetTypeFinder)} cannot be null");
 
             // the boot loader boots using a container scope, so anything that is PerScope will
             // be disposed after the boot loader has booted, and anything else will remain.
@@ -120,8 +135,8 @@ namespace Umbraco.Core.Runtime
                 // configs
                 var configs = GetConfigs();
 
-                // type loader
-                var typeLoader = new TypeLoader(appCaches.RuntimeCache, configs.Global().LocalTempPath, ProfilingLogger);
+                // type finder/loader
+                var typeLoader = new TypeLoader(IOHelper, TypeFinder, appCaches.RuntimeCache, new DirectoryInfo(configs.Global().LocalTempPath), ProfilingLogger);
 
                 // runtime state
                 // beware! must use '() => _factory.GetInstance<T>()' and NOT '_factory.GetInstance<T>'
@@ -137,9 +152,9 @@ namespace Umbraco.Core.Runtime
                 // main dom
                 var mainDom = new MainDom(Logger);
 
-                // create the composition   
+                // create the composition
                 composition = new Composition(register, typeLoader, ProfilingLogger, _state, configs);
-                composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, mainDom, appCaches, databaseFactory, typeLoader, _state, IOHelper);
+                composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, mainDom, appCaches, databaseFactory, typeLoader, _state, TypeFinder, IOHelper);
 
                 // run handlers
                 RuntimeOptions.DoRuntimeEssentials(composition, appCaches, typeLoader, databaseFactory);
@@ -297,7 +312,6 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         public virtual void Compose(Composition composition)
         {
-            // nothing
         }
 
         #region Getters
@@ -323,11 +337,18 @@ namespace Umbraco.Core.Runtime
             => new LogProfiler(Logger);
 
         /// <summary>
+        /// Gets a <see cref="ITypeFinder"/>
+        /// </summary>
+        /// <returns></returns>
+        protected virtual ITypeFinder GetTypeFinder()
+            => new TypeFinder(Logger);
+
+        /// <summary>
         /// Gets a <see cref="IIOHelper"/>
         /// </summary>
         /// <returns></returns>
         protected virtual IIOHelper GetIOHelper()
-            => new Umbraco.Core.IO.IOHelper();
+            => Umbraco.Core.IO.IOHelper.Default;
 
         /// <summary>
         /// Gets the application caches.
@@ -339,9 +360,9 @@ namespace Umbraco.Core.Runtime
             // is overridden by the web runtime
 
             return new AppCaches(
-                new DeepCloneAppCache(new ObjectCacheAppCache()),
+                new DeepCloneAppCache(new ObjectCacheAppCache(TypeFinder)),
                 NoAppCache.Instance,
-                new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
+                new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache(TypeFinder))));
         }
 
         // by default, returns null, meaning that Umbraco should auto-detect the application root path.

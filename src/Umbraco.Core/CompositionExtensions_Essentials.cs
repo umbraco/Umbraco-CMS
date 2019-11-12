@@ -21,6 +21,7 @@ namespace Umbraco.Core
             IUmbracoDatabaseFactory databaseFactory,
             TypeLoader typeLoader,
             IRuntimeState state,
+            ITypeFinder typeFinder,
             IIOHelper ioHelper)
         {
             composition.RegisterUnique(logger);
@@ -32,6 +33,7 @@ namespace Umbraco.Core
             composition.RegisterUnique(factory => factory.GetInstance<IUmbracoDatabaseFactory>().SqlContext);
             composition.RegisterUnique(typeLoader);
             composition.RegisterUnique(state);
+            composition.RegisterUnique(typeFinder);
             composition.RegisterUnique(ioHelper);
         }
     }

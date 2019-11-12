@@ -7,6 +7,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Tests.Components;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Composing
 {
@@ -21,7 +22,7 @@ namespace Umbraco.Tests.Composing
             Current.Reset();
 
             var register = RegisterFactory.Create();
-            _composition = new Composition(register, new TypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run));
+            _composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run));
         }
 
         [TearDown]

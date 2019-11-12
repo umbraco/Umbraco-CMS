@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using Moq;
 using NUnit.Framework;
@@ -22,10 +23,9 @@ namespace Umbraco.Tests.Composing
         {
             ProfilingLogger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
 
-            TypeLoader = new TypeLoader(NoAppCache.Instance, Current.IOHelper.MapPath("~/App_Data/TEMP"), ProfilingLogger, detectChanges: false)
-            {
-                AssembliesToScan = AssembliesToScan
-            };
+            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var ioHelper = IOHelper.Default;
+            TypeLoader = new TypeLoader(ioHelper, typeFinder, NoAppCache.Instance, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), ProfilingLogger, false, AssembliesToScan);
         }
 
         [TearDown]

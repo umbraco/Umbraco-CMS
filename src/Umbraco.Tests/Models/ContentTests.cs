@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using Umbraco.Core;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.CompositionExtensions;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
@@ -269,7 +270,7 @@ namespace Umbraco.Tests.Models
             content.UpdateDate = DateTime.Now;
             content.WriterId = 23;
 
-            var runtimeCache = new ObjectCacheAppCache();
+            var runtimeCache = new ObjectCacheAppCache(new TypeFinder(Mock.Of<ILogger>()));
             runtimeCache.Insert(content.Id.ToString(CultureInfo.InvariantCulture), () => content);
 
             var proflog = GetTestProfilingLogger();

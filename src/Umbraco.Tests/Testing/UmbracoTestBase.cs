@@ -101,6 +101,8 @@ namespace Umbraco.Tests.Testing
 
         protected IIOHelper IOHelper { get; private set; }
 
+        protected ITypeFinder TypeFinder { get; private set; }
+
         protected IProfiler Profiler => Factory.GetInstance<IProfiler>();
 
         protected virtual IProfilingLogger ProfilingLogger => Factory.GetInstance<IProfilingLogger>();
@@ -131,16 +133,19 @@ namespace Umbraco.Tests.Testing
 
             var (logger, profiler) = GetLoggers(Options.Logger);
             var proflogger = new ProfilingLogger(logger, profiler);
-            IOHelper = new IOHelper();
+            IOHelper = Umbraco.Core.IO.IOHelper.Default;
+            TypeFinder = new TypeFinder(logger);
             var appCaches = GetAppCaches();
             var globalSettings = SettingsForTests.GetDefaultGlobalSettings();
-            var typeLoader = GetTypeLoader(appCaches.RuntimeCache, globalSettings, proflogger, Options.TypeLoader);
+            var typeLoader = GetTypeLoader(IOHelper, TypeFinder, appCaches.RuntimeCache, globalSettings, proflogger, Options.TypeLoader);
 
             var register = RegisterFactory.Create();
 
             Composition = new Composition(register, typeLoader, proflogger, ComponentTests.MockRuntimeState(RuntimeLevel.Run));
 
+
             Composition.RegisterUnique(IOHelper);
+            Composition.RegisterUnique(TypeFinder);
             Composition.RegisterUnique(typeLoader);
             Composition.RegisterUnique(logger);
             Composition.RegisterUnique(profiler);
@@ -269,38 +274,35 @@ namespace Umbraco.Tests.Testing
                 .ComposeWebMappingProfiles();
         }
 
-        protected virtual TypeLoader GetTypeLoader(IAppPolicyCache runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger, UmbracoTestOptions.TypeLoader option)
+        protected virtual TypeLoader GetTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger, UmbracoTestOptions.TypeLoader option)
         {
             switch (option)
             {
                 case UmbracoTestOptions.TypeLoader.Default:
-                    return _commonTypeLoader ?? (_commonTypeLoader = CreateCommonTypeLoader(runtimeCache, globalSettings, logger));
+                    return _commonTypeLoader ?? (_commonTypeLoader = CreateCommonTypeLoader(ioHelper, typeFinder, runtimeCache, globalSettings, logger));
                 case UmbracoTestOptions.TypeLoader.PerFixture:
-                    return _featureTypeLoader ?? (_featureTypeLoader = CreateTypeLoader(runtimeCache, globalSettings, logger));
+                    return _featureTypeLoader ?? (_featureTypeLoader = CreateTypeLoader(ioHelper, typeFinder, runtimeCache, globalSettings, logger));
                 case UmbracoTestOptions.TypeLoader.PerTest:
-                    return CreateTypeLoader(runtimeCache, globalSettings, logger);
+                    return CreateTypeLoader(ioHelper, typeFinder, runtimeCache, globalSettings, logger);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(option));
             }
         }
 
-        protected virtual TypeLoader CreateTypeLoader(IAppPolicyCache runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
+        protected virtual TypeLoader CreateTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
         {
-            return CreateCommonTypeLoader(runtimeCache, globalSettings, logger);
+            return CreateCommonTypeLoader(ioHelper, typeFinder, runtimeCache, globalSettings, logger);
         }
 
         // common to all tests = cannot be overriden
-        private static TypeLoader CreateCommonTypeLoader(IAppPolicyCache runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
+        private static TypeLoader CreateCommonTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
         {
-            return new TypeLoader(runtimeCache, globalSettings.LocalTempPath, logger, false)
+            return new TypeLoader(ioHelper, typeFinder, runtimeCache, new DirectoryInfo(globalSettings.LocalTempPath), logger, false, new[]
             {
-                AssembliesToScan = new[]
-                {
-                    Assembly.Load("Umbraco.Core"),
-                    Assembly.Load("Umbraco.Web"),
-                    Assembly.Load("Umbraco.Tests")
-                }
-            };
+                Assembly.Load("Umbraco.Core"),
+                Assembly.Load("Umbraco.Web"),
+                Assembly.Load("Umbraco.Tests")
+            });
         }
 
         protected virtual void ComposeDatabase(UmbracoTestOptions.Database option)
@@ -361,7 +363,7 @@ namespace Umbraco.Tests.Testing
             Composition.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty
 
             Composition.RegisterUnique(factory
-                => TestObjects.GetScopeProvider(factory.TryGetInstance<ILogger>(), factory.TryGetInstance<FileSystems>(), factory.TryGetInstance<IUmbracoDatabaseFactory>()));
+                => TestObjects.GetScopeProvider(factory.TryGetInstance<ILogger>(), factory.TryGetInstance<ITypeFinder>(), factory.TryGetInstance<FileSystems>(), factory.TryGetInstance<IUmbracoDatabaseFactory>()));
             Composition.RegisterUnique(factory => (IScopeAccessor) factory.GetInstance<IScopeProvider>());
 
             Composition.ComposeServices();

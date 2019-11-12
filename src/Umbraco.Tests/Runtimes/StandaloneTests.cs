@@ -61,14 +61,16 @@ namespace Umbraco.Tests.Runtimes
             var profilingLogger = new ProfilingLogger(logger, profiler);
             var appCaches = AppCaches.Disabled;
             var databaseFactory = new UmbracoDatabaseFactory(logger, new Lazy<IMapperCollection>(() => factory.GetInstance<IMapperCollection>()));
-            var typeLoader = new TypeLoader(appCaches.RuntimeCache, Current.IOHelper.MapPath("~/App_Data/TEMP"), profilingLogger);
+            var typeFinder = new TypeFinder(logger);
+            var ioHelper = IOHelper.Default;
+            var typeLoader = new TypeLoader(ioHelper, typeFinder, appCaches.RuntimeCache, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), profilingLogger);
             var mainDom = new SimpleMainDom();
             var runtimeState = new RuntimeState(logger, null, null, new Lazy<IMainDom>(() => mainDom), new Lazy<IServerRegistrar>(() => factory.GetInstance<IServerRegistrar>()));
 
             // create the register and the composition
             var register = RegisterFactory.Create();
             var composition = new Composition(register, typeLoader, profilingLogger, runtimeState);
-            composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, new IOHelper());
+            composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper);
 
             // create the core runtime and have it compose itself
             var coreRuntime = new CoreRuntime();
@@ -249,7 +251,9 @@ namespace Umbraco.Tests.Runtimes
             var profilingLogger = new ProfilingLogger(logger, profiler);
             var appCaches = AppCaches.Disabled;
             var databaseFactory = Mock.Of<IUmbracoDatabaseFactory>();
-            var typeLoader = new TypeLoader(appCaches.RuntimeCache, Current.IOHelper.MapPath("~/App_Data/TEMP"), profilingLogger);
+            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
+            var ioHelper = IOHelper.Default;
+            var typeLoader = new TypeLoader(ioHelper, typeFinder, appCaches.RuntimeCache, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), profilingLogger);
             var runtimeState = Mock.Of<IRuntimeState>();
             Mock.Get(runtimeState).Setup(x => x.Level).Returns(RuntimeLevel.Run);
             var mainDom = Mock.Of<IMainDom>();
@@ -258,7 +262,7 @@ namespace Umbraco.Tests.Runtimes
             // create the register and the composition
             var register = RegisterFactory.Create();
             var composition = new Composition(register, typeLoader, profilingLogger, runtimeState);
-            composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, new IOHelper());
+            composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper);
 
             // create the core runtime and have it compose itself
             var coreRuntime = new CoreRuntime();

@@ -17,6 +17,7 @@ namespace Umbraco.Core.Scoping
     {
         private readonly ScopeProvider _scopeProvider;
         private readonly ILogger _logger;
+        private readonly ITypeFinder _typeFinder;
 
         private readonly IsolationLevel _isolationLevel;
         private readonly RepositoryCacheMode _repositoryCacheMode;
@@ -35,7 +36,7 @@ namespace Umbraco.Core.Scoping
 
         // initializes a new scope
         private Scope(ScopeProvider scopeProvider,
-            ILogger logger, FileSystems fileSystems, Scope parent, ScopeContext scopeContext, bool detachable,
+            ILogger logger, ITypeFinder typeFinder, FileSystems fileSystems, Scope parent, ScopeContext scopeContext, bool detachable,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             IEventDispatcher eventDispatcher = null,
@@ -45,6 +46,7 @@ namespace Umbraco.Core.Scoping
         {
             _scopeProvider = scopeProvider;
             _logger = logger;
+            _typeFinder = typeFinder;
 
             Context = scopeContext;
 
@@ -109,26 +111,26 @@ namespace Umbraco.Core.Scoping
 
         // initializes a new scope
         public Scope(ScopeProvider scopeProvider,
-            ILogger logger, FileSystems fileSystems, bool detachable, ScopeContext scopeContext,
+            ILogger logger, ITypeFinder typeFinder, FileSystems fileSystems, bool detachable, ScopeContext scopeContext,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             IEventDispatcher eventDispatcher = null,
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false)
-            : this(scopeProvider, logger, fileSystems, null, scopeContext, detachable, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete)
+            : this(scopeProvider, logger, typeFinder, fileSystems, null, scopeContext, detachable, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete)
         { }
 
         // initializes a new scope in a nested scopes chain, with its parent
         public Scope(ScopeProvider scopeProvider,
-            ILogger logger, FileSystems fileSystems, Scope parent,
+            ILogger logger, ITypeFinder typeFinder, FileSystems fileSystems, Scope parent,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             IEventDispatcher eventDispatcher = null,
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false)
-            : this(scopeProvider, logger, fileSystems, parent, null, false, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete)
+            : this(scopeProvider, logger, typeFinder, fileSystems, parent, null, false, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete)
         { }
 
         public Guid InstanceId { get; } = Guid.NewGuid();
@@ -175,7 +177,7 @@ namespace Umbraco.Core.Scoping
                 if (ParentScope != null) return ParentScope.IsolatedCaches;
 
                 return _isolatedCaches ?? (_isolatedCaches
-                           = new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
+                           = new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache(_typeFinder))));
             }
         }
 
