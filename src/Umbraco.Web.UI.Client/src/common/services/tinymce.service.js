@@ -662,6 +662,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         sizeImageInEditor(editor, imgDomElement, img.url);
                     }
 
+                    // make sure the RTE picks up on the changes (this seems particularly relevant for Grid RTEs)
+                    editor.fire("Change");
+
                 } else{
                     // We need to create a NEW DOM <img> element to insert
                     // setting an attribute of ID to __mcenew, so we can gather a reference to the node, to be able to update its size accordingly to the size of the image.
