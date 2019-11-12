@@ -471,7 +471,6 @@
     <Compile Include="Persistence\Mappers\AuditItemMapper.cs" />
     <Compile Include="Persistence\Mappers\ConsentMapper.cs" />
     <Compile Include="Persistence\Mappers\SimpleContentTypeMapper.cs" />
-    <Compile Include="Persistence\Repositories\IAuditEntryRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\AuditEntryRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\ConsentRepository.cs" />
     <Compile Include="Persistence\SqlContextExtensions.cs" />
@@ -583,7 +582,6 @@
     <Compile Include="Models\DictionaryItem.cs" />
     <Compile Include="Models\DictionaryItemExtensions.cs" />
     <Compile Include="Models\DictionaryTranslation.cs" />
-    <Compile Include="Models\EntityContainer.cs" />
     <Compile Include="Models\EntityExtensions.cs" />
     <Compile Include="Models\GridValue.cs" />
     <Compile Include="Models\Identity\BackOfficeIdentityUser.cs" />
@@ -918,18 +916,12 @@
     <Compile Include="Persistence\Repositories\IDocumentRepository.cs" />
     <Compile Include="Persistence\Repositories\IContentTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\IContentTypeRepositoryBase.cs" />
-    <Compile Include="Persistence\Repositories\IDataTypeContainerRepository.cs" />
     <Compile Include="Persistence\Repositories\IDataTypeRepository.cs" />
-    <Compile Include="Persistence\Repositories\IDocumentTypeContainerRepository.cs" />
-    <Compile Include="Persistence\Repositories\IEntityContainerRepository.cs" />
     <Compile Include="Persistence\Repositories\IEntityRepository.cs" />
     <Compile Include="Persistence\Repositories\IMediaRepository.cs" />
-    <Compile Include="Persistence\Repositories\IMediaTypeContainerRepository.cs" />
     <Compile Include="Persistence\Repositories\IMediaTypeRepository.cs" />
-    <Compile Include="Persistence\Repositories\IMemberGroupRepository.cs" />
     <Compile Include="Persistence\Repositories\IMemberRepository.cs" />
     <Compile Include="Persistence\Repositories\IMemberTypeRepository.cs" />
-    <Compile Include="Persistence\Repositories\INotificationsRepository.cs" />
     <Compile Include="Persistence\Repositories\IPublicAccessRepository.cs" />
     <Compile Include="Persistence\Repositories\IContentRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\LanguageRepository.cs" />
