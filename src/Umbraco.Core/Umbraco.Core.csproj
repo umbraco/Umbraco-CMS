@@ -657,7 +657,6 @@
     <Compile Include="Models\UmbracoObjectTypes.cs" />
     <Compile Include="Models\UserExtensions.cs" />
     <Compile Include="Models\Validation\RequiredForPersistenceAttribute.cs" />
-    <Compile Include="NamedUdiRange.cs" />
     <Compile Include="NameValueCollectionExtensions.cs" />
     <Compile Include="ObjectJsonExtensions.cs" />
     <Compile Include="Packaging\ConflictingPackageData.cs" />
@@ -1098,11 +1097,9 @@
     <Compile Include="Sync\DatabaseServerMessenger.cs" />
     <Compile Include="Sync\RefreshInstruction.cs" />
     <Compile Include="Sync\ServerMessengerBase.cs" />
-    <Compile Include="UdiDefinitionAttribute.cs" />
     <Compile Include="UdiEntityTypeHelper.cs" />
     <Compile Include="UdiGetterExtensions.cs" />
     <Compile Include="UdiParserServiceConnectors.cs" />
-    <Compile Include="UdiRange.cs" />
     <Compile Include="UriExtensions.cs" />
     <Compile Include="PackageActions\IPackageAction.cs" />
     <Compile Include="PackageActions\PackageActionCollection.cs" />
