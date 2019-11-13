@@ -195,57 +195,23 @@ Use this directive to construct a header inside the main editor window.
 @param {string=} icon Show and edit the content icon. Opens an overlay to change the icon.
 @param {boolean=} hideIcon Set to <code>true</code> to hide icon.
 @param {string=} alias show and edit the content alias.
+@param {boolean=} aliasLocked Set to <code>true</code> to lock the alias.
 @param {boolean=} hideAlias Set to <code>true</code> to hide alias.
 @param {string=} description Add a description to the content.
 @param {boolean=} hideDescription Set to <code>true</code> to hide description.
-@param {boolean=} setpagetitle If true the page title will be set to reflect the type of data the header is working with 
-@param {string=} editorfor The localization to use to aid accessibility on the edit and create screen
+
 **/
 
 (function () {
     'use strict';
 
-    function EditorHeaderDirective(editorService, localizationService, editorState) {
-        
-        function link(scope, $injector) {
+    function EditorHeaderDirective(editorService) {
 
+        function link(scope) {
             scope.vm = {};
             scope.vm.dropdownOpen = false;
             scope.vm.currentVariant = "";
-            scope.loading = true;
-            scope.accessibility = {};
-            scope.accessibility.a11yMessage = "";
-            scope.accessibility.a11yName = "";
-            scope.accessibility.a11yMessageVisible = false;
-            scope.accessibility.a11yNameVisible = false;
 
-            // need to call localizationService service outside of routine to set a11y due to promise requirements
-            if (editorState.current) {
-                //to do make work for user create/edit
-                // to do make it work for user group create/ edit
-                // to make it work for language edit/create
-                scope.isNew = editorState.current.id === 0 ||
-                    editorState.current.id === "0" ||
-                    editorState.current.id === -1 ||
-                    editorState.current.id === 0 ||
-                    editorState.current.id === "-1";
-
-                var localizeVars = [
-                    scope.isNew ? "placeholders_a11yCreateItem" : "placeholders_a11yEdit",
-                    "placeholders_a11yName",
-                    scope.isNew ? "general_new" : "general_edit"
-                ];
-
-                if (scope.editorfor) {
-                    localizeVars.push(scope.editorfor);
-                }
-                localizationService.localizeMany(localizeVars).then(function(data) {
-                    setAccessibilityForEditor(data);
-                    scope.loading = false;
-                });
-            } else {
-                scope.loading = false;
-            }
             scope.goBack = function () {
                 if (scope.onBack) {
                     scope.onBack();
@@ -347,6 +313,7 @@ Use this directive to construct a header inside the main editor window.
                 icon: "=",
                 hideIcon: "@",
                 alias: "=",
+                aliasLocked: "<",
                 hideAlias: "=",
                 description: "=",
                 hideDescription: "@",
@@ -355,9 +322,7 @@ Use this directive to construct a header inside the main editor window.
                 onSelectNavigationItem: "&?",
                 key: "=",
                 onBack: "&?",
-                showBackButton: "<?",
-                editorfor: "=",
-                setpagetitle:"="
+                showBackButton: "<?"
             },
             link: link
         };
