@@ -6,43 +6,7 @@ namespace Umbraco.Core
 {
     public static class UdiEntityTypeHelper
     {
-        internal static Dictionary<string, UdiType> GetTypes() =>
-            new Dictionary<string, UdiType>
-            {
-                { Constants.UdiEntityType.Unknown, UdiType.Unknown },
-
-                { Constants.UdiEntityType.AnyGuid, UdiType.GuidUdi },
-                { Constants.UdiEntityType.Document, UdiType.GuidUdi },
-                { Constants.UdiEntityType.DocumentBlueprint, UdiType.GuidUdi },
-                { Constants.UdiEntityType.Media, UdiType.GuidUdi },
-                { Constants.UdiEntityType.Member, UdiType.GuidUdi },
-                { Constants.UdiEntityType.DictionaryItem, UdiType.GuidUdi },
-                { Constants.UdiEntityType.Macro, UdiType.GuidUdi },
-                { Constants.UdiEntityType.Template, UdiType.GuidUdi },
-                { Constants.UdiEntityType.DocumentType, UdiType.GuidUdi },
-                { Constants.UdiEntityType.DocumentTypeContainer, UdiType.GuidUdi },
-                { Constants.UdiEntityType.DocumentTypeBluePrints, UdiType.GuidUdi },
-                { Constants.UdiEntityType.MediaType, UdiType.GuidUdi },
-                { Constants.UdiEntityType.MediaTypeContainer, UdiType.GuidUdi },
-                { Constants.UdiEntityType.DataType, UdiType.GuidUdi },
-                { Constants.UdiEntityType.DataTypeContainer, UdiType.GuidUdi },
-                { Constants.UdiEntityType.MemberType, UdiType.GuidUdi },
-                { Constants.UdiEntityType.MemberGroup, UdiType.GuidUdi },
-                { Constants.UdiEntityType.RelationType, UdiType.GuidUdi },
-                { Constants.UdiEntityType.FormsForm, UdiType.GuidUdi },
-                { Constants.UdiEntityType.FormsPreValue, UdiType.GuidUdi },
-                { Constants.UdiEntityType.FormsDataSource, UdiType.GuidUdi },
-
-                { Constants.UdiEntityType.AnyString, UdiType.StringUdi },
-                { Constants.UdiEntityType.Language, UdiType.StringUdi },
-                { Constants.UdiEntityType.MacroScript, UdiType.StringUdi },
-                { Constants.UdiEntityType.MediaFile, UdiType.StringUdi },
-                { Constants.UdiEntityType.TemplateFile, UdiType.StringUdi },
-                { Constants.UdiEntityType.Script, UdiType.StringUdi },
-                { Constants.UdiEntityType.PartialView, UdiType.StringUdi },
-                { Constants.UdiEntityType.PartialViewMacro, UdiType.StringUdi },
-                { Constants.UdiEntityType.Stylesheet, UdiType.StringUdi }
-            };
+        
 
         public static string FromUmbracoObjectType(UmbracoObjectTypes umbracoObjectType)
         {

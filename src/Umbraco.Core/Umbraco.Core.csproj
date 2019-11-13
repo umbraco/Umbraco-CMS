@@ -446,7 +446,6 @@
     <Compile Include="Events\UninstallPackageEventArgs.cs" />
     <Compile Include="Composing\LightInject\LightInjectException.cs" />
     <Compile Include="FileResources\Files.Designer.cs" />
-    <Compile Include="GuidUdi.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="IO\FileSecurityException.cs" />
     <Compile Include="IO\FileSystemExtensions.cs" />
@@ -565,7 +564,6 @@
     <Compile Include="Models\UmbracoObjectTypes.cs" />
     <Compile Include="Models\UserExtensions.cs" />
     <Compile Include="Models\Validation\RequiredForPersistenceAttribute.cs" />
-    <Compile Include="NamedUdiRange.cs" />
     <Compile Include="NameValueCollectionExtensions.cs" />
     <Compile Include="ObjectJsonExtensions.cs" />
     <Compile Include="Packaging\ConflictingPackageData.cs" />
@@ -993,17 +991,13 @@
     <Compile Include="Compose\RelateOnCopyComponent.cs" />
     <Compile Include="Compose\RelateOnTrashComponent.cs" />
     <Compile Include="Strings\UrlSegmentProviderCollectionBuilder.cs" />
-    <Compile Include="StringUdi.cs" />
     <Compile Include="Sync\ApplicationUrlHelper.cs" />
     <Compile Include="Sync\DatabaseServerMessenger.cs" />
     <Compile Include="Sync\RefreshInstruction.cs" />
     <Compile Include="Sync\ServerMessengerBase.cs" />
-    <Compile Include="Udi.cs" />
-    <Compile Include="UdiDefinitionAttribute.cs" />
     <Compile Include="UdiEntityTypeHelper.cs" />
     <Compile Include="UdiGetterExtensions.cs" />
-    <Compile Include="UdiRange.cs" />
-    <Compile Include="UdiTypeConverter.cs" />
+    <Compile Include="UdiParserServiceConnectors.cs" />
     <Compile Include="UriExtensions.cs" />
     <Compile Include="PackageActions\IPackageAction.cs" />
     <Compile Include="PackageActions\PackageActionCollection.cs" />

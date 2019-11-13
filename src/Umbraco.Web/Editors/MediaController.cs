@@ -793,10 +793,9 @@ namespace Umbraco.Web.Editors
         private int GetParentIdAsInt(string parentId, bool validatePermissions)
         {
             int intParentId;
-            GuidUdi parentUdi;
 
             // test for udi
-            if (GuidUdi.TryParse(parentId, out parentUdi))
+            if (UdiParser.TryParse(parentId, out GuidUdi parentUdi))
             {
                 parentId = parentUdi.Guid.ToString();
             }

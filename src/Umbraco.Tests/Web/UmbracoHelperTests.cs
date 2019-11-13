@@ -176,7 +176,7 @@ namespace Umbraco.Tests.Web
         public static void Converting_Boxed_Udi_To_A_Udi_Returns_Original_Udi_Value()
         {
             // Arrange
-            Udi.ResetUdiTypes();
+            UdiParser.ResetUdiTypes();
             Udi sample = new GuidUdi(Constants.UdiEntityType.AnyGuid, Guid.NewGuid());
 
             // Act
@@ -198,7 +198,7 @@ namespace Umbraco.Tests.Web
         {
             // Arrange
             SetUpDependencyContainer();
-            Udi.ResetUdiTypes();
+            UdiParser.ResetUdiTypes();
             Udi sample = new GuidUdi(Constants.UdiEntityType.AnyGuid, Guid.NewGuid());
 
             // Act
@@ -220,7 +220,7 @@ namespace Umbraco.Tests.Web
         {
             // Arrange
             SetUpDependencyContainer();
-            Udi.ResetUdiTypes();
+            UdiParser.ResetUdiTypes();
             const string sample = "Hello";
 
             // Act
@@ -241,7 +241,7 @@ namespace Umbraco.Tests.Web
         public static void Converting_Unsupported_Object_To_A_Udi_Returns_False()
         {
             // Arrange
-            Udi.ResetUdiTypes();
+            UdiParser.ResetUdiTypes();
 
             var clearlyWillNotConvertToGuid = new StringBuilder(0);
 

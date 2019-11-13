@@ -1,14 +1,10 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Web;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
@@ -17,10 +13,7 @@ using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
 using Umbraco.Web.Templates;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
 
 namespace Umbraco.Tests.Web
 {
@@ -30,37 +23,9 @@ namespace Umbraco.Tests.Web
         [SetUp]
         public void SetUp()
         {
-            Current.Reset();
-
-            // FIXME: now UrlProvider depends on EntityService for GetUrl(guid) - this is bad
-            // should not depend on more than IdkMap maybe - fix this!
-            var entityService = new Mock<IEntityService>();
-            entityService.Setup(x => x.GetId(It.IsAny<Guid>(), It.IsAny<UmbracoObjectTypes>())).Returns(Attempt<int>.Fail());
-            var serviceContext = ServiceContext.CreatePartial(entityService: entityService.Object);
-
-            // FIXME: bad in a unit test - but Udi has a static ctor that wants it?!
-            var factory = new Mock<IFactory>();
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
-            var ioHelper = IOHelper.Default;
-            factory.Setup(x => x.GetInstance(typeof(TypeLoader))).Returns(
-                new TypeLoader(ioHelper, typeFinder, NoAppCache.Instance, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
-            factory.Setup(x => x.GetInstance(typeof (ServiceContext))).Returns(serviceContext);
-
-            var settings = SettingsForTests.GetDefaultUmbracoSettings();
-            factory.Setup(x => x.GetInstance(typeof(IUmbracoSettingsSection))).Returns(settings);
-
-            Current.Factory = factory.Object;
-
-            Umbraco.Web.Composing.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
-
-            Udi.ResetUdiTypes();
+            UdiParser.ResetUdiTypes();
         }
 
-        [TearDown]
-        public void TearDown()
-        {
-            Current.Reset();
-        }
 
         [TestCase("", "")]
         [TestCase("hello href=\"{localLink:1234}\" world ", "hello href=\"/my-test-url\" world ")]
@@ -71,17 +36,7 @@ namespace Umbraco.Tests.Web
         [TestCase("hello href=\"{localLink:umb^://document/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ", "hello href=\"{localLink:umb^://document/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ")]
         [TestCase("hello href=\"{localLink:umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ", "hello href=\"#\" world ")]
         public void ParseLocalLinks(string input, string result)
-        {
-            var serviceCtxMock = new TestObjects(null).GetServiceContextMock();
-
-            //setup a mock entity service from the service context to return an integer for a GUID
-            var entityService = Mock.Get(serviceCtxMock.EntityService);
-            //entityService.Setup(x => x.GetId(It.IsAny<Guid>(), It.IsAny<UmbracoObjectTypes>()))
-            //    .Returns((Guid id, UmbracoObjectTypes objType) =>
-            //    {
-            //        return Attempt.Succeed(1234);
-            //    });
-
+        {            
             //setup a mock url provider which we'll use for testing
             var testUrlProvider = new Mock<IUrlProvider>();
             testUrlProvider
@@ -106,8 +61,9 @@ namespace Umbraco.Tests.Web
             var mediaCache = Mock.Of<IPublishedMediaCache>();
             Mock.Get(mediaCache).Setup(x => x.GetById(It.IsAny<Guid>())).Returns(media);
 
+            var umbracoContextAccessor = new TestUmbracoContextAccessor();
             var umbracoContextFactory = new UmbracoContextFactory(
-                Umbraco.Web.Composing.Current.UmbracoContextAccessor,
+                umbracoContextAccessor,
                 snapshotService,
                 new TestVariationContextAccessor(),
                 new TestDefaultCultureAccessor(),

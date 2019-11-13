@@ -67,7 +67,7 @@ namespace Umbraco.Web.Editors
         public RedirectUrlSearchResult RedirectUrlsForContentItem(string contentUdi)
         {
             var redirectsResult = new RedirectUrlSearchResult();
-            if (GuidUdi.TryParse(contentUdi, out var guidIdi))
+            if (UdiParser.TryParse(contentUdi, out GuidUdi guidIdi))
             {
                 var redirectUrlService = Services.RedirectUrlService;
                 var redirects = redirectUrlService.GetContentRedirectUrls(guidIdi.Guid);

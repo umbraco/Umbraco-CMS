@@ -64,7 +64,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                     GuidUdi udi = null;
                     if (relatedLink.IsInternal)
                     {
-                        var linkIsUdi = GuidUdi.TryParse(relatedLink.Link, out udi);
+                        var linkIsUdi = UdiParser.TryParse(relatedLink.Link, out udi);
                         if (linkIsUdi == false)
                         {
                             // oh no.. probably an integer, yikes!
