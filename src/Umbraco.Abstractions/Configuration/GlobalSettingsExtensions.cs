@@ -19,16 +19,16 @@ namespace Umbraco.Core.Configuration
         /// We also make sure that the virtual directory (SystemDirectories.Root) is stripped off first, otherwise we'd end up with something
         /// like "MyVirtualDirectory-Umbraco" instead of just "Umbraco".
         /// </remarks>
-        public static string GetUmbracoMvcArea(this IGlobalSettings globalSettings, ISystemDirectories systemDirectories)
+        public static string GetUmbracoMvcArea(this IGlobalSettings globalSettings, IIOHelper ioHelper)
         {
             if (_mvcArea != null) return _mvcArea;
 
-            _mvcArea = GetUmbracoMvcAreaNoCache(globalSettings, systemDirectories);
+            _mvcArea = GetUmbracoMvcAreaNoCache(globalSettings, ioHelper);
 
             return _mvcArea;
         }
 
-        internal static string GetUmbracoMvcAreaNoCache(this IGlobalSettings globalSettings, ISystemDirectories systemDirectories)
+        internal static string GetUmbracoMvcAreaNoCache(this IGlobalSettings globalSettings, IIOHelper ioHelper)
         {
             if (globalSettings.Path.IsNullOrWhiteSpace())
             {
@@ -36,8 +36,8 @@ namespace Umbraco.Core.Configuration
             }
 
             var path = globalSettings.Path;
-            if (path.StartsWith(systemDirectories.Root)) // beware of TrimStart, see U4-2518
-                path = path.Substring(systemDirectories.Root.Length);
+            if (path.StartsWith(ioHelper.Root)) // beware of TrimStart, see U4-2518
+                path = path.Substring(ioHelper.Root.Length);
             return path.TrimStart('~').TrimStart('/').Replace('/', '-').Trim().ToLower();
         }
 

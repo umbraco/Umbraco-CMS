@@ -8,22 +8,20 @@ namespace Umbraco.Core.Configuration
     public class ConfigsFactory : IConfigsFactory
     {
         private readonly IIOHelper _ioHelper;
-        private readonly ISystemDirectories _systemDirectories;
 
-        public ConfigsFactory(IIOHelper ioHelper, ISystemDirectories systemDirectories)
+        public ConfigsFactory(IIOHelper ioHelper)
         {
             _ioHelper = ioHelper;
-            _systemDirectories = systemDirectories;
         }
 
         public Configs Create() {
             var configs =  new Configs(section => ConfigurationManager.GetSection(section));
-            configs.Add<IGlobalSettings>(() => new GlobalSettings(_ioHelper, _systemDirectories));
+            configs.Add<IGlobalSettings>(() => new GlobalSettings(_ioHelper));
             configs.Add<IUmbracoSettingsSection>("umbracoConfiguration/settings");
             configs.Add<IHealthChecks>("umbracoConfiguration/HealthChecks");
 
             configs.Add(() => new CoreDebug());
-            configs.AddCoreConfigs(_ioHelper, _systemDirectories);
+            configs.AddCoreConfigs(_ioHelper);
             return configs;
         }
     }

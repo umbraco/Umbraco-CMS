@@ -41,7 +41,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public static IConfigsFactory GetConfigsFactory()
         {
-            return new ConfigsFactory(IOHelper.Default, new SystemDirectories());
+            return new ConfigsFactory(IOHelper.Default);
         }
 
         /// <summary>

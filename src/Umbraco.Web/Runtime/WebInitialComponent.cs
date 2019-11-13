@@ -150,7 +150,7 @@ namespace Umbraco.Web.Runtime
             SurfaceControllerTypeCollection surfaceControllerTypes,
             UmbracoApiControllerTypeCollection apiControllerTypes)
         {
-            var umbracoPath = globalSettings.GetUmbracoMvcArea(Current.SystemDirectories);
+            var umbracoPath = globalSettings.GetUmbracoMvcArea(Current.IOHelper);
 
             // create the front-end route
             var defaultRoute = RouteTable.Routes.MapRoute(
@@ -175,7 +175,7 @@ namespace Umbraco.Web.Runtime
             SurfaceControllerTypeCollection surfaceControllerTypes,
             UmbracoApiControllerTypeCollection apiControllerTypes)
         {
-            var umbracoPath = globalSettings.GetUmbracoMvcArea(Current.SystemDirectories);
+            var umbracoPath = globalSettings.GetUmbracoMvcArea(Current.IOHelper);
 
             // need to find the plugin controllers and route them
             var pluginControllers = surfaceControllerTypes.Concat(apiControllerTypes).ToArray();

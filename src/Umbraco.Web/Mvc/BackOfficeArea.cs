@@ -48,6 +48,6 @@ namespace Umbraco.Web.Mvc
                 new[] {typeof (BackOfficeController).Namespace});
         }
 
-        public override string AreaName => _globalSettings.GetUmbracoMvcArea(Current.SystemDirectories);
+        public override string AreaName => _globalSettings.GetUmbracoMvcArea(Current.IOHelper);
     }
 }

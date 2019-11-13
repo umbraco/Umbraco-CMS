@@ -52,7 +52,7 @@ namespace Umbraco.Core
             //if not, then def not back office
             if (isUmbracoPath == false) return false;
 
-            var mvcArea = globalSettings.GetUmbracoMvcArea(Current.SystemDirectories);
+            var mvcArea = globalSettings.GetUmbracoMvcArea(Current.IOHelper);
             //if its the normal /umbraco path
             if (urlPath.InvariantEquals("/" + mvcArea)
                 || urlPath.InvariantEquals("/" + mvcArea + "/"))

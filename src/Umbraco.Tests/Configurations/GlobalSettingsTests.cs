@@ -17,13 +17,13 @@ namespace Umbraco.Tests.Configurations
         public override void SetUp()
         {
             base.SetUp();
-            _root = Current.SystemDirectories.Root;
+            _root = Current.IOHelper.Root;
         }
 
         public override void TearDown()
         {
             base.TearDown();
-            Current.SystemDirectories.Root = _root;
+            Current.IOHelper.Root = _root;
         }
 
         [Test]
@@ -51,8 +51,8 @@ namespace Umbraco.Tests.Configurations
             var globalSettingsMock = Mock.Get(globalSettings);
             globalSettingsMock.Setup(x => x.Path).Returns(() => Current.IOHelper.ResolveUrl(path));
 
-            Current.SystemDirectories.Root = rootPath;
-            Assert.AreEqual(outcome, globalSettings.GetUmbracoMvcAreaNoCache(new SystemDirectories()));
+            Current.IOHelper.Root = rootPath;
+            Assert.AreEqual(outcome, globalSettings.GetUmbracoMvcAreaNoCache(Core.IO.IOHelper.Default));
         }
 
 

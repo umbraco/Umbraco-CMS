@@ -115,7 +115,7 @@ namespace Umbraco.Core.IO
         }
 
         //use a tilde character instead of the complete path
-        public string ReturnPath(string settingsKey, string standardPath, bool useTilde)
+        private string ReturnPath(string settingsKey, string standardPath, bool useTilde)
         {
             var retval = ConfigurationManager.AppSettings[settingsKey];
 
@@ -125,7 +125,7 @@ namespace Umbraco.Core.IO
             return retval.TrimEnd('/');
         }
 
-        public string ReturnPath(string settingsKey, string standardPath)
+        private string ReturnPath(string settingsKey, string standardPath)
         {
             return ReturnPath(settingsKey, standardPath, false);
 

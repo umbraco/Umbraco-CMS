@@ -56,7 +56,7 @@ namespace Umbraco.Web.Mvc
             if (routes == null) throw new ArgumentNullException(nameof(routes));
             if (defaultId == null) throw new ArgumentNullException(nameof(defaultId));
 
-            var umbracoArea = globalSettings.GetUmbracoMvcArea(Current.SystemDirectories);
+            var umbracoArea = globalSettings.GetUmbracoMvcArea(Current.IOHelper);
 
             //routes are explicitly named with controller names and IDs
             var url = umbracoArea + "/" +

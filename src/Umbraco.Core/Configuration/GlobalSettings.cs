@@ -20,7 +20,6 @@ namespace Umbraco.Core.Configuration
     public class GlobalSettings : IGlobalSettings
     {
         private readonly IIOHelper _ioHelper;
-        private readonly ISystemDirectories _systemDirectories;
         private string _localTempPath;
 
         // TODO these should not be static
@@ -31,10 +30,9 @@ namespace Umbraco.Core.Configuration
         internal const string StaticReservedPaths = "~/app_plugins/,~/install/,~/mini-profiler-resources/,"; //must end with a comma!
         internal const string StaticReservedUrls = "~/config/splashes/noNodes.aspx,~/.well-known,"; //must end with a comma!
 
-        public GlobalSettings(IIOHelper ioHelper, ISystemDirectories systemDirectories)
+        public GlobalSettings(IIOHelper ioHelper)
         {
             _ioHelper = ioHelper;
-            _systemDirectories = systemDirectories;
         }
 
         /// <summary>
@@ -168,7 +166,7 @@ namespace Umbraco.Core.Configuration
             }
             set
             {
-                SaveSetting(Constants.AppSettings.ConfigurationStatus, value, _ioHelper, _systemDirectories);
+                SaveSetting(Constants.AppSettings.ConfigurationStatus, value, _ioHelper);
             }
         }
 
@@ -177,9 +175,9 @@ namespace Umbraco.Core.Configuration
         /// </summary>
         /// <param name="key">Key of the setting to be saved.</param>
         /// <param name="value">Value of the setting to be saved.</param>
-        internal static void SaveSetting(string key, string value, IIOHelper ioHelper, ISystemDirectories systemDirectories)
+        internal static void SaveSetting(string key, string value, IIOHelper ioHelper)
         {
-            var fileName = ioHelper.MapPath(string.Format("{0}/web.config", systemDirectories.Root));
+            var fileName = ioHelper.MapPath(string.Format("{0}/web.config", ioHelper.Root));
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
 
             var appSettings = xml.Root.DescendantsAndSelf("appSettings").Single();
@@ -199,9 +197,9 @@ namespace Umbraco.Core.Configuration
         /// Removes a setting from the configuration file.
         /// </summary>
         /// <param name="key">Key of the setting to be removed.</param>
-        internal static void RemoveSetting(string key, IIOHelper ioHelper, ISystemDirectories systemDirectories)
+        internal static void RemoveSetting(string key, IIOHelper ioHelper)
         {
-            var fileName = ioHelper.MapPath(string.Format("{0}/web.config", systemDirectories.Root));
+            var fileName = ioHelper.MapPath(string.Format("{0}/web.config", ioHelper.Root));
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
 
             var appSettings = xml.Root.DescendantsAndSelf("appSettings").Single();
