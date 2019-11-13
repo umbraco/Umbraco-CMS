@@ -205,7 +205,6 @@ namespace Umbraco.Web.Mvc
                     {
                         surfaceRoute = surfaceRoutes.SingleOrDefault();
                     }
-
                 }
                 else
                 {
