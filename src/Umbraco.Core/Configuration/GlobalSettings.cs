@@ -6,7 +6,6 @@ using System.Web;
 using System.Web.Configuration;
 using System.Web.Hosting;
 using System.Xml.Linq;
-using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Configuration
