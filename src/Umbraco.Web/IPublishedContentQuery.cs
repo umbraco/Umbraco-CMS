@@ -35,12 +35,15 @@ namespace Umbraco.Web
         /// <summary>
         /// Searches content.
         /// </summary>
-        /// <param name="term">Term to search.</param>
-        /// <param name="culture">Optional culture.</param>
-        /// <param name="indexName">Optional index name.</param>
+        /// <param name="term">The term to search.</param>
+        /// <param name="culture">The culture (defaults to a culture insensitive search).</param>
+        /// <param name="indexName">The name of the index to search (defaults to <see cref="Constants.UmbracoIndexes.ExternalIndexName" />).</param>
+        /// <returns>
+        /// The search results.
+        /// </returns>
         /// <remarks>
         /// <para>
-        /// When the <paramref name="culture"/> is not specified or is *, all cultures are searched.
+        /// When the <paramref name="culture" /> is not specified or is *, all cultures are searched.
         /// To search for only invariant documents and fields use null.
         /// When searching on a specific culture, all culture specific fields are searched for the provided culture and all invariant fields for all documents.
         /// </para>
@@ -51,15 +54,18 @@ namespace Umbraco.Web
         /// <summary>
         /// Searches content.
         /// </summary>
-        /// <param name="term">Term to search.</param>
-        /// <param name="skip">Numbers of items to skip.</param>
-        /// <param name="take">Numbers of items to return.</param>
-        /// <param name="totalRecords">Total number of matching items.</param>
-        /// <param name="culture">Optional culture.</param>
-        /// <param name="indexName">Optional index name.</param>
+        /// <param name="term">The term to search.</param>
+        /// <param name="skip">The amount of results to skip.</param>
+        /// <param name="take">The amount of results to take/return.</param>
+        /// <param name="totalRecords">The total amount of records.</param>
+        /// <param name="culture">The culture (defaults to a culture insensitive search).</param>
+        /// <param name="indexName">The name of the index to search (defaults to <see cref="Constants.UmbracoIndexes.ExternalIndexName" />).</param>
+        /// <returns>
+        /// The search results.
+        /// </returns>
         /// <remarks>
         /// <para>
-        /// When the <paramref name="culture"/> is not specified or is *, all cultures are searched.
+        /// When the <paramref name="culture" /> is not specified or is *, all cultures are searched.
         /// To search for only invariant documents and fields use null.
         /// When searching on a specific culture, all culture specific fields are searched for the provided culture and all invariant fields for all documents.
         /// </para>
@@ -68,18 +74,26 @@ namespace Umbraco.Web
         IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = null);
 
         /// <summary>
-        /// Executes the query and converts the results to PublishedSearchResult.
+        /// Executes the query and converts the results to <see cref="PublishedSearchResult" /> using the <see cref="Umbraco.Web.PublishedCache.IPublishedContentCache" />.
         /// </summary>
-        /// <remarks>
-        /// <para>While enumerating results, the ambient culture is changed to be the searched culture.</para>
-        /// </remarks>
+        /// <param name="query">The query.</param>
+        /// <returns>
+        /// The search results.
+        /// </returns>
         IEnumerable<PublishedSearchResult> Search(IQueryExecutor query);
 
         /// <summary>
-        /// Executes the query and converts the results to PublishedSearchResult.
+        /// Executes the query and converts the results to <see cref="PublishedSearchResult" /> using the <see cref="Umbraco.Web.PublishedCache.IPublishedContentCache" />.
         /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="skip">The amount of results to skip.</param>
+        /// <param name="take">The amount of results to take/return.</param>
+        /// <param name="totalRecords">The total amount of records.</param>
+        /// <returns>
+        /// The search results.
+        /// </returns>
         /// <remarks>
-        /// <para>While enumerating results, the ambient culture is changed to be the searched culture.</para>
+        /// Make sure only content is searched (<c>searcher.CreateQuery(IndexTypes.Content)</c>), as this only returns content, but the <paramref name="totalRecords"/> could otherwise also include media records.
         /// </remarks>
         IEnumerable<PublishedSearchResult> Search(IQueryExecutor query, int skip, int take, out long totalRecords);
     }
