@@ -7,7 +7,6 @@ namespace Umbraco.Web.Install
     /// Used for steps to be able to return a JSON structure back to the UI.
     /// </summary>
     /// <seealso cref="System.Exception" />
-    [Obsolete("Refactor the view model into a concrete serializable type.")]
     [Serializable]
     internal class InstallException : Exception
     {
@@ -84,7 +83,6 @@ namespace Umbraco.Web.Install
             : base(info, context)
         {
             View = info.GetString(nameof(View));
-            ViewModel = info.GetValue(nameof(ViewModel), typeof(object));
         }
 
         /// <summary>
@@ -101,7 +99,6 @@ namespace Umbraco.Web.Install
             }
 
             info.AddValue(nameof(View), View);
-            info.AddValue(nameof(ViewModel), ViewModel, typeof(object));
 
             base.GetObjectData(info, context);
         }
