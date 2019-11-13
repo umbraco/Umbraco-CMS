@@ -114,22 +114,7 @@ namespace Umbraco.Core.IO
             return MapPath(path, true);
         }
 
-        //use a tilde character instead of the complete path
-        public string ReturnPath(string settingsKey, string standardPath, bool useTilde)
-        {
-            var retval = ConfigurationManager.AppSettings[settingsKey];
 
-            if (string.IsNullOrEmpty(retval))
-                retval = standardPath;
-
-            return retval.TrimEnd('/');
-        }
-
-        public string ReturnPath(string settingsKey, string standardPath)
-        {
-            return ReturnPath(settingsKey, standardPath, false);
-
-        }
 
         /// <summary>
         /// Verifies that the current filepath matches a directory where the user is allowed to edit a file.
@@ -311,6 +296,18 @@ namespace Umbraco.Core.IO
         public string Css => ReturnPath("umbracoCssPath", "~/css");
 
         public string Umbraco => ReturnPath("umbracoPath", "~/umbraco");
+
+        //use a tilde character instead of the complete path
+        string ReturnPath(string settingsKey, string standardPath)
+        {
+            //TODO do not use ConfigurationManager directly
+            var retval = ConfigurationManager.AppSettings[settingsKey];
+
+            if (string.IsNullOrEmpty(retval))
+                retval = standardPath;
+
+            return retval.TrimEnd('/');
+        }
 
         private string _root;
 

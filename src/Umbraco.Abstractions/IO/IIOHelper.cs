@@ -18,8 +18,6 @@ namespace Umbraco.Core.IO
         Attempt<string> TryResolveUrl(string virtualPath);
         string MapPath(string path, bool useHttpContext);
         string MapPath(string path);
-        string ReturnPath(string settingsKey, string standardPath, bool useTilde);
-        string ReturnPath(string settingsKey, string standardPath);
 
         /// <summary>
         /// Verifies that the current filepath matches a directory where the user is allowed to edit a file.
