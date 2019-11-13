@@ -11,7 +11,7 @@ namespace Umbraco.Core.IO
     {
         private readonly IFactory _container;
         private readonly ILogger _logger;
-        private readonly ISystemDirectories _systemDirectories;
+        private readonly IIOHelper _ioHelper;
 
         private readonly ConcurrentDictionary<Type, Lazy<IFileSystem>> _filesystems = new ConcurrentDictionary<Type, Lazy<IFileSystem>>();
 
@@ -34,11 +34,11 @@ namespace Umbraco.Core.IO
         #region Constructor
 
         // DI wants a public ctor
-        public FileSystems(IFactory container, ILogger logger)
+        public FileSystems(IFactory container, ILogger logger, IIOHelper ioHelper)
         {
             _container = container;
             _logger = logger;
-            _systemDirectories = Current.SystemDirectories;
+            _ioHelper = ioHelper;
         }
 
         // for tests only, totally unsafe
@@ -122,11 +122,11 @@ namespace Umbraco.Core.IO
         // but it does not really matter what we return - here, null
         private object CreateWellKnownFileSystems()
         {
-            var macroPartialFileSystem = new PhysicalFileSystem(_systemDirectories.MacroPartials);
-            var partialViewsFileSystem = new PhysicalFileSystem(_systemDirectories.PartialViews);
-            var stylesheetsFileSystem = new PhysicalFileSystem(_systemDirectories.Css);
-            var scriptsFileSystem = new PhysicalFileSystem(_systemDirectories.Scripts);
-            var mvcViewsFileSystem = new PhysicalFileSystem(_systemDirectories.MvcViews);
+            var macroPartialFileSystem = new PhysicalFileSystem(Constants.SystemDirectories.MacroPartials);
+            var partialViewsFileSystem = new PhysicalFileSystem(Constants.SystemDirectories.PartialViews);
+            var stylesheetsFileSystem = new PhysicalFileSystem(_ioHelper.Css);
+            var scriptsFileSystem = new PhysicalFileSystem(_ioHelper.Scripts);
+            var mvcViewsFileSystem = new PhysicalFileSystem(Constants.SystemDirectories.MvcViews);
 
             _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, "macro-partials", IsScoped);
             _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, "partials", IsScoped);

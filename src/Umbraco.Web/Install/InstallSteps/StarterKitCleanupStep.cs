@@ -27,7 +27,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
         private void CleanupInstallation(int packageId, string packageFile)
         {
-            var zipFile = new FileInfo(Path.Combine(Current.IOHelper.MapPath(Current.SystemDirectories.Packages), HttpUtility.UrlDecode(packageFile)));
+            var zipFile = new FileInfo(Path.Combine(Current.IOHelper.MapPath(Core.Constants.SystemDirectories.Packages), HttpUtility.UrlDecode(packageFile)));
 
             if (zipFile.Exists)
                 zipFile.Delete();

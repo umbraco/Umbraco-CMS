@@ -9,7 +9,7 @@ namespace Umbraco.Tests.IO
     [TestFixture]
     public class IoHelperTests
     {
-        private ISystemDirectories SystemDirectories => Current.SystemDirectories;
+        private IIOHelper _ioHelper => IOHelper.Default;
 
         [TestCase("~/Scripts", "/Scripts", null)]
         [TestCase("/Scripts", "/Scripts", null)]
@@ -35,17 +35,17 @@ namespace Umbraco.Tests.IO
         {
             //System.Diagnostics.Debugger.Break();
 
-            Assert.AreEqual(Current.IOHelper.MapPath(SystemDirectories.Bin, true), Current.IOHelper.MapPath(SystemDirectories.Bin, false));
-            Assert.AreEqual(Current.IOHelper.MapPath(SystemDirectories.Config, true), Current.IOHelper.MapPath(SystemDirectories.Config, false));
-            Assert.AreEqual(Current.IOHelper.MapPath(SystemDirectories.Css, true), Current.IOHelper.MapPath(SystemDirectories.Css, false));
-            Assert.AreEqual(Current.IOHelper.MapPath(SystemDirectories.Data, true), Current.IOHelper.MapPath(SystemDirectories.Data, false));
-            Assert.AreEqual(Current.IOHelper.MapPath(SystemDirectories.Install, true), Current.IOHelper.MapPath(SystemDirectories.Install, false));
-            Assert.AreEqual(Current.IOHelper.MapPath(SystemDirectories.Media, true), Current.IOHelper.MapPath(SystemDirectories.Media, false));
-            Assert.AreEqual(Current.IOHelper.MapPath(SystemDirectories.Packages, true), Current.IOHelper.MapPath(SystemDirectories.Packages, false));
-            Assert.AreEqual(Current.IOHelper.MapPath(SystemDirectories.Preview, true), Current.IOHelper.MapPath(SystemDirectories.Preview, false));
-            Assert.AreEqual(Current.IOHelper.MapPath(SystemDirectories.Root, true), Current.IOHelper.MapPath(SystemDirectories.Root, false));
-            Assert.AreEqual(Current.IOHelper.MapPath(SystemDirectories.Scripts, true), Current.IOHelper.MapPath(SystemDirectories.Scripts, false));
-            Assert.AreEqual(Current.IOHelper.MapPath(SystemDirectories.Umbraco, true), Current.IOHelper.MapPath(SystemDirectories.Umbraco, false));
+            Assert.AreEqual(Current.IOHelper.MapPath(Constants.SystemDirectories.Bin, true), Current.IOHelper.MapPath(Constants.SystemDirectories.Bin, false));
+            Assert.AreEqual(Current.IOHelper.MapPath(Constants.SystemDirectories.Config, true), Current.IOHelper.MapPath(Constants.SystemDirectories.Config, false));
+            Assert.AreEqual(Current.IOHelper.MapPath(_ioHelper.Css, true), Current.IOHelper.MapPath(_ioHelper.Css, false));
+            Assert.AreEqual(Current.IOHelper.MapPath(Constants.SystemDirectories.Data, true), Current.IOHelper.MapPath(Constants.SystemDirectories.Data, false));
+            Assert.AreEqual(Current.IOHelper.MapPath(Constants.SystemDirectories.Install, true), Current.IOHelper.MapPath(Constants.SystemDirectories.Install, false));
+            Assert.AreEqual(Current.IOHelper.MapPath(_ioHelper.Media, true), Current.IOHelper.MapPath(_ioHelper.Media, false));
+            Assert.AreEqual(Current.IOHelper.MapPath(Constants.SystemDirectories.Packages, true), Current.IOHelper.MapPath(Constants.SystemDirectories.Packages, false));
+            Assert.AreEqual(Current.IOHelper.MapPath(Constants.SystemDirectories.Preview, true), Current.IOHelper.MapPath(Constants.SystemDirectories.Preview, false));
+            Assert.AreEqual(Current.IOHelper.MapPath(_ioHelper.Root, true), Current.IOHelper.MapPath(_ioHelper.Root, false));
+            Assert.AreEqual(Current.IOHelper.MapPath(_ioHelper.Scripts, true), Current.IOHelper.MapPath(_ioHelper.Scripts, false));
+            Assert.AreEqual(Current.IOHelper.MapPath(_ioHelper.Umbraco, true), Current.IOHelper.MapPath(_ioHelper.Umbraco, false));
         }
 
         [Test]

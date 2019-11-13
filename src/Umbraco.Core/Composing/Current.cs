@@ -206,7 +206,6 @@ namespace Umbraco.Core.Composing
             => Factory.GetInstance<IVariationContextAccessor>();
 
         public static readonly IIOHelper IOHelper = Umbraco.Core.IO.IOHelper.Default;
-        public static readonly ISystemDirectories SystemDirectories = new SystemDirectories();
 
         #endregion
     }

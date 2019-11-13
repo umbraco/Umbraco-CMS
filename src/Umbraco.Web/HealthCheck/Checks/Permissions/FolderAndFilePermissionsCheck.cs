@@ -60,24 +60,24 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
             // in ALL circumstances or just some
             var pathsToCheck = new Dictionary<string, PermissionCheckRequirement>
             {
-                { Current.SystemDirectories.Data, PermissionCheckRequirement.Required },
-                { Current.SystemDirectories.Packages, PermissionCheckRequirement.Required},
-                { Current.SystemDirectories.Preview, PermissionCheckRequirement.Required },
-                { Current.SystemDirectories.AppPlugins, PermissionCheckRequirement.Required },
-                { Current.SystemDirectories.Config, PermissionCheckRequirement.Optional },
-                { Current.SystemDirectories.Css, PermissionCheckRequirement.Optional },
-                { Current.SystemDirectories.Media, PermissionCheckRequirement.Optional },
-                { Current.SystemDirectories.Scripts, PermissionCheckRequirement.Optional },
-                { Current.SystemDirectories.Umbraco, PermissionCheckRequirement.Optional },
-                { Current.SystemDirectories.MvcViews, PermissionCheckRequirement.Optional }
+                { Core.Constants.SystemDirectories.Data, PermissionCheckRequirement.Required },
+                { Core.Constants.SystemDirectories.Packages, PermissionCheckRequirement.Required},
+                { Core.Constants.SystemDirectories.Preview, PermissionCheckRequirement.Required },
+                { Core.Constants.SystemDirectories.AppPlugins, PermissionCheckRequirement.Required },
+                { Core.Constants.SystemDirectories.Config, PermissionCheckRequirement.Optional },
+                { Current.IOHelper.Css, PermissionCheckRequirement.Optional },
+                { Current.IOHelper.Media, PermissionCheckRequirement.Optional },
+                { Current.IOHelper.Scripts, PermissionCheckRequirement.Optional },
+                { Current.IOHelper.Umbraco, PermissionCheckRequirement.Optional },
+                { Core.Constants.SystemDirectories.MvcViews, PermissionCheckRequirement.Optional }
             };
 
             //These are special paths to check that will restart an app domain if a file is written to them,
             //so these need to be tested differently
             var pathsToCheckWithRestarts = new Dictionary<string, PermissionCheckRequirement>
             {
-                { Current.SystemDirectories.AppCode, PermissionCheckRequirement.Optional },
-                { Current.SystemDirectories.Bin, PermissionCheckRequirement.Optional }
+                { Core.Constants.SystemDirectories.AppCode, PermissionCheckRequirement.Optional },
+                { Core.Constants.SystemDirectories.Bin, PermissionCheckRequirement.Optional }
             };
 
             // Run checks for required and optional paths for modify permission

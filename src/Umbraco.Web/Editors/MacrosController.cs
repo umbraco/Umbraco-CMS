@@ -311,12 +311,12 @@ namespace Umbraco.Web.Editors
         /// </returns>
         private IEnumerable<string> FindPartialViewFilesInViewsFolder()
         {
-            var partialsDir = Current.IOHelper.MapPath(Current.SystemDirectories.MacroPartials);
+            var partialsDir = Current.IOHelper.MapPath(Constants.SystemDirectories.MacroPartials);
 
             return this.FindPartialViewFilesInFolder(
                  partialsDir,
                  partialsDir,
-                 Current.SystemDirectories.MacroPartials);
+                 Constants.SystemDirectories.MacroPartials);
         }
 
         /// <summary>
@@ -329,7 +329,7 @@ namespace Umbraco.Web.Editors
         {
             var files = new List<string>();
 
-            var appPluginsFolder = new DirectoryInfo(Current.IOHelper.MapPath(Current.SystemDirectories.AppPlugins));
+            var appPluginsFolder = new DirectoryInfo(Current.IOHelper.MapPath(Constants.SystemDirectories.AppPlugins));
 
             if (!appPluginsFolder.Exists)
             {
@@ -344,7 +344,7 @@ namespace Umbraco.Web.Editors
                     var macroPartials = viewsFolder.First().GetDirectories("MacroPartials");
                     if (macroPartials.Any())
                     {
-                        files.AddRange(this.FindPartialViewFilesInFolder(macroPartials.First().FullName, macroPartials.First().FullName, Current.SystemDirectories.AppPlugins + "/" + directory.Name + "/Views/MacroPartials"));
+                        files.AddRange(this.FindPartialViewFilesInFolder(macroPartials.First().FullName, macroPartials.First().FullName, Constants.SystemDirectories.AppPlugins + "/" + directory.Name + "/Views/MacroPartials"));
                     }
                 }
             }

@@ -6,7 +6,7 @@ namespace Umbraco.Core.IO
 {
     public class SystemFiles
     {
-        public static string TinyMceConfig => Current.SystemDirectories.Config + "/tinyMceConfig.config";
+        public static string TinyMceConfig => Constants.SystemDirectories.Config + "/tinyMceConfig.config";
 
         // TODO: Kill this off we don't have umbraco.config XML cache we now have NuCache
         public static string GetContentCacheXml(IGlobalSettings globalSettings)

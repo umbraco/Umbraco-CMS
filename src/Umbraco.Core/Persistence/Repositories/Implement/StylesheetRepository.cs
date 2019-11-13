@@ -121,7 +121,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             // validate path and extension
-            var validDir = Current.SystemDirectories.Css;
+            var validDir = _ioHelper.Css;
             var isValidPath = _ioHelper.VerifyEditPath(fullPath, validDir);
             var isValidExtension = _ioHelper.VerifyFileExtension(stylesheet.Path, ValidExtensions);
             return isValidPath && isValidExtension;

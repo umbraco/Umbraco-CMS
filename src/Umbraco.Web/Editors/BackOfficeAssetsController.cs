@@ -11,7 +11,7 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class BackOfficeAssetsController : UmbracoAuthorizedJsonController
     {
-        private readonly IFileSystem _jsLibFileSystem = new PhysicalFileSystem(Current.SystemDirectories.Umbraco + Current.IOHelper.DirSepChar + "lib");
+        private readonly IFileSystem _jsLibFileSystem = new PhysicalFileSystem(Current.IOHelper.Umbraco + Current.IOHelper.DirSepChar + "lib");
 
         [HttpGet]
         public object GetSupportedLocales()

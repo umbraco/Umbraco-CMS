@@ -21,7 +21,7 @@ namespace Umbraco.Web.Editors.Binders
         public TModelSave BindModelFromMultipartRequest<TModelSave>(HttpActionContext actionContext, ModelBindingContext bindingContext)
             where TModelSave : IHaveUploadedFiles
         {
-            var result = actionContext.ReadAsMultipart(Current.SystemDirectories.TempFileUploads);
+            var result = actionContext.ReadAsMultipart(Constants.SystemDirectories.TempFileUploads);
 
             var model = actionContext.GetModelFromMultipartRequest<TModelSave>(result, "contentItem");
 

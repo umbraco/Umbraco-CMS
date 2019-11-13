@@ -108,7 +108,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             _previewXml = _xmlStore.GetPreviewXml(contentId, includeSubs);
 
             // make sure the preview folder exists
-            var dir = new DirectoryInfo(Current.IOHelper.MapPath(Current.SystemDirectories.Preview));
+            var dir = new DirectoryInfo(Current.IOHelper.MapPath(Constants.SystemDirectories.Preview));
             if (dir.Exists == false)
                 dir.Create();
 
@@ -122,7 +122,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         // get the full path to the preview set
         private static string GetPreviewSetPath(int userId, Guid previewSet)
         {
-            return Current.IOHelper.MapPath(Path.Combine(Current.SystemDirectories.Preview, userId + "_" + previewSet + ".config"));
+            return Current.IOHelper.MapPath(Path.Combine(Constants.SystemDirectories.Preview, userId + "_" + previewSet + ".config"));
         }
 
         // deletes files for the user, and files accessed more than one hour ago

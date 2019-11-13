@@ -15,13 +15,13 @@ namespace Umbraco.Tests.CoreThings
         [SetUp]
         public void SetUp()
         {
-            _root = Current.SystemDirectories.Root;
+            _root = Current.IOHelper.Root;
         }
 
         [TearDown]
         public void TearDown()
         {
-            Current.SystemDirectories.Root = _root;
+            Current.IOHelper.Root = _root;
         }
 
         [TestCase("http://www.domain.com/umbraco", "", true)]
@@ -45,7 +45,7 @@ namespace Umbraco.Tests.CoreThings
         [TestCase("http://www.domain.com/umbraco/test/legacyAjaxCalls.ashx?some=query&blah=js", "", true)]
         public void Is_Back_Office_Request(string input, string virtualPath, bool expected)
         {
-            Current.SystemDirectories.Root = virtualPath;
+            Current.IOHelper.Root = virtualPath;
             var globalConfig = SettingsForTests.GenerateMockGlobalSettings();
             var source = new Uri(input);
             Assert.AreEqual(expected, source.IsBackOfficeRequest(virtualPath, globalConfig));
