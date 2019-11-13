@@ -14,7 +14,7 @@ namespace Umbraco.Core.Exceptions
     /// </remarks>
     /// <seealso cref="System.NotImplementedException" />
     [Serializable]
-    [Obsolete("If a method or operation is not, and will not be, implemented, it is invalid, so we should throw an InvalidOperationException instead.")]
+    [Obsolete("If a method or operation is not, and will not be, implemented, it is invalid or not supported, so we should throw either an InvalidOperationException or NotSupportedException instead.")]
     public class WontImplementException : NotImplementedException
     {
         /// <summary>
