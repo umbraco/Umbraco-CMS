@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.IO
 {
@@ -34,11 +35,12 @@ namespace Umbraco.Core.IO
         #region Constructor
 
         // DI wants a public ctor
-        public FileSystems(IFactory container, ILogger logger, IIOHelper ioHelper)
+        public FileSystems(IFactory container, ILogger logger, IIOHelper ioHelper, IGlobalSettings globalSettings)
         {
             _container = container;
             _logger = logger;
             _ioHelper = ioHelper;
+            _globalSettings = globalSettings;
         }
 
         // for tests only, totally unsafe
@@ -124,8 +126,8 @@ namespace Umbraco.Core.IO
         {
             var macroPartialFileSystem = new PhysicalFileSystem(Constants.SystemDirectories.MacroPartials);
             var partialViewsFileSystem = new PhysicalFileSystem(Constants.SystemDirectories.PartialViews);
-            var stylesheetsFileSystem = new PhysicalFileSystem(_ioHelper.Css);
-            var scriptsFileSystem = new PhysicalFileSystem(_ioHelper.Scripts);
+            var stylesheetsFileSystem = new PhysicalFileSystem(_globalSettings.UmbracoCssPath);
+            var scriptsFileSystem = new PhysicalFileSystem(_globalSettings.UmbracoScriptsPath);
             var mvcViewsFileSystem = new PhysicalFileSystem(Constants.SystemDirectories.MvcViews);
 
             _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, "macro-partials", IsScoped);
@@ -149,6 +151,7 @@ namespace Umbraco.Core.IO
         #region Providers
 
         private readonly Dictionary<Type, string> _paths = new Dictionary<Type, string>();
+        private IGlobalSettings _globalSettings;
 
         // internal for tests
         internal IReadOnlyDictionary<Type, string> Paths => _paths;

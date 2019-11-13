@@ -1,6 +1,7 @@
 ﻿using System.Web.UI;
 using ClientDependency.Core.Controls;
 using ClientDependency.Core.FileRegistration.Providers;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 
@@ -18,7 +19,7 @@ namespace Umbraco.Web.JavaScript
         public UmbracoClientDependencyLoader()
             : base()
         {
-            this.AddPath("UmbracoRoot", Current.IOHelper.ResolveUrl(Current.IOHelper.Umbraco));
+            this.AddPath("UmbracoRoot", Current.IOHelper.ResolveUrl(Current.Configs.Global().UmbracoPath));
             this.ProviderName = LoaderControlProvider.DefaultName;
 
         }

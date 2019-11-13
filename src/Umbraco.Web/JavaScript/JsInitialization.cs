@@ -6,6 +6,7 @@ using System.Web;
 using ClientDependency.Core;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Manifest;
@@ -58,7 +59,7 @@ namespace Umbraco.Web.JavaScript
             }
             jarray.Append("]");
 
-            return WriteScript(jarray.ToString(), Current.IOHelper.ResolveUrl(Current.IOHelper.Umbraco), angularModule);
+            return WriteScript(jarray.ToString(), Current.IOHelper.ResolveUrl(Current.Configs.Global().UmbracoPath), angularModule);
         }
 
         /// <summary>

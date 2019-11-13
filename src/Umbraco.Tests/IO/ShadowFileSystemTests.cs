@@ -397,7 +397,7 @@ namespace Umbraco.Tests.IO
             var phy = new PhysicalFileSystem(path, "ignore");
 
             var container = Mock.Of<IFactory>();
-            var fileSystems = new FileSystems(container, logger, IOHelper.Default) { IsScoped = () => scopedFileSystems };
+            var fileSystems = new FileSystems(container, logger, IOHelper.Default, SettingsForTests.GenerateMockGlobalSettings()) { IsScoped = () => scopedFileSystems };
             var fs = fileSystems.GetFileSystem<FS>(phy);
             var sw = (ShadowWrapper) fs.InnerFileSystem;
 
@@ -491,7 +491,7 @@ namespace Umbraco.Tests.IO
             var phy = new PhysicalFileSystem(path, "ignore");
 
             var container = Mock.Of<IFactory>();
-            var fileSystems = new FileSystems(container, logger, IOHelper.Default) { IsScoped = () => scopedFileSystems };
+            var fileSystems = new FileSystems(container, logger, IOHelper.Default, SettingsForTests.GenerateMockGlobalSettings()) { IsScoped = () => scopedFileSystems };
             var fs = fileSystems.GetFileSystem<FS>( phy);
             var sw = (ShadowWrapper) fs.InnerFileSystem;
 
@@ -544,7 +544,7 @@ namespace Umbraco.Tests.IO
             var phy = new PhysicalFileSystem(path, "ignore");
 
             var container = Mock.Of<IFactory>();
-            var fileSystems = new FileSystems(container, logger, IOHelper.Default) { IsScoped = () => scopedFileSystems };
+            var fileSystems = new FileSystems(container, logger, IOHelper.Default, SettingsForTests.GenerateMockGlobalSettings()) { IsScoped = () => scopedFileSystems };
             var fs = fileSystems.GetFileSystem<FS>( phy);
             var sw = (ShadowWrapper)fs.InnerFileSystem;
 

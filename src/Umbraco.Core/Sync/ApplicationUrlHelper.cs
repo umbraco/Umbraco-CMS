@@ -98,7 +98,7 @@ namespace Umbraco.Core.Sync
                 : "";
 
             var ssl = globalSettings.UseHttps ? "s" : ""; // force, whatever the first request
-            var url = "http" + ssl + "://" + request.ServerVariables["SERVER_NAME"] + port + Current.IOHelper.ResolveUrl(Current.IOHelper.Umbraco);
+            var url = "http" + ssl + "://" + request.ServerVariables["SERVER_NAME"] + port + Current.IOHelper.ResolveUrl(Current.Configs.Global().UmbracoPath);
 
             return url.TrimEnd('/');
         }

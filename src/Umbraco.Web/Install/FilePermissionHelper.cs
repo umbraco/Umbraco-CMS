@@ -12,8 +12,8 @@ namespace Umbraco.Web.Install
     internal class FilePermissionHelper
     {
         // ensure that these directories exist and Umbraco can write to them
-        private static readonly string[] PermissionDirs = { Current.IOHelper.Css, Constants.SystemDirectories.Config, Constants.SystemDirectories.Data, Current.IOHelper.Media, Constants.SystemDirectories.Preview };
-        private static readonly string[] PackagesPermissionsDirs = { Constants.SystemDirectories.Bin, Current.IOHelper.Umbraco, Constants.SystemDirectories.Packages };
+        private static readonly string[] PermissionDirs = { Current.Configs.Global().UmbracoCssPath, Constants.SystemDirectories.Config, Constants.SystemDirectories.Data, Current.Configs.Global().UmbracoMediaPath, Constants.SystemDirectories.Preview };
+        private static readonly string[] PackagesPermissionsDirs = { Constants.SystemDirectories.Bin, Current.Configs.Global().UmbracoPath, Constants.SystemDirectories.Packages };
 
         // ensure Umbraco can write to these files (the directories must exist)
         private static readonly string[] PermissionFiles = { };
@@ -36,7 +36,7 @@ namespace Umbraco.Web.Install
                 if (TestPublishedSnapshotService(out errors) == false)
                     report["Published snapshot environment check failed"] = errors.ToList();
 
-                if (EnsureCanCreateSubDirectory(Current.IOHelper.Media, out errors) == false)
+                if (EnsureCanCreateSubDirectory(Current.Configs.Global().UmbracoMediaPath, out errors) == false)
                     report["Media folder creation failed"] = errors.ToList();
             }
 

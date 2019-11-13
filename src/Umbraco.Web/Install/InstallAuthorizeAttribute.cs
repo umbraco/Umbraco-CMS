@@ -66,7 +66,7 @@ namespace Umbraco.Web.Install
         /// <param name="filterContext"></param>
         protected override void HandleUnauthorizedRequest(AuthorizationContext filterContext)
         {
-            filterContext.Result = new RedirectResult(Current.IOHelper.Umbraco.EnsureEndsWith('/'));
+            filterContext.Result = new RedirectResult(Current.Configs.Global().UmbracoPath.EnsureEndsWith('/'));
         }
     }
 }

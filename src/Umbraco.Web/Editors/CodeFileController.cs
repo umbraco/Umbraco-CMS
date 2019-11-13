@@ -118,11 +118,11 @@ namespace Umbraco.Web.Editors
                     Services.FileService.CreatePartialViewMacroFolder(virtualPath);
                     break;
                 case Core.Constants.Trees.Scripts:
-                    virtualPath = NormalizeVirtualPath(name, Current.IOHelper.Scripts);
+                    virtualPath = NormalizeVirtualPath(name, Current.Configs.Global().UmbracoScriptsPath);
                     Services.FileService.CreateScriptFolder(virtualPath);
                     break;
                 case Core.Constants.Trees.Stylesheets:
-                    virtualPath = NormalizeVirtualPath(name, Current.IOHelper.Css);
+                    virtualPath = NormalizeVirtualPath(name, Current.Configs.Global().UmbracoCssPath);
                     Services.FileService.CreateStyleSheetFolder(virtualPath);
                     break;
 
@@ -262,11 +262,11 @@ namespace Umbraco.Web.Editors
                     break;
                 case Core.Constants.Trees.Scripts:
                     codeFileDisplay = Mapper.Map<Script, CodeFileDisplay>(new Script(string.Empty));
-                    codeFileDisplay.VirtualPath = Current.IOHelper.Scripts;
+                    codeFileDisplay.VirtualPath = Current.Configs.Global().UmbracoScriptsPath;
                     break;
                 case Core.Constants.Trees.Stylesheets:
                     codeFileDisplay = Mapper.Map<Stylesheet, CodeFileDisplay>(new Stylesheet(string.Empty));
-                    codeFileDisplay.VirtualPath = Current.IOHelper.Css;
+                    codeFileDisplay.VirtualPath = Current.Configs.Global().UmbracoCssPath;
                     break;
                 default:
                     throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Unsupported editortype"));
@@ -329,7 +329,7 @@ namespace Umbraco.Web.Editors
                     return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Partial View Macro or folder found with the specified path");
 
                 case Core.Constants.Trees.Scripts:
-                    if (IsDirectory(virtualPath, Current.IOHelper.Scripts))
+                    if (IsDirectory(virtualPath, Current.Configs.Global().UmbracoScriptsPath))
                     {
                         Services.FileService.DeleteScriptFolder(virtualPath);
                         return Request.CreateResponse(HttpStatusCode.OK);
@@ -342,7 +342,7 @@ namespace Umbraco.Web.Editors
                     return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Script or folder found with the specified path");
 
                 case Core.Constants.Trees.Stylesheets:
-                    if (IsDirectory(virtualPath, Current.IOHelper.Css))
+                    if (IsDirectory(virtualPath, Current.Configs.Global().UmbracoCssPath))
                     {
                         Services.FileService.DeleteStyleSheetFolder(virtualPath);
                         return Request.CreateResponse(HttpStatusCode.OK);

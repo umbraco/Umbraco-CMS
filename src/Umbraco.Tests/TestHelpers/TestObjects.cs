@@ -118,7 +118,7 @@ namespace Umbraco.Tests.TestHelpers
             var localizedTextService = GetLazyService<ILocalizedTextService>(factory, c => new LocalizedTextService(
                     new Lazy<LocalizedTextServiceFileSources>(() =>
                     {
-                        var mainLangFolder = new DirectoryInfo(Current.IOHelper.MapPath(Current.IOHelper.Umbraco + "/config/lang/"));
+                        var mainLangFolder = new DirectoryInfo(Current.IOHelper.MapPath(Current.Configs.Global().UmbracoPath + "/config/lang/"));
                         var appPlugins = new DirectoryInfo(Current.IOHelper.MapPath(Constants.SystemDirectories.AppPlugins));
                         var configLangFolder = new DirectoryInfo(Current.IOHelper.MapPath(Constants.SystemDirectories.Config + "/lang/"));
 
@@ -242,7 +242,7 @@ namespace Umbraco.Tests.TestHelpers
             }
 
             typeFinder = typeFinder ?? new TypeFinder(logger);
-            fileSystems = fileSystems ?? new FileSystems(Current.Factory, logger, IOHelper.Default);
+            fileSystems = fileSystems ?? new FileSystems(Current.Factory, logger, IOHelper.Default, SettingsForTests.GenerateMockGlobalSettings());
             var scopeProvider = new ScopeProvider(databaseFactory, fileSystems, logger, typeFinder);
             return scopeProvider;
         }
