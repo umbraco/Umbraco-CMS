@@ -230,7 +230,7 @@ namespace Umbraco.Core.Xml
         {
             if (xd == null) throw new ArgumentNullException(nameof(xd));
             if (name == null) throw new ArgumentNullException(nameof(name));
-            if (string.IsNullOrEmpty(name)) throw new ArgumentException("Value can't be empty.", nameof(name));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
 
             var temp = xd.CreateAttribute(name);
             temp.Value = value;
