@@ -8,9 +8,9 @@ namespace Umbraco.Core.Exceptions
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <seealso cref="System.Exception" />
-    [Obsolete("Refactor the generic type to a concrete serializable type.")]
     [Serializable]
     internal class DataOperationException<T> : Exception
+        where T : Enum
     {
         /// <summary>
         /// Gets the operation.
@@ -74,7 +74,7 @@ namespace Umbraco.Core.Exceptions
         protected DataOperationException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-            Operation = (T)info.GetValue(nameof(Operation), typeof(T));
+            Operation = (T)Enum.Parse(typeof(T), info.GetString(nameof(Operation)));
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace Umbraco.Core.Exceptions
                 throw new ArgumentNullException(nameof(info));
             }
 
-            info.AddValue(nameof(Operation), Operation);
+            info.AddValue(nameof(Operation), Enum.GetName(typeof(T), Operation));
 
             base.GetObjectData(info, context);
         }
