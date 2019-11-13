@@ -3,16 +3,22 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
 using System.IO;
-using System.Configuration;
 using System.Linq;
 using System.Web;
 using System.Web.Hosting;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.IO
 {
     public class IOHelper : IIOHelper
     {
-        internal static IIOHelper Default { get; } = new IOHelper();
+        private readonly IGlobalSettings _globalSettings;
+        internal static IIOHelper Default { get; } = new IOHelper(new GlobalSettings());
+
+        public IOHelper(IGlobalSettings globalSettings)
+        {
+            _globalSettings = globalSettings;
+        }
 
         /// <summary>
         /// Gets or sets a value forcing Umbraco to consider it is non-hosted.
@@ -289,25 +295,13 @@ namespace Umbraco.Core.IO
         }
 
 
-        public string Media => ReturnPath("umbracoMediaPath", "~/media");
+        public string Media => _globalSettings.UmbracoMediaPath;
 
-        public string Scripts => ReturnPath("umbracoScriptsPath", "~/scripts");
+        public string Scripts => _globalSettings.UmbracoScriptsPath;
 
-        public string Css => ReturnPath("umbracoCssPath", "~/css");
+        public string Css => _globalSettings.UmbracoCssPath;
 
-        public string Umbraco => ReturnPath("umbracoPath", "~/umbraco");
-
-        //use a tilde character instead of the complete path
-        string ReturnPath(string settingsKey, string standardPath)
-        {
-            //TODO do not use ConfigurationManager directly
-            var retval = ConfigurationManager.AppSettings[settingsKey];
-
-            if (string.IsNullOrEmpty(retval))
-                retval = standardPath;
-
-            return retval.TrimEnd('/');
-        }
+        public string Umbraco => _globalSettings.UmbracoPath;
 
         private string _root;
 

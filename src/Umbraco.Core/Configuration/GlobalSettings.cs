@@ -378,5 +378,43 @@ namespace Umbraco.Core.Configuration
                 }
             }
         }
+
+        private string _umbracoMediaPath = null;
+        public string UmbracoMediaPath => GetterWithDefaultValue(Constants.AppSettings.UmbracoMediaPath, "~/umbraco", ref _umbracoMediaPath);
+
+        private string _umbracoScriptsPath = null;
+        public string UmbracoScriptsPath => GetterWithDefaultValue(Constants.AppSettings.UmbracoScriptsPath, "~/umbraco", ref _umbracoScriptsPath);
+
+        private string _umbracoCssPath = null;
+        public string UmbracoCssPath => GetterWithDefaultValue(Constants.AppSettings.UmbracoCssPath, "~/umbraco", ref _umbracoCssPath);
+
+        private string _umbracoPath = null;
+        public string UmbracoPath => GetterWithDefaultValue(Constants.AppSettings.UmbracoPath, "~/umbraco", ref _umbracoPath);
+
+        private T GetterWithDefaultValue<T>(string appSettingKey, T defaultValue, ref T backingField)
+        {
+            if (backingField != null) return backingField;
+
+            if (ConfigurationManager.AppSettings.ContainsKey(appSettingKey))
+            {
+                try
+                {
+                    var value = ConfigurationManager.AppSettings[appSettingKey];
+
+                    backingField = (T)Convert.ChangeType(value, typeof(T));
+                }
+                catch
+                {
+                    /* ignore and use default value */
+                    backingField = defaultValue;
+                }
+            }
+            else
+            {
+                backingField = defaultValue;
+            }
+
+            return backingField;
+        }
     }
 }
