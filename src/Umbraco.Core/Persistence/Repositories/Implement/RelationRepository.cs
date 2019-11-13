@@ -253,7 +253,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // apply ordering
             ApplyOrdering(ref sql, ordering);
 
-            var pageIndexToFetch = pageIndex;
+            var pageIndexToFetch = pageIndex + 1;
             var page = Database.Page<RelationDto>(pageIndexToFetch, pageSize, sql);
             var dtos = page.Items;
             totalRecords = page.TotalItems;

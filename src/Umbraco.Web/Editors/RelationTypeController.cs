@@ -61,7 +61,7 @@ namespace Umbraco.Web.Editors
             }
 
             // Ordering do we need to pass through?
-            var relations = Services.RelationService.GetPagedByRelationTypeId(id, pageNumber, pageSize, out long totalRecords);
+            var relations = Services.RelationService.GetPagedByRelationTypeId(id, pageNumber -1, pageSize, out long totalRecords);
 
             return new PagedResult<RelationDisplay>(totalRecords, pageNumber, pageSize)
             {

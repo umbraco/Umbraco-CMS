@@ -25,7 +25,6 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
 
         vm.changePageNumber = changePageNumber;
         vm.options = {};
-        vm.options.pageSize = 3;
 
         var labelKeys = [
             "relationType_tabRelationType",

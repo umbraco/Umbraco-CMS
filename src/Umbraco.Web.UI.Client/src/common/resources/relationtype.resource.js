@@ -118,13 +118,9 @@ function relationTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
 
         getPagedResults: function (id, options) {
 
-            console.log('options in', options);
-
             var defaults = {
-                pageSize: 100,
-                pageNumber: 1,
-                orderDirection: "Ascending",
-                orderBy: "SortOrder"
+                pageSize: 25,
+                pageNumber: 1
             };
             if (options === undefined) {
                 options = {};
@@ -133,16 +129,7 @@ function relationTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
             angular.extend(defaults, options);
             //now copy back to the options we will use
             options = defaults;
-            //change asc/desct
-            if (options.orderDirection === "asc") {
-                options.orderDirection = "Ascending";
-            }
-            else if (options.orderDirection === "desc") {
-                options.orderDirection = "Descending";
-            }
-
-            console.log('options before HTTP', options);
-
+            
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
@@ -151,9 +138,7 @@ function relationTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                         {
                             id: id,
                             pageNumber: options.pageNumber,
-                            pageSize: options.pageSize,
-                            orderBy: options.orderBy,
-                            orderDirection: options.orderDirection
+                            pageSize: options.pageSize
                         }
                     )),
                 'Failed to get paged relations for id ' + id);
