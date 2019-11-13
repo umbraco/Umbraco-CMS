@@ -36,7 +36,7 @@ namespace Umbraco.Web
 
             var view = "Grid/" + framework;
             var prop = contentItem.GetProperty(propertyAlias);
-            if (prop == null) throw new NullReferenceException("No property type found with alias " + propertyAlias); // TODO NullReferenceException should not be thrown by user code
+            if (prop == null) throw new InvalidOperationException("No property type found with alias " + propertyAlias);
             var model = prop.GetValue();
 
             var asString = model as string;
@@ -53,10 +53,12 @@ namespace Umbraco.Web
             var view = "Grid/" + framework;
             return html.Partial(view, property.GetValue());
         }
+
         public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem, HtmlHelper html)
         {
             return GetGridHtml(contentItem, html, "bodyText", "bootstrap3");
         }
+
         public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem, HtmlHelper html, string propertyAlias)
         {
             if (propertyAlias == null) throw new ArgumentNullException(nameof(propertyAlias));
@@ -64,6 +66,7 @@ namespace Umbraco.Web
 
             return GetGridHtml(contentItem, html, propertyAlias, "bootstrap3");
         }
+
         public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem, HtmlHelper html, string propertyAlias, string framework)
         {
             if (propertyAlias == null) throw new ArgumentNullException(nameof(propertyAlias));
@@ -71,7 +74,7 @@ namespace Umbraco.Web
 
             var view = "Grid/" + framework;
             var prop = contentItem.GetProperty(propertyAlias);
-            if (prop == null) throw new NullReferenceException("No property type found with alias " + propertyAlias); // TODO NullReferenceException should not be thrown by user code
+            if (prop == null) throw new InvalidOperationException("No property type found with alias " + propertyAlias);
             var model = prop.GetValue();
 
             var asString = model as string;
