@@ -24,21 +24,7 @@ namespace Umbraco.Tests.CoreThings
         [SetUp]
         public void SetUp()
         {
-            // FIXME: bad in a unit test - but Udi has a static ctor that wants it?!
-            var container = new Mock<IFactory>();
-            var ioHelper = IOHelper.Default;
-            var typeFinder = new TypeFinder(Mock.Of<ILogger>());
-            container.Setup(x => x.GetInstance(typeof(TypeLoader))).Returns(
-                new TypeLoader(ioHelper, typeFinder, NoAppCache.Instance, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
-            Current.Factory = container.Object;
-
-            Udi.ResetUdiTypes();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            Current.Reset();
+            UdiParser.ResetUdiTypes();            
         }
 
         [Test]
@@ -53,7 +39,7 @@ namespace Umbraco.Tests.CoreThings
         [Test]
         public void StringUdiParseTest()
         {
-            var udi = Udi.Parse("umb://" + Constants.UdiEntityType.AnyString + "/test-id");
+            var udi = UdiParser.Parse("umb://" + Constants.UdiEntityType.AnyString + "/test-id");
             Assert.AreEqual(Constants.UdiEntityType.AnyString, udi.EntityType);
             Assert.IsInstanceOf<StringUdi>(udi);
             var stringEntityId = udi as StringUdi;
@@ -61,7 +47,7 @@ namespace Umbraco.Tests.CoreThings
             Assert.AreEqual("test-id", stringEntityId.Id);
             Assert.AreEqual("umb://" + Constants.UdiEntityType.AnyString + "/test-id", udi.ToString());
 
-            udi = Udi.Parse("umb://" + Constants.UdiEntityType.AnyString + "/DA845952BE474EE9BD6F6194272AC750");
+            udi = UdiParser.Parse("umb://" + Constants.UdiEntityType.AnyString + "/DA845952BE474EE9BD6F6194272AC750");
             Assert.IsInstanceOf<StringUdi>(udi);
         }
 
@@ -78,7 +64,7 @@ namespace Umbraco.Tests.CoreThings
             Assert.AreEqual("%2Fthis%20is%20a%20test", Uri.EscapeDataString("/this is a test"));
             Assert.AreEqual("/this%20is%20a%20test", Uri.EscapeUriString("/this is a test"));
 
-            var udi = Udi.Parse("umb://" + Constants.UdiEntityType.AnyString + "/this%20is%20a%20test");
+            var udi = UdiParser.Parse("umb://" + Constants.UdiEntityType.AnyString + "/this%20is%20a%20test");
             Assert.AreEqual(Constants.UdiEntityType.AnyString, udi.EntityType);
             Assert.IsInstanceOf<StringUdi>(udi);
             var stringEntityId = udi as StringUdi;
@@ -112,7 +98,7 @@ namespace Umbraco.Tests.CoreThings
             // with the proper fix in StringUdi this should work:
             var udi1 = new StringUdi("partial-view-macro", "path/to/View[1].cshtml");
             Assert.AreEqual("umb://partial-view-macro/path/to/View%5B1%5D.cshtml", udi1.ToString());
-            var udi2 = Udi.Parse("umb://partial-view-macro/path/to/View%5B1%5D.cshtml");
+            var udi2 = UdiParser.Parse("umb://partial-view-macro/path/to/View%5B1%5D.cshtml");
             Assert.AreEqual("path/to/View[1].cshtml", ((StringUdi) udi2).Id);
         }
 
@@ -131,7 +117,7 @@ namespace Umbraco.Tests.CoreThings
         {
             var guid = Guid.NewGuid();
             var s = "umb://" + Constants.UdiEntityType.AnyGuid + "/" + guid.ToString("N");
-            var udi = Udi.Parse(s);
+            var udi = UdiParser.Parse(s);
             Assert.AreEqual(Constants.UdiEntityType.AnyGuid, udi.EntityType);
             Assert.IsInstanceOf<GuidUdi>(udi);
             var gudi = udi as GuidUdi;
@@ -198,15 +184,15 @@ namespace Umbraco.Tests.CoreThings
             Assert.IsTrue(guidUdi.IsRoot);
             Assert.AreEqual("umb://any-guid/00000000000000000000000000000000", guidUdi.ToString());
 
-            var udi = Udi.Parse("umb://any-string/");
+            var udi = UdiParser.Parse("umb://any-string/");
             Assert.IsTrue(udi.IsRoot);
             Assert.IsInstanceOf<StringUdi>(udi);
 
-            udi = Udi.Parse("umb://any-guid/00000000000000000000000000000000");
+            udi = UdiParser.Parse("umb://any-guid/00000000000000000000000000000000");
             Assert.IsTrue(udi.IsRoot);
             Assert.IsInstanceOf<GuidUdi>(udi);
 
-            udi = Udi.Parse("umb://any-guid/");
+            udi = UdiParser.Parse("umb://any-guid/");
             Assert.IsTrue(udi.IsRoot);
             Assert.IsInstanceOf<GuidUdi>(udi);
         }
@@ -217,13 +203,13 @@ namespace Umbraco.Tests.CoreThings
             // can parse open string udi
             var stringUdiString = "umb://" + Constants.UdiEntityType.AnyString;
             Udi stringUdi;
-            Assert.IsTrue(Udi.TryParse(stringUdiString, out stringUdi));
+            Assert.IsTrue(UdiParser.TryParse(stringUdiString, out stringUdi));
             Assert.AreEqual(string.Empty, ((StringUdi)stringUdi).Id);
 
             // can parse open guid udi
             var guidUdiString = "umb://" + Constants.UdiEntityType.AnyGuid;
             Udi guidUdi;
-            Assert.IsTrue(Udi.TryParse(guidUdiString, out guidUdi));
+            Assert.IsTrue(UdiParser.TryParse(guidUdiString, out guidUdi));
             Assert.AreEqual(Guid.Empty, ((GuidUdi)guidUdi).Guid);
 
             // can create a range
@@ -294,33 +280,34 @@ namespace Umbraco.Tests.CoreThings
 
             // cannot parse an unknown type, udi is null
             // this will scan
-            Assert.IsFalse(Udi.TryParse("umb://whatever/1234", out udi));
+            Assert.IsFalse(UdiParser.TryParse("umb://whatever/1234", out udi));
             Assert.IsNull(udi);
 
-            Udi.ResetUdiTypes();
-
+            UdiParser.ResetUdiTypes();
+            
             // unless we want to know
-            Assert.IsFalse(Udi.TryParse("umb://whatever/1234", true, out udi));
+            Assert.IsFalse(UdiParser.TryParse("umb://whatever/1234", true, out udi));
             Assert.AreEqual(Constants.UdiEntityType.Unknown, udi.EntityType);
-            Assert.AreEqual("Umbraco.Core.Udi+UnknownTypeUdi", udi.GetType().FullName);
+            Assert.AreEqual("Umbraco.Core.UnknownTypeUdi", udi.GetType().FullName);
 
-            Udi.ResetUdiTypes();
-
+            UdiParser.ResetUdiTypes();
+            
             // not known
-            Assert.IsFalse(Udi.TryParse("umb://foo/A87F65C8D6B94E868F6949BA92C93045", true, out udi));
+            Assert.IsFalse(UdiParser.TryParse("umb://foo/A87F65C8D6B94E868F6949BA92C93045", true, out udi));
             Assert.AreEqual(Constants.UdiEntityType.Unknown, udi.EntityType);
-            Assert.AreEqual("Umbraco.Core.Udi+UnknownTypeUdi", udi.GetType().FullName);
+            Assert.AreEqual("Umbraco.Core.UnknownTypeUdi", udi.GetType().FullName);
 
-            // scanned
-            Assert.IsTrue(Udi.TryParse("umb://foo/A87F65C8D6B94E868F6949BA92C93045", out udi));
+            // scanned            
+            UdiParserServiceConnectors.RegisterServiceConnector<FooConnector>(); // this is the equivalent of scanning but we'll just manually register this one
+            Assert.IsTrue(UdiParser.TryParse("umb://foo/A87F65C8D6B94E868F6949BA92C93045", out udi));
             Assert.IsInstanceOf<GuidUdi>(udi);
 
             // known
-            Assert.IsTrue(Udi.TryParse("umb://foo/A87F65C8D6B94E868F6949BA92C93045", true, out udi));
+            Assert.IsTrue(UdiParser.TryParse("umb://foo/A87F65C8D6B94E868F6949BA92C93045", true, out udi));
             Assert.IsInstanceOf<GuidUdi>(udi);
 
             // can get method for Deploy compatibility
-            var method = typeof(Udi).GetMethod("Parse", BindingFlags.Static | BindingFlags.Public, null, new[] { typeof(string), typeof(bool) }, null);
+            var method = typeof(UdiParser).GetMethod("Parse", BindingFlags.Static | BindingFlags.Public, null, new[] { typeof(string), typeof(bool) }, null);
             Assert.IsNotNull(method);
         }
 

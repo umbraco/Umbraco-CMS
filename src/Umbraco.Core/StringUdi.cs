@@ -49,29 +49,6 @@ namespace Umbraco.Core
             return string.Join("/", s.Split('/').Select(Uri.EscapeDataString));
         }
 
-        /// <summary>
-        /// Converts the string representation of an entity identifier into the equivalent StringUdi instance.
-        /// </summary>
-        /// <param name="s">The string to convert.</param>
-        /// <returns>A StringUdi instance that contains the value that was parsed.</returns>
-        public new static StringUdi Parse(string s)
-        {
-            var udi = Udi.Parse(s);
-            if (udi is StringUdi == false)
-                throw new FormatException("String \"" + s + "\" is not a string entity id.");
-
-            return (StringUdi) udi;
-        }
-
-        public static bool TryParse(string s, out StringUdi udi)
-        {
-            udi = null;
-            Udi tmp;
-            if (TryParse(s, out tmp) == false || tmp is StringUdi == false) return false;
-            udi = (StringUdi) tmp;
-            return true;
-        }
-
         /// <inheritdoc/>
         public override bool IsRoot
         {

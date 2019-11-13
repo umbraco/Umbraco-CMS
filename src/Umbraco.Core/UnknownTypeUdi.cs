@@ -1,0 +1,16 @@
+﻿namespace Umbraco.Core
+{
+    internal class UnknownTypeUdi : Udi
+    {
+        private UnknownTypeUdi()
+            : base("unknown", "umb://unknown/")
+        { }
+
+        public static readonly UnknownTypeUdi Instance = new UnknownTypeUdi();
+
+        public override bool IsRoot
+        {
+            get { return false; }
+        }
+    }
+}

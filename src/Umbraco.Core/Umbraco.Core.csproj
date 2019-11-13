@@ -1104,8 +1104,11 @@
     <Compile Include="UdiDefinitionAttribute.cs" />
     <Compile Include="UdiEntityTypeHelper.cs" />
     <Compile Include="UdiGetterExtensions.cs" />
+    <Compile Include="UdiParser.cs" />
+    <Compile Include="UdiParserServiceConnectors.cs" />
     <Compile Include="UdiRange.cs" />
     <Compile Include="UdiTypeConverter.cs" />
+    <Compile Include="UnknownTypeUdi.cs" />
     <Compile Include="UriExtensions.cs" />
     <Compile Include="PackageActions\IPackageAction.cs" />
     <Compile Include="PackageActions\PackageActionCollection.cs" />
