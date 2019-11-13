@@ -193,6 +193,13 @@ namespace Umbraco.Web.Mvc
                         surfaceRoute = surfaceRoutes.FirstOrDefault(x =>
                             x.Defaults["action"] != null &&
                             x.Defaults["action"].ToString().InvariantEquals(postedInfo.ActionName));
+
+                        if (surfaceRoute == null)
+                        {
+                            // we found n possibilities, but no exact matches in the Route Table.
+                            // is one of these a generic SurfaceController route?
+                            surfaceRoute = surfaceRoutes.Where(x => x.DataTokens["umbraco"].ToString().InvariantEquals("surface")).FirstOrDefault();
+                        }
                     }
                     else
                     {
