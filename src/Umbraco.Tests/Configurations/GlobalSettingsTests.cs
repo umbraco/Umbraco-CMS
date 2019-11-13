@@ -52,7 +52,7 @@ namespace Umbraco.Tests.Configurations
             globalSettingsMock.Setup(x => x.Path).Returns(() => Current.IOHelper.ResolveUrl(path));
 
             Current.SystemDirectories.Root = rootPath;
-            Assert.AreEqual(outcome, globalSettings.GetUmbracoMvcAreaNoCache());
+            Assert.AreEqual(outcome, globalSettings.GetUmbracoMvcAreaNoCache(new SystemDirectories()));
         }
 
 

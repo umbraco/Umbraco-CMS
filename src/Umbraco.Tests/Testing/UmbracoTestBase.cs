@@ -141,7 +141,7 @@ namespace Umbraco.Tests.Testing
 
             var register = RegisterFactory.Create();
 
-            Composition = new Composition(register, typeLoader, proflogger, ComponentTests.MockRuntimeState(RuntimeLevel.Run), new ConfigsFactory().Create());
+            Composition = new Composition(register, typeLoader, proflogger, ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs());
 
 
             Composition.RegisterUnique(IOHelper);
@@ -229,6 +229,7 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique<IVariationContextAccessor, TestVariationContextAccessor>();
             Composition.RegisterUnique<IPublishedSnapshotAccessor, TestPublishedSnapshotAccessor>();
             Composition.RegisterUnique<IIOHelper, IOHelper>();
+            Composition.RegisterUnique<ISystemDirectories, SystemDirectories>();
 
             // register back office sections in the order we want them rendered
             Composition.WithCollectionBuilder<SectionCollectionBuilder>().Append<ContentSection>()

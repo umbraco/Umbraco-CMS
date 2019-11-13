@@ -53,12 +53,13 @@ namespace Umbraco.Core.Runtime
         /// Gets the <see cref="IIOHelper"/>
         /// </summary>
         protected IIOHelper IOHelper { get; private set; }
+        protected ISystemDirectories SystemDirectories { get; private set; }
 
         /// <inheritdoc />
         public IRuntimeState State => _state;
 
         /// <inheritdoc/>
-        public virtual IFactory Boot(IRegister register, IConfigsFactory configsFactory)
+        public virtual IFactory Boot(IRegister register)
         {
             // create and register the essential services
             // ie the bare minimum required to boot
@@ -80,6 +81,10 @@ namespace Umbraco.Core.Runtime
             TypeFinder = GetTypeFinder();
             if (TypeFinder == null)
                 throw new InvalidOperationException($"The object returned from {nameof(GetTypeFinder)} cannot be null");
+
+            SystemDirectories = GetSystemDirectories();
+            if (SystemDirectories == null)
+                throw new InvalidOperationException($"The object returned from {nameof(GetSystemDirectories)} cannot be null");
 
             // the boot loader boots using a container scope, so anything that is PerScope will
             // be disposed after the boot loader has booted, and anything else will remain.
@@ -106,7 +111,7 @@ namespace Umbraco.Core.Runtime
                 ConfigureUnhandledException();
                 ConfigureApplicationRootPath();
 
-                Boot(register, timer, configsFactory);
+                Boot(register, timer);
             }
 
             return _factory;
@@ -115,7 +120,7 @@ namespace Umbraco.Core.Runtime
         /// <summary>
         /// Boots the runtime within a timer.
         /// </summary>
-        protected virtual IFactory Boot(IRegister register, DisposableTimer timer, IConfigsFactory configsFactory)
+        protected virtual IFactory Boot(IRegister register, DisposableTimer timer)
         {
             Composition composition = null;
 
@@ -134,7 +139,7 @@ namespace Umbraco.Core.Runtime
                 var databaseFactory = GetDatabaseFactory();
 
                 // configs
-                var configs = GetConfigs(configsFactory);
+                var configs = GetConfigs();
 
                 // type finder/loader
                 var typeLoader = new TypeLoader(IOHelper, TypeFinder, appCaches.RuntimeCache, new DirectoryInfo(configs.Global().LocalTempPath), ProfilingLogger);
@@ -350,6 +355,8 @@ namespace Umbraco.Core.Runtime
         /// <returns></returns>
         protected virtual IIOHelper GetIOHelper()
             => Umbraco.Core.IO.IOHelper.Default;
+    protected virtual ISystemDirectories GetSystemDirectories()
+            => new SystemDirectories();
 
         /// <summary>
         /// Gets the application caches.
@@ -381,9 +388,9 @@ namespace Umbraco.Core.Runtime
         /// <summary>
         /// Gets the configurations.
         /// </summary>
-        protected virtual Configs GetConfigs(IConfigsFactory configsFactory)
+        protected virtual Configs GetConfigs()
         {
-            var configs = configsFactory.Create();
+            var configs = new ConfigsFactory(IOHelper, SystemDirectories).Create();
 
             return configs;
         }

@@ -63,7 +63,7 @@ namespace Umbraco.Web
             // the boot manager is responsible for registrations
             var register = GetRegister();
             _runtime = GetRuntime();
-            _runtime.Boot(register, new ConfigsFactory());
+            _runtime.Boot(register);
         }
 
         // called by ASP.NET (auto event wireup) once per app domain

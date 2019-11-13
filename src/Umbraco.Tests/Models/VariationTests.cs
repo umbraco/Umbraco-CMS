@@ -29,7 +29,7 @@ namespace Umbraco.Tests.Models
 
             Current.Reset();
 
-            var configs = new ConfigsFactory().Create();
+            var configs = TestHelper.GetConfigs();
             configs.Add(SettingsForTests.GetDefaultGlobalSettings);
             configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
 

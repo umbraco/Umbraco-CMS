@@ -4,6 +4,7 @@ using System.Data;
 using System.Web.Hosting;
 using Examine;
 using Moq;
+using NPoco.Expressions;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Compose;
@@ -11,6 +12,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Runtime;
@@ -102,9 +104,9 @@ namespace Umbraco.Tests.Runtimes
                 return mock.Object;
             }
 
-            protected override Configs GetConfigs(IConfigsFactory configsFactory)
+            protected override Configs GetConfigs()
             {
-                var configs = configsFactory.Create();
+                var configs = new ConfigsFactory(Umbraco.Core.IO.IOHelper.Default, new SystemDirectories()).Create();
                 configs.Add(SettingsForTests.GetDefaultGlobalSettings);
                 configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
                 return configs;
@@ -142,9 +144,9 @@ namespace Umbraco.Tests.Runtimes
 
             private IMainDom _mainDom;
 
-            public override IFactory Boot(IRegister container, IConfigsFactory configsFactory)
+            public override IFactory Boot(IRegister container)
             {
-                var factory = base.Boot(container, configsFactory);
+                var factory = base.Boot(container);
                 _mainDom = factory.GetInstance<IMainDom>();
                 return factory;
             }

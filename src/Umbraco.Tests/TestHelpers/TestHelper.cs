@@ -36,7 +36,12 @@ namespace Umbraco.Tests.TestHelpers
 
         public static Configs GetConfigs()
         {
-            return new ConfigsFactory().Create();
+            return GetConfigsFactory().Create();
+        }
+
+        public static IConfigsFactory GetConfigsFactory()
+        {
+            return new ConfigsFactory(IOHelper.Default, new SystemDirectories());
         }
 
         /// <summary>
@@ -269,5 +274,7 @@ namespace Umbraco.Tests.TestHelpers
 
             );
         }
+
+
     }
 }

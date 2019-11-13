@@ -18,7 +18,7 @@ namespace Umbraco.Tests.Models
         public void Setup()
         {
             Current.Reset();
-            Current.UnlockConfigs(new ConfigsFactory());
+            Current.UnlockConfigs(TestHelper.GetConfigsFactory());
             Current.Configs.Add(SettingsForTests.GetDefaultGlobalSettings);
         }
 

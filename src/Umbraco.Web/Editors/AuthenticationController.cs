@@ -514,7 +514,7 @@ namespace Umbraco.Web.Editors
             var action = urlHelper.Action("ValidatePasswordResetCode", "BackOffice",
                 new
                 {
-                    area = GlobalSettings.GetUmbracoMvcArea(),
+                    area = GlobalSettings.GetUmbracoMvcArea(Current.SystemDirectories),
                     u = userId,
                     r = code
                 });

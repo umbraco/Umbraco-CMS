@@ -13,7 +13,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="register">The application register.</param>
         /// <returns>The application factory.</returns>
-        IFactory Boot(IRegister register, IConfigsFactory configsFactory);
+        IFactory Boot(IRegister register);
 
         /// <summary>
         /// Gets the runtime state.

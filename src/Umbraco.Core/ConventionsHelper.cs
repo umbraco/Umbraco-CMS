@@ -21,7 +21,8 @@ namespace Umbraco.Core
                     new PropertyType(Constants.PropertyEditors.Aliases.Label, ValueStorageType.Integer, true,
                         Constants.Conventions.Member.FailedPasswordAttempts)
                     {
-                        Name = Constants.Conventions.Member.FailedPasswordAttemptsLabel
+                        Name = Constants.Conventions.Member.FailedPasswordAttemptsLabel,
+                        DataTypeId = Constants.DataTypes.LabelInt
                     }
                 },
                 {
@@ -45,7 +46,8 @@ namespace Umbraco.Core
                     new PropertyType(Constants.PropertyEditors.Aliases.Label, ValueStorageType.Date, true,
                         Constants.Conventions.Member.LastLockoutDate)
                     {
-                        Name = Constants.Conventions.Member.LastLockoutDateLabel
+                        Name = Constants.Conventions.Member.LastLockoutDateLabel,
+                        DataTypeId = Constants.DataTypes.LabelDateTime
                     }
                 },
                 {
@@ -53,7 +55,8 @@ namespace Umbraco.Core
                     new PropertyType(Constants.PropertyEditors.Aliases.Label, ValueStorageType.Date, true,
                         Constants.Conventions.Member.LastLoginDate)
                     {
-                        Name = Constants.Conventions.Member.LastLoginDateLabel
+                        Name = Constants.Conventions.Member.LastLoginDateLabel,
+                        DataTypeId = Constants.DataTypes.LabelDateTime
                     }
                 },
                 {
@@ -61,7 +64,8 @@ namespace Umbraco.Core
                     new PropertyType(Constants.PropertyEditors.Aliases.Label, ValueStorageType.Date, true,
                         Constants.Conventions.Member.LastPasswordChangeDate)
                     {
-                        Name = Constants.Conventions.Member.LastPasswordChangeDateLabel
+                        Name = Constants.Conventions.Member.LastPasswordChangeDateLabel,
+                        DataTypeId = Constants.DataTypes.LabelDateTime
                     }
                 },
                 {
@@ -69,7 +73,8 @@ namespace Umbraco.Core
                     new PropertyType(Constants.PropertyEditors.Aliases.Label, ValueStorageType.Nvarchar, true,
                         Constants.Conventions.Member.PasswordAnswer)
                     {
-                        Name = Constants.Conventions.Member.PasswordAnswerLabel
+                        Name = Constants.Conventions.Member.PasswordAnswerLabel,
+                        DataTypeId = Constants.DataTypes.LabelString
                     }
                 },
                 {
@@ -77,7 +82,8 @@ namespace Umbraco.Core
                     new PropertyType(Constants.PropertyEditors.Aliases.Label, ValueStorageType.Nvarchar, true,
                         Constants.Conventions.Member.PasswordQuestion)
                     {
-                        Name = Constants.Conventions.Member.PasswordQuestionLabel
+                        Name = Constants.Conventions.Member.PasswordQuestionLabel,
+                        DataTypeId = Constants.DataTypes.LabelString
                     }
                 }
             };

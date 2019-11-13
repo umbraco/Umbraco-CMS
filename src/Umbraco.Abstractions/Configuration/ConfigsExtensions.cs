@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.IO;
@@ -14,9 +15,9 @@ namespace Umbraco.Core
     public static class ConfigsExtensions
     {
 
-        public static void AddCoreConfigs(this Configs configs, IIOHelper ioHelper)
+        public static void AddCoreConfigs(this Configs configs, IIOHelper ioHelper, ISystemDirectories systemDirectories)
         {
-            var configDir = new DirectoryInfo(ioHelper.MapPath(SystemDirectories.Config));
+            var configDir = new DirectoryInfo(ioHelper.MapPath(systemDirectories.Config));
 
             // GridConfig depends on runtime caches, manifest parsers... and cannot be available during composition
             configs.Add<IGridConfig>(factory => new GridConfig(
