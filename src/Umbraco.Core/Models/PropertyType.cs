@@ -36,7 +36,7 @@ namespace Umbraco.Core.Models
         {
             if (dataType == null) throw new ArgumentNullException(nameof(dataType));
 
-            if(dataType.HasIdentity)
+            if (dataType.HasIdentity)
                 _dataTypeId = dataType.Id;
 
             _propertyEditorAlias = dataType.EditorAlias;
@@ -58,14 +58,16 @@ namespace Umbraco.Core.Models
         /// </summary>
         public PropertyType(string propertyEditorAlias, ValueStorageType valueStorageType)
             : this(propertyEditorAlias, valueStorageType, false)
-        { }
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyType"/> class.
         /// </summary>
         public PropertyType(string propertyEditorAlias, ValueStorageType valueStorageType, string propertyTypeAlias)
             : this(propertyEditorAlias, valueStorageType, false, propertyTypeAlias)
-        { }
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyType"/> class.
@@ -99,9 +101,7 @@ namespace Umbraco.Core.Models
         /// </remarks>
         public bool SupportsPublishing { get; internal set; }
 
-        /// <summary>
-        /// Gets of sets the name of the property type.
-        /// </summary>
+        /// <inheritdoc />
         [DataMember]
         public string Name
         {
@@ -109,9 +109,7 @@ namespace Umbraco.Core.Models
             set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
         }
 
-        /// <summary>
-        /// Gets of sets the alias of the property type.
-        /// </summary>
+        /// <inheritdoc />
         [DataMember]
         public virtual string Alias
         {
@@ -119,9 +117,7 @@ namespace Umbraco.Core.Models
             set => SetPropertyValueAndDetectChanges(SanitizeAlias(value), ref _alias, nameof(Alias));
         }
 
-        /// <summary>
-        /// Gets of sets the description of the property type.
-        /// </summary>
+        /// <inheritdoc />
         [DataMember]
         public string Description
         {
@@ -129,9 +125,7 @@ namespace Umbraco.Core.Models
             set => SetPropertyValueAndDetectChanges(value, ref _description, nameof(Description));
         }
 
-        /// <summary>
-        /// Gets or sets the identifier of the datatype for this property type.
-        /// </summary>
+        /// <inheritdoc />
         [DataMember]
         public int DataTypeId
         {
@@ -146,9 +140,7 @@ namespace Umbraco.Core.Models
             set => SetPropertyValueAndDetectChanges(value, ref _dataTypeKey, nameof(DataTypeKey));
         }
 
-        /// <summary>
-        /// Gets or sets the alias of the property editor for this property type.
-        /// </summary>
+        /// <inheritdoc />
         [DataMember]
         public string PropertyEditorAlias
         {
@@ -156,9 +148,7 @@ namespace Umbraco.Core.Models
             set => SetPropertyValueAndDetectChanges(value, ref _propertyEditorAlias, nameof(PropertyEditorAlias));
         }
 
-        /// <summary>
-        /// Gets or sets the database type for storing value for this property type.
-        /// </summary>
+        /// <inheritdoc />
         [DataMember]
         public ValueStorageType ValueStorageType
         {
@@ -170,10 +160,7 @@ namespace Umbraco.Core.Models
             }
         }
 
-        /// <summary>
-        /// Gets or sets the identifier of the property group this property type belongs to.
-        /// </summary>
-        /// <remarks>For generic properties, the value is <c>null</c>.</remarks>
+        /// <inheritdoc />
         [DataMember]
         public Lazy<int> PropertyGroupId
         {
@@ -181,9 +168,8 @@ namespace Umbraco.Core.Models
             set => SetPropertyValueAndDetectChanges(value, ref _propertyGroupId, nameof(PropertyGroupId));
         }
 
-        /// <summary>
-        /// Gets of sets a value indicating whether a value for this property type is required.
-        /// </summary>
+
+        /// <inheritdoc />
         [DataMember]
         public bool Mandatory
         {
@@ -191,9 +177,8 @@ namespace Umbraco.Core.Models
             set => SetPropertyValueAndDetectChanges(value, ref _mandatory, nameof(Mandatory));
         }
 
-        /// <summary>
-        /// Gets of sets the sort order of the property type.
-        /// </summary>
+
+        /// <inheritdoc />
         [DataMember]
         public int SortOrder
         {
@@ -201,9 +186,7 @@ namespace Umbraco.Core.Models
             set => SetPropertyValueAndDetectChanges(value, ref _sortOrder, nameof(SortOrder));
         }
 
-        /// <summary>
-        /// Gets or sets the regular expression validating the property values.
-        /// </summary>
+        /// <inheritdoc />
         [DataMember]
         public string ValidationRegExp
         {
@@ -211,21 +194,14 @@ namespace Umbraco.Core.Models
             set => SetPropertyValueAndDetectChanges(value, ref _validationRegExp, nameof(ValidationRegExp));
         }
 
-        /// <summary>
-        /// Gets or sets the content variation of the property type.
-        /// </summary>
+        /// <inheritdoc />
         public ContentVariation Variations
         {
             get => _variations;
             set => SetPropertyValueAndDetectChanges(value, ref _variations, nameof(Variations));
         }
 
-        /// <summary>
-        /// Determines whether the property type supports a combination of culture and segment.
-        /// </summary>
-        /// <param name="culture">The culture.</param>
-        /// <param name="segment">The segment.</param>
-        /// <param name="wildcards">A value indicating whether wildcards are valid.</param>
+        /// <inheritdoc />
         public bool SupportsVariation(string culture, string segment, bool wildcards = false)
         {
             // exact validation: cannot accept a 'null' culture if the property type varies
@@ -249,7 +225,7 @@ namespace Umbraco.Core.Models
         /// <para>If the value is of the expected type, it can be directly assigned to the property.
         /// Otherwise, some conversion is required.</para>
         /// </remarks>
-        public bool IsOfExpectedPropertyType(object value)
+        private bool IsOfExpectedPropertyType(object value)
         {
             // null values are assumed to be ok
             if (value == null)
@@ -275,19 +251,7 @@ namespace Umbraco.Core.Models
             }
         }
 
-        /// <summary>
-        /// Determines whether a value can be assigned to a property.
-        /// </summary>
-        public bool IsValueAssignable(object value) => TryConvertAssignedValue(value, false, out _);
-
-        /// <summary>
-        /// Converts a value assigned to a property.
-        /// </summary>
-        /// <remarks>
-        /// <para>The input value can be pretty much anything, and is converted to the actual CLR type
-        /// expected by the property (eg an integer if the property values are integers).</para>
-        /// <para>Throws if the value cannot be converted.</para>
-        /// </remarks>
+        /// <inheritdoc />
         public object ConvertAssignedValue(object value) => TryConvertAssignedValue(value, true, out var converted) ? converted : null;
 
         /// <summary>
@@ -296,8 +260,6 @@ namespace Umbraco.Core.Models
         /// <remarks>
         /// <para></para>
         /// </remarks>
-        public bool TryConvertAssignedValue(object value, out object converted) => TryConvertAssignedValue(value, false, out converted);
-
         private bool TryConvertAssignedValue(object value, bool throwOnError, out object converted)
         {
             var isOfExpectedType = IsOfExpectedPropertyType(value);
@@ -332,6 +294,7 @@ namespace Umbraco.Core.Models
                         converted = convInt.Result;
                         return true;
                     }
+
                     if (throwOnError)
                         ThrowTypeException(value, typeof(int), Alias);
                     return false;
@@ -347,6 +310,7 @@ namespace Umbraco.Core.Models
                         converted = convDecimal.Result.Normalize();
                         return true;
                     }
+
                     if (throwOnError)
                         ThrowTypeException(value, typeof(decimal), Alias);
                     return false;
@@ -360,6 +324,7 @@ namespace Umbraco.Core.Models
                         converted = convDateTime.Result;
                         return true;
                     }
+
                     if (throwOnError)
                         ThrowTypeException(value, typeof(DateTime), Alias);
                     return false;
@@ -413,7 +378,7 @@ namespace Umbraco.Core.Models
         {
             base.PerformDeepClone(clone);
 
-            var clonedEntity = (PropertyType)clone;
+            var clonedEntity = (PropertyType) clone;
 
             //need to manually assign the Lazy value as it will not be automatically mapped
             if (PropertyGroupId != null)
