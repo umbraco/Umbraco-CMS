@@ -245,7 +245,7 @@ namespace Umbraco.Web
                 }
 
                 //write out the hidden surface form routes
-                _viewContext.Writer.Write("<input name='ufprt' type='hidden' value='" + _encryptedString + "' />");
+                _viewContext.Writer.Write("<input name=\"ufprt\" type=\"hidden\" value=\"" + _encryptedString + "\" />");
 
                 base.Dispose(disposing);
             }
