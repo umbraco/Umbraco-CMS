@@ -162,12 +162,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(EntityContainer entity)
         {
-            // TODO Ensure correct exceptions are thrown (entity.Name is not an argument and NullReferenceException shouldn't be thrown by user code)
             if (entity == null) throw new ArgumentNullException(nameof(entity));
             EnsureContainerType(entity);
 
-            if (entity.Name == null) throw new ArgumentNullException(nameof(entity.Name));
-            if (string.IsNullOrWhiteSpace(entity.Name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(entity.Name));
+            if (entity.Name == null) throw new InvalidOperationException("Entity name can't be null.");
+            if (string.IsNullOrWhiteSpace(entity.Name)) throw new InvalidOperationException("Entity name can't be empty or consist only of white-space characters.");
             entity.Name = entity.Name.Trim();
 
             // guard against duplicates
@@ -187,7 +186,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     .Where<NodeDto>(dto => dto.NodeId == entity.ParentId && dto.NodeObjectType == entity.ContainerObjectType));
 
                 if (parentDto == null)
-                    throw new NullReferenceException("Could not find parent container with id " + entity.ParentId);
+                    throw new InvalidOperationException("Could not find parent container with id " + entity.ParentId);
 
                 level = parentDto.Level;
                 path = parentDto.Path;
@@ -226,12 +225,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         //
         protected override void PersistUpdatedItem(EntityContainer entity)
         {
-            // TODO Ensure correct exceptions are thrown (entity.Name is not an argument and NullReferenceException shouldn't be thrown by user code)
             if (entity == null) throw new ArgumentNullException(nameof(entity));
             EnsureContainerType(entity);
 
-            if (entity.Name == null) throw new ArgumentNullException(nameof(entity.Name));
-            if (string.IsNullOrWhiteSpace(entity.Name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(entity.Name));
+            if (entity.Name == null) throw new InvalidOperationException("Entity name can't be null.");
+            if (string.IsNullOrWhiteSpace(entity.Name)) throw new InvalidOperationException("Entity name can't be empty or consist only of white-space characters.");
             entity.Name = entity.Name.Trim();
 
             // find container to update
@@ -261,7 +259,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                         .Where<NodeDto>(dto => dto.NodeId == entity.ParentId && dto.NodeObjectType == entity.ContainerObjectType));
 
                     if (parent == null)
-                        throw new NullReferenceException("Could not find parent container with id " + entity.ParentId);
+                        throw new InvalidOperationException("Could not find parent container with id " + entity.ParentId);
 
                     nodeDto.Level = Convert.ToInt16(parent.Level + 1);
                     nodeDto.Path = parent.Path + "," + nodeDto.NodeId;
