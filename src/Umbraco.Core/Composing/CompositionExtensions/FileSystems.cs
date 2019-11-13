@@ -90,7 +90,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
             // register the IFileSystem supporting the IMediaFileSystem
             // THIS IS THE ONLY THING THAT NEEDS TO CHANGE, IN ORDER TO REPLACE THE UNDERLYING FILESYSTEM
             // and, SupportingFileSystem.For<IMediaFileSystem>() returns the underlying filesystem
-            composition.SetMediaFileSystem(() => new PhysicalFileSystem(Current.SystemDirectories.Media));
+            composition.SetMediaFileSystem(() => new PhysicalFileSystem(Current.IOHelper.Media));
 
             return composition;
         }

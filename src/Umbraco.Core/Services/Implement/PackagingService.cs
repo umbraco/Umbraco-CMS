@@ -64,7 +64,7 @@ namespace Umbraco.Core.Services.Implement
             //successful
             if (bytes.Length > 0)
             {
-                var packagePath = Current.IOHelper.MapPath(Current.SystemDirectories.Packages);
+                var packagePath = Current.IOHelper.MapPath(Constants.SystemDirectories.Packages);
 
                 // Check for package directory
                 if (Directory.Exists(packagePath) == false)

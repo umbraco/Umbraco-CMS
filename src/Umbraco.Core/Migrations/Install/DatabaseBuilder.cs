@@ -283,7 +283,7 @@ namespace Umbraco.Core.Migrations.Install
             if (string.IsNullOrWhiteSpace(providerName)) throw new ArgumentNullOrEmptyException(nameof(providerName));
 
             var fileSource = "web.config";
-            var fileName = Current.IOHelper.MapPath(Current.SystemDirectories.Root +"/" + fileSource);
+            var fileName = Current.IOHelper.MapPath(Current.IOHelper.Root +"/" + fileSource);
 
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
             if (xml.Root == null) throw new Exception($"Invalid {fileSource} file (no root).");
@@ -296,7 +296,7 @@ namespace Umbraco.Core.Migrations.Install
             if (configSourceAttribute != null)
             {
                 fileSource = configSourceAttribute.Value;
-                fileName = Current.IOHelper.MapPath(Current.SystemDirectories.Root + "/" + fileSource);
+                fileName = Current.IOHelper.MapPath(Current.IOHelper.Root + "/" + fileSource);
 
                 if (!File.Exists(fileName))
                     throw new Exception($"Invalid configSource \"{fileSource}\" (no such file).");

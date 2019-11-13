@@ -138,9 +138,9 @@ namespace Umbraco.Core.Packaging
             if (path.Contains("[$"))
             {
                 //this is experimental and undocumented...
-                path = path.Replace("[$UMBRACO]", Current.SystemDirectories.Umbraco);
-                path = path.Replace("[$CONFIG]", Current.SystemDirectories.Config);
-                path = path.Replace("[$DATA]", Current.SystemDirectories.Data);
+                path = path.Replace("[$UMBRACO]", Current.IOHelper.Umbraco);
+                path = path.Replace("[$CONFIG]", Constants.SystemDirectories.Config);
+                path = path.Replace("[$DATA]", Constants.SystemDirectories.Data);
             }
             return path;
         }

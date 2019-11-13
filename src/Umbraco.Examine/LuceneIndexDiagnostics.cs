@@ -11,10 +11,13 @@ namespace Umbraco.Examine
 {
     public class LuceneIndexDiagnostics : IIndexDiagnostics
     {
+        private IIOHelper _ioHelper;
+
         public LuceneIndexDiagnostics(LuceneIndex index, ILogger logger)
         {
             Index = index;
             Logger = logger;
+            _ioHelper = Current.IOHelper;
         }
 
         public LuceneIndex Index { get; }
@@ -72,7 +75,7 @@ namespace Umbraco.Examine
 
                 if (luceneDir is FSDirectory fsDir)
                 {
-                    d[nameof(UmbracoExamineIndex.LuceneIndexFolder)] = fsDir.Directory.ToString().ToLowerInvariant().TrimStart(Current.IOHelper.MapPath(Current.SystemDirectories.Root).ToLowerInvariant()).Replace("\\", "/").EnsureStartsWith('/');
+                    d[nameof(UmbracoExamineIndex.LuceneIndexFolder)] = fsDir.Directory.ToString().ToLowerInvariant().TrimStart(_ioHelper.MapPath(_ioHelper.Root).ToLowerInvariant()).Replace("\\", "/").EnsureStartsWith('/');
                 }
 
                 return d;

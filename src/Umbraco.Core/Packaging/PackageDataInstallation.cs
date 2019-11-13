@@ -1318,7 +1318,7 @@ namespace Umbraco.Core.Packaging
 
         private string ViewPath(string alias)
         {
-            return Current.SystemDirectories.MvcViews + "/" + alias.Replace(" ", "") + ".cshtml";
+            return Constants.SystemDirectories.MvcViews + "/" + alias.Replace(" ", "") + ".cshtml";
         }
 
         #endregion

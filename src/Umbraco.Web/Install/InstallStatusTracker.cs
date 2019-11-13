@@ -25,10 +25,10 @@ namespace Umbraco.Web.Install
 
         private static string GetFile(Guid installId)
         {
-            var file = Current.IOHelper.MapPath(Current.SystemDirectories.TempData.EnsureEndsWith('/') + "Install/"
-                                                                                                       + "install_"
-                                                                                                       + installId.ToString("N")
-                                                                                                       + ".txt");
+            var file = Current.IOHelper.MapPath(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "Install/"
+                                                                                                         + "install_"
+                                                                                                         + installId.ToString("N")
+                                                                                                         + ".txt");
             return file;
         }
 
@@ -40,7 +40,7 @@ namespace Umbraco.Web.Install
 
         public static void ClearFiles()
         {
-            var dir = Current.IOHelper.MapPath(Current.SystemDirectories.TempData.EnsureEndsWith('/') + "Install/");
+            var dir = Current.IOHelper.MapPath(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "Install/");
             if (Directory.Exists(dir))
             {
                 var files = Directory.GetFiles(dir);

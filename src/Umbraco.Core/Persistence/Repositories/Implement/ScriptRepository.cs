@@ -15,13 +15,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal class ScriptRepository : FileRepository<string, IScript>, IScriptRepository
     {
         private readonly IIOHelper _ioHelper;
-        private readonly ISystemDirectories _systemDirectories;
 
         public ScriptRepository(IFileSystems fileSystems, IIOHelper ioHelper)
             : base(fileSystems.ScriptsFileSystem)
         {
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
-            _systemDirectories = Current.SystemDirectories;
         }
 
         #region Implementation of IRepository<string,Script>
@@ -106,7 +104,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             // validate path & extension
-            var validDir = _systemDirectories.Scripts;
+            var validDir = _ioHelper.Scripts;
             var isValidPath = _ioHelper.VerifyEditPath(fullPath, validDir);
             var validExts = new[] {"js"};
             var isValidExtension = _ioHelper.VerifyFileExtension(script.Path, validExts);

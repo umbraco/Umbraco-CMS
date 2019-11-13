@@ -5,7 +5,7 @@ namespace Umbraco.Core.IO
     public interface IIOHelper
     {
         bool ForceNotHosted { get; set; }
-        
+
         /// <summary>
         /// Gets a value indicating whether Umbraco is hosted.
         /// </summary>
@@ -80,5 +80,20 @@ namespace Umbraco.Core.IO
         /// <param name="path"></param>
         /// <returns></returns>
         string GetRelativePath(string path);
+
+        string Media { get; }
+        string Scripts { get; }
+        string Css { get; }
+        string Umbraco { get; }
+
+
+        /// <summary>
+        /// Gets the root path of the application
+        /// </summary>
+        string Root
+        {
+            get;
+            set; //Only required for unit tests
+        }
     }
 }
