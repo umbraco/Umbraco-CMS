@@ -380,13 +380,13 @@ namespace Umbraco.Core.Configuration
         }
 
         private string _umbracoMediaPath = null;
-        public string UmbracoMediaPath => GetterWithDefaultValue(Constants.AppSettings.UmbracoMediaPath, "~/umbraco", ref _umbracoMediaPath);
+        public string UmbracoMediaPath => GetterWithDefaultValue(Constants.AppSettings.UmbracoMediaPath, "~/media", ref _umbracoMediaPath);
 
         private string _umbracoScriptsPath = null;
-        public string UmbracoScriptsPath => GetterWithDefaultValue(Constants.AppSettings.UmbracoScriptsPath, "~/umbraco", ref _umbracoScriptsPath);
+        public string UmbracoScriptsPath => GetterWithDefaultValue(Constants.AppSettings.UmbracoScriptsPath, "~/scripts", ref _umbracoScriptsPath);
 
         private string _umbracoCssPath = null;
-        public string UmbracoCssPath => GetterWithDefaultValue(Constants.AppSettings.UmbracoCssPath, "~/umbraco", ref _umbracoCssPath);
+        public string UmbracoCssPath => GetterWithDefaultValue(Constants.AppSettings.UmbracoCssPath, "~/css", ref _umbracoCssPath);
 
         private string _umbracoPath = null;
         public string UmbracoPath => GetterWithDefaultValue(Constants.AppSettings.UmbracoPath, "~/umbraco", ref _umbracoPath);

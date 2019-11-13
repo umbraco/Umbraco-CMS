@@ -12,13 +12,8 @@ namespace Umbraco.Core.IO
 {
     public class IOHelper : IIOHelper
     {
-        private readonly IGlobalSettings _globalSettings;
-        internal static IIOHelper Default { get; } = new IOHelper(new GlobalSettings());
+        internal static IIOHelper Default { get; } = new IOHelper();
 
-        public IOHelper(IGlobalSettings globalSettings)
-        {
-            _globalSettings = globalSettings;
-        }
 
         /// <summary>
         /// Gets or sets a value forcing Umbraco to consider it is non-hosted.
@@ -293,15 +288,6 @@ namespace Umbraco.Core.IO
 
             return path.EnsurePathIsApplicationRootPrefixed();
         }
-
-
-        public string Media => _globalSettings.UmbracoMediaPath;
-
-        public string Scripts => _globalSettings.UmbracoScriptsPath;
-
-        public string Css => _globalSettings.UmbracoCssPath;
-
-        public string Umbraco => _globalSettings.UmbracoPath;
 
         private string _root;
 

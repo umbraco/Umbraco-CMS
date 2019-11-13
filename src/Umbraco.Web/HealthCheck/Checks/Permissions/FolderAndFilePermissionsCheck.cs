@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
@@ -60,24 +61,24 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
             // in ALL circumstances or just some
             var pathsToCheck = new Dictionary<string, PermissionCheckRequirement>
             {
-                { Core.Constants.SystemDirectories.Data, PermissionCheckRequirement.Required },
-                { Core.Constants.SystemDirectories.Packages, PermissionCheckRequirement.Required},
-                { Core.Constants.SystemDirectories.Preview, PermissionCheckRequirement.Required },
-                { Core.Constants.SystemDirectories.AppPlugins, PermissionCheckRequirement.Required },
-                { Core.Constants.SystemDirectories.Config, PermissionCheckRequirement.Optional },
-                { Current.IOHelper.Css, PermissionCheckRequirement.Optional },
-                { Current.IOHelper.Media, PermissionCheckRequirement.Optional },
-                { Current.IOHelper.Scripts, PermissionCheckRequirement.Optional },
-                { Current.IOHelper.Umbraco, PermissionCheckRequirement.Optional },
-                { Core.Constants.SystemDirectories.MvcViews, PermissionCheckRequirement.Optional }
+                { Constants.SystemDirectories.Data, PermissionCheckRequirement.Required },
+                { Constants.SystemDirectories.Packages, PermissionCheckRequirement.Required},
+                { Constants.SystemDirectories.Preview, PermissionCheckRequirement.Required },
+                { Constants.SystemDirectories.AppPlugins, PermissionCheckRequirement.Required },
+                { Constants.SystemDirectories.Config, PermissionCheckRequirement.Optional },
+                { Current.Configs.Global().UmbracoCssPath, PermissionCheckRequirement.Optional },
+                { Current.Configs.Global().UmbracoMediaPath, PermissionCheckRequirement.Optional },
+                { Current.Configs.Global().UmbracoScriptsPath, PermissionCheckRequirement.Optional },
+                { Current.Configs.Global().UmbracoPath, PermissionCheckRequirement.Optional },
+                { Constants.SystemDirectories.MvcViews, PermissionCheckRequirement.Optional }
             };
 
             //These are special paths to check that will restart an app domain if a file is written to them,
             //so these need to be tested differently
             var pathsToCheckWithRestarts = new Dictionary<string, PermissionCheckRequirement>
             {
-                { Core.Constants.SystemDirectories.AppCode, PermissionCheckRequirement.Optional },
-                { Core.Constants.SystemDirectories.Bin, PermissionCheckRequirement.Optional }
+                { Constants.SystemDirectories.AppCode, PermissionCheckRequirement.Optional },
+                { Constants.SystemDirectories.Bin, PermissionCheckRequirement.Optional }
             };
 
             // Run checks for required and optional paths for modify permission

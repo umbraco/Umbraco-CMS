@@ -104,7 +104,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             // validate path & extension
-            var validDir = _ioHelper.Scripts;
+            var validDir = Current.Configs.Global().UmbracoScriptsPath;
             var isValidPath = _ioHelper.VerifyEditPath(fullPath, validDir);
             var validExts = new[] {"js"};
             var isValidExtension = _ioHelper.VerifyFileExtension(script.Path, validExts);

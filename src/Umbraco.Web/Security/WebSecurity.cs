@@ -209,7 +209,7 @@ namespace Umbraco.Web.Security
 
         private static bool RequestIsInUmbracoApplication(HttpContextBase context)
         {
-            return context.Request.Path.ToLower().IndexOf(Current.IOHelper.ResolveUrl(Current.IOHelper.Umbraco).ToLower(), StringComparison.Ordinal) > -1;
+            return context.Request.Path.ToLower().IndexOf(Current.IOHelper.ResolveUrl(Current.Configs.Global().UmbracoPath).ToLower(), StringComparison.Ordinal) > -1;
         }
 
         /// <summary>

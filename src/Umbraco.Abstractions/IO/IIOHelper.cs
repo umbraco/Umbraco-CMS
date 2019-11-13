@@ -79,12 +79,6 @@ namespace Umbraco.Core.IO
         /// <returns></returns>
         string GetRelativePath(string path);
 
-        string Media { get; }
-        string Scripts { get; }
-        string Css { get; }
-        string Umbraco { get; }
-
-
         /// <summary>
         /// Gets the root path of the application
         /// </summary>

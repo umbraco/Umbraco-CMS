@@ -41,7 +41,7 @@ namespace Umbraco.Web.Install.Controllers
         public ActionResult Index()
         {
             if (_runtime.Level == RuntimeLevel.Run)
-                return Redirect(Current.IOHelper.Umbraco.EnsureEndsWith('/'));
+                return Redirect(Current.Configs.Global().UmbracoPath.EnsureEndsWith('/'));
 
             if (_runtime.Level == RuntimeLevel.Upgrade)
             {
@@ -58,7 +58,7 @@ namespace Umbraco.Web.Install.Controllers
                 {
                     case ValidateRequestAttempt.FailedNoPrivileges:
                     case ValidateRequestAttempt.FailedNoContextId:
-                        return Redirect(Current.IOHelper.Umbraco + "/AuthorizeUpgrade?redir=" + Server.UrlEncode(Request.RawUrl));
+                        return Redirect(Current.Configs.Global().UmbracoPath + "/AuthorizeUpgrade?redir=" + Server.UrlEncode(Request.RawUrl));
                 }
             }
 
@@ -66,7 +66,7 @@ namespace Umbraco.Web.Install.Controllers
             ViewData.SetInstallApiBaseUrl(Url.GetUmbracoApiService("GetSetup", "InstallApi", "UmbracoInstall").TrimEnd("GetSetup"));
 
             // get the base umbraco folder
-            ViewData.SetUmbracoBaseFolder(Current.IOHelper.ResolveUrl(Current.IOHelper.Umbraco));
+            ViewData.SetUmbracoBaseFolder(Current.IOHelper.ResolveUrl(Current.Configs.Global().UmbracoPath));
 
             _installHelper.InstallStatus(false, "");
 
