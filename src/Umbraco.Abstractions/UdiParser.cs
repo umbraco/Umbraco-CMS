@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Umbraco.Core
 {
@@ -12,13 +14,16 @@ namespace Umbraco.Core
         {
             // initialize with known (built-in) Udi types
             // we will add scanned types later on
-            UdiTypes = new ConcurrentDictionary<string, UdiType>(UdiEntityTypeHelper.GetTypes());
+            UdiTypes = new ConcurrentDictionary<string, UdiType>(GetKnownUdiTypes());
         }
 
-        // for tests, totally unsafe
-        internal static void ResetUdiTypes()
+        /// <summary>
+        /// Internal API for tests to resets all udi types back to only the known udi types.
+        /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void ResetUdiTypes()
         {
-            UdiTypes = new ConcurrentDictionary<string, UdiType>(UdiEntityTypeHelper.GetTypes());
+            UdiTypes = new ConcurrentDictionary<string, UdiType>(GetKnownUdiTypes());
         }
 
         /// <summary>
@@ -175,5 +180,43 @@ namespace Umbraco.Core
         /// <param name="entityType"></param>
         /// <param name="udiType"></param>
         public static void RegisterUdiType(string entityType, UdiType udiType) => UdiTypes.TryAdd(entityType, udiType);
+
+        public static Dictionary<string, UdiType> GetKnownUdiTypes() =>
+            new Dictionary<string, UdiType>
+            {
+                { Constants.UdiEntityType.Unknown, UdiType.Unknown },
+
+                { Constants.UdiEntityType.AnyGuid, UdiType.GuidUdi },
+                { Constants.UdiEntityType.Document, UdiType.GuidUdi },
+                { Constants.UdiEntityType.DocumentBlueprint, UdiType.GuidUdi },
+                { Constants.UdiEntityType.Media, UdiType.GuidUdi },
+                { Constants.UdiEntityType.Member, UdiType.GuidUdi },
+                { Constants.UdiEntityType.DictionaryItem, UdiType.GuidUdi },
+                { Constants.UdiEntityType.Macro, UdiType.GuidUdi },
+                { Constants.UdiEntityType.Template, UdiType.GuidUdi },
+                { Constants.UdiEntityType.DocumentType, UdiType.GuidUdi },
+                { Constants.UdiEntityType.DocumentTypeContainer, UdiType.GuidUdi },
+                { Constants.UdiEntityType.DocumentTypeBluePrints, UdiType.GuidUdi },
+                { Constants.UdiEntityType.MediaType, UdiType.GuidUdi },
+                { Constants.UdiEntityType.MediaTypeContainer, UdiType.GuidUdi },
+                { Constants.UdiEntityType.DataType, UdiType.GuidUdi },
+                { Constants.UdiEntityType.DataTypeContainer, UdiType.GuidUdi },
+                { Constants.UdiEntityType.MemberType, UdiType.GuidUdi },
+                { Constants.UdiEntityType.MemberGroup, UdiType.GuidUdi },
+                { Constants.UdiEntityType.RelationType, UdiType.GuidUdi },
+                { Constants.UdiEntityType.FormsForm, UdiType.GuidUdi },
+                { Constants.UdiEntityType.FormsPreValue, UdiType.GuidUdi },
+                { Constants.UdiEntityType.FormsDataSource, UdiType.GuidUdi },
+
+                { Constants.UdiEntityType.AnyString, UdiType.StringUdi },
+                { Constants.UdiEntityType.Language, UdiType.StringUdi },
+                { Constants.UdiEntityType.MacroScript, UdiType.StringUdi },
+                { Constants.UdiEntityType.MediaFile, UdiType.StringUdi },
+                { Constants.UdiEntityType.TemplateFile, UdiType.StringUdi },
+                { Constants.UdiEntityType.Script, UdiType.StringUdi },
+                { Constants.UdiEntityType.PartialView, UdiType.StringUdi },
+                { Constants.UdiEntityType.PartialViewMacro, UdiType.StringUdi },
+                { Constants.UdiEntityType.Stylesheet, UdiType.StringUdi }
+            };
     }
 }

@@ -12,7 +12,7 @@ namespace Umbraco.Core
     [TypeConverter(typeof(UdiTypeConverter))]
     public abstract class Udi : IComparable<Udi>
     {           
-        internal readonly Uri UriValue; // internal for UdiRange
+        public Uri UriValue { get; } 
 
         /// <summary>
         /// Initializes a new instance of the Udi class.
@@ -104,7 +104,7 @@ namespace Umbraco.Core
             return new GuidUdi(entityType, id);
         }
 
-        internal static Udi Create(Uri uri)
+        public static Udi Create(Uri uri)
         {
             // if it's a know type go fast and use ctors
             // else fallback to parsing the string (and guess the type)
