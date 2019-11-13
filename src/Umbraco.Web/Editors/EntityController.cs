@@ -509,7 +509,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            if (Udi.TryParse(id, out _))
+            if (UdiParser.TryParse(id, out _))
             {
                 //Not supported currently
                 throw new HttpResponseException(HttpStatusCode.NotFound);

@@ -20,7 +20,7 @@ namespace Umbraco.Core.Serialization
         {
             var jo = JToken.ReadFrom(reader);
             var val = jo.ToObject<string>();
-            return val == null ? null : Udi.Parse(val);
+            return val == null ? null : UdiParser.Parse(val);
         }
     }
 }

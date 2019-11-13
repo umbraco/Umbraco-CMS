@@ -491,7 +491,7 @@ namespace Umbraco.Web.Trees
             {
                 return new Tuple<Guid?, int?>(null, idInt);
             }
-            if (Udi.TryParse(id, out idUdi))
+            if (UdiParser.TryParse(id, out idUdi))
             {
                 var guidUdi = idUdi as GuidUdi;
                 if (guidUdi != null)
@@ -523,7 +523,7 @@ namespace Umbraco.Web.Trees
                 {
                     entity = Services.EntityService.Get(idInt, UmbracoObjectType);
                 }
-                else if (Udi.TryParse(s, out var idUdi))
+                else if (UdiParser.TryParse(s, out var idUdi))
                 {
                     var guidUdi = idUdi as GuidUdi;
                     entity = guidUdi != null ? Services.EntityService.Get(guidUdi.Guid, UmbracoObjectType) : null;

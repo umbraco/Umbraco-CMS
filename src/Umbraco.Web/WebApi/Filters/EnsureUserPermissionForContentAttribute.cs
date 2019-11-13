@@ -87,7 +87,7 @@ namespace Umbraco.Web.WebApi.Filters
                     {
                         nodeId = parsedId;
                     }
-                    else if (Udi.TryParse(argument, true, out Udi udi))
+                    else if (UdiParser.TryParse(argument, true, out Udi udi))
                     {
                         // TODO: inject? we can't because this is an attribute but we could provide ctors and empty ctors that pass in the required services
                         nodeId = Current.Services.EntityService.GetId(udi).Result;

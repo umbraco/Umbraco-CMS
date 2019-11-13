@@ -621,7 +621,7 @@ namespace Umbraco.Web
             switch (id)
             {
                 case string s:
-                    return Udi.TryParse(s, out guidId);
+                    return UdiParser.TryParse(s, out guidId);
 
                 case Udi u:
                     guidId = u;

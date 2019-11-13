@@ -59,7 +59,7 @@ namespace Umbraco.Web.Templates
                     var id = tag.Groups[1].Value; //.Remove(tag.Groups[1].Value.Length - 1, 1);
 
                     //The id could be an int or a UDI
-                    if (Udi.TryParse(id, out var udi))
+                    if (UdiParser.TryParse(id, out var udi))
                     {
                         var guidUdi = udi as GuidUdi;
                         if (guidUdi != null)
@@ -166,7 +166,7 @@ namespace Umbraco.Web.Templates
                 // - 4 = the data-udi attribute value
                 // - 5 = anything after group 4 until the image tag is closed
                 var udi = match.Groups[4].Value;
-                if(udi.IsNullOrWhiteSpace() || GuidUdi.TryParse(udi, out var guidUdi) == false)
+                if(udi.IsNullOrWhiteSpace() || UdiParser.TryParse(udi, out GuidUdi guidUdi) == false)
                 {
                     return match.Value;
                 }
