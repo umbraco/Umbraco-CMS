@@ -133,7 +133,7 @@ namespace Umbraco.Web.PropertyEditors
                                 {
                                     continue;
                                 }
-                                var tempConfig = _dataTypeService.GetDataType(propType.DataTypeId).Configuration;
+                                var tempConfig = DataTypeService.GetDataType(propType.DataTypeId).Configuration;
                                 var valEditor = propEditor.GetValueEditor(tempConfig);
                                 var convValue = valEditor.ConvertDbToString(propType, propValues[propAlias]?.ToString());
                                 propValues[propAlias] = convValue;
@@ -201,7 +201,7 @@ namespace Umbraco.Web.PropertyEditors
                                     propValues[propAlias] = tempProp.GetValue()?.ToString();
                                     continue;
                                 }
-                                var tempConfig = _dataTypeService.GetDataType(propType.DataTypeId).Configuration;
+                                var tempConfig = DataTypeService.GetDataType(propType.DataTypeId).Configuration;
                                 var valEditor = propEditor.GetValueEditor(tempConfig);
                                 var convValue = valEditor.ToEditor(tempProp);
                                 propValues[propAlias] = convValue == null ? null : JToken.FromObject(convValue);
