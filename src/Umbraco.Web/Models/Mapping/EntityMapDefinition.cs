@@ -177,9 +177,8 @@ namespace Umbraco.Web.Models.Mapping
 
             target.Name = source.Values.ContainsKey("nodeName") ? source.Values["nodeName"] : "[no name]";
 
-            if (source.Values.ContainsKey(UmbracoExamineIndex.UmbracoFileFieldName))
+            if (source.Values.TryGetValue(UmbracoExamineIndex.UmbracoFileFieldName, out var umbracoFile))
             {
-                var umbracoFile = source.Values[UmbracoExamineIndex.UmbracoFileFieldName];
                 if (umbracoFile != null)
                 {
                     target.Name = $"{target.Name} ({umbracoFile})";

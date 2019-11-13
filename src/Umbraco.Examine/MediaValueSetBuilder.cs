@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
@@ -16,14 +17,16 @@ namespace Umbraco.Examine
     {
         private readonly UrlSegmentProviderCollection _urlSegmentProviders;
         private readonly IUserService _userService;
+        private readonly ILogger _logger;
 
         public MediaValueSetBuilder(PropertyEditorCollection propertyEditors,
             UrlSegmentProviderCollection urlSegmentProviders,
-            IUserService userService)
+            IUserService userService, ILogger logger)
             : base(propertyEditors, false)
         {
             _urlSegmentProviders = urlSegmentProviders;
             _userService = userService;
+            _logger = logger;
         }
 
         /// <inheritdoc />
@@ -40,7 +43,17 @@ namespace Umbraco.Examine
 
                 if (umbracoFileSource.DetectIsJson())
                 {
-                    var cropper = JsonConvert.DeserializeObject<ImageCropperValue>(m.GetValue<string>(Constants.Conventions.Media.File));
+                    ImageCropperValue cropper = null;
+                    try
+                    {
+                        cropper = JsonConvert.DeserializeObject<ImageCropperValue>(
+                            m.GetValue<string>(Constants.Conventions.Media.File));
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Error<MediaValueSetBuilder>(ex, $"Could not Deserialize ImageCropperValue for item with key {m.Key} ");
+                    }
+
                     if (cropper != null)
                     {
                         umbracoFilePath = cropper.Src;
