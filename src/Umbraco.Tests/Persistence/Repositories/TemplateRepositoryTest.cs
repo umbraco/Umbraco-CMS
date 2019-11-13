@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private ITemplateRepository CreateRepository(IScopeProvider provider)
         {
-            return new TemplateRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, _fileSystems);
+            return new TemplateRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, _fileSystems, IOHelper);
         }
 
         public override void SetUp()
@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.SetUp();
 
             _fileSystems = Mock.Of<IFileSystems>();
-            var viewsFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews);
+            var viewsFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews, IOHelper);
             Mock.Get(_fileSystems).Setup(x => x.MvcViewsFileSystem).Returns(viewsFileSystem);
         }
 
@@ -526,7 +526,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             _fileSystems  = null;
 
             //Delete all files
-            var fsViews = new PhysicalFileSystem(SystemDirectories.MvcViews);
+            var fsViews = new PhysicalFileSystem(SystemDirectories.MvcViews, new IOHelper());
             var views = fsViews.GetFiles("", "*.cshtml");
             foreach (var file in views)
                 fsViews.DeleteFile(file);

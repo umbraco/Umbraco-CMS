@@ -12,14 +12,16 @@ namespace Umbraco.Core.IO
 
         private readonly Func<bool> _isScoped;
         private readonly IFileSystem _innerFileSystem;
+        private readonly IIOHelper _ioHelper;
         private readonly string _shadowPath;
         private ShadowFileSystem _shadowFileSystem;
         private string _shadowDir;
 
-        public ShadowWrapper(IFileSystem innerFileSystem, string shadowPath, Func<bool> isScoped = null)
+        public ShadowWrapper(IFileSystem innerFileSystem, string shadowPath, IIOHelper ioHelper, Func<bool> isScoped = null)
         {
             _innerFileSystem = innerFileSystem;
             _shadowPath = shadowPath;
+            _ioHelper = ioHelper;
             _isScoped = isScoped;
         }
 
@@ -33,12 +35,14 @@ namespace Umbraco.Core.IO
             // we should end up with a unique identifier eventually - but just
             // detect infinite loops (just in case)
 
+            var ioHelper = Current.Factory.GetInstance<IIOHelper>();
+
             for (var i = 0; i < retries; i++)
             {
                 var id = GuidUtils.ToBase32String(Guid.NewGuid(), idLength);
 
                 var virt = ShadowFsPath + "/" + id;
-                var shadowDir = Current.IOHelper.MapPath(virt);
+                var shadowDir = ioHelper.MapPath(virt);
                 if (Directory.Exists(shadowDir))
                     continue;
 
@@ -56,9 +60,9 @@ namespace Umbraco.Core.IO
             // in a single thread anyways
 
             var virt = ShadowFsPath + "/" + id + "/" + _shadowPath;
-            _shadowDir = Current.IOHelper.MapPath(virt);
+            _shadowDir = _ioHelper.MapPath(virt);
             Directory.CreateDirectory(_shadowDir);
-            var tempfs = new PhysicalFileSystem(virt);
+            var tempfs = new PhysicalFileSystem(virt, _ioHelper);
             _shadowFileSystem = new ShadowFileSystem(_innerFileSystem, tempfs);
         }
 
@@ -83,7 +87,7 @@ namespace Umbraco.Core.IO
 
                     // shadowPath make be path/to/dir, remove each
                     dir = dir.Replace("/", "\\");
-                    var min = Current.IOHelper.MapPath(ShadowFsPath).Length;
+                    var min = _ioHelper.MapPath(ShadowFsPath).Length;
                     var pos = dir.LastIndexOf("\\", StringComparison.OrdinalIgnoreCase);
                     while (pos > min)
                     {

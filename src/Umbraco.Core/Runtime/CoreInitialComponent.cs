@@ -5,15 +5,22 @@ namespace Umbraco.Core.Runtime
 {
     public class CoreInitialComponent : IComponent
     {
+        private readonly IIOHelper _ioHelper;
+
+        public CoreInitialComponent(IIOHelper ioHelper)
+        {
+            _ioHelper = ioHelper;
+        }
+
         public void Initialize()
         {
             // ensure we have some essential directories
             // every other component can then initialize safely
-            Current.IOHelper.EnsurePathExists("~/App_Data");
-            Current.IOHelper.EnsurePathExists(SystemDirectories.Media);
-            Current.IOHelper.EnsurePathExists(SystemDirectories.MvcViews);
-            Current.IOHelper.EnsurePathExists(SystemDirectories.MvcViews + "/Partials");
-            Current.IOHelper.EnsurePathExists(SystemDirectories.MvcViews + "/MacroPartials");
+            _ioHelper.EnsurePathExists("~/App_Data");
+            _ioHelper.EnsurePathExists(SystemDirectories.Media);
+            _ioHelper.EnsurePathExists(SystemDirectories.MvcViews);
+            _ioHelper.EnsurePathExists(SystemDirectories.MvcViews + "/Partials");
+            _ioHelper.EnsurePathExists(SystemDirectories.MvcViews + "/MacroPartials");
         }
 
         public void Terminate()

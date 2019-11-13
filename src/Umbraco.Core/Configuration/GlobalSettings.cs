@@ -19,6 +19,7 @@ namespace Umbraco.Core.Configuration
     /// </summary>
     public class GlobalSettings : IGlobalSettings
     {
+        private readonly IIOHelper _ioHelper;
         private string _localTempPath;
 
         // TODO these should not be static
@@ -28,6 +29,11 @@ namespace Umbraco.Core.Configuration
         //ensure the built on (non-changeable) reserved paths are there at all times
         internal const string StaticReservedPaths = "~/app_plugins/,~/install/,~/mini-profiler-resources/,"; //must end with a comma!
         internal const string StaticReservedUrls = "~/config/splashes/noNodes.aspx,~/.well-known,"; //must end with a comma!
+
+        public GlobalSettings(IIOHelper ioHelper)
+        {
+            _ioHelper = ioHelper;
+        }
 
         /// <summary>
         /// Used in unit testing to reset all config items that were set with property setters (i.e. did not come from config)
@@ -141,7 +147,7 @@ namespace Umbraco.Core.Configuration
             get
             {
                 return ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.Path)
-                    ? Current.IOHelper.ResolveUrl(ConfigurationManager.AppSettings[Constants.AppSettings.Path])
+                    ? _ioHelper.ResolveUrl(ConfigurationManager.AppSettings[Constants.AppSettings.Path])
                     : string.Empty;
             }
         }
@@ -171,7 +177,9 @@ namespace Umbraco.Core.Configuration
         /// <param name="value">Value of the setting to be saved.</param>
         internal static void SaveSetting(string key, string value)
         {
-            var fileName = Current.IOHelper.MapPath(string.Format("{0}/web.config", SystemDirectories.Root));
+            var ioHelper = Current.Factory.GetInstance<IIOHelper>();
+
+            var fileName = ioHelper.MapPath(string.Format("{0}/web.config", SystemDirectories.Root));
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
 
             var appSettings = xml.Root.DescendantsAndSelf("appSettings").Single();
@@ -191,9 +199,9 @@ namespace Umbraco.Core.Configuration
         /// Removes a setting from the configuration file.
         /// </summary>
         /// <param name="key">Key of the setting to be removed.</param>
-        internal static void RemoveSetting(string key)
+        internal static void RemoveSetting(string key, IIOHelper ioHelper)
         {
-            var fileName = Current.IOHelper.MapPath(string.Format("{0}/web.config", SystemDirectories.Root));
+            var fileName = ioHelper.MapPath(string.Format("{0}/web.config", SystemDirectories.Root));
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
 
             var appSettings = xml.Root.DescendantsAndSelf("appSettings").Single();
@@ -320,7 +328,7 @@ namespace Umbraco.Core.Configuration
                     //case LocalTempStorage.Default:
                     //case LocalTempStorage.Unknown:
                     default:
-                        return _localTempPath = Current.IOHelper.MapPath("~/App_Data/TEMP");
+                        return _localTempPath = _ioHelper.MapPath("~/App_Data/TEMP");
                 }
             }
         }

@@ -33,8 +33,9 @@ namespace Umbraco.Tests.Models
             var logger = Mock.Of<ILogger>();
             var scheme = Mock.Of<IMediaPathScheme>();
             var config = Mock.Of<IContentSection>();
+            var ioHelper = Mock.Of<IIOHelper>();
 
-            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), config, scheme, logger);
+            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), config, scheme, logger, ioHelper);
             var ignored = new FileUploadPropertyEditor(Mock.Of<ILogger>(), mediaFileSystem, config);
 
             var media = MockedMedia.CreateMediaImage(mediaType, -1);

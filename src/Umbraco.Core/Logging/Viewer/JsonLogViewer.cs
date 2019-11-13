@@ -5,6 +5,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Serilog.Events;
 using Serilog.Formatting.Compact.Reader;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Logging.Viewer
 {
@@ -13,7 +14,7 @@ namespace Umbraco.Core.Logging.Viewer
         private readonly string _logsPath;
         private readonly ILogger _logger;
 
-        public JsonLogViewer(ILogger logger, string logsPath = "", string searchPath = "") : base(searchPath)
+        public JsonLogViewer(ILogger logger, IIOHelper ioHelper, string logsPath = "", string searchPath = "") : base(ioHelper, searchPath)
         {
             if (string.IsNullOrEmpty(logsPath))
                 logsPath = $@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\";

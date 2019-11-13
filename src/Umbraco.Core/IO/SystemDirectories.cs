@@ -6,6 +6,8 @@ namespace Umbraco.Core.IO
     //all paths has a starting but no trailing /
     public class SystemDirectories
     {
+        private static IIOHelper IOHelper => Current.Factory.GetInstance<IIOHelper>();
+
         public static string Bin => "~/bin";
 
         public static string Config => "~/config";
@@ -30,13 +32,13 @@ namespace Umbraco.Core.IO
 
         public static string MacroPartials => MvcViews + "/MacroPartials/";
 
-        public static string Media => Current.IOHelper.ReturnPath("umbracoMediaPath", "~/media");
+        public static string Media => IOHelper.ReturnPath("umbracoMediaPath", "~/media");
 
-        public static string Scripts => Current.IOHelper.ReturnPath("umbracoScriptsPath", "~/scripts");
+        public static string Scripts => IOHelper.ReturnPath("umbracoScriptsPath", "~/scripts");
 
-        public static string Css => Current.IOHelper.ReturnPath("umbracoCssPath", "~/css");
+        public static string Css => IOHelper.ReturnPath("umbracoCssPath", "~/css");
 
-        public static string Umbraco => Current.IOHelper.ReturnPath("umbracoPath", "~/umbraco");
+        public static string Umbraco => IOHelper.ReturnPath("umbracoPath", "~/umbraco");
 
         public static string Packages => Data + "/packages";
 

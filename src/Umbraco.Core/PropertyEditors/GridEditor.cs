@@ -8,11 +8,13 @@ namespace Umbraco.Core.PropertyEditors
 {
     public class GridEditor : IGridEditorConfig
     {
+        private readonly IIOHelper _ioHelper;
         private string _view;
         private string _render;
 
-        public GridEditor()
+        public GridEditor(IIOHelper ioHelper)
         {
+            _ioHelper = ioHelper;
             Config = new Dictionary<string, object>();
         }
 
@@ -29,14 +31,14 @@ namespace Umbraco.Core.PropertyEditors
         public string View
         {
             get => _view;
-            set => _view = Current.IOHelper.ResolveVirtualUrl(value);
+            set => _view = _ioHelper.ResolveVirtualUrl(value);
         }
 
         [JsonProperty("render")]
         public string Render
         {
             get => _render;
-            set => _render = Current.IOHelper.ResolveVirtualUrl(value);
+            set => _render = _ioHelper.ResolveVirtualUrl(value);
         }
 
         [JsonProperty("icon", Required = Required.Always)]

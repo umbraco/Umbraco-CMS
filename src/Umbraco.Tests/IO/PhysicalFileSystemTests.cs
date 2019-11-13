@@ -14,7 +14,7 @@ namespace Umbraco.Tests.IO
     {
         public PhysicalFileSystemTests()
             : base(new PhysicalFileSystem(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileSysTests"),
-                "/Media/"))
+                "/Media/", new IOHelper()))
         { }
 
         [SetUp]

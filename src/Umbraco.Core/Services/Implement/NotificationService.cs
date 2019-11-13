@@ -30,9 +30,10 @@ namespace Umbraco.Core.Services.Implement
         private readonly IGlobalSettings _globalSettings;
         private readonly IContentSection _contentSection;
         private readonly ILogger _logger;
+        private readonly IIOHelper _ioHelper;
 
         public NotificationService(IScopeProvider provider, IUserService userService, IContentService contentService, ILocalizationService localizationService,
-            ILogger logger, INotificationsRepository notificationsRepository, IGlobalSettings globalSettings, IContentSection contentSection)
+            ILogger logger, IIOHelper ioHelper, INotificationsRepository notificationsRepository, IGlobalSettings globalSettings, IContentSection contentSection)
         {
             _notificationsRepository = notificationsRepository;
             _globalSettings = globalSettings;
@@ -42,6 +43,7 @@ namespace Umbraco.Core.Services.Implement
             _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
             _localizationService = localizationService;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _ioHelper = ioHelper;
         }
 
         /// <summary>
@@ -384,7 +386,7 @@ namespace Umbraco.Core.Services.Implement
             var protocol = _globalSettings.UseHttps ? "https" : "http";
 
             var subjectVars = new NotificationEmailSubjectParams(
-                string.Concat(siteUri.Authority, Current.IOHelper.ResolveUrl(SystemDirectories.Umbraco)),
+                string.Concat(siteUri.Authority, _ioHelper.ResolveUrl(SystemDirectories.Umbraco)),
                 actionName,
                 content.Name);
 
@@ -400,7 +402,7 @@ namespace Umbraco.Core.Services.Implement
                     string.Concat(content.Id, ".aspx"),
                     protocol),
                 performingUser.Name,
-                string.Concat(siteUri.Authority, Current.IOHelper.ResolveUrl(SystemDirectories.Umbraco)),
+                string.Concat(siteUri.Authority, _ioHelper.ResolveUrl(SystemDirectories.Umbraco)),
                 summary.ToString());
 
             // create the mail message

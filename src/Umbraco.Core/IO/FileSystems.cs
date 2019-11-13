@@ -11,6 +11,7 @@ namespace Umbraco.Core.IO
     {
         private readonly IFactory _container;
         private readonly ILogger _logger;
+        private readonly IIOHelper _ioHelper;
 
         private readonly ConcurrentDictionary<Type, Lazy<IFileSystem>> _filesystems = new ConcurrentDictionary<Type, Lazy<IFileSystem>>();
 
@@ -33,10 +34,11 @@ namespace Umbraco.Core.IO
         #region Constructor
 
         // DI wants a public ctor
-        public FileSystems(IFactory container, ILogger logger)
+        public FileSystems(IFactory container, ILogger logger, IIOHelper ioHelper)
         {
             _container = container;
             _logger = logger;
+            _ioHelper = ioHelper;
         }
 
         // for tests only, totally unsafe
@@ -120,17 +122,17 @@ namespace Umbraco.Core.IO
         // but it does not really matter what we return - here, null
         private object CreateWellKnownFileSystems()
         {
-            var macroPartialFileSystem = new PhysicalFileSystem(SystemDirectories.MacroPartials);
-            var partialViewsFileSystem = new PhysicalFileSystem(SystemDirectories.PartialViews);
-            var stylesheetsFileSystem = new PhysicalFileSystem(SystemDirectories.Css);
-            var scriptsFileSystem = new PhysicalFileSystem(SystemDirectories.Scripts);
-            var mvcViewsFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews);
+            var macroPartialFileSystem = new PhysicalFileSystem(SystemDirectories.MacroPartials, _ioHelper);
+            var partialViewsFileSystem = new PhysicalFileSystem(SystemDirectories.PartialViews, _ioHelper);
+            var stylesheetsFileSystem = new PhysicalFileSystem(SystemDirectories.Css, _ioHelper);
+            var scriptsFileSystem = new PhysicalFileSystem(SystemDirectories.Scripts, _ioHelper);
+            var mvcViewsFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews, _ioHelper);
 
-            _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, "macro-partials", IsScoped);
-            _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, "partials", IsScoped);
-            _stylesheetsFileSystem = new ShadowWrapper(stylesheetsFileSystem, "css", IsScoped);
-            _scriptsFileSystem = new ShadowWrapper(scriptsFileSystem, "scripts", IsScoped);
-            _mvcViewsFileSystem = new ShadowWrapper(mvcViewsFileSystem, "views", IsScoped);
+            _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, "macro-partials", _ioHelper, IsScoped);
+            _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, "partials", _ioHelper, IsScoped);
+            _stylesheetsFileSystem = new ShadowWrapper(stylesheetsFileSystem, "css", _ioHelper, IsScoped);
+            _scriptsFileSystem = new ShadowWrapper(scriptsFileSystem, "scripts", _ioHelper, IsScoped);
+            _mvcViewsFileSystem = new ShadowWrapper(mvcViewsFileSystem, "views", _ioHelper, IsScoped);
 
             // TODO: do we need a lock here?
             _shadowWrappers.Add(_macroPartialFileSystem);
@@ -269,7 +271,7 @@ namespace Umbraco.Core.IO
         {
             lock (_shadowLocker)
             {
-                var wrapper = new ShadowWrapper(filesystem, shadowPath, IsScoped);
+                var wrapper = new ShadowWrapper(filesystem, shadowPath, _ioHelper, IsScoped);
                 if (_shadowCurrentId != null)
                     wrapper.Shadow(_shadowCurrentId);
                 _shadowWrappers.Add(wrapper);

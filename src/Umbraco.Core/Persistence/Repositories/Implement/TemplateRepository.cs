@@ -23,12 +23,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class TemplateRepository : NPocoRepositoryBase<int, ITemplate>, ITemplateRepository
     {
+        private readonly IIOHelper _ioHelper;
         private readonly IFileSystem _viewsFileSystem;
         private readonly ViewHelper _viewHelper;
 
-        public TemplateRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IFileSystems fileSystems)
+        public TemplateRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IFileSystems fileSystems,  IIOHelper ioHelper)
             : base(scopeAccessor, cache, logger)
         {
+            _ioHelper = ioHelper;
             _viewsFileSystem = fileSystems.MvcViewsFileSystem;
             _viewHelper = new ViewHelper(_viewsFileSystem);
         }
@@ -593,8 +595,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             validExts.Add("vbhtml");
 
             // validate path and extension
-            var validFile = Current.IOHelper.VerifyEditPath(path, validDirs);
-            var validExtension = Current.IOHelper.VerifyFileExtension(path, validExts);
+            var validFile = _ioHelper.VerifyEditPath(path, validDirs);
+            var validExtension = _ioHelper.VerifyFileExtension(path, validExts);
             return validFile && validExtension;
         }
 

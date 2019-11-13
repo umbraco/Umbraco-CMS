@@ -112,7 +112,9 @@ namespace Umbraco.Core
 
                 if (isValid)
                 {
-                    var resolvedUrlResult = Current.IOHelper.TryResolveUrl(input);
+                    var ioHelper = Current.Factory.GetInstance<IIOHelper>();
+
+                    var resolvedUrlResult = ioHelper.TryResolveUrl(input);
                     //if the resolution was success, return it, otherwise just return the path, we've detected
                     // it's a path but maybe it's relative and resolution has failed, etc... in which case we're just
                     // returning what was given to us.

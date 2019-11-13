@@ -8,9 +8,18 @@ namespace Umbraco.Web.Trees
     [CoreTree]
     public class FilesTreeController : FileSystemTreeController
     {
-        protected override IFileSystem FileSystem => new PhysicalFileSystem("~/");
+        private readonly IIOHelper _ioHelper;
+        private readonly IFileSystem _fileSystem;
+
+        protected override IFileSystem FileSystem => _fileSystem;
 
         private static readonly string[] ExtensionsStatic = { "*" };
+
+        public FilesTreeController(IIOHelper ioHelper)
+        {
+            _ioHelper = ioHelper;
+            _fileSystem = new PhysicalFileSystem("~/", _ioHelper);
+        }
 
         protected override string[] Extensions => ExtensionsStatic;
 

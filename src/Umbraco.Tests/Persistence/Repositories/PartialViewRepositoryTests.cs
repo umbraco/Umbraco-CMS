@@ -20,7 +20,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             base.SetUp();
 
-            _fileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews + "/Partials/");
+            _fileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews + "/Partials/", new IOHelper());
         }
 
         protected override void Compose()
@@ -41,7 +41,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var repository = new PartialViewRepository(fileSystems);
+                var repository = new PartialViewRepository(fileSystems, IOHelper);
 
                 var partialView = new PartialView(PartialViewType.PartialView, "test-path-1.cshtml") { Content = "// partialView" };
                 repository.Save(partialView);

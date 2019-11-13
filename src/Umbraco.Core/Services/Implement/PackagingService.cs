@@ -23,6 +23,7 @@ namespace Umbraco.Core.Services.Implement
     {
 
         private readonly IPackageInstallation _packageInstallation;
+        private readonly IIOHelper _ioHelper;
         private readonly IAuditService _auditService;
         private readonly ICreatedPackagesRepository _createdPackages;
         private readonly IInstalledPackagesRepository _installedPackages;
@@ -32,12 +33,14 @@ namespace Umbraco.Core.Services.Implement
             IAuditService auditService,
             ICreatedPackagesRepository createdPackages,
             IInstalledPackagesRepository installedPackages,
-            IPackageInstallation packageInstallation)
+            IPackageInstallation packageInstallation,
+            IIOHelper ioHelper)
         {
             _auditService = auditService;
             _createdPackages = createdPackages;
             _installedPackages = installedPackages;
             _packageInstallation = packageInstallation;
+            _ioHelper = ioHelper;
         }
 
         #region Package Files
@@ -64,7 +67,7 @@ namespace Umbraco.Core.Services.Implement
             //successful
             if (bytes.Length > 0)
             {
-                var packagePath = Current.IOHelper.MapPath(SystemDirectories.Packages);
+                var packagePath = _ioHelper.MapPath(SystemDirectories.Packages);
 
                 // Check for package directory
                 if (Directory.Exists(packagePath) == false)
