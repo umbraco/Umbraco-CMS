@@ -355,7 +355,7 @@ namespace Umbraco.Web
             if (action == null) throw new ArgumentNullException(nameof(action));
             if (string.IsNullOrWhiteSpace(action)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(action));
             if (controllerName == null) throw new ArgumentNullException(nameof(controllerName));
-            if (string.IsNullOrEmpty(controllerName)) throw new ArgumentException("Value can't be empty.", nameof(controllerName));
+            if (string.IsNullOrWhiteSpace(controllerName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(controllerName));
 
             return html.BeginUmbracoForm(action, controllerName, "", additionalRouteVals, htmlAttributes, method);
         }
@@ -693,7 +693,7 @@ namespace Umbraco.Web
             if (action == null) throw new ArgumentNullException(nameof(action));
             if (string.IsNullOrEmpty(action)) throw new ArgumentException("Value can't be empty.", nameof(action));
             if (controllerName == null) throw new ArgumentNullException(nameof(controllerName));
-            if (string.IsNullOrEmpty(controllerName)) throw new ArgumentException("Value can't be empty.", nameof(controllerName));
+            if (string.IsNullOrWhiteSpace(controllerName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(controllerName));
 
             var formAction = Current.UmbracoContext.OriginalRequestUrl.PathAndQuery;
             return html.RenderForm(formAction, method, htmlAttributes, controllerName, action, area, additionalRouteVals);
