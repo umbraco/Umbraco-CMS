@@ -201,38 +201,30 @@ namespace Umbraco.Web
                 throw new InvalidOperationException($"No index found by name {indexName} or is not of type {typeof(IUmbracoIndex)}");
             }
 
-            var searcher = umbIndex.GetSearcher();
+            var query = umbIndex.GetSearcher().CreateQuery(IndexTypes.Content);
 
-            ISearchResults results;
+            IQueryExecutor queryExecutor;
             if (culture == "*")
             {
                 // Search everything
-                results = skip == 0 && take == 0
-                    ? searcher.Search(term)
-                    : searcher.Search(term, skip + take);
+                queryExecutor = query.ManagedQuery(term);
+            }
+            else if (string.IsNullOrWhiteSpace(culture))
+            {
+                // Only search invariant
+                queryExecutor = query.Field(UmbracoContentIndex.VariesByCultureFieldName, "n") // Must not vary by culture
+                    .And().ManagedQuery(term);
             }
             else
             {
-                IBooleanOperation query;
-                if (string.IsNullOrWhiteSpace(culture))
-                {
-                    // Only search invariant
-                    query = searcher.CreateQuery()
-                        .Field(UmbracoContentIndex.VariesByCultureFieldName, "n") // Must not vary by culture
-                        .And().ManagedQuery(term);
-                }
-                else
-                {
-                    // Only search the specified culture
-                    var fields = umbIndex.GetCultureAndInvariantFields(culture).ToArray(); // Get all index fields suffixed with the culture name supplied
-                    query = searcher.CreateQuery()
-                        .ManagedQuery(term, fields);
-                }
-
-                results = skip == 0 && take == 0
-                    ? query.Execute()
-                    : query.Execute(skip + take);
+                // Only search the specified culture
+                var fields = umbIndex.GetCultureAndInvariantFields(culture).ToArray(); // Get all index fields suffixed with the culture name supplied
+                queryExecutor = query.ManagedQuery(term, fields);
             }
+
+            var results = skip == 0 && take == 0
+                ? queryExecutor.Execute()
+                : queryExecutor.Execute(skip + take);
 
             totalRecords = results.TotalItemCount;
 
