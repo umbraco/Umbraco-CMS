@@ -43,16 +43,23 @@ namespace Umbraco.Web.Routing
 
                     var route = docRequest.HasDomain ? (docRequest.Domain.RootNodeId.ToString() + path) : path;
                     node = FindContent(docRequest, route);
-
-                    if (node.IsAllowedTemplate(template.Id))
-                    {
-                        docRequest.TemplateModel = template;
+                    //not guaranteed to find a node - just because last portion of url contains a template alias, doesn't mean remaining part of the url is a published node
+                    if (node !=null){
+                        if (node.IsAllowedTemplate(template.Id))
+                        {
+                            docRequest.TemplateModel = template;
+                        }
+                        else
+                        {
+                            LogHelper.Warn<ContentFinderByNiceUrlAndTemplate>("Configuration settings prevent template \"{0}\" from showing for node \"{1}\"", () => templateAlias, () => node.Id);
+                            docRequest.PublishedContent = null;
+                            node = null;
+                        }
                     }
-                    else
+                    else 
                     {
-                        LogHelper.Warn<ContentFinderByNiceUrlAndTemplate>("Configuration settings prevent template \"{0}\" from showing for node \"{1}\"", () => templateAlias, () => node.Id);
-                        docRequest.PublishedContent = null;
-                        node = null;
+                     LogHelper.Debug<ContentFinderByNiceUrlAndTemplate>("Attempt to find content by alternative template alias: \"{0}\" triggered because end portion of url matched template alias, but no node exists for the url without the alt template alias at the route: \"{1}\"", () => templateAlias, () => route);
+                     docRequest.PublishedContent = null;
                     }
                 }
                 else
