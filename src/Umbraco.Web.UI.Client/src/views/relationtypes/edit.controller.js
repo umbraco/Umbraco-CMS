@@ -6,7 +6,7 @@
  * @description
  * The controller for editing relation types.
  */
-function RelationTypeEditController($scope, $routeParams, relationTypeResource, editorState, navigationService, dateHelper, userService, entityResource, formHelper, contentEditingHelper, localizationService) {
+function RelationTypeEditController($scope, $routeParams, relationTypeResource, editorState, navigationService, dateHelper, userService, entityResource, formHelper, contentEditingHelper, localizationService, eventsService) {
 
     var vm = this;
 
@@ -21,6 +21,10 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
 
     function init() {
         vm.page.loading = true;
+        vm.relationsLoading = true;
+
+        vm.changePageNumber = changePageNumber;
+        vm.options = {};
 
         var labelKeys = [
             "relationType_tabRelationType",
@@ -45,6 +49,14 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
             ];
         });
 
+        // load references when the 'relations' tab is first activated/switched to
+        eventsService.on("app.tabChange", function (event, args) {
+            if (args.alias === "relations") {
+                loadRelations();
+            }
+        });
+
+        // Inital page/overview API call of relation type
         relationTypeResource.getById($routeParams.id)
             .then(function (data) {
                 bindRelationType(data);
@@ -52,9 +64,24 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
             });
     }
 
-    function bindRelationType(relationType) {
-        formatDates(relationType.relations);
+    function changePageNumber(pageNumber) {
+        vm.options.pageNumber = pageNumber;
+        loadRelations();
+    } 
 
+
+    /** Loads in the references one time  when content app changed */
+    function loadRelations() {
+        relationTypeResource.getPagedResults($routeParams.id, vm.options)
+            .then(function (data) {
+                formatDates(data.items);
+                vm.relationsLoading = false;
+                vm.relations = data;
+            });
+    }
+    
+
+    function bindRelationType(relationType) {
         // Convert property value to string, since the umb-radiobutton component at the moment only handle string values.
         // Sometime later the umb-radiobutton might be able to handle value as boolean.
         relationType.isBidirectional = (relationType.isBidirectional || false).toString();

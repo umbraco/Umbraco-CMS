@@ -48,13 +48,6 @@ namespace Umbraco.Web.Models.ContentEditing
         public string ChildObjectTypeName { get; set; }
 
         /// <summary>
-        /// Gets or sets the relations associated with this relation type.
-        /// </summary>
-        [DataMember(Name = "relations")]
-        [ReadOnly(true)]
-        public IEnumerable<RelationDisplay> Relations { get; set; }
-
-        /// <summary>
         /// This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.
         /// </summary>
         [DataMember(Name = "notifications")]
