@@ -207,6 +207,9 @@ namespace Umbraco.Core.Composing
 
         public static readonly IIOHelper IOHelper = Umbraco.Core.IO.IOHelper.Default;
 
+        public static IUmbracoVersion UmbracoVersion
+            => Factory.GetInstance<IUmbracoVersion>();
+
         #endregion
     }
 }

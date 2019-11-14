@@ -75,10 +75,10 @@ namespace Umbraco.Web.Install
                     IsBrandNewInstall == false,
                     isCompleted,
                     DateTime.Now,
-                    UmbracoVersion.Current.Major,
-                    UmbracoVersion.Current.Minor,
-                    UmbracoVersion.Current.Build,
-                    UmbracoVersion.Comment,
+                    Current.UmbracoVersion.Current.Major,
+                    Current.UmbracoVersion.Current.Minor,
+                    Current.UmbracoVersion.Current.Build,
+                    Current.UmbracoVersion.Comment,
                     errorMsg,
                     userAgent,
                     dbProvider);
@@ -141,7 +141,7 @@ namespace Umbraco.Web.Install
             var packages = new List<Package>();
             try
             {
-                var requestUri = $"https://our.umbraco.com/webapi/StarterKit/Get/?umbracoVersion={UmbracoVersion.Current}";
+                var requestUri = $"https://our.umbraco.com/webapi/StarterKit/Get/?umbracoVersion={Current.UmbracoVersion.Current}";
 
                 using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))
                 {

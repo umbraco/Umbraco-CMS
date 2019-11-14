@@ -246,5 +246,6 @@ namespace Umbraco.Tests.TestHelpers
             var scopeProvider = new ScopeProvider(databaseFactory, fileSystems, logger, typeFinder);
             return scopeProvider;
         }
+        
     }
 }

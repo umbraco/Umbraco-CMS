@@ -15,7 +15,7 @@ namespace Umbraco.Tests.TestHelpers
         {
             var config = Mock.Of<IGlobalSettings>(
                 settings =>
-                    settings.ConfigurationStatus == UmbracoVersion.SemanticVersion.ToSemanticString() &&
+                    settings.ConfigurationStatus == TestHelper.GetUmbracoVersion().SemanticVersion.ToSemanticString() &&
                     settings.UseHttps == false &&
                     settings.HideTopLevelNodeFromPath == false &&
                     settings.Path == Current.IOHelper.ResolveUrl("~/umbraco") &&

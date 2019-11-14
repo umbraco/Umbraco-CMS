@@ -355,7 +355,7 @@ namespace Umbraco.Web.Security.Providers
                 // http://issues.umbraco.org/issue/U4-3451
 
                 // when upgrading from 7.2 to 7.3 trying to save will throw
-                if (UmbracoVersion.Current >= new Version(7, 3, 0, 0))
+                if (Current.UmbracoVersion.Current >= new Version(7, 3, 0, 0))
                     MemberService.Save(member, false);
             }
 
@@ -595,7 +595,7 @@ namespace Umbraco.Web.Security.Providers
             // for this type of thing (i.e. UpdateLastLogin or similar).
 
             // when upgrading from 7.2 to 7.3 trying to save will throw
-            if (UmbracoVersion.Current >= new Version(7, 3, 0, 0))
+            if (Current.UmbracoVersion.Current >= new Version(7, 3, 0, 0))
                 MemberService.Save(member, false);
 
             return new ValidateUserResult

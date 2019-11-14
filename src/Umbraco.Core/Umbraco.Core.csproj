@@ -136,11 +136,8 @@
     <Compile Include="Composing\ComposeAfterAttribute.cs" />
     <Compile Include="Composing\ComposeBeforeAttribute.cs" />
     <Compile Include="Composing\Composers.cs" />
-    <Compile Include="Composing\Composition.cs" />
-    <Compile Include="Composing\IComposer.cs" />
     <Compile Include="Composing\RegisterFactory.cs" />
     <Compile Include="CompositionExtensions.cs" />
-    <Compile Include="Composing\ICoreComposer.cs" />
     <Compile Include="Composing\IUserComposer.cs" />
     <Compile Include="Compose\ManifestWatcherComposer.cs" />
     <Compile Include="Compose\RelateOnCopyComposer.cs" />
@@ -152,8 +149,8 @@
     <Compile Include="Composing\CompositionExtensions\Services.cs" />
     <Compile Include="CompositionExtensions_Essentials.cs" />
     <Compile Include="CompositionExtensions_FileSystems.cs" />
-    <Compile Include="CompositionExtensions_Uniques.cs" />
     <Compile Include="Configuration\ConfigsFactory.cs" />
+    <Compile Include="Configuration\CoreDebug.cs" />
     <Compile Include="Configuration\GlobalSettings.cs" />
     <Compile Include="ConventionsHelper.cs" />
     <Compile Include="Events\ContentPublishedEventArgs.cs" />
@@ -1019,10 +1016,6 @@
     <ProjectReference Include="..\Umbraco.Abstractions\Umbraco.Abstractions.csproj">
       <Project>{29aa69d9-b597-4395-8d42-43b1263c240a}</Project>
       <Name>Umbraco.Abstractions</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Umbraco.Configuration\Umbraco.Configuration.csproj">
-      <Project>{fbe7c065-dac0-4025-a78b-63b24d3ab00b}</Project>
-      <Name>Umbraco.Configuration</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

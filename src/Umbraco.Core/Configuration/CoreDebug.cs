@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration
 {
-    public class CoreDebug
+    public class CoreDebug : ICoreDebug
     {
         public CoreDebug()
         {

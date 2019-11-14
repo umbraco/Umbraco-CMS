@@ -65,12 +65,13 @@ namespace Umbraco.Tests.Runtimes
             var ioHelper = IOHelper.Default;
             var typeLoader = new TypeLoader(ioHelper, typeFinder, appCaches.RuntimeCache, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), profilingLogger);
             var mainDom = new SimpleMainDom();
-            var runtimeState = new RuntimeState(logger, null, null, new Lazy<IMainDom>(() => mainDom), new Lazy<IServerRegistrar>(() => factory.GetInstance<IServerRegistrar>()));
+            var umbracoVersion = TestHelper.GetUmbracoVersion();
+            var runtimeState = new RuntimeState(logger, null, null, new Lazy<IMainDom>(() => mainDom), new Lazy<IServerRegistrar>(() => factory.GetInstance<IServerRegistrar>()), umbracoVersion);
 
             // create the register and the composition
             var register = RegisterFactory.Create();
             var composition = new Composition(register, typeLoader, profilingLogger, runtimeState, TestHelper.GetConfigs());
-            composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper);
+            composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper, umbracoVersion);
 
             // create the core runtime and have it compose itself
             var coreRuntime = new CoreRuntime();
@@ -262,7 +263,8 @@ namespace Umbraco.Tests.Runtimes
             // create the register and the composition
             var register = RegisterFactory.Create();
             var composition = new Composition(register, typeLoader, profilingLogger, runtimeState, TestHelper.GetConfigs());
-            composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper);
+            var umbracoVersion = TestHelper.GetUmbracoVersion();
+            composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper, umbracoVersion);
 
             // create the core runtime and have it compose itself
             var coreRuntime = new CoreRuntime();

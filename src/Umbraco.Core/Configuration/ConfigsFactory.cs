@@ -20,7 +20,7 @@ namespace Umbraco.Core.Configuration
             configs.Add<IUmbracoSettingsSection>("umbracoConfiguration/settings");
             configs.Add<IHealthChecks>("umbracoConfiguration/HealthChecks");
 
-            configs.Add(() => new CoreDebug());
+            configs.Add<ICoreDebug>(() => new CoreDebug());
             configs.AddCoreConfigs(_ioHelper);
             return configs;
         }

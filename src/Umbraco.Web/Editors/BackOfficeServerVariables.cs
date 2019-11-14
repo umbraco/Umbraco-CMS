@@ -442,10 +442,10 @@ namespace Umbraco.Web.Editors
                 // add versions - see UmbracoVersion for details & differences
 
                 // the complete application version (eg "8.1.2-alpha.25")
-                { "version", UmbracoVersion.SemanticVersion.ToSemanticString() },
+                { "version", Current.UmbracoVersion.SemanticVersion.ToSemanticString() },
 
                 // the assembly version (eg "8.0.0")
-                { "assemblyVersion", UmbracoVersion.AssemblyVersion.ToString() }
+                { "assemblyVersion", Current.UmbracoVersion.AssemblyVersion.ToString() }
             };
 
             var version = _runtimeState.SemanticVersion.ToSemanticString();

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Web;
 using Semver;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Exceptions;
@@ -25,18 +26,20 @@ namespace Umbraco.Core
         private readonly HashSet<string> _applicationUrls = new HashSet<string>();
         private readonly Lazy<IMainDom> _mainDom;
         private readonly Lazy<IServerRegistrar> _serverRegistrar;
+        private readonly IUmbracoVersion _umbracoVersion;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RuntimeState"/> class.
         /// </summary>
         public RuntimeState(ILogger logger, IUmbracoSettingsSection settings, IGlobalSettings globalSettings,
-            Lazy<IMainDom> mainDom, Lazy<IServerRegistrar> serverRegistrar)
+            Lazy<IMainDom> mainDom, Lazy<IServerRegistrar> serverRegistrar, IUmbracoVersion umbracoVersion)
         {
             _logger = logger;
             _settings = settings;
             _globalSettings = globalSettings;
             _mainDom = mainDom;
             _serverRegistrar = serverRegistrar;
+            _umbracoVersion = umbracoVersion;
         }
 
         /// <summary>
@@ -56,13 +59,13 @@ namespace Umbraco.Core
         public IMainDom MainDom => _mainDom.Value;
 
         /// <inheritdoc />
-        public Version Version => UmbracoVersion.Current;
+        public Version Version => _umbracoVersion.Current;
 
         /// <inheritdoc />
-        public string VersionComment => UmbracoVersion.Comment;
+        public string VersionComment => _umbracoVersion.Comment;
 
         /// <inheritdoc />
-        public SemVersion SemanticVersion => UmbracoVersion.SemanticVersion;
+        public SemVersion SemanticVersion => _umbracoVersion.SemanticVersion;
 
         /// <inheritdoc />
         public bool Debug { get; } = GlobalSettings.DebugMode;
@@ -125,7 +128,7 @@ namespace Umbraco.Core
         /// </summary>
         public void DetermineRuntimeLevel(IUmbracoDatabaseFactory databaseFactory, ILogger logger)
         {
-            var localVersion = UmbracoVersion.LocalVersion; // the local, files, version
+            var localVersion = _umbracoVersion.LocalVersion; // the local, files, version
             var codeVersion = SemanticVersion; // the executing code version
             var connect = false;
 

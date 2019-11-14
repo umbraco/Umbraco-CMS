@@ -276,5 +276,9 @@ namespace Umbraco.Tests.TestHelpers
         }
 
 
+        public static IUmbracoVersion GetUmbracoVersion()
+        {
+            return new UmbracoVersion(GetConfigs().Global());
+        }
     }
 }

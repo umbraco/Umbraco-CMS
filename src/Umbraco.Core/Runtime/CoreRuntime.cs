@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Web;
 using System.Web.Hosting;
+using Semver;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
@@ -89,8 +90,9 @@ namespace Umbraco.Core.Runtime
             // are NOT disposed - which is not a big deal as long as they remain lightweight
             // objects.
 
+            var umbracoVersion = new UmbracoVersion();
             using (var timer = profilingLogger.TraceDuration<CoreRuntime>(
-                $"Booting Umbraco {UmbracoVersion.SemanticVersion.ToSemanticString()}.",
+                $"Booting Umbraco {umbracoVersion.SemanticVersion.ToSemanticString()}.",
                 "Booted.",
                 "Boot failed."))
             {
@@ -135,6 +137,7 @@ namespace Umbraco.Core.Runtime
                 // configs
                 var configs = GetConfigs();
 
+                var umbracoVersion = GetUmbracoVersion(configs.Global());
                 // type finder/loader
                 var typeLoader = new TypeLoader(IOHelper, TypeFinder, appCaches.RuntimeCache, new DirectoryInfo(configs.Global().LocalTempPath), ProfilingLogger);
 
@@ -144,7 +147,8 @@ namespace Umbraco.Core.Runtime
                 _state = new RuntimeState(Logger,
                     configs.Settings(), configs.Global(),
                     new Lazy<IMainDom>(() => _factory.GetInstance<IMainDom>()),
-                    new Lazy<IServerRegistrar>(() => _factory.GetInstance<IServerRegistrar>()))
+                    new Lazy<IServerRegistrar>(() => _factory.GetInstance<IServerRegistrar>()),
+                    umbracoVersion)
                 {
                     Level = RuntimeLevel.Boot
                 };
@@ -154,7 +158,7 @@ namespace Umbraco.Core.Runtime
 
                 // create the composition
                 composition = new Composition(register, typeLoader, ProfilingLogger, _state, configs);
-                composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, mainDom, appCaches, databaseFactory, typeLoader, _state, TypeFinder, IOHelper);
+                composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, mainDom, appCaches, databaseFactory, typeLoader, _state, TypeFinder, IOHelper, umbracoVersion);
 
                 // run handlers
                 RuntimeOptions.DoRuntimeEssentials(composition, appCaches, typeLoader, databaseFactory);
@@ -216,6 +220,11 @@ namespace Umbraco.Core.Runtime
             }
 
             return _factory;
+        }
+
+        private IUmbracoVersion GetUmbracoVersion(IGlobalSettings globalSettings)
+        {
+            return new UmbracoVersion(globalSettings);
         }
 
         protected virtual void ConfigureUnhandledException()

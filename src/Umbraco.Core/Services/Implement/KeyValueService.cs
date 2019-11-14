@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations;
@@ -39,7 +40,7 @@ namespace Umbraco.Core.Services.Implement
             // if already running 8, either following an upgrade or an install,
             // then everything should be ok (the table should exist, etc)
 
-            if (UmbracoVersion.LocalVersion != null && UmbracoVersion.LocalVersion.Major >= 8)
+            if (Current.UmbracoVersion.LocalVersion != null && Current.UmbracoVersion.LocalVersion.Major >= 8)
             {
                 _initialized = true;
                 return;
@@ -202,9 +203,7 @@ namespace Umbraco.Core.Services.Implement
         /// <remarks>Used by <see cref="Runtime.CoreRuntime"/> to determine the runtime state.</remarks>
         internal static string GetValue(IUmbracoDatabase database, string key)
         {
-            // not 8 yet = no key/value table, no value
-            if (UmbracoVersion.LocalVersion.Major < 8)
-                return null;
+            if (database is null) return null;
 
             var sql = database.SqlContext.Sql()
                 .Select<KeyValueDto>()

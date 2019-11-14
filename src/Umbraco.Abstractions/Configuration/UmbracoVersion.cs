@@ -8,9 +8,17 @@ namespace Umbraco.Core.Configuration
     /// <summary>
     /// Represents the version of the executing code.
     /// </summary>
-    public static class UmbracoVersion
+    public class UmbracoVersion : IUmbracoVersion
     {
-        static UmbracoVersion()
+        private readonly IGlobalSettings _globalSettings;
+
+        public UmbracoVersion(IGlobalSettings globalSettings)
+        :this()
+        {
+            _globalSettings = globalSettings;
+        }
+
+        public UmbracoVersion()
         {
             var umbracoCoreAssembly = typeof(SemVersion).Assembly;
 
@@ -32,12 +40,12 @@ namespace Umbraco.Core.Configuration
         /// Gets the non-semantic version of the Umbraco code.
         /// </summary>
         // TODO: rename to Version
-        public static Version Current { get; }
+        public Version Current { get; }
 
         /// <summary>
         /// Gets the semantic version comments of the Umbraco code.
         /// </summary>
-        public static string Comment => SemanticVersion.Prerelease;
+        public string Comment => SemanticVersion.Prerelease;
 
         /// <summary>
         /// Gets the assembly version of the Umbraco code.
@@ -47,7 +55,7 @@ namespace Umbraco.Core.Configuration
         /// <para>Is the one that the CLR checks for compatibility. Therefore, it changes only on
         /// hard-breaking changes (for instance, on new major versions).</para>
         /// </remarks>
-        public static Version AssemblyVersion {get; }
+        public Version AssemblyVersion {get; }
 
         /// <summary>
         /// Gets the assembly file version of the Umbraco code.
@@ -55,7 +63,7 @@ namespace Umbraco.Core.Configuration
         /// <remarks>
         /// <para>The assembly version is the value of the <see cref="AssemblyFileVersionAttribute"/>.</para>
         /// </remarks>
-        public static Version AssemblyFileVersion { get; }
+        public Version AssemblyFileVersion { get; }
 
         /// <summary>
         /// Gets the semantic version of the Umbraco code.
@@ -64,7 +72,7 @@ namespace Umbraco.Core.Configuration
         /// <para>The semantic version is the value of the <see cref="AssemblyInformationalVersionAttribute"/>.</para>
         /// <para>It is the full version of Umbraco, including comments.</para>
         /// </remarks>
-        public static SemVersion SemanticVersion { get; }
+        public SemVersion SemanticVersion { get; }
 
         /// <summary>
         /// Gets the "local" version of the site.
@@ -75,21 +83,11 @@ namespace Umbraco.Core.Configuration
         /// and changes during an upgrade. The executing code version changes when new code is
         /// deployed. The site/files version changes during an upgrade.</para>
         /// </remarks>
-        public static SemVersion LocalVersion
-        {
+        public SemVersion LocalVersion {
             get
             {
-                try
-                {
-                    // TODO: https://github.com/umbraco/Umbraco-CMS/issues/4238 - stop having version in web.config appSettings
-                    var value = ConfigurationManager.AppSettings[Constants.AppSettings.ConfigurationStatus];
-                    return value.IsNullOrWhiteSpace() ? null : SemVersion.TryParse(value, out var semver) ? semver : null;
-                }
-                catch
-                {
-                    return null;
-                }
-            }
-        }
+                var value = _globalSettings.ConfigurationStatus;
+                return value.IsNullOrWhiteSpace() ? null : SemVersion.TryParse(value, out var semver) ? semver : null;
+            } }
     }
 }

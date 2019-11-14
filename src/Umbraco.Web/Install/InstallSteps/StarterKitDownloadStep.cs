@@ -64,7 +64,7 @@ namespace Umbraco.Web.Install.InstallSteps
         private async Task<(string packageFile, int packageId)> DownloadPackageFilesAsync(Guid kitGuid)
         {
             //Go get the package file from the package repo
-            var packageFile = await _packageService.FetchPackageFileAsync(kitGuid, UmbracoVersion.Current, _umbracoContextAccessor.UmbracoContext.Security.GetUserId().ResultOr(0));
+            var packageFile = await _packageService.FetchPackageFileAsync(kitGuid, Current.UmbracoVersion.Current, _umbracoContextAccessor.UmbracoContext.Security.GetUserId().ResultOr(0));
             if (packageFile == null) throw new InvalidOperationException("Could not fetch package file " + kitGuid);
 
             //add an entry to the installedPackages.config

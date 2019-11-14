@@ -61,7 +61,7 @@ namespace Umbraco.Web.Install.InstallSteps
             }
 
             // Update configurationStatus
-            _globalSettings.ConfigurationStatus = UmbracoVersion.SemanticVersion.ToSemanticString();
+            _globalSettings.ConfigurationStatus = Current.UmbracoVersion.SemanticVersion.ToSemanticString();
 
             //reports the ended install
             _installHelper.InstallStatus(true, "");
