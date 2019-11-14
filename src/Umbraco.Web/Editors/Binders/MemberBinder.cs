@@ -66,7 +66,7 @@ namespace Umbraco.Web.Editors.Binders
         /// <returns></returns>
         private IMember GetExisting(MemberSave model)
         {
-            var scenario = _services.MemberService.GetMembershipScenario();
+            var scenario = _services.MemberTypeService.GetMembershipScenario();
             var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
             switch (scenario)
             {

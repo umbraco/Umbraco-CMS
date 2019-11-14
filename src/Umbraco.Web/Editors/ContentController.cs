@@ -2310,7 +2310,7 @@ namespace Umbraco.Web.Editors
                 .Select(rule => rule.RuleValue).ToArray();
 
             MemberDisplay[] members;
-            switch (Services.MemberService.GetMembershipScenario())
+            switch (Services.MemberTypeService.GetMembershipScenario())
             {
                 case MembershipScenario.NativeUmbraco:
                     members = usernames
