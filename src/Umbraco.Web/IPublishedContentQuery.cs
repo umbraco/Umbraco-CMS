@@ -74,7 +74,7 @@ namespace Umbraco.Web
         IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = null);
 
         /// <summary>
-        /// Executes the query and converts the results to <see cref="PublishedSearchResult" /> using the <see cref="Umbraco.Web.PublishedCache.IPublishedContentCache" />.
+        /// Executes the query and converts the results to <see cref="PublishedSearchResult" />.
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>
@@ -83,7 +83,7 @@ namespace Umbraco.Web
         IEnumerable<PublishedSearchResult> Search(IQueryExecutor query);
 
         /// <summary>
-        /// Executes the query and converts the results to <see cref="PublishedSearchResult" /> using the <see cref="Umbraco.Web.PublishedCache.IPublishedContentCache" />.
+        /// Executes the query and converts the results to <see cref="PublishedSearchResult" />.
         /// </summary>
         /// <param name="query">The query.</param>
         /// <param name="skip">The amount of results to skip.</param>
@@ -92,9 +92,6 @@ namespace Umbraco.Web
         /// <returns>
         /// The search results.
         /// </returns>
-        /// <remarks>
-        /// Make sure only content is searched (<c>searcher.CreateQuery(IndexTypes.Content)</c>), as this only returns content, but the <paramref name="totalRecords"/> could otherwise also include media records.
-        /// </remarks>
         IEnumerable<PublishedSearchResult> Search(IQueryExecutor query, int skip, int take, out long totalRecords);
     }
 }

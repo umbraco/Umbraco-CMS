@@ -246,7 +246,7 @@ namespace Umbraco.Web
 
             totalRecords = results.TotalItemCount;
 
-            return results.Skip(skip).ToPublishedSearchResults(_publishedSnapshot.Content);
+            return results.Skip(skip).ToPublishedSearchResults(_publishedSnapshot);
         }
 
         /// <summary>
