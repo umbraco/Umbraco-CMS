@@ -229,15 +229,16 @@
     <Compile Include="Models\Membership\UserGroup.cs" />
     <Compile Include="Models\Membership\UserGroupExtensions.cs" />
     <Compile Include="Models\ObjectTypes.cs" />
-    <Compile Include="Models\Packaging\PackageDefinition.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\FixLanguageIsoCodeLength.cs" />
     <Compile Include="Models\CultureImpact.cs" />
+    <Compile Include="Models\Packaging\PackageDefinition.cs" />
     <Compile Include="Models\PublishedContent\IndexedArrayItem.cs" />
     <Compile Include="Models\PublishedContent\IPublishedContentTypeFactory.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentType.cs" />
     <Compile Include="Models\PublishedContent\VariationContextAccessorExtensions.cs" />
     <Compile Include="Models\Template.cs" />
     <Compile Include="Models\TemplateOnDisk.cs" />
+    <Compile Include="Packaging\CompiledPackageXmlParser.cs" />
     <Compile Include="PropertyEditors\IIgnoreUserStartNodesConfig.cs" />
     <Compile Include="PropertyEditors\Validators\DelimitedValueValidator.cs" />
     <Compile Include="PropertyEditors\Validators\RegexValidator.cs" />
@@ -396,7 +397,6 @@
     <Compile Include="Models\SimpleContentType.cs" />
     <Compile Include="PackageActions\AllowDoctype.cs" />
     <Compile Include="PackageActions\PublishRootDocument.cs" />
-    <Compile Include="Packaging\CompiledPackageXmlParser.cs" />
     <Compile Include="Packaging\ICreatedPackagesRepository.cs" />
     <Compile Include="Packaging\IInstalledPackagesRepository.cs" />
     <Compile Include="Packaging\IPackageDefinitionRepository.cs" />
@@ -404,7 +404,6 @@
     <Compile Include="Packaging\PackageDataInstallation.cs" />
     <Compile Include="Packaging\PackageDefinitionXmlParser.cs" />
     <Compile Include="Packaging\PackageFileInstallation.cs" />
-    <Compile Include="Packaging\PackageInstallType.cs" />
     <Compile Include="Packaging\PackagesRepository.cs" />
     <Compile Include="Persistence\Dtos\AuditEntryDto.cs" />
     <Compile Include="Persistence\Dtos\ConsentDto.cs" />
@@ -594,7 +593,6 @@
     <Compile Include="Models\UserExtensions.cs" />
     <Compile Include="NameValueCollectionExtensions.cs" />
     <Compile Include="ObjectJsonExtensions.cs" />
-    <Compile Include="Packaging\ConflictingPackageData.cs" />
     <Compile Include="Models\Packaging\UninstallationSummary.cs" />
     <Compile Include="Packaging\PackageInstallation.cs" />
     <Compile Include="Persistence\BulkDataReader.cs" />
