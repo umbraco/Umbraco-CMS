@@ -816,8 +816,8 @@ namespace Umbraco.Core.Services.Implement
         {
             //trimming username and email to make sure we have no trailing space
             member.Username = member.Username.Trim();
-            member.Email = member.Email.Trim();
-
+            member.Email = member.Email.Trim();         
+            
             using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<IMember>(member);
