@@ -7,7 +7,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Packaging
 {
-    internal class ConflictingPackageData 
+    public class ConflictingPackageData 
     {
         private readonly IMacroService _macroService;
         private readonly IFileService _fileService;

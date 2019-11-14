@@ -11,7 +11,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Web.Security;
 using Umbraco.Core.Mapping;
-using UserExtensions = Umbraco.Core.Models.UserExtensions;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.WebApi.Filters
 {
@@ -78,19 +78,19 @@ namespace Umbraco.Web.WebApi.Filters
                 () => user.Username != identity.Username,
                 () =>
                 {
-                    var culture = UserExtensions.GetUserCulture(user, Current.Services.TextService, Current.Configs.Global());
+                    var culture = user.GetUserCulture(Current.Services.TextService, Current.Configs.Global());
                     return culture != null && culture.ToString() != identity.Culture;
                 },
                 () => user.AllowedSections.UnsortedSequenceEqual(identity.AllowedApplications) == false,
                 () => user.Groups.Select(x => x.Alias).UnsortedSequenceEqual(identity.Roles) == false,
                 () =>
                 {
-                    var startContentIds = UserExtensions.CalculateContentStartNodeIds(user, Current.Services.EntityService);
+                    var startContentIds = user.CalculateContentStartNodeIds(Current.Services.EntityService);
                     return startContentIds.UnsortedSequenceEqual(identity.StartContentNodes) == false;
                 },
                 () =>
                 {
-                    var startMediaIds = UserExtensions.CalculateMediaStartNodeIds(user, Current.Services.EntityService);
+                    var startMediaIds = user.CalculateMediaStartNodeIds(Current.Services.EntityService);
                     return startMediaIds.UnsortedSequenceEqual(identity.StartMediaNodes) == false;
                 }
             };

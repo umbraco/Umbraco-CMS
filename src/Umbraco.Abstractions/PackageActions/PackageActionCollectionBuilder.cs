@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.PackageActions
 {
-    internal class PackageActionCollectionBuilder : LazyCollectionBuilderBase<PackageActionCollectionBuilder, PackageActionCollection, IPackageAction>
+    public class PackageActionCollectionBuilder : LazyCollectionBuilderBase<PackageActionCollectionBuilder, PackageActionCollection, IPackageAction>
     {
         protected override PackageActionCollectionBuilder This => this;
     }
