@@ -78,17 +78,17 @@
 
 
           <umb-control-group hide-label="true">
-             <ul class="unstyled">
-                  <li>
-                      <label>
-                          <input type="checkbox"
-                                 ng-model="currentSection.allowAll"
-                                 style="float: left; margin-right: 10px;"
-                                 ng-change="toggleAllowed(currentSection)" />
-                                 <localize key="grid_allowAllRowConfigurations"/>
-                      </label>
-                  </li>
-             </ul>
+
+            <umb-toggle
+                class="umb-toggle-group-item__toggle"
+                checked="currentSection.allowAll"
+                on-click="currentSection.allowAll = !currentSection.allowAll"
+                show-labels="true"
+                label-position="right"
+                label-off="Allow all row configurations"
+                label-on="Allow all row configurations"
+                style="margin-left: 18px">
+            </umb-toggle>
 
              <div ng-if="currentSection.allowAll === false">
                   <hr />
