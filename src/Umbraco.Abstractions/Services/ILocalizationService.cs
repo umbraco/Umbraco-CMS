@@ -19,7 +19,7 @@ namespace Umbraco.Core.Services
         /// Adds or updates a translation for a dictionary item and language
         /// </summary>
         /// <param name="item"></param>
-        /// <param name="language"></param>
+        /// <param name="language"></param
         /// <param name="value"></param>
         /// <returns></returns>
         void AddOrUpdateDictionaryValue(IDictionaryItem item, ILanguage language, string value);

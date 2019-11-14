@@ -16,7 +16,7 @@ namespace Umbraco.Web.Models.Mapping
             : base(dataTypeService, entityService, logger, propertyEditors)
         { }
 
-        public override void Map(Property property, ContentPropertyDto dest, MapperContext context)
+        public override void Map(IProperty property, ContentPropertyDto dest, MapperContext context)
         {
             base.Map(property, dest, context);
 

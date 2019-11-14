@@ -18,7 +18,7 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     public class GridPropertyIndexValueFactory : IPropertyIndexValueFactory
     {
-        public IEnumerable<KeyValuePair<string, IEnumerable<object>>> GetIndexValues(Property property, string culture, string segment, bool published)
+        public IEnumerable<KeyValuePair<string, IEnumerable<object>>> GetIndexValues(IProperty property, string culture, string segment, bool published)
         {
             var result = new List<KeyValuePair<string, IEnumerable<object>>>();
 

@@ -98,7 +98,7 @@ namespace Umbraco.Core.Models
         /// List of properties, which make up all the data available for this Content object
         /// </summary>
         /// <remarks>Properties are loaded as part of the Content object graph</remarks>
-        PropertyCollection Properties { get; set; }
+        IPropertyCollection Properties { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether the content entity has a property with the supplied alias.

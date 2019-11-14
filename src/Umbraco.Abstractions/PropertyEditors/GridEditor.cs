@@ -1,48 +1,37 @@
 ﻿using System.Collections.Generic;
-using Newtonsoft.Json;
-using Umbraco.Core.Composing;
+using System.Runtime.Serialization;
 using Umbraco.Core.Configuration.Grid;
-using Umbraco.Core.IO;
 
 namespace Umbraco.Core.PropertyEditors
 {
+
+    [DataContract]
     public class GridEditor : IGridEditorConfig
     {
-        private string _view;
-        private string _render;
-
         public GridEditor()
         {
             Config = new Dictionary<string, object>();
         }
 
-        [JsonProperty("name", Required = Required.Always)]
+        [DataMember(Name = "name", IsRequired = true)]
         public string Name { get; set; }
 
-        [JsonProperty("nameTemplate")]
+        [DataMember(Name = "nameTemplate")]
         public string NameTemplate { get; set; }
 
-        [JsonProperty("alias", Required = Required.Always)]
+        [DataMember(Name = "alias", IsRequired = true)]
         public string Alias { get; set; }
 
-        [JsonProperty("view", Required = Required.Always)]
-        public string View
-        {
-            get => _view;
-            set => _view = Current.IOHelper.ResolveVirtualUrl(value);
-        }
+        [DataMember(Name = "view", IsRequired = true)]
+        public string View{ get; set; }
 
-        [JsonProperty("render")]
-        public string Render
-        {
-            get => _render;
-            set => _render = Current.IOHelper.ResolveVirtualUrl(value);
-        }
+        [DataMember(Name = "render")]
+        public string Render { get; set; }
 
-        [JsonProperty("icon", Required = Required.Always)]
+        [DataMember(Name = "icon", IsRequired = true)]
         public string Icon { get; set; }
 
-        [JsonProperty("config")]
+        [DataMember(Name = "config")]
         public IDictionary<string, object> Config { get; set; }
 
         protected bool Equals(GridEditor other)

@@ -1402,7 +1402,7 @@ namespace Umbraco.Core.Services.Implement
                             if (d.Trashed) continue; // won't publish
 
                             //publish the culture values and validate the property values, if validation fails, log the invalid properties so the develeper has an idea of what has failed
-                            Property[] invalidProperties = null;
+                            IProperty[] invalidProperties = null;
                             var impact = CultureImpact.Explicit(culture, IsDefaultCulture(allLangs, culture));
                             var tryPublish = d.PublishCulture(impact) && _propertyValidationService.Value.IsPropertyDataValid(d, out invalidProperties, impact);
                             if (invalidProperties != null && invalidProperties.Length > 0)
@@ -2602,7 +2602,7 @@ namespace Umbraco.Core.Services.Implement
                 return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
 
             //validate the property values
-            Property[] invalidProperties = null;
+            IProperty[] invalidProperties = null;
             if (!impactsToPublish.All(x => _propertyValidationService.Value.IsPropertyDataValid(content, out invalidProperties, x)))
                 return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content)
                 {

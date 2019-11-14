@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Services
                 x => x.Type == EditorType.PropertyValue
                      && x.Alias == Constants.PropertyEditors.Aliases.TextBox);
             Mock.Get(dataEditor).Setup(x => x.GetValueEditor(It.IsAny<object>()))
-                .Returns(new CustomTextOnlyValueEditor(new DataEditorAttribute(Constants.PropertyEditors.Aliases.TextBox, "Test Textbox", "textbox"), textService.Object));
+                .Returns(new CustomTextOnlyValueEditor(Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), new DataEditorAttribute(Constants.PropertyEditors.Aliases.TextBox, "Test Textbox", "textbox"),   textService.Object));
 
             var propEditors = new PropertyEditorCollection(new DataEditorCollection(new[] { dataEditor }));
 
@@ -164,7 +164,7 @@ namespace Umbraco.Tests.Services
         {
             private readonly ILocalizedTextService _textService;
 
-            public CustomTextOnlyValueEditor(DataEditorAttribute attribute, ILocalizedTextService textService) : base(attribute)
+            public CustomTextOnlyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute, ILocalizedTextService textService) : base(dataTypeService, localizationService, attribute)
             {
                 _textService = textService;
             }

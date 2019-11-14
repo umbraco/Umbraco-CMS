@@ -18,6 +18,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 using File = System.IO.File;
 
 namespace Umbraco.Tests.TestHelpers
@@ -247,6 +248,21 @@ namespace Umbraco.Tests.TestHelpers
                     Thread.Sleep(waitMilliseconds);
                 }
             }
+        }
+
+        public static DataValueEditor CreateDataValueEditor(string name)
+        {
+            var valueType = (ValueTypes.IsValue(name)) ? name : ValueTypes.String;
+
+            return new DataValueEditor(
+                Mock.Of<IDataTypeService>(),
+                Mock.Of<ILocalizationService>(),
+                new DataEditorAttribute(name, name, name)
+                {
+                    ValueType = valueType
+                }
+
+            );
         }
     }
 }

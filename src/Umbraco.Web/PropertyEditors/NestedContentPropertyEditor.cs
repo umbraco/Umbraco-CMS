@@ -28,13 +28,17 @@ namespace Umbraco.Web.PropertyEditors
     public class NestedContentPropertyEditor : DataEditor
     {
         private readonly Lazy<PropertyEditorCollection> _propertyEditors;
+        private readonly IDataTypeService _dataTypeService;
+        private readonly ILocalizationService _localizationService;
 
         internal const string ContentTypeAliasPropertyKey = "ncContentTypeAlias";
 
-        public NestedContentPropertyEditor(ILogger logger, Lazy<PropertyEditorCollection> propertyEditors)
+        public NestedContentPropertyEditor(ILogger logger, Lazy<PropertyEditorCollection> propertyEditors, IDataTypeService dataTypeService, ILocalizationService localizationService)
             : base (logger)
         {
             _propertyEditors = propertyEditors;
+            _dataTypeService = dataTypeService;
+            _localizationService = localizationService;
         }
 
         // has to be lazy else circular dep in ctor
@@ -48,7 +52,7 @@ namespace Umbraco.Web.PropertyEditors
 
         #region Value Editor
 
-        protected override IDataValueEditor CreateValueEditor() => new NestedContentPropertyValueEditor(Attribute, PropertyEditors);
+        protected override IDataValueEditor CreateValueEditor() => new NestedContentPropertyValueEditor(_dataTypeService, _localizationService, Attribute, PropertyEditors);
 
         internal class NestedContentPropertyValueEditor : DataValueEditor
         {
@@ -58,8 +62,8 @@ namespace Umbraco.Web.PropertyEditors
                     Current.Services.ContentTypeService.GetAll().ToDictionary(c => c.Alias)
             );
 
-            public NestedContentPropertyValueEditor(DataEditorAttribute attribute, PropertyEditorCollection propertyEditors)
-                : base(attribute)
+            public NestedContentPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute, PropertyEditorCollection propertyEditors)
+                : base(dataTypeService, localizationService, attribute)
             {
                 _propertyEditors = propertyEditors;
                 Validators.Add(new NestedContentValidator(propertyEditors, GetElementType));
@@ -92,7 +96,7 @@ namespace Umbraco.Web.PropertyEditors
 
             #region DB to String
 
-            public override string ConvertDbToString(PropertyType propertyType, object propertyValue, IDataTypeService dataTypeService)
+            public override string ConvertDbToString(IPropertyType propertyType, object propertyValue)
             {
                 if (propertyValue == null || string.IsNullOrWhiteSpace(propertyValue.ToString()))
                     return string.Empty;
@@ -129,9 +133,9 @@ namespace Umbraco.Web.PropertyEditors
                                 {
                                     continue;
                                 }
-                                var tempConfig = dataTypeService.GetDataType(propType.DataTypeId).Configuration;
+                                var tempConfig = DataTypeService.GetDataType(propType.DataTypeId).Configuration;
                                 var valEditor = propEditor.GetValueEditor(tempConfig);
-                                var convValue = valEditor.ConvertDbToString(propType, propValues[propAlias]?.ToString(), dataTypeService);
+                                var convValue = valEditor.ConvertDbToString(propType, propValues[propAlias]?.ToString());
                                 propValues[propAlias] = convValue;
                             }
                             catch (InvalidOperationException)
@@ -152,7 +156,7 @@ namespace Umbraco.Web.PropertyEditors
 
             // note: there is NO variant support here
 
-            public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
+            public override object ToEditor(IProperty property, string culture = null, string segment = null)
             {
                 var val = property.GetValue(culture, segment);
                 if (val == null || string.IsNullOrWhiteSpace(val.ToString()))
@@ -197,9 +201,9 @@ namespace Umbraco.Web.PropertyEditors
                                     propValues[propAlias] = tempProp.GetValue()?.ToString();
                                     continue;
                                 }
-                                var tempConfig = dataTypeService.GetDataType(propType.DataTypeId).Configuration;
+                                var tempConfig = DataTypeService.GetDataType(propType.DataTypeId).Configuration;
                                 var valEditor = propEditor.GetValueEditor(tempConfig);
-                                var convValue = valEditor.ToEditor(tempProp, dataTypeService);
+                                var convValue = valEditor.ToEditor(tempProp);
                                 propValues[propAlias] = convValue == null ? null : JToken.FromObject(convValue);
                             }
                             catch (InvalidOperationException)

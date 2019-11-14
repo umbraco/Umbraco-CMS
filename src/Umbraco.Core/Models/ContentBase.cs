@@ -20,7 +20,7 @@ namespace Umbraco.Core.Models
     {
         private int _contentTypeId;
         private int _writerId;
-        private PropertyCollection _properties;
+        private IPropertyCollection _properties;
         private ContentCultureInfosCollection _cultureInfos;
         internal IReadOnlyList<PropertyType> AllPropertyTypes { get; }
 
@@ -135,7 +135,7 @@ namespace Umbraco.Core.Models
         /// </remarks>
         [DataMember]
         [DoNotClone]
-        public PropertyCollection Properties
+        public IPropertyCollection Properties
         {
             get => _properties;
             set
@@ -490,7 +490,7 @@ namespace Umbraco.Core.Models
             if (clonedContent._properties != null)
             {
                 clonedContent._properties.CollectionChanged -= PropertiesChanged;         //clear this event handler if any
-                clonedContent._properties = (PropertyCollection)_properties.DeepClone(); //manually deep clone
+                clonedContent._properties = (IPropertyCollection)_properties.DeepClone(); //manually deep clone
                 clonedContent._properties.CollectionChanged += clonedContent.PropertiesChanged;   //re-assign correct event handler
             }
 

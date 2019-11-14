@@ -105,6 +105,7 @@ namespace Umbraco.Core.Models
 
         // we have to have all this, because we're an IUmbracoEntity, because that is
         // required by the query expression visitor / SimpleContentTypeMapper
+        // TODO: Make the query expression visitor use a different common interface, or investigate removing IRememberBeingDirty from being a requirement on that interface and expliclty checking for that throughout the code?
 
         string ITreeEntity.Name { get => this.Name; set => throw new NotImplementedException(); }
         int IEntity.Id { get => this.Id; set => throw new NotImplementedException(); }
@@ -130,5 +131,7 @@ namespace Umbraco.Core.Models
         bool ICanBeDirty.IsPropertyDirty(string propName) => throw new NotImplementedException();
         IEnumerable<string> ICanBeDirty.GetDirtyProperties() => throw new NotImplementedException();
         void ICanBeDirty.ResetDirtyProperties() => throw new NotImplementedException();
+        public void DisableChangeTracking() => throw new NotImplementedException();
+        public void EnableChangeTracking() => throw new NotImplementedException();
     }
 }

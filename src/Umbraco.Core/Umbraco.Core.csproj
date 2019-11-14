@@ -36,7 +36,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data.Entity" />
     <Reference Include="System.IO.Compression" />
@@ -65,10 +64,13 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Serilog.Sinks.Async">
-      <Version>1.3.0</Version>
+      <Version>1.4.0</Version>
     </PackageReference>
     <PackageReference Include="Serilog.Sinks.Map">
       <Version>1.0.0</Version>
+    </PackageReference>
+    <PackageReference Include="System.ComponentModel.Annotations">
+      <Version>4.6.0</Version>
     </PackageReference>
     <PackageReference Include="Umbraco.Code">
       <Version>1.0.5</Version>
@@ -91,19 +93,19 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
     <PackageReference Include="NPoco" Version="3.9.4" />
     <PackageReference Include="Serilog">
-      <Version>2.8.0</Version>
+      <Version>2.9.0</Version>
     </PackageReference>
     <PackageReference Include="Serilog.Enrichers.Process">
       <Version>2.0.1</Version>
     </PackageReference>
     <PackageReference Include="Serilog.Enrichers.Thread">
-      <Version>3.0.0</Version>
+      <Version>3.1.0</Version>
     </PackageReference>
     <PackageReference Include="Serilog.Filters.Expressions">
       <Version>2.0.0</Version>
     </PackageReference>
     <PackageReference Include="Serilog.Formatting.Compact">
-      <Version>1.0.0</Version>
+      <Version>1.1.0</Version>
     </PackageReference>
     <PackageReference Include="Serilog.Formatting.Compact.Reader">
       <Version>1.0.3</Version>
@@ -112,7 +114,7 @@
       <Version>2.2.2</Version>
     </PackageReference>
     <PackageReference Include="Serilog.Sinks.File">
-      <Version>4.0.0</Version>
+      <Version>4.1.0</Version>
     </PackageReference>
     <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
   </ItemGroup>
@@ -182,9 +184,7 @@
     <Compile Include="IO\IOHelper.cs" />
     <Compile Include="IO\MediaPathSchemes\UniqueMediaPathScheme.cs" />
     <Compile Include="Logging\Viewer\LogTimePeriod.cs" />
-    <Compile Include="Manifest\IManifestFilter.cs" />
-    <Compile Include="Manifest\ManifestFilterCollection.cs" />
-    <Compile Include="Manifest\ManifestFilterCollectionBuilder.cs" />
+    <Compile Include="Manifest\ManifestParser.cs" />
     <Compile Include="Migrations\IMigrationBuilder.cs" />
     <Compile Include="Migrations\Upgrade\Common\DeleteKeysAndIndexes.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\ContentPickerPreValueMigrator.cs" />
@@ -218,16 +218,12 @@
     <Compile Include="Migrations\Upgrade\V_8_0_1\ChangeNuCacheJsonFormat.cs" />
     <Compile Include="Migrations\Upgrade\V_8_1_0\ConvertTinyMceAndGridMediaUrlsToLocalLink.cs" />
     <Compile Include="Models\ContentBaseExtensions.cs" />
-    <Compile Include="Models\IContent.cs" />
-    <Compile Include="Models\IContentBase.cs" />
     <Compile Include="Models\IContentType.cs" />
     <Compile Include="Models\IContentTypeBase.cs" />
     <Compile Include="Models\IContentTypeComposition.cs" />
     <Compile Include="Models\IDataType.cs" />
-    <Compile Include="Models\IDataValueEditor.cs" />
     <Compile Include="Models\Identity\IdentityMapDefinition.cs" />
     <Compile Include="Models\Identity\UserLoginInfoWrapper.cs" />
-    <Compile Include="Models\IMedia.cs" />
     <Compile Include="Models\IMediaType.cs" />
     <Compile Include="Models\IMember.cs" />
     <Compile Include="Models\IMemberType.cs" />
@@ -262,8 +258,10 @@
     <Compile Include="Models\TemplateOnDisk.cs" />
     <Compile Include="Models\PublishedContent\IPublishedContentType.cs" />
     <Compile Include="Models\PublishedContent\IPublishedPropertyType.cs" />
-    <Compile Include="PropertyEditors\ConfigurationFieldsExtensions.cs" />
     <Compile Include="PropertyEditors\IIgnoreUserStartNodesConfig.cs" />
+    <Compile Include="PropertyEditors\Validators\DelimitedValueValidator.cs" />
+    <Compile Include="PropertyEditors\Validators\RegexValidator.cs" />
+    <Compile Include="PropertyEditors\Validators\RequiredValidator.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="Models\PublishedContent\UrlMode.cs" />
     <Compile Include="Persistence\Dtos\PropertyTypeCommonDto.cs" />
@@ -271,14 +269,9 @@
     <Compile Include="Persistence\Repositories\Implement\ContentTypeCommonRepository.cs" />
     <Compile Include="Persistence\Repositories\IContentTypeCommonRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\LanguageRepositoryExtensions.cs" />
-    <Compile Include="PropertyEditors\ConfigurationField.cs" />
-    <Compile Include="PropertyEditors\ConfigurationFieldAttribute.cs" />
     <Compile Include="PropertyEditors\DataEditorAttribute.cs" />
     <Compile Include="PropertyEditors\DateTimeConfiguration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RenameLabelAndRichTextPropertyEditorAliases.cs" />
-    <Compile Include="PropertyEditors\IDataEditor.cs" />
-    <Compile Include="PropertyEditors\IPropertyIndexValueFactory.cs" />
-    <Compile Include="PropertyEditors\IValueValidator.cs" />
     <Compile Include="PropertyEditors\PropertyValueConverterCollection.cs" />
     <Compile Include="PropertyEditors\PropertyValueConverterCollectionBuilder.cs" />
     <Compile Include="PropertyEditors\VoidEditor.cs" />
@@ -380,10 +373,7 @@
     <Compile Include="Logging\Viewer\MessageTemplateFilter.cs" />
     <Compile Include="Logging\Viewer\SavedLogSearch.cs" />
     <Compile Include="Manifest\DashboardAccessRuleConverter.cs" />
-    <Compile Include="Manifest\ManifestSection.cs" />
-    <Compile Include="Manifest\ManifestContentAppDefinition.cs" />
     <Compile Include="Manifest\ManifestContentAppFactory.cs" />
-    <Compile Include="Manifest\ManifestDashboard.cs" />
     <Compile Include="Migrations\MergeBuilder.cs" />
     <Compile Include="Migrations\MigrationBase_Extra.cs" />
     <Compile Include="Migrations\PostMigrations\IPublishedSnapshotRebuilder.cs" />
@@ -419,9 +409,6 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\UserForeignKeys.cs" />
     <Compile Include="Migrations\Upgrade\Common\CreateKeysAndIndexes.cs" />
     <Compile Include="Models\ContentRepositoryExtensions.cs" />
-    <Compile Include="Models\ContentSchedule.cs" />
-    <Compile Include="Models\ContentScheduleAction.cs" />
-    <Compile Include="Models\ContentScheduleCollection.cs" />
     <Compile Include="Models\ContentTagsExtensions.cs" />
     <Compile Include="Models\ContentTypeBaseExtensions.cs" />
     <Compile Include="Models\DataTypeExtensions.cs" />
@@ -470,11 +457,7 @@
     <Compile Include="PropertyEditors\ConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\DefaultPropertyIndexValueFactory.cs" />
     <Compile Include="PropertyEditors\DropDownFlexibleConfiguration.cs" />
-    <Compile Include="PropertyEditors\IConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\ImageCropperConfiguration.cs" />
-    <Compile Include="PropertyEditors\IManifestValueValidator.cs" />
-    <Compile Include="PropertyEditors\IValueFormatValidator.cs" />
-    <Compile Include="PropertyEditors\IValueRequiredValidator.cs" />
     <Compile Include="PropertyEditors\LabelConfiguration.cs" />
     <Compile Include="PropertyEditors\LabelConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\LabelPropertyEditor.cs" />
@@ -548,10 +531,8 @@
     <Compile Include="Logging\OwinLoggerFactory.cs" />
     <Compile Include="Logging\VoidProfiler.cs" />
     <Compile Include="MainDom.cs" />
-    <Compile Include="Manifest\ManifestParser.cs" />
     <Compile Include="Manifest\ValueValidatorConverter.cs" />
     <Compile Include="Manifest\ManifestWatcher.cs" />
-    <Compile Include="Manifest\PackageManifest.cs" />
     <Compile Include="Manifest\DataEditorConverter.cs" />
     <Compile Include="Migrations\MigrationBuilder.cs" />
     <Compile Include="Migrations\MigrationPlan.cs" />
@@ -957,22 +938,13 @@
     <Compile Include="Persistence\UmbracoDatabaseExtensions.cs" />
     <Compile Include="Persistence\UmbracoDatabaseFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PropertyEditors\Validators\DecimalValidator.cs" />
     <Compile Include="PropertyEditors\DefaultPropertyValueConverterAttribute.cs" />
-    <Compile Include="PropertyEditors\Validators\DelimitedValueValidator.cs" />
-    <Compile Include="PropertyEditors\Validators\EmailValidator.cs" />
-    <Compile Include="PropertyEditors\GridEditor.cs" />
-    <Compile Include="PropertyEditors\Validators\IntegerValidator.cs" />
     <Compile Include="PropertyEditors\IPropertyValueConverter.cs" />
     <Compile Include="PropertyEditors\DataEditor.cs" />
     <Compile Include="PropertyEditors\DataEditorCollection.cs" />
     <Compile Include="PropertyEditors\DataEditorCollectionBuilder.cs" />
     <Compile Include="PropertyEditors\PropertyValueConverterBase.cs" />
     <Compile Include="PropertyEditors\DataValueEditor.cs" />
-    <Compile Include="PropertyEditors\Validators\RegexValidator.cs" />
-    <Compile Include="PropertyEditors\Validators\RequiredValidator.cs" />
-    <Compile Include="PropertyEditors\ManifestValueValidatorCollection.cs" />
-    <Compile Include="PropertyEditors\ManifestValueValidatorCollectionBuilder.cs" />
     <Compile Include="PropertyEditors\ValueConverters\CheckboxListValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ColorPickerValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\DatePickerValueConverter.cs" />

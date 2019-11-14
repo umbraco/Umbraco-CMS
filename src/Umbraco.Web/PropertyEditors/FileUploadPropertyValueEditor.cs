@@ -7,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -17,8 +18,8 @@ namespace Umbraco.Web.PropertyEditors
     {
         private readonly IMediaFileSystem _mediaFileSystem;
 
-        public FileUploadPropertyValueEditor(DataEditorAttribute attribute, IMediaFileSystem mediaFileSystem)
-            : base(attribute)
+        public FileUploadPropertyValueEditor(DataEditorAttribute attribute, IMediaFileSystem mediaFileSystem, IDataTypeService dataTypeService, ILocalizationService localizationService)
+            : base(dataTypeService, localizationService, attribute)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
         }
@@ -92,7 +93,7 @@ namespace Umbraco.Web.PropertyEditors
             if (editorFile == null) return null;
             return filepath == null ? string.Empty : _mediaFileSystem.GetUrl(filepath);
 
-            
+
         }
 
         private string ProcessFile(ContentPropertyData editorValue, ContentPropertyFile file, string currentPath, Guid cuid, Guid puid)

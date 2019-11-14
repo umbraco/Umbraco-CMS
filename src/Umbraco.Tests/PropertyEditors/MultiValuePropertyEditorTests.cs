@@ -25,12 +25,12 @@ namespace Umbraco.Tests.PropertyEditors
     /// to cache. Now we always just deal with strings and we'll keep the tests that show that.
     /// </remarks>
     [TestFixture]
-    public class MultiValuePropertyEditorTests 
+    public class MultiValuePropertyEditorTests
     {
         [Test]
         public void DropDownMultipleValueEditor_Format_Data_For_Cache()
         {
-            var dataType = new DataType(new CheckBoxListPropertyEditor(Mock.Of<ILogger>(), Mock.Of<ILocalizedTextService>()))
+            var dataType = new DataType(new CheckBoxListPropertyEditor(Mock.Of<ILogger>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>()))
             {
                 Configuration = new ValueListConfiguration
                 {
@@ -51,7 +51,7 @@ namespace Umbraco.Tests.PropertyEditors
 
             var valueEditor = dataType.Editor.GetValueEditor();
             ((DataValueEditor) valueEditor).Configuration = dataType.Configuration;
-            var result = valueEditor.ConvertDbToString(prop.PropertyType, prop.GetValue(), dataTypeService);
+            var result = valueEditor.ConvertDbToString(prop.PropertyType, prop.GetValue());
 
             Assert.AreEqual("Value 1,Value 2,Value 3", result);
         }
@@ -59,7 +59,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void DropDownValueEditor_Format_Data_For_Cache()
         {
-            var dataType = new DataType(new CheckBoxListPropertyEditor(Mock.Of<ILogger>(), Mock.Of<ILocalizedTextService>()))
+            var dataType = new DataType(new CheckBoxListPropertyEditor(Mock.Of<ILogger>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>()))
             {
                 Configuration = new ValueListConfiguration
                 {
@@ -78,7 +78,7 @@ namespace Umbraco.Tests.PropertyEditors
             var prop = new Property(1, new PropertyType(dataType));
             prop.SetValue("Value 2");
 
-            var result = dataType.Editor.GetValueEditor().ConvertDbToString(prop.PropertyType, prop.GetValue(), dataTypeService);
+            var result = dataType.Editor.GetValueEditor().ConvertDbToString(prop.PropertyType, prop.GetValue());
 
             Assert.AreEqual("Value 2", result);
         }

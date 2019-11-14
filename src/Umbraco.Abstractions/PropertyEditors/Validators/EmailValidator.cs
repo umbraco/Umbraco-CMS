@@ -6,7 +6,7 @@ namespace Umbraco.Core.PropertyEditors.Validators
     /// <summary>
     /// A validator that validates an email address
     /// </summary>
-    internal sealed class EmailValidator : IManifestValueValidator
+    public sealed class EmailValidator : IManifestValueValidator
     {
         /// <inheritdoc />
         public string ValidationName => "Email";

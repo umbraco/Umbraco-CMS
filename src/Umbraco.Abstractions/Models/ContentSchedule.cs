@@ -36,7 +36,7 @@ namespace Umbraco.Core.Models
         /// Gets the unique identifier of the document targeted by the scheduled action.
         /// </summary>
         [DataMember]
-        public Guid Id { get; internal set; }
+        public Guid Id { get; set; }
 
         /// <summary>
         /// Gets the culture of the scheduled action.

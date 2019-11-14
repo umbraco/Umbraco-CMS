@@ -1837,7 +1837,7 @@ namespace Umbraco.Web.Editors
         private void MapValuesForPersistence(ContentItemSave contentSave)
         {
             // inline method to determine if a property type varies
-            bool Varies(Property property) => property.PropertyType.VariesByCulture();
+            bool Varies(IProperty property) => property.PropertyType.VariesByCulture();
 
             var variantIndex = 0;
 
