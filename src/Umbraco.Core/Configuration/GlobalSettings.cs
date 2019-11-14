@@ -171,7 +171,7 @@ namespace Umbraco.Core.Configuration
         /// <param name="value">Value of the setting to be saved.</param>
         internal static void SaveSetting(string key, string value)
         {
-            var fileName = Current.IOHelper.MapPath(string.Format("{0}/web.config", SystemDirectories.Root));
+            var fileName = Current.IOHelper.MapPath(string.Format("{0}/web.config", Current.IOHelper.Root));
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
 
             var appSettings = xml.Root.DescendantsAndSelf("appSettings").Single();
@@ -193,7 +193,7 @@ namespace Umbraco.Core.Configuration
         /// <param name="key">Key of the setting to be removed.</param>
         internal static void RemoveSetting(string key)
         {
-            var fileName = Current.IOHelper.MapPath(string.Format("{0}/web.config", SystemDirectories.Root));
+            var fileName = Current.IOHelper.MapPath(string.Format("{0}/web.config", Current.IOHelper.Root));
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
 
             var appSettings = xml.Root.DescendantsAndSelf("appSettings").Single();
@@ -377,6 +377,44 @@ namespace Umbraco.Core.Configuration
                     return false;
                 }
             }
+        }
+
+        private string _umbracoMediaPath = null;
+        public string UmbracoMediaPath => GetterWithDefaultValue(Constants.AppSettings.UmbracoMediaPath, "~/media", ref _umbracoMediaPath);
+
+        private string _umbracoScriptsPath = null;
+        public string UmbracoScriptsPath => GetterWithDefaultValue(Constants.AppSettings.UmbracoScriptsPath, "~/scripts", ref _umbracoScriptsPath);
+
+        private string _umbracoCssPath = null;
+        public string UmbracoCssPath => GetterWithDefaultValue(Constants.AppSettings.UmbracoCssPath, "~/css", ref _umbracoCssPath);
+
+        private string _umbracoPath = null;
+        public string UmbracoPath => GetterWithDefaultValue(Constants.AppSettings.UmbracoPath, "~/umbraco", ref _umbracoPath);
+
+        private T GetterWithDefaultValue<T>(string appSettingKey, T defaultValue, ref T backingField)
+        {
+            if (backingField != null) return backingField;
+
+            if (ConfigurationManager.AppSettings.ContainsKey(appSettingKey))
+            {
+                try
+                {
+                    var value = ConfigurationManager.AppSettings[appSettingKey];
+
+                    backingField = (T)Convert.ChangeType(value, typeof(T));
+                }
+                catch
+                {
+                    /* ignore and use default value */
+                    backingField = defaultValue;
+                }
+            }
+            else
+            {
+                backingField = defaultValue;
+            }
+
+            return backingField;
         }
     }
 }

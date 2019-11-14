@@ -205,7 +205,7 @@ namespace Umbraco.Core.Composing
         public static IVariationContextAccessor VariationContextAccessor
             => Factory.GetInstance<IVariationContextAccessor>();
 
-        public static readonly IIOHelper IOHelper = new IOHelper();
+        public static readonly IIOHelper IOHelper = Umbraco.Core.IO.IOHelper.Default;
 
         #endregion
     }

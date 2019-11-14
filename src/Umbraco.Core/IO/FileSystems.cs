@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.IO
 {
@@ -11,6 +12,7 @@ namespace Umbraco.Core.IO
     {
         private readonly IFactory _container;
         private readonly ILogger _logger;
+        private readonly IIOHelper _ioHelper;
 
         private readonly ConcurrentDictionary<Type, Lazy<IFileSystem>> _filesystems = new ConcurrentDictionary<Type, Lazy<IFileSystem>>();
 
@@ -33,10 +35,12 @@ namespace Umbraco.Core.IO
         #region Constructor
 
         // DI wants a public ctor
-        public FileSystems(IFactory container, ILogger logger)
+        public FileSystems(IFactory container, ILogger logger, IIOHelper ioHelper, IGlobalSettings globalSettings)
         {
             _container = container;
             _logger = logger;
+            _ioHelper = ioHelper;
+            _globalSettings = globalSettings;
         }
 
         // for tests only, totally unsafe
@@ -120,11 +124,11 @@ namespace Umbraco.Core.IO
         // but it does not really matter what we return - here, null
         private object CreateWellKnownFileSystems()
         {
-            var macroPartialFileSystem = new PhysicalFileSystem(SystemDirectories.MacroPartials);
-            var partialViewsFileSystem = new PhysicalFileSystem(SystemDirectories.PartialViews);
-            var stylesheetsFileSystem = new PhysicalFileSystem(SystemDirectories.Css);
-            var scriptsFileSystem = new PhysicalFileSystem(SystemDirectories.Scripts);
-            var mvcViewsFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews);
+            var macroPartialFileSystem = new PhysicalFileSystem(Constants.SystemDirectories.MacroPartials);
+            var partialViewsFileSystem = new PhysicalFileSystem(Constants.SystemDirectories.PartialViews);
+            var stylesheetsFileSystem = new PhysicalFileSystem(_globalSettings.UmbracoCssPath);
+            var scriptsFileSystem = new PhysicalFileSystem(_globalSettings.UmbracoScriptsPath);
+            var mvcViewsFileSystem = new PhysicalFileSystem(Constants.SystemDirectories.MvcViews);
 
             _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, "macro-partials", IsScoped);
             _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, "partials", IsScoped);
@@ -147,6 +151,7 @@ namespace Umbraco.Core.IO
         #region Providers
 
         private readonly Dictionary<Type, string> _paths = new Dictionary<Type, string>();
+        private IGlobalSettings _globalSettings;
 
         // internal for tests
         internal IReadOnlyDictionary<Type, string> Paths => _paths;

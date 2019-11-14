@@ -1,7 +1,7 @@
 ﻿namespace Umbraco.Core.Configuration
 {
     /// <summary>
-    /// Contains general settings information for the entire Umbraco instance based on information from  web.config appsettings 
+    /// Contains general settings information for the entire Umbraco instance based on information from  web.config appsettings
     /// </summary>
     public interface IGlobalSettings
     {
@@ -21,7 +21,7 @@
         /// Gets the path to umbraco's root directory (/umbraco by default).
         /// </summary>
         string Path { get; }
-        
+
         /// <summary>
         /// Gets or sets the configuration status. This will return the version number of the currently installed umbraco instance.
         /// </summary>
@@ -67,5 +67,10 @@
         /// Gets the location of temporary files.
         /// </summary>
         string LocalTempPath { get; }
+
+        string UmbracoPath { get; }
+        string UmbracoCssPath { get; }
+        string UmbracoScriptsPath { get; }
+        string UmbracoMediaPath { get; }
     }
 }

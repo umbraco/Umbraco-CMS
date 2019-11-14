@@ -13,6 +13,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Scoping;
+using Umbraco.Tests.TestHelpers;
 
 [assembly:DisableComposer(typeof(Umbraco.Tests.Components.ComponentTests.Composer26))]
 
@@ -34,7 +35,7 @@ namespace Umbraco.Tests.Components
             var logger = Mock.Of<ILogger>();
             var typeFinder = new TypeFinder(logger);
             var f = new UmbracoDatabaseFactory(logger, new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())));
-            var fs = new FileSystems(mock.Object, logger);
+            var fs = new FileSystems(mock.Object, logger, IOHelper.Default, SettingsForTests.GenerateMockGlobalSettings());
             var p = new ScopeProvider(f, fs, logger, typeFinder);
 
             mock.Setup(x => x.GetInstance(typeof (ILogger))).Returns(logger);

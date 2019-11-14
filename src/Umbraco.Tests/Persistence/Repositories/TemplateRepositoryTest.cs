@@ -7,6 +7,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
@@ -35,7 +36,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.SetUp();
 
             _fileSystems = Mock.Of<IFileSystems>();
-            var viewsFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews);
+            var viewsFileSystem = new PhysicalFileSystem(Constants.SystemDirectories.MvcViews);
             Mock.Get(_fileSystems).Setup(x => x.MvcViewsFileSystem).Returns(viewsFileSystem);
         }
 
@@ -63,7 +64,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var template = new Template("test", "test");
                 repository.Save(template);
-                
+
 
                 //Assert
                 Assert.That(repository.Get("test"), Is.Not.Null);
@@ -526,7 +527,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             _fileSystems  = null;
 
             //Delete all files
-            var fsViews = new PhysicalFileSystem(SystemDirectories.MvcViews);
+            var fsViews = new PhysicalFileSystem(Constants.SystemDirectories.MvcViews);
             var views = fsViews.GetFiles("", "*.cshtml");
             foreach (var file in views)
                 fsViews.DeleteFile(file);
@@ -615,7 +616,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             repository.Save(toddler4);
             repository.Save(baby1);
             repository.Save(baby2);
-            
+
 
             return new[] {parent, child1, child2, toddler1, toddler2, toddler3, toddler4, baby1, baby2};
         }

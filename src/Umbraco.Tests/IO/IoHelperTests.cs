@@ -3,12 +3,16 @@ using NUnit.Framework;
 using Umbraco.Core.IO;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.IO
 {
     [TestFixture]
     public class IoHelperTests
     {
+        private IIOHelper _ioHelper => IOHelper.Default;
+
         [TestCase("~/Scripts", "/Scripts", null)]
         [TestCase("/Scripts", "/Scripts", null)]
         [TestCase("../Scripts", "/Scripts", typeof(ArgumentException))]
@@ -32,18 +36,19 @@ namespace Umbraco.Tests.IO
         public void IOHelper_MapPathTestVDirTraversal()
         {
             //System.Diagnostics.Debugger.Break();
+            var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
 
-            Assert.AreEqual(Current.IOHelper.MapPath(SystemDirectories.Bin, true), Current.IOHelper.MapPath(SystemDirectories.Bin, false));
-            Assert.AreEqual(Current.IOHelper.MapPath(SystemDirectories.Config, true), Current.IOHelper.MapPath(SystemDirectories.Config, false));
-            Assert.AreEqual(Current.IOHelper.MapPath(SystemDirectories.Css, true), Current.IOHelper.MapPath(SystemDirectories.Css, false));
-            Assert.AreEqual(Current.IOHelper.MapPath(SystemDirectories.Data, true), Current.IOHelper.MapPath(SystemDirectories.Data, false));
-            Assert.AreEqual(Current.IOHelper.MapPath(SystemDirectories.Install, true), Current.IOHelper.MapPath(SystemDirectories.Install, false));
-            Assert.AreEqual(Current.IOHelper.MapPath(SystemDirectories.Media, true), Current.IOHelper.MapPath(SystemDirectories.Media, false));
-            Assert.AreEqual(Current.IOHelper.MapPath(SystemDirectories.Packages, true), Current.IOHelper.MapPath(SystemDirectories.Packages, false));
-            Assert.AreEqual(Current.IOHelper.MapPath(SystemDirectories.Preview, true), Current.IOHelper.MapPath(SystemDirectories.Preview, false));
-            Assert.AreEqual(Current.IOHelper.MapPath(SystemDirectories.Root, true), Current.IOHelper.MapPath(SystemDirectories.Root, false));
-            Assert.AreEqual(Current.IOHelper.MapPath(SystemDirectories.Scripts, true), Current.IOHelper.MapPath(SystemDirectories.Scripts, false));
-            Assert.AreEqual(Current.IOHelper.MapPath(SystemDirectories.Umbraco, true), Current.IOHelper.MapPath(SystemDirectories.Umbraco, false));
+            Assert.AreEqual(Current.IOHelper.MapPath(Constants.SystemDirectories.Bin, true), Current.IOHelper.MapPath(Constants.SystemDirectories.Bin, false));
+            Assert.AreEqual(Current.IOHelper.MapPath(Constants.SystemDirectories.Config, true), Current.IOHelper.MapPath(Constants.SystemDirectories.Config, false));
+            Assert.AreEqual(Current.IOHelper.MapPath(globalSettings.UmbracoCssPath, true), Current.IOHelper.MapPath(globalSettings.UmbracoCssPath, false));
+            Assert.AreEqual(Current.IOHelper.MapPath(Constants.SystemDirectories.Data, true), Current.IOHelper.MapPath(Constants.SystemDirectories.Data, false));
+            Assert.AreEqual(Current.IOHelper.MapPath(Constants.SystemDirectories.Install, true), Current.IOHelper.MapPath(Constants.SystemDirectories.Install, false));
+            Assert.AreEqual(Current.IOHelper.MapPath(globalSettings.UmbracoMediaPath, true), Current.IOHelper.MapPath(globalSettings.UmbracoMediaPath, false));
+            Assert.AreEqual(Current.IOHelper.MapPath(Constants.SystemDirectories.Packages, true), Current.IOHelper.MapPath(Constants.SystemDirectories.Packages, false));
+            Assert.AreEqual(Current.IOHelper.MapPath(Constants.SystemDirectories.Preview, true), Current.IOHelper.MapPath(Constants.SystemDirectories.Preview, false));
+            Assert.AreEqual(Current.IOHelper.MapPath(_ioHelper.Root, true), Current.IOHelper.MapPath(_ioHelper.Root, false));
+            Assert.AreEqual(Current.IOHelper.MapPath(globalSettings.UmbracoScriptsPath, true), Current.IOHelper.MapPath(globalSettings.UmbracoScriptsPath, false));
+            Assert.AreEqual(Current.IOHelper.MapPath(globalSettings.UmbracoPath, true), Current.IOHelper.MapPath(globalSettings.UmbracoPath, false));
         }
 
         [Test]

@@ -585,7 +585,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var path = template.VirtualPath;
 
             // get valid paths
-            var validDirs = new[] { SystemDirectories.MvcViews };
+            var validDirs = new[] { Constants.SystemDirectories.MvcViews };
 
             // get valid extensions
             var validExts = new List<string>();

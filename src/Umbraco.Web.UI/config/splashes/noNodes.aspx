@@ -1,4 +1,5 @@
 <%@ Page Language="C#" AutoEventWireup="True" Inherits="Umbraco.Web.UI.Config.Splashes.NoNodes" CodeBehind="NoNodes.aspx.cs" %>
+<%@ Import Namespace="Umbraco.Core" %>
 <%@ Import Namespace="Umbraco.Core.Composing" %>
 <%@ Import Namespace="Umbraco.Core.Configuration" %>
 <%@ Import Namespace="Umbraco.Core.IO" %>
@@ -31,7 +32,7 @@
 			<h3>You're seeing this wonderful page because your website doesn't contain any published content yet.</h3>
 
 			<div class="cta">
-				<a href="<%= Current.IOHelper.ResolveUrl(SystemDirectories.Umbraco) %>" class="button">Open Umbraco</a>
+				<a href="<%= Current.IOHelper.ResolveUrl(Current.Configs.Global().UmbracoPath) %>" class="button">Open Umbraco</a>
 			</div>
 
 

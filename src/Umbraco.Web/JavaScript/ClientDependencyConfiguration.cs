@@ -27,7 +27,7 @@ namespace Umbraco.Web.JavaScript
         {
             if (logger == null) throw new ArgumentNullException("logger");
             _logger = logger;
-            _fileName = Current.IOHelper.MapPath(string.Format("{0}/ClientDependency.config", SystemDirectories.Config));
+            _fileName = Current.IOHelper.MapPath(string.Format("{0}/ClientDependency.config", Core.Constants.SystemDirectories.Config));
         }
 
         /// <summary>

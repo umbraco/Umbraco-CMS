@@ -6,63 +6,7 @@ namespace Umbraco.Core.IO
     //all paths has a starting but no trailing /
     public class SystemDirectories
     {
-        public static string Bin => "~/bin";
 
-        public static string Config => "~/config";
 
-        public static string Data => "~/App_Data";
-
-        public static string TempData => Data + "/TEMP";
-
-        public static string TempFileUploads => TempData + "/FileUploads";
-
-        public static string TempImageUploads => TempFileUploads + "/rte";
-
-        public static string Install => "~/install";
-
-        public static string AppCode => "~/App_Code";
-
-        public static string AppPlugins => "~/App_Plugins";
-
-        public static string MvcViews => "~/Views";
-
-        public static string PartialViews => MvcViews + "/Partials/";
-
-        public static string MacroPartials => MvcViews + "/MacroPartials/";
-
-        public static string Media => Current.IOHelper.ReturnPath("umbracoMediaPath", "~/media");
-
-        public static string Scripts => Current.IOHelper.ReturnPath("umbracoScriptsPath", "~/scripts");
-
-        public static string Css => Current.IOHelper.ReturnPath("umbracoCssPath", "~/css");
-
-        public static string Umbraco => Current.IOHelper.ReturnPath("umbracoPath", "~/umbraco");
-
-        public static string Packages => Data + "/packages";
-
-        public static string Preview => Data + "/preview";
-
-        private static string _root;
-
-        /// <summary>
-        /// Gets the root path of the application
-        /// </summary>
-        public static string Root
-        {
-            get
-            {
-                if (_root != null) return _root;
-
-                var appPath = HttpRuntime.AppDomainAppVirtualPath;
-                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-                if (appPath == null || appPath == "/") appPath = string.Empty;
-
-                _root = appPath;
-
-                return _root;
-            }
-            //Only required for unit tests
-            internal set => _root = value;
-        }
     }
 }

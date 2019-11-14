@@ -384,7 +384,7 @@ namespace Umbraco.Core.Services.Implement
             var protocol = _globalSettings.UseHttps ? "https" : "http";
 
             var subjectVars = new NotificationEmailSubjectParams(
-                string.Concat(siteUri.Authority, Current.IOHelper.ResolveUrl(SystemDirectories.Umbraco)),
+                string.Concat(siteUri.Authority, Current.IOHelper.ResolveUrl(Current.Configs.Global().UmbracoPath)),
                 actionName,
                 content.Name);
 
@@ -400,7 +400,7 @@ namespace Umbraco.Core.Services.Implement
                     string.Concat(content.Id, ".aspx"),
                     protocol),
                 performingUser.Name,
-                string.Concat(siteUri.Authority, Current.IOHelper.ResolveUrl(SystemDirectories.Umbraco)),
+                string.Concat(siteUri.Authority, Current.IOHelper.ResolveUrl(Current.Configs.Global().UmbracoPath)),
                 summary.ToString());
 
             // create the mail message

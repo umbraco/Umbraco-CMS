@@ -12,6 +12,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -62,12 +63,12 @@ namespace Umbraco.Tests.TestHelpers
 
         public static void InitializeContentDirectories()
         {
-            CreateDirectories(new[] { SystemDirectories.MvcViews, SystemDirectories.Media, SystemDirectories.AppPlugins });
+            CreateDirectories(new[] { Constants.SystemDirectories.MvcViews, new GlobalSettings().UmbracoMediaPath, Constants.SystemDirectories.AppPlugins });
         }
 
         public static void CleanContentDirectories()
         {
-            CleanDirectories(new[] { SystemDirectories.MvcViews, SystemDirectories.Media });
+            CleanDirectories(new[] { Constants.SystemDirectories.MvcViews, new GlobalSettings().UmbracoMediaPath });
         }
 
         public static void CreateDirectories(string[] directories)
@@ -84,7 +85,7 @@ namespace Umbraco.Tests.TestHelpers
         {
             var preserves = new Dictionary<string, string[]>
             {
-                { SystemDirectories.MvcViews, new[] {"dummy.txt"} }
+                { Constants.SystemDirectories.MvcViews, new[] {"dummy.txt"} }
             };
             foreach (var directory in directories)
             {
