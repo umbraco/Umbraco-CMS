@@ -77,7 +77,7 @@ namespace Umbraco.Core.Models
             }
         }
         
-        internal IEnumerable<Guid> RemovedRules => _removedRules;
+        public IEnumerable<Guid> RemovedRules => _removedRules;
 
         public IEnumerable<PublicAccessRule> Rules => _ruleCollection;
 

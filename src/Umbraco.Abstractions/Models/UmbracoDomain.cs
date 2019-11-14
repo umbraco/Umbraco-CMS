@@ -49,6 +49,6 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Readonly value of the language ISO code for the domain
         /// </summary>
-        public string LanguageIsoCode { get; internal set; }
+        public string LanguageIsoCode { get; set; }
     }
 }
