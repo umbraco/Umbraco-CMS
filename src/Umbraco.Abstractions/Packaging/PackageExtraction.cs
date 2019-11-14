@@ -6,7 +6,7 @@ using System.IO.Compression;
 
 namespace Umbraco.Core.Packaging
 {
-    internal class PackageExtraction
+    public class PackageExtraction
     {
         public string ReadTextFileFromArchive(FileInfo packageFile, string fileToRead, out string directoryInPackage)
         {

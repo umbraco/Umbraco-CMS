@@ -399,10 +399,8 @@
     <Compile Include="Packaging\CompiledPackageXmlParser.cs" />
     <Compile Include="Packaging\ICreatedPackagesRepository.cs" />
     <Compile Include="Packaging\IInstalledPackagesRepository.cs" />
-    <Compile Include="Packaging\IPackageActionRunner.cs" />
     <Compile Include="Packaging\IPackageDefinitionRepository.cs" />
     <Compile Include="Packaging\IPackageInstallation.cs" />
-    <Compile Include="Packaging\PackageActionRunner.cs" />
     <Compile Include="Packaging\PackageDataInstallation.cs" />
     <Compile Include="Packaging\PackageDefinitionXmlParser.cs" />
     <Compile Include="Packaging\PackageFileInstallation.cs" />
@@ -598,7 +596,6 @@
     <Compile Include="ObjectJsonExtensions.cs" />
     <Compile Include="Packaging\ConflictingPackageData.cs" />
     <Compile Include="Models\Packaging\UninstallationSummary.cs" />
-    <Compile Include="Packaging\PackageExtraction.cs" />
     <Compile Include="Packaging\PackageInstallation.cs" />
     <Compile Include="Persistence\BulkDataReader.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\ConstraintAttribute.cs" />
@@ -1027,9 +1024,6 @@
     <Compile Include="UdiGetterExtensions.cs" />
     <Compile Include="UdiParserServiceConnectors.cs" />
     <Compile Include="UriExtensions.cs" />
-    <Compile Include="PackageActions\IPackageAction.cs" />
-    <Compile Include="PackageActions\PackageActionCollection.cs" />
-    <Compile Include="PackageActions\PackageActionCollectionBuilder.cs" />
     <Compile Include="Persistence\FaultHandling\RetryDbConnection.cs">
       <SubType>Component</SubType>
     </Compile>

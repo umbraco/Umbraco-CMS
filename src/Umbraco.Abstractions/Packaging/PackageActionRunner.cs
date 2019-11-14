@@ -9,7 +9,7 @@ namespace Umbraco.Core.Packaging
     /// <summary>
     /// Package actions are executed on package install / uninstall.
     /// </summary>
-    internal class PackageActionRunner : IPackageActionRunner
+    public class PackageActionRunner : IPackageActionRunner
     {
         private readonly ILogger _logger;
         private readonly PackageActionCollection _packageActions;
