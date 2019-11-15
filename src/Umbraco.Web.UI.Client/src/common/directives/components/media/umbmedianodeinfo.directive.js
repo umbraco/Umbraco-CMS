@@ -12,17 +12,14 @@
 
             scope.changeContentPageNumber = changeContentPageNumber;
             scope.contentOptions = {};
-            scope.contentOptions.pageSize = 1;
             scope.hasContentReferences = false;
 
             scope.changeMediaPageNumber = changeMediaPageNumber;
             scope.mediaOptions = {};
-            scope.mediaOptions.pageSize = 1;
             scope.hasMediaReferences = false;
 
             scope.changeMemberPageNumber = changeMemberPageNumber;
             scope.memberOptions = {};
-            scope.memberOptions.pageSize = 1;
             scope.hasMemberReferences = false;
 
 
