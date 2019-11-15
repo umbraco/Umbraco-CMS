@@ -606,10 +606,12 @@ When building a custom infinite editor view you can use the same components as a
          * @methodOf umbraco.services.editorService
          *
          * @description
-         * Opens the document type editor in infinite editing, the submit callback returns the saved document type
+         * Opens the document type editor in infinite editing, the submit callback returns the alias of the saved document type.
          * @param {Object} editor rendering options
-         * @param {Callback} editor.submit Submits the editor
-         * @param {Callback} editor.close Closes the editor
+         * @param {Callback} editor.id Indicates the ID of the document type to be edited. Alternatively the ID may be set to `-1` in combination with `create` being set to `true` to open the document type editor for creating a new document type.
+         * @param {Callback} editor.create Set to `true` to open the document type editor for creating a new document type.
+         * @param {Callback} editor.submit Submits the editor.
+         * @param {Callback} editor.close Closes the editor.
          * @returns {Object} editor object
          */
         function documentTypeEditor(editor) {
