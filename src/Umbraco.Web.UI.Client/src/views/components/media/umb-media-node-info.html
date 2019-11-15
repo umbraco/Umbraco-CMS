@@ -29,7 +29,7 @@
         </umb-box>
 
         <!-- Media Tracking (NO Items) -->
-        <umb-box ng-if="loading === false && hasReferences === false">
+        <umb-box ng-if="(hasContentReferences === false) && (hasMediaReferences === false) && (hasMemberReferences === false) && loading === false">
             <umb-box-header title-key="references_tabName"></umb-box-header>
             <umb-box-content>
                 <umb-empty-state size="small">
@@ -39,10 +39,9 @@
         </umb-box>
 
         <!-- Media Tracking (With Items) -->
-        <div ng-if="loading === false && hasReferences === true">
-
+        <div ng-if="loading === false">
             <!-- Content -->
-            <div ng-if="references.content.length > 0">
+            <div ng-if="contentReferences.items.length > 0">
 
                 <h5 class="mt4" style="margin-bottom: 20px;">
                     <localize key="references_labelUsedByDocuments">Used in Documents</localize>
@@ -58,7 +57,7 @@
                         </div>
                     </div>
                     <div class="umb-table-body">
-                        <div class="umb-table-row" ng-repeat="reference in references.content">
+                        <div class="umb-table-row" ng-repeat="reference in contentReferences.items">
                             <div class="umb-table-cell"><i class="umb-table-body__icon {{reference.icon}}"></i></div>
                             <div class="umb-table-cell umb-table__name"><span>{{::reference.name}}</span></div>
                             <div class="umb-table-cell"><span title="{{::reference.alias}}">{{::reference.alias}}</span></div>
@@ -66,10 +65,19 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Pagination -->
+                <div class="flex justify-center">
+                    <umb-pagination ng-if="contentReferences.totalPages"
+                                    page-number="contentReferences.pageNumber"
+                                    total-pages="contentReferences.totalPages"
+                                    on-change="changeContentPageNumber(pageNumber)">
+                    </umb-pagination>
+                </div>
             </div>
 
             <!-- Members -->
-            <div ng-if="references.members.length > 0">
+            <div ng-if="memberReferences.items.length > 0">
 
                 <h5 class="mt4" style="margin-bottom: 20px;">
                     <localize key="references_labelUsedByMembers">Used in Members</localize>
@@ -85,7 +93,7 @@
                         </div>
                     </div>
                     <div class="umb-table-body">
-                        <div class="umb-table-row" ng-repeat="reference in references.members">
+                        <div class="umb-table-row" ng-repeat="reference in memberReferences.items">
                             <div class="umb-table-cell"><i class="umb-table-body__icon {{reference.icon}}"></i></div>
                             <div class="umb-table-cell umb-table__name"><span>{{::reference.name}}</span></div>
                             <div class="umb-table-cell"><span title="{{::reference.alias}}">{{::reference.alias}}</span></div>
@@ -93,10 +101,19 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Pagination -->
+                <div class="flex justify-center">
+                    <umb-pagination ng-if="memberReferences.totalPages"
+                                    page-number="memberReferences.pageNumber"
+                                    total-pages="memberReferences.totalPages"
+                                    on-change="changeMemberPageNumber(pageNumber)">
+                    </umb-pagination>
+                </div>
             </div>
 
             <!-- Media -->
-            <div ng-if="references.media.length > 0">
+            <div ng-if="mediaReferences.items.length > 0">
 
                 <h5 class="mt4" style="margin-bottom: 20px;">
                     <localize key="references_labelUsedByMedia">Used in Media</localize>
@@ -112,13 +129,22 @@
                         </div>
                     </div>
                     <div class="umb-table-body">
-                        <div class="umb-table-row" ng-repeat="reference in references.media">
+                        <div class="umb-table-row" ng-repeat="reference in mediaReferences.items">
                             <div class="umb-table-cell"><i class="umb-table-body__icon {{reference.icon}}"></i></div>
                             <div class="umb-table-cell umb-table__name"><span>{{::reference.name}}</span></div>
                             <div class="umb-table-cell"><span title="{{::reference.alias}}">{{::reference.alias}}</span></div>
                             <div class="umb-table-cell umb-table-cell--nano"><a href="#/media/media/edit/{{::reference.id}}"><localize key="general_open">Open</localize></a></div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="flex justify-center">
+                    <umb-pagination ng-if="mediaReferences.totalPages"
+                                    page-number="mediaReferences.pageNumber"
+                                    total-pages="mediaReferences.totalPages"
+                                    on-change="changeMediaPageNumber(pageNumber)">
+                    </umb-pagination>
                 </div>
             </div>
 
