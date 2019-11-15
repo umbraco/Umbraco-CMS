@@ -183,6 +183,14 @@ namespace Umbraco.Web.Models.Mapping
                 target.Name = source.Values.ContainsKey($"nodeName_{culture}") ? source.Values[$"nodeName_{culture}"] : target.Name;
             }
 
+            if (source.Values.TryGetValue(UmbracoExamineIndex.UmbracoFileFieldName, out var umbracoFile))
+            {
+                if (umbracoFile != null)
+                {
+                    target.Name = $"{target.Name} ({umbracoFile})";
+                }
+            }
+
             if (source.Values.ContainsKey(UmbracoExamineIndex.NodeKeyFieldName))
             {
                 if (Guid.TryParse(source.Values[UmbracoExamineIndex.NodeKeyFieldName], out var key))
