@@ -708,6 +708,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
 
         var validate = function () {
             $scope.nestedContentForm.minCount.$setValidity("minCount", $scope.nodes.length >= $scope.minItems);
+            $scope.nestedContentForm.maxCount.$setValidity("maxCount", $scope.nodes.length <= $scope.maxItems);
         }
 
         $scope.$watch("currentNode", function (newVal) {
@@ -732,20 +733,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 return $scope.nodes.length;
             },
             function () {
-                //Validate!
-                if ($scope.nodes.length < $scope.minItems) {
-                    $scope.nestedContentForm.minCount.$setValidity("minCount", false);
-                }
-                else {
-                    $scope.nestedContentForm.minCount.$setValidity("minCount", true);
-                }
-
-                if ($scope.nodes.length > $scope.maxItems) {
-                    $scope.nestedContentForm.maxCount.$setValidity("maxCount", false);
-                }
-                else {
-                    $scope.nestedContentForm.maxCount.$setValidity("maxCount", true);
-                }
+                validate();
             }
         );
 
