@@ -735,7 +735,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                 //get all macro divs and load their content
                 $(editor.dom.select(".umb-macro-holder.mceNonEditable")).each(function () {
-                    self.loadMacroContent($(this), null);
+                    self.loadMacroContent($(this), null, editor);
                 });
 
             });
@@ -850,14 +850,15 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             }
 
             var $macroDiv = $(editor.dom.select("div.umb-macro-holder." + uniqueId));
+            editor.setDirty(true);
 
             //async load the macro content
-            this.loadMacroContent($macroDiv, macroObject);
+            this.loadMacroContent($macroDiv, macroObject, editor);
 
         },
 
         /** loads in the macro content async from the server */
-        loadMacroContent: function ($macroDiv, macroData) {
+        loadMacroContent: function ($macroDiv, macroData, editor) {
 
             //if we don't have the macroData, then we'll need to parse it from the macro div
             if (!macroData) {
@@ -893,7 +894,11 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         $macroDiv.removeClass("loading");
                         htmlResult = htmlResult.trim();
                         if (htmlResult !== "") {
+                            var wasDirty = editor.isDirty();
                             $ins.html(htmlResult);
+                            if (!wasDirty) {
+                                editor.undoManager.clear();
+                            }
                         }
                     });
             });
@@ -1489,6 +1494,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     onlyImages: true,
                     showDetails: true,
                     disableFolderSelect: true,
+                    disableFocalPoint: true,
                     startNodeId: startNodeId,
                     startNodeIsVirtual: startNodeIsVirtual,
                     dataTypeKey: args.model.dataTypeKey,
