@@ -3083,7 +3083,7 @@ namespace Umbraco.Core.Services.Implement
             var version = GetVersion(versionId);
 
             //Good ole null checks
-            if (content == null || version == null)
+            if (content == null || version == null || content.Trashed)
             {
                 return new OperationResult(OperationResultType.FailedCannot, evtMsgs);
             }

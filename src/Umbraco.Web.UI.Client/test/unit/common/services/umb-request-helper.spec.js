@@ -1,6 +1,7 @@
 describe('umbRequestHelper tests', function () {
     var umbRequestHelper;
 
+    beforeEach(module('umbraco'));
     beforeEach(module('umbraco.services'));
 
     beforeEach(inject(function ($injector) {

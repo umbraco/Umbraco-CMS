@@ -95,7 +95,7 @@
                                    </div>
 
                                     <div class="cell-tools-remove row-tool">
-                                        <i class="icon-trash" ng-click="togglePrompt(row)"></i>
+                                        <i class="icon-trash" ng-click="togglePrompt(row)" localize="title" title="@delete"></i>
                                         <umb-confirm-action
                                             ng-if="row.deletePrompt"
                                             direction="left"
@@ -182,7 +182,7 @@
                                                               <div class="umb-control-click-overlay" ng-show="control !== active && !sortMode"></div>
 
                                                               <div class="umb-control-collapsed umb-control-handle" ng-show="sortMode">
-                                                                  {{control.editor.name}}
+                                                                  {{ getTemplateName(control) }}
                                                               </div>
 
                                                               <div class="umb-control-inner" ng-hide="sortMode">
@@ -190,7 +190,7 @@
                                                                   <div class="umb-control-bar umb-control-handle">
 
                                                                       <div class="umb-control-title" ng-if="control === active">
-                                                                          {{control.editor.name}}
+                                                                          {{ getTemplateName(control) }}
                                                                       </div>
 
                                                                       <div class="umb-tools" ng-if="control === active">
@@ -200,7 +200,7 @@
                                                                           </div>
 
                                                                           <div class="umb-control-tool">
-                                                                              <i class="umb-control-tool-icon icon-trash" ng-click="togglePrompt(control)"></i>
+                                                                              <i class="umb-control-tool-icon icon-trash" ng-click="togglePrompt(control)" localize="title" title="@delete"></i>
                                                                               <umb-confirm-action ng-if="control.deletePrompt"
                                                                                                   direction="left"
                                                                                                   on-confirm="removeControl(area, $index)"
