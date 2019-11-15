@@ -16,6 +16,7 @@ function RelationTypeCreateController($scope, $location, relationTypeResource, n
     init();
 
     function init() {
+        $scope.$emit("$changeTitle", "");
         relationTypeResource.getRelationObjectTypes().then(function(data) {
                 vm.objectTypes = data;
             },
