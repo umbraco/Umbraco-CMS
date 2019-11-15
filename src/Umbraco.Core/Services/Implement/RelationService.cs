@@ -274,20 +274,20 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int id, long pageIndex, int pageSize, out long totalChildren)
+        public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _relationRepository.GetPagedParentEntitiesByChildId(id, pageIndex, pageSize, out totalChildren);
+                return _relationRepository.GetPagedParentEntitiesByChildId(id, pageIndex, pageSize, out totalChildren, entityTypes.Select(x => x.GetGuid()).ToArray());
             }
         }
 
         /// <inheritdoc />
-        public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int id, long pageIndex, int pageSize, out long totalChildren)
+        public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _relationRepository.GetPagedChildEntitiesByParentId(id, pageIndex, pageSize, out totalChildren);
+                return _relationRepository.GetPagedChildEntitiesByParentId(id, pageIndex, pageSize, out totalChildren, entityTypes.Select(x => x.GetGuid()).ToArray());
             }
         }
 

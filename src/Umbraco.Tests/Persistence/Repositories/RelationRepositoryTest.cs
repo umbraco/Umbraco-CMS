@@ -198,6 +198,16 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(10, contentEntities.Count);
                 Assert.AreEqual(0, mediaEntities.Count);
                 Assert.AreEqual(10, memberEntities.Count);
+
+                //only of a certain type
+                parents.AddRange(repository.GetPagedParentEntitiesByChildId(createdMedia[0].Id, 0, 100, out totalRecords, UmbracoObjectTypes.Document.GetGuid()));
+                Assert.AreEqual(10, totalRecords);
+
+                parents.AddRange(repository.GetPagedParentEntitiesByChildId(createdMedia[0].Id, 0, 100, out totalRecords, UmbracoObjectTypes.Member.GetGuid()));
+                Assert.AreEqual(10, totalRecords);
+
+                parents.AddRange(repository.GetPagedParentEntitiesByChildId(createdMedia[0].Id, 0, 100, out totalRecords, UmbracoObjectTypes.Media.GetGuid()));
+                Assert.AreEqual(0, totalRecords);
             }
         }
 
@@ -256,6 +266,16 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(0, contentEntities.Count);
                 Assert.AreEqual(10, mediaEntities.Count);
                 Assert.AreEqual(0, memberEntities.Count);
+
+                //only of a certain type
+                parents.AddRange(repository.GetPagedChildEntitiesByParentId(createdContent[0].Id, 0, 100, out totalRecords, UmbracoObjectTypes.Media.GetGuid()));
+                Assert.AreEqual(10, totalRecords);
+
+                parents.AddRange(repository.GetPagedChildEntitiesByParentId(createdMembers[0].Id, 0, 100, out totalRecords, UmbracoObjectTypes.Media.GetGuid()));
+                Assert.AreEqual(10, totalRecords);
+
+                parents.AddRange(repository.GetPagedChildEntitiesByParentId(createdContent[0].Id, 0, 100, out totalRecords, UmbracoObjectTypes.Member.GetGuid()));
+                Assert.AreEqual(0, totalRecords);
             }
         }
 

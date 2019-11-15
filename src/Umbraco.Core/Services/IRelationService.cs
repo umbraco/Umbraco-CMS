@@ -207,7 +207,7 @@ namespace Umbraco.Core.Services
         /// <param name="pageSize"></param>
         /// <param name="totalChildren"></param>
         /// <returns></returns>
-        IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int id, long pageIndex, int pageSize, out long totalChildren);
+        IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes);
 
         /// <summary>
         /// Returns paged child entities for a related parent id
@@ -217,7 +217,7 @@ namespace Umbraco.Core.Services
         /// <param name="pageSize"></param>
         /// <param name="totalChildren"></param>
         /// <returns></returns>
-        IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int id, long pageIndex, int pageSize, out long totalChildren);
+        IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes);
 
         /// <summary>
         /// Gets the Parent and Child objects from a list of Relations as a list of <see cref="IUmbracoEntity"/> objects.
