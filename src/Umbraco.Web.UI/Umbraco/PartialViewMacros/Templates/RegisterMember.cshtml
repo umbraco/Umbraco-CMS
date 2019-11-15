@@ -33,7 +33,7 @@
 
     Html.EnableClientValidation();
     Html.EnableUnobtrusiveJavaScript();
-    Html.RequiresJs("https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js");
+    Html.RequiresJs("https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js");
     Html.RequiresJs("https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js");
     Html.RequiresJs("https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js");
 
@@ -85,7 +85,7 @@ else
                         easily change it. For example, if you wanted to render a custom editor for this field called "MyEditor" you would
                         create a file at ~/Views/Shared/EditorTemplates/MyEditor.cshtml", then you will change the next line of code to
                         render your specific editor template like:
-                        @Html.EditorFor(m => profileModel.MemberProperties[i].Value, "MyEditor")
+                        @Html.EditorFor(m => registerModel.MemberProperties[i].Value, "MyEditor")
                     *@
                     @Html.EditorFor(m => registerModel.MemberProperties[i].Value)
                     @Html.HiddenFor(m => registerModel.MemberProperties[i].Alias)
