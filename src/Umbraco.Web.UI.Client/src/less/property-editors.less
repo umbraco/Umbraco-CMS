@@ -415,8 +415,6 @@
     text-decoration: none;
     display: flex;
     flex-direction: row;
-    opacity: 0;
-    visibility: hidden;
 }
 
 .umb-sortable-thumbnails.ui-sortable:not(.ui-sortable-disabled) {
@@ -425,9 +423,8 @@
     }
 }
 
-.umb-sortable-thumbnails li:hover .umb-sortable-thumbnails__actions  {
+.umb-sortable-thumbnails li:hover .umb-sortable-thumbnails__action  {
     opacity: 1;
-    visibility: visible;
 }
 
 .umb-sortable-thumbnails .umb-sortable-thumbnails__action {
@@ -443,6 +440,12 @@
     margin-left: 5px;
     text-decoration: none;
     .box-shadow(0 1px 2px rgba(0,0,0,0.25));
+    opacity: 0;
+    transition: opacity .1s ease-in-out;
+
+    .tabbing-active &:focus {
+        opacity: 1;
+    }
 }
 
 .umb-sortable-thumbnails .umb-sortable-thumbnails__action.-red {

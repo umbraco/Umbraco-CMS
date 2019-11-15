@@ -160,6 +160,8 @@ input.umb-table__input {
     font-size: 20px;
     line-height: 20px;
     color: @ui-option-type;
+    vertical-align: bottom;
+    text-decoration: none;
 }
 
 .umb-table-body__checkicon,
@@ -245,7 +247,7 @@ input.umb-table__input {
 .umb-table-cell {
     display: flex;
     flex-flow: row nowrap;
-    flex: 1 1 1%; //NOTE 1% is a Internet Explore hack, so that cells don't collapse
+    flex: 1 1 5%;
     position: relative;
     margin: auto 14px;
     padding: 6px 2px;
@@ -258,6 +260,11 @@ input.umb-table__input {
     white-space: nowrap; //NOTE Disable/Enable this to keep textstring on one line
     text-overflow: ellipsis;
 }
+.umb-table-cell.--noOverflow > * {
+    overflow: visible;
+    white-space: normal;
+    text-overflow: unset;
+}
 
 .umb-table-cell:first-of-type:not(.not-fixed) {
     flex: 0 0 25px;
@@ -269,6 +276,9 @@ input.umb-table__input {
     flex: 0 0 auto !important;
 }
 
+.umb-table-cell--nano {
+    flex: 0 0 50px;
+}
 .umb-table-cell--small {
     flex: .5 .5 1%;
     max-width: 12.5%;
@@ -285,8 +295,8 @@ input.umb-table__input {
 
 // Increases the space for the name cell
 .umb-table__name {
-    flex: 1 1 25%;
-    max-width: 25%;
+    flex: 1 1 20%;
+    max-width: 300px;
 }
 
 .umb-table__loading-overlay {

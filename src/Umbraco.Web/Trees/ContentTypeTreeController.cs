@@ -62,8 +62,10 @@ namespace Umbraco.Web.Trees
             //if the request is for folders only then just return
             if (queryStrings["foldersonly"].IsNullOrWhiteSpace() == false && queryStrings["foldersonly"] == "1") return nodes;
 
+            var children = Services.EntityService.GetChildren(intId.Result, UmbracoObjectTypes.DocumentType).ToArray();
+            var contentTypes = Services.ContentTypeService.GetAll(children.Select(c => c.Id).ToArray()).ToDictionary(c => c.Id);
             nodes.AddRange(
-                Services.EntityService.GetChildren(intId.Result, UmbracoObjectTypes.DocumentType)
+                children
                     .OrderBy(entity => entity.Name)
                     .Select(dt =>
                     {
@@ -73,6 +75,12 @@ namespace Umbraco.Web.Trees
                         var node = CreateTreeNode(dt, Constants.ObjectTypes.DocumentType, id, queryStrings, Constants.Icons.ContentType, hasChildren);
 
                         node.Path = dt.Path;
+
+                        // enrich the result with content type data that's not available in the entity service output
+                        var contentType = contentTypes[dt.Id];
+                        node.Alias = contentType.Alias;
+                        node.AdditionalData["isElement"] = contentType.IsElement;
+
                         return node;
                     }));
 
