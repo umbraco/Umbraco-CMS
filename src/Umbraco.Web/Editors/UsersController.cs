@@ -466,10 +466,10 @@ namespace Umbraco.Web.Editors
 
             var emailSubject = Services.TextService.Localize("user/inviteEmailCopySubject",
                 //Ensure the culture of the found user is used for the email!
-                UserExtensions.GetUserCulture(to.Language, Services.TextService, GlobalSettings));
+                UmbracoUserExtensions.GetUserCulture(to.Language, Services.TextService, GlobalSettings));
             var emailBody = Services.TextService.Localize("user/inviteEmailCopyFormat",
                 //Ensure the culture of the found user is used for the email!
-                UserExtensions.GetUserCulture(to.Language, Services.TextService, GlobalSettings),
+                UmbracoUserExtensions.GetUserCulture(to.Language, Services.TextService, GlobalSettings),
                 new[] { userDisplay.Name, from, message, inviteUri.ToString(), fromEmail });
 
             await UserManager.EmailService.SendAsync(

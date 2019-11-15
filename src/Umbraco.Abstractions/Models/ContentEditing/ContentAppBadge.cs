@@ -1,9 +1,7 @@
-﻿namespace Umbraco.Core.Models.ContentEditing
+﻿using System.Runtime.Serialization;
+
+namespace Umbraco.Core.Models.ContentEditing
 {
-    using System.Runtime.Serialization;
-
-    using Umbraco.Core.Events;
-
     /// <summary>
     /// Represents a content app badge
     /// </summary>

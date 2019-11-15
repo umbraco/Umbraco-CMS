@@ -12,11 +12,9 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class PropertyCollection : KeyedCollection<string, IProperty>, INotifyCollectionChanged, IDeepCloneable, IPropertyCollection
+    public class PropertyCollection : KeyedCollection<string, IProperty>, IPropertyCollection
     {
         private readonly object _addLocker = new object();
-
-        internal Func<Property, bool> AdditionValidator { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyCollection"/> class.
@@ -24,16 +22,6 @@ namespace Umbraco.Core.Models
         internal PropertyCollection()
             : base(StringComparer.InvariantCultureIgnoreCase)
         { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PropertyCollection"/> class.
-        /// </summary>
-        /// <param name="additionValidator">A function validating added properties.</param>
-        internal PropertyCollection(Func<Property, bool> additionValidator)
-            : this()
-        {
-            AdditionValidator = additionValidator;
-        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyCollection"/> class.
@@ -47,7 +35,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Replaces all properties, whilst maintaining validation delegates.
         /// </summary>
-        internal void Reset(IEnumerable<Property> properties)
+        private void Reset(IEnumerable<Property> properties)
         {
             //collection events will be raised in each of these calls
             Clear();
@@ -95,9 +83,7 @@ namespace Umbraco.Core.Models
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
-        /// <summary>
-        /// Adds or updates a property.
-        /// </summary>
+        /// <inheritdoc />
         public new void Add(IProperty property)
         {
             lock (_addLocker) // TODO: why are we locking here and not everywhere else?!
@@ -131,7 +117,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets the index for a specified property alias.
         /// </summary>
-        public int IndexOfKey(string key)
+        private int IndexOfKey(string key)
         {
             for (var i = 0; i < Count; i++)
             {
@@ -173,9 +159,8 @@ namespace Umbraco.Core.Models
             CollectionChanged?.Invoke(this, args);
         }
 
-        /// <summary>
-        /// Ensures that the collection contains properties for the specified property types.
-        /// </summary>
+
+        /// <inheritdoc />
         public void EnsurePropertyTypes(IEnumerable<IPropertyType> propertyTypes)
         {
             if (propertyTypes == null)
@@ -185,9 +170,8 @@ namespace Umbraco.Core.Models
                 Add(new Property(propertyType));
         }
 
-        /// <summary>
-        /// Ensures that the collection does not contain properties not in the specified property types.
-        /// </summary>
+
+        /// <inheritdoc />
         public void EnsureCleanPropertyTypes(IEnumerable<IPropertyType> propertyTypes)
         {
             if (propertyTypes == null)

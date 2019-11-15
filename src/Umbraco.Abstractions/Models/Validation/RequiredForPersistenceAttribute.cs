@@ -19,7 +19,7 @@ namespace Umbraco.Core.Models.Validation
         /// <summary>
         /// Determines whether an object has all required values for persistence.
         /// </summary>
-        internal static bool HasRequiredValuesForPersistence(object model)
+        public static bool HasRequiredValuesForPersistence(object model)
         {
             return model.GetType().GetProperties().All(x =>
             {

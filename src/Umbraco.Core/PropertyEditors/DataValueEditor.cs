@@ -20,9 +20,8 @@ namespace Umbraco.Core.PropertyEditors
     /// </summary>
     public class DataValueEditor : IDataValueEditor
     {
-        protected readonly IDataTypeService _dataTypeService;
-        protected readonly ILocalizationService _localizationService;
-        private string _view;
+        protected IDataTypeService DataTypeService { get; }
+        protected ILocalizationService LocalizationService { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataValueEditor"/> class.
@@ -31,8 +30,8 @@ namespace Umbraco.Core.PropertyEditors
         {
             ValueType = ValueTypes.String;
             Validators = new List<IValueValidator>();
-            _dataTypeService = dataTypeService;
-            _localizationService = localizationService;
+            DataTypeService = dataTypeService;
+            LocalizationService = localizationService;
         }
 
         /// <summary>
@@ -50,8 +49,8 @@ namespace Umbraco.Core.PropertyEditors
             ValueType = attribute.ValueType;
             HideLabel = attribute.HideLabel;
 
-            _dataTypeService = dataTypeService;
-            _localizationService = localizationService;
+            DataTypeService = dataTypeService;
+            LocalizationService = localizationService;
         }
 
         /// <summary>
@@ -111,12 +110,12 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Gets the validator used to validate the special property type -level "required".
         /// </summary>
-        public virtual IValueRequiredValidator RequiredValidator => new RequiredValidator();
+        public virtual IValueRequiredValidator RequiredValidator => new RequiredValidator(); //TODO: Pass in the ILocalizedTextService here and not rely on Current!
 
         /// <summary>
         /// Gets the validator used to validate the special property type -level "format".
         /// </summary>
-        public virtual IValueFormatValidator FormatValidator => new RegexValidator();
+        public virtual IValueFormatValidator FormatValidator => new RegexValidator(); //TODO: Pass in the ILocalizedTextService here and not rely on Current!
 
         /// <summary>
         /// If this is true than the editor will be displayed full width without a label

@@ -7,7 +7,7 @@ namespace Umbraco.Core.Models.PublishedContent
     /// Provides a base class for <c>IPublishedProperty</c> implementations which converts and caches
     /// the value source to the actual value to use when rendering content.
     /// </summary>
-    internal abstract class PublishedPropertyBase : IPublishedProperty
+    public abstract class PublishedPropertyBase : IPublishedProperty
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedPropertyBase"/> class.

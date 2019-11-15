@@ -6,6 +6,8 @@
     /// </summary>
     public enum MembershipScenario
     {
+        //TODO: This will become obsolete when we get asp.net identity members in place
+
         /// <summary>
         /// The member is based on the native Umbraco members (IMember + Umbraco membership provider)
         /// </summary>

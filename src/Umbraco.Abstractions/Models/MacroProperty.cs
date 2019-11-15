@@ -41,7 +41,7 @@ namespace Umbraco.Core.Models
         /// <param name="name"></param>
         /// <param name="sortOrder"></param>
         /// <param name="editorAlias"></param>
-        internal MacroProperty(int id, Guid key, string @alias, string name, int sortOrder, string editorAlias)
+        public MacroProperty(int id, Guid key, string @alias, string name, int sortOrder, string editorAlias)
         {
             _id = id;
             _alias = alias;

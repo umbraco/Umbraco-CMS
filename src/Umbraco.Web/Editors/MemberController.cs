@@ -57,7 +57,7 @@ namespace Umbraco.Web.Editors
         /// <value></value>
         protected MembershipScenario MembershipScenario
         {
-            get { return Services.MemberService.GetMembershipScenario(); }
+            get { return Services.MemberTypeService.GetMembershipScenario(); }
         }
 
         public PagedResult<MemberBasic> GetPagedResults(

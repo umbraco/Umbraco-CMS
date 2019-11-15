@@ -11,7 +11,7 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class DictionaryTranslation : EntityBase, IDictionaryTranslation
     {
-        internal Func<int, ILanguage> GetLanguage { get; set; }
+        public Func<int, ILanguage> GetLanguage { get; set; }
 
         private ILanguage _language;
         private string _value;
@@ -35,13 +35,13 @@ namespace Umbraco.Core.Models
             Key = uniqueId;
         }
 
-        internal DictionaryTranslation(int languageId, string value)
+        public DictionaryTranslation(int languageId, string value)
         {
             _languageId = languageId;
             _value = value;
         }
 
-        internal DictionaryTranslation(int languageId, string value, Guid uniqueId)
+        public DictionaryTranslation(int languageId, string value, Guid uniqueId)
         {
             _languageId = languageId;
             _value = value;
