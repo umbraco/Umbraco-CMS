@@ -8,7 +8,7 @@ namespace Umbraco.Core.Exceptions
     /// </summary>
     /// <seealso cref="System.Exception" />
     [Serializable]
-    internal class PanicException : Exception
+    public class PanicException : Exception
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PanicException" /> class.

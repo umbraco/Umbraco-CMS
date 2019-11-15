@@ -8,7 +8,7 @@ namespace Umbraco.Web.Media.Exif
     /// </summary>
     /// <seealso cref="System.Exception" />
     [Serializable]
-    internal class NotValidExifFileException : Exception
+    public class NotValidExifFileException : Exception
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NotValidExifFileException" /> class.

@@ -50,7 +50,7 @@ namespace Umbraco.Web.Media.Exif
     /// </summary>
     /// <seealso cref="System.Exception" />
     [Serializable]
-    internal class NotValidJPEGFileException : Exception
+    public class NotValidJPEGFileException : Exception
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NotValidJPEGFileException" /> class.
@@ -91,7 +91,7 @@ namespace Umbraco.Web.Media.Exif
     /// </summary>
     /// <seealso cref="System.Exception" />
     [Serializable]
-    internal class NotValidTIFFileException : Exception
+    public class NotValidTIFFileException : Exception
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NotValidTIFFileException" /> class.
@@ -173,7 +173,7 @@ namespace Umbraco.Web.Media.Exif
     /// </summary>
     /// <seealso cref="System.Exception" />
     [Serializable]
-    internal class SectionExceeds64KBException : Exception
+    public class SectionExceeds64KBException : Exception
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="SectionExceeds64KBException" /> class.

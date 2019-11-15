@@ -8,7 +8,7 @@ namespace Umbraco.Web.Install
     /// </summary>
     /// <seealso cref="System.Exception" />
     [Serializable]
-    internal class InstallException : Exception
+    public class InstallException : Exception
     {
         /// <summary>
         /// Gets the view.
