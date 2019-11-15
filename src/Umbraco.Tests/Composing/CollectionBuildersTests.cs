@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Composing
         {
             Current.Reset();
 
-            var register = RegisterFactory.Create();
+            var register = TestHelper.GetRegister();
             _composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs());
         }
 

@@ -23,7 +23,7 @@ namespace Umbraco.Tests.PropertyEditors
             //normalize culture
             Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture;
 
-            var register = RegisterFactory.Create();
+            var register = TestHelper.GetRegister();
             var composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs());
 
             register.Register<IShortStringHelper>(_

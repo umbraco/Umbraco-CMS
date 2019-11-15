@@ -30,7 +30,7 @@ namespace Umbraco.Tests.Composing
 
         private IRegister CreateRegister()
         {
-            return RegisterFactory.Create();
+            return TestHelper.GetRegister();
         }
 
         // note

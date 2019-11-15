@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Web;
 using System.Web.Hosting;
-using Semver;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
@@ -30,10 +28,31 @@ namespace Umbraco.Core.Runtime
         private IFactory _factory;
         private RuntimeState _state;
 
+
+        public CoreRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger)
+        {
+            IOHelper = ioHelper;
+            Configs = configs;
+            UmbracoVersion = umbracoVersion ;
+
+            Logger = logger;
+            // runtime state
+            // beware! must use '() => _factory.GetInstance<T>()' and NOT '_factory.GetInstance<T>'
+            // as the second one captures the current value (null) and therefore fails
+           _state = new RuntimeState(Logger,
+                Configs.Settings(), Configs.Global(),
+                new Lazy<IMainDom>(() => _factory.GetInstance<IMainDom>()),
+                new Lazy<IServerRegistrar>(() => _factory.GetInstance<IServerRegistrar>()),
+                UmbracoVersion)
+            {
+                Level = RuntimeLevel.Boot
+            };
+        }
+
         /// <summary>
         /// Gets the logger.
         /// </summary>
-        protected ILogger Logger { get; private set; }
+        protected ILogger Logger { get; set; }
 
         /// <summary>
         /// Gets the profiler.
@@ -53,7 +72,10 @@ namespace Umbraco.Core.Runtime
         /// <summary>
         /// Gets the <see cref="IIOHelper"/>
         /// </summary>
-        protected IIOHelper IOHelper { get; private set; }
+        protected IIOHelper IOHelper { get; }
+        protected Configs Configs { get; set; }
+        protected IUmbracoVersion UmbracoVersion { get; }
+
         /// <inheritdoc />
         public IRuntimeState State => _state;
 
@@ -64,18 +86,11 @@ namespace Umbraco.Core.Runtime
             // ie the bare minimum required to boot
 
             // loggers
-            var logger = Logger = GetLogger();
-            if (logger == null)
-                throw new InvalidOperationException($"The object returned from {nameof(GetLogger)} cannot be null");
             var profiler = Profiler = GetProfiler();
             if (profiler == null)
                 throw new InvalidOperationException($"The object returned from {nameof(GetProfiler)} cannot be null");
 
-            var profilingLogger = ProfilingLogger = new ProfilingLogger(logger, profiler);
-
-            IOHelper = GetIOHelper();
-            if (IOHelper == null)
-                throw new InvalidOperationException($"The object returned from {nameof(GetIOHelper)} cannot be null");
+            var profilingLogger = ProfilingLogger = new ProfilingLogger(Logger, profiler);
 
             TypeFinder = GetTypeFinder();
             if (TypeFinder == null)
@@ -96,12 +111,12 @@ namespace Umbraco.Core.Runtime
                 "Booted.",
                 "Boot failed."))
             {
-                logger.Info<CoreRuntime>("Booting site '{HostingSiteName}', app '{HostingApplicationID}', path '{HostingPhysicalPath}', server '{MachineName}'.",
+                Logger.Info<CoreRuntime>("Booting site '{HostingSiteName}', app '{HostingApplicationID}', path '{HostingPhysicalPath}', server '{MachineName}'.",
                     HostingEnvironment.SiteName,
                     HostingEnvironment.ApplicationID,
                     HostingEnvironment.ApplicationPhysicalPath,
                     NetworkHelper.MachineName);
-                logger.Debug<CoreRuntime>("Runtime: {Runtime}", GetType().FullName);
+                Logger.Debug<CoreRuntime>("Runtime: {Runtime}", GetType().FullName);
 
                 // application environment
                 ConfigureUnhandledException();
@@ -134,31 +149,15 @@ namespace Umbraco.Core.Runtime
                 // database factory
                 var databaseFactory = GetDatabaseFactory();
 
-                // configs
-                var configs = GetConfigs();
-
-                var umbracoVersion = GetUmbracoVersion(configs.Global());
                 // type finder/loader
-                var typeLoader = new TypeLoader(IOHelper, TypeFinder, appCaches.RuntimeCache, new DirectoryInfo(configs.Global().LocalTempPath), ProfilingLogger);
-
-                // runtime state
-                // beware! must use '() => _factory.GetInstance<T>()' and NOT '_factory.GetInstance<T>'
-                // as the second one captures the current value (null) and therefore fails
-                _state = new RuntimeState(Logger,
-                    configs.Settings(), configs.Global(),
-                    new Lazy<IMainDom>(() => _factory.GetInstance<IMainDom>()),
-                    new Lazy<IServerRegistrar>(() => _factory.GetInstance<IServerRegistrar>()),
-                    umbracoVersion)
-                {
-                    Level = RuntimeLevel.Boot
-                };
+                var typeLoader = new TypeLoader(IOHelper, TypeFinder, appCaches.RuntimeCache, new DirectoryInfo(Configs.Global().LocalTempPath(IOHelper)), ProfilingLogger);
 
                 // main dom
                 var mainDom = new MainDom(Logger);
 
                 // create the composition
-                composition = new Composition(register, typeLoader, ProfilingLogger, _state, configs);
-                composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, mainDom, appCaches, databaseFactory, typeLoader, _state, TypeFinder, IOHelper, umbracoVersion);
+                composition = new Composition(register, typeLoader, ProfilingLogger, _state, Configs);
+                composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, mainDom, appCaches, databaseFactory, typeLoader, _state, TypeFinder, IOHelper, UmbracoVersion);
 
                 // run handlers
                 RuntimeOptions.DoRuntimeEssentials(composition, appCaches, typeLoader, databaseFactory);
@@ -334,12 +333,6 @@ namespace Umbraco.Core.Runtime
             => typeLoader.GetTypes<IComposer>();
 
         /// <summary>
-        /// Gets a logger.
-        /// </summary>
-        protected virtual ILogger GetLogger()
-            => SerilogLogger.CreateWithDefaultConfiguration();
-
-        /// <summary>
         /// Gets a profiler.
         /// </summary>
         protected virtual IProfiler GetProfiler()
@@ -352,12 +345,6 @@ namespace Umbraco.Core.Runtime
         protected virtual ITypeFinder GetTypeFinder()
             => new TypeFinder(Logger);
 
-        /// <summary>
-        /// Gets a <see cref="IIOHelper"/>
-        /// </summary>
-        /// <returns></returns>
-        protected virtual IIOHelper GetIOHelper()
-            => Umbraco.Core.IO.IOHelper.Default;
 
         /// <summary>
         /// Gets the application caches.
@@ -384,17 +371,8 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         /// <remarks>This is strictly internal, for tests only.</remarks>
         protected internal virtual IUmbracoDatabaseFactory GetDatabaseFactory()
-            => new UmbracoDatabaseFactory(Logger, new Lazy<IMapperCollection>(() => _factory.GetInstance<IMapperCollection>()));
+            => new UmbracoDatabaseFactory(Logger, new Lazy<IMapperCollection>(() => _factory.GetInstance<IMapperCollection>()), Configs);
 
-        /// <summary>
-        /// Gets the configurations.
-        /// </summary>
-        protected virtual Configs GetConfigs()
-        {
-            var configs = new ConfigsFactory(IOHelper).Create();
-
-            return configs;
-        }
 
         #endregion
     }

@@ -69,7 +69,7 @@ namespace Umbraco.Tests.PropertyEditors
         {
             try
             {
-                var container = RegisterFactory.Create();
+                var container = TestHelper.GetRegister();
                 var composition = new Composition(container, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs());
 
                 composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>();

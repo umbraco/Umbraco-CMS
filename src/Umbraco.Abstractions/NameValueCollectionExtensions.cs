@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Umbraco.Core
 {
-    internal static class NameValueCollectionExtensions
+    public static class NameValueCollectionExtensions
     {
         public static IEnumerable<KeyValuePair<string, string>> AsEnumerable(this NameValueCollection nvc)
         {

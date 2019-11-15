@@ -19,6 +19,9 @@ namespace Umbraco.Core
         public static IGlobalSettings Global(this Configs configs)
             => configs.GetConfig<IGlobalSettings>();
 
+        public static IConnectionStrings ConnectionStrings(this Configs configs)
+            => configs.GetConfig<IConnectionStrings>();
+
         public static IUmbracoSettingsSection Settings(this Configs configs)
             => configs.GetConfig<IUmbracoSettingsSection>();
 
@@ -35,7 +38,7 @@ namespace Umbraco.Core
         {
             var configDir = new DirectoryInfo(ioHelper.MapPath(Constants.SystemDirectories.Config));
 
-            
+
             // GridConfig depends on runtime caches, manifest parsers... and cannot be available during composition
             configs.Add<IGridConfig>(factory => new GridConfig(
                 factory.GetInstance<ILogger>(),

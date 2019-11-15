@@ -60,22 +60,22 @@ namespace Umbraco.Tests.Runtimes
             var profiler = new LogProfiler(logger);
             var profilingLogger = new ProfilingLogger(logger, profiler);
             var appCaches = AppCaches.Disabled;
-            var databaseFactory = new UmbracoDatabaseFactory(logger, new Lazy<IMapperCollection>(() => factory.GetInstance<IMapperCollection>()));
+            var databaseFactory = new UmbracoDatabaseFactory(logger, new Lazy<IMapperCollection>(() => factory.GetInstance<IMapperCollection>()), TestHelper.GetConfigs());
             var typeFinder = new TypeFinder(logger);
             var ioHelper = IOHelper.Default;
             var typeLoader = new TypeLoader(ioHelper, typeFinder, appCaches.RuntimeCache, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), profilingLogger);
             var mainDom = new SimpleMainDom();
             var umbracoVersion = TestHelper.GetUmbracoVersion();
             var runtimeState = new RuntimeState(logger, null, null, new Lazy<IMainDom>(() => mainDom), new Lazy<IServerRegistrar>(() => factory.GetInstance<IServerRegistrar>()), umbracoVersion);
+            var configs = TestHelper.GetConfigs();
 
             // create the register and the composition
-            var register = RegisterFactory.Create();
-            var composition = new Composition(register, typeLoader, profilingLogger, runtimeState, TestHelper.GetConfigs());
+            var register = TestHelper.GetRegister();
+            var composition = new Composition(register, typeLoader, profilingLogger, runtimeState, configs);
             composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper, umbracoVersion);
 
             // create the core runtime and have it compose itself
-            var coreRuntime = new CoreRuntime();
-            coreRuntime.Compose(composition);
+            var coreRuntime = new CoreRuntime(configs, umbracoVersion, ioHelper, logger);coreRuntime.Compose(composition);
 
             // determine actual runtime level
             runtimeState.DetermineRuntimeLevel(databaseFactory, logger);
@@ -259,15 +259,16 @@ namespace Umbraco.Tests.Runtimes
             Mock.Get(runtimeState).Setup(x => x.Level).Returns(RuntimeLevel.Run);
             var mainDom = Mock.Of<IMainDom>();
             Mock.Get(mainDom).Setup(x => x.IsMainDom).Returns(true);
+            var configs = TestHelper.GetConfigs();
 
             // create the register and the composition
-            var register = RegisterFactory.Create();
-            var composition = new Composition(register, typeLoader, profilingLogger, runtimeState, TestHelper.GetConfigs());
+            var register = TestHelper.GetRegister();
+            var composition = new Composition(register, typeLoader, profilingLogger, runtimeState, configs);
             var umbracoVersion = TestHelper.GetUmbracoVersion();
             composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper, umbracoVersion);
 
             // create the core runtime and have it compose itself
-            var coreRuntime = new CoreRuntime();
+            var coreRuntime = new CoreRuntime(configs, umbracoVersion, ioHelper, logger);
             coreRuntime.Compose(composition);
 
             // get the components

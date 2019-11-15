@@ -119,7 +119,7 @@ namespace Umbraco.Web.Runtime
             // location to be there
             if (globalSettings.LocalTempStorageLocation == LocalTempStorage.EnvironmentTemp)
             {
-                var cachePath = globalSettings.LocalTempPath;
+                var cachePath = globalSettings.LocalTempPath(Current.IOHelper);
 
                 //set the file map and composite file default location to the %temp% location
                 BaseCompositeFileProcessingProvider.CompositeFilePathDefaultFolder

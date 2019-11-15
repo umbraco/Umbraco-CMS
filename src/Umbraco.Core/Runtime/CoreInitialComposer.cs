@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Configuration;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.CompositionExtensions;
@@ -81,10 +80,11 @@ namespace Umbraco.Core.Runtime
             // register a server registrar, by default it's the db registrar
             composition.RegisterUnique<IServerRegistrar>(f =>
             {
-                // TODO: this is a hack, use proper configuration!
-                // also: we still register the full IServerMessenger because
+                var globalSettings = f.GetInstance<IGlobalSettings>();
+
+                // TODO:  we still register the full IServerMessenger because
                 // even on 1 single server we can have 2 concurrent app domains
-                var singleServer = "true".InvariantEquals(ConfigurationManager.AppSettings[Constants.AppSettings.DisableElectionForSingleServer]);
+                var singleServer = globalSettings.DisableElectionForSingleServer;
                 return singleServer
                     ? (IServerRegistrar) new SingleServerRegistrar(f.GetInstance<IRuntimeState>())
                     : new DatabaseServerRegistrar(

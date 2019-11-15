@@ -149,9 +149,7 @@
     <Compile Include="Composing\CompositionExtensions\Services.cs" />
     <Compile Include="CompositionExtensions_Essentials.cs" />
     <Compile Include="CompositionExtensions_FileSystems.cs" />
-    <Compile Include="Configuration\ConfigsFactory.cs" />
-    <Compile Include="Configuration\CoreDebug.cs" />
-    <Compile Include="Configuration\GlobalSettings.cs" />
+    <Compile Include="Configuration\GlobalSettingsExtensions.cs" />
     <Compile Include="ConventionsHelper.cs" />
     <Compile Include="Events\ContentPublishedEventArgs.cs" />
     <Compile Include="Events\ContentPublishingEventArgs.cs" />
@@ -561,7 +559,6 @@
     <Compile Include="Models\UmbracoObjectTypes.cs" />
     <Compile Include="Models\UserExtensions.cs" />
     <Compile Include="Models\Validation\RequiredForPersistenceAttribute.cs" />
-    <Compile Include="NameValueCollectionExtensions.cs" />
     <Compile Include="ObjectJsonExtensions.cs" />
     <Compile Include="Packaging\ConflictingPackageData.cs" />
     <Compile Include="Models\Packaging\UninstallationSummary.cs" />

@@ -26,7 +26,7 @@ namespace Umbraco.Tests.IO
         [SetUp]
         public void Setup()
         {
-            _register = RegisterFactory.Create();
+            _register = TestHelper.GetRegister();
 
             var composition = new Composition(_register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs());
 

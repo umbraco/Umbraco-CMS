@@ -280,5 +280,10 @@ namespace Umbraco.Tests.TestHelpers
         {
             return new UmbracoVersion(GetConfigs().Global());
         }
+
+        public static IRegister GetRegister()
+        {
+            return RegisterFactory.Create(GetConfigs().Global());
+        }
     }
 }

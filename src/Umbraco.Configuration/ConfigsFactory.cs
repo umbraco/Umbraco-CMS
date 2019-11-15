@@ -12,15 +12,21 @@ namespace Umbraco.Core.Configuration
         public ConfigsFactory(IIOHelper ioHelper)
         {
             _ioHelper = ioHelper;
+            GlobalSettings = new GlobalSettings(_ioHelper);
         }
 
-        public Configs Create() {
+        public IGlobalSettings GlobalSettings { get; }
+
+        public Configs Create()
+        {
             var configs =  new Configs(section => ConfigurationManager.GetSection(section));
-            configs.Add<IGlobalSettings>(() => new GlobalSettings(_ioHelper));
+            configs.Add<IGlobalSettings>(() => GlobalSettings);
+
             configs.Add<IUmbracoSettingsSection>("umbracoConfiguration/settings");
             configs.Add<IHealthChecks>("umbracoConfiguration/HealthChecks");
 
             configs.Add<ICoreDebug>(() => new CoreDebug());
+            configs.Add<IConnectionStrings>(() => new ConnectionStrings());
             configs.AddCoreConfigs(_ioHelper);
             return configs;
         }

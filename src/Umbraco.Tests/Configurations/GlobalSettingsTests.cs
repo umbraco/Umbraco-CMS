@@ -26,12 +26,6 @@ namespace Umbraco.Tests.Configurations
             Current.IOHelper.Root = _root;
         }
 
-        [Test]
-        public void Is_Debug_Mode()
-        {
-            Assert.That(GlobalSettings.DebugMode, Is.EqualTo(true));
-        }
-
         [Ignore("fixme - ignored test")]
         [Test]
         public void Is_Version_From_Assembly_Correct()

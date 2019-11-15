@@ -30,7 +30,7 @@ namespace Umbraco.Tests.Scoping
             DoThing2 = null;
             DoThing3 = null;
 
-            var register = RegisterFactory.Create();
+            var register = TestHelper.GetRegister();
 
             var composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs());
 

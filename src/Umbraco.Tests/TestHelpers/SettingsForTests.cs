@@ -22,7 +22,7 @@ namespace Umbraco.Tests.TestHelpers
                     settings.TimeOutInMinutes == 20 &&
                     settings.DefaultUILanguage == "en" &&
                     settings.LocalTempStorageLocation == LocalTempStorage.Default &&
-                    settings.LocalTempPath == Current.IOHelper.MapPath("~/App_Data/TEMP") &&
+                    //settings.LocalTempPath == Current.IOHelper.MapPath("~/App_Data/TEMP") &&
                     settings.ReservedPaths == (GlobalSettings.StaticReservedPaths + "~/umbraco") &&
                     settings.ReservedUrls == GlobalSettings.StaticReservedUrls &&
                     settings.UmbracoPath == "~/umbraco" &&

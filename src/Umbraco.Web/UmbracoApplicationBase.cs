@@ -6,6 +6,7 @@ using System.Web.Hosting;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
 
@@ -18,17 +19,36 @@ namespace Umbraco.Web
     {
         private IRuntime _runtime;
 
+        public readonly ILogger _logger;
+        private readonly Configs _configs;
+        private readonly IIOHelper _ioHelper;
+
+        protected UmbracoApplicationBase()
+        {
+            _logger = SerilogLogger.CreateWithDefaultConfiguration();
+            _ioHelper = IOHelper.Default;
+            _configs = new ConfigsFactory(_ioHelper).Create();
+        }
+
+        protected UmbracoApplicationBase(ILogger logger, Configs configs)
+        {
+            _logger = logger;
+            _configs = configs;
+            _ioHelper = IOHelper.Default;
+        }
+
+
         /// <summary>
         /// Gets a runtime.
         /// </summary>
-        protected abstract IRuntime GetRuntime();
+        protected abstract IRuntime GetRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger);
 
         /// <summary>
         /// Gets the application register.
         /// </summary>
-        protected virtual IRegister GetRegister()
+        protected virtual IRegister GetRegister(IGlobalSettings globalSettings)
         {
-            return RegisterFactory.Create();
+            return RegisterFactory.Create(globalSettings);
         }
 
         // events - in the order they trigger
@@ -59,10 +79,14 @@ namespace Umbraco.Web
         {
             // ******** THIS IS WHERE EVERYTHING BEGINS ********
 
+
+            var globalSettings = _configs.Global();
+            var umbracoVersion = new UmbracoVersion(globalSettings);
+
             // create the register for the application, and boot
             // the boot manager is responsible for registrations
-            var register = GetRegister();
-            _runtime = GetRuntime();
+            var register = GetRegister(globalSettings);
+            _runtime = GetRuntime(_configs, umbracoVersion, _ioHelper, _logger);
             _runtime.Boot(register);
         }
 

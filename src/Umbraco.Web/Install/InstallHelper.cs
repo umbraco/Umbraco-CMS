@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
@@ -113,9 +110,9 @@ namespace Umbraco.Web.Install
         {
             get
             {
-                var databaseSettings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
+                var databaseSettings = Current.Configs.ConnectionStrings()[Constants.System.UmbracoConnectionName];
                 if (_globalSettings.ConfigurationStatus.IsNullOrWhiteSpace()
-                    && _databaseBuilder.IsConnectionStringConfigured(databaseSettings) == false)
+                    && DatabaseHelper.IsConnectionStringConfigured(databaseSettings) == false)
                 {
                     //no version or conn string configured, must be a brand new install
                     return true;
@@ -123,7 +120,7 @@ namespace Umbraco.Web.Install
 
                 //now we have to check if this is really a new install, the db might be configured and might contain data
 
-                if (_databaseBuilder.IsConnectionStringConfigured(databaseSettings) == false
+                if (DatabaseHelper.IsConnectionStringConfigured(databaseSettings) == false
                     || _databaseBuilder.IsDatabaseConfigured == false)
                 {
                     return true;

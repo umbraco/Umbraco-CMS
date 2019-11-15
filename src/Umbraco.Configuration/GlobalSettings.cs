@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Configuration;
 using System.Linq;
-using System.Net.Configuration;
-using System.Web;
-using System.Web.Configuration;
-using System.Web.Hosting;
 using System.Xml.Linq;
 using Umbraco.Core.IO;
 
@@ -52,20 +48,42 @@ namespace Umbraco.Core.Configuration
         {
             ResetInternal();
         }
-
-        public static bool HasSmtpServerConfigured(string appPath)
+        public bool IsSmtpServerConfigured
         {
-            if (HasSmtpServer.HasValue) return HasSmtpServer.Value;
+            get
+            {
+                var smtpSection = ConfigurationManager.GetSection("system.net/mailSettings/smtp") as ConfigurationSection;
+                if (smtpSection is null) return false;
 
-            var config = WebConfigurationManager.OpenWebConfiguration(appPath);
-            var settings = (MailSettingsSectionGroup)config.GetSectionGroup("system.net/mailSettings");
-            // note: "noreply@example.com" is/was the sample SMTP from email - we'll regard that as "not configured"
-            if (settings == null || settings.Smtp == null || "noreply@example.com".Equals(settings.Smtp.From, StringComparison.OrdinalIgnoreCase)) return false;
-            if (settings.Smtp.SpecifiedPickupDirectory != null && string.IsNullOrEmpty(settings.Smtp.SpecifiedPickupDirectory.PickupDirectoryLocation) == false)
-                return true;
-            if (settings.Smtp.Network != null && string.IsNullOrEmpty(settings.Smtp.Network.Host) == false)
-                return true;
-            return false;
+                var from = smtpSection.ElementInformation.Properties["from"];
+                if (@from != null
+                    && @from.Value is string fromPropValue
+                    && string.IsNullOrEmpty(fromPropValue) == false
+                    && !string.Equals("noreply@example.com", fromPropValue, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+
+                var networkSection = ConfigurationManager.GetSection("system.net/mailSettings/smtp/network") as ConfigurationSection;
+                var host = networkSection?.ElementInformation.Properties["host"];
+                if (host != null
+                    && host.Value is string hostPropValue
+                    && string.IsNullOrEmpty(hostPropValue) == false)
+                {
+                    return true;
+                }
+
+                var specifiedPickupDirectorySection = ConfigurationManager.GetSection("system.net/mailSettings/smtp/specifiedPickupDirectory") as ConfigurationSection;
+                var pickupDirectoryLocation = specifiedPickupDirectorySection?.ElementInformation.Properties["pickupDirectoryLocation"];
+                if (pickupDirectoryLocation != null
+                    && pickupDirectoryLocation.Value is string pickupDirectoryLocationPropValue
+                    && string.IsNullOrEmpty(pickupDirectoryLocationPropValue) == false)
+                {
+                    return true;
+                }
+
+                return false;
+            }
         }
 
         /// <summary>
@@ -196,7 +214,7 @@ namespace Umbraco.Core.Configuration
         /// Removes a setting from the configuration file.
         /// </summary>
         /// <param name="key">Key of the setting to be removed.</param>
-        internal static void RemoveSetting(string key, IIOHelper ioHelper)
+        public static void RemoveSetting(string key, IIOHelper ioHelper)
         {
             var fileName = ioHelper.MapPath(string.Format("{0}/web.config", ioHelper.Root));
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
@@ -212,28 +230,25 @@ namespace Umbraco.Core.Configuration
             }
         }
 
-        /// <summary>
-        /// Gets a value indicating whether umbraco is running in [debug mode].
-        /// </summary>
-        /// <value><c>true</c> if [debug mode]; otherwise, <c>false</c>.</value>
-        public static bool DebugMode
+        public bool DebugMode
         {
             get
             {
                 try
                 {
-                    if (HttpContext.Current != null)
+                    if (ConfigurationManager.GetSection("system.web/compilation") is ConfigurationSection compilation)
                     {
-                        return HttpContext.Current.IsDebuggingEnabled;
+                        var debugElement = compilation.ElementInformation.Properties["debug"];
+
+                        return debugElement != null && (debugElement.Value is bool debug && debug);
                     }
-                    //go and get it from config directly
-                    var section = ConfigurationManager.GetSection("system.web/compilation") as CompilationSection;
-                    return section != null && section.Debug;
                 }
                 catch
                 {
-                    return false;
+                    // ignored
                 }
+
+                return false;
             }
         }
 
@@ -288,47 +303,6 @@ namespace Umbraco.Core.Configuration
             }
         }
 
-        /// <inheritdoc />
-        public string LocalTempPath
-        {
-            get
-            {
-                if (_localTempPath != null)
-                    return _localTempPath;
-
-                switch (LocalTempStorageLocation)
-                {
-                    case LocalTempStorage.AspNetTemp:
-                        return _localTempPath = System.IO.Path.Combine(HttpRuntime.CodegenDir, "UmbracoData");
-
-                    case LocalTempStorage.EnvironmentTemp:
-
-                        // environment temp is unique, we need a folder per site
-
-                        // use a hash
-                        // combine site name and application id
-                        //  site name is a Guid on Cloud
-                        //  application id is eg /LM/W3SVC/123456/ROOT
-                        // the combination is unique on one server
-                        // and, if a site moves from worker A to B and then back to A...
-                        //  hopefully it gets a new Guid or new application id?
-
-                        var siteName = HostingEnvironment.SiteName;
-                        var applicationId = HostingEnvironment.ApplicationID; // ie HttpRuntime.AppDomainAppId
-
-                        var hashString = siteName + "::" + applicationId;
-                        var hash = hashString.GenerateHash();
-                        var siteTemp = System.IO.Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData", hash);
-
-                        return _localTempPath = siteTemp;
-
-                    //case LocalTempStorage.Default:
-                    //case LocalTempStorage.Unknown:
-                    default:
-                        return _localTempPath = _ioHelper.MapPath("~/App_Data/TEMP");
-                }
-            }
-        }
 
         /// <summary>
         /// Gets the default UI language.
@@ -395,6 +369,21 @@ namespace Umbraco.Core.Configuration
 
         private string _umbracoPath = null;
         public string UmbracoPath => GetterWithDefaultValue(Constants.AppSettings.UmbracoPath, "~/umbraco", ref _umbracoPath);
+
+        private bool _installMissingDatabase;
+        public bool InstallMissingDatabase => GetterWithDefaultValue("Umbraco.Core.RuntimeState.InstallMissingDatabase", false, ref _installMissingDatabase);
+
+        private bool _installEmptyDatabase;
+        public bool InstallEmptyDatabase => GetterWithDefaultValue("Umbraco.Core.RuntimeState.InstallEmptyDatabase", false, ref _installEmptyDatabase);
+
+        private bool _disableElectionForSingleServer;
+        public bool DisableElectionForSingleServer => GetterWithDefaultValue(Constants.AppSettings.DisableElectionForSingleServer, false, ref _disableElectionForSingleServer);
+
+        private string _registerType;
+        public string RegisterType => GetterWithDefaultValue(Constants.AppSettings.RegisterType, string.Empty, ref _registerType);
+
+        private string _databaseFactoryServerVersion;
+        public string DatabaseFactoryServerVersion => GetterWithDefaultValue(Constants.AppSettings.Debug.DatabaseFactoryServerVersion, string.Empty, ref _databaseFactoryServerVersion);
 
         private T GetterWithDefaultValue<T>(string appSettingKey, T defaultValue, ref T backingField)
         {

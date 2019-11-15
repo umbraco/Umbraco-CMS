@@ -35,7 +35,7 @@ namespace Umbraco.Tests.TestHelpers
         {
             Current.Reset();
 
-            var container = RegisterFactory.Create();
+            var container = TestHelper.GetRegister();
 
             var ioHelper = IOHelper.Default;
             var logger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());

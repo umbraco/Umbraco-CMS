@@ -1,13 +1,11 @@
-﻿using System;
-using System.Configuration;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Migrations.Upgrade;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Install.Models;
-using Umbraco.Web.Migrations;
 using Umbraco.Web.Migrations.PostMigrations;
 
 namespace Umbraco.Web.Install.InstallSteps
@@ -66,9 +64,9 @@ namespace Umbraco.Web.Install.InstallSteps
                 return false;
             }
 
-            var databaseSettings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
+            var databaseSettings = Current.Configs.ConnectionStrings()[Constants.System.UmbracoConnectionName];
 
-            if (_databaseBuilder.IsConnectionStringConfigured(databaseSettings))
+            if (DatabaseHelper.IsConnectionStringConfigured(databaseSettings))
             {
                 // a connection string was present, determine whether this is an install/upgrade
                 // return true (upgrade) if there is an installed version, else false (install)

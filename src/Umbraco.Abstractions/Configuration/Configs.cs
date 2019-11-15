@@ -114,5 +114,7 @@ namespace Umbraco.Core.Configuration
             // no need to keep them around
             _registerings = null;
         }
+
+
     }
 }

@@ -142,7 +142,7 @@ namespace Umbraco.Tests.Testing
             UmbracoVersion = new UmbracoVersion(globalSettings);
             var typeLoader = GetTypeLoader(IOHelper, TypeFinder, appCaches.RuntimeCache, globalSettings, proflogger, Options.TypeLoader);
 
-            var register = RegisterFactory.Create();
+            var register = TestHelper.GetRegister();
 
             Composition = new Composition(register, typeLoader, proflogger, ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs());
 
@@ -302,7 +302,7 @@ namespace Umbraco.Tests.Testing
         // common to all tests = cannot be overriden
         private static TypeLoader CreateCommonTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
         {
-            return new TypeLoader(ioHelper, typeFinder, runtimeCache, new DirectoryInfo(globalSettings.LocalTempPath), logger, false, new[]
+            return new TypeLoader(ioHelper, typeFinder, runtimeCache, new DirectoryInfo(globalSettings.LocalTempPath(ioHelper)), logger, false, new[]
             {
                 Assembly.Load("Umbraco.Core"),
                 Assembly.Load("Umbraco.Web"),
@@ -362,7 +362,8 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique<IUmbracoDatabaseFactory>(f => new UmbracoDatabaseFactory(
                 Constants.System.UmbracoConnectionName,
                 Logger,
-                new Lazy<IMapperCollection>(f.GetInstance<IMapperCollection>)));
+                new Lazy<IMapperCollection>(f.GetInstance<IMapperCollection>),
+                TestHelper.GetConfigs()));
             Composition.RegisterUnique(f => f.TryGetInstance<IUmbracoDatabaseFactory>().SqlContext);
 
             Composition.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty

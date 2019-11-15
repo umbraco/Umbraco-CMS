@@ -91,7 +91,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var baseLoader = base.CreateTypeLoader(ioHelper, typeFinder, runtimeCache, globalSettings, logger);
 
-            return new TypeLoader(ioHelper, typeFinder, runtimeCache, new DirectoryInfo(globalSettings.LocalTempPath), logger, false,
+            return new TypeLoader(ioHelper, typeFinder, runtimeCache, new DirectoryInfo(globalSettings.LocalTempPath(ioHelper)), logger, false,
                 // this is so the model factory looks into the test assembly
                 baseLoader.AssembliesToScan
                     .Union(new[] { typeof(PublishedContentTests).Assembly })

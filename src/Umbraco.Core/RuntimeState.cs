@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Web;
 using Semver;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Exceptions;
@@ -68,7 +67,7 @@ namespace Umbraco.Core
         public SemVersion SemanticVersion => _umbracoVersion.SemanticVersion;
 
         /// <inheritdoc />
-        public bool Debug { get; } = GlobalSettings.DebugMode;
+        public bool Debug => HttpContext.Current != null ? HttpContext.Current.IsDebuggingEnabled : _globalSettings.DebugMode;
 
         /// <inheritdoc />
         public bool IsMainDom => MainDom.IsMainDom;
@@ -170,7 +169,7 @@ namespace Umbraco.Core
             // else, keep going,
             // anything other than install wants a database - see if we can connect
             // (since this is an already existing database, assume localdb is ready)
-            var tries = RuntimeOptions.InstallMissingDatabase ? 2 : 5;
+            var tries = _globalSettings.InstallMissingDatabase ? 2 : 5;
             for (var i = 0;;)
             {
                 connect = databaseFactory.CanConnect;
@@ -184,7 +183,7 @@ namespace Umbraco.Core
                 // cannot connect to configured database, this is bad, fail
                 logger.Debug<RuntimeState>("Could not connect to database.");
 
-                if (RuntimeOptions.InstallMissingDatabase)
+                if (_globalSettings.InstallMissingDatabase)
                 {
                     // ok to install on a configured but missing database
                     Level = RuntimeLevel.Install;
@@ -213,7 +212,7 @@ namespace Umbraco.Core
                 // can connect to the database but cannot check the upgrade state... oops
                 logger.Warn<RuntimeState>(e, "Could not check the upgrade state.");
 
-                if (RuntimeOptions.InstallEmptyDatabase)
+                if (_globalSettings.InstallEmptyDatabase)
                 {
                     // ok to install on an empty database
                     Level = RuntimeLevel.Install;
