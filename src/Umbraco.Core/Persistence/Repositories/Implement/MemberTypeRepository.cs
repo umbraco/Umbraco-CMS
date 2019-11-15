@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
@@ -18,8 +19,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IMemberTypeRepository
     {
-        public MemberTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IContentTypeCommonRepository commonRepository)
-            : base(scopeAccessor, cache, logger, commonRepository)
+        public MemberTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IContentTypeCommonRepository commonRepository, ILanguageRepository languageRepository)
+            : base(scopeAccessor, cache, logger, commonRepository, languageRepository)
         { }
 
         protected override bool SupportsPublishing => MemberType.SupportsPublishingConst;
@@ -57,7 +58,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             // the cache policy will always want everything
             // even GetMany(ids) gets everything and filters afterwards
-            if (ids.Any()) throw new Exception("panic");
+            if (ids.Any()) throw new PanicException("There can be no ids specified");
             return CommonRepository.GetAllTypes().OfType<IMemberType>();
         }
 
@@ -224,8 +225,17 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (builtinProperties.ContainsKey(propertyType.Alias))
                 {
                     //this reset's its current data type reference which will be re-assigned based on the property editor assigned on the next line
-                    propertyType.DataTypeId = 0;
-                    propertyType.DataTypeKey = default;
+                    var propDefinition = builtinProperties[propertyType.Alias];
+                    if (propDefinition != null)
+                    {
+                        propertyType.DataTypeId = propDefinition.DataTypeId;
+                        propertyType.DataTypeKey = propDefinition.DataTypeKey;
+                    }
+                    else
+                    {
+                        propertyType.DataTypeId = 0;
+                        propertyType.DataTypeKey = default;
+                    }
                 }
             }
         }

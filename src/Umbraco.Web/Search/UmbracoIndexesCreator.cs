@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Examine;
@@ -19,18 +20,20 @@ namespace Umbraco.Web.Search
         public UmbracoIndexesCreator(IProfilingLogger profilingLogger,
             ILocalizationService languageService,
             IPublicAccessService publicAccessService,
-            IMemberService memberService)
+            IMemberService memberService, IUmbracoIndexConfig umbracoIndexConfig)
         {
             ProfilingLogger = profilingLogger ?? throw new System.ArgumentNullException(nameof(profilingLogger));
             LanguageService = languageService ?? throw new System.ArgumentNullException(nameof(languageService));
             PublicAccessService = publicAccessService ?? throw new System.ArgumentNullException(nameof(publicAccessService));
             MemberService = memberService ?? throw new System.ArgumentNullException(nameof(memberService));
+            UmbracoIndexConfig = umbracoIndexConfig;
         }
 
         protected IProfilingLogger ProfilingLogger { get; }
         protected ILocalizationService LanguageService { get; }
         protected IPublicAccessService PublicAccessService { get; }
         protected IMemberService MemberService { get; }
+        protected IUmbracoIndexConfig UmbracoIndexConfig { get; }
 
         /// <summary>
         /// Creates the Umbraco indexes
@@ -55,7 +58,8 @@ namespace Umbraco.Web.Search
                 new CultureInvariantWhitespaceAnalyzer(),
                 ProfilingLogger,
                 LanguageService,
-                GetContentValueSetValidator());
+                GetContentValueSetValidator()
+                );
             return index;
         }
 
@@ -80,28 +84,31 @@ namespace Umbraco.Web.Search
                 CreateFileSystemLuceneDirectory(Constants.UmbracoIndexes.MembersIndexPath),
                 new CultureInvariantWhitespaceAnalyzer(),
                 ProfilingLogger,
-                GetMemberValueSetValidator());
+                GetMemberValueSetValidator()
+                );
             return index;
         }
-        
+        [Obsolete("This method should not be used and will be removed in future versions. GetContentValueSetValidator was moved to IUmbracoIndexConfig")]
         public virtual IContentValueSetValidator GetContentValueSetValidator()
         {
-            return new ContentValueSetValidator(false, true, PublicAccessService);
+            return UmbracoIndexConfig.GetContentValueSetValidator();
         }
-
+        [Obsolete("This method should not be used and will be removed in future versions. GetPublishedContentValueSetValidator was moved to IUmbracoIndexConfig")]
         public virtual IContentValueSetValidator GetPublishedContentValueSetValidator()
         {
-            return new ContentValueSetValidator(true, false, PublicAccessService);
+            return UmbracoIndexConfig.GetPublishedContentValueSetValidator();
         }
 
         /// <summary>
         /// Returns the <see cref="IValueSetValidator"/> for the member indexer
         /// </summary>
         /// <returns></returns>
+        [Obsolete("This method should not be used and will be removed in future versions. GetMemberValueSetValidator was moved to IUmbracoIndexConfig")]
         public virtual IValueSetValidator GetMemberValueSetValidator()
         {
-            return new MemberValueSetValidator();
+            return UmbracoIndexConfig.GetMemberValueSetValidator();
         }
+
 
     }
 }

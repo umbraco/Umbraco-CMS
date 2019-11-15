@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
@@ -90,7 +91,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     contentType = ContentTypeFactory.BuildContentTypeEntity(contentTypeDto);
                 else if (contentTypeDto.NodeDto.NodeObjectType == Constants.ObjectTypes.MemberType)
                     contentType = ContentTypeFactory.BuildMemberTypeEntity(contentTypeDto);
-                else throw new Exception("panic");
+                else throw new PanicException($"The node object type {contentTypeDto.NodeDto.NodeObjectType} is not supported");
                 contentTypes.Add(contentType.Id, contentType);
 
                 // map allowed content types

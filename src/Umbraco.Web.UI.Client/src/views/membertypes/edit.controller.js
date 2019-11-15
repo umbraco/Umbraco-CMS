@@ -9,12 +9,16 @@
 (function () {
     "use strict";
 
-    function MemberTypesEditController($scope, $rootScope, $routeParams, $log, $filter, memberTypeResource, dataTypeResource, editorState, iconHelper, formHelper, navigationService, contentEditingHelper, notificationsService, $q, localizationService, overlayHelper, contentTypeHelper) {
+    function MemberTypesEditController($scope, $rootScope, $routeParams, $log, $filter, memberTypeResource, dataTypeResource, editorState, iconHelper, formHelper, navigationService, contentEditingHelper, notificationsService, $q, localizationService, overlayHelper, contentTypeHelper, angularHelper, eventsService) {
 
+        var evts = [];
         var vm = this;
 
         vm.save = save;
-
+        vm.editorfor = "visuallyHiddenTexts_newMember";
+        vm.header = {};
+        vm.header.editorfor = "content_membergroup";
+        vm.header.setPageTitle = true;
         vm.currentNode = null;
         vm.contentType = {};
         vm.page = {};
@@ -304,7 +308,16 @@
 
         }
 
+        evts.push(eventsService.on("editors.groupsBuilder.changed", function(name, args) {
+            angularHelper.getCurrentForm($scope).$setDirty();
+        }));
 
+        //ensure to unregister from all events!
+        $scope.$on('$destroy', function () {
+            for (var e in evts) {
+                eventsService.unsubscribe(evts[e]);
+            }
+        });
     }
 
     angular.module("umbraco").controller("Umbraco.Editors.MemberTypes.EditController", MemberTypesEditController);

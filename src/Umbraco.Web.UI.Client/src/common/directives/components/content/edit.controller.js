@@ -4,7 +4,7 @@
     function ContentEditController($rootScope, $scope, $routeParams, $q, $window,
         appState, contentResource, entityResource, navigationService, notificationsService,
         serverValidationManager, contentEditingHelper, localizationService, formHelper, umbRequestHelper,
-        editorState, $http, eventsService, overlayService, $location) {
+        editorState, $http, eventsService, overlayService, $location, localStorageService, treeService) {
 
         var evts = [];
         var infiniteMode = $scope.infiniteModel && $scope.infiniteModel.infiniteMode;
@@ -21,6 +21,12 @@
         $scope.page.menu.currentSection = appState.getSectionState("currentSection");
         $scope.page.listViewPath = null;
         $scope.page.isNew = $scope.isNew ? true : false;
+
+        if (infiniteMode) {
+            $scope.page.allowInfinitePublishAndClose = $scope.infiniteModel.allowPublishAndClose;
+            $scope.page.allowInfiniteSaveAndClose = $scope.infiniteModel.allowSaveAndClose;
+        }
+
         $scope.page.buttonGroupState = "init";
         $scope.page.hideActionsMenu = infiniteMode ? true : false;
         $scope.page.hideChangeVariant = false;
@@ -30,14 +36,13 @@
         //initializes any watches
         function startWatches(content) {
 
-            //watch for changes to isNew & the content.id, set the page.isNew accordingly and load the breadcrumb if we can
-            $scope.$watchGroup(['isNew', 'content.id'], function (newVal, oldVal) {
+            //watch for changes to isNew, set the page.isNew accordingly and load the breadcrumb if we can
+            $scope.$watch('isNew', function (newVal, oldVal) {
                 
-                var contentId = newVal[1];
-                $scope.page.isNew = Object.toBoolean(newVal[0]);
+                $scope.page.isNew = Object.toBoolean(newVal);
 
                 //We fetch all ancestors of the node to generate the footer breadcrumb navigation
-                if (!$scope.page.isNew && contentId && content.parentId && content.parentId !== -1) {
+                if (content.parentId && content.parentId !== -1) {
                     loadBreadcrumb();
                     if (!watchingCulture) {
                         $scope.$watch('culture',
@@ -56,11 +61,13 @@
         function init() {
 
             var content = $scope.content;
-
             if (content.id && content.isChildOfListView && content.trashed === false) {
-                $scope.page.listViewPath = ($routeParams.page) ?
-                    "/content/content/edit/" + content.parentId + "?page=" + $routeParams.page :
-                    "/content/content/edit/" + content.parentId;
+                $scope.page.listViewPath = "/content/content/edit/" + content.parentId
+                    + "?list=" + $routeParams.list
+                    + "&page=" + $routeParams.page
+                    + "&filter=" + $routeParams.filter
+                    + "&orderBy=" + $routeParams.orderBy
+                    + "&orderDirection=" + $routeParams.orderDirection;
             }
 
             // we need to check wether an app is present in the current data, if not we will present the default app.
@@ -107,7 +114,12 @@
         }
 
         function loadBreadcrumb() {
-            entityResource.getAncestors($scope.content.id, "document", $scope.culture)
+            // load the parent breadcrumb when creating new content
+            var id = $scope.page.isNew ? $scope.content.parentId : $scope.content.id;
+            if (!id) {
+                return;
+            }
+            entityResource.getAncestors(id, "document", $scope.culture)
                 .then(function (anc) {
                     $scope.ancestors = anc;
                 });
@@ -145,9 +157,16 @@
 
         function reload() {
             $scope.page.loading = true;
-            loadContent().then(function () {
-                $scope.page.loading = false;
-            });
+
+            if ($scope.page.isNew) {
+                loadScaffold().then(function () {
+                    $scope.page.loading = false;
+                });
+            } else {
+                loadContent().then(function () {
+                    $scope.page.loading = false;
+                });
+            }
         }
 
         function bindEvents() {
@@ -163,6 +182,37 @@
                 }
             }));
 
+            evts.push(eventsService.on("editors.content.reload", function (name, args) {                
+                if (args && args.node && $scope.content.id === args.node.id) {
+                    reload();
+                    loadBreadcrumb();
+                    syncTreeNode($scope.content, $scope.content.path);
+                }
+            }));
+            
+            evts.push(eventsService.on("rte.file.uploading", function(){
+                $scope.page.saveButtonState = "busy";
+                $scope.page.buttonGroupState = "busy";
+
+            }));
+
+            evts.push(eventsService.on("rte.file.uploaded", function(){
+                $scope.page.saveButtonState = "success";
+                $scope.page.buttonGroupState = "success";
+            }));
+
+            evts.push(eventsService.on("rte.shortcut.save", function(){
+                if ($scope.page.showSaveButton) {
+                    $scope.save();
+                }
+            }));
+
+            evts.push(eventsService.on("content.saved", function(){
+                // Clear out localstorage keys that start with tinymce__
+                // When we save/perist a content node
+                // NOTE: clearAll supports a RegEx pattern of items to remove
+                localStorageService.clearAll(/^tinymce__/);
+            }));
         }
 
         /**
@@ -192,6 +242,28 @@
         }
 
         /**
+        *  This loads the content scaffold for when creating new content
+        */
+        function loadScaffold() {
+            //we are creating so get an empty content item
+            return $scope.getScaffoldMethod()()
+                .then(function (data) {
+
+                    $scope.content = data;
+
+                    init();
+                    startWatches($scope.content);
+
+                    resetLastListPageNumber($scope.content);
+
+                    eventsService.emit("content.newReady", { content: $scope.content });
+
+                    return $q.resolve($scope.content);
+
+                });
+        }
+
+        /**
          * Create the save/publish/preview buttons for the view
          * @param {any} content the content node
          * @param {any} app the active content app
@@ -199,11 +271,10 @@
         function createButtons(content) {
 
             // for trashed and element type items, the save button is the primary action - otherwise it's a secondary action
-            $scope.page.saveButtonStyle = content.trashed || content.isElement ? "primary" : "info";
-
+            $scope.page.saveButtonStyle = content.trashed || content.isElement || content.isBlueprint ? "primary" : "info";
             // only create the save/publish/preview buttons if the
             // content app is "Conent"
-            if ($scope.app && $scope.app.alias !== "umbContent" && $scope.app.alias !== "umbInfo") {
+            if ($scope.app && $scope.app.alias !== "umbContent" && $scope.app.alias !== "umbInfo" && $scope.app.alias !== "umbListView") {
                 $scope.defaultButton = null;
                 $scope.subButtons = null;
                 $scope.page.showSaveButton = false;
@@ -239,7 +310,7 @@
         }
 
         /** Syncs the content item to it's tree node - this occurs on first load and after saving */
-        function syncTreeNode(content, path, initialLoad) {
+        function syncTreeNode(content, path, initialLoad, reloadChildren) {
 
             if (infiniteMode || !path) {
                 return;
@@ -249,6 +320,9 @@
                 navigationService.syncTree({ tree: $scope.treeAlias, path: path.split(","), forceReload: initialLoad !== true })
                     .then(function (syncArgs) {
                         $scope.page.menu.currentNode = syncArgs.node;
+                        if (reloadChildren && syncArgs.node.expanded) {
+                            treeService.loadNodeChildren({node: syncArgs.node});
+                        }
                     }, function () {
                         //handle the rejection
                         console.log("A problem occurred syncing the tree! A path is probably incorrect.")
@@ -369,13 +443,18 @@
                 saveMethod: args.saveMethod,
                 scope: $scope,
                 content: $scope.content,
+                create: $scope.page.isNew,
                 action: args.action,
                 showNotifications: args.showNotifications,
                 softRedirect: true
             }).then(function (data) {
                 //success
                 init();
-                syncTreeNode($scope.content, data.path);
+
+                //needs to be manually set for infinite editing mode
+                $scope.page.isNew = false;
+
+                syncTreeNode($scope.content, data.path, false, args.reloadChildren);
 
                 eventsService.emit("content.saved", { content: $scope.content, action: args.action });
 
@@ -451,22 +530,9 @@
 
             $scope.page.loading = true;
 
-            //we are creating so get an empty content item
-            $scope.getScaffoldMethod()()
-                .then(function (data) {
-
-                    $scope.content = data;
-
-                    init();
-                    startWatches($scope.content);
-
-                    resetLastListPageNumber($scope.content);
-
-                    eventsService.emit("content.newReady", { content: $scope.content });
-
-                    $scope.page.loading = false;
-
-                });
+            loadScaffold().then(function () {
+                $scope.page.loading = false;
+            });
         }
         else {
 
@@ -480,7 +546,7 @@
 
         $scope.unpublish = function () {
             clearNotifications($scope.content);
-            if (formHelper.submitForm({ scope: $scope, action: "unpublish", skipValidation: true })) {                
+            if (formHelper.submitForm({ scope: $scope, action: "unpublish", skipValidation: true })) {
                 var dialog = {
                     parentScope: $scope,
                     view: "views/content/overlays/unpublish.html",
@@ -708,16 +774,6 @@
             clearNotifications($scope.content);
             //before we launch the dialog we want to execute all client side validations first
             if (formHelper.submitForm({ scope: $scope, action: "schedule" })) {
-
-                //used to track the original values so if the user doesn't save the schedule and they close the dialog we reset the dates back to what they were.
-                let origDates = [];
-                for (let i = 0; i < $scope.content.variants.length; i++) {
-                    origDates.push({
-                        releaseDate: $scope.content.variants[i].releaseDate,
-                        expireDate: $scope.content.variants[i].expireDate
-                    });
-                }
-
                 if (!isContentCultureVariant()) {
                     //ensure the flags are set
                     $scope.content.variants[0].save = true;
@@ -726,10 +782,17 @@
                 var dialog = {
                     parentScope: $scope,
                     view: "views/content/overlays/schedule.html",
-                    variants: $scope.content.variants, //set a model property for the dialog
+                    variants:  angular.copy($scope.content.variants), //set a model property for the dialog
                     skipFormValidation: true, //when submitting the overlay form, skip any client side validation
                     submitButtonLabelKey: "buttons_schedulePublish",
                     submit: function (model) {
+                        for (let i = 0; i < $scope.content.variants.length; i++) {
+                            $scope.content.variants[i].releaseDate = model.variants[i].releaseDate;
+                            $scope.content.variants[i].expireDate = model.variants[i].expireDate;
+                            $scope.content.variants[i].releaseDateFormatted = model.variants[i].releaseDateFormatted;
+                            $scope.content.variants[i].expireDateFormatted = model.variants[i].expireDateFormatted;
+                        }
+
                         model.submitButtonState = "busy";
                         clearNotifications($scope.content);
 
@@ -752,7 +815,7 @@
                             }
                             model.submitButtonState = "error";
                             //re-map the dialog model since we've re-bound the properties
-                            dialog.variants = $scope.content.variants;
+                            dialog.variants = angular.copy($scope.content.variants);
                             //don't reject, we've handled the error
                             return $q.when(err);
                         });
@@ -760,11 +823,6 @@
                     },
                     close: function () {
                         overlayService.close();
-                        //restore the dates
-                        for (let i = 0; i < $scope.content.variants.length; i++) {
-                            $scope.content.variants[i].releaseDate = origDates[i].releaseDate;
-                            $scope.content.variants[i].expireDate = origDates[i].expireDate;
-                        }
                     }
                 };
                 overlayService.open(dialog);
@@ -801,7 +859,8 @@
                                 return contentResource.publishWithDescendants(content, create, model.includeUnpublished, files, showNotifications);
                             },
                             action: "publishDescendants",
-                            showNotifications: false
+                            showNotifications: false,
+                            reloadChildren: model.includeUnpublished
                         }).then(function (data) {
                             //show all notifications manually here since we disabled showing them automatically in the save method
                             formHelper.showNotifications(data);
