@@ -39,6 +39,8 @@ To build Umbraco, fire up PowerShell and move to Umbraco's repository root (the 
 
     build/build.ps1
     
+If you only see a build.bat-file, you're probably on the wrong branch. If you switch to the correct branch (dev-v8) the file will appear and you can build it.
+
 You might run into [Powershell quirks](#powershell-quirks).
 
 ### Build Infrastructure

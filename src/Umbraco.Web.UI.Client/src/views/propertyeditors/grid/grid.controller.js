@@ -8,7 +8,8 @@ angular.module("umbraco")
             angularHelper,
             $element,
             eventsService,
-            editorService
+            editorService,
+            $interpolate
         ) {
 
             // Grid status variables
@@ -72,7 +73,10 @@ angular.module("umbraco")
                     ui.item.find(".umb-rte").each(function (key, value) {
                         // remove all RTEs in the dragged row and save their settings
                         var rteId = value.id;
-                        draggedRteSettings[rteId] = _.findWhere(tinyMCE.editors, { id: rteId }).settings;
+                        var editor = _.findWhere(tinyMCE.editors, { id: rteId });
+                        if (editor) {
+                            draggedRteSettings[rteId] = editor.settings;
+                        }
                     });
                 },
 
@@ -84,9 +88,17 @@ angular.module("umbraco")
                     // reset all RTEs affected by the dragging
                     ui.item.parents(".umb-column").find(".umb-rte").each(function (key, value) {
                         var rteId = value.id;
-                        draggedRteSettings[rteId] = draggedRteSettings[rteId] || _.findWhere(tinyMCE.editors, { id: rteId }).settings;
-                        tinyMCE.execCommand("mceRemoveEditor", false, rteId);
-                        tinyMCE.init(draggedRteSettings[rteId]);
+                        var settings = draggedRteSettings[rteId];
+                        if (!settings) {
+                            var editor = _.findWhere(tinyMCE.editors, { id: rteId });
+                            if (editor) {
+                                settings = editor.settings;
+                            }
+                        }
+                        if (settings) {
+                            tinyMCE.execCommand("mceRemoveEditor", false, rteId);
+                            tinyMCE.init(settings);
+                        }
                     });
                     currentForm.$setDirty();
                 }
@@ -680,6 +692,17 @@ angular.module("umbraco")
                 $scope.showRowConfigurations = !$scope.showRowConfigurations;
             };
 
+            $scope.getTemplateName = function (control) {
+                var templateName = control.editor.name;
+                if (control.editor.nameExp) {
+                    var valueOfTemplate = control.editor.nameExp(control);
+                    if (valueOfTemplate != "") {
+                        templateName += ": ";
+                        templateName += valueOfTemplate;
+                    }
+                }
+                return templateName;
+            }
 
             // *********************************************
             // Initialization
@@ -923,6 +946,11 @@ angular.module("umbraco")
                     localizationService.localize("grid_" + value.alias, undefined, value.name).then(function (v) {
                         value.name = v;
                     });
+                    // setup nametemplate
+
+                    value.nameExp = !!value.nameTemplate
+                        ? $interpolate(value.nameTemplate)
+                        : undefined;
                 });
 
                 $scope.contentReady = true;
