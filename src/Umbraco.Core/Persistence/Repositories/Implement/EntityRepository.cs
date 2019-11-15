@@ -44,7 +44,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         // get a page of entities
         public IEnumerable<IEntitySlim> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid[] objectTypes, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IUmbracoEntity> filter, Ordering ordering, IQuery<IRelation> relationQuery = null)
+            IQuery<IUmbracoEntity> filter, Ordering ordering, Action<Sql<ISqlContext>> sqlCustomization = null)
         {
             var isContent = objectTypes.Any(objectType => objectType == Constants.ObjectTypes.Document || objectType == Constants.ObjectTypes.DocumentBlueprint);
             var isMedia = objectTypes.Any(objectType => objectType == Constants.ObjectTypes.Media);
@@ -52,17 +52,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             var sql = GetBaseWhere(isContent, isMedia, isMember, false, s =>
             {
-                if (relationQuery != null)
-                {
-                    // add left joins for relation tables (this joins on both child or parent, so beware that this will normally return entities for
-                    // both sides of the relation type unless the IUmbracoEntity query passed in filters one side out).
-                    s.LeftJoin<RelationDto>().On<NodeDto, RelationDto>((left, right) => left.NodeId == right.ChildId || left.NodeId == right.ParentId);
-                    s.LeftJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>((left, right) => left.RelationType == right.Id);
-
-                    // append the relations wheres
-                    foreach (var relClause in relationQuery.GetWhereClauses())
-                        s.Where(relClause.Item1, relClause.Item2);
-                }
+                sqlCustomization?.Invoke(s);
 
                 if (filter != null)
                 {

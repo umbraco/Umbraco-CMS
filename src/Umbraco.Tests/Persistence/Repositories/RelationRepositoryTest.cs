@@ -202,6 +202,34 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Get_Paged_Parent_Child_Entities_With_Same_Entity_Relation()
+        {
+            //Create a media item and create a relationship between itself (parent -> child)            
+            var imageType = MockedContentTypes.CreateImageMediaType("myImage");
+            ServiceContext.MediaTypeService.Save(imageType);
+            var media = MockedMedia.CreateMediaImage(imageType, -1);
+            ServiceContext.MediaService.Save(media);
+            var relType = ServiceContext.RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMediaAlias);
+            ServiceContext.RelationService.Relate(media.Id, media.Id, relType);
+
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
+            {
+                var repository = CreateRepository(provider, out var relationTypeRepository);
+
+                // Get parent entities for child id
+                var parents = repository.GetPagedParentEntitiesByChildId(media.Id, 0, 10, out var totalRecords).ToList();
+                Assert.AreEqual(1, totalRecords);
+                Assert.AreEqual(1, parents.Count);
+
+                // Get child entities for parent id
+                var children = repository.GetPagedChildEntitiesByParentId(media.Id, 0, 10, out totalRecords).ToList();
+                Assert.AreEqual(1, totalRecords);
+                Assert.AreEqual(1, children.Count);
+            }
+        }
+
+        [Test]
         public void Get_Paged_Child_Entities_By_Parent_Id()
         {
             CreateTestDataForPagingTests(out var createdContent, out var createdMembers, out var createdMedia);

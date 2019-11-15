@@ -160,40 +160,50 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #endregion
 
+        /// <summary>
+        /// Used for joining the entity query with relations for the paging methods
+        /// </summary>
+        /// <param name="sql"></param>
+        private void SqlJoinRelations(Sql<ISqlContext> sql)
+        {
+            // add left joins for relation tables (this joins on both child or parent, so beware that this will normally return entities for
+            // both sides of the relation type unless the IUmbracoEntity query passed in filters one side out).
+            sql.LeftJoin<RelationDto>().On<NodeDto, RelationDto>((left, right) => left.NodeId == right.ChildId || left.NodeId == right.ParentId);
+            sql.LeftJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>((left, right) => left.RelationType == right.Id);
+        }
+
         public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int childId, long pageIndex, int pageSize, out long totalRecords)
         {
-            // Create a query to match the child id
-            var relQuery = Query<IRelation>().Where(r => r.ChildId == childId);
-
-            // Because of the way that the entity repository joins relations (on both child or parent) we need to add
-            // a clause to filter out the child entity from being returned from the results
-            var entityQuery = Query<IUmbracoEntity>().Where(e => e.Id != childId);
-
             // var contentObjectTypes = new[] { Constants.ObjectTypes.Document, Constants.ObjectTypes.Media, Constants.ObjectTypes.Member }
             // we could pass in the contentObjectTypes so that the entity repository sql is configured to do full entity lookups so that we get the full data
             // required to populate content, media or members, else we get the bare minimum data needed to populate an entity. BUT if we do this it
             // means that the SQL is less efficient and returns data that is probably not needed for what we need this lookup for. For the time being we
             // will just return the bare minimum entity data.
 
-            return _entityRepository.GetPagedResultsByQuery(entityQuery, Array.Empty<Guid>(), pageIndex, pageSize, out totalRecords, null, null, relQuery);
+            return _entityRepository.GetPagedResultsByQuery(Query<IUmbracoEntity>(), Array.Empty<Guid>(), pageIndex, pageSize, out totalRecords, null, null, sql =>
+            {
+                SqlJoinRelations(sql);
+
+                sql.Where<RelationDto>(r => r.ChildId == childId);
+                sql.Where<RelationDto, NodeDto>((rel, node) => rel.ParentId == childId || node.NodeId != childId);
+            });
         }
 
         public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int parentId, long pageIndex, int pageSize, out long totalRecords)
         {
-            // Create a query to match the parent id
-            var relQuery = Query<IRelation>().Where(r => r.ParentId == parentId);
-
-            // Because of the way that the entity repository joins relations (on both child or parent) we need to add
-            // a clause to filter out the child entity from being returned from the results
-            var entityQuery = Query<IUmbracoEntity>().Where(e => e.Id != parentId);
-
             // var contentObjectTypes = new[] { Constants.ObjectTypes.Document, Constants.ObjectTypes.Media, Constants.ObjectTypes.Member }
             // we could pass in the contentObjectTypes so that the entity repository sql is configured to do full entity lookups so that we get the full data
             // required to populate content, media or members, else we get the bare minimum data needed to populate an entity. BUT if we do this it
             // means that the SQL is less efficient and returns data that is probably not needed for what we need this lookup for. For the time being we
             // will just return the bare minimum entity data.
 
-            return _entityRepository.GetPagedResultsByQuery(entityQuery, Array.Empty<Guid>(), pageIndex, pageSize, out totalRecords, null, null, relQuery);
+            return _entityRepository.GetPagedResultsByQuery(Query<IUmbracoEntity>(), Array.Empty<Guid>(), pageIndex, pageSize, out totalRecords, null, null, sql =>
+            {
+                SqlJoinRelations(sql);
+
+                sql.Where<RelationDto>(r => r.ParentId == parentId);
+                sql.Where<RelationDto, NodeDto>((rel, node) => rel.ChildId == parentId || node.NodeId != parentId);
+            });
         }
 
         public void Save(IEnumerable<IRelation> relations)
