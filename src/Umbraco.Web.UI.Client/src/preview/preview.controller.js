@@ -143,7 +143,10 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
                 setPageUrl();
             }
         };
-        
+
+        $scope.isCurrentCulture = function(culture) {
+            return $location.search().culture === culture;
+        }
     })
 
 

@@ -3,8 +3,6 @@ using System.Runtime.Serialization;
 
 namespace Umbraco.Core.Persistence
 {
-    // TODO: Would be good to use this exception type anytime we cannot find an entity
-
     /// <summary>
     /// An exception used to indicate that an Umbraco entity could not be found.
     /// </summary>

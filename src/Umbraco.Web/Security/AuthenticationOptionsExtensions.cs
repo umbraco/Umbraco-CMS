@@ -102,7 +102,7 @@ namespace Umbraco.Web.Security
                         var path = (PathString) prop.GetValue(options);
                         if (path.HasValue)
                         {
-                            UmbracoModule.ReservedPaths.TryAdd(path.ToString());
+                            RoutableDocumentFilter.ReservedPaths.TryAdd(path.ToString());
                         }
                     }
                 }
@@ -113,7 +113,7 @@ namespace Umbraco.Web.Security
             }
             else
             {
-                UmbracoModule.ReservedPaths.TryAdd(callbackPath);
+                RoutableDocumentFilter.ReservedPaths.TryAdd(callbackPath);
             }
         }
     }

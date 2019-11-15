@@ -248,14 +248,63 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return dto == null ? null : MapDtoToContent(dto);
         }
 
+        // deletes a specific version
+        public override void DeleteVersion(int versionId)
+        {
+            // TODO: test object node type?
+
+            // get the version we want to delete
+            var template = SqlContext.Templates.Get("Umbraco.Core.DocumentRepository.GetVersion", tsql =>
+                tsql.Select<ContentVersionDto>()
+                    .AndSelect<DocumentVersionDto>()
+                    .From<ContentVersionDto>()
+                    .InnerJoin<DocumentVersionDto>()
+                    .On<ContentVersionDto, DocumentVersionDto>((c, d) => c.Id == d.Id)
+                    .Where<ContentVersionDto>(x => x.Id == SqlTemplate.Arg<int>("versionId"))
+            );
+            var versionDto = Database.Fetch<DocumentVersionDto>(template.Sql(new { versionId })).FirstOrDefault();
+
+            // nothing to delete
+            if (versionDto == null)
+                return;
+
+            // don't delete the current or published version
+            if (versionDto.ContentVersionDto.Current)
+                throw new InvalidOperationException("Cannot delete the current version.");
+            else if (versionDto.Published)
+                throw new InvalidOperationException("Cannot delete the published version.");
+
+            PerformDeleteVersion(versionDto.ContentVersionDto.NodeId, versionId);
+        }
+
+        //  deletes all versions of an entity, older than a date.
+        public override void DeleteVersions(int nodeId, DateTime versionDate)
+        {
+            // TODO: test object node type?
+
+            // get the versions we want to delete, excluding the current one
+            var template = SqlContext.Templates.Get("Umbraco.Core.DocumentRepository.GetVersions", tsql =>
+               tsql.Select<ContentVersionDto>()
+                    .From<ContentVersionDto>()
+                    .InnerJoin<DocumentVersionDto>()
+                    .On<ContentVersionDto, DocumentVersionDto>((c, d) => c.Id == d.Id)
+                    .Where<ContentVersionDto>(x => x.NodeId == SqlTemplate.Arg<int>("nodeId") && !x.Current && x.VersionDate < SqlTemplate.Arg<DateTime>("versionDate"))
+                    .Where<DocumentVersionDto>( x => !x.Published)                    
+            );
+            var versionDtos = Database.Fetch<ContentVersionDto>(template.Sql(new { nodeId, versionDate }));
+            foreach (var versionDto in versionDtos)
+                PerformDeleteVersion(versionDto.NodeId, versionDto.Id);
+        }
+
         protected override void PerformDeleteVersion(int id, int versionId)
         {
             // raise event first else potential FK issues
             OnUowRemovingVersion(new ScopedVersionEventArgs(AmbientScope, id, versionId));
 
             Database.Delete<PropertyDataDto>("WHERE versionId = @versionId", new { versionId });
-            Database.Delete<ContentVersionDto>("WHERE id = @versionId", new { versionId });
+            Database.Delete<ContentVersionCultureVariationDto>("WHERE versionId = @versionId", new { versionId });
             Database.Delete<DocumentVersionDto>("WHERE id = @versionId", new { versionId });
+            Database.Delete<ContentVersionDto>("WHERE id = @versionId", new { versionId });
         }
 
         #endregion
@@ -386,7 +435,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 Database.BulkInsertRecords(GetContentVariationDtos(entity, publishing));
 
                 // insert document variations
-                Database.BulkInsertRecords(GetDocumentVariationDtos(entity, publishing, editedCultures));
+                Database.BulkInsertRecords(GetDocumentVariationDtos(entity, editedCultures));
             }
 
             // refresh content
@@ -511,7 +560,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 entity.VersionId = documentVersionDto.Id = contentVersionDto.Id; // get the new id
 
                 documentVersionDto.Published = false; // non-published version
-                Database.Insert(documentVersionDto);
+                Database.Insert(documentVersionDto); 
             }
 
             // replace the property data (rather than updating)
@@ -571,7 +620,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 Database.BulkInsertRecords(GetContentVariationDtos(entity, publishing));
 
                 // insert document variations
-                Database.BulkInsertRecords(GetDocumentVariationDtos(entity, publishing, editedCultures));
+                Database.BulkInsertRecords(GetDocumentVariationDtos(entity, editedCultures));
             }
 
             // refresh content
@@ -1297,25 +1346,28 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 };
         }
 
-        private IEnumerable<DocumentCultureVariationDto> GetDocumentVariationDtos(IContent content, bool publishing, HashSet<string> editedCultures)
+        private IEnumerable<DocumentCultureVariationDto> GetDocumentVariationDtos(IContent content, HashSet<string> editedCultures)
         {
             var allCultures = content.AvailableCultures.Union(content.PublishedCultures); // union = distinct
             foreach (var culture in allCultures)
-                yield return new DocumentCultureVariationDto
+            {
+                var dto = new DocumentCultureVariationDto
                 {
                     NodeId = content.Id,
                     LanguageId = LanguageRepository.GetIdByIsoCode(culture) ?? throw new InvalidOperationException("Not a valid culture."),
                     Culture = culture,
 
                     Name = content.GetCultureName(culture) ?? content.GetPublishName(culture),
-
-                    // note: can't use IsCultureEdited at that point - hasn't been updated yet - see PersistUpdatedItem
-
                     Available = content.IsCultureAvailable(culture),
                     Published = content.IsCulturePublished(culture),
+                    // note: can't use IsCultureEdited at that point - hasn't been updated yet - see PersistUpdatedItem
                     Edited = content.IsCultureAvailable(culture) &&
                              (!content.IsCulturePublished(culture) || (editedCultures != null && editedCultures.Contains(culture)))
                 };
+
+                yield return dto;
+            }
+                
         }
 
         private class ContentVariation

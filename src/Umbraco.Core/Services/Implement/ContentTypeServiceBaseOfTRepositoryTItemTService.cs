@@ -252,12 +252,12 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public IEnumerable<TItem> GetAll(params Guid[] ids)
+        public IEnumerable<TItem> GetAll(IEnumerable<Guid> ids)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);
-                return Repository.GetMany(ids);
+                return Repository.GetMany(ids.ToArray());
             }
         }
 
@@ -389,6 +389,11 @@ namespace Umbraco.Core.Services.Implement
 
                 if (string.IsNullOrWhiteSpace(item.Name))
                     throw new ArgumentException("Cannot save item with empty name.");
+
+                if (item.Name != null && item.Name.Length > 255)
+                {
+                    throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+                }
 
                 scope.WriteLock(WriteLockIds);
 

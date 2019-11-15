@@ -25,7 +25,7 @@ namespace Umbraco.Web.Install
         /// The view model.
         /// </value>
         /// <remarks>
-        /// This object should be serializable to prevent a <see cref="SerializationException" /> to be thrown.
+        /// This object is not included when serializing.
         /// </remarks>
         public object ViewModel { get; private set; }
 

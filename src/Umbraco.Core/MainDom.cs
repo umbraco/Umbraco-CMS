@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Web.Hosting;
 using Umbraco.Core.Logging;
@@ -64,7 +65,7 @@ namespace Umbraco.Core
             // a new process for the same application path
 
             var appPath = HostingEnvironment.ApplicationPhysicalPath;
-            var hash = (appId + ":::" + appPath).ToSHA1();
+            var hash = (appId + ":::" + appPath).GenerateHash<SHA1>();
 
             var lockName = "UMBRACO-" + hash + "-MAINDOM-LCK";
             _asyncLock = new AsyncLock(lockName);
@@ -113,7 +114,7 @@ namespace Umbraco.Core
 
             lock (_locko)
             {
-                _logger.Debug<MainDom>("Signaled {Signaled} ({SignalSource})", _signaled ? "(again)" : string.Empty, source);
+                _logger.Debug<MainDom>("Signaled ({Signaled}) ({SignalSource})", _signaled ? "again" : "first", source);
                 if (_signaled) return;
                 if (_isMainDom == false) return; // probably not needed
                 _signaled = true;
@@ -171,6 +172,7 @@ namespace Umbraco.Core
                 // if more than 1 instance reach that point, one will get the lock
                 // and the other one will timeout, which is accepted
 
+                //TODO: This can throw a TimeoutException - in which case should this be in a try/finally to ensure the signal is always reset?
                 _asyncLocker = _asyncLock.Lock(LockTimeoutMilliseconds);
                 _isMainDom = true;
 
@@ -181,6 +183,9 @@ namespace Umbraco.Core
                 // which is accepted
 
                 _signal.Reset();
+
+                //WaitOneAsync (ext method) will wait for a signal without blocking the main thread, the waiting is done on a background thread
+
                 _signal.WaitOneAsync()
                     .ContinueWith(_ => OnSignal("signal"));
 

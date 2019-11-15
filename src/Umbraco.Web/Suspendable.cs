@@ -50,6 +50,8 @@ namespace Umbraco.Web
             }
         }
 
+        //This is really needed at all since the only place this is used is in ExamineComponent and that already maintains a flag of whether it suspsended or not
+        // AHH... but Deploy probably uses this?
         public static class ExamineEvents
         {
             private static bool _tried, _suspended;

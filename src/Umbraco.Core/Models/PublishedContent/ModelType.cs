@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
@@ -76,7 +77,7 @@ namespace Umbraco.Core.Models.PublishedContent
                 return type;
             var def = type.GetGenericTypeDefinition();
             if (def == null)
-                throw new InvalidOperationException("panic");
+                throw new PanicException($"The type {type} has not generic type definition");
 
             var args = type.GetGenericArguments().Select(x => Map(x, modelTypes, true)).ToArray();
             return def.MakeGenericType(args);
@@ -115,7 +116,7 @@ namespace Umbraco.Core.Models.PublishedContent
                 return type.FullName;
             var def = type.GetGenericTypeDefinition();
             if (def == null)
-                throw new InvalidOperationException("panic");
+                throw new PanicException($"The type {type} has not generic type definition");
 
             var args = type.GetGenericArguments().Select(x => MapToName(x, map, true)).ToArray();
             var defFullName = def.FullName.Substring(0, def.FullName.IndexOf('`'));

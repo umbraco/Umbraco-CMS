@@ -54,6 +54,7 @@
 </pre>
 
 @param {boolean} checked Set to <code>true</code> or <code>false</code> to toggle the switch.
+@param {string} inputId Set the <code>id</code> of the toggle.
 @param {callback} onClick The function which should be called when the toggle is clicked.
 @param {string=} showLabels Set to <code>true</code> or <code>false</code> to show a "On" or "Off" label next to the switch.
 @param {string=} labelOn Set a custom label for when the switched is turned on. It will default to "On".
@@ -122,6 +123,7 @@
             scope: {
                 checked: "=",
                 disabled: "=",
+                inputId: "@",
                 onClick: "&",
                 labelOn: "@?",
                 labelOff: "@?",

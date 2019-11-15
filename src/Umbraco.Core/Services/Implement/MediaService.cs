@@ -138,6 +138,10 @@ namespace Umbraco.Core.Services.Implement
             var parent = parentId > 0 ? GetById(parentId) : null;
             if (parentId > 0 && parent == null)
                 throw new ArgumentException("No media with that id.", nameof(parentId));
+            if (name != null && name.Length > 255)
+            {
+                throw new InvalidOperationException("Name cannot be more than 255 characters in length."); throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+            }
 
             var media = new Models.Media(name, parentId, mediaType);
             using (var scope = ScopeProvider.CreateScope())
@@ -167,6 +171,10 @@ namespace Umbraco.Core.Services.Implement
             var mediaType = GetMediaType(mediaTypeAlias);
             if (mediaType == null)
                 throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias));
+            if (name != null && name.Length > 255)
+            {
+                throw new InvalidOperationException("Name cannot be more than 255 characters in length."); throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+            }
 
             var media = new Models.Media(name, -1, mediaType);
             using (var scope = ScopeProvider.CreateScope())
@@ -201,6 +209,10 @@ namespace Umbraco.Core.Services.Implement
                 var mediaType = GetMediaType(mediaTypeAlias);
                 if (mediaType == null)
                     throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias)); // causes rollback
+                if (name != null && name.Length > 255)
+                {
+                    throw new InvalidOperationException("Name cannot be more than 255 characters in length."); throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+                }
 
                 var media = new Models.Media(name, parent, mediaType);
                 CreateMedia(scope, media, parent, userId, false);
@@ -647,6 +659,11 @@ namespace Umbraco.Core.Services.Implement
                 if (string.IsNullOrWhiteSpace(media.Name))
                     throw new ArgumentException("Media has no name.", nameof(media));
 
+                if (media.Name != null && media.Name.Length > 255)
+                {
+                    throw new InvalidOperationException("Name cannot be more than 255 characters in length."); throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+                }
+
                 scope.WriteLock(Constants.Locks.MediaTree);
                 if (media.HasIdentity == false)
                     media.CreatorId = userId;
@@ -759,7 +776,7 @@ namespace Umbraco.Core.Services.Implement
             const int pageSize = 500;
             var page = 0;
             var total = long.MaxValue;
-            while(page * pageSize < total)
+            while (page * pageSize < total)
             {
                 //get descendants - ordered from deepest to shallowest
                 var descendants = GetPagedDescendants(media.Id, page, pageSize, out total, ordering: Ordering.By("Path", Direction.Descending));
@@ -944,7 +961,7 @@ namespace Umbraco.Core.Services.Implement
                 // if media was trashed, and since we're not moving to the recycle bin,
                 // indicate that the trashed status should be changed to false, else just
                 // leave it unchanged
-                var trashed = media.Trashed ? false : (bool?) null;
+                var trashed = media.Trashed ? false : (bool?)null;
 
                 PerformMoveLocked(media, parentId, parent, userId, moves, trashed);
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IMedia>(media, TreeChangeTypes.RefreshBranch).ToEventArgs());
@@ -1008,7 +1025,7 @@ namespace Umbraco.Core.Services.Implement
 
         private void PerformMoveMediaLocked(IMedia media, int userId, bool? trash)
         {
-            if (trash.HasValue) ((ContentBase) media).Trashed = trash.Value;
+            if (trash.HasValue) ((ContentBase)media).Trashed = trash.Value;
             _mediaRepository.Save(media);
         }
 

@@ -27,7 +27,7 @@
                         </umb-control-group>
 
                         <umb-control-group label="@stylesheet_styles" description="@stylesheet_stylesHelp">
-                            <textarea class="umb-stylesheet-rule-styles" ng-model="model.rule.styles" required></textarea>
+                            <textarea class="umb-stylesheet-rule-styles" ng-model="model.rule.styles" ng-required="model.rule.selector.charAt(0) === '.' || model.rule.selector.charAt(0) === '#' "></textarea>
                         </umb-control-group>
 
                         <umb-control-group label="@stylesheet_preview" description="@stylesheet_previewHelp">

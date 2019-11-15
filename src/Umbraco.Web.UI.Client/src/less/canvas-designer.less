@@ -163,7 +163,8 @@ a, a:hover{
     background-clip: padding-box;
 }
 
-.dropdown-menu > li > a {
+.dropdown-menu > li > a,
+.dropdown-menu > li > button {
     display: block;
     padding: 3px 20px;
     clear: both;
@@ -174,7 +175,12 @@ a, a:hover{
     cursor:pointer;
 }
 
-.dropdown-menu > li > a:hover, .dropdown-menu > li > a:focus, .dropdown-submenu:hover > a, .dropdown-submenu:focus > a {
+.dropdown-menu > li > a:hover, 
+.dropdown-menu > li > a:focus, 
+.dropdown-menu > li > button:hover, 
+.dropdown-menu > li > button:focus, 
+.dropdown-submenu:hover > a, 
+.dropdown-submenu:focus > a {
     color: #000000;
     background: #e4e0dd;
 }
@@ -266,7 +272,6 @@ a, a:hover{
 ul.sections {
     display: block;
     background: #1b264f;
-    height: 100%;
     position:absolute;
     top: 90px;
     width: 80px;
@@ -275,12 +280,21 @@ ul.sections {
     margin:0;
     padding:0;
     margin-left: -80px;
+    overflow: auto;
+    overflow-x: hidden;
+    height: calc(100% - 91px);
+
+    &::-webkit-scrollbar {
+        width: 0px;
+        background: transparent; 
+    }
 }
 
 ul.sections li {
     display: block;
     border-left: 4px #1b264f solid;
     transition: all .3s linear;
+    cursor: pointer;
 }
 
 .fix-left-menu ul.sections li a span,
@@ -302,35 +316,40 @@ ul.sections li a {
     &:hover {
         span, i {
             opacity: 1;
+            color:#fff;
         }
     }
 }
 
 ul.sections li a i {
     font-size: 30px;
+    opacity: 0.8;
 }
 
 ul.sections li a span {
-    display:block;
+    display: block;
     font-size: 10px;
     line-height: 1.4em;
-    opacity: 0.4;
+    opacity: 0.8;
 }
 
 ul.sections li.current {
-    background-color: #2E2246;
-}
-
-ul.sections li.current a i {
-    color: #ffffff;
-}
-
-ul.sections li.current, ul.sections li:hover {
     border-left: 4px #f5c1bc solid;
 }
 
-.fix-left-menu:hover ul.sections li a span,
-.fix-left-menu:hover ul.sections li a i,
+ul.sections li.current a i {
+    color: #f5c1bc;
+}
+
+ul.sections li.current {
+    border-left: 4px #f5c1bc solid;
+}
+
+ul.sections li:hover a i,
+ul.sections li:hover a span {
+    opacity: 1;
+}
+
 .fix-left-menu:hover .help {
     opacity: 1;
 }

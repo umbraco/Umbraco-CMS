@@ -221,7 +221,13 @@ namespace Umbraco.Core.Models
             return true;
         }
 
-        public static void UnpublishCulture(this IContent content, string culture = "*")
+        /// <summary>
+        /// Returns false if the culture is already unpublished
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="culture"></param>
+        /// <returns></returns>
+        public static bool UnpublishCulture(this IContent content, string culture = "*")
         {
             culture = culture.NullOrWhiteSpaceAsNull();
 
@@ -229,16 +235,31 @@ namespace Umbraco.Core.Models
             if (!content.ContentType.SupportsPropertyVariation(culture, "*", true))
                 throw new NotSupportedException($"Culture \"{culture}\" is not supported by content type \"{content.ContentType.Alias}\" with variation \"{content.ContentType.Variations}\".");
 
-            if (culture == "*") // all cultures
+
+            var keepProcessing = true;
+
+            if (culture == "*")
+            {
+                // all cultures
                 content.ClearPublishInfos();
-            else // one single culture
-                content.ClearPublishInfo(culture);
+            }
+            else
+            {
+                // one single culture
+                keepProcessing = content.ClearPublishInfo(culture);
+            }
+            
 
-            // property.PublishValues only publishes what is valid, variation-wise
-            foreach (var property in content.Properties)
-                property.UnpublishValues(culture);
+            if (keepProcessing)
+            {
+                // property.PublishValues only publishes what is valid, variation-wise
+                foreach (var property in content.Properties)
+                    property.UnpublishValues(culture);
 
-            content.PublishedState = PublishedState.Publishing;
+                content.PublishedState = PublishedState.Publishing;
+            }
+
+            return keepProcessing;
         }
 
         public static void ClearPublishInfos(this IContent content)
@@ -246,15 +267,24 @@ namespace Umbraco.Core.Models
             content.PublishCultureInfos = null;
         }
 
-        public static void ClearPublishInfo(this IContent content, string culture)
+        /// <summary>
+        /// Returns false if the culture is already unpublished
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="culture"></param>
+        /// <returns></returns>
+        public static bool ClearPublishInfo(this IContent content, string culture)
         {
             if (culture == null) throw new ArgumentNullException(nameof(culture));
             if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(culture));
 
-            content.PublishCultureInfos.Remove(culture);
-
-            // set the culture to be dirty - it's been modified
-            content.TouchCulture(culture);
+            var removed = content.PublishCultureInfos.Remove(culture);
+            if (removed)
+            {
+                // set the culture to be dirty - it's been modified
+                content.TouchCulture(culture);
+            }
+            return removed;
         }
 
         /// <summary>

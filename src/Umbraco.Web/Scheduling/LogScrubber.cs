@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 
 namespace Umbraco.Web.Scheduling
 {
+
     internal class LogScrubber : RecurringTaskBase
     {
         private readonly IRuntimeState _runtime;

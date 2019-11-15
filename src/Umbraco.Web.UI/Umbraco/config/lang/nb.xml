@@ -2,7 +2,7 @@
 <language alias="no" intName="Norwegian" localName="norsk" lcid="20" culture="nb-NO">
   <creator>
     <name>The Umbraco community</name>
-    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Angi domene</key>
@@ -234,7 +234,6 @@
     <key alias="linkinternal">Intern link:</key>
     <key alias="linklocaltip">Ved lokal link, sett inn "#" foran link</key>
     <key alias="linknewwindow">Åpne i nytt vindu?</key>
-    <key alias="macroContainerSettings">Makroinnstillinger</key>
     <key alias="macroDoesNotHaveProperties">Denne makroen har ingen egenskaper du kan endre</key>
     <key alias="paste">Lim inn</key>
     <key alias="permissionsEdit">Endre rettigheter for</key>
@@ -437,7 +436,7 @@
     <key alias="databaseHeader">Databasekonfigurasjon</key>
     <key alias="databaseInstall"><![CDATA[Klikk <strong>installer</strong>-knappen for å installere Umbraco %0% databasen]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% har nå blitt kopiert til din database. Trykk <strong>Neste</strong> for å fortsette.]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>Databasen ble ikke funnet! Vennligst sjekk at informasjonen i "connection string" i "web.config"-filen er korrekt.</p><p>For å fortsette, vennligst rediger "web.config"-filen (bruk Visual Studio eller din favoritteditor), rull ned til bunnen, og legg til tilkoblingsstrengen for din database i nøkkelen "umbracoDbDSN" og lagre filen.</p><p>Klikk <strong>prøv på nytt</strong> når du er ferdig.<br /> <a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">Mer informasjon om redigering av web.config her.</a></p>]]></key>
+    <key alias="databaseNotFound"><![CDATA[<p>Databasen ble ikke funnet! Vennligst sjekk at informasjonen i "connection string" i "web.config"-filen er korrekt.</p><p>For å fortsette, vennligst rediger "web.config"-filen (bruk Visual Studio eller din favoritteditor), rull ned til bunnen, og legg til tilkoblingsstrengen for din database i nøkkelen "umbracoDbDSN" og lagre filen.</p><p>Klikk <strong>prøv på nytt</strong> når du er ferdig.<br /> <a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">Mer informasjon om redigering av web.config her.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[For å fullføre dette steget, må du vite en del informasjon om din database server ("tilkoblingsstreng").<br/> Vennligst kontakt din ISP om nødvendig. Hvis du installerer på en lokal maskin eller server, må du kanskje skaffe informasjonen fra din systemadministrator.]]></key>
     <key alias="databaseUpgrade"><![CDATA[<p> Trykk på knappen <strong>oppgrader</strong> for å oppgradere databasen din til Umbraco %0%</p> <p> Ikke vær urolig - intet innhold vil bli slettet og alt vil fortsette å virke etterpå! </p>]]></key>
     <key alias="databaseUpgradeDone"><![CDATA[Databasen din har blitt oppgradert til den siste utgaven, %0%.<br/>Trykk <strong>Neste</strong> for å fortsette.]]></key>
