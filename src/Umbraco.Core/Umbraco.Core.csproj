@@ -350,6 +350,7 @@
     <Compile Include="Configuration\UmbracoSettings\ITourSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IUmbracoSettingsSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IWebRoutingSection.cs" />
+    <Compile Include="Configuration\UmbracoSettings\IKeepAliveSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\LoggingElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\NotificationsElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\RequestHandlerElement.cs" />
@@ -359,6 +360,7 @@
     <Compile Include="Configuration\UmbracoSettings\UmbracoSettingsSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\UrlReplacingElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\WebRoutingElement.cs" />
+    <Compile Include="Configuration\UmbracoSettings\KeepAliveElement.cs" />
     <Compile Include="Configuration\UmbracoVersion.cs" />
     <Compile Include="Constants-Applications.cs" />
     <Compile Include="Constants-Conventions.cs" />

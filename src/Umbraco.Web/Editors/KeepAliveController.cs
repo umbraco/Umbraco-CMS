@@ -8,7 +8,6 @@ namespace Umbraco.Web.Editors
 {
     public class KeepAliveController : UmbracoApiController
     {
-        [OnlyLocalRequests]
         [HttpGet]
         public KeepAlivePingResult Ping()
         {

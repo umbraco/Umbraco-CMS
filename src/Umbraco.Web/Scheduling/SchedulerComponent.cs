@@ -99,7 +99,11 @@ namespace Umbraco.Web.Scheduling
 
                 var tasks = new List<IBackgroundTask>();
 
-                tasks.Add(RegisterKeepAlive());
+                if (settings.KeepAlive.EnableKeepAliveTask)
+                {
+                    tasks.Add(RegisterKeepAlive());
+                }
+
                 tasks.Add(RegisterScheduledPublishing());
                 tasks.Add(RegisterLogScrubber(settings));
                 tasks.Add(RegisterTempFileCleanup());

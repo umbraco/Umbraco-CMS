@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
 
@@ -46,25 +47,28 @@ namespace Umbraco.Web.Scheduling
 
             using (_logger.DebugDuration<KeepAlive>("Keep alive executing", "Keep alive complete"))
             {
-                string umbracoAppUrl = null;
+                string keepAlivePingUrl = Current.Configs.Settings().KeepAlive.KeepAlivePingUrl;
 
                 try
                 {
-                    umbracoAppUrl = _runtime.ApplicationUrl.ToString();
-                    if (umbracoAppUrl.IsNullOrWhiteSpace())
+                    if (keepAlivePingUrl.Contains("{umbracoApplicationUrl}"))
                     {
-                        _logger.Warn<KeepAlive>("No url for service (yet), skip.");
-                        return true; // repeat
+                        var umbracoAppUrl = _runtime.ApplicationUrl.ToString();
+                        if (umbracoAppUrl.IsNullOrWhiteSpace())
+                        {
+                            _logger.Warn<KeepAlive>("No umbracoApplicationUrl for service (yet), skip.");
+                            return true; // repeat
+                        }
+
+                        keepAlivePingUrl = keepAlivePingUrl.Replace("{umbracoApplicationUrl}", umbracoAppUrl.TrimEnd('/'));
                     }
 
-                    var url = umbracoAppUrl.TrimEnd('/') + "/api/keepalive/ping";
-
-                    var request = new HttpRequestMessage(HttpMethod.Get, url);
+                    var request = new HttpRequestMessage(HttpMethod.Get, keepAlivePingUrl);
                     var result = await _httpClient.SendAsync(request, token);
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error<KeepAlive>(ex, "Keep alive failed (at '{UmbracoAppUrl}').", umbracoAppUrl);
+                    _logger.Error<KeepAlive>(ex, "Keep alive failed (at '{keepAlivePingUrl}').", keepAlivePingUrl);
                 }
             }
 
