@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.IO
 {
@@ -34,11 +35,12 @@ namespace Umbraco.Core.IO
         #region Constructor
 
         // DI wants a public ctor
-        public FileSystems(IFactory container, ILogger logger, IIOHelper ioHelper)
+        public FileSystems(IFactory container, ILogger logger, IIOHelper ioHelper, IGlobalSettings globalSettings)
         {
             _container = container;
             _logger = logger;
             _ioHelper = ioHelper;
+            _globalSettings = globalSettings;
         }
 
         // for tests only, totally unsafe
@@ -122,11 +124,11 @@ namespace Umbraco.Core.IO
         // but it does not really matter what we return - here, null
         private object CreateWellKnownFileSystems()
         {
-            var macroPartialFileSystem = new PhysicalFileSystem(SystemDirectories.MacroPartials, _ioHelper);
-            var partialViewsFileSystem = new PhysicalFileSystem(SystemDirectories.PartialViews, _ioHelper);
-            var stylesheetsFileSystem = new PhysicalFileSystem(SystemDirectories.Css, _ioHelper);
-            var scriptsFileSystem = new PhysicalFileSystem(SystemDirectories.Scripts, _ioHelper);
-            var mvcViewsFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews, _ioHelper);
+            var macroPartialFileSystem = new PhysicalFileSystem(Constants.SystemDirectories.MacroPartials, _ioHelper);
+            var partialViewsFileSystem = new PhysicalFileSystem(Constants.SystemDirectories.PartialViews, _ioHelper);
+            var stylesheetsFileSystem = new PhysicalFileSystem(_globalSettings.UmbracoCssPath, _ioHelper);
+            var scriptsFileSystem = new PhysicalFileSystem(_globalSettings.UmbracoScriptsPath, _ioHelper);
+            var mvcViewsFileSystem = new PhysicalFileSystem(Constants.SystemDirectories.MvcViews, _ioHelper);
 
             _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, "macro-partials", _ioHelper, IsScoped);
             _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, "partials", _ioHelper, IsScoped);
@@ -152,6 +154,7 @@ namespace Umbraco.Core.IO
 
         // internal for tests
         internal IReadOnlyDictionary<Type, string> Paths => _paths;
+        private IGlobalSettings _globalSettings;
 
         /// <summary>
         /// Gets a strongly-typed filesystem.

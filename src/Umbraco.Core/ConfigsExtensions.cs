@@ -35,7 +35,7 @@ namespace Umbraco.Core
         {
             var configDir = new DirectoryInfo(Current.IOHelper.MapPath(Constants.SystemDirectories.Config));
 
-            configs.Add<IGlobalSettings>(() => new GlobalSettings(ioHelper));
+            configs.Add<IGlobalSettings>(() => new GlobalSettings(Current.IOHelper));
             configs.Add<IUmbracoSettingsSection>("umbracoConfiguration/settings");
             configs.Add<IHealthChecks>("umbracoConfiguration/HealthChecks");
 

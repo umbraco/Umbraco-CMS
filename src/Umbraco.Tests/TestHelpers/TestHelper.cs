@@ -64,12 +64,12 @@ namespace Umbraco.Tests.TestHelpers
 
         public static void InitializeContentDirectories()
         {
-            CreateDirectories(new[] { Constants.SystemDirectories.MvcViews, new GlobalSettings().UmbracoMediaPath, Constants.SystemDirectories.AppPlugins });
+            CreateDirectories(new[] { Constants.SystemDirectories.MvcViews, new GlobalSettings(IOHelper.Default).UmbracoMediaPath, Constants.SystemDirectories.AppPlugins });
         }
 
         public static void CleanContentDirectories()
         {
-            CleanDirectories(new[] { Constants.SystemDirectories.MvcViews, new GlobalSettings().UmbracoMediaPath });
+            CleanDirectories(new[] { Constants.SystemDirectories.MvcViews, new GlobalSettings(IOHelper.Default).UmbracoMediaPath });
         }
 
         public static void CreateDirectories(string[] directories)
