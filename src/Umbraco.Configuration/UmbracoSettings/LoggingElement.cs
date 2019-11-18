@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    public class LoggingElement : UmbracoConfigurationElement, ILoggingSection
+    internal class LoggingElement : UmbracoConfigurationElement, ILoggingSection
     {
 
         [ConfigurationProperty("maxLogAge")]

@@ -3,7 +3,7 @@ using System.Xml.Linq;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    public class ContentErrorPageElement : InnerTextConfigurationElement<string>, IContentErrorPage
+    internal class ContentErrorPageElement : InnerTextConfigurationElement<string>, IContentErrorPage
     {
         public ContentErrorPageElement(XElement rawXml)
             : base(rawXml)

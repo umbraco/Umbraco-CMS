@@ -51,9 +51,8 @@ namespace Umbraco.Tests.Routing
         public class TestRuntime : WebRuntime
         {
             public TestRuntime(UmbracoApplicationBase umbracoApplication, Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger)
-                : base(umbracoApplication, configs, umbracoVersion, ioHelper, logger)
+                : base(umbracoApplication, configs, umbracoVersion, ioHelper, Mock.Of<ILogger>())
             {
-                Logger = Mock.Of<ILogger>();
             }
 
             protected override IProfiler GetProfiler() => Mock.Of<IProfiler>();

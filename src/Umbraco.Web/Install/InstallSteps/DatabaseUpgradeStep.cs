@@ -66,7 +66,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             var databaseSettings = Current.Configs.ConnectionStrings()[Constants.System.UmbracoConnectionName];
 
-            if (DatabaseHelper.IsConnectionStringConfigured(databaseSettings))
+            if (databaseSettings.IsConnectionStringConfigured())
             {
                 // a connection string was present, determine whether this is an install/upgrade
                 // return true (upgrade) if there is an installed version, else false (install)

@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    public class UmbracoSettingsSection : ConfigurationSection, IUmbracoSettingsSection
+    internal class UmbracoSettingsSection : ConfigurationSection, IUmbracoSettingsSection
     {
         [ConfigurationProperty("backOffice")]
         public BackOfficeElement BackOffice => (BackOfficeElement)this["backOffice"];

@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Configurations
             globalSettingsMock.Setup(x => x.Path).Returns(() => Current.IOHelper.ResolveUrl(path));
 
             Current.IOHelper.Root = rootPath;
-            Assert.AreEqual(outcome, globalSettings.GetUmbracoMvcAreaNoCache(Core.IO.IOHelper.Default));
+            Assert.AreEqual(outcome, globalSettings.GetUmbracoMvcAreaNoCache(IOHelper));
         }
 
 

@@ -21,15 +21,17 @@ namespace Umbraco.Web.Install
         private readonly HttpContextBase _httpContext;
         private readonly ILogger _logger;
         private readonly IGlobalSettings _globalSettings;
+        private readonly IUmbracoVersion _umbracoVersion;
         private InstallationType? _installationType;
 
         public InstallHelper(IUmbracoContextAccessor umbracoContextAccessor,
             DatabaseBuilder databaseBuilder,
-            ILogger logger, IGlobalSettings globalSettings)
+            ILogger logger, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion)
         {
             _httpContext = umbracoContextAccessor.UmbracoContext.HttpContext;
             _logger = logger;
             _globalSettings = globalSettings;
+            _umbracoVersion = umbracoVersion;
             _databaseBuilder = databaseBuilder;
         }
 
@@ -72,10 +74,10 @@ namespace Umbraco.Web.Install
                     IsBrandNewInstall == false,
                     isCompleted,
                     DateTime.Now,
-                    Current.UmbracoVersion.Current.Major,
-                    Current.UmbracoVersion.Current.Minor,
-                    Current.UmbracoVersion.Current.Build,
-                    Current.UmbracoVersion.Comment,
+                    _umbracoVersion.Current.Major,
+                    _umbracoVersion.Current.Minor,
+                    _umbracoVersion.Current.Build,
+                    _umbracoVersion.Comment,
                     errorMsg,
                     userAgent,
                     dbProvider);
@@ -112,7 +114,7 @@ namespace Umbraco.Web.Install
             {
                 var databaseSettings = Current.Configs.ConnectionStrings()[Constants.System.UmbracoConnectionName];
                 if (_globalSettings.ConfigurationStatus.IsNullOrWhiteSpace()
-                    && DatabaseHelper.IsConnectionStringConfigured(databaseSettings) == false)
+                    && databaseSettings.IsConnectionStringConfigured() == false)
                 {
                     //no version or conn string configured, must be a brand new install
                     return true;
@@ -120,7 +122,7 @@ namespace Umbraco.Web.Install
 
                 //now we have to check if this is really a new install, the db might be configured and might contain data
 
-                if (DatabaseHelper.IsConnectionStringConfigured(databaseSettings) == false
+                if (databaseSettings.IsConnectionStringConfigured() == false
                     || _databaseBuilder.IsDatabaseConfigured == false)
                 {
                     return true;
@@ -138,7 +140,7 @@ namespace Umbraco.Web.Install
             var packages = new List<Package>();
             try
             {
-                var requestUri = $"https://our.umbraco.com/webapi/StarterKit/Get/?umbracoVersion={Current.UmbracoVersion.Current}";
+                var requestUri = $"https://our.umbraco.com/webapi/StarterKit/Get/?umbracoVersion={_umbracoVersion.Current}";
 
                 using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))
                 {

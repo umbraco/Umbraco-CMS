@@ -10,7 +10,6 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Sync;
@@ -52,7 +51,7 @@ namespace Umbraco.Core.Runtime
         /// <summary>
         /// Gets the logger.
         /// </summary>
-        protected ILogger Logger { get; set; }
+        protected ILogger Logger { get; }
 
         /// <summary>
         /// Gets the profiler.
@@ -73,7 +72,7 @@ namespace Umbraco.Core.Runtime
         /// Gets the <see cref="IIOHelper"/>
         /// </summary>
         protected IIOHelper IOHelper { get; }
-        protected Configs Configs { get; set; }
+        protected Configs Configs { get; }
         protected IUmbracoVersion UmbracoVersion { get; }
 
         /// <inheritdoc />

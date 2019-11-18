@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    public class CharCollection : ConfigurationElementCollection, IEnumerable<IChar>
+    internal class CharCollection : ConfigurationElementCollection, IEnumerable<IChar>
     {
         internal void Add(CharElement c)
         {

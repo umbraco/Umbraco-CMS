@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    public class ImagingAutoFillPropertiesCollection : ConfigurationElementCollection, IEnumerable<IImagingAutoFillUploadField>
+    internal class ImagingAutoFillPropertiesCollection : ConfigurationElementCollection, IEnumerable<IImagingAutoFillUploadField>
     {
 
         protected override ConfigurationElement CreateNewElement()

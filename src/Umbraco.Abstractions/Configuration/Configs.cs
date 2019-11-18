@@ -15,6 +15,16 @@ namespace Umbraco.Core.Configuration
     {
         private readonly Func<string, object> _configGetter;
 
+        public IFactory Factory
+        {
+            get => _factory;
+            set
+            {
+                if(!(_factory is null)) throw new InvalidOperationException("Factory cannot be set multiple times");
+                _factory = value;
+            }
+        }
+
         public Configs(Func<string, object> configGetter)
         {
             _configGetter = configGetter;
@@ -22,6 +32,7 @@ namespace Umbraco.Core.Configuration
 
         private readonly Dictionary<Type, Lazy<object>> _configs = new Dictionary<Type, Lazy<object>>();
         private Dictionary<Type, Action<IRegister>> _registerings = new Dictionary<Type, Action<IRegister>>();
+        private IFactory _factory;
 
         /// <summary>
         /// Gets a configuration.
@@ -65,7 +76,7 @@ namespace Umbraco.Core.Configuration
 
             _configs[typeOfConfig] = new Lazy<object>(() =>
             {
-                if (CurrentCore.HasFactory) return CurrentCore.Factory.GetInstance<TConfig>();
+                if (!(Factory is null)) return Factory.GetInstance<TConfig>();
                 throw new InvalidOperationException($"Cannot get configuration of type {typeOfConfig} during composition.");
             });
             _registerings[typeOfConfig] = register => register.Register(configFactory, Lifetime.Singleton);
@@ -90,9 +101,7 @@ namespace Umbraco.Core.Configuration
             {
                 if ((_configGetter(sectionName) is TConfig config))
                     return config;
-//                var ex = new ConfigurationErrorsException($"Could not get configuration section \"{sectionName}\" from config files.");
-                var ex = new Exception($"Could not get configuration section \"{sectionName}\" from config files.");
-//                Current.Logger.Error<Configs>(ex, "Config error");
+                var ex = new InvalidOperationException($"Could not get configuration section \"{sectionName}\" from config files.");
                 throw ex;
             }
         }
@@ -114,7 +123,5 @@ namespace Umbraco.Core.Configuration
             // no need to keep them around
             _registerings = null;
         }
-
-
     }
 }

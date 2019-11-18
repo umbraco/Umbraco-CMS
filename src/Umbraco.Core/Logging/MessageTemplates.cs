@@ -8,9 +8,6 @@ using Serilog.Parsing;
 
 namespace Umbraco.Core.Logging
 {
-    /// <summary>
-    /// Provides tools to support message templates.
-    /// </summary>
     public class MessageTemplates : IMessageTemplates
     {
         // Umbraco now uses Message Templates (https://messagetemplates.org/) for logging, which means

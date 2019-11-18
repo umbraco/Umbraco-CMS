@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    public class CharElement : InnerTextConfigurationElement<string>, IChar
+    internal class CharElement : InnerTextConfigurationElement<string>, IChar
     {
         private string _char;
         private string _replacement;

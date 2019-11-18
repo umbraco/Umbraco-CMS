@@ -27,11 +27,13 @@ namespace Umbraco.Web.Security.Providers
         where T : IMembershipMemberService<TEntity>
         where TEntity : class, IMembershipUser
     {
+        private readonly IUmbracoVersion _umbracoVersion;
 
         protected IMembershipMemberService<TEntity> MemberService { get; private set; }
 
-        protected UmbracoMembershipProvider(IMembershipMemberService<TEntity> memberService)
+        protected UmbracoMembershipProvider(IMembershipMemberService<TEntity> memberService, IUmbracoVersion umbracoVersion)
         {
+            _umbracoVersion = umbracoVersion;
             MemberService = memberService;
         }
 
@@ -355,7 +357,7 @@ namespace Umbraco.Web.Security.Providers
                 // http://issues.umbraco.org/issue/U4-3451
 
                 // when upgrading from 7.2 to 7.3 trying to save will throw
-                if (Current.UmbracoVersion.Current >= new Version(7, 3, 0, 0))
+                if (_umbracoVersion.Current >= new Version(7, 3, 0, 0))
                     MemberService.Save(member, false);
             }
 
@@ -595,7 +597,7 @@ namespace Umbraco.Web.Security.Providers
             // for this type of thing (i.e. UpdateLastLogin or similar).
 
             // when upgrading from 7.2 to 7.3 trying to save will throw
-            if (Current.UmbracoVersion.Current >= new Version(7, 3, 0, 0))
+            if (_umbracoVersion.Current >= new Version(7, 3, 0, 0))
                 MemberService.Save(member, false);
 
             return new ValidateUserResult

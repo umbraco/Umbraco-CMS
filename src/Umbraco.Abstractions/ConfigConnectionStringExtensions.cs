@@ -1,15 +1,14 @@
 using System;
 using System.IO;
 using System.Linq;
-using Umbraco.Core;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core
 {
 
-    public static class DatabaseHelper
+    public static class ConfigConnectionStringExtensions
     {
-        public static bool IsConnectionStringConfigured(ConfigConnectionString databaseSettings)
+        public static bool IsConnectionStringConfigured(this ConfigConnectionString databaseSettings)
         {
             var dbIsSqlCe = false;
             if (databaseSettings?.ProviderName != null)

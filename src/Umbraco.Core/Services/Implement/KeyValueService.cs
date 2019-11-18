@@ -15,12 +15,14 @@ namespace Umbraco.Core.Services.Implement
         private readonly object _initialock = new object();
         private readonly IScopeProvider _scopeProvider;
         private readonly ILogger _logger;
+        private readonly IUmbracoVersion _umbracoVersion;
         private bool _initialized;
 
-        public KeyValueService(IScopeProvider scopeProvider, ILogger logger)
+        public KeyValueService(IScopeProvider scopeProvider, ILogger logger, IUmbracoVersion umbracoVersion)
         {
             _scopeProvider = scopeProvider;
             _logger = logger;
+            _umbracoVersion = umbracoVersion;
         }
 
         private void EnsureInitialized()
@@ -40,7 +42,7 @@ namespace Umbraco.Core.Services.Implement
             // if already running 8, either following an upgrade or an install,
             // then everything should be ok (the table should exist, etc)
 
-            if (Current.UmbracoVersion.LocalVersion != null && Current.UmbracoVersion.LocalVersion.Major >= 8)
+            if (_umbracoVersion.LocalVersion != null && _umbracoVersion.LocalVersion.Major >= 8)
             {
                 _initialized = true;
                 return;

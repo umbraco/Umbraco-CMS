@@ -74,7 +74,7 @@ namespace Umbraco.Web.Install.InstallSteps
             //If the connection string is already present in web.config we don't need to show the settings page and we jump to installing/upgrading.
             var databaseSettings = Current.Configs.ConnectionStrings()[Constants.System.UmbracoConnectionName];
 
-            if (DatabaseHelper.IsConnectionStringConfigured(databaseSettings))
+            if (databaseSettings.IsConnectionStringConfigured())
             {
                 try
                 {

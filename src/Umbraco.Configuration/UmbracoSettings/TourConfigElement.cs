@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    public class TourConfigElement : UmbracoConfigurationElement, ITourSection
+    internal class TourConfigElement : UmbracoConfigurationElement, ITourSection
     {
         //disabled by default so that upgraders don't get it enabled by default
         // TODO: we probably just want to disable the initial one from automatically loading ?

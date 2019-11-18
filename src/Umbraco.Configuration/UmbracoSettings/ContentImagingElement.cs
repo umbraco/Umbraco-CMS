@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    public class ContentImagingElement : ConfigurationElement
+    internal class ContentImagingElement : ConfigurationElement
     {
 
         [ConfigurationProperty("imageFileTypes")]

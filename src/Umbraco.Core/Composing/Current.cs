@@ -61,7 +61,7 @@ namespace Umbraco.Core.Composing
             }
         }
 
-        internal static bool HasFactory => _factory != null;
+        public static bool HasFactory => _factory != null;
 
         /// <summary>
         /// Resets <see cref="Current"/>. Indented for testing only, and not supported in production code.

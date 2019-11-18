@@ -21,15 +21,15 @@ namespace Umbraco.Web.Install.InstallSteps
         private readonly InstallHelper _installHelper;
         private readonly IGlobalSettings _globalSettings;
         private readonly IUserService _userService;
-        private readonly DistributedCache _distributedCache;
+        private readonly IUmbracoVersion _umbracoVersion;
 
-        public SetUmbracoVersionStep(HttpContextBase httpContext, InstallHelper installHelper, IGlobalSettings globalSettings, IUserService userService, DistributedCache distributedCache)
+        public SetUmbracoVersionStep(HttpContextBase httpContext, InstallHelper installHelper, IGlobalSettings globalSettings, IUserService userService, IUmbracoVersion umbracoVersion)
         {
             _httpContext = httpContext;
             _installHelper = installHelper;
             _globalSettings = globalSettings;
             _userService = userService;
-            _distributedCache = distributedCache;
+            _umbracoVersion = umbracoVersion;
         }
 
         public override Task<InstallSetupResult> ExecuteAsync(object model)
@@ -61,7 +61,7 @@ namespace Umbraco.Web.Install.InstallSteps
             }
 
             // Update configurationStatus
-            _globalSettings.ConfigurationStatus = Current.UmbracoVersion.SemanticVersion.ToSemanticString();
+            _globalSettings.ConfigurationStatus = _umbracoVersion.SemanticVersion.ToSemanticString();
 
             //reports the ended install
             _installHelper.InstallStatus(true, "");

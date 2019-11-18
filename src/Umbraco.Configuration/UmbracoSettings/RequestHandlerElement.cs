@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    public class RequestHandlerElement : UmbracoConfigurationElement, IRequestHandlerSection
+    internal class RequestHandlerElement : UmbracoConfigurationElement, IRequestHandlerSection
     {
         [ConfigurationProperty("addTrailingSlash")]
         public InnerTextConfigurationElement<bool> AddTrailingSlash => GetOptionalTextElement("addTrailingSlash", true);
