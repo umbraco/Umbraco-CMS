@@ -221,7 +221,6 @@
     <Compile Include="Models\Identity\IdentityUser.cs" />
     <Compile Include="Models\Identity\UserLoginInfoWrapper.cs" />
     <Compile Include="Models\IMediaType.cs" />
-    <Compile Include="Models\IMember.cs" />
     <Compile Include="Models\IMemberType.cs" />
     <Compile Include="Models\Language.cs" />
     <Compile Include="Models\Macro.cs" />
@@ -983,7 +982,6 @@
     <Compile Include="Services\IMemberService.cs" />
     <Compile Include="Services\IMemberTypeService.cs" />
     <Compile Include="Services\Implement\KeyValueService.cs" />
-    <Compile Include="Services\IPublicAccessService.cs" />
     <Compile Include="Services\Implement\LocalizationService.cs" />
     <Compile Include="Services\Implement\LocalizedTextService.cs" />
     <Compile Include="Services\Implement\LocalizedTextServiceFileSources.cs" />
