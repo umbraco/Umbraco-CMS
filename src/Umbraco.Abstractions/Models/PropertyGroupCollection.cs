@@ -68,7 +68,7 @@ namespace Umbraco.Core.Models
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
-        internal new void Add(PropertyGroup item)
+        public new void Add(PropertyGroup item)
         {
             try
             {

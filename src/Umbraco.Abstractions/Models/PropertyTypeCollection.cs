@@ -84,7 +84,7 @@ namespace Umbraco.Core.Models
         }
 
         // TODO: Instead of 'new' this should explicitly implement one of the collection interfaces members
-        internal new void Add(IPropertyType item)
+        public new void Add(IPropertyType item)
         {
             item.SupportsPublishing = SupportsPublishing;
 
