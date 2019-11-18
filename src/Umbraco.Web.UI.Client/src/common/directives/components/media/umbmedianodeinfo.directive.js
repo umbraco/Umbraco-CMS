@@ -12,14 +12,17 @@
 
             scope.changeContentPageNumber = changeContentPageNumber;
             scope.contentOptions = {};
+            scope.contentOptions.entityType = "DOCUMENT";
             scope.hasContentReferences = false;
 
             scope.changeMediaPageNumber = changeMediaPageNumber;
             scope.mediaOptions = {};
+            scope.mediaOptions.entityType = "MEDIA";
             scope.hasMediaReferences = false;
 
             scope.changeMemberPageNumber = changeMemberPageNumber;
             scope.memberOptions = {};
+            scope.memberOptions.entityType = "MEMBER";
             scope.hasMemberReferences = false;
 
 
@@ -124,7 +127,7 @@
             }
 
             function loadContentRelations() {
-                return mediaResource.getPagedContentReferences($routeParams.id, scope.contentOptions)
+                return mediaResource.getPagedReferences($routeParams.id, scope.contentOptions)
                     .then(function (data) {
                         scope.contentReferences = data;
                         scope.hasContentReferences = data.items.length > 0;
@@ -132,7 +135,7 @@
             }
 
             function loadMediaRelations() {
-                return mediaResource.getPagedMediaReferences($routeParams.id, scope.mediaOptions)
+                return mediaResource.getPagedReferences($routeParams.id, scope.mediaOptions)
                     .then(function (data) {
                         scope.mediaReferences = data;
                         scope.hasMediaReferences = data.items.length > 0;
@@ -140,7 +143,7 @@
             }
 
             function loadMemberRelations() {
-                return mediaResource.getPagedMemberReferences($routeParams.id, scope.memberOptions)
+                return mediaResource.getPagedReferences($routeParams.id, scope.memberOptions)
                     .then(function (data) {
                         scope.memberReferences = data;
                         scope.hasMemberReferences = data.items.length > 0;

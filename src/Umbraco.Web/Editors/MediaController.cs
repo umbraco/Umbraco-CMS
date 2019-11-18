@@ -945,71 +945,57 @@ namespace Umbraco.Web.Editors
             return hasPathAccess;
         }
 
-        public PagedResult<EntityTypeReferences> GetPagedContentReferences(int id, int pageNumber = 1, int pageSize = 100)
+        public PagedResult<EntityBasic> GetPagedReferences(int id, string entityType, int pageNumber = 1, int pageSize = 100)
         {
             if (pageNumber <= 0 || pageSize <= 0)
             {
                 throw new NotSupportedException("Both pageNumber and pageSize must be greater than zero");
             }
 
-            var relations = Services.RelationService.GetPagedParentEntitiesByChildId(id, pageNumber - 1, pageSize, out long totalRecords, UmbracoObjectTypes.Document);
+            UmbracoObjectTypes entity;
+            string udiEntity;
+            Type castType;
 
-            return new PagedResult<EntityTypeReferences>(totalRecords, pageNumber, pageSize)
+            switch (entityType.ToUpperInvariant())
             {
-                Items = relations.Cast<DocumentEntitySlim>().Select(doc => new EntityTypeReferences
-                {
-                    Id = doc.Id,
-                    Key = doc.Key,
-                    Udi = Udi.Create(Constants.UdiEntityType.Document, doc.Key),
-                    Icon = doc.ContentTypeIcon,
-                    Name = doc.Name,
-                    Alias = doc.ContentTypeAlias
-                })
-            };
-        }
+                case "DOCUMENT":
+                    entity = UmbracoObjectTypes.Document;
+                    udiEntity = Constants.UdiEntityType.Document;
+                    castType = typeof(DocumentEntitySlim);
+                    break;
 
-        public PagedResult<EntityTypeReferences> GetPagedMemberReferences(int id, int pageNumber = 1, int pageSize = 100)
-        {
-            if (pageNumber <= 0 || pageSize <= 0)
-            {
-                throw new NotSupportedException("Both pageNumber and pageSize must be greater than zero");
+                case "MEDIA":
+                    entity = UmbracoObjectTypes.Media;
+                    udiEntity = Constants.UdiEntityType.Media;
+                    castType = typeof(MediaEntitySlim);
+                    break;
+
+                case "MEMBER":
+                    entity = UmbracoObjectTypes.Member;
+                    udiEntity = Constants.UdiEntityType.Member;
+                    castType = typeof(MemberEntitySlim);
+                    break;
+
+                default:
+                    entity = UmbracoObjectTypes.Document;
+                    udiEntity = Constants.UdiEntityType.Document;
+                    castType = typeof(DocumentEntitySlim);
+                    break;
             }
 
-            var relations = Services.RelationService.GetPagedParentEntitiesByChildId(id, pageNumber - 1, pageSize, out long totalRecords, UmbracoObjectTypes.Member);
+            var relations = Services.RelationService.GetPagedParentEntitiesByChildId(id, pageNumber - 1, pageSize, out long totalRecords, entity);
 
-            return new PagedResult<EntityTypeReferences>(totalRecords, pageNumber, pageSize)
+
+            return new PagedResult<EntityBasic>(totalRecords, pageNumber, pageSize)
             {
-                Items = relations.Cast<MemberEntitySlim>().Select(memb => new EntityTypeReferences
+                Items = relations.Cast<DocumentEntitySlim>().Select(rel => new EntityBasic
                 {
-                    Id = memb.Id,
-                    Key = memb.Key,
-                    Udi = Udi.Create(Constants.UdiEntityType.Member, memb.Key),
-                    Icon = memb.ContentTypeIcon,
-                    Name = memb.Name,
-                    Alias = memb.ContentTypeAlias
-                })
-            };
-        }
-
-        public PagedResult<EntityTypeReferences> GetPagedMediaReferences(int id, int pageNumber = 1, int pageSize = 100)
-        {
-            if (pageNumber <= 0 || pageSize <= 0)
-            {
-                throw new NotSupportedException("Both pageNumber and pageSize must be greater than zero");
-            }
-
-            var relations = Services.RelationService.GetPagedParentEntitiesByChildId(id, pageNumber - 1, pageSize, out long totalRecords, UmbracoObjectTypes.Media);
-
-            return new PagedResult<EntityTypeReferences>(totalRecords, pageNumber, pageSize)
-            {
-                Items = relations.Cast<MediaEntitySlim>().Select(med => new EntityTypeReferences
-                {
-                    Id = med.Id,
-                    Key = med.Key,
-                    Udi = Udi.Create(Constants.UdiEntityType.Media, med.Key),
-                    Icon = med.ContentTypeIcon,
-                    Name = med.Name,
-                    Alias = med.ContentTypeAlias
+                    Id = rel.Id,
+                    Key = rel.Key,
+                    Udi = Udi.Create(udiEntity, rel.Key),
+                    Icon = rel.ContentTypeIcon,
+                    Name = rel.Name,
+                    Alias = rel.ContentTypeAlias
                 })
             };
         }

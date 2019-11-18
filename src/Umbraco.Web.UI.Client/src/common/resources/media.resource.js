@@ -554,11 +554,12 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 'Failed to retrieve media items for search: ' + query);
         },
 
-        getPagedContentReferences: function (id, options) {
+        getPagedReferences: function (id, options) {
 
             var defaults = {
                 pageSize: 25,
-                pageNumber: 1
+                pageNumber: 1,
+                entityType: "DOCUMENT"
             };
             if (options === undefined) {
                 options = {};
@@ -572,71 +573,17 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "mediaApiBaseUrl",
-                        "GetPagedContentReferences",
+                        "GetPagedReferences",
                         {
                             id: id,
-                            pageNumber: options.pageNumber,
-                            pageSize: options.pageSize
-                        }
-                    )),
-                "Failed to retrieve usages for media of id " + id);
-        },
-
-        getPagedMemberReferences: function (id, options) {
-
-            var defaults = {
-                pageSize: 25,
-                pageNumber: 1
-            };
-            if (options === undefined) {
-                options = {};
-            }
-            //overwrite the defaults if there are any specified
-            angular.extend(defaults, options);
-            //now copy back to the options we will use
-            options = defaults;
-
-            return umbRequestHelper.resourcePromise(
-                $http.get(
-                    umbRequestHelper.getApiUrl(
-                        "mediaApiBaseUrl",
-                        "GetPagedMemberReferences",
-                        {
-                            id: id,
-                            pageNumber: options.pageNumber,
-                            pageSize: options.pageSize
-                        }
-                    )),
-                "Failed to retrieve usages for media of id " + id);
-        },
-
-        getPagedMediaReferences: function (id, options) {
-
-            var defaults = {
-                pageSize: 25,
-                pageNumber: 1
-            };
-            if (options === undefined) {
-                options = {};
-            }
-            //overwrite the defaults if there are any specified
-            angular.extend(defaults, options);
-            //now copy back to the options we will use
-            options = defaults;
-
-            return umbRequestHelper.resourcePromise(
-                $http.get(
-                    umbRequestHelper.getApiUrl(
-                        "mediaApiBaseUrl",
-                        "GetPagedMediaReferences",
-                        {
-                            id: id,
+                            entityType: options.entityType,
                             pageNumber: options.pageNumber,
                             pageSize: options.pageSize
                         }
                     )),
                 "Failed to retrieve usages for media of id " + id);
         }
+
     };
 }
 
