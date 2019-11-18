@@ -36,7 +36,5 @@ namespace Umbraco.Core.Models.Entities
         /// Gets properties that were dirty.
         /// </summary>
         IEnumerable<string> GetWereDirtyProperties();
-
-
     }
 }
