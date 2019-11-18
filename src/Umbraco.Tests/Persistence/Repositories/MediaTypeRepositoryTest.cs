@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         private MediaTypeRepository CreateRepository(IScopeProvider provider)
         {
             var cacheHelper = AppCaches.Disabled;
-            var templateRepository = new TemplateRepository((IScopeAccessor)provider, cacheHelper, Logger, TestObjects.GetFileSystemsMock());
+            var templateRepository = new TemplateRepository((IScopeAccessor)provider, cacheHelper, Logger, TestObjects.GetFileSystemsMock(), IOHelper);
             var commonRepository = new ContentTypeCommonRepository((IScopeAccessor)provider, templateRepository, AppCaches);
             var languageRepository = new LanguageRepository((IScopeAccessor)provider, AppCaches, Logger);
             return new MediaTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, commonRepository, languageRepository);

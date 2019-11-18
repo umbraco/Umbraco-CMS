@@ -33,7 +33,7 @@ namespace Umbraco.Core
 
         public static void AddCoreConfigs(this Configs configs)
         {
-            var ioHelper = Current.Factory.GetInstance<IIOHelper>();
+            var ioHelper = Umbraco.Core.IO.IOHelper.Default;
 
             var configDir = new DirectoryInfo(ioHelper.MapPath(SystemDirectories.Config));
 

@@ -406,7 +406,7 @@ namespace Umbraco.Tests.IO
         public void ShadowScopeComplete()
         {
             var logger = Mock.Of<ILogger>();
-            var ioHelper = new IOHelper();
+            var ioHelper = IOHelper.Default;
 
             var path = ioHelper.MapPath("FileSysTests");
             var shadowfs = ioHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs");
@@ -429,7 +429,7 @@ namespace Umbraco.Tests.IO
             string id;
 
             // explicit shadow without scope does not work
-            sw.Shadow(id = ShadowWrapper.CreateShadowId());
+            sw.Shadow(id = ShadowWrapper.CreateShadowId(ioHelper));
             Assert.IsTrue(Directory.Exists(shadowfs + "/" + id));
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 sw.AddFile("sub/f2.txt", ms);
@@ -440,7 +440,7 @@ namespace Umbraco.Tests.IO
 
             // shadow with scope but no complete does not complete
             scopedFileSystems = true; // pretend we have a scope
-            var scope = new ShadowFileSystems(fileSystems, id = ShadowWrapper.CreateShadowId());
+            var scope = new ShadowFileSystems(fileSystems, id = ShadowWrapper.CreateShadowId(ioHelper));
             Assert.IsTrue(Directory.Exists(shadowfs + "/" + id));
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 sw.AddFile("sub/f3.txt", ms);
@@ -462,7 +462,7 @@ namespace Umbraco.Tests.IO
 
             // shadow with scope and complete does complete
             scopedFileSystems = true; // pretend we have a scope
-            scope = new ShadowFileSystems(fileSystems, id = ShadowWrapper.CreateShadowId());
+            scope = new ShadowFileSystems(fileSystems, id = ShadowWrapper.CreateShadowId(ioHelper));
             Assert.IsTrue(Directory.Exists(shadowfs + "/" + id));
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 sw.AddFile("sub/f4.txt", ms);
@@ -478,7 +478,7 @@ namespace Umbraco.Tests.IO
             // test scope for "another thread"
 
             scopedFileSystems = true; // pretend we have a scope
-            scope = new ShadowFileSystems(fileSystems, id = ShadowWrapper.CreateShadowId());
+            scope = new ShadowFileSystems(fileSystems, id = ShadowWrapper.CreateShadowId(ioHelper));
             Assert.IsTrue(Directory.Exists(shadowfs + "/" + id));
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 sw.AddFile("sub/f5.txt", ms);
@@ -524,7 +524,7 @@ namespace Umbraco.Tests.IO
             string id;
 
             scopedFileSystems = true; // pretend we have a scope
-            var scope = new ShadowFileSystems(fileSystems, id = ShadowWrapper.CreateShadowId());
+            var scope = new ShadowFileSystems(fileSystems, id = ShadowWrapper.CreateShadowId(ioHelper));
             Assert.IsTrue(Directory.Exists(shadowfs + "/" + id));
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 sw.AddFile("sub/f2.txt", ms);
@@ -578,7 +578,7 @@ namespace Umbraco.Tests.IO
             string id;
 
             scopedFileSystems = true; // pretend we have a scope
-            var scope = new ShadowFileSystems(fileSystems, id = ShadowWrapper.CreateShadowId());
+            var scope = new ShadowFileSystems(fileSystems, id = ShadowWrapper.CreateShadowId(ioHelper));
             Assert.IsTrue(Directory.Exists(shadowfs + "/" + id));
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 sw.AddFile("sub/f2.txt", ms);

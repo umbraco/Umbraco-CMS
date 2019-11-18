@@ -44,10 +44,10 @@ namespace Umbraco.Core.Manifest
             _cache = appCaches.RuntimeCache;
             _validators = validators ?? throw new ArgumentNullException(nameof(validators));
             _filters = filters ?? throw new ArgumentNullException(nameof(filters));
-            if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullOrEmptyException(nameof(path));
-            Path = path;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _ioHelper = ioHelper;
+            if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullOrEmptyException(nameof(path));
+            Path = path;
         }
 
         public string Path

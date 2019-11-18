@@ -25,7 +25,7 @@ namespace Umbraco.Core.IO
             _isScoped = isScoped;
         }
 
-        public static string CreateShadowId()
+        public static string CreateShadowId(IIOHelper ioHelper)
         {
             const int retries = 50; // avoid infinite loop
             const int idLength = 8; // 6 chars
@@ -34,8 +34,6 @@ namespace Umbraco.Core.IO
             // with an existing directory or not - if it does, try again, and
             // we should end up with a unique identifier eventually - but just
             // detect infinite loops (just in case)
-
-            var ioHelper = Current.Factory.GetInstance<IIOHelper>();
 
             for (var i = 0; i < retries; i++)
             {

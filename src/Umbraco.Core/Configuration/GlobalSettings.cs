@@ -199,8 +199,10 @@ namespace Umbraco.Core.Configuration
         /// Removes a setting from the configuration file.
         /// </summary>
         /// <param name="key">Key of the setting to be removed.</param>
-        internal static void RemoveSetting(string key, IIOHelper ioHelper)
+        internal static void RemoveSetting(string key)
         {
+            var ioHelper = Current.Factory.GetInstance<IIOHelper>();
+
             var fileName = ioHelper.MapPath(string.Format("{0}/web.config", SystemDirectories.Root));
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
 

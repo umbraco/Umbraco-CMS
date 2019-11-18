@@ -205,7 +205,7 @@ namespace Umbraco.Core.Composing
         public static IVariationContextAccessor VariationContextAccessor
             => Factory.GetInstance<IVariationContextAccessor>();
 
-        [Obsolete("being removed...", true)]
+        [Obsolete("being removed...", false)]
         public static readonly IIOHelper IOHelper = new IOHelper();
 
         #endregion

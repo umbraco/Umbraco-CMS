@@ -94,7 +94,7 @@ namespace Umbraco.Core.PropertyEditors
         public string View
         {
             get => _view;
-            set => _view = Current.Factory.GetInstance<IIOHelper>().ResolveVirtualUrl(value);
+            set => _view = Current.IOHelper.ResolveVirtualUrl(value);
         }
 
         /// <summary>
