@@ -954,32 +954,27 @@ namespace Umbraco.Web.Editors
 
             UmbracoObjectTypes entity;
             string udiEntity;
-            Type castType;
 
             switch (entityType.ToUpperInvariant())
             {
-                case "DOCUMENT":
+                case "DOCUMENT":                    
                     entity = UmbracoObjectTypes.Document;
                     udiEntity = Constants.UdiEntityType.Document;
-                    castType = typeof(DocumentEntitySlim);
                     break;
 
                 case "MEDIA":
                     entity = UmbracoObjectTypes.Media;
                     udiEntity = Constants.UdiEntityType.Media;
-                    castType = typeof(MediaEntitySlim);
                     break;
 
                 case "MEMBER":
                     entity = UmbracoObjectTypes.Member;
                     udiEntity = Constants.UdiEntityType.Member;
-                    castType = typeof(MemberEntitySlim);
                     break;
 
                 default:
                     entity = UmbracoObjectTypes.Document;
                     udiEntity = Constants.UdiEntityType.Document;
-                    castType = typeof(DocumentEntitySlim);
                     break;
             }
 
@@ -988,7 +983,7 @@ namespace Umbraco.Web.Editors
 
             return new PagedResult<EntityBasic>(totalRecords, pageNumber, pageSize)
             {
-                Items = relations.Cast<DocumentEntitySlim>().Select(rel => new EntityBasic
+                Items = relations.Cast<ContentEntitySlim>().Select(rel => new EntityBasic
                 {
                     Id = rel.Id,
                     Key = rel.Key,
