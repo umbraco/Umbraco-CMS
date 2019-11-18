@@ -217,7 +217,6 @@
     <Compile Include="Models\IContentType.cs" />
     <Compile Include="Models\IContentTypeBase.cs" />
     <Compile Include="Models\IContentTypeComposition.cs" />
-    <Compile Include="Models\IDataType.cs" />
     <Compile Include="Models\Identity\IdentityMapDefinition.cs" />
     <Compile Include="Models\Identity\IdentityUser.cs" />
     <Compile Include="Models\Identity\UserLoginInfoWrapper.cs" />
@@ -976,7 +975,6 @@
     <Compile Include="Services\Implement\EntityXmlSerializer.cs" />
     <Compile Include="Services\Implement\ExternalLoginService.cs" />
     <Compile Include="Services\Implement\FileService.cs" />
-    <Compile Include="Services\IContentService.cs" />
     <Compile Include="Services\IContentTypeService.cs" />
     <Compile Include="Services\IContentTypeServiceBase.cs" />
     <Compile Include="Services\IdkMap.cs" />
@@ -1000,7 +998,6 @@
     <Compile Include="Services\Implement\PackagingService.cs" />
     <Compile Include="Services\Implement\PublicAccessService.cs" />
     <Compile Include="Services\PublicAccessServiceExtensions.cs" />
-    <Compile Include="Services\PublishResult.cs" />
     <Compile Include="Services\Implement\RedirectUrlService.cs" />
     <Compile Include="Services\Implement\RelationService.cs" />
     <Compile Include="Services\Implement\RepositoryService.cs" />
