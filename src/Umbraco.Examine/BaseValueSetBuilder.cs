@@ -24,7 +24,7 @@ namespace Umbraco.Examine
         /// <inheritdoc />
         public abstract IEnumerable<ValueSet> GetValueSets(params TContent[] content);
 
-        protected void AddPropertyValue(Property property, string culture, string segment, IDictionary<string, IEnumerable<object>> values)
+        protected void AddPropertyValue(IProperty property, string culture, string segment, IDictionary<string, IEnumerable<object>> values)
         {
             var editor = _propertyEditors[property.PropertyType.PropertyEditorAlias];
             if (editor == null) return;
@@ -61,7 +61,7 @@ namespace Umbraco.Examine
                                 else
                                     values.Add($"{keyVal.Key}{cultureSuffix}", val.Yield());
                             }
-                            
+
                             break;
                     }
                 }

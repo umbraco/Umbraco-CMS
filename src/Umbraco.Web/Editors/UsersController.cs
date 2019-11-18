@@ -75,7 +75,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
-            var root = Current.IOHelper.MapPath(SystemDirectories.TempFileUploads);
+            var root = Current.IOHelper.MapPath(Constants.SystemDirectories.TempFileUploads);
             //ensure it exists
             Directory.CreateDirectory(root);
             var provider = new MultipartFormDataStreamProvider(root);
@@ -466,10 +466,10 @@ namespace Umbraco.Web.Editors
 
             var emailSubject = Services.TextService.Localize("user/inviteEmailCopySubject",
                 //Ensure the culture of the found user is used for the email!
-                UserExtensions.GetUserCulture(to.Language, Services.TextService, GlobalSettings));
+                UmbracoUserExtensions.GetUserCulture(to.Language, Services.TextService, GlobalSettings));
             var emailBody = Services.TextService.Localize("user/inviteEmailCopyFormat",
                 //Ensure the culture of the found user is used for the email!
-                UserExtensions.GetUserCulture(to.Language, Services.TextService, GlobalSettings),
+                UmbracoUserExtensions.GetUserCulture(to.Language, Services.TextService, GlobalSettings),
                 new[] { userDisplay.Name, from, message, inviteUri.ToString(), fromEmail });
 
             await UserManager.EmailService.SendAsync(

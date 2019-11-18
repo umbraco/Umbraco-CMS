@@ -2,6 +2,7 @@
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.ContentEditing;
@@ -28,7 +29,7 @@ namespace Umbraco.Web.ContentApps
             // its dependencies too, and that can create cycles or other oddities
             var manifestParser = factory.GetInstance<ManifestParser>();
 
-            return base.CreateItems(factory).Concat(manifestParser.Manifest.ContentApps.Select(x => new ManifestContentAppFactory(x)));
+            return base.CreateItems(factory).Concat(manifestParser.Manifest.ContentApps.Select(x => new ManifestContentAppFactory(x, Current.IOHelper)));
         }
     }
 }

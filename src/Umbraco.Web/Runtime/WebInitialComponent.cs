@@ -112,7 +112,7 @@ namespace Umbraco.Web.Runtime
         private static void ConfigureClientDependency(IGlobalSettings globalSettings)
         {
             // Backwards compatibility - set the path and URL type for ClientDependency 1.5.1 [LK]
-            XmlFileMapper.FileMapDefaultFolder = SystemDirectories.TempData.EnsureEndsWith('/') + "ClientDependency";
+            XmlFileMapper.FileMapDefaultFolder = Core.Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "ClientDependency";
             BaseCompositeFileProcessingProvider.UrlTypeDefault = CompositeUrlType.Base64QueryStrings;
 
             // Now we need to detect if we are running 'Umbraco.Core.LocalTempStorage' as EnvironmentTemp and in that case we want to change the CDF file

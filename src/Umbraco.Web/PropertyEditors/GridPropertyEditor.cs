@@ -28,14 +28,18 @@ namespace Umbraco.Web.PropertyEditors
         private IMediaService _mediaService;
         private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
         private IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IDataTypeService _dataTypeService;
+        private readonly ILocalizationService _localizationService;
         private ILogger _logger;
 
-        public GridPropertyEditor(ILogger logger, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor)
+        public GridPropertyEditor(ILogger logger, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor, IDataTypeService dataTypeService, ILocalizationService localizationService)
             : base(logger)
         {
             _mediaService = mediaService;
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
             _umbracoContextAccessor = umbracoContextAccessor;
+            _dataTypeService = dataTypeService;
+            _localizationService = localizationService;
             _logger = logger;
         }
 
@@ -45,7 +49,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Overridden to ensure that the value is validated
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider, _umbracoContextAccessor, _logger);
+        protected override IDataValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider, _umbracoContextAccessor, _logger, _dataTypeService, _localizationService);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new GridConfigurationEditor();
 
@@ -56,8 +60,8 @@ namespace Umbraco.Web.PropertyEditors
             private IUmbracoContextAccessor _umbracoContextAccessor;
             private ILogger _logger;
 
-            public GridPropertyValueEditor(DataEditorAttribute attribute, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor, ILogger logger)
-                : base(attribute)
+            public GridPropertyValueEditor(DataEditorAttribute attribute, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor, ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService)
+                : base(dataTypeService, localizationService, attribute)
             {
                 _mediaService = mediaService;
                 _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
@@ -115,7 +119,7 @@ namespace Umbraco.Web.PropertyEditors
             /// <param name="culture"></param>
             /// <param name="segment"></param>
             /// <returns></returns>
-            public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
+            public override object ToEditor(IProperty property, string culture = null, string segment = null)
             {
                 var val = property.GetValue(culture, segment);
                 if (val == null) return string.Empty;

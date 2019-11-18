@@ -21,8 +21,8 @@ namespace Umbraco.Web.PropertyEditors
         private readonly ILogger _logger;
         private readonly IMediaFileSystem _mediaFileSystem;
 
-        public ImageCropperPropertyValueEditor(DataEditorAttribute attribute, ILogger logger, IMediaFileSystem mediaFileSystem)
-            : base(attribute)
+        public ImageCropperPropertyValueEditor(DataEditorAttribute attribute, ILogger logger, IMediaFileSystem mediaFileSystem, IDataTypeService dataTypeService, ILocalizationService localizationService)
+            : base(dataTypeService, localizationService, attribute)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
@@ -32,7 +32,7 @@ namespace Umbraco.Web.PropertyEditors
         /// This is called to merge in the prevalue crops with the value that is saved - similar to the property value converter for the front-end
         /// </summary>
 
-        public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
+        public override object ToEditor(IProperty property, string culture = null, string segment = null)
         {
             var val = property.GetValue(culture, segment);
             if (val == null) return null;
@@ -47,7 +47,7 @@ namespace Umbraco.Web.PropertyEditors
                 value = new ImageCropperValue { Src = val.ToString() };
             }
 
-            var dataType = dataTypeService.GetDataType(property.PropertyType.DataTypeId);
+            var dataType = DataTypeService.GetDataType(property.PropertyType.DataTypeId);
             if (dataType?.Configuration != null)
                 value.ApplyConfiguration(dataType.ConfigurationAs<ImageCropperConfiguration>());
 
@@ -161,7 +161,7 @@ namespace Umbraco.Web.PropertyEditors
         }
 
 
-        public override string ConvertDbToString(PropertyType propertyType, object value, IDataTypeService dataTypeService)
+        public override string ConvertDbToString(IPropertyType propertyType, object value)
         {
             if (value == null || string.IsNullOrEmpty(value.ToString()))
                 return null;
@@ -172,7 +172,7 @@ namespace Umbraco.Web.PropertyEditors
                 return val;
 
             // more magic here ;-(
-            var configuration = dataTypeService.GetDataType(propertyType.DataTypeId).ConfigurationAs<ImageCropperConfiguration>();
+            var configuration = DataTypeService.GetDataType(propertyType.DataTypeId).ConfigurationAs<ImageCropperConfiguration>();
             var crops = configuration?.Crops ?? Array.Empty<ImageCropperConfiguration.Crop>();
 
             return JsonConvert.SerializeObject(new

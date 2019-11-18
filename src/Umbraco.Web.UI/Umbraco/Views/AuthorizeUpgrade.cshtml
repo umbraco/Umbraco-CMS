@@ -33,7 +33,7 @@
     <title>Umbraco</title>
 
     @Html.RenderCssHere(
-        new BasicPath("Umbraco", Current.IOHelper.ResolveUrl(SystemDirectories.Umbraco)))
+        new BasicPath("Umbraco", Current.IOHelper.ResolveUrl(Current.Configs.Global().UmbracoPath)))
 
     @*Because we're lazy loading angular js, the embedded cloak style will not be loaded initially, but we need it*@
     <style>

@@ -147,7 +147,7 @@ namespace Umbraco.Web.Macros
                 _content = content;
             }
 
-            public PagePublishedProperty(IPublishedPropertyType propertyType, IPublishedContent content, Umbraco.Core.Models.Property property)
+            public PagePublishedProperty(IPublishedPropertyType propertyType, IPublishedContent content, IProperty property)
                 : base(propertyType, PropertyCacheLevel.Unknown) // cache level is ignored
             {
                 _sourceValue = property.GetValue();

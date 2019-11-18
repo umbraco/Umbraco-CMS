@@ -11,8 +11,8 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     public class TextOnlyValueEditor : DataValueEditor
     {
-        public TextOnlyValueEditor(DataEditorAttribute attribute)
-            : base(attribute)
+        public TextOnlyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute)
+            : base(dataTypeService, localizationService, attribute)
         { }
 
         /// <summary>
@@ -26,7 +26,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <remarks>
         /// The object returned will always be a string and if the database type is not a valid string type an exception is thrown
         /// </remarks>
-        public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
+        public override object ToEditor(IProperty property, string culture = null, string segment = null)
         {
             var val = property.GetValue(culture, segment);
 

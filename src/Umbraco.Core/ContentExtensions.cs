@@ -108,7 +108,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        public static IEnumerable<Property> GetNonGroupedProperties(this IContentBase content)
+        public static IEnumerable<IProperty> GetNonGroupedProperties(this IContentBase content)
         {
             return content.Properties
                 .Where(x => x.PropertyType.PropertyGroupId == null)
@@ -121,7 +121,7 @@ namespace Umbraco.Core
         /// <param name="content"></param>
         /// <param name="propertyGroup"></param>
         /// <returns></returns>
-        public static IEnumerable<Property> GetPropertiesForGroup(this IContentBase content, PropertyGroup propertyGroup)
+        public static IEnumerable<IProperty> GetPropertiesForGroup(this IContentBase content, PropertyGroup propertyGroup)
         {
             //get the properties for the current tab
             return content.Properties
@@ -180,7 +180,7 @@ namespace Umbraco.Core
         }
 
         // gets or creates a property for a content item.
-        private static Property GetProperty(IContentBase content, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, string propertyTypeAlias)
+        private static IProperty GetProperty(IContentBase content, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, string propertyTypeAlias)
         {
             var property = content.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
             if (property != null) return property;

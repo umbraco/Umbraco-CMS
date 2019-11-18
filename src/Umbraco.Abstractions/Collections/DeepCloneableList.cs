@@ -47,8 +47,7 @@ namespace Umbraco.Core.Collections
                     var newList = new DeepCloneableList<T>(ListCloneBehavior.None);
                     foreach (var item in this)
                     {
-                        var dc = item as IDeepCloneable;
-                        if (dc != null)
+                        if (item is IDeepCloneable dc)
                         {
                             newList.Add((T)dc.DeepClone());
                         }
@@ -66,8 +65,7 @@ namespace Umbraco.Core.Collections
                     var newList2 = new DeepCloneableList<T>(ListCloneBehavior.Always);
                     foreach (var item in this)
                     {
-                        var dc = item as IDeepCloneable;
-                        if (dc != null)
+                        if (item is IDeepCloneable dc)
                         {
                             newList2.Add((T)dc.DeepClone());
                         }
@@ -119,6 +117,16 @@ namespace Umbraco.Core.Collections
             {
                 dc.ResetDirtyProperties();
             }
+        }
+
+        public void DisableChangeTracking()
+        {
+            // noop
+        }
+
+        public void EnableChangeTracking()
+        {
+            // noop
         }
 
         public void ResetWereDirtyProperties()

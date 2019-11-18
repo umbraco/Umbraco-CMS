@@ -74,9 +74,9 @@ namespace Umbraco.Core.Packaging
             _ioHelper = ioHelper;
             _packageRepositoryFileName = packageRepositoryFileName;
 
-            _tempFolderPath = tempFolderPath ?? SystemDirectories.TempData.EnsureEndsWith('/') + "PackageFiles";
-            _packagesFolderPath = packagesFolderPath ?? SystemDirectories.Packages;
-            _mediaFolderPath = mediaFolderPath ?? SystemDirectories.Media + "/created-packages";
+            _tempFolderPath = tempFolderPath ?? Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "PackageFiles";
+            _packagesFolderPath = packagesFolderPath ?? Constants.SystemDirectories.Packages;
+            _mediaFolderPath = mediaFolderPath ?? Current.Configs.Global().UmbracoMediaPath + "/created-packages";
 
             _parser = new PackageDefinitionXmlParser(logger);
         }

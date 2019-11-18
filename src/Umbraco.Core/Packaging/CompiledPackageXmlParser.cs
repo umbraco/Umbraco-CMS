@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Packaging;
@@ -131,15 +132,15 @@ namespace Umbraco.Core.Packaging
         {
             return pathElement.TrimStart(new[] { '\\', '/', '~' }).Replace("/", "\\");
         }
-        
+
         private static string UpdatePathPlaceholders(string path)
         {
             if (path.Contains("[$"))
             {
                 //this is experimental and undocumented...
-                path = path.Replace("[$UMBRACO]", SystemDirectories.Umbraco);
-                path = path.Replace("[$CONFIG]", SystemDirectories.Config);
-                path = path.Replace("[$DATA]", SystemDirectories.Data);
+                path = path.Replace("[$UMBRACO]", Current.Configs.Global().UmbracoPath);
+                path = path.Replace("[$CONFIG]", Constants.SystemDirectories.Config);
+                path = path.Replace("[$DATA]", Constants.SystemDirectories.Data);
             }
             return path;
         }

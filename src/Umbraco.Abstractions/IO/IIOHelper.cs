@@ -5,7 +5,7 @@ namespace Umbraco.Core.IO
     public interface IIOHelper
     {
         bool ForceNotHosted { get; set; }
-        
+
         /// <summary>
         /// Gets a value indicating whether Umbraco is hosted.
         /// </summary>
@@ -18,8 +18,6 @@ namespace Umbraco.Core.IO
         Attempt<string> TryResolveUrl(string virtualPath);
         string MapPath(string path, bool useHttpContext);
         string MapPath(string path);
-        string ReturnPath(string settingsKey, string standardPath, bool useTilde);
-        string ReturnPath(string settingsKey, string standardPath);
 
         /// <summary>
         /// Verifies that the current filepath matches a directory where the user is allowed to edit a file.
@@ -80,5 +78,14 @@ namespace Umbraco.Core.IO
         /// <param name="path"></param>
         /// <returns></returns>
         string GetRelativePath(string path);
+
+        /// <summary>
+        /// Gets the root path of the application
+        /// </summary>
+        string Root
+        {
+            get;
+            set; //Only required for unit tests
+        }
     }
 }

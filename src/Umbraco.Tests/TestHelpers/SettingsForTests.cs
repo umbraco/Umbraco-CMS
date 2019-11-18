@@ -24,7 +24,15 @@ namespace Umbraco.Tests.TestHelpers
                     settings.LocalTempStorageLocation == LocalTempStorage.Default &&
                     settings.LocalTempPath == Current.IOHelper.MapPath("~/App_Data/TEMP") &&
                     settings.ReservedPaths == (GlobalSettings.StaticReservedPaths + "~/umbraco") &&
-                    settings.ReservedUrls == GlobalSettings.StaticReservedUrls);
+                    settings.ReservedUrls == GlobalSettings.StaticReservedUrls &&
+                    settings.UmbracoPath == "~/umbraco" &&
+                    settings.UmbracoMediaPath == "~/media" &&
+                    settings.UmbracoCssPath == "~/css" &&
+                    settings.UmbracoScriptsPath == "~/scripts"
+            );
+
+
+
             return config;
         }
 

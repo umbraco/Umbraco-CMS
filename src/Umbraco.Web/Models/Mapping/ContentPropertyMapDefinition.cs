@@ -27,9 +27,9 @@ namespace Umbraco.Web.Models.Mapping
         public void DefineMaps(UmbracoMapper mapper)
         {
             mapper.Define<PropertyGroup, Tab<ContentPropertyDisplay>>((source, context) => new Tab<ContentPropertyDisplay>(), Map);
-            mapper.Define<Property, ContentPropertyBasic>((source, context) => new ContentPropertyBasic(), Map);
-            mapper.Define<Property, ContentPropertyDto>((source, context) => new ContentPropertyDto(), Map);
-            mapper.Define<Property, ContentPropertyDisplay>((source, context) => new ContentPropertyDisplay(), Map);
+            mapper.Define<IProperty, ContentPropertyBasic>((source, context) => new ContentPropertyBasic(), Map);
+            mapper.Define<IProperty, ContentPropertyDto>((source, context) => new ContentPropertyDto(), Map);
+            mapper.Define<IProperty, ContentPropertyDisplay>((source, context) => new ContentPropertyDisplay(), Map);
         }
 
         // Umbraco.Code.MapAll -Properties -Alias -Expanded
@@ -40,19 +40,19 @@ namespace Umbraco.Web.Models.Mapping
             target.Label = source.Name;
 }
 
-        private void Map(Property source, ContentPropertyBasic target, MapperContext context)
+        private void Map(IProperty source, ContentPropertyBasic target, MapperContext context)
         {
             // assume this is mapping everything and no MapAll is required
             _contentPropertyBasicConverter.Map(source, target, context);
         }
 
-        private void Map(Property source, ContentPropertyDto target, MapperContext context)
+        private void Map(IProperty source, ContentPropertyDto target, MapperContext context)
         {
             // assume this is mapping everything and no MapAll is required
             _contentPropertyDtoConverter.Map(source, target, context);
         }
 
-        private void Map(Property source, ContentPropertyDisplay target, MapperContext context)
+        private void Map(IProperty source, ContentPropertyDisplay target, MapperContext context)
         {
             // assume this is mapping everything and no MapAll is required
             _contentPropertyDisplayMapper.Map(source, target, context);

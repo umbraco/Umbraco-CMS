@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Models.Membership;
@@ -31,10 +32,12 @@ namespace Umbraco.Core.Manifest
     public class ManifestContentAppFactory : IContentAppFactory
     {
         private readonly ManifestContentAppDefinition _definition;
+        private readonly IIOHelper _ioHelper;
 
-        public ManifestContentAppFactory(ManifestContentAppDefinition definition)
+        public ManifestContentAppFactory(ManifestContentAppDefinition definition, IIOHelper ioHelper)
         {
             _definition = definition;
+            _ioHelper = ioHelper;
         }
 
         private ContentApp _app;
@@ -132,7 +135,7 @@ namespace Umbraco.Core.Manifest
                 Alias = _definition.Alias,
                 Name = _definition.Name,
                 Icon = _definition.Icon,
-                View = _definition.View,
+                View = _ioHelper.ResolveVirtualUrl(_definition.View),
                 Weight = _definition.Weight
             });
         }

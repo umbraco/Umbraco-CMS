@@ -3,9 +3,11 @@ using System.Linq;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using Umbraco.Core.IO;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Tests.Manifest
 {
@@ -67,7 +69,7 @@ namespace Umbraco.Tests.Manifest
         private void AssertDefinition(object source, bool expected, string[] show, IReadOnlyUserGroup[] groups)
         {
             var definition = JsonConvert.DeserializeObject<ManifestContentAppDefinition>("{" + (show.Length == 0 ? "" : " \"show\": [" + string.Join(",", show.Select(x => "\"" + x + "\"")) + "] ") + "}");
-            var factory = new ManifestContentAppFactory(definition);
+            var factory = new ManifestContentAppFactory(definition, IOHelper.Default);
             var app = factory.GetContentAppFor(source, groups);
             if (expected)
                 Assert.IsNotNull(app);

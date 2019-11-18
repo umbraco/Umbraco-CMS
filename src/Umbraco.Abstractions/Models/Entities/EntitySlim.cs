@@ -146,6 +146,16 @@ namespace Umbraco.Core.Models.Entities
             throw new WontImplementException();
         }
 
+        public void DisableChangeTracking()
+        {
+            // noop
+        }
+
+        public void EnableChangeTracking()
+        {
+            // noop
+        }
+
         public bool WasDirty()
         {
             throw new WontImplementException();

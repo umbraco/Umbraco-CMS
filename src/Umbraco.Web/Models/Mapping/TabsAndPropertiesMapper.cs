@@ -103,9 +103,9 @@ namespace Umbraco.Web.Models.Mapping
         /// <param name="properties"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        protected virtual List<ContentPropertyDisplay> MapProperties(IContentBase content, List<Property> properties, MapperContext context)
+        protected virtual List<ContentPropertyDisplay> MapProperties(IContentBase content, List<IProperty> properties, MapperContext context)
         {
-            return context.MapEnumerable<Property, ContentPropertyDisplay>(properties.OrderBy(x => x.PropertyType.SortOrder));
+            return context.MapEnumerable<IProperty, ContentPropertyDisplay>(properties.OrderBy(x => x.PropertyType.SortOrder));
         }
     }
 
@@ -132,7 +132,7 @@ namespace Umbraco.Web.Models.Mapping
             var groupsGroupsByName = contentType.CompositionPropertyGroups.OrderBy(x => x.SortOrder).GroupBy(x => x.Name);
             foreach (var groupsByName in groupsGroupsByName)
             {
-                var properties = new List<Property>();
+                var properties = new List<IProperty>();
 
                 // merge properties for groups with the same name
                 foreach (var group in groupsByName)

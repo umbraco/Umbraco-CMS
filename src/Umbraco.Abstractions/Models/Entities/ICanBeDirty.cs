@@ -26,5 +26,15 @@ namespace Umbraco.Core.Models.Entities
         /// Resets dirty properties.
         /// </summary>
         void ResetDirtyProperties();
+
+        /// <summary>
+        /// Disables change tracking.
+        /// </summary>
+        void DisableChangeTracking();
+
+        /// <summary>
+        /// Enables change tracking.
+        /// </summary>
+        void EnableChangeTracking();
     }
 }

@@ -30,7 +30,7 @@ namespace Umbraco.Core.Models.Membership
         /// Returns the currently configured membership scenario for members in umbraco
         /// </summary>
         /// <value></value>
-        internal static MembershipScenario GetMembershipScenario(this IMemberService memberService)
+        internal static MembershipScenario GetMembershipScenario(this IMemberTypeService memberTypeService)
         {
             if (_scenario.HasValue == false)
             {
@@ -39,7 +39,7 @@ namespace Umbraco.Core.Models.Membership
                 {
                     return MembershipScenario.NativeUmbraco;
                 }
-                var memberType = Current.Services.MemberTypeService.Get(Constants.Conventions.MemberTypes.DefaultAlias);
+                var memberType = memberTypeService.Get(Constants.Conventions.MemberTypes.DefaultAlias);
                 return memberType != null
                            ? MembershipScenario.CustomProviderWithUmbracoLink
                            : MembershipScenario.StandaloneCustomProvider;

@@ -305,13 +305,13 @@ namespace Umbraco.Web.Editors
 
                     var message = Services.TextService.Localize("resetPasswordEmailCopyFormat",
                         // Ensure the culture of the found user is used for the email!
-                        UserExtensions.GetUserCulture(identityUser.Culture, Services.TextService, GlobalSettings),
+                        UmbracoUserExtensions.GetUserCulture(identityUser.Culture, Services.TextService, GlobalSettings),
                         new[] { identityUser.UserName, callbackUrl });
 
                     await UserManager.SendEmailAsync(identityUser.Id,
                         Services.TextService.Localize("login/resetPasswordEmailCopySubject",
                             // Ensure the culture of the found user is used for the email!
-                            UserExtensions.GetUserCulture(identityUser.Culture, Services.TextService, GlobalSettings)),
+                            UmbracoUserExtensions.GetUserCulture(identityUser.Culture, Services.TextService, GlobalSettings)),
                         message);
 
                     UserManager.RaiseForgotPasswordRequestedEvent(user.Id);
