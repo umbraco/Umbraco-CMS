@@ -56,15 +56,16 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     function removeKeys(values) {
         for (var i = 0; i < values.length; i++) {
             var obj = values[i];
-            
-            delete obj.key;
-            delete obj.$$hashKey;
 
-            // Loop through all properties:
-            for (var k in obj) {
-                // if this property is an array, we need to check if there's more keys to remove.
-                if (Array.isArray(obj[k])) {
-                    removeKeys(obj[k])
+            // Entires with this property are entries of a nested content property. And those keys we can remove.
+            if (obj.ncContentTypeAlias) {
+                delete obj.key;
+                // Loop through all properties:
+                for (var k in obj) {
+                    // if this property is an array, we need to check if there's more keys to remove.
+                    if (Array.isArray(obj[k])) {
+                        removeKeys(obj[k])
+                    }
                 }
             }
         }
