@@ -27,16 +27,26 @@ namespace Umbraco.Web.PropertyEditors
         private IMediaService _mediaService;
         private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
         private IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IDataTypeService _dataTypeService;
+        private readonly ILocalizationService _localizationService;
         private ILogger _logger;
 
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public RichTextPropertyEditor(ILogger logger, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor) : base(logger)
+        public RichTextPropertyEditor(
+            ILogger logger,
+            IMediaService mediaService,
+            IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IDataTypeService dataTypeService,
+            ILocalizationService localizationService) : base(logger)
         {
             _mediaService = mediaService;
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
             _umbracoContextAccessor = umbracoContextAccessor;
+            _dataTypeService = dataTypeService;
+            _localizationService = localizationService;
             _logger = logger;
         }
 
@@ -44,7 +54,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Create a custom value editor
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider, _umbracoContextAccessor, _logger);
+        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider, _umbracoContextAccessor, _logger, _dataTypeService, _localizationService);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new RichTextConfigurationEditor();
 
@@ -60,8 +70,8 @@ namespace Umbraco.Web.PropertyEditors
             private IUmbracoContextAccessor _umbracoContextAccessor;
             private ILogger _logger;
 
-            public RichTextPropertyValueEditor(DataEditorAttribute attribute, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor, ILogger logger)
-                : base(attribute)
+            public RichTextPropertyValueEditor(DataEditorAttribute attribute, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor, ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService)
+                : base(dataTypeService, localizationService, attribute)
             {
                 _mediaService = mediaService;
                 _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
@@ -92,7 +102,7 @@ namespace Umbraco.Web.PropertyEditors
             /// <param name="dataTypeService"></param>
             /// <param name="culture"></param>
             /// <param name="segment"></param>
-            public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
+            public override object ToEditor(IProperty property, string culture = null, string segment = null)
             {
                 var val = property.GetValue(culture, segment);
                 if (val == null)
@@ -130,7 +140,7 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class RichTextPropertyIndexValueFactory : IPropertyIndexValueFactory
         {
-            public IEnumerable<KeyValuePair<string, IEnumerable<object>>> GetIndexValues(Property property, string culture, string segment, bool published)
+            public IEnumerable<KeyValuePair<string, IEnumerable<object>>> GetIndexValues(IProperty property, string culture, string segment, bool published)
             {
                 var val = property.GetValue(culture, segment, published);
 

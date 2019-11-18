@@ -90,7 +90,7 @@ namespace Umbraco.Core.IO
         #region Associated Media Files
 
         /// <inheritoc />
-        public string StoreFile(IContentBase content, PropertyType propertyType, string filename, Stream filestream, string oldpath)
+        public string StoreFile(IContentBase content, IPropertyType propertyType, string filename, Stream filestream, string oldpath)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (propertyType == null) throw new ArgumentNullException(nameof(propertyType));
@@ -109,7 +109,7 @@ namespace Umbraco.Core.IO
         }
 
         /// <inheritoc />
-        public string CopyFile(IContentBase content, PropertyType propertyType, string sourcepath)
+        public string CopyFile(IContentBase content, IPropertyType propertyType, string sourcepath)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (propertyType == null) throw new ArgumentNullException(nameof(propertyType));

@@ -11,6 +11,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
@@ -31,9 +32,10 @@ namespace Umbraco.Tests.Published
             var logger = Mock.Of<ILogger>();
             var profiler = Mock.Of<IProfiler>();
             var proflog = new ProfilingLogger(logger, profiler);
+            var localizationService = Mock.Of<ILocalizationService>();
 
             PropertyEditorCollection editors = null;
-            var editor = new NestedContentPropertyEditor(logger, new Lazy<PropertyEditorCollection>(() => editors));
+            var editor = new NestedContentPropertyEditor(logger, new Lazy<PropertyEditorCollection>(() => editors), Mock.Of<IDataTypeService>(), localizationService);
             editors = new PropertyEditorCollection(new DataEditorCollection(new DataEditor[] { editor }));
 
             var dataType1 = new DataType(editor)
@@ -64,7 +66,7 @@ namespace Umbraco.Tests.Published
                 }
             };
 
-            var dataType3 = new DataType(new TextboxPropertyEditor(logger))
+            var dataType3 = new DataType(new TextboxPropertyEditor(logger, Mock.Of<IDataTypeService>(), localizationService))
             {
                 Id = 3
             };

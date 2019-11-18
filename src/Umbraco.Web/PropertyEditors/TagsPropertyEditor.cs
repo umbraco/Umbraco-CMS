@@ -4,10 +4,12 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -30,14 +32,14 @@ namespace Umbraco.Web.PropertyEditors
             _validators = validators;
         }
 
-        protected override IDataValueEditor CreateValueEditor() => new TagPropertyValueEditor(Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new TagPropertyValueEditor(Current.Services.DataTypeService, Current.Services.LocalizationService, Attribute);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new TagConfigurationEditor(_validators);
 
         internal class TagPropertyValueEditor : DataValueEditor
         {
-            public TagPropertyValueEditor(DataEditorAttribute attribute)
-                : base(attribute)
+            public TagPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute)
+                : base(dataTypeService, localizationService, attribute)
             { }
 
             /// <inheritdoc />

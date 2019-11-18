@@ -46,7 +46,7 @@ namespace Umbraco.Web.Editors.Filters
         protected ContentModelValidator(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor) : base(logger, umbracoContextAccessor)
         {
         }
-        
+
         /// <summary>
         /// Ensure the content exists
         /// </summary>
@@ -85,7 +85,7 @@ namespace Umbraco.Web.Editors.Filters
         /// <param name="persistedProperties"></param>
         /// <param name="actionContext"></param>
         /// <returns></returns>
-        protected bool ValidateProperties(List<ContentPropertyBasic> postedProperties, List<Property> persistedProperties, HttpActionContext actionContext)
+        protected bool ValidateProperties(List<ContentPropertyBasic> postedProperties, List<IProperty> persistedProperties, HttpActionContext actionContext)
         {
             foreach (var p in postedProperties)
             {
@@ -142,7 +142,7 @@ namespace Umbraco.Web.Editors.Filters
                 var postedValue = postedProp.Value;
 
                 ValidatePropertyValue(model, modelWithProperties, editor, p, postedValue, modelState);
-    
+
             }
 
             return modelState.IsValid;

@@ -78,6 +78,7 @@ namespace Umbraco.Tests.TestHelpers
         /// <param name="scopeAccessor"></param>
         /// <param name="cache">A cache.</param>
         /// <param name="logger">A logger.</param>
+        /// <param name="ioHelper">An io helper.</param>
         /// <param name="globalSettings"></param>
         /// <param name="umbracoSettings"></param>
         /// <param name="eventMessagesFactory">An event messages factory.</param>
@@ -92,6 +93,7 @@ namespace Umbraco.Tests.TestHelpers
             IScopeProvider scopeProvider, IScopeAccessor scopeAccessor,
             AppCaches cache,
             ILogger logger,
+            IIOHelper ioHelper,
             IGlobalSettings globalSettings,
             IUmbracoSettingsSection umbracoSettings,
             IEventMessagesFactory eventMessagesFactory,
@@ -107,7 +109,6 @@ namespace Umbraco.Tests.TestHelpers
 
             var scheme = Mock.Of<IMediaPathScheme>();
             var config = Mock.Of<IContentSection>();
-            var ioHelper = Mock.Of<IIOHelper>();
 
             var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), config, scheme, logger, ioHelper);
 
@@ -243,7 +244,7 @@ namespace Umbraco.Tests.TestHelpers
             }
 
             typeFinder = typeFinder ?? new TypeFinder(logger);
-            fileSystems = fileSystems ?? new FileSystems(Current.Factory, logger, new IOHelper());
+            fileSystems = fileSystems ?? new FileSystems(Current.Factory, logger, IOHelper.Default, SettingsForTests.GenerateMockGlobalSettings());
             var scopeProvider = new ScopeProvider(databaseFactory, fileSystems, logger, typeFinder);
             return scopeProvider;
         }

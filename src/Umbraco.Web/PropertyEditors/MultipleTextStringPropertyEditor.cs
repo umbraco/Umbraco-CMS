@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -34,7 +35,7 @@ namespace Umbraco.Web.PropertyEditors
         { }
 
         /// <inheritdoc />
-        protected override IDataValueEditor CreateValueEditor() => new MultipleTextStringPropertyValueEditor(Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new MultipleTextStringPropertyValueEditor(Current.Services.DataTypeService, Current.Services.LocalizationService,Attribute);
 
         /// <inheritdoc />
         protected override IConfigurationEditor CreateConfigurationEditor() => new MultipleTextStringConfigurationEditor();
@@ -44,8 +45,8 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         internal class MultipleTextStringPropertyValueEditor : DataValueEditor
         {
-            public MultipleTextStringPropertyValueEditor(DataEditorAttribute attribute)
-                : base(attribute)
+            public MultipleTextStringPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute)
+                : base(dataTypeService, localizationService, attribute)
             { }
 
             /// <summary>
@@ -95,7 +96,7 @@ namespace Umbraco.Web.PropertyEditors
             /// <remarks>
             /// The legacy property editor saved this data as new line delimited! strange but we have to maintain that.
             /// </remarks>
-            public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
+            public override object ToEditor(IProperty property, string culture = null, string segment = null)
             {
                 var val = property.GetValue(culture, segment);
                 return val?.ToString().Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries)

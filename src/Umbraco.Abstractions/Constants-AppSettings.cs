@@ -47,6 +47,26 @@ namespace Umbraco.Core
             public const string ReservedUrls = "Umbraco.Core.ReservedUrls";
 
             /// <summary>
+            /// The path of backoffice.
+            /// </summary>
+            public const string UmbracoPath = "umbracoPath";
+
+            /// <summary>
+            /// The path of the stylesheet folder.
+            /// </summary>
+            public const string UmbracoCssPath = "umbracoCssPath";
+
+            /// <summary>
+            /// The path of script folder.
+            /// </summary>
+            public const string UmbracoScriptsPath = "umbracoScriptsPath";
+
+            /// <summary>
+            /// The path of media folder.
+            /// </summary>
+            public const string UmbracoMediaPath = "umbracoMediaPath";
+
+            /// <summary>
             /// The reserved paths from web.config
             /// </summary>
             public const string ReservedPaths = "Umbraco.Core.ReservedPaths";

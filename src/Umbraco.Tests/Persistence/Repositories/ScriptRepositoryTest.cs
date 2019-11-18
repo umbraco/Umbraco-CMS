@@ -3,6 +3,9 @@ using System.Linq;
 using System.Text;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
@@ -26,7 +29,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.SetUp();
 
             _fileSystems = Mock.Of<IFileSystems>();
-            _fileSystem = new PhysicalFileSystem(SystemDirectories.Scripts, new IOHelper());
+            _fileSystem = new PhysicalFileSystem(new GlobalSettings().UmbracoScriptsPath);
             Mock.Get(_fileSystems).Setup(x => x.ScriptsFileSystem).Returns(_fileSystem);
             using (var stream = CreateStream("Umbraco.Sys.registerNamespace(\"Umbraco.Utils\");"))
             {
@@ -36,7 +39,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private IScriptRepository CreateRepository()
         {
-            return new ScriptRepository(_fileSystems, new IOHelper());
+            return new ScriptRepository(_fileSystems, IOHelper);
         }
 
         protected override void Compose()

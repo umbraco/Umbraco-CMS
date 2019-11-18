@@ -70,7 +70,6 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Abstractions" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -85,9 +84,9 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
-    <PackageReference Include="ClientDependency" Version="1.9.7" />
-    <PackageReference Include="ClientDependency-Mvc5" Version="1.8.0.0" />
-    <PackageReference Include="Examine" Version="1.0.0" />
+    <PackageReference Include="ClientDependency" Version="1.9.8" />
+    <PackageReference Include="ClientDependency-Mvc5" Version="1.9.3" />
+    <PackageReference Include="Examine" Version="1.0.1" />
     <PackageReference Include="ImageProcessor.Web" Version="4.10.0.100" />
     <PackageReference Include="ImageProcessor.Web.Config" Version="2.5.0.100" />
     <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.2" />
@@ -110,6 +109,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.6.0" />
     <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
   </ItemGroup>
   <ItemGroup>
@@ -351,6 +351,9 @@
           <DevelopmentServerPort>9000</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:9000/</IISUrl>
+          <DevelopmentServerPort>8600</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:8600/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

@@ -31,7 +31,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Validates the content item's properties pass validation rules
         /// </summary>
-        public bool IsPropertyDataValid(IContent content, out Property[] invalidProperties, CultureImpact impact)
+        public bool IsPropertyDataValid(IContent content, out IProperty[] invalidProperties, CultureImpact impact)
         {
             // select invalid properties
             invalidProperties = content.Properties.Where(x =>
@@ -66,7 +66,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets a value indicating whether the property has valid values.
         /// </summary>
-        public bool IsPropertyValid(Property property, string culture = "*", string segment = "*")
+        public bool IsPropertyValid(IProperty property, string culture = "*", string segment = "*")
         {
             //NOTE - the pvalue and vvalues logic in here is borrowed directly from the Property.Values setter so if you are wondering what that's all about, look there.
             // The underlying Property._pvalue and Property._vvalues are not exposed but we can re-create these values ourselves which is what it's doing.
@@ -74,7 +74,7 @@ namespace Umbraco.Core.Services
             culture = culture.NullOrWhiteSpaceAsNull();
             segment = segment.NullOrWhiteSpaceAsNull();
 
-            Property.PropertyValue pvalue = null;
+            IPropertyValue pvalue = null;
 
             // if validating invariant/neutral, and it is supported, validate
             // (including ensuring that the value exists, if mandatory)
@@ -120,7 +120,7 @@ namespace Umbraco.Core.Services
         /// <param name="property"></param>
         /// <param name="value"></param>
         /// <returns>True is property value is valid, otherwise false</returns>
-        private bool IsValidPropertyValue(Property property, object value)
+        private bool IsValidPropertyValue(IProperty property, object value)
         {
             return IsPropertyValueValid(property.PropertyType, value);
         }
@@ -128,7 +128,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Determines whether a value is valid for this property type.
         /// </summary>
-        private bool IsPropertyValueValid(PropertyType propertyType, object value)
+        private bool IsPropertyValueValid(IPropertyType propertyType, object value)
         {
             var editor = _propertyEditors[propertyType.PropertyEditorAlias];
             if (editor == null)

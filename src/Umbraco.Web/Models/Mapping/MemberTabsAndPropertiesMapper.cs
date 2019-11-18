@@ -126,7 +126,7 @@ namespace Umbraco.Web.Models.Mapping
                     Value = _localizedTextService.UmbracoDictionaryTranslate(member.ContentType.Name),
                     View = Current.PropertyEditors[Constants.PropertyEditors.Aliases.Label].GetValueEditor().View
                 },
-                GetLoginProperty(_memberService, member, _localizedTextService),
+                GetLoginProperty(_memberTypeService, member, _localizedTextService),
                 new ContentPropertyDisplay
                 {
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email",
@@ -176,7 +176,7 @@ namespace Umbraco.Web.Models.Mapping
         /// <param name="properties"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        protected override List<ContentPropertyDisplay> MapProperties(IContentBase content, List<Property> properties, MapperContext context)
+        protected override List<ContentPropertyDisplay> MapProperties(IContentBase content, List<IProperty> properties, MapperContext context)
         {
             var result = base.MapProperties(content, properties, context);
             var member = (IMember)content;
@@ -208,7 +208,7 @@ namespace Umbraco.Web.Models.Mapping
         /// <summary>
         /// Returns the login property display field
         /// </summary>
-        /// <param name="memberService"></param>
+        /// <param name="memberTypeService"></param>
         /// <param name="member"></param>
         /// <param name="display"></param>
         /// <param name="localizedText"></param>
@@ -218,7 +218,7 @@ namespace Umbraco.Web.Models.Mapping
         /// the membership provider is a custom one, we cannot allow changing the username because MembershipProvider's do not actually natively
         /// allow that.
         /// </remarks>
-        internal static ContentPropertyDisplay GetLoginProperty(IMemberService memberService, IMember member, ILocalizedTextService localizedText)
+        internal static ContentPropertyDisplay GetLoginProperty(IMemberTypeService memberTypeService, IMember member, ILocalizedTextService localizedText)
         {
             var prop = new ContentPropertyDisplay
             {
@@ -227,7 +227,7 @@ namespace Umbraco.Web.Models.Mapping
                 Value = member.Username
             };
 
-            var scenario = memberService.GetMembershipScenario();
+            var scenario = memberTypeService.GetMembershipScenario();
 
             // only allow editing if this is a new member, or if the membership provider is the Umbraco one
             if (member.HasIdentity == false || scenario == MembershipScenario.NativeUmbraco)

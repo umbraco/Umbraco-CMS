@@ -19,8 +19,8 @@ namespace Umbraco.Web.PropertyEditors
     {
         private readonly ILogger _logger;
 
-        internal MultipleValueEditor(ILogger logger, DataEditorAttribute attribute)
-            : base(attribute)
+        internal MultipleValueEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute)
+            : base(dataTypeService, localizationService, attribute)
         {
             _logger = logger;
         }
@@ -33,9 +33,9 @@ namespace Umbraco.Web.PropertyEditors
         /// <param name="culture"></param>
         /// <param name="segment"></param>
         /// <returns></returns>
-        public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
+        public override object ToEditor(IProperty property, string culture = null, string segment = null)
         {
-            var json = base.ToEditor(property, dataTypeService, culture, segment).ToString();
+            var json = base.ToEditor(property, culture, segment).ToString();
             return JsonConvert.DeserializeObject<string[]>(json) ?? Array.Empty<string>();
         }
 

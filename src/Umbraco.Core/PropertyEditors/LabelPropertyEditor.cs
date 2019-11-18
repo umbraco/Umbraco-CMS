@@ -1,4 +1,6 @@
-﻿using Umbraco.Core.Logging;
+﻿using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -20,7 +22,7 @@ namespace Umbraco.Core.PropertyEditors
         { }
 
         /// <inheritdoc />
-        protected override IDataValueEditor CreateValueEditor() => new LabelPropertyValueEditor(Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new LabelPropertyValueEditor(Current.Services.DataTypeService, Current.Services.LocalizationService, Attribute);
 
         /// <inheritdoc />
         protected override IConfigurationEditor CreateConfigurationEditor() => new LabelConfigurationEditor();
@@ -28,8 +30,8 @@ namespace Umbraco.Core.PropertyEditors
         // provides the property value editor
         internal class LabelPropertyValueEditor : DataValueEditor
         {
-            public LabelPropertyValueEditor(DataEditorAttribute attribute)
-                : base(attribute)
+            public LabelPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute)
+                : base(dataTypeService, localizationService, attribute)
             { }
 
             /// <inheritdoc />

@@ -10,8 +10,6 @@
     * and then add the exports command to add the new item into the task menu.
     */
 
-global.isProd = true;
-
 const { src, dest, series, parallel, lastRun } = require('gulp');
 
 const { dependencies } = require('./gulp/tasks/dependencies');
@@ -20,7 +18,6 @@ const { less } = require('./gulp/tasks/less');
 const { testE2e, testUnit } = require('./gulp/tasks/test');
 const { views } = require('./gulp/tasks/views');
 const { watchTask } = require('./gulp/tasks/watchTask');
-const { removeProductionMode } = require('./gulp/tasks/removeProductionMode');
 
 // Load local overwrites, can be used to overwrite paths in your local setup.
 var fs = require('fs');
@@ -41,7 +38,6 @@ try {
 // ***********************************************************
 exports.build = series(parallel(dependencies, js, less, views), testUnit);
 exports.dev = series(parallel(dependencies, js, less, views), watchTask);
-exports.fastdev = series(removeProductionMode, parallel(dependencies, js, less, views), watchTask);
 exports.watch = series(watchTask);
 // 
 exports.runTests = series(js, testUnit);

@@ -320,8 +320,8 @@ namespace Umbraco.Web.Editors
                     "umbracoSettings", new Dictionary<string, object>
                     {
                         {"umbracoPath", _globalSettings.Path},
-                        {"mediaPath", Current.IOHelper.ResolveUrl(SystemDirectories.Media).TrimEnd('/')},
-                        {"appPluginsPath", Current.IOHelper.ResolveUrl(SystemDirectories.AppPlugins).TrimEnd('/')},
+                        {"mediaPath", Current.IOHelper.ResolveUrl(Current.Configs.Global().UmbracoMediaPath).TrimEnd('/')},
+                        {"appPluginsPath", Current.IOHelper.ResolveUrl(Constants.SystemDirectories.AppPlugins).TrimEnd('/')},
                         {
                             "imageFileTypes",
                             string.Join(",", Current.Configs.Settings().Content.ImageFileTypes)
@@ -340,7 +340,7 @@ namespace Umbraco.Web.Editors
                         },
                         {"keepUserLoggedIn", Current.Configs.Settings().Security.KeepUserLoggedIn},
                         {"usernameIsEmail", Current.Configs.Settings().Security.UsernameIsEmail},
-                        {"cssPath", Current.IOHelper.ResolveUrl(SystemDirectories.Css).TrimEnd('/')},
+                        {"cssPath", Current.IOHelper.ResolveUrl(Current.Configs.Global().UmbracoCssPath).TrimEnd('/')},
                         {"allowPasswordReset", Current.Configs.Settings().Security.AllowPasswordReset},
                         {"loginBackgroundImage",  Current.Configs.Settings().Content.LoginBackgroundImage},
                         {"showUserInvite", EmailSender.CanSendRequiredEmail},

@@ -13,16 +13,16 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class Property : EntityBase
+    public class Property : EntityBase, IProperty
     {
         // _values contains all property values, including the invariant-neutral value
-        private List<PropertyValue> _values = new List<PropertyValue>();
+        private List<IPropertyValue> _values = new List<IPropertyValue>();
 
         // _pvalue contains the invariant-neutral property value
-        private PropertyValue _pvalue;
+        private IPropertyValue _pvalue;
 
         // _vvalues contains the (indexed) variant property values
-        private Dictionary<CompositeNStringNStringKey, PropertyValue> _vvalues;
+        private Dictionary<CompositeNStringNStringKey, IPropertyValue> _vvalues;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Property"/> class.
@@ -33,7 +33,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="Property"/> class.
         /// </summary>
-        public Property(PropertyType propertyType)
+        public Property(IPropertyType propertyType)
         {
             PropertyType = propertyType;
         }
@@ -41,7 +41,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="Property"/> class.
         /// </summary>
-        public Property(int id, PropertyType propertyType)
+        public Property(int id, IPropertyType propertyType)
         {
             Id = id;
             PropertyType = propertyType;
@@ -50,7 +50,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Represents a property value.
         /// </summary>
-        public class PropertyValue
+        public class PropertyValue : IPropertyValue
         {
             // TODO: Either we allow change tracking at this class level, or we add some special change tracking collections to the Property
             // class to deal with change tracking which variants have changed
@@ -66,7 +66,7 @@ namespace Umbraco.Core.Models
             public string Culture
             {
                 get => _culture;
-                internal set => _culture = value.IsNullOrWhiteSpace() ? null : value.ToLowerInvariant();
+                set => _culture = value.IsNullOrWhiteSpace() ? null : value.ToLowerInvariant();
             }
 
             /// <summary>
@@ -77,23 +77,23 @@ namespace Umbraco.Core.Models
             public string Segment
             {
                 get => _segment;
-                internal set => _segment = value?.ToLowerInvariant();
+                set => _segment = value?.ToLowerInvariant();
             }
 
             /// <summary>
             /// Gets or sets the edited value of the property.
             /// </summary>
-            public object EditedValue { get; internal set; }
+            public object EditedValue { get; set; }
 
             /// <summary>
             /// Gets or sets the published value of the property.
             /// </summary>
-            public object PublishedValue { get; internal set; }
+            public object PublishedValue { get; set; }
 
             /// <summary>
             /// Clones the property value.
             /// </summary>
-            public PropertyValue Clone()
+            public IPropertyValue Clone()
                 => new PropertyValue { _culture = _culture, _segment = _segment, PublishedValue = PublishedValue, EditedValue = EditedValue };
         }
 
@@ -121,13 +121,13 @@ namespace Umbraco.Core.Models
         /// Returns the PropertyType, which this Property is based on
         /// </summary>
         [IgnoreDataMember]
-        public PropertyType PropertyType { get; private set; }
+        public IPropertyType PropertyType { get; private set; }
 
         /// <summary>
         /// Gets the list of values.
         /// </summary>
         [DataMember]
-        public IReadOnlyCollection<PropertyValue> Values
+        public IReadOnlyCollection<IPropertyValue> Values
         {
             get => _values;
             set
@@ -152,7 +152,7 @@ namespace Umbraco.Core.Models
         /// Returns the Id of the PropertyType, which this Property is based on
         /// </summary>
         [IgnoreDataMember]
-        internal int PropertyTypeId => PropertyType.Id;
+        public int PropertyTypeId => PropertyType.Id;
 
         /// <summary>
         /// Returns the DatabaseType that the underlaying DataType is using to store its values
@@ -161,7 +161,7 @@ namespace Umbraco.Core.Models
         /// Only used internally when saving the property value.
         /// </remarks>
         [IgnoreDataMember]
-        internal ValueStorageType ValueStorageType => PropertyType.ValueStorageType;
+        public ValueStorageType ValueStorageType => PropertyType.ValueStorageType;
 
         /// <summary>
         /// Gets the value.
@@ -180,7 +180,7 @@ namespace Umbraco.Core.Models
                 : null;
         }
 
-        private object GetPropertyValue(PropertyValue pvalue, bool published)
+        private object GetPropertyValue(IPropertyValue pvalue, bool published)
         {
             if (pvalue == null) return null;
 
@@ -191,7 +191,7 @@ namespace Umbraco.Core.Models
 
         // internal - must be invoked by the content item
         // does *not* validate the value - content item must validate first
-        internal void PublishValues(string culture = "*", string segment = "*")
+        public void PublishValues(string culture = "*", string segment = "*")
         {
             culture = culture.NullOrWhiteSpaceAsNull();
             segment = segment.NullOrWhiteSpaceAsNull();
@@ -216,7 +216,7 @@ namespace Umbraco.Core.Models
         }
 
         // internal - must be invoked by the content item
-        internal void UnpublishValues(string culture = "*", string segment = "*")
+        public void UnpublishValues(string culture = "*", string segment = "*")
         {
             culture = culture.NullOrWhiteSpaceAsNull();
             segment = segment.NullOrWhiteSpaceAsNull();
@@ -240,7 +240,7 @@ namespace Umbraco.Core.Models
                 UnpublishValue(pvalue);
         }
 
-        private void PublishValue(PropertyValue pvalue)
+        private void PublishValue(IPropertyValue pvalue)
         {
             if (pvalue == null) return;
 
@@ -251,7 +251,7 @@ namespace Umbraco.Core.Models
             DetectChanges(pvalue.EditedValue, origValue, nameof(Values), PropertyValueComparer, false);
         }
 
-        private void UnpublishValue(PropertyValue pvalue)
+        private void UnpublishValue(IPropertyValue pvalue)
         {
             if (pvalue == null) return;
 
@@ -294,7 +294,7 @@ namespace Umbraco.Core.Models
                 pvalue.EditedValue = value;
         }
 
-        private (PropertyValue, bool) GetPValue(bool create)
+        private (IPropertyValue, bool) GetPValue(bool create)
         {
             var change = false;
             if (_pvalue == null)
@@ -307,7 +307,7 @@ namespace Umbraco.Core.Models
             return (_pvalue, change);
         }
 
-        private (PropertyValue, bool) GetPValue(string culture, string segment, bool create)
+        private (IPropertyValue, bool) GetPValue(string culture, string segment, bool create)
         {
             if (culture == null && segment == null)
                 return GetPValue(create);
@@ -316,7 +316,7 @@ namespace Umbraco.Core.Models
             if (_vvalues == null)
             {
                 if (!create) return (null, false);
-                _vvalues = new Dictionary<CompositeNStringNStringKey, PropertyValue>();
+                _vvalues = new Dictionary<CompositeNStringNStringKey, IPropertyValue>();
                 change = true;
             }
             var k = new CompositeNStringNStringKey(culture, segment);

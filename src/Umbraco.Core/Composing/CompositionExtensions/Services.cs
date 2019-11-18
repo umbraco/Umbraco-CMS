@@ -89,11 +89,9 @@ namespace Umbraco.Core.Composing.CompositionExtensions
 
         private static LocalizedTextServiceFileSources SourcesFactory(IFactory container)
         {
-            var ioHelper = container.GetInstance<IIOHelper>();
-
-            var mainLangFolder = new DirectoryInfo(ioHelper.MapPath(SystemDirectories.Umbraco + "/config/lang/"));
-            var appPlugins = new DirectoryInfo(ioHelper.MapPath(SystemDirectories.AppPlugins));
-            var configLangFolder = new DirectoryInfo(ioHelper.MapPath(SystemDirectories.Config + "/lang/"));
+            var mainLangFolder = new DirectoryInfo(Current.IOHelper.MapPath(Current.Configs.Global().UmbracoPath + "/config/lang/"));
+            var appPlugins = new DirectoryInfo(Current.IOHelper.MapPath(Constants.SystemDirectories.AppPlugins));
+            var configLangFolder = new DirectoryInfo(Current.IOHelper.MapPath(Constants.SystemDirectories.Config + "/lang/"));
 
             var pluginLangFolders = appPlugins.Exists == false
                 ? Enumerable.Empty<LocalizedTextServiceSupplementaryFileSource>()

@@ -22,7 +22,7 @@
     <meta name="pinterest" content="nopin" />
 
     @Html.RenderCssHere(
-        new BasicPath("Umbraco", Current.IOHelper.ResolveUrl(SystemDirectories.Umbraco)))
+        new BasicPath("Umbraco", Current.IOHelper.ResolveUrl(Current.Configs.Global().UmbracoPath)))
 
 </head>
 <body id="canvasdesignerPanel" ng-mouseover="outlinePositionHide()" ng-controller="previewController">

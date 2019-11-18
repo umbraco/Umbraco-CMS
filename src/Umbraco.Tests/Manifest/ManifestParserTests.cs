@@ -14,6 +14,7 @@ using Umbraco.Core.PropertyEditors.Validators;
 using Umbraco.Core.Services;
 using Umbraco.Core.Dashboards;
 using Umbraco.Core.IO;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Tests.Manifest
 {
@@ -25,27 +26,12 @@ namespace Umbraco.Tests.Manifest
         [SetUp]
         public void Setup()
         {
-            Current.Reset();
-            var factory = Mock.Of<IFactory>();
-            Current.Factory = factory;
-
-            var serviceContext = ServiceContext.CreatePartial(
-                localizedTextService: Mock.Of<ILocalizedTextService>());
-
-            Mock.Get(factory)
-                .Setup(x => x.GetInstance(It.IsAny<Type>()))
-                .Returns<Type>(x =>
-                {
-                    if (x == typeof(ServiceContext)) return serviceContext;
-                    throw new Exception("oops");
-                });
-
             var validators = new IManifestValueValidator[]
             {
                 new RequiredValidator(Mock.Of<ILocalizedTextService>()),
                 new RegexValidator(Mock.Of<ILocalizedTextService>(), null)
             };
-            _parser = new ManifestParser(AppCaches.Disabled, new ManifestValueValidatorCollection(validators), new ManifestFilterCollection(Array.Empty<IManifestFilter>()),  Mock.Of<ILogger>(), IOHelper.Default);
+            _parser = new ManifestParser(AppCaches.Disabled, new ManifestValueValidatorCollection(validators), new ManifestFilterCollection(Array.Empty<IManifestFilter>()),  Mock.Of<ILogger>(), IOHelper.Default, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), new JsonNetSerializer());
         }
 
         [Test]

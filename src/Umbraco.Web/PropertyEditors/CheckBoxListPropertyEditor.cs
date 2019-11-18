@@ -17,20 +17,24 @@ namespace Umbraco.Web.PropertyEditors
     public class CheckBoxListPropertyEditor : DataEditor
     {
         private readonly ILocalizedTextService _textService;
+        private readonly IDataTypeService _dataTypeService;
+        private readonly ILocalizationService _localizationService;
 
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public CheckBoxListPropertyEditor(ILogger logger, ILocalizedTextService textService)
+        public CheckBoxListPropertyEditor(ILogger logger, ILocalizedTextService textService, IDataTypeService dataTypeService, ILocalizationService localizationService)
             : base(logger)
         {
             _textService = textService;
+            _dataTypeService = dataTypeService;
+            _localizationService = localizationService;
         }
 
         /// <inheritdoc />
         protected override IConfigurationEditor CreateConfigurationEditor() => new ValueListConfigurationEditor(_textService);
 
         /// <inheritdoc />
-        protected override IDataValueEditor CreateValueEditor() => new MultipleValueEditor(Logger, Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new MultipleValueEditor(Logger, _dataTypeService, _localizationService, Attribute);
     }
 }

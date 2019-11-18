@@ -19,7 +19,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             _textService = textService;
         }
-        public override void Map(Property originalProp, ContentPropertyDisplay dest, MapperContext context)
+        public override void Map(IProperty originalProp, ContentPropertyDisplay dest, MapperContext context)
         {
             base.Map(originalProp, dest, context);
 

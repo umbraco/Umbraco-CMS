@@ -110,19 +110,19 @@ namespace Umbraco.Web.Editors
             switch (type)
             {
                 case Core.Constants.Trees.PartialViews:
-                    virtualPath = NormalizeVirtualPath(name, SystemDirectories.PartialViews);
+                    virtualPath = NormalizeVirtualPath(name, Core.Constants.SystemDirectories.PartialViews);
                     Services.FileService.CreatePartialViewFolder(virtualPath);
                     break;
                 case Core.Constants.Trees.PartialViewMacros:
-                    virtualPath = NormalizeVirtualPath(name, SystemDirectories.MacroPartials);
+                    virtualPath = NormalizeVirtualPath(name, Core.Constants.SystemDirectories.MacroPartials);
                     Services.FileService.CreatePartialViewMacroFolder(virtualPath);
                     break;
                 case Core.Constants.Trees.Scripts:
-                    virtualPath = NormalizeVirtualPath(name, SystemDirectories.Scripts);
+                    virtualPath = NormalizeVirtualPath(name, Current.Configs.Global().UmbracoScriptsPath);
                     Services.FileService.CreateScriptFolder(virtualPath);
                     break;
                 case Core.Constants.Trees.Stylesheets:
-                    virtualPath = NormalizeVirtualPath(name, SystemDirectories.Css);
+                    virtualPath = NormalizeVirtualPath(name, Current.Configs.Global().UmbracoCssPath);
                     Services.FileService.CreateStyleSheetFolder(virtualPath);
                     break;
 
@@ -250,23 +250,23 @@ namespace Umbraco.Web.Editors
             {
                 case Core.Constants.Trees.PartialViews:
                     codeFileDisplay = Mapper.Map<IPartialView, CodeFileDisplay>(new PartialView(PartialViewType.PartialView, string.Empty));
-                    codeFileDisplay.VirtualPath = SystemDirectories.PartialViews;
+                    codeFileDisplay.VirtualPath = Core.Constants.SystemDirectories.PartialViews;
                     if (snippetName.IsNullOrWhiteSpace() == false)
                         codeFileDisplay.Content = Services.FileService.GetPartialViewSnippetContent(snippetName);
                     break;
                 case Core.Constants.Trees.PartialViewMacros:
                     codeFileDisplay = Mapper.Map<IPartialView, CodeFileDisplay>(new PartialView(PartialViewType.PartialViewMacro, string.Empty));
-                    codeFileDisplay.VirtualPath = SystemDirectories.MacroPartials;
+                    codeFileDisplay.VirtualPath = Core.Constants.SystemDirectories.MacroPartials;
                     if (snippetName.IsNullOrWhiteSpace() == false)
                         codeFileDisplay.Content = Services.FileService.GetPartialViewMacroSnippetContent(snippetName);
                     break;
                 case Core.Constants.Trees.Scripts:
                     codeFileDisplay = Mapper.Map<Script, CodeFileDisplay>(new Script(string.Empty));
-                    codeFileDisplay.VirtualPath = SystemDirectories.Scripts;
+                    codeFileDisplay.VirtualPath = Current.Configs.Global().UmbracoScriptsPath;
                     break;
                 case Core.Constants.Trees.Stylesheets:
                     codeFileDisplay = Mapper.Map<Stylesheet, CodeFileDisplay>(new Stylesheet(string.Empty));
-                    codeFileDisplay.VirtualPath = SystemDirectories.Css;
+                    codeFileDisplay.VirtualPath = Current.Configs.Global().UmbracoCssPath;
                     break;
                 default:
                     throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Unsupported editortype"));
@@ -305,7 +305,7 @@ namespace Umbraco.Web.Editors
             switch (type)
             {
                 case Core.Constants.Trees.PartialViews:
-                    if (IsDirectory(virtualPath, SystemDirectories.PartialViews))
+                    if (IsDirectory(virtualPath, Core.Constants.SystemDirectories.PartialViews))
                     {
                         Services.FileService.DeletePartialViewFolder(virtualPath);
                         return Request.CreateResponse(HttpStatusCode.OK);
@@ -317,7 +317,7 @@ namespace Umbraco.Web.Editors
                     return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Partial View or folder found with the specified path");
 
                 case Core.Constants.Trees.PartialViewMacros:
-                    if (IsDirectory(virtualPath, SystemDirectories.MacroPartials))
+                    if (IsDirectory(virtualPath, Core.Constants.SystemDirectories.MacroPartials))
                     {
                         Services.FileService.DeletePartialViewMacroFolder(virtualPath);
                         return Request.CreateResponse(HttpStatusCode.OK);
@@ -329,7 +329,7 @@ namespace Umbraco.Web.Editors
                     return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Partial View Macro or folder found with the specified path");
 
                 case Core.Constants.Trees.Scripts:
-                    if (IsDirectory(virtualPath, SystemDirectories.Scripts))
+                    if (IsDirectory(virtualPath, Current.Configs.Global().UmbracoScriptsPath))
                     {
                         Services.FileService.DeleteScriptFolder(virtualPath);
                         return Request.CreateResponse(HttpStatusCode.OK);
@@ -342,7 +342,7 @@ namespace Umbraco.Web.Editors
                     return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No Script or folder found with the specified path");
 
                 case Core.Constants.Trees.Stylesheets:
-                    if (IsDirectory(virtualPath, SystemDirectories.Css))
+                    if (IsDirectory(virtualPath, Current.Configs.Global().UmbracoCssPath))
                     {
                         Services.FileService.DeleteStyleSheetFolder(virtualPath);
                         return Request.CreateResponse(HttpStatusCode.OK);
@@ -561,13 +561,13 @@ namespace Umbraco.Web.Editors
 
         private Attempt<IPartialView> CreateOrUpdatePartialView(CodeFileDisplay display)
         {
-            return CreateOrUpdatePartialView(display, SystemDirectories.PartialViews,
+            return CreateOrUpdatePartialView(display, Core.Constants.SystemDirectories.PartialViews,
                 Services.FileService.GetPartialView, Services.FileService.SavePartialView, Services.FileService.CreatePartialView);
         }
 
         private Attempt<IPartialView> CreateOrUpdatePartialViewMacro(CodeFileDisplay display)
         {
-            return CreateOrUpdatePartialView(display, SystemDirectories.MacroPartials,
+            return CreateOrUpdatePartialView(display, Core.Constants.SystemDirectories.MacroPartials,
                 Services.FileService.GetPartialViewMacro, Services.FileService.SavePartialViewMacro, Services.FileService.CreatePartialViewMacro);
         }
 

@@ -11,6 +11,7 @@ namespace Umbraco.Tests.Models.Collections
 {
     public abstract class Item : IEntity, ICanBeDirty
     {
+        private bool _withChanges = true; // should we track changes?
         private bool _hasIdentity;
         private int _id;
         private Guid _key;
@@ -26,10 +27,7 @@ namespace Umbraco.Tests.Models.Collections
         [DataMember]
         public int Id
         {
-            get
-            {
-                return _id;
-            }
+            get => _id;
             set
             {
                 _id = value;
@@ -45,14 +43,8 @@ namespace Umbraco.Tests.Models.Collections
         [DataMember]
         public Guid Key
         {
-            get
-            {
-                if (_key == Guid.Empty)
-                    return _id.ToGuid();
-
-                return _key;
-            }
-            set { _key = value; }
+            get => _key == Guid.Empty ? _id.ToGuid() : _key;
+            set => _key = value;
         }
 
         /// <summary>
@@ -93,12 +85,12 @@ namespace Umbraco.Tests.Models.Collections
         /// <param name="propertyInfo">The property info.</param>
         protected virtual void OnPropertyChanged(PropertyInfo propertyInfo)
         {
+            if (_withChanges == false)
+                return;
+
             _propertyChangedInfo[propertyInfo.Name] = true;
 
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyInfo.Name));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyInfo.Name));
         }
 
         internal virtual void ResetIdentity()
@@ -128,7 +120,7 @@ namespace Umbraco.Tests.Models.Collections
         /// Tracks the properties that have changed
         /// </summary>
         //private readonly IDictionary<string, bool> _propertyChangedInfo = new Dictionary<string, bool>();
-        private IDictionary<string, bool> _propertyChangedInfo;
+        private readonly IDictionary<string, bool> _propertyChangedInfo;
 
         /// <summary>
         /// Indicates whether a specific property on the current entity is dirty.
@@ -167,18 +159,28 @@ namespace Umbraco.Tests.Models.Collections
         }
 
         /// <summary>
+        /// Disables change tracking.
+        /// </summary>
+        public void DisableChangeTracking()
+        {
+            _withChanges = false;
+        }
+
+        /// <summary>
+        /// Enables change tracking.
+        /// </summary>
+        public void EnableChangeTracking()
+        {
+            _withChanges = true;
+        }
+
+        /// <summary>
         /// Indicates whether the current entity has an identity, eg. Id.
         /// </summary>
         public virtual bool HasIdentity
         {
-            get
-            {
-                return _hasIdentity;
-            }
-            protected set
-            {
-                _hasIdentity = value;
-            }
+            get => _hasIdentity;
+            protected set => _hasIdentity = value;
         }
 
         public static bool operator ==(Item left, Item right)
