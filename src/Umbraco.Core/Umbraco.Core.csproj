@@ -214,14 +214,9 @@
     <Compile Include="Migrations\Upgrade\V_8_1_0\ConvertTinyMceAndGridMediaUrlsToLocalLink.cs" />
     <Compile Include="Models\ContentBaseExtensions.cs" />
     <Compile Include="Models\GridValue.cs" />
-    <Compile Include="Models\IContentType.cs" />
-    <Compile Include="Models\IContentTypeBase.cs" />
-    <Compile Include="Models\IContentTypeComposition.cs" />
     <Compile Include="Models\Identity\IdentityMapDefinition.cs" />
     <Compile Include="Models\Identity\IdentityUser.cs" />
     <Compile Include="Models\Identity\UserLoginInfoWrapper.cs" />
-    <Compile Include="Models\IMediaType.cs" />
-    <Compile Include="Models\IMemberType.cs" />
     <Compile Include="Models\Language.cs" />
     <Compile Include="Models\Macro.cs" />
     <Compile Include="Models\Membership\UserGroup.cs" />
@@ -258,9 +253,7 @@
     <Compile Include="Services\Changes\ContentTypeChange.cs" />
     <Compile Include="Services\Changes\ContentTypeChangeExtensions.cs" />
     <Compile Include="Services\IDataTypeService.cs" />
-    <Compile Include="Services\IEntityService.cs" />
     <Compile Include="Services\IMembershipMemberService.cs" />
-    <Compile Include="Services\INotificationService.cs" />
     <Compile Include="Services\IPackagingService.cs" />
     <Compile Include="Services\LocalizedTextServiceExtensions.cs" />
     <Compile Include="Services\DateTypeServiceExtensions.cs" />
@@ -531,10 +524,7 @@
     <Compile Include="Models\Packaging\InstallationSummary.cs" />
     <Compile Include="Models\Property.cs" />
     <Compile Include="Models\PropertyCollection.cs" />
-    <Compile Include="Models\PropertyGroup.cs" />
-    <Compile Include="Models\PropertyGroupCollection.cs" />
     <Compile Include="Models\PropertyType.cs" />
-    <Compile Include="Models\PropertyTypeCollection.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentTypeFactory.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentExtensionsForModels.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentModel.cs" />
@@ -587,7 +577,6 @@
     <Compile Include="Persistence\Dtos\UserGroup2NodePermissionDto.cs" />
     <Compile Include="Persistence\Dtos\UserGroupDto.cs" />
     <Compile Include="Persistence\Dtos\UserStartNodeDto.cs" />
-    <Compile Include="Models\UmbracoObjectTypes.cs" />
     <Compile Include="Models\UserExtensions.cs" />
     <Compile Include="NameValueCollectionExtensions.cs" />
     <Compile Include="ObjectJsonExtensions.cs" />

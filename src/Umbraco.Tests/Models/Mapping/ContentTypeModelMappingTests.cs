@@ -626,7 +626,7 @@ namespace Umbraco.Tests.Models.Mapping
                 }
             };
 
-            var result = Mapper.Map<PropertyType>(basic);
+            var result = Mapper.Map<IPropertyType>(basic);
 
             Assert.AreEqual(basic.Id, result.Id);
             Assert.AreEqual(basic.SortOrder, result.SortOrder);
@@ -660,7 +660,7 @@ namespace Umbraco.Tests.Models.Mapping
                 }
             };
 
-            var result = Mapper.Map<PropertyType>(basic);
+            var result = Mapper.Map<IPropertyType>(basic);
 
             Assert.AreEqual(basic.Id, result.Id);
             Assert.AreEqual(basic.SortOrder, result.SortOrder);

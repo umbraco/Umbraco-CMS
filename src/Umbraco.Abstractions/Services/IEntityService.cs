@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Services
@@ -27,28 +26,28 @@ namespace Umbraco.Core.Services
         /// <param name="id">The identifier of the entity.</param>
         /// <param name="objectType">The object type of the entity.</param>
         IEntitySlim Get(int id, UmbracoObjectTypes objectType);
-        
+
         /// <summary>
         /// Gets an entity.
         /// </summary>
         /// <param name="key">The unique key of the entity.</param>
         /// <param name="objectType">The object type of the entity.</param>
         IEntitySlim Get(Guid key, UmbracoObjectTypes objectType);
-        
+
         /// <summary>
         /// Gets an entity.
         /// </summary>
         /// <typeparam name="T">The type used to determine the object type of the entity.</typeparam>
         /// <param name="id">The identifier of the entity.</param>
         IEntitySlim Get<T>(int id) where T : IUmbracoEntity;
-        
+
         /// <summary>
         /// Gets an entity.
         /// </summary>
         /// <typeparam name="T">The type used to determine the object type of the entity.</typeparam>
         /// <param name="key">The unique key of the entity.</param>
         IEntitySlim Get<T>(Guid key) where T : IUmbracoEntity;
-        
+
         /// <summary>
         /// Determines whether an entity exists.
         /// </summary>

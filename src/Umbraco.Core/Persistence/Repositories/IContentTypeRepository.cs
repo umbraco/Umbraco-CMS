@@ -8,7 +8,7 @@ namespace Umbraco.Core.Persistence.Repositories
     public interface IContentTypeRepository : IContentTypeRepositoryBase<IContentType>
     {
         /// <summary>
-        /// Gets all entities of the specified <see cref="PropertyType"/> query
+        /// Gets all entities of the specified <see cref="IPropertyType"/> query
         /// </summary>
         /// <param name="query"></param>
         /// <returns>An enumerable list of <see cref="IContentType"/> objects</returns>

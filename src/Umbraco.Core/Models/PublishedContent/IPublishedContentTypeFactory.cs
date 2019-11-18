@@ -18,7 +18,7 @@
         /// <param name="contentType">The published content type owning the property.</param>
         /// <param name="propertyType">A property type.</param>
         /// <remarks>Is used by <see cref="PublishedContentType"/> constructor to create property types.</remarks>
-        IPublishedPropertyType CreatePropertyType(IPublishedContentType contentType, PropertyType propertyType);
+        IPublishedPropertyType CreatePropertyType(IPublishedContentType contentType, IPropertyType propertyType);
 
         /// <summary>
         /// Creates a published property type.

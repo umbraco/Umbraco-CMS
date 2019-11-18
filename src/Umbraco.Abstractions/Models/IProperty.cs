@@ -41,5 +41,6 @@ namespace Umbraco.Core.Models
         int PropertyTypeId { get; }
         void PublishValues(string culture = "*", string segment = "*");
         void UnpublishValues(string culture = "*", string segment = "*");
+        void FactorySetValue(string culture, string segment, bool published, object value);
     }
 }

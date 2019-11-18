@@ -99,7 +99,7 @@ namespace Umbraco.Core.Models
         /// <para>When false, getting the property value always return the edited value,
         /// regardless of the 'published' method parameter.</para>
         /// </remarks>
-        public bool SupportsPublishing { get; internal set; }
+        public bool SupportsPublishing { get; set; }
 
         /// <inheritdoc />
         [DataMember]
@@ -213,7 +213,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Creates a new property of this property type.
         /// </summary>
-        public Property CreateProperty()
+        public IProperty CreateProperty()
         {
             return new Property(this);
         }

@@ -21,7 +21,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets the property types for the entire composition.
         /// </summary>
-        IEnumerable<PropertyType> CompositionPropertyTypes { get; }
+        IEnumerable<IPropertyType> CompositionPropertyTypes { get; }
 
         /// <summary>
         /// Adds a new ContentType to the list of composite ContentTypes

@@ -284,7 +284,7 @@ namespace Umbraco.Core.Models
         }
 
         // bypasses all changes detection and is the *only* way to set the published value
-        internal void FactorySetValue(string culture, string segment, bool published, object value)
+        public void FactorySetValue(string culture, string segment, bool published, object value)
         {
             var (pvalue, _) = GetPValue(culture, segment, true);
 
