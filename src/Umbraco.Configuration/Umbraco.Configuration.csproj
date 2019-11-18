@@ -28,7 +28,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Umbraco.Abstractions\Umbraco.Abstractions.csproj" />
-      <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>
