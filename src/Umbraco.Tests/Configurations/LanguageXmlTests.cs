@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using System.Xml;
 using NUnit.Framework;
-using Umbraco.Core.IO;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Configurations
@@ -13,11 +12,16 @@ namespace Umbraco.Tests.Configurations
         [Test]
         public void Can_Load_Language_Xml_Files()
         {
-            var languageDirectory = new DirectoryInfo(TestHelper.MapPathForTest(SystemDirectories.Umbraco + "/../../../../Umbraco.Web.UI/Umbraco/config/lang/"));
+            var dir = new DirectoryInfo(TestHelper.MapPathForTest("~/"));
+            while (dir.Name != "src")
+            {
+                dir = dir.Parent;
+            }
+            var languageDirectory = new DirectoryInfo(dir.FullName + "/Umbraco.Web.UI/Umbraco/config/lang/");
             var readFilesCount = 0;
+            var xmlDocument = new XmlDocument();
             foreach (var languageFile in languageDirectory.EnumerateFiles("*.xml"))
             {
-                var xmlDocument = new XmlDocument();
                 // load will throw an exception if the xml isn't valid.
                 xmlDocument.Load(languageFile.FullName);
                 readFilesCount++;
