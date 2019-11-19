@@ -19,7 +19,7 @@ namespace Umbraco.Tests.UmbracoExamine
         public void Events_Ignoring_Node()
         {
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, IOHelper, luceneDir,
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, IOHelper, RuntimeState, luceneDir,
                 //make parent id 999 so all are ignored
                 validator: new ContentValueSetValidator(false, 999)))
             using (indexer.ProcessNonAsync())

@@ -34,6 +34,7 @@ namespace Umbraco.Examine
         /// <param name="defaultAnalyzer"></param>
         /// <param name="profilingLogger"></param>
         /// <param name="ioHelper"></param>
+        /// <param name="runtimeState"></param>
         /// <param name="languageService"></param>
         /// <param name="validator"></param>
         /// <param name="indexValueTypes"></param>
@@ -44,10 +45,11 @@ namespace Umbraco.Examine
             Analyzer defaultAnalyzer,
             IProfilingLogger profilingLogger,
             IIOHelper ioHelper,
+            IRuntimeState runtimeState,
             ILocalizationService languageService,
             IContentValueSetValidator validator,
             IReadOnlyDictionary<string, IFieldValueTypeFactory> indexValueTypes = null)
-            : base(name, luceneDirectory, fieldDefinitions, defaultAnalyzer, profilingLogger, ioHelper, validator, indexValueTypes)
+            : base(name, luceneDirectory, fieldDefinitions, defaultAnalyzer, profilingLogger, ioHelper, runtimeState, validator, indexValueTypes)
         {
             if (validator == null) throw new ArgumentNullException(nameof(validator));
             LanguageService = languageService ?? throw new ArgumentNullException(nameof(languageService));
