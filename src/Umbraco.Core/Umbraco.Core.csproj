@@ -217,6 +217,7 @@
     <Compile Include="Models\PublishedContent\VariationContextAccessorExtensions.cs" />
     <Compile Include="Models\Template.cs" />
     <Compile Include="Models\TemplateOnDisk.cs" />
+    <Compile Include="Persistence\Mappers\SimpleContentTypeMapper.cs" />
     <Compile Include="PropertyEditors\Validators\DelimitedValueValidator.cs" />
     <Compile Include="PropertyEditors\Validators\RegexValidator.cs" />
     <Compile Include="PropertyEditors\Validators\RequiredValidator.cs" />
