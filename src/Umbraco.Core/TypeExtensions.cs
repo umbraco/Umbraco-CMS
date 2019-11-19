@@ -97,19 +97,7 @@ namespace Umbraco.Core
                    && (type.Attributes & TypeAttributes.NotPublic) == TypeAttributes.NotPublic;
         }
 
-        public static T GetCustomAttribute<T>(this Type type, bool inherit)
-            where T : Attribute
-        {
-            return type.GetCustomAttributes<T>(inherit).SingleOrDefault();
-        }
-
-        public static IEnumerable<T> GetCustomAttributes<T>(this Type type, bool inherited)
-            where T : Attribute
-        {
-            if (type == null) return Enumerable.Empty<T>();
-            return type.GetCustomAttributes(typeof (T), inherited).OfType<T>();
-        }
-
+ 
 
         /// <summary>
         /// Determines whether the specified type is enumerable.
