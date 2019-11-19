@@ -11,6 +11,7 @@ using Lucene.Net.Store;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Examine.LuceneEngine;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Examine
 {
@@ -32,6 +33,7 @@ namespace Umbraco.Examine
         /// <param name="luceneDirectory"></param>
         /// <param name="defaultAnalyzer"></param>
         /// <param name="profilingLogger"></param>
+        /// <param name="ioHelper"></param>
         /// <param name="languageService"></param>
         /// <param name="validator"></param>
         /// <param name="indexValueTypes"></param>
@@ -41,10 +43,11 @@ namespace Umbraco.Examine
             FieldDefinitionCollection fieldDefinitions,
             Analyzer defaultAnalyzer,
             IProfilingLogger profilingLogger,
+            IIOHelper ioHelper,
             ILocalizationService languageService,
             IContentValueSetValidator validator,
             IReadOnlyDictionary<string, IFieldValueTypeFactory> indexValueTypes = null)
-            : base(name, luceneDirectory, fieldDefinitions, defaultAnalyzer, profilingLogger, validator, indexValueTypes)
+            : base(name, luceneDirectory, fieldDefinitions, defaultAnalyzer, profilingLogger, ioHelper, validator, indexValueTypes)
         {
             if (validator == null) throw new ArgumentNullException(nameof(validator));
             LanguageService = languageService ?? throw new ArgumentNullException(nameof(languageService));

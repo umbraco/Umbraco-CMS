@@ -8,6 +8,7 @@ using Examine.LuceneEngine;
 using Examine;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Search
 {
@@ -23,8 +24,11 @@ namespace Umbraco.Web.Search
             IProfilingLogger profilingLogger,
             ILocalizationService languageService,
             IPublicAccessService publicAccessService,
-            IMemberService memberService, IUmbracoIndexConfig umbracoIndexConfig) : base(typeFinder)
+            IMemberService memberService,
+            IUmbracoIndexConfig umbracoIndexConfig,
+            IIOHelper ioHelper) : base(typeFinder, ioHelper)
         {
+            IOHelper = ioHelper;
             ProfilingLogger = profilingLogger ?? throw new System.ArgumentNullException(nameof(profilingLogger));
             LanguageService = languageService ?? throw new System.ArgumentNullException(nameof(languageService));
             PublicAccessService = publicAccessService ?? throw new System.ArgumentNullException(nameof(publicAccessService));
@@ -33,6 +37,7 @@ namespace Umbraco.Web.Search
         }
 
         protected IProfilingLogger ProfilingLogger { get; }
+        protected IIOHelper IOHelper { get; }
         protected ILocalizationService LanguageService { get; }
         protected IPublicAccessService PublicAccessService { get; }
         protected IMemberService MemberService { get; }
@@ -60,6 +65,7 @@ namespace Umbraco.Web.Search
                 new UmbracoFieldDefinitionCollection(),
                 new CultureInvariantWhitespaceAnalyzer(),
                 ProfilingLogger,
+                IOHelper,
                 LanguageService,
                 GetContentValueSetValidator()
                 );
@@ -74,6 +80,7 @@ namespace Umbraco.Web.Search
                 new UmbracoFieldDefinitionCollection(),
                 new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_30),
                 ProfilingLogger,
+                IOHelper,
                 LanguageService,
                 GetPublishedContentValueSetValidator());
             return index;
@@ -87,6 +94,7 @@ namespace Umbraco.Web.Search
                 CreateFileSystemLuceneDirectory(Constants.UmbracoIndexes.MembersIndexPath),
                 new CultureInvariantWhitespaceAnalyzer(),
                 ProfilingLogger,
+                IOHelper,
                 GetMemberValueSetValidator()
                 );
             return index;

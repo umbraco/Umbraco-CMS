@@ -34,12 +34,13 @@ namespace Umbraco.Tests.Packaging
             base.TearDown();
 
             //clear out files/folders
-            Directory.Delete(Current.IOHelper.MapPath("~/" + _testBaseFolder), true);
+            Directory.Delete(IOHelper.MapPath("~/" + _testBaseFolder), true);
         }
 
         public ICreatedPackagesRepository PackageBuilder => new PackagesRepository(
             ServiceContext.ContentService, ServiceContext.ContentTypeService, ServiceContext.DataTypeService,
             ServiceContext.FileService, ServiceContext.MacroService, ServiceContext.LocalizationService,
+            IOHelper,
             Factory.GetInstance<IEntityXmlSerializer>(), Logger,
             "createdPackages.config",
             //temp paths

@@ -78,6 +78,7 @@ namespace Umbraco.Tests.TestHelpers
         /// <param name="scopeAccessor"></param>
         /// <param name="cache">A cache.</param>
         /// <param name="logger">A logger.</param>
+        /// <param name="ioHelper">An io helper.</param>
         /// <param name="globalSettings"></param>
         /// <param name="umbracoSettings"></param>
         /// <param name="eventMessagesFactory">An event messages factory.</param>
@@ -92,6 +93,7 @@ namespace Umbraco.Tests.TestHelpers
             IScopeProvider scopeProvider, IScopeAccessor scopeAccessor,
             AppCaches cache,
             ILogger logger,
+            IIOHelper ioHelper,
             IGlobalSettings globalSettings,
             IUmbracoSettingsSection umbracoSettings,
             IEventMessagesFactory eventMessagesFactory,
@@ -108,7 +110,7 @@ namespace Umbraco.Tests.TestHelpers
             var scheme = Mock.Of<IMediaPathScheme>();
             var config = Mock.Of<IContentSection>();
 
-            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), config, scheme, logger);
+            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), config, scheme, logger, ioHelper);
 
             var externalLoginService = GetLazyService<IExternalLoginService>(factory, c => new ExternalLoginService(scopeProvider, logger, eventMessagesFactory, GetRepo<IExternalLoginRepository>(c)));
             var publicAccessService = GetLazyService<IPublicAccessService>(factory, c => new PublicAccessService(scopeProvider, logger, eventMessagesFactory, GetRepo<IPublicAccessRepository>(c)));
@@ -118,9 +120,9 @@ namespace Umbraco.Tests.TestHelpers
             var localizedTextService = GetLazyService<ILocalizedTextService>(factory, c => new LocalizedTextService(
                     new Lazy<LocalizedTextServiceFileSources>(() =>
                     {
-                        var mainLangFolder = new DirectoryInfo(Current.IOHelper.MapPath(Current.Configs.Global().UmbracoPath + "/config/lang/"));
-                        var appPlugins = new DirectoryInfo(Current.IOHelper.MapPath(Constants.SystemDirectories.AppPlugins));
-                        var configLangFolder = new DirectoryInfo(Current.IOHelper.MapPath(Constants.SystemDirectories.Config + "/lang/"));
+                        var mainLangFolder = new DirectoryInfo(ioHelper.MapPath(Current.Configs.Global().UmbracoPath + "/config/lang/"));
+                        var appPlugins = new DirectoryInfo(ioHelper.MapPath(Constants.SystemDirectories.AppPlugins));
+                        var configLangFolder = new DirectoryInfo(ioHelper.MapPath(Constants.SystemDirectories.Config + "/lang/"));
 
                         var pluginLangFolders = appPlugins.Exists == false
                             ? Enumerable.Empty<LocalizedTextServiceSupplementaryFileSource>()
@@ -154,14 +156,14 @@ namespace Umbraco.Tests.TestHelpers
             var userService = GetLazyService<IUserService>(factory, c => new UserService(scopeProvider, logger, eventMessagesFactory, runtimeState, GetRepo<IUserRepository>(c), GetRepo<IUserGroupRepository>(c),globalSettings));
             var dataTypeService = GetLazyService<IDataTypeService>(factory, c => new DataTypeService(scopeProvider, logger, eventMessagesFactory, GetRepo<IDataTypeRepository>(c), GetRepo<IDataTypeContainerRepository>(c), GetRepo<IAuditRepository>(c), GetRepo<IEntityRepository>(c), GetRepo<IContentTypeRepository>(c)));
             var contentService = GetLazyService<IContentService>(factory, c => new ContentService(scopeProvider, logger, eventMessagesFactory, GetRepo<IDocumentRepository>(c), GetRepo<IEntityRepository>(c), GetRepo<IAuditRepository>(c), GetRepo<IContentTypeRepository>(c), GetRepo<IDocumentBlueprintRepository>(c), GetRepo<ILanguageRepository>(c)));
-            var notificationService = GetLazyService<INotificationService>(factory, c => new NotificationService(scopeProvider, userService.Value, contentService.Value, localizationService.Value, logger, GetRepo<INotificationsRepository>(c), globalSettings, umbracoSettings.Content));
+            var notificationService = GetLazyService<INotificationService>(factory, c => new NotificationService(scopeProvider, userService.Value, contentService.Value, localizationService.Value, logger, ioHelper, GetRepo<INotificationsRepository>(c), globalSettings, umbracoSettings.Content));
             var serverRegistrationService = GetLazyService<IServerRegistrationService>(factory, c => new ServerRegistrationService(scopeProvider, logger, eventMessagesFactory, GetRepo<IServerRegistrationRepository>(c)));
             var memberGroupService = GetLazyService<IMemberGroupService>(factory, c => new MemberGroupService(scopeProvider, logger, eventMessagesFactory, GetRepo<IMemberGroupRepository>(c)));
             var memberService = GetLazyService<IMemberService>(factory, c => new MemberService(scopeProvider, logger, eventMessagesFactory, memberGroupService.Value, GetRepo<IMemberRepository>(c), GetRepo<IMemberTypeRepository>(c), GetRepo<IMemberGroupRepository>(c), GetRepo<IAuditRepository>(c)));
             var mediaService = GetLazyService<IMediaService>(factory, c => new MediaService(scopeProvider, mediaFileSystem, logger, eventMessagesFactory, GetRepo<IMediaRepository>(c), GetRepo<IAuditRepository>(c), GetRepo<IMediaTypeRepository>(c), GetRepo<IEntityRepository>(c)));
             var contentTypeService = GetLazyService<IContentTypeService>(factory, c => new ContentTypeService(scopeProvider, logger, eventMessagesFactory, contentService.Value, GetRepo<IContentTypeRepository>(c), GetRepo<IAuditRepository>(c), GetRepo<IDocumentTypeContainerRepository>(c), GetRepo<IEntityRepository>(c)));
             var mediaTypeService = GetLazyService<IMediaTypeService>(factory, c => new MediaTypeService(scopeProvider, logger, eventMessagesFactory, mediaService.Value, GetRepo<IMediaTypeRepository>(c), GetRepo<IAuditRepository>(c), GetRepo<IMediaTypeContainerRepository>(c), GetRepo<IEntityRepository>(c)));
-            var fileService = GetLazyService<IFileService>(factory, c => new FileService(scopeProvider, logger, eventMessagesFactory, GetRepo<IStylesheetRepository>(c), GetRepo<IScriptRepository>(c), GetRepo<ITemplateRepository>(c), GetRepo<IPartialViewRepository>(c), GetRepo<IPartialViewMacroRepository>(c), GetRepo<IAuditRepository>(c)));
+            var fileService = GetLazyService<IFileService>(factory, c => new FileService(scopeProvider, ioHelper, logger, eventMessagesFactory, GetRepo<IStylesheetRepository>(c), GetRepo<IScriptRepository>(c), GetRepo<ITemplateRepository>(c), GetRepo<IPartialViewRepository>(c), GetRepo<IPartialViewMacroRepository>(c), GetRepo<IAuditRepository>(c)));
 
             var memberTypeService = GetLazyService<IMemberTypeService>(factory, c => new MemberTypeService(scopeProvider, logger, eventMessagesFactory, memberService.Value, GetRepo<IMemberTypeRepository>(c), GetRepo<IAuditRepository>(c), GetRepo<IEntityRepository>(c)));
             var entityService = GetLazyService<IEntityService>(factory, c => new EntityService(scopeProvider, logger, eventMessagesFactory, idkMap, GetRepo<IEntityRepository>(c)));
@@ -173,15 +175,15 @@ namespace Umbraco.Tests.TestHelpers
                 var compiledPackageXmlParser = new CompiledPackageXmlParser(new ConflictingPackageData(macroService.Value, fileService.Value));
                 return new PackagingService(
                     auditService.Value,
-                    new PackagesRepository(contentService.Value, contentTypeService.Value, dataTypeService.Value, fileService.Value, macroService.Value, localizationService.Value,
+                    new PackagesRepository(contentService.Value, contentTypeService.Value, dataTypeService.Value, fileService.Value, macroService.Value, localizationService.Value, ioHelper,
                         new EntityXmlSerializer(contentService.Value, mediaService.Value, dataTypeService.Value, userService.Value, localizationService.Value, contentTypeService.Value, urlSegmentProviders), logger, "createdPackages.config"),
-                    new PackagesRepository(contentService.Value, contentTypeService.Value, dataTypeService.Value, fileService.Value, macroService.Value, localizationService.Value,
+                    new PackagesRepository(contentService.Value, contentTypeService.Value, dataTypeService.Value, fileService.Value, macroService.Value, localizationService.Value, ioHelper,
                         new EntityXmlSerializer(contentService.Value, mediaService.Value, dataTypeService.Value, userService.Value, localizationService.Value, contentTypeService.Value, urlSegmentProviders), logger, "installedPackages.config"),
                     new PackageInstallation(
                         new PackageDataInstallation(logger, fileService.Value, macroService.Value, localizationService.Value, dataTypeService.Value, entityService.Value, contentTypeService.Value, contentService.Value, propertyEditorCollection, scopeProvider),
-                        new PackageFileInstallation(compiledPackageXmlParser, new ProfilingLogger(logger, new TestProfiler())),
+                        new PackageFileInstallation(compiledPackageXmlParser, ioHelper, new ProfilingLogger(logger, new TestProfiler())),
                         compiledPackageXmlParser, Mock.Of<IPackageActionRunner>(),
-                        new DirectoryInfo(Current.IOHelper.GetRootDirectorySafe())));
+                        new DirectoryInfo(ioHelper.GetRootDirectorySafe())), ioHelper);
             });
             var relationService = GetLazyService<IRelationService>(factory, c => new RelationService(scopeProvider, logger, eventMessagesFactory, entityService.Value, GetRepo<IRelationRepository>(c), GetRepo<IRelationTypeRepository>(c)));
             var tagService = GetLazyService<ITagService>(factory, c => new TagService(scopeProvider, logger, eventMessagesFactory, GetRepo<ITagRepository>(c)));

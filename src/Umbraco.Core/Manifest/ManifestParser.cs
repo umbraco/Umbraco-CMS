@@ -53,6 +53,8 @@ namespace Umbraco.Core.Manifest
             _localizationService = localizationService;
             _validators = validators ?? throw new ArgumentNullException(nameof(validators));
             _filters = filters ?? throw new ArgumentNullException(nameof(filters));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _ioHelper = ioHelper;
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullOrEmptyException(nameof(path));
 
             Path = path;

@@ -15,7 +15,6 @@ namespace Umbraco.Core.Configuration
     public class GlobalSettings : IGlobalSettings
     {
         private readonly IIOHelper _ioHelper;
-        private string _localTempPath;
 
         // TODO these should not be static
         private static string _reservedPaths;
@@ -230,6 +229,10 @@ namespace Umbraco.Core.Configuration
             }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether umbraco is running in [debug mode].
+        /// </summary>
+        /// <value><c>true</c> if [debug mode]; otherwise, <c>false</c>.</value>
         public bool DebugMode
         {
             get

@@ -110,11 +110,13 @@ namespace Umbraco.Core.Diagnostics
                 // filter everywhere in our code = not!
                 var stacktrace = withException ? Environment.StackTrace : string.Empty;
 
-                var filepath = Current.IOHelper.MapPath("~/App_Data/MiniDump");
+                var ioHelper = Current.Factory.GetInstance<IIOHelper>();
+
+                var filepath = ioHelper.MapPath("~/App_Data/MiniDump");
                 if (Directory.Exists(filepath) == false)
                     Directory.CreateDirectory(filepath);
 
-                var filename = Path.Combine(filepath, string.Format("{0:yyyyMMddTHHmmss}.{1}.dmp", DateTime.UtcNow, Guid.NewGuid().ToString("N").Substring(0, 4)));
+                var filename = Path.Combine(filepath, $"{DateTime.UtcNow:yyyyMMddTHHmmss}.{Guid.NewGuid().ToString("N").Substring(0, 4)}.dmp");
                 using (var stream = new FileStream(filename, FileMode.Create, FileAccess.ReadWrite, FileShare.Write))
                 {
                     return Write(stream.SafeFileHandle, options, withException);
@@ -126,7 +128,8 @@ namespace Umbraco.Core.Diagnostics
         {
             lock (LockO)
             {
-                var filepath = Current.IOHelper.MapPath("~/App_Data/MiniDump");
+                var ioHelper = Current.Factory.GetInstance<IIOHelper>();
+                var filepath = ioHelper.MapPath("~/App_Data/MiniDump");
                 if (Directory.Exists(filepath) == false) return true;
                 var count = Directory.GetFiles(filepath, "*.dmp").Length;
                 return count < 8;

@@ -34,6 +34,7 @@ namespace Umbraco.Core.Sync
         private readonly ManualResetEvent _syncIdle;
         private readonly object _locko = new object();
         private readonly IProfilingLogger _profilingLogger;
+        private readonly IIOHelper _ioHelper;
         private readonly ISqlContext _sqlContext;
         private readonly Lazy<string> _distCacheFilePath;
         private int _lastId = -1;
@@ -47,13 +48,14 @@ namespace Umbraco.Core.Sync
 
         public DatabaseServerMessenger(
             IRuntimeState runtime, IScopeProvider scopeProvider, ISqlContext sqlContext, IProfilingLogger proflog, IGlobalSettings globalSettings,
-            bool distributedEnabled, DatabaseServerMessengerOptions options)
+            bool distributedEnabled, DatabaseServerMessengerOptions options, IIOHelper ioHelper)
             : base(distributedEnabled)
         {
             ScopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
             _sqlContext = sqlContext;
             _runtime = runtime;
             _profilingLogger = proflog ?? throw new ArgumentNullException(nameof(proflog));
+            _ioHelper = ioHelper;
             Logger = proflog;
             Options = options ?? throw new ArgumentNullException(nameof(options));
             _lastPruned = _lastSync = DateTime.UtcNow;
@@ -534,7 +536,7 @@ namespace Umbraco.Core.Sync
         {
             var fileName = HttpRuntime.AppDomainAppId.ReplaceNonAlphanumericChars(string.Empty) + "-lastsynced.txt";
 
-            var distCacheFilePath = Path.Combine(globalSettings.LocalTempPath(Current.IOHelper), "DistCache", fileName);
+            var distCacheFilePath = Path.Combine(globalSettings.LocalTempPath(_ioHelper), "DistCache", fileName);
 
             //ensure the folder exists
             var folder = Path.GetDirectoryName(distCacheFilePath);

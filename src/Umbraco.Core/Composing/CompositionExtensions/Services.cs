@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -71,7 +72,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
                 new PackageInstallation(
                     factory.GetInstance<PackageDataInstallation>(), factory.GetInstance<PackageFileInstallation>(),
                     factory.GetInstance<CompiledPackageXmlParser>(), factory.GetInstance<IPackageActionRunner>(),
-                    new DirectoryInfo(Current.IOHelper.GetRootDirectorySafe())));
+                    new DirectoryInfo( factory.GetInstance<IIOHelper>().GetRootDirectorySafe())));
 
             return composition;
         }
@@ -84,14 +85,16 @@ namespace Umbraco.Core.Composing.CompositionExtensions
         /// <returns></returns>
         private static PackagesRepository CreatePackageRepository(IFactory factory, string packageRepoFileName)
             => new PackagesRepository(
-                factory.GetInstance<IContentService>(), factory.GetInstance<IContentTypeService>(), factory.GetInstance<IDataTypeService>(), factory.GetInstance<IFileService>(), factory.GetInstance<IMacroService>(), factory.GetInstance<ILocalizationService>(), factory.GetInstance<IEntityXmlSerializer>(), factory.GetInstance<ILogger>(),
+                factory.GetInstance<IContentService>(), factory.GetInstance<IContentTypeService>(), factory.GetInstance<IDataTypeService>(), factory.GetInstance<IFileService>(), factory.GetInstance<IMacroService>(), factory.GetInstance<ILocalizationService>(),  factory.GetInstance<IIOHelper>(), factory.GetInstance<IEntityXmlSerializer>(), factory.GetInstance<ILogger>(),
                 packageRepoFileName);
 
         private static LocalizedTextServiceFileSources SourcesFactory(IFactory container)
         {
-            var mainLangFolder = new DirectoryInfo(Current.IOHelper.MapPath(Current.Configs.Global().UmbracoPath + "/config/lang/"));
-            var appPlugins = new DirectoryInfo(Current.IOHelper.MapPath(Constants.SystemDirectories.AppPlugins));
-            var configLangFolder = new DirectoryInfo(Current.IOHelper.MapPath(Constants.SystemDirectories.Config + "/lang/"));
+            var ioHelper = container.GetInstance<IIOHelper>();
+            var globalSettings = container.GetInstance<IGlobalSettings>();
+            var mainLangFolder = new DirectoryInfo(ioHelper.MapPath(globalSettings.UmbracoPath + "/config/lang/"));
+            var appPlugins = new DirectoryInfo(ioHelper.MapPath(Constants.SystemDirectories.AppPlugins));
+            var configLangFolder = new DirectoryInfo(ioHelper.MapPath(Constants.SystemDirectories.Config + "/lang/"));
 
             var pluginLangFolders = appPlugins.Exists == false
                 ? Enumerable.Empty<LocalizedTextServiceSupplementaryFileSource>()

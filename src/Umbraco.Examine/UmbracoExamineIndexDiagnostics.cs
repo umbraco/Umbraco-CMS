@@ -11,8 +11,8 @@ namespace Umbraco.Examine
     {
         private readonly UmbracoExamineIndex _index;
 
-        public UmbracoExamineIndexDiagnostics(UmbracoExamineIndex index, ILogger logger)
-            : base(index, logger)
+        public UmbracoExamineIndexDiagnostics(UmbracoExamineIndex index, ILogger logger, IIOHelper ioHelper)
+            : base(index, logger, ioHelper)
         {
             _index = index;
         }

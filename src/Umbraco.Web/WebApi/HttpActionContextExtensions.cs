@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using Newtonsoft.Json;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 
@@ -59,7 +60,8 @@ namespace Umbraco.Web.WebApi
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
-            var root = Current.IOHelper.MapPath(rootVirtualPath);
+            var ioHelper = Current.Factory.GetInstance<IIOHelper>();
+            var root = ioHelper.MapPath(rootVirtualPath);
             //ensure it exists
             Directory.CreateDirectory(root);
             var provider = new MultipartFormDataStreamProvider(root);

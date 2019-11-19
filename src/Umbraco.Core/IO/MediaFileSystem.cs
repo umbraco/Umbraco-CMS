@@ -19,16 +19,18 @@ namespace Umbraco.Core.IO
         private readonly IMediaPathScheme _mediaPathScheme;
         private readonly IContentSection _contentConfig;
         private readonly ILogger _logger;
+        private readonly IIOHelper _ioHelper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MediaFileSystem"/> class.
         /// </summary>
-        public MediaFileSystem(IFileSystem innerFileSystem, IContentSection contentConfig, IMediaPathScheme mediaPathScheme, ILogger logger)
+        public MediaFileSystem(IFileSystem innerFileSystem, IContentSection contentConfig, IMediaPathScheme mediaPathScheme, ILogger logger, IIOHelper ioHelper)
             : base(innerFileSystem)
         {
             _contentConfig = contentConfig;
             _mediaPathScheme = mediaPathScheme;
             _logger = logger;
+            _ioHelper = ioHelper;
         }
 
         /// <inheritoc />
@@ -65,7 +67,7 @@ namespace Umbraco.Core.IO
         {
             filename = Path.GetFileName(filename);
             if (filename == null) throw new ArgumentException("Cannot become a safe filename.", nameof(filename));
-            filename = Current.IOHelper.SafeFileName(filename.ToLowerInvariant());
+            filename = _ioHelper.SafeFileName(filename.ToLowerInvariant());
 
             return _mediaPathScheme.GetFilePath(this, cuid, puid, filename);
         }
@@ -75,7 +77,7 @@ namespace Umbraco.Core.IO
         {
             filename = Path.GetFileName(filename);
             if (filename == null) throw new ArgumentException("Cannot become a safe filename.", nameof(filename));
-            filename = Current.IOHelper.SafeFileName(filename.ToLowerInvariant());
+            filename = _ioHelper.SafeFileName(filename.ToLowerInvariant());
 
             return _mediaPathScheme.GetFilePath(this, cuid, puid, filename, prevpath);
         }

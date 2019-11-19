@@ -29,6 +29,7 @@ namespace Umbraco.Core.Packaging
         private readonly ILocalizationService _languageService;
         private readonly IEntityXmlSerializer _serializer;
         private readonly ILogger _logger;
+        private readonly IIOHelper _ioHelper;
         private readonly string _packageRepositoryFileName;
         private readonly string _mediaFolderPath;
         private readonly string _packagesFolderPath;
@@ -44,6 +45,7 @@ namespace Umbraco.Core.Packaging
         /// <param name="fileService"></param>
         /// <param name="macroService"></param>
         /// <param name="languageService"></param>
+        /// <param name="ioHelper"></param>
         /// <param name="serializer"></param>
         /// <param name="logger"></param>
         /// <param name="packageRepositoryFileName">
@@ -55,6 +57,7 @@ namespace Umbraco.Core.Packaging
         public PackagesRepository(IContentService contentService, IContentTypeService contentTypeService,
             IDataTypeService dataTypeService, IFileService fileService, IMacroService macroService,
             ILocalizationService languageService,
+            IIOHelper ioHelper,
             IEntityXmlSerializer serializer, ILogger logger,
             string packageRepositoryFileName,
             string tempFolderPath = null, string packagesFolderPath = null, string mediaFolderPath = null)
@@ -68,6 +71,7 @@ namespace Umbraco.Core.Packaging
             _languageService = languageService;
             _serializer = serializer;
             _logger = logger;
+            _ioHelper = ioHelper;
             _packageRepositoryFileName = packageRepositoryFileName;
 
             _tempFolderPath = tempFolderPath ?? Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "PackageFiles";
@@ -155,7 +159,7 @@ namespace Umbraco.Core.Packaging
             ValidatePackage(definition);
 
             //Create a folder for building this package
-            var temporaryPath = Current.IOHelper.MapPath(_tempFolderPath.EnsureEndsWith('/') + Guid.NewGuid());
+            var temporaryPath = _ioHelper.MapPath(_tempFolderPath.EnsureEndsWith('/') + Guid.NewGuid());
             if (Directory.Exists(temporaryPath) == false)
                 Directory.CreateDirectory(temporaryPath);
 
@@ -178,13 +182,13 @@ namespace Umbraco.Core.Packaging
 
                 //Files
                 foreach (var fileName in definition.Files)
-                    AppendFileToPackage(fileName, temporaryPath, filesXml);
+                    AppendFileToPackage(fileName, temporaryPath, filesXml, _ioHelper);
 
                 //Load view on install...
                 if (!string.IsNullOrEmpty(definition.PackageView))
                 {
                     var control = new XElement("view", definition.PackageView);
-                    AppendFileToPackage(definition.PackageView, temporaryPath, filesXml);
+                    AppendFileToPackage(definition.PackageView, temporaryPath, filesXml, _ioHelper);
                     root.Add(control);
                 }
 
@@ -214,11 +218,11 @@ namespace Umbraco.Core.Packaging
 
                 // check if there's a packages directory below media
 
-                if (Directory.Exists(Current.IOHelper.MapPath(_mediaFolderPath)) == false)
-                    Directory.CreateDirectory(Current.IOHelper.MapPath(_mediaFolderPath));
+                if (Directory.Exists(_ioHelper.MapPath(_mediaFolderPath)) == false)
+                    Directory.CreateDirectory(_ioHelper.MapPath(_mediaFolderPath));
 
                 var packPath = _mediaFolderPath.EnsureEndsWith('/') + (definition.Name + "_" + definition.Version).Replace(' ', '_') + ".zip";
-                ZipPackage(temporaryPath, Current.IOHelper.MapPath(packPath));
+                ZipPackage(temporaryPath, _ioHelper.MapPath(packPath));
 
                 //we need to update the package path and save it
                 definition.PackagePath = packPath;
@@ -294,7 +298,7 @@ namespace Umbraco.Core.Packaging
                 macros.Add(macroXml);
                 //if the macro has a file copy it to the xml
                 if (!string.IsNullOrEmpty(macro.MacroSource))
-                    AppendFileToPackage(macro.MacroSource, temporaryPath, filesXml);
+                    AppendFileToPackage(macro.MacroSource, temporaryPath, filesXml,_ioHelper);
             }
             root.Add(macros);
         }
@@ -444,12 +448,12 @@ namespace Umbraco.Core.Packaging
         /// <param name="path">The path.</param>
         /// <param name="packageDirectory">The package directory.</param>
         /// <param name="filesXml">The files xml node</param>
-        private static void AppendFileToPackage(string path, string packageDirectory, XContainer filesXml)
+        private static void AppendFileToPackage(string path, string packageDirectory, XContainer filesXml, IIOHelper ioHelper)
         {
             if (!path.StartsWith("~/") && !path.StartsWith("/"))
                 path = "~/" + path;
 
-            var serverPath = Current.IOHelper.MapPath(path);
+            var serverPath = ioHelper.MapPath(path);
 
             if (File.Exists(serverPath))
                 AppendFileXml(new FileInfo(serverPath), path, packageDirectory, filesXml);
@@ -609,11 +613,11 @@ namespace Umbraco.Core.Packaging
 
         private XDocument EnsureStorage(out string packagesFile)
         {
-            var packagesFolder = Current.IOHelper.MapPath(_packagesFolderPath);
+            var packagesFolder = _ioHelper.MapPath(_packagesFolderPath);
             //ensure it exists
             Directory.CreateDirectory(packagesFolder);
 
-            packagesFile = Current.IOHelper.MapPath(CreatedPackagesFile);
+            packagesFile = _ioHelper.MapPath(CreatedPackagesFile);
             if (!File.Exists(packagesFile))
             {
                 var xml = new XDocument(new XElement("packages"));
