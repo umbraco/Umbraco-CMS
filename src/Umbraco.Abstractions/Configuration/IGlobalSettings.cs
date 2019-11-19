@@ -5,6 +5,9 @@
     /// </summary>
     public interface IGlobalSettings
     {
+        // fixme: Review this class, it is now just a dumping ground for config options (based basically on whatever might be in appSettings),
+        //          our config classes should be named according to what they are configuring. 
+
         /// <summary>
         /// Gets the reserved urls from web.config.
         /// </summary>

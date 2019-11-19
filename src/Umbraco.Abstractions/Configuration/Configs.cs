@@ -13,11 +13,11 @@ namespace Umbraco.Core.Configuration
     /// </remarks>
     public class Configs
     {
-        private readonly Func<string, object> _configGetter;
+        private readonly Func<string, object> _configSectionResolver;
 
-        public Configs(Func<string, object> configGetter)
+        public Configs(Func<string, object> configSectionResolver)
         {
-            _configGetter = configGetter;
+            _configSectionResolver = configSectionResolver ?? throw new ArgumentNullException(nameof(configSectionResolver));
         }
 
         private readonly Dictionary<Type, Lazy<object>> _configs = new Dictionary<Type, Lazy<object>>();
@@ -89,7 +89,7 @@ namespace Umbraco.Core.Configuration
 
             using (new SafeCallContext())
             {
-                if ((_configGetter(sectionName) is TConfig config))
+                if ((_configSectionResolver(sectionName) is TConfig config))
                     return config;
                 var ex = new InvalidOperationException($"Could not get configuration section \"{sectionName}\" from config files.");
                 throw ex;
