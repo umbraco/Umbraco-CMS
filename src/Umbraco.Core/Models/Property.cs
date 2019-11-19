@@ -48,6 +48,54 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Creates a new <see cref="Property"/> instance for existing <see cref="IProperty"/>
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="propertyType"></param>
+        /// <param name="values">
+        /// Generally will contain a published and an unpublished property values
+        /// </param>
+        /// <returns></returns>
+        public static Property CreateWithValues(int id, IPropertyType propertyType, params InitialPropertyValue[] values)
+        {
+            var property = new Property(propertyType);
+            try
+            {
+                property.DisableChangeTracking();
+                property.Id = id;
+                foreach(var value in values)
+                {
+                    property.FactorySetValue(value.Culture, value.Segment, value.Published, value.Value);
+                }
+                property.ResetDirtyProperties(false);
+                return property;
+            }
+            finally
+            {
+                property.EnableChangeTracking();
+            }
+        }
+
+        /// <summary>
+        /// Used for constructing a new <see cref="Property"/> instance
+        /// </summary>
+        public class InitialPropertyValue
+        {
+            public InitialPropertyValue(string culture, string segment, bool published, object value)
+            {
+                Culture = culture ?? throw new ArgumentNullException(nameof(culture));
+                Segment = segment ?? throw new ArgumentNullException(nameof(segment));
+                Published = published;
+                Value = value ?? throw new ArgumentNullException(nameof(value));
+            }
+
+            public string Culture { get; }
+            public string Segment { get; }
+            public bool Published { get; }
+            public object Value { get; }
+        }
+
+        /// <summary>
         /// Represents a property value.
         /// </summary>
         public class PropertyValue : IPropertyValue
@@ -284,7 +332,7 @@ namespace Umbraco.Core.Models
         }
 
         // bypasses all changes detection and is the *only* way to set the published value
-        public void FactorySetValue(string culture, string segment, bool published, object value)
+        private void FactorySetValue(string culture, string segment, bool published, object value)
         {
             var (pvalue, _) = GetPValue(culture, segment, true);
 
