@@ -249,6 +249,7 @@
     <Compile Include="Services\IPackagingService.cs" />
     <Compile Include="Services\LocalizedTextServiceExtensions.cs" />
     <Compile Include="Services\DateTypeServiceExtensions.cs" />
+    <Compile Include="Services\MediaServiceExtensions.cs" />
     <Compile Include="Services\PropertyValidationService.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="Strings\DefaultUrlSegmentProvider.cs" />
