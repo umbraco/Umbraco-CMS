@@ -29,7 +29,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.SetUp();
 
             _fileSystems = Mock.Of<IFileSystems>();
-            _fileSystem = new PhysicalFileSystem(SettingsForTests.GenerateMockGlobalSettings().UmbracoScriptsPath);
+            _fileSystem = new PhysicalFileSystem(SettingsForTests.GenerateMockGlobalSettings().UmbracoScriptsPath, IOHelper);
             Mock.Get(_fileSystems).Setup(x => x.ScriptsFileSystem).Returns(_fileSystem);
             using (var stream = CreateStream("Umbraco.Sys.registerNamespace(\"Umbraco.Utils\");"))
             {

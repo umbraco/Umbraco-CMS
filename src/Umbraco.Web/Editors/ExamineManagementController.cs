@@ -8,6 +8,7 @@ using Examine;
 using Examine.LuceneEngine.Providers;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Examine;
 using Umbraco.Web.Models.ContentEditing;
@@ -22,16 +23,18 @@ namespace Umbraco.Web.Editors
     {
         private readonly IExamineManager _examineManager;
         private readonly ILogger _logger;
+        private readonly IIOHelper _ioHelper;
         private readonly IAppPolicyCache _runtimeCache;
         private readonly IndexRebuilder _indexRebuilder;
 
 
-        public ExamineManagementController(IExamineManager examineManager, ILogger logger,
+        public ExamineManagementController(IExamineManager examineManager, ILogger logger, IIOHelper ioHelper,
             AppCaches appCaches,
             IndexRebuilder indexRebuilder)
         {
             _examineManager = examineManager;
             _logger = logger;
+            _ioHelper = ioHelper;
             _runtimeCache = appCaches.RuntimeCache;
             _indexRebuilder = indexRebuilder;
         }
@@ -179,7 +182,7 @@ namespace Umbraco.Web.Editors
             if (!(index is IIndexDiagnostics indexDiag))
             {
                 if (index is LuceneIndex luceneIndex)
-                    indexDiag = new LuceneIndexDiagnostics(luceneIndex, Logger);
+                    indexDiag = new LuceneIndexDiagnostics(luceneIndex, Logger, _ioHelper);
                 else
                     indexDiag = new GenericIndexDiagnostics(index);
             }

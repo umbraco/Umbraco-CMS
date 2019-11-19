@@ -10,6 +10,7 @@ using Examine;
 using Examine.LuceneEngine;
 using Lucene.Net.Store;
 using Umbraco.Core.Composing;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Directory = Lucene.Net.Store.Directory;
 
@@ -57,6 +58,7 @@ namespace Umbraco.Examine
             FieldDefinitionCollection fieldDefinitions,
             Analyzer defaultAnalyzer,
             IProfilingLogger profilingLogger,
+            IIOHelper ioHelper,
             IValueSetValidator validator = null,
             IReadOnlyDictionary<string, IFieldValueTypeFactory> indexValueTypes = null)
             : base(name, luceneDirectory, fieldDefinitions, defaultAnalyzer, validator, indexValueTypes)
@@ -67,7 +69,7 @@ namespace Umbraco.Examine
             if (luceneDirectory is FSDirectory fsDir)
                 LuceneIndexFolder = fsDir.Directory;
 
-            _diagnostics = new UmbracoExamineIndexDiagnostics(this, ProfilingLogger);
+            _diagnostics = new UmbracoExamineIndexDiagnostics(this, ProfilingLogger, ioHelper);
         }
 
         private readonly bool _configBased = false;
@@ -185,7 +187,7 @@ namespace Umbraco.Examine
                 e.ValueSet.Values[IconFieldName] = icon;
             }
         }
-        
+
         #region IIndexDiagnostics
 
         private readonly UmbracoExamineIndexDiagnostics _diagnostics;

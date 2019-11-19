@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using System.Linq;
-using System.Net.Configuration;
-using System.Web;
-using System.Web.Configuration;
-using System.Web.Hosting;
 using System.Xml.Linq;
-using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Configuration
@@ -20,7 +15,6 @@ namespace Umbraco.Core.Configuration
     public class GlobalSettings : IGlobalSettings
     {
         private readonly IIOHelper _ioHelper;
-        private string _localTempPath;
 
         // TODO these should not be static
         private static string _reservedPaths;

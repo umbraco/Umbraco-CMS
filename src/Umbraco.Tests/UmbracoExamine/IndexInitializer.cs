@@ -8,6 +8,7 @@ using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Store;
 using Moq;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -153,6 +154,7 @@ namespace Umbraco.Tests.UmbracoExamine
 
         public static UmbracoContentIndex GetUmbracoIndexer(
             IProfilingLogger profilingLogger,
+            IIOHelper ioHelper,
             Directory luceneDir,
             Analyzer analyzer = null,
             ILocalizationService languageService = null,
@@ -173,6 +175,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 new UmbracoFieldDefinitionCollection(),
                 analyzer,
                 profilingLogger,
+                ioHelper,
                 languageService,
                 validator);
 
