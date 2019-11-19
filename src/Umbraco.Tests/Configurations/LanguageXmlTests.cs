@@ -18,9 +18,9 @@ namespace Umbraco.Tests.Configurations
                 throw new NullReferenceException("dir is null. | " + dir.FullName);
             while (dir.Name != "src")
             {
-                dir = dir.Parent;
-                if (dir == null)
+                if (dir.Parent == null)
                     throw new NullReferenceException("dir is null - 2 | " + dir.FullName);
+                dir = dir.Parent;
             }
             var languageDirectory = new DirectoryInfo(dir.FullName + "/Umbraco.Web.UI/Umbraco/config/lang/");
             var readFilesCount = 0;
