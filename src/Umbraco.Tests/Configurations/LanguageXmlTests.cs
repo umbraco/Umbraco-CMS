@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Xml;
 using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;
@@ -13,9 +14,13 @@ namespace Umbraco.Tests.Configurations
         public void Can_Load_Language_Xml_Files()
         {
             var dir = new DirectoryInfo(TestHelper.MapPathForTest("~/"));
+            if (dir == null)
+                throw new NullReferenceException("dir is null. | " + dir.FullName);
             while (dir.Name != "src")
             {
                 dir = dir.Parent;
+                if (dir == null)
+                    throw new NullReferenceException("dir is null - 2 | " + dir.FullName);
             }
             var languageDirectory = new DirectoryInfo(dir.FullName + "/Umbraco.Web.UI/Umbraco/config/lang/");
             var readFilesCount = 0;
