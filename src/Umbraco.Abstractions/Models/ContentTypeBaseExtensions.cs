@@ -27,7 +27,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="contentType"></param>
         /// <returns></returns>
-        internal static bool WasPropertyTypeVariationChanged(this IContentTypeBase contentType)
+        public static bool WasPropertyTypeVariationChanged(this IContentTypeBase contentType)
         {
             return contentType.WasPropertyTypeVariationChanged(out var _);
         }
