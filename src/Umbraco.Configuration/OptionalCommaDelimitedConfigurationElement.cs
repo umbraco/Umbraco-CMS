@@ -6,7 +6,7 @@ namespace Umbraco.Core.Configuration
     /// <summary>
     /// Used for specifying default values for comma delimited config
     /// </summary>
-    public class OptionalCommaDelimitedConfigurationElement : CommaDelimitedConfigurationElement
+    internal class OptionalCommaDelimitedConfigurationElement : CommaDelimitedConfigurationElement
     {
         private readonly CommaDelimitedConfigurationElement _wrapped;
         private readonly string[] _defaultValue;

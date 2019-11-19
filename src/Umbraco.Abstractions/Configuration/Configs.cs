@@ -15,16 +15,6 @@ namespace Umbraco.Core.Configuration
     {
         private readonly Func<string, object> _configGetter;
 
-        public IFactory Factory
-        {
-            get => _factory;
-            set
-            {
-                if(!(_factory is null)) throw new InvalidOperationException("Factory cannot be set multiple times");
-                _factory = value;
-            }
-        }
-
         public Configs(Func<string, object> configGetter)
         {
             _configGetter = configGetter;
@@ -32,7 +22,7 @@ namespace Umbraco.Core.Configuration
 
         private readonly Dictionary<Type, Lazy<object>> _configs = new Dictionary<Type, Lazy<object>>();
         private Dictionary<Type, Action<IRegister>> _registerings = new Dictionary<Type, Action<IRegister>>();
-        private IFactory _factory;
+        private Lazy<IFactory> _factory;
 
         /// <summary>
         /// Gets a configuration.
@@ -76,7 +66,7 @@ namespace Umbraco.Core.Configuration
 
             _configs[typeOfConfig] = new Lazy<object>(() =>
             {
-                if (!(Factory is null)) return Factory.GetInstance<TConfig>();
+                if (!(_factory is null)) return _factory.Value.GetInstance<TConfig>();
                 throw new InvalidOperationException($"Cannot get configuration of type {typeOfConfig} during composition.");
             });
             _registerings[typeOfConfig] = register => register.Register(configFactory, Lifetime.Singleton);
@@ -109,11 +99,13 @@ namespace Umbraco.Core.Configuration
         /// <summary>
         /// Registers configurations in a register.
         /// </summary>
-        public void RegisterWith(IRegister register)
+        public void RegisterWith(IRegister register, Func<IFactory> factory)
         {
             // do it only once
             if (_registerings == null)
                 throw new InvalidOperationException("Configurations have already been registered.");
+
+            _factory = new Lazy<IFactory>(factory);
 
             register.Register(this);
 

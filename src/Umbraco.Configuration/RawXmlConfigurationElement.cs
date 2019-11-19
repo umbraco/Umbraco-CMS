@@ -8,7 +8,7 @@ namespace Umbraco.Core.Configuration
     /// A configuration section that simply exposes the entire raw xml of the section itself which inheritors can use
     /// to do with as they please.
     /// </summary>
-    public abstract class RawXmlConfigurationElement : ConfigurationElement
+    internal abstract class RawXmlConfigurationElement : ConfigurationElement
     {
         protected RawXmlConfigurationElement()
         {
