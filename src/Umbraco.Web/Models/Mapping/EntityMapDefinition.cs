@@ -41,6 +41,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Path = source.Path;
             target.Trashed = source.Trashed;
             target.Udi = Udi.Create(ObjectTypes.GetUdiType(source.NodeObjectType), source.Key);
+            target.CreateDate = source.CreateDate;
 
             if (source is IContentEntitySlim contentSlim)
             {
