@@ -329,6 +329,43 @@ Use this directive to generate a thumbnail grid of media items.
             scope.$on('$destroy', function() {
                 unbindItemsWatcher();
             });
+            //determine if sort is current
+            scope.sortColumn = "name";
+            scope.sortReverse = false;
+            scope.sortDirection = "asc";
+            //check sort status
+            scope.isSortDirection = function (col, direction) {
+                return col === scope.sortColumn && direction === scope.sortDirection;
+            };
+            //change sort
+            scope.setSort = function (col) {
+                if (scope.sortColumn === col) {
+                    scope.sortReverse = !scope.sortReverse;      
+                }
+                else {
+                    scope.sortColumn = col;
+                    if (col === "createDate") {
+                        scope.sortReverse = true;
+                    }
+                    else {
+                        scope.sortReverse = false;
+                    }
+                }
+                scope.sortDirection = scope.sortReverse ? "desc" : "asc";
+              
+            }
+            // sort function          
+            scope.sortBy = function (item) {
+                if (scope.sortColumn === "createDate") {
+                  // return ['-isFolder','createDate']; 
+                    return [-item['isFolder'],item['createDate']];
+                }
+                else {
+                   //return ['-isFolder','name']; 
+                    return [-item['isFolder'],item['name']];
+                }
+            };
+
 
         }
 
@@ -352,7 +389,8 @@ Use this directive to generate a thumbnail grid of media items.
                 onlyImages: "@",
                 onlyFolders: "@",
                 includeSubFolders: "@",
-                currentFolderId: "@"
+                currentFolderId: "@",
+                showMediaList: "="
             },
             link: link
         };
