@@ -115,6 +115,7 @@ namespace Umbraco.Tests.Testing
         protected IMapperCollection Mappers => Factory.GetInstance<IMapperCollection>();
 
         protected UmbracoMapper Mapper => Factory.GetInstance<UmbracoMapper>();
+        protected IRuntimeState RuntimeState => ComponentTests.MockRuntimeState(RuntimeLevel.Run);
 
         #endregion
 

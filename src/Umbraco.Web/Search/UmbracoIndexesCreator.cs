@@ -9,6 +9,7 @@ using Examine;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
+using Umbraco.Web.PublishedCache.NuCache;
 
 namespace Umbraco.Web.Search
 {
@@ -26,18 +27,21 @@ namespace Umbraco.Web.Search
             IPublicAccessService publicAccessService,
             IMemberService memberService,
             IUmbracoIndexConfig umbracoIndexConfig,
-            IIOHelper ioHelper) : base(typeFinder, ioHelper)
+            IIOHelper ioHelper,
+            IRuntimeState runtimeState) : base(typeFinder, ioHelper)
         {
-            IOHelper = ioHelper;
             ProfilingLogger = profilingLogger ?? throw new System.ArgumentNullException(nameof(profilingLogger));
             LanguageService = languageService ?? throw new System.ArgumentNullException(nameof(languageService));
             PublicAccessService = publicAccessService ?? throw new System.ArgumentNullException(nameof(publicAccessService));
             MemberService = memberService ?? throw new System.ArgumentNullException(nameof(memberService));
             UmbracoIndexConfig = umbracoIndexConfig;
+            IOHelper = ioHelper ?? throw new System.ArgumentNullException(nameof(ioHelper));
+            RuntimeState = runtimeState ?? throw new System.ArgumentNullException(nameof(runtimeState));
         }
 
         protected IProfilingLogger ProfilingLogger { get; }
         protected IIOHelper IOHelper { get; }
+        protected IRuntimeState RuntimeState { get; }
         protected ILocalizationService LanguageService { get; }
         protected IPublicAccessService PublicAccessService { get; }
         protected IMemberService MemberService { get; }
@@ -66,6 +70,7 @@ namespace Umbraco.Web.Search
                 new CultureInvariantWhitespaceAnalyzer(),
                 ProfilingLogger,
                 IOHelper,
+                RuntimeState,
                 LanguageService,
                 GetContentValueSetValidator()
                 );
@@ -81,6 +86,7 @@ namespace Umbraco.Web.Search
                 new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_30),
                 ProfilingLogger,
                 IOHelper,
+                RuntimeState,
                 LanguageService,
                 GetPublishedContentValueSetValidator());
             return index;
@@ -95,6 +101,7 @@ namespace Umbraco.Web.Search
                 new CultureInvariantWhitespaceAnalyzer(),
                 ProfilingLogger,
                 IOHelper,
+                RuntimeState,
                 GetMemberValueSetValidator()
                 );
             return index;

@@ -58,7 +58,7 @@ namespace Umbraco.Tests.UmbracoExamine
             var rebuilder = IndexInitializer.GetContentIndexRebuilder(propertyEditors, contentService, ScopeProvider.SqlContext, true);
 
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, IOHelper, luceneDir))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, IOHelper, RuntimeState, luceneDir))
             using (indexer.ProcessNonAsync())
             {
                 indexer.CreateIndex();

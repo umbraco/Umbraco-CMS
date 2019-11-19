@@ -120,7 +120,7 @@ namespace Umbraco.Tests.PublishedContent
             var rebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
 
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, IOHelper, luceneDir,
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, IOHelper, RuntimeState, luceneDir,
                 validator: new ContentValueSetValidator(true)))
             using (indexer.ProcessNonAsync())
             {
@@ -149,7 +149,7 @@ namespace Umbraco.Tests.PublishedContent
             var rebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
 
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, IOHelper, luceneDir,
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, IOHelper, RuntimeState, luceneDir,
                 //include unpublished content since this uses the 'internal' indexer, it's up to the media cache to filter
                 validator: new ContentValueSetValidator(false)))
             using (indexer.ProcessNonAsync())
@@ -197,7 +197,7 @@ namespace Umbraco.Tests.PublishedContent
             var rebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
 
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, IOHelper, luceneDir,
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, IOHelper, RuntimeState, luceneDir,
                 validator: new ContentValueSetValidator(true)))
             using (indexer.ProcessNonAsync())
             {
@@ -225,7 +225,7 @@ namespace Umbraco.Tests.PublishedContent
             var rebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
 
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, IOHelper, luceneDir,
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, IOHelper, RuntimeState, luceneDir,
                 validator: new ContentValueSetValidator(true)))
             using (indexer.ProcessNonAsync())
             {
@@ -253,7 +253,7 @@ namespace Umbraco.Tests.PublishedContent
             var rebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
 
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, IOHelper, luceneDir,
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, IOHelper, RuntimeState, luceneDir,
                 validator: new ContentValueSetValidator(true)))
             using (indexer.ProcessNonAsync())
             {
@@ -282,7 +282,7 @@ namespace Umbraco.Tests.PublishedContent
 
 
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, IOHelper, luceneDir,
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, IOHelper, RuntimeState, luceneDir,
                 validator: new ContentValueSetValidator(true)))
             using (indexer.ProcessNonAsync())
             {
@@ -307,7 +307,7 @@ namespace Umbraco.Tests.PublishedContent
             var rebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
 
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, IOHelper, luceneDir,
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, IOHelper, RuntimeState, luceneDir,
                 validator: new ContentValueSetValidator(true)))
             using (indexer.ProcessNonAsync())
             {

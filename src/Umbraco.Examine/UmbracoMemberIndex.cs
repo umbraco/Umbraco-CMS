@@ -2,6 +2,7 @@
 using Examine;
 using Examine.LuceneEngine;
 using Lucene.Net.Analysis;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Directory = Lucene.Net.Store.Directory;
@@ -31,8 +32,9 @@ namespace Umbraco.Examine
             Analyzer analyzer,
             IProfilingLogger profilingLogger,
             IIOHelper ioHelper,
+            IRuntimeState runtimeState,
             IValueSetValidator validator = null) :
-            base(name, luceneDirectory, fieldDefinitions, analyzer, profilingLogger, ioHelper, validator)
+            base(name, luceneDirectory, fieldDefinitions, analyzer, profilingLogger, ioHelper, runtimeState, validator)
         {
         }
 
