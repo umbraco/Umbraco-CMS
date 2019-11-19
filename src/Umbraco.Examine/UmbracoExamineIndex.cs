@@ -9,7 +9,6 @@ using Umbraco.Core;
 using Examine;
 using Examine.LuceneEngine;
 using Lucene.Net.Store;
-using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Directory = Lucene.Net.Store.Directory;
@@ -22,6 +21,7 @@ namespace Umbraco.Examine
     /// </summary>
     public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDiagnostics
     {
+        private readonly IRuntimeState _runtimeState;
         // note
         // wrapping all operations that end up calling base.SafelyProcessQueueItems in a safe call
         // context because they will fork a thread/task/whatever which should *not* capture our
@@ -50,6 +50,8 @@ namespace Umbraco.Examine
         /// <param name="luceneDirectory"></param>
         /// <param name="defaultAnalyzer"></param>
         /// <param name="profilingLogger"></param>
+        /// <param name="ioHelper"></param>
+        /// <param name="runtimeState"></param>
         /// <param name="validator"></param>
         /// <param name="indexValueTypes"></param>
         protected UmbracoExamineIndex(
@@ -59,10 +61,12 @@ namespace Umbraco.Examine
             Analyzer defaultAnalyzer,
             IProfilingLogger profilingLogger,
             IIOHelper ioHelper,
+            IRuntimeState runtimeState,
             IValueSetValidator validator = null,
             IReadOnlyDictionary<string, IFieldValueTypeFactory> indexValueTypes = null)
             : base(name, luceneDirectory, fieldDefinitions, defaultAnalyzer, validator, indexValueTypes)
         {
+            _runtimeState = runtimeState;
             ProfilingLogger = profilingLogger ?? throw new ArgumentNullException(nameof(profilingLogger));
 
             //try to set the value of `LuceneIndexFolder` for diagnostic reasons
@@ -116,7 +120,7 @@ namespace Umbraco.Examine
         {
             // only affects indexers that are config file based, if an index was created via code then
             // this has no effect, it is assumed the index would not be created if it could not be initialized
-            return _configBased == false || Current.RuntimeState.Level == RuntimeLevel.Run;
+            return _configBased == false || _runtimeState.Level == RuntimeLevel.Run;
         }
 
         /// <summary>

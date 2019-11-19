@@ -155,6 +155,7 @@ namespace Umbraco.Tests.UmbracoExamine
         public static UmbracoContentIndex GetUmbracoIndexer(
             IProfilingLogger profilingLogger,
             IIOHelper ioHelper,
+            IRuntimeState runtimeState,
             Directory luceneDir,
             Analyzer analyzer = null,
             ILocalizationService languageService = null,
@@ -176,6 +177,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 analyzer,
                 profilingLogger,
                 ioHelper,
+                runtimeState,
                 languageService,
                 validator);
 
