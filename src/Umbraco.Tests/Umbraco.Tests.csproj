@@ -120,6 +120,7 @@
     <Compile Include="Composing\CompositionTests.cs" />
     <Compile Include="Composing\LightInjectValidation.cs" />
     <Compile Include="Composing\ContainerConformingTests.cs" />
+    <Compile Include="Configurations\LanguageXmlTests.cs" />
     <Compile Include="Configurations\GlobalSettingsTests.cs" />
     <Compile Include="CoreThings\CallContextTests.cs" />
     <Compile Include="Components\ComponentTests.cs" />
