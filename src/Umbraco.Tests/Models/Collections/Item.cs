@@ -93,7 +93,7 @@ namespace Umbraco.Tests.Models.Collections
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyInfo.Name));
         }
 
-        internal virtual void ResetIdentity()
+        public virtual void ResetIdentity()
         {
             _hasIdentity = false;
             _id = default(int);

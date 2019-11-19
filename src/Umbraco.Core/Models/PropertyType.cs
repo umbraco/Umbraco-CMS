@@ -211,14 +211,6 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Creates a new property of this property type.
-        /// </summary>
-        public IProperty CreateProperty()
-        {
-            return new Property(this);
-        }
-
-        /// <summary>
         /// Determines whether a value is of the expected type for this property type.
         /// </summary>
         /// <remarks>

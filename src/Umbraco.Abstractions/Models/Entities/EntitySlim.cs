@@ -181,6 +181,12 @@ namespace Umbraco.Core.Models.Entities
             throw new WontImplementException();
         }
 
+        public void ResetIdentity()
+        {
+            Id = default;
+            Key = Guid.Empty;
+        }
+
         #endregion
     }
 }

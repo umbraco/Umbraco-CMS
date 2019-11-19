@@ -16,7 +16,7 @@ namespace Umbraco.Core.Persistence.Factories
 
             foreach (var propertyType in propertyTypes)
             {
-                var property = propertyType.CreateProperty();
+                var property = new Property(propertyType);
 
                 try
                 {

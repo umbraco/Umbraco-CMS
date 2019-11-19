@@ -85,8 +85,6 @@ namespace Umbraco.Core.Models
         /// </remarks>
         object ConvertAssignedValue(object value);
 
-        event PropertyChangedEventHandler PropertyChanged;
-        void ResetIdentity();
-        IProperty CreateProperty();
+        event PropertyChangedEventHandler PropertyChanged;        
     }
 }

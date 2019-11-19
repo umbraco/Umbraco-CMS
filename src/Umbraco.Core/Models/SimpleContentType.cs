@@ -110,6 +110,7 @@ namespace Umbraco.Core.Models
         string ITreeEntity.Name { get => this.Name; set => throw new NotImplementedException(); }
         int IEntity.Id { get => this.Id; set => throw new NotImplementedException(); }
         bool IEntity.HasIdentity => this.Id != default;
+        void IEntity.ResetIdentity() => throw new NotImplementedException();
         int ITreeEntity.CreatorId { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         int ITreeEntity.ParentId { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         int ITreeEntity.Level { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
