@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Scheduling
         [OneTimeSetUp]
         public void InitializeFixture()
         {
-            _logger = new DebugDiagnosticsLogger();
+            _logger = new DebugDiagnosticsLogger(new MessageTemplates());
         }
 
         [Test]

@@ -26,7 +26,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyCollection"/> class.
         /// </summary>
-        public PropertyCollection(IEnumerable<Property> properties)
+        public PropertyCollection(IEnumerable<IProperty> properties)
             : this()
         {
             Reset(properties);
@@ -35,7 +35,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Replaces all properties, whilst maintaining validation delegates.
         /// </summary>
-        private void Reset(IEnumerable<Property> properties)
+        private void Reset(IEnumerable<IProperty> properties)
         {
             //collection events will be raised in each of these calls
             Clear();

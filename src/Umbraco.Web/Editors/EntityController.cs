@@ -1031,7 +1031,7 @@ namespace Umbraco.Web.Editors
                                                 .SelectMany(x => x.PropertyTypes)
                                                 .DistinctBy(composition => composition.Alias);
                     var filteredPropertyTypes = ExecutePostFilter(propertyTypes, postFilter);
-                    return Mapper.MapEnumerable<PropertyType, EntityBasic>(filteredPropertyTypes);
+                    return Mapper.MapEnumerable<IPropertyType, EntityBasic>(filteredPropertyTypes);
 
                 case UmbracoEntityTypes.PropertyGroup:
 

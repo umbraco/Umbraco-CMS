@@ -4,6 +4,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Serialization;
 using Umbraco.Tests.TestHelpers;
@@ -17,7 +18,7 @@ namespace Umbraco.Tests.Models
         public void Setup()
         {
             Current.Reset();
-            Current.UnlockConfigs();
+            Current.UnlockConfigs(TestHelper.GetConfigsFactory());
             Current.Configs.Add(SettingsForTests.GetDefaultGlobalSettings);
         }
 

@@ -143,7 +143,7 @@ namespace Umbraco.Web
             //in case the user bypasses the installer and just bumps the web.config or client dependency config
 
             //if in debug mode, always burst the cache
-            if (GlobalSettings.DebugMode)
+            if (Current.RuntimeState.Debug)
             {
                 return DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture).GenerateHash();
             }

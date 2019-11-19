@@ -9,38 +9,28 @@ namespace Umbraco.Core.Persistence.Factories
 {
     internal static class PropertyFactory
     {
-        public static IEnumerable<Property> BuildEntities(PropertyType[] propertyTypes, IReadOnlyCollection<PropertyDataDto> dtos, int publishedVersionId, ILanguageRepository languageRepository)
+        public static IEnumerable<IProperty> BuildEntities(IPropertyType[] propertyTypes, IReadOnlyCollection<PropertyDataDto> dtos, int publishedVersionId, ILanguageRepository languageRepository)
         {
-            var properties = new List<Property>();
+            var properties = new List<IProperty>();
             var xdtos = dtos.GroupBy(x => x.PropertyTypeId).ToDictionary(x => x.Key, x => (IEnumerable<PropertyDataDto>)x);
 
             foreach (var propertyType in propertyTypes)
             {
-                var property = propertyType.CreateProperty();
+                var values = new List<Property.InitialPropertyValue>();
+                int propertyId = default;
 
-                try
+                // see notes in BuildDtos - we always have edit+published dtos
+                if (xdtos.TryGetValue(propertyType.Id, out var propDtos))
                 {
-                    property.DisableChangeTracking();
-
-                    // see notes in BuildDtos - we always have edit+published dtos
-
-                    if (xdtos.TryGetValue(propertyType.Id, out var propDtos))
+                    foreach (var propDto in propDtos)
                     {
-                        foreach (var propDto in propDtos)
-                        {
-                            property.Id = propDto.Id;
-                            property.FactorySetValue(languageRepository.GetIsoCodeById(propDto.LanguageId), propDto.Segment, propDto.VersionId == publishedVersionId, propDto.Value);
-                        }
-
+                        propertyId = propDto.Id;
+                        values.Add(new Property.InitialPropertyValue(languageRepository.GetIsoCodeById(propDto.LanguageId), propDto.Segment, propDto.VersionId == publishedVersionId, propDto.Value));
                     }
+                }
 
-                    property.ResetDirtyProperties(false);
-                    properties.Add(property);
-                }
-                finally
-                {
-                    property.EnableChangeTracking();
-                }
+                var property = Property.CreateWithValues(propertyId, propertyType, values.ToArray());
+                properties.Add(property);
             }
 
             return properties;

@@ -11,7 +11,7 @@ namespace Umbraco.Core.IO
         // TODO: Kill this off we don't have umbraco.config XML cache we now have NuCache
         public static string GetContentCacheXml(IGlobalSettings globalSettings)
         {
-            return Path.Combine(globalSettings.LocalTempPath, "umbraco.config");
+            return Path.Combine(globalSettings.LocalTempPath(Current.IOHelper), "umbraco.config");
         }
     }
 }

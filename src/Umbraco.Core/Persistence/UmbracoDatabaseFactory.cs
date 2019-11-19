@@ -1,9 +1,10 @@
 ﻿using System;
-using System.Configuration;
 using System.Data.Common;
 using System.Threading;
 using NPoco;
 using NPoco.FluentMappings;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.FaultHandling;
@@ -51,15 +52,15 @@ namespace Umbraco.Core.Persistence
         /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
         /// </summary>
         /// <remarks>Used by core runtime.</remarks>
-        public UmbracoDatabaseFactory(ILogger logger, Lazy<IMapperCollection> mappers)
-            : this(Constants.System.UmbracoConnectionName, logger, mappers)
+        public UmbracoDatabaseFactory(ILogger logger, Lazy<IMapperCollection> mappers, Configs configs)
+            : this(Constants.System.UmbracoConnectionName, logger, mappers, configs)
         { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
         /// </summary>
         /// <remarks>Used by the other ctor and in tests.</remarks>
-        public UmbracoDatabaseFactory(string connectionStringName, ILogger logger, Lazy<IMapperCollection> mappers)
+        public UmbracoDatabaseFactory(string connectionStringName, ILogger logger, Lazy<IMapperCollection> mappers, Configs configs)
         {
             if (string.IsNullOrWhiteSpace(connectionStringName))
                 throw new ArgumentNullOrEmptyException(nameof(connectionStringName));
@@ -67,7 +68,8 @@ namespace Umbraco.Core.Persistence
             _mappers = mappers ?? throw new ArgumentNullException(nameof(mappers));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            var settings = ConfigurationManager.ConnectionStrings[connectionStringName];
+            var settings = configs.ConnectionStrings()[connectionStringName];
+
             if (settings == null)
             {
                 logger.Debug<UmbracoDatabaseFactory>("Missing connection string, defer configuration.");
@@ -135,7 +137,7 @@ namespace Umbraco.Core.Persistence
         {
             // replace NPoco database type by a more efficient one
 
-            var setting = ConfigurationManager.AppSettings[Constants.AppSettings.Debug.DatabaseFactoryServerVersion];
+            var setting = Current.Configs.Global().DatabaseFactoryServerVersion;
             var fromSettings = false;
 
             if (setting.IsNullOrWhiteSpace() || !setting.StartsWith("SqlServer.")

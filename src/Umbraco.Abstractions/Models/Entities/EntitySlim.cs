@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 using Umbraco.Core.Exceptions;
@@ -23,7 +24,7 @@ namespace Umbraco.Core.Models.Entities
         /// Gets an entity representing "root".
         /// </summary>
         public static readonly IEntitySlim Root = new EntitySlim { Path = "-1", Name = "root", HasChildren = true };
-        
+
         // implement IEntity
 
         /// <inheritdoc />
@@ -121,66 +122,10 @@ namespace Umbraco.Core.Models.Entities
 
         #endregion
 
-        #region IRememberBeingDirty
-
-        // IEntitySlim does *not* track changes, but since it indirectly implements IUmbracoEntity,
-        // and therefore IRememberBeingDirty, we have to have those methods - which all throw.
-
-        public bool IsDirty()
+        public void ResetIdentity()
         {
-            throw new WontImplementException();
+            Id = default;
+            Key = Guid.Empty;
         }
-
-        public bool IsPropertyDirty(string propName)
-        {
-            throw new WontImplementException();
-        }
-
-        public IEnumerable<string> GetDirtyProperties()
-        {
-            throw new WontImplementException();
-        }
-
-        public void ResetDirtyProperties()
-        {
-            throw new WontImplementException();
-        }
-
-        public void DisableChangeTracking()
-        {
-            // noop
-        }
-
-        public void EnableChangeTracking()
-        {
-            // noop
-        }
-
-        public bool WasDirty()
-        {
-            throw new WontImplementException();
-        }
-
-        public bool WasPropertyDirty(string propertyName)
-        {
-            throw new WontImplementException();
-        }
-
-        public void ResetWereDirtyProperties()
-        {
-            throw new WontImplementException();
-        }
-
-        public void ResetDirtyProperties(bool rememberDirty)
-        {
-            throw new WontImplementException();
-        }
-
-        public IEnumerable<string> GetWereDirtyProperties()
-        {
-            throw new WontImplementException();
-        }
-
-        #endregion
     }
 }

@@ -194,7 +194,7 @@ namespace Umbraco.Web.Models.Mapping
             return groups.OrderBy(x => x.SortOrder);
         }
 
-        private IEnumerable<TPropertyType> MapProperties(IEnumerable<PropertyType> properties, IContentTypeBase contentType, int groupId, bool inherited)
+        private IEnumerable<TPropertyType> MapProperties(IEnumerable<IPropertyType> properties, IContentTypeBase contentType, int groupId, bool inherited)
         {
             var mappedProperties = new List<TPropertyType>();
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.Entities;
@@ -403,6 +404,18 @@ namespace Umbraco.Core.Models.Identity
             _beingDirty.EnableChangeTracking();
         }
 
+        public event PropertyChangedEventHandler PropertyChanged
+        {
+            add
+            {
+                _beingDirty.PropertyChanged += value;
+            }
+            remove
+            {
+                _beingDirty.PropertyChanged -= value;
+            }
+        }
+
         #endregion
 
         //Custom comparer for enumerables
@@ -413,5 +426,6 @@ namespace Umbraco.Core.Models.Identity
         private static readonly DelegateEqualityComparer<int[]> StartIdsComparer = new DelegateEqualityComparer<int[]>(
             (groups, enumerable) => groups.UnsortedSequenceEqual(enumerable),
             groups => groups.GetHashCode());
+        
     }
 }

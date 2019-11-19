@@ -60,8 +60,8 @@ namespace Umbraco.Core.Persistence.Querying
 
             if (m.Expression != null
                 && m.Expression.Type != typeof(T)
-                && TypeHelper.IsTypeAssignableFrom<IUmbracoEntity>(m.Expression.Type) //TODO: Could this just be `IEntity` ? why does it need to be IUmbracoEntity, we aren't even using the reference to that below
-                && EndsWithConstant(m) == false)
+                && EndsWithConstant(m) == false
+                && _mappers.TryGetMapper(m.Expression.Type, out var subMapper))
             {
                 //if this is the case, it means we have a sub expression / nested property access, such as: x.ContentType.Alias == "Test";
                 //and since the sub type (x.ContentType) is not the same as x, we need to resolve a mapper for x.ContentType to get it's mapped SQL column
@@ -69,7 +69,6 @@ namespace Umbraco.Core.Persistence.Querying
                 //don't execute if compiled
                 if (Visited == false)
                 {
-                    var subMapper = _mappers[m.Expression.Type]; // throws if not found
                     var field = subMapper.Map(m.Member.Name);
                     if (field.IsNullOrWhiteSpace())
                         throw new InvalidOperationException($"The mapper returned an empty field for the member name: {m.Member.Name} for type: {m.Expression.Type}");

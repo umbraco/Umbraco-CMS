@@ -534,7 +534,7 @@ namespace Umbraco.Core.Sync
         {
             var fileName = HttpRuntime.AppDomainAppId.ReplaceNonAlphanumericChars(string.Empty) + "-lastsynced.txt";
 
-            var distCacheFilePath = Path.Combine(globalSettings.LocalTempPath, "DistCache", fileName);
+            var distCacheFilePath = Path.Combine(globalSettings.LocalTempPath(Current.IOHelper), "DistCache", fileName);
 
             //ensure the folder exists
             var folder = Path.GetDirectoryName(distCacheFilePath);

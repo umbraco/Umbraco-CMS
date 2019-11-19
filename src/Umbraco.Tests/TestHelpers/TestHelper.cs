@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -32,6 +31,16 @@ namespace Umbraco.Tests.TestHelpers
         public static TypeLoader GetMockedTypeLoader()
         {
             return new TypeLoader(IOHelper.Default, Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(IOHelper.Default.MapPath("~/App_Data/TEMP")), Mock.Of<IProfilingLogger>());
+        }
+
+        public static Configs GetConfigs()
+        {
+            return GetConfigsFactory().Create();
+        }
+
+        public static IConfigsFactory GetConfigsFactory()
+        {
+            return new ConfigsFactory(IOHelper.Default);
         }
 
         /// <summary>
@@ -64,12 +73,12 @@ namespace Umbraco.Tests.TestHelpers
 
         public static void InitializeContentDirectories()
         {
-            CreateDirectories(new[] { Constants.SystemDirectories.MvcViews, new GlobalSettings(IOHelper.Default).UmbracoMediaPath, Constants.SystemDirectories.AppPlugins });
+            CreateDirectories(new[] { Constants.SystemDirectories.MvcViews, SettingsForTests.GenerateMockGlobalSettings().UmbracoMediaPath, Constants.SystemDirectories.AppPlugins });
         }
 
         public static void CleanContentDirectories()
         {
-            CleanDirectories(new[] { Constants.SystemDirectories.MvcViews, new GlobalSettings(IOHelper.Default).UmbracoMediaPath });
+            CleanDirectories(new[] { Constants.SystemDirectories.MvcViews, SettingsForTests.GenerateMockGlobalSettings().UmbracoMediaPath });
         }
 
         public static void CreateDirectories(string[] directories)
@@ -263,6 +272,17 @@ namespace Umbraco.Tests.TestHelpers
                 }
 
             );
+        }
+
+
+        public static IUmbracoVersion GetUmbracoVersion()
+        {
+            return new UmbracoVersion(GetConfigs().Global());
+        }
+
+        public static IRegister GetRegister()
+        {
+            return RegisterFactory.Create(GetConfigs().Global());
         }
     }
 }

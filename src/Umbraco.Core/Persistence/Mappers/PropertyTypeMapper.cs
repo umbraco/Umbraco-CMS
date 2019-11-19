@@ -6,7 +6,7 @@ using Umbraco.Core.Persistence.Dtos;
 namespace Umbraco.Core.Persistence.Mappers
 {
     /// <summary>
-    /// Represents a <see cref="PropertyType"/> to DTO mapper used to translate the properties of the public api
+    /// Represents a <see cref="IPropertyType"/> to DTO mapper used to translate the properties of the public api
     /// implementation to that of the database's DTO as sql: [tableName].[columnName].
     /// </summary>
     [MapperFor(typeof(PropertyType))]

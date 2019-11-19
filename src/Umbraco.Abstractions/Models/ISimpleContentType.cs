@@ -1,14 +1,15 @@
-﻿using Umbraco.Core.Models.Entities;
+﻿using System;
 
 namespace Umbraco.Core.Models
 {
     /// <summary>
     /// Represents a simplified view of a content type.
     /// </summary>
-    public interface ISimpleContentType : IUmbracoEntity
+    public interface ISimpleContentType
     {
-        new int Id { get; }
-        new string Name { get; }
+        int Id { get; }
+        Guid Key { get; }
+        string Name { get; }
 
         /// <summary>
         /// Gets the alias of the content type.

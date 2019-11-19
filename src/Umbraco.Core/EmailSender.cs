@@ -2,6 +2,7 @@
 using System.Net.Mail;
 using System.Threading.Tasks;
 using System.Web;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 
@@ -28,7 +29,7 @@ namespace Umbraco.Core
             _enableEvents = enableEvents;
         }
 
-        private static readonly Lazy<bool> SmtpConfigured = new Lazy<bool>(() => GlobalSettings.HasSmtpServerConfigured(HttpRuntime.AppDomainAppVirtualPath));
+        private static readonly Lazy<bool> SmtpConfigured = new Lazy<bool>(() => Current.Configs.Global().IsSmtpServerConfigured);
 
         /// <summary>
         /// Sends the message non-async

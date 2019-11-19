@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Models
@@ -26,7 +27,7 @@ namespace Umbraco.Web.Models
         {
             Type = upgradeType;
             Comment = upgradeComment;
-            Url = upgradeUrl + "?version=" + HttpUtility.UrlEncode(UmbracoVersion.Current.ToString(3));
+            Url = upgradeUrl + "?version=" + HttpUtility.UrlEncode(Current.UmbracoVersion.Current.ToString(3));
         }
     }
 }

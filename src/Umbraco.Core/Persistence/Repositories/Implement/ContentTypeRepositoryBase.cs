@@ -405,7 +405,7 @@ AND umbracoNode.id <> @id",
             }
 
             // collect property types that have a dirty variation
-            List<PropertyType> propertyTypeVariationDirty = null;
+            List<IPropertyType> propertyTypeVariationDirty = null;
 
             // note: this only deals with *local* property types, we're dealing w/compositions later below
             foreach (var propertyType in entity.PropertyTypes)
@@ -415,7 +415,7 @@ AND umbracoNode.id <> @id",
                 {
                     // allocate the list only when needed
                     if (propertyTypeVariationDirty == null)
-                        propertyTypeVariationDirty = new List<PropertyType>();
+                        propertyTypeVariationDirty = new List<IPropertyType>();
 
                     propertyTypeVariationDirty.Add(propertyType);
                 }
@@ -571,7 +571,7 @@ AND umbracoNode.id <> @id",
 
         // gets property types that have actually changed, and the corresponding changes
         // returns null if no property type has actually changed
-        private Dictionary<int, (ContentVariation FromVariation, ContentVariation ToVariation)> GetPropertyVariationChanges(IEnumerable<PropertyType> propertyTypes)
+        private Dictionary<int, (ContentVariation FromVariation, ContentVariation ToVariation)> GetPropertyVariationChanges(IEnumerable<IPropertyType> propertyTypes)
         {
             var propertyTypesL = propertyTypes.ToList();
 
@@ -1190,7 +1190,7 @@ AND umbracoNode.id <> @id",
                 new { Id = contentTypeId, PropertyTypeId = propertyTypeId });
         }
 
-        protected void ValidateAlias(PropertyType pt)
+        protected void ValidateAlias(IPropertyType pt)
         {
             if (string.IsNullOrWhiteSpace(pt.Alias))
             {
@@ -1221,7 +1221,7 @@ AND umbracoNode.id <> @id",
         /// Try to set the data type id based on its ControlId
         /// </summary>
         /// <param name="propertyType"></param>
-        private void AssignDataTypeFromPropertyEditor(PropertyType propertyType)
+        private void AssignDataTypeFromPropertyEditor(IPropertyType propertyType)
         {
             //we cannot try to assign a data type of it's empty
             if (propertyType.PropertyEditorAlias.IsNullOrWhiteSpace() == false)
