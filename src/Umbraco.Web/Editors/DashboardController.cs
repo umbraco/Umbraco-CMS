@@ -11,6 +11,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Logging;
@@ -51,7 +52,7 @@ namespace Umbraco.Web.Editors
             var user = Security.CurrentUser;
             var allowedSections = string.Join(",", user.AllowedSections);
             var language = user.Language;
-            var version = UmbracoVersion.SemanticVersion.ToSemanticString();
+            var version = Current.UmbracoVersion.SemanticVersion.ToSemanticString();
 
             var url = string.Format(baseUrl + "{0}?section={0}&allowed={1}&lang={2}&version={3}", section, allowedSections, language, version);
             var key = "umbraco-dynamic-dashboard-" + language + allowedSections.Replace(",", "-") + section;

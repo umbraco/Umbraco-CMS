@@ -548,6 +548,7 @@ namespace Umbraco.Core.Packaging
 
         private static XElement GetPackageInfoXml(PackageDefinition definition)
         {
+
             var info = new XElement("info");
 
             //Package info
@@ -564,9 +565,9 @@ namespace Umbraco.Core.Packaging
 
             var requirements = new XElement("requirements");
 
-            requirements.Add(new XElement("major", definition.UmbracoVersion == null ? UmbracoVersion.SemanticVersion.Major.ToInvariantString() : definition.UmbracoVersion.Major.ToInvariantString()));
-            requirements.Add(new XElement("minor", definition.UmbracoVersion == null ? UmbracoVersion.SemanticVersion.Minor.ToInvariantString() : definition.UmbracoVersion.Minor.ToInvariantString()));
-            requirements.Add(new XElement("patch", definition.UmbracoVersion == null ? UmbracoVersion.SemanticVersion.Patch.ToInvariantString() : definition.UmbracoVersion.Build.ToInvariantString()));
+            requirements.Add(new XElement("major", definition.UmbracoVersion == null ? Current.UmbracoVersion.SemanticVersion.Major.ToInvariantString() : definition.UmbracoVersion.Major.ToInvariantString()));
+            requirements.Add(new XElement("minor", definition.UmbracoVersion == null ? Current.UmbracoVersion.SemanticVersion.Minor.ToInvariantString() : definition.UmbracoVersion.Minor.ToInvariantString()));
+            requirements.Add(new XElement("patch", definition.UmbracoVersion == null ? Current.UmbracoVersion.SemanticVersion.Patch.ToInvariantString() : definition.UmbracoVersion.Build.ToInvariantString()));
 
             if (definition.UmbracoVersion != null)
                 requirements.Add(new XAttribute("type", RequirementsType.Strict.ToString()));

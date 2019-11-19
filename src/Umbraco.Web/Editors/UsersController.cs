@@ -456,7 +456,7 @@ namespace Umbraco.Web.Editors
             var action = urlHelper.Action("VerifyInvite", "BackOffice",
                 new
                 {
-                    area = GlobalSettings.GetUmbracoMvcArea(),
+                    area = GlobalSettings.GetUmbracoMvcArea(Current.IOHelper),
                     invite = inviteToken
                 });
 

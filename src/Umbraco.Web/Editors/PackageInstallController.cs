@@ -118,7 +118,7 @@ namespace Umbraco.Web.Editors
             if (ins.UmbracoVersionRequirementsType == RequirementsType.Strict)
             {
                 var packageMinVersion = ins.UmbracoVersion;
-                if (UmbracoVersion.Current < packageMinVersion)
+                if (Current.UmbracoVersion.Current < packageMinVersion)
                 {
                     model.IsCompatible = false;
                 }
@@ -215,7 +215,7 @@ namespace Umbraco.Web.Editors
             {
                 var packageFile = await Services.PackagingService.FetchPackageFileAsync(
                     Guid.Parse(packageGuid),
-                    UmbracoVersion.Current,
+                    Current.UmbracoVersion.Current,
                     Security.GetUserId().ResultOr(0));
 
                 fileName = packageFile.Name;
@@ -259,7 +259,7 @@ namespace Umbraco.Web.Editors
             if (packageInfo.UmbracoVersionRequirementsType == RequirementsType.Strict)
             {
                 var packageMinVersion = packageInfo.UmbracoVersion;
-                if (UmbracoVersion.Current < packageMinVersion)
+                if (Current.UmbracoVersion.Current < packageMinVersion)
                     throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(
                         Services.TextService.Localize("packager/targetVersionMismatch", new[] {packageMinVersion.ToString()})));
             }
@@ -366,7 +366,7 @@ namespace Umbraco.Web.Editors
             //bump cdf to be safe
             var clientDependencyConfig = new ClientDependencyConfiguration(Logger);
             var clientDependencyUpdated = clientDependencyConfig.UpdateVersionNumber(
-                UmbracoVersion.SemanticVersion, DateTime.UtcNow, "yyyyMMdd");
+                Current.UmbracoVersion.SemanticVersion, DateTime.UtcNow, "yyyyMMdd");
 
             var redirectUrl = "";
             if (!packageInfo.PackageView.IsNullOrWhiteSpace())

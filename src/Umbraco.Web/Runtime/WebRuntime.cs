@@ -2,6 +2,7 @@
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Runtime;
 using Umbraco.Web.Cache;
@@ -24,7 +25,8 @@ namespace Umbraco.Web.Runtime
         /// Initializes a new instance of the <see cref="WebRuntime"/> class.
         /// </summary>
         /// <param name="umbracoApplication"></param>
-        public WebRuntime(UmbracoApplicationBase umbracoApplication)
+        public WebRuntime(UmbracoApplicationBase umbracoApplication, Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger):
+            base(configs, umbracoVersion, ioHelper, logger)
         {
             _umbracoApplication = umbracoApplication;
         }
@@ -33,8 +35,7 @@ namespace Umbraco.Web.Runtime
         public override IFactory Boot(IRegister register)
         {
             // create and start asap to profile boot
-            var debug = GlobalSettings.DebugMode;
-            if (debug)
+            if (State.Debug)
             {
                 _webProfiler = new WebProfiler();
                 _webProfiler.Start();

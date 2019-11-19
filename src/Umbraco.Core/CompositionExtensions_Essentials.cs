@@ -1,5 +1,6 @@
 ﻿using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
@@ -22,7 +23,8 @@ namespace Umbraco.Core
             TypeLoader typeLoader,
             IRuntimeState state,
             ITypeFinder typeFinder,
-            IIOHelper ioHelper)
+            IIOHelper ioHelper,
+            IUmbracoVersion umbracoVersion)
         {
             composition.RegisterUnique(logger);
             composition.RegisterUnique(profiler);
@@ -35,6 +37,7 @@ namespace Umbraco.Core
             composition.RegisterUnique(state);
             composition.RegisterUnique(typeFinder);
             composition.RegisterUnique(ioHelper);
+            composition.RegisterUnique(umbracoVersion);
         }
     }
 }

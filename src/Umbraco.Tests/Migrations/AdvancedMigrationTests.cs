@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void CreateTableOfTDto()
         {
-            var logger = new DebugDiagnosticsLogger();
+            var logger = new DebugDiagnosticsLogger(new MessageTemplates());
 
             var builder = Mock.Of<IMigrationBuilder>();
             Mock.Get(builder)
@@ -53,7 +53,7 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void DeleteKeysAndIndexesOfTDto()
         {
-            var logger = new DebugDiagnosticsLogger();
+            var logger = new DebugDiagnosticsLogger(new MessageTemplates());
 
             var builder = Mock.Of<IMigrationBuilder>();
             Mock.Get(builder)
@@ -87,7 +87,7 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void CreateKeysAndIndexesOfTDto()
         {
-            var logger = new DebugDiagnosticsLogger();
+            var logger = new DebugDiagnosticsLogger(new MessageTemplates());
 
             var builder = Mock.Of<IMigrationBuilder>();
             Mock.Get(builder)
@@ -124,7 +124,7 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void CreateKeysAndIndexes()
         {
-            var logger = new DebugDiagnosticsLogger();
+            var logger = new DebugDiagnosticsLogger(new MessageTemplates());
 
             var builder = Mock.Of<IMigrationBuilder>();
             Mock.Get(builder)
@@ -161,7 +161,7 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void CreateColumn()
         {
-            var logger = new DebugDiagnosticsLogger();
+            var logger = new DebugDiagnosticsLogger(new MessageTemplates());
 
             var builder = Mock.Of<IMigrationBuilder>();
             Mock.Get(builder)

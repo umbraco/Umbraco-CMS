@@ -92,7 +92,7 @@ namespace Umbraco.Tests.Persistence.NPocoTests
             // create the db
             // prob not what we want, this is not a real database, but hey, the test is ignored anyways
             // we'll fix this when we have proper testing infrastructure
-            var dbSqlServer = TestObjects.GetUmbracoSqlServerDatabase(new DebugDiagnosticsLogger());
+            var dbSqlServer = TestObjects.GetUmbracoSqlServerDatabase(new DebugDiagnosticsLogger(new MessageTemplates()));
 
             //drop the table
             dbSqlServer.Execute("DROP TABLE [umbracoServer]");

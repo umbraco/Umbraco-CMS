@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Misc
         [Test]
         public void NoApplicationUrlByDefault()
         {
-            var state = new RuntimeState(Mock.Of<ILogger>(), Mock.Of<IUmbracoSettingsSection>(), Mock.Of<IGlobalSettings>(), new Lazy<IMainDom>(), new Lazy<IServerRegistrar>());
+            var state = new RuntimeState(Mock.Of<ILogger>(), Mock.Of<IUmbracoSettingsSection>(), Mock.Of<IGlobalSettings>(), new Lazy<IMainDom>(), new Lazy<IServerRegistrar>(), TestHelper.GetUmbracoVersion());
             Assert.IsNull(state.ApplicationUrl);
         }
 
@@ -45,7 +45,7 @@ namespace Umbraco.Tests.Misc
             var registrar = new Mock<IServerRegistrar>();
             registrar.Setup(x => x.GetCurrentServerUmbracoApplicationUrl()).Returns("http://server1.com/umbraco");
 
-            var state = new RuntimeState(Mock.Of<ILogger>(), settings, globalConfig.Object, new Lazy<IMainDom>(), new Lazy<IServerRegistrar>(() => registrar.Object));
+            var state = new RuntimeState(Mock.Of<ILogger>(), settings, globalConfig.Object, new Lazy<IMainDom>(), new Lazy<IServerRegistrar>(() => registrar.Object), TestHelper.GetUmbracoVersion());
 
             state.EnsureApplicationUrl();
 
@@ -67,7 +67,7 @@ namespace Umbraco.Tests.Misc
 
 
 
-            var state = new RuntimeState(Mock.Of<ILogger>(), settings, globalConfig.Object, new Lazy<IMainDom>(), new Lazy<IServerRegistrar>(() => Mock.Of<IServerRegistrar>()));
+            var state = new RuntimeState(Mock.Of<ILogger>(), settings, globalConfig.Object, new Lazy<IMainDom>(), new Lazy<IServerRegistrar>(() => Mock.Of<IServerRegistrar>()), TestHelper.GetUmbracoVersion());
 
             state.EnsureApplicationUrl();
 
@@ -90,7 +90,7 @@ namespace Umbraco.Tests.Misc
             // still NOT set
             Assert.IsNull(url);
         }
-        
+
         [Test]
         public void SetApplicationUrlFromWrSettingsSsl()
         {

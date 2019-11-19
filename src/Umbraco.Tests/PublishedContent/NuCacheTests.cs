@@ -8,6 +8,7 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -49,9 +50,9 @@ namespace Umbraco.Tests.PublishedContent
             var factory = Mock.Of<IFactory>();
             Current.Factory = factory;
 
-            var configs = new Configs();
+            var configs = TestHelper.GetConfigs();
             Mock.Get(factory).Setup(x => x.GetInstance(typeof(Configs))).Returns(configs);
-            var globalSettings = new GlobalSettings();
+            var globalSettings = new GlobalSettings(IOHelper.Default);
             configs.Add(SettingsForTests.GenerateMockUmbracoSettings);
             configs.Add<IGlobalSettings>(() => globalSettings);
 

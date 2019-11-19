@@ -35,7 +35,7 @@ namespace Umbraco.Tests.TestHelpers
         {
             Current.Reset();
 
-            var container = RegisterFactory.Create();
+            var container = TestHelper.GetRegister();
 
             var ioHelper = IOHelper.Default;
             var logger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
@@ -45,7 +45,7 @@ namespace Umbraco.Tests.TestHelpers
                 logger,
                 false);
 
-            var composition = new Composition(container, typeLoader, Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run));
+            var composition = new Composition(container, typeLoader, Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs());
 
             composition.RegisterUnique<ILogger>(_ => Mock.Of<ILogger>());
             composition.RegisterUnique<IProfiler>(_ => Mock.Of<IProfiler>());

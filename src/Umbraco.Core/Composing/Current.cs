@@ -61,7 +61,7 @@ namespace Umbraco.Core.Composing
             }
         }
 
-        internal static bool HasFactory => _factory != null;
+        public static bool HasFactory => _factory != null;
 
         /// <summary>
         /// Resets <see cref="Current"/>. Indented for testing only, and not supported in production code.
@@ -93,11 +93,11 @@ namespace Umbraco.Core.Composing
         /// <para>Unlocks <see cref="Configs"/> so that it is possible to add configurations
         /// directly to <see cref="Current"/> without having to wire composition.</para>
         /// </remarks>
-        public static void UnlockConfigs()
+        public static void UnlockConfigs(IConfigsFactory configsFactory)
         {
             if (_factory != null)
                 throw new InvalidOperationException("Cannot unlock configs when a factory has been set.");
-            _configs = new Configs();
+            _configs = configsFactory.Create();
         }
 
         internal static event EventHandler Resetted;
@@ -113,7 +113,7 @@ namespace Umbraco.Core.Composing
 
         public static ILogger Logger
             => _logger ?? (_logger = _factory?.TryGetInstance<ILogger>()
-                                     ?? new DebugDiagnosticsLogger());
+                                     ?? new DebugDiagnosticsLogger(new MessageTemplates()));
 
         public static IProfiler Profiler
             => _profiler ?? (_profiler = _factory?.TryGetInstance<IProfiler>()
@@ -206,6 +206,9 @@ namespace Umbraco.Core.Composing
             => Factory.GetInstance<IVariationContextAccessor>();
 
         public static readonly IIOHelper IOHelper = Umbraco.Core.IO.IOHelper.Default;
+
+        public static IUmbracoVersion UmbracoVersion
+            => Factory.GetInstance<IUmbracoVersion>();
 
         #endregion
     }

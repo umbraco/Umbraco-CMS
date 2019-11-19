@@ -1,51 +1,56 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using System.Web;
-using System.Web.Routing;
-using Umbraco.Core.Composing;
+using System.Web.Hosting;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Configuration
 {
+
     public static class GlobalSettingsExtensions
     {
-        private static string _mvcArea;
-
+        private static string _localTempPath;
 
         /// <summary>
-        /// This returns the string of the MVC Area route.
+        /// Gets the location of temporary files.
         /// </summary>
-        /// <remarks>
-        /// This will return the MVC area that we will route all custom routes through like surface controllers, etc...
-        /// We will use the 'Path' (default ~/umbraco) to create it but since it cannot contain '/' and people may specify a path of ~/asdf/asdf/admin
-        /// we will convert the '/' to '-' and use that as the path. its a bit lame but will work.
-        ///
-        /// We also make sure that the virtual directory (SystemDirectories.Root) is stripped off first, otherwise we'd end up with something
-        /// like "MyVirtualDirectory-Umbraco" instead of just "Umbraco".
-        /// </remarks>
-        public static string GetUmbracoMvcArea(this IGlobalSettings globalSettings)
+        public static string LocalTempPath(this IGlobalSettings globalSettings, IIOHelper ioHelper)
         {
-            if (_mvcArea != null) return _mvcArea;
 
-            _mvcArea = GetUmbracoMvcAreaNoCache(globalSettings);
+            if (_localTempPath != null)
+                return _localTempPath;
 
-            return _mvcArea;
-        }
-
-        internal static string GetUmbracoMvcAreaNoCache(this IGlobalSettings globalSettings)
-        {
-            if (globalSettings.Path.IsNullOrWhiteSpace())
+            switch (globalSettings.LocalTempStorageLocation)
             {
-                throw new InvalidOperationException("Cannot create an MVC Area path without the umbracoPath specified");
+                case LocalTempStorage.AspNetTemp:
+                    return _localTempPath = System.IO.Path.Combine(HttpRuntime.CodegenDir, "UmbracoData");
+
+                case LocalTempStorage.EnvironmentTemp:
+
+                    // environment temp is unique, we need a folder per site
+
+                    // use a hash
+                    // combine site name and application id
+                    //  site name is a Guid on Cloud
+                    //  application id is eg /LM/W3SVC/123456/ROOT
+                    // the combination is unique on one server
+                    // and, if a site moves from worker A to B and then back to A...
+                    //  hopefully it gets a new Guid or new application id?
+
+                    var siteName = HostingEnvironment.SiteName;
+                    var applicationId = HostingEnvironment.ApplicationID; // ie HttpRuntime.AppDomainAppId
+
+                    var hashString = siteName + "::" + applicationId;
+                    var hash = hashString.GenerateHash();
+                    var siteTemp = System.IO.Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData", hash);
+
+                    return _localTempPath = siteTemp;
+
+                //case LocalTempStorage.Default:
+                //case LocalTempStorage.Unknown:
+                default:
+                    return _localTempPath = ioHelper.MapPath("~/App_Data/TEMP");
             }
 
-            var path = globalSettings.Path;
-            if (path.StartsWith(Current.IOHelper.Root)) // beware of TrimStart, see U4-2518
-                path = path.Substring(Current.IOHelper.Root.Length);
-            return path.TrimStart('~').TrimStart('/').Replace('/', '-').Trim().ToLower();
         }
 
     }

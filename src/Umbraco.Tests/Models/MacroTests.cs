@@ -2,6 +2,7 @@
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Tests.TestHelpers;
@@ -15,7 +16,7 @@ namespace Umbraco.Tests.Models
         public void Init()
         {
             Current.Reset();
-            Current.UnlockConfigs();
+            Current.UnlockConfigs(TestHelper.GetConfigsFactory());
             Current.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
         }
 

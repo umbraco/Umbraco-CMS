@@ -49,7 +49,7 @@ namespace Umbraco.Tests.Benchmarks
         [GlobalSetup]
         public void Setup()
         {
-            var logger = new DebugDiagnosticsLogger();
+            var logger = new DebugDiagnosticsLogger(new MessageTemplates());
             var path = TestHelper.CurrentAssemblyDirectory;
 
             SetupSqlCe(path, logger);
