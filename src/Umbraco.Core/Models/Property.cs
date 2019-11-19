@@ -83,10 +83,10 @@ namespace Umbraco.Core.Models
         {
             public InitialPropertyValue(string culture, string segment, bool published, object value)
             {
-                Culture = culture ?? throw new ArgumentNullException(nameof(culture));
-                Segment = segment ?? throw new ArgumentNullException(nameof(segment));
+                Culture = culture;
+                Segment = segment;
                 Published = published;
-                Value = value ?? throw new ArgumentNullException(nameof(value));
+                Value = value;
             }
 
             public string Culture { get; }
