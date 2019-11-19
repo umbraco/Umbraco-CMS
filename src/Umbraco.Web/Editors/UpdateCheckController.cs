@@ -15,6 +15,13 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class UpdateCheckController : UmbracoAuthorizedJsonController
     {
+        private readonly IUmbracoVersion _umbracoVersion;
+
+        public UpdateCheckController (IUmbracoVersion umbracoVersion)
+        {
+            _umbracoVersion = umbracoVersion;
+        }
+
         [UpdateCheckResponseFilter]
         public UpgradeCheckResponse GetCheck()
         {
@@ -26,10 +33,10 @@ namespace Umbraco.Web.Editors
                 {
                     var check = new org.umbraco.update.CheckForUpgrade { Timeout = 2000 };
 
-                    var result = check.CheckUpgrade(Current.UmbracoVersion.Current.Major,
-                        Current.UmbracoVersion.Current.Minor,
-                        Current.UmbracoVersion.Current.Build,
-                        Current.UmbracoVersion.Comment);
+                    var result = check.CheckUpgrade(_umbracoVersion.Current.Major,
+                        _umbracoVersion.Current.Minor,
+                        _umbracoVersion.Current.Build,
+                        _umbracoVersion.Comment);
 
                     return new UpgradeCheckResponse(result.UpgradeType.ToString(), result.Comment, result.UpgradeUrl);
                 }

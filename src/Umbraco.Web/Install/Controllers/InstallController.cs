@@ -3,9 +3,7 @@ using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Migrations.Install;
 using Umbraco.Web.JavaScript;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Security;
@@ -26,14 +24,16 @@ namespace Umbraco.Web.Install.Controllers
         private readonly IRuntimeState _runtime;
         private readonly ILogger _logger;
         private readonly IGlobalSettings _globalSettings;
+        private readonly IUmbracoVersion _umbracoVersion;
 
-        public InstallController(IUmbracoContextAccessor umbracoContextAccessor, InstallHelper installHelper, IRuntimeState runtime, ILogger logger, IGlobalSettings globalSettings)
+        public InstallController(IUmbracoContextAccessor umbracoContextAccessor, InstallHelper installHelper, IRuntimeState runtime, ILogger logger, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _installHelper = installHelper;
             _runtime = runtime;
             _logger = logger;
             _globalSettings = globalSettings;
+            _umbracoVersion = umbracoVersion;
         }
 
         [HttpGet]
@@ -48,7 +48,7 @@ namespace Umbraco.Web.Install.Controllers
                 // Update ClientDependency version
                 var clientDependencyConfig = new ClientDependencyConfiguration(_logger);
                 var clientDependencyUpdated = clientDependencyConfig.UpdateVersionNumber(
-                    Current.UmbracoVersion.SemanticVersion, DateTime.UtcNow, "yyyyMMdd");
+                    _umbracoVersion.SemanticVersion, DateTime.UtcNow, "yyyyMMdd");
                 // Delete ClientDependency temp directories to make sure we get fresh caches
                 var clientDependencyTempFilesDeleted = clientDependencyConfig.ClearTempFiles(HttpContext);
 

@@ -35,11 +35,15 @@ namespace Umbraco.Web.Editors
     [UmbracoApplicationAuthorize(Core.Constants.Applications.Packages)]
     public class PackageInstallController : UmbracoAuthorizedJsonController
     {
+
+        private readonly IUmbracoVersion _umbracoVersion;
         public PackageInstallController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor,
             ISqlContext sqlContext, ServiceContext services, AppCaches appCaches,
-            IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+            IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IUmbracoVersion umbracoVersion)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
+            _umbracoVersion = umbracoVersion;
+                
         }
 
         /// <summary>
@@ -118,7 +122,7 @@ namespace Umbraco.Web.Editors
             if (ins.UmbracoVersionRequirementsType == RequirementsType.Strict)
             {
                 var packageMinVersion = ins.UmbracoVersion;
-                if (Current.UmbracoVersion.Current < packageMinVersion)
+                if (_umbracoVersion.Current < packageMinVersion)
                 {
                     model.IsCompatible = false;
                 }
@@ -215,7 +219,7 @@ namespace Umbraco.Web.Editors
             {
                 var packageFile = await Services.PackagingService.FetchPackageFileAsync(
                     Guid.Parse(packageGuid),
-                    Current.UmbracoVersion.Current,
+                    _umbracoVersion.Current,
                     Security.GetUserId().ResultOr(0));
 
                 fileName = packageFile.Name;
@@ -259,7 +263,7 @@ namespace Umbraco.Web.Editors
             if (packageInfo.UmbracoVersionRequirementsType == RequirementsType.Strict)
             {
                 var packageMinVersion = packageInfo.UmbracoVersion;
-                if (Current.UmbracoVersion.Current < packageMinVersion)
+                if (_umbracoVersion.Current < packageMinVersion)
                     throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(
                         Services.TextService.Localize("packager/targetVersionMismatch", new[] {packageMinVersion.ToString()})));
             }
@@ -366,7 +370,7 @@ namespace Umbraco.Web.Editors
             //bump cdf to be safe
             var clientDependencyConfig = new ClientDependencyConfiguration(Logger);
             var clientDependencyUpdated = clientDependencyConfig.UpdateVersionNumber(
-                Current.UmbracoVersion.SemanticVersion, DateTime.UtcNow, "yyyyMMdd");
+                _umbracoVersion.SemanticVersion, DateTime.UtcNow, "yyyyMMdd");
 
             var redirectUrl = "";
             if (!packageInfo.PackageView.IsNullOrWhiteSpace())

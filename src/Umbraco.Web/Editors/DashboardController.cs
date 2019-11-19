@@ -32,14 +32,16 @@ namespace Umbraco.Web.Editors
     public class DashboardController : UmbracoApiController
     {
         private readonly IDashboardService _dashboardService;
+        private readonly IUmbracoVersion _umbracoVersion;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DashboardController"/> with all its dependencies.
         /// </summary>
-        public DashboardController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, IDashboardService dashboardService, UmbracoHelper umbracoHelper)
+        public DashboardController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, IDashboardService dashboardService, UmbracoHelper umbracoHelper, IUmbracoVersion umbracoVersion)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _dashboardService = dashboardService;
+            _umbracoVersion = umbracoVersion;
         }
 
         //we have just one instance of HttpClient shared for the entire application
@@ -52,7 +54,7 @@ namespace Umbraco.Web.Editors
             var user = Security.CurrentUser;
             var allowedSections = string.Join(",", user.AllowedSections);
             var language = user.Language;
-            var version = Current.UmbracoVersion.SemanticVersion.ToSemanticString();
+            var version = _umbracoVersion.SemanticVersion.ToSemanticString();
 
             var url = string.Format(baseUrl + "{0}?section={0}&allowed={1}&lang={2}&version={3}", section, allowedSections, language, version);
             var key = "umbraco-dynamic-dashboard-" + language + allowedSections.Replace(",", "-") + section;
