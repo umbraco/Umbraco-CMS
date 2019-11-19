@@ -151,6 +151,7 @@
     <Compile Include="CompositionExtensions_FileSystems.cs" />
     <Compile Include="Configuration\GlobalSettingsExtensions.cs" />
     <Compile Include="ConventionsHelper.cs" />
+    <Compile Include="Deploy\IGridCellValueConnector.cs" />
     <Compile Include="Events\ContentPublishedEventArgs.cs" />
     <Compile Include="Events\ContentPublishingEventArgs.cs" />
     <Compile Include="Events\ContentSavedEventArgs.cs" />
@@ -251,7 +252,6 @@
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />
     <Compile Include="ContentVariationExtensions.cs" />
-    <Compile Include="Deploy\IDataTypeConfigurationConnector.cs" />
     <Compile Include="IO\MediaPathSchemes\CombinedGuidsMediaPathScheme.cs" />
     <Compile Include="IO\MediaPathSchemes\OriginalMediaPathScheme.cs" />
     <Compile Include="IO\MediaPathSchemes\TwoGuidsMediaPathScheme.cs" />
@@ -376,14 +376,6 @@
     <Compile Include="Migrations\Expressions\Delete\KeysAndIndexes\DeleteKeysAndIndexesBuilder.cs" />
     <Compile Include="Migrations\Install\DatabaseBuilder.cs" />
     <Compile Include="Deploy\ArtifactBase.cs" />
-    <Compile Include="Deploy\ArtifactSignature.cs" />
-    <Compile Include="Deploy\Direction.cs" />
-    <Compile Include="Deploy\IGridCellValueConnector.cs" />
-    <Compile Include="Deploy\IImageSourceParser.cs" />
-    <Compile Include="Deploy\ILocalLinkParser.cs" />
-    <Compile Include="Deploy\IMacroParser.cs" />
-    <Compile Include="Deploy\IUniqueIdentifyingServiceConnector.cs" />
-    <Compile Include="Deploy\IValueConnector.cs" />
     <Compile Include="Diagnostics\MiniDump.cs" />
     <Compile Include="EmailSender.cs" />
     <Compile Include="Events\QueuingEventDispatcher.cs" />
