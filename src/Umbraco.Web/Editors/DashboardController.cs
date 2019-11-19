@@ -11,7 +11,6 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Logging;

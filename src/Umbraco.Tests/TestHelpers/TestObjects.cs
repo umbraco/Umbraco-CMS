@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Moq;
@@ -23,7 +22,6 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers.Stubs;
-using Umbraco.Web.Services;
 
 namespace Umbraco.Tests.TestHelpers
 {
