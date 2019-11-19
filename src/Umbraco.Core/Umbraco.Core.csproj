@@ -246,10 +246,7 @@
     <Compile Include="Services\Changes\ContentTypeChangeExtensions.cs" />
     <Compile Include="Services\IMemberService.cs" />
     <Compile Include="Services\IMembershipMemberService.cs" />
-    <Compile Include="Services\IPackagingService.cs" />
     <Compile Include="Services\LocalizedTextServiceExtensions.cs" />
-    <Compile Include="Services\DateTypeServiceExtensions.cs" />
-    <Compile Include="Services\MediaServiceExtensions.cs" />
     <Compile Include="Services\PropertyValidationService.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="Strings\DefaultUrlSegmentProvider.cs" />
@@ -866,9 +863,6 @@
       <Project>{29aa69d9-b597-4395-8d42-43b1263c240a}</Project>
       <Name>Umbraco.Abstractions</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\Packaging" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
