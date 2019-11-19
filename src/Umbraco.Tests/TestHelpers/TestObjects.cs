@@ -78,6 +78,7 @@ namespace Umbraco.Tests.TestHelpers
         /// <param name="scopeAccessor"></param>
         /// <param name="cache">A cache.</param>
         /// <param name="logger">A logger.</param>
+        /// <param name="umbracoVersion">An Umbraco Version.</param>
         /// <param name="ioHelper">An io helper.</param>
         /// <param name="globalSettings"></param>
         /// <param name="umbracoSettings"></param>
@@ -94,6 +95,7 @@ namespace Umbraco.Tests.TestHelpers
             AppCaches cache,
             ILogger logger,
             IIOHelper ioHelper,
+            IUmbracoVersion umbracoVersion,
             IGlobalSettings globalSettings,
             IUmbracoSettingsSection umbracoSettings,
             IEventMessagesFactory eventMessagesFactory,
@@ -172,12 +174,12 @@ namespace Umbraco.Tests.TestHelpers
             var packagingService = GetLazyService<IPackagingService>(factory, c =>
             {
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
-                var compiledPackageXmlParser = new CompiledPackageXmlParser(new ConflictingPackageData(macroService.Value, fileService.Value));
+                var compiledPackageXmlParser = new CompiledPackageXmlParser(new ConflictingPackageData(macroService.Value, fileService.Value), globalSettings);
                 return new PackagingService(
                     auditService.Value,
-                    new PackagesRepository(contentService.Value, contentTypeService.Value, dataTypeService.Value, fileService.Value, macroService.Value, localizationService.Value, ioHelper,
+                    new PackagesRepository(contentService.Value, contentTypeService.Value, dataTypeService.Value, fileService.Value, macroService.Value, localizationService.Value, ioHelper, umbracoVersion,
                         new EntityXmlSerializer(contentService.Value, mediaService.Value, dataTypeService.Value, userService.Value, localizationService.Value, contentTypeService.Value, urlSegmentProviders), logger, "createdPackages.config"),
-                    new PackagesRepository(contentService.Value, contentTypeService.Value, dataTypeService.Value, fileService.Value, macroService.Value, localizationService.Value, ioHelper,
+                    new PackagesRepository(contentService.Value, contentTypeService.Value, dataTypeService.Value, fileService.Value, macroService.Value, localizationService.Value, ioHelper, umbracoVersion,
                         new EntityXmlSerializer(contentService.Value, mediaService.Value, dataTypeService.Value, userService.Value, localizationService.Value, contentTypeService.Value, urlSegmentProviders), logger, "installedPackages.config"),
                     new PackageInstallation(
                         new PackageDataInstallation(logger, fileService.Value, macroService.Value, localizationService.Value, dataTypeService.Value, entityService.Value, contentTypeService.Value, contentService.Value, propertyEditorCollection, scopeProvider),

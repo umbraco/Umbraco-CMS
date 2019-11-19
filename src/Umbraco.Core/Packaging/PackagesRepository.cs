@@ -58,6 +58,7 @@ namespace Umbraco.Core.Packaging
             IDataTypeService dataTypeService, IFileService fileService, IMacroService macroService,
             ILocalizationService languageService,
             IIOHelper ioHelper,
+            IUmbracoVersion umbracoVersion,
             IEntityXmlSerializer serializer, ILogger logger,
             string packageRepositoryFileName,
             string tempFolderPath = null, string packagesFolderPath = null, string mediaFolderPath = null)
@@ -78,7 +79,7 @@ namespace Umbraco.Core.Packaging
             _packagesFolderPath = packagesFolderPath ?? Constants.SystemDirectories.Packages;
             _mediaFolderPath = mediaFolderPath ?? Current.Configs.Global().UmbracoMediaPath + "/created-packages";
 
-            _parser = new PackageDefinitionXmlParser(logger);
+            _parser = new PackageDefinitionXmlParser(logger, umbracoVersion);
         }
 
         private string CreatedPackagesFile => _packagesFolderPath.EnsureEndsWith('/') + _packageRepositoryFileName;
