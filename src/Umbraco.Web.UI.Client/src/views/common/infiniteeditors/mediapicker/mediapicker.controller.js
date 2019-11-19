@@ -24,6 +24,9 @@ angular.module("umbraco")
             vm.clickItemName = clickItemName;
             vm.editMediaItem = editMediaItem;
             vm.gotoFolder = gotoFolder;
+            vm.toggleListView = toggleListView;
+
+            vm.showMediaList = false;
 
             var dialogOptions = $scope.model;
             
@@ -224,7 +227,9 @@ angular.module("umbraco")
 
                 return getChildren(folder.id);
             }
-
+            function toggleListView() {          
+                    vm.showMediaList = !vm.showMediaList;
+            }
             function clickHandler(media, event, index) {
 
                 if (media.isFolder) {

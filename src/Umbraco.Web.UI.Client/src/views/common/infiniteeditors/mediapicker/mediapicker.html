@@ -42,16 +42,19 @@
                     <div class="upload-button">
                         <umb-button
                             type="button"
-                            label-key="general_upload"
-                            action="vm.upload()"
-                            disabled="lockedFolder"
-                            button-style="action">
+                                    label-key="general_upload"
+                                    action="vm.upload()"
+                                    disabled="lockedFolder"
+                                    button-style="action">
                         </umb-button>
                     </div>
 
                 </div>
-
+                <div class="row umb-control-group" ng-show="vm.searchOptions.filter && images.length > 0 && !vm.loading && !activeDrag">
+                    <a class="pull-right" ng-click="vm.toggleListView()"><span ng-show="!vm.showMediaList" title="Switch to ListView"><i class="icon-list"></i></span><span ng-show="vm.showMediaList" title="Switch to Grid View"><i class="icon-thumbnails-small"></i></span></a>
+                </div>
                 <div class="row umb-control-group" ng-show="!vm.searchOptions.filter">
+                    <a class="pull-right" ng-click="vm.toggleListView()"><span ng-show="!vm.showMediaList" title="Switch to ListView"><i class="icon-list"></i></span><span ng-show="vm.showMediaList" title="Switch to Grid View"><i class="icon-thumbnails-small"></i></span></a>
                     <ul class="umb-breadcrumbs">
                         <li ng-hide="startNodeId != -1" class="umb-breadcrumbs__ancestor">
                             <a href ng-click="vm.gotoFolder()" prevent-default><localize key="treeHeaders_media">Media</localize></a>
@@ -69,7 +72,7 @@
                             </a>
 
                             <input type="text" class="umb-breadcrumbs__add-ancestor" ng-show="model.showFolderInput" ng-model="model.newFolderName" ng-keydown="enterSubmitFolder($event)"
-                                ng-blur="vm.submitFolder()" focus-when="{{model.showFolderInput}}" />
+                                   ng-blur="vm.submitFolder()" focus-when="{{model.showFolderInput}}" />
                         </li>
                     </ul>
                     <div class="umb-loader" ng-if="model.creatingFolder"></div>
@@ -77,40 +80,41 @@
 
                 <umb-file-dropzone
                     ng-if="vm.acceptedMediatypes.length > 0 && !vm.loading && !lockedFolder"
-                    accepted-mediatypes="vm.acceptedMediatypes"
-                    parent-id="{{currentFolder.id}}"
-                    files-uploaded="vm.onUploadComplete"
-                    files-queued="vm.onFilesQueue"
-                    accept="{{vm.acceptedFileTypes}}"
-                    max-file-size="{{vm.maxFileSize}}"
-                    hide-dropzone="{{ !activeDrag && (images.length > 0 || vm.searchOptions.filter !== '') }}"
-                    compact="{{ images.length > 0 }}">
+                                   accepted-mediatypes="vm.acceptedMediatypes"
+                                   parent-id="{{currentFolder.id}}"
+                                   files-uploaded="vm.onUploadComplete"
+                                   files-queued="vm.onFilesQueue"
+                                   accept="{{vm.acceptedFileTypes}}"
+                                   max-file-size="{{vm.maxFileSize}}"
+                                   hide-dropzone="{{ !activeDrag && (images.length > 0 || vm.searchOptions.filter !== '') }}"
+                                   compact="{{ images.length > 0 }}">
                 </umb-file-dropzone>
 
                 <umb-media-grid
                         ng-if="!vm.loading"
-                        items="images"
-                        on-click="vm.clickHandler"
-                        on-click-name="vm.clickItemName"
-                        on-click-edit="vm.editMediaItem(item)"
-                        allow-on-click-edit="{{allowMediaEdit}}"
-                        item-max-width="150"
-                        item-max-height="150"
-                        item-min-width="100"
-                        item-min-height="100"
-                        disable-folder-select={{disableFolderSelect}}
-                        only-images={{onlyImages}}
-                        only-folders={{onlyFolders}}
-                        include-sub-folders={{showChilds}}
-                        current-folder-id="{{currentFolder.id}}">
+                                items="images"
+                                on-click="vm.clickHandler"
+                                on-click-name="vm.clickItemName"
+                                on-click-edit="vm.editMediaItem(item)"
+                                allow-on-click-edit="{{allowMediaEdit}}"
+                                item-max-width="150"
+                                item-max-height="150"
+                                item-min-width="100"
+                                item-min-height="100"
+                                disable-folder-select={{disableFolderSelect}}
+                                only-images={{onlyImages}}
+                                only-folders={{onlyFolders}}
+                                include-sub-folders={{showChilds}}
+                                current-folder-id="{{currentFolder.id}}"
+                                show-media-list=vm.showMediaList>
                 </umb-media-grid>
 
                 <div class="flex justify-center">
                     <umb-pagination
                         ng-if="vm.searchOptions.totalPages > 0 && !vm.loading"
-                        page-number="vm.searchOptions.pageNumber"
-                        total-pages="vm.searchOptions.totalPages"
-                        on-change="vm.changePagination(pageNumber)">
+                                    page-number="vm.searchOptions.pageNumber"
+                                    total-pages="vm.searchOptions.totalPages"
+                                    on-change="vm.changePagination(pageNumber)">
                     </umb-pagination>
                 </div>
 
@@ -120,54 +124,54 @@
 
             </div>
 
-            <umb-overlay ng-if="vm.mediaPickerDetailsOverlay.show" model="vm.mediaPickerDetailsOverlay" position="right">
+                <umb-overlay ng-if="vm.mediaPickerDetailsOverlay.show" model="vm.mediaPickerDetailsOverlay" position="right">
 
-                <div class="umb-control-group">
+                    <div class="umb-control-group">
 
-                    <div ng-if="target.url">
+                        <div ng-if="target.url">
                         <umb-image-gravity
                             src="target.url"
-                            center="target.focalPoint"
-							on-value-changed="vm.focalPointChanged(left, top)">
-                        </umb-image-gravity>
+                                               center="target.focalPoint"
+                                               on-value-changed="vm.focalPointChanged(left, top)">
+                            </umb-image-gravity>
+                        </div>
+
+                        <div ng-if="cropSize">
+
+                            <h5>
+                                <localize key="general_preview">Preview</localize>
+                            </h5>
+
+                            <umb-image-thumbnail center="target.focalPoint"
+                                                 src="target.url"
+                                                 height="{{cropSize.height}}"
+                                                 width="{{cropSize.width}}"
+                                                 max-size="400">
+                            </umb-image-thumbnail>
+
+                        </div>
+
                     </div>
 
-                    <div ng-if="cropSize">
-
-                        <h5>
-                            <localize key="general_preview">Preview</localize>
-                        </h5>
-
-                        <umb-image-thumbnail center="target.focalPoint"
-                                             src="target.url"
-                                             height="{{cropSize.height}}"
-                                             width="{{cropSize.width}}"
-                                             max-size="400">
-                        </umb-image-thumbnail>
-
+                    <div class="umb-control-group">
+                        <label>
+                            <localize key="@general_url"></localize>
+                        </label>
+                        <input type="text" localize="placeholder" placeholder="@general_url" class="umb-property-editor umb-textstring" ng-model="target.url"
+                               ng-disabled="target.id" />
                     </div>
 
-                </div>
-
-                <div class="umb-control-group">
-                    <label>
-                        <localize key="@general_url"></localize>
-                    </label>
-                    <input type="text" localize="placeholder" placeholder="@general_url" class="umb-property-editor umb-textstring" ng-model="target.url"
-                        ng-disabled="target.id" />
-                </div>
-
-                <div class="umb-control-group">
-                    <label>
-                        <localize key="@content_altTextOptional"></localize>
-                    </label>
-                    <input type="text" class="umb-property-editor umb-textstring" ng-model="target.altText" />
-                </div>
+                    <div class="umb-control-group">
+                        <label>
+                            <localize key="@content_altTextOptional"></localize>
+                        </label>
+                        <input type="text" class="umb-property-editor umb-textstring" ng-model="target.altText" />
+                    </div>
 
 
-            </umb-overlay>
+                </umb-overlay>
 
-        </form>
+</form>
 
     </umb-editor-container>
 
