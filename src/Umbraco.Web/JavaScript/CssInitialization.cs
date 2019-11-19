@@ -10,9 +10,9 @@ namespace Umbraco.Web.JavaScript
 {
     internal class CssInitialization : AssetInitialization
     {
-        private readonly ManifestParser _parser;
+        private readonly IManifestParser _parser;
 
-        public CssInitialization(ManifestParser parser)
+        public CssInitialization(IManifestParser parser)
         {
             _parser = parser;
         }

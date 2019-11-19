@@ -50,7 +50,7 @@ namespace Umbraco.Core.Models.PublishedContent
         }
 
         /// <inheritdoc />
-        public IPublishedPropertyType CreatePropertyType(IPublishedContentType contentType, PropertyType propertyType)
+        public IPublishedPropertyType CreatePropertyType(IPublishedContentType contentType, IPropertyType propertyType)
         {
             return new PublishedPropertyType(contentType, propertyType, _propertyValueConverters, _publishedModelFactory, this);
         }

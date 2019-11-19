@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Configuration;
 using System.Reflection;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.Composing
 {
@@ -21,11 +21,11 @@ namespace Umbraco.Core.Composing
         /// To override the default LightInjectContainer, add an appSetting named 'Umbraco.Core.RegisterType' with
         /// a fully qualified type name to a class with a static method "Create" returning an IRegister.
         /// </remarks>
-        public static IRegister Create()
+        public static IRegister Create(IGlobalSettings globalSettings)
         {
             Type type;
 
-            var configuredTypeName = ConfigurationManager.AppSettings[Constants.AppSettings.RegisterType];
+            var configuredTypeName = globalSettings.RegisterType;
             if (configuredTypeName.IsNullOrWhiteSpace())
             {
                 // try to get the web LightInject container type,

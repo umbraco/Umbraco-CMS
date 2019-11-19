@@ -22,7 +22,7 @@ namespace Umbraco.Core.Models
         private int _writerId;
         private IPropertyCollection _properties;
         private ContentCultureInfosCollection _cultureInfos;
-        internal IReadOnlyList<PropertyType> AllPropertyTypes { get; }
+        internal IReadOnlyList<IPropertyType> AllPropertyTypes { get; }
 
         #region Used for change tracking
 
@@ -78,7 +78,7 @@ namespace Umbraco.Core.Models
             //track all property types on this content type, these can never change during the lifetime of this single instance
             //there is no real extra memory overhead of doing this since these property types are already cached on this object via the
             //properties already.
-            AllPropertyTypes = new List<PropertyType>(contentType.CompositionPropertyTypes);
+            AllPropertyTypes = new List<IPropertyType>(contentType.CompositionPropertyTypes);
         }
 
         [IgnoreDataMember]

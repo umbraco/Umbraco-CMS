@@ -1,4 +1,10 @@
-﻿using Umbraco.Web.Editors;
+﻿using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
+using Umbraco.Web.Editors;
 using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Profiling
@@ -9,11 +15,19 @@ namespace Umbraco.Web.Profiling
     [UmbracoApplicationAuthorize(Core.Constants.Applications.Settings)]
     public class WebProfilingController : UmbracoAuthorizedJsonController
     {
+        private readonly IRuntimeState _runtimeState;
+
+        public WebProfilingController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        {
+            _runtimeState = runtimeState;
+        }
+
         public object GetStatus()
         {
             return new
             {
-                Enabled = Core.Configuration.GlobalSettings.DebugMode
+                Enabled = _runtimeState.Debug
             };
         }
     }}

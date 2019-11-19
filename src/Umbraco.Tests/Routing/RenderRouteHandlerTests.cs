@@ -19,6 +19,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
@@ -49,11 +50,11 @@ namespace Umbraco.Tests.Routing
 
         public class TestRuntime : WebRuntime
         {
-            public TestRuntime(UmbracoApplicationBase umbracoApplication)
-                : base(umbracoApplication)
-            { }
+            public TestRuntime(UmbracoApplicationBase umbracoApplication, Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger)
+                : base(umbracoApplication, configs, umbracoVersion, ioHelper, Mock.Of<ILogger>())
+            {
+            }
 
-            protected override ILogger GetLogger() => Mock.Of<ILogger>();
             protected override IProfiler GetProfiler() => Mock.Of<IProfiler>();
         }
 

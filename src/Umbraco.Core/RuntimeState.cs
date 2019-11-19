@@ -25,18 +25,20 @@ namespace Umbraco.Core
         private readonly HashSet<string> _applicationUrls = new HashSet<string>();
         private readonly Lazy<IMainDom> _mainDom;
         private readonly Lazy<IServerRegistrar> _serverRegistrar;
+        private readonly IUmbracoVersion _umbracoVersion;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RuntimeState"/> class.
         /// </summary>
         public RuntimeState(ILogger logger, IUmbracoSettingsSection settings, IGlobalSettings globalSettings,
-            Lazy<IMainDom> mainDom, Lazy<IServerRegistrar> serverRegistrar)
+            Lazy<IMainDom> mainDom, Lazy<IServerRegistrar> serverRegistrar, IUmbracoVersion umbracoVersion)
         {
             _logger = logger;
             _settings = settings;
             _globalSettings = globalSettings;
             _mainDom = mainDom;
             _serverRegistrar = serverRegistrar;
+            _umbracoVersion = umbracoVersion;
         }
 
         /// <summary>
@@ -56,16 +58,16 @@ namespace Umbraco.Core
         public IMainDom MainDom => _mainDom.Value;
 
         /// <inheritdoc />
-        public Version Version => UmbracoVersion.Current;
+        public Version Version => _umbracoVersion.Current;
 
         /// <inheritdoc />
-        public string VersionComment => UmbracoVersion.Comment;
+        public string VersionComment => _umbracoVersion.Comment;
 
         /// <inheritdoc />
-        public SemVersion SemanticVersion => UmbracoVersion.SemanticVersion;
+        public SemVersion SemanticVersion => _umbracoVersion.SemanticVersion;
 
         /// <inheritdoc />
-        public bool Debug { get; } = GlobalSettings.DebugMode;
+        public bool Debug => HttpContext.Current != null ? HttpContext.Current.IsDebuggingEnabled : _globalSettings.DebugMode;
 
         /// <inheritdoc />
         public bool IsMainDom => MainDom.IsMainDom;
@@ -125,7 +127,7 @@ namespace Umbraco.Core
         /// </summary>
         public void DetermineRuntimeLevel(IUmbracoDatabaseFactory databaseFactory, ILogger logger)
         {
-            var localVersion = UmbracoVersion.LocalVersion; // the local, files, version
+            var localVersion = _umbracoVersion.LocalVersion; // the local, files, version
             var codeVersion = SemanticVersion; // the executing code version
             var connect = false;
 
@@ -167,7 +169,7 @@ namespace Umbraco.Core
             // else, keep going,
             // anything other than install wants a database - see if we can connect
             // (since this is an already existing database, assume localdb is ready)
-            var tries = RuntimeOptions.InstallMissingDatabase ? 2 : 5;
+            var tries = _globalSettings.InstallMissingDatabase ? 2 : 5;
             for (var i = 0;;)
             {
                 connect = databaseFactory.CanConnect;
@@ -181,7 +183,7 @@ namespace Umbraco.Core
                 // cannot connect to configured database, this is bad, fail
                 logger.Debug<RuntimeState>("Could not connect to database.");
 
-                if (RuntimeOptions.InstallMissingDatabase)
+                if (_globalSettings.InstallMissingDatabase)
                 {
                     // ok to install on a configured but missing database
                     Level = RuntimeLevel.Install;
@@ -210,7 +212,7 @@ namespace Umbraco.Core
                 // can connect to the database but cannot check the upgrade state... oops
                 logger.Warn<RuntimeState>(e, "Could not check the upgrade state.");
 
-                if (RuntimeOptions.InstallEmptyDatabase)
+                if (_globalSettings.InstallEmptyDatabase)
                 {
                     // ok to install on an empty database
                     Level = RuntimeLevel.Install;

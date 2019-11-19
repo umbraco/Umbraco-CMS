@@ -11,7 +11,6 @@ namespace Umbraco.Core.Models.Entities
         {
             var now = DateTime.Now;
 
-            // just in case
             if (entity.CreateDate == default)
             {
                 entity.CreateDate = now;

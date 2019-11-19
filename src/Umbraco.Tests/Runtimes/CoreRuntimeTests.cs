@@ -4,6 +4,7 @@ using System.Data;
 using System.Web.Hosting;
 using Examine;
 using Moq;
+using NPoco.Expressions;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Compose;
@@ -11,6 +12,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Runtime;
@@ -78,18 +80,34 @@ namespace Umbraco.Tests.Runtimes
         // test application
         public class TestUmbracoApplication : UmbracoApplicationBase
         {
+            public TestUmbracoApplication() : base(new DebugDiagnosticsLogger(new MessageTemplates()), GetConfigs())
+            {
+            }
+
+            private static Configs GetConfigs()
+            {
+                var configs = new ConfigsFactory(IOHelper.Default).Create();
+                configs.Add(SettingsForTests.GetDefaultGlobalSettings);
+                configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
+                return configs;
+            }
+
             public IRuntime Runtime { get; private set; }
 
-            protected override IRuntime GetRuntime()
+            protected override IRuntime GetRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger)
             {
-                return Runtime = new TestRuntime();
+                return Runtime = new TestRuntime(configs, umbracoVersion, ioHelper, logger);
             }
         }
 
         // test runtime
         public class TestRuntime : CoreRuntime
         {
-            protected override ILogger GetLogger() => new DebugDiagnosticsLogger();
+            public TestRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger)
+                :base(configs, umbracoVersion, ioHelper, logger)
+            {
+
+            }
             protected override IProfiler GetProfiler() => new TestProfiler();
 
             // must override the database factory
@@ -100,14 +118,6 @@ namespace Umbraco.Tests.Runtimes
                 mock.Setup(x => x.Configured).Returns(true);
                 mock.Setup(x => x.CanConnect).Returns(true);
                 return mock.Object;
-            }
-
-            protected override Configs GetConfigs()
-            {
-                var configs = new Configs();
-                configs.Add(SettingsForTests.GetDefaultGlobalSettings);
-                configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
-                return configs;
             }
 
             // FIXME: so how the f* should we do it now?

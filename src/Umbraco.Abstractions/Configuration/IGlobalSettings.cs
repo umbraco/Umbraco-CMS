@@ -5,6 +5,9 @@
     /// </summary>
     public interface IGlobalSettings
     {
+        // fixme: Review this class, it is now just a dumping ground for config options (based basically on whatever might be in appSettings),
+        //          our config classes should be named according to what they are configuring. 
+
         /// <summary>
         /// Gets the reserved urls from web.config.
         /// </summary>
@@ -63,14 +66,39 @@
         /// </summary>
         LocalTempStorage LocalTempStorageLocation { get; }
 
-        /// <summary>
-        /// Gets the location of temporary files.
-        /// </summary>
-        string LocalTempPath { get; }
-
         string UmbracoPath { get; }
         string UmbracoCssPath { get; }
         string UmbracoScriptsPath { get; }
         string UmbracoMediaPath { get; }
+        bool DebugMode { get; }
+
+        bool IsSmtpServerConfigured { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the runtime should enter Install level when the database is missing.
+        /// </summary>
+        /// <remarks>
+        /// <para>By default, when a database connection string is configured but it is not possible to
+        /// connect to the database, the runtime enters the BootFailed level. If this options is set to true,
+        /// it enters the Install level instead.</para>
+        /// <para>It is then up to the implementor, that is setting this value, to take over the installation
+        /// sequence.</para>
+        /// </remarks>
+        bool InstallMissingDatabase { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the runtime should enter Install level when the database is empty.
+        /// </summary>
+        /// <remarks>
+        /// <para>By default, when a database connection string is configured and it is possible to connect to
+        /// the database, but the database is empty, the runtime enters the BootFailed level. If this options
+        /// is set to true, it enters the Install level instead.</para>
+        /// <para>It is then up to the implementor, that is setting this value, to take over the installation
+        /// sequence.</para>
+        /// </remarks>
+        bool InstallEmptyDatabase { get; }
+        bool DisableElectionForSingleServer { get; }
+        string RegisterType { get; }
+        string DatabaseFactoryServerVersion { get; }
     }
 }

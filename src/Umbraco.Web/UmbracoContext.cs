@@ -4,6 +4,7 @@ using System.IO;
 using System.Web;
 using System.Web.Routing;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
@@ -173,7 +174,7 @@ namespace Umbraco.Web
             {
                 var request = GetRequestFromContext();
                 //NOTE: the request can be null during app startup!
-                return GlobalSettings.DebugMode
+                return Current.RuntimeState.Debug
                     && request != null
                     && (string.IsNullOrEmpty(request["umbdebugshowtrace"]) == false
                         || string.IsNullOrEmpty(request["umbdebug"]) == false
@@ -290,7 +291,7 @@ namespace Umbraco.Web
 
             _previewing = _previewToken.IsNullOrWhiteSpace() == false;
         }
-        
+
         // say we render a macro or RTE in a give 'preview' mode that might not be the 'current' one,
         // then due to the way it all works at the moment, the 'current' published snapshot need to be in the proper
         // default 'preview' mode - somehow we have to force it. and that could be recursive.

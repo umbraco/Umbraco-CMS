@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Membership
         {
             var memberTypeServiceMock = new Mock<IMemberTypeService>();
             memberTypeServiceMock.Setup(x => x.GetDefault()).Returns("Blah");
-            var provider = new MembersMembershipProvider(Mock.Of<IMembershipMemberService>(), memberTypeServiceMock.Object);
+            var provider = new MembersMembershipProvider(Mock.Of<IMembershipMemberService>(), memberTypeServiceMock.Object, TestHelper.GetUmbracoVersion());
             provider.Initialize("test", new NameValueCollection());
 
             Assert.AreEqual("Blah", provider.DefaultMemberTypeAlias);
@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Membership
         {
             var memberTypeServiceMock = new Mock<IMemberTypeService>();
             memberTypeServiceMock.Setup(x => x.GetDefault()).Returns("Blah");
-            var provider = new MembersMembershipProvider(Mock.Of<IMembershipMemberService>(), memberTypeServiceMock.Object);
+            var provider = new MembersMembershipProvider(Mock.Of<IMembershipMemberService>(), memberTypeServiceMock.Object, TestHelper.GetUmbracoVersion());
             provider.Initialize("test", new NameValueCollection { { "defaultMemberTypeAlias", "Hello" } });
 
             Assert.AreEqual("Hello", provider.DefaultMemberTypeAlias);
@@ -48,7 +48,7 @@ namespace Umbraco.Tests.Membership
             var membershipServiceMock = new Mock<IMembershipMemberService>();
             membershipServiceMock.Setup(service => service.Exists("test")).Returns(true);
 
-            var provider = new MembersMembershipProvider(membershipServiceMock.Object, memberTypeServiceMock.Object);
+            var provider = new MembersMembershipProvider(membershipServiceMock.Object, memberTypeServiceMock.Object, TestHelper.GetUmbracoVersion());
             provider.Initialize("test", new NameValueCollection());
 
             MembershipCreateStatus status;
@@ -65,7 +65,7 @@ namespace Umbraco.Tests.Membership
             var membershipServiceMock = new Mock<IMembershipMemberService>();
             membershipServiceMock.Setup(service => service.GetByEmail("test@test.com")).Returns(() => new Member("test", MockedContentTypes.CreateSimpleMemberType()));
 
-            var provider = new MembersMembershipProvider(membershipServiceMock.Object, memberTypeServiceMock.Object);
+            var provider = new MembersMembershipProvider(membershipServiceMock.Object, memberTypeServiceMock.Object, TestHelper.GetUmbracoVersion());
             provider.Initialize("test", new NameValueCollection { { "requiresUniqueEmail", "true" } });
 
             MembershipCreateStatus status;
@@ -95,7 +95,7 @@ namespace Umbraco.Tests.Membership
                                 createdMember = new Member("test", e, u, p, memberType, isApproved);
                             })
                         .Returns(() => createdMember);
-            var provider = new MembersMembershipProvider(membershipServiceMock.Object, memberTypeServiceMock.Object);
+            var provider = new MembersMembershipProvider(membershipServiceMock.Object, memberTypeServiceMock.Object, TestHelper.GetUmbracoVersion());
             provider.Initialize("test", new NameValueCollection());
 
 
@@ -128,7 +128,7 @@ namespace Umbraco.Tests.Membership
                             })
                         .Returns(() => createdMember);
 
-            var provider = new MembersMembershipProvider(membershipServiceMock.Object, memberTypeServiceMock.Object);
+            var provider = new MembersMembershipProvider(membershipServiceMock.Object, memberTypeServiceMock.Object, TestHelper.GetUmbracoVersion());
             provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Encrypted" } });
 
 
@@ -162,7 +162,7 @@ namespace Umbraco.Tests.Membership
                         })
                         .Returns(() => createdMember);
 
-            var provider = new MembersMembershipProvider(membershipServiceMock.Object, memberTypeServiceMock.Object);
+            var provider = new MembersMembershipProvider(membershipServiceMock.Object, memberTypeServiceMock.Object, TestHelper.GetUmbracoVersion());
             provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Hashed" }, { "hashAlgorithmType", "HMACSHA256" } });
 
 

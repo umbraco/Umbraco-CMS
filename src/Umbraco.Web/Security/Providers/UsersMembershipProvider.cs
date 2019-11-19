@@ -21,12 +21,12 @@ namespace Umbraco.Web.Security.Providers
     {
 
         public UsersMembershipProvider()
-            : this(Current.Services.UserService, Current.Services.MemberTypeService)
+            : this(Current.Services.UserService, Current.Services.MemberTypeService, Current.UmbracoVersion)
         {
         }
 
-        public UsersMembershipProvider(IMembershipMemberService<IUser> memberService, IMemberTypeService memberTypeService)
-            : base(memberService)
+        public UsersMembershipProvider(IMembershipMemberService<IUser> memberService, IMemberTypeService memberTypeService, IUmbracoVersion umbracoVersion)
+            : base(memberService, umbracoVersion)
         {
             _memberTypeService = memberTypeService;
         }

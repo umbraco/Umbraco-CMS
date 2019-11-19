@@ -99,7 +99,7 @@ namespace Umbraco.Core.Models
         /// <para>When false, getting the property value always return the edited value,
         /// regardless of the 'published' method parameter.</para>
         /// </remarks>
-        public bool SupportsPublishing { get; internal set; }
+        public bool SupportsPublishing { get; set; }
 
         /// <inheritdoc />
         [DataMember]
@@ -209,136 +209,6 @@ namespace Umbraco.Core.Models
             // wildcard validation: can accept a '*' culture or segment
             return Variations.ValidateVariation(culture, segment, true, wildcards, false);
         }
-
-        /// <summary>
-        /// Creates a new property of this property type.
-        /// </summary>
-        public Property CreateProperty()
-        {
-            return new Property(this);
-        }
-
-        /// <summary>
-        /// Determines whether a value is of the expected type for this property type.
-        /// </summary>
-        /// <remarks>
-        /// <para>If the value is of the expected type, it can be directly assigned to the property.
-        /// Otherwise, some conversion is required.</para>
-        /// </remarks>
-        private bool IsOfExpectedPropertyType(object value)
-        {
-            // null values are assumed to be ok
-            if (value == null)
-                return true;
-
-            // check if the type of the value matches the type from the DataType/PropertyEditor
-            // then it can be directly assigned, anything else requires conversion
-            var valueType = value.GetType();
-            switch (ValueStorageType)
-            {
-                case ValueStorageType.Integer:
-                    return valueType == typeof(int);
-                case ValueStorageType.Decimal:
-                    return valueType == typeof(decimal);
-                case ValueStorageType.Date:
-                    return valueType == typeof(DateTime);
-                case ValueStorageType.Nvarchar:
-                    return valueType == typeof(string);
-                case ValueStorageType.Ntext:
-                    return valueType == typeof(string);
-                default:
-                    throw new NotSupportedException($"Not supported storage type \"{ValueStorageType}\".");
-            }
-        }
-
-        /// <inheritdoc />
-        public object ConvertAssignedValue(object value) => TryConvertAssignedValue(value, true, out var converted) ? converted : null;
-
-        /// <summary>
-        /// Tries to convert a value assigned to a property.
-        /// </summary>
-        /// <remarks>
-        /// <para></para>
-        /// </remarks>
-        private bool TryConvertAssignedValue(object value, bool throwOnError, out object converted)
-        {
-            var isOfExpectedType = IsOfExpectedPropertyType(value);
-            if (isOfExpectedType)
-            {
-                converted = value;
-                return true;
-            }
-
-            // isOfExpectedType is true if value is null - so if false, value is *not* null
-            // "garbage-in", accept what we can & convert
-            // throw only if conversion is not possible
-
-            var s = value.ToString();
-            converted = null;
-
-            switch (ValueStorageType)
-            {
-                case ValueStorageType.Nvarchar:
-                case ValueStorageType.Ntext:
-                {
-                    converted = s;
-                    return true;
-                }
-
-                case ValueStorageType.Integer:
-                    if (s.IsNullOrWhiteSpace())
-                        return true; // assume empty means null
-                    var convInt = value.TryConvertTo<int>();
-                    if (convInt)
-                    {
-                        converted = convInt.Result;
-                        return true;
-                    }
-
-                    if (throwOnError)
-                        ThrowTypeException(value, typeof(int), Alias);
-                    return false;
-
-                case ValueStorageType.Decimal:
-                    if (s.IsNullOrWhiteSpace())
-                        return true; // assume empty means null
-                    var convDecimal = value.TryConvertTo<decimal>();
-                    if (convDecimal)
-                    {
-                        // need to normalize the value (change the scaling factor and remove trailing zeros)
-                        // because the underlying database is going to mess with the scaling factor anyways.
-                        converted = convDecimal.Result.Normalize();
-                        return true;
-                    }
-
-                    if (throwOnError)
-                        ThrowTypeException(value, typeof(decimal), Alias);
-                    return false;
-
-                case ValueStorageType.Date:
-                    if (s.IsNullOrWhiteSpace())
-                        return true; // assume empty means null
-                    var convDateTime = value.TryConvertTo<DateTime>();
-                    if (convDateTime)
-                    {
-                        converted = convDateTime.Result;
-                        return true;
-                    }
-
-                    if (throwOnError)
-                        ThrowTypeException(value, typeof(DateTime), Alias);
-                    return false;
-
-                default:
-                    throw new NotSupportedException($"Not supported storage type \"{ValueStorageType}\".");
-            }
-        }
-
-        private static void ThrowTypeException(object value, Type expected, string alias)
-        {
-            throw new InvalidOperationException($"Cannot assign value \"{value}\" of type \"{value.GetType()}\" to property \"{alias}\" expecting type \"{expected}\".");
-        }
-
 
         /// <summary>
         /// Sanitizes a property type alias.

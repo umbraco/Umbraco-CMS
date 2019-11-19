@@ -2,6 +2,7 @@
 
 namespace Umbraco.Core.Models.Entities
 {
+
     /// <summary>
     /// Represents an entity that can be managed by the entity service.
     /// </summary>
@@ -10,6 +11,6 @@ namespace Umbraco.Core.Models.Entities
     /// <para>IUmbracoEntities can be retrieved with the IEntityService.</para>
     /// <para>An IUmbracoEntity can participate in notifications.</para>
     /// </remarks>
-    public interface IUmbracoEntity : ITreeEntity, IRememberBeingDirty
+    public interface IUmbracoEntity : ITreeEntity
     { }
 }

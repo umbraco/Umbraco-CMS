@@ -299,7 +299,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private string GetLocalFilesPath()
         {
-            var path = Path.Combine(_globalSettings.LocalTempPath, "NuCache");
+            var path = Path.Combine(_globalSettings.LocalTempPath(Current.IOHelper), "NuCache");
 
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
