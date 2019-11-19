@@ -519,7 +519,8 @@
         }));
 
         evts.push(eventsService.on("editors.documentType.saved", function(name, args) {
-            if(args.documentType.allowedTemplates.length > 0){
+            // sync the templates tree if the content type has any templates assigned (unless we're in infinite mode)
+            if(args.documentType.allowedTemplates.length > 0 && !infiniteMode){
                 navigationService.syncTree({ tree: "templates", path: [], forceReload: true })
                     .then(function (syncArgs) {
                         navigationService.reloadNode(syncArgs.node)
