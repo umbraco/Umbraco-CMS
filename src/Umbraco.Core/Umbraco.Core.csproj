@@ -314,7 +314,6 @@
     <Compile Include="Migrations\Upgrade\Common\CreateKeysAndIndexes.cs" />
     <Compile Include="Models\ContentRepositoryExtensions.cs" />
     <Compile Include="Models\ContentTagsExtensions.cs" />
-    <Compile Include="Models\ContentTypeBaseExtensions.cs" />
     <Compile Include="Models\DataTypeExtensions.cs" />
     <Compile Include="Models\PathValidationExtensions.cs" />
     <Compile Include="Models\PropertyTagsExtensions.cs" />
