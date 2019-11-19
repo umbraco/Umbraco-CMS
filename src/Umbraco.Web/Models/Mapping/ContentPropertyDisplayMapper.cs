@@ -39,7 +39,6 @@ namespace Umbraco.Web.Models.Mapping
             dest.Description = originalProp.PropertyType.Description;
             dest.Label = originalProp.PropertyType.Name;
             dest.HideLabel = valEditor.HideLabel;
-            dest.CanCopy = valEditor.CanCopy;
 
             //add the validation information
             dest.Validation.Mandatory = originalProp.PropertyType.Mandatory;

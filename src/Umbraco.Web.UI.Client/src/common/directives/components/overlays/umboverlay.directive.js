@@ -1,6 +1,6 @@
 /**
-@ngdoc directive
-@name umbraco.directives.directive:umbOverlay
+@name umbraco.directives.directive:umbOverlay*
+@deprecated
 @restrict E
 @scope
 

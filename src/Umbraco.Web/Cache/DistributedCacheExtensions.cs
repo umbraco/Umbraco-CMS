@@ -266,13 +266,21 @@ namespace Umbraco.Web.Cache
         public static void RefreshLanguageCache(this DistributedCache dc, ILanguage language)
         {
             if (language == null) return;
-            dc.Refresh(LanguageCacheRefresher.UniqueId, language.Id);
+
+            var payload = new LanguageCacheRefresher.JsonPayload(language.Id, language.IsoCode,
+                language.WasPropertyDirty(nameof(ILanguage.IsoCode))
+                    ? LanguageCacheRefresher.JsonPayload.LanguageChangeType.ChangeCulture
+                    : LanguageCacheRefresher.JsonPayload.LanguageChangeType.Update);
+
+            dc.RefreshByPayload(LanguageCacheRefresher.UniqueId, new[] { payload });
         }
 
         public static void RemoveLanguageCache(this DistributedCache dc, ILanguage language)
         {
             if (language == null) return;
-            dc.Remove(LanguageCacheRefresher.UniqueId, language.Id);
+
+            var payload = new LanguageCacheRefresher.JsonPayload(language.Id, language.IsoCode, LanguageCacheRefresher.JsonPayload.LanguageChangeType.Remove);
+            dc.RefreshByPayload(LanguageCacheRefresher.UniqueId, new[] { payload });
         }
 
         #endregion

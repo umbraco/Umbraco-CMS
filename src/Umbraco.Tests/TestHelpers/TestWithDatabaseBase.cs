@@ -259,7 +259,7 @@ namespace Umbraco.Tests.TestHelpers
 
             var publishedSnapshotAccessor = new UmbracoContextPublishedSnapshotAccessor(Umbraco.Web.Composing.Current.UmbracoContextAccessor);
             var variationContextAccessor = new TestVariationContextAccessor();
-            var service = new PublishedSnapshotService(
+            var service = new XmlPublishedSnapshotService(
                 ServiceContext,
                 Factory.GetInstance<IPublishedContentTypeFactory>(),
                 ScopeProvider,
@@ -357,14 +357,14 @@ namespace Umbraco.Tests.TestHelpers
         protected UmbracoContext GetUmbracoContext(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null, IEnumerable<IMediaUrlProvider> mediaUrlProviders = null, IGlobalSettings globalSettings = null, IPublishedSnapshotService snapshotService = null)
         {
             // ensure we have a PublishedCachesService
-            var service = snapshotService ?? PublishedSnapshotService as PublishedSnapshotService;
+            var service = snapshotService ?? PublishedSnapshotService as XmlPublishedSnapshotService;
             if (service == null)
                 throw new Exception("Not a proper XmlPublishedCache.PublishedCachesService.");
 
-            if (service is PublishedSnapshotService)
+            if (service is XmlPublishedSnapshotService)
             {
                 // re-initialize PublishedCacheService content with an Xml source with proper template id
-                ((PublishedSnapshotService)service).XmlStore.GetXmlDocument = () =>
+                ((XmlPublishedSnapshotService)service).XmlStore.GetXmlDocument = () =>
                 {
                     var doc = new XmlDocument();
                     doc.LoadXml(GetXmlContent(templateId));
