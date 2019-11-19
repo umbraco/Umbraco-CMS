@@ -41,5 +41,7 @@ namespace Umbraco.Core.Models.Entities
         /// Gets a value indicating whether the entity has an identity.
         /// </summary>
         bool HasIdentity { get; }
+
+        void ResetIdentity();
     }
 }

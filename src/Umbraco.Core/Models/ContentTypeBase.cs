@@ -107,7 +107,7 @@ namespace Umbraco.Core.Models
             //    {
             //        var newAliases = string.Join(", ", e.NewItems.Cast<PropertyType>().Select(x => x.Alias));
             //        throw new InvalidOperationException($"Other property types already exist with the aliases: {newAliases}");
-            //    }   
+            //    }
             //}
 
             OnPropertyChanged(nameof(PropertyTypes));
@@ -246,7 +246,7 @@ namespace Umbraco.Core.Models
         /// <inheritdoc />
         [IgnoreDataMember]
         [DoNotClone]
-        public IEnumerable<PropertyType> PropertyTypes
+        public IEnumerable<IPropertyType> PropertyTypes
         {
             get
             {
@@ -256,7 +256,7 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         [DoNotClone]
-        public IEnumerable<PropertyType> NoGroupPropertyTypes
+        public IEnumerable<IPropertyType> NoGroupPropertyTypes
         {
             get => _noGroupPropertyTypes;
             set
@@ -305,17 +305,17 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Adds a PropertyType to a specific PropertyGroup
         /// </summary>
-        /// <param name="propertyType"><see cref="PropertyType"/> to add</param>
+        /// <param name="propertyType"><see cref="IPropertyType"/> to add</param>
         /// <param name="propertyGroupName">Name of the PropertyGroup to add the PropertyType to</param>
         /// <returns>Returns <c>True</c> if PropertyType was added, otherwise <c>False</c></returns>
-        public abstract bool AddPropertyType(PropertyType propertyType, string propertyGroupName);
+        public abstract bool AddPropertyType(IPropertyType propertyType, string propertyGroupName);
 
         /// <summary>
         /// Adds a PropertyType, which does not belong to a PropertyGroup.
         /// </summary>
-        /// <param name="propertyType"><see cref="PropertyType"/> to add</param>
+        /// <param name="propertyType"><see cref="IPropertyType"/> to add</param>
         /// <returns>Returns <c>True</c> if PropertyType was added, otherwise <c>False</c></returns>
-        public bool AddPropertyType(PropertyType propertyType)
+        public bool AddPropertyType(IPropertyType propertyType)
         {
             if (PropertyTypeExists(propertyType.Alias) == false)
             {
@@ -365,7 +365,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Removes a PropertyType from the current ContentType
         /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the <see cref="PropertyType"/> to remove</param>
+        /// <param name="propertyTypeAlias">Alias of the <see cref="IPropertyType"/> to remove</param>
         public void RemovePropertyType(string propertyTypeAlias)
         {
             //check through each property group to see if we can remove the property type by alias from it

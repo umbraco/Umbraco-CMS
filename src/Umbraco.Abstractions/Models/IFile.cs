@@ -7,7 +7,7 @@ namespace Umbraco.Core.Models
     /// Defines a File
     /// </summary>
     /// <remarks>Used for Scripts, Stylesheets and Templates</remarks>
-    public interface IFile : IEntity
+    public interface IFile : IEntity, IRememberBeingDirty
     {
         /// <summary>
         /// Gets the Name of the File including extension

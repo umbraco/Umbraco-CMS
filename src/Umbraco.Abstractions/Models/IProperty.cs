@@ -33,13 +33,9 @@ namespace Umbraco.Core.Models
         /// </summary>
         void SetValue(object value, string culture = null, string segment = null);
 
-        /// <summary>
-        /// Resets the entity identity.
-        /// </summary>
-        void ResetIdentity();
-
         int PropertyTypeId { get; }
         void PublishValues(string culture = "*", string segment = "*");
         void UnpublishValues(string culture = "*", string segment = "*");
+
     }
 }

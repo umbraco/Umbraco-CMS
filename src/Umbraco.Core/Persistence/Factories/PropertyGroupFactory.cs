@@ -8,7 +8,7 @@ namespace Umbraco.Core.Persistence.Factories
 {
     internal static class PropertyGroupFactory
     {
-        
+
         #region Implementation of IEntityFactory<IEnumerable<PropertyGroup>,IEnumerable<TabDto>>
 
         public static IEnumerable<PropertyGroup> BuildEntity(IEnumerable<PropertyTypeGroupDto> groupDtos,
@@ -115,7 +115,7 @@ namespace Umbraco.Core.Persistence.Factories
             return dto;
         }
 
-        internal static PropertyTypeDto BuildPropertyTypeDto(int tabId, PropertyType propertyType, int contentTypeId)
+        internal static PropertyTypeDto BuildPropertyTypeDto(int tabId, IPropertyType propertyType, int contentTypeId)
         {
             var propertyTypeDto = new PropertyTypeDto
             {

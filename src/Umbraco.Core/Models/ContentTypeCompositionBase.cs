@@ -56,7 +56,7 @@ namespace Umbraco.Core.Models
                 // any change to compositions are ignored and that breaks many things - and tracking
                 // changes to refresh the cache would be expensive.
 
-                void AcquireProperty(PropertyType propertyType)
+                void AcquireProperty(IPropertyType propertyType)
                 {
                     propertyType.Variations = propertyType.Variations & Variations;
                     propertyType.ResetDirtyProperties(false);
@@ -76,7 +76,7 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         [IgnoreDataMember]
-        public IEnumerable<PropertyType> CompositionPropertyTypes
+        public IEnumerable<IPropertyType> CompositionPropertyTypes
         {
             get
             {
@@ -85,9 +85,9 @@ namespace Umbraco.Core.Models
                 //
                 // see note in CompositionPropertyGroups for comments on caching the resulting enumerable
 
-                PropertyType AcquireProperty(PropertyType propertyType)
+                IPropertyType AcquireProperty(IPropertyType propertyType)
                 {
-                    propertyType = (PropertyType) propertyType.DeepClone();
+                    propertyType = (IPropertyType) propertyType.DeepClone();
                     propertyType.Variations = propertyType.Variations & Variations;
                     propertyType.ResetDirtyProperties(false);
                     return propertyType;
@@ -107,9 +107,9 @@ namespace Umbraco.Core.Models
         /// <para>Gets them raw, ie with their original variation.</para>
         /// </remarks>
         [IgnoreDataMember]
-        internal IEnumerable<PropertyType> RawComposedPropertyTypes => GetRawComposedPropertyTypes();
+        internal IEnumerable<IPropertyType> RawComposedPropertyTypes => GetRawComposedPropertyTypes();
 
-        private IEnumerable<PropertyType> GetRawComposedPropertyTypes(bool start = true)
+        private IEnumerable<IPropertyType> GetRawComposedPropertyTypes(bool start = true)
         {
             var propertyTypes = ContentTypeComposition
                 .Cast<ContentTypeCompositionBase>()
@@ -250,10 +250,10 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Adds a PropertyType to a specific PropertyGroup
         /// </summary>
-        /// <param name="propertyType"><see cref="PropertyType"/> to add</param>
+        /// <param name="propertyType"><see cref="IPropertyType"/> to add</param>
         /// <param name="propertyGroupName">Name of the PropertyGroup to add the PropertyType to</param>
         /// <returns>Returns <c>True</c> if PropertyType was added, otherwise <c>False</c></returns>
-        public override bool AddPropertyType(PropertyType propertyType, string propertyGroupName)
+        public override bool AddPropertyType(IPropertyType propertyType, string propertyGroupName)
         {
             // ensure no duplicate alias - over all composition properties
             if (PropertyTypeExists(propertyType.Alias))
@@ -302,7 +302,7 @@ namespace Umbraco.Core.Models
             base.PerformDeepClone(clone);
 
             var clonedEntity = (ContentTypeCompositionBase)clone;
-            
+
             //need to manually assign since this is an internal field and will not be automatically mapped
             clonedEntity.RemovedContentTypeKeyTracker = new List<int>();
             clonedEntity._contentTypeComposition = ContentTypeComposition.Select(x => (IContentTypeComposition)x.DeepClone()).ToList();

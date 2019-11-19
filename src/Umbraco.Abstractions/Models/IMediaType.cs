@@ -1,6 +1,4 @@
-﻿using Umbraco.Core.Persistence.Mappers;
-
-namespace Umbraco.Core.Models
+﻿namespace Umbraco.Core.Models
 {
     /// <summary>
     /// Defines a ContentType, which Media is based on

@@ -6,7 +6,7 @@ namespace Umbraco.Core.Models
     /// <summary>
     /// Represents a data type.
     /// </summary>
-    public interface IDataType : IUmbracoEntity
+    public interface IDataType : IUmbracoEntity, IRememberBeingDirty
     {
         /// <summary>
         /// Gets or sets the property editor.

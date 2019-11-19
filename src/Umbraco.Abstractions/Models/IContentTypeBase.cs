@@ -8,7 +8,7 @@ namespace Umbraco.Core.Models
     /// Defines the base for a ContentType with properties that
     /// are shared between ContentTypes and MediaTypes.
     /// </summary>
-    public interface IContentTypeBase : IUmbracoEntity
+    public interface IContentTypeBase : IUmbracoEntity, IRememberBeingDirty
     {
         /// <summary>
         /// Gets or Sets the Alias of the ContentType
@@ -103,17 +103,17 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets all local property types all local property groups or ungrouped.
         /// </summary>
-        IEnumerable<PropertyType> PropertyTypes { get; }
+        IEnumerable<IPropertyType> PropertyTypes { get; }
 
         /// <summary>
         /// Gets or sets the local property types that do not belong to a group.
         /// </summary>
-        IEnumerable<PropertyType> NoGroupPropertyTypes { get; set; }
+        IEnumerable<IPropertyType> NoGroupPropertyTypes { get; set; }
 
         /// <summary>
         /// Removes a PropertyType from the current ContentType
         /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the <see cref="PropertyType"/> to remove</param>
+        /// <param name="propertyTypeAlias">Alias of the <see cref="IPropertyType"/> to remove</param>
         void RemovePropertyType(string propertyTypeAlias);
 
         /// <summary>
@@ -132,17 +132,17 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Adds a PropertyType to a specific PropertyGroup
         /// </summary>
-        /// <param name="propertyType"><see cref="PropertyType"/> to add</param>
+        /// <param name="propertyType"><see cref="IPropertyType"/> to add</param>
         /// <param name="propertyGroupName">Name of the PropertyGroup to add the PropertyType to</param>
         /// <returns>Returns <c>True</c> if PropertyType was added, otherwise <c>False</c></returns>
-        bool AddPropertyType(PropertyType propertyType, string propertyGroupName);
+        bool AddPropertyType(IPropertyType propertyType, string propertyGroupName);
 
         /// <summary>
         /// Adds a PropertyType, which does not belong to a PropertyGroup.
         /// </summary>
-        /// <param name="propertyType"><see cref="PropertyType"/> to add</param>
+        /// <param name="propertyType"><see cref="IPropertyType"/> to add</param>
         /// <returns>Returns <c>True</c> if PropertyType was added, otherwise <c>False</c></returns>
-        bool AddPropertyType(PropertyType propertyType);
+        bool AddPropertyType(IPropertyType propertyType);
 
         /// <summary>
         /// Adds a PropertyGroup.

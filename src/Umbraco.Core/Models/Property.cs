@@ -48,6 +48,54 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Creates a new <see cref="Property"/> instance for existing <see cref="IProperty"/>
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="propertyType"></param>
+        /// <param name="values">
+        /// Generally will contain a published and an unpublished property values
+        /// </param>
+        /// <returns></returns>
+        public static Property CreateWithValues(int id, IPropertyType propertyType, params InitialPropertyValue[] values)
+        {
+            var property = new Property(propertyType);
+            try
+            {
+                property.DisableChangeTracking();
+                property.Id = id;
+                foreach(var value in values)
+                {
+                    property.FactorySetValue(value.Culture, value.Segment, value.Published, value.Value);
+                }
+                property.ResetDirtyProperties(false);
+                return property;
+            }
+            finally
+            {
+                property.EnableChangeTracking();
+            }
+        }
+
+        /// <summary>
+        /// Used for constructing a new <see cref="Property"/> instance
+        /// </summary>
+        public class InitialPropertyValue
+        {
+            public InitialPropertyValue(string culture, string segment, bool published, object value)
+            {
+                Culture = culture;
+                Segment = segment;
+                Published = published;
+                Value = value;
+            }
+
+            public string Culture { get; }
+            public string Segment { get; }
+            public bool Published { get; }
+            public object Value { get; }
+        }
+
+        /// <summary>
         /// Represents a property value.
         /// </summary>
         public class PropertyValue : IPropertyValue
@@ -247,7 +295,7 @@ namespace Umbraco.Core.Models
             if (!PropertyType.SupportsPublishing)
                 throw new NotSupportedException("Property type does not support publishing.");
             var origValue = pvalue.PublishedValue;
-            pvalue.PublishedValue = PropertyType.ConvertAssignedValue(pvalue.EditedValue);
+            pvalue.PublishedValue = ConvertAssignedValue(pvalue.EditedValue);
             DetectChanges(pvalue.EditedValue, origValue, nameof(Values), PropertyValueComparer, false);
         }
 
@@ -258,7 +306,7 @@ namespace Umbraco.Core.Models
             if (!PropertyType.SupportsPublishing)
                 throw new NotSupportedException("Property type does not support publishing.");
             var origValue = pvalue.PublishedValue;
-            pvalue.PublishedValue = PropertyType.ConvertAssignedValue(null);
+            pvalue.PublishedValue = ConvertAssignedValue(null);
             DetectChanges(pvalue.EditedValue, origValue, nameof(Values), PropertyValueComparer, false);
         }
 
@@ -276,7 +324,7 @@ namespace Umbraco.Core.Models
             var (pvalue, change) = GetPValue(culture, segment, true);
 
             var origValue = pvalue.EditedValue;
-            var setValue = PropertyType.ConvertAssignedValue(value);
+            var setValue = ConvertAssignedValue(value);
 
             pvalue.EditedValue = setValue;
 
@@ -284,7 +332,7 @@ namespace Umbraco.Core.Models
         }
 
         // bypasses all changes detection and is the *only* way to set the published value
-        internal void FactorySetValue(string culture, string segment, bool published, object value)
+        private void FactorySetValue(string culture, string segment, bool published, object value)
         {
             var (pvalue, _) = GetPValue(culture, segment, true);
 
@@ -331,6 +379,128 @@ namespace Umbraco.Core.Models
             }
             return (pvalue, change);
         }
+
+        /// <inheritdoc />
+        public object ConvertAssignedValue(object value) => TryConvertAssignedValue(value, true, out var converted) ? converted : null;
+
+        /// <summary>
+        /// Tries to convert a value assigned to a property.
+        /// </summary>
+        /// <remarks>
+        /// <para></para>
+        /// </remarks>
+        private bool TryConvertAssignedValue(object value, bool throwOnError, out object converted)
+        {
+            var isOfExpectedType = IsOfExpectedPropertyType(value);
+            if (isOfExpectedType)
+            {
+                converted = value;
+                return true;
+            }
+
+            // isOfExpectedType is true if value is null - so if false, value is *not* null
+            // "garbage-in", accept what we can & convert
+            // throw only if conversion is not possible
+
+            var s = value.ToString();
+            converted = null;
+
+            switch (ValueStorageType)
+            {
+                case ValueStorageType.Nvarchar:
+                case ValueStorageType.Ntext:
+                    {
+                        converted = s;
+                        return true;
+                    }
+
+                case ValueStorageType.Integer:
+                    if (s.IsNullOrWhiteSpace())
+                        return true; // assume empty means null
+                    var convInt = value.TryConvertTo<int>();
+                    if (convInt)
+                    {
+                        converted = convInt.Result;
+                        return true;
+                    }
+
+                    if (throwOnError)
+                        ThrowTypeException(value, typeof(int), Alias);
+                    return false;
+
+                case ValueStorageType.Decimal:
+                    if (s.IsNullOrWhiteSpace())
+                        return true; // assume empty means null
+                    var convDecimal = value.TryConvertTo<decimal>();
+                    if (convDecimal)
+                    {
+                        // need to normalize the value (change the scaling factor and remove trailing zeros)
+                        // because the underlying database is going to mess with the scaling factor anyways.
+                        converted = convDecimal.Result.Normalize();
+                        return true;
+                    }
+
+                    if (throwOnError)
+                        ThrowTypeException(value, typeof(decimal), Alias);
+                    return false;
+
+                case ValueStorageType.Date:
+                    if (s.IsNullOrWhiteSpace())
+                        return true; // assume empty means null
+                    var convDateTime = value.TryConvertTo<DateTime>();
+                    if (convDateTime)
+                    {
+                        converted = convDateTime.Result;
+                        return true;
+                    }
+
+                    if (throwOnError)
+                        ThrowTypeException(value, typeof(DateTime), Alias);
+                    return false;
+
+                default:
+                    throw new NotSupportedException($"Not supported storage type \"{ValueStorageType}\".");
+            }
+        }
+
+        private static void ThrowTypeException(object value, Type expected, string alias)
+        {
+            throw new InvalidOperationException($"Cannot assign value \"{value}\" of type \"{value.GetType()}\" to property \"{alias}\" expecting type \"{expected}\".");
+        }
+
+        /// <summary>
+        /// Determines whether a value is of the expected type for this property type.
+        /// </summary>
+        /// <remarks>
+        /// <para>If the value is of the expected type, it can be directly assigned to the property.
+        /// Otherwise, some conversion is required.</para>
+        /// </remarks>
+        private bool IsOfExpectedPropertyType(object value)
+        {
+            // null values are assumed to be ok
+            if (value == null)
+                return true;
+
+            // check if the type of the value matches the type from the DataType/PropertyEditor
+            // then it can be directly assigned, anything else requires conversion
+            var valueType = value.GetType();
+            switch (ValueStorageType)
+            {
+                case ValueStorageType.Integer:
+                    return valueType == typeof(int);
+                case ValueStorageType.Decimal:
+                    return valueType == typeof(decimal);
+                case ValueStorageType.Date:
+                    return valueType == typeof(DateTime);
+                case ValueStorageType.Nvarchar:
+                    return valueType == typeof(string);
+                case ValueStorageType.Ntext:
+                    return valueType == typeof(string);
+                default:
+                    throw new NotSupportedException($"Not supported storage type \"{ValueStorageType}\".");
+            }
+        }
+
 
         protected override void PerformDeepClone(object clone)
         {

@@ -48,7 +48,7 @@ namespace Umbraco.Web.Models.Mapping
             mapper.Define<IMediaType, MediaTypeDisplay>((source, context) => new MediaTypeDisplay(), Map);
             mapper.Define<IMemberType, MemberTypeDisplay>((source, context) => new MemberTypeDisplay(), Map);
 
-            mapper.Define<PropertyTypeBasic, PropertyType>(
+            mapper.Define<PropertyTypeBasic, IPropertyType>(
                 (source, context) =>
                 {
                     var dataType = _dataTypeService.GetDataType(source.DataTypeId);
@@ -216,7 +216,7 @@ namespace Umbraco.Web.Models.Mapping
 
         // Umbraco.Code.MapAll -CreateDate -DeleteDate -UpdateDate
         // Umbraco.Code.MapAll -SupportsPublishing -Key -PropertyEditorAlias -ValueStorageType
-        private static void Map(PropertyTypeBasic source, PropertyType target, MapperContext context)
+        private static void Map(PropertyTypeBasic source, IPropertyType target, MapperContext context)
         {
             target.Name = source.Label;
             target.DataTypeId = source.DataTypeId;
@@ -610,9 +610,9 @@ namespace Umbraco.Web.Models.Mapping
             return destGroup;
         }
 
-        private static PropertyType MapSaveProperty(PropertyTypeBasic sourceProperty, IEnumerable<PropertyType> destOrigProperties, MapperContext context)
+        private static IPropertyType MapSaveProperty(PropertyTypeBasic sourceProperty, IEnumerable<IPropertyType> destOrigProperties, MapperContext context)
         {
-            PropertyType destProperty;
+            IPropertyType destProperty;
             if (sourceProperty.Id > 0)
             {
                 // updating an existing property
@@ -631,11 +631,11 @@ namespace Umbraco.Web.Models.Mapping
             // insert a new property, or update an existing property that has
             // been deleted in the meantime and we need to re-create
             // map/create
-            destProperty = context.Map<PropertyType>(sourceProperty);
+            destProperty = context.Map<IPropertyType>(sourceProperty);
             return destProperty;
         }
 
-        private static void EnsureUniqueAliases(IEnumerable<PropertyType> properties)
+        private static void EnsureUniqueAliases(IEnumerable<IPropertyType> properties)
         {
             var propertiesA = properties.ToArray();
             var distinctProperties = propertiesA

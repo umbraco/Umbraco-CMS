@@ -524,7 +524,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             where T : class, IContentBase
         {
             var result = new Dictionary<int, PropertyCollection>();
-            var compositionPropertiesIndex = new Dictionary<int, PropertyType[]>();
+            var compositionPropertiesIndex = new Dictionary<int, IPropertyType[]>();
 
             // index PropertyDataDto per versionId for perfs
             // merge edited and published dtos

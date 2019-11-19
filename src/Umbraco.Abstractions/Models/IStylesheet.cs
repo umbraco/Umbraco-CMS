@@ -3,7 +3,7 @@ using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
-    public interface IStylesheet : IFile, IRememberBeingDirty
+    public interface IStylesheet : IFile
     {
         /// <summary>
         /// Returns a list of umbraco back office enabled stylesheet properties

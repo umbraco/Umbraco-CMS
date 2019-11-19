@@ -414,7 +414,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <remarks>
         /// Please note that deleting a <see cref="IDataType"/> will remove
-        /// all the <see cref="PropertyType"/> data that references this <see cref="IDataType"/>.
+        /// all the <see cref="IPropertyType"/> data that references this <see cref="IDataType"/>.
         /// </remarks>
         /// <param name="dataType"><see cref="IDataType"/> to delete</param>
         /// <param name="userId">Optional Id of the user issuing the deletion</param>
