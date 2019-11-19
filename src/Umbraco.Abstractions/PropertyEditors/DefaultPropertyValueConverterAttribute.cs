@@ -6,7 +6,7 @@ namespace Umbraco.Core.PropertyEditors
     /// Indicates that this is a default property value converter (shipped with Umbraco)
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-    internal class DefaultPropertyValueConverterAttribute : Attribute
+    public class DefaultPropertyValueConverterAttribute : Attribute
     {
         public DefaultPropertyValueConverterAttribute()
         {

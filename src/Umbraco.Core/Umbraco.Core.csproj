@@ -220,7 +220,6 @@
     <Compile Include="PropertyEditors\Validators\DelimitedValueValidator.cs" />
     <Compile Include="PropertyEditors\Validators\RegexValidator.cs" />
     <Compile Include="PropertyEditors\Validators\RequiredValidator.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\CheckboxListValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ColorPickerValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\GridValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValue.cs" />
@@ -357,7 +356,6 @@
     <Compile Include="PropertyEditors\ConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\LabelConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\LabelPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\PropertyEditorTagsExtensions.cs" />
     <Compile Include="ReflectionUtilities-Unused.cs" />
     <Compile Include="RuntimeOptions.cs" />
     <Compile Include="Runtime\CoreRuntime.cs" />
