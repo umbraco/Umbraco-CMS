@@ -83,7 +83,9 @@ namespace Umbraco.Core.Models
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
-        void ICollection<IPropertyType>.Add(IPropertyType item)
+        // 'new' keyword is required! we can explicitly implement ICollection<IPropertyType>.Add BUT since normally a concrete PropertyType type
+        // is passed in, the explicit implementation doesn't get called, this ensures it does get called. 
+        public new void Add(IPropertyType item)
         {
             item.SupportsPublishing = SupportsPublishing;
 
