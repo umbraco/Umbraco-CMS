@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.IO
 {
@@ -15,15 +16,19 @@ namespace Umbraco.Core.IO
         private readonly string _shadowPath;
         private ShadowFileSystem _shadowFileSystem;
         private string _shadowDir;
+        private readonly IIOHelper _ioHelper;
+        private readonly ILogger _logger;
 
-        public ShadowWrapper(IFileSystem innerFileSystem, string shadowPath, Func<bool> isScoped = null)
+        public ShadowWrapper(IFileSystem innerFileSystem, IIOHelper ioHelper, ILogger logger, string shadowPath, Func<bool> isScoped = null)
         {
             _innerFileSystem = innerFileSystem;
+            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _shadowPath = shadowPath;
             _isScoped = isScoped;
         }
 
-        public static string CreateShadowId()
+        public static string CreateShadowId(IIOHelper ioHelper)
         {
             const int retries = 50; // avoid infinite loop
             const int idLength = 8; // 6 chars
@@ -38,7 +43,7 @@ namespace Umbraco.Core.IO
                 var id = GuidUtils.ToBase32String(Guid.NewGuid(), idLength);
 
                 var virt = ShadowFsPath + "/" + id;
-                var shadowDir = Current.IOHelper.MapPath(virt);
+                var shadowDir = ioHelper.MapPath(virt);
                 if (Directory.Exists(shadowDir))
                     continue;
 
@@ -56,9 +61,9 @@ namespace Umbraco.Core.IO
             // in a single thread anyways
 
             var virt = ShadowFsPath + "/" + id + "/" + _shadowPath;
-            _shadowDir = Current.IOHelper.MapPath(virt);
+            _shadowDir = _ioHelper.MapPath(virt);
             Directory.CreateDirectory(_shadowDir);
-            var tempfs = new PhysicalFileSystem(virt);
+            var tempfs = new PhysicalFileSystem(_ioHelper, _logger, virt);
             _shadowFileSystem = new ShadowFileSystem(_innerFileSystem, tempfs);
         }
 
@@ -83,7 +88,7 @@ namespace Umbraco.Core.IO
 
                     // shadowPath make be path/to/dir, remove each
                     dir = dir.Replace("/", "\\");
-                    var min = Current.IOHelper.MapPath(ShadowFsPath).Length;
+                    var min = _ioHelper.MapPath(ShadowFsPath).Length;
                     var pos = dir.LastIndexOf("\\", StringComparison.OrdinalIgnoreCase);
                     while (pos > min)
                     {

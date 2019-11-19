@@ -1,6 +1,7 @@
 ﻿using Umbraco.Core.Compose;
 using Umbraco.Core.IO;
 using Umbraco.Core.IO.MediaPathSchemes;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Composing.CompositionExtensions
 {
@@ -90,7 +91,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
             // register the IFileSystem supporting the IMediaFileSystem
             // THIS IS THE ONLY THING THAT NEEDS TO CHANGE, IN ORDER TO REPLACE THE UNDERLYING FILESYSTEM
             // and, SupportingFileSystem.For<IMediaFileSystem>() returns the underlying filesystem
-            composition.SetMediaFileSystem(() => new PhysicalFileSystem(Current.Configs.Global().UmbracoMediaPath));
+            composition.SetMediaFileSystem(factory => new PhysicalFileSystem(factory.GetInstance<IIOHelper>(), factory.GetInstance<ILogger>(), Current.Configs.Global().UmbracoMediaPath));
 
             return composition;
         }

@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
-using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web.Editors
@@ -12,7 +13,14 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class BackOfficeAssetsController : UmbracoAuthorizedJsonController
     {
-        private readonly IFileSystem _jsLibFileSystem = new PhysicalFileSystem(Current.Configs.Global().UmbracoPath + Current.IOHelper.DirSepChar + "lib");
+        private readonly IFileSystem _jsLibFileSystem;
+
+        public BackOfficeAssetsController(IIOHelper ioHelper, ILogger logger, IGlobalSettings globalSettings)
+        {
+            _jsLibFileSystem = new PhysicalFileSystem(ioHelper, logger, globalSettings.UmbracoPath + Current.IOHelper.DirSepChar + "lib");
+        }
+
+
 
         [HttpGet]
         public object GetSupportedLocales()

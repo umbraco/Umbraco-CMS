@@ -107,8 +107,9 @@ namespace Umbraco.Tests.TestHelpers
 
             var scheme = Mock.Of<IMediaPathScheme>();
             var config = Mock.Of<IContentSection>();
+            var ioHelper = Mock.Of<IIOHelper>();
 
-            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), config, scheme, logger);
+            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), config, scheme, logger, ioHelper);
 
             var externalLoginService = GetLazyService<IExternalLoginService>(factory, c => new ExternalLoginService(scopeProvider, logger, eventMessagesFactory, GetRepo<IExternalLoginRepository>(c)));
             var publicAccessService = GetLazyService<IPublicAccessService>(factory, c => new PublicAccessService(scopeProvider, logger, eventMessagesFactory, GetRepo<IPublicAccessRepository>(c)));

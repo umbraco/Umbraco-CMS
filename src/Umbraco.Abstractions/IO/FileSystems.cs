@@ -59,7 +59,7 @@ namespace Umbraco.Core.IO
         }
 
         // set by the scope provider when taking control of filesystems
-        internal Func<bool> IsScoped { get; set; } = () => false;
+        public Func<bool> IsScoped { get; set; } = () => false;
 
         #endregion
 
@@ -124,17 +124,17 @@ namespace Umbraco.Core.IO
         // but it does not really matter what we return - here, null
         private object CreateWellKnownFileSystems()
         {
-            var macroPartialFileSystem = new PhysicalFileSystem(Constants.SystemDirectories.MacroPartials);
-            var partialViewsFileSystem = new PhysicalFileSystem(Constants.SystemDirectories.PartialViews);
-            var stylesheetsFileSystem = new PhysicalFileSystem(_globalSettings.UmbracoCssPath);
-            var scriptsFileSystem = new PhysicalFileSystem(_globalSettings.UmbracoScriptsPath);
-            var mvcViewsFileSystem = new PhysicalFileSystem(Constants.SystemDirectories.MvcViews);
+            var macroPartialFileSystem = new PhysicalFileSystem(_ioHelper, _logger, Constants.SystemDirectories.MacroPartials);
+            var partialViewsFileSystem = new PhysicalFileSystem(_ioHelper, _logger, Constants.SystemDirectories.PartialViews);
+            var stylesheetsFileSystem = new PhysicalFileSystem(_ioHelper, _logger, _globalSettings.UmbracoCssPath);
+            var scriptsFileSystem = new PhysicalFileSystem(_ioHelper, _logger, _globalSettings.UmbracoScriptsPath);
+            var mvcViewsFileSystem = new PhysicalFileSystem(_ioHelper, _logger, Constants.SystemDirectories.MvcViews);
 
-            _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, "macro-partials", IsScoped);
-            _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, "partials", IsScoped);
-            _stylesheetsFileSystem = new ShadowWrapper(stylesheetsFileSystem, "css", IsScoped);
-            _scriptsFileSystem = new ShadowWrapper(scriptsFileSystem, "scripts", IsScoped);
-            _mvcViewsFileSystem = new ShadowWrapper(mvcViewsFileSystem, "views", IsScoped);
+            _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, _ioHelper, _logger,"macro-partials", IsScoped);
+            _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, _ioHelper, _logger,"partials", IsScoped);
+            _stylesheetsFileSystem = new ShadowWrapper(stylesheetsFileSystem, _ioHelper, _logger,"css", IsScoped);
+            _scriptsFileSystem = new ShadowWrapper(scriptsFileSystem, _ioHelper, _logger,"scripts", IsScoped);
+            _mvcViewsFileSystem = new ShadowWrapper(mvcViewsFileSystem, _ioHelper, _logger,"views", IsScoped);
 
             // TODO: do we need a lock here?
             _shadowWrappers.Add(_macroPartialFileSystem);
@@ -212,11 +212,11 @@ namespace Umbraco.Core.IO
         // global shadow for the entire application, so great care should be taken to ensure that the
         // application is *not* doing anything else when using a shadow.
 
-        internal ICompletable Shadow()
+        public ICompletable Shadow()
         {
             if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
 
-            var id = ShadowWrapper.CreateShadowId();
+            var id = ShadowWrapper.CreateShadowId(_ioHelper);
             return new ShadowFileSystems(this, id); // will invoke BeginShadow and EndShadow
         }
 
@@ -274,7 +274,7 @@ namespace Umbraco.Core.IO
         {
             lock (_shadowLocker)
             {
-                var wrapper = new ShadowWrapper(filesystem, shadowPath, IsScoped);
+                var wrapper = new ShadowWrapper(filesystem, _ioHelper, _logger, shadowPath, IsScoped);
                 if (_shadowCurrentId != null)
                     wrapper.Shadow(_shadowCurrentId);
                 _shadowWrappers.Add(wrapper);

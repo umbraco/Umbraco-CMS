@@ -77,10 +77,11 @@ namespace Umbraco.Tests.PropertyEditors
                 Current.Factory = composition.CreateFactory();
 
                 var logger = Mock.Of<ILogger>();
+                var ioHelper = Mock.Of<IIOHelper>();
                 var scheme = Mock.Of<IMediaPathScheme>();
                 var config = Mock.Of<IContentSection>();
 
-                var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), config, scheme, logger);
+                var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), config, scheme, logger, ioHelper);
 
                 var dataTypeService = new TestObjects.TestDataTypeService(
                     new DataType(new ImageCropperPropertyEditor(Mock.Of<ILogger>(), mediaFileSystem, Mock.Of<IContentSection>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>())) { Id = 1 });
