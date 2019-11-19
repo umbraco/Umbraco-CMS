@@ -75,14 +75,5 @@ namespace Umbraco.Core.Models
         /// <param name="wildcards">A value indicating whether wildcards are valid.</param>
         bool SupportsVariation(string culture, string segment, bool wildcards = false);
 
-        /// <summary>
-        /// Converts a value assigned to a property.
-        /// </summary>
-        /// <remarks>
-        /// <para>The input value can be pretty much anything, and is converted to the actual CLR type
-        /// expected by the property (eg an integer if the property values are integers).</para>
-        /// <para>Throws if the value cannot be converted.</para>
-        /// </remarks>
-        object ConvertAssignedValue(object value);
     }
 }
