@@ -8,7 +8,7 @@ namespace Umbraco.Core.Models
     /// Defines the base for a ContentType with properties that
     /// are shared between ContentTypes and MediaTypes.
     /// </summary>
-    public interface IContentTypeBase : IUmbracoEntity
+    public interface IContentTypeBase : IUmbracoEntity, IRememberBeingDirty
     {
         /// <summary>
         /// Gets or Sets the Alias of the ContentType

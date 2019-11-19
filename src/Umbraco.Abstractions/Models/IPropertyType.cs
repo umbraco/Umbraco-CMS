@@ -84,7 +84,5 @@ namespace Umbraco.Core.Models
         /// <para>Throws if the value cannot be converted.</para>
         /// </remarks>
         object ConvertAssignedValue(object value);
-
-        event PropertyChangedEventHandler PropertyChanged;        
     }
 }

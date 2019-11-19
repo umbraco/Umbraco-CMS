@@ -9,7 +9,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class MacroProperty : BeingDirtyBase, IMacroProperty, IRememberBeingDirty, IDeepCloneable
+    public class MacroProperty : BeingDirtyBase, IMacroProperty
     {
         public MacroProperty()
         {

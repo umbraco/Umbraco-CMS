@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
@@ -80,6 +81,7 @@ namespace Umbraco.Core.Collections
             }
         }
 
+        #region IRememberBeingDirty
         public bool IsDirty()
         {
             return this.OfType<IRememberBeingDirty>().Any(x => x.IsDirty());
@@ -150,5 +152,8 @@ namespace Umbraco.Core.Collections
         {
             return Enumerable.Empty<string>();
         }
+
+        public event PropertyChangedEventHandler PropertyChanged; // noop 
+        #endregion
     }
 }

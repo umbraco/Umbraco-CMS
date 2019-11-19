@@ -3,7 +3,7 @@ using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
-    public interface IDictionaryTranslation : IEntity
+    public interface IDictionaryTranslation : IEntity, IRememberBeingDirty
     {
         /// <summary>
         /// Gets or sets the <see cref="Language"/> for the translation
