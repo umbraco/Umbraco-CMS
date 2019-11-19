@@ -100,6 +100,7 @@ namespace Umbraco.Tests.Testing
         protected ILogger Logger => Factory.GetInstance<ILogger>();
 
         protected IIOHelper IOHelper { get; private set; }
+        protected IUmbracoVersion UmbracoVersion { get; private set; }
 
         protected ITypeFinder TypeFinder { get; private set; }
 
@@ -134,17 +135,20 @@ namespace Umbraco.Tests.Testing
             var (logger, profiler) = GetLoggers(Options.Logger);
             var proflogger = new ProfilingLogger(logger, profiler);
             IOHelper = Umbraco.Core.IO.IOHelper.Default;
+
             TypeFinder = new TypeFinder(logger);
             var appCaches = GetAppCaches();
             var globalSettings = SettingsForTests.GetDefaultGlobalSettings();
+            UmbracoVersion = new UmbracoVersion(globalSettings);
             var typeLoader = GetTypeLoader(IOHelper, TypeFinder, appCaches.RuntimeCache, globalSettings, proflogger, Options.TypeLoader);
 
-            var register = RegisterFactory.Create();
+            var register = TestHelper.GetRegister();
 
-            Composition = new Composition(register, typeLoader, proflogger, ComponentTests.MockRuntimeState(RuntimeLevel.Run));
+            Composition = new Composition(register, typeLoader, proflogger, ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs());
 
 
             Composition.RegisterUnique(IOHelper);
+            Composition.RegisterUnique(UmbracoVersion);
             Composition.RegisterUnique(TypeFinder);
             Composition.RegisterUnique(typeLoader);
             Composition.RegisterUnique(logger);
@@ -200,7 +204,7 @@ namespace Umbraco.Tests.Testing
                     profiler = new LogProfiler(logger);
                     break;
                 case UmbracoTestOptions.Logger.Console:
-                    logger = new ConsoleLogger();
+                    logger = new ConsoleLogger(new MessageTemplates());
                     profiler = new LogProfiler(logger);
                     break;
                 default:
@@ -297,7 +301,7 @@ namespace Umbraco.Tests.Testing
         // common to all tests = cannot be overriden
         private static TypeLoader CreateCommonTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
         {
-            return new TypeLoader(ioHelper, typeFinder, runtimeCache, new DirectoryInfo(globalSettings.LocalTempPath), logger, false, new[]
+            return new TypeLoader(ioHelper, typeFinder, runtimeCache, new DirectoryInfo(globalSettings.LocalTempPath(ioHelper)), logger, false, new[]
             {
                 Assembly.Load("Umbraco.Core"),
                 Assembly.Load("Umbraco.Web"),
@@ -357,7 +361,8 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique<IUmbracoDatabaseFactory>(f => new UmbracoDatabaseFactory(
                 Constants.System.UmbracoConnectionName,
                 Logger,
-                new Lazy<IMapperCollection>(f.GetInstance<IMapperCollection>)));
+                new Lazy<IMapperCollection>(f.GetInstance<IMapperCollection>),
+                TestHelper.GetConfigs()));
             Composition.RegisterUnique(f => f.TryGetInstance<IUmbracoDatabaseFactory>().SqlContext);
 
             Composition.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty
@@ -374,7 +379,8 @@ namespace Umbraco.Tests.Testing
 
             // somehow property editor ends up wanting this
             Composition.WithCollectionBuilder<ManifestValueValidatorCollectionBuilder>();
-            Composition.RegisterUnique<ManifestParser>();
+
+            Composition.RegisterUnique<IManifestParser, ManifestParser>();
 
             // note - don't register collections, use builders
             Composition.WithCollectionBuilder<DataEditorCollectionBuilder>();

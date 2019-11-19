@@ -19,9 +19,9 @@ namespace Umbraco.Web.JavaScript
     /// </summary>
     internal class JsInitialization : AssetInitialization
     {
-        private readonly ManifestParser _parser;
+        private readonly IManifestParser _parser;
 
-        public JsInitialization(ManifestParser parser)
+        public JsInitialization(IManifestParser parser)
         {
             _parser = parser;
         }

@@ -19,6 +19,7 @@ namespace Umbraco.Core.IO
         string MapPath(string path, bool useHttpContext);
         string MapPath(string path);
 
+
         /// <summary>
         /// Verifies that the current filepath matches a directory where the user is allowed to edit a file.
         /// </summary>

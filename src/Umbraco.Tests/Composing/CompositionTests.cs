@@ -7,6 +7,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Composing
 {
@@ -40,7 +41,7 @@ namespace Umbraco.Tests.Composing
             var typeFinder = new TypeFinder(Mock.Of<ILogger>());
             var ioHelper = IOHelper.Default;
             var typeLoader = new TypeLoader(ioHelper, typeFinder, Mock.Of<IAppPolicyCache>(), new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), logger);
-            var composition = new Composition(mockedRegister, typeLoader, logger, Mock.Of<IRuntimeState>());
+            var composition = new Composition(mockedRegister, typeLoader, logger, Mock.Of<IRuntimeState>(), TestHelper.GetConfigs());
 
             // create the factory, ensure it is the mocked factory
             var factory = composition.CreateFactory();

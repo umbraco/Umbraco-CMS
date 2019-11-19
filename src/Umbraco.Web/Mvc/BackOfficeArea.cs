@@ -1,4 +1,5 @@
 ﻿using System.Web.Mvc;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.Editors;
 
@@ -26,15 +27,16 @@ namespace Umbraco.Web.Mvc
         /// </remarks>
         public override void RegisterArea(AreaRegistrationContext context)
         {
+
             context.MapRoute(
                 "Umbraco_preview",
-                _globalSettings.GetUmbracoMvcArea() + "/preview/{action}/{editor}",
+                AreaName + "/preview/{action}/{editor}",
                 new {controller = "Preview", action = "Index", editor = UrlParameter.Optional},
                 new[] { "Umbraco.Web.Editors" });
 
             context.MapRoute(
                 "Umbraco_back_office",
-                _globalSettings.GetUmbracoMvcArea() + "/{action}/{id}",
+                AreaName + "/{action}/{id}",
                 new {controller = "BackOffice", action = "Default", id = UrlParameter.Optional},
                 //limit the action/id to only allow characters - this is so this route doesn't hog all other
                 // routes like: /umbraco/channels/word.aspx, etc...
@@ -46,6 +48,6 @@ namespace Umbraco.Web.Mvc
                 new[] {typeof (BackOfficeController).Namespace});
         }
 
-        public override string AreaName => _globalSettings.GetUmbracoMvcArea();
+        public override string AreaName => _globalSettings.GetUmbracoMvcArea(Current.IOHelper);
     }
 }

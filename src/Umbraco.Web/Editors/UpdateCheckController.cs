@@ -26,10 +26,10 @@ namespace Umbraco.Web.Editors
                 {
                     var check = new org.umbraco.update.CheckForUpgrade { Timeout = 2000 };
 
-                    var result = check.CheckUpgrade(UmbracoVersion.Current.Major,
-                                                    UmbracoVersion.Current.Minor,
-                                                    UmbracoVersion.Current.Build,
-                                                    UmbracoVersion.Comment);
+                    var result = check.CheckUpgrade(Current.UmbracoVersion.Current.Major,
+                        Current.UmbracoVersion.Current.Minor,
+                        Current.UmbracoVersion.Current.Build,
+                        Current.UmbracoVersion.Comment);
 
                     return new UpgradeCheckResponse(result.UpgradeType.ToString(), result.Comment, result.UpgradeUrl);
                 }

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Models.Packaging
 {
@@ -69,8 +70,8 @@ namespace Umbraco.Core.Models.Packaging
         /// The minimum umbraco version that this package requires
         /// </summary>
         [DataMember(Name = "umbracoVersion")]
-        public Version UmbracoVersion { get; set; } = Configuration.UmbracoVersion.Current;
-        
+        public Version UmbracoVersion { get; set; } = Current.UmbracoVersion.Current;
+
         [DataMember(Name = "author")]
         [Required]
         public string Author { get; set; } = string.Empty;
@@ -131,7 +132,7 @@ namespace Umbraco.Core.Models.Packaging
 
         [DataMember(Name = "iconUrl")]
         public string IconUrl { get; set; } = string.Empty;
-        
+
 
     }
 

@@ -119,7 +119,7 @@ namespace Umbraco.Web.Runtime
             // location to be there
             if (globalSettings.LocalTempStorageLocation == LocalTempStorage.EnvironmentTemp)
             {
-                var cachePath = globalSettings.LocalTempPath;
+                var cachePath = globalSettings.LocalTempPath(Current.IOHelper);
 
                 //set the file map and composite file default location to the %temp% location
                 BaseCompositeFileProcessingProvider.CompositeFilePathDefaultFolder
@@ -150,7 +150,7 @@ namespace Umbraco.Web.Runtime
             SurfaceControllerTypeCollection surfaceControllerTypes,
             UmbracoApiControllerTypeCollection apiControllerTypes)
         {
-            var umbracoPath = globalSettings.GetUmbracoMvcArea();
+            var umbracoPath = globalSettings.GetUmbracoMvcArea(Current.IOHelper);
 
             // create the front-end route
             var defaultRoute = RouteTable.Routes.MapRoute(
@@ -175,7 +175,7 @@ namespace Umbraco.Web.Runtime
             SurfaceControllerTypeCollection surfaceControllerTypes,
             UmbracoApiControllerTypeCollection apiControllerTypes)
         {
-            var umbracoPath = globalSettings.GetUmbracoMvcArea();
+            var umbracoPath = globalSettings.GetUmbracoMvcArea(Current.IOHelper);
 
             // need to find the plugin controllers and route them
             var pluginControllers = surfaceControllerTypes.Concat(apiControllerTypes).ToArray();

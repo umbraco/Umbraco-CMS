@@ -34,6 +34,16 @@ namespace Umbraco.Tests.TestHelpers
             return new TypeLoader(IOHelper.Default, Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(IOHelper.Default.MapPath("~/App_Data/TEMP")), Mock.Of<IProfilingLogger>());
         }
 
+        public static Configs GetConfigs()
+        {
+            return GetConfigsFactory().Create();
+        }
+
+        public static IConfigsFactory GetConfigsFactory()
+        {
+            return new ConfigsFactory(IOHelper.Default);
+        }
+
         /// <summary>
         /// Gets the current assembly directory.
         /// </summary>
@@ -64,12 +74,12 @@ namespace Umbraco.Tests.TestHelpers
 
         public static void InitializeContentDirectories()
         {
-            CreateDirectories(new[] { Constants.SystemDirectories.MvcViews, new GlobalSettings().UmbracoMediaPath, Constants.SystemDirectories.AppPlugins });
+            CreateDirectories(new[] { Constants.SystemDirectories.MvcViews, SettingsForTests.GenerateMockGlobalSettings().UmbracoMediaPath, Constants.SystemDirectories.AppPlugins });
         }
 
         public static void CleanContentDirectories()
         {
-            CleanDirectories(new[] { Constants.SystemDirectories.MvcViews, new GlobalSettings().UmbracoMediaPath });
+            CleanDirectories(new[] { Constants.SystemDirectories.MvcViews, SettingsForTests.GenerateMockGlobalSettings().UmbracoMediaPath });
         }
 
         public static void CreateDirectories(string[] directories)
@@ -263,6 +273,17 @@ namespace Umbraco.Tests.TestHelpers
                 }
 
             );
+        }
+
+
+        public static IUmbracoVersion GetUmbracoVersion()
+        {
+            return new UmbracoVersion(GetConfigs().Global());
+        }
+
+        public static IRegister GetRegister()
+        {
+            return RegisterFactory.Create(GetConfigs().Global());
         }
     }
 }

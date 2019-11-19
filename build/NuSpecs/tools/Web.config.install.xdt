@@ -5,9 +5,9 @@
     <sectionGroup name="applicationSettings" xdt:Locator="Match(name)" xdt:Transform="Remove" />
     <sectionGroup name="system.web.webPages.razor" xdt:Locator="Match(name)" xdt:Transform="Remove" />
     <sectionGroup name="umbracoConfiguration" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing">
-      <section name="settings" type="Umbraco.Core.Configuration.UmbracoSettings.UmbracoSettingsSection, Umbraco.Core" requirePermission="false" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
+      <section name="settings" type="Umbraco.Core.Configuration.UmbracoSettings.UmbracoSettingsSection, Umbraco.Configuration" requirePermission="false" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
       <section name="dashBoard" xdt:Locator="Match(name)" xdt:Transform="Remove" />
-      <section name="HealthChecks" type="Umbraco.Core.Configuration.HealthChecks.HealthChecksSection, Umbraco.Core" requirePermission="false" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
+      <section name="HealthChecks" type="Umbraco.Core.Configuration.HealthChecks.HealthChecksSection, Umbraco.Configuration" requirePermission="false" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
     </sectionGroup>
   </configSections>
 

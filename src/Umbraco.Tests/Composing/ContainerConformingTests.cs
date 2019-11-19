@@ -4,6 +4,7 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Composing
 {
@@ -12,7 +13,7 @@ namespace Umbraco.Tests.Composing
     {
         // tests that a container conforms
 
-        private IRegister GetRegister() => RegisterFactory.Create();
+        private IRegister GetRegister() => TestHelper.GetRegister();
 
         [Test]
         public void CanRegisterAndGet()

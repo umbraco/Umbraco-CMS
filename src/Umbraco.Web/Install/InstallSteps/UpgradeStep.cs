@@ -25,9 +25,9 @@ namespace Umbraco.Web.Install.InstallSteps
                 // that was a "normal" way to force the upgrader to execute, and we would detect the current
                 // version via the DB like DatabaseSchemaResult.DetermineInstalledVersion - magic, do we really
                 // need this now?
-                var currentVersion = (UmbracoVersion.LocalVersion ?? new Semver.SemVersion(0)).ToString();
+                var currentVersion = (Current.UmbracoVersion.LocalVersion ?? new Semver.SemVersion(0)).ToString();
 
-                var newVersion = UmbracoVersion.SemanticVersion.ToString();
+                var newVersion = Current.UmbracoVersion.SemanticVersion.ToString();
 
                 string FormatGuidState(string value)
                 {

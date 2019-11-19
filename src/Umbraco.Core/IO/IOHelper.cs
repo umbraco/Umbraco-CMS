@@ -115,8 +115,6 @@ namespace Umbraco.Core.IO
             return MapPath(path, true);
         }
 
-
-
         /// <summary>
         /// Verifies that the current filepath matches a directory where the user is allowed to edit a file.
         /// </summary>

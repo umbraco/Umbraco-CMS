@@ -1,6 +1,9 @@
 ﻿using System.Threading;
 using System.Web;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Web.Runtime;
 
 namespace Umbraco.Web
@@ -10,9 +13,9 @@ namespace Umbraco.Web
     /// </summary>
     public class UmbracoApplication : UmbracoApplicationBase
     {
-        protected override IRuntime GetRuntime()
+        protected override IRuntime GetRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger)
         {
-            return new WebRuntime(this);
+            return new WebRuntime(this, configs, umbracoVersion, ioHelper, logger);
         }
 
         /// <summary>
