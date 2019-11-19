@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.IO
