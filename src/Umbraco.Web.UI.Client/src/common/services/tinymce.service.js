@@ -544,7 +544,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 },
                 embed.preview);
             
-            // Only replace if actieElement is an Embed element.
+            // Only replace if activeElement is an Embed element.
             if (activeElement && activeElement.nodeName.toUpperCase() === "DIV" && activeElement.classList.contains("embeditem")){
                 activeElement.replaceWith(wrapper); // directly replaces the html node
             } else {
