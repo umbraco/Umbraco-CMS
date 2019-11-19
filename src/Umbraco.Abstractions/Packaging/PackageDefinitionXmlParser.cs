@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
-using System.Xml.XPath;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Packaging;
 
@@ -14,10 +14,12 @@ namespace Umbraco.Core.Packaging
     public class PackageDefinitionXmlParser
     {
         private readonly ILogger _logger;
+        private readonly IUmbracoVersion _umbracoVersion;
 
-        public PackageDefinitionXmlParser(ILogger logger)
+        public PackageDefinitionXmlParser(ILogger logger, IUmbracoVersion umbracoVersion)
         {
             _logger = logger;
+            _umbracoVersion = umbracoVersion;
         }
 
         public PackageDefinition ToPackageDefinition(XElement xml)
@@ -66,7 +68,7 @@ namespace Umbraco.Core.Packaging
             }
             catch (Exception e)
             {
-                _logger.Warn<PackagesRepository>(e, "Could not add package actions to the package xml definition, the xml did not parse");
+                _logger.Warn<PackageDefinitionXmlParser>(e, "Could not add package actions to the package xml definition, the xml did not parse");
             }
 
             var packageXml = new XElement("package",
@@ -76,7 +78,7 @@ namespace Umbraco.Core.Packaging
                 new XAttribute("name", def.Name ?? string.Empty),
                 new XAttribute("packagePath", def.PackagePath ?? string.Empty),
                 new XAttribute("iconUrl", def.IconUrl ?? string.Empty),
-                new XAttribute("umbVersion", def.UmbracoVersion),
+                new XAttribute("umbVersion", def.UmbracoVersion ?? _umbracoVersion.Current),
                 new XAttribute("packageGuid", def.PackageId),
                 new XAttribute("view", def.PackageView ?? string.Empty),
 
@@ -104,11 +106,11 @@ namespace Umbraco.Core.Packaging
                 new XElement("macros", string.Join(",", def.Macros ?? Array.Empty<string>())),
                 new XElement("files", (def.Files ?? Array.Empty<string>()).Where(x => !x.IsNullOrWhiteSpace()).Select(x => new XElement("file", x))),
                 new XElement("languages", string.Join(",", def.Languages ?? Array.Empty<string>())),
-                new XElement("dictionaryitems", string.Join(",", def.DictionaryItems ?? Array.Empty<string>()))); 
+                new XElement("dictionaryitems", string.Join(",", def.DictionaryItems ?? Array.Empty<string>())));
 
             return packageXml;
         }
 
-        
+
     }
 }

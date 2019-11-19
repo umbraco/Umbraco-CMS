@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using Umbraco.Core.Composing;
-using Umbraco.Core.IO;
-using Umbraco.Core.Models;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Packaging;
 using File = System.IO.File;
 
@@ -14,13 +12,15 @@ namespace Umbraco.Core.Packaging
     /// <summary>
     /// Parses the xml document contained in a compiled (zip) Umbraco package
     /// </summary>
-    internal class CompiledPackageXmlParser
+    public class CompiledPackageXmlParser
     {
         private readonly ConflictingPackageData _conflictingPackageData;
+        private readonly IGlobalSettings _globalSettings;
 
-        public CompiledPackageXmlParser(ConflictingPackageData conflictingPackageData)
+        public CompiledPackageXmlParser(ConflictingPackageData conflictingPackageData, IGlobalSettings globalSettings)
         {
             _conflictingPackageData = conflictingPackageData;
+            _globalSettings = globalSettings;
         }
 
         public CompiledPackage ToCompiledPackage(XDocument xml, FileInfo packageFile, string applicationRootFolder)
@@ -133,12 +133,12 @@ namespace Umbraco.Core.Packaging
             return pathElement.TrimStart(new[] { '\\', '/', '~' }).Replace("/", "\\");
         }
 
-        private static string UpdatePathPlaceholders(string path)
+        private string UpdatePathPlaceholders(string path)
         {
             if (path.Contains("[$"))
             {
                 //this is experimental and undocumented...
-                path = path.Replace("[$UMBRACO]", Current.Configs.Global().UmbracoPath);
+                path = path.Replace("[$UMBRACO]", _globalSettings.UmbracoPath);
                 path = path.Replace("[$CONFIG]", Constants.SystemDirectories.Config);
                 path = path.Replace("[$DATA]", Constants.SystemDirectories.Data);
             }

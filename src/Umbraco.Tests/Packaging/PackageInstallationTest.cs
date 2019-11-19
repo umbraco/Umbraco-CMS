@@ -6,6 +6,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Packaging;
@@ -40,7 +41,7 @@ namespace Umbraco.Tests.Packaging
                 Directory.Delete(path, true);
         }
 
-        private CompiledPackageXmlParser Parser => new CompiledPackageXmlParser(new ConflictingPackageData(ServiceContext.MacroService, ServiceContext.FileService));
+        private CompiledPackageXmlParser Parser => new CompiledPackageXmlParser(new ConflictingPackageData(ServiceContext.MacroService, ServiceContext.FileService),Factory.GetInstance<IGlobalSettings>());
 
         private PackageDataInstallation PackageDataInstallation => new PackageDataInstallation(
             Logger, ServiceContext.FileService, ServiceContext.MacroService, ServiceContext.LocalizationService,
