@@ -54,6 +54,7 @@ namespace Umbraco.Web.Runtime
             base.Compose(composition);
 
             composition.Register<UmbracoInjectedModule>();
+            composition.Register<IIpResolver, IpResolver>();
 
             composition.RegisterUnique<IHttpContextAccessor, AspNetHttpContextAccessor>(); // required for hybrid accessors
 
@@ -73,7 +74,7 @@ namespace Umbraco.Web.Runtime
             // register accessors for cultures
             composition.RegisterUnique<IDefaultCultureAccessor, DefaultCultureAccessor>();
             composition.RegisterUnique<IVariationContextAccessor, HybridVariationContextAccessor>();
-            
+
             // register the http context and umbraco context accessors
             // we *should* use the HttpContextUmbracoContextAccessor, however there are cases when
             // we have no http context, eg when booting Umbraco or in background threads, so instead
@@ -268,7 +269,7 @@ namespace Umbraco.Web.Runtime
                 .Append<Issuu>()
                 .Append<Hulu>()
                 .Append<Giphy>();
-            
+
 
             // replace with web implementation
             composition.RegisterUnique<IPublishedSnapshotRebuilder, Migrations.PostMigrations.PublishedSnapshotRebuilder>();

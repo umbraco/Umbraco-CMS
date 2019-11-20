@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Web;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
@@ -18,12 +17,14 @@ namespace Umbraco.Core.Compose
         private readonly IAuditService _auditService;
         private readonly IUserService _userService;
         private readonly IEntityService _entityService;
+        private readonly IIpResolver _ipResolver;
 
-        public AuditEventsComponent(IAuditService auditService, IUserService userService, IEntityService entityService)
+        public AuditEventsComponent(IAuditService auditService, IUserService userService, IEntityService entityService, IIpResolver ipResolver)
         {
             _auditService = auditService;
             _userService = userService;
             _entityService = entityService;
+            _ipResolver = ipResolver;
         }
 
         public void Initialize()
@@ -62,16 +63,7 @@ namespace Umbraco.Core.Compose
             return found ?? UnknownUser;
         }
 
-        private string PerformingIp
-        {
-            get
-            {
-                var httpContext = HttpContext.Current == null ? (HttpContextBase) null : new HttpContextWrapper(HttpContext.Current);
-                var ip = httpContext.GetCurrentRequestIpAddress();
-                if (ip.ToLowerInvariant().StartsWith("unknown")) ip = "";
-                return ip;
-            }
-        }
+        private string PerformingIp => _ipResolver.GetCurrentRequestIpAddress();
 
         private string FormatEmail(IMember member)
         {

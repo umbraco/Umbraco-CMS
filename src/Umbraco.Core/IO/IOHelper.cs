@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Hosting;
-using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.IO
 {
