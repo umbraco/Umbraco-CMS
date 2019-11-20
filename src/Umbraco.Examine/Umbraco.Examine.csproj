@@ -103,6 +103,7 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="ValueSetExtensions.cs" />
     <Compile Include="ValueSetValidator.cs" />
   </ItemGroup>
   <ItemGroup>

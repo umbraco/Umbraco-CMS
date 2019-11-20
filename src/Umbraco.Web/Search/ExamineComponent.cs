@@ -600,17 +600,36 @@ namespace Umbraco.Web.Search
 
             public static void Execute(ExamineComponent examineComponent, IContent content, bool isPublished)
             {
+                List<ValueSet> publishedValueSets = null;
+                List<ValueSet> unpublishedValueSets = null;
+
                 foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
                     //filter the indexers
                     .Where(x => isPublished || !x.PublishedValuesOnly)
                     .Where(x => x.EnableDefaultEventHandler))
                 {
-                    //for content we have a different builder for published vs unpublished
-                    var builder = index.PublishedValuesOnly
-                        ? examineComponent._publishedContentValueSetBuilder
-                        : (IValueSetBuilder<IContent>)examineComponent._contentValueSetBuilder;
 
-                    index.IndexItems(builder.GetValueSets(content));
+                    //for content we have a different builder for published vs unpublished
+                    if (index.PublishedValuesOnly)
+                    {
+                        if (publishedValueSets == null)
+                            publishedValueSets = examineComponent._publishedContentValueSetBuilder.GetValueSets(content).ToList();
+
+                        // new value set instances MUST be created for each index, we cannot share value sets between indexes
+                        // because each index is allowed to modify them independently, so we first create them (slower) and then
+                        // clone them (faster)
+                        index.IndexItems(publishedValueSets.Select(x => x.Clone()));
+                    }
+                    else
+                    {
+                        if (unpublishedValueSets == null)
+                            unpublishedValueSets = examineComponent._contentValueSetBuilder.GetValueSets(content).ToList();
+
+                        // new value set instances MUST be created for each index, we cannot share value sets between indexes
+                        // because each index is allowed to modify them independently, so we first create them (slower) and then
+                        // clone them (faster)
+                        index.IndexItems(unpublishedValueSets.Select(x => x.Clone()));
+                    }
                 }
             }
         }
@@ -635,14 +654,18 @@ namespace Umbraco.Web.Search
 
             public static void Execute(ExamineComponent examineComponent, IMedia media, bool isPublished)
             {
-                var valueSet = examineComponent._mediaValueSetBuilder.GetValueSets(media).ToList();
+                var valueSets = examineComponent._mediaValueSetBuilder.GetValueSets(media).ToList();
 
                 foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
                     //filter the indexers
                     .Where(x => isPublished || !x.PublishedValuesOnly)
                     .Where(x => x.EnableDefaultEventHandler))
                 {
-                    index.IndexItems(valueSet);
+                    // new value set instances MUST be created for each index, we cannot share value sets between indexes
+                    // because each index is allowed to modify them independently, so we first create them (slower) and then
+                    // clone them (faster)
+                    
+                    index.IndexItems(valueSets.Select(x => x.Clone()));
                 }
             }
         }
@@ -665,12 +688,17 @@ namespace Umbraco.Web.Search
 
             public static void Execute(ExamineComponent examineComponent, IMember member)
             {
-                var valueSet = examineComponent._memberValueSetBuilder.GetValueSets(member).ToList();
+                var valueSets = examineComponent._memberValueSetBuilder.GetValueSets(member).ToList();
+
                 foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
                     //filter the indexers
                     .Where(x => x.EnableDefaultEventHandler))
                 {
-                    index.IndexItems(valueSet);
+                    // new value set instances MUST be created for each index, we cannot share value sets between indexes
+                    // because each index is allowed to modify them independently, so we first create them (slower) and then
+                    // clone them (faster)
+
+                    index.IndexItems(valueSets.Select(x => x.Clone()));
                 }
             }
         }
