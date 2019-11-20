@@ -14,6 +14,7 @@ using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Scoping;
 using Umbraco.Web.Composing;
 using System.ComponentModel;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Web
@@ -29,8 +30,8 @@ namespace Umbraco.Web
         private readonly IUmbracoDatabaseFactory _databaseFactory;
 
         public BatchedDatabaseServerMessenger(
-            IRuntimeState runtime, IUmbracoDatabaseFactory databaseFactory, IScopeProvider scopeProvider, ISqlContext sqlContext, IProfilingLogger proflog, IGlobalSettings globalSettings, DatabaseServerMessengerOptions options, IIOHelper ioHelper)
-            : base(runtime, scopeProvider, sqlContext, proflog, globalSettings, true, options, ioHelper)
+            IRuntimeState runtime, IUmbracoDatabaseFactory databaseFactory, IScopeProvider scopeProvider, ISqlContext sqlContext, IProfilingLogger proflog, DatabaseServerMessengerOptions options, IIOHelper ioHelper, IHostingEnvironment hostingEnvironment)
+            : base(runtime, scopeProvider, sqlContext, proflog, true, options, ioHelper, hostingEnvironment )
         {
             _databaseFactory = databaseFactory;
         }

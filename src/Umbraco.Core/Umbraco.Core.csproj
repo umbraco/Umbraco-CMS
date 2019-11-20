@@ -149,7 +149,6 @@
     <Compile Include="Composing\CompositionExtensions\Services.cs" />
     <Compile Include="CompositionExtensions_Essentials.cs" />
     <Compile Include="CompositionExtensions_FileSystems.cs" />
-    <Compile Include="Configuration\GlobalSettingsExtensions.cs" />
     <Compile Include="ConventionsHelper.cs" />
     <Compile Include="Deploy\IGridCellValueConnector.cs" />
     <Compile Include="Events\ContentPublishedEventArgs.cs" />

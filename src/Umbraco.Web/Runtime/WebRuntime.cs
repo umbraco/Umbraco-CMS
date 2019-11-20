@@ -1,14 +1,15 @@
 ﻿using System.Web;
-using System.Web.Hosting;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Runtime;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing;
+using Umbraco.Web.Hosting;
 using Umbraco.Web.Logging;
 
 namespace Umbraco.Web.Runtime
@@ -26,8 +27,8 @@ namespace Umbraco.Web.Runtime
         /// Initializes a new instance of the <see cref="WebRuntime"/> class.
         /// </summary>
         /// <param name="umbracoApplication"></param>
-        public WebRuntime(UmbracoApplicationBase umbracoApplication, Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler):
-            base(configs, umbracoVersion, ioHelper, logger, profiler ,new AspNetUmbracoBootPermissionChecker())
+        public WebRuntime(UmbracoApplicationBase umbracoApplication, Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment):
+            base(configs, umbracoVersion, ioHelper, logger, profiler ,new AspNetUmbracoBootPermissionChecker(), hostingEnvironment)
         {
             _umbracoApplication = umbracoApplication;
 
@@ -63,7 +64,7 @@ namespace Umbraco.Web.Runtime
             {
                 Logger.Info<CoreRuntime>("Booting site '{HostingSiteName}', app '{HostingApplicationID}', path '{HostingPhysicalPath}', server '{MachineName}'.",
                     HostingEnvironment.SiteName,
-                    HostingEnvironment.ApplicationID,
+                    HostingEnvironment.ApplicationId,
                     HostingEnvironment.ApplicationPhysicalPath,
                     NetworkHelper.MachineName);
                 Logger.Debug<CoreRuntime>("Runtime: {Runtime}", GetType().FullName);

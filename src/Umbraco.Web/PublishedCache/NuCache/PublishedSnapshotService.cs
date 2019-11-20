@@ -10,6 +10,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -48,6 +49,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
         private readonly UrlSegmentProviderCollection _urlSegmentProviders;
         private readonly ITypeFinder _typeFinder;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
         // volatile because we read it with no lock
         private volatile bool _isReady;
@@ -80,7 +82,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IEntityXmlSerializer entitySerializer,
             IPublishedModelFactory publishedModelFactory,
             UrlSegmentProviderCollection urlSegmentProviders,
-            ITypeFinder typeFinder)
+            ITypeFinder typeFinder,
+            IHostingEnvironment hostingEnvironment)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
@@ -98,6 +101,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _globalSettings = globalSettings;
             _urlSegmentProviders = urlSegmentProviders;
             _typeFinder = typeFinder;
+            _hostingEnvironment = hostingEnvironment;
 
             // we need an Xml serializer here so that the member cache can support XPath,
             // for members this is done by navigating the serialized-to-xml member
@@ -299,7 +303,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private string GetLocalFilesPath()
         {
-            var path = Path.Combine(_globalSettings.LocalTempPath(Current.IOHelper), "NuCache");
+            var path = Path.Combine(_hostingEnvironment.LocalTempPath, "NuCache");
 
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);

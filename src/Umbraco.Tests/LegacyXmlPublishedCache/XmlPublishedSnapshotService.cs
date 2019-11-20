@@ -3,6 +3,7 @@ using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -37,6 +38,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private readonly ISiteDomainHelper _siteDomainHelper;
         private readonly IEntityXmlSerializer _entitySerializer;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
         #region Constructors
 
@@ -51,6 +53,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             IDefaultCultureAccessor defaultCultureAccessor,
             ILogger logger,
             IGlobalSettings globalSettings,
+            IHostingEnvironment hostingEnvironment,
             ISiteDomainHelper siteDomainHelper,
             IEntityXmlSerializer entitySerializer,
             MainDom mainDom,
@@ -59,7 +62,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                 publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor,
                 documentRepository, mediaRepository, memberRepository,
                 defaultCultureAccessor,
-                logger, globalSettings, siteDomainHelper, entitySerializer, null, mainDom, testing, enableRepositoryEvents)
+                logger, globalSettings, hostingEnvironment, siteDomainHelper, entitySerializer, null, mainDom, testing, enableRepositoryEvents)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
         }
@@ -75,6 +78,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             IDefaultCultureAccessor defaultCultureAccessor,
             ILogger logger,
             IGlobalSettings globalSettings,
+            IHostingEnvironment hostingEnvironment,
             ISiteDomainHelper siteDomainHelper,
             IEntityXmlSerializer entitySerializer,
             PublishedContentTypeCache contentTypeCache,
@@ -89,7 +93,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
             _xmlStore = new XmlStore(serviceContext.ContentTypeService, serviceContext.ContentService, scopeProvider, _routesCache,
                 _contentTypeCache, publishedSnapshotAccessor, mainDom, testing, enableRepositoryEvents,
-                documentRepository, mediaRepository, memberRepository, globalSettings, entitySerializer);
+                documentRepository, mediaRepository, memberRepository, globalSettings, entitySerializer, hostingEnvironment);
 
             _domainService = serviceContext.DomainService;
             _memberService = serviceContext.MemberService;
@@ -102,6 +106,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             _globalSettings = globalSettings;
             _siteDomainHelper = siteDomainHelper;
             _entitySerializer = entitySerializer;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         public override void Dispose()
@@ -126,7 +131,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             }
             catch
             {
-                errors = new[] { SystemFiles.GetContentCacheXml(_globalSettings) };
+                errors = new[] { SystemFiles.GetContentCacheXml(_hostingEnvironment) };
                 return false;
             }
         }

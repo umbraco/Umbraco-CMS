@@ -13,6 +13,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -20,6 +21,7 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
+using Umbraco.Web.Hosting;
 using File = System.IO.File;
 
 namespace Umbraco.Tests.TestHelpers
@@ -295,6 +297,11 @@ namespace Umbraco.Tests.TestHelpers
         public static IRegister GetRegister()
         {
             return RegisterFactory.Create(GetConfigs().Global());
+        }
+
+        public static IHostingEnvironment GetHostingEnvironment()
+        {
+            return new AspNetHostingEnvironment(SettingsForTests.GetDefaultGlobalSettings(), IOHelper.Default);
         }
     }
 }

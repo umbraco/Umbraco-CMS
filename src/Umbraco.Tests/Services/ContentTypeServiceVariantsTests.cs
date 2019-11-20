@@ -8,6 +8,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -49,10 +50,12 @@ namespace Umbraco.Tests.Services
             var runtimeStateMock = new Mock<IRuntimeState>();
             runtimeStateMock.Setup(x => x.Level).Returns(() => RuntimeLevel.Run);
 
-            var contentTypeFactory = Factory.GetInstance<IPublishedContentTypeFactory>();            
+            var contentTypeFactory = Factory.GetInstance<IPublishedContentTypeFactory>();
             var documentRepository = Factory.GetInstance<IDocumentRepository>();
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
+            var hostingEnvironment = Mock.Of<IHostingEnvironment>();
+
 
             var typeFinder = new TypeFinder(Mock.Of<ILogger>());
 
@@ -74,7 +77,8 @@ namespace Umbraco.Tests.Services
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }),
-                typeFinder);
+                typeFinder,
+                hostingEnvironment);
         }
 
         public class LocalServerMessenger : ServerMessengerBase
@@ -127,8 +131,8 @@ namespace Umbraco.Tests.Services
         [TestCase(ContentVariation.CultureAndSegment, ContentVariation.CultureAndSegment, false)]
         public void Change_Content_Type_Variation_Clears_Redirects(ContentVariation startingContentTypeVariation, ContentVariation changedContentTypeVariation, bool shouldUrlRedirectsBeCleared)
         {
-            var contentType = MockedContentTypes.CreateBasicContentType();            
-            contentType.Variations = startingContentTypeVariation;            
+            var contentType = MockedContentTypes.CreateBasicContentType();
+            contentType.Variations = startingContentTypeVariation;
             ServiceContext.ContentTypeService.Save(contentType);
             var contentType2 = MockedContentTypes.CreateBasicContentType("test");
             ServiceContext.ContentTypeService.Save(contentType2);
@@ -407,7 +411,7 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("hello world", doc.GetValue("title"));
             Assert.IsTrue(doc.IsCultureEdited("en-US")); //invariant prop changes show up on default lang
             Assert.IsTrue(doc.Edited);
-            
+
             //change the property type to be variant
             contentType.PropertyTypes.First().Variations = variant;
             ServiceContext.ContentTypeService.Save(contentType);
@@ -435,7 +439,7 @@ namespace Umbraco.Tests.Services
         {
             //create content type with a property type that varies by culture
             var contentType = MockedContentTypes.CreateBasicContentType();
-            // content type supports all variations            
+            // content type supports all variations
             contentType.Variations = ContentVariation.Culture | ContentVariation.Segment;
             var properties = CreatePropertyCollection(("title", variant));
             contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
@@ -472,7 +476,7 @@ namespace Umbraco.Tests.Services
         {
             //create content type with a property type that varies by culture
             var contentType = MockedContentTypes.CreateBasicContentType();
-            // content type supports all variations            
+            // content type supports all variations
             contentType.Variations = ContentVariation.Culture | ContentVariation.Segment;
             var properties = CreatePropertyCollection(("title", variant));
             contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
@@ -879,14 +883,14 @@ namespace Umbraco.Tests.Services
             // switch property type to Invariant
             contentType.PropertyTypes.First(x => x.Alias == "value1").Variations = invariant;
             ServiceContext.ContentTypeService.Save(contentType); //This is going to have to re-normalize the "Edited" flag
-            
+
             document = ServiceContext.ContentService.GetById(document.Id);
             Assert.IsTrue(document.IsCultureEdited("en")); //This will remain true because there is now a pending change for the invariant property data which is flagged under the default lang
             Assert.IsFalse(document.IsCultureEdited("fr")); //This will be false because nothing has changed for this culture and the property no longer reflects variant changes
             Assert.IsTrue(document.Edited);
 
             //update the invariant value and publish
-            document.SetValue("value1", "v1inv"); 
+            document.SetValue("value1", "v1inv");
             ServiceContext.ContentService.SaveAndPublish(document);
 
             document = ServiceContext.ContentService.GetById(document.Id);
@@ -906,7 +910,7 @@ namespace Umbraco.Tests.Services
             // switch property back to Culture
             contentType.PropertyTypes.First(x => x.Alias == "value1").Variations = variant;
             ServiceContext.ContentTypeService.Save(contentType);
-                        
+
             document = ServiceContext.ContentService.GetById(document.Id);
             Assert.AreEqual("v1inv", document.GetValue("value1", "en")); //The invariant property value gets copied over to the default language
             Assert.AreEqual("v1inv", document.GetValue("value1", "en", published: true));
@@ -970,9 +974,9 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("doc1en", document.GetCultureName("en"));
             Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
             Assert.AreEqual("v1en", document.GetValue("value1"));
-            Assert.AreEqual("v1en-init", document.GetValue("value1", published: true));            
+            Assert.AreEqual("v1en-init", document.GetValue("value1", published: true));
             Assert.IsTrue(document.IsCultureEdited("en")); //This is true because the invariant property reflects changes on the default lang
-            Assert.IsFalse(document.IsCultureEdited("fr")); 
+            Assert.IsFalse(document.IsCultureEdited("fr"));
             Assert.IsTrue(document.Edited);
 
             // switch property type to Culture
@@ -980,7 +984,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentTypeService.Save(contentType); //This is going to have to re-normalize the "Edited" flag
 
             document = ServiceContext.ContentService.GetById(document.Id);
-            Assert.IsTrue(document.IsCultureEdited("en")); //Remains true 
+            Assert.IsTrue(document.IsCultureEdited("en")); //Remains true
             Assert.IsFalse(document.IsCultureEdited("fr")); //False because no french property has ever been edited
             Assert.IsTrue(document.Edited);
 
@@ -1010,7 +1014,7 @@ namespace Umbraco.Tests.Services
             Assert.IsNull(document.GetValue("value1", "fr"));  //The values are there but the business logic returns null
             Assert.IsNull(document.GetValue("value1", "fr", published: true));  //The values are there but the business logic returns null
             Assert.IsFalse(document.IsCultureEdited("en")); //The variant published AND edited values are copied over to the invariant
-            Assert.IsFalse(document.IsCultureEdited("fr"));  
+            Assert.IsFalse(document.IsCultureEdited("fr"));
             Assert.IsFalse(document.Edited);
 
         }

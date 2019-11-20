@@ -23,6 +23,7 @@ using Umbraco.Web.Security;
 using Umbraco.Web.Routing;
 using File = System.IO.File;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.Testing;
@@ -60,6 +61,7 @@ namespace Umbraco.Tests.TestHelpers
         internal ScopeProvider ScopeProvider => Current.ScopeProvider as ScopeProvider;
 
         protected ISqlContext SqlContext => Factory.GetInstance<ISqlContext>();
+        protected IHostingEnvironment HostingEnvironment => Factory.GetInstance<IHostingEnvironment>();
 
         public override void SetUp()
         {
@@ -268,7 +270,9 @@ namespace Umbraco.Tests.TestHelpers
                 Factory.GetInstance<IDocumentRepository>(), Factory.GetInstance<IMediaRepository>(), Factory.GetInstance<IMemberRepository>(),
                 DefaultCultureAccessor,
                 Logger,
-                Factory.GetInstance<IGlobalSettings>(), new SiteDomainHelper(),
+                Factory.GetInstance<IGlobalSettings>(),
+                HostingEnvironment,
+                new SiteDomainHelper(),
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 ContentTypesCache,
                 null, true, Options.PublishedRepositoryEvents);

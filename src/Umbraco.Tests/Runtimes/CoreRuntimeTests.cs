@@ -12,6 +12,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
@@ -20,6 +21,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
+using Umbraco.Web.Hosting;
 using Umbraco.Web.Runtime;
 
 namespace Umbraco.Tests.Runtimes
@@ -81,7 +83,7 @@ namespace Umbraco.Tests.Runtimes
         // test application
         public class TestUmbracoApplication : UmbracoApplicationBase
         {
-            public TestUmbracoApplication() : base(new DebugDiagnosticsLogger(new MessageTemplates()),  GetConfigs(), IOHelper.Default, GetProfiler())
+            public TestUmbracoApplication() : base(new DebugDiagnosticsLogger(new MessageTemplates()),  GetConfigs(), IOHelper.Default, GetProfiler(), new AspNetHostingEnvironment(GetConfigs().Global(), IOHelper.Default))
             {
             }
 
@@ -100,17 +102,17 @@ namespace Umbraco.Tests.Runtimes
 
             public IRuntime Runtime { get; private set; }
 
-            protected override IRuntime GetRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler)
+            protected override IRuntime GetRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment)
             {
-                return Runtime = new TestRuntime(configs, umbracoVersion, ioHelper, logger, profiler);
+                return Runtime = new TestRuntime(configs, umbracoVersion, ioHelper, logger, profiler, hostingEnvironment);
             }
         }
 
         // test runtime
         public class TestRuntime : CoreRuntime
         {
-            public TestRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler)
-                :base(configs, umbracoVersion, ioHelper, logger,  profiler, new AspNetUmbracoBootPermissionChecker())
+            public TestRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment)
+                :base(configs, umbracoVersion, ioHelper, logger,  profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment)
             {
 
             }

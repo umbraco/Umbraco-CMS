@@ -6,6 +6,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
@@ -27,12 +28,13 @@ namespace Umbraco.Core.Runtime
         private readonly IUmbracoBootPermissionChecker _umbracoBootPermissionChecker;
 
 
-        public CoreRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IUmbracoBootPermissionChecker umbracoBootPermissionChecker)
+        public CoreRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IUmbracoBootPermissionChecker umbracoBootPermissionChecker, IHostingEnvironment hostingEnvironment)
         {
             IOHelper = ioHelper;
             Configs = configs;
             UmbracoVersion = umbracoVersion ;
             Profiler = profiler;
+            HostingEnvironment = hostingEnvironment;
 
             _umbracoBootPermissionChecker = umbracoBootPermissionChecker;
 
@@ -74,6 +76,7 @@ namespace Umbraco.Core.Runtime
         /// Gets the <see cref="IIOHelper"/>
         /// </summary>
         protected IIOHelper IOHelper { get; }
+        protected IHostingEnvironment HostingEnvironment { get; }
         protected Configs Configs { get; }
         protected IUmbracoVersion UmbracoVersion { get; }
 
@@ -142,10 +145,10 @@ namespace Umbraco.Core.Runtime
                 var databaseFactory = GetDatabaseFactory();
 
                 // type finder/loader
-                var typeLoader = new TypeLoader(IOHelper, TypeFinder, appCaches.RuntimeCache, new DirectoryInfo(Configs.Global().LocalTempPath(IOHelper)), ProfilingLogger);
+                var typeLoader = new TypeLoader(IOHelper, TypeFinder, appCaches.RuntimeCache, new DirectoryInfo(HostingEnvironment.LocalTempPath), ProfilingLogger);
 
                 // main dom
-                var mainDom = new MainDom(Logger);
+                var mainDom = new MainDom(Logger, HostingEnvironment);
 
                 // create the composition
                 composition = new Composition(register, typeLoader, ProfilingLogger, _state, Configs);

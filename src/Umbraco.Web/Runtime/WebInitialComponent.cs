@@ -14,6 +14,7 @@ using ClientDependency.Core.Config;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Web.Install;
 using Umbraco.Web.JavaScript;
@@ -30,13 +31,15 @@ namespace Umbraco.Web.Runtime
         private readonly SurfaceControllerTypeCollection _surfaceControllerTypes;
         private readonly UmbracoApiControllerTypeCollection _apiControllerTypes;
         private readonly IGlobalSettings _globalSettings;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
-        public WebInitialComponent(IUmbracoContextAccessor umbracoContextAccessor, SurfaceControllerTypeCollection surfaceControllerTypes, UmbracoApiControllerTypeCollection apiControllerTypes, IGlobalSettings globalSettings)
+        public WebInitialComponent(IUmbracoContextAccessor umbracoContextAccessor, SurfaceControllerTypeCollection surfaceControllerTypes, UmbracoApiControllerTypeCollection apiControllerTypes, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _surfaceControllerTypes = surfaceControllerTypes;
             _apiControllerTypes = apiControllerTypes;
             _globalSettings = globalSettings;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         public void Initialize()
@@ -48,7 +51,7 @@ namespace Umbraco.Web.Runtime
             // want to access HttpContext.Current, which doesn't exist
             if (Current.IOHelper.IsHosted)
             {
-                ConfigureClientDependency(_globalSettings);
+                ConfigureClientDependency();
             }
 
             // Disable the X-AspNetMvc-Version HTTP Header
@@ -109,7 +112,7 @@ namespace Umbraco.Web.Runtime
                 new NamespaceHttpControllerSelector(GlobalConfiguration.Configuration));
         }
 
-        private static void ConfigureClientDependency(IGlobalSettings globalSettings)
+        private void ConfigureClientDependency()
         {
             // Backwards compatibility - set the path and URL type for ClientDependency 1.5.1 [LK]
             XmlFileMapper.FileMapDefaultFolder = Core.Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "ClientDependency";
@@ -117,9 +120,9 @@ namespace Umbraco.Web.Runtime
 
             // Now we need to detect if we are running 'Umbraco.Core.LocalTempStorage' as EnvironmentTemp and in that case we want to change the CDF file
             // location to be there
-            if (globalSettings.LocalTempStorageLocation == LocalTempStorage.EnvironmentTemp)
+            if (_globalSettings.LocalTempStorageLocation == LocalTempStorage.EnvironmentTemp)
             {
-                var cachePath = globalSettings.LocalTempPath(Current.IOHelper);
+                var cachePath = _hostingEnvironment.LocalTempPath;
 
                 //set the file map and composite file default location to the %temp% location
                 BaseCompositeFileProcessingProvider.CompositeFilePathDefaultFolder
