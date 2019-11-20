@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Migrations.Upgrade;
@@ -17,12 +18,14 @@ namespace Umbraco.Web.Install.InstallSteps
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly IRuntimeState _runtime;
         private readonly ILogger _logger;
+        private readonly IUmbracoVersion _umbracoVersion;
 
-        public DatabaseUpgradeStep(DatabaseBuilder databaseBuilder, IRuntimeState runtime, ILogger logger)
+        public DatabaseUpgradeStep(DatabaseBuilder databaseBuilder, IRuntimeState runtime, ILogger logger, IUmbracoVersion umbracoVersion)
         {
             _databaseBuilder = databaseBuilder;
             _runtime = runtime;
             _logger = logger;
+            _umbracoVersion = umbracoVersion;
         }
 
         public override Task<InstallSetupResult> ExecuteAsync(object model)
@@ -35,7 +38,7 @@ namespace Umbraco.Web.Install.InstallSteps
             {
                 _logger.Info<DatabaseUpgradeStep>("Running 'Upgrade' service");
 
-                var plan = new UmbracoPlan();
+                var plan = new UmbracoPlan(_umbracoVersion);
                 plan.AddPostMigration<ClearCsrfCookies>(); // needed when running installer (back-office)
 
                 var result = _databaseBuilder.UpgradeSchemaAndData(plan);

@@ -10,7 +10,7 @@ namespace Umbraco.Web.Editors
         private readonly UmbracoFeatures _features;
         public IEnumerable<ILanguage> Languages { get; }
 
-        public BackOfficePreviewModel(UmbracoFeatures features, IGlobalSettings globalSettings, IEnumerable<ILanguage> languages) : base(features, globalSettings)
+        public BackOfficePreviewModel(UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IEnumerable<ILanguage> languages) : base(features, globalSettings, umbracoVersion)
         {
             _features = features;
             Languages = languages;

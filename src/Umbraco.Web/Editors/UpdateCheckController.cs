@@ -38,7 +38,7 @@ namespace Umbraco.Web.Editors
                         _umbracoVersion.Current.Build,
                         _umbracoVersion.Comment);
 
-                    return new UpgradeCheckResponse(result.UpgradeType.ToString(), result.Comment, result.UpgradeUrl);
+                    return new UpgradeCheckResponse(result.UpgradeType.ToString(), result.Comment, result.UpgradeUrl, _umbracoVersion);
                 }
                 catch (System.Net.WebException)
                 {

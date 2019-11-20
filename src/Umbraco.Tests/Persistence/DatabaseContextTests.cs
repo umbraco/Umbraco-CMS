@@ -7,6 +7,7 @@ using Moq;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
@@ -26,6 +27,7 @@ namespace Umbraco.Tests.Persistence
         private ILogger _logger;
         private SqlCeSyntaxProvider _sqlCeSyntaxProvider;
         private ISqlSyntaxProvider[] _sqlSyntaxProviders;
+        private IUmbracoVersion _umbracoVersion;
 
         [SetUp]
         public void Setup()
@@ -34,6 +36,7 @@ namespace Umbraco.Tests.Persistence
             _sqlCeSyntaxProvider = new SqlCeSyntaxProvider();
             _sqlSyntaxProviders = new[] { (ISqlSyntaxProvider) _sqlCeSyntaxProvider };
             _logger = Mock.Of<ILogger>();
+            _umbracoVersion = TestHelper.GetUmbracoVersion();
             _databaseFactory = new UmbracoDatabaseFactory(_logger, new Lazy<IMapperCollection>(() => Mock.Of<IMapperCollection>()), TestHelper.GetConfigs());
         }
 
@@ -88,7 +91,7 @@ namespace Umbraco.Tests.Persistence
             using (var database = _databaseFactory.CreateDatabase())
             using (var transaction = database.GetTransaction())
             {
-                schemaHelper = new DatabaseSchemaCreator(database, _logger);
+                schemaHelper = new DatabaseSchemaCreator(database, _logger, _umbracoVersion);
                 schemaHelper.InitializeDatabaseSchema();
                 transaction.Complete();
             }

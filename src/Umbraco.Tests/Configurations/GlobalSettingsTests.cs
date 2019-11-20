@@ -24,13 +24,6 @@ namespace Umbraco.Tests.Configurations
             Current.IOHelper.Root = _root;
         }
 
-        [Ignore("fixme - ignored test")]
-        [Test]
-        public void Is_Version_From_Assembly_Correct()
-        {
-            Assert.That(Current.UmbracoVersion.SemanticVersion, Is.EqualTo("6.0.0"));
-        }
-
         [TestCase("~/umbraco", "/", "umbraco")]
         [TestCase("~/umbraco", "/MyVirtualDir", "umbraco")]
         [TestCase("~/customPath", "/MyVirtualDir/", "custompath")]

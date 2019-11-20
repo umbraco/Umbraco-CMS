@@ -42,14 +42,15 @@ namespace Umbraco.Web.Editors
         private readonly IRuntimeState _runtimeState;
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
-        private IUmbracoVersion _umbracoVersion;
+        private readonly IUmbracoVersion _umbracoVersion;
 
-        public BackOfficeController(IManifestParser manifestParser, UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+        public BackOfficeController(IManifestParser manifestParser, UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IUmbracoVersion umbracoVersion)
             : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger, umbracoHelper)
         {
             _manifestParser = manifestParser;
             _features = features;
             _runtimeState = runtimeState;
+            _umbracoVersion = umbracoVersion;
         }
 
         protected BackOfficeSignInManager SignInManager => _signInManager ?? (_signInManager = OwinContext.GetBackOfficeSignInManager());
@@ -65,8 +66,8 @@ namespace Umbraco.Web.Editors
         public async Task<ActionResult> Default()
         {
             return await RenderDefaultOrProcessExternalLoginAsync(
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings)),
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings)));
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion)),
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion)));
         }
 
         [HttpGet]
@@ -149,7 +150,7 @@ namespace Umbraco.Web.Editors
         {
             return await RenderDefaultOrProcessExternalLoginAsync(
                 //The default view to render when there is no external login info or errors
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml", new BackOfficeModel(_features, GlobalSettings)),
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion)),
                 //The ActionResult to perform if external login is successful
                 () => Redirect("/"));
         }

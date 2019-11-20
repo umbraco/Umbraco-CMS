@@ -1,6 +1,7 @@
 ﻿using System.Runtime.Serialization;
 using System.Web;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Models
 {
@@ -17,11 +18,11 @@ namespace Umbraco.Web.Models
         public string Url { get; set; }
 
         public UpgradeCheckResponse() { }
-        public UpgradeCheckResponse(string upgradeType, string upgradeComment, string upgradeUrl)
+        public UpgradeCheckResponse(string upgradeType, string upgradeComment, string upgradeUrl, IUmbracoVersion umbracoVersion)
         {
             Type = upgradeType;
             Comment = upgradeComment;
-            Url = upgradeUrl + "?version=" + HttpUtility.UrlEncode(Current.UmbracoVersion.Current.ToString(3));
+            Url = upgradeUrl + "?version=" + HttpUtility.UrlEncode(umbracoVersion.Current.ToString(3));
         }
     }
 }
