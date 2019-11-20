@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
@@ -51,8 +52,8 @@ namespace Umbraco.Tests.Benchmarks
         {
             var logger = new DebugDiagnosticsLogger(new MessageTemplates());
             var path = TestHelper.CurrentAssemblyDirectory;
-
-            SetupSqlCe(path, logger);
+            var umbracoVersion = TestHelper.GetUmbracoVersion();
+            SetupSqlCe(path, logger, umbracoVersion);
             SetupSqlServer(logger);
 
 
@@ -83,7 +84,7 @@ namespace Umbraco.Tests.Benchmarks
 )");
         }
 
-        private void SetupSqlCe(string path, ILogger logger)
+        private void SetupSqlCe(string path, ILogger logger, IUmbracoVersion umbracoVersion)
         {
             var dbName = string.Concat("Umb", Guid.NewGuid(), ".sdf");
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
@@ -102,7 +103,7 @@ namespace Umbraco.Tests.Benchmarks
                 //use the db  to create the initial schema so we can reuse in each bench
                 using (_dbSqlCe = GetSqlCeDatabase(sqlCeConnectionString, logger))
                 {
-                    var creation = new DatabaseSchemaCreator(_dbSqlCe, logger);
+                    var creation = new DatabaseSchemaCreator(_dbSqlCe, logger, umbracoVersion);
                     creation.InitializeDatabaseSchema();
                 }
                 _initDbBytes = File.ReadAllBytes(_dbFile);

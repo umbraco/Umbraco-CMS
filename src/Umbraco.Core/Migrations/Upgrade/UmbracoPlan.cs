@@ -14,16 +14,16 @@ namespace Umbraco.Core.Migrations.Upgrade
     /// </summary>
     public class UmbracoPlan : MigrationPlan
     {
+        private readonly IUmbracoVersion _umbracoVersion;
         private const string InitPrefix = "{init-";
         private const string InitSuffix = "}";
-
-        private IUmbracoVersion UmbracoVersion => Current.UmbracoVersion;
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoPlan"/> class.
         /// </summary>
-        public UmbracoPlan()
+        public UmbracoPlan(IUmbracoVersion umbracoVersion)
             : base(Constants.System.UmbracoUpgradePlanName)
         {
+            _umbracoVersion = umbracoVersion;
             DefinePlan();
         }
 
@@ -66,13 +66,13 @@ namespace Umbraco.Core.Migrations.Upgrade
                     throw new InvalidOperationException($"Could not get current version from web.config {Constants.AppSettings.ConfigurationStatus} appSetting.");
 
                 // cannot go back in time
-                if (currentVersion > UmbracoVersion.SemanticVersion)
-                    throw new InvalidOperationException($"Version {currentVersion} cannot be downgraded to {UmbracoVersion.SemanticVersion}.");
+                if (currentVersion > _umbracoVersion.SemanticVersion)
+                    throw new InvalidOperationException($"Version {currentVersion} cannot be downgraded to {_umbracoVersion.SemanticVersion}.");
 
                 // only from 7.14.0 and above
                 var minVersion = new SemVersion(7, 14);
                 if (currentVersion < minVersion)
-                    throw new InvalidOperationException($"Version {currentVersion} cannot be migrated to {UmbracoVersion.SemanticVersion}."
+                    throw new InvalidOperationException($"Version {currentVersion} cannot be migrated to {_umbracoVersion.SemanticVersion}."
                                                         + $" Please upgrade first to at least {minVersion}.");
 
                 // Force versions between 7.14.*-7.15.* into into 7.14 initial state. Because there is no db-changes,
@@ -89,7 +89,7 @@ namespace Umbraco.Core.Migrations.Upgrade
         {
             if (TryGetInitStateVersion(state, out var initVersion))
             {
-                throw new InvalidOperationException($"Version {UmbracoVersion.SemanticVersion} does not support migrating from {initVersion}."
+                throw new InvalidOperationException($"Version {_umbracoVersion.SemanticVersion} does not support migrating from {initVersion}."
                                                     + $" Please verify which versions support migrating from {initVersion}.");
             }
 

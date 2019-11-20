@@ -15,11 +15,13 @@ namespace Umbraco.Core.Migrations.Install
     {
         private readonly IDatabase _database;
         private readonly ILogger _logger;
+        private readonly IUmbracoVersion _umbracoVersion;
 
-        public DatabaseDataCreator(IDatabase database, ILogger logger)
+        public DatabaseDataCreator(IDatabase database, ILogger logger, IUmbracoVersion umbracoVersion)
         {
             _database = database;
             _logger = logger;
+            _umbracoVersion = umbracoVersion;
         }
 
         /// <summary>
@@ -324,7 +326,7 @@ namespace Umbraco.Core.Migrations.Install
         {
             // on install, initialize the umbraco migration plan with the final state
 
-            var upgrader = new Upgrader(new UmbracoPlan());
+            var upgrader = new Upgrader(new UmbracoPlan(_umbracoVersion));
             var stateValueKey = upgrader.StateValueKey;
             var finalState = upgrader.Plan.FinalState;
 
