@@ -3,7 +3,7 @@ using Umbraco.Core;
 
 namespace Umbraco.Web
 {
-    public class IpResolver : IIpResolver
+    public class AspNetIpResolver : IIpResolver
     {
         public string GetCurrentRequestIpAddress()
         {

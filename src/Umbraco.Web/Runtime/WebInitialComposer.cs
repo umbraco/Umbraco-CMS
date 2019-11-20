@@ -56,7 +56,7 @@ namespace Umbraco.Web.Runtime
             base.Compose(composition);
 
             composition.Register<UmbracoInjectedModule>();
-            composition.Register<IIpResolver, IpResolver>();
+            composition.Register<IIpResolver, AspNetIpResolver>();
             composition.Register<IHostingEnvironment, AspNetHostingEnvironment>();
 
             composition.RegisterUnique<IHttpContextAccessor, AspNetHttpContextAccessor>(); // required for hybrid accessors

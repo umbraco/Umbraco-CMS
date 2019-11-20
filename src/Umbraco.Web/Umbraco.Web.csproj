@@ -164,7 +164,7 @@
     <Compile Include="Editors\RelationTypeController.cs" />
     <Compile Include="Editors\TinyMceController.cs" />
     <Compile Include="Hosting\AspNetHostingEnvironment.cs" />
-    <Compile Include="IpResolver.cs" />
+    <Compile Include="AspNetIpResolver.cs" />
     <Compile Include="IUmbracoContextFactory.cs" />
     <Compile Include="Install\ChangesMonitor.cs" />
     <Compile Include="Logging\WebProfiler.cs" />
