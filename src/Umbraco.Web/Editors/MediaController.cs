@@ -952,34 +952,10 @@ namespace Umbraco.Web.Editors
                 throw new NotSupportedException("Both pageNumber and pageSize must be greater than zero");
             }
 
-            UmbracoObjectTypes entity;
-            string udiEntity;
+            var objectType = ObjectTypes.GetUmbracoObjectType(entityType);
+            var udiType = ObjectTypes.GetUdiType(objectType);
 
-            switch (entityType.ToUpperInvariant())
-            {
-                case "DOCUMENT":                    
-                    entity = UmbracoObjectTypes.Document;
-                    udiEntity = Constants.UdiEntityType.Document;
-                    break;
-
-                case "MEDIA":
-                    entity = UmbracoObjectTypes.Media;
-                    udiEntity = Constants.UdiEntityType.Media;
-                    break;
-
-                case "MEMBER":
-                    entity = UmbracoObjectTypes.Member;
-                    udiEntity = Constants.UdiEntityType.Member;
-                    break;
-
-                default:
-                    entity = UmbracoObjectTypes.Document;
-                    udiEntity = Constants.UdiEntityType.Document;
-                    break;
-            }
-
-            var relations = Services.RelationService.GetPagedParentEntitiesByChildId(id, pageNumber - 1, pageSize, out long totalRecords, entity);
-
+            var relations = Services.RelationService.GetPagedParentEntitiesByChildId(id, pageNumber - 1, pageSize, out var totalRecords, objectType);
 
             return new PagedResult<EntityBasic>(totalRecords, pageNumber, pageSize)
             {
@@ -987,7 +963,7 @@ namespace Umbraco.Web.Editors
                 {
                     Id = rel.Id,
                     Key = rel.Key,
-                    Udi = Udi.Create(udiEntity, rel.Key),
+                    Udi = Udi.Create(udiType, rel.Key),
                     Icon = rel.ContentTypeIcon,
                     Name = rel.Name,
                     Alias = rel.ContentTypeAlias
