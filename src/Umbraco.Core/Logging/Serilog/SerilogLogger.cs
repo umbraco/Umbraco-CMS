@@ -5,8 +5,8 @@ using System.Threading;
 using Serilog;
 using Serilog.Events;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Diagnostics;
+using Umbraco.Core.Hosting;
 
 namespace Umbraco.Core.Logging.Serilog
 {
@@ -36,11 +36,11 @@ namespace Umbraco.Core.Logging.Serilog
         /// Creates a logger with some pre-defined configuration and remainder from config file
         /// </summary>
         /// <remarks>Used by UmbracoApplicationBase to get its logger.</remarks>
-        public static SerilogLogger CreateWithDefaultConfiguration()
+        public static SerilogLogger CreateWithDefaultConfiguration(IHostingEnvironment hostingEnvironment)
         {
             var loggerConfig = new LoggerConfiguration();
             loggerConfig
-                .MinimalConfiguration()
+                .MinimalConfiguration(hostingEnvironment)
                 .ReadFromConfigFile()
                 .ReadFromUserConfigFile();
 

@@ -22,11 +22,19 @@ namespace Umbraco.Web.Hosting
             SiteName = HostingEnvironment.SiteName;
             ApplicationId = HostingEnvironment.ApplicationID;
             ApplicationPhysicalPath = HostingEnvironment.ApplicationPhysicalPath;
+            ApplicationVirtualPath = HostingEnvironment.ApplicationVirtualPath;
+
+            IsDebugMode = HttpContext.Current?.IsDebuggingEnabled ?? globalSettings.DebugMode;
         }
 
         public string SiteName { get; }
         public string ApplicationId { get; }
         public string ApplicationPhysicalPath { get; }
+
+        public string ApplicationVirtualPath { get; }
+        public bool IsDebugMode { get; }
+        public bool IsHosted => HostingEnvironment.IsHosted;
+        public string MapPath(string path) => HostingEnvironment.MapPath(path);
 
         public string LocalTempPath
         {
@@ -65,5 +73,6 @@ namespace Umbraco.Web.Hosting
                 }
             }
         }
+
     }
 }

@@ -61,7 +61,7 @@ namespace Umbraco.Web
                 // since it's assuming that the Culture can be empty (invariant) when in reality of a website this will never be empty since a real culture is always set here.
                 _variationContextAccessor.VariationContext = new VariationContext(_defaultCultureAccessor.DefaultCulture);
             }
-                
+
 
             var webSecurity = new WebSecurity(httpContext, _userService, _globalSettings);
 

@@ -110,6 +110,7 @@ namespace Umbraco.Tests.Testing
 
         protected virtual IProfilingLogger ProfilingLogger => Factory.GetInstance<IProfilingLogger>();
 
+        protected IHostingEnvironment HostingEnvironment => Factory.GetInstance<IHostingEnvironment>();
         protected AppCaches AppCaches => Factory.GetInstance<AppCaches>();
 
         protected virtual ISqlSyntaxProvider SqlSyntax => Factory.GetInstance<ISqlSyntaxProvider>();

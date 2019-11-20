@@ -29,11 +29,11 @@ namespace Umbraco.Web
 
         protected UmbracoApplicationBase()
         {
-            _logger = SerilogLogger.CreateWithDefaultConfiguration();
             _ioHelper = IOHelper.Default;
             _configs = new ConfigsFactory(_ioHelper).Create();
             _profiler = new LogProfiler(_logger);
             _hostingEnvironment = new AspNetHostingEnvironment(_configs.Global(), _ioHelper);
+            _logger = SerilogLogger.CreateWithDefaultConfiguration(_hostingEnvironment);
         }
 
         protected UmbracoApplicationBase(ILogger logger, Configs configs, IIOHelper ioHelper, IProfiler profiler, IHostingEnvironment hostingEnvironment)

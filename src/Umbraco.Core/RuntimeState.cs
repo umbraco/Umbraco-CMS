@@ -6,6 +6,7 @@ using Semver;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
@@ -26,12 +27,14 @@ namespace Umbraco.Core
         private readonly Lazy<IMainDom> _mainDom;
         private readonly Lazy<IServerRegistrar> _serverRegistrar;
         private readonly IUmbracoVersion _umbracoVersion;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RuntimeState"/> class.
         /// </summary>
         public RuntimeState(ILogger logger, IUmbracoSettingsSection settings, IGlobalSettings globalSettings,
-            Lazy<IMainDom> mainDom, Lazy<IServerRegistrar> serverRegistrar, IUmbracoVersion umbracoVersion)
+            Lazy<IMainDom> mainDom, Lazy<IServerRegistrar> serverRegistrar, IUmbracoVersion umbracoVersion,
+            IHostingEnvironment hostingEnvironment)
         {
             _logger = logger;
             _settings = settings;
@@ -39,6 +42,9 @@ namespace Umbraco.Core
             _mainDom = mainDom;
             _serverRegistrar = serverRegistrar;
             _umbracoVersion = umbracoVersion;
+            _hostingEnvironment = hostingEnvironment;
+
+            ApplicationVirtualPath = _hostingEnvironment.ApplicationVirtualPath;
         }
 
         /// <summary>
@@ -67,7 +73,7 @@ namespace Umbraco.Core
         public SemVersion SemanticVersion => _umbracoVersion.SemanticVersion;
 
         /// <inheritdoc />
-        public bool Debug => HttpContext.Current != null ? HttpContext.Current.IsDebuggingEnabled : _globalSettings.DebugMode;
+        public bool Debug => _hostingEnvironment.IsDebugMode;
 
         /// <inheritdoc />
         public bool IsMainDom => MainDom.IsMainDom;
@@ -79,7 +85,7 @@ namespace Umbraco.Core
         public Uri ApplicationUrl { get; private set; }
 
         /// <inheritdoc />
-        public string ApplicationVirtualPath { get; } = HttpRuntime.AppDomainAppVirtualPath;
+        public string ApplicationVirtualPath { get; }
 
         /// <inheritdoc />
         public string CurrentMigrationState { get; internal set; }

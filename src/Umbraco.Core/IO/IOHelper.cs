@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Hosting;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.IO
 {
@@ -297,7 +298,7 @@ namespace Umbraco.Core.IO
             {
                 if (_root != null) return _root;
 
-                var appPath = HttpRuntime.AppDomainAppVirtualPath;
+                var appPath = HostingEnvironment.ApplicationVirtualPath;
                 // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                 if (appPath == null || appPath == "/") appPath = string.Empty;
 

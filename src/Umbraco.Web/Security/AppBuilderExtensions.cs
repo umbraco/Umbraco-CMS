@@ -40,7 +40,8 @@ namespace Umbraco.Web.Security
             UmbracoMapper mapper,
             IContentSection contentSettings,
             IGlobalSettings globalSettings,
-            MembershipProviderBase userMembershipProvider)
+            MembershipProviderBase userMembershipProvider,
+            IIpResolver ipResolver)
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
             if (userMembershipProvider == null) throw new ArgumentNullException(nameof(userMembershipProvider));
@@ -56,7 +57,8 @@ namespace Umbraco.Web.Security
                     userMembershipProvider,
                     mapper,
                     contentSettings,
-                    globalSettings));
+                    globalSettings,
+                    ipResolver));
 
             app.SetBackOfficeUserManagerType<BackOfficeUserManager, BackOfficeIdentityUser>();
 
@@ -73,12 +75,14 @@ namespace Umbraco.Web.Security
         /// <param name="userMembershipProvider"></param>
         /// <param name="customUserStore"></param>
         /// <param name="contentSettings"></param>
+        /// <param name="ipResolver"></param>
         public static void ConfigureUserManagerForUmbracoBackOffice(this IAppBuilder app,
             IRuntimeState runtimeState,
             IContentSection contentSettings,
             IGlobalSettings globalSettings,
             MembershipProviderBase userMembershipProvider,
-            BackOfficeUserStore customUserStore)
+            BackOfficeUserStore customUserStore,
+            IIpResolver ipResolver)
         {
             if (runtimeState == null) throw new ArgumentNullException(nameof(runtimeState));
             if (userMembershipProvider == null) throw new ArgumentNullException(nameof(userMembershipProvider));
@@ -87,6 +91,7 @@ namespace Umbraco.Web.Security
             //Configure Umbraco user manager to be created per request
             app.CreatePerOwinContext<BackOfficeUserManager>(
                 (options, owinContext) => BackOfficeUserManager.Create(
+                    ipResolver,
                     options,
                     customUserStore,
                     userMembershipProvider,

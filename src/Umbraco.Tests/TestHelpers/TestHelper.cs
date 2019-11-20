@@ -49,7 +49,9 @@ namespace Umbraco.Tests.TestHelpers
                 Mock.Of<IGlobalSettings>(),
                 new Lazy<IMainDom>(),
                 new Lazy<IServerRegistrar>(),
-                TestHelper.GetUmbracoVersion());
+                TestHelper.GetUmbracoVersion(),
+                TestHelper.GetHostingEnvironment()
+                );
         }
 
         public static IConfigsFactory GetConfigsFactory()

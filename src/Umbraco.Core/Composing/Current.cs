@@ -2,6 +2,7 @@
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
@@ -209,6 +210,8 @@ namespace Umbraco.Core.Composing
 
         public static IUmbracoVersion UmbracoVersion
             => Factory.GetInstance<IUmbracoVersion>();
+
+        public static IHostingEnvironment HostingEnvironment => Factory.GetInstance<IHostingEnvironment>();
 
         #endregion
     }

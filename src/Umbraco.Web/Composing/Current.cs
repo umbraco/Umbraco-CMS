@@ -11,6 +11,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.PackageActions;
 using Umbraco.Core.Packaging;
@@ -228,6 +229,8 @@ namespace Umbraco.Web.Composing
 
         public static IIOHelper IOHelper => CoreCurrent.IOHelper;
         public static IUmbracoVersion UmbracoVersion => CoreCurrent.UmbracoVersion;
+        public static IHostingEnvironment HostingEnvironment => CoreCurrent.HostingEnvironment;
+        public static IIpResolver IpResolver => Factory.GetInstance<IIpResolver>();
 
         #endregion
     }

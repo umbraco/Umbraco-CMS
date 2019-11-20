@@ -2,10 +2,8 @@
 using System.Security.Principal;
 using System.Threading;
 using System.Web;
-using System.Web.Hosting;
 using System.Web.Security;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 
@@ -128,7 +126,7 @@ namespace Umbraco.Core.Security
         /// <returns></returns>
         internal static string GetCurrentUserName(this MembershipProvider membershipProvider)
         {
-            if (HostingEnvironment.IsHosted)
+            if (Current.HostingEnvironment.IsHosted)
             {
                 HttpContext current = HttpContext.Current;
                 if (current != null && current.User != null && current.User.Identity != null)

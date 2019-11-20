@@ -46,7 +46,7 @@ namespace Umbraco.Core.Runtime
                 Configs.Settings(), Configs.Global(),
                 new Lazy<IMainDom>(() => _factory.GetInstance<IMainDom>()),
                 new Lazy<IServerRegistrar>(() => _factory.GetInstance<IServerRegistrar>()),
-                UmbracoVersion)
+                UmbracoVersion,HostingEnvironment)
             {
                 Level = RuntimeLevel.Boot
             };

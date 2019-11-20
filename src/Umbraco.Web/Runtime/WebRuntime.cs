@@ -9,7 +9,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Runtime;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing;
-using Umbraco.Web.Hosting;
 using Umbraco.Web.Logging;
 
 namespace Umbraco.Web.Runtime
@@ -62,7 +61,7 @@ namespace Umbraco.Web.Runtime
                 "Booted.",
                 "Boot failed."))
             {
-                Logger.Info<CoreRuntime>("Booting site '{HostingSiteName}', app '{HostingApplicationID}', path '{HostingPhysicalPath}', server '{MachineName}'.",
+                Logger.Info<CoreRuntime>("Booting site '{HostingSiteName}', app '{HostingApplicationId}', path '{HostingPhysicalPath}', server '{MachineName}'.",
                     HostingEnvironment.SiteName,
                     HostingEnvironment.ApplicationId,
                     HostingEnvironment.ApplicationPhysicalPath,

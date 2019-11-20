@@ -5,17 +5,14 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Scoping;
 
@@ -35,7 +32,6 @@ namespace Umbraco.Core.Sync
         private readonly ManualResetEvent _syncIdle;
         private readonly object _locko = new object();
         private readonly IProfilingLogger _profilingLogger;
-        private readonly IIOHelper _ioHelper;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ISqlContext _sqlContext;
         private readonly Lazy<string> _distCacheFilePath;
@@ -50,14 +46,13 @@ namespace Umbraco.Core.Sync
 
         public DatabaseServerMessenger(
             IRuntimeState runtime, IScopeProvider scopeProvider, ISqlContext sqlContext, IProfilingLogger proflog,
-            bool distributedEnabled, DatabaseServerMessengerOptions options, IIOHelper ioHelper, IHostingEnvironment hostingEnvironment)
+            bool distributedEnabled, DatabaseServerMessengerOptions options,  IHostingEnvironment hostingEnvironment)
             : base(distributedEnabled)
         {
             ScopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
             _sqlContext = sqlContext;
             _runtime = runtime;
             _profilingLogger = proflog ?? throw new ArgumentNullException(nameof(proflog));
-            _ioHelper = ioHelper;
             _hostingEnvironment = hostingEnvironment;
             Logger = proflog;
             Options = options ?? throw new ArgumentNullException(nameof(options));
@@ -530,14 +525,14 @@ namespace Umbraco.Core.Sync
         /// and debugging purposes.</para>
         /// </remarks>
         protected static readonly string LocalIdentity = NetworkHelper.MachineName // eg DOMAIN\SERVER
-            + "/" + HttpRuntime.AppDomainAppId // eg /LM/S3SVC/11/ROOT
+            + "/" + Current.HostingEnvironment.ApplicationId // eg /LM/S3SVC/11/ROOT
             + " [P" + Process.GetCurrentProcess().Id // eg 1234
             + "/D" + AppDomain.CurrentDomain.Id // eg 22
             + "] " + Guid.NewGuid().ToString("N").ToUpper(); // make it truly unique
 
         private string GetDistCacheFilePath(IHostingEnvironment hostingEnvironment)
         {
-            var fileName = HttpRuntime.AppDomainAppId.ReplaceNonAlphanumericChars(string.Empty) + "-lastsynced.txt";
+            var fileName = _hostingEnvironment.ApplicationId.ReplaceNonAlphanumericChars(string.Empty) + "-lastsynced.txt";
 
             var distCacheFilePath = Path.Combine(hostingEnvironment.LocalTempPath, "DistCache", fileName);
 

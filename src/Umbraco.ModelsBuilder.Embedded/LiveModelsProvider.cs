@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Web.Hosting;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.ModelsBuilder.Embedded.Building;
 using Umbraco.ModelsBuilder.Embedded.Configuration;
@@ -17,16 +18,18 @@ namespace Umbraco.ModelsBuilder.Embedded
         private readonly IModelsBuilderConfig _config;
         private readonly ModelsGenerator _modelGenerator;
         private readonly ModelsGenerationError _mbErrors;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
         // we do not manage pure live here
         internal bool IsEnabled => _config.ModelsMode.IsLiveNotPure();
 
-        public LiveModelsProvider(ILogger logger, IModelsBuilderConfig config, ModelsGenerator modelGenerator, ModelsGenerationError mbErrors)
+        public LiveModelsProvider(ILogger logger, IModelsBuilderConfig config, ModelsGenerator modelGenerator, ModelsGenerationError mbErrors, IHostingEnvironment hostingEnvironment)
         {
             _logger = logger;
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _modelGenerator = modelGenerator;
             _mbErrors = mbErrors;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         internal void Install()
@@ -38,7 +41,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             // initialize mutex
             // ApplicationId will look like "/LM/W3SVC/1/Root/AppName"
             // name is system-wide and must be less than 260 chars
-            var name = HostingEnvironment.ApplicationID + "/UmbracoLiveModelsProvider";
+            var name = _hostingEnvironment.ApplicationId + "/UmbracoLiveModelsProvider";
 
             _mutex = new Mutex(false, name); //TODO: Replace this with MainDom? Seems we now have 2x implementations of almost the same thing
 

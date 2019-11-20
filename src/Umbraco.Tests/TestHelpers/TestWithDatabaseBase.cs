@@ -61,7 +61,6 @@ namespace Umbraco.Tests.TestHelpers
         internal ScopeProvider ScopeProvider => Current.ScopeProvider as ScopeProvider;
 
         protected ISqlContext SqlContext => Factory.GetInstance<ISqlContext>();
-        protected IHostingEnvironment HostingEnvironment => Factory.GetInstance<IHostingEnvironment>();
 
         public override void SetUp()
         {

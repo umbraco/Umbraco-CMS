@@ -8,6 +8,7 @@ using System.Web.Configuration;
 using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
@@ -31,7 +32,8 @@ namespace Umbraco.Web.Security.Providers
 
         protected IMembershipMemberService<TEntity> MemberService { get; private set; }
 
-        protected UmbracoMembershipProvider(IMembershipMemberService<TEntity> memberService, IUmbracoVersion umbracoVersion)
+        protected UmbracoMembershipProvider(IMembershipMemberService<TEntity> memberService, IUmbracoVersion umbracoVersion, IHostingEnvironment hostingEnvironment)
+        :base(hostingEnvironment)
         {
             _umbracoVersion = umbracoVersion;
             MemberService = memberService;

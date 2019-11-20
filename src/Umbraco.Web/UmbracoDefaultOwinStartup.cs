@@ -30,6 +30,7 @@ namespace Umbraco.Web
         protected IRuntimeState RuntimeState => Core.Composing.Current.RuntimeState;
         protected ServiceContext Services => Current.Services;
         protected UmbracoMapper Mapper => Current.Mapper;
+        protected IIpResolver IpResolver => Current.IpResolver;
 
         /// <summary>
         /// Main startup method
@@ -85,7 +86,8 @@ namespace Umbraco.Web
                 Mapper,
                 UmbracoSettings.Content,
                 GlobalSettings,
-                Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider().AsUmbracoMembershipProvider());
+                Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider().AsUmbracoMembershipProvider(),
+                IpResolver);
         }
 
         /// <summary>

@@ -7,5 +7,10 @@ namespace Umbraco.Core.Hosting
         string ApplicationPhysicalPath { get; }
 
         string LocalTempPath { get; }
+        string ApplicationVirtualPath { get; }
+
+        bool IsDebugMode { get; }
+        bool IsHosted { get; }
+        string MapPath(string path);
     }
 }

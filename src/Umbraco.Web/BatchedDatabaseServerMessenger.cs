@@ -30,8 +30,8 @@ namespace Umbraco.Web
         private readonly IUmbracoDatabaseFactory _databaseFactory;
 
         public BatchedDatabaseServerMessenger(
-            IRuntimeState runtime, IUmbracoDatabaseFactory databaseFactory, IScopeProvider scopeProvider, ISqlContext sqlContext, IProfilingLogger proflog, DatabaseServerMessengerOptions options, IIOHelper ioHelper, IHostingEnvironment hostingEnvironment)
-            : base(runtime, scopeProvider, sqlContext, proflog, true, options, ioHelper, hostingEnvironment )
+            IRuntimeState runtime, IUmbracoDatabaseFactory databaseFactory, IScopeProvider scopeProvider, ISqlContext sqlContext, IProfilingLogger proflog, DatabaseServerMessengerOptions options, IHostingEnvironment hostingEnvironment)
+            : base(runtime, scopeProvider, sqlContext, proflog, true, options, hostingEnvironment )
         {
             _databaseFactory = databaseFactory;
         }

@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
@@ -21,12 +22,12 @@ namespace Umbraco.Web.Security.Providers
     {
 
         public UsersMembershipProvider()
-            : this(Current.Services.UserService, Current.Services.MemberTypeService, Current.UmbracoVersion)
+            : this(Current.Services.UserService, Current.Services.MemberTypeService, Current.UmbracoVersion, Current.HostingEnvironment)
         {
         }
 
-        public UsersMembershipProvider(IMembershipMemberService<IUser> memberService, IMemberTypeService memberTypeService, IUmbracoVersion umbracoVersion)
-            : base(memberService, umbracoVersion)
+        public UsersMembershipProvider(IMembershipMemberService<IUser> memberService, IMemberTypeService memberTypeService, IUmbracoVersion umbracoVersion, IHostingEnvironment hostingEnvironment)
+            : base(memberService, umbracoVersion, hostingEnvironment)
         {
             _memberTypeService = memberTypeService;
         }

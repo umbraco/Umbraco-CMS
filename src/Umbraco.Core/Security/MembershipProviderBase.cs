@@ -7,9 +7,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Configuration;
-using System.Web.Hosting;
 using System.Web.Security;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Security
@@ -19,6 +19,12 @@ namespace Umbraco.Core.Security
     /// </summary>
     public abstract class MembershipProviderBase : MembershipProvider
     {
+        private readonly IHostingEnvironment _hostingEnvironment;
+
+        protected MembershipProviderBase(IHostingEnvironment hostingEnvironment)
+        {
+            _hostingEnvironment = hostingEnvironment;
+        }
 
         public string HashPasswordForStorage(string password)
         {
@@ -250,7 +256,7 @@ namespace Umbraco.Core.Security
 
             _applicationName = config["applicationName"];
             if (string.IsNullOrEmpty(_applicationName))
-                _applicationName = GetDefaultAppName();
+                _applicationName = GetDefaultAppName(_hostingEnvironment);
 
             //by default we will continue using the legacy encoding.
             UseLegacyEncoding = config.GetValue("useLegacyEncoding", DefaultUseLegacyEncoding);
@@ -605,11 +611,11 @@ namespace Umbraco.Core.Security
         /// Gets the name of the default app.
         /// </summary>
         /// <returns></returns>
-        internal static string GetDefaultAppName()
+        internal static string GetDefaultAppName(IHostingEnvironment hostingEnvironment)
         {
             try
             {
-                string applicationVirtualPath = HostingEnvironment.ApplicationVirtualPath;
+                string applicationVirtualPath = hostingEnvironment.ApplicationVirtualPath;
                 if (string.IsNullOrEmpty(applicationVirtualPath))
                 {
                     return "/";
