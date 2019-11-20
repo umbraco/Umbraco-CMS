@@ -27,7 +27,7 @@ namespace Umbraco.Core.Models
         /// <param name="parent">Parent <see cref="IMedia"/> object</param>
         /// <param name="contentType">MediaType for the current Media object</param>
         /// <param name="properties">Collection of properties</param>
-        public Media(string name, IMedia parent, IMediaType contentType, PropertyCollection properties)
+        public Media(string name, IMedia parent, IMediaType contentType, IPropertyCollection properties)
             : base(name, parent, contentType, properties)
         { }
 
@@ -48,7 +48,7 @@ namespace Umbraco.Core.Models
         /// <param name="parentId">Id of the Parent IMedia</param>
         /// <param name="contentType">MediaType for the current Media object</param>
         /// <param name="properties">Collection of properties</param>
-        public Media(string name, int parentId, IMediaType contentType, PropertyCollection properties)
+        public Media(string name, int parentId, IMediaType contentType, IPropertyCollection properties)
             : base(name, parentId, contentType, properties)
         { }
 

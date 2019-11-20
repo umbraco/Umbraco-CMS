@@ -44,7 +44,7 @@ namespace Umbraco.Core
         /// <summary>
         /// Determines whether the property type is invariant.
         /// </summary>
-        public static bool VariesByNothing(this PropertyType propertyType) => propertyType.Variations.VariesByNothing();
+        public static bool VariesByNothing(this IPropertyType propertyType) => propertyType.Variations.VariesByNothing();
 
         /// <summary>
         /// Determines whether the property type varies by culture.

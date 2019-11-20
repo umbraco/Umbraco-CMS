@@ -328,15 +328,7 @@ namespace Umbraco.Core
             return entity.Properties.Where(x => x.IsDirty()).Select(x => x.Alias);
         }
 
-        public static bool IsAnyUserPropertyDirty(this IContentBase entity)
-        {
-            return entity.Properties.Any(x => x.IsDirty());
-        }
 
-        public static bool WasAnyUserPropertyDirty(this IContentBase entity)
-        {
-            return entity.Properties.Any(x => x.WasDirty());
-        }
 
         #endregion
     }
