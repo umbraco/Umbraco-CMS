@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function MediaNodeInfoDirective($timeout, $location, eventsService, userService, dateHelper, editorService, mediaHelper, mediaResource, $routeParams, $q) {
+    function MediaNodeInfoDirective($timeout, $location, eventsService, userService, dateHelper, editorService, mediaHelper, mediaResource, $q) {
 
         function link(scope, element, attrs, ctrl) {
 
@@ -127,7 +127,7 @@
             }
 
             function loadContentRelations() {
-                return mediaResource.getPagedReferences($routeParams.id, scope.contentOptions)
+                return mediaResource.getPagedReferences(scope.node.id, scope.contentOptions)
                     .then(function (data) {
                         scope.contentReferences = data;
                         scope.hasContentReferences = data.items.length > 0;
@@ -135,7 +135,7 @@
             }
 
             function loadMediaRelations() {
-                return mediaResource.getPagedReferences($routeParams.id, scope.mediaOptions)
+                return mediaResource.getPagedReferences(scope.node.id, scope.mediaOptions)
                     .then(function (data) {
                         scope.mediaReferences = data;
                         scope.hasMediaReferences = data.items.length > 0;
@@ -143,7 +143,7 @@
             }
 
             function loadMemberRelations() {
-                return mediaResource.getPagedReferences($routeParams.id, scope.memberOptions)
+                return mediaResource.getPagedReferences(scope.node.id, scope.memberOptions)
                     .then(function (data) {
                         scope.memberReferences = data;
                         scope.hasMemberReferences = data.items.length > 0;
