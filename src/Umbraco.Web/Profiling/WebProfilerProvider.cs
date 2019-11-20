@@ -1,7 +1,10 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Web;
+using System.Web.Routing;
 using StackExchange.Profiling;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Profiling
 {
@@ -24,6 +27,20 @@ namespace Umbraco.Web.Profiling
         {
             // booting...
             _bootPhase = BootPhase.Boot;
+
+            // Remove Mini Profiler routes when not in debug mode
+            if (GlobalSettings.DebugMode == false)
+            {
+                //NOTE: Keep the global fully qualified name, for some reason without it I was getting null refs
+                var prefix = global::StackExchange.Profiling.MiniProfiler.Settings.RouteBasePath.Replace("~/", string.Empty);
+
+                using (RouteTable.Routes.GetWriteLock())
+                {
+                    var routes = RouteTable.Routes.Where(x => x is Route r && r.Url.StartsWith(prefix)).ToList();
+                    foreach(var r in routes)
+                        RouteTable.Routes.Remove(r);
+                }
+            }
         }
 
         /// <summary>
