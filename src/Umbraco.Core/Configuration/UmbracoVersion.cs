@@ -6,7 +6,7 @@ namespace Umbraco.Core.Configuration
 {
     public class UmbracoVersion
     {
-        private static readonly Version Version = new Version("7.5.14");
+        private static readonly Version Version = new Version("7.5.15");
 
         /// <summary>
         /// Gets the current version of Umbraco.
