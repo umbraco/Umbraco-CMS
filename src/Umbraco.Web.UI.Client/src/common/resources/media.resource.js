@@ -554,29 +554,36 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 'Failed to retrieve media items for search: ' + query);
         },
 
-        /**
-         * @ngdoc method
-         * @name umbraco.resources.mediaResource#getReferences
-         * @methodOf umbraco.resources.mediaResource
-         *
-         * @description
-         * Retrieves references of a given media item.
-         *
-         * @param {Int} id id of media node to retrieve references for
-         * @returns {Promise} resourcePromise object.
-         *
-         */
-        getReferences: function (id) {
+        getPagedReferences: function (id, options) {
+
+            var defaults = {
+                pageSize: 25,
+                pageNumber: 1,
+                entityType: "DOCUMENT"
+            };
+            if (options === undefined) {
+                options = {};
+            }
+            //overwrite the defaults if there are any specified
+            angular.extend(defaults, options);
+            //now copy back to the options we will use
+            options = defaults;
 
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "mediaApiBaseUrl",
-                        "GetReferences",
-                        { id: id })),
+                        "GetPagedReferences",
+                        {
+                            id: id,
+                            entityType: options.entityType,
+                            pageNumber: options.pageNumber,
+                            pageSize: options.pageSize
+                        }
+                    )),
                 "Failed to retrieve usages for media of id " + id);
-
         }
+
     };
 }
 

@@ -236,6 +236,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                         },
                         RelationFactory.BuildDto);  // value = DTO
 
+                    // Use NPoco's own InsertBulk command which will automatically re-populate the new Ids on the entities, our own
+                    // BulkInsertRecords does not cater for this.
                     Database.InsertBulk(entitiesAndDtos.Values);
 
                     // All dtos now have IDs assigned
