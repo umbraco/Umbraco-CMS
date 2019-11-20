@@ -31,7 +31,6 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.Testing.Objects.Accessors;
-using Umbraco.Web.Cache;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -132,7 +131,7 @@ namespace Umbraco.Tests.TestHelpers
 
             // ensure the configuration matches the current version for tests
             var globalSettingsMock = Mock.Get(Factory.GetInstance<IGlobalSettings>()); //this will modify the IGlobalSettings instance stored in the container
-            globalSettingsMock.Setup(x => x.ConfigurationStatus).Returns(Current.UmbracoVersion.Current.ToString(3));
+            globalSettingsMock.Setup(x => x.ConfigurationStatus).Returns(UmbracoVersion.Current.ToString(3));
 
             using (ProfilingLogger.TraceDuration<TestWithDatabaseBase>("Initialize database."))
             {
@@ -304,7 +303,7 @@ namespace Umbraco.Tests.TestHelpers
             {
                 using (var scope = ScopeProvider.CreateScope())
                 {
-                    var schemaHelper = new DatabaseSchemaCreator(scope.Database, Logger);
+                    var schemaHelper = new DatabaseSchemaCreator(scope.Database, Logger, UmbracoVersion);
                     //Create the umbraco database and its base data
                     schemaHelper.InitializeDatabaseSchema();
 

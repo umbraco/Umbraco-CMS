@@ -92,9 +92,9 @@ namespace Umbraco.Core.Composing.CompositionExtensions
                 factory.GetInstance<IMacroService>(),
                 factory.GetInstance<ILocalizationService>(),
                 factory.GetInstance<IIOHelper>(),
-                factory.GetInstance<IUmbracoVersion>(),
                 factory.GetInstance<IEntityXmlSerializer>(),
                 factory.GetInstance<ILogger>(),
+                factory.GetInstance<IUmbracoVersion>(),
                 packageRepoFileName);
 
         private static LocalizedTextServiceFileSources SourcesFactory(IFactory container)

@@ -153,7 +153,7 @@ namespace Umbraco.Tests.Runtimes
                 var scopeProvider = factory.GetInstance<IScopeProvider>();
                 using (var scope = scopeProvider.CreateScope())
                 {
-                    var creator = new DatabaseSchemaCreator(scope.Database, logger);
+                    var creator = new DatabaseSchemaCreator(scope.Database, logger, umbracoVersion);
                     creator.InitializeDatabaseSchema();
                     scope.Complete();
                 }

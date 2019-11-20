@@ -41,8 +41,8 @@ namespace Umbraco.Tests.Packaging
             ServiceContext.ContentService, ServiceContext.ContentTypeService, ServiceContext.DataTypeService,
             ServiceContext.FileService, ServiceContext.MacroService, ServiceContext.LocalizationService,
             IOHelper,
-            UmbracoVersion,
             Factory.GetInstance<IEntityXmlSerializer>(), Logger,
+            UmbracoVersion,
             "createdPackages.config",
             //temp paths
             tempFolderPath: "~/" + _testBaseFolder + "/temp",
