@@ -222,6 +222,7 @@
     <key alias="createDateDesc" version="7.0">Date/time this document was created</key>
     <key alias="documentType">Document Type</key>
     <key alias="editing">Editing</key>
+    <key alias="elementType">Element Type</key>
     <key alias="expireDate">Remove at</key>
     <key alias="itemChanged">This item has been changed after publication</key>
     <key alias="itemNotPublished">This item is not published</key>

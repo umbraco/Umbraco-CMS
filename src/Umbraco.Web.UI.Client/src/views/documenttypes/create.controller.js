@@ -125,6 +125,13 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
         navigationService.hideMenu();
     };
 
+    $scope.createElementType = function () {
+        $location.search("create", null);
+        $location.search("iselement", null);
+        $location.path("/settings/documenttypes/edit/" + node.id).search("create", "true").search("iselement", "true");
+        navigationService.hideMenu();
+    };
+
     $scope.close = function() {
         const showMenu = true;
         navigationService.hideDialog(showMenu);
