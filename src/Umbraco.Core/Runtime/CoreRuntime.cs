@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Web;
-using System.Web.Hosting;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
@@ -26,13 +24,17 @@ namespace Umbraco.Core.Runtime
         private ComponentCollection _components;
         private IFactory _factory;
         private RuntimeState _state;
+        private readonly IUmbracoBootPermissionChecker _umbracoBootPermissionChecker;
 
 
-        public CoreRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger)
+        public CoreRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IUmbracoBootPermissionChecker umbracoBootPermissionChecker)
         {
             IOHelper = ioHelper;
             Configs = configs;
             UmbracoVersion = umbracoVersion ;
+            Profiler = profiler;
+
+            _umbracoBootPermissionChecker = umbracoBootPermissionChecker;
 
             Logger = logger;
             // runtime state
@@ -56,7 +58,7 @@ namespace Umbraco.Core.Runtime
         /// <summary>
         /// Gets the profiler.
         /// </summary>
-        protected IProfiler Profiler { get; private set; }
+        protected IProfiler Profiler { get; set; }
 
         /// <summary>
         /// Gets the profiling logger.
@@ -84,12 +86,6 @@ namespace Umbraco.Core.Runtime
             // create and register the essential services
             // ie the bare minimum required to boot
 
-            // loggers
-            var profiler = Profiler = GetProfiler();
-            if (profiler == null)
-                throw new InvalidOperationException($"The object returned from {nameof(GetProfiler)} cannot be null");
-
-            var profilingLogger = ProfilingLogger = new ProfilingLogger(Logger, profiler);
 
             TypeFinder = GetTypeFinder();
             if (TypeFinder == null)
@@ -105,16 +101,13 @@ namespace Umbraco.Core.Runtime
             // objects.
 
             var umbracoVersion = new UmbracoVersion();
+            var profilingLogger = ProfilingLogger = new ProfilingLogger(Logger, Profiler);
             using (var timer = profilingLogger.TraceDuration<CoreRuntime>(
                 $"Booting Umbraco {umbracoVersion.SemanticVersion.ToSemanticString()}.",
                 "Booted.",
                 "Boot failed."))
             {
-                Logger.Info<CoreRuntime>("Booting site '{HostingSiteName}', app '{HostingApplicationID}', path '{HostingPhysicalPath}', server '{MachineName}'.",
-                    HostingEnvironment.SiteName,
-                    HostingEnvironment.ApplicationID,
-                    HostingEnvironment.ApplicationPhysicalPath,
-                    NetworkHelper.MachineName);
+                Logger.Info<CoreRuntime>("Booting Core");
                 Logger.Debug<CoreRuntime>("Runtime: {Runtime}", GetType().FullName);
 
                 // application environment
@@ -137,7 +130,7 @@ namespace Umbraco.Core.Runtime
             try
             {
                 // throws if not full-trust
-                new AspNetHostingPermission(AspNetHostingPermissionLevel.Unrestricted).Demand();
+                _umbracoBootPermissionChecker.ThrowIfNotPermissions();
 
                 // run handlers
                 RuntimeOptions.DoRuntimeBoot(ProfilingLogger);
@@ -330,12 +323,6 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         protected virtual IEnumerable<Type> GetComposerTypes(TypeLoader typeLoader)
             => typeLoader.GetTypes<IComposer>();
-
-        /// <summary>
-        /// Gets a profiler.
-        /// </summary>
-        protected virtual IProfiler GetProfiler()
-            => new LogProfiler(Logger);
 
         /// <summary>
         /// Gets a <see cref="ITypeFinder"/>

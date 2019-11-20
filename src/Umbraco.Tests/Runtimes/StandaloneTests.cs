@@ -75,7 +75,7 @@ namespace Umbraco.Tests.Runtimes
             composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper, umbracoVersion);
 
             // create the core runtime and have it compose itself
-            var coreRuntime = new CoreRuntime(configs, umbracoVersion, ioHelper, logger);coreRuntime.Compose(composition);
+            var coreRuntime = new CoreRuntime(configs, umbracoVersion, ioHelper, logger, profiler, new AspNetUmbracoBootPermissionChecker());coreRuntime.Compose(composition);
 
             // determine actual runtime level
             runtimeState.DetermineRuntimeLevel(databaseFactory, logger);
@@ -268,7 +268,7 @@ namespace Umbraco.Tests.Runtimes
             composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper, umbracoVersion);
 
             // create the core runtime and have it compose itself
-            var coreRuntime = new CoreRuntime(configs, umbracoVersion, ioHelper, logger);
+            var coreRuntime = new CoreRuntime(configs, umbracoVersion, ioHelper, logger, profiler, new AspNetUmbracoBootPermissionChecker());
             coreRuntime.Compose(composition);
 
             // get the components

@@ -20,6 +20,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
+using Umbraco.Web.Runtime;
 
 namespace Umbraco.Tests.Runtimes
 {
@@ -80,7 +81,7 @@ namespace Umbraco.Tests.Runtimes
         // test application
         public class TestUmbracoApplication : UmbracoApplicationBase
         {
-            public TestUmbracoApplication() : base(new DebugDiagnosticsLogger(new MessageTemplates()), GetConfigs())
+            public TestUmbracoApplication() : base(new DebugDiagnosticsLogger(new MessageTemplates()),  GetConfigs(), IOHelper.Default, GetProfiler())
             {
             }
 
@@ -92,23 +93,27 @@ namespace Umbraco.Tests.Runtimes
                 return configs;
             }
 
+            private static IProfiler GetProfiler()
+            {
+                return new TestProfiler();
+            }
+
             public IRuntime Runtime { get; private set; }
 
-            protected override IRuntime GetRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger)
+            protected override IRuntime GetRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler)
             {
-                return Runtime = new TestRuntime(configs, umbracoVersion, ioHelper, logger);
+                return Runtime = new TestRuntime(configs, umbracoVersion, ioHelper, logger, profiler);
             }
         }
 
         // test runtime
         public class TestRuntime : CoreRuntime
         {
-            public TestRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger)
-                :base(configs, umbracoVersion, ioHelper, logger)
+            public TestRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler)
+                :base(configs, umbracoVersion, ioHelper, logger,  profiler, new AspNetUmbracoBootPermissionChecker())
             {
 
             }
-            protected override IProfiler GetProfiler() => new TestProfiler();
 
             // must override the database factory
             // else BootFailedException because U cannot connect to the configured db

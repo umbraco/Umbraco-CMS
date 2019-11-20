@@ -51,11 +51,10 @@ namespace Umbraco.Tests.Routing
         public class TestRuntime : WebRuntime
         {
             public TestRuntime(UmbracoApplicationBase umbracoApplication, Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger)
-                : base(umbracoApplication, configs, umbracoVersion, ioHelper, Mock.Of<ILogger>())
+                : base(umbracoApplication, configs, umbracoVersion, ioHelper, Mock.Of<ILogger>(), Mock.Of<IProfiler>())
             {
             }
 
-            protected override IProfiler GetProfiler() => Mock.Of<IProfiler>();
         }
 
         protected override void Compose()

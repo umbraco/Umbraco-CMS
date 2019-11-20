@@ -1,4 +1,6 @@
 ﻿using System.Web;
+using System.Web.Hosting;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
@@ -18,51 +20,71 @@ namespace Umbraco.Web.Runtime
     public class WebRuntime : CoreRuntime
     {
         private readonly UmbracoApplicationBase _umbracoApplication;
-        private IProfiler _webProfiler;
         private BuildManagerTypeFinder _typeFinder;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WebRuntime"/> class.
         /// </summary>
         /// <param name="umbracoApplication"></param>
-        public WebRuntime(UmbracoApplicationBase umbracoApplication, Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger):
-            base(configs, umbracoVersion, ioHelper, logger)
+        public WebRuntime(UmbracoApplicationBase umbracoApplication, Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler):
+            base(configs, umbracoVersion, ioHelper, logger, profiler ,new AspNetUmbracoBootPermissionChecker())
         {
             _umbracoApplication = umbracoApplication;
+
+            Profiler = GetWebProfiler();
+        }
+
+        private IProfiler GetWebProfiler()
+        {
+            // create and start asap to profile boot
+            if (!State.Debug)
+            {
+                // should let it be null, that's how MiniProfiler is meant to work,
+                // but our own IProfiler expects an instance so let's get one
+                return new VoidProfiler();
+            }
+
+            var webProfiler = new WebProfiler();
+            webProfiler.Start();
+
+            return webProfiler;
         }
 
         /// <inheritdoc/>
         public override IFactory Boot(IRegister register)
         {
-            // create and start asap to profile boot
-            if (State.Debug)
+
+            var profilingLogger =  new ProfilingLogger(Logger, Profiler);
+            var umbracoVersion = new UmbracoVersion();
+            using (var timer = profilingLogger.TraceDuration<CoreRuntime>(
+                $"Booting Umbraco {umbracoVersion.SemanticVersion.ToSemanticString()}.",
+                "Booted.",
+                "Boot failed."))
             {
-                _webProfiler = new WebProfiler();
-                _webProfiler.Start();
+                Logger.Info<CoreRuntime>("Booting site '{HostingSiteName}', app '{HostingApplicationID}', path '{HostingPhysicalPath}', server '{MachineName}'.",
+                    HostingEnvironment.SiteName,
+                    HostingEnvironment.ApplicationID,
+                    HostingEnvironment.ApplicationPhysicalPath,
+                    NetworkHelper.MachineName);
+                Logger.Debug<CoreRuntime>("Runtime: {Runtime}", GetType().FullName);
+
+                var factory = base.Boot(register);
+
+                // now (and only now) is the time to switch over to perWebRequest scopes.
+                // up until that point we may not have a request, and scoped services would
+                // fail to resolve - but we run Initialize within a factory scope - and then,
+                // here, we switch the factory to bind scopes to requests
+                factory.EnablePerWebRequestScope();
+
+                return factory;
             }
-            else
-            {
-                // should let it be null, that's how MiniProfiler is meant to work,
-                // but our own IProfiler expects an instance so let's get one
-                _webProfiler = new VoidProfiler();
-            }
 
-            var factory = base.Boot(register);
 
-            // now (and only now) is the time to switch over to perWebRequest scopes.
-            // up until that point we may not have a request, and scoped services would
-            // fail to resolve - but we run Initialize within a factory scope - and then,
-            // here, we switch the factory to bind scopes to requests
-            factory.EnablePerWebRequestScope();
-
-            return factory;
         }
 
         #region Getters
 
         protected override ITypeFinder GetTypeFinder() => _typeFinder ?? (_typeFinder = new BuildManagerTypeFinder(IOHelper, Logger, new BuildManagerTypeFinder.TypeFinderConfig()));
-
-        protected override IProfiler GetProfiler() => _webProfiler;
 
         protected override AppCaches GetAppCaches() => new AppCaches(
                 // we need to have the dep clone runtime cache provider to ensure

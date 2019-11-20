@@ -22,26 +22,29 @@ namespace Umbraco.Web
         public readonly ILogger _logger;
         private readonly Configs _configs;
         private readonly IIOHelper _ioHelper;
+        private readonly IProfiler _profiler;
 
         protected UmbracoApplicationBase()
         {
             _logger = SerilogLogger.CreateWithDefaultConfiguration();
             _ioHelper = IOHelper.Default;
             _configs = new ConfigsFactory(_ioHelper).Create();
+            _profiler = new LogProfiler(_logger);
         }
 
-        protected UmbracoApplicationBase(ILogger logger, Configs configs)
+        protected UmbracoApplicationBase(ILogger logger, Configs configs, IIOHelper ioHelper, IProfiler profiler)
         {
             _logger = logger;
             _configs = configs;
-            _ioHelper = IOHelper.Default;
+            _ioHelper = ioHelper;
+            _profiler = profiler;
         }
 
 
         /// <summary>
         /// Gets a runtime.
         /// </summary>
-        protected abstract IRuntime GetRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger);
+        protected abstract IRuntime GetRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler);
 
         /// <summary>
         /// Gets the application register.
@@ -86,7 +89,7 @@ namespace Umbraco.Web
             // create the register for the application, and boot
             // the boot manager is responsible for registrations
             var register = GetRegister(globalSettings);
-            _runtime = GetRuntime(_configs, umbracoVersion, _ioHelper, _logger);
+            _runtime = GetRuntime(_configs, umbracoVersion, _ioHelper, _logger, _profiler);
             _runtime.Boot(register);
         }
 
