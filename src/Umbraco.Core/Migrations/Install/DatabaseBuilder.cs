@@ -6,6 +6,7 @@ using System.Xml.Linq;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
@@ -27,13 +28,24 @@ namespace Umbraco.Core.Migrations.Install
         private readonly IMigrationBuilder _migrationBuilder;
         private readonly IKeyValueService _keyValueService;
         private readonly ILogger _logger;
+        private readonly IIOHelper _ioHelper;
+        private readonly IUmbracoVersion _umbracoVersion;
 
         private DatabaseSchemaResult _databaseSchemaValidationResult;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseBuilder"/> class.
         /// </summary>
-        public DatabaseBuilder(IScopeProvider scopeProvider, IGlobalSettings globalSettings, IUmbracoDatabaseFactory databaseFactory, IRuntimeState runtime, ILogger logger, IMigrationBuilder migrationBuilder, IKeyValueService keyValueService)
+        public DatabaseBuilder(
+            IScopeProvider scopeProvider,
+            IGlobalSettings globalSettings,
+            IUmbracoDatabaseFactory databaseFactory,
+            IRuntimeState runtime,
+            ILogger logger,
+            IMigrationBuilder migrationBuilder,
+            IKeyValueService keyValueService,
+            IIOHelper ioHelper,
+            IUmbracoVersion umbracoVersion)
         {
             _scopeProvider = scopeProvider;
             _globalSettings = globalSettings;
@@ -42,6 +54,8 @@ namespace Umbraco.Core.Migrations.Install
             _logger = logger;
             _migrationBuilder = migrationBuilder;
             _keyValueService = keyValueService;
+            _ioHelper = ioHelper;
+            _umbracoVersion = umbracoVersion;
         }
 
         #region Status
@@ -123,14 +137,14 @@ namespace Umbraco.Core.Migrations.Install
         /// </summary>
         public void ConfigureEmbeddedDatabaseConnection()
         {
-            ConfigureEmbeddedDatabaseConnection(_databaseFactory, _logger);
+            ConfigureEmbeddedDatabaseConnection(_databaseFactory, _ioHelper, _logger);
         }
 
-        private static void ConfigureEmbeddedDatabaseConnection(IUmbracoDatabaseFactory factory, ILogger logger)
+        private static void ConfigureEmbeddedDatabaseConnection(IUmbracoDatabaseFactory factory, IIOHelper ioHelper, ILogger logger)
         {
-            SaveConnectionString(EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe, logger);
+            SaveConnectionString(EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe, ioHelper, logger);
 
-            var path = Path.Combine(Current.IOHelper.GetRootDirectorySafe(), "App_Data", "Umbraco.sdf");
+            var path = Path.Combine(ioHelper.GetRootDirectorySafe(), "App_Data", "Umbraco.sdf");
             if (File.Exists(path) == false)
             {
                 // this should probably be in a "using (new SqlCeEngine)" clause but not sure
@@ -152,7 +166,7 @@ namespace Umbraco.Core.Migrations.Install
         {
             const string providerName = Constants.DbProviderNames.SqlServer;
 
-            SaveConnectionString(connectionString, providerName, _logger);
+            SaveConnectionString(connectionString, providerName, _ioHelper, _logger);
             _databaseFactory.Configure(connectionString, providerName);
         }
 
@@ -168,7 +182,7 @@ namespace Umbraco.Core.Migrations.Install
         {
             var connectionString = GetDatabaseConnectionString(server, databaseName, user, password, databaseProvider, out var providerName);
 
-            SaveConnectionString(connectionString, providerName, _logger);
+            SaveConnectionString(connectionString, providerName, _ioHelper, _logger);
             _databaseFactory.Configure(connectionString, providerName);
         }
 
@@ -199,7 +213,7 @@ namespace Umbraco.Core.Migrations.Install
         public void ConfigureIntegratedSecurityDatabaseConnection(string server, string databaseName)
         {
             var connectionString = GetIntegratedSecurityDatabaseConnectionString(server, databaseName);
-            SaveConnectionString(connectionString, Constants.DbProviderNames.SqlServer, _logger);
+            SaveConnectionString(connectionString, Constants.DbProviderNames.SqlServer, _ioHelper, _logger);
             _databaseFactory.Configure(connectionString, Constants.DbProviderNames.SqlServer);
         }
 
@@ -275,13 +289,13 @@ namespace Umbraco.Core.Migrations.Install
         /// <param name="connectionString">The connection string.</param>
         /// <param name="providerName">The provider name.</param>
         /// <param name="logger">A logger.</param>
-        private static void SaveConnectionString(string connectionString, string providerName, ILogger logger)
+        private static void SaveConnectionString(string connectionString, string providerName, IIOHelper ioHelper, ILogger logger)
         {
             if (string.IsNullOrWhiteSpace(connectionString)) throw new ArgumentNullOrEmptyException(nameof(connectionString));
             if (string.IsNullOrWhiteSpace(providerName)) throw new ArgumentNullOrEmptyException(nameof(providerName));
 
             var fileSource = "web.config";
-            var fileName = Current.IOHelper.MapPath(Current.IOHelper.Root +"/" + fileSource);
+            var fileName = ioHelper.MapPath(ioHelper.Root +"/" + fileSource);
 
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
             if (xml.Root == null) throw new Exception($"Invalid {fileSource} file (no root).");
@@ -294,7 +308,7 @@ namespace Umbraco.Core.Migrations.Install
             if (configSourceAttribute != null)
             {
                 fileSource = configSourceAttribute.Value;
-                fileName = Current.IOHelper.MapPath(Current.IOHelper.Root + "/" + fileSource);
+                fileName = ioHelper.MapPath(ioHelper.Root + "/" + fileSource);
 
                 if (!File.Exists(fileName))
                     throw new Exception($"Invalid configSource \"{fileSource}\" (no such file).");
@@ -366,7 +380,7 @@ namespace Umbraco.Core.Migrations.Install
                 return _databaseSchemaValidationResult;
 
             var database = scope.Database;
-            var dbSchema = new DatabaseSchemaCreator(database, _logger);
+            var dbSchema = new DatabaseSchemaCreator(database, _logger, _umbracoVersion);
             _databaseSchemaValidationResult = dbSchema.ValidateSchema();
             scope.Complete();
             return _databaseSchemaValidationResult;
@@ -416,7 +430,7 @@ namespace Umbraco.Core.Migrations.Install
                     if (_runtime.Level == RuntimeLevel.Run)
                         throw new Exception("Umbraco is already configured!");
 
-                    var creator = new DatabaseSchemaCreator(database, _logger);
+                    var creator = new DatabaseSchemaCreator(database, _logger, _umbracoVersion);
                     creator.InitializeDatabaseSchema();
 
                     message = message + "<p>Installation completed!</p>";

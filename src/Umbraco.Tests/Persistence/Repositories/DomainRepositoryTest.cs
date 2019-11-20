@@ -20,7 +20,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         private DomainRepository CreateRepository(IScopeProvider provider, out ContentTypeRepository contentTypeRepository, out DocumentRepository documentRepository, out LanguageRepository languageRepository)
         {
             var accessor = (IScopeAccessor) provider;
-            var templateRepository = new TemplateRepository(accessor, Core.Cache.AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock());
+            var templateRepository = new TemplateRepository(accessor, Core.Cache.AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock(), IOHelper);
             var tagRepository = new TagRepository(accessor, Core.Cache.AppCaches.Disabled, Logger);
             var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches);
             languageRepository = new LanguageRepository(accessor, Core.Cache.AppCaches.Disabled, Logger);

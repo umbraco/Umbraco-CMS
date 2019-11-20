@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -13,12 +12,14 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Core.Sync;
 using File = System.IO.File;
 
 namespace Umbraco.Tests.TestHelpers
@@ -37,6 +38,16 @@ namespace Umbraco.Tests.TestHelpers
         public static Configs GetConfigs()
         {
             return GetConfigsFactory().Create();
+        }
+        public static IRuntimeState GetRuntimeState()
+        {
+            return new RuntimeState(
+                Mock.Of<ILogger>(),
+                Mock.Of<IUmbracoSettingsSection>(),
+                Mock.Of<IGlobalSettings>(),
+                new Lazy<IMainDom>(),
+                new Lazy<IServerRegistrar>(),
+                TestHelper.GetUmbracoVersion());
         }
 
         public static IConfigsFactory GetConfigsFactory()

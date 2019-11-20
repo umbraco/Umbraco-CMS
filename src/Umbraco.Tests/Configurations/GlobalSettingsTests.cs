@@ -1,9 +1,7 @@
 ﻿using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Configurations
@@ -24,13 +22,6 @@ namespace Umbraco.Tests.Configurations
         {
             base.TearDown();
             Current.IOHelper.Root = _root;
-        }
-
-        [Ignore("fixme - ignored test")]
-        [Test]
-        public void Is_Version_From_Assembly_Correct()
-        {
-            Assert.That(Current.UmbracoVersion.SemanticVersion, Is.EqualTo("6.0.0"));
         }
 
         [TestCase("~/umbraco", "/", "umbraco")]

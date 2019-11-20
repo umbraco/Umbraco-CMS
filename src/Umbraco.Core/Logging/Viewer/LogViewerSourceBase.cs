@@ -15,16 +15,18 @@ namespace Umbraco.Core.Logging.Viewer
 {
     public abstract class LogViewerSourceBase : ILogViewer
     {
-        protected LogViewerSourceBase(string pathToSearches = "")
+        private readonly string _searchesConfigPath;
+        private readonly IIOHelper _ioHelper;
+
+        protected LogViewerSourceBase(IIOHelper ioHelper, string pathToSearches = "")
         {
             if (string.IsNullOrEmpty(pathToSearches))
                 // ReSharper disable once StringLiteralTypo
-                pathToSearches = Current.IOHelper.MapPath("~/Config/logviewer.searches.config.js");
+                pathToSearches = ioHelper.MapPath("~/Config/logviewer.searches.config.js");
 
             _searchesConfigPath = pathToSearches;
+            _ioHelper = ioHelper;
         }
-
-        private readonly string _searchesConfigPath;
 
         public abstract bool CanHandleLargeLogs { get; }
 
@@ -40,7 +42,7 @@ namespace Umbraco.Core.Logging.Viewer
             //Our default implementation
 
             //If file does not exist - lets create it with an empty array
-            EnsureFileExists(_searchesConfigPath, "[]");
+            EnsureFileExists(_searchesConfigPath, "[]", _ioHelper);
 
             var rawJson = System.IO.File.ReadAllText(_searchesConfigPath);
             return JsonConvert.DeserializeObject<SavedLogSearch[]>(rawJson);
@@ -58,7 +60,7 @@ namespace Umbraco.Core.Logging.Viewer
             var rawJson = JsonConvert.SerializeObject(searches, Formatting.Indented);
 
             //If file does not exist - lets create it with an empty array
-            EnsureFileExists(_searchesConfigPath, "[]");
+            EnsureFileExists(_searchesConfigPath, "[]", _ioHelper);
 
             //Write it back down to file
             System.IO.File.WriteAllText(_searchesConfigPath, rawJson);
@@ -180,9 +182,9 @@ namespace Umbraco.Core.Logging.Viewer
             };
         }
 
-        private static void EnsureFileExists(string path, string contents)
+        private static void EnsureFileExists(string path, string contents, IIOHelper ioHelper)
         {
-            var absolutePath = Current.IOHelper.MapPath(path);
+            var absolutePath = ioHelper.MapPath(path);
             if (System.IO.File.Exists(absolutePath)) return;
 
             using (var writer = System.IO.File.CreateText(absolutePath))

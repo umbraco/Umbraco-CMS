@@ -12,6 +12,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Migrations
@@ -137,7 +138,7 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void ValidateUmbracoPlan()
         {
-            var plan = new UmbracoPlan();
+            var plan = new UmbracoPlan(TestHelper.GetUmbracoVersion());
             plan.Validate();
             Console.WriteLine(plan.FinalState);
             Assert.IsFalse(plan.FinalState.IsNullOrWhiteSpace());

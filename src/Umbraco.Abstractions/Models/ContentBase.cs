@@ -44,7 +44,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentBase"/> class.
         /// </summary>
-        protected ContentBase(string name, int parentId, IContentTypeComposition contentType, PropertyCollection properties, string culture = null)
+        protected ContentBase(string name, int parentId, IContentTypeComposition contentType, IPropertyCollection properties, string culture = null)
             : this(name, contentType, properties, culture)
         {
             if (parentId == 0) throw new ArgumentOutOfRangeException(nameof(parentId));
@@ -54,14 +54,14 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentBase"/> class.
         /// </summary>
-        protected ContentBase(string name, IContentBase parent, IContentTypeComposition contentType, PropertyCollection properties, string culture = null)
+        protected ContentBase(string name, IContentBase parent, IContentTypeComposition contentType, IPropertyCollection properties, string culture = null)
             : this(name, contentType, properties, culture)
         {
             if (parent == null) throw new ArgumentNullException(nameof(parent));
             SetParent(parent);
         }
 
-        private ContentBase(string name, IContentTypeComposition contentType, PropertyCollection properties, string culture = null)
+        private ContentBase(string name, IContentTypeComposition contentType, IPropertyCollection properties, string culture = null)
         {
             ContentType = contentType?.ToSimple() ?? throw new ArgumentNullException(nameof(contentType));
 
@@ -84,7 +84,7 @@ namespace Umbraco.Core.Models
         [IgnoreDataMember]
         public ISimpleContentType ContentType { get; private set; }
 
-        internal void ChangeContentType(ISimpleContentType contentType)
+        public void ChangeContentType(ISimpleContentType contentType)
         {
             ContentType = contentType;
             ContentTypeId = contentType.Id;

@@ -151,10 +151,10 @@ namespace Umbraco.Core.IO
         #region Providers
 
         private readonly Dictionary<Type, string> _paths = new Dictionary<Type, string>();
-        private IGlobalSettings _globalSettings;
 
         // internal for tests
         internal IReadOnlyDictionary<Type, string> Paths => _paths;
+        private IGlobalSettings _globalSettings;
 
         /// <summary>
         /// Gets a strongly-typed filesystem.

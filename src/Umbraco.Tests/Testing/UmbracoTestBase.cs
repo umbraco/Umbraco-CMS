@@ -115,6 +115,7 @@ namespace Umbraco.Tests.Testing
         protected IMapperCollection Mappers => Factory.GetInstance<IMapperCollection>();
 
         protected UmbracoMapper Mapper => Factory.GetInstance<UmbracoMapper>();
+        protected IRuntimeState RuntimeState => ComponentTests.MockRuntimeState(RuntimeLevel.Run);
 
         #endregion
 
@@ -344,9 +345,9 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique(factory => TestObjects.GetFileSystemsMock());
 
             var logger = Mock.Of<ILogger>();
-            var ioHelper = Mock.Of<IIOHelper>();
             var scheme = Mock.Of<IMediaPathScheme>();
             var config = Mock.Of<IContentSection>();
+            var ioHelper = Mock.Of<IIOHelper>();
 
             var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), config, scheme, logger, ioHelper);
             Composition.RegisterUnique<IMediaFileSystem>(factory => mediaFileSystem);

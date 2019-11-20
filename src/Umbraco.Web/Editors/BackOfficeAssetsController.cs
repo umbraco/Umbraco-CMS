@@ -20,8 +20,6 @@ namespace Umbraco.Web.Editors
             _jsLibFileSystem = new PhysicalFileSystem(ioHelper, logger, globalSettings.UmbracoPath + Current.IOHelper.DirSepChar + "lib");
         }
 
-
-
         [HttpGet]
         public object GetSupportedLocales()
         {

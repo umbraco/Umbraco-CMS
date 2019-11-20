@@ -4,6 +4,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.CompositionExtensions;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Migrations;
@@ -102,7 +103,8 @@ namespace Umbraco.Core.Runtime
                     factory.GetInstance<ISqlContext>(),
                     factory.GetInstance<IProfilingLogger>(),
                     factory.GetInstance<IGlobalSettings>(),
-                    true, new DatabaseServerMessengerOptions()));
+                    true, new DatabaseServerMessengerOptions(),
+                    factory.GetInstance<IIOHelper>()));
 
             composition.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add(() => composition.TypeLoader.GetCacheRefreshers());

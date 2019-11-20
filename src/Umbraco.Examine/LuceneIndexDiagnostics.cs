@@ -13,11 +13,11 @@ namespace Umbraco.Examine
     {
         private IIOHelper _ioHelper;
 
-        public LuceneIndexDiagnostics(LuceneIndex index, ILogger logger)
+        public LuceneIndexDiagnostics(LuceneIndex index, ILogger logger, IIOHelper ioHelper)
         {
             Index = index;
             Logger = logger;
-            _ioHelper = Current.IOHelper;
+            _ioHelper = ioHelper;
         }
 
         public LuceneIndex Index { get; }

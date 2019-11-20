@@ -20,12 +20,14 @@ namespace Umbraco.Core.Packaging
     internal class PackageFileInstallation
     {
         private readonly CompiledPackageXmlParser _parser;
+        private readonly IIOHelper _ioHelper;
         private readonly IProfilingLogger _logger;
         private readonly PackageExtraction _packageExtraction;
 
-        public PackageFileInstallation(CompiledPackageXmlParser parser, IProfilingLogger logger)
+        public PackageFileInstallation(CompiledPackageXmlParser parser, IIOHelper ioHelper, IProfilingLogger logger)
         {
             _parser = parser;
+            _ioHelper = ioHelper;
             _logger = logger;
             _packageExtraction = new PackageExtraction();
         }
@@ -60,15 +62,15 @@ namespace Umbraco.Core.Packaging
 
             foreach (var item in package.Files.ToArray())
             {
-                removedFiles.Add(Current.IOHelper.GetRelativePath(item));
+                removedFiles.Add(_ioHelper.GetRelativePath(item));
 
                 //here we need to try to find the file in question as most packages does not support the tilde char
-                var file = Current.IOHelper.FindFile(item);
+                var file = _ioHelper.FindFile(item);
                 if (file != null)
                 {
                     // TODO: Surely this should be ~/ ?
                     file = file.EnsureStartsWith("/");
-                    var filePath = Current.IOHelper.MapPath(file);
+                    var filePath = _ioHelper.MapPath(file);
 
                     if (File.Exists(filePath))
                         File.Delete(filePath);

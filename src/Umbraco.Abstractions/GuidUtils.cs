@@ -7,7 +7,7 @@ namespace Umbraco.Core
     /// <summary>
     /// Utility methods for the <see cref="Guid"/> struct.
     /// </summary>
-    internal static class GuidUtils
+    public static class GuidUtils
     {
         /// <summary>
         /// Combines two guid instances utilizing an exclusive disjunction.

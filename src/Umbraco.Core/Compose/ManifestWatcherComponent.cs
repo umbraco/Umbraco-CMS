@@ -10,15 +10,17 @@ namespace Umbraco.Core.Compose
     {
         private readonly IRuntimeState _runtimeState;
         private readonly ILogger _logger;
+        private readonly IIOHelper _ioHelper;
 
         // if configured and in debug mode, a ManifestWatcher watches App_Plugins folders for
         // package.manifest chances and restarts the application on any change
         private ManifestWatcher _mw;
 
-        public ManifestWatcherComponent(IRuntimeState runtimeState, ILogger logger)
+        public ManifestWatcherComponent(IRuntimeState runtimeState, ILogger logger, IIOHelper ioHelper)
         {
             _runtimeState = runtimeState;
             _logger = logger;
+            _ioHelper = ioHelper;
         }
 
         public void Initialize()
@@ -28,7 +30,7 @@ namespace Umbraco.Core.Compose
             //if (ApplicationContext.Current.IsConfigured == false || GlobalSettings.DebugMode == false)
             //    return;
 
-            var appPlugins = Current.IOHelper.MapPath("~/App_Plugins/");
+            var appPlugins = _ioHelper.MapPath("~/App_Plugins/");
             if (Directory.Exists(appPlugins) == false) return;
 
             _mw = new ManifestWatcher(_logger);

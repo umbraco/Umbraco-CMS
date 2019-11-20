@@ -148,7 +148,9 @@ namespace Umbraco.Core
             if (filename == null || filestream == null) return;
 
             // get a safe & clean filename
-            filename = Current.IOHelper.SafeFileName(filename);
+            var ioHelper = Current.Factory.GetInstance<IIOHelper>();
+
+            filename = ioHelper.SafeFileName(filename);
             if (string.IsNullOrWhiteSpace(filename)) return;
             filename = filename.ToLower();
 
@@ -326,15 +328,7 @@ namespace Umbraco.Core
             return entity.Properties.Where(x => x.IsDirty()).Select(x => x.Alias);
         }
 
-        public static bool IsAnyUserPropertyDirty(this IContentBase entity)
-        {
-            return entity.Properties.Any(x => x.IsDirty());
-        }
 
-        public static bool WasAnyUserPropertyDirty(this IContentBase entity)
-        {
-            return entity.Properties.Any(x => x.WasDirty());
-        }
 
         #endregion
     }

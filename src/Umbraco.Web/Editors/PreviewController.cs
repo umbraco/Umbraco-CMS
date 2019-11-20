@@ -24,19 +24,22 @@ namespace Umbraco.Web.Editors
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILocalizationService _localizationService;
+        private readonly IUmbracoVersion _umbracoVersion;
 
         public PreviewController(
             UmbracoFeatures features,
             IGlobalSettings globalSettings,
             IPublishedSnapshotService publishedSnapshotService,
             IUmbracoContextAccessor umbracoContextAccessor,
-            ILocalizationService localizationService)
+            ILocalizationService localizationService,
+            IUmbracoVersion umbracoVersion)
         {
             _features = features;
             _globalSettings = globalSettings;
             _publishedSnapshotService = publishedSnapshotService;
             _umbracoContextAccessor = umbracoContextAccessor;
             _localizationService = localizationService;
+            _umbracoVersion = umbracoVersion;
         }
 
         [UmbracoAuthorize(redirectToUmbracoLogin: true)]
@@ -45,7 +48,7 @@ namespace Umbraco.Web.Editors
         {
             var availableLanguages = _localizationService.GetAllLanguages();
 
-            var model = new BackOfficePreviewModel(_features, _globalSettings, availableLanguages);
+            var model = new BackOfficePreviewModel(_features, _globalSettings, _umbracoVersion, availableLanguages);
 
             if (model.PreviewExtendedHeaderView.IsNullOrWhiteSpace() == false)
             {

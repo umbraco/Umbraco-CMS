@@ -88,7 +88,7 @@ namespace Umbraco.Core.Models
             {
                 content.CultureInfos.Clear();
                 content.CultureInfos = null;
-            }                
+            }
 
             if (culture == null || culture == "*")
                 content.Name = other.Name;
@@ -112,32 +112,7 @@ namespace Umbraco.Core.Models
             content.PublishCultureInfos.AddOrUpdate(culture, name, date);
         }
 
-        /// <summary>
-        /// Used to synchronize all culture dates to the same date if they've been modified
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="date"></param>
-        /// <remarks>
-        /// This is so that in an operation where (for example) 2 languages are updates like french and english, it is possible that
-        /// these dates assigned to them differ by a couple of Ticks, but we need to ensure they are persisted at the exact same time.
-        /// </remarks>
-        public static void AdjustDates(this IContent content, DateTime date)
-        {
-            foreach (var culture in content.PublishedCultures.ToList())
-            {
-                if (!content.PublishCultureInfos.TryGetValue(culture, out var publishInfos))
-                    continue;
 
-                // if it's not dirty, it means it hasn't changed so there's nothing to adjust
-                if (!publishInfos.IsDirty())
-                    continue; 
-                
-                content.PublishCultureInfos.AddOrUpdate(culture, publishInfos.Name, date);
-
-                if (content.CultureInfos.TryGetValue(culture, out var infos))
-                    SetCultureInfo(content, culture, infos.Name, date);
-            }
-        }
 
         // sets the edited cultures on the content
         public static void SetCultureEdited(this IContent content, IEnumerable<string> cultures)
@@ -149,17 +124,6 @@ namespace Umbraco.Core.Models
                 var editedCultures = new HashSet<string>(cultures.Where(x => !x.IsNullOrWhiteSpace()), StringComparer.OrdinalIgnoreCase);
                 content.EditedCultures = editedCultures.Count > 0 ? editedCultures : null;
             }
-        }
-
-        public static void SetCultureInfo(this IContentBase content, string culture, string name, DateTime date)
-        {
-            if (name.IsNullOrWhiteSpace())
-                throw new ArgumentNullOrEmptyException(nameof(name));
-
-            if (culture.IsNullOrWhiteSpace())
-                throw new ArgumentNullOrEmptyException(nameof(culture));
-
-            content.CultureInfos.AddOrUpdate(culture, name, date);
         }
 
         /// <summary>
@@ -249,7 +213,7 @@ namespace Umbraco.Core.Models
                 // one single culture
                 keepProcessing = content.ClearPublishInfo(culture);
             }
-            
+
 
             if (keepProcessing)
             {
@@ -288,14 +252,6 @@ namespace Umbraco.Core.Models
             return removed;
         }
 
-        /// <summary>
-        /// Updates a culture date, if the culture exists.
-        /// </summary>
-        public static void TouchCulture(this IContentBase content, string culture)
-        {
-            if (culture.IsNullOrWhiteSpace()) return;
-            if (!content.CultureInfos.TryGetValue(culture, out var infos)) return;
-            content.CultureInfos.AddOrUpdate(culture, infos.Name, DateTime.Now);
-        }
+
     }
 }

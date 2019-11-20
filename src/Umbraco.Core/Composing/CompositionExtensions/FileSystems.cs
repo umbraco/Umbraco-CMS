@@ -1,5 +1,4 @@
-﻿using Umbraco.Core.Compose;
-using Umbraco.Core.IO;
+﻿using Umbraco.Core.IO;
 using Umbraco.Core.IO.MediaPathSchemes;
 using Umbraco.Core.Logging;
 

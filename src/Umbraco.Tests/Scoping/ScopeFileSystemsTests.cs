@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Scoping
             base.SetUp();
 
             SafeCallContext.Clear();
-            ClearFiles();
+            ClearFiles(IOHelper);
         }
 
         protected override void ComposeApplication(bool withApplication)
@@ -39,21 +39,21 @@ namespace Umbraco.Tests.Scoping
             base.TearDown();
             SafeCallContext.Clear();
             FileSystems.ResetShadowId();
-            ClearFiles();
+            ClearFiles(IOHelper);
         }
 
-        private static void ClearFiles()
+        private static void ClearFiles(IIOHelper ioHelper)
         {
-            TestHelper.DeleteDirectory(Current.IOHelper.MapPath("media"));
-            TestHelper.DeleteDirectory(Current.IOHelper.MapPath("FileSysTests"));
-            TestHelper.DeleteDirectory(Current.IOHelper.MapPath(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs"));
+            TestHelper.DeleteDirectory(ioHelper.MapPath("media"));
+            TestHelper.DeleteDirectory(ioHelper.MapPath("FileSysTests"));
+            TestHelper.DeleteDirectory(ioHelper.MapPath(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs"));
         }
 
         [TestCase(true)]
         [TestCase(false)]
         public void CreateMediaTest(bool complete)
         {
-            var physMediaFileSystem = new PhysicalFileSystem(Current.IOHelper, Current.Logger, Current.IOHelper.MapPath("media"), "ignore");
+            var physMediaFileSystem = new PhysicalFileSystem(IOHelper, Current.Logger, IOHelper.MapPath("media"), "ignore");
             var mediaFileSystem = Current.MediaFileSystem;
 
             Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
@@ -86,7 +86,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void MultiThread()
         {
-            var physMediaFileSystem = new PhysicalFileSystem(Current.IOHelper, Current.Logger, Current.IOHelper.MapPath("media"), "ignore");
+            var physMediaFileSystem = new PhysicalFileSystem(IOHelper, Logger, IOHelper.MapPath("media"), "ignore");
             var mediaFileSystem = Current.MediaFileSystem;
 
             var scopeProvider = ScopeProvider;

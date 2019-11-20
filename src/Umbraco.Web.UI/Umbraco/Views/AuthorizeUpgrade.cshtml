@@ -57,7 +57,7 @@
             redirectUrl = Url.Action("AuthorizeUpgrade", "BackOffice")
         });
     }
-    @Html.BareMinimumServerVariablesScript(Url, externalLoginUrl, Model.Features, Model.GlobalSettings)
+    @Html.BareMinimumServerVariablesScript(Url, externalLoginUrl, Model.Features, Model.GlobalSettings, Model.UmbracoVersion)
 
     <script type="text/javascript">
     document.angularReady = function (app) {

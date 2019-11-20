@@ -33,6 +33,7 @@ namespace Umbraco.Tests.IO
             composition.Register(_ => Mock.Of<ILogger>());
             composition.Register(_ => Mock.Of<IDataTypeService>());
             composition.Register(_ => Mock.Of<IContentSection>());
+            composition.Register(_ => IOHelper.Default);
             composition.RegisterUnique<IMediaPathScheme, UniqueMediaPathScheme>();
             composition.RegisterUnique(IOHelper.Default);
 
@@ -106,7 +107,8 @@ namespace Umbraco.Tests.IO
             fs.AddFile(virtPath, ms);
 
             // ~/media/1234/file.txt exists
-            var physPath = Current.IOHelper.MapPath(Path.Combine("media", virtPath));
+            var ioHelper = _factory.GetInstance<IIOHelper>();
+            var physPath = ioHelper.MapPath(Path.Combine("media", virtPath));
             Assert.IsTrue(File.Exists(physPath));
 
             // ~/media/1234/file.txt is gone

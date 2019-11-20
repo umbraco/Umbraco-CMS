@@ -3,8 +3,8 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using NUnit.Framework;
-using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
+using Umbraco.Web.Composing;
 
 
 namespace Umbraco.Tests.IO
@@ -14,7 +14,7 @@ namespace Umbraco.Tests.IO
     public class PhysicalFileSystemTests : AbstractFileSystemTests
     {
         public PhysicalFileSystemTests()
-            : base(new PhysicalFileSystem(Current.IOHelper, Current.Logger, Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileSysTests"),
+            : base(new PhysicalFileSystem(IOHelper.Default, Current.Logger, Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileSysTests"),
                 "/Media/"))
         { }
 

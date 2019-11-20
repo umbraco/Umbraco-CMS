@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Packaging
             base.TearDown();
 
             //clear out files/folders
-            var path = Current.IOHelper.MapPath("~/" + _testBaseFolder);
+            var path = IOHelper.MapPath("~/" + _testBaseFolder);
             if (Directory.Exists(path))
                 Directory.Delete(path, true);
         }
@@ -51,9 +51,9 @@ namespace Umbraco.Tests.Packaging
 
         private IPackageInstallation PackageInstallation => new PackageInstallation(
             PackageDataInstallation,
-            new PackageFileInstallation(Parser, ProfilingLogger),
+            new PackageFileInstallation(Parser, IOHelper, ProfilingLogger),
             Parser, Mock.Of<IPackageActionRunner>(),
-            applicationRootFolder: new DirectoryInfo(Current.IOHelper.MapPath("~/" + _testBaseFolder))); //we don't want to extract package files to the real root, so extract to a test folder
+            applicationRootFolder: new DirectoryInfo(IOHelper.MapPath("~/" + _testBaseFolder))); //we don't want to extract package files to the real root, so extract to a test folder
 
         private const string DocumentTypePickerPackage = "Document_Type_Picker_1.1.umb";
         private const string HelloPackage = "Hello_1.0.0.zip";
@@ -63,7 +63,7 @@ namespace Umbraco.Tests.Packaging
         {
             var package = PackageInstallation.ReadPackage(
                 //this is where our test zip file is
-                new FileInfo(Path.Combine(Current.IOHelper.MapPath("~/Packaging/packages"), DocumentTypePickerPackage)));
+                new FileInfo(Path.Combine(IOHelper.MapPath("~/Packaging/packages"), DocumentTypePickerPackage)));
             Assert.IsNotNull(package);
             Assert.AreEqual(1, package.Files.Count);
             Assert.AreEqual("095e064b-ba4d-442d-9006-3050983c13d8.dll", package.Files[0].UniqueFileName);
@@ -86,7 +86,7 @@ namespace Umbraco.Tests.Packaging
         {
             var package = PackageInstallation.ReadPackage(
                 //this is where our test zip file is
-                new FileInfo(Path.Combine(Current.IOHelper.MapPath("~/Packaging/packages"), HelloPackage)));
+                new FileInfo(Path.Combine(IOHelper.MapPath("~/Packaging/packages"), HelloPackage)));
             Assert.IsNotNull(package);
             Assert.AreEqual(0, package.Files.Count);
             Assert.AreEqual("Hello", package.Name);
@@ -111,7 +111,7 @@ namespace Umbraco.Tests.Packaging
         public void Can_Read_Compiled_Package_Warnings()
         {
             //copy a file to the same path that the package will install so we can detect file conflicts
-            var path = Current.IOHelper.MapPath("~/" + _testBaseFolder);
+            var path = IOHelper.MapPath("~/" + _testBaseFolder);
             Console.WriteLine(path);
 
             var filePath = Path.Combine(path, "bin", "Auros.DocumentTypePicker.dll");
@@ -119,7 +119,7 @@ namespace Umbraco.Tests.Packaging
             File.WriteAllText(filePath, "test");
 
             //this is where our test zip file is
-            var packageFile = Path.Combine(Current.IOHelper.MapPath("~/Packaging/packages"), DocumentTypePickerPackage);
+            var packageFile = Path.Combine(IOHelper.MapPath("~/Packaging/packages"), DocumentTypePickerPackage);
             Console.WriteLine(packageFile);
 
             var package = PackageInstallation.ReadPackage(new FileInfo(packageFile));
@@ -137,7 +137,7 @@ namespace Umbraco.Tests.Packaging
         {
             var package = PackageInstallation.ReadPackage(
                 //this is where our test zip file is
-                new FileInfo(Path.Combine(Current.IOHelper.MapPath("~/Packaging/packages"), DocumentTypePickerPackage)));
+                new FileInfo(Path.Combine(IOHelper.MapPath("~/Packaging/packages"), DocumentTypePickerPackage)));
 
             var def = PackageDefinition.FromCompiledPackage(package);
             def.Id = 1;
@@ -148,7 +148,7 @@ namespace Umbraco.Tests.Packaging
 
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual("bin\\Auros.DocumentTypePicker.dll", result[0]);
-            Assert.IsTrue(File.Exists(Path.Combine(Current.IOHelper.MapPath("~/" + _testBaseFolder), result[0])));
+            Assert.IsTrue(File.Exists(Path.Combine(IOHelper.MapPath("~/" + _testBaseFolder), result[0])));
 
             //make sure the def is updated too
             Assert.AreEqual(result.Count, def.Files.Count);
@@ -159,7 +159,7 @@ namespace Umbraco.Tests.Packaging
         {
             var package = PackageInstallation.ReadPackage(
                 //this is where our test zip file is
-                new FileInfo(Path.Combine(Current.IOHelper.MapPath("~/Packaging/packages"), DocumentTypePickerPackage)));
+                new FileInfo(Path.Combine(IOHelper.MapPath("~/Packaging/packages"), DocumentTypePickerPackage)));
             var def = PackageDefinition.FromCompiledPackage(package);
             def.Id = 1;
             def.PackageId = Guid.NewGuid();

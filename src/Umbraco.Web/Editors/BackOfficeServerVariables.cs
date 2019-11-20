@@ -13,9 +13,6 @@ using Microsoft.Owin.Security;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.IO;
-using Umbraco.Web.Controllers;
 using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Models.ContentEditing;
@@ -38,8 +35,9 @@ namespace Umbraco.Web.Editors
         private readonly IGlobalSettings _globalSettings;
         private readonly HttpContextBase _httpContext;
         private readonly IOwinContext _owinContext;
+        private readonly IUmbracoVersion _umbracoVersion;
 
-        internal BackOfficeServerVariables(UrlHelper urlHelper, IRuntimeState runtimeState, UmbracoFeatures features, IGlobalSettings globalSettings)
+        internal BackOfficeServerVariables(UrlHelper urlHelper, IRuntimeState runtimeState, UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion)
         {
             _urlHelper = urlHelper;
             _runtimeState = runtimeState;
@@ -47,6 +45,7 @@ namespace Umbraco.Web.Editors
             _globalSettings = globalSettings;
             _httpContext = _urlHelper.RequestContext.HttpContext;
             _owinContext = _httpContext.GetOwinContext();
+            _umbracoVersion = umbracoVersion;
         }
 
         /// <summary>
@@ -442,10 +441,10 @@ namespace Umbraco.Web.Editors
                 // add versions - see UmbracoVersion for details & differences
 
                 // the complete application version (eg "8.1.2-alpha.25")
-                { "version", Current.UmbracoVersion.SemanticVersion.ToSemanticString() },
+                { "version", _umbracoVersion.SemanticVersion.ToSemanticString() },
 
                 // the assembly version (eg "8.0.0")
-                { "assemblyVersion", Current.UmbracoVersion.AssemblyVersion.ToString() }
+                { "assemblyVersion", _umbracoVersion.AssemblyVersion.ToString() }
             };
 
             var version = _runtimeState.SemanticVersion.ToSemanticString();

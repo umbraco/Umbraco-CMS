@@ -32,7 +32,7 @@ namespace Umbraco.Tests.UmbracoExamine
             var contentValueSetBuilder = IndexInitializer.GetContentValueSetBuilder(Factory.GetInstance<PropertyEditorCollection>(), false);
 
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, IOHelper, RuntimeState, luceneDir,
                 validator: new ContentValueSetValidator(false)))
             using (indexer.ProcessNonAsync())
             {
@@ -125,7 +125,7 @@ namespace Umbraco.Tests.UmbracoExamine
             var mediaRebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
 
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, IOHelper, RuntimeState, luceneDir,
                 validator: new ContentValueSetValidator(false)))
             using (indexer.ProcessNonAsync())
             {
@@ -153,7 +153,7 @@ namespace Umbraco.Tests.UmbracoExamine
 
 
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, IOHelper, RuntimeState, luceneDir))
             using (indexer.ProcessNonAsync())
             using (var searcher = ((LuceneSearcher)indexer.GetSearcher()).GetLuceneSearcher())
             {
@@ -190,7 +190,7 @@ namespace Umbraco.Tests.UmbracoExamine
             var validator = new ContentValueSetValidator(false, 1116);
 
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, validator: validator))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, IOHelper, RuntimeState, luceneDir, validator: validator))
             using (indexer.ProcessNonAsync())
             {
                 var searcher = indexer.GetSearcher();
@@ -233,7 +233,7 @@ namespace Umbraco.Tests.UmbracoExamine
             var validator = new ContentValueSetValidator(false, 2222);
 
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer1 = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, validator: validator))
+            using (var indexer1 = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, IOHelper, RuntimeState, luceneDir, validator: validator))
             using (indexer1.ProcessNonAsync())
             {
                 var searcher = indexer1.GetSearcher();
@@ -276,7 +276,7 @@ namespace Umbraco.Tests.UmbracoExamine
         {
             var rebuilder = IndexInitializer.GetContentIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockContentService(), ScopeProvider.SqlContext, false);
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, IOHelper, RuntimeState, luceneDir,
                 validator: new ContentValueSetValidator(false)))
             using (indexer.ProcessNonAsync())
             {
@@ -318,7 +318,7 @@ namespace Umbraco.Tests.UmbracoExamine
             var rebuilder = IndexInitializer.GetContentIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockContentService(), ScopeProvider.SqlContext, false);
 
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, IOHelper, RuntimeState, luceneDir))
             using (indexer.ProcessNonAsync())
             {
                 var searcher = indexer.GetSearcher();

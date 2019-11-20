@@ -18,13 +18,15 @@ namespace Umbraco.Tests.IO
         [TestCase("../Scripts", "/Scripts", typeof(ArgumentException))]
         public void IOHelper_ResolveUrl(string input, string expected, Type expectedExceptionType)
         {
+            var ioHelper = new IOHelper();
+
             if (expectedExceptionType != null)
             {
-                Assert.Throws(expectedExceptionType, () => Current.IOHelper.ResolveUrl(input));
+                Assert.Throws(expectedExceptionType, () =>ioHelper.ResolveUrl(input));
             }
             else
             {
-                var result = Current.IOHelper.ResolveUrl(input);
+                var result = ioHelper.ResolveUrl(input);
                 Assert.AreEqual(expected, result);
             }
         }

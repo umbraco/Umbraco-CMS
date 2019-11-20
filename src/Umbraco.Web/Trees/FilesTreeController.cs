@@ -1,7 +1,6 @@
 ﻿using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Web.Models.Trees;
 
 namespace Umbraco.Web.Trees
 {
@@ -11,16 +10,18 @@ namespace Umbraco.Web.Trees
     {
         private readonly IIOHelper _ioHelper;
         private readonly ILogger _logger;
+        private readonly IFileSystem _fileSystem;
+
+        protected override IFileSystem FileSystem => _fileSystem;
+
+        private static readonly string[] ExtensionsStatic = { "*" };
 
         public FilesTreeController(IIOHelper ioHelper, ILogger logger)
         {
             _ioHelper = ioHelper;
             _logger = logger;
+            _fileSystem = new PhysicalFileSystem(_ioHelper, _logger, "~/");
         }
-
-        protected override IFileSystem FileSystem => new PhysicalFileSystem(_ioHelper, _logger, "~/");
-
-        private static readonly string[] ExtensionsStatic = { "*" };
 
         protected override string[] Extensions => ExtensionsStatic;
 
