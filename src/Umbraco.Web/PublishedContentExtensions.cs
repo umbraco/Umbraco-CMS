@@ -1193,7 +1193,7 @@ namespace Umbraco.Web
         /// if any. In addition, when the content type is multi-lingual, this is the url for the
         /// specified culture. Otherwise, it is the invariant url.</para>
         /// </remarks>
-        public static string Url(this IPublishedContent content, string culture = null, UrlMode mode = UrlMode.Auto)
+        public static string Url(this IPublishedContent content, string culture = null, UrlMode mode = UrlMode.Default)
         {
             var umbracoContext = Composing.Current.UmbracoContext;
 
@@ -1201,6 +1201,12 @@ namespace Umbraco.Web
                 throw new InvalidOperationException("Cannot resolve a Url when Current.UmbracoContext is null.");
             if (umbracoContext.UrlProvider == null)
                 throw new InvalidOperationException("Cannot resolve a Url when Current.UmbracoContext.UrlProvider is null.");
+
+            // if it is the default mode, get the one that is configured
+            if (mode == UrlMode.Default)
+            {
+                mode = umbracoContext.UrlProvider.Mode;
+            }
 
             switch (content.ContentType.ItemType)
             {
