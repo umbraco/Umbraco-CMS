@@ -184,7 +184,13 @@
               });
               if (cached) return cached[1];
 
-              nodeComputedStyle = nodeComputedStyle || this.doc.defaultView.getComputedStyle(node);
+              if (!nodeComputedStyle) {
+                if (node instanceof DocumentFragment) {
+                  return false;
+                } else {
+                  nodeComputedStyle = this.doc.defaultView.getComputedStyle(node);
+                }
+              }
 
               var result = false;
 
