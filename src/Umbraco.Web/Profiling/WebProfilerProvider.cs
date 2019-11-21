@@ -36,7 +36,11 @@ namespace Umbraco.Web.Profiling
 
                 using (RouteTable.Routes.GetWriteLock())
                 {
-                    var routes = RouteTable.Routes.Where(x => x is Route r && r.Url.StartsWith(prefix)).ToList();
+                    var routes = RouteTable.Routes.Where(x =>
+                    {
+                        var route = x as Route;
+                        return route != null && route.Url.StartsWith(prefix);
+                    }).ToList();
                     foreach(var r in routes)
                         RouteTable.Routes.Remove(r);
                 }
