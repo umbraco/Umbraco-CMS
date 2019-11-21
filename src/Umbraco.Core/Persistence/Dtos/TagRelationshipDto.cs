@@ -17,10 +17,12 @@ namespace Umbraco.Core.Persistence.Dtos
 
         [Column("tagId")]
         [ForeignKey(typeof(TagDto))]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_TagId")]
         public int TagId { get; set; }
 
         [Column("propertyTypeId")]
         [ForeignKey(typeof(PropertyTypeDto), Name = "FK_cmsTagRelationship_cmsPropertyType")]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_PropertyTypeId")]
         public int PropertyTypeId { get; set; }
     }
 }

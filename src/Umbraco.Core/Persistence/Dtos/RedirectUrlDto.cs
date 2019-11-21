@@ -4,11 +4,13 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.RedirectUrl)]
+    [TableName(TableName)]
     [PrimaryKey("id", AutoIncrement = false)]
     [ExplicitColumns]
     class RedirectUrlDto
     {
+        public const string TableName = Constants.DatabaseSchema.Tables.RedirectUrl;
+
         public RedirectUrlDto()
         {
             CreateDateUtc = DateTime.UtcNow;
@@ -31,6 +33,7 @@ namespace Umbraco.Core.Persistence.Dtos
         [Column("contentKey")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
         [ForeignKey(typeof(NodeDto), Column = "uniqueID")]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ContentKey")]
         public Guid ContentKey { get; set; }
 
         [Column("createDateUtc")]

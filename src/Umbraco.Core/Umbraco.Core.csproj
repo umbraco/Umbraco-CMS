@@ -251,6 +251,7 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\RichTextPreValueMigrator.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\DropDownFlexiblePreValueMigrator.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\MergeDateAndDateTimePropertyEditor.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_4_0\AddForeignKeyIndexes.cs" />
     <Compile Include="Models\ContentEditing\ContentAppBadge.cs" />
     <Compile Include="Models\ContentEditing\ContentAppBadgeType.cs" />
     <Compile Include="Models\Entities\EntityExtensions.cs" />

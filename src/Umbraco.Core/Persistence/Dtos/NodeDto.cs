@@ -48,6 +48,7 @@ namespace Umbraco.Core.Persistence.Dtos
         [Column("nodeUser")] // TODO: db rename to 'createUserId'
         [ForeignKey(typeof(UserDto))]
         [NullSetting(NullSetting = NullSettings.Null)]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_UserId")]
         public int? UserId { get => _userId == 0 ? null : _userId; set => _userId = value; } //return null if zero
 
         [Column("text")]

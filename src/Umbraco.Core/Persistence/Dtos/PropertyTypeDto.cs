@@ -5,26 +5,31 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.PropertyType)]
+    [TableName(TableName)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class PropertyTypeDto
     {
+        public const string TableName = Constants.DatabaseSchema.Tables.PropertyType;
+
         [Column("id")]
         [PrimaryKeyColumn(IdentitySeed = 50)]
         public int Id { get; set; }
 
         [Column("dataTypeId")]
         [ForeignKey(typeof(DataTypeDto), Column = "nodeId")]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_DataTypeId")]
         public int DataTypeId { get; set; }
 
         [Column("contentTypeId")]
         [ForeignKey(typeof(ContentTypeDto), Column = "nodeId")]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ContentTypeId")]
         public int ContentTypeId { get; set; }
 
         [Column("propertyTypeGroupId")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [ForeignKey(typeof(PropertyTypeGroupDto))]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_PropertyTypeGroupId")]
         public int? PropertyTypeGroupId { get; set; }
 
         [Index(IndexTypes.NonClustered, Name = "IX_cmsPropertyTypeAlias")]

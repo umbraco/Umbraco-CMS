@@ -21,6 +21,7 @@ namespace Umbraco.Core.Persistence.Dtos
         [Column("userId")]
         [ForeignKey(typeof(UserDto))]
         [NullSetting(NullSetting = NullSettings.Null)]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_UserId")]
         public int? UserId { get => _userId == 0 ? null : _userId; set => _userId = value; } //return null if zero
 
         [Column("NodeId")]
@@ -35,14 +36,14 @@ namespace Umbraco.Core.Persistence.Dtos
         [NullSetting(NullSetting = NullSettings.Null)]
         public string EntityType { get; set; }
 
-        // TODO: Should we have an index on this since we allow searching on it?
         [Column("Datestamp")]
         [Constraint(Default = SystemMethods.CurrentDateTime)]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Datestamp")]
         public DateTime Datestamp { get; set; }
 
-        // TODO: Should we have an index on this since we allow searching on it?
         [Column("logHeader")]
         [Length(50)]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_LogHeader")]
         public string Header { get; set; }
 
         [Column("logComment")]

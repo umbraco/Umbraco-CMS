@@ -6,17 +6,20 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.PropertyTypeGroup)]
+    [TableName(TableName)]
     [PrimaryKey("id", AutoIncrement = true)]
     [ExplicitColumns]
     internal class PropertyTypeGroupDto
     {
+        public const string TableName = Constants.DatabaseSchema.Tables.PropertyTypeGroup;
+
         [Column("id")]
         [PrimaryKeyColumn(IdentitySeed = 12)]
         public int Id { get; set; }
 
         [Column("contenttypeNodeId")]
         [ForeignKey(typeof(ContentTypeDto), Column = "nodeId")]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ContentTypeNodeId")]
         public int ContentTypeNodeId { get; set; }
 
         [Column("text")]
