@@ -357,11 +357,9 @@ Use this directive to generate a thumbnail grid of media items.
             // sort function          
             scope.sortBy = function (item) {
                 if (scope.sortColumn === "createDate") {
-                  // return ['-isFolder','createDate']; 
                     return [-item['isFolder'],item['createDate']];
                 }
                 else {
-                   //return ['-isFolder','name']; 
                     return [-item['isFolder'],item['name']];
                 }
             };
