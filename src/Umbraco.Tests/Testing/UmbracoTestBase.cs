@@ -111,6 +111,7 @@ namespace Umbraco.Tests.Testing
         protected virtual IProfilingLogger ProfilingLogger => Factory.GetInstance<IProfilingLogger>();
 
         protected IHostingEnvironment HostingEnvironment => Factory.GetInstance<IHostingEnvironment>();
+        protected IBackOfficeInfo BackOfficeInfo => Factory.GetInstance<IBackOfficeInfo>();
         protected AppCaches AppCaches => Factory.GetInstance<AppCaches>();
 
         protected virtual ISqlSyntaxProvider SqlSyntax => Factory.GetInstance<ISqlSyntaxProvider>();
@@ -143,7 +144,9 @@ namespace Umbraco.Tests.Testing
             TypeFinder = new TypeFinder(logger);
             var appCaches = GetAppCaches();
             var globalSettings = SettingsForTests.GetDefaultGlobalSettings();
+            var settings = SettingsForTests.GetDefaultUmbracoSettings();
             IHostingEnvironment hostingEnvironment = new AspNetHostingEnvironment(globalSettings, IOHelper);
+            IBackOfficeInfo backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, IOHelper, settings, logger);
             UmbracoVersion = new UmbracoVersion(globalSettings);
             var typeLoader = GetTypeLoader(IOHelper, TypeFinder, appCaches.RuntimeCache, hostingEnvironment, proflogger, Options.TypeLoader);
 
@@ -161,6 +164,7 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique<IProfilingLogger>(proflogger);
             Composition.RegisterUnique(appCaches);
             Composition.RegisterUnique(hostingEnvironment);
+            Composition.RegisterUnique(backOfficeInfo);
 
             TestObjects = new TestObjects(register);
             Compose();
