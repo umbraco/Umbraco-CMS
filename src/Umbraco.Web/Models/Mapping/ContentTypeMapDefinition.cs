@@ -222,7 +222,9 @@ namespace Umbraco.Web.Models.Mapping
             target.DataTypeId = source.DataTypeId;
             target.DataTypeKey = source.DataTypeKey;
             target.Mandatory = source.Validation.Mandatory;
+            target.MandatoryMessage = source.Validation.MandatoryMessage;
             target.ValidationRegExp = source.Validation.Pattern;
+            target.ValidationRegExpMessage = source.Validation.PatternMessage;
             target.Variations = source.AllowCultureVariant ? ContentVariation.Culture : ContentVariation.Nothing;
 
             if (source.Id > 0)
