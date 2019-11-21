@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Scoping
             base.SetUp();
 
             SafeCallContext.Clear();
-            ClearFiles(this.IOHelper);
+            ClearFiles(IOHelper);
         }
 
         protected override void ComposeApplication(bool withApplication)
@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Scoping
             base.TearDown();
             SafeCallContext.Clear();
             FileSystems.ResetShadowId();
-            ClearFiles(this.IOHelper);
+            ClearFiles(IOHelper);
         }
 
         private static void ClearFiles(IIOHelper ioHelper)
@@ -53,7 +53,7 @@ namespace Umbraco.Tests.Scoping
         [TestCase(false)]
         public void CreateMediaTest(bool complete)
         {
-            var physMediaFileSystem = new PhysicalFileSystem(IOHelper.MapPath("media"), "ignore", IOHelper);
+            var physMediaFileSystem = new PhysicalFileSystem(IOHelper, Logger, IOHelper.MapPath("media"), "ignore");
             var mediaFileSystem = Current.MediaFileSystem;
 
             Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
@@ -86,7 +86,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void MultiThread()
         {
-            var physMediaFileSystem = new PhysicalFileSystem(IOHelper.MapPath("media"), "ignore", new IOHelper());
+            var physMediaFileSystem = new PhysicalFileSystem(IOHelper, Logger, IOHelper.MapPath("media"), "ignore");
             var mediaFileSystem = Current.MediaFileSystem;
 
             var scopeProvider = ScopeProvider;
