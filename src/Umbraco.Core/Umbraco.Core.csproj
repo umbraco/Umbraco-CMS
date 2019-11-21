@@ -132,13 +132,8 @@
     <Compile Include="Cache\RepositoryCachePolicyBase.cs" />
     <Compile Include="Cache\SingleItemsOnlyRepositoryCachePolicy.cs" />
     <Compile Include="Compose\AuditEventsComposer.cs" />
-    <Compile Include="Composing\ComponentComposer.cs" />
-    <Compile Include="Composing\ComposeAfterAttribute.cs" />
-    <Compile Include="Composing\ComposeBeforeAttribute.cs" />
-    <Compile Include="Composing\Composers.cs" />
     <Compile Include="Composing\RegisterFactory.cs" />
     <Compile Include="CompositionExtensions.cs" />
-    <Compile Include="Composing\IUserComposer.cs" />
     <Compile Include="Compose\ManifestWatcherComposer.cs" />
     <Compile Include="Compose\RelateOnCopyComposer.cs" />
     <Compile Include="Compose\RelateOnTrashComposer.cs" />
@@ -163,7 +158,6 @@
     <Compile Include="Composing\Current.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="Composing\LightInject\MixedLightInjectScopeManagerProvider.cs" />
-    <Compile Include="Composing\TargetedServiceFactory.cs" />
     <Compile Include="IO\IMediaFileSystem.cs" />
     <Compile Include="IO\IMediaPathScheme.cs" />
     <Compile Include="IO\IOHelper.cs" />
@@ -233,7 +227,6 @@
     <Compile Include="PropertyEditors\ValueConverters\SliderValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\TagsValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\TinyMceValueConverter.cs" />
-    <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="Persistence\Dtos\PropertyTypeCommonDto.cs" />
     <Compile Include="Persistence\Factories\MacroFactory.cs" />
     <Compile Include="Persistence\Repositories\Implement\ContentTypeCommonRepository.cs" />
