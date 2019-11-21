@@ -14,9 +14,9 @@ namespace Umbraco.Web
     /// </summary>
     public class UmbracoApplication : UmbracoApplicationBase
     {
-        protected override IRuntime GetRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment)
+        protected override IRuntime GetRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
         {
-            return new WebRuntime(this, configs, umbracoVersion, ioHelper, logger, profiler, hostingEnvironment);
+            return new WebRuntime(this, configs, umbracoVersion, ioHelper, logger, profiler, hostingEnvironment, backOfficeInfo);
         }
 
         /// <summary>

@@ -126,6 +126,7 @@
     </Compile>
     <Compile Include="AppBuilderExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
+    <Compile Include="AspNetBackOfficeInfo.cs" />
     <Compile Include="AspNetHttpContextAccessor.cs" />
     <Compile Include="Cache\DistributedCacheBinder.cs" />
     <Compile Include="Cache\DistributedCacheBinderComposer.cs" />

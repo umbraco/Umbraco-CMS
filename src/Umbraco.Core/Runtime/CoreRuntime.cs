@@ -28,13 +28,14 @@ namespace Umbraco.Core.Runtime
         private readonly IUmbracoBootPermissionChecker _umbracoBootPermissionChecker;
 
 
-        public CoreRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IUmbracoBootPermissionChecker umbracoBootPermissionChecker, IHostingEnvironment hostingEnvironment)
+        public CoreRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IUmbracoBootPermissionChecker umbracoBootPermissionChecker, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
         {
             IOHelper = ioHelper;
             Configs = configs;
             UmbracoVersion = umbracoVersion ;
             Profiler = profiler;
             HostingEnvironment = hostingEnvironment;
+            BackOfficeInfo = backOfficeInfo;
 
             _umbracoBootPermissionChecker = umbracoBootPermissionChecker;
 
@@ -46,7 +47,7 @@ namespace Umbraco.Core.Runtime
                 Configs.Settings(), Configs.Global(),
                 new Lazy<IMainDom>(() => _factory.GetInstance<IMainDom>()),
                 new Lazy<IServerRegistrar>(() => _factory.GetInstance<IServerRegistrar>()),
-                UmbracoVersion,HostingEnvironment)
+                UmbracoVersion,HostingEnvironment, BackOfficeInfo)
             {
                 Level = RuntimeLevel.Boot
             };
@@ -56,6 +57,8 @@ namespace Umbraco.Core.Runtime
         /// Gets the logger.
         /// </summary>
         protected ILogger Logger { get; }
+
+        protected IBackOfficeInfo BackOfficeInfo { get; }
 
         /// <summary>
         /// Gets the profiler.

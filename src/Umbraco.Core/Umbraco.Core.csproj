@@ -386,7 +386,6 @@
     <Compile Include="IO\ShadowFileSystem.cs" />
     <Compile Include="IO\ShadowFileSystems.cs" />
     <Compile Include="IO\ShadowWrapper.cs" />
-    <Compile Include="IO\SystemDirectories.cs" />
     <Compile Include="IO\SystemFiles.cs" />
     <Compile Include="IO\ViewHelper.cs" />
     <Compile Include="Logging\Serilog\SerilogLogger.cs" />
@@ -881,7 +880,6 @@
     <Compile Include="Compose\RelateOnCopyComponent.cs" />
     <Compile Include="Compose\RelateOnTrashComponent.cs" />
     <Compile Include="Strings\UrlSegmentProviderCollectionBuilder.cs" />
-    <Compile Include="Sync\ApplicationUrlHelper.cs" />
     <Compile Include="Sync\DatabaseServerMessenger.cs" />
     <Compile Include="Sync\RefreshInstruction.cs" />
     <Compile Include="Sync\ServerMessengerBase.cs" />

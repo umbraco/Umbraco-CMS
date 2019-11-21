@@ -21,6 +21,7 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
+using Umbraco.Web;
 using Umbraco.Web.Hosting;
 using File = System.IO.File;
 
@@ -50,8 +51,14 @@ namespace Umbraco.Tests.TestHelpers
                 new Lazy<IMainDom>(),
                 new Lazy<IServerRegistrar>(),
                 TestHelper.GetUmbracoVersion(),
-                TestHelper.GetHostingEnvironment()
+                TestHelper.GetHostingEnvironment(),
+                TestHelper.GetBackOfficeInfo()
                 );
+        }
+
+        public static IBackOfficeInfo GetBackOfficeInfo()
+        {
+            return new AspNetBackOfficeInfo(SettingsForTests.GenerateMockGlobalSettings(), IOHelper.Default, SettingsForTests.GenerateMockUmbracoSettings(), Mock.Of<ILogger>());
         }
 
         public static IConfigsFactory GetConfigsFactory()

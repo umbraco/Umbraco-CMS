@@ -26,8 +26,8 @@ namespace Umbraco.Web.Runtime
         /// Initializes a new instance of the <see cref="WebRuntime"/> class.
         /// </summary>
         /// <param name="umbracoApplication"></param>
-        public WebRuntime(UmbracoApplicationBase umbracoApplication, Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment):
-            base(configs, umbracoVersion, ioHelper, logger, profiler ,new AspNetUmbracoBootPermissionChecker(), hostingEnvironment)
+        public WebRuntime(UmbracoApplicationBase umbracoApplication, Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo):
+            base(configs, umbracoVersion, ioHelper, logger, profiler ,new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo)
         {
             _umbracoApplication = umbracoApplication;
 
