@@ -13,6 +13,12 @@ namespace Umbraco.Web.Install.InstallSteps
     internal class UpgradeStep : InstallSetupStep<object>
     {
         public override bool RequiresExecution(object model) => true;
+        private readonly IUmbracoVersion _umbracoVersion;
+
+        public UpgradeStep(IUmbracoVersion umbracoVersion)
+        {
+            _umbracoVersion = umbracoVersion;
+        }
 
         public override Task<InstallSetupResult> ExecuteAsync(object model) => Task.FromResult<InstallSetupResult>(null);
 
@@ -25,9 +31,9 @@ namespace Umbraco.Web.Install.InstallSteps
                 // that was a "normal" way to force the upgrader to execute, and we would detect the current
                 // version via the DB like DatabaseSchemaResult.DetermineInstalledVersion - magic, do we really
                 // need this now?
-                var currentVersion = (Current.UmbracoVersion.LocalVersion ?? new Semver.SemVersion(0)).ToString();
+                var currentVersion = (_umbracoVersion.LocalVersion ?? new Semver.SemVersion(0)).ToString();
 
-                var newVersion = Current.UmbracoVersion.SemanticVersion.ToString();
+                var newVersion = _umbracoVersion.SemanticVersion.ToString();
 
                 string FormatGuidState(string value)
                 {

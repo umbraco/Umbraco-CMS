@@ -36,9 +36,9 @@ namespace Umbraco.Web
         /// These are the bare minimal server variables that are required for the application to start without being authenticated,
         /// we will load the rest of the server vars after the user is authenticated.
         /// </remarks>
-        public static IHtmlString BareMinimumServerVariablesScript(this HtmlHelper html, UrlHelper uri, string externalLoginsUrl, UmbracoFeatures features, IGlobalSettings globalSettings)
+        public static IHtmlString BareMinimumServerVariablesScript(this HtmlHelper html, UrlHelper uri, string externalLoginsUrl, UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion)
         {
-            var serverVars = new BackOfficeServerVariables(uri, Current.RuntimeState, features, globalSettings);
+            var serverVars = new BackOfficeServerVariables(uri, Current.RuntimeState, features, globalSettings, umbracoVersion);
             var minVars = serverVars.BareMinimumServerVariables();
 
             var str = @"<script type=""text/javascript"">

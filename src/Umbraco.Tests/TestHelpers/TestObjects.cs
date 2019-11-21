@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Moq;
@@ -23,7 +22,6 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers.Stubs;
-using Umbraco.Web.Services;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -99,6 +97,7 @@ namespace Umbraco.Tests.TestHelpers
             IEventMessagesFactory eventMessagesFactory,
             UrlSegmentProviderCollection urlSegmentProviders,
             TypeLoader typeLoader,
+            IUmbracoVersion umbracoVersion,
             IFactory factory = null)
         {
             if (scopeProvider == null) throw new ArgumentNullException(nameof(scopeProvider));
@@ -176,9 +175,9 @@ namespace Umbraco.Tests.TestHelpers
                 return new PackagingService(
                     auditService.Value,
                     new PackagesRepository(contentService.Value, contentTypeService.Value, dataTypeService.Value, fileService.Value, macroService.Value, localizationService.Value, ioHelper,
-                        new EntityXmlSerializer(contentService.Value, mediaService.Value, dataTypeService.Value, userService.Value, localizationService.Value, contentTypeService.Value, urlSegmentProviders), logger, "createdPackages.config"),
+                        new EntityXmlSerializer(contentService.Value, mediaService.Value, dataTypeService.Value, userService.Value, localizationService.Value, contentTypeService.Value, urlSegmentProviders), logger, umbracoVersion, "createdPackages.config"),
                     new PackagesRepository(contentService.Value, contentTypeService.Value, dataTypeService.Value, fileService.Value, macroService.Value, localizationService.Value, ioHelper,
-                        new EntityXmlSerializer(contentService.Value, mediaService.Value, dataTypeService.Value, userService.Value, localizationService.Value, contentTypeService.Value, urlSegmentProviders), logger, "installedPackages.config"),
+                        new EntityXmlSerializer(contentService.Value, mediaService.Value, dataTypeService.Value, userService.Value, localizationService.Value, contentTypeService.Value, urlSegmentProviders), logger, umbracoVersion, "installedPackages.config"),
                     new PackageInstallation(
                         new PackageDataInstallation(logger, fileService.Value, macroService.Value, localizationService.Value, dataTypeService.Value, entityService.Value, contentTypeService.Value, contentService.Value, propertyEditorCollection, scopeProvider),
                         new PackageFileInstallation(compiledPackageXmlParser, ioHelper, new ProfilingLogger(logger, new TestProfiler())),

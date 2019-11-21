@@ -35,6 +35,7 @@ namespace Umbraco.Core.Packaging
         private readonly string _packagesFolderPath;
         private readonly string _tempFolderPath;
         private readonly PackageDefinitionXmlParser _parser;
+        private readonly IUmbracoVersion _umbracoVersion;
 
         /// <summary>
         /// Constructor
@@ -59,6 +60,7 @@ namespace Umbraco.Core.Packaging
             ILocalizationService languageService,
             IIOHelper ioHelper,
             IEntityXmlSerializer serializer, ILogger logger,
+            IUmbracoVersion umbracoVersion,
             string packageRepositoryFileName,
             string tempFolderPath = null, string packagesFolderPath = null, string mediaFolderPath = null)
         {
@@ -79,6 +81,7 @@ namespace Umbraco.Core.Packaging
             _mediaFolderPath = mediaFolderPath ?? Current.Configs.Global().UmbracoMediaPath + "/created-packages";
 
             _parser = new PackageDefinitionXmlParser(logger);
+            _umbracoVersion = umbracoVersion;
         }
 
         private string CreatedPackagesFile => _packagesFolderPath.EnsureEndsWith('/') + _packageRepositoryFileName;
@@ -169,7 +172,7 @@ namespace Umbraco.Core.Packaging
                 var compiledPackageXml = CreateCompiledPackageXml(out var root, out var filesXml);
 
                 //Info section
-                root.Add(GetPackageInfoXml(definition));
+                root.Add(GetPackageInfoXml(definition, _umbracoVersion));
 
                 PackageDocumentsAndTags(definition, root);
                 PackageDocumentTypes(definition, root);
@@ -550,7 +553,7 @@ namespace Umbraco.Core.Packaging
                 dtl.Add(dt);
         }
 
-        private static XElement GetPackageInfoXml(PackageDefinition definition)
+        private static XElement GetPackageInfoXml(PackageDefinition definition, IUmbracoVersion umbracoVersion)
         {
 
             var info = new XElement("info");
@@ -569,9 +572,9 @@ namespace Umbraco.Core.Packaging
 
             var requirements = new XElement("requirements");
 
-            requirements.Add(new XElement("major", definition.UmbracoVersion == null ? Current.UmbracoVersion.SemanticVersion.Major.ToInvariantString() : definition.UmbracoVersion.Major.ToInvariantString()));
-            requirements.Add(new XElement("minor", definition.UmbracoVersion == null ? Current.UmbracoVersion.SemanticVersion.Minor.ToInvariantString() : definition.UmbracoVersion.Minor.ToInvariantString()));
-            requirements.Add(new XElement("patch", definition.UmbracoVersion == null ? Current.UmbracoVersion.SemanticVersion.Patch.ToInvariantString() : definition.UmbracoVersion.Build.ToInvariantString()));
+            requirements.Add(new XElement("major", definition.UmbracoVersion == null ? umbracoVersion.SemanticVersion.Major.ToInvariantString() : definition.UmbracoVersion.Major.ToInvariantString()));
+            requirements.Add(new XElement("minor", definition.UmbracoVersion == null ? umbracoVersion.SemanticVersion.Minor.ToInvariantString() : definition.UmbracoVersion.Minor.ToInvariantString()));
+            requirements.Add(new XElement("patch", definition.UmbracoVersion == null ? umbracoVersion.SemanticVersion.Patch.ToInvariantString() : definition.UmbracoVersion.Build.ToInvariantString()));
 
             if (definition.UmbracoVersion != null)
                 requirements.Add(new XAttribute("type", RequirementsType.Strict.ToString()));
