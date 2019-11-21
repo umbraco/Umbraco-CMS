@@ -680,7 +680,6 @@
     <Compile Include="Exceptions\ArgumentNullOrEmptyException.cs" />
     <Compile Include="Exceptions\AuthorizationException.cs" />
     <Compile Include="Exceptions\BootFailedException.cs" />
-    <Compile Include="Exceptions\ConnectionException.cs" />
     <Compile Include="Exceptions\DataOperationException.cs" />
     <Compile Include="Exceptions\InvalidCompositionException.cs" />
     <Compile Include="Composing\LightInject\LightInjectException.cs" />
@@ -1065,7 +1064,6 @@
     <Compile Include="Persistence\Mappers\UserGroupMapper.cs" />
     <Compile Include="Persistence\Mappers\UserMapper.cs" />
     <Compile Include="Persistence\Mappers\UserSectionMapper.cs" />
-    <Compile Include="Migrations\DataLossException.cs" />
     <Compile Include="Migrations\IMigration.cs" />
     <Compile Include="Migrations\IMigrationContext.cs" />
     <Compile Include="Migrations\IMigrationExpression.cs" />
