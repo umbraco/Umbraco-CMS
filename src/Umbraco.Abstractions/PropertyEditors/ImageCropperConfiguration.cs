@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Runtime.Serialization;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -10,15 +10,16 @@ namespace Umbraco.Core.PropertyEditors
         [ConfigurationField("crops", "Define crops", "views/propertyeditors/imagecropper/imagecropper.prevalues.html")]
         public Crop[] Crops { get; set; }
 
+        [DataContract]
         public class Crop
         {
-            [JsonProperty("alias")]
+            [DataMember(Name = "alias")]
             public string Alias { get; set; }
 
-            [JsonProperty("width")]
+            [DataMember(Name = "width")]
             public int Width { get; set; }
 
-            [JsonProperty("height")]
+            [DataMember(Name = "height")]
             public int Height { get; set; }
         }
     }
