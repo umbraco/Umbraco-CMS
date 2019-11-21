@@ -77,11 +77,7 @@ namespace Umbraco.Core
         public static ManifestFilterCollectionBuilder ManifestFilters(this Composition composition)
             => composition.WithCollectionBuilder<ManifestFilterCollectionBuilder>();
 
-        /// <summary>
-        /// Gets the components collection builder.
-        /// </summary>
-        public static ComponentCollectionBuilder Components(this Composition composition)
-            => composition.WithCollectionBuilder<ComponentCollectionBuilder>();
+        
 
         #endregion
 

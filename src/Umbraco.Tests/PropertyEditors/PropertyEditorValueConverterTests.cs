@@ -7,6 +7,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
+using Umbraco.Core.Serialization;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.PropertyEditors.ValueConverters;
 
@@ -72,7 +73,7 @@ namespace Umbraco.Tests.PropertyEditors
         [TestCase(null, new string[] { })]
         public void CanConvertCheckboxListPropertyEditor(object value, IEnumerable<string> expected)
         {
-            var converter = new CheckboxListValueConverter();
+            var converter = new CheckboxListValueConverter(new JsonNetSerializer());
             var result = converter.ConvertIntermediateToObject(null, null, PropertyCacheLevel.Unknown, value, false);
 
             Assert.AreEqual(expected, result);
