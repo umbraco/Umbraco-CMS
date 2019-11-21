@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             base.SetUp();
 
-            _fileSystem = new PhysicalFileSystem(Current.IOHelper, Current.Logger, Constants.SystemDirectories.MvcViews + "/Partials/");
+            _fileSystem = new PhysicalFileSystem(IOHelper, Logger, Constants.SystemDirectories.MvcViews + "/Partials/");
         }
 
         protected override void Compose()

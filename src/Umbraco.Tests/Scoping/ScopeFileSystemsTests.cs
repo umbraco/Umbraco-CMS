@@ -53,7 +53,7 @@ namespace Umbraco.Tests.Scoping
         [TestCase(false)]
         public void CreateMediaTest(bool complete)
         {
-            var physMediaFileSystem = new PhysicalFileSystem(IOHelper, Current.Logger, IOHelper.MapPath("media"), "ignore");
+            var physMediaFileSystem = new PhysicalFileSystem(IOHelper, Logger, IOHelper.MapPath("media"), "ignore");
             var mediaFileSystem = Current.MediaFileSystem;
 
             Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));

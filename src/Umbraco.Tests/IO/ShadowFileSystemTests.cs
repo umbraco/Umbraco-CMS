@@ -53,14 +53,15 @@ namespace Umbraco.Tests.IO
         public void ShadowDeleteDirectory()
         {
             var ioHelper = IOHelper.Default;
+            var logger = Mock.Of<ILogger>();
 
             var path = ioHelper.MapPath("FileSysTests");
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(path + "/ShadowTests");
             Directory.CreateDirectory(path + "/ShadowSystem");
 
-            var fs = new PhysicalFileSystem(ioHelper, Current.Logger, path + "/ShadowTests/", "ignore");
-            var sfs = new PhysicalFileSystem(ioHelper, Current.Logger, path + "/ShadowSystem/", "ignore");
+            var fs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowTests/", "ignore");
+            var sfs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowSystem/", "ignore");
             var ss = new ShadowFileSystem(fs, sfs);
 
             Directory.CreateDirectory(path + "/ShadowTests/d1");
