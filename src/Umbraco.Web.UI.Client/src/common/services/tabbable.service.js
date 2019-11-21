@@ -186,7 +186,7 @@
 
               if (!nodeComputedStyle) {
                 if (node instanceof DocumentFragment) {
-                  return false;
+                  return true;// though DocumentFragment dosnt directly have display 'none', we know that it will never be visible, and therefor we return true. (and do not cache this, cause it will change if appended to the DOM)
                 } else {
                   nodeComputedStyle = this.doc.defaultView.getComputedStyle(node);
                 }
