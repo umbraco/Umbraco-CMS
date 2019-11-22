@@ -24,10 +24,6 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
             alias: "selectedEditor",
             description: "Select a property editor",
             label: "Property editor"
-        },
-        selectedEditorId: {
-            alias: "selectedEditorId",
-            label: "Property editor alias"
         }
     };
 
@@ -221,7 +217,7 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
                 {
                     "name": values[1],
                     "alias": "info",
-                    "icon": "icon-molecular-network",
+                    "icon": "icon-info",
                     "view": "views/datatypes/views/datatype.info.html"
                 }
             ];
