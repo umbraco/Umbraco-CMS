@@ -34,8 +34,9 @@ angular.module("umbraco.directives")
         },
         
         link: function (scope, element, attrs, umbTreeCtrl) {
-            localizationService.localize("general_search").then(function (value) {
-                scope.searchAltText = value;
+            localizationService.localizeMany(["general_search", "visuallyHiddenTexts_openContextMenu"]).then(function (value) {
+                scope.searchAltText = value[0];
+                scope.optionsText = value[1];
             });
             
             // updates the node's DOM/styles
