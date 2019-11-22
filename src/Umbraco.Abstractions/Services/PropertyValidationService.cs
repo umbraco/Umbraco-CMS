@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Umbraco.Core.Collections;
-using Umbraco.Core.Composing;
+﻿using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Services
 {
-    //TODO: We should make this an interface and inject it into the ContentService
-    internal class PropertyValidationService
+    internal class PropertyValidationService : IPropertyValidationService
     {
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IDataTypeService _dataTypeService;
@@ -20,12 +13,6 @@ namespace Umbraco.Core.Services
         {
             _propertyEditors = propertyEditors;
             _dataTypeService = dataTypeService;
-        }
-
-        //TODO: Remove this method in favor of the overload specifying all dependencies
-        public PropertyValidationService()
-            : this(Current.PropertyEditors, Current.Services.DataTypeService)
-        {
         }
 
         /// <summary>

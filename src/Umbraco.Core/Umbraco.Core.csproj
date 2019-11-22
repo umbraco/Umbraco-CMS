@@ -203,7 +203,6 @@
     <Compile Include="Models\PropertyCollection.cs" />
     <Compile Include="Models\PropertyType.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\FixLanguageIsoCodeLength.cs" />
-    <Compile Include="Models\CultureImpact.cs" />
     <Compile Include="Models\PublishedContent\IndexedArrayItem.cs" />
     <Compile Include="Models\PublishedContent\VariationContextAccessorExtensions.cs" />
     <Compile Include="Models\Template.cs" />
@@ -236,10 +235,7 @@
     <Compile Include="Serialization\JsonNetSerializer.cs" />
     <Compile Include="Services\Changes\ContentTypeChange.cs" />
     <Compile Include="Services\Changes\ContentTypeChangeExtensions.cs" />
-    <Compile Include="Services\IMemberService.cs" />
-    <Compile Include="Services\IMembershipMemberService.cs" />
     <Compile Include="Services\LocalizedTextServiceExtensions.cs" />
-    <Compile Include="Services\PropertyValidationService.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="Strings\DefaultUrlSegmentProvider.cs" />
     <Compile Include="Strings\IUrlSegmentProvider.cs" />
@@ -651,7 +647,6 @@
     <Compile Include="Persistence\Querying\SqlExpressionExtensions.cs" />
     <Compile Include="Persistence\Querying\SqlTranslator.cs" />
     <Compile Include="Persistence\Querying\TextColumnType.cs" />
-    <Compile Include="Persistence\Querying\ValuePropertyMatchType.cs" />
     <Compile Include="Persistence\RecordPersistenceType.cs" />
     <Compile Include="Persistence\Repositories\Implement\AuditRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\DocumentBlueprintRepository.cs" />
@@ -804,7 +799,6 @@
     <Compile Include="Services\Implement\RepositoryService.cs" />
     <Compile Include="Services\Implement\ScopeRepositoryService.cs" />
     <Compile Include="Services\Implement\ServerRegistrationService.cs" />
-    <Compile Include="Services\ServiceContext.cs" />
     <Compile Include="Services\Implement\TagService.cs" />
     <Compile Include="Services\Implement\UserService.cs" />
     <Compile Include="Services\UserServiceExtensions.cs" />
