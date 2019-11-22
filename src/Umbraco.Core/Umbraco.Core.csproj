@@ -742,7 +742,6 @@
     <Compile Include="Security\IUmbracoMemberTypeMembershipProvider.cs" />
     <Compile Include="Security\IUserAwarePasswordHasher.cs" />
     <Compile Include="Security\IUserSessionStore.cs" />
-    <Compile Include="Security\IUsersMembershipProvider.cs" />
     <Compile Include="Security\MachineKeyGenerator.cs" />
     <Compile Include="Security\MembershipProviderBase.cs" />
     <Compile Include="Security\MembershipProviderExtensions.cs" />

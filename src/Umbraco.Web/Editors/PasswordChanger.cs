@@ -158,19 +158,18 @@ namespace Umbraco.Web.Editors
             if (passwordModel == null) throw new ArgumentNullException(nameof(passwordModel));
             if (membershipProvider == null) throw new ArgumentNullException(nameof(membershipProvider));
 
-            BackOfficeUserManager<BackOfficeIdentityUser> backofficeUserManager = null;
+            var backofficeUserManager = _httpContext.GetOwinContext().GetBackOfficeUserManager();
             var userId = -1;
 
-            if (membershipProvider.IsUmbracoUsersProvider())
+            if (backofficeUserManager == null)
             {
-                backofficeUserManager = _httpContext.GetOwinContext().GetBackOfficeUserManager();
-                if (backofficeUserManager != null)
-                {
-                    var profile = _userService.GetProfileByUserName(username);
-                    if (profile != null)
-                        int.TryParse(profile.Id.ToString(), out userId);
-                }
+                // should never happen
+                throw new InvalidOperationException("Could not resolve the back office user manager");
             }
+
+            var profile = _userService.GetProfileByUserName(username);
+            if (profile != null)
+                int.TryParse(profile.Id.ToString(), out userId);
 
             //Are we resetting the password?
             //This flag indicates that either an admin user is changing another user's password without knowing the original password
@@ -226,7 +225,7 @@ namespace Umbraco.Web.Editors
                             username,
                             membershipProvider.RequiresQuestionAndAnswer ? passwordModel.Answer : null);
 
-                    if (membershipProvider.IsUmbracoUsersProvider() && backofficeUserManager != null && userId >= 0)
+                    if (userId >= 0)
                         backofficeUserManager.RaisePasswordResetEvent(userId);
 
                     //return the generated pword

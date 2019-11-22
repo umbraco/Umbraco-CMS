@@ -252,14 +252,6 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         protected virtual IPasswordHasher GetDefaultPasswordHasher(MembershipProviderBase provider)
         {
-            //if the current user membership provider is unknown (this would be rare), then return the default password hasher
-            if (provider.IsUmbracoUsersProvider() == false)
-                return new PasswordHasher();
-
-            //if the configured provider has legacy features enabled, then return the membership provider password hasher
-            if (provider.AllowManuallyChangingPassword || provider.DefaultUseLegacyEncoding)
-                return new MembershipProviderPasswordHasher(provider);
-
             //we can use the user aware password hasher (which will be the default and preferred way)
             return new UserAwareMembershipProviderPasswordHasher(provider);
         }
