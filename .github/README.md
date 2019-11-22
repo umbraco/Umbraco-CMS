@@ -1,7 +1,7 @@
 # Restore database
 1. Copy `_db/Umbraco.sdf` to `src/Umbraco.Web.UI/App_Data`
 2. Update `src/Umbraco.Web.UI/Web.config`:
-    * Update app setting `Umbraco.Core.ConfigurationStatus` to `"8.3.0"`
+    * Update app setting `Umbraco.Core.ConfigurationStatus` to `"8.6.0"`
     * Replace configuration/connectionStrings with this:
 ```
 <connectionStrings>
