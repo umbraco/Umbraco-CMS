@@ -36,7 +36,7 @@ namespace Umbraco.Web
         /// <returns>A value indicating whether the content is of a content type composed of a content type identified by the alias.</returns>
         public static bool IsComposedOf(this IPublishedElement content, string alias)
         {
-            return content.ContentType.CompositionAliases.Contains(alias);
+            return content.ContentType.CompositionAliases.InvariantContains(alias);
         }
 
         #endregion
@@ -165,8 +165,9 @@ namespace Umbraco.Web
         public static IEnumerable<T> OfTypes<T>(this IEnumerable<T> contents, params string[] types)
             where T : IPublishedElement
         {
-            types = types.Select(x => x.ToLowerInvariant()).ToArray();
-            return contents.Where(x => types.Contains(x.ContentType.Alias.ToLowerInvariant()));
+            if (types == null || types.Length == 0) return Enumerable.Empty<T>();
+            
+            return contents.Where(x => types.InvariantContains(x.ContentType.Alias));
         }
 
         #endregion

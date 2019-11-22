@@ -82,6 +82,7 @@
                 view: "views/dashboard/content/overlays/disable.html",
                 submitButtonLabel: "Disable",
                 submitButtonLabelKey: "actions_disable",
+                submitButtonStyle:"danger",
                 submit: function (model) {
                     performDisable();
                     overlayService.close();

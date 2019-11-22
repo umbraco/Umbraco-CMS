@@ -1,13 +1,13 @@
 <ul role="tablist" class="umb-tabs-nav">
-    <li class="umb-tab" role="tab" aria-selected="true" tabindex="0" ng-repeat="tab in vm.tabs |  limitTo: vm.maxTabs" data-element="tab-{{tab.alias}}" ng-class="{'umb-tab--active': tab.active, 'umb-tab--error': tabHasError}" val-tab>
-        <a ng-href="" ng-click="vm.clickTab($event, tab)">{{ tab.label }}</a>
+    <li ng-click="vm.clickTab($event, tab)" class="umb-tab" role="tab" aria-selected="true" tabindex="0" ng-repeat="tab in vm.tabs |  limitTo: vm.maxTabs" data-element="tab-{{tab.alias}}" ng-class="{'umb-tab--active': tab.active, 'umb-tab--error': tabHasError}" val-tab>
+        <a>{{ tab.label }}</a>
     </li>
 
-    <li data-element="tab-expand" class="umb-tab umb-tab--expand" ng-class="{ 'open': vm.showTray }" ng-show="vm.needTray">
-        <a ng-href="" ng-click="vm.toggleTray()"><i></i><i></i><i></i></a>
+    <li data-element="tab-expand" class="umb-tab umb-tab--expand" tabindex="0" ng-click="vm.toggleTray()" ng-class="{ 'open': vm.showTray }" ng-show="vm.needTray">
+        <a ng-href=""><i></i><i></i><i></i></a>
         <umb-dropdown class="umb-tabs-tray" ng-if="vm.showTray" on-close="vm.hideTray()">
-            <umb-dropdown-item ng-repeat="tab in vm.tabs | limitTo: vm.overflowingTabs" ng-class="{'umb-tabs-tray-item--active': tab.active}">
-                <a ng-href="" href="" ng-click="vm.clickTab($event, tab)">{{ tab.label }}</a>
+            <umb-dropdown-item ng-repeat="tab in vm.tabs | limitTo: vm.overflowingTabs" ng-class="{'umb-tabs-tray-item--active': tab.active}" tabindex="0" ng-click="vm.clickTab($event, tab)">
+                <a ng-href="">{{ tab.label }}</a>
             </umb-dropdown-item>
         </umb-dropdown>
     </li>
