@@ -1,4 +1,7 @@
-﻿namespace Umbraco.Web.Dictionary
+﻿using Umbraco.Core.Cache;
+using Umbraco.Core.Services;
+
+namespace Umbraco.Web.Dictionary
 {
     /// <summary>
     /// A culture dictionary factory used to create an Umbraco.Core.Dictionary.ICultureDictionary.
@@ -8,9 +11,18 @@
     /// </remarks>
     internal class DefaultCultureDictionaryFactory : Umbraco.Core.Dictionary.ICultureDictionaryFactory
     {
+        private readonly ILocalizationService _localizationService;
+        private readonly AppCaches _appCaches;
+
+        public DefaultCultureDictionaryFactory(ILocalizationService localizationService, AppCaches appCaches)
+        {
+            _localizationService = localizationService;
+            _appCaches = appCaches;
+        }
+
         public Umbraco.Core.Dictionary.ICultureDictionary CreateDictionary()
         {
-            return new DefaultCultureDictionary();
+            return new DefaultCultureDictionary(_localizationService, _appCaches.RequestCache);
         }
     }
 }

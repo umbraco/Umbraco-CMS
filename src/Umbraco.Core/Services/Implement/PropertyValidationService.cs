@@ -15,9 +15,7 @@ namespace Umbraco.Core.Services
             _dataTypeService = dataTypeService;
         }
 
-        /// <summary>
-        /// Validates the content item's properties pass validation rules
-        /// </summary>
+        /// <inheritdoc />
         public bool IsPropertyDataValid(IContent content, out IProperty[] invalidProperties, CultureImpact impact)
         {
             // select invalid properties
@@ -50,9 +48,7 @@ namespace Umbraco.Core.Services
             return invalidProperties.Length == 0;
         }
 
-        /// <summary>
-        /// Gets a value indicating whether the property has valid values.
-        /// </summary>
+        /// <inheritdoc />
         public bool IsPropertyValid(IProperty property, string culture = "*", string segment = "*")
         {
             //NOTE - the pvalue and vvalues logic in here is borrowed directly from the Property.Values setter so if you are wondering what that's all about, look there.

@@ -7,22 +7,25 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Composing;
+using Umbraco.Core.Dictionary;
 
 namespace Umbraco.Web.Models.Mapping
 {
     internal abstract class TabsAndPropertiesMapper
     {
+        protected ICultureDictionary CultureDictionary { get; }
         protected ILocalizedTextService LocalizedTextService { get; }
         protected IEnumerable<string> IgnoreProperties { get; set; }
 
-        protected TabsAndPropertiesMapper(ILocalizedTextService localizedTextService)
+        protected TabsAndPropertiesMapper(ICultureDictionary cultureDictionary, ILocalizedTextService localizedTextService)
         {
+            CultureDictionary = cultureDictionary ?? throw new ArgumentNullException(nameof(cultureDictionary));
             LocalizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
             IgnoreProperties = new List<string>();
         }
 
-        protected TabsAndPropertiesMapper(ILocalizedTextService localizedTextService, IEnumerable<string> ignoreProperties)
-            : this(localizedTextService)
+        protected TabsAndPropertiesMapper(ICultureDictionary cultureDictionary, ILocalizedTextService localizedTextService, IEnumerable<string> ignoreProperties)
+            : this(cultureDictionary, localizedTextService)
         {
             IgnoreProperties = ignoreProperties ?? throw new ArgumentNullException(nameof(ignoreProperties));
         }
@@ -115,8 +118,8 @@ namespace Umbraco.Web.Models.Mapping
     internal class TabsAndPropertiesMapper<TSource> : TabsAndPropertiesMapper
         where TSource : IContentBase
     {
-        public TabsAndPropertiesMapper(ILocalizedTextService localizedTextService)
-            : base(localizedTextService)
+        public TabsAndPropertiesMapper(ICultureDictionary cultureDictionary, ILocalizedTextService localizedTextService)
+            : base(cultureDictionary, localizedTextService)
         { }
 
         public virtual IEnumerable<Tab<ContentPropertyDisplay>> Map(TSource source, MapperContext context)
@@ -159,7 +162,7 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     Id = groupId,
                     Alias = groupName,
-                    Label = LocalizedTextService.UmbracoDictionaryTranslate(groupName),
+                    Label = LocalizedTextService.UmbracoDictionaryTranslate(CultureDictionary, groupName),
                     Properties = mappedProperties,
                     IsActive = false
                 });

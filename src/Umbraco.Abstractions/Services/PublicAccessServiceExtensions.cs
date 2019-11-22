@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.Security;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Services
@@ -51,11 +50,6 @@ namespace Umbraco.Core.Services
             if (entry == null) return true;
 
             return HasAccess(entry, username, currentMemberRoles);
-        }
-
-        public static bool HasAccess(this IPublicAccessService publicAccessService, string path, MembershipUser member, RoleProvider roleProvider)
-        {
-            return publicAccessService.HasAccess(path, member.UserName, roleProvider.GetRolesForUser);
         }
 
         /// <summary>

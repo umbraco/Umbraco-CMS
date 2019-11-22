@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Logging;
+﻿using Umbraco.Core.Dictionary;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -17,11 +18,11 @@ namespace Umbraco.Web.Models.Mapping
         private readonly ContentPropertyDtoMapper _contentPropertyDtoConverter;
         private readonly ContentPropertyDisplayMapper _contentPropertyDisplayMapper;
 
-        public ContentPropertyMapDefinition(IDataTypeService dataTypeService, IEntityService entityService, ILocalizedTextService textService, ILogger logger, PropertyEditorCollection propertyEditors)
+        public ContentPropertyMapDefinition(ICultureDictionary cultureDictionary, IDataTypeService dataTypeService, IEntityService entityService, ILocalizedTextService textService, ILogger logger, PropertyEditorCollection propertyEditors)
         {
             _contentPropertyBasicConverter = new ContentPropertyBasicMapper<ContentPropertyBasic>(dataTypeService, entityService, logger, propertyEditors);
             _contentPropertyDtoConverter = new ContentPropertyDtoMapper(dataTypeService, entityService, logger, propertyEditors);
-            _contentPropertyDisplayMapper = new ContentPropertyDisplayMapper(dataTypeService, entityService, textService, logger, propertyEditors);
+            _contentPropertyDisplayMapper = new ContentPropertyDisplayMapper(cultureDictionary, dataTypeService, entityService, textService, logger, propertyEditors);
         }
 
         public void DefineMaps(UmbracoMapper mapper)

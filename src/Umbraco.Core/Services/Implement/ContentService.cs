@@ -8,7 +8,6 @@ using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Scoping;
@@ -27,7 +26,7 @@ namespace Umbraco.Core.Services.Implement
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly IDocumentBlueprintRepository _documentBlueprintRepository;
         private readonly ILanguageRepository _languageRepository;
-        private readonly IPropertyValidationService _propertyValidationService;
+        private readonly Lazy<IPropertyValidationService> _propertyValidationService;
         private IQuery<IContent> _queryNotTrashed;
         
         #region Constructors
@@ -36,7 +35,7 @@ namespace Umbraco.Core.Services.Implement
             IEventMessagesFactory eventMessagesFactory,
             IDocumentRepository documentRepository, IEntityRepository entityRepository, IAuditRepository auditRepository,
             IContentTypeRepository contentTypeRepository, IDocumentBlueprintRepository documentBlueprintRepository, ILanguageRepository languageRepository,
-            IPropertyValidationService propertyValidationService)
+            Lazy<IPropertyValidationService> propertyValidationService)
             : base(provider, logger, eventMessagesFactory)
         {
             _documentRepository = documentRepository;
@@ -1404,7 +1403,7 @@ namespace Umbraco.Core.Services.Implement
                             //publish the culture values and validate the property values, if validation fails, log the invalid properties so the develeper has an idea of what has failed
                             IProperty[] invalidProperties = null;
                             var impact = CultureImpact.Explicit(culture, IsDefaultCulture(allLangs, culture));
-                            var tryPublish = d.PublishCulture(impact) && _propertyValidationService.IsPropertyDataValid(d, out invalidProperties, impact);
+                            var tryPublish = d.PublishCulture(impact) && _propertyValidationService.Value.IsPropertyDataValid(d, out invalidProperties, impact);
                             if (invalidProperties != null && invalidProperties.Length > 0)
                                 Logger.Warn<ContentService>("Scheduled publishing will fail for document {DocumentId} and culture {Culture} because of invalid properties {InvalidProperties}",
                                     d.Id, culture, string.Join(",", invalidProperties.Select(x => x.Alias)));
@@ -1505,12 +1504,12 @@ namespace Umbraco.Core.Services.Implement
                 return culturesToPublish.All(culture =>
                 {
                     var impact = CultureImpact.Create(culture, IsDefaultCulture(allLangs, culture), content);
-                    return content.PublishCulture(impact) && _propertyValidationService.IsPropertyDataValid(content, out _, impact);
+                    return content.PublishCulture(impact) && _propertyValidationService.Value.IsPropertyDataValid(content, out _, impact);
                 });
             }
 
             return content.PublishCulture(CultureImpact.Invariant)
-                   && _propertyValidationService.IsPropertyDataValid(content, out _, CultureImpact.Invariant);
+                   && _propertyValidationService.Value.IsPropertyDataValid(content, out _, CultureImpact.Invariant);
         }
 
         // utility 'ShouldPublish' func used by SaveAndPublishBranch
@@ -2603,7 +2602,7 @@ namespace Umbraco.Core.Services.Implement
 
             //validate the property values
             IProperty[] invalidProperties = null;
-            if (!impactsToPublish.All(x => _propertyValidationService.IsPropertyDataValid(content, out invalidProperties, x)))
+            if (!impactsToPublish.All(x => _propertyValidationService.Value.IsPropertyDataValid(content, out invalidProperties, x)))
                 return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content)
                 {
                     InvalidProperties = invalidProperties

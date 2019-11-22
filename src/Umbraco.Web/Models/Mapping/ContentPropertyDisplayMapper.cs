@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Logging;
+﻿using Umbraco.Core.Dictionary;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -12,11 +13,13 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class ContentPropertyDisplayMapper : ContentPropertyBasicMapper<ContentPropertyDisplay>
     {
+        private readonly ICultureDictionary _cultureDictionary;
         private readonly ILocalizedTextService _textService;
 
-        public ContentPropertyDisplayMapper(IDataTypeService dataTypeService, IEntityService entityService, ILocalizedTextService textService, ILogger logger, PropertyEditorCollection propertyEditors)
+        public ContentPropertyDisplayMapper(ICultureDictionary cultureDictionary, IDataTypeService dataTypeService, IEntityService entityService, ILocalizedTextService textService, ILogger logger, PropertyEditorCollection propertyEditors)
             : base(dataTypeService, entityService, logger, propertyEditors)
         {
+            _cultureDictionary = cultureDictionary;
             _textService = textService;
         }
         public override void Map(IProperty originalProp, ContentPropertyDisplay dest, MapperContext context)
@@ -59,8 +62,8 @@ namespace Umbraco.Web.Models.Mapping
             }
 
             //Translate
-            dest.Label = _textService.UmbracoDictionaryTranslate(dest.Label);
-            dest.Description = _textService.UmbracoDictionaryTranslate(dest.Description);
+            dest.Label = _textService.UmbracoDictionaryTranslate(_cultureDictionary, dest.Label);
+            dest.Description = _textService.UmbracoDictionaryTranslate(_cultureDictionary, dest.Description);
         }
     }
 }

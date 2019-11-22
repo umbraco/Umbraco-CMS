@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Dictionary;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
@@ -21,7 +22,7 @@ namespace Umbraco.Web.Models.Mapping
         private readonly IMediaTypeService _mediaTypeService;
         private readonly TabsAndPropertiesMapper<IMedia> _tabsAndPropertiesMapper;
 
-        public MediaMapDefinition(ILogger logger, CommonMapper commonMapper, IMediaService mediaService, IMediaTypeService mediaTypeService,
+        public MediaMapDefinition(ICultureDictionary cultureDictionary, ILogger logger, CommonMapper commonMapper, IMediaService mediaService, IMediaTypeService mediaTypeService,
             ILocalizedTextService localizedTextService)
         {
             _logger = logger;
@@ -29,7 +30,7 @@ namespace Umbraco.Web.Models.Mapping
             _mediaService = mediaService;
             _mediaTypeService = mediaTypeService;
 
-            _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IMedia>(localizedTextService);
+            _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IMedia>(cultureDictionary, localizedTextService);
         }
 
         public void DefineMaps(UmbracoMapper mapper)

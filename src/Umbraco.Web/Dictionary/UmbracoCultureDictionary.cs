@@ -24,22 +24,23 @@ namespace Umbraco.Web.Dictionary
         private readonly IAppCache _requestCache;
         private readonly CultureInfo _specificCulture;
 
-        public DefaultCultureDictionary()
-            : this(Current.Services.LocalizationService, Current.AppCaches.RequestCache)
-        { }
-
+        /// <summary>
+        /// Default constructor which will use the current thread's culture
+        /// </summary>
+        /// <param name="localizationService"></param>
+        /// <param name="requestCache"></param>
         public DefaultCultureDictionary(ILocalizationService localizationService, IAppCache requestCache)
         {
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             _requestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
         }
 
-        public DefaultCultureDictionary(CultureInfo specificCulture)
-            : this(Current.Services.LocalizationService, Current.AppCaches.RequestCache)
-        {
-            _specificCulture = specificCulture ?? throw new ArgumentNullException(nameof(specificCulture));
-        }
-
+        /// <summary>
+        /// Constructor for testing to specify a static culture
+        /// </summary>
+        /// <param name="specificCulture"></param>
+        /// <param name="localizationService"></param>
+        /// <param name="requestCache"></param>
         public DefaultCultureDictionary(CultureInfo specificCulture, ILocalizationService localizationService, IAppCache requestCache)
         {
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));

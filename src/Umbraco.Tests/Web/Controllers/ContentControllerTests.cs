@@ -21,8 +21,6 @@ using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.PublishedCache;
-
 using Task = System.Threading.Tasks.Task;
 using Umbraco.Core.Dictionary;
 using Umbraco.Web.PropertyEditors;
@@ -260,6 +258,7 @@ namespace Umbraco.Tests.Web.Controllers
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
 
                 var controller = new ContentController(
+                    Factory.GetInstance<ICultureDictionary>(),
                     propertyEditorCollection,
                     Factory.GetInstance<IGlobalSettings>(),
                     umbracoContextAccessor,
@@ -293,6 +292,7 @@ namespace Umbraco.Tests.Web.Controllers
             {
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
                 var controller = new ContentController(
+                    Factory.GetInstance<ICultureDictionary>(),
                     propertyEditorCollection,
                     Factory.GetInstance<IGlobalSettings>(),
                     umbracoContextAccessor,
@@ -334,6 +334,7 @@ namespace Umbraco.Tests.Web.Controllers
 
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
                 var controller = new ContentController(
+                    Factory.GetInstance<ICultureDictionary>(),
                     propertyEditorCollection,
                     Factory.GetInstance<IGlobalSettings>(),
                     umbracoContextAccessor,
@@ -380,6 +381,7 @@ namespace Umbraco.Tests.Web.Controllers
 
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
                 var controller = new ContentController(
+                    Factory.GetInstance<ICultureDictionary>(),
                     propertyEditorCollection,
                     Factory.GetInstance<IGlobalSettings>(),
                     umbracoContextAccessor,
@@ -418,6 +420,7 @@ namespace Umbraco.Tests.Web.Controllers
 
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
                 var controller = new ContentController(
+                    Factory.GetInstance<ICultureDictionary>(),
                     propertyEditorCollection,
                     Factory.GetInstance<IGlobalSettings>(),
                     umbracoContextAccessor,
@@ -462,6 +465,7 @@ namespace Umbraco.Tests.Web.Controllers
 
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
                 var controller = new ContentController(
+                    Factory.GetInstance<ICultureDictionary>(),
                     propertyEditorCollection,
                     Factory.GetInstance<IGlobalSettings>(),
                     umbracoContextAccessor,

@@ -27,6 +27,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
             composition.RegisterUnique<IdkMap>();
 
             // register the services
+            composition.RegisterUnique<IPropertyValidationService, PropertyValidationService>();
             composition.RegisterUnique<IKeyValueService, KeyValueService>();
             composition.RegisterUnique<IPublicAccessService, PublicAccessService>();
             composition.RegisterUnique<IDomainService, DomainService>();

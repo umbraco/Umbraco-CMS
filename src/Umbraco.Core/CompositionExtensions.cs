@@ -91,7 +91,7 @@ namespace Umbraco.Core
         public static void SetCultureDictionaryFactory<T>(this Composition composition)
             where T : ICultureDictionaryFactory
         {
-            composition.RegisterUnique<ICultureDictionaryFactory, T>();
+            composition.RegisterUnique<ICultureDictionaryFactory, T>();            
         }
 
         /// <summary>

@@ -202,7 +202,7 @@ namespace Umbraco.Web.Runtime
 
             composition.RegisterUnique<ISiteDomainHelper, SiteDomainHelper>();
 
-            composition.RegisterUnique<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();
+            composition.SetCultureDictionaryFactory<DefaultCultureDictionaryFactory>();
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course
             composition.WithCollectionBuilder<HealthCheckCollectionBuilder>()

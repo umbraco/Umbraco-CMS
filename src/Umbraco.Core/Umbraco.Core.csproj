@@ -235,7 +235,7 @@
     <Compile Include="Serialization\JsonNetSerializer.cs" />
     <Compile Include="Services\Changes\ContentTypeChange.cs" />
     <Compile Include="Services\Changes\ContentTypeChangeExtensions.cs" />
-    <Compile Include="Services\LocalizedTextServiceExtensions.cs" />
+    <Compile Include="Services\Implement\PropertyValidationService.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="Strings\DefaultUrlSegmentProvider.cs" />
     <Compile Include="Strings\IUrlSegmentProvider.cs" />
@@ -793,7 +793,6 @@
     <Compile Include="Services\Implement\NotificationService.cs" />
     <Compile Include="Services\Implement\PackagingService.cs" />
     <Compile Include="Services\Implement\PublicAccessService.cs" />
-    <Compile Include="Services\PublicAccessServiceExtensions.cs" />
     <Compile Include="Services\Implement\RedirectUrlService.cs" />
     <Compile Include="Services\Implement\RelationService.cs" />
     <Compile Include="Services\Implement\RepositoryService.cs" />
@@ -801,7 +800,6 @@
     <Compile Include="Services\Implement\ServerRegistrationService.cs" />
     <Compile Include="Services\Implement\TagService.cs" />
     <Compile Include="Services\Implement\UserService.cs" />
-    <Compile Include="Services\UserServiceExtensions.cs" />
     <Compile Include="Compose\ManifestWatcherComponent.cs" />
     <Compile Include="Compose\RelateOnCopyComponent.cs" />
     <Compile Include="Compose\RelateOnTrashComponent.cs" />
