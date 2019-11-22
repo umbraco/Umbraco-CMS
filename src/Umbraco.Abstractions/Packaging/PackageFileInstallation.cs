@@ -17,7 +17,7 @@ namespace Umbraco.Core.Packaging
     /// <summary>
     /// Installs package files
     /// </summary>
-    internal class PackageFileInstallation
+    public class PackageFileInstallation
     {
         private readonly CompiledPackageXmlParser _parser;
         private readonly IIOHelper _ioHelper;
