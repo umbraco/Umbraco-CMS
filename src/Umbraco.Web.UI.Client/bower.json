@@ -22,7 +22,7 @@
         "jquery": "2.0.3",
         "jquery-file-upload": "~9.4.0",
         "jquery-ui": "1.10.3",
-        "angular-dynamic-locale": "~0.1.27",
+        "angular-dynamic-locale": "0.1.27",
         "bootstrap-tabdrop": "~1.0.0"
     },
     "exportsOverride": {
