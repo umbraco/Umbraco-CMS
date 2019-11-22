@@ -288,7 +288,7 @@ namespace Umbraco.Web.Security.Providers
         /// </remarks>
         public override int GetNumberOfUsersOnline()
         {
-            return MemberService.GetCount(MemberCountType.Online);
+            throw new NotImplementedException();
         }
 
         /// <summary>

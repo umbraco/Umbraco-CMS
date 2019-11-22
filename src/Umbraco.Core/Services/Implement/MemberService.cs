@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.Security;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Scoping;
@@ -71,11 +68,7 @@ namespace Umbraco.Core.Services.Implement
                 {
                     case MemberCountType.All:
                         query = Query<IMember>();
-                        break;
-                    case MemberCountType.Online:
-                        var fromDate = DateTime.Now.AddMinutes(-Membership.UserIsOnlineTimeWindow);
-                        query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == Constants.Conventions.Member.LastLoginDate && ((Member) x).DateTimePropertyValue > fromDate);
-                        break;
+                        break;                    
                     case MemberCountType.LockedOut:
                         query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == Constants.Conventions.Member.IsLockedOut && ((Member) x).BoolPropertyValue);
                         break;

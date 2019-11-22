@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data.Common;
-using System.Data.SqlClient;
-using System.Data.SqlServerCe;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -12,12 +9,10 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Services.Implement
 {
@@ -479,23 +474,7 @@ namespace Umbraco.Core.Services.Implement
                 {
                     case MemberCountType.All:
                         query = Query<IUser>();
-                        break;
-                    case MemberCountType.Online:
-                        throw new NotImplementedException();
-                    //var fromDate = DateTime.Now.AddMinutes(-Membership.UserIsOnlineTimeWindow);
-                    //query =
-                    //    Query<IMember>.Builder.Where(
-                    //        x =>
-                    //        ((Member)x).PropertyTypeAlias == Constants.Conventions.Member.LastLoginDate &&
-                    //        ((Member)x).DateTimePropertyValue > fromDate);
-                    //return repository.GetCountByQuery(query);
-                    //var fromDate = DateTime.Now.AddMinutes(-Membership.UserIsOnlineTimeWindow);
-                    //query =
-                    //    Query<IMember>.Builder.Where(
-                    //        x =>
-                    //        ((Member)x).PropertyTypeAlias == Constants.Conventions.Member.LastLoginDate &&
-                    //        ((Member)x).DateTimePropertyValue > fromDate);
-                    //return repository.GetCountByQuery(query);
+                        break;                    
                     case MemberCountType.LockedOut:
                         query = Query<IUser>().Where(x => x.IsLockedOut);
                         break;

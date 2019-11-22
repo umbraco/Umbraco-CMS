@@ -1119,23 +1119,6 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void Count_All_Online_Members()
-        {
-            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            ServiceContext.MemberTypeService.Save(memberType);
-            var members = MockedMember.CreateSimpleMember(memberType, 10, (i, member) => member.LastLoginDate = DateTime.Now.AddMinutes(i * -2));
-            ServiceContext.MemberService.Save(members);
-
-            var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
-            customMember.SetValue(Constants.Conventions.Member.LastLoginDate, DateTime.Now);
-            ServiceContext.MemberService.Save(customMember);
-
-            var found = ServiceContext.MemberService.GetCount(MemberCountType.Online);
-
-            Assert.AreEqual(9, found);
-        }
-
-        [Test]
         public void Count_All_Locked_Members()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();

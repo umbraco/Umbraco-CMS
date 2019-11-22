@@ -6,7 +6,6 @@
     public enum MemberCountType
     {
         All,
-        Online,
         LockedOut,
         Approved
     }
