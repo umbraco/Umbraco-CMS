@@ -1,4 +1,4 @@
-function dateTimePickerController($scope, notificationsService, assetsService, angularHelper, userService, $element, dateHelper) {
+function dateTimePickerController($scope, angularHelper, dateHelper, validationMessageService) {
 
     let flatPickr = null;
 
@@ -53,9 +53,20 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
             dateFormat: dateFormat,
             time_24hr: true
         };
+
+        // Don't show calendar if date format has been set to only time
+        if ($scope.model.config.format === "HH:mm:ss" || $scope.model.config.format === "HH:mm" || $scope.model.config.format === "HH") {
+            $scope.datePickerConfig.enableTime = true;
+            $scope.datePickerConfig.noCalendar = true;
+        }
             
         setDatePickerVal();
 
+        // Set the message to use for when a mandatory field isn't completed.
+        // Will either use the one provided on the property type or a localised default.
+        validationMessageService.getMandatoryMessage($scope.model.validation).then(function (value) {
+            $scope.mandatoryMessage = value;
+        });
     }
 
     $scope.clearDate = function() {

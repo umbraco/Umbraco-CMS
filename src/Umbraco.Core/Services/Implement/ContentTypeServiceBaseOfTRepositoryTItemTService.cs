@@ -252,12 +252,12 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public IEnumerable<TItem> GetAll(params Guid[] ids)
+        public IEnumerable<TItem> GetAll(IEnumerable<Guid> ids)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);
-                return Repository.GetMany(ids);
+                return Repository.GetMany(ids.ToArray());
             }
         }
 
@@ -595,10 +595,9 @@ namespace Umbraco.Core.Services.Implement
         public TItem Copy(TItem original, string alias, string name, TItem parent)
         {
             if (original == null) throw new ArgumentNullException(nameof(original));
-            if (string.IsNullOrWhiteSpace(alias)) throw new ArgumentNullOrEmptyException(nameof(alias));
-
-            if (parent != null && parent.HasIdentity == false)
-                throw new InvalidOperationException("Parent must have an identity.");
+            if (alias == null) throw new ArgumentNullException(nameof(alias));
+            if (string.IsNullOrWhiteSpace(alias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(alias));
+            if (parent != null && parent.HasIdentity == false) throw new InvalidOperationException("Parent must have an identity.");
 
             // this is illegal
             //var originalb = (ContentTypeCompositionBase)original;
