@@ -100,6 +100,15 @@ namespace Umbraco.Web.ContentApps
                 if (configTabName != null && String.IsNullOrWhiteSpace(configTabName.ToString()) == false)
                     contentApp.Name = configTabName.ToString();
             }
+
+            //Override Icon if icon is provided
+            if (listViewConfig.ContainsKey("icon"))
+            {
+                var configIcon = listViewConfig["icon"];
+                if (configIcon != null && String.IsNullOrWhiteSpace(configIcon.ToString()) == false)
+                    contentApp.Icon = configIcon.ToString();
+            }
+
             // if the list view is configured to show umbContent first, update the list view content app weight accordingly
             if(listViewConfig.ContainsKey("showContentFirst") &&
                listViewConfig["showContentFirst"]?.ToString().TryConvertTo<bool>().Result == true)

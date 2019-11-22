@@ -97,10 +97,15 @@
                         </div>
 
                         <div class="umb-info-local-item mt4 flex items-center flex-column" ng-if="vm.installState.status == ''">
-                            <label for="confirm-uninstall" class="umb-package-installer-label">
-                                <input type="checkbox" id="confirm-uninstall" ng-model="vm.package.confirmUninstall" required no-dirty-check>
-                                <strong class="label-text"><localize key="packager_packageUninstallConfirm">Confirm package uninstall</localize></strong>
-                            </label>
+
+                            <umb-checkbox
+                                css-class="-small-text -bold"
+                                model="vm.package.confirmUninstall"
+                                text="Confirm package uninstall"
+                                label-key="packager_packageUninstallConfirm"
+                                required="true">
+                            </umb-checkbox>
+
                             <umb-button
                                 class="mt3"
                                 type="button"

@@ -225,8 +225,17 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (builtinProperties.ContainsKey(propertyType.Alias))
                 {
                     //this reset's its current data type reference which will be re-assigned based on the property editor assigned on the next line
-                    propertyType.DataTypeId = 0;
-                    propertyType.DataTypeKey = default;
+                    var propDefinition = builtinProperties[propertyType.Alias];
+                    if (propDefinition != null)
+                    {
+                        propertyType.DataTypeId = propDefinition.DataTypeId;
+                        propertyType.DataTypeKey = propDefinition.DataTypeKey;
+                    }
+                    else
+                    {
+                        propertyType.DataTypeId = 0;
+                        propertyType.DataTypeKey = default;
+                    }
                 }
             }
         }
