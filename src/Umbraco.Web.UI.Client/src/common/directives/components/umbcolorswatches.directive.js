@@ -18,6 +18,7 @@ Use this directive to generate color swatches to pick from.
 @param {string} size (<code>attribute</code>): The size (s, m).
 @param {string} useLabel (<code>attribute</code>): Specify if labels should be used.
 @param {string} useColorClass (<code>attribute</code>): Specify if color values are css classes.
+@param {string} colorClassNamePrefix (<code>attribute</code>): Specify the prefix used for the class for each color (defaults to "btn").
 @param {function} onSelect (<code>expression</code>): Callback function when the item is selected.
 **/
 
@@ -31,6 +32,11 @@ Use this directive to generate color swatches to pick from.
             // Set default to true if not defined
             if (angular.isUndefined(scope.useColorClass)) {
                 scope.useColorClass = false;
+            }
+
+            // Set default to "btn" if not defined
+            if (angular.isUndefined(scope.colorClassNamePrefix)) {
+                scope.colorClassNamePrefix = "btn";
             }
             
             scope.setColor = function (color, $index, $event) {
@@ -66,7 +72,8 @@ Use this directive to generate color swatches to pick from.
                 selectedColor: '=',
                 onSelect: '&',
                 useLabel: '=',
-                useColorClass: '=?'
+                useColorClass: '=?',
+                colorClassNamePrefix: '@?'
             },
             link: link
         };
