@@ -233,8 +233,6 @@
     <Compile Include="PropertyEditors\VoidEditor.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="Serialization\JsonNetSerializer.cs" />
-    <Compile Include="Services\Changes\ContentTypeChange.cs" />
-    <Compile Include="Services\Changes\ContentTypeChangeExtensions.cs" />
     <Compile Include="Services\Implement\PropertyValidationService.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="Strings\DefaultUrlSegmentProvider.cs" />
@@ -828,5 +826,6 @@
       <Name>Umbraco.Abstractions</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
