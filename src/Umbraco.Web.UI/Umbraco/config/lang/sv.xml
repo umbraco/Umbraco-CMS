@@ -102,6 +102,7 @@
     <key alias="blueprintDescription">En innehållsmall är fördefinierat innehåll som en redaktör kan välja att använda som grund för att skapa nytt innehåll</key>
   </area>
   <area alias="buttons">
+    <key alias="clearSelection">Rensa urval</key>
     <key alias="bold">Fetstil</key>
     <key alias="deindent">Minska indrag</key>
     <key alias="formFieldInsert">Infoga formulärfält</key>
@@ -794,7 +795,7 @@
     <key alias="template">Sidmall</key>
   </area>
   <area alias="grid">
-    <key alias="media">Image</key>
+    <key alias="media">Bild</key>
     <key alias="macro">Macro</key>
     <key alias="insertControl">Lägg till</key>
     <key alias="chooseLayout">Choose layout</key>
@@ -945,6 +946,11 @@
     <key alias="resetPassword">Återställ lösenord</key>
     <key alias="searchAllChildren">Sök igenom alla undernoder</key>
     <key alias="sessionExpires">Sessionen går ut</key>
+    <key alias="stateAll">Alla</key>
+    <key alias="stateActive">Aktiv</key>
+    <key alias="stateLockedOut">Utlåst</key>
+    <key alias="stateInvited">Inbjuden</key>
+    <key alias="stateInactive">Inaktiv</key>
     <key alias="sortNameAscending">Namn (A-Z)</key>
     <key alias="sortNameDescending">Namn (Z-A)</key>
     <key alias="startnode">Startnod i innehåll</key>
@@ -956,5 +962,8 @@
     <key alias="writer">Skribent</key>
     <key alias="yourHistory">Din nuvarande historik</key>
     <key alias="yourProfile">Din profil</key>
+    <key alias="sortCreateDateAscending">Nyast</key>
+    <key alias="sortCreateDateDescending">Äldst</key>
+    <key alias="sortLastLoginDateDescending">Senaste login</key>
   </area>
 </language>
