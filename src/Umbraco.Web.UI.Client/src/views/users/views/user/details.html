@@ -71,6 +71,7 @@
                                             sections="userGroup.sections"
                                             content-start-node="userGroup.contentStartNode"
                                             media-start-node="userGroup.mediaStartNode"
+                                            allow-remove="true"
                                             on-remove="model.removeSelectedItem($index, model.user.userGroups)">
                     </umb-user-group-preview>
 
@@ -259,7 +260,7 @@
                     <div>
 
                         <umb-button type="button" ng-if="model.user.userDisplayState.key !== 'Invited' && model.changePasswordModel.isChanging === false"
-                                    button-style="[info,block]"
+                                    button-style="[action,block]"
                                     action="model.toggleChangePassword()"
                                     label="Change password"
                                     label-key="general_changePassword"
@@ -321,7 +322,7 @@
                               rows="4">
                 </textarea>
                     <umb-button type="button"
-                                button-style="[info,block]"
+                                button-style="[action,block]"
                                 action="model.resendInvite()"
                                 state="model.resendInviteButtonState"
                                 label="Resend Invite"
