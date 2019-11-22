@@ -1,4 +1,4 @@
-function listViewController($scope, $routeParams, $injector, $timeout, currentUserResource, notificationsService, iconHelper, editorState, localizationService, appState, $location, listViewHelper, navigationService, editorService, overlayService, languageResource, mediaHelper) {
+function listViewController($scope, $interpolate, $routeParams, $injector, $timeout, currentUserResource, notificationsService, iconHelper, editorState, localizationService, appState, $location, listViewHelper, navigationService, editorService, overlayService, languageResource, mediaHelper) {
 
     //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
     // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -168,6 +168,11 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
         allowBulkDelete: $scope.model.config.bulkActionPermissions.allowBulkDelete,
         cultureName: $routeParams.cculture ? $routeParams.cculture : $routeParams.mculture
     };
+    _.each($scope.options.includeProperties, function (property) {
+        property.nameExp = !!property.nameTemplate
+            ? $interpolate(property.nameTemplate)
+            : undefined;
+    });
 
     //watch for culture changes in the query strings and update accordingly
     $scope.$watch(function () {
@@ -193,9 +198,14 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
     _.each($scope.options.includeProperties, function (e, i) {
         e.allowSorting = true;
 
-        // Special case for members, only fields on the base table (cmsMember) can be used for sorting
-        if (e.isSystem && $scope.entityType == "member") {
-            e.allowSorting = e.alias == 'username' || e.alias == 'email';
+        // Special case for members, only the configured system fields should be enabled sorting
+        // (see MemberRepository.ApplySystemOrdering)
+        if (e.isSystem && $scope.entityType === "member") {
+            e.allowSorting = e.alias === "username" ||
+                e.alias === "email" ||
+                e.alias === "updateDate" ||
+                e.alias === "createDate" ||
+                e.alias === "contentTypeAlias";
         }
 
         if (e.isSystem) {
@@ -393,6 +403,7 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
         const dialog = {
             view: "views/propertyeditors/listview/overlays/delete.html",
             deletesVariants: selectionHasVariants(),
+            isTrashed: $scope.isTrashed,
             submitButtonLabelKey: "contentTypeEditor_yesDelete",
             submitButtonStyle: "danger",
             submit: function (model) {
@@ -694,6 +705,13 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
                 value = value.substring(0, value.length - 3);
             }
 
+            if (e.nameExp) {
+                var newValue = e.nameExp({ value });
+                if (newValue && (newValue = $.trim(newValue))) {
+                    value = newValue;
+                }
+            }
+
             // set what we've got on the result
             result[alias] = value;
         });
@@ -749,10 +767,11 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
 
 
         $scope.contentId = id;
-        $scope.isTrashed = id === "-20" || id === "-21";
+        $scope.isTrashed = editorState.current ? editorState.current.trashed : id === "-20" || id === "-21";
 
         $scope.options.allowBulkPublish = $scope.options.allowBulkPublish && !$scope.isTrashed;
         $scope.options.allowBulkUnpublish = $scope.options.allowBulkUnpublish && !$scope.isTrashed;
+        $scope.options.allowBulkCopy = $scope.options.allowBulkCopy && !$scope.isTrashed;
 
         $scope.options.bulkActionsAllowed = $scope.options.allowBulkPublish ||
             $scope.options.allowBulkUnpublish ||
@@ -779,8 +798,11 @@ function listViewController($scope, $routeParams, $injector, $timeout, currentUs
             case "published":
                 return "content_isPublished";
             case "contentTypeAlias":
-                // TODO: Check for members
-                return $scope.entityType === "content" ? "content_documentType" : "content_mediatype";
+                return $scope.entityType === "content"
+                    ? "content_documentType"
+                    : $scope.entityType === "media"
+                        ? "content_mediatype"
+                        : "content_membertype";
             case "email":
                 return "general_email";
             case "username":

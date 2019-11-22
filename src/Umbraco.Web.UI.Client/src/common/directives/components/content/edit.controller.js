@@ -4,7 +4,7 @@
     function ContentEditController($rootScope, $scope, $routeParams, $q, $window,
         appState, contentResource, entityResource, navigationService, notificationsService,
         serverValidationManager, contentEditingHelper, localizationService, formHelper, umbRequestHelper,
-        editorState, $http, eventsService, overlayService, $location, localStorageService) {
+        editorState, $http, eventsService, overlayService, $location, localStorageService, treeService) {
 
         var evts = [];
         var infiniteMode = $scope.infiniteModel && $scope.infiniteModel.infiniteMode;
@@ -201,6 +201,12 @@
                 $scope.page.buttonGroupState = "success";
             }));
 
+            evts.push(eventsService.on("rte.shortcut.save", function(){
+                if ($scope.page.showSaveButton) {
+                    $scope.save();
+                }
+            }));
+
             evts.push(eventsService.on("content.saved", function(){
                 // Clear out localstorage keys that start with tinymce__
                 // When we save/perist a content node
@@ -265,8 +271,7 @@
         function createButtons(content) {
 
             // for trashed and element type items, the save button is the primary action - otherwise it's a secondary action
-            $scope.page.saveButtonStyle = content.trashed || content.isElement ? "primary" : "info";
-
+            $scope.page.saveButtonStyle = content.trashed || content.isElement || content.isBlueprint ? "primary" : "info";
             // only create the save/publish/preview buttons if the
             // content app is "Conent"
             if ($scope.app && $scope.app.alias !== "umbContent" && $scope.app.alias !== "umbInfo" && $scope.app.alias !== "umbListView") {
@@ -305,7 +310,7 @@
         }
 
         /** Syncs the content item to it's tree node - this occurs on first load and after saving */
-        function syncTreeNode(content, path, initialLoad) {
+        function syncTreeNode(content, path, initialLoad, reloadChildren) {
 
             if (infiniteMode || !path) {
                 return;
@@ -315,6 +320,9 @@
                 navigationService.syncTree({ tree: $scope.treeAlias, path: path.split(","), forceReload: initialLoad !== true })
                     .then(function (syncArgs) {
                         $scope.page.menu.currentNode = syncArgs.node;
+                        if (reloadChildren && syncArgs.node.expanded) {
+                            treeService.loadNodeChildren({node: syncArgs.node});
+                        }
                     }, function () {
                         //handle the rejection
                         console.log("A problem occurred syncing the tree! A path is probably incorrect.")
@@ -446,7 +454,7 @@
                 //needs to be manually set for infinite editing mode
                 $scope.page.isNew = false;
 
-                syncTreeNode($scope.content, data.path);
+                syncTreeNode($scope.content, data.path, false, args.reloadChildren);
 
                 eventsService.emit("content.saved", { content: $scope.content, action: args.action });
 
@@ -851,7 +859,8 @@
                                 return contentResource.publishWithDescendants(content, create, model.includeUnpublished, files, showNotifications);
                             },
                             action: "publishDescendants",
-                            showNotifications: false
+                            showNotifications: false,
+                            reloadChildren: model.includeUnpublished
                         }).then(function (data) {
                             //show all notifications manually here since we disabled showing them automatically in the save method
                             formHelper.showNotifications(data);

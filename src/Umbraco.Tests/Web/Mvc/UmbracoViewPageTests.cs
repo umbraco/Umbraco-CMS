@@ -29,7 +29,7 @@ namespace Umbraco.Tests.Web.Mvc
     [UmbracoTest(WithApplication = true)]
     public class UmbracoViewPageTests : UmbracoTestBase
     {
-        private PublishedSnapshotService _service;
+        private XmlPublishedSnapshotService _service;
 
         [TearDown]
         public override void TearDown()
@@ -421,7 +421,7 @@ namespace Umbraco.Tests.Web.Mvc
             var scopeProvider = TestObjects.GetScopeProvider(Mock.Of<ILogger>());
             var factory = Mock.Of<IPublishedContentTypeFactory>();
             var umbracoContextAccessor = Mock.Of<IUmbracoContextAccessor>();
-            _service = new PublishedSnapshotService(svcCtx, factory, scopeProvider, cache,
+            _service = new XmlPublishedSnapshotService(svcCtx, factory, scopeProvider, cache,
                 null, null,
                 umbracoContextAccessor, null, null, null,
                 new TestDefaultCultureAccessor(),

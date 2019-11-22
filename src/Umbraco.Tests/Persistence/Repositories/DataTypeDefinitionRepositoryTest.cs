@@ -29,6 +29,68 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Can_Find_Usages()
+        {
+            var provider = TestObjects.GetScopeProvider(Logger);
+
+            using (provider.CreateScope())
+            {
+                var dtRepo = CreateRepository();
+                IDataType dataType1 = new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService)) { Name = "dt1" };
+                dtRepo.Save(dataType1);
+                IDataType dataType2 = new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService)) { Name = "dt2" };
+                dtRepo.Save(dataType2);
+
+                var ctRepo = Factory.GetInstance<IContentTypeRepository>();
+                IContentType ct = new ContentType(-1)
+                {
+                    Alias = "ct1",
+                    Name = "CT1",
+                    AllowedAsRoot = true,
+                    Icon = "icon-home",
+                    PropertyGroups = new PropertyGroupCollection
+                    {
+                        new PropertyGroup(true)
+                        {
+                            Name = "PG1",
+                            PropertyTypes = new PropertyTypeCollection(true)
+                            {
+                                new PropertyType(dataType1, "pt1")
+                                {
+                                    Name = "PT1"
+                                },
+                                new PropertyType(dataType1, "pt2")
+                                {
+                                    Name = "PT2"
+                                },
+                                new PropertyType(dataType2, "pt3")
+                                {
+                                    Name = "PT3"
+                                }
+                            }
+                        }
+                    }
+                };
+                ctRepo.Save(ct);
+
+                var usages = dtRepo.FindUsages(dataType1.Id);
+
+                var key = usages.First().Key;
+                Assert.AreEqual(ct.Key, ((GuidUdi)key).Guid);
+                Assert.AreEqual(2, usages[key].Count());
+                Assert.AreEqual("pt1", usages[key].ElementAt(0));
+                Assert.AreEqual("pt2", usages[key].ElementAt(1));
+
+                usages = dtRepo.FindUsages(dataType2.Id);
+
+                key = usages.First().Key;
+                Assert.AreEqual(ct.Key, ((GuidUdi)key).Guid);
+                Assert.AreEqual(1, usages[key].Count());
+                Assert.AreEqual("pt3", usages[key].ElementAt(0));
+            }
+        }
+
+        [Test]
         public void Can_Move()
         {
             var provider = TestObjects.GetScopeProvider(Logger);

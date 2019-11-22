@@ -212,6 +212,22 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
     evts.push(eventsService.on("editors.languages.languageDeleted", function (e, args) {
         loadLanguages().then(function (languages) {
             $scope.languages = languages;
+            const defaultCulture = $scope.languages[0].culture;
+
+            if (args.language.culture === $scope.selectedLanguage.culture) {
+                $scope.selectedLanguage = defaultCulture;
+
+                if ($scope.languages.length > 1) {
+                    $location.search("mculture", defaultCulture);
+                } else {
+                    $location.search("mculture", null);
+                }
+                
+                var currentEditorState = editorState.getCurrent();
+                if (currentEditorState && currentEditorState.path) {
+                    $scope.treeApi.syncTree({ path: currentEditorState.path, activate: true });
+                }
+            }
         });
     }));
 
@@ -255,7 +271,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
     evts.push(eventsService.on("treeService.removeNode", function (e, args) {
         //check to see if the current page has been removed
 
-        var currentEditorState = editorState.getCurrent()
+        var currentEditorState = editorState.getCurrent();
         if (currentEditorState && currentEditorState.id.toString() === args.node.id.toString()) {
             //current page is loaded, so navigate to root
             var section = appState.getSectionState("currentSection");
@@ -279,6 +295,9 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
             //select the current language if set in the query string
             if (mainCulture && $scope.languages && $scope.languages.length > 1) {
                 var found = _.find($scope.languages, function (l) {
+                    if (mainCulture === true) {
+                        return false;
+                    }
                     return l.culture.toLowerCase() === mainCulture.toLowerCase();
                 });
                 if (found) {
@@ -348,7 +367,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
 
         return contentResource.allowsCultureVariation().then(function (b) {
             if (b === true) {
-                return languageResource.getAll()
+                return languageResource.getAll();
             } else {
                 return $q.when([]); //resolve an empty collection
             }

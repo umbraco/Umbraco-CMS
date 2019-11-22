@@ -40,14 +40,6 @@ namespace Umbraco.Web.PropertyEditors
         // has to be lazy else circular dep in ctor
         private PropertyEditorCollection PropertyEditors => _propertyEditors.Value;
 
-        private static IContentType GetElementType(JObject item)
-        {
-            var contentTypeAlias = item[ContentTypeAliasPropertyKey]?.ToObject<string>();
-            return string.IsNullOrEmpty(contentTypeAlias)
-                ? null
-                : Current.Services.ContentTypeService.Get(contentTypeAlias);
-        }
-
         #region Pre Value Editor
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new NestedContentConfigurationEditor();
@@ -62,11 +54,22 @@ namespace Umbraco.Web.PropertyEditors
         {
             private readonly PropertyEditorCollection _propertyEditors;
 
+            private readonly Lazy<Dictionary<string, IContentType>> _contentTypes = new Lazy<Dictionary<string, IContentType>>(() =>
+                    Current.Services.ContentTypeService.GetAll().ToDictionary(c => c.Alias)
+            );
+
             public NestedContentPropertyValueEditor(DataEditorAttribute attribute, PropertyEditorCollection propertyEditors)
                 : base(attribute)
             {
                 _propertyEditors = propertyEditors;
-                Validators.Add(new NestedContentValidator(propertyEditors));
+                Validators.Add(new NestedContentValidator(propertyEditors, GetElementType));
+            }
+
+
+            private IContentType GetElementType(JObject item)
+            {
+                var contentTypeAlias = item[ContentTypeAliasPropertyKey]?.ToObject<string>() ?? string.Empty;
+                return _contentTypes.Value.ContainsKey(contentTypeAlias) ? _contentTypes.Value[contentTypeAlias] : null;
             }
 
             internal ServiceContext Services => Current.Services;
@@ -122,6 +125,10 @@ namespace Umbraco.Web.PropertyEditors
                             {
                                 // convert the value, and store the converted value
                                 var propEditor = _propertyEditors[propType.PropertyEditorAlias];
+                                if (propEditor == null)
+                                {
+                                    continue;
+                                }
                                 var tempConfig = dataTypeService.GetDataType(propType.DataTypeId).Configuration;
                                 var valEditor = propEditor.GetValueEditor(tempConfig);
                                 var convValue = valEditor.ConvertDbToString(propType, propValues[propAlias]?.ToString(), dataTypeService);
@@ -185,6 +192,11 @@ namespace Umbraco.Web.PropertyEditors
 
                                 // convert that temp property, and store the converted value
                                 var propEditor = _propertyEditors[propType.PropertyEditorAlias];
+                                if(propEditor == null)
+                                {
+                                    propValues[propAlias] = tempProp.GetValue()?.ToString();
+                                    continue;
+                                }
                                 var tempConfig = dataTypeService.GetDataType(propType.DataTypeId).Configuration;
                                 var valEditor = propEditor.GetValueEditor(tempConfig);
                                 var convValue = valEditor.ToEditor(tempProp, dataTypeService);
@@ -249,6 +261,10 @@ namespace Umbraco.Web.PropertyEditors
 
                             // Lookup the property editor
                             var propEditor = _propertyEditors[propType.PropertyEditorAlias];
+                            if (propEditor == null)
+                            {
+                                continue;
+                            }
 
                             // Create a fake content property data object
                             var contentPropData = new ContentPropertyData(propValues[propKey], propConfiguration);
@@ -272,10 +288,12 @@ namespace Umbraco.Web.PropertyEditors
         internal class NestedContentValidator : IValueValidator
         {
             private readonly PropertyEditorCollection _propertyEditors;
+            private readonly Func<JObject, IContentType> _getElementType;
 
-            public NestedContentValidator(PropertyEditorCollection propertyEditors)
+            public NestedContentValidator(PropertyEditorCollection propertyEditors, Func<JObject, IContentType> getElementType)
             {
                 _propertyEditors = propertyEditors;
+                _getElementType = getElementType;
             }
 
             public IEnumerable<ValidationResult> Validate(object rawValue, string valueType, object dataTypeConfiguration)
@@ -293,7 +311,7 @@ namespace Umbraco.Web.PropertyEditors
                     var o = value[i];
                     var propValues = (JObject) o;
 
-                    var contentType = GetElementType(propValues);
+                    var contentType = _getElementType(propValues);
                     if (contentType == null) continue;
 
                     var propValueKeys = propValues.Properties().Select(x => x.Name).ToArray();
@@ -305,6 +323,11 @@ namespace Umbraco.Web.PropertyEditors
                         {
                             var config = dataTypeService.GetDataType(propType.DataTypeId).Configuration;
                             var propertyEditor = _propertyEditors[propType.PropertyEditorAlias];
+
+                            if (propertyEditor == null)
+                            {
+                                continue;
+                            }
 
                             foreach (var validator in propertyEditor.GetValueEditor().Validators)
                             {
@@ -319,9 +342,19 @@ namespace Umbraco.Web.PropertyEditors
                             if (propType.Mandatory)
                             {
                                 if (propValues[propKey] == null)
-                                    yield return new ValidationResult("Item " + (i + 1) + " '" + propType.Name + "' cannot be null", new[] { propKey });
+                                {
+                                    var message = string.IsNullOrWhiteSpace(propType.MandatoryMessage)
+                                                      ? $"'{propType.Name}' cannot be null"
+                                                      : propType.MandatoryMessage;
+                                    yield return new ValidationResult($"Item {(i + 1)}: {message}", new[] { propKey });
+                                }
                                 else if (propValues[propKey].ToString().IsNullOrWhiteSpace() || (propValues[propKey].Type == JTokenType.Array && !propValues[propKey].HasValues))
-                                    yield return new ValidationResult("Item " + (i + 1) + " '" + propType.Name + "' cannot be empty", new[] { propKey });
+                                {
+                                    var message = string.IsNullOrWhiteSpace(propType.MandatoryMessage)
+                                                      ? $"'{propType.Name}' cannot be empty"
+                                                      : propType.MandatoryMessage;
+                                    yield return new ValidationResult($"Item {(i + 1)}: {message}", new[] { propKey });
+                                }
                             }
 
                             // Check regex
@@ -331,7 +364,10 @@ namespace Umbraco.Web.PropertyEditors
                                 var regex = new Regex(propType.ValidationRegExp);
                                 if (!regex.IsMatch(propValues[propKey].ToString()))
                                 {
-                                    yield return new ValidationResult("Item " + (i + 1) + " '" + propType.Name + "' is invalid, it does not match the correct pattern", new[] { propKey });
+                                    var message = string.IsNullOrWhiteSpace(propType.ValidationRegExpMessage)
+                                                      ? $"'{propType.Name}' is invalid, it does not match the correct pattern"
+                                                      : propType.ValidationRegExpMessage;
+                                    yield return new ValidationResult($"Item {(i + 1)}: {message}", new[] { propKey });
                                 }
                             }
                         }
