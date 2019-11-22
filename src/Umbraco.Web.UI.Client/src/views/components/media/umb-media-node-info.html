@@ -6,7 +6,7 @@
     <div class="umb-package-details__main-content" ng-if="loading === false">
 
         <!-- Links -->
-        <umb-box data-element="node-info-urls">
+        <umb-box data-element="node-info-urls" class="mb4">
             <umb-box-header title-key="general_links"></umb-box-header>
             <umb-box-content class="block-form">
 
@@ -43,7 +43,7 @@
             <!-- Content -->
             <div ng-if="contentReferences.items.length > 0">
 
-                <h5 class="mt4" style="margin-bottom: 20px;">
+                <h5 class="mt0" style="margin-bottom: 20px;">
                     <localize key="references_labelUsedByDocuments">Used in Documents</localize>
                 </h5>
 
@@ -79,7 +79,7 @@
             <!-- Members -->
             <div ng-if="memberReferences.items.length > 0">
 
-                <h5 class="mt4" style="margin-bottom: 20px;">
+                <h5 class="mt0" style="margin-bottom: 20px;">
                     <localize key="references_labelUsedByMembers">Used in Members</localize>
                 </h5>
 
@@ -115,7 +115,7 @@
             <!-- Media -->
             <div ng-if="mediaReferences.items.length > 0">
 
-                <h5 class="mt4" style="margin-bottom: 20px;">
+                <h5 class="mt0" style="margin-bottom: 20px;">
                     <localize key="references_labelUsedByMedia">Used in Media</localize>
                 </h5>
 
