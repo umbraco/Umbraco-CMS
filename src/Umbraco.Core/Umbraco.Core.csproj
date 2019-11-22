@@ -232,6 +232,7 @@
     <Compile Include="Persistence\Repositories\Implement\LanguageRepositoryExtensions.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RenameLabelAndRichTextPropertyEditorAliases.cs" />
     <Compile Include="PropertyEditors\VoidEditor.cs" />
+    <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="Serialization\JsonNetSerializer.cs" />
     <Compile Include="Services\Changes\ContentTypeChange.cs" />
     <Compile Include="Services\Changes\ContentTypeChangeExtensions.cs" />
