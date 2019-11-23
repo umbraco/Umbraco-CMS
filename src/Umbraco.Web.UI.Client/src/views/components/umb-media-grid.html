@@ -57,10 +57,10 @@
                         <div class="umb-table-cell">
                             <button type="button"
                                     class="umb-table-head__link sortable"
-                                    ng-click="setSort('createDate')"
+                                    ng-click="setSort('updateDate')"
                                     prevent-default>
                                 Last Updated
-                                <i class="umb-table-head__icon icon" ng-class="{'icon-navigation-up': isSortDirection('createDate', 'asc'), 'icon-navigation-down': isSortDirection('createDate', 'desc')}"></i>
+                                <i class="umb-table-head__icon icon" ng-class="{'icon-navigation-up': isSortDirection('updateDate', 'asc'), 'icon-navigation-down': isSortDirection('updateDate', 'desc')}"></i>
                             </button>                           
                         </div>
                
@@ -78,7 +78,7 @@
                             <ins ng-show="item.isFolder" ng-class="{'-locked': item.selected || !item.file || !item.thumbnail}" ng-click="clickItemName(item, $event, $index)" class="icon-navigation-right"></ins> <span data-src="{{item.value.src}}" class="item-name">{{item.name}}</span>
                         </div>
                         <div class="umb-table-cell">
-                            <span class="muted small" style="font-size:0.8em">{{item.createDate | date:'medium'}}</span>
+                            <span class="muted small" style="font-size:0.8em">{{item.updateDate | date:'medium'}}</span>
                         </div>           
                     </div>
                 </div>

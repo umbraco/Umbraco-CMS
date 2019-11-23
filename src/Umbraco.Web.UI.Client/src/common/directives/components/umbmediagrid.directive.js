@@ -344,7 +344,7 @@ Use this directive to generate a thumbnail grid of media items.
                 }
                 else {
                     scope.sortColumn = col;
-                    if (col === "createDate") {
+                    if (col === "updateDate") {
                         scope.sortReverse = true;
                     }
                     else {
@@ -356,8 +356,8 @@ Use this directive to generate a thumbnail grid of media items.
             }
             // sort function          
             scope.sortBy = function (item) {
-                if (scope.sortColumn === "createDate") {
-                    return [-item['isFolder'],item['createDate']];
+                if (scope.sortColumn === "updateDate") {
+                    return [-item['isFolder'],item['updateDate']];
                 }
                 else {
                     return [-item['isFolder'],item['name']];
