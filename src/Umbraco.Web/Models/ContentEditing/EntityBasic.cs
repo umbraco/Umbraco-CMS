@@ -64,8 +64,8 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "path")]
         public string Path { get; set; }
-        [DataMember(Name = "createDate")]
-        public DateTime CreateDate { get; set; }
+        [DataMember(Name = "updateDate")]
+        public DateTime UpdateDate { get; set; }
         /// <summary>
         /// A collection of extra data that is available for this specific entity/entity type
         /// </summary>
