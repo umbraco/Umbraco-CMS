@@ -1,13 +1,12 @@
 (function () {
     "use strict";
 
-    function UsersController($scope, $timeout, $location, $routeParams, usersResource, 
-        userGroupsResource, userService, localizationService, contentEditingHelper, 
-        usersHelper, formHelper, notificationsService, dateHelper, editorService, 
+    function UsersController($scope, $timeout, $location, $routeParams, $rootScope, usersResource,
+        userGroupsResource, userService, localizationService,
+        usersHelper, formHelper, dateHelper, editorService,
         listViewHelper) {
 
         var vm = this;
-        var localizeSaving = localizationService.localize("general_saving");
 
         vm.page = {};
         vm.users = [];
@@ -128,8 +127,7 @@
 
         function init() {
 
-            vm.usersOptions.orderBy = "Name";
-            vm.usersOptions.orderDirection = "Ascending";
+            initViewOptions();
 
             if ($routeParams.create) {
                 setUsersViewState("createUser");
@@ -144,8 +142,37 @@
             // Get user groups
             userGroupsResource.getUserGroups({ onlyCurrentUserGroups: false }).then(function (userGroups) {
                 vm.userGroups = userGroups;
+                initUserGroupSelections();
             });
 
+        }
+
+        function initViewOptions() {
+            var previousViewOptions = $rootScope.usersViewOptions;
+
+            if (previousViewOptions) {
+                // We've got previously saved view options, so we can restore the last view the editor had.
+                for (var key in previousViewOptions) {
+                    vm.usersOptions[key] = previousViewOptions[key];
+                }
+            } else {
+                // Use default view options.
+                vm.usersOptions.orderBy = "Name";
+                vm.usersOptions.orderDirection = "Ascending";
+            }
+        }
+
+        function initUserGroupSelections() {
+            if (vm.usersOptions.userGroups && vm.usersOptions.userGroups.length > 0 &&
+                vm.userGroups && vm.userGroups.length > 0) {
+                for (var i = 0; i < vm.usersOptions.userGroups.length; i++) {
+                    for (var j = 0; j < vm.userGroups.length; j++) {
+                        if (vm.userGroups[j].alias === vm.usersOptions.userGroups[i]) {
+                            vm.userGroups[j].selected = true;
+                        }
+                    }
+                }
+            }
         }
 
         function getSortLabel(sortKey, sortDirection) {
@@ -467,6 +494,7 @@
                 vm.usersOptions.userStates.splice(index, 1);
             }
 
+            saveViewOption("userStates", vm.usersOptions.userStates);
             getUsers();
         }
 
@@ -483,18 +511,33 @@
                 vm.usersOptions.userGroups.splice(index, 1);
             }
 
+            saveViewOption("userGroups", vm.usersOptions.userGroups);
+
             getUsers();
         }
 
         function setOrderByFilter(value, direction) {
             vm.usersOptions.orderBy = value;
             vm.usersOptions.orderDirection = direction;
+            saveViewOption("orderBy", value);
+            saveViewOption("orderDirection", direction);
             getUsers();
         }
 
         function changePageNumber(pageNumber) {
             vm.usersOptions.pageNumber = pageNumber;
+            saveViewOption("pageNumber", pageNumber);
             getUsers();
+        }
+
+        function saveViewOption(key, value) {
+            // When navigating to a user's details and back again, we want to be able to restore the editor's filters and sorts.
+            // To do this we'll save it to rootScope and retrieve from here with initialising the view.
+            if (!$rootScope.usersViewOptions) {
+                $rootScope.usersViewOptions = {};
+            }
+
+            $rootScope.usersViewOptions[key] = value;
         }
 
         function createUser(addUserForm) {
