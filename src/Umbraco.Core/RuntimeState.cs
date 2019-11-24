@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Web;
@@ -22,7 +23,7 @@ namespace Umbraco.Core
         private readonly ILogger _logger;
         private readonly IUmbracoSettingsSection _settings;
         private readonly IGlobalSettings _globalSettings;
-        private readonly HashSet<string> _applicationUrls = new HashSet<string>();
+        private readonly ConcurrentDictionary<string, byte> _applicationUrls = new ConcurrentDictionary<string, byte>();
         private readonly Lazy<IMainDom> _mainDom;
         private readonly Lazy<IServerRegistrar> _serverRegistrar;
 
@@ -106,11 +107,11 @@ namespace Umbraco.Core
             // (this is a simplified version of what was in 7.x)
             // note: should this be optional? is it expensive?
             var url = request == null ? null : ApplicationUrlHelper.GetApplicationUrlFromCurrentRequest(request, _globalSettings);
-            var change = url != null && !_applicationUrls.Contains(url);
+            var change = url != null && !_applicationUrls.ContainsKey(url);
             if (change)
             {
                 _logger.Info(typeof(ApplicationUrlHelper), "New url {Url} detected, re-discovering application url.", url);
-                _applicationUrls.Add(url);
+                _applicationUrls[url] = 0;
             }
 
             if (ApplicationUrl != null && !change) return;
