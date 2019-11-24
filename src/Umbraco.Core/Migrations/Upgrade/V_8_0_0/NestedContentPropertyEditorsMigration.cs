@@ -123,7 +123,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             var elementTypeId = _elementTypeIds[elementTypeAlias];
             _elementTypesInUse.Add(elementTypeId);
 
-            var propertyValues = element.ToObject<Dictionary<string, string>>();
+            var propertyValues = element.Properties().ToDictionary(p => p.Name, p => p.Value.ToString());
             if (!propertyValues.TryGetValue("key", out var keyo)
                 || !Guid.TryParse(keyo.ToString(), out var key))
             {
@@ -161,7 +161,8 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                         }
                         break;
 
-                    case Constants.PropertyEditors.Aliases.MultiUrlPicker:                        
+                    case Constants.PropertyEditors.Legacy.Aliases.RelatedLinks:
+                    case Constants.PropertyEditors.Legacy.Aliases.RelatedLinks2:
                         if (string.IsNullOrWhiteSpace(propertyValue))
                             continue;
                         element[pt.Alias] = ConvertRelatedLinksToMultiUrlPicker(propertyValue);
