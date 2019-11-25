@@ -83,14 +83,16 @@ namespace Umbraco.Web.Security.Providers
                 }
             }
 
-            PasswordConfiguration = new MembershipProviderPasswordConfiguration(
+            // these need to be lazy else we get a stack overflow since we cannot access Membership.HashAlgorithmType without initializing the providers
+
+            _passwordConfig = new Lazy<IPasswordConfiguration>(() => new MembershipProviderPasswordConfiguration(
                     MinRequiredPasswordLength,
                     MinRequiredNonAlphanumericCharacters > 0,
                     false, false, false, UseLegacyEncoding,
-                    CustomHashAlgorithmType ?? Membership.HashAlgorithmType,
-                    MaxInvalidPasswordAttempts);
+                    CustomHashAlgorithmType.IsNullOrWhiteSpace() ? Membership.HashAlgorithmType : CustomHashAlgorithmType,
+                    MaxInvalidPasswordAttempts));
 
-            _passwordSecurity = new PasswordSecurity(PasswordConfiguration);
+            _passwordSecurity = new Lazy<PasswordSecurity>(() => new PasswordSecurity(PasswordConfiguration));
 
         }
 
@@ -124,10 +126,11 @@ namespace Umbraco.Web.Security.Providers
             }
         }
 
-        private PasswordSecurity _passwordSecurity;
+        private Lazy<PasswordSecurity> _passwordSecurity;
+        private Lazy<IPasswordConfiguration> _passwordConfig;
 
-        public override PasswordSecurity PasswordSecurity => _passwordSecurity;
-        public IPasswordConfiguration PasswordConfiguration { get; private set; }
+        public override PasswordSecurity PasswordSecurity => _passwordSecurity.Value;
+        public IPasswordConfiguration PasswordConfiguration => _passwordConfig.Value;
 
         private class MembershipProviderPasswordConfiguration : IPasswordConfiguration
         {

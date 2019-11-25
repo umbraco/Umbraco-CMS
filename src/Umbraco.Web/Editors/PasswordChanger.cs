@@ -103,7 +103,7 @@ namespace Umbraco.Web.Editors
             }
             //is the old password correct?
             var validateResult = await userMgr.CheckPasswordAsync(backOfficeIdentityUser, passwordModel.OldPassword);
-            if(validateResult == false)
+            if (validateResult == false)
             {
                 //no, fail with an error message for "oldPassword"
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Incorrect password", new[] { "oldPassword" }) });
@@ -127,7 +127,10 @@ namespace Umbraco.Web.Editors
         /// <param name="passwordModel"></param>
         /// <param name="membershipProvider"></param>
         /// <returns></returns>
-        public Attempt<PasswordChangedModel> ChangePasswordWithMembershipProvider(string username, ChangingPasswordModel passwordModel, MembershipProvider membershipProvider)
+        public Attempt<PasswordChangedModel> ChangePasswordWithMembershipProvider(
+            string username,
+            ChangingPasswordModel passwordModel,
+            MembershipProvider membershipProvider)
         {
             var umbracoBaseProvider = membershipProvider as MembershipProviderBase;
 
@@ -158,7 +161,7 @@ namespace Umbraco.Web.Editors
                 //this is only possible when using a membership provider if the membership provider supports AllowManuallyChangingPassword
                 if (passwordModel.NewPassword.IsNullOrWhiteSpace() == false)
                 {
-                    if (umbracoBaseProvider !=null && umbracoBaseProvider.AllowManuallyChangingPassword)
+                    if (umbracoBaseProvider != null && umbracoBaseProvider.AllowManuallyChangingPassword)
                     {
                         //this provider allows manually changing the password without the old password, so we can just do it
                         try

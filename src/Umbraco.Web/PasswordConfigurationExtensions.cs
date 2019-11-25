@@ -28,7 +28,7 @@ namespace Umbraco.Web
                     // has permission to the user section to edit them. Similarly, when we have ASP.Net identity enabled for members, these legacy settings
                     // will no longer exist and admins will just be able to change a members' password if they have access to the member section to edit them.
                     {"allowManuallyChangingPassword", true},
-                    {"enableReset", false},
+                    {"enableReset", false}, // TODO: Actually, this is still used for the member editor, see MemberTabsAndPropertiesMapper.GetPasswordConfig, need to remove that eventually
                     {"enablePasswordRetrieval", false},
                     {"requiresQuestionAnswer", false}
 

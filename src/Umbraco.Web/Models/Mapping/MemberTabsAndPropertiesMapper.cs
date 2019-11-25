@@ -12,6 +12,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Core.Dictionary;
 using Umbraco.Web.Security;
+using Umbraco.Web.Security.Providers;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -137,11 +138,7 @@ namespace Umbraco.Web.Models.Mapping
                     // TODO: Hard coding this because the changepassword doesn't necessarily need to be a resolvable (real) property editor
                     View = "changepassword",
                     // initialize the dictionary with the configuration from the default membership provider
-                    Config = new Dictionary<string, object>(membersProvider.PasswordConfiguration.GetConfiguration())
-                    {
-                        // the password change toggle will only be displayed if there is already a password assigned.
-                        {"hasPassword", member.RawPasswordValue.IsNullOrWhiteSpace() == false}
-                    }
+                    Config = GetPasswordConfig(membersProvider, member)
                 },
                 new ContentPropertyDisplay
                 {
@@ -154,6 +151,20 @@ namespace Umbraco.Web.Models.Mapping
             };
 
             return genericProperties;
+        }
+
+        private Dictionary<string, object> GetPasswordConfig(MembersMembershipProvider membersProvider, IMember member)
+        {
+            var result = new Dictionary<string, object>(membersProvider.PasswordConfiguration.GetConfiguration())
+                {
+                    // the password change toggle will only be displayed if there is already a password assigned.
+                    {"hasPassword", member.RawPasswordValue.IsNullOrWhiteSpace() == false}
+                };
+
+            result["enableReset"] = membersProvider.CanResetPassword(_userService);
+            result["allowManuallyChangingPassword"] = membersProvider.AllowManuallyChangingPassword;
+
+            return result;
         }
 
         /// <summary>
