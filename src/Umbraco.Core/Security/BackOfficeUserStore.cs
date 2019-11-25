@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web.Security;
 using Microsoft.AspNet.Identity;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;

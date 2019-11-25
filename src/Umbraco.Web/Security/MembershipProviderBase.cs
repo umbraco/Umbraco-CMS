@@ -5,13 +5,13 @@ using System.Configuration.Provider;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
-using System.Web.Configuration;
 using System.Web.Hosting;
 using System.Web.Security;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Web.Security
 {
     /// <summary>
     /// A base membership provider class offering much of the underlying functionality for initializing and password encryption/hashing.

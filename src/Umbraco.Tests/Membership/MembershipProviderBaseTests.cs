@@ -7,6 +7,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Security;
 using Umbraco.Tests.Testing;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Tests.Membership
 {

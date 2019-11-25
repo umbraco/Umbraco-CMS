@@ -1,7 +1,8 @@
 ﻿using System.Text;
 using System.Web.Security;
+using Umbraco.Core.Security;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Web.Security
 {
     /// <summary>
     /// A base membership provider class for umbraco providers

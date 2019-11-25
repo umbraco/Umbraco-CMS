@@ -6,14 +6,22 @@ using System.Web.Hosting;
 using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
+using Umbraco.Web.Models.Membership;
 using Umbraco.Web.Security.Providers;
 
 namespace Umbraco.Web.Security
 {
     public static class MembershipProviderExtensions
     {
+
+        internal static UmbracoMembershipMember AsConcreteMembershipUser(this IMembershipUser member, string providerName, bool providerKeyAsGuid = false)
+        {
+            var membershipMember = new UmbracoMembershipMember(member, providerName, providerKeyAsGuid);
+            return membershipMember;
+        }
 
         /// <summary>
         /// Extension method to check if a password can be reset based on a given provider and the current request (logged in user)
