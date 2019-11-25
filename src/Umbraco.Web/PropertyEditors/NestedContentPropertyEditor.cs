@@ -342,9 +342,19 @@ namespace Umbraco.Web.PropertyEditors
                             if (propType.Mandatory)
                             {
                                 if (propValues[propKey] == null)
-                                    yield return new ValidationResult("Item " + (i + 1) + " '" + propType.Name + "' cannot be null", new[] { propKey });
+                                {
+                                    var message = string.IsNullOrWhiteSpace(propType.MandatoryMessage)
+                                                      ? $"'{propType.Name}' cannot be null"
+                                                      : propType.MandatoryMessage;
+                                    yield return new ValidationResult($"Item {(i + 1)}: {message}", new[] { propKey });
+                                }
                                 else if (propValues[propKey].ToString().IsNullOrWhiteSpace() || (propValues[propKey].Type == JTokenType.Array && !propValues[propKey].HasValues))
-                                    yield return new ValidationResult("Item " + (i + 1) + " '" + propType.Name + "' cannot be empty", new[] { propKey });
+                                {
+                                    var message = string.IsNullOrWhiteSpace(propType.MandatoryMessage)
+                                                      ? $"'{propType.Name}' cannot be empty"
+                                                      : propType.MandatoryMessage;
+                                    yield return new ValidationResult($"Item {(i + 1)}: {message}", new[] { propKey });
+                                }
                             }
 
                             // Check regex
@@ -354,7 +364,10 @@ namespace Umbraco.Web.PropertyEditors
                                 var regex = new Regex(propType.ValidationRegExp);
                                 if (!regex.IsMatch(propValues[propKey].ToString()))
                                 {
-                                    yield return new ValidationResult("Item " + (i + 1) + " '" + propType.Name + "' is invalid, it does not match the correct pattern", new[] { propKey });
+                                    var message = string.IsNullOrWhiteSpace(propType.ValidationRegExpMessage)
+                                                      ? $"'{propType.Name}' is invalid, it does not match the correct pattern"
+                                                      : propType.ValidationRegExpMessage;
+                                    yield return new ValidationResult($"Item {(i + 1)}: {message}", new[] { propKey });
                                 }
                             }
                         }
