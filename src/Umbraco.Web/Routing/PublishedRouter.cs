@@ -594,38 +594,31 @@ namespace Umbraco.Web.Routing
                 }
                 else
                 {
-                    if (membershipHelper.IsUmbracoMembershipProviderActive())
+                    // grab the current member
+                    var member = membershipHelper.GetCurrentMember();
+                    // if the member has the "approved" and/or "locked out" properties, make sure they're correctly set before allowing access
+                    var memberIsActive = true;
+                    if (member != null)
                     {
-                        // grab the current member
-                        var member = membershipHelper.GetCurrentMember();
-                        // if the member has the "approved" and/or "locked out" properties, make sure they're correctly set before allowing access
-                        var memberIsActive = true;
-                        if (member != null)
-                        {
-                            if (member.HasProperty(Constants.Conventions.Member.IsApproved) == false)
-                                memberIsActive = member.Value<bool>(Constants.Conventions.Member.IsApproved);
+                        if (member.HasProperty(Constants.Conventions.Member.IsApproved) == false)
+                            memberIsActive = member.Value<bool>(Constants.Conventions.Member.IsApproved);
 
-                            if (member.HasProperty(Constants.Conventions.Member.IsLockedOut) == false)
-                                memberIsActive = member.Value<bool>(Constants.Conventions.Member.IsLockedOut) == false;
-                        }
+                        if (member.HasProperty(Constants.Conventions.Member.IsLockedOut) == false)
+                            memberIsActive = member.Value<bool>(Constants.Conventions.Member.IsLockedOut) == false;
+                    }
 
-                        if (memberIsActive == false)
-                        {
-                            _logger.Debug<PublishedRouter>(
-                                "Current member is either unapproved or locked out, redirect to error page");
-                            var errorPageId = publicAccessAttempt.Result.NoAccessNodeId;
-                            if (errorPageId != request.PublishedContent.Id)
-                                request.PublishedContent =
-                                    request.UmbracoContext.PublishedSnapshot.Content.GetById(errorPageId);
-                        }
-                        else
-                        {
-                            _logger.Debug<PublishedRouter>("Current member has access");
-                        }
+                    if (memberIsActive == false)
+                    {
+                        _logger.Debug<PublishedRouter>(
+                            "Current member is either unapproved or locked out, redirect to error page");
+                        var errorPageId = publicAccessAttempt.Result.NoAccessNodeId;
+                        if (errorPageId != request.PublishedContent.Id)
+                            request.PublishedContent =
+                                request.UmbracoContext.PublishedSnapshot.Content.GetById(errorPageId);
                     }
                     else
                     {
-                        _logger.Debug<PublishedRouter>("Current custom MembershipProvider member has access");
+                        _logger.Debug<PublishedRouter>("Current member has access");
                     }
                 }
             }

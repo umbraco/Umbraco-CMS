@@ -2,7 +2,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using System.Web;
-using System.Web.Http.ModelBinding;
 using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -45,27 +44,6 @@ namespace Umbraco.Web.Editors
         {
             if (passwordModel == null) throw new ArgumentNullException(nameof(passwordModel));
             if (userMgr == null) throw new ArgumentNullException(nameof(userMgr));
-
-            //check if this identity implementation is powered by an underlying membership provider (it will be in most cases)
-            var membershipPasswordHasher = userMgr.PasswordHasher as IMembershipProviderPasswordHasher;
-
-            //check if this identity implementation is powered by an IUserAwarePasswordHasher (it will be by default in 7.7+ but not for upgrades)
-
-            if (membershipPasswordHasher != null && !(userMgr.PasswordHasher is IUserAwarePasswordHasher<BackOfficeIdentityUser, int>))
-            {
-                //if this isn't using an IUserAwarePasswordHasher, then fallback to the old way
-                if (membershipPasswordHasher.MembershipProvider.RequiresQuestionAndAnswer)
-                    throw new NotSupportedException("Currently the user editor does not support providers that have RequiresQuestionAndAnswer specified");
-                return ChangePasswordWithMembershipProvider(savingUser.Username, passwordModel, membershipPasswordHasher.MembershipProvider);
-            }
-
-            //if we are here, then a IUserAwarePasswordHasher is available, however we cannot proceed in that case if for some odd reason
-            //the user has configured the membership provider to not be hashed. This will actually never occur because the BackOfficeUserManager
-            //will throw if it's not hashed, but we should make sure to check anyways (i.e. in case we want to unit test!)
-            if (membershipPasswordHasher != null && membershipPasswordHasher.MembershipProvider.PasswordFormat != MembershipPasswordFormat.Hashed)
-            {
-                throw new InvalidOperationException("The membership provider cannot have a password format of " + membershipPasswordHasher.MembershipProvider.PasswordFormat + " and be configured with secured hashed passwords");
-            }
 
             //Are we resetting the password?
             //This flag indicates that either an admin user is changing another user's password without knowing the original password
@@ -208,7 +186,7 @@ namespace Umbraco.Web.Editors
 
                 //we've made it here which means we need to generate a new password
 
-                var canReset = membershipProvider.CanResetPassword(_userService);
+                var canReset = true; // TODO: Remove this! This is legacy, all of this will be gone when we get membership providers entirely gone
                 if (canReset == false)
                 {
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password reset is not enabled", new[] { "resetPassword" }) });

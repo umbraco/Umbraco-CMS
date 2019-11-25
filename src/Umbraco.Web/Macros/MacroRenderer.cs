@@ -15,6 +15,7 @@ using Umbraco.Core.Macros;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Macros
 {
@@ -57,8 +58,8 @@ namespace Umbraco.Web.Macros
                 if (_umbracoContextAccessor.UmbracoContext.HttpContext?.User?.Identity?.IsAuthenticated ?? false)
                 {
                     //ugh, membershipproviders :(
-                    var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-                    var member = Core.Security.MembershipProviderExtensions.GetCurrentUser(provider);
+                    var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+                    var member = MembershipProviderExtensions.GetCurrentUser(provider);
                     key = member?.ProviderUserKey ?? 0;
                 }
 
@@ -122,8 +123,8 @@ namespace Umbraco.Web.Macros
             // do not cache if it should cache by member and there's not member
             if (model.CacheByMember)
             {
-                var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-                var member = Core.Security.MembershipProviderExtensions.GetCurrentUser(provider);
+                var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+                var member = MembershipProviderExtensions.GetCurrentUser(provider);
                 var key = member?.ProviderUserKey;
                 if (key == null) return;
             }

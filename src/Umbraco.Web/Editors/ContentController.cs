@@ -2309,28 +2309,11 @@ namespace Umbraco.Web.Editors
                 .Where(rule => rule.RuleType == Constants.Conventions.PublicAccess.MemberUsernameRuleType)
                 .Select(rule => rule.RuleValue).ToArray();
 
-            MemberDisplay[] members;
-            switch (Services.MemberTypeService.GetMembershipScenario())
-            {
-                case MembershipScenario.NativeUmbraco:
-                    members = usernames
-                        .Select(username => Services.MemberService.GetByUsername(username))
-                        .Where(member => member != null)
-                        .Select(Mapper.Map<MemberDisplay>)
-                        .ToArray();
-                    break;
-                // TODO: test support custom membership providers
-                case MembershipScenario.CustomProviderWithUmbracoLink:
-                case MembershipScenario.StandaloneCustomProvider:
-                default:
-                    var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-                    members = usernames
-                        .Select(username => provider.GetUser(username, false))
-                        .Where(membershipUser => membershipUser != null)
-                        .Select(Mapper.Map<MembershipUser, MemberDisplay>)
-                        .ToArray();
-                    break;
-            }
+            var members = usernames
+                .Select(username => Services.MemberService.GetByUsername(username))
+                .Where(member => member != null)
+                .Select(Mapper.Map<MemberDisplay>)
+                .ToArray();
 
             var allGroups = Services.MemberGroupService.GetAll().ToArray();
             var groups = entry.Rules

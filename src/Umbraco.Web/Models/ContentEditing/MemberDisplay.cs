@@ -23,9 +23,6 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "email")]
         public string Email { get; set; }
 
-        [DataMember(Name = "membershipScenario")]
-        public MembershipScenario MembershipScenario { get; set; }
-
         /// <summary>
         /// This is used to indicate how to map the membership provider properties to the save model, this mapping
         /// will change if a developer has opted to have custom member property aliases specified in their membership provider config,

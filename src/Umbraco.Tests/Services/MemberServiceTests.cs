@@ -39,14 +39,6 @@ namespace Umbraco.Tests.Services
         public override void SetUp()
         {
             base.SetUp();
-
-            // HACK: but we have no choice until we remove the SavePassword method from IMemberService
-            var providerMock = new Mock<MembersMembershipProvider>(ServiceContext.MemberService, ServiceContext.MemberTypeService, TestHelper.GetUmbracoVersion()) { CallBase = true };
-            providerMock.Setup(@base => @base.AllowManuallyChangingPassword).Returns(false);
-            providerMock.Setup(@base => @base.PasswordFormat).Returns(MembershipPasswordFormat.Hashed);
-            var provider = providerMock.Object;
-
-            ((MemberService)ServiceContext.MemberService).MembershipProvider = provider;
         }
 
         [Test]
@@ -101,39 +93,6 @@ namespace Umbraco.Tests.Services
 
             var email = properties[aliases.IndexOf("Email")];
             Assert.AreEqual("xemail", email.GetSourceValue());
-        }
-
-        [Test]
-        public void Can_Set_Password_On_New_Member()
-        {
-            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            ServiceContext.MemberTypeService.Save(memberType);
-            //this will construct a member without a password
-            var member = MockedMember.CreateSimpleMember(memberType, "test", "test@test.com", "test");
-            ServiceContext.MemberService.Save(member);
-
-            Assert.IsTrue(member.RawPasswordValue.StartsWith(Constants.Security.EmptyPasswordPrefix));
-
-            ServiceContext.MemberService.SavePassword(member, "hello123456$!");
-
-            var foundMember = ServiceContext.MemberService.GetById(member.Id);
-            Assert.IsNotNull(foundMember);
-            Assert.AreNotEqual("hello123456$!", foundMember.RawPasswordValue);
-            Assert.IsFalse(member.RawPasswordValue.StartsWith(Constants.Security.EmptyPasswordPrefix));
-        }
-
-        [Test]
-        public void Can_Not_Set_Password_On_Existing_Member()
-        {
-            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            ServiceContext.MemberTypeService.Save(memberType);
-            //this will construct a member with a password
-            var member = MockedMember.CreateSimpleMember(memberType, "test", "test@test.com", "hello123456$!", "test");
-            ServiceContext.MemberService.Save(member);
-
-            Assert.IsFalse(member.RawPasswordValue.StartsWith(Constants.Security.EmptyPasswordPrefix));
-
-            Assert.Throws<NotSupportedException>(() => ServiceContext.MemberService.SavePassword(member, "HELLO123456$!"));
         }
 
         [Test]

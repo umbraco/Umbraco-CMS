@@ -17,6 +17,7 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Security;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
@@ -130,6 +131,8 @@ namespace Umbraco.Core.Runtime
 
             // by default, register a noop rebuilder
             composition.RegisterUnique<IPublishedSnapshotRebuilder, PublishedSnapshotRebuilder>();
+
+            composition.RegisterUnique<IPasswordGenerator, PasswordGenerator>();
         }
     }
 }

@@ -14,6 +14,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -54,7 +55,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         private UserRepository CreateRepository(IScopeProvider provider)
         {
             var accessor = (IScopeAccessor) provider;
-            var repository = new UserRepository(accessor, AppCaches.Disabled, Logger, Mappers, TestObjects.GetGlobalSettings());
+            var repository = new UserRepository(accessor, AppCaches.Disabled, Logger, Mappers, TestObjects.GetGlobalSettings(), Mock.Of<IUserPasswordConfiguration>());
             return repository;
         }
 
@@ -208,7 +209,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var id = user.Id;
 
-                var repository2 = new UserRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, Mock.Of<IMapperCollection>(),TestObjects.GetGlobalSettings());
+                var repository2 = new UserRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, Mock.Of<IMapperCollection>(),TestObjects.GetGlobalSettings(), Mock.Of<IUserPasswordConfiguration>());
 
                 repository2.Delete(user);
 

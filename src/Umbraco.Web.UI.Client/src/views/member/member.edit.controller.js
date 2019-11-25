@@ -122,10 +122,7 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
     }
 
     function setHeaderNameState(content) {
-
-      if(content.membershipScenario === 0) {
-         $scope.page.nameLocked = true;
-      }
+        $scope.page.nameLocked = true;
     }
 
     /** Just shows a simple notification that there are client side validation issues to be fixed */

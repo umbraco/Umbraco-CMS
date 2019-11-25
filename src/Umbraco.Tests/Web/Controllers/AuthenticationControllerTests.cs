@@ -18,6 +18,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
@@ -75,6 +76,7 @@ namespace Umbraco.Tests.Web.Controllers
                 }
                 Current.IOHelper.ForceNotHosted = true;
                 var usersController = new AuthenticationController(
+                    new DefaultUserPasswordConfig(),
                     Factory.GetInstance<IGlobalSettings>(),
                     umbracoContextAccessor,
                     Factory.GetInstance<ISqlContext>(),
@@ -82,7 +84,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper);
+                    helper,
+                    Factory.GetInstance<UmbracoMapper>());
                 return usersController;
             }
 

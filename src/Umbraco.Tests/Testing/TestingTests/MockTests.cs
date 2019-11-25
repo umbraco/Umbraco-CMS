@@ -22,6 +22,7 @@ using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
+using Umbraco.Web.Security.Providers;
 using Umbraco.Web.WebApi;
 using Current = Umbraco.Web.Composing.Current;
 
@@ -70,7 +71,7 @@ namespace Umbraco.Tests.Testing.TestingTests
                 Mock.Of<ICultureDictionaryFactory>(),
                 Mock.Of<IUmbracoComponentRenderer>(),
                 Mock.Of<IPublishedContentQuery>(),
-                new MembershipHelper(umbracoContext.HttpContext, Mock.Of<IPublishedMemberCache>(), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), AppCaches.Disabled, Mock.Of<ILogger>()));
+                new MembershipHelper(umbracoContext.HttpContext, Mock.Of<IPublishedMemberCache>(), Mock.Of<MembersMembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), AppCaches.Disabled, Mock.Of<ILogger>()));
             Assert.Pass();
         }
 
@@ -98,7 +99,7 @@ namespace Umbraco.Tests.Testing.TestingTests
         {
             var umbracoContext = TestObjects.GetUmbracoContextMock();
 
-            var membershipHelper = new MembershipHelper(umbracoContext.HttpContext, Mock.Of<IPublishedMemberCache>(), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), AppCaches.Disabled, Mock.Of<ILogger>());
+            var membershipHelper = new MembershipHelper(umbracoContext.HttpContext, Mock.Of<IPublishedMemberCache>(), Mock.Of<MembersMembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), AppCaches.Disabled, Mock.Of<ILogger>());
             var umbracoHelper = new UmbracoHelper(Mock.Of<IPublishedContent>(), Mock.Of<ITagQuery>(), Mock.Of<ICultureDictionaryFactory>(), Mock.Of<IUmbracoComponentRenderer>(), Mock.Of<IPublishedContentQuery>(), membershipHelper);
             var umbracoMapper = new UmbracoMapper(new MapDefinitionCollection(new[] { Mock.Of<IMapDefinition>() }));
             

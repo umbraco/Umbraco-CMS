@@ -65,7 +65,7 @@ namespace Umbraco.Web.Runtime
             composition.ComposeInstaller();
 
             // register membership stuff
-            composition.Register(factory => Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider());
+            composition.Register(factory => MembershipProviderExtensions.GetMembersMembershipProvider());
             composition.Register(factory => Roles.Enabled ? Roles.Provider : new MembersRoleProvider(factory.GetInstance<IMemberService>()));
             composition.Register<MembershipHelper>(Lifetime.Request);
             composition.Register<IPublishedMemberCache>(factory => factory.GetInstance<UmbracoContext>().PublishedSnapshot.Members);

@@ -11,6 +11,7 @@ using Umbraco.Core.Packaging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
@@ -125,6 +126,9 @@ namespace Umbraco.Core.Composing
 
         public static IRuntimeState RuntimeState
             => Factory.GetInstance<IRuntimeState>();
+
+        public static IPasswordGenerator PasswordGenerator
+            => Factory.GetInstance<IPasswordGenerator>();
 
         public static TypeLoader TypeLoader
             => Factory.GetInstance<TypeLoader>();

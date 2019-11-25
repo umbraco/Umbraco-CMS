@@ -8,6 +8,7 @@ using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Composing;
+using System;
 
 namespace Umbraco.Web.Security.Providers
 {
@@ -81,6 +82,16 @@ namespace Umbraco.Web.Security.Providers
                     _providerKeyAsGuid = true;
                 }
             }
+
+            PasswordConfiguration = new MembershipProviderPasswordConfiguration(
+                    MinRequiredPasswordLength,
+                    MinRequiredNonAlphanumericCharacters > 0,
+                    false, false, false, UseLegacyEncoding,
+                    CustomHashAlgorithmType ?? Membership.HashAlgorithmType,
+                    MaxInvalidPasswordAttempts);
+
+            _passwordSecurity = new PasswordSecurity(PasswordConfiguration);
+
         }
 
         protected override Attempt<string> GetRawPassword(string username)
@@ -111,6 +122,42 @@ namespace Umbraco.Web.Security.Providers
                 }
                 return _defaultMemberTypeAlias;
             }
+        }
+
+        private PasswordSecurity _passwordSecurity;
+
+        public override PasswordSecurity PasswordSecurity => _passwordSecurity;
+        public IPasswordConfiguration PasswordConfiguration { get; private set; }
+
+        private class MembershipProviderPasswordConfiguration : IPasswordConfiguration
+        {
+            public MembershipProviderPasswordConfiguration(int requiredLength, bool requireNonLetterOrDigit, bool requireDigit, bool requireLowercase, bool requireUppercase, bool useLegacyEncoding, string hashAlgorithmType, int maxFailedAccessAttemptsBeforeLockout)
+            {
+                RequiredLength = requiredLength;
+                RequireNonLetterOrDigit = requireNonLetterOrDigit;
+                RequireDigit = requireDigit;
+                RequireLowercase = requireLowercase;
+                RequireUppercase = requireUppercase;
+                UseLegacyEncoding = useLegacyEncoding;
+                HashAlgorithmType = hashAlgorithmType ?? throw new ArgumentNullException(nameof(hashAlgorithmType));
+                MaxFailedAccessAttemptsBeforeLockout = maxFailedAccessAttemptsBeforeLockout;
+            }
+
+            public int RequiredLength { get; }
+
+            public bool RequireNonLetterOrDigit { get; }
+
+            public bool RequireDigit { get; }
+
+            public bool RequireLowercase { get; }
+
+            public bool RequireUppercase { get; }
+
+            public bool UseLegacyEncoding { get; }
+
+            public string HashAlgorithmType { get; }
+
+            public int MaxFailedAccessAttemptsBeforeLockout { get; }
         }
     }
 }

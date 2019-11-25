@@ -40,23 +40,24 @@ namespace Umbraco.Web.Security
             UmbracoMapper mapper,
             IContentSection contentSettings,
             IGlobalSettings globalSettings,
-            MembershipProviderBase userMembershipProvider)
+            // TODO: This could probably be optional?
+            IPasswordConfiguration passwordConfiguration,
+            IPasswordGenerator passwordGenerator)
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
-            if (userMembershipProvider == null) throw new ArgumentNullException(nameof(userMembershipProvider));
 
             //Configure Umbraco user manager to be created per request
             app.CreatePerOwinContext<BackOfficeUserManager>(
                 (options, owinContext) => BackOfficeUserManager.Create(
                     options,
                     services.UserService,
-                    services.MemberTypeService,
                     services.EntityService,
                     services.ExternalLoginService,
-                    userMembershipProvider,
                     mapper,
                     contentSettings,
-                    globalSettings));
+                    globalSettings,
+                    passwordConfiguration,
+                    passwordGenerator));
 
             app.SetBackOfficeUserManagerType<BackOfficeUserManager, BackOfficeIdentityUser>();
 
@@ -77,11 +78,12 @@ namespace Umbraco.Web.Security
             IRuntimeState runtimeState,
             IContentSection contentSettings,
             IGlobalSettings globalSettings,
-            MembershipProviderBase userMembershipProvider,
-            BackOfficeUserStore customUserStore)
+            BackOfficeUserStore customUserStore,
+            // TODO: This could probably be optional?
+            IPasswordConfiguration passwordConfiguration,
+            IPasswordGenerator passwordGenerator)
         {
             if (runtimeState == null) throw new ArgumentNullException(nameof(runtimeState));
-            if (userMembershipProvider == null) throw new ArgumentNullException(nameof(userMembershipProvider));
             if (customUserStore == null) throw new ArgumentNullException(nameof(customUserStore));
 
             //Configure Umbraco user manager to be created per request
@@ -89,8 +91,9 @@ namespace Umbraco.Web.Security
                 (options, owinContext) => BackOfficeUserManager.Create(
                     options,
                     customUserStore,
-                    userMembershipProvider,
-                    contentSettings));
+                    contentSettings,
+                    passwordConfiguration,
+                    passwordGenerator));
 
             app.SetBackOfficeUserManagerType<BackOfficeUserManager, BackOfficeIdentityUser>();
 

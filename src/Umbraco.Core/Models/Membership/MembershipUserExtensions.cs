@@ -25,26 +25,5 @@ namespace Umbraco.Core.Models.Membership
             throw new NotImplementedException();
         }
 
-        private static MembershipScenario? _scenario = null;
-        /// <summary>
-        /// Returns the currently configured membership scenario for members in umbraco
-        /// </summary>
-        /// <value></value>
-        internal static MembershipScenario GetMembershipScenario(this IMemberTypeService memberTypeService)
-        {
-            if (_scenario.HasValue == false)
-            {
-                var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
-                if (provider.IsUmbracoMembershipProvider())
-                {
-                    return MembershipScenario.NativeUmbraco;
-                }
-                var memberType = memberTypeService.Get(Constants.Conventions.MemberTypes.DefaultAlias);
-                return memberType != null
-                           ? MembershipScenario.CustomProviderWithUmbracoLink
-                           : MembershipScenario.StandaloneCustomProvider;
-            }
-            return _scenario.Value;
-        }
     }
 }

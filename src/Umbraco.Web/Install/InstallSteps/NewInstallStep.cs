@@ -10,8 +10,11 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Migrations.Install;
+using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Services;
 using Umbraco.Web.Install.Models;
+using Umbraco.Web.Security;
+using System.Web;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
@@ -31,26 +34,20 @@ namespace Umbraco.Web.Install.InstallSteps
         private readonly DatabaseBuilder _databaseBuilder;
         private static HttpClient _httpClient;
         private readonly IGlobalSettings _globalSettings;
+        private readonly IUserPasswordConfiguration _passwordConfiguration;
+        private readonly BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
 
-        public NewInstallStep(HttpContextBase http, IUserService userService, DatabaseBuilder databaseBuilder, IGlobalSettings globalSettings)
+        public NewInstallStep(HttpContextBase http, IUserService userService, DatabaseBuilder databaseBuilder, IGlobalSettings globalSettings, IUserPasswordConfiguration passwordConfiguration)
         {
             _http = http;
             _userService = userService;
             _databaseBuilder = databaseBuilder;
             _globalSettings = globalSettings;
+            _passwordConfiguration = passwordConfiguration;
+            _userManager = _http.GetOwinContext().GetBackOfficeUserManager();
         }
 
-        // TODO: Change all logic in this step to use ASP.NET Identity NOT MembershipProviders
-        private MembershipProvider CurrentProvider
-        {
-            get
-            {
-                var provider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
-                return provider;
-            }
-        }
-
-        public override Task<InstallSetupResult> ExecuteAsync(UserModel user)
+        public override async Task<InstallSetupResult> ExecuteAsync(UserModel user)
         {
             var admin = _userService.GetUserById(Constants.Security.SuperUserId);
             if (admin == null)
@@ -58,23 +55,16 @@ namespace Umbraco.Web.Install.InstallSteps
                 throw new InvalidOperationException("Could not find the super user!");
             }
 
-            var membershipUser = CurrentProvider.GetUser(Constants.Security.SuperUserId, true);
+            var membershipUser = await _userManager.FindByIdAsync(Constants.Security.SuperUserId);
             if (membershipUser == null)
             {
                 throw new InvalidOperationException($"No user found in membership provider with id of {Constants.Security.SuperUserId}.");
             }
 
-            try
+            var success = await _userManager.ChangePasswordAsync(membershipUser.Id, "default", user.Password.Trim());
+            if (success.Succeeded == false)
             {
-                var success = membershipUser.ChangePassword("default", user.Password.Trim());
-                if (success == false)
-                {
-                    throw new FormatException("Password must be at least " + CurrentProvider.MinRequiredPasswordLength + " characters long and contain at least " + CurrentProvider.MinRequiredNonAlphanumericCharacters + " symbols");
-                }
-            }
-            catch (Exception)
-            {
-                throw new FormatException("Password must be at least " + CurrentProvider.MinRequiredPasswordLength + " characters long and contain at least " + CurrentProvider.MinRequiredNonAlphanumericCharacters + " symbols");
+                throw new InvalidOperationException("Invalid password: " + string.Join(", ", success.Errors));
             }
 
             admin.Email = user.Email.Trim();
@@ -98,7 +88,7 @@ namespace Umbraco.Web.Install.InstallSteps
                 catch { /* fail in silence */ }
             }
 
-            return Task.FromResult<InstallSetupResult>(null);
+            return null;
         }
 
         /// <summary>
@@ -108,12 +98,10 @@ namespace Umbraco.Web.Install.InstallSteps
         {
             get
             {
-                var provider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
-
                 return new
                 {
-                    minCharLength = provider.MinRequiredPasswordLength,
-                    minNonAlphaNumericLength = provider.MinRequiredNonAlphanumericCharacters
+                    minCharLength = _passwordConfiguration.RequiredLength,
+                    minNonAlphaNumericLength = _passwordConfiguration.RequireNonLetterOrDigit ? 1 : 0
                 };
             }
         }

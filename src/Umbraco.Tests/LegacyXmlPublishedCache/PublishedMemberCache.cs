@@ -31,11 +31,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             return _requestCache.GetCacheItem<IPublishedContent>(
                 GetCacheKey("GetByProviderKey", key), () =>
                 {
-                    var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-                    if (provider.IsUmbracoMembershipProvider() == false)
-                    {
-                        throw new NotSupportedException("Cannot access this method unless the Umbraco membership provider is active");
-                    }
+                    var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
 
                     var result = _memberService.GetByProviderKey(key);
                     if (result == null) return null;
@@ -49,11 +45,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             return _requestCache.GetCacheItem<IPublishedContent>(
                 GetCacheKey("GetById", memberId), () =>
                 {
-                    var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-                    if (provider.IsUmbracoMembershipProvider() == false)
-                    {
-                        throw new NotSupportedException("Cannot access this method unless the Umbraco membership provider is active");
-                    }
+                    var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
 
                     var result = _memberService.GetById(memberId);
                     if (result == null) return null;
@@ -67,11 +59,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             return _requestCache.GetCacheItem<IPublishedContent>(
                 GetCacheKey("GetByUsername", username), () =>
                 {
-                    var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-                    if (provider.IsUmbracoMembershipProvider() == false)
-                    {
-                        throw new NotSupportedException("Cannot access this method unless the Umbraco membership provider is active");
-                    }
+                    var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
 
                     var result = _memberService.GetByUsername(username);
                     if (result == null) return null;
@@ -85,11 +73,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             return _requestCache.GetCacheItem<IPublishedContent>(
                 GetCacheKey("GetByEmail", email), () =>
                 {
-                    var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-                    if (provider.IsUmbracoMembershipProvider() == false)
-                    {
-                        throw new NotSupportedException("Cannot access this method unless the Umbraco membership provider is active");
-                    }
+                    var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
 
                     var result = _memberService.GetByEmail(email);
                     if (result == null) return null;

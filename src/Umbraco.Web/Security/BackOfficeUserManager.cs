@@ -24,20 +24,16 @@ namespace Umbraco.Web.Security
     {
         public const string OwinMarkerKey = "Umbraco.Web.Security.Identity.BackOfficeUserManagerMarker";
 
-        public BackOfficeUserManager(IUserStore<BackOfficeIdentityUser, int> store)
-            : base(store)
-        {
-        }
-
         public BackOfficeUserManager(
             IUserStore<BackOfficeIdentityUser, int> store,
-            IdentityFactoryOptions<BackOfficeUserManager> options,
-            MembershipProviderBase membershipProvider,
-            IContentSection contentSectionConfig)
-            : base(store)
+            IdentityFactoryOptions<BackOfficeUserManager> options, 
+            IContentSection contentSectionConfig,
+            IPasswordConfiguration passwordConfiguration,
+            IPasswordGenerator passwordGenerator)
+            : base(store, passwordConfiguration, passwordGenerator)
         {
             if (options == null) throw new ArgumentNullException("options");
-            InitUserManager(this, membershipProvider, contentSectionConfig, options);
+            InitUserManager(this, passwordConfiguration, options.DataProtectionProvider, contentSectionConfig);            
         }
 
         #region Static Create methods
@@ -47,32 +43,29 @@ namespace Umbraco.Web.Security
         /// </summary>
         /// <param name="options"></param>
         /// <param name="userService"></param>
-        /// <param name="memberTypeService"></param>
         /// <param name="entityService"></param>
         /// <param name="externalLoginService"></param>
-        /// <param name="membershipProvider"></param>
+        /// <param name="passwordConfiguration"></param>
         /// <param name="contentSectionConfig"></param>
         /// <param name="globalSettings"></param>
         /// <returns></returns>
         public static BackOfficeUserManager Create(
             IdentityFactoryOptions<BackOfficeUserManager> options,
             IUserService userService,
-            IMemberTypeService memberTypeService,
             IEntityService entityService,
-            IExternalLoginService externalLoginService,
-            MembershipProviderBase membershipProvider,
+            IExternalLoginService externalLoginService,            
             UmbracoMapper mapper,
             IContentSection contentSectionConfig,
-            IGlobalSettings globalSettings)
+            IGlobalSettings globalSettings,
+            IPasswordConfiguration passwordConfiguration,
+            IPasswordGenerator passwordGenerator)
         {
             if (options == null) throw new ArgumentNullException("options");
             if (userService == null) throw new ArgumentNullException("userService");
-            if (memberTypeService == null) throw new ArgumentNullException("memberTypeService");
             if (externalLoginService == null) throw new ArgumentNullException("externalLoginService");
 
-            var manager = new BackOfficeUserManager(
-                new BackOfficeUserStore(userService, memberTypeService, entityService, externalLoginService, globalSettings, membershipProvider, mapper));
-            manager.InitUserManager(manager, membershipProvider, contentSectionConfig, options);
+            var store = new BackOfficeUserStore(userService, entityService, externalLoginService, globalSettings, mapper);
+            var manager = new BackOfficeUserManager(store, options, contentSectionConfig, passwordConfiguration, passwordGenerator);
             return manager;
         }
 
@@ -81,37 +74,22 @@ namespace Umbraco.Web.Security
         /// </summary>
         /// <param name="options"></param>
         /// <param name="customUserStore"></param>
-        /// <param name="membershipProvider"></param>
+        /// <param name="passwordConfiguration"></param>
         /// <param name="contentSectionConfig"></param>
         /// <returns></returns>
         public static BackOfficeUserManager Create(
             IdentityFactoryOptions<BackOfficeUserManager> options,
-            BackOfficeUserStore customUserStore,
-            MembershipProviderBase membershipProvider,
-            IContentSection contentSectionConfig)
+            BackOfficeUserStore customUserStore,            
+            IContentSection contentSectionConfig,
+            IPasswordConfiguration passwordConfiguration,
+            IPasswordGenerator passwordGenerator)
         {
-            var manager = new BackOfficeUserManager(customUserStore, options, membershipProvider, contentSectionConfig);
+            var manager = new BackOfficeUserManager(customUserStore, options, contentSectionConfig, passwordConfiguration, passwordGenerator);
             return manager;
         }
         #endregion
 
-        /// <summary>
-        /// Initializes the user manager with the correct options
-        /// </summary>
-        /// <param name="manager"></param>
-        /// <param name="membershipProvider"></param>
-        /// <param name="contentSectionConfig"></param>
-        /// <param name="options"></param>
-        /// <returns></returns>
-        protected void InitUserManager(
-            BackOfficeUserManager manager,
-            MembershipProviderBase membershipProvider,
-            IContentSection contentSectionConfig,
-            IdentityFactoryOptions<BackOfficeUserManager> options)
-        {
-            //NOTE: This method is mostly here for backwards compat
-            base.InitUserManager(manager, membershipProvider, options.DataProtectionProvider, contentSectionConfig);
-        }
+        
     }
 
     /// <summary>
@@ -120,9 +98,13 @@ namespace Umbraco.Web.Security
     public class BackOfficeUserManager<T> : UserManager<T, int>
         where T : BackOfficeIdentityUser
     {
-        public BackOfficeUserManager(IUserStore<T, int> store)
+        public BackOfficeUserManager(IUserStore<T, int> store,
+            IPasswordConfiguration passwordConfiguration,
+            IPasswordGenerator passwordGenerator)
             : base(store)
         {
+            PasswordConfiguration = passwordConfiguration;
+            PasswordGenerator = passwordGenerator;
         }
 
         #region What we support do not currently
@@ -162,19 +144,35 @@ namespace Umbraco.Web.Security
             return userIdentity;
         }
 
+        ///// <summary>
+        ///// Initializes the user manager with the correct options
+        ///// </summary>
+        ///// <param name="manager"></param>
+        ///// <param name="passwordConfig"></param>
+        ///// <param name="contentSectionConfig"></param>
+        ///// <param name="options"></param>
+        ///// <returns></returns>
+        //protected void InitUserManager(
+        //    BackOfficeUserManager manager,
+        //    IPasswordConfiguration passwordConfig,
+        //    IContentSection contentSectionConfig,
+        //    IdentityFactoryOptions<BackOfficeUserManager> options)
+        //{
+        //    //NOTE: This method is mostly here for backwards compat
+        //    base.InitUserManager(manager, passwordConfig, options.DataProtectionProvider, contentSectionConfig);
+        //}
+
         /// <summary>
         /// Initializes the user manager with the correct options
         /// </summary>
         /// <param name="manager"></param>
-        /// <param name="membershipProvider">
-        /// The <see cref="MembershipProviderBase"/> for the users called UsersMembershipProvider
-        /// </param>
+        /// <param name="passwordConfig"></param>
         /// <param name="dataProtectionProvider"></param>
         /// <param name="contentSectionConfig"></param>
         /// <returns></returns>
         protected void InitUserManager(
             BackOfficeUserManager<T> manager,
-            MembershipProviderBase membershipProvider,
+            IPasswordConfiguration passwordConfig,
             IDataProtectionProvider dataProtectionProvider,
             IContentSection contentSectionConfig)
         {
@@ -186,10 +184,10 @@ namespace Umbraco.Web.Security
             };
 
             // Configure validation logic for passwords
-            manager.PasswordValidator = new MembershipProviderPasswordValidator(membershipProvider);
+            manager.PasswordValidator = new ConfiguredPasswordValidator(passwordConfig);
 
             //use a custom hasher based on our membership provider
-            manager.PasswordHasher = GetDefaultPasswordHasher(membershipProvider);
+            manager.PasswordHasher = GetDefaultPasswordHasher(passwordConfig);
 
             if (dataProtectionProvider != null)
             {
@@ -200,7 +198,7 @@ namespace Umbraco.Web.Security
             }
 
             manager.UserLockoutEnabledByDefault = true;
-            manager.MaxFailedAccessAttemptsBeforeLockout = membershipProvider.MaxInvalidPasswordAttempts;
+            manager.MaxFailedAccessAttemptsBeforeLockout = passwordConfig.MaxFailedAccessAttemptsBeforeLockout;
             //NOTE: This just needs to be in the future, we currently don't support a lockout timespan, it's either they are locked
             // or they are not locked, but this determines what is set on the account lockout date which corresponds to whether they are
             // locked out or not.
@@ -250,58 +248,26 @@ namespace Umbraco.Web.Security
         /// This will determine which password hasher to use based on what is defined in config
         /// </summary>
         /// <returns></returns>
-        protected virtual IPasswordHasher GetDefaultPasswordHasher(MembershipProviderBase provider)
+        protected virtual IPasswordHasher GetDefaultPasswordHasher(IPasswordConfiguration passwordConfiguration)
         {
             //we can use the user aware password hasher (which will be the default and preferred way)
-            return new UserAwareMembershipProviderPasswordHasher(provider);
+            return new UserAwarePasswordHasher(new PasswordSecurity(passwordConfiguration));
         }
 
         /// <summary>
         /// Gets/sets the default back office user password checker
         /// </summary>
         public IBackOfficeUserPasswordChecker BackOfficeUserPasswordChecker { get; set; }
+        public IPasswordConfiguration PasswordConfiguration { get; }
+        public IPasswordGenerator PasswordGenerator { get; }
 
         /// <summary>
         /// Helper method to generate a password for a user based on the current password validator
         /// </summary>
         /// <returns></returns>
         public string GeneratePassword()
-        {
-            var passwordValidator = PasswordValidator as PasswordValidator;
-
-            if (passwordValidator == null)
-            {
-                var membershipPasswordHasher = PasswordHasher as IMembershipProviderPasswordHasher;
-
-                //get the real password validator, this should not be null but in some very rare cases it could be, in which case
-                //we need to create a default password validator to use since we have no idea what it actually is or what it's rules are
-                //this is an Edge Case!
-                passwordValidator = PasswordValidator as PasswordValidator
-                                    ?? (membershipPasswordHasher != null
-                                        ? new MembershipProviderPasswordValidator(membershipPasswordHasher.MembershipProvider)
-                                        : new PasswordValidator());
-            }
-
-            var password = Membership.GeneratePassword(
-                passwordValidator.RequiredLength,
-                passwordValidator.RequireNonLetterOrDigit ? 2 : 0);
-
-            var random = new Random();
-
-            var passwordChars = password.ToCharArray();
-
-            if (passwordValidator.RequireDigit && passwordChars.ContainsAny(Enumerable.Range(48, 58).Select(x => (char)x)))
-                password += Convert.ToChar(random.Next(48, 58));  // 0-9
-
-            if (passwordValidator.RequireLowercase && passwordChars.ContainsAny(Enumerable.Range(97, 123).Select(x => (char)x)))
-                password += Convert.ToChar(random.Next(97, 123));  // a-z
-
-            if (passwordValidator.RequireUppercase && passwordChars.ContainsAny(Enumerable.Range(65, 91).Select(x => (char)x)))
-                password += Convert.ToChar(random.Next(65, 91));  // A-Z
-
-            if (passwordValidator.RequireNonLetterOrDigit && passwordChars.ContainsAny(Enumerable.Range(33, 48).Select(x => (char)x)))
-                password += Convert.ToChar(random.Next(33, 48));  // symbols !"#$%&'()*+,-./
-
+        {            
+            var password = PasswordGenerator.GeneratePassword(PasswordConfiguration);
             return password;
         }
 

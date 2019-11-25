@@ -3,7 +3,6 @@ using System.Collections.Specialized;
 using System.Configuration.Provider;
 using System.Linq;
 using System.Text;
-using System.Web;
 using System.Web.Configuration;
 using System.Web.Security;
 using Umbraco.Core;
@@ -14,7 +13,6 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
-using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Web.Security.Providers
 {
@@ -93,9 +91,9 @@ namespace Umbraco.Web.Security.Providers
             if (m == null) return false;
 
             string salt;
-            var encodedPassword = EncryptOrHashNewPassword(newPassword, out salt);
+            var encodedPassword = PasswordSecurity.EncryptOrHashNewPassword(newPassword, out salt);
 
-            m.RawPasswordValue = FormatPasswordForStorage(encodedPassword, salt);
+            m.RawPasswordValue = PasswordSecurity.FormatPasswordForStorage(encodedPassword, salt);
             m.LastPasswordChangeDate = DateTime.Now;
 
             MemberService.Save(m);
@@ -164,12 +162,12 @@ namespace Umbraco.Web.Security.Providers
             }
 
             string salt;
-            var encodedPassword = EncryptOrHashNewPassword(password, out salt);
+            var encodedPassword = PasswordSecurity.EncryptOrHashNewPassword(password, out salt);
 
             var member = MemberService.CreateWithIdentity(
                 username,
                 email,
-                FormatPasswordForStorage(encodedPassword, salt),
+                PasswordSecurity.FormatPasswordForStorage(encodedPassword, salt),
                 memberTypeAlias,
                 isApproved);
 
@@ -442,8 +440,8 @@ namespace Umbraco.Web.Security.Providers
             }
 
             string salt;
-            var encodedPassword = EncryptOrHashNewPassword(generatedPassword, out salt);
-            m.RawPasswordValue = FormatPasswordForStorage(encodedPassword, salt);
+            var encodedPassword = PasswordSecurity.EncryptOrHashNewPassword(generatedPassword, out salt);
+            m.RawPasswordValue = PasswordSecurity.FormatPasswordForStorage(encodedPassword, salt);
             m.LastPasswordChangeDate = DateTime.Now;
             MemberService.Save(m);
 
@@ -555,7 +553,7 @@ namespace Umbraco.Web.Security.Providers
                 };
             }
 
-            var authenticated = CheckPassword(password, member.RawPasswordValue);
+            var authenticated = PasswordSecurity.CheckPassword(password, member.RawPasswordValue);
 
             if (authenticated == false)
             {

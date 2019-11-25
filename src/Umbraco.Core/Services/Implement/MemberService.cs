@@ -10,7 +10,6 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Services.Implement
 {
@@ -25,9 +24,6 @@ namespace Umbraco.Core.Services.Implement
         private readonly IAuditRepository _auditRepository;
 
         private readonly IMemberGroupService _memberGroupService;
-
-        //only for unit tests!
-        internal MembershipProviderBase MembershipProvider { get; set; }
 
         #region Constructor
 
@@ -1123,39 +1119,6 @@ namespace Umbraco.Core.Services.Implement
 
         #region Membership
 
-        /// <summary>
-        /// This is simply a helper method which essentially just wraps the MembershipProvider's ChangePassword method
-        /// </summary>
-        /// <remarks>This method exists so that Umbraco developers can use one entry point to create/update
-        /// Members if they choose to. </remarks>
-        /// <param name="member">The Member to save the password for</param>
-        /// <param name="password">The password to encrypt and save</param>
-        public void SavePassword(IMember member, string password)
-        {
-            if (member == null) throw new ArgumentNullException(nameof(member));
-
-            var provider = MembershipProvider ?? MembershipProviderExtensions.GetMembersMembershipProvider();
-            if (provider.IsUmbracoMembershipProvider())
-                provider.ChangePassword(member.Username, "", password); // this is actually updating the password
-            else
-                throw new NotSupportedException("When using a non-Umbraco membership provider you must change the member password by using the MembershipProvider.ChangePassword method");
-
-            // go re-fetch the member to update the properties that may have changed
-            // check that it still exists (optimistic concurrency somehow)
-
-            // re-fetch and ensure it exists
-            var m = GetByUsername(member.Username);
-            if (m == null) return; // gone
-
-            // update properties that have changed
-            member.RawPasswordValue = m.RawPasswordValue;
-            member.LastPasswordChangeDate = m.LastPasswordChangeDate;
-            member.UpdateDate = m.UpdateDate;
-
-            // no need to save anything - provider.ChangePassword has done the updates,
-            // and then all we do is re-fetch to get the updated values, and update the
-            // in-memory member accordingly
-        }
 
         /// <summary>
         /// A helper method that will create a basic/generic member for use with a generic membership provider

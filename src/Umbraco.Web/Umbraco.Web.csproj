@@ -257,6 +257,7 @@
     <Compile Include="Search\ExamineFinalComponent.cs" />
     <Compile Include="Search\ExamineFinalComposer.cs" />
     <Compile Include="Search\ExamineUserComponent.cs" />
+    <Compile Include="Security\MembershipProviderExtensions.cs" />
     <Compile Include="Services\DashboardService.cs" />
     <Compile Include="Services\IDashboardService.cs" />
     <Compile Include="Models\Link.cs" />
@@ -835,7 +836,7 @@
     <Compile Include="Editors\MacroRenderingController.cs" />
     <Compile Include="Editors\MemberTypeController.cs" />
     <Compile Include="Editors\UpdateCheckController.cs" />
-    <Compile Include="MembershipProviderExtensions.cs" />
+    <Compile Include="PasswordConfigurationExtensions.cs" />
     <Compile Include="Models\ChangingPasswordModel.cs" />
     <Compile Include="Models\ContentEditing\ModelWithNotifications.cs" />
     <Compile Include="Models\ContentEditing\StyleSheet.cs" />
@@ -1020,7 +1021,6 @@
     <Compile Include="Security\Providers\MembersMembershipProvider.cs" />
     <Compile Include="Security\Providers\MembersRoleProvider.cs" />
     <Compile Include="Security\Providers\UmbracoMembershipProvider.cs" />
-    <Compile Include="Security\Providers\UsersMembershipProvider.cs" />
     <Compile Include="Trees\ContentTreeController.cs" />
     <Compile Include="Trees\TreeRenderingEventArgs.cs" />
     <Compile Include="Trees\UrlHelperExtensions.cs" />
