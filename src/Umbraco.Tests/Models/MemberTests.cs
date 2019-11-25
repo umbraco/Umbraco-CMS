@@ -50,7 +50,6 @@ namespace Umbraco.Tests.Models
             member.LastLockoutDate = DateTime.Now;
             member.LastLoginDate = DateTime.Now;
             member.LastPasswordChangeDate = DateTime.Now;
-            member.ProviderUserKey = Guid.NewGuid();
             member.RawPasswordValue = "raw pass";
             member.SortOrder = 5;
             member.Trashed = false;
@@ -87,7 +86,6 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone.Trashed, member.Trashed);
             Assert.AreEqual(clone.UpdateDate, member.UpdateDate);
             Assert.AreEqual(clone.VersionId, member.VersionId);
-            Assert.AreEqual(clone.ProviderUserKey, member.ProviderUserKey);
             Assert.AreEqual(clone.RawPasswordValue, member.RawPasswordValue);
             Assert.AreNotSame(clone.Properties, member.Properties);
             Assert.AreEqual(clone.Properties.Count(), member.Properties.Count());
@@ -133,7 +131,6 @@ namespace Umbraco.Tests.Models
             member.LastLockoutDate = DateTime.Now;
             member.LastLoginDate = DateTime.Now;
             member.LastPasswordChangeDate = DateTime.Now;
-            member.ProviderUserKey = Guid.NewGuid();
             member.RawPasswordValue = "raw pass";
             member.SortOrder = 5;
             member.Trashed = false;

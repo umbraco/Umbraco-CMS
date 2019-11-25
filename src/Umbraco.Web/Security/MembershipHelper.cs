@@ -387,7 +387,6 @@ namespace Umbraco.Web.Security
 
             model.Email = membershipUser.Email;
             model.UserName = membershipUser.UserName;
-            model.PasswordQuestion = membershipUser.PasswordQuestion;
             model.Comment = membershipUser.Comment;
             model.IsApproved = membershipUser.IsApproved;
             model.IsLockedOut = membershipUser.IsLockedOut;

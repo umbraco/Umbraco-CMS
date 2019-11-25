@@ -18,7 +18,6 @@ namespace Umbraco.Core.Models
         private string _username;
         private string _email;
         private string _rawPasswordValue;
-        private object _providerUserKey;
 
         /// <summary>
         /// Constructor for creating an empty Member object
@@ -401,22 +400,6 @@ namespace Umbraco.Core.Models
         /// </summary>
         [DataMember]
         public virtual string ContentTypeAlias => ContentType.Alias;
-
-        /// <summary>
-        /// User key from the Provider.
-        /// </summary>
-        /// <remarks>
-        /// When using standard umbraco provider this key will
-        /// correspond to the guid UniqueId/Key.
-        /// Otherwise it will the one available from the asp.net
-        /// membership provider.
-        /// </remarks>
-        [DataMember]
-        public virtual object ProviderUserKey
-        {
-            get => _providerUserKey;
-            set => SetPropertyValueAndDetectChanges(value, ref _providerUserKey, nameof(ProviderUserKey));
-        }
 
         /* Internal experiment - only used for mapping queries.
          * Adding these to have first level properties instead of the Properties collection.
