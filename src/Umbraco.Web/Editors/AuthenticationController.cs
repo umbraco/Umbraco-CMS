@@ -46,7 +46,7 @@ namespace Umbraco.Web.Editors
         public AuthenticationController(IUserPasswordConfiguration passwordConfiguration, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, UmbracoMapper umbracoMapper)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper)
         {
-            _passwordConfiguration = passwordConfiguration;
+            _passwordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
         }
 
         protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager => _userManager

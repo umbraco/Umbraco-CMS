@@ -21,13 +21,11 @@ namespace Umbraco.Web.Models.Mapping
     internal class MemberMapDefinition : IMapDefinition
     {
         private readonly CommonMapper _commonMapper;
-        private readonly IMemberTypeService _memberTypeService;
         private readonly MemberTabsAndPropertiesMapper _tabsAndPropertiesMapper;
 
-        public MemberMapDefinition(CommonMapper commonMapper, IMemberTypeService memberTypeService, MemberTabsAndPropertiesMapper tabsAndPropertiesMapper)
+        public MemberMapDefinition(CommonMapper commonMapper, MemberTabsAndPropertiesMapper tabsAndPropertiesMapper)
         {
             _commonMapper = commonMapper;
-            _memberTypeService = memberTypeService;
 
             _tabsAndPropertiesMapper = tabsAndPropertiesMapper;
         }

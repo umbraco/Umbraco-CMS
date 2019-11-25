@@ -147,6 +147,8 @@
     <Compile Include="Configuration\GlobalSettingsExtensions.cs" />
     <Compile Include="ConventionsHelper.cs" />
     <Compile Include="Deploy\IGridCellValueConnector.cs" />
+    <Compile Include="Dictionary\UmbracoCultureDictionary.cs" />
+    <Compile Include="Dictionary\UmbracoCultureDictionaryFactory.cs" />
     <Compile Include="Events\ContentPublishedEventArgs.cs" />
     <Compile Include="Events\ContentPublishingEventArgs.cs" />
     <Compile Include="Events\ContentSavedEventArgs.cs" />

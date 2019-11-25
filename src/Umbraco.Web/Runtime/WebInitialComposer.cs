@@ -20,7 +20,6 @@ using Umbraco.Web.Cache;
 using Umbraco.Web.Composing.CompositionExtensions;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Dashboards;
-using Umbraco.Web.Dictionary;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
@@ -201,8 +200,6 @@ namespace Umbraco.Web.Runtime
                 .Append<ContentFinderByRedirectUrl>();
 
             composition.RegisterUnique<ISiteDomainHelper, SiteDomainHelper>();
-
-            composition.SetCultureDictionaryFactory<DefaultCultureDictionaryFactory>();
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course
             composition.WithCollectionBuilder<HealthCheckCollectionBuilder>()

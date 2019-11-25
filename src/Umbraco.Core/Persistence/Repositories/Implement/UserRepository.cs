@@ -42,9 +42,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         public UserRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger, IMapperCollection mapperCollection, IGlobalSettings globalSettings, IUserPasswordConfiguration passwordConfiguration)
             : base(scopeAccessor, appCaches, logger)
         {
-            _mapperCollection = mapperCollection;
-            _globalSettings = globalSettings;
-            _passwordConfiguration = passwordConfiguration;
+            _mapperCollection = mapperCollection ?? throw new ArgumentNullException(nameof(mapperCollection));
+            _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
+            _passwordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
         }     
 
         /// <summary>

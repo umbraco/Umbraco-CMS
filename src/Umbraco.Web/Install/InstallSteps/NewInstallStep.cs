@@ -43,7 +43,7 @@ namespace Umbraco.Web.Install.InstallSteps
             _userService = userService;
             _databaseBuilder = databaseBuilder;
             _globalSettings = globalSettings;
-            _passwordConfiguration = passwordConfiguration;
+            _passwordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
             _userManager = _http.GetOwinContext().GetBackOfficeUserManager();
         }
 
