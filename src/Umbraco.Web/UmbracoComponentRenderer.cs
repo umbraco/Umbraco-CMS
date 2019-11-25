@@ -107,7 +107,7 @@ namespace Umbraco.Web
         /// <param name="parameters">The parameters.</param>
         /// <param name="content">The content used for macro rendering</param>
         /// <returns></returns>
-        public IHtmlString RenderMacro(IPublishedContent content, string alias, IDictionary<string, object> parameters)
+        private IHtmlString RenderMacro(IPublishedContent content, string alias, IDictionary<string, object> parameters)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
 
