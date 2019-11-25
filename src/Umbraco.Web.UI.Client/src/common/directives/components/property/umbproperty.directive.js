@@ -15,19 +15,20 @@ angular.module("umbraco.directives")
             restrict: 'E',
             replace: true,
             templateUrl: 'views/components/property/umb-property.html',
-            link: function (scope) {
+            link: function ($scope) {
 
-                scope.propertyEditorAPI = {};
+                $scope.propertyActions = [];
 
                 userService.getCurrentUser().then(function (u) {
                     var isAdmin = u.userGroups.indexOf('admin') !== -1;
-                    scope.propertyAlias = (Umbraco.Sys.ServerVariables.isDebuggingEnabled === true || isAdmin) ? scope.property.alias : null;
+                    $scope.propertyAlias = (Umbraco.Sys.ServerVariables.isDebuggingEnabled === true || isAdmin) ? $scope.property.alias : null;
                 });
             },
             //Define a controller for this directive to expose APIs to other directives
             controller: function ($scope, $timeout) {
 
                 var self = this;
+                self.propertyActions = [];
 
                 //set the API properties/methods
 
@@ -35,18 +36,10 @@ angular.module("umbraco.directives")
                 self.setPropertyError = function (errorMsg) {
                     $scope.property.propertyErrorMessage = errorMsg;
                 };
-                
-                var unsubscribe = $scope.$on("ExposePropertyEditorAPI", function(event, api) {
-                    
-                    //avoid eventual parent properties to capture this.
-                    event.stopPropagation();
-                    
-                    $scope.propertyEditorAPI = api;
-                });
 
-                $scope.$on("$destroy", function () {
-                    unsubscribe();
-                });
+                self.setPropertyActions = function(actions) {
+                    $scope.propertyActions = actions;
+                };
 
             }
         };

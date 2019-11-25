@@ -7,12 +7,13 @@
             templateUrl: 'views/propertyeditors/nestedcontent/nestedcontent.propertyeditor.html',
             controller: NestedContentController,
             controllerAs: 'vm',
-            bindings: {
-                
+            require: {
+                umbProperty: '^umbProperty',
+                umbVariantContent: '?^^umbVariantContent'
             }
         });
 
-    function NestedContentController($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper, clipboardService, eventsService, overlayService, $routeParams, editorState, propertyEditorService) {
+    function NestedContentController($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper, clipboardService, eventsService, overlayService, $routeParams, editorState) {
         
         var vm = this;
         var model = $scope.$parent.$parent.model;
@@ -65,14 +66,14 @@
 
             // remove dublicates
             aliases = aliases.filter((item, index) => aliases.indexOf(item) === index);
+            
+            var nodeName = "";
 
-            // Retrive variant name
-            var culture = $routeParams.cculture ? $routeParams.cculture : $routeParams.mculture;
-            var activeVariant = _.find(editorState.current.variants, function (v) {
-                return !v.language || v.language.culture === culture;
-            });
+            if(vm.umbVariantContent) {
+                nodeName = vm.umbVariantContent.editor.content.name;
+            }
 
-            localizationService.localize("clipboard_labelForArrayOfItemsFrom", [model.label, activeVariant.name]).then(function(data) {
+            localizationService.localize("clipboard_labelForArrayOfItemsFrom", [model.label, nodeName]).then(function(data) {
                 clipboardService.copyArray("elementTypeArray", aliases, vm.nodes, data, "icon-thumbnail-list", model.id);
             });
         }
@@ -538,13 +539,14 @@
 
 
         
-        var api = {};
-        api.propertyActions = [
+        var propertyActions = [
             copyAllEntriesAction
         ];
         
-        propertyEditorService.exposeAPI($scope, api);// must be executed at a state where the API is set.
-        
+        this.$onInit = function () {
+            this.umbProperty.setPropertyActions(propertyActions);
+        };
+
         var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
             updateModel();
         });
