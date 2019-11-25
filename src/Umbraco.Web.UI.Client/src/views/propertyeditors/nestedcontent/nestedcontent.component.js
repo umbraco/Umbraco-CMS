@@ -8,7 +8,7 @@
             controller: NestedContentController,
             controllerAs: 'vm',
             require: {
-                umbProperty: '^umbProperty',
+                umbProperty: '?^umbProperty',
                 umbVariantContent: '?^^umbVariantContent'
             }
         });
@@ -534,7 +534,7 @@
         }
 
         function updatePropertyActionStates() {
-            copyAllEntriesAction.isDisabled = model.value.length === 0;
+            copyAllEntriesAction.isDisabled = !model.value || model.value.length === 0;
         }
 
 
@@ -544,7 +544,9 @@
         ];
         
         this.$onInit = function () {
-            this.umbProperty.setPropertyActions(propertyActions);
+            if (this.umbProperty) {
+                this.umbProperty.setPropertyActions(propertyActions);
+            }
         };
 
         var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
