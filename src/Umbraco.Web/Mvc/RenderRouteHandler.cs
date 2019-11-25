@@ -13,6 +13,7 @@ using Umbraco.Web.Routing;
 using System.Collections.Generic;
 using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Web.Features;
+using System.Reflection;
 
 namespace Umbraco.Web.Mvc
 {
@@ -279,9 +280,39 @@ namespace Umbraco.Web.Mvc
                     //set the controller and name to the custom one
                     def.ControllerType = controllerType;
                     def.ControllerName = ControllerExtensions.GetControllerName(controllerType);
+
                     if (def.ControllerName != defaultControllerName)
                     {
                         def.HasHijackedRoute = true;
+                    }
+
+                    // Look for hijacked action
+                    var hijackActions = controllerType
+                        .GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                        .Select(x => Tuple.Create(x, x.GetCustomAttribute<HijackRouteAttribute>(true)))
+                        .Where(x => x.Item2 != null && x.Item2.ContentTypeAlias.InvariantEquals(request.PublishedContent.ContentType.Alias))
+                        .ToList();
+
+                    if (hijackActions.Count > 0)
+                    {
+                        MethodInfo hijackAction = null;
+
+                        if (request.HasTemplate)
+                        {
+                            hijackAction = hijackActions
+                                .FirstOrDefault(x => x.Item2
+                                    .TemplateAlias.InvariantEquals(request.TemplateAlias))?.Item1;
+                        }
+
+                        if (hijackAction == null)
+                        {
+                            hijackAction = hijackActions.FirstOrDefault(x => x.Item2.TemplateAlias == null)?.Item1;
+                        }
+
+                        if (hijackAction != null)
+                        {
+                            def.ActionName = hijackAction.Name;
+                        }
                     }
                 }
                 else
