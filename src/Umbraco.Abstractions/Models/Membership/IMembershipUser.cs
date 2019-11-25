@@ -8,23 +8,13 @@ namespace Umbraco.Core.Models.Membership
     /// </summary>
     public interface IMembershipUser : IEntity
     {
-        object ProviderUserKey { get; set; } // fixme: This will be obsolete when we remove membership providers
-
-
         string Username { get; set; }
         string Email { get; set; }
 
         /// <summary>
         /// Gets or sets the raw password value
         /// </summary>
-        string RawPasswordValue { get; set; } // fixme: This will be obsolete when we remove membership providers
-
-        string PasswordQuestion { get; set; } // fixme: This will be obsolete when we remove membership providers
-
-        /// <summary>
-        /// Gets or sets the raw password answer value
-        /// </summary>
-        string RawPasswordAnswerValue { get; set; } // fixme: This will be obsolete when we remove membership providers
+        string RawPasswordValue { get; set; }
 
         string Comments { get; set; }
         bool IsApproved { get; set; }

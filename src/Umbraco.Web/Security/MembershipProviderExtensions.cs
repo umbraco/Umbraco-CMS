@@ -17,9 +17,9 @@ namespace Umbraco.Web.Security
     public static class MembershipProviderExtensions
     {
 
-        internal static UmbracoMembershipMember AsConcreteMembershipUser(this IMembershipUser member, string providerName, bool providerKeyAsGuid = false)
+        internal static UmbracoMembershipMember AsConcreteMembershipUser(this IMembershipUser member, string providerName)
         {
-            var membershipMember = new UmbracoMembershipMember(member, providerName, providerKeyAsGuid);
+            var membershipMember = new UmbracoMembershipMember(member, providerName);
             return membershipMember;
         }
 

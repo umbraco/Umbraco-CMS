@@ -74,7 +74,6 @@ namespace Umbraco.Web.Security
         private int _passwordAttemptWindow;
         private MembershipPasswordFormat _passwordFormat;
         private string _passwordStrengthRegularExpression;
-        private bool _requiresQuestionAndAnswer;
         private bool _requiresUniqueEmail;
 
         public bool UseLegacyEncoding { get; private set; }
@@ -164,14 +163,9 @@ namespace Umbraco.Web.Security
         }
 
         /// <summary>
-        /// Gets a value indicating whether the membership provider is configured to require the user to answer a password question for password reset and retrieval.
+        /// Always returns false, question/answer is not supported
         /// </summary>
-        /// <value></value>
-        /// <returns>true if a password answer is required for password reset and retrieval; otherwise, false. The default is true.</returns>
-        public override bool RequiresQuestionAndAnswer
-        {
-            get { return _requiresQuestionAndAnswer; }
-        }
+        public override bool RequiresQuestionAndAnswer => false;
 
         /// <summary>
         /// Gets a value indicating whether the membership provider is configured to require a unique e-mail address for each user name.
@@ -225,7 +219,6 @@ namespace Umbraco.Web.Security
 
             _enablePasswordRetrieval = config.GetValue("enablePasswordRetrieval", false);
             _enablePasswordReset = config.GetValue("enablePasswordReset", true);
-            _requiresQuestionAndAnswer = config.GetValue("requiresQuestionAndAnswer", false);
             _requiresUniqueEmail = config.GetValue("requiresUniqueEmail", true);
             _maxInvalidPasswordAttempts = GetIntValue(config, "maxInvalidPasswordAttempts", 5, false, 0);
             _passwordAttemptWindow = GetIntValue(config, "passwordAttemptWindow", 10, false, 0);
@@ -695,7 +688,7 @@ namespace Umbraco.Web.Security
             sb.AppendLine("_passwordAttemptWindow=" + _passwordAttemptWindow);
             sb.AppendLine("_passwordFormat=" + _passwordFormat);
             sb.AppendLine("_passwordStrengthRegularExpression=" + _passwordStrengthRegularExpression);
-            sb.AppendLine("_requiresQuestionAndAnswer=" + _requiresQuestionAndAnswer);
+            sb.AppendLine("_requiresQuestionAndAnswer=" + RequiresQuestionAndAnswer);
             sb.AppendLine("_requiresUniqueEmail=" + _requiresUniqueEmail);
             return sb.ToString();
         }

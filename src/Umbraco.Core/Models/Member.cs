@@ -167,66 +167,6 @@ namespace Umbraco.Core.Models
         // * If any of the fields don't exist, what should we do? Currently it will throw an exception!
 
         /// <summary>
-        /// Gets or sets the Password Question
-        /// </summary>
-        /// <remarks>
-        /// Alias: umbracoMemberPasswordRetrievalQuestion
-        /// Part of the standard properties collection.
-        /// </remarks>
-        [DataMember]
-        public string PasswordQuestion
-        {
-            get
-            {
-                var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.PasswordQuestion, "PasswordQuestion", default(string));
-                if (a.Success == false) return a.Result;
-
-                return Properties[Constants.Conventions.Member.PasswordQuestion].GetValue() == null
-                    ? string.Empty
-                    : Properties[Constants.Conventions.Member.PasswordQuestion].GetValue().ToString();
-            }
-            set
-            {
-                if (WarnIfPropertyTypeNotFoundOnSet(
-                    Constants.Conventions.Member.PasswordQuestion,
-                    "PasswordQuestion") == false) return;
-
-                Properties[Constants.Conventions.Member.PasswordQuestion].SetValue(value);
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the raw password answer value
-        /// </summary>
-        /// <remarks>
-        /// For security reasons this value should be encrypted, the encryption process is handled by the membership provider
-        /// Alias: umbracoMemberPasswordRetrievalAnswer
-        ///
-        /// Part of the standard properties collection.
-        /// </remarks>
-        [IgnoreDataMember]
-        public string RawPasswordAnswerValue
-        {
-            get
-            {
-                var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.PasswordAnswer, "PasswordAnswer", default(string));
-                if (a.Success == false) return a.Result;
-
-                return Properties[Constants.Conventions.Member.PasswordAnswer].GetValue() == null
-                    ? string.Empty
-                    : Properties[Constants.Conventions.Member.PasswordAnswer].GetValue().ToString();
-            }
-            set
-            {
-                if (WarnIfPropertyTypeNotFoundOnSet(
-                    Constants.Conventions.Member.PasswordAnswer,
-                    "PasswordAnswer") == false) return;
-
-                Properties[Constants.Conventions.Member.PasswordAnswer].SetValue(value);
-            }
-        }
-
-        /// <summary>
         /// Gets or set the comments for the member
         /// </summary>
         /// <remarks>

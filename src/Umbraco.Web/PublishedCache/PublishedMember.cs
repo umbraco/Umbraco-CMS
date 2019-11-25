@@ -51,8 +51,6 @@ namespace Umbraco.Web.PublishedCache
 
         public string UserName => _membershipUser.Username;
 
-        public string PasswordQuestion => _membershipUser.PasswordQuestion;
-
         public string Comments => _membershipUser.Comments;
 
         public bool IsApproved => _membershipUser.IsApproved;
@@ -98,7 +96,6 @@ namespace Umbraco.Web.PublishedCache
 
             EnsureMemberProperty(properties, aliases, "Email", Email);
             EnsureMemberProperty(properties, aliases, "UserName", UserName);
-            EnsureMemberProperty(properties, aliases, "PasswordQuestion", PasswordQuestion);
             EnsureMemberProperty(properties, aliases, "Comments", Comments);
             EnsureMemberProperty(properties, aliases, "IsApproved", IsApproved);
             EnsureMemberProperty(properties, aliases, "IsLockedOut", IsLockedOut);

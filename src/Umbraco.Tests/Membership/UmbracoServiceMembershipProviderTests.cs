@@ -75,38 +75,6 @@ namespace Umbraco.Tests.Membership
         }
 
         [Test]
-        public void Answer_Is_Encrypted()
-        {
-            IMember createdMember = null;
-            var memberType = MockedContentTypes.CreateSimpleMemberType();
-            foreach (var p in ConventionsHelper.GetStandardPropertyTypeStubs())
-            {
-                memberType.AddPropertyType(p.Value);
-            }
-            var memberTypeServiceMock = new Mock<IMemberTypeService>();
-            memberTypeServiceMock.Setup(x => x.GetDefault()).Returns("Member");
-            var membershipServiceMock = new Mock<IMembershipMemberService>();
-            membershipServiceMock.Setup(service => service.Exists("test")).Returns(false);
-            membershipServiceMock.Setup(service => service.GetByEmail("test@test.com")).Returns(() => null);
-            membershipServiceMock.Setup(
-                service => service.CreateWithIdentity(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))
-                        .Callback((string u, string e, string p, string m, bool isApproved) =>
-                            {
-                                createdMember = new Member("test", e, u, p, memberType, isApproved);
-                            })
-                        .Returns(() => createdMember);
-            var provider = new MembersMembershipProvider(membershipServiceMock.Object, memberTypeServiceMock.Object, TestHelper.GetUmbracoVersion());
-            provider.Initialize("test", new NameValueCollection());
-
-
-            MembershipCreateStatus status;
-            provider.CreateUser("test", "test", "testtest$1", "test@test.com", "test", "test", true, "test", out status);
-
-            Assert.AreNotEqual("test", createdMember.RawPasswordAnswerValue);
-            Assert.AreEqual(provider.EncryptString("test"), createdMember.RawPasswordAnswerValue);
-        }
-
-        [Test]
         public void Password_Encrypted()
         {
             IMember createdMember = null;

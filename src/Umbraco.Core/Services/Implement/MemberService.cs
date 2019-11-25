@@ -1235,13 +1235,6 @@ namespace Umbraco.Core.Services.Implement
 
             foreach (var property in member.Properties)
             {
-                //ignore list
-                switch (property.Alias)
-                {
-                    case Constants.Conventions.Member.PasswordQuestion:
-                        continue;
-                }
-
                 var propertyExportModel = new MemberExportProperty
                 {
                     Id = property.Id,

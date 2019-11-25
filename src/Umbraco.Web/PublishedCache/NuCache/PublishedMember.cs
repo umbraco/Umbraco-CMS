@@ -76,7 +76,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // see also PublishedContentType
             AddIf(contentType, properties, "Email", member.Email);
             AddIf(contentType, properties, "Username", member.Username);
-            AddIf(contentType, properties, "PasswordQuestion", member.PasswordQuestion);
             AddIf(contentType, properties, "Comments", member.Comments);
             AddIf(contentType, properties, "IsApproved", member.IsApproved);
             AddIf(contentType, properties, "IsLockedOut", member.IsLockedOut);
@@ -102,8 +101,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public string Email => _member.Email;
 
         public string UserName => _member.Username;
-
-        public string PasswordQuestion => _member.PasswordQuestion;
 
         public string Comments => _member.Comments;
 

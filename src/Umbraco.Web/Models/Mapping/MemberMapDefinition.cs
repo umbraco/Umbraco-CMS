@@ -65,7 +65,6 @@ namespace Umbraco.Web.Models.Mapping
             target.LastLockoutDate = source.LastLockoutDate;
             target.LastLoginDate = source.LastLoginDate;
             target.LastPasswordChangeDate = source.LastPasswordChangedDate;
-            target.ProviderUserKey = source.ProviderUserKey;
             target.RawPasswordValue = source.CreationDate > DateTime.MinValue ? Guid.NewGuid().ToString("N") : "";
             target.UpdateDate = source.LastActivityDate;
             target.Username = source.UserName;

@@ -113,18 +113,7 @@ namespace Umbraco.Web.Security.Providers
         /// </returns>
         protected override bool PerformChangePasswordQuestionAndAnswer(string username, string password, string newPasswordQuestion, string newPasswordAnswer)
         {
-            var member = MemberService.GetByUsername(username);
-            if (member == null)
-            {
-                return false;
-            }
-
-            member.PasswordQuestion = newPasswordQuestion;
-            member.RawPasswordAnswerValue = EncryptString(newPasswordAnswer);
-
-            MemberService.Save(member);
-
-            return true;
+            throw new NotSupportedException("Password question/answer is not supported");
         }
 
         /// <summary>
@@ -171,8 +160,6 @@ namespace Umbraco.Web.Security.Providers
                 memberTypeAlias,
                 isApproved);
 
-            member.PasswordQuestion = passwordQuestion;
-            member.RawPasswordAnswerValue = EncryptString(passwordAnswer);
             member.LastLoginDate = DateTime.Now;
             member.LastPasswordChangeDate = DateTime.Now;
 
@@ -305,13 +292,6 @@ namespace Umbraco.Web.Security.Providers
                 throw new ProviderException("The supplied user is not found");
             }
 
-            var encAnswer = EncryptString(answer);
-
-            if (RequiresQuestionAndAnswer && m.RawPasswordAnswerValue != encAnswer)
-            {
-                throw new ProviderException("Incorrect password answer");
-            }
-
             var decodedPassword = DecryptPassword(m.RawPasswordValue);
 
             return decodedPassword;
@@ -430,13 +410,6 @@ namespace Umbraco.Web.Security.Providers
             if (m.IsLockedOut)
             {
                 throw new ProviderException("The member is locked out.");
-            }
-
-            var encAnswer = EncryptString(answer);
-
-            if (RequiresQuestionAndAnswer && m.RawPasswordAnswerValue != encAnswer)
-            {
-                throw new ProviderException("Incorrect password answer");
             }
 
             string salt;

@@ -31,8 +31,6 @@ namespace Umbraco.Web.Security.Providers
             CommentPropertyTypeAlias = Constants.Conventions.Member.Comments;
             LastLoginPropertyTypeAlias = Constants.Conventions.Member.LastLoginDate;
             LastPasswordChangedPropertyTypeAlias = Constants.Conventions.Member.LastPasswordChangeDate;
-            PasswordRetrievalQuestionPropertyTypeAlias = Constants.Conventions.Member.PasswordQuestion;
-            PasswordRetrievalAnswerPropertyTypeAlias = Constants.Conventions.Member.PasswordAnswer;
             _memberTypeService = memberTypeService;
         }
 
@@ -40,13 +38,12 @@ namespace Umbraco.Web.Security.Providers
         private string _defaultMemberTypeAlias = "Member";
         private volatile bool _hasDefaultMember;
         private static readonly object Locker = new object();
-        private bool _providerKeyAsGuid;
 
         public override string ProviderName => "MembersMembershipProvider";
 
         protected override MembershipUser ConvertToMembershipUser(IMember entity)
         {
-            return entity.AsConcreteMembershipUser(Name, _providerKeyAsGuid);
+            return entity.AsConcreteMembershipUser(Name);
         }
 
         public string LockPropertyTypeAlias { get; }
@@ -56,8 +53,6 @@ namespace Umbraco.Web.Security.Providers
         public string CommentPropertyTypeAlias { get; }
         public string LastLoginPropertyTypeAlias { get; }
         public string LastPasswordChangedPropertyTypeAlias { get; }
-        public string PasswordRetrievalQuestionPropertyTypeAlias { get; }
-        public string PasswordRetrievalAnswerPropertyTypeAlias { get; }
 
         public override void Initialize(string name, NameValueCollection config)
         {
@@ -72,15 +67,6 @@ namespace Umbraco.Web.Security.Providers
                     throw new ProviderException("No default member type alias is specified in the web.config string. Please add a 'defaultUserTypeAlias' to the add element in the provider declaration in web.config");
                 }
                 _hasDefaultMember = true;
-            }
-
-            //devs can configure the provider user key to be a guid if they want, by default it is int
-            if (config["providerKeyType"] != null)
-            {
-                if (config["providerKeyType"] == "guid")
-                {
-                    _providerKeyAsGuid = true;
-                }
             }
 
             // these need to be lazy else we get a stack overflow since we cannot access Membership.HashAlgorithmType without initializing the providers

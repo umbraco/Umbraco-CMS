@@ -10,7 +10,6 @@ namespace Umbraco.Web.Models.Membership
         private readonly IMembershipUser _member;
         private readonly string _userName;
         private readonly object _providerUserKey;
-        private readonly string _passwordQuestion;
         private readonly bool _isLockedOut;
         private readonly DateTime _lastLockoutDate;
         private readonly DateTime _creationDate;
@@ -26,7 +25,7 @@ namespace Umbraco.Web.Models.Membership
 
         //NOTE: We are not calling the base constructor which will validate that a provider with the specified name exists which causes issues with unit tests. The ctor
         // validation for that doesn't need to be there anyways (have checked the source).
-        public UmbracoMembershipMember(IMembershipUser member, string providerName, bool providerKeyAsGuid = false)
+        public UmbracoMembershipMember(IMembershipUser member, string providerName)
         {
             _member = member;
             //NOTE: We are copying the values here so that everything is consistent with how the underlying built-in ASP.Net membership user
@@ -34,11 +33,9 @@ namespace Umbraco.Web.Models.Membership
             if (member.Username != null)
                 _userName = member.Username.Trim();
             if (member.Email != null)
-                _email = member.Email.Trim();
-            if (member.PasswordQuestion != null)
-                _passwordQuestion = member.PasswordQuestion.Trim();
+                _email = member.Email.Trim();            
             _providerName = providerName;
-            _providerUserKey = providerKeyAsGuid ? member.ProviderUserKey : member.Id;
+            _providerUserKey = member.Key;
             _comment = member.Comments;
             _isApproved = member.IsApproved;
             _isLockedOut = member.IsLockedOut;
@@ -71,10 +68,7 @@ namespace Umbraco.Web.Models.Membership
             set { _email = value; }
         }
 
-        public override string PasswordQuestion
-        {
-            get { return _passwordQuestion; }
-        }
+        public override string PasswordQuestion => string.Empty;
 
         public override string Comment
         {
