@@ -44,8 +44,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         public UserRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger, IMapperCollection mapperCollection, IGlobalSettings globalSettings)
             : base(scopeAccessor, appCaches, logger)
         {
-            _mapperCollection = mapperCollection;
-            _globalSettings = globalSettings;
+            _mapperCollection = mapperCollection ?? throw new ArgumentNullException(nameof(mapperCollection));
+            _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
         }
 
         // for tests

@@ -4,6 +4,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.CompositionExtensions;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Dictionary;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
@@ -130,6 +131,8 @@ namespace Umbraco.Core.Runtime
 
             // by default, register a noop rebuilder
             composition.RegisterUnique<IPublishedSnapshotRebuilder, PublishedSnapshotRebuilder>();
+            composition.SetCultureDictionaryFactory<DefaultCultureDictionaryFactory>();
+            composition.Register(f => f.GetInstance<ICultureDictionaryFactory>().CreateDictionary(), Lifetime.Singleton);
         }
     }
 }

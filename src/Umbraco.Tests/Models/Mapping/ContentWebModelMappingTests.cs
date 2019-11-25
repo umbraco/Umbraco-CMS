@@ -31,9 +31,6 @@ namespace Umbraco.Tests.Models.Mapping
         {
             base.Compose();
 
-            Composition.RegisterUnique(f => Mock.Of<ICultureDictionaryFactory>());
-
-            Composition.Register(_ => Mock.Of<ILogger>());
             Composition.ComposeFileSystems();
 
             Composition.Register(_ => Mock.Of<IDataTypeService>());
