@@ -35,7 +35,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public static TypeLoader GetMockedTypeLoader()
         {
-            return new TypeLoader(IOHelper.Default, Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(IOHelper.Default.MapPath("~/App_Data/TEMP")), Mock.Of<IProfilingLogger>());
+            return new TypeLoader(IOHelper, Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(IOHelper.MapPath("~/App_Data/TEMP")), Mock.Of<IProfilingLogger>());
         }
 
         public static Configs GetConfigs()
@@ -58,12 +58,12 @@ namespace Umbraco.Tests.TestHelpers
 
         public static IBackOfficeInfo GetBackOfficeInfo()
         {
-            return new AspNetBackOfficeInfo(SettingsForTests.GenerateMockGlobalSettings(), IOHelper.Default, SettingsForTests.GenerateMockUmbracoSettings(), Mock.Of<ILogger>());
+            return new AspNetBackOfficeInfo(SettingsForTests.GenerateMockGlobalSettings(), TestHelper.IOHelper, SettingsForTests.GenerateMockUmbracoSettings(), Mock.Of<ILogger>());
         }
 
         public static IConfigsFactory GetConfigsFactory()
         {
-            return new ConfigsFactory(IOHelper.Default);
+            return new ConfigsFactory(IOHelper);
         }
 
         /// <summary>
@@ -80,6 +80,8 @@ namespace Umbraco.Tests.TestHelpers
                 return Path.GetDirectoryName(path);
             }
         }
+
+        public static IIOHelper IOHelper = new IOHelper();
 
         /// <summary>
         /// Maps the given <paramref name="relativePath"/> making it rooted on <see cref="CurrentAssemblyDirectory"/>. <paramref name="relativePath"/> must start with <code>~/</code>
@@ -108,9 +110,9 @@ namespace Umbraco.Tests.TestHelpers
         {
             foreach (var directory in directories)
             {
-                var directoryInfo = new DirectoryInfo(Current.IOHelper.MapPath(directory));
+                var directoryInfo = new DirectoryInfo(IOHelper.MapPath(directory));
                 if (directoryInfo.Exists == false)
-                    Directory.CreateDirectory(Current.IOHelper.MapPath(directory));
+                    Directory.CreateDirectory(IOHelper.MapPath(directory));
             }
         }
 
@@ -122,7 +124,7 @@ namespace Umbraco.Tests.TestHelpers
             };
             foreach (var directory in directories)
             {
-                var directoryInfo = new DirectoryInfo(Current.IOHelper.MapPath(directory));
+                var directoryInfo = new DirectoryInfo(IOHelper.MapPath(directory));
                 var preserve = preserves.ContainsKey(directory) ? preserves[directory] : null;
                 if (directoryInfo.Exists)
                     foreach (var x in directoryInfo.GetFiles().Where(x => preserve == null || preserve.Contains(x.Name) == false))
@@ -310,7 +312,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public static IHostingEnvironment GetHostingEnvironment()
         {
-            return new AspNetHostingEnvironment(SettingsForTests.GetDefaultGlobalSettings(), IOHelper.Default);
+            return new AspNetHostingEnvironment(SettingsForTests.GetDefaultGlobalSettings(), TestHelper.IOHelper);
         }
     }
 }

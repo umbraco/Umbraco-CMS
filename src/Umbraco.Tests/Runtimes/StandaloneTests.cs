@@ -63,7 +63,7 @@ namespace Umbraco.Tests.Runtimes
             var appCaches = AppCaches.Disabled;
             var databaseFactory = new UmbracoDatabaseFactory(logger, new Lazy<IMapperCollection>(() => factory.GetInstance<IMapperCollection>()), TestHelper.GetConfigs());
             var typeFinder = new TypeFinder(logger);
-            var ioHelper = IOHelper.Default;
+            var ioHelper = TestHelper.IOHelper;
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
             var typeLoader = new TypeLoader(ioHelper, typeFinder, appCaches.RuntimeCache, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), profilingLogger);
             var mainDom = new SimpleMainDom();
@@ -256,7 +256,7 @@ namespace Umbraco.Tests.Runtimes
             var appCaches = AppCaches.Disabled;
             var databaseFactory = Mock.Of<IUmbracoDatabaseFactory>();
             var typeFinder = new TypeFinder(Mock.Of<ILogger>());
-            var ioHelper = IOHelper.Default;
+            var ioHelper = TestHelper.IOHelper;
             var typeLoader = new TypeLoader(ioHelper, typeFinder, appCaches.RuntimeCache, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), profilingLogger);
             var runtimeState = Mock.Of<IRuntimeState>();
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();

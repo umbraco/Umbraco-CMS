@@ -41,7 +41,7 @@ namespace Umbraco.Tests.Services
             base.SetUp();
 
             // HACK: but we have no choice until we remove the SavePassword method from IMemberService
-            var providerMock = new Mock<MembersMembershipProvider>(ServiceContext.MemberService, ServiceContext.MemberTypeService, TestHelper.GetUmbracoVersion(), TestHelper.GetHostingEnvironment()) { CallBase = true };
+            var providerMock = new Mock<MembersMembershipProvider>(ServiceContext.MemberService, ServiceContext.MemberTypeService, TestHelper.GetUmbracoVersion(), TestHelper.GetHostingEnvironment(), new AspNetIpResolver()) { CallBase = true };
             providerMock.Setup(@base => @base.AllowManuallyChangingPassword).Returns(false);
             providerMock.Setup(@base => @base.PasswordFormat).Returns(MembershipPasswordFormat.Hashed);
             var provider = providerMock.Object;

@@ -89,7 +89,7 @@ namespace Umbraco.Tests.Runtimes
             }
 
             private static readonly DebugDiagnosticsLogger _logger = new DebugDiagnosticsLogger(new MessageTemplates());
-            private static readonly IIOHelper _ioHelper = IOHelper.Default;
+            private static readonly IIOHelper _ioHelper = TestHelper.IOHelper;
             private static readonly IProfiler _profiler = new TestProfiler();
             private static readonly Configs _configs = GetConfigs();
             private static readonly IGlobalSettings _globalSettings = _configs.Global();

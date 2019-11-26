@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core.IO;
+using Umbraco.Tests.TestHelpers;
 
 
 namespace Umbraco.Tests.IO
@@ -14,7 +15,7 @@ namespace Umbraco.Tests.IO
     {
         public PhysicalFileSystemTests()
             : base(new PhysicalFileSystem(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileSysTests"),
-                "/Media/", new IOHelper()))
+                "/Media/", TestHelper.IOHelper))
         { }
 
         [SetUp]

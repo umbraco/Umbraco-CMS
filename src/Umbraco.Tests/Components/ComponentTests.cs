@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Components
             var logger = Mock.Of<ILogger>();
             var typeFinder = new TypeFinder(logger);
             var f = new UmbracoDatabaseFactory(logger, new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())), TestHelper.GetConfigs());
-            var fs = new FileSystems(mock.Object, logger, IOHelper.Default, SettingsForTests.GenerateMockGlobalSettings());
+            var fs = new FileSystems(mock.Object, logger, TestHelper.IOHelper, SettingsForTests.GenerateMockGlobalSettings());
             var p = new ScopeProvider(f, fs, logger, typeFinder);
 
             mock.Setup(x => x.GetInstance(typeof (ILogger))).Returns(logger);
@@ -56,7 +56,7 @@ namespace Umbraco.Tests.Components
 
         private static TypeLoader MockTypeLoader()
         {
-            var ioHelper = IOHelper.Default;
+            var ioHelper = TestHelper.IOHelper;
             return new TypeLoader(ioHelper, Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), Mock.Of<IProfilingLogger>());
         }
 
@@ -367,7 +367,7 @@ namespace Umbraco.Tests.Components
         [Test]
         public void AllComposers()
         {
-            var ioHelper = IOHelper.Default;
+            var ioHelper = TestHelper.IOHelper;
             var typeFinder = new TypeFinder(Mock.Of<ILogger>());
             var typeLoader = new TypeLoader(ioHelper, typeFinder, AppCaches.Disabled.RuntimeCache, new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), Mock.Of<IProfilingLogger>());
 

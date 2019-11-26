@@ -28,8 +28,8 @@ namespace Umbraco.Tests.Composing
         {
             // this ensures it's reset
             var typeFinder = new TypeFinder(Mock.Of<ILogger>());
-            _typeLoader = new TypeLoader(IOHelper.Default, typeFinder, NoAppCache.Instance,
-                new DirectoryInfo(IOHelper.Default.MapPath("~/App_Data/TEMP")),
+            _typeLoader = new TypeLoader(TestHelper.IOHelper, typeFinder, NoAppCache.Instance,
+                new DirectoryInfo(TestHelper.IOHelper.MapPath("~/App_Data/TEMP")),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()), false,
 
                 // for testing, we'll specify which assemblies are scanned for the PluginTypeResolver

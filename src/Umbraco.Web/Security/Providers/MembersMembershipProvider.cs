@@ -18,11 +18,11 @@ namespace Umbraco.Web.Security.Providers
     public class MembersMembershipProvider : UmbracoMembershipProvider<IMembershipMemberService, IMember>, IUmbracoMemberTypeMembershipProvider
     {
         public MembersMembershipProvider()
-            : this(Current.Services.MemberService, Current.Services.MemberTypeService, Current.UmbracoVersion, Current.HostingEnvironment)
+            : this(Current.Services.MemberService, Current.Services.MemberTypeService, Current.UmbracoVersion, Current.HostingEnvironment, Current.IpResolver)
         { }
 
-        public MembersMembershipProvider(IMembershipMemberService<IMember> memberService, IMemberTypeService memberTypeService, IUmbracoVersion umbracoVersion, IHostingEnvironment hostingEnvironment)
-            : base(memberService, umbracoVersion, hostingEnvironment)
+        public MembersMembershipProvider(IMembershipMemberService<IMember> memberService, IMemberTypeService memberTypeService, IUmbracoVersion umbracoVersion, IHostingEnvironment hostingEnvironment, IIpResolver ipResolver)
+            : base(memberService, umbracoVersion, hostingEnvironment, ipResolver)
         {
             LockPropertyTypeAlias = Constants.Conventions.Member.IsLockedOut;
             LastLockedOutPropertyTypeAlias = Constants.Conventions.Member.LastLockoutDate;

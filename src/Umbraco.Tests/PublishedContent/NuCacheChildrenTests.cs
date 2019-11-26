@@ -58,7 +58,7 @@ namespace Umbraco.Tests.PublishedContent
 
             var configs = TestHelper.GetConfigs();
             Mock.Get(factory).Setup(x => x.GetInstance(typeof(Configs))).Returns(configs);
-            var globalSettings = new GlobalSettings(IOHelper.Default);
+            var globalSettings = new GlobalSettings(TestHelper.IOHelper);
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
             configs.Add(SettingsForTests.GenerateMockUmbracoSettings);
             configs.Add<IGlobalSettings>(() => globalSettings);

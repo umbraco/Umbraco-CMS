@@ -86,7 +86,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void MultiThread()
         {
-            var physMediaFileSystem = new PhysicalFileSystem(IOHelper.MapPath("media"), "ignore", new IOHelper());
+            var physMediaFileSystem = new PhysicalFileSystem(IOHelper.MapPath("media"), "ignore", IOHelper);
             var mediaFileSystem = Current.MediaFileSystem;
 
             var scopeProvider = ScopeProvider;

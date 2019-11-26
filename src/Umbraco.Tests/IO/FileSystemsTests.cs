@@ -33,9 +33,9 @@ namespace Umbraco.Tests.IO
             composition.Register(_ => Mock.Of<ILogger>());
             composition.Register(_ => Mock.Of<IDataTypeService>());
             composition.Register(_ => Mock.Of<IContentSection>());
-            composition.Register(_ => IOHelper.Default);
+            composition.Register(_ => TestHelper.IOHelper);
             composition.RegisterUnique<IMediaPathScheme, UniqueMediaPathScheme>();
-            composition.RegisterUnique(IOHelper.Default);
+            composition.RegisterUnique(TestHelper.IOHelper);
 
             composition.Configs.Add(SettingsForTests.GetDefaultGlobalSettings);
             composition.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);

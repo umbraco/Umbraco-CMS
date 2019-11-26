@@ -20,12 +20,12 @@ namespace Umbraco.Web.Security.Providers
     {
 
         public UsersMembershipProvider()
-            : this(Current.Services.UserService, Current.Services.MemberTypeService, Current.UmbracoVersion, Current.HostingEnvironment)
+            : this(Current.Services.UserService, Current.Services.MemberTypeService, Current.UmbracoVersion, Current.HostingEnvironment, Current.IpResolver)
         {
         }
 
-        public UsersMembershipProvider(IMembershipMemberService<IUser> memberService, IMemberTypeService memberTypeService, IUmbracoVersion umbracoVersion, IHostingEnvironment hostingEnvironment)
-            : base(memberService, umbracoVersion, hostingEnvironment)
+        public UsersMembershipProvider(IMembershipMemberService<IUser> memberService, IMemberTypeService memberTypeService, IUmbracoVersion umbracoVersion, IHostingEnvironment hostingEnvironment, IIpResolver ipResolver)
+            : base(memberService, umbracoVersion, hostingEnvironment, ipResolver)
         {
             _memberTypeService = memberTypeService;
         }

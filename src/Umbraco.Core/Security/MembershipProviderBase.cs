@@ -956,15 +956,7 @@ namespace Umbraco.Core.Security
             return sb.ToString();
         }
 
-        /// <summary>
-        /// Returns the current request IP address for logging if there is one
-        /// </summary>
-        /// <returns></returns>
-        protected string GetCurrentRequestIpAddress()
-        {
-            var httpContext = HttpContext.Current == null ? (HttpContextBase) null : new HttpContextWrapper(HttpContext.Current);
-            return httpContext.GetCurrentRequestIpAddress();
-        }
+
 
     }
 }

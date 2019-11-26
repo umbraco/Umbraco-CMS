@@ -30,7 +30,7 @@ namespace Umbraco.Web
 
         protected UmbracoApplicationBase()
         {
-            _ioHelper = IOHelper.Default;
+            _ioHelper = new IOHelper();
             _configs = new ConfigsFactory(_ioHelper).Create();
             var globalSettings = _configs.Global();
 
