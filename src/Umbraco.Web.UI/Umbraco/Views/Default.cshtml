@@ -140,7 +140,7 @@
             <script>
                 if ('serviceWorker' in navigator) {
                   window.addEventListener('load', function() {
-                      navigator.serviceWorker.register('/umbraco/service-worker.js', {scope:'/'});
+                      navigator.serviceWorker.register('/umbraco/service-worker.js?version=@UrlHelperExtensions.GetCacheBustHash()', {scope:'/'});
                   });
                 }
             </script>
