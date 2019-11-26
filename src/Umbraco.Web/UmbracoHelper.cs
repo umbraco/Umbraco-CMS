@@ -146,7 +146,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IHtmlString RenderMacro(string alias)
         {
-            return ComponentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, new { });
+            return ComponentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, new Dictionary<string, object>());
         }
 
         /// <summary>
