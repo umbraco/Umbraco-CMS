@@ -50,6 +50,13 @@ namespace Umbraco.Core
             => composition.WithCollectionBuilder<DataEditorCollectionBuilder>();
 
         /// <summary>
+        /// Gets the data value reference collection builder.
+        /// </summary>
+        /// <param name="composition">The composition.</param>
+        public static DataValueReferenceCollectionBuilder DataValueReferences(this Composition composition)
+            => composition.WithCollectionBuilder<DataValueReferenceCollectionBuilder>();
+
+        /// <summary>
         /// Gets the property value converters collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>

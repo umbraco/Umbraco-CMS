@@ -75,6 +75,10 @@ namespace Umbraco.Core.Runtime
             composition.RegisterUnique<PropertyEditorCollection>();
             composition.RegisterUnique<ParameterEditorCollection>();
 
+            // TODO: WB Add our collection
+            // Manually register stuff in this collection
+            composition.DataValueReferences();
+
             // register a server registrar, by default it's the db registrar
             composition.RegisterUnique<IServerRegistrar>(f =>
             {
