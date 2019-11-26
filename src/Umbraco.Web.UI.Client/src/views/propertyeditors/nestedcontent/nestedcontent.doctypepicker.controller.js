@@ -43,14 +43,18 @@
         }
 
 
-        $scope.add = function () {
-            $scope.model.value.push({
+        $scope.add = function ($event) {
+            var config = {
                 // As per PR #4, all stored content type aliases must be prefixed "nc" for easier recognition.
                 // For good measure we'll also prefix the tab alias "nc"
                 ncAlias: "",
                 ncTabAlias: "",
                 nameTemplate: ""
-            });
+            };
+            $scope.model.value.push(config);
+            if ($event) {
+                $scope.openElemTypeModal($event, config);
+            }
         }
 
         $scope.canAdd = function () {
