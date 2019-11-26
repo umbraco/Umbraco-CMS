@@ -549,7 +549,9 @@
               property.dataTypeIcon = propertyModel.dataTypeIcon;
               property.dataTypeName = propertyModel.dataTypeName;
               property.validation.mandatory = propertyModel.validation.mandatory;
+              property.validation.mandatoryMessage = propertyModel.validation.mandatoryMessage;
               property.validation.pattern = propertyModel.validation.pattern;
+              property.validation.patternMessage = propertyModel.validation.patternMessage;
               property.showOnMemberProfile = propertyModel.showOnMemberProfile;
               property.memberCanEdit = propertyModel.memberCanEdit;
               property.isSensitiveValue = propertyModel.isSensitiveValue;
@@ -632,7 +634,9 @@
           propertyState: "init",
           validation: {
             mandatory: false,
-            pattern: null
+            mandatoryMessage: null,
+            pattern: null,
+            patternMessage: null
           }
         };
 
