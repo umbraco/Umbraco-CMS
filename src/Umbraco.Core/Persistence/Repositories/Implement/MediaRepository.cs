@@ -425,32 +425,32 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             protected override IEnumerable<IMedia> PerformGetByQuery(IQuery<IMedia> query)
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
             protected override IEnumerable<string> GetDeleteClauses()
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
             protected override void PersistNewItem(IMedia entity)
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
             protected override void PersistUpdatedItem(IMedia entity)
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
             protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
             protected override string GetBaseWhereClause()
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
         }
 
