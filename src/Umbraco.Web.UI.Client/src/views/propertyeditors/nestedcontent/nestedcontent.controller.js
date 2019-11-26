@@ -608,10 +608,6 @@
             unsubscribe();
             watcher();
         });
-
-        $scope.isCurrentNode = function (node) {
-            return $scope.realCurrentNode && $scope.realCurrentNode.key === node.key;
-        }
     }
 
 })();
