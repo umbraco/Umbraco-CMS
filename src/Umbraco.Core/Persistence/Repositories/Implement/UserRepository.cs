@@ -492,6 +492,7 @@ ORDER BY colName";
             // list the columns to save, NOTE: would be nice to not have hard coded strings here but no real good way around that
             var colsToSave = new Dictionary<string, string>
             {
+                //TODO: Change these to constants + nameof
                 {"userDisabled", "IsApproved"},
                 {"userNoConsole", "IsLockedOut"},
                 {"startStructureID", "StartContentId"},

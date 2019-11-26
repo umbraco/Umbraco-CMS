@@ -94,15 +94,15 @@ namespace Umbraco.Web.PublishedCache
         {
             var aliases = properties.Select(x => x.Alias).ToList();
 
-            EnsureMemberProperty(properties, aliases, "Email", Email);
-            EnsureMemberProperty(properties, aliases, "UserName", UserName);
-            EnsureMemberProperty(properties, aliases, "Comments", Comments);
-            EnsureMemberProperty(properties, aliases, "IsApproved", IsApproved);
-            EnsureMemberProperty(properties, aliases, "IsLockedOut", IsLockedOut);
-            EnsureMemberProperty(properties, aliases, "LastLockoutDate", LastLockoutDate);
-            EnsureMemberProperty(properties, aliases, "CreateDate", CreateDate);
-            EnsureMemberProperty(properties, aliases, "LastLoginDate", LastLoginDate);
-            EnsureMemberProperty(properties, aliases, "LastPasswordChangeDate", LastPasswordChangeDate);
+            EnsureMemberProperty(properties, aliases, nameof(IMember.Email), Email);
+            EnsureMemberProperty(properties, aliases, nameof(IMember.Username), UserName);
+            EnsureMemberProperty(properties, aliases, nameof(IMember.Comments), Comments);
+            EnsureMemberProperty(properties, aliases, nameof(IMember.IsApproved), IsApproved);
+            EnsureMemberProperty(properties, aliases, nameof(IMember.IsLockedOut), IsLockedOut);
+            EnsureMemberProperty(properties, aliases, nameof(IMember.LastLockoutDate), LastLockoutDate);
+            EnsureMemberProperty(properties, aliases, nameof(IMember.CreateDate), CreateDate);
+            EnsureMemberProperty(properties, aliases, nameof(IMember.LastLoginDate), LastLoginDate);
+            EnsureMemberProperty(properties, aliases, nameof(IMember.LastPasswordChangeDate), LastPasswordChangeDate);
         }
 
         private void EnsureMemberProperty(List<IPublishedProperty> properties, List<string> aliases, string alias, object value)

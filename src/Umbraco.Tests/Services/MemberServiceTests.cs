@@ -65,33 +65,30 @@ namespace Umbraco.Tests.Services
             // TODO: see TODO in PublishedContentType, this list contains duplicates
 
             var aliases = new[]
-            {
-                "umbracoMemberPasswordRetrievalQuestion",
-                "umbracoMemberPasswordRetrievalAnswer",
-                "umbracoMemberComments",
-                "umbracoMemberFailedPasswordAttempts",
-                "umbracoMemberApproved",
-                "umbracoMemberLockedOut",
-                "umbracoMemberLastLockoutDate",
-                "umbracoMemberLastLogin",
-                "umbracoMemberLastPasswordChangeDate",
-                "Email",
-                "Username",
-                "PasswordQuestion",
-                "Comments",
-                "IsApproved",
-                "IsLockedOut",
-                "LastLockoutDate",
-                "CreateDate",
-                "LastLoginDate",
-                "LastPasswordChangeDate"
+            {                
+                Constants.Conventions.Member.Comments,
+                Constants.Conventions.Member.FailedPasswordAttempts,
+                Constants.Conventions.Member.IsApproved,
+                Constants.Conventions.Member.IsLockedOut,
+                Constants.Conventions.Member.LastLockoutDate,
+                Constants.Conventions.Member.LastLoginDate,
+                Constants.Conventions.Member.LastPasswordChangeDate,
+                nameof(IMember.Email),
+                nameof(IMember.Username),
+                nameof(IMember.Comments),
+                nameof(IMember.IsApproved),
+                nameof(IMember.IsLockedOut),
+                nameof(IMember.LastLockoutDate),
+                nameof(IMember.CreateDate),
+                nameof(IMember.LastLoginDate),
+                nameof(IMember.LastPasswordChangeDate)
             };
 
             var properties = pmember.Properties.ToList();
 
             Assert.IsTrue(properties.Select(x => x.Alias).ContainsAll(aliases));
 
-            var email = properties[aliases.IndexOf("Email")];
+            var email = properties[aliases.IndexOf(nameof(IMember.Email))];
             Assert.AreEqual("xemail", email.GetSourceValue());
         }
 
