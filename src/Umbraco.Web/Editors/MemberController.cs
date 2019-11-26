@@ -612,9 +612,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public HttpResponseMessage DeleteByKey(Guid key)
         {
-            IMember foundMember;
-            MembershipUser foundMembershipUser;
-            foundMember = Services.MemberService.GetByKey(key);
+            var foundMember = Services.MemberService.GetByKey(key);
             if (foundMember == null)
             {
                 return HandleContentNotFound(key, false);
