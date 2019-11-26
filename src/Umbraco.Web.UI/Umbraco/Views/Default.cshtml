@@ -137,7 +137,13 @@
     {
         if (Current.Configs.Settings().BackOffice.ServiceWorker.Domains.Contains(Request.Url.Host))
         {
-
+            <script>
+                if ('serviceWorker' in navigator) {
+                  window.addEventListener('load', function() {
+                      navigator.serviceWorker.register('/umbraco/service-worker.js', {scope:'/'});
+                  });
+                }
+            </script>
         }
     }
 </body>
