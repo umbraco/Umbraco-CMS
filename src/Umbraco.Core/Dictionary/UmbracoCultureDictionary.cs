@@ -5,9 +5,8 @@ using System.Linq;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
 
-namespace Umbraco.Web.Dictionary
+namespace Umbraco.Core.Dictionary
 {
 
     /// <summary>
@@ -18,28 +17,29 @@ namespace Umbraco.Web.Dictionary
     /// The ILocalizationService is the service used for interacting with this data from the database which isn't all that fast
     /// (even though there is caching involved, if there's lots of dictionary items the caching is not great)
     /// </remarks>
-    public class DefaultCultureDictionary : Core.Dictionary.ICultureDictionary
+    public class DefaultCultureDictionary : ICultureDictionary
     {
         private readonly ILocalizationService _localizationService;
         private readonly IAppCache _requestCache;
         private readonly CultureInfo _specificCulture;
 
-        public DefaultCultureDictionary()
-            : this(Current.Services.LocalizationService, Current.AppCaches.RequestCache)
-        { }
-
+        /// <summary>
+        /// Default constructor which will use the current thread's culture
+        /// </summary>
+        /// <param name="localizationService"></param>
+        /// <param name="requestCache"></param>
         public DefaultCultureDictionary(ILocalizationService localizationService, IAppCache requestCache)
         {
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             _requestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
         }
 
-        public DefaultCultureDictionary(CultureInfo specificCulture)
-            : this(Current.Services.LocalizationService, Current.AppCaches.RequestCache)
-        {
-            _specificCulture = specificCulture ?? throw new ArgumentNullException(nameof(specificCulture));
-        }
-
+        /// <summary>
+        /// Constructor for testing to specify a static culture
+        /// </summary>
+        /// <param name="specificCulture"></param>
+        /// <param name="localizationService"></param>
+        /// <param name="requestCache"></param>
         public DefaultCultureDictionary(CultureInfo specificCulture, ILocalizationService localizationService, IAppCache requestCache)
         {
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));

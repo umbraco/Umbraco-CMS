@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Dictionary;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
@@ -18,6 +19,7 @@ namespace Umbraco.Web.Models.Mapping
     internal class ContentMapDefinition : IMapDefinition
     {
         private readonly CommonMapper _commonMapper;
+        private readonly ICultureDictionary _cultureDictionary;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IContentService _contentService;
         private readonly IContentTypeService _contentTypeService;
@@ -32,11 +34,12 @@ namespace Umbraco.Web.Models.Mapping
         private readonly ContentBasicSavedStateMapper<ContentPropertyBasic> _basicStateMapper;
         private readonly ContentVariantMapper _contentVariantMapper;
 
-        public ContentMapDefinition(CommonMapper commonMapper, ILocalizedTextService localizedTextService, IContentService contentService, IContentTypeService contentTypeService,
+        public ContentMapDefinition(CommonMapper commonMapper, ICultureDictionary cultureDictionary, ILocalizedTextService localizedTextService, IContentService contentService, IContentTypeService contentTypeService,
             IFileService fileService, IUmbracoContextAccessor umbracoContextAccessor, IPublishedRouter publishedRouter, ILocalizationService localizationService, ILogger logger,
             IUserService userService)
         {
             _commonMapper = commonMapper;
+            _cultureDictionary = cultureDictionary;
             _localizedTextService = localizedTextService;
             _contentService = contentService;
             _contentTypeService = contentTypeService;
@@ -47,7 +50,7 @@ namespace Umbraco.Web.Models.Mapping
             _logger = logger;
             _userService = userService;
 
-            _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IContent>(localizedTextService);
+            _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IContent>(cultureDictionary, localizedTextService);
             _stateMapper = new ContentSavedStateMapper<ContentPropertyDisplay>();
             _basicStateMapper = new ContentBasicSavedStateMapper<ContentPropertyBasic>();
             _contentVariantMapper = new ContentVariantMapper(_localizationService);
@@ -75,7 +78,7 @@ namespace Umbraco.Web.Models.Mapping
             target.ContentApps = _commonMapper.GetContentApps(source);
             target.ContentTypeId = source.ContentType.Id;
             target.ContentTypeAlias = source.ContentType.Alias;
-            target.ContentTypeName = _localizedTextService.UmbracoDictionaryTranslate(source.ContentType.Name);
+            target.ContentTypeName = _localizedTextService.UmbracoDictionaryTranslate(_cultureDictionary, source.ContentType.Name);
             target.DocumentType = _commonMapper.GetContentType(source, context);
             target.Icon = source.ContentType.Icon;
             target.Id = source.Id;
@@ -231,7 +234,7 @@ namespace Umbraco.Web.Models.Mapping
 
             return contentType.AllowedTemplates
                 .Where(t => t.Alias.IsNullOrWhiteSpace() == false && t.Name.IsNullOrWhiteSpace() == false)
-                .ToDictionary(t => t.Alias, t => _localizedTextService.UmbracoDictionaryTranslate(t.Name));
+                .ToDictionary(t => t.Alias, t => _localizedTextService.UmbracoDictionaryTranslate(_cultureDictionary, t.Name));
         }
 
         private string GetDefaultTemplate(IContent source)

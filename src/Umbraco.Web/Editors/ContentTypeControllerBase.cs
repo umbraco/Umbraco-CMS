@@ -28,16 +28,13 @@ namespace Umbraco.Web.Editors
     public abstract class ContentTypeControllerBase<TContentType> : UmbracoAuthorizedJsonController
         where TContentType : class, IContentTypeComposition
     {
-        private readonly ICultureDictionaryFactory _cultureDictionaryFactory;
-        private ICultureDictionary _cultureDictionary;
-
-        protected ContentTypeControllerBase(ICultureDictionaryFactory cultureDictionaryFactory, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+        protected ContentTypeControllerBase(ICultureDictionary cultureDictionary, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
-            _cultureDictionaryFactory = cultureDictionaryFactory;
+            CultureDictionary = cultureDictionary;
         }
 
-
+        protected ICultureDictionary CultureDictionary { get; }
 
         /// <summary>
         /// Returns the available composite content types for a given content type
@@ -551,9 +548,6 @@ namespace Umbraco.Web.Editors
 
             forDisplay.Errors = ModelState.ToErrorDictionary();
             return new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
-        }
-
-        private ICultureDictionary CultureDictionary
-            => _cultureDictionary ?? (_cultureDictionary = _cultureDictionaryFactory.CreateDictionary());
+        }        
     }
 }

@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -27,6 +28,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
             composition.RegisterUnique<IdkMap>();
 
             // register the services
+            composition.RegisterUnique<IPropertyValidationService, PropertyValidationService>();
             composition.RegisterUnique<IKeyValueService, KeyValueService>();
             composition.RegisterUnique<IPublicAccessService, PublicAccessService>();
             composition.RegisterUnique<IDomainService, DomainService>();

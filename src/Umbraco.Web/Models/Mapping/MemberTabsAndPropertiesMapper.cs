@@ -10,6 +10,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Core.Dictionary;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -26,15 +27,13 @@ namespace Umbraco.Web.Models.Mapping
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IMemberTypeService _memberTypeService;
-        private readonly IMemberService _memberService;
         private readonly IUserService _userService;
 
-        public MemberTabsAndPropertiesMapper(IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService localizedTextService, IMemberService memberService, IUserService userService, IMemberTypeService memberTypeService)
-            : base(localizedTextService)
+        public MemberTabsAndPropertiesMapper(ICultureDictionary cultureDictionary, IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService localizedTextService, IUserService userService, IMemberTypeService memberTypeService)
+            : base(cultureDictionary, localizedTextService)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
-            _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
         }
@@ -123,7 +122,7 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}doctype",
                     Label = _localizedTextService.Localize("content/membertype"),
-                    Value = _localizedTextService.UmbracoDictionaryTranslate(member.ContentType.Name),
+                    Value = _localizedTextService.UmbracoDictionaryTranslate(CultureDictionary, member.ContentType.Name),
                     View = Current.PropertyEditors[Constants.PropertyEditors.Aliases.Label].GetValueEditor().View
                 },
                 GetLoginProperty(_memberTypeService, member, _localizedTextService),

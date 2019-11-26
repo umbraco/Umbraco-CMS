@@ -1,4 +1,6 @@
-﻿using Umbraco.Core.Composing;
+﻿using Umbraco.Core;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Dictionary;
 
 namespace Umbraco.Web.Runtime
 {
@@ -7,5 +9,6 @@ namespace Umbraco.Web.Runtime
     [ComposeAfter(typeof(IUserComposer))]
     [ComposeAfter(typeof(ICoreComposer))]
     public class WebFinalComposer : ComponentComposer<WebFinalComponent>
-    { }
+    {
+    }
 }

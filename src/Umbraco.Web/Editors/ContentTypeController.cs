@@ -52,14 +52,14 @@ namespace Umbraco.Web.Editors
         private readonly IScopeProvider _scopeProvider;
 
         public ContentTypeController(IEntityXmlSerializer serializer,
-            ICultureDictionaryFactory cultureDictionaryFactory,
+            ICultureDictionary cultureDictionary,
             IGlobalSettings globalSettings,
             IUmbracoContextAccessor umbracoContextAccessor,
             ISqlContext sqlContext, PropertyEditorCollection propertyEditors,
             ServiceContext services, AppCaches appCaches,
             IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper,
             IScopeProvider scopeProvider)
-            : base(cultureDictionaryFactory, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _serializer = serializer;
             _propertyEditors = propertyEditors;
@@ -438,8 +438,8 @@ namespace Umbraco.Web.Editors
             var localizedTextService = Services.TextService;
             foreach (var basic in basics)
             {
-                basic.Name = localizedTextService.UmbracoDictionaryTranslate(basic.Name);
-                basic.Description = localizedTextService.UmbracoDictionaryTranslate(basic.Description);
+                basic.Name = localizedTextService.UmbracoDictionaryTranslate(CultureDictionary, basic.Name);
+                basic.Description = localizedTextService.UmbracoDictionaryTranslate(CultureDictionary, basic.Description);
             }
 
             //map the blueprints

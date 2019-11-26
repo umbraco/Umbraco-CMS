@@ -8,7 +8,6 @@ using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Scoping;
@@ -27,17 +26,16 @@ namespace Umbraco.Core.Services.Implement
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly IDocumentBlueprintRepository _documentBlueprintRepository;
         private readonly ILanguageRepository _languageRepository;
+        private readonly Lazy<IPropertyValidationService> _propertyValidationService;
         private IQuery<IContent> _queryNotTrashed;
-        //TODO: The non-lazy object should be injected
-        private readonly Lazy<PropertyValidationService> _propertyValidationService = new Lazy<PropertyValidationService>(() => new PropertyValidationService());
-
-
+        
         #region Constructors
 
         public ContentService(IScopeProvider provider, ILogger logger,
             IEventMessagesFactory eventMessagesFactory,
             IDocumentRepository documentRepository, IEntityRepository entityRepository, IAuditRepository auditRepository,
-            IContentTypeRepository contentTypeRepository, IDocumentBlueprintRepository documentBlueprintRepository, ILanguageRepository languageRepository)
+            IContentTypeRepository contentTypeRepository, IDocumentBlueprintRepository documentBlueprintRepository, ILanguageRepository languageRepository,
+            Lazy<IPropertyValidationService> propertyValidationService)
             : base(provider, logger, eventMessagesFactory)
         {
             _documentRepository = documentRepository;
@@ -46,6 +44,7 @@ namespace Umbraco.Core.Services.Implement
             _contentTypeRepository = contentTypeRepository;
             _documentBlueprintRepository = documentBlueprintRepository;
             _languageRepository = languageRepository;
+            _propertyValidationService = propertyValidationService;
         }
 
         #endregion

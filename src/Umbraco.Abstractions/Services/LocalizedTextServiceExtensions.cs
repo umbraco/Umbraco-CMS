@@ -69,24 +69,7 @@ namespace Umbraco.Core.Services
                 .ToDictionary(keyvals => keyvals.index, keyvals => keyvals.value);
         }
 
-        private static ICultureDictionary _cultureDictionary;
-
-        /// <summary>
-        /// TODO: We need to refactor how we work with ICultureDictionary - this is supposed to be the 'fast' way to
-        /// do readonly access to the Dictionary without using the ILocalizationService. See TODO Notes in `DefaultCultureDictionary`
-        /// Also NOTE that the ICultureDictionary is based on the ILocalizationService not the ILocalizedTextService (which is used
-        /// only for the localization files - not the dictionary)
-        /// </summary>
-        /// <param name="manager"></param>
-        /// <param name="text"></param>
-        /// <returns></returns>
-        internal static string UmbracoDictionaryTranslate(this ILocalizedTextService manager, string text)
-        {
-            var cultureDictionary = CultureDictionary;
-            return manager.UmbracoDictionaryTranslate(text, cultureDictionary);
-        }
-
-        private static string UmbracoDictionaryTranslate(this ILocalizedTextService manager, string text, ICultureDictionary cultureDictionary)
+        public static string UmbracoDictionaryTranslate(this ILocalizedTextService manager, ICultureDictionary cultureDictionary, string text)
         {
             if (text == null)
                 return null;
@@ -105,7 +88,5 @@ namespace Umbraco.Core.Services
             return value.StartsWith("[") ? text : value;
         }
 
-        private static ICultureDictionary CultureDictionary
-            => _cultureDictionary ?? (_cultureDictionary = Current.CultureDictionaryFactory.CreateDictionary());
     }
 }
