@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Web;
+using System.Net;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Umbraco.Core.Collections;
@@ -521,7 +521,7 @@ namespace Umbraco.Core.Packaging
                 {
                     var alias = documentType.Element("Info").Element("Alias").Value;
                     var folders = foldersAttribute.Value.Split('/');
-                    var rootFolder = HttpUtility.UrlDecode(folders[0]);
+                    var rootFolder = WebUtility.UrlDecode(folders[0]);
                     //level 1 = root level folders, there can only be one with the same name
                     var current = _contentTypeService.GetContainers(rootFolder, 1).FirstOrDefault();
 
@@ -541,7 +541,7 @@ namespace Umbraco.Core.Packaging
 
                     for (var i = 1; i < folders.Length; i++)
                     {
-                        var folderName = HttpUtility.UrlDecode(folders[i]);
+                        var folderName = WebUtility.UrlDecode(folders[i]);
                         current = CreateContentTypeChildFolder(folderName, current);
                         importedFolders[alias] = current.Id;
                     }
@@ -927,7 +927,7 @@ namespace Umbraco.Core.Packaging
                 {
                     var name = datatypeElement.Attribute("Name").Value;
                     var folders = foldersAttribute.Value.Split('/');
-                    var rootFolder = HttpUtility.UrlDecode(folders[0]);
+                    var rootFolder = WebUtility.UrlDecode(folders[0]);
                     //there will only be a single result by name for level 1 (root) containers
                     var current = _dataTypeService.GetContainers(rootFolder, 1).FirstOrDefault();
 
@@ -946,7 +946,7 @@ namespace Umbraco.Core.Packaging
 
                     for (var i = 1; i < folders.Length; i++)
                     {
-                        var folderName = HttpUtility.UrlDecode(folders[i]);
+                        var folderName = WebUtility.UrlDecode(folders[i]);
                         current = CreateDataTypeChildFolder(folderName, current);
                         importedFolders[name] = current.Id;
                     }
