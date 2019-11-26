@@ -150,19 +150,19 @@ namespace Umbraco.Web.Runtime
                 .ComposeUmbracoControllers(GetType().Assembly)
                 .SetDefaultRenderMvcController<RenderMvcController>(); // default controller for template views
 
-            composition.WithCollectionBuilder<SearchableTreeCollectionBuilder>()
+            composition.SearchableTrees()
                 .Add(() => composition.TypeLoader.GetTypes<ISearchableTree>());
 
             composition.Register<UmbracoTreeSearcher>(Lifetime.Request);
 
-            composition.WithCollectionBuilder<EditorValidatorCollectionBuilder>()
+            composition.EditorValidators()
                 .Add(() => composition.TypeLoader.GetTypes<IEditorValidator>());
 
-            composition.WithCollectionBuilder<TourFilterCollectionBuilder>();
+            composition.TourFilters();
 
             composition.RegisterUnique<UmbracoFeatures>();
 
-            composition.WithCollectionBuilder<ActionCollectionBuilder>()
+            composition.Actions()
                 .Add(() => composition.TypeLoader.GetTypes<IAction>());
 
             //we need to eagerly scan controller types since they will need to be routed
@@ -177,26 +177,26 @@ namespace Umbraco.Web.Runtime
             // here because there cannot be two converters for one property editor - and we want the full
             // RteMacroRenderingValueConverter that converts macros, etc. So remove TinyMceValueConverter.
             // (the limited one, defined in Core, is there for tests) - same for others
-            composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>()
+            composition.PropertyValueConverters()
                 .Remove<TinyMceValueConverter>()
                 .Remove<TextStringValueConverter>()
                 .Remove<MarkdownEditorValueConverter>();
 
             // add all known factories, devs can then modify this list on application
             // startup either by binding to events or in their own global.asax
-            composition.WithCollectionBuilder<FilteredControllerFactoryCollectionBuilder>()
+            composition.FilteredControllerFactory()
                 .Append<RenderControllerFactory>();
 
-            composition.WithCollectionBuilder<UrlProviderCollectionBuilder>()
+            composition.UrlProviders()
                 .Append<AliasUrlProvider>()
                 .Append<DefaultUrlProvider>();
 
-            composition.WithCollectionBuilder<MediaUrlProviderCollectionBuilder>()
+            composition.MediaUrlProviders()
                 .Append<DefaultMediaUrlProvider>();
 
             composition.RegisterUnique<IContentLastChanceFinder, ContentFinderByConfigured404>();
 
-            composition.WithCollectionBuilder<ContentFinderCollectionBuilder>()
+            composition.ContentFinders()
                 // all built-in finders in the correct order,
                 // devs can then modify this list on application startup
                 .Append<ContentFinderByPageIdQuery>()
@@ -211,7 +211,7 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course
-            composition.WithCollectionBuilder<HealthCheckCollectionBuilder>()
+            composition.HealthChecks()
                 .Add(() => composition.TypeLoader.GetTypes<HealthCheck.HealthCheck>());
 
             composition.WithCollectionBuilder<HealthCheckNotificationMethodCollectionBuilder>()
@@ -231,13 +231,13 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<IPublishedValueFallback, PublishedValueFallback>();
 
             // register known content apps
-            composition.WithCollectionBuilder<ContentAppFactoryCollectionBuilder>()
+            composition.ContentApps()
                 .Append<ListViewContentAppFactory>()
                 .Append<ContentEditorContentAppFactory>()
                 .Append<ContentInfoContentAppFactory>();
 
             // register back office sections in the order we want them rendered
-            composition.WithCollectionBuilder<SectionCollectionBuilder>()
+            composition.Sections()
                 .Append<ContentSection>()
                 .Append<MediaSection>()
                 .Append<SettingsSection>()
@@ -248,18 +248,18 @@ namespace Umbraco.Web.Runtime
                 .Append<TranslationSection>();
 
             // register core CMS dashboards and 3rd party types - will be ordered by weight attribute & merged with package.manifest dashboards
-            composition.WithCollectionBuilder<DashboardCollectionBuilder>()
+            composition.Dashboards()
                 .Add(composition.TypeLoader.GetTypes<IDashboard>());
 
             // register back office trees
             // the collection builder only accepts types inheriting from TreeControllerBase
             // and will filter out those that are not attributed with TreeAttribute
-            composition.WithCollectionBuilder<TreeCollectionBuilder>()
+            composition.Trees()
                 .AddTreeControllers(umbracoApiControllerTypes.Where(x => typeof(TreeControllerBase).IsAssignableFrom(x)));
 
             // register OEmbed providers - no type scanning - all explicit opt-in of adding types
             // note: IEmbedProvider is not IDiscoverable - think about it if going for type scanning
-            composition.WithCollectionBuilder<EmbedProvidersCollectionBuilder>()
+            composition.OEmbedProviders()
                 .Append<YouTube>()
                 .Append<Instagram>()
                 .Append<Twitter>()
