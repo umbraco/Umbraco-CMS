@@ -87,6 +87,33 @@
         }
 
 
+        var removeAllEntries = function () {
+            localizationService.localizeMany(["content_nestedContentDeleteAllItems", "general_delete"]).then(function (data) {
+                overlayService.confirmDelete({
+                    title: data[1],
+                    content: data[0],
+                    close: function () {
+                        overlayService.close();
+                    },
+                    submit: function () {
+                        vm.nodes = [];
+                        setDirty();
+                        updateModel();
+                        overlayService.close();
+                    }
+                });
+            });
+        }
+
+        var removeAllEntriesAction = {
+            labelKey: 'clipboard_labelForRemoveAllEntries',
+            labelTokens: [],
+            icon: 'trash',
+            method: removeAllEntries,
+            isDisabled: true
+        }
+
+
 
         // helper to force the current form into the dirty state
         function setDirty() {
@@ -535,12 +562,14 @@
 
         function updatePropertyActionStates() {
             copyAllEntriesAction.isDisabled = !model.value || model.value.length === 0;
+            removeAllEntriesAction.isDisabled = model.value.length === 0;
         }
 
 
         
         var propertyActions = [
-            copyAllEntriesAction
+            copyAllEntriesAction,
+            removeAllEntriesAction
         ];
         
         this.$onInit = function () {
