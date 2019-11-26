@@ -208,8 +208,6 @@ namespace Umbraco.Core.Composing
 
         public static IIOHelper IOHelper => new IOHelper();
 
-        public static IUmbracoVersion UmbracoVersion
-            => Factory.GetInstance<IUmbracoVersion>();
 
         public static IHostingEnvironment HostingEnvironment => Factory.GetInstance<IHostingEnvironment>();
         public static IBackOfficeInfo BackOfficeInfo => Factory.GetInstance<IBackOfficeInfo>();

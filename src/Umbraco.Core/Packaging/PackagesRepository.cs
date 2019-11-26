@@ -80,7 +80,7 @@ namespace Umbraco.Core.Packaging
             _packagesFolderPath = packagesFolderPath ?? Constants.SystemDirectories.Packages;
             _mediaFolderPath = mediaFolderPath ?? Current.Configs.Global().UmbracoMediaPath + "/created-packages";
 
-            _parser = new PackageDefinitionXmlParser(logger);
+            _parser = new PackageDefinitionXmlParser(logger, umbracoVersion);
             _umbracoVersion = umbracoVersion;
         }
 

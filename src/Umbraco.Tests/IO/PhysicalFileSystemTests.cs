@@ -2,8 +2,10 @@
 using System.IO;
 using System.Text;
 using System.Threading;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Tests.TestHelpers;
 
 
@@ -14,8 +16,7 @@ namespace Umbraco.Tests.IO
     public class PhysicalFileSystemTests : AbstractFileSystemTests
     {
         public PhysicalFileSystemTests()
-            : base(new PhysicalFileSystem(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileSysTests"),
-                "/Media/", TestHelper.IOHelper))
+            : base(new PhysicalFileSystem(TestHelper.IOHelper, Mock.Of<ILogger>(), Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileSysTests"), "/Media/"))
         { }
 
         [SetUp]

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.IO
 {
@@ -12,16 +13,18 @@ namespace Umbraco.Core.IO
 
         private readonly Func<bool> _isScoped;
         private readonly IFileSystem _innerFileSystem;
-        private readonly IIOHelper _ioHelper;
         private readonly string _shadowPath;
         private ShadowFileSystem _shadowFileSystem;
         private string _shadowDir;
+        private readonly IIOHelper _ioHelper;
+        private readonly ILogger _logger;
 
-        public ShadowWrapper(IFileSystem innerFileSystem, string shadowPath, IIOHelper ioHelper, Func<bool> isScoped = null)
+        public ShadowWrapper(IFileSystem innerFileSystem, IIOHelper ioHelper, ILogger logger, string shadowPath, Func<bool> isScoped = null)
         {
             _innerFileSystem = innerFileSystem;
+            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _shadowPath = shadowPath;
-            _ioHelper = ioHelper;
             _isScoped = isScoped;
         }
 
@@ -60,7 +63,7 @@ namespace Umbraco.Core.IO
             var virt = ShadowFsPath + "/" + id + "/" + _shadowPath;
             _shadowDir = _ioHelper.MapPath(virt);
             Directory.CreateDirectory(_shadowDir);
-            var tempfs = new PhysicalFileSystem(virt, _ioHelper);
+            var tempfs = new PhysicalFileSystem(_ioHelper, _logger, virt);
             _shadowFileSystem = new ShadowFileSystem(_innerFileSystem, tempfs);
         }
 

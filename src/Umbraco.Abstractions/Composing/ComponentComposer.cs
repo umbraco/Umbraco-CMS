@@ -1,5 +1,4 @@
-﻿using Umbraco.Core.Compose;
-
+﻿
 namespace Umbraco.Core.Composing
 {
     /// <summary>

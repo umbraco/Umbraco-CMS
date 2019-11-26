@@ -21,7 +21,7 @@ namespace Umbraco.Core.IO
             return _viewFileSystem.FileExists(ViewPath(t.Alias));
         }
 
-        internal string GetFileContents(ITemplate t)
+        public string GetFileContents(ITemplate t)
         {
             var viewContent = "";
             var path = ViewPath(t.Alias);

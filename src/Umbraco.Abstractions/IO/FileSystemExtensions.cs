@@ -55,7 +55,7 @@ namespace Umbraco.Core.IO
         }
 
         // TODO: Currently this is the only way to do this
-        internal static void CreateFolder(this IFileSystem fs, string folderPath)
+        public static void CreateFolder(this IFileSystem fs, string folderPath)
         {
             var path = fs.GetRelativePath(folderPath);
             var tempFile = Path.Combine(path, Guid.NewGuid().ToString("N") + ".tmp");

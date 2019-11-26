@@ -70,7 +70,7 @@ namespace Umbraco.Core.Models.Packaging
         /// The minimum umbraco version that this package requires
         /// </summary>
         [DataMember(Name = "umbracoVersion")]
-        public Version UmbracoVersion { get; set; } = Current.UmbracoVersion.Current;
+        public Version UmbracoVersion { get; set; }
 
         [DataMember(Name = "author")]
         [Required]

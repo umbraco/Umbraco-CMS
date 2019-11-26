@@ -226,9 +226,9 @@ namespace Umbraco.Web.Composing
         public static IVariationContextAccessor VariationContextAccessor => CoreCurrent.VariationContextAccessor;
 
         public static IIOHelper IOHelper => CoreCurrent.IOHelper;
-        public static IUmbracoVersion UmbracoVersion => CoreCurrent.UmbracoVersion;
         public static IHostingEnvironment HostingEnvironment => CoreCurrent.HostingEnvironment;
         public static IIpResolver IpResolver => Factory.GetInstance<IIpResolver>();
+        public static IUmbracoVersion UmbracoVersion => Factory.GetInstance<IUmbracoVersion>();
 
         #endregion
     }
