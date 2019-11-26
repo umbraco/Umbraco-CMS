@@ -562,6 +562,7 @@
 
         function updatePropertyActionStates() {
             copyAllEntriesAction.isDisabled = !model.value || model.value.length === 0;
+            removeAllEntriesAction.isDisabled = $scope.model.value.length === 0;
         }
 
 
