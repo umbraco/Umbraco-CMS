@@ -2,7 +2,7 @@
 
     <umb-load-indicator ng-if="!vm.inited"></umb-load-indicator>
 
-    <ng-form name="nestedContentForm">
+    <ng-form name="nestedContentForm" ng-show="vm.inited">
 
         <div class="umb-nested-content__items" ng-hide="vm.nodes.length === 0" ui-sortable="vm.sortableOptions" ng-model="vm.nodes">
 
@@ -16,7 +16,7 @@
                         <a class="umb-nested-content__icon umb-nested-content__icon--copy" title="{{copyIconTitle}}" ng-click="vm.clickCopy($event, node);" ng-if="vm.showCopy" prevent-default>
                             <i class="icon icon-documents"></i>
                         </a>
-                        <a class="umb-nested-content__icon umb-nested-content__icon--delete" localize="title" title="general_delete" ng-click="vm.requestDeleteNode($index); $event.stopPropagation();" prevent-default>
+                        <a class="umb-nested-content__icon umb-nested-content__icon--delete" localize="title" title="general_delete" ng-class="{ 'umb-nested-content__icon--disabled': !vm.canDeleteNode($index) }" ng-click="vm.requestDeleteNode($index); $event.stopPropagation();" prevent-default>
                             <i class="icon icon-trash"></i>
                         </a>
                     </div>
@@ -37,7 +37,7 @@
         </div>
 
         <div class="umb-nested-content__footer-bar" ng-hide="vm.hasContentTypes === false">
-            <button class="btn-reset umb-nested-content__add-content umb-focus" ng-class="{ '--disabled': (!vm.scaffolds.length || vm.nodes.length >= maxItems) }" ng-click="vm.openNodeTypePicker($event)" prevent-default>
+            <button class="btn-reset umb-nested-content__add-content umb-focus" ng-class="{ '--disabled': (!vm.scaffolds.length || vm.nodes.length >= vm.maxItems) }" ng-click="vm.openNodeTypePicker($event)" prevent-default>
                 <localize key="grid_addElement"></localize>
             </button>
         </div>

@@ -41,7 +41,7 @@
         if (vm.maxItems === 0)
             vm.maxItems = 1000;
 
-        vm.singleMode = vm.minItems === 1 && vm.maxItems === 1;
+        vm.singleMode = vm.minItems === 1 && vm.maxItems === 1 && model.config.contentTypes.length === 1;;
         vm.showIcons = Object.toBoolean(model.config.showIcons);
         vm.wideMode = Object.toBoolean(model.config.hideLabel);
         vm.hasContentTypes = model.config.contentTypes.length > 0;
@@ -129,6 +129,7 @@
 
             setCurrentNode(newNode);
             setDirty();
+            validate();
         };
 
         vm.openNodeTypePicker = function ($event) {
@@ -232,12 +233,22 @@
             }
         };
 
+        vm.canDeleteNode = function (idx) {
+            return (vm.nodes.length > vm.minItems)
+                ? true
+                : model.config.contentTypes.length > 1;
+        }
+
         function deleteNode(idx) {
             vm.nodes.splice(idx, 1);
             setDirty();
             updateModel();
+            validate();
         };
         vm.requestDeleteNode = function (idx) {
+            if (!vm.canDeleteNode(idx)) {
+                return;
+            }
             if (model.config.confirmDeletes === true) {
                 localizationService.localizeMany(["content_nestedContentDeleteItem", "general_delete", "general_cancel", "contentTypeEditor_yesDelete"]).then(function (data) {
                     const overlay = {
@@ -466,8 +477,8 @@
                     }
                 }
 
-                // Auto-fill with elementTypes, but only if we have one type to choose from, and if this property is empty.
-                if (vm.singleMode === true && vm.nodes.length === 0 && model.config.minItems > 0) {
+                // Enforce min items if we only have one scaffold type
+                if (vm.nodes.length < vm.minItems && vm.scaffolds.length === 1) {
                     for (var i = vm.nodes.length; i < model.config.minItems; i++) {
                         addNode(vm.scaffolds[0].contentTypeAlias);
                     }
@@ -477,6 +488,8 @@
                 if (vm.singleMode || (vm.nodes.length === 1 && vm.maxItems === 1)) {
                     setCurrentNode(vm.nodes[0]);
                 }
+
+                validate();
 
                 vm.inited = true;
 
@@ -582,25 +595,28 @@
             updateModel();
         });
 
+        var validate = function () {
+            if (vm.nodes.length < vm.minItems) {
+                $scope.nestedContentForm.minCount.$setValidity("minCount", false);
+            }
+            else {
+                $scope.nestedContentForm.minCount.$setValidity("minCount", true);
+            }
+
+            if (vm.nodes.length > vm.maxItems) {
+                $scope.nestedContentForm.maxCount.$setValidity("maxCount", false);
+            }
+            else {
+                $scope.nestedContentForm.maxCount.$setValidity("maxCount", true);
+            }
+        }
+
         var watcher = $scope.$watch(
             function () {
                 return vm.nodes.length;
             },
             function () {
-                //Validate!
-                if (vm.nodes.length < vm.minItems) {
-                    $scope.nestedContentForm.minCount.$setValidity("minCount", false);
-                }
-                else {
-                    $scope.nestedContentForm.minCount.$setValidity("minCount", true);
-                }
-
-                if (vm.nodes.length > vm.maxItems) {
-                    $scope.nestedContentForm.maxCount.$setValidity("maxCount", false);
-                }
-                else {
-                    $scope.nestedContentForm.maxCount.$setValidity("maxCount", true);
-                }
+                validate();
             }
         );
 
