@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Net.Http;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Services
@@ -94,20 +90,6 @@ namespace Umbraco.Core.Services
         /// <param name="memberType">MemberType the Member should be based on</param>
         /// <returns><see cref="IMember"/></returns>
         IMember CreateMemberWithIdentity(string username, string email, string name, IMemberType memberType);
-
-        /// <summary>
-        /// This is simply a helper method which essentially just wraps the MembershipProvider's ChangePassword method which can be
-        /// used during Member creation.
-        /// </summary>
-        /// <remarks>This method exists so that Umbraco developers can use one entry point to create/update
-        /// this will not work for updating members in most cases (depends on your membership provider settings)
-        ///
-        /// It is preferred to use the membership APIs for working with passwords, in the near future this method will be obsoleted
-        /// and the ASP.NET Identity APIs should be used instead.
-        /// </remarks>
-        /// <param name="member">The Member to save the password for</param>
-        /// <param name="password">The password to encrypt and save</param>
-        void SavePassword(IMember member, string password);
 
         /// <summary>
         /// Gets the count of Members by an optional MemberType alias

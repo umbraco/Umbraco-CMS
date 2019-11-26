@@ -15,7 +15,7 @@ namespace Umbraco.Core.Services.Changes
 
         public TItem Item { get; }
 
-        public ContentTypeChangeTypes ChangeTypes { get; internal set; }
+        public ContentTypeChangeTypes ChangeTypes { get; set; }
 
         public EventArgs ToEventArgs(ContentTypeChange<TItem> change)
         {

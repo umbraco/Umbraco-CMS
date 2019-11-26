@@ -6,8 +6,8 @@ using System.Web.Security;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Security;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Tests.Membership
 {
@@ -18,7 +18,7 @@ namespace Umbraco.Tests.Membership
         [Test]
         public void Change_Password_Without_AllowManuallyChangingPassword_And_No_Pass_Validation()
         {
-            var providerMock = new Mock<MembershipProviderBase>(TestHelper.GetHostingEnvironment()) { CallBase = true };
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
             providerMock.Setup(@base => @base.AllowManuallyChangingPassword).Returns(false);
             var provider = providerMock.Object;
 
@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Membership
         [Test]
         public void Change_Password_With_AllowManuallyChangingPassword_And_Invalid_Creds()
         {
-            var providerMock = new Mock<MembershipProviderBase>(TestHelper.GetHostingEnvironment()) { CallBase = true };
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
             providerMock.Setup(@base => @base.AllowManuallyChangingPassword).Returns(false);
             providerMock.Setup(@base => @base.ValidateUser("test", "test")).Returns(false);
             var provider = providerMock.Object;
@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Membership
         [Test]
         public void ChangePasswordQuestionAndAnswer_Without_RequiresQuestionAndAnswer()
         {
-            var providerMock = new Mock<MembershipProviderBase>(TestHelper.GetHostingEnvironment()) { CallBase = true };
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
             providerMock.Setup(@base => @base.RequiresQuestionAndAnswer).Returns(false);
             var provider = providerMock.Object;
 
@@ -50,7 +50,7 @@ namespace Umbraco.Tests.Membership
         [Test]
         public void ChangePasswordQuestionAndAnswer_Without_AllowManuallyChangingPassword_And_Invalid_Creds()
         {
-            var providerMock = new Mock<MembershipProviderBase>(TestHelper.GetHostingEnvironment()) { CallBase = true };
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
             providerMock.Setup(@base => @base.RequiresQuestionAndAnswer).Returns(true);
             providerMock.Setup(@base => @base.AllowManuallyChangingPassword).Returns(false);
             providerMock.Setup(@base => @base.ValidateUser("test", "test")).Returns(false);
@@ -62,7 +62,7 @@ namespace Umbraco.Tests.Membership
         [Test]
         public void CreateUser_Not_Whitespace()
         {
-            var providerMock = new Mock<MembershipProviderBase>(TestHelper.GetHostingEnvironment()) {CallBase = true};
+            var providerMock = new Mock<MembershipProviderBase>() {CallBase = true};
             var provider = providerMock.Object;
 
             MembershipCreateStatus status;
@@ -75,7 +75,7 @@ namespace Umbraco.Tests.Membership
         [Test]
         public void CreateUser_Invalid_Question()
         {
-            var providerMock = new Mock<MembershipProviderBase>(TestHelper.GetHostingEnvironment()) { CallBase = true };
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
             providerMock.Setup(@base => @base.RequiresQuestionAndAnswer).Returns(true);
             var provider = providerMock.Object;
 
@@ -89,7 +89,7 @@ namespace Umbraco.Tests.Membership
         [Test]
         public void CreateUser_Invalid_Answer()
         {
-            var providerMock = new Mock<MembershipProviderBase>(TestHelper.GetHostingEnvironment()) { CallBase = true };
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
             providerMock.Setup(@base => @base.RequiresQuestionAndAnswer).Returns(true);
             var provider = providerMock.Object;
 
@@ -103,7 +103,7 @@ namespace Umbraco.Tests.Membership
         [Test]
         public void GetPassword_Without_EnablePasswordRetrieval()
         {
-            var providerMock = new Mock<MembershipProviderBase>(TestHelper.GetHostingEnvironment()) { CallBase = true };
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
             providerMock.Setup(@base => @base.EnablePasswordRetrieval).Returns(false);
             var provider = providerMock.Object;
 
@@ -113,7 +113,7 @@ namespace Umbraco.Tests.Membership
         [Test]
         public void GetPassword_With_Hashed()
         {
-            var providerMock = new Mock<MembershipProviderBase>(TestHelper.GetHostingEnvironment()) { CallBase = true };
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
             providerMock.Setup(@base => @base.EnablePasswordRetrieval).Returns(true);
             providerMock.Setup(@base => @base.PasswordFormat).Returns(MembershipPasswordFormat.Hashed);
             var provider = providerMock.Object;
@@ -128,7 +128,7 @@ namespace Umbraco.Tests.Membership
         [Ignore("makes no sense?")]
         public void ResetPassword_Without_EnablePasswordReset()
         {
-            var providerMock = new Mock<MembershipProviderBase>(TestHelper.GetHostingEnvironment()) { CallBase = true };
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
             providerMock.Setup(@base => @base.EnablePasswordReset).Returns(false);
             var provider = providerMock.Object;
 
@@ -138,12 +138,12 @@ namespace Umbraco.Tests.Membership
         [Test]
         public void Sets_Defaults()
         {
-            var providerMock = new Mock<MembershipProviderBase>(TestHelper.GetHostingEnvironment()) { CallBase = true };
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
             var provider = providerMock.Object;
             provider.Initialize("test", new NameValueCollection());
 
             Assert.AreEqual("test", provider.Name);
-            Assert.AreEqual(MembershipProviderBase.GetDefaultAppName(TestHelper.GetHostingEnvironment()), provider.ApplicationName);
+            Assert.AreEqual(MembershipProviderBase.GetDefaultAppName(), provider.ApplicationName);
             Assert.AreEqual(false, provider.EnablePasswordRetrieval);
             Assert.AreEqual(true, provider.EnablePasswordReset);
             Assert.AreEqual(false, provider.RequiresQuestionAndAnswer);
@@ -160,7 +160,7 @@ namespace Umbraco.Tests.Membership
         [Test]
         public void Throws_Exception_With_Hashed_Password_And_Password_Retrieval()
         {
-            var providerMock = new Mock<MembershipProviderBase>(TestHelper.GetHostingEnvironment()) { CallBase = true };
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
             var provider = providerMock.Object;
 
             Assert.Throws<ProviderException>(() => provider.Initialize("test", new NameValueCollection()
@@ -189,223 +189,9 @@ namespace Umbraco.Tests.Membership
             Assert.AreEqual(pass, result.Success);
         }
 
-        /// <summary>
-        /// The salt generated is always the same length
-        /// </summary>
-        [Test]
-        public void Check_Salt_Length()
-        {
-            var lastLength = 0;
-            for (var i = 0; i < 10000; i++)
-            {
-                var result = MembershipProviderBase.GenerateSalt();
+        
 
-                if (i > 0)
-                {
-                    Assert.AreEqual(lastLength, result.Length);
-                }
-
-                lastLength = result.Length;
-            }
-        }
-
-        [Test]
-        public void Get_Stored_Password_Hashed()
-        {
-            var providerMock = new Mock<MembershipProviderBase>(TestHelper.GetHostingEnvironment()) { CallBase = true };
-            var provider = providerMock.Object;
-            provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Hashed" }, { "hashAlgorithmType", "HMACSHA256" } });
-
-            var salt = MembershipProviderBase.GenerateSalt();
-            var stored = salt + "ThisIsAHashedPassword";
-
-            string initSalt;
-            var result = provider.StoredPassword(stored, out initSalt);
-
-            Assert.AreEqual("ThisIsAHashedPassword", result);
-        }
-
-        [Test]
-        public void Get_Stored_Password_Encrypted()
-        {
-            var providerMock = new Mock<MembershipProviderBase>(TestHelper.GetHostingEnvironment()) { CallBase = true };
-            var provider = providerMock.Object;
-            provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Encrypted" } });
-
-            var stored = "ThisIsAnEncryptedPassword";
-
-            string initSalt;
-            var result = provider.StoredPassword(stored, out initSalt);
-
-            Assert.AreEqual("ThisIsAnEncryptedPassword", result);
-        }
-
-        [Test]
-        public void Get_Stored_Password_Clear()
-        {
-            var providerMock = new Mock<MembershipProviderBase>(TestHelper.GetHostingEnvironment()) { CallBase = true };
-            var provider = providerMock.Object;
-            provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Clear" } });
-
-            var salt = MembershipProviderBase.GenerateSalt();
-            var stored = "ThisIsAClearPassword";
-
-            string initSalt;
-            var result = provider.StoredPassword(stored, out initSalt);
-
-            Assert.AreEqual("ThisIsAClearPassword", result);
-        }
-
-        [Test]
-        public void Format_Pass_For_Storage_Hashed()
-        {
-            var providerMock = new Mock<MembershipProviderBase>(TestHelper.GetHostingEnvironment()) { CallBase = true };
-            var provider = providerMock.Object;
-            provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Hashed" }, { "hashAlgorithmType", "HMACSHA256" } });
-
-            var salt = MembershipProviderBase.GenerateSalt();
-            var stored = "ThisIsAHashedPassword";
-
-            var result = provider.FormatPasswordForStorage(stored, salt);
-
-            Assert.AreEqual(salt + "ThisIsAHashedPassword", result);
-        }
-
-        [Test]
-        public void Format_Pass_For_Storage_Encrypted()
-        {
-            var providerMock = new Mock<MembershipProviderBase>(TestHelper.GetHostingEnvironment()) { CallBase = true };
-            var provider = providerMock.Object;
-            provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Encrypted" } });
-
-            var salt = MembershipProviderBase.GenerateSalt();
-            var stored = "ThisIsAnEncryptedPassword";
-
-            var result = provider.FormatPasswordForStorage(stored, salt);
-
-            Assert.AreEqual("ThisIsAnEncryptedPassword", result);
-        }
-
-        [Test]
-        public void Format_Pass_For_Storage_Clear()
-        {
-            var providerMock = new Mock<MembershipProviderBase>(TestHelper.GetHostingEnvironment()) { CallBase = true };
-            var provider = providerMock.Object;
-            provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Clear" } });
-
-            var salt = MembershipProviderBase.GenerateSalt();
-            var stored = "ThisIsAClearPassword";
-
-            var result = provider.FormatPasswordForStorage(stored, salt);
-
-            Assert.AreEqual("ThisIsAClearPassword", result);
-        }
-
-        [Test]
-        public void Check_Password_Hashed_KeyedHashAlgorithm()
-        {
-            var providerMock = new Mock<MembershipProviderBase>(TestHelper.GetHostingEnvironment()) { CallBase = true };
-            var provider = providerMock.Object;
-            provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Hashed" }, { "hashAlgorithmType", "HMACSHA256" } });
-
-            string salt;
-            var pass = "ThisIsAHashedPassword";
-            var hashed = provider.EncryptOrHashNewPassword(pass, out salt);
-            var storedPassword = provider.FormatPasswordForStorage(hashed, salt);
-
-            var result = provider.CheckPassword("ThisIsAHashedPassword", storedPassword);
-
-            Assert.IsTrue(result);
-        }
-
-        [Test]
-        public void Check_Password_Hashed_Non_KeyedHashAlgorithm()
-        {
-            var providerMock = new Mock<MembershipProviderBase>(TestHelper.GetHostingEnvironment()) { CallBase = true };
-            var provider = providerMock.Object;
-            provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Hashed" } });
-
-            string salt;
-            var pass = "ThisIsAHashedPassword";
-            var hashed = provider.EncryptOrHashNewPassword(pass, out salt);
-            var storedPassword = provider.FormatPasswordForStorage(hashed, salt);
-
-            var result = provider.CheckPassword("ThisIsAHashedPassword", storedPassword);
-
-            Assert.IsTrue(result);
-        }
-
-        [Test]
-        public void Check_Password_Encrypted()
-        {
-            var providerMock = new Mock<MembershipProviderBase>(TestHelper.GetHostingEnvironment()) { CallBase = true };
-            var provider = providerMock.Object;
-            provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Encrypted" } });
-
-            string salt;
-            var pass = "ThisIsAnEncryptedPassword";
-            var encrypted = provider.EncryptOrHashNewPassword(pass, out salt);
-
-            var result = provider.CheckPassword("ThisIsAnEncryptedPassword", encrypted);
-
-            Assert.IsTrue(result);
-        }
-
-        [Test]
-        public void Check_Password_Clear()
-        {
-            var providerMock = new Mock<MembershipProviderBase>(TestHelper.GetHostingEnvironment()) { CallBase = true };
-            var provider = providerMock.Object;
-            provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Clear" } });
-
-            var pass = "ThisIsAClearPassword";
-
-            var result = provider.CheckPassword("ThisIsAClearPassword", pass);
-
-            Assert.IsTrue(result);
-        }
-
-        [Test]
-        public void Can_Decrypt_Password()
-        {
-            var providerMock = new Mock<MembershipProviderBase>(TestHelper.GetHostingEnvironment()) { CallBase = true };
-            var provider = providerMock.Object;
-            provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Encrypted" } });
-
-            string salt;
-            var pass = "ThisIsAnEncryptedPassword";
-            var encrypted = provider.EncryptOrHashNewPassword(pass, out salt);
-
-            var result = provider.DecryptPassword(encrypted);
-
-            Assert.AreEqual(pass, result);
-
-        }
-
-        [Test]
-        public void Get_Hash_Algorithm_Legacy()
-        {
-            var providerMock = new Mock<MembershipProviderBase>(TestHelper.GetHostingEnvironment()) { CallBase = true };
-            var provider = providerMock.Object;
-            provider.Initialize("test", new NameValueCollection { {"useLegacyEncoding", "true"}, { "passwordFormat", "Hashed" }, { "hashAlgorithmType", "HMACSHA256" } });
-
-            var alg = provider.GetHashAlgorithm("blah");
-
-            Assert.IsTrue(alg is HMACSHA1);
-        }
-
-        [Test]
-        public void Get_Hash_Algorithm()
-        {
-            var providerMock = new Mock<MembershipProviderBase>(TestHelper.GetHostingEnvironment()) { CallBase = true };
-            var provider = providerMock.Object;
-            provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Hashed" }, { "hashAlgorithmType", "HMACSHA256" } });
-
-            var alg = provider.GetHashAlgorithm("blah");
-
-            Assert.IsTrue(alg is HMACSHA256);
-        }
-
+       
 
     }
 }

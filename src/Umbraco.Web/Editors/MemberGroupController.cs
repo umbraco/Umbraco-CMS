@@ -10,6 +10,7 @@ using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Security;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 
@@ -22,8 +23,6 @@ namespace Umbraco.Web.Editors
     [UmbracoTreeAuthorize(Constants.Trees.MemberGroups)]
     public class MemberGroupController : UmbracoAuthorizedJsonController
     {
-        private readonly MembershipProvider _provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-
         public MemberGroupDisplay GetById(int id)
         {
             var memberGroup = Services.MemberGroupService.GetById(id);
@@ -38,13 +37,8 @@ namespace Umbraco.Web.Editors
 
         public IEnumerable<MemberGroupDisplay> GetByIds([FromUri]int[] ids)
         {
-            if (_provider.IsUmbracoMembershipProvider())
-            {
-                return Services.MemberGroupService.GetByIds(ids)
+            return Services.MemberGroupService.GetByIds(ids)
                     .Select(Mapper.Map<IMemberGroup, MemberGroupDisplay>);
-            }
-
-            return Enumerable.Empty<MemberGroupDisplay>();
         }
 
         [HttpDelete]
@@ -63,13 +57,8 @@ namespace Umbraco.Web.Editors
 
         public IEnumerable<MemberGroupDisplay> GetAllGroups()
         {
-            if (_provider.IsUmbracoMembershipProvider())
-            {
-                return Services.MemberGroupService.GetAll()
+            return Services.MemberGroupService.GetAll()
                     .Select(Mapper.Map<IMemberGroup, MemberGroupDisplay>);
-            }
-
-            return Enumerable.Empty<MemberGroupDisplay>();
         }
 
         public MemberGroupDisplay GetEmpty()

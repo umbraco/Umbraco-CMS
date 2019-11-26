@@ -25,10 +25,26 @@ namespace Umbraco.Core.Configuration
             configs.Add<IUmbracoSettingsSection>("umbracoConfiguration/settings");
             configs.Add<IHealthChecks>("umbracoConfiguration/HealthChecks");
 
+            configs.Add<IUserPasswordConfiguration>(() => new DefaultUserPasswordConfig());
             configs.Add<ICoreDebug>(() => new CoreDebug());
             configs.Add<IConnectionStrings>(() => new ConnectionStrings());
             configs.AddCoreConfigs(_ioHelper);
             return configs;
         }
+    }
+
+    // Default/static user password configs
+    // TODO: Make this configurable somewhere - we've removed membership providers, so could be a section in the umbracosettings.config file?
+    // keeping in mind that we will also be removing the members membership provider so there will be 2x the same/similar configuration
+    internal class DefaultUserPasswordConfig : IUserPasswordConfiguration
+    {
+        public int RequiredLength => 12;
+        public bool RequireNonLetterOrDigit => false;
+        public bool RequireDigit => false;
+        public bool RequireLowercase => false;
+        public bool RequireUppercase => false;
+        public bool UseLegacyEncoding => false;
+        public string HashAlgorithmType => "HMACSHA256";
+        public int MaxFailedAccessAttemptsBeforeLockout => 5;
     }
 }

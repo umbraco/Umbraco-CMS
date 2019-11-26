@@ -1,8 +1,9 @@
 ﻿using System.Text;
 using System.Web.Security;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.Security;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Web.Security
 {
     /// <summary>
     /// A base membership provider class for umbraco providers
@@ -13,6 +14,7 @@ namespace Umbraco.Core.Security
         {
         }
 
+        public abstract PasswordSecurity PasswordSecurity { get; }
         public abstract string DefaultMemberTypeAlias { get; }
 
         /// <summary>

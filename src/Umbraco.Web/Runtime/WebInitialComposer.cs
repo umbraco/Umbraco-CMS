@@ -21,7 +21,6 @@ using Umbraco.Web.Cache;
 using Umbraco.Web.Composing.CompositionExtensions;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Dashboards;
-using Umbraco.Web.Dictionary;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
@@ -70,7 +69,7 @@ namespace Umbraco.Web.Runtime
             composition.ComposeInstaller();
 
             // register membership stuff
-            composition.Register(factory => Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider());
+            composition.Register(factory => MembershipProviderExtensions.GetMembersMembershipProvider());
             composition.Register(factory => Roles.Enabled ? Roles.Provider : new MembersRoleProvider(factory.GetInstance<IMemberService>()));
             composition.Register<MembershipHelper>(Lifetime.Request);
             composition.Register<IPublishedMemberCache>(factory => factory.GetInstance<UmbracoContext>().PublishedSnapshot.Members);
@@ -206,8 +205,6 @@ namespace Umbraco.Web.Runtime
                 .Append<ContentFinderByRedirectUrl>();
 
             composition.RegisterUnique<ISiteDomainHelper, SiteDomainHelper>();
-
-            composition.RegisterUnique<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course
             composition.WithCollectionBuilder<HealthCheckCollectionBuilder>()

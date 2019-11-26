@@ -9,6 +9,7 @@ using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Composing;
+using System;
 
 namespace Umbraco.Web.Security.Providers
 {
@@ -31,8 +32,6 @@ namespace Umbraco.Web.Security.Providers
             CommentPropertyTypeAlias = Constants.Conventions.Member.Comments;
             LastLoginPropertyTypeAlias = Constants.Conventions.Member.LastLoginDate;
             LastPasswordChangedPropertyTypeAlias = Constants.Conventions.Member.LastPasswordChangeDate;
-            PasswordRetrievalQuestionPropertyTypeAlias = Constants.Conventions.Member.PasswordQuestion;
-            PasswordRetrievalAnswerPropertyTypeAlias = Constants.Conventions.Member.PasswordAnswer;
             _memberTypeService = memberTypeService;
         }
 
@@ -40,13 +39,12 @@ namespace Umbraco.Web.Security.Providers
         private string _defaultMemberTypeAlias = "Member";
         private volatile bool _hasDefaultMember;
         private static readonly object Locker = new object();
-        private bool _providerKeyAsGuid;
 
         public override string ProviderName => "MembersMembershipProvider";
 
         protected override MembershipUser ConvertToMembershipUser(IMember entity)
         {
-            return entity.AsConcreteMembershipUser(Name, _providerKeyAsGuid);
+            return entity.AsConcreteMembershipUser(Name);
         }
 
         public string LockPropertyTypeAlias { get; }
@@ -56,8 +54,6 @@ namespace Umbraco.Web.Security.Providers
         public string CommentPropertyTypeAlias { get; }
         public string LastLoginPropertyTypeAlias { get; }
         public string LastPasswordChangedPropertyTypeAlias { get; }
-        public string PasswordRetrievalQuestionPropertyTypeAlias { get; }
-        public string PasswordRetrievalAnswerPropertyTypeAlias { get; }
 
         public override void Initialize(string name, NameValueCollection config)
         {
@@ -74,14 +70,17 @@ namespace Umbraco.Web.Security.Providers
                 _hasDefaultMember = true;
             }
 
-            //devs can configure the provider user key to be a guid if they want, by default it is int
-            if (config["providerKeyType"] != null)
-            {
-                if (config["providerKeyType"] == "guid")
-                {
-                    _providerKeyAsGuid = true;
-                }
-            }
+            // these need to be lazy else we get a stack overflow since we cannot access Membership.HashAlgorithmType without initializing the providers
+
+            _passwordConfig = new Lazy<IPasswordConfiguration>(() => new MembershipProviderPasswordConfiguration(
+                    MinRequiredPasswordLength,
+                    MinRequiredNonAlphanumericCharacters > 0,
+                    false, false, false, UseLegacyEncoding,
+                    CustomHashAlgorithmType.IsNullOrWhiteSpace() ? Membership.HashAlgorithmType : CustomHashAlgorithmType,
+                    MaxInvalidPasswordAttempts));
+
+            _passwordSecurity = new Lazy<PasswordSecurity>(() => new PasswordSecurity(PasswordConfiguration));
+
         }
 
         protected override Attempt<string> GetRawPassword(string username)
@@ -112,6 +111,43 @@ namespace Umbraco.Web.Security.Providers
                 }
                 return _defaultMemberTypeAlias;
             }
+        }
+
+        private Lazy<PasswordSecurity> _passwordSecurity;
+        private Lazy<IPasswordConfiguration> _passwordConfig;
+
+        public override PasswordSecurity PasswordSecurity => _passwordSecurity.Value;
+        public IPasswordConfiguration PasswordConfiguration => _passwordConfig.Value;
+
+        private class MembershipProviderPasswordConfiguration : IPasswordConfiguration
+        {
+            public MembershipProviderPasswordConfiguration(int requiredLength, bool requireNonLetterOrDigit, bool requireDigit, bool requireLowercase, bool requireUppercase, bool useLegacyEncoding, string hashAlgorithmType, int maxFailedAccessAttemptsBeforeLockout)
+            {
+                RequiredLength = requiredLength;
+                RequireNonLetterOrDigit = requireNonLetterOrDigit;
+                RequireDigit = requireDigit;
+                RequireLowercase = requireLowercase;
+                RequireUppercase = requireUppercase;
+                UseLegacyEncoding = useLegacyEncoding;
+                HashAlgorithmType = hashAlgorithmType ?? throw new ArgumentNullException(nameof(hashAlgorithmType));
+                MaxFailedAccessAttemptsBeforeLockout = maxFailedAccessAttemptsBeforeLockout;
+            }
+
+            public int RequiredLength { get; }
+
+            public bool RequireNonLetterOrDigit { get; }
+
+            public bool RequireDigit { get; }
+
+            public bool RequireLowercase { get; }
+
+            public bool RequireUppercase { get; }
+
+            public bool UseLegacyEncoding { get; }
+
+            public string HashAlgorithmType { get; }
+
+            public int MaxFailedAccessAttemptsBeforeLockout { get; }
         }
     }
 }

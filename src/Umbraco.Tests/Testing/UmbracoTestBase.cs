@@ -44,6 +44,7 @@ using Umbraco.Web.Hosting;
 using Umbraco.Web.Sections;
 using Current = Umbraco.Core.Composing.Current;
 using FileSystems = Umbraco.Core.IO.FileSystems;
+using Umbraco.Core.Dictionary;
 
 namespace Umbraco.Tests.Testing
 {
@@ -136,7 +137,7 @@ namespace Umbraco.Tests.Testing
             // get/merge the attributes marking the method and/or the classes
             Options = TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
 
-            // FIXME: align to runtimes & components - don't redo everything here
+            // FIXME: align to runtimes & components - don't redo everything here !!!! Yes this is getting painful
 
             var (logger, profiler) = GetLoggers(Options.Logger);
             var proflogger = new ProfilingLogger(logger, profiler);
@@ -245,7 +246,8 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique<IContentLastChanceFinder, TestLastChanceFinder>();
             Composition.RegisterUnique<IVariationContextAccessor, TestVariationContextAccessor>();
             Composition.RegisterUnique<IPublishedSnapshotAccessor, TestPublishedSnapshotAccessor>();
-
+            Composition.SetCultureDictionaryFactory<DefaultCultureDictionaryFactory>();
+            Composition.Register(f => f.GetInstance<ICultureDictionaryFactory>().CreateDictionary(), Lifetime.Singleton);
             // register back office sections in the order we want them rendered
             Composition.WithCollectionBuilder<SectionCollectionBuilder>().Append<ContentSection>()
                 .Append<MediaSection>()
@@ -334,6 +336,7 @@ namespace Umbraco.Tests.Testing
         {
             Composition.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
             Composition.Configs.Add(SettingsForTests.GetDefaultGlobalSettings);
+            //Composition.Configs.Add<IUserPasswordConfiguration>(() => new DefaultUserPasswordConfig());
         }
 
         protected virtual void ComposeApplication(bool withApplication)

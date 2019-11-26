@@ -74,16 +74,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 .ToDictionary(x => x.Alias, x => new[] { new PropertyData { Value = x.GetValue(), Culture = string.Empty, Segment = string.Empty } }, StringComparer.OrdinalIgnoreCase);
 
             // see also PublishedContentType
-            AddIf(contentType, properties, "Email", member.Email);
-            AddIf(contentType, properties, "Username", member.Username);
-            AddIf(contentType, properties, "PasswordQuestion", member.PasswordQuestion);
-            AddIf(contentType, properties, "Comments", member.Comments);
-            AddIf(contentType, properties, "IsApproved", member.IsApproved);
-            AddIf(contentType, properties, "IsLockedOut", member.IsLockedOut);
-            AddIf(contentType, properties, "LastLockoutDate", member.LastLockoutDate);
-            AddIf(contentType, properties, "CreateDate", member.CreateDate);
-            AddIf(contentType, properties, "LastLoginDate", member.LastLoginDate);
-            AddIf(contentType, properties, "LastPasswordChangeDate", member.LastPasswordChangeDate);
+            AddIf(contentType, properties, nameof(IMember.Email), member.Email);
+            AddIf(contentType, properties, nameof(IMember.Username), member.Username);
+            AddIf(contentType, properties, nameof(IMember.Comments), member.Comments);
+            AddIf(contentType, properties, nameof(IMember.IsApproved), member.IsApproved);
+            AddIf(contentType, properties, nameof(IMember.IsLockedOut), member.IsLockedOut);
+            AddIf(contentType, properties, nameof(IMember.LastLockoutDate), member.LastLockoutDate);
+            AddIf(contentType, properties, nameof(IMember.CreateDate), member.CreateDate);
+            AddIf(contentType, properties, nameof(IMember.LastLoginDate), member.LastLoginDate);
+            AddIf(contentType, properties, nameof(IMember.LastPasswordChangeDate), member.LastPasswordChangeDate);
 
             return properties;
         }
@@ -102,8 +101,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public string Email => _member.Email;
 
         public string UserName => _member.Username;
-
-        public string PasswordQuestion => _member.PasswordQuestion;
 
         public string Comments => _member.Comments;
 

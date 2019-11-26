@@ -22,6 +22,7 @@ using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
+using Umbraco.Web.Security.Providers;
 using Umbraco.Web.WebApi;
 using Current = Umbraco.Web.Composing.Current;
 
@@ -70,7 +71,7 @@ namespace Umbraco.Tests.Testing.TestingTests
                 Mock.Of<ICultureDictionaryFactory>(),
                 Mock.Of<IUmbracoComponentRenderer>(),
                 Mock.Of<IPublishedContentQuery>(),
-                new MembershipHelper(umbracoContext.HttpContext, Mock.Of<IPublishedMemberCache>(), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), AppCaches.Disabled, Mock.Of<ILogger>()));
+                new MembershipHelper(umbracoContext.HttpContext, Mock.Of<IPublishedMemberCache>(), Mock.Of<MembersMembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), AppCaches.Disabled, Mock.Of<ILogger>()));
             Assert.Pass();
         }
 
@@ -98,12 +99,15 @@ namespace Umbraco.Tests.Testing.TestingTests
         {
             var umbracoContext = TestObjects.GetUmbracoContextMock();
 
-            var membershipHelper = new MembershipHelper(umbracoContext.HttpContext, Mock.Of<IPublishedMemberCache>(), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), AppCaches.Disabled, Mock.Of<ILogger>());
+            var logger = Mock.Of<IProfilingLogger>();
+            var memberService = Mock.Of<IMemberService>();
+            var memberTypeService = Mock.Of<IMemberTypeService>();
+            var membershipProvider = new MembersMembershipProvider(memberService, memberTypeService, Mock.Of<IUmbracoVersion>());
+            var membershipHelper = new MembershipHelper(umbracoContext.HttpContext, Mock.Of<IPublishedMemberCache>(), membershipProvider, Mock.Of<RoleProvider>(), memberService, memberTypeService, Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), AppCaches.Disabled, logger);
             var umbracoHelper = new UmbracoHelper(Mock.Of<IPublishedContent>(), Mock.Of<ITagQuery>(), Mock.Of<ICultureDictionaryFactory>(), Mock.Of<IUmbracoComponentRenderer>(), Mock.Of<IPublishedContentQuery>(), membershipHelper);
             var umbracoMapper = new UmbracoMapper(new MapDefinitionCollection(new[] { Mock.Of<IMapDefinition>() }));
-            
-            // ReSharper disable once UnusedVariable
-            var umbracoApiController = new FakeUmbracoApiController(Mock.Of<IGlobalSettings>(), Mock.Of<IUmbracoContextAccessor>(), Mock.Of<ISqlContext>(), ServiceContext.CreatePartial(), AppCaches.NoCache, Mock.Of<IProfilingLogger>(), Mock.Of<IRuntimeState>(), umbracoHelper, umbracoMapper);
+
+            var umbracoApiController = new FakeUmbracoApiController(Mock.Of<IGlobalSettings>(), Mock.Of<IUmbracoContextAccessor>(), Mock.Of<ISqlContext>(), ServiceContext.CreatePartial(), AppCaches.NoCache, logger, Mock.Of<IRuntimeState>(), umbracoHelper, umbracoMapper);
 
             Assert.Pass();
         }

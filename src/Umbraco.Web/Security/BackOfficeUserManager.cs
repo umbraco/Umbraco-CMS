@@ -24,21 +24,16 @@ namespace Umbraco.Web.Security
     {
         public const string OwinMarkerKey = "Umbraco.Web.Security.Identity.BackOfficeUserManagerMarker";
 
-        public BackOfficeUserManager(IIpResolver ipResolver, IUserStore<BackOfficeIdentityUser, int> store)
-            : base(ipResolver, store)
-        {
-        }
-
         public BackOfficeUserManager(
-            IIpResolver ipResolver,
             IUserStore<BackOfficeIdentityUser, int> store,
-            IdentityFactoryOptions<BackOfficeUserManager> options,
-            MembershipProviderBase membershipProvider,
-            IContentSection contentSectionConfig)
-            : base(ipResolver, store)
+            IdentityFactoryOptions<BackOfficeUserManager> options, 
+            IContentSection contentSectionConfig,
+            IPasswordConfiguration passwordConfiguration,
+            IPasswordGenerator passwordGenerator)
+            : base(store, passwordConfiguration, passwordGenerator)
         {
             if (options == null) throw new ArgumentNullException("options");
-            InitUserManager(this, membershipProvider, contentSectionConfig, options);
+            InitUserManager(this, passwordConfiguration, options.DataProtectionProvider, contentSectionConfig);            
         }
 
         #region Static Create methods
@@ -48,76 +43,53 @@ namespace Umbraco.Web.Security
         /// </summary>
         /// <param name="options"></param>
         /// <param name="userService"></param>
-        /// <param name="memberTypeService"></param>
         /// <param name="entityService"></param>
         /// <param name="externalLoginService"></param>
-        /// <param name="membershipProvider"></param>
-        /// <param name="mapper"></param>
+        /// <param name="passwordConfiguration"></param>
         /// <param name="contentSectionConfig"></param>
         /// <param name="globalSettings"></param>
-        /// <param name="ipResolver"></param>
         /// <returns></returns>
         public static BackOfficeUserManager Create(
             IdentityFactoryOptions<BackOfficeUserManager> options,
             IUserService userService,
-            IMemberTypeService memberTypeService,
             IEntityService entityService,
-            IExternalLoginService externalLoginService,
-            MembershipProviderBase membershipProvider,
+            IExternalLoginService externalLoginService,            
             UmbracoMapper mapper,
             IContentSection contentSectionConfig,
             IGlobalSettings globalSettings,
-            IIpResolver ipResolver)
+            IPasswordConfiguration passwordConfiguration,
+            IPasswordGenerator passwordGenerator)
         {
             if (options == null) throw new ArgumentNullException("options");
             if (userService == null) throw new ArgumentNullException("userService");
-            if (memberTypeService == null) throw new ArgumentNullException("memberTypeService");
             if (externalLoginService == null) throw new ArgumentNullException("externalLoginService");
 
-            var manager = new BackOfficeUserManager(ipResolver,
-                new BackOfficeUserStore(userService, memberTypeService, entityService, externalLoginService, globalSettings, membershipProvider, mapper));
-            manager.InitUserManager(manager, membershipProvider, contentSectionConfig, options);
+            var store = new BackOfficeUserStore(userService, entityService, externalLoginService, globalSettings, mapper);
+            var manager = new BackOfficeUserManager(store, options, contentSectionConfig, passwordConfiguration, passwordGenerator);
             return manager;
         }
 
         /// <summary>
         /// Creates a BackOfficeUserManager instance with all default options and a custom BackOfficeUserManager instance
         /// </summary>
-        /// <param name="ipResolver"></param>
         /// <param name="options"></param>
         /// <param name="customUserStore"></param>
-        /// <param name="membershipProvider"></param>
+        /// <param name="passwordConfiguration"></param>
         /// <param name="contentSectionConfig"></param>
         /// <returns></returns>
         public static BackOfficeUserManager Create(
-            IIpResolver ipResolver,
             IdentityFactoryOptions<BackOfficeUserManager> options,
-            BackOfficeUserStore customUserStore,
-            MembershipProviderBase membershipProvider,
-            IContentSection contentSectionConfig)
+            BackOfficeUserStore customUserStore,            
+            IContentSection contentSectionConfig,
+            IPasswordConfiguration passwordConfiguration,
+            IPasswordGenerator passwordGenerator)
         {
-            var manager = new BackOfficeUserManager(ipResolver, customUserStore, options, membershipProvider, contentSectionConfig);
+            var manager = new BackOfficeUserManager(customUserStore, options, contentSectionConfig, passwordConfiguration, passwordGenerator);
             return manager;
         }
         #endregion
 
-        /// <summary>
-        /// Initializes the user manager with the correct options
-        /// </summary>
-        /// <param name="manager"></param>
-        /// <param name="membershipProvider"></param>
-        /// <param name="contentSectionConfig"></param>
-        /// <param name="options"></param>
-        /// <returns></returns>
-        protected void InitUserManager(
-            BackOfficeUserManager manager,
-            MembershipProviderBase membershipProvider,
-            IContentSection contentSectionConfig,
-            IdentityFactoryOptions<BackOfficeUserManager> options)
-        {
-            //NOTE: This method is mostly here for backwards compat
-            base.InitUserManager(manager, membershipProvider, options.DataProtectionProvider, contentSectionConfig);
-        }
+        
     }
 
     /// <summary>
@@ -126,12 +98,13 @@ namespace Umbraco.Web.Security
     public class BackOfficeUserManager<T> : UserManager<T, int>
         where T : BackOfficeIdentityUser
     {
-        private readonly IIpResolver _ipResolver;
-
-        public BackOfficeUserManager(IIpResolver ipResolver, IUserStore<T, int> store)
+        public BackOfficeUserManager(IUserStore<T, int> store,
+            IPasswordConfiguration passwordConfiguration,
+            IPasswordGenerator passwordGenerator)
             : base(store)
         {
-            _ipResolver = ipResolver;
+            PasswordConfiguration = passwordConfiguration;
+            PasswordGenerator = passwordGenerator;
         }
 
         #region What we support do not currently
@@ -171,19 +144,35 @@ namespace Umbraco.Web.Security
             return userIdentity;
         }
 
+        ///// <summary>
+        ///// Initializes the user manager with the correct options
+        ///// </summary>
+        ///// <param name="manager"></param>
+        ///// <param name="passwordConfig"></param>
+        ///// <param name="contentSectionConfig"></param>
+        ///// <param name="options"></param>
+        ///// <returns></returns>
+        //protected void InitUserManager(
+        //    BackOfficeUserManager manager,
+        //    IPasswordConfiguration passwordConfig,
+        //    IContentSection contentSectionConfig,
+        //    IdentityFactoryOptions<BackOfficeUserManager> options)
+        //{
+        //    //NOTE: This method is mostly here for backwards compat
+        //    base.InitUserManager(manager, passwordConfig, options.DataProtectionProvider, contentSectionConfig);
+        //}
+
         /// <summary>
         /// Initializes the user manager with the correct options
         /// </summary>
         /// <param name="manager"></param>
-        /// <param name="membershipProvider">
-        /// The <see cref="MembershipProviderBase"/> for the users called UsersMembershipProvider
-        /// </param>
+        /// <param name="passwordConfig"></param>
         /// <param name="dataProtectionProvider"></param>
         /// <param name="contentSectionConfig"></param>
         /// <returns></returns>
         protected void InitUserManager(
             BackOfficeUserManager<T> manager,
-            MembershipProviderBase membershipProvider,
+            IPasswordConfiguration passwordConfig,
             IDataProtectionProvider dataProtectionProvider,
             IContentSection contentSectionConfig)
         {
@@ -195,10 +184,10 @@ namespace Umbraco.Web.Security
             };
 
             // Configure validation logic for passwords
-            manager.PasswordValidator = new MembershipProviderPasswordValidator(membershipProvider);
+            manager.PasswordValidator = new ConfiguredPasswordValidator(passwordConfig);
 
             //use a custom hasher based on our membership provider
-            manager.PasswordHasher = GetDefaultPasswordHasher(membershipProvider);
+            manager.PasswordHasher = GetDefaultPasswordHasher(passwordConfig);
 
             if (dataProtectionProvider != null)
             {
@@ -209,7 +198,7 @@ namespace Umbraco.Web.Security
             }
 
             manager.UserLockoutEnabledByDefault = true;
-            manager.MaxFailedAccessAttemptsBeforeLockout = membershipProvider.MaxInvalidPasswordAttempts;
+            manager.MaxFailedAccessAttemptsBeforeLockout = passwordConfig.MaxFailedAccessAttemptsBeforeLockout;
             //NOTE: This just needs to be in the future, we currently don't support a lockout timespan, it's either they are locked
             // or they are not locked, but this determines what is set on the account lockout date which corresponds to whether they are
             // locked out or not.
@@ -259,66 +248,26 @@ namespace Umbraco.Web.Security
         /// This will determine which password hasher to use based on what is defined in config
         /// </summary>
         /// <returns></returns>
-        protected virtual IPasswordHasher GetDefaultPasswordHasher(MembershipProviderBase provider)
+        protected virtual IPasswordHasher GetDefaultPasswordHasher(IPasswordConfiguration passwordConfiguration)
         {
-            //if the current user membership provider is unknown (this would be rare), then return the default password hasher
-            if (provider.IsUmbracoUsersProvider() == false)
-                return new PasswordHasher();
-
-            //if the configured provider has legacy features enabled, then return the membership provider password hasher
-            if (provider.AllowManuallyChangingPassword || provider.DefaultUseLegacyEncoding)
-                return new MembershipProviderPasswordHasher(provider);
-
             //we can use the user aware password hasher (which will be the default and preferred way)
-            return new UserAwareMembershipProviderPasswordHasher(provider);
+            return new UserAwarePasswordHasher(new PasswordSecurity(passwordConfiguration));
         }
 
         /// <summary>
         /// Gets/sets the default back office user password checker
         /// </summary>
         public IBackOfficeUserPasswordChecker BackOfficeUserPasswordChecker { get; set; }
+        public IPasswordConfiguration PasswordConfiguration { get; }
+        public IPasswordGenerator PasswordGenerator { get; }
 
         /// <summary>
         /// Helper method to generate a password for a user based on the current password validator
         /// </summary>
         /// <returns></returns>
         public string GeneratePassword()
-        {
-            var passwordValidator = PasswordValidator as PasswordValidator;
-
-            if (passwordValidator == null)
-            {
-                var membershipPasswordHasher = PasswordHasher as IMembershipProviderPasswordHasher;
-
-                //get the real password validator, this should not be null but in some very rare cases it could be, in which case
-                //we need to create a default password validator to use since we have no idea what it actually is or what it's rules are
-                //this is an Edge Case!
-                passwordValidator = PasswordValidator as PasswordValidator
-                                    ?? (membershipPasswordHasher != null
-                                        ? new MembershipProviderPasswordValidator(membershipPasswordHasher.MembershipProvider)
-                                        : new PasswordValidator());
-            }
-
-            var password = Membership.GeneratePassword(
-                passwordValidator.RequiredLength,
-                passwordValidator.RequireNonLetterOrDigit ? 2 : 0);
-
-            var random = new Random();
-
-            var passwordChars = password.ToCharArray();
-
-            if (passwordValidator.RequireDigit && passwordChars.ContainsAny(Enumerable.Range(48, 58).Select(x => (char)x)))
-                password += Convert.ToChar(random.Next(48, 58));  // 0-9
-
-            if (passwordValidator.RequireLowercase && passwordChars.ContainsAny(Enumerable.Range(97, 123).Select(x => (char)x)))
-                password += Convert.ToChar(random.Next(97, 123));  // a-z
-
-            if (passwordValidator.RequireUppercase && passwordChars.ContainsAny(Enumerable.Range(65, 91).Select(x => (char)x)))
-                password += Convert.ToChar(random.Next(65, 91));  // A-Z
-
-            if (passwordValidator.RequireNonLetterOrDigit && passwordChars.ContainsAny(Enumerable.Range(33, 48).Select(x => (char)x)))
-                password += Convert.ToChar(random.Next(33, 48));  // symbols !"#$%&'()*+,-./
-
+        {            
+            var password = PasswordGenerator.GeneratePassword(PasswordConfiguration);
             return password;
         }
 
@@ -581,63 +530,63 @@ namespace Umbraco.Web.Security
 
         internal void RaiseAccountLockedEvent(int userId)
         {
-            OnAccountLocked(new IdentityAuditEventArgs(AuditEvent.AccountLocked, _ipResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
+            OnAccountLocked(new IdentityAuditEventArgs(AuditEvent.AccountLocked, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseAccountUnlockedEvent(int userId)
         {
-            OnAccountUnlocked(new IdentityAuditEventArgs(AuditEvent.AccountUnlocked, _ipResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
+            OnAccountUnlocked(new IdentityAuditEventArgs(AuditEvent.AccountUnlocked, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseForgotPasswordRequestedEvent(int userId)
         {
-            OnForgotPasswordRequested(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordRequested, _ipResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
+            OnForgotPasswordRequested(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordRequested, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseForgotPasswordChangedSuccessEvent(int userId)
         {
-            OnForgotPasswordChangedSuccess(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordChangedSuccess, _ipResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
+            OnForgotPasswordChangedSuccess(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordChangedSuccess, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseLoginFailedEvent(int userId)
         {
-            OnLoginFailed(new IdentityAuditEventArgs(AuditEvent.LoginFailed, _ipResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
+            OnLoginFailed(new IdentityAuditEventArgs(AuditEvent.LoginFailed, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseInvalidLoginAttemptEvent(string username)
         {
-            OnLoginFailed(new IdentityAuditEventArgs(AuditEvent.LoginFailed, _ipResolver.GetCurrentRequestIpAddress(), username, string.Format("Attempted login for username '{0}' failed", username)));
+            OnLoginFailed(new IdentityAuditEventArgs(AuditEvent.LoginFailed, GetCurrentRequestIpAddress(), username, string.Format("Attempted login for username '{0}' failed", username)));
         }
 
         internal void RaiseLoginRequiresVerificationEvent(int userId)
         {
-            OnLoginRequiresVerification(new IdentityAuditEventArgs(AuditEvent.LoginRequiresVerification, _ipResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
+            OnLoginRequiresVerification(new IdentityAuditEventArgs(AuditEvent.LoginRequiresVerification, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseLoginSuccessEvent(int userId)
         {
-            OnLoginSuccess(new IdentityAuditEventArgs(AuditEvent.LoginSucces, _ipResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
+            OnLoginSuccess(new IdentityAuditEventArgs(AuditEvent.LoginSucces, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseLogoutSuccessEvent(int userId)
         {
-            OnLogoutSuccess(new IdentityAuditEventArgs(AuditEvent.LogoutSuccess, _ipResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
+            OnLogoutSuccess(new IdentityAuditEventArgs(AuditEvent.LogoutSuccess, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaisePasswordChangedEvent(int userId)
         {
-            OnPasswordChanged(new IdentityAuditEventArgs(AuditEvent.PasswordChanged, _ipResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
+            OnPasswordChanged(new IdentityAuditEventArgs(AuditEvent.PasswordChanged, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         // TODO: I don't think this is required anymore since from 7.7 we no longer display the reset password checkbox since that didn't make sense.
         internal void RaisePasswordResetEvent(int userId)
         {
-            OnPasswordReset(new IdentityAuditEventArgs(AuditEvent.PasswordReset, _ipResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
+            OnPasswordReset(new IdentityAuditEventArgs(AuditEvent.PasswordReset, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseResetAccessFailedCountEvent(int userId)
         {
-            OnResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.ResetAccessFailedCount, _ipResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
+            OnResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.ResetAccessFailedCount, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         public static event EventHandler AccountLocked;
@@ -705,6 +654,17 @@ namespace Umbraco.Web.Security
         protected virtual void OnResetAccessFailedCount(IdentityAuditEventArgs e)
         {
             if (ResetAccessFailedCount != null) ResetAccessFailedCount(this, e);
+        }
+
+        /// <summary>
+        /// Returns the current request IP address for logging if there is one
+        /// </summary>
+        /// <returns></returns>
+        protected virtual string GetCurrentRequestIpAddress()
+        {
+            // TODO: inject a service to get this value, we should not be relying on the old HttpContext.Current especially in the ASP.NET Identity world.
+            var httpContext = HttpContext.Current == null ? (HttpContextBase)null : new HttpContextWrapper(HttpContext.Current);
+            return httpContext.GetCurrentRequestIpAddress();
         }
 
     }

@@ -6,6 +6,7 @@ using System.Web.Http;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Dictionary;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
@@ -26,9 +27,12 @@ namespace Umbraco.Web.Editors
     [JsonDateTimeFormatAttribute]
     public abstract class ContentControllerBase : BackOfficeNotificationsController
     {
-        protected ContentControllerBase(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+        protected ICultureDictionary CultureDictionary { get; }
+
+        protected ContentControllerBase(ICultureDictionary cultureDictionary, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
+            CultureDictionary = cultureDictionary;
         }
 
         protected HttpResponseMessage HandleContentNotFound(object id, bool throwException = true)

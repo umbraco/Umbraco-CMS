@@ -1,23 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Security;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Composing;
-using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Security
 {
+
     /// <summary>
     /// A utility class used for dealing with USER security in Umbraco
     /// </summary>

@@ -10,6 +10,9 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Core.Dictionary;
+using Umbraco.Web.Security;
+using Umbraco.Web.Security.Providers;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -26,15 +29,13 @@ namespace Umbraco.Web.Models.Mapping
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IMemberTypeService _memberTypeService;
-        private readonly IMemberService _memberService;
         private readonly IUserService _userService;
 
-        public MemberTabsAndPropertiesMapper(IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService localizedTextService, IMemberService memberService, IUserService userService, IMemberTypeService memberTypeService)
-            : base(localizedTextService)
+        public MemberTabsAndPropertiesMapper(ICultureDictionary cultureDictionary, IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService localizedTextService, IUserService userService, IMemberTypeService memberTypeService)
+            : base(cultureDictionary, localizedTextService)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
-            _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
         }
@@ -43,7 +44,7 @@ namespace Umbraco.Web.Models.Mapping
         /// <remarks>Overridden to deal with custom member properties and permissions.</remarks>
         public override IEnumerable<Tab<ContentPropertyDisplay>> Map(IMember source, MapperContext context)
         {
-            var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
 
             var memberType = _memberTypeService.Get(source.ContentTypeId);
 
@@ -54,29 +55,16 @@ namespace Umbraco.Web.Models.Mapping
 
             var resolved = base.Map(source, context);
 
-            if (provider.IsUmbracoMembershipProvider() == false)
-            {
-                // it's a generic provider so update the locked out property based on our known constant alias
-                var isLockedOutProperty = resolved.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == Constants.Conventions.Member.IsLockedOut);
-                if (isLockedOutProperty?.Value != null && isLockedOutProperty.Value.ToString() != "1")
-                {
-                    isLockedOutProperty.View = "readonlyvalue";
-                    isLockedOutProperty.Value = _localizedTextService.Localize("general/no");
-                }
-            }
-            else
-            {
-                var umbracoProvider = (IUmbracoMemberTypeMembershipProvider)provider;
+            var umbracoProvider = (IUmbracoMemberTypeMembershipProvider)provider;
 
-                // This is kind of a hack because a developer is supposed to be allowed to set their property editor - would have been much easier
-                // if we just had all of the membership provider fields on the member table :(
-                // TODO: But is there a way to map the IMember.IsLockedOut to the property ? i dunno.
-                var isLockedOutProperty = resolved.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == umbracoProvider.LockPropertyTypeAlias);
-                if (isLockedOutProperty?.Value != null && isLockedOutProperty.Value.ToString() != "1")
-                {
-                    isLockedOutProperty.View = "readonlyvalue";
-                    isLockedOutProperty.Value = _localizedTextService.Localize("general/no");
-                }
+            // This is kind of a hack because a developer is supposed to be allowed to set their property editor - would have been much easier
+            // if we just had all of the membership provider fields on the member table :(
+            // TODO: But is there a way to map the IMember.IsLockedOut to the property ? i dunno.
+            var isLockedOutProperty = resolved.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == umbracoProvider.LockPropertyTypeAlias);
+            if (isLockedOutProperty?.Value != null && isLockedOutProperty.Value.ToString() != "1")
+            {
+                isLockedOutProperty.View = "readonlyvalue";
+                isLockedOutProperty.Value = _localizedTextService.Localize("general/no");
             }
 
             var umbracoContext = _umbracoContextAccessor.UmbracoContext;
@@ -108,7 +96,7 @@ namespace Umbraco.Web.Models.Mapping
         protected override IEnumerable<ContentPropertyDisplay> GetCustomGenericProperties(IContentBase content)
         {
             var member = (IMember)content;
-            var membersProvider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+            var membersProvider = MembershipProviderExtensions.GetMembersMembershipProvider();
 
             var genericProperties = new List<ContentPropertyDisplay>
             {
@@ -123,7 +111,7 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}doctype",
                     Label = _localizedTextService.Localize("content/membertype"),
-                    Value = _localizedTextService.UmbracoDictionaryTranslate(member.ContentType.Name),
+                    Value = _localizedTextService.UmbracoDictionaryTranslate(CultureDictionary, member.ContentType.Name),
                     View = Current.PropertyEditors[Constants.PropertyEditors.Aliases.Label].GetValueEditor().View
                 },
                 GetLoginProperty(_memberTypeService, member, _localizedTextService),
@@ -150,11 +138,7 @@ namespace Umbraco.Web.Models.Mapping
                     // TODO: Hard coding this because the changepassword doesn't necessarily need to be a resolvable (real) property editor
                     View = "changepassword",
                     // initialize the dictionary with the configuration from the default membership provider
-                    Config = new Dictionary<string, object>(membersProvider.GetConfiguration(_userService))
-                    {
-                        // the password change toggle will only be displayed if there is already a password assigned.
-                        {"hasPassword", member.RawPasswordValue.IsNullOrWhiteSpace() == false}
-                    }
+                    Config = GetPasswordConfig(membersProvider, member)
                 },
                 new ContentPropertyDisplay
                 {
@@ -167,6 +151,20 @@ namespace Umbraco.Web.Models.Mapping
             };
 
             return genericProperties;
+        }
+
+        private Dictionary<string, object> GetPasswordConfig(MembersMembershipProvider membersProvider, IMember member)
+        {
+            var result = new Dictionary<string, object>(membersProvider.PasswordConfiguration.GetConfiguration())
+                {
+                    // the password change toggle will only be displayed if there is already a password assigned.
+                    {"hasPassword", member.RawPasswordValue.IsNullOrWhiteSpace() == false}
+                };
+
+            result["enableReset"] = membersProvider.CanResetPassword(_userService);
+            result["allowManuallyChangingPassword"] = membersProvider.AllowManuallyChangingPassword;
+
+            return result;
         }
 
         /// <summary>
@@ -227,18 +225,8 @@ namespace Umbraco.Web.Models.Mapping
                 Value = member.Username
             };
 
-            var scenario = memberTypeService.GetMembershipScenario();
-
-            // only allow editing if this is a new member, or if the membership provider is the Umbraco one
-            if (member.HasIdentity == false || scenario == MembershipScenario.NativeUmbraco)
-            {
-                prop.View = "textbox";
-                prop.Validation.Mandatory = true;
-            }
-            else
-            {
-                prop.View = "readonlyvalue";
-            }
+            prop.View = "textbox";
+            prop.Validation.Mandatory = true;
             return prop;
         }
 

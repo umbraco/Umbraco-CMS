@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Membership
         {
             var memberTypeServiceMock = new Mock<IMemberTypeService>();
             memberTypeServiceMock.Setup(x => x.GetDefault()).Returns("Blah");
-            var provider = new MembersMembershipProvider(Mock.Of<IMembershipMemberService>(), memberTypeServiceMock.Object, UmbracoVersion, HostingEnvironment, IpResolver);
+            var provider = new MembersMembershipProvider(Mock.Of<IMembershipMemberService>(), memberTypeServiceMock.Object, TestHelper.GetUmbracoVersion());
             provider.Initialize("test", new NameValueCollection());
 
             Assert.AreEqual("Blah", provider.DefaultMemberTypeAlias);
@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Membership
         {
             var memberTypeServiceMock = new Mock<IMemberTypeService>();
             memberTypeServiceMock.Setup(x => x.GetDefault()).Returns("Blah");
-            var provider = new MembersMembershipProvider(Mock.Of<IMembershipMemberService>(), memberTypeServiceMock.Object, UmbracoVersion, HostingEnvironment, IpResolver);
+            var provider = new MembersMembershipProvider(Mock.Of<IMembershipMemberService>(), memberTypeServiceMock.Object, TestHelper.GetUmbracoVersion());
             provider.Initialize("test", new NameValueCollection { { "defaultMemberTypeAlias", "Hello" } });
 
             Assert.AreEqual("Hello", provider.DefaultMemberTypeAlias);
@@ -48,7 +48,7 @@ namespace Umbraco.Tests.Membership
             var membershipServiceMock = new Mock<IMembershipMemberService>();
             membershipServiceMock.Setup(service => service.Exists("test")).Returns(true);
 
-            var provider = new MembersMembershipProvider(membershipServiceMock.Object, memberTypeServiceMock.Object, UmbracoVersion, HostingEnvironment, IpResolver);
+            var provider = new MembersMembershipProvider(membershipServiceMock.Object, memberTypeServiceMock.Object, TestHelper.GetUmbracoVersion());
             provider.Initialize("test", new NameValueCollection());
 
             MembershipCreateStatus status;
@@ -65,7 +65,7 @@ namespace Umbraco.Tests.Membership
             var membershipServiceMock = new Mock<IMembershipMemberService>();
             membershipServiceMock.Setup(service => service.GetByEmail("test@test.com")).Returns(() => new Member("test", MockedContentTypes.CreateSimpleMemberType()));
 
-            var provider = new MembersMembershipProvider(membershipServiceMock.Object, memberTypeServiceMock.Object, UmbracoVersion, HostingEnvironment, IpResolver);
+            var provider = new MembersMembershipProvider(membershipServiceMock.Object, memberTypeServiceMock.Object, TestHelper.GetUmbracoVersion());
             provider.Initialize("test", new NameValueCollection { { "requiresUniqueEmail", "true" } });
 
             MembershipCreateStatus status;
@@ -73,73 +73,7 @@ namespace Umbraco.Tests.Membership
 
             Assert.IsNull(user);
         }
-
-        [Test]
-        public void Answer_Is_Encrypted()
-        {
-            IMember createdMember = null;
-            var memberType = MockedContentTypes.CreateSimpleMemberType();
-            foreach (var p in ConventionsHelper.GetStandardPropertyTypeStubs())
-            {
-                memberType.AddPropertyType(p.Value);
-            }
-            var memberTypeServiceMock = new Mock<IMemberTypeService>();
-            memberTypeServiceMock.Setup(x => x.GetDefault()).Returns("Member");
-            var membershipServiceMock = new Mock<IMembershipMemberService>();
-            membershipServiceMock.Setup(service => service.Exists("test")).Returns(false);
-            membershipServiceMock.Setup(service => service.GetByEmail("test@test.com")).Returns(() => null);
-            membershipServiceMock.Setup(
-                service => service.CreateWithIdentity(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))
-                        .Callback((string u, string e, string p, string m, bool isApproved) =>
-                            {
-                                createdMember = new Member("test", e, u, p, memberType, isApproved);
-                            })
-                        .Returns(() => createdMember);
-            var provider = new MembersMembershipProvider(membershipServiceMock.Object, memberTypeServiceMock.Object, UmbracoVersion, HostingEnvironment, IpResolver);
-            provider.Initialize("test", new NameValueCollection());
-
-
-            MembershipCreateStatus status;
-            provider.CreateUser("test", "test", "testtest$1", "test@test.com", "test", "test", true, "test", out status);
-
-            Assert.AreNotEqual("test", createdMember.RawPasswordAnswerValue);
-            Assert.AreEqual(provider.EncryptString("test"), createdMember.RawPasswordAnswerValue);
-        }
-
-        [Test]
-        public void Password_Encrypted()
-        {
-            IMember createdMember = null;
-            var memberType = MockedContentTypes.CreateSimpleMemberType();
-            foreach (var p in ConventionsHelper.GetStandardPropertyTypeStubs())
-            {
-                memberType.AddPropertyType(p.Value);
-            }
-            var memberTypeServiceMock = new Mock<IMemberTypeService>();
-            memberTypeServiceMock.Setup(x => x.GetDefault()).Returns("Member");
-            var membershipServiceMock = new Mock<IMembershipMemberService>();
-            membershipServiceMock.Setup(service => service.Exists("test")).Returns(false);
-            membershipServiceMock.Setup(service => service.GetByEmail("test@test.com")).Returns(() => null);
-            membershipServiceMock.Setup(
-                service => service.CreateWithIdentity(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))
-                        .Callback((string u, string e, string p, string m, bool isApproved) =>
-                            {
-                                createdMember = new Member("test", e, u, p, memberType, isApproved);
-                            })
-                        .Returns(() => createdMember);
-
-            var provider = new MembersMembershipProvider(membershipServiceMock.Object, memberTypeServiceMock.Object, UmbracoVersion, HostingEnvironment, IpResolver);
-            provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Encrypted" } });
-
-
-            MembershipCreateStatus status;
-            provider.CreateUser("test", "test", "testtest$1", "test@test.com", "test", "test", true, "test", out status);
-
-            Assert.AreNotEqual("test", createdMember.RawPasswordValue);
-            var decrypted = provider.DecryptPassword(createdMember.RawPasswordValue);
-            Assert.AreEqual("testtest$1", decrypted);
-        }
-
+        
         [Test]
         public void Password_Hashed_With_Salt()
         {
@@ -162,7 +96,7 @@ namespace Umbraco.Tests.Membership
                         })
                         .Returns(() => createdMember);
 
-            var provider = new MembersMembershipProvider(membershipServiceMock.Object, memberTypeServiceMock.Object, UmbracoVersion, HostingEnvironment, IpResolver);
+            var provider = new MembersMembershipProvider(membershipServiceMock.Object, memberTypeServiceMock.Object, TestHelper.GetUmbracoVersion());
             provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Hashed" }, { "hashAlgorithmType", "HMACSHA256" } });
 
 
@@ -172,8 +106,8 @@ namespace Umbraco.Tests.Membership
             Assert.AreNotEqual("test", createdMember.RawPasswordValue);
 
             string salt;
-            var storedPassword = provider.StoredPassword(createdMember.RawPasswordValue, out salt);
-            var hashedPassword = provider.EncryptOrHashPassword("testtest$1", salt);
+            var storedPassword = provider.PasswordSecurity.StoredPassword(createdMember.RawPasswordValue, out salt);
+            var hashedPassword = provider.PasswordSecurity.EncryptOrHashPassword("testtest$1", salt);
             Assert.AreEqual(hashedPassword, storedPassword);
         }
 

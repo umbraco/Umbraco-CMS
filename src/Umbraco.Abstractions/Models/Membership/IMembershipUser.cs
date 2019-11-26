@@ -8,7 +8,6 @@ namespace Umbraco.Core.Models.Membership
     /// </summary>
     public interface IMembershipUser : IEntity
     {
-        object ProviderUserKey { get; set; }
         string Username { get; set; }
         string Email { get; set; }
 
@@ -16,13 +15,6 @@ namespace Umbraco.Core.Models.Membership
         /// Gets or sets the raw password value
         /// </summary>
         string RawPasswordValue { get; set; }
-
-        string PasswordQuestion { get; set; }
-
-        /// <summary>
-        /// Gets or sets the raw password answer value
-        /// </summary>
-        string RawPasswordAnswerValue { get; set; }
 
         string Comments { get; set; }
         bool IsApproved { get; set; }

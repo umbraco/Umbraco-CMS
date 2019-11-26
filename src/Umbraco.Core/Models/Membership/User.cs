@@ -124,13 +124,6 @@ namespace Umbraco.Core.Models.Membership
 
         #region Implementation of IMembershipUser
 
-        [IgnoreDataMember]
-        public object ProviderUserKey
-        {
-            get => Id;
-            set => throw new NotSupportedException("Cannot set the provider user key for a user");
-        }
-
         [DataMember]
         public DateTime? EmailConfirmedDate
         {
@@ -204,13 +197,6 @@ namespace Umbraco.Core.Models.Membership
             set => SetPropertyValueAndDetectChanges(value, ref _failedLoginAttempts, nameof(FailedPasswordAttempts));
         }
 
-        // TODO: Figure out how to support all of this! - we cannot have NotImplementedExceptions because these get used by the IMembershipMemberService<IUser> service so
-        // we'll just have them as generic get/set which don't interact with the db.
-
-        [IgnoreDataMember]
-        public string PasswordQuestion { get; set; }
-        [IgnoreDataMember]
-        public string RawPasswordAnswerValue { get; set; }
         [IgnoreDataMember]
         public string Comments { get; set; }
 

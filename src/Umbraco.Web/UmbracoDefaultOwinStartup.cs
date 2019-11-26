@@ -27,7 +27,9 @@ namespace Umbraco.Web
         protected IUmbracoContextAccessor UmbracoContextAccessor => Current.UmbracoContextAccessor;
         protected IGlobalSettings GlobalSettings => Current.Configs.Global();
         protected IUmbracoSettingsSection UmbracoSettings => Current.Configs.Settings();
+        protected IUserPasswordConfiguration UserPasswordConfig => Current.Configs.UserPasswordConfig();
         protected IRuntimeState RuntimeState => Core.Composing.Current.RuntimeState;
+        protected IPasswordGenerator PasswordGenerator => Core.Composing.Current.PasswordGenerator;
         protected ServiceContext Services => Current.Services;
         protected UmbracoMapper Mapper => Current.Mapper;
         protected IIpResolver IpResolver => Current.IpResolver;
@@ -86,7 +88,8 @@ namespace Umbraco.Web
                 Mapper,
                 UmbracoSettings.Content,
                 GlobalSettings,
-                Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider().AsUmbracoMembershipProvider(),
+                UserPasswordConfig,
+                PasswordGenerator,
                 IpResolver);
         }
 

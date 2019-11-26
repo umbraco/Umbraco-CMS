@@ -137,21 +137,7 @@ namespace Umbraco.Core
                 public static readonly string UmbracoMemberProviderName = "UmbracoMembershipProvider";
 
                 public static readonly string UmbracoRoleProviderName = "UmbracoRoleProvider";
-
-                /// <summary>
-                /// Property alias for a Members Password Question
-                /// </summary>
-                public const string PasswordQuestion = "umbracoMemberPasswordRetrievalQuestion";
-
-                public const string PasswordQuestionLabel = "Password Question";
-
-                /// <summary>
-                /// Property alias for Members Password Answer
-                /// </summary>
-                public const string PasswordAnswer = "umbracoMemberPasswordRetrievalAnswer";
-
-                public const string PasswordAnswerLabel = "Password Answer";
-
+                
                 /// <summary>
                 /// Property alias for the Comments on a Member
                 /// </summary>

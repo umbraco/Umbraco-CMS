@@ -39,14 +39,6 @@ namespace Umbraco.Tests.Services
         public override void SetUp()
         {
             base.SetUp();
-
-            // HACK: but we have no choice until we remove the SavePassword method from IMemberService
-            var providerMock = new Mock<MembersMembershipProvider>(ServiceContext.MemberService, ServiceContext.MemberTypeService, TestHelper.GetUmbracoVersion(), TestHelper.GetHostingEnvironment(), new AspNetIpResolver()) { CallBase = true };
-            providerMock.Setup(@base => @base.AllowManuallyChangingPassword).Returns(false);
-            providerMock.Setup(@base => @base.PasswordFormat).Returns(MembershipPasswordFormat.Hashed);
-            var provider = providerMock.Object;
-
-            ((MemberService)ServiceContext.MemberService).MembershipProvider = provider;
         }
 
         [Test]
@@ -73,67 +65,31 @@ namespace Umbraco.Tests.Services
             // TODO: see TODO in PublishedContentType, this list contains duplicates
 
             var aliases = new[]
-            {
-                "umbracoMemberPasswordRetrievalQuestion",
-                "umbracoMemberPasswordRetrievalAnswer",
-                "umbracoMemberComments",
-                "umbracoMemberFailedPasswordAttempts",
-                "umbracoMemberApproved",
-                "umbracoMemberLockedOut",
-                "umbracoMemberLastLockoutDate",
-                "umbracoMemberLastLogin",
-                "umbracoMemberLastPasswordChangeDate",
-                "Email",
-                "Username",
-                "PasswordQuestion",
-                "Comments",
-                "IsApproved",
-                "IsLockedOut",
-                "LastLockoutDate",
-                "CreateDate",
-                "LastLoginDate",
-                "LastPasswordChangeDate"
+            {                
+                Constants.Conventions.Member.Comments,
+                Constants.Conventions.Member.FailedPasswordAttempts,
+                Constants.Conventions.Member.IsApproved,
+                Constants.Conventions.Member.IsLockedOut,
+                Constants.Conventions.Member.LastLockoutDate,
+                Constants.Conventions.Member.LastLoginDate,
+                Constants.Conventions.Member.LastPasswordChangeDate,
+                nameof(IMember.Email),
+                nameof(IMember.Username),
+                nameof(IMember.Comments),
+                nameof(IMember.IsApproved),
+                nameof(IMember.IsLockedOut),
+                nameof(IMember.LastLockoutDate),
+                nameof(IMember.CreateDate),
+                nameof(IMember.LastLoginDate),
+                nameof(IMember.LastPasswordChangeDate)
             };
 
             var properties = pmember.Properties.ToList();
 
             Assert.IsTrue(properties.Select(x => x.Alias).ContainsAll(aliases));
 
-            var email = properties[aliases.IndexOf("Email")];
+            var email = properties[aliases.IndexOf(nameof(IMember.Email))];
             Assert.AreEqual("xemail", email.GetSourceValue());
-        }
-
-        [Test]
-        public void Can_Set_Password_On_New_Member()
-        {
-            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            ServiceContext.MemberTypeService.Save(memberType);
-            //this will construct a member without a password
-            var member = MockedMember.CreateSimpleMember(memberType, "test", "test@test.com", "test");
-            ServiceContext.MemberService.Save(member);
-
-            Assert.IsTrue(member.RawPasswordValue.StartsWith(Constants.Security.EmptyPasswordPrefix));
-
-            ServiceContext.MemberService.SavePassword(member, "hello123456$!");
-
-            var foundMember = ServiceContext.MemberService.GetById(member.Id);
-            Assert.IsNotNull(foundMember);
-            Assert.AreNotEqual("hello123456$!", foundMember.RawPasswordValue);
-            Assert.IsFalse(member.RawPasswordValue.StartsWith(Constants.Security.EmptyPasswordPrefix));
-        }
-
-        [Test]
-        public void Can_Not_Set_Password_On_Existing_Member()
-        {
-            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            ServiceContext.MemberTypeService.Save(memberType);
-            //this will construct a member with a password
-            var member = MockedMember.CreateSimpleMember(memberType, "test", "test@test.com", "hello123456$!", "test");
-            ServiceContext.MemberService.Save(member);
-
-            Assert.IsFalse(member.RawPasswordValue.StartsWith(Constants.Security.EmptyPasswordPrefix));
-
-            Assert.Throws<NotSupportedException>(() => ServiceContext.MemberService.SavePassword(member, "HELLO123456$!"));
         }
 
         [Test]
@@ -1116,23 +1072,6 @@ namespace Umbraco.Tests.Services
             var found = ServiceContext.MemberService.GetCount(MemberCountType.All);
 
             Assert.AreEqual(11, found);
-        }
-
-        [Test]
-        public void Count_All_Online_Members()
-        {
-            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            ServiceContext.MemberTypeService.Save(memberType);
-            var members = MockedMember.CreateSimpleMember(memberType, 10, (i, member) => member.LastLoginDate = DateTime.Now.AddMinutes(i * -2));
-            ServiceContext.MemberService.Save(members);
-
-            var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
-            customMember.SetValue(Constants.Conventions.Member.LastLoginDate, DateTime.Now);
-            ServiceContext.MemberService.Save(customMember);
-
-            var found = ServiceContext.MemberService.GetCount(MemberCountType.Online);
-
-            Assert.AreEqual(9, found);
         }
 
         [Test]
