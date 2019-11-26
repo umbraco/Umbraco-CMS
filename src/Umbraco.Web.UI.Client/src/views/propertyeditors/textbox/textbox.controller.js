@@ -1,4 +1,4 @@
-function textboxController($scope) {
+function textboxController($scope, validationMessageService) {
     // macro parameter editor doesn't contains a config object,
     // so we create a new one to hold any properties
     if (!$scope.model.config) {
@@ -18,6 +18,11 @@ function textboxController($scope) {
         }
     }
     $scope.model.change();
-    
+
+    // Set the message to use for when a mandatory field isn't completed.
+    // Will either use the one provided on the property type or a localised default.
+    validationMessageService.getMandatoryMessage($scope.model.validation).then(function(value) {
+        $scope.mandatoryMessage = value;
+    });    
 }
 angular.module('umbraco').controller("Umbraco.PropertyEditors.textboxController", textboxController);
