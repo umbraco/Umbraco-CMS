@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UsersController($scope, $timeout, $location, $routeParams, $rootScope, usersResource,
+    function UsersController($scope, $timeout, $location, $routeParams, usersResource,
         userGroupsResource, userService, localizationService,
         usersHelper, formHelper, dateHelper, editorService,
         listViewHelper) {
@@ -148,17 +148,27 @@
         }
 
         function initViewOptions() {
-            var previousViewOptions = $rootScope.usersViewOptions;
 
-            if (previousViewOptions) {
-                // We've got previously saved view options, so we can restore the last view the editor had.
-                for (var key in previousViewOptions) {
-                    vm.usersOptions[key] = previousViewOptions[key];
+            // Start with default view options.
+            vm.usersOptions.orderBy = "Name";
+            vm.usersOptions.orderDirection = "Ascending";
+
+            // Update from querystring if available.
+            initViewOptionFromQueryString("orderBy");
+            initViewOptionFromQueryString("orderDirection");
+            initViewOptionFromQueryString("pageNumber");
+            initViewOptionFromQueryString("userStates", true);
+            initViewOptionFromQueryString("userGroups", true);
+        }
+
+        function initViewOptionFromQueryString(key, isCollection) {
+            var value = $location.search()[key];
+            if (value) {
+                if (isCollection) {
+                    value = value.split(",");
                 }
-            } else {
-                // Use default view options.
-                vm.usersOptions.orderBy = "Name";
-                vm.usersOptions.orderDirection = "Ascending";
+
+                vm.usersOptions[key] = value;
             }
         }
 
@@ -494,7 +504,7 @@
                 vm.usersOptions.userStates.splice(index, 1);
             }
 
-            saveViewOption("userStates", vm.usersOptions.userStates);
+            updateLocation("userStates", vm.usersOptions.userStates.join(","));
             getUsers();
         }
 
@@ -511,33 +521,26 @@
                 vm.usersOptions.userGroups.splice(index, 1);
             }
 
-            saveViewOption("userGroups", vm.usersOptions.userGroups);
-
+            updateLocation("userGroups", vm.usersOptions.userGroups.join(","));
             getUsers();
         }
 
         function setOrderByFilter(value, direction) {
             vm.usersOptions.orderBy = value;
             vm.usersOptions.orderDirection = direction;
-            saveViewOption("orderBy", value);
-            saveViewOption("orderDirection", direction);
+            updateLocation("orderBy", value);
+            updateLocation("orderDirection", direction);
             getUsers();
         }
 
         function changePageNumber(pageNumber) {
             vm.usersOptions.pageNumber = pageNumber;
-            saveViewOption("pageNumber", pageNumber);
+            updateLocation("pageNumber", pageNumber);
             getUsers();
         }
 
-        function saveViewOption(key, value) {
-            // When navigating to a user's details and back again, we want to be able to restore the editor's filters and sorts.
-            // To do this we'll save it to rootScope and retrieve from here with initialising the view.
-            if (!$rootScope.usersViewOptions) {
-                $rootScope.usersViewOptions = {};
-            }
-
-            $rootScope.usersViewOptions[key] = value;
+        function updateLocation(key, value) {
+            $location.search(key, value);
         }
 
         function createUser(addUserForm) {
@@ -618,15 +621,32 @@
         }
 
         function goToUser(user) {
-            $location.path(pathToUser(user)).search("create", null).search("invite", null);
+            $location.url(pathToUser(user)).search("create", null).search("invite", null);
         }
         
         function getEditPath(user) {
-            return pathToUser(user) + "?mculture=" + $location.search().mculture;
+            return pathToUser(user) + "&mculture=" + $location.search().mculture;
         }
         
         function pathToUser(user) {
-            return "/users/users/user/" + user.id;
+            var path = "/users/users/user/" +
+                user.id +
+                "?orderBy=" + vm.usersOptions.orderBy +
+                "&orderDirection=" + vm.usersOptions.orderDirection +
+                "&pageNumber=" + vm.usersOptions.pageNumber;
+
+            path += addFilterCollectionToPathToUser("userStates", vm.usersOptions.userStates);
+            path += addFilterCollectionToPathToUser("userGroups", vm.usersOptions.userGroups);
+
+            return path;
+        }
+
+        function addFilterCollectionToPathToUser(name, collection) {
+            if (collection && collection.length > 0) {
+                return "&" + name + "=" + collection.join(",");
+            }
+
+            return "";
         }
 
         // helpers
