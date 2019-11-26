@@ -93,12 +93,12 @@ namespace Umbraco.Web.Security
             //Configure Umbraco user manager to be created per request
             app.CreatePerOwinContext<BackOfficeUserManager>(
                 (options, owinContext) => BackOfficeUserManager.Create(
-                    ipResolver,
                     options,
                     customUserStore,
                     contentSettings,
                     passwordConfiguration,
-                    passwordGenerator));
+                    passwordGenerator,
+                    ipResolver));
 
             app.SetBackOfficeUserManagerType<BackOfficeUserManager, BackOfficeIdentityUser>();
 

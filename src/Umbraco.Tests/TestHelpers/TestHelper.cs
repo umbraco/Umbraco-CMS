@@ -314,5 +314,10 @@ namespace Umbraco.Tests.TestHelpers
         {
             return new AspNetHostingEnvironment(SettingsForTests.GetDefaultGlobalSettings(), TestHelper.IOHelper);
         }
+
+        public static IIpResolver GetIpResolver()
+        {
+            return new AspNetIpResolver();
+        }
     }
 }

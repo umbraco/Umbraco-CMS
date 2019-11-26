@@ -12,6 +12,7 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security
 {
@@ -25,19 +26,6 @@ namespace Umbraco.Web.Security
         protected MembershipProviderBase(IHostingEnvironment hostingEnvironment)
         {
             _hostingEnvironment = hostingEnvironment;
-        }
-
-        public string HashPasswordForStorage(string password)
-        {
-            string salt;
-            var hashed = EncryptOrHashNewPassword(password, out salt);
-            return FormatPasswordForStorage(hashed, salt);
-        }
-
-        public bool VerifyPassword(string password, string hashedPassword)
-        {
-            if (string.IsNullOrWhiteSpace(hashedPassword)) throw new ArgumentException("Value cannot be null or whitespace.", "hashedPassword");
-            return CheckPassword(password, hashedPassword);
         }
 
         /// <summary>
