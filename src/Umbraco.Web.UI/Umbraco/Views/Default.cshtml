@@ -133,6 +133,12 @@
     {
         @Html.RenderProfiler()
     }
+    else if(Request.IsSecureConnection || Request.IsLocal)
+    {
+        if (Current.Configs.Settings().BackOffice.ServiceWorker.Domains.Contains(Request.Url.Host))
+        {
 
+        }
+    }
 </body>
 </html>

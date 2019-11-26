@@ -3,5 +3,7 @@
     public interface IBackOfficeSection
     {
         ITourSection Tours { get; }
+
+        IServiceWorkerSection ServiceWorker { get; }
     }
 }

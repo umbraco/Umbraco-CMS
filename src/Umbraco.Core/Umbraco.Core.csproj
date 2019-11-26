@@ -210,6 +210,8 @@
     <Compile Include="CompositionExtensions_Essentials.cs" />
     <Compile Include="CompositionExtensions_FileSystems.cs" />
     <Compile Include="CompositionExtensions_Uniques.cs" />
+    <Compile Include="Configuration\UmbracoSettings\IServiceWorkerSection.cs" />
+    <Compile Include="Configuration\UmbracoSettings\ServiceWorkerConfigElement.cs" />
     <Compile Include="Exceptions\PanicException.cs" />
     <Compile Include="FactoryExtensions.cs" />
     <Compile Include="Composing\RegisterFactory.cs" />
