@@ -10,7 +10,7 @@
 
                 <div class="umb-nested-content__header-bar" ng-click="vm.editNode($index)" ng-hide="vm.singleMode">
 
-                    <div class="umb-nested-content__heading"><i ng-if="vm.showIcons" class="icon" ng-class="vm.getIcon($index)"></i><span class="umb-nested-content__item-name" ng-class="{'--has-icon': vm.showIcons}" ng-bind="vm.getName($index)"></span></div>
+                    <div class="umb-nested-content__heading"><i ng-if="vm.showIcons" class="icon" ng-class="vm.getIcon($index)"></i><span class="umb-nested-content__item-name" ng-class="{'--has-icon': vm.showIcons}" ng-bind="vm.getName($index)"></span><small ng-show="vm.showTypeNames" class="umb-nested-content__item-type-name" ng-class="{'--has-icon': vm.showIcons}">{{::vm.getTypeName($index)}}</small></div>
 
                     <div class="umb-nested-content__icons">
                         <a class="umb-nested-content__icon umb-nested-content__icon--copy" title="{{copyIconTitle}}" ng-click="vm.clickCopy($event, node);" ng-if="vm.showCopy" prevent-default>

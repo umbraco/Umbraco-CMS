@@ -43,6 +43,7 @@
 
         vm.singleMode = vm.minItems === 1 && vm.maxItems === 1;
         vm.showIcons = Object.toBoolean(model.config.showIcons);
+        vm.showTypeNames = Object.toBoolean(model.config.showTypeNames);
         vm.wideMode = Object.toBoolean(model.config.hideLabel);
         vm.hasContentTypes = model.config.contentTypes.length > 0;
 
@@ -315,6 +316,16 @@
             var scaffold = getScaffold(model.value[idx].ncContentTypeAlias);
             return scaffold && scaffold.icon ? iconHelper.convertFromLegacyIcon(scaffold.icon) : "icon-folder";
         }
+        
+        vm.getTypeName = function (idx) {
+            if (model.value[idx]) {
+                var scaffold = getScaffold(model.value[idx].ncContentTypeAlias);
+                if (scaffold) {
+                    return scaffold.contentTypeName;
+                }
+            }
+            return null;
+        };
 
         vm.sortableOptions = {
             axis: "y",
