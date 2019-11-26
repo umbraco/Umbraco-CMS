@@ -61,10 +61,12 @@ namespace Umbraco.Web.Install.InstallSteps
                 throw new InvalidOperationException($"No user found in membership provider with id of {Constants.Security.SuperUserId}.");
             }
 
-            var success = await _userManager.ChangePasswordAsync(membershipUser.Id, "default", user.Password.Trim());
-            if (success.Succeeded == false)
+            //To change the password here we actually need to reset it since we don't have an old one to use to change
+            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(membershipUser.Id);
+            var resetResult = await _userManager.ChangePasswordWithResetAsync(membershipUser.Id, resetToken, user.Password.Trim());
+            if (!resetResult.Succeeded)
             {
-                throw new InvalidOperationException("Invalid password: " + string.Join(", ", success.Errors));
+                throw new InvalidOperationException("Could not reset password: " + string.Join(", ", resetResult.Errors));
             }
 
             admin.Email = user.Email.Trim();
