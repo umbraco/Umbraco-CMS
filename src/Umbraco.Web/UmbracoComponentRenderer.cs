@@ -77,7 +77,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IHtmlString RenderMacro(int contentId, string alias, object parameters)
         {
-            return RenderMacro(contentId, alias, parameters.ToDictionary<object>());
+            return RenderMacro(contentId, alias, parameters?.ToDictionary<object>());
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace Umbraco.Web
 
             // TODO: We are doing at ToLower here because for some insane reason the UpdateMacroModel method looks for a lower case match. the whole macro concept needs to be rewritten.
             //NOTE: the value could have HTML encoded values, so we need to deal with that
-            var macroProps = parameters.ToDictionary(
+            var macroProps = parameters?.ToDictionary(
                 x => x.Key.ToLowerInvariant(),
                 i => (i.Value is string) ? HttpUtility.HtmlDecode(i.Value.ToString()) : i.Value);
             
