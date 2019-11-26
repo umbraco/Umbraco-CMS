@@ -11,7 +11,7 @@
                no-dirty-check />
     </div>
 
-    <div class="umb-overlay__section-header" ng-if="(model.pasteItems | filter:searchTerm).length > 0">
+    <div class="umb-overlay__section-header" ng-if="(model.pasteItems | filter:{name: searchTerm}).length > 0">
         <h5><localize key="content_createFromClipboard">Paste from clipboard</localize></h5>
         <button ng-if="model.clickClearPaste" ng-click="model.clickClearPaste($event)" alt="Clear clipboard for entries accepted in this context.">
             <i class="icon-trash"></i>
@@ -19,7 +19,7 @@
     </div>
 
     <ul class="umb-card-grid" ng-class="{'-three-in-row': model.availableItems.length < 7, '-four-in-row': model.availableItems.length >= 7}">
-        <li ng-repeat="pasteItem in model.pasteItems | filter:searchTerm"
+        <li ng-repeat="pasteItem in model.pasteItems | filter:{name: searchTerm}"
             ng-click="model.clickPasteItem(pasteItem)">
             <a class="umb-card-grid-item" href="" title="{{ pasteItem.name }}">
                 <span>
@@ -30,12 +30,12 @@
         </li>
     </ul>
 
-    <div class="umb-overlay__section-header" ng-if="model.pasteItems.length > 0 && (model.availableItems | filter:searchTerm).length > 0">
+    <div class="umb-overlay__section-header" ng-if="model.pasteItems.length > 0 && (model.availableItems | filter:{name: searchTerm}).length > 0">
         <h5><localize key="content_createEmpty">Create new</localize></h5>
     </div>
 
     <ul class="umb-card-grid" ng-class="{'-three-in-row': model.availableItems.length < 7, '-four-in-row': model.availableItems.length >= 7}">
-        <li ng-repeat="availableItem in model.availableItems | compareArrays:model.selectedItems:'alias' | orderBy:model.orderBy | filter:searchTerm"
+        <li ng-repeat="availableItem in model.availableItems | compareArrays:model.selectedItems:'alias' | orderBy:model.orderBy | filter:{name: searchTerm}"
             ng-click="selectItem(availableItem)">
             <a class="umb-card-grid-item" href="" title="{{ availableItem.name }}">
                 <span>
