@@ -25,6 +25,9 @@ namespace Umbraco.Core
         public static IUmbracoSettingsSection Settings(this Configs configs)
             => configs.GetConfig<IUmbracoSettingsSection>();
 
+        public static IUserPasswordConfiguration UserPasswordConfig(this Configs configs)
+            => configs.GetConfig<IUserPasswordConfiguration>();
+
         public static IHealthChecks HealthChecks(this Configs configs)
             => configs.GetConfig<IHealthChecks>();
 

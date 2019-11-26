@@ -11,6 +11,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Core.Services.Implement;
 using UserProfile = Umbraco.Web.Models.ContentEditing.UserProfile;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -20,13 +21,11 @@ namespace Umbraco.Web.Models.Mapping
     internal class MemberMapDefinition : IMapDefinition
     {
         private readonly CommonMapper _commonMapper;
-        private readonly IMemberTypeService _memberTypeService;
         private readonly MemberTabsAndPropertiesMapper _tabsAndPropertiesMapper;
 
-        public MemberMapDefinition(CommonMapper commonMapper, IMemberTypeService memberTypeService, MemberTabsAndPropertiesMapper tabsAndPropertiesMapper)
+        public MemberMapDefinition(CommonMapper commonMapper, MemberTabsAndPropertiesMapper tabsAndPropertiesMapper)
         {
             _commonMapper = commonMapper;
-            _memberTypeService = memberTypeService;
 
             _tabsAndPropertiesMapper = tabsAndPropertiesMapper;
         }
@@ -66,7 +65,6 @@ namespace Umbraco.Web.Models.Mapping
             target.LastLockoutDate = source.LastLockoutDate;
             target.LastLoginDate = source.LastLoginDate;
             target.LastPasswordChangeDate = source.LastPasswordChangedDate;
-            target.ProviderUserKey = source.ProviderUserKey;
             target.RawPasswordValue = source.CreationDate > DateTime.MinValue ? Guid.NewGuid().ToString("N") : "";
             target.UpdateDate = source.LastActivityDate;
             target.Username = source.UserName;
@@ -85,7 +83,6 @@ namespace Umbraco.Web.Models.Mapping
             target.Id = source.Id;
             target.Key = source.Key;
             target.MemberProviderFieldMapping = GetMemberProviderFieldMapping();
-            target.MembershipScenario = GetMembershipScenario();
             target.Name = source.Name;
             target.Owner = _commonMapper.GetOwner(source, context);
             target.ParentId = source.ParentId;
@@ -154,34 +151,10 @@ namespace Umbraco.Web.Models.Mapping
             target.Properties = context.MapEnumerable<IProperty, ContentPropertyDto>(source.Properties);
         }
 
-        private MembershipScenario GetMembershipScenario()
-        {
-            var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-
-            if (provider.IsUmbracoMembershipProvider())
-            {
-                return MembershipScenario.NativeUmbraco;
-            }
-            var memberType = _memberTypeService.Get(Constants.Conventions.MemberTypes.DefaultAlias);
-            return memberType != null
-                ? MembershipScenario.CustomProviderWithUmbracoLink
-                : MembershipScenario.StandaloneCustomProvider;
-        }
-
         private static IDictionary<string, string> GetMemberProviderFieldMapping()
         {
-            var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-
-            if (provider.IsUmbracoMembershipProvider() == false)
-            {
-                return new Dictionary<string, string>
-                {
-                    {Constants.Conventions.Member.IsLockedOut, Constants.Conventions.Member.IsLockedOut},
-                    {Constants.Conventions.Member.IsApproved, Constants.Conventions.Member.IsApproved},
-                    {Constants.Conventions.Member.Comments, Constants.Conventions.Member.Comments}
-                };
-            }
-
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+            
             var umbracoProvider = (IUmbracoMemberTypeMembershipProvider)provider;
 
             return new Dictionary<string, string>

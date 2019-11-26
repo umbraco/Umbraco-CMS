@@ -80,7 +80,7 @@
                 vm.usernameIsEmail = Umbraco.Sys.ServerVariables.umbracoSettings.usernameIsEmail && user.email === user.username;
 
                 //go get the config for the membership provider and add it to the model
-                authResource.getMembershipProviderConfig().then(function (data) {
+                authResource.getPasswordConfig().then(function (data) {
                   vm.changePasswordModel.config = data;
 
                   //the user has a password if they are not states: Invited, NoCredentials

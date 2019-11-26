@@ -233,10 +233,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(IMember entity)
         {
-            if (entity.ProviderUserKey == null)
-            {
-                entity.ProviderUserKey = entity.Key;
-            }
             entity.AddingEntity();
 
             var member = (Member) entity;

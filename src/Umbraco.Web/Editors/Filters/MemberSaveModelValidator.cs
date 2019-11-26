@@ -11,6 +11,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Editors.Filters
 {
@@ -52,7 +53,7 @@ namespace Umbraco.Web.Editors.Filters
             }
 
             //default provider!
-            var membershipProvider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+            var membershipProvider = MembershipProviderExtensions.GetMembersMembershipProvider();
 
             var validEmail = ValidateUniqueEmail(model, membershipProvider);
             if (validEmail == false)

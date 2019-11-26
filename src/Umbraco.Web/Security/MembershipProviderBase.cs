@@ -2,37 +2,22 @@
 using System.Collections.Specialized;
 using System.ComponentModel.DataAnnotations;
 using System.Configuration.Provider;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
-using System.Web.Configuration;
 using System.Web.Hosting;
 using System.Web.Security;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Web.Security
 {
     /// <summary>
     /// A base membership provider class offering much of the underlying functionality for initializing and password encryption/hashing.
     /// </summary>
     public abstract class MembershipProviderBase : MembershipProvider
     {
-
-        public string HashPasswordForStorage(string password)
-        {
-            string salt;
-            var hashed = EncryptOrHashNewPassword(password, out salt);
-            return FormatPasswordForStorage(hashed, salt);
-        }
-
-        public bool VerifyPassword(string password, string hashedPassword)
-        {
-            if (string.IsNullOrWhiteSpace(hashedPassword)) throw new ArgumentException("Value cannot be null or whitespace.", "hashedPassword");
-            return CheckPassword(password, hashedPassword);
-        }
-
         /// <summary>
         /// Providers can override this setting, default is 10
         /// </summary>
@@ -89,14 +74,13 @@ namespace Umbraco.Core.Security
         private int _passwordAttemptWindow;
         private MembershipPasswordFormat _passwordFormat;
         private string _passwordStrengthRegularExpression;
-        private bool _requiresQuestionAndAnswer;
         private bool _requiresUniqueEmail;
-        private string _customHashAlgorithmType ;
 
         public bool UseLegacyEncoding { get; private set; }
 
         #region Properties
 
+        public string CustomHashAlgorithmType { get; private set; }
 
         /// <summary>
         /// Indicates whether the membership provider is configured to allow users to reset their passwords.
@@ -179,14 +163,9 @@ namespace Umbraco.Core.Security
         }
 
         /// <summary>
-        /// Gets a value indicating whether the membership provider is configured to require the user to answer a password question for password reset and retrieval.
+        /// Always returns false, question/answer is not supported
         /// </summary>
-        /// <value></value>
-        /// <returns>true if a password answer is required for password reset and retrieval; otherwise, false. The default is true.</returns>
-        public override bool RequiresQuestionAndAnswer
-        {
-            get { return _requiresQuestionAndAnswer; }
-        }
+        public override bool RequiresQuestionAndAnswer => false;
 
         /// <summary>
         /// Gets a value indicating whether the membership provider is configured to require a unique e-mail address for each user name.
@@ -240,7 +219,6 @@ namespace Umbraco.Core.Security
 
             _enablePasswordRetrieval = config.GetValue("enablePasswordRetrieval", false);
             _enablePasswordReset = config.GetValue("enablePasswordReset", true);
-            _requiresQuestionAndAnswer = config.GetValue("requiresQuestionAndAnswer", false);
             _requiresUniqueEmail = config.GetValue("requiresUniqueEmail", true);
             _maxInvalidPasswordAttempts = GetIntValue(config, "maxInvalidPasswordAttempts", 5, false, 0);
             _passwordAttemptWindow = GetIntValue(config, "passwordAttemptWindow", 10, false, 0);
@@ -283,7 +261,7 @@ namespace Umbraco.Core.Security
                 throw ex;
             }
 
-            _customHashAlgorithmType = config.GetValue("hashAlgorithmType", string.Empty);
+            CustomHashAlgorithmType = config.GetValue("hashAlgorithmType", string.Empty);
         }
 
         /// <summary>
@@ -546,15 +524,6 @@ namespace Umbraco.Core.Security
 
         public override string ResetPassword(string username, string answer)
         {
-            var userService = Current.Services.UserService;
-
-            var canReset = this.CanResetPassword(userService);
-
-            if (canReset == false)
-            {
-                throw new NotSupportedException("Password reset is not supported");
-            }
-
             var newPassword = Membership.GeneratePassword(MinRequiredPasswordLength, MinRequiredNonAlphanumericCharacters);
 
             var args = new ValidatePasswordEventArgs(username, newPassword, true);
@@ -653,140 +622,9 @@ namespace Umbraco.Core.Security
             return num;
         }
 
-        /// <summary>
-        /// If the password format is a hashed keyed algorithm then we will pre-pend the salt used to hash the password
-        /// to the hashed password itself.
-        /// </summary>
-        /// <param name="pass"></param>
-        /// <param name="salt"></param>
-        /// <returns></returns>
-        protected internal string FormatPasswordForStorage(string pass, string salt)
-        {
-            if (UseLegacyEncoding)
-            {
-                return pass;
-            }
-
-            if (PasswordFormat == MembershipPasswordFormat.Hashed)
-            {
-                //the better way, we use salt per member
-                return salt + pass;
-            }
-            return pass;
-        }
-
         internal static bool IsEmailValid(string email)
         {
             return new EmailAddressAttribute().IsValid(email);
-        }
-
-        protected internal string EncryptOrHashPassword(string pass, string salt)
-        {
-            //if we are doing it the old way
-
-            if (UseLegacyEncoding)
-            {
-                return LegacyEncodePassword(pass);
-            }
-
-            //This is the correct way to implement this (as per the sql membership provider)
-
-            if (PasswordFormat == MembershipPasswordFormat.Clear)
-                return pass;
-            var bytes = Encoding.Unicode.GetBytes(pass);
-            var saltBytes = Convert.FromBase64String(salt);
-            byte[] inArray;
-
-            if (PasswordFormat == MembershipPasswordFormat.Hashed)
-            {
-                var hashAlgorithm = GetHashAlgorithm(pass);
-                var algorithm = hashAlgorithm as KeyedHashAlgorithm;
-                if (algorithm != null)
-                {
-                    var keyedHashAlgorithm = algorithm;
-                    if (keyedHashAlgorithm.Key.Length == saltBytes.Length)
-                    {
-                        //if the salt bytes is the required key length for the algorithm, use it as-is
-                        keyedHashAlgorithm.Key = saltBytes;
-                    }
-                    else if (keyedHashAlgorithm.Key.Length < saltBytes.Length)
-                    {
-                        //if the salt bytes is too long for the required key length for the algorithm, reduce it
-                        var numArray2 = new byte[keyedHashAlgorithm.Key.Length];
-                        Buffer.BlockCopy(saltBytes, 0, numArray2, 0, numArray2.Length);
-                        keyedHashAlgorithm.Key = numArray2;
-                    }
-                    else
-                    {
-                        //if the salt bytes is too short for the required key length for the algorithm, extend it
-                        var numArray2 = new byte[keyedHashAlgorithm.Key.Length];
-                        var dstOffset = 0;
-                        while (dstOffset < numArray2.Length)
-                        {
-                            var count = Math.Min(saltBytes.Length, numArray2.Length - dstOffset);
-                            Buffer.BlockCopy(saltBytes, 0, numArray2, dstOffset, count);
-                            dstOffset += count;
-                        }
-                        keyedHashAlgorithm.Key = numArray2;
-                    }
-                    inArray = keyedHashAlgorithm.ComputeHash(bytes);
-                }
-                else
-                {
-                    var buffer = new byte[saltBytes.Length + bytes.Length];
-                    Buffer.BlockCopy(saltBytes, 0, buffer, 0, saltBytes.Length);
-                    Buffer.BlockCopy(bytes, 0, buffer, saltBytes.Length, bytes.Length);
-                    inArray = hashAlgorithm.ComputeHash(buffer);
-                }
-            }
-            else
-            {
-                //this code is copied from the sql membership provider - pretty sure this could be nicely re-written to completely
-                // ignore the salt stuff since we are not salting the password when encrypting.
-                var password = new byte[saltBytes.Length + bytes.Length];
-                Buffer.BlockCopy(saltBytes, 0, password, 0, saltBytes.Length);
-                Buffer.BlockCopy(bytes, 0, password, saltBytes.Length, bytes.Length);
-                inArray = EncryptPassword(password, MembershipPasswordCompatibilityMode.Framework40);
-            }
-            return Convert.ToBase64String(inArray);
-        }
-
-        /// <summary>
-        /// Checks the password.
-        /// </summary>
-        /// <param name="password">The password.</param>
-        /// <param name="dbPassword">The dbPassword.</param>
-        /// <returns></returns>
-        protected internal bool CheckPassword(string password, string dbPassword)
-        {
-            if (string.IsNullOrWhiteSpace(dbPassword)) throw new ArgumentException("Value cannot be null or whitespace.", "dbPassword");
-            switch (PasswordFormat)
-            {
-                case MembershipPasswordFormat.Encrypted:
-                    var decrypted = DecryptPassword(dbPassword);
-                    return decrypted == password;
-                case MembershipPasswordFormat.Hashed:
-                    string salt;
-                    var storedHashedPass = StoredPassword(dbPassword, out salt);
-                    var hashed = EncryptOrHashPassword(password, salt);
-                    return storedHashedPass == hashed;
-                case MembershipPasswordFormat.Clear:
-                    return password == dbPassword;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        /// <summary>
-        /// Encrypt/hash a new password with a new salt
-        /// </summary>
-        /// <param name="newPassword"></param>
-        /// <param name="salt"></param>
-        /// <returns></returns>
-        protected internal string EncryptOrHashNewPassword(string newPassword, out string salt)
-        {
-            salt = GenerateSalt();
-            return EncryptOrHashPassword(newPassword, salt);
         }
 
         protected internal string DecryptPassword(string pass)
@@ -811,101 +649,6 @@ namespace Umbraco.Core.Security
                     var bytes = DecryptPassword(Convert.FromBase64String(pass));
                     return bytes == null ? null : Encoding.Unicode.GetString(bytes, 16, bytes.Length - 16);
             }
-        }
-
-        /// <summary>
-        /// Returns the hashed password without the salt if it is hashed
-        /// </summary>
-        /// <param name="storedString"></param>
-        /// <param name="salt">returns the salt</param>
-        /// <returns></returns>
-        internal string StoredPassword(string storedString, out string salt)
-        {
-            if (string.IsNullOrWhiteSpace(storedString)) throw new ArgumentException("Value cannot be null or whitespace.", "storedString");
-            if (UseLegacyEncoding)
-            {
-                salt = string.Empty;
-                return storedString;
-            }
-
-            switch (PasswordFormat)
-            {
-                case MembershipPasswordFormat.Hashed:
-                    var saltLen = GenerateSalt();
-                    salt = storedString.Substring(0, saltLen.Length);
-                    return storedString.Substring(saltLen.Length);
-                case MembershipPasswordFormat.Clear:
-                case MembershipPasswordFormat.Encrypted:
-                default:
-                   salt = string.Empty;
-                    return storedString;
-
-            }
-        }
-
-        protected internal static string GenerateSalt()
-        {
-            var numArray = new byte[16];
-            new RNGCryptoServiceProvider().GetBytes(numArray);
-            return Convert.ToBase64String(numArray);
-        }
-
-        protected internal HashAlgorithm GetHashAlgorithm(string password)
-        {
-            if (UseLegacyEncoding)
-            {
-                //before we were never checking for an algorithm type so we were always using HMACSHA1
-                // for any SHA specified algorithm :( so we'll need to keep doing that for backwards compat support.
-                if (Membership.HashAlgorithmType.InvariantContains("SHA"))
-                {
-                    return new HMACSHA1
-                        {
-                            //the legacy salt was actually the password :(
-                            Key = Encoding.Unicode.GetBytes(password)
-                        };
-                }
-            }
-
-            //get the algorithm by name
-
-            if (_customHashAlgorithmType.IsNullOrWhiteSpace())
-            {
-                _customHashAlgorithmType = Membership.HashAlgorithmType;
-            }
-
-            var alg = HashAlgorithm.Create(_customHashAlgorithmType);
-            if (alg == null)
-            {
-                throw new InvalidOperationException("The hash algorithm specified " + Membership.HashAlgorithmType + " cannot be resolved");
-            }
-
-            return alg;
-        }
-
-        /// <summary>
-        /// Encodes the password.
-        /// </summary>
-        /// <param name="password">The password.</param>
-        /// <returns>The encoded password.</returns>
-        protected string LegacyEncodePassword(string password)
-        {
-            string encodedPassword = password;
-            switch (PasswordFormat)
-            {
-                case MembershipPasswordFormat.Clear:
-                    break;
-                case MembershipPasswordFormat.Encrypted:
-                    encodedPassword =
-                        Convert.ToBase64String(EncryptPassword(Encoding.Unicode.GetBytes(password)));
-                    break;
-                case MembershipPasswordFormat.Hashed:
-                    var hashAlgorith = GetHashAlgorithm(password);
-                    encodedPassword = Convert.ToBase64String(hashAlgorith.ComputeHash(Encoding.Unicode.GetBytes(password)));
-                    break;
-                default:
-                    throw new ProviderException("Unsupported password format.");
-            }
-            return encodedPassword;
         }
 
         /// <summary>
@@ -945,7 +688,7 @@ namespace Umbraco.Core.Security
             sb.AppendLine("_passwordAttemptWindow=" + _passwordAttemptWindow);
             sb.AppendLine("_passwordFormat=" + _passwordFormat);
             sb.AppendLine("_passwordStrengthRegularExpression=" + _passwordStrengthRegularExpression);
-            sb.AppendLine("_requiresQuestionAndAnswer=" + _requiresQuestionAndAnswer);
+            sb.AppendLine("_requiresQuestionAndAnswer=" + RequiresQuestionAndAnswer);
             sb.AppendLine("_requiresUniqueEmail=" + _requiresUniqueEmail);
             return sb.ToString();
         }
@@ -956,9 +699,8 @@ namespace Umbraco.Core.Security
         /// <returns></returns>
         protected string GetCurrentRequestIpAddress()
         {
-            var httpContext = HttpContext.Current == null ? (HttpContextBase) null : new HttpContextWrapper(HttpContext.Current);
+            var httpContext = HttpContext.Current == null ? (HttpContextBase)null : new HttpContextWrapper(HttpContext.Current);
             return httpContext.GetCurrentRequestIpAddress();
         }
-
     }
 }

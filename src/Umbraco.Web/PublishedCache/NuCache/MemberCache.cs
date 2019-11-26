@@ -10,6 +10,7 @@ using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Xml.XPath;
 using Umbraco.Web.PublishedCache.NuCache.Navigable;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
@@ -45,13 +46,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 : cache.GetCacheItem<T>(cacheKey, getCacheItem);
         }
 
-        private static void EnsureProvider()
-        {
-            var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-            if (provider.IsUmbracoMembershipProvider() == false)
-                throw new NotSupportedException("Cannot access this method unless the Umbraco membership provider is active");
-        }
-
         public IPublishedContent GetById(bool preview, int memberId)
         {
             return GetById(memberId);
@@ -61,7 +55,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             return GetCacheItem(CacheKeys.MemberCacheMember("ById", _previewDefault, memberId), () =>
                 {
-                    EnsureProvider();
                     var member = _memberService.GetById(memberId);
                     return member == null
                         ? null
@@ -79,7 +72,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             return GetCacheItem(CacheKeys.MemberCacheMember("ByProviderKey", _previewDefault, key), () =>
                 {
-                    EnsureProvider();
                     var member = _memberService.GetByProviderKey(key);
                     return member == null ? null : GetById(member, _previewDefault);
                 });
@@ -89,7 +81,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             return GetCacheItem(CacheKeys.MemberCacheMember("ByUsername", _previewDefault, username), () =>
                 {
-                    EnsureProvider();
                     var member = _memberService.GetByUsername(username);
                     return member == null ? null : GetById(member, _previewDefault);
                 });
@@ -99,7 +90,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             return GetCacheItem(CacheKeys.MemberCacheMember("ByEmail", _previewDefault, email), () =>
                 {
-                    EnsureProvider();
                     var member = _memberService.GetByEmail(email);
                     return member == null ? null : GetById(member, _previewDefault);
                 });
@@ -132,12 +122,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public XPathNavigator CreateNodeNavigator(int id, bool preview)
         {
-            var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-            if (provider.IsUmbracoMembershipProvider() == false)
-            {
-                throw new NotSupportedException("Cannot access this method unless the Umbraco membership provider is active");
-            }
-
             var result = _memberService.GetById(id);
             if (result == null) return null;
 

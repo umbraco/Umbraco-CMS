@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
-using System.Web.Security;
 using Newtonsoft.Json;
 using NPoco;
 using Umbraco.Core.Cache;
@@ -11,13 +10,11 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -28,6 +25,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     {
         private readonly IMapperCollection _mapperCollection;
         private readonly IGlobalSettings _globalSettings;
+        private readonly IUserPasswordConfiguration _passwordConfiguration;
         private string _passwordConfigJson;
         private bool _passwordConfigInitialized;
 
@@ -41,23 +39,17 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// A dictionary specifying the configuration for user passwords. If this is null then no password configuration will be persisted or read.
         /// </param>
         /// <param name="globalSettings"></param>
-        public UserRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger, IMapperCollection mapperCollection, IGlobalSettings globalSettings)
+        public UserRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger, IMapperCollection mapperCollection, IGlobalSettings globalSettings, IUserPasswordConfiguration passwordConfiguration)
             : base(scopeAccessor, appCaches, logger)
         {
             _mapperCollection = mapperCollection ?? throw new ArgumentNullException(nameof(mapperCollection));
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
-        }
+            _passwordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
+        }     
 
-        // for tests
-        internal UserRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger, IMapperCollection mapperCollection, IDictionary<string, string> passwordConfig, IGlobalSettings globalSettings)
-            : base(scopeAccessor, appCaches, logger)
-        {
-            _mapperCollection = mapperCollection;
-            _globalSettings = globalSettings;
-            _passwordConfigJson = JsonConvert.SerializeObject(passwordConfig);
-            _passwordConfigInitialized = true;
-        }
-
+        /// <summary>
+        /// Returns a serialized dictionary of the password configuration that is stored against the user in the database
+        /// </summary>
         private string PasswordConfigJson
         {
             get
@@ -65,14 +57,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (_passwordConfigInitialized)
                     return _passwordConfigJson;
 
-                // TODO: this is bad
-                // because the membership provider we're trying to get has a dependency on the user service
-                // and we should not depend on services in repositories - need a way better way to do this
-
-                var userMembershipProvider = MembershipProviderExtensions.GetUsersMembershipProvider();
-                var passwordConfig = userMembershipProvider == null || userMembershipProvider.PasswordFormat != MembershipPasswordFormat.Hashed
-                    ? null
-                    : new Dictionary<string, string> { { "hashAlgorithm", Membership.HashAlgorithmType } };
+                var passwordConfig = new Dictionary<string, string> { { "hashAlgorithm", _passwordConfiguration.HashAlgorithmType } };
                 _passwordConfigJson = passwordConfig == null ? null : JsonConvert.SerializeObject(passwordConfig);
                 _passwordConfigInitialized = true;
                 return _passwordConfigJson;
@@ -507,6 +492,7 @@ ORDER BY colName";
             // list the columns to save, NOTE: would be nice to not have hard coded strings here but no real good way around that
             var colsToSave = new Dictionary<string, string>
             {
+                //TODO: Change these to constants + nameof
                 {"userDisabled", "IsApproved"},
                 {"userNoConsole", "IsLockedOut"},
                 {"startStructureID", "StartContentId"},

@@ -16,8 +16,6 @@ namespace Umbraco.Core.Security
         string CommentPropertyTypeAlias { get;  }
         string LastLoginPropertyTypeAlias { get;  }
         string LastPasswordChangedPropertyTypeAlias { get;  }
-        string PasswordRetrievalQuestionPropertyTypeAlias { get;  }
-        string PasswordRetrievalAnswerPropertyTypeAlias { get;  }
 
     }
 }

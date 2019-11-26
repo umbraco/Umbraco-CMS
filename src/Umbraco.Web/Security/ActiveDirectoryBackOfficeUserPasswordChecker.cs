@@ -6,7 +6,7 @@ using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Web.Security
 {
-    // TODO: This relies on an assembly that is not .NET Standard :(
+    // TODO: This relies on an assembly that is not .NET Standard (at least not at the time of implementation) :(
     public class ActiveDirectoryBackOfficeUserPasswordChecker : IBackOfficeUserPasswordChecker
     {
         public virtual string ActiveDirectoryDomain

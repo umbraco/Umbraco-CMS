@@ -16,6 +16,7 @@ using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Security;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 
@@ -33,8 +34,6 @@ namespace Umbraco.Web.Editors
             : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
         }
-
-        private readonly MembershipProvider _provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
 
         [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
         public MemberTypeDisplay GetById(int id)
@@ -114,12 +113,8 @@ namespace Umbraco.Web.Editors
         /// </summary>
         public IEnumerable<ContentTypeBasic> GetAllTypes()
         {
-            if (_provider.IsUmbracoMembershipProvider())
-            {
-                return Services.MemberTypeService.GetAll()
+            return Services.MemberTypeService.GetAll()
                                .Select(Mapper.Map<IMemberType, ContentTypeBasic>);
-            }
-            return Enumerable.Empty<ContentTypeBasic>();
         }
 
         [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]

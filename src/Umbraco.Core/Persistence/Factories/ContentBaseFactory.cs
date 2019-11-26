@@ -143,8 +143,6 @@ namespace Umbraco.Core.Persistence.Factories
                 content.CreateDate = nodeDto.CreateDate;
                 content.UpdateDate = contentVersionDto.VersionDate;
 
-                content.ProviderUserKey = content.Key; // The `ProviderUserKey` is a membership provider thing
-
                 // reset dirty initial properties (U4-1946)
                 content.ResetDirtyProperties(false);
                 return content;

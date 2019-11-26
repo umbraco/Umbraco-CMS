@@ -8,6 +8,7 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.Testing;
+using Umbraco.Web;
 
 namespace Umbraco.Tests.Strings
 {

@@ -8,6 +8,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Controllers
 {
@@ -26,12 +27,6 @@ namespace Umbraco.Web.Controllers
         [ValidateUmbracoFormRouteString]
         public ActionResult HandleUpdateProfile([Bind(Prefix = "profileModel")] ProfileModel model)
         {
-            var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-            if (provider.IsUmbracoMembershipProvider() == false)
-            {
-                throw new NotSupportedException("Profile editing with the " + typeof(UmbProfileController) + " is not supported when not using the default Umbraco membership provider");
-            }
-
             if (ModelState.IsValid == false)
             {
                 return CurrentUmbracoPage();

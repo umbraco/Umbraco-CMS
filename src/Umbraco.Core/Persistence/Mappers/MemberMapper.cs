@@ -41,8 +41,6 @@ namespace Umbraco.Core.Persistence.Mappers
             DefineMap<Member, PropertyDataDto>(nameof(Member.IsApproved), nameof(PropertyDataDto.IntegerValue));
             DefineMap<Member, PropertyDataDto>(nameof(Member.IsLockedOut), nameof(PropertyDataDto.IntegerValue));
             DefineMap<Member, PropertyDataDto>(nameof(Member.Comments), nameof(PropertyDataDto.TextValue));
-            DefineMap<Member, PropertyDataDto>(nameof(Member.RawPasswordAnswerValue), nameof(PropertyDataDto.VarcharValue));
-            DefineMap<Member, PropertyDataDto>(nameof(Member.PasswordQuestion), nameof(PropertyDataDto.VarcharValue));
             DefineMap<Member, PropertyDataDto>(nameof(Member.FailedPasswordAttempts), nameof(PropertyDataDto.IntegerValue));
             DefineMap<Member, PropertyDataDto>(nameof(Member.LastLockoutDate), nameof(PropertyDataDto.DateValue));
             DefineMap<Member, PropertyDataDto>(nameof(Member.LastLoginDate), nameof(PropertyDataDto.DateValue));

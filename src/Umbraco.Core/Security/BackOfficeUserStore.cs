@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web.Security;
 using Microsoft.AspNet.Identity;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
@@ -34,32 +33,24 @@ namespace Umbraco.Core.Security
     //IQueryableUserStore<BackOfficeIdentityUser, int>
     {
         private readonly IUserService _userService;
-        private readonly IMemberTypeService _memberTypeService;
         private readonly IEntityService _entityService;
         private readonly IExternalLoginService _externalLoginService;
         private readonly IGlobalSettings _globalSettings;
         private readonly UmbracoMapper _mapper;
         private bool _disposed = false;
 
-        public BackOfficeUserStore(IUserService userService, IMemberTypeService memberTypeService, IEntityService entityService, IExternalLoginService externalLoginService, IGlobalSettings globalSettings, MembershipProviderBase usersMembershipProvider, UmbracoMapper mapper)
+        public BackOfficeUserStore(IUserService userService, IEntityService entityService, IExternalLoginService externalLoginService, IGlobalSettings globalSettings, UmbracoMapper mapper)
         {
             _userService = userService;
-            _memberTypeService = memberTypeService;
             _entityService = entityService;
             _externalLoginService = externalLoginService;
             _globalSettings = globalSettings;
             if (userService == null) throw new ArgumentNullException("userService");
-            if (usersMembershipProvider == null) throw new ArgumentNullException("usersMembershipProvider");
             if (externalLoginService == null) throw new ArgumentNullException("externalLoginService");
             _mapper = mapper;
 
             _userService = userService;
             _externalLoginService = externalLoginService;
-
-            if (usersMembershipProvider.PasswordFormat != MembershipPasswordFormat.Hashed)
-            {
-                throw new InvalidOperationException("Cannot use ASP.Net Identity with UmbracoMembersUserStore when the password format is not Hashed");
-            }
         }
 
         /// <summary>

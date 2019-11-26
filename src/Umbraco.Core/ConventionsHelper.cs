@@ -67,24 +67,6 @@ namespace Umbraco.Core
                         Name = Constants.Conventions.Member.LastPasswordChangeDateLabel,
                         DataTypeId = Constants.DataTypes.LabelDateTime
                     }
-                },
-                {
-                    Constants.Conventions.Member.PasswordAnswer,
-                    new PropertyType(Constants.PropertyEditors.Aliases.Label, ValueStorageType.Nvarchar, true,
-                        Constants.Conventions.Member.PasswordAnswer)
-                    {
-                        Name = Constants.Conventions.Member.PasswordAnswerLabel,
-                        DataTypeId = Constants.DataTypes.LabelString
-                    }
-                },
-                {
-                    Constants.Conventions.Member.PasswordQuestion,
-                    new PropertyType(Constants.PropertyEditors.Aliases.Label, ValueStorageType.Nvarchar, true,
-                        Constants.Conventions.Member.PasswordQuestion)
-                    {
-                        Name = Constants.Conventions.Member.PasswordQuestionLabel,
-                        DataTypeId = Constants.DataTypes.LabelString
-                    }
                 }
             };
     }

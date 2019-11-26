@@ -55,9 +55,6 @@ namespace Umbraco.Web.Models
         public string UserName { get; set; }
 
         [ReadOnly(true)]
-        public string PasswordQuestion { get; set; }
-
-        [ReadOnly(true)]
         public string Comment { get; set; }
 
         [ReadOnly(true)]

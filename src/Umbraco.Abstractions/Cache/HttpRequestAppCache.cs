@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Web;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Cache

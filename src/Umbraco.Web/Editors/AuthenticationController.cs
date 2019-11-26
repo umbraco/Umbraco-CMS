@@ -26,6 +26,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Web.Composing;
 using IUser = Umbraco.Core.Models.Membership.IUser;
+using Umbraco.Core.Mapping;
 
 namespace Umbraco.Web.Editors
 {
@@ -40,10 +41,12 @@ namespace Umbraco.Web.Editors
     {
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
+        private readonly IUserPasswordConfiguration _passwordConfiguration;
 
-        public AuthenticationController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        public AuthenticationController(IUserPasswordConfiguration passwordConfiguration, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, UmbracoMapper umbracoMapper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper)
         {
+            _passwordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
         }
 
         protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager => _userManager
@@ -57,12 +60,9 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [WebApi.UmbracoAuthorize(requireApproval: false)]
-        public IDictionary<string, object> GetMembershipProviderConfig()
+        public IDictionary<string, object> GetPasswordConfig()
         {
-            // TODO: Check if the current PasswordValidator is an IMembershipProviderPasswordValidator, if
-            // it's not than we should return some generic defaults
-            var provider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
-            return provider.GetConfiguration(Services.UserService);
+            return _passwordConfiguration.GetConfiguration();
         }
 
         /// <summary>
