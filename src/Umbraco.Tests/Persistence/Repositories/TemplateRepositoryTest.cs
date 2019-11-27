@@ -246,7 +246,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var entityRepository = new EntityRepository(ScopeProvider);
                 var relationRepository = new RelationRepository(ScopeProvider, Logger, relationTypeRepository, entityRepository);
                 var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
-                var contentRepo = new DocumentRepository(ScopeProvider, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors);
+                var dataValueReferences = new DataValueReferenceCollection(Enumerable.Empty<IDataValueReference>());
+                var contentRepo = new DocumentRepository(ScopeProvider, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences);
 
                 var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
