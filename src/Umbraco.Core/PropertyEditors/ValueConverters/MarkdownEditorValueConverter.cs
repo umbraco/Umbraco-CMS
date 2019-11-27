@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Web;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
@@ -11,7 +10,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             => Constants.PropertyEditors.Aliases.MarkdownEditor.Equals(propertyType.EditorAlias);
 
         public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
-            => typeof (IHtmlString);
+            => typeof (IHtmlEncodedString);
 
         // PropertyCacheLevel.Content is ok here because that converter does not parse {locallink} nor executes macros
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
@@ -28,7 +27,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
             // source should come from ConvertSource and be a string (or null) already
-            return new HtmlString(inter == null ? string.Empty : (string) inter);
+            return new HtmlEncodedString(inter == null ? string.Empty : (string) inter);
         }
 
         public override object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)

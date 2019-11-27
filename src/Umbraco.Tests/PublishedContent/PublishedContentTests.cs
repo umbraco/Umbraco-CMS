@@ -369,15 +369,15 @@ namespace Umbraco.Tests.PublishedContent
             var doc = GetNode(1173);
 
             var propVal = doc.Value("content");
-            Assert.IsInstanceOf(typeof(IHtmlString), propVal);
+            Assert.IsInstanceOf(typeof(IHtmlEncodedString), propVal);
             Assert.AreEqual("<div>This is some content</div>", propVal.ToString());
 
-            var propVal2 = doc.Value<IHtmlString>("content");
-            Assert.IsInstanceOf(typeof(IHtmlString), propVal2);
+            var propVal2 = doc.Value<IHtmlEncodedString>("content");
+            Assert.IsInstanceOf(typeof(IHtmlEncodedString), propVal2);
             Assert.AreEqual("<div>This is some content</div>", propVal2.ToString());
 
             var propVal3 = doc.Value("Content");
-            Assert.IsInstanceOf(typeof(IHtmlString), propVal3);
+            Assert.IsInstanceOf(typeof(IHtmlEncodedString), propVal3);
             Assert.AreEqual("<div>This is some content</div>", propVal3.ToString());
         }
 

@@ -102,15 +102,15 @@ namespace Umbraco.Tests.PublishedContent
             var publishedMedia = GetNode(media.Id);
 
             var propVal = publishedMedia.Value("content");
-            Assert.IsInstanceOf<IHtmlString>(propVal);
+            Assert.IsInstanceOf<IHtmlEncodedString>(propVal);
             Assert.AreEqual("<div>This is some content</div>", propVal.ToString());
 
-            var propVal2 = publishedMedia.Value<IHtmlString>("content");
-            Assert.IsInstanceOf<IHtmlString>(propVal2);
+            var propVal2 = publishedMedia.Value<IHtmlEncodedString>("content");
+            Assert.IsInstanceOf<IHtmlEncodedString>(propVal2);
             Assert.AreEqual("<div>This is some content</div>", propVal2.ToString());
 
             var propVal3 = publishedMedia.Value("Content");
-            Assert.IsInstanceOf<IHtmlString>(propVal3);
+            Assert.IsInstanceOf<IHtmlEncodedString>(propVal3);
             Assert.AreEqual("<div>This is some content</div>", propVal3.ToString());
         }
 

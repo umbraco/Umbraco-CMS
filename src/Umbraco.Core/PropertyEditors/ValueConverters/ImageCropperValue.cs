@@ -5,7 +5,6 @@ using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Web;
 using Newtonsoft.Json;
 using Umbraco.Core.Serialization;
 
@@ -17,7 +16,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     [JsonConverter(typeof(NoTypeConverterJsonConverter<ImageCropperValue>))]
     [TypeConverter(typeof(ImageCropperValueTypeConverter))]
     [DataContract(Name="imageCropDataSet")]
-    public class ImageCropperValue : IHtmlString, IEquatable<ImageCropperValue>
+    public class ImageCropperValue : IHtmlEncodedString, IEquatable<ImageCropperValue>
     {
         /// <summary>
         /// Gets or sets the value source image.
@@ -354,7 +353,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             public decimal Y2 { get; set; }
 
             #region IEquatable
-            
+
             /// <inheritdoc />
             public bool Equals(ImageCropperCropCoordinates other)
                 => ReferenceEquals(this, other) || Equals(this, other);
