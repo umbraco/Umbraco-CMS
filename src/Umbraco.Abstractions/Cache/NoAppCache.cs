@@ -7,9 +7,9 @@ namespace Umbraco.Core.Cache
     /// <summary>
     /// Implements <see cref="IAppPolicyCache"/> and do not cache.
     /// </summary>
-    public class NoAppCache : IAppPolicyCache
+    public class NoAppCache : IAppPolicyCache, IRequestCache
     {
-        private NoAppCache() { }
+        protected NoAppCache() { }
 
         /// <summary>
         /// Gets the singleton instance.
@@ -27,6 +27,10 @@ namespace Umbraco.Core.Cache
         {
             return factory();
         }
+
+        public bool Set(string key, object value) => false;
+
+        public bool Remove(string key) => false;
 
         /// <inheritdoc />
         public virtual IEnumerable<object> SearchByKey(string keyStartsWith)

@@ -15,7 +15,7 @@ namespace Umbraco.Core.Cache
     /// or no Items...) then this cache acts as a pass-through and does not cache
     /// anything.</para>
     /// </remarks>
-    public class HttpRequestAppCache : FastDictionaryAppCacheBase
+    public class HttpRequestAppCache : FastDictionaryAppCacheBase, IRequestCache
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpRequestAppCache"/> class with a context, for unit tests!
@@ -73,6 +73,42 @@ namespace Umbraco.Core.Cache
             var value = result.Value; // will not throw (safe lazy)
             if (value is SafeLazy.ExceptionHolder eh) eh.Exception.Throw(); // throw once!
             return value;
+        }
+
+        public bool Set(string key, object value)
+        {
+            //no place to cache so just return the callback result
+            if (!TryGetContextItems(out var items)) return false;
+            key = GetCacheKey(key);
+            try
+            {
+
+                EnterWriteLock();
+                items[key] = SafeLazy.GetSafeLazy(() => value);
+            }
+            finally
+            {
+                ExitWriteLock();
+            }
+            return true;
+        }
+
+        public bool Remove(string key)
+        {
+            //no place to cache so just return the callback result
+            if (!TryGetContextItems(out var items)) return false;
+            key = GetCacheKey(key);
+            try
+            {
+
+                EnterWriteLock();
+                items.Remove(key);
+            }
+            finally
+            {
+                ExitWriteLock();
+            }
+            return true;
         }
 
         #region Entries

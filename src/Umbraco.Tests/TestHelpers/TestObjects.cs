@@ -173,7 +173,7 @@ namespace Umbraco.Tests.TestHelpers
 
             var macroService = GetLazyService<IMacroService>(factory, c => new MacroService(scopeProvider, logger, eventMessagesFactory, GetRepo<IMacroRepository>(c), GetRepo<IAuditRepository>(c)));
             var packagingService = GetLazyService<IPackagingService>(factory, c =>
-            {                
+            {
                 var compiledPackageXmlParser = new CompiledPackageXmlParser(new ConflictingPackageData(macroService.Value, fileService.Value), globalSettings);
                 return new PackagingService(
                     auditService.Value,
@@ -247,7 +247,7 @@ namespace Umbraco.Tests.TestHelpers
 
             typeFinder = typeFinder ?? new TypeFinder(logger);
             fileSystems = fileSystems ?? new FileSystems(Current.Factory, logger, IOHelper.Default, SettingsForTests.GenerateMockGlobalSettings());
-            var scopeProvider = new ScopeProvider(databaseFactory, fileSystems, logger, typeFinder);
+            var scopeProvider = new ScopeProvider(databaseFactory, fileSystems, logger, typeFinder, NoAppCache.Instance);
             return scopeProvider;
         }
 
