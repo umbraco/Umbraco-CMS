@@ -13,11 +13,11 @@
                     <div class="umb-nested-content__heading"><i ng-if="vm.showIcons" class="icon" ng-class="vm.getIcon($index)"></i><span class="umb-nested-content__item-name" ng-class="{'--has-icon': vm.showIcons}" ng-bind="vm.getName($index)"></span></div>
 
                     <div class="umb-nested-content__icons">
-                        <button type="button" class="umb-nested-content__icon umb-nested-content__icon--copy" title="{{vm.labels.copy_icon_title}}" ng-click="clickCopy($event, node);" ng-if="showCopy">
+                        <button type="button" class="umb-nested-content__icon umb-nested-content__icon--copy" title="{{vm.labels.copy_icon_title}}" ng-click="vm.clickCopy($event, node);" ng-if="vm.showCopy">
                             <i class="icon icon-documents" aria-hidden="true"></i>
                             <span class="sr-only">{{vm.labels.copy_icon_title}}</span>
                         </button>
-                        <button type="button" class="umb-nested-content__icon umb-nested-content__icon--delete" localize="title" title="general_delete" ng-class="{ 'umb-nested-content__icon--disabled': $parent.nodes.length <= $parent.minItems }" ng-click="$parent.requestDeleteNode($index); $event.stopPropagation();">
+                        <button type="button" class="umb-nested-content__icon umb-nested-content__icon--delete" localize="title" title="general_delete" ng-click="vm.requestDeleteNode($index); $event.stopPropagation();">
                             <i class="icon icon-trash" aria-hidden="true"></i>
                             <span class="sr-only">
                                 <localize key="general_delete">Delete</localize>
