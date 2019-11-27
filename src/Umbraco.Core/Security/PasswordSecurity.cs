@@ -17,7 +17,7 @@ namespace Umbraco.Core.Security
         public string HashPasswordForStorage(string password)
         {
             string salt;
-            var hashed = EncryptOrHashNewPassword(password, out salt);
+            var hashed = HashNewPassword(password, out salt);
             return FormatPasswordForStorage(hashed, salt);
         }
 
@@ -44,7 +44,7 @@ namespace Umbraco.Core.Security
             return salt + pass;
         }
 
-        public string EncryptOrHashPassword(string pass, string salt)
+        public string HashPassword(string pass, string salt)
         {
             //if we are doing it the old way
 
@@ -112,20 +112,20 @@ namespace Umbraco.Core.Security
         {
             if (string.IsNullOrWhiteSpace(dbPassword)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(dbPassword));
             var storedHashedPass = StoredPassword(dbPassword, out var salt);
-            var hashed = EncryptOrHashPassword(password, salt);
+            var hashed = HashPassword(password, salt);
             return storedHashedPass == hashed;
         }
 
         /// <summary>
-        /// Encrypt/hash a new password with a new salt
+        /// hash a new password with a new salt
         /// </summary>
         /// <param name="newPassword"></param>
         /// <param name="salt"></param>
         /// <returns></returns>
-        public string EncryptOrHashNewPassword(string newPassword, out string salt)
+        public string HashNewPassword(string newPassword, out string salt)
         {
             salt = GenerateSalt();
-            return EncryptOrHashPassword(newPassword, salt);
+            return HashPassword(newPassword, salt);
         }
 
         /// <summary>

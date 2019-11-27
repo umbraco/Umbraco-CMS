@@ -107,7 +107,7 @@ namespace Umbraco.Tests.Membership
 
             string salt;
             var storedPassword = provider.PasswordSecurity.StoredPassword(createdMember.RawPasswordValue, out salt);
-            var hashedPassword = provider.PasswordSecurity.EncryptOrHashPassword("testtest$1", salt);
+            var hashedPassword = provider.PasswordSecurity.HashPassword("testtest$1", salt);
             Assert.AreEqual(hashedPassword, storedPassword);
         }
 
