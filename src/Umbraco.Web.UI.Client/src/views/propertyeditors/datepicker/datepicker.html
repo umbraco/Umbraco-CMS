@@ -32,11 +32,11 @@
 
         </div>
 
-        <span ng-messages="datePickerForm.datepicker.$error" show-validation-on-submit >
-            <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
-            <span class="help-inline" ng-message="valServer">{{datePickerForm.datepicker.errorMsg}}</span>
-            <span class="help-inline" ng-message="pickerError"><localize key="validation_invalidDate">Invalid date</localize></span>
-        </span>
+        <div ng-messages="datePickerForm.datepicker.$error" show-validation-on-submit >
+            <p class="help-inline" ng-message="required">{{mandatoryMessage}}</p>
+            <p class="help-inline" ng-message="valServer">{{datePickerForm.datepicker.errorMsg}}</p>
+            <p class="help-inline" ng-message="pickerError"><localize key="validation_invalidDate">Invalid date</localize></p>
+        </div>
 
         <p ng-if="model.config.offsetTime === '1' && serverTimeNeedsOffsetting && model.value" class="muted">
             <small><localize key="content_scheduledPublishServerTime">This translates to the following time on the server:</localize> {{serverTime}}</small><br />

@@ -7,6 +7,7 @@ using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Store;
 using Moq;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -44,11 +45,10 @@ namespace Umbraco.Tests.UmbracoExamine
 
         public static MediaIndexPopulator GetMediaIndexRebuilder(PropertyEditorCollection propertyEditors, IMediaService mediaService)
         {
-            var mediaValueSetBuilder = new MediaValueSetBuilder(propertyEditors, new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }), GetMockUserService());
+            var mediaValueSetBuilder = new MediaValueSetBuilder(propertyEditors, new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }), GetMockUserService(), GetMockLogger());
             var mediaIndexDataSource = new MediaIndexPopulator(null, mediaService, mediaValueSetBuilder);
             return mediaIndexDataSource;
         }
-
         public static IContentService GetMockContentService()
         {
             long longTotalRecs;
@@ -144,6 +144,11 @@ namespace Umbraco.Tests.UmbracoExamine
                     new MediaType(-1) {Alias = "Image", Name = "Image", Id = 1032, Icon = "icon-picture"}
                 });
             return mediaTypeServiceMock.Object;
+        }
+
+        public static IProfilingLogger GetMockLogger()
+        {
+            return new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
         }
 
         public static UmbracoContentIndex GetUmbracoIndexer(

@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Web.Security;
 using Microsoft.AspNet.Identity;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
@@ -217,7 +216,8 @@ namespace Umbraco.Core.Security
         {
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException(nameof(user));
-            if (string.IsNullOrEmpty(passwordHash)) throw new ArgumentNullOrEmptyException(nameof(passwordHash));
+            if (passwordHash == null) throw new ArgumentNullException(nameof(passwordHash));
+            if (string.IsNullOrEmpty(passwordHash)) throw new ArgumentException("Value can't be empty.", nameof(passwordHash));
 
             user.PasswordHash = passwordHash;
 
@@ -329,7 +329,7 @@ namespace Umbraco.Core.Security
         {
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException(nameof(user));
-            if (login == null) throw new ArgumentNullException("login");
+            if (login == null) throw new ArgumentNullException(nameof(login));
 
             var logins = user.Logins;
             var instance = new IdentityUserLogin(login.LoginProvider, login.ProviderKey, user.Id);
@@ -348,7 +348,7 @@ namespace Umbraco.Core.Security
         {
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException(nameof(user));
-            if (login == null) throw new ArgumentNullException("login");
+            if (login == null) throw new ArgumentNullException(nameof(login));
 
             var provider = login.LoginProvider;
             var key = login.ProviderKey;
@@ -379,7 +379,7 @@ namespace Umbraco.Core.Security
         public Task<BackOfficeIdentityUser> FindAsync(UserLoginInfo login)
         {
             ThrowIfDisposed();
-            if (login == null) throw new ArgumentNullException("login");
+            if (login == null) throw new ArgumentNullException(nameof(login));
 
             //get all logins associated with the login id
             var result = _externalLoginService.Find(login).ToArray();
@@ -413,7 +413,8 @@ namespace Umbraco.Core.Security
         {
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException(nameof(user));
-            if (string.IsNullOrWhiteSpace(roleName)) throw new ArgumentException("Value cannot be null or whitespace.", "roleName");
+            if (roleName == null) throw new ArgumentNullException(nameof(roleName));
+            if (string.IsNullOrWhiteSpace(roleName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(roleName));
 
             var userRole = user.Roles.SingleOrDefault(r => r.RoleId == roleName);
 
@@ -434,7 +435,8 @@ namespace Umbraco.Core.Security
         {
             ThrowIfDisposed();
             if (user == null) throw new ArgumentNullException(nameof(user));
-            if (string.IsNullOrWhiteSpace(roleName)) throw new ArgumentException("Value cannot be null or whitespace.", "roleName");
+            if (roleName == null) throw new ArgumentNullException(nameof(roleName));
+            if (string.IsNullOrWhiteSpace(roleName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(roleName));
 
             var userRole = user.Roles.SingleOrDefault(r => r.RoleId == roleName);
 

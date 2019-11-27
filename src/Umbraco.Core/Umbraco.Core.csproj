@@ -260,6 +260,7 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\RenameMediaVersionTable.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\ValueListPreValueMigrator.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\UmbracoSliderPreValueMigrator.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_6_0\AddPropertyTypeValidationMessageColumns.cs" />
     <Compile Include="Migrations\Upgrade\V_8_1_0\FixContentNuCascade.cs" />
     <Compile Include="Migrations\Upgrade\V_8_1_0\RenameUserLoginDtoDateIndex.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_1\ChangeNuCacheJsonFormat.cs" />
@@ -273,6 +274,7 @@
     <Compile Include="Models\Entities\IMediaEntitySlim.cs" />
     <Compile Include="Models\Entities\IMemberEntitySlim.cs" />
     <Compile Include="Models\Entities\MediaEntitySlim.cs" />
+    <Compile Include="Models\PagedResult.cs" />
     <Compile Include="Models\Entities\MemberEntitySlim.cs" />
     <Compile Include="Models\PublishedContent\ILivePublishedModelFactory.cs" />
     <Compile Include="Models\PublishedContent\IPublishedContentType.cs" />
@@ -679,7 +681,6 @@
     <Compile Include="Exceptions\ArgumentNullOrEmptyException.cs" />
     <Compile Include="Exceptions\AuthorizationException.cs" />
     <Compile Include="Exceptions\BootFailedException.cs" />
-    <Compile Include="Exceptions\ConnectionException.cs" />
     <Compile Include="Exceptions\DataOperationException.cs" />
     <Compile Include="Exceptions\InvalidCompositionException.cs" />
     <Compile Include="Composing\LightInject\LightInjectException.cs" />
@@ -847,7 +848,7 @@
     <Compile Include="Models\Packaging\InstallationSummary.cs" />
     <Compile Include="Models\Packaging\PackageAction.cs" />
     <Compile Include="Models\Packaging\PreInstallWarnings.cs" />
-    <Compile Include="Models\PagedResult.cs" />
+    <Compile Include="Models\PagedResultOfT.cs" />
     <Compile Include="Models\PartialView.cs" />
     <Compile Include="Models\PartialViewType.cs" />
     <Compile Include="Models\Property.cs" />
@@ -1064,7 +1065,6 @@
     <Compile Include="Persistence\Mappers\UserGroupMapper.cs" />
     <Compile Include="Persistence\Mappers\UserMapper.cs" />
     <Compile Include="Persistence\Mappers\UserSectionMapper.cs" />
-    <Compile Include="Migrations\DataLossException.cs" />
     <Compile Include="Migrations\IMigration.cs" />
     <Compile Include="Migrations\IMigrationContext.cs" />
     <Compile Include="Migrations\IMigrationExpression.cs" />
