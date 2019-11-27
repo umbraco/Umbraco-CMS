@@ -42,6 +42,8 @@ using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Web.PropertyEditors;
+using static Umbraco.Web.PropertyEditors.GridPropertyEditor;
+using Umbraco.Web.PropertyEditors.ValueReferences;
 
 namespace Umbraco.Web.Runtime
 {
@@ -274,7 +276,22 @@ namespace Umbraco.Web.Runtime
                 .Append<Issuu>()
                 .Append<Hulu>()
                 .Append<Giphy>();
-            
+
+            // Used to determine if a datatype/editor should be storing/tracking
+            // references to media item/s
+            composition.DataValueReferences()
+                .Append<ContentPickerPropertyValueReferences>()
+
+                // TODO: Unsure how to call other ValueReference in collection
+                // When looking at grid item cells for RTE or media found
+                //.Append<GridPropertyValueReferences>()
+                .Append<MediaPickerPropertyValueReferences>()
+                .Append<MultiNodeTreePickerPropertyValueReferences>()
+                .Append<MultiUrlPickerValueReferences>()
+
+                // TODO: LightInject problem
+                //.Append<NestedContentPropertyValueReferences>()
+                .Append<RichTextPropertyValueReferences>();
 
             // replace with web implementation
             composition.RegisterUnique<IPublishedSnapshotRebuilder, Migrations.PostMigrations.PublishedSnapshotRebuilder>();

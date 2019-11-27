@@ -15,7 +15,7 @@ using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
+    public class MultiUrlPickerValueEditor : DataValueEditor
     {
         private readonly IEntityService _entityService;
         private readonly ILogger _logger;
@@ -190,9 +190,6 @@ namespace Umbraco.Web.PropertyEditors
                 }
 
             }
-
-
-
         }
     }
 }

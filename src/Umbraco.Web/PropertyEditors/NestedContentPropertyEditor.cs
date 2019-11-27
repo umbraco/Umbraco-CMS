@@ -54,7 +54,7 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override IDataValueEditor CreateValueEditor() => new NestedContentPropertyValueEditor(Attribute, PropertyEditors, _dataTypeService, _contentTypeService);
 
-        internal class NestedContentPropertyValueEditor : DataValueEditor, IDataValueReference
+        internal class NestedContentPropertyValueEditor : DataValueEditor
         {
             private readonly PropertyEditorCollection _propertyEditors;
             private readonly IDataTypeService _dataTypeService;
@@ -227,32 +227,6 @@ namespace Umbraco.Web.PropertyEditors
                 // return json
                 return JsonConvert.SerializeObject(deserialized);
             }
-
-            public IEnumerable<UmbracoEntityReference> GetReferences(object value)
-            {
-                var rawJson = value == null ? string.Empty : value is string str ? str : value.ToString();
-
-                var result = new List<UmbracoEntityReference>();
-
-                foreach (var row in _nestedContentValues.GetPropertyValues(rawJson, out _))
-                {
-                    if (row.PropType == null) continue;
-
-                    var propEditor = _propertyEditors[row.PropType.PropertyEditorAlias];
-
-                    var valueEditor = propEditor?.GetValueEditor();
-                    if (!(valueEditor is IDataValueReference reference)) continue;
-
-                    var val = row.JsonRowValue[row.PropKey]?.ToString();
-
-                    var refs = reference.GetReferences(val);
-
-                    result.AddRange(refs);
-                }
-
-                return result;
-            }
-
             #endregion
         }
 

@@ -235,6 +235,13 @@
     <Compile Include="Profiling\WebProfilingController.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
+    <Compile Include="PropertyEditors\ValueReferences\ContentPickerPropertyValueReferences.cs" />
+    <Compile Include="PropertyEditors\ValueReferences\GridPropertyValueReferences.cs" />
+    <Compile Include="PropertyEditors\ValueReferences\MediaPickerPropertyValueReferences.cs" />
+    <Compile Include="PropertyEditors\ValueReferences\MultiNodeTreePickerPropertyValueReferences.cs" />
+    <Compile Include="PropertyEditors\ValueReferences\MultiUrlPickerValueReferences.cs" />
+    <Compile Include="PropertyEditors\ValueReferences\NestedContentPropertyValueReferences.cs" />
+    <Compile Include="PropertyEditors\ValueReferences\RichTextPropertyValueReferences.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />

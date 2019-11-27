@@ -36,6 +36,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         where TRepository : class, IRepository
     {
         private readonly Lazy<PropertyEditorCollection> _propertyEditors;
+        private readonly DataValueReferenceCollection _dataValueReferences;
 
         /// <summary>
         ///
@@ -49,13 +50,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// </param>
         protected ContentRepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger,
             ILanguageRepository languageRepository, IRelationRepository relationRepository, IRelationTypeRepository relationTypeRepository,
-            Lazy<PropertyEditorCollection> propertyEditors)
+            Lazy<PropertyEditorCollection> propertyEditors, DataValueReferenceCollection dataValueReferences)
             : base(scopeAccessor, cache, logger)
         {
             LanguageRepository = languageRepository;
             RelationRepository = relationRepository;
             RelationTypeRepository = relationTypeRepository;
             _propertyEditors = propertyEditors;
+            _dataValueReferences = dataValueReferences;
         }
 
         protected abstract TRepository This { get; }
@@ -826,15 +828,21 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             foreach (var p in entity.Properties)
             {
                 if (!PropertyEditors.TryGet(p.PropertyType.PropertyEditorAlias, out var editor)) continue;
-                var valueEditor = editor.GetValueEditor();
-                if (!(valueEditor is IDataValueReference reference)) continue;
 
                 //TODO: Support variants/segments! This is not required for this initial prototype which is why there is a check here
                 if (!p.PropertyType.VariesByNothing()) continue;
 
                 var val = p.GetValue(); // get the invariant value
-                var refs = reference.GetReferences(val);
-                trackedRelations.AddRange(refs);
+
+                // WB: Loop over our collection of references registered and add references
+                foreach (var item in _dataValueReferences)
+                {
+                    // Check if this value reference is for this datatype/editor
+                    // Then call it's GetReferences method - to see if the value stored
+                    // in the dataeditor/property has referecnes to media items
+                    if (item.IsForEditor(editor))
+                        trackedRelations.AddRange(item.GetReferences(val));
+                }
             }
 
             //First delete all auto-relations for this entity

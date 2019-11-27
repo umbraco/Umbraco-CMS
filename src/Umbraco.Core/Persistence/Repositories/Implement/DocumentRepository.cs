@@ -46,8 +46,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// </param>
         public DocumentRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger,
             IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, ILanguageRepository languageRepository, IRelationRepository relationRepository, IRelationTypeRepository relationTypeRepository,
-            Lazy<PropertyEditorCollection> propertyEditors)
-            : base(scopeAccessor, appCaches, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditors)
+            Lazy<PropertyEditorCollection> propertyEditors, DataValueReferenceCollection dataValueReferences)
+            : base(scopeAccessor, appCaches, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences)
         {
             _contentTypeRepository = contentTypeRepository ?? throw new ArgumentNullException(nameof(contentTypeRepository));
             _templateRepository = templateRepository ?? throw new ArgumentNullException(nameof(templateRepository));

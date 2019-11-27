@@ -57,7 +57,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// A custom value editor to ensure that macro syntax is parsed when being persisted and formatted correctly for display in the editor
         /// </summary>
-        internal class RichTextPropertyValueEditor : DataValueEditor, IDataValueReference
+        internal class RichTextPropertyValueEditor : DataValueEditor
         {
             private IUmbracoContextAccessor _umbracoContextAccessor;
             private readonly HtmlImageSourceParser _imageSourceParser;
@@ -129,24 +129,6 @@ namespace Umbraco.Web.PropertyEditors
                 var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValueWithMediaUrlsRemoved);
 
                 return parsed;
-            }
-
-            /// <summary>
-            /// Resolve references from <see cref="IDataValueEditor"/> values
-            /// </summary>
-            /// <param name="value"></param>
-            /// <returns></returns>
-            public IEnumerable<UmbracoEntityReference> GetReferences(object value)
-            {
-                var asString = value == null ? string.Empty : value is string str ? str : value.ToString();
-
-                foreach (var udi in _imageSourceParser.FindUdisFromDataAttributes(asString))
-                    yield return new UmbracoEntityReference(udi);
-
-                foreach (var udi in _localLinkParser.FindUdisFromLocalLinks(asString))
-                    yield return new UmbracoEntityReference(udi);
-
-                //TODO: Detect Macros too ... but we can save that for a later date, right now need to do media refs
             }
         }
 

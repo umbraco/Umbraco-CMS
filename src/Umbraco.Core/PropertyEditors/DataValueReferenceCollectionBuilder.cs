@@ -2,8 +2,8 @@
 
 namespace Umbraco.Core.PropertyEditors
 {
-    public class DataValueReferenceCollectionBuilder : LazyCollectionBuilderBase<DataValueReferenceCollectionBuilder, DataValueReferenceCollection, IDataValueReference>
+    public class DataValueReferenceCollectionBuilder : OrderedCollectionBuilderBase<DataValueReferenceCollectionBuilder, DataValueReferenceCollection, IDataValueReference>
     {
-        protected override DataValueReferenceCollectionBuilder This => this;
+        protected override DataValueReferenceCollectionBuilder This => this;         
     }
 }
