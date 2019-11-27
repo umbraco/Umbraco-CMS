@@ -503,6 +503,7 @@
                     // Force validation to occur server side as this is the
                     // only way we can have consistency between mandatory and
                     // regex validation messages. Not ideal, but it works.
+                    prop.ncMandatory = prop.validation.mandatory;
                     prop.validation = {
                         mandatory: false,
                         pattern: ""
