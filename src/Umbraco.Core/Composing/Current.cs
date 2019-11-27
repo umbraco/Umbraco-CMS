@@ -215,6 +215,7 @@ namespace Umbraco.Core.Composing
 
         public static IHostingEnvironment HostingEnvironment => Factory.GetInstance<IHostingEnvironment>();
         public static IBackOfficeInfo BackOfficeInfo => Factory.GetInstance<IBackOfficeInfo>();
+        public static ISessionIdResolver SessionIdResolver  => Factory.GetInstance<ISessionIdResolver>();
 
         #endregion
     }

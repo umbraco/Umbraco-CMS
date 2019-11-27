@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading;
-using System.Web;
 using Serilog.Core;
 using Serilog.Events;
+using Umbraco.Core.Cache;
 
 namespace Umbraco.Core.Logging.Serilog.Enrichers
 {
@@ -14,13 +14,20 @@ namespace Umbraco.Core.Logging.Serilog.Enrichers
     /// </summary>
     internal class HttpRequestNumberEnricher : ILogEventEnricher
     {
+        private static int _lastRequestNumber;
+        private static readonly string _requestNumberItemName = typeof(HttpRequestNumberEnricher).Name + "+RequestNumber";
+
         /// <summary>
         /// The property name added to enriched log events.
         /// </summary>
-        public const string HttpRequestNumberPropertyName = "HttpRequestNumber";
+        private const string _httpRequestNumberPropertyName = "HttpRequestNumber";
 
-        static int _lastRequestNumber;
-        static readonly string RequestNumberItemName = typeof(HttpRequestNumberEnricher).Name + "+RequestNumber";
+        private readonly Lazy<IAppCache> _requestCache;
+
+        public HttpRequestNumberEnricher(Lazy<IAppCache> requestCache)
+        {
+            _requestCache = requestCache;
+        }
 
         /// <summary>
         /// Enrich the log event with the number assigned to the currently-executing HTTP request, if any.
@@ -31,17 +38,10 @@ namespace Umbraco.Core.Logging.Serilog.Enrichers
         {
             if (logEvent == null) throw new ArgumentNullException("logEvent");
 
-            if (HttpContext.Current == null)
-                return;
+            var requestNumber = _requestCache.Value.Get(_requestNumberItemName,
+                    () => Interlocked.Increment(ref _lastRequestNumber));
 
-            int requestNumber;
-            var requestNumberItem = HttpContext.Current.Items[RequestNumberItemName];
-            if (requestNumberItem == null)
-                HttpContext.Current.Items[RequestNumberItemName] = requestNumber = Interlocked.Increment(ref _lastRequestNumber);
-            else
-                requestNumber = (int)requestNumberItem;
-
-            var requestNumberProperty = new LogEventProperty(HttpRequestNumberPropertyName, new ScalarValue(requestNumber));
+            var requestNumberProperty = new LogEventProperty(_httpRequestNumberPropertyName, new ScalarValue(requestNumber));
             logEvent.AddPropertyIfAbsent(requestNumberProperty);
         }
     }

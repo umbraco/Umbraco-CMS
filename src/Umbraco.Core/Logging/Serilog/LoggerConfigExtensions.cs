@@ -6,6 +6,8 @@ using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting;
 using Serilog.Formatting.Compact;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging.Serilog.Enrichers;
 
@@ -39,8 +41,8 @@ namespace Umbraco.Core.Logging.Serilog
                 .Enrich.WithProperty("AppDomainAppId", hostingEnvironment.ApplicationId.ReplaceNonAlphanumericChars(string.Empty))
                 .Enrich.WithProperty("MachineName", Environment.MachineName)
                 .Enrich.With<Log4NetLevelMapperEnricher>()
-                .Enrich.With<HttpSessionIdEnricher>()
-                .Enrich.With<HttpRequestNumberEnricher>()
+                .Enrich.With(new HttpSessionIdEnricher(new Lazy<ISessionIdResolver>(() => Current.SessionIdResolver)))
+                .Enrich.With(new HttpRequestNumberEnricher(new Lazy<IAppCache>(() => Current.AppCaches.RequestCache)))
                 .Enrich.With<HttpRequestIdEnricher>();
 
             return logConfig;

@@ -56,6 +56,7 @@ namespace Umbraco.Web.Runtime
 
             composition.Register<UmbracoInjectedModule>();
             composition.Register<IIpResolver, AspNetIpResolver>();
+            composition.Register<ISessionIdResolver, AspNetSessionIdResolver>();
             composition.Register<IHostingEnvironment, AspNetHostingEnvironment>();
             composition.Register<IBackOfficeInfo, AspNetBackOfficeInfo>();
 
