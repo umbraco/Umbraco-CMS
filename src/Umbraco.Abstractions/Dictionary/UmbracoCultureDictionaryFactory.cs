@@ -9,7 +9,7 @@ namespace Umbraco.Core.Dictionary
     /// <remarks>
     /// In the future this will allow use to potentially store dictionary items elsewhere and allows for maximum flexibility.
     /// </remarks>
-    internal class DefaultCultureDictionaryFactory : ICultureDictionaryFactory
+    public class DefaultCultureDictionaryFactory : ICultureDictionaryFactory
     {
         private readonly ILocalizationService _localizationService;
         private readonly AppCaches _appCaches;

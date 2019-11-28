@@ -4,7 +4,7 @@ using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Events
 {
-    internal class ExportedMemberEventArgs : EventArgs
+    public class ExportedMemberEventArgs : EventArgs
     {
         public IMember Member { get; }
         public MemberExportModel Exported { get; }

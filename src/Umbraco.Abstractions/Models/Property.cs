@@ -509,7 +509,7 @@ namespace Umbraco.Core.Models
             var clonedEntity = (Property)clone;
 
             //need to manually assign since this is a readonly property
-            clonedEntity.PropertyType = (PropertyType) PropertyType.DeepClone();
+            clonedEntity.PropertyType = (IPropertyType) PropertyType.DeepClone();
         }
     }
 }

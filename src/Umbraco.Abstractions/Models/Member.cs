@@ -405,28 +405,28 @@ namespace Umbraco.Core.Models
          * Adding these to have first level properties instead of the Properties collection.
          */
         [IgnoreDataMember]
-        internal string LongStringPropertyValue { get; set; }
+        public string LongStringPropertyValue { get; set; }
         [IgnoreDataMember]
-        internal string ShortStringPropertyValue { get; set; }
+        public string ShortStringPropertyValue { get; set; }
         [IgnoreDataMember]
-        internal int IntegerPropertyValue { get; set; }
+        public int IntegerPropertyValue { get; set; }
         [IgnoreDataMember]
-        internal bool BoolPropertyValue { get; set; }
+        public bool BoolPropertyValue { get; set; }
         [IgnoreDataMember]
-        internal DateTime DateTimePropertyValue { get; set; }
+        public DateTime DateTimePropertyValue { get; set; }
         [IgnoreDataMember]
-        internal string PropertyTypeAlias { get; set; }
+        public string PropertyTypeAlias { get; set; }
 
         private Attempt<T> WarnIfPropertyTypeNotFoundOnGet<T>(string propertyAlias, string propertyName, T defaultVal)
         {
             void DoLog(string logPropertyAlias, string logPropertyName)
             {
-                Current.Logger.Warn<Member>("Trying to access the '{PropertyName}' property on '{MemberType}' " +
-                                            "but the {PropertyAlias} property does not exist on the member type so a default value is returned. " +
-                                            "Ensure that you have a property type with alias:  {PropertyAlias} configured on your member type in order to use the '{PropertyName}' property on the model correctly.",
-                                                logPropertyName,
-                                                typeof(Member),
-                                                logPropertyAlias);
+                // Current.Logger.Warn<Member>("Trying to access the '{PropertyName}' property on '{MemberType}' " +
+                //                             "but the {PropertyAlias} property does not exist on the member type so a default value is returned. " +
+                //                             "Ensure that you have a property type with alias:  {PropertyAlias} configured on your member type in order to use the '{PropertyName}' property on the model correctly.",
+                //                                 logPropertyName,
+                //                                 typeof(Member),
+                //                                 logPropertyAlias);
             }
 
             // if the property doesn't exist,
@@ -446,11 +446,11 @@ namespace Umbraco.Core.Models
         {
             void DoLog(string logPropertyAlias, string logPropertyName)
             {
-                Current.Logger.Warn<Member>("An attempt was made to set a value on the property '{PropertyName}' on type '{MemberType}' but the " +
-                                            "property type {PropertyAlias} does not exist on the member type, ensure that this property type exists so that setting this property works correctly.",
-                                                logPropertyName,
-                                                typeof(Member),
-                                                logPropertyAlias);
+                // Current.Logger.Warn<Member>("An attempt was made to set a value on the property '{PropertyName}' on type '{MemberType}' but the " +
+                //                             "property type {PropertyAlias} does not exist on the member type, ensure that this property type exists so that setting this property works correctly.",
+                //                                 logPropertyName,
+                //                                 typeof(Member),
+                //                                 logPropertyAlias);
             }
 
             // if the property doesn't exist,
