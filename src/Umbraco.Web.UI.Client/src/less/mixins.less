@@ -332,7 +332,7 @@
 }
 
 // Gradient Bar Colors for buttons and alerts
-.gradientBar(@primaryColor, @secondaryColor, @textColor: #fff) {
+.gradientBar(@primaryColor, @secondaryColor, @textColor: @white) {
   color: @textColor;
   #gradient > .vertical(@primaryColor, @secondaryColor);
   border-color: @secondaryColor @secondaryColor darken(@secondaryColor, 15%);
@@ -435,14 +435,14 @@
 
 // Button backgrounds
 // ------------------
-.buttonBackground(@startColor, @hoverColor: @startColor, @textColor: #fff, @textColorHover: @textColor) {
-  
+.buttonBackground(@startColor, @hoverColor: @startColor, @textColor: @white, @textColorHover: @textColor) {
+
   color: @textColor;
   border-color: @startColor @startColor darken(@startColor, 15%);
   border-color: rgba(0,0,0,.1) rgba(0,0,0,.1) fadein(rgba(0,0,0,.1), 15%);
-  
+
   background-color: @startColor;
-  
+
   .caret {
       border-top-color: @textColor;
       border-bottom-color: @textColor;
