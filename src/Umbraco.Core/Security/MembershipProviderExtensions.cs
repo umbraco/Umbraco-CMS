@@ -158,7 +158,7 @@ namespace Umbraco.Core.Security
         /// <returns></returns>
         public static bool IsUmbracoMembershipProvider(this MembershipProvider membershipProvider)
         {
-            return (membershipProvider is UmbracoMembershipProviderBase);
+            return (membershipProvider.GetType() == typeof(UmbracoMembershipProviderBase));
         }
 
         // TODO: Add role provider checks too
