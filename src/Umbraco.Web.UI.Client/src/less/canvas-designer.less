@@ -32,8 +32,8 @@ body {
 h4 {
     margin: 0;
     font-size: 16px;
-    background-color: #535353; //NOT IN VARIABLES
-    color: #b3b3b3; //NOT IN VARIABLES
+    background-color: @gray-3;
+    color: @gray-7;
     text-transform: uppercase;
     position: initial;
     display: block;
@@ -54,7 +54,7 @@ ul {
 }
 
 a, a:hover{
-    color:#333; //NOT IN VARIABLES
+    color: @grayDark;
     text-decoration:none;
 }
 
@@ -104,7 +104,7 @@ a, a:hover{
     vertical-align: middle;
     cursor: pointer;
     background: #f2f2f2; //NOT IN VARIABLES
-    border: 1px solid #cccccc; //NOT IN VARIABLES
+    border: 1px solid @gray-8;
     border-radius: 2px;
     box-shadow: none;
 }
@@ -402,7 +402,7 @@ ul.sections li:hover a span {
 }
 
 .main-panel .header h3 i:hover {
-    color:#333;
+    color: @grayDark;
 }
 
 .main-panel.selected {
@@ -602,8 +602,8 @@ h4.panel-title {
 .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default,
 .ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover,
 .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus {
-    border: 1px solid #535353  !important; //Not in variables
-    background: #535353  !important; //Not in variables
+    border: 1px solid @gray-3  !important;
+    background: @gray-3  !important;
     background-color:none !important;
     outline:none;
 }
@@ -616,7 +616,7 @@ h4.panel-title {
 .canvasdesigner .ui-slider .ui-slider-handle span {
     position: absolute !important;
     margin: -15px 0 0 -8px !important;
-    color: #535353 !important; //Not in variables
+    color: @gray-3 !important;
     font-size: 9px !important;
     text-align: -webkit-center !important;
     display: block !important;
@@ -936,7 +936,7 @@ iframe {
 
 .canvasdesignerImagePicker h3 {
   font-size: 18px;
-  color: #555555; //Not in variables
+  color: @gray;
 }
 
 /*************************************************/
@@ -952,11 +952,11 @@ iframe {
     width: 30px;
     border-radius: 1px;
     border: none;
-    display:inline-block;
-    background-color:#535353; //Not in variables
-    cursor:pointer;
+    display: inline-block;
+    background-color: @gray-3;
+    cursor: pointer;
     margin-right: 6px;
-    position:relative;
+    position: relative;
 }
 
 .box-preview li:last-child{
@@ -968,29 +968,29 @@ iframe {
 }
 
 .box-preview li.border-all {
-    border: 6px solid #b3b3b3; //Not in variables
+    border: 6px solid @gray-7;
     height: 18px;
     width: 18px;
-    margin-left:0px
+    margin-left: 0px
 }
 
 .box-preview li.border-left {
-    border-left: 6px solid #b3b3b3; //Not in variables
+    border-left: 6px solid @gray-7;
     width: 24px;
 }
 
 .box-preview li.border-right {
-    border-right: 6px solid #b3b3b3; //Not in variables
+    border-right: 6px solid @gray-7;
     width: 24px;
 }
 
 .box-preview li.border-top {
-    border-top: 6px solid #b3b3b3; //Not in variables
+    border-top: 6px solid @gray-7;
     height: 24px;
 }
 
 .box-preview li.border-bottom {
-    border-bottom: 6px solid #b3b3b3; //Not in variables
+    border-bottom: 6px solid @gray-7;
     height: 24px;
 }
 
@@ -1007,7 +1007,7 @@ iframe {
 .radius-top-left, .radius-top-right, .radius-bottom-left, .radius-bottom-right {
     display: block;
     position: absolute;
-    background-color: #b3b3b3; //Not in variables
+    background-color: @gray-7;
     width: 7px;
     height: 7px;
 }

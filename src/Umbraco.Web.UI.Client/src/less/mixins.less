@@ -341,7 +341,7 @@
 
 // Gradients
 #gradient {
-  .horizontal(@startColor: @gray, @endColor: #333) { //Not in variables
+  .horizontal(@startColor: @gray, @endColor: @grayDark) {
     background-color: @endColor;
     background-image: -moz-linear-gradient(left, @startColor, @endColor); // FF 3.6+
     background-image: -webkit-gradient(linear, 0 0, 100% 0, from(@startColor), to(@endColor)); // Safari 4+, Chrome 2+
@@ -350,7 +350,7 @@
     background-image: linear-gradient(to right, @startColor, @endColor); // Standard, IE10
     background-repeat: repeat-x;
   }
-  .vertical(@startColor: @gray, @endColor: #333) { //Not in variables
+  .vertical(@startColor: @gray, @endColor: @grayDark) {
     background-color: mix(@startColor, @endColor, 60%);
     background-image: -moz-linear-gradient(top, @startColor, @endColor); // FF 3.6+
     background-image: -webkit-gradient(linear, 0 0, 0 100%, from(@startColor), to(@endColor)); // Safari 4+, Chrome 2+
@@ -359,7 +359,7 @@
     background-image: linear-gradient(to bottom, @startColor, @endColor); // Standard, IE10
     background-repeat: repeat-x;
   }
-  .directional(@startColor: @gray, @endColor: #333, @deg: 45deg) { //Not in variables
+  .directional(@startColor: @gray, @endColor: @grayDark, @deg: 45deg) {
     background-color: @endColor;
     background-repeat: repeat-x;
     background-image: -moz-linear-gradient(@deg, @startColor, @endColor); // FF 3.6+
@@ -367,7 +367,7 @@
     background-image: -o-linear-gradient(@deg, @startColor, @endColor); // Opera 11.10
     background-image: linear-gradient(@deg, @startColor, @endColor); // Standard, IE10
   }
-  .horizontal-three-colors(@startColor: #00b3ee, @midColor: #71677a, @colorStop: 50%, @endColor: #c3325f) { //Not in variables
+  .horizontal-three-colors(@startColor: @lightBlueIcon, @midColor: @purple-l1, @colorStop: 50%, @endColor: #c3325f) { //Not in variables
     background-color: mix(@midColor, @endColor, 80%);
     background-image: -webkit-gradient(left, linear, 0 0, 0 100%, from(@startColor), color-stop(@colorStop, @midColor), to(@endColor));
     background-image: -webkit-linear-gradient(left, @startColor, @midColor @colorStop, @endColor);
@@ -377,7 +377,7 @@
     background-repeat: no-repeat;
   }
 
-  .vertical-three-colors(@startColor: #00b3ee, @midColor: #7a43b6, @colorStop: 50%, @endColor: #c3325f) { //Not in variables
+  .vertical-three-colors(@startColor: @lightBlueIcon, @midColor: #7a43b6, @colorStop: 50%, @endColor: #c3325f) { //Not in variables
     background-color: mix(@midColor, @endColor, 80%);
     background-image: -webkit-gradient(linear, 0 0, 0 100%, from(@startColor), color-stop(@colorStop, @midColor), to(@endColor));
     background-image: -webkit-linear-gradient(@startColor, @midColor @colorStop, @endColor);
@@ -386,7 +386,7 @@
     background-image: linear-gradient(@startColor, @midColor @colorStop, @endColor);
     background-repeat: no-repeat;
   }
-  .radial(@innerColor: @gray, @outerColor: #333) { //Not in variables
+  .radial(@innerColor: @gray, @outerColor: @grayDark) {
     background-color: @outerColor;
     background-image: -webkit-gradient(radial, center center, 0, center center, 460, from(@innerColor), to(@outerColor));
     background-image: -webkit-radial-gradient(circle, @innerColor, @outerColor);
