@@ -10,6 +10,7 @@ module.exports = {
             nonodes: { files: "./src/less/pages/nonodes.less", watch: "./src/less/**/*.less", out: "nonodes.style.min.css"},
             preview: { files: "./src/less/canvas-designer.less", watch: "./src/less/**/*.less", out: "canvasdesigner.css" },
             umbraco: { files: "./src/less/belle.less", watch: "./src/less/**/*.less", out: "umbraco.css" },
+            night: { files: "./src/less/night.less", watch: "./src/less/**/*.less", out: "night.css" },
             rteContent: { files: "./src/less/rte-content.less", watch: "./src/less/**/*.less", out: "rte-content.css" }
         },
 
@@ -22,7 +23,7 @@ module.exports = {
             resources: { files: "./src/common/resources/**/*.js", out: "umbraco.resources.js" },
             services: { files: "./src/common/services/**/*.js", out: "umbraco.services.js" },
             security: { files: "./src/common/interceptors/**/*.js", out: "umbraco.interceptors.js" },
-            
+
             //the controllers for views
             controllers: {
                 files: [
@@ -42,7 +43,7 @@ module.exports = {
                 ],
                 out: "umbraco.directives.js"
             }
-            
+
         },
 
         //selectors for copying all views into the build
