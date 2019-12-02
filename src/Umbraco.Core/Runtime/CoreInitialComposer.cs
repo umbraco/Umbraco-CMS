@@ -75,6 +75,10 @@ namespace Umbraco.Core.Runtime
             composition.RegisterUnique<PropertyEditorCollection>();
             composition.RegisterUnique<ParameterEditorCollection>();
 
+            // Used to determine if a datatype/editor should be storing/tracking
+            // references to media item/s
+            composition.DataValueReferenceFors();
+                //WB:TODO Try me out & overide/add to an existing list
 
             // register a server registrar, by default it's the db registrar
             composition.RegisterUnique<IServerRegistrar>(f =>

@@ -177,7 +177,7 @@ namespace Umbraco.Web.Runtime
                 .Remove<TinyMceValueConverter>()
                 .Remove<TextStringValueConverter>()
                 .Remove<MarkdownEditorValueConverter>();
-
+            
             // add all known factories, devs can then modify this list on application
             // startup either by binding to events or in their own global.asax
             composition.FilteredControllerFactory()
@@ -271,10 +271,6 @@ namespace Umbraco.Web.Runtime
                 .Append<Hulu>()
                 .Append<Giphy>();
 
-            // Used to determine if a datatype/editor should be storing/tracking
-            // references to media item/s
-            composition.DataValueReferenceFors();
-                //WB:TODO Try me out
 
             // replace with web implementation
             composition.RegisterUnique<IPublishedSnapshotRebuilder, Migrations.PostMigrations.PublishedSnapshotRebuilder>();
