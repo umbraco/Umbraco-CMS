@@ -519,11 +519,16 @@
         }));
 
         evts.push(eventsService.on("editors.documentType.saved", function(name, args) {
-            if(args.documentType.allowedTemplates.length > 0){
-                navigationService.syncTree({ tree: "templates", path: [], forceReload: true })
-                    .then(function (syncArgs) {
-                        navigationService.reloadNode(syncArgs.node)
-                    });
+            if(args.documentType.allowedTemplates.length > 0) {
+                navigationService.hasTree("templates").then(function (treeExists) {
+                    if (treeExists) {
+                        navigationService.syncTree({ tree: "templates", path: [], forceReload: true })
+                            .then(function (syncArgs) {
+                                navigationService.reloadNode(syncArgs.node)
+                            }
+                        );
+                    }
+                }); 
             }
         }));
 

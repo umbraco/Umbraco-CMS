@@ -5,7 +5,6 @@ using NPoco;
 using NPoco.FluentMappings;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.FaultHandling;
 using Umbraco.Core.Persistence.Mappers;
@@ -62,8 +61,8 @@ namespace Umbraco.Core.Persistence
         /// <remarks>Used by the other ctor and in tests.</remarks>
         public UmbracoDatabaseFactory(string connectionStringName, ILogger logger, Lazy<IMapperCollection> mappers, Configs configs)
         {
-            if (string.IsNullOrWhiteSpace(connectionStringName))
-                throw new ArgumentNullOrEmptyException(nameof(connectionStringName));
+            if (connectionStringName == null) throw new ArgumentNullException(nameof(connectionStringName));
+            if (string.IsNullOrWhiteSpace(connectionStringName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(connectionStringName));
 
             _mappers = mappers ?? throw new ArgumentNullException(nameof(mappers));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
