@@ -126,21 +126,10 @@
                </umb-editor-sub-header-section>
 
                <umb-editor-sub-header-section ng-show="(selection.length == 0)">
-                   <ng-form class="form-search -no-margin-bottom pull-right" novalidate>
-                       <div class="inner-addon left-addon">
-                           <i class="icon icon-search" ng-click="enterSearch($event)"></i>
-                           <input
-                               class="form-control search-input"
-                               type="text"
-                               localize="placeholder"
-                               placeholder="@general_typeToSearch"
-                               ng-model="options.filter"
-                               ng-change="enterSearch()"
-                               ng-keydown="forceSearch($event)"
-                               prevent-enter-submit
-                               no-dirty-check>
-                       </div>
-                   </ng-form>
+
+                    <umb-mini-search model="options.filter" on-search="makeSearch()" on-start-typing="onSearchStartTyping()">
+                    </umb-mini-search>
+
                </umb-editor-sub-header-section>
 
                <umb-editor-sub-header-section ng-show="(selection.length > 0)">
