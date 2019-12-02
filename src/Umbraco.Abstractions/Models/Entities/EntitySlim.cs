@@ -11,7 +11,7 @@ namespace Umbraco.Core.Models.Entities
     /// Implementation of <see cref="IEntitySlim"/> for internal use.
     /// </summary>
     /// <remarks>
-    /// <para>Although it implements <see cref="IEntitySlim"/>, this class does not 
+    /// <para>Although it implements <see cref="IEntitySlim"/>, this class does not
     /// implement <see cref="IRememberBeingDirty"/> and everything this interface defines, throws.</para>
     /// <para>Although it implements <see cref="IEntitySlim"/>, this class does not
     /// implement <see cref="IDeepCloneable"/> and deep-cloning throws.</para>
@@ -67,7 +67,7 @@ namespace Umbraco.Core.Models.Entities
         public int ParentId { get; set; }
 
         /// <inheritdoc />
-        public void SetParent(ITreeEntity parent) => throw new WontImplementException();
+        public void SetParent(ITreeEntity parent) => throw new InvalidOperationException("This property won't be implemented.");
 
         /// <inheritdoc />
         [DataMember]
@@ -117,7 +117,7 @@ namespace Umbraco.Core.Models.Entities
         /// <inheritdoc />
         public object DeepClone()
         {
-            throw new WontImplementException();
+            throw new InvalidOperationException("This method won't be implemented.");
         }
 
         #endregion
@@ -127,5 +127,58 @@ namespace Umbraco.Core.Models.Entities
             Id = default;
             Key = Guid.Empty;
         }
+
+        #region IRememberBeingDirty
+
+        // IEntitySlim does *not* track changes, but since it indirectly implements IUmbracoEntity,
+        // and therefore IRememberBeingDirty, we have to have those methods - which all throw.
+
+        public bool IsDirty()
+        {
+            throw new InvalidOperationException("This method won't be implemented.");
+        }
+
+        public bool IsPropertyDirty(string propName)
+        {
+            throw new InvalidOperationException("This method won't be implemented.");
+        }
+
+        public IEnumerable<string> GetDirtyProperties()
+        {
+            throw new InvalidOperationException("This method won't be implemented.");
+        }
+
+        public void ResetDirtyProperties()
+        {
+            throw new InvalidOperationException("This method won't be implemented.");
+        }
+
+        public bool WasDirty()
+        {
+            throw new InvalidOperationException("This method won't be implemented.");
+        }
+
+        public bool WasPropertyDirty(string propertyName)
+        {
+            throw new InvalidOperationException("This method won't be implemented.");
+        }
+
+        public void ResetWereDirtyProperties()
+        {
+            throw new InvalidOperationException("This method won't be implemented.");
+        }
+
+        public void ResetDirtyProperties(bool rememberDirty)
+        {
+            throw new InvalidOperationException("This method won't be implemented.");
+        }
+
+        public IEnumerable<string> GetWereDirtyProperties()
+        {
+            throw new InvalidOperationException("This method won't be implemented.");
+        }
+
+        #endregion
+
     }
 }

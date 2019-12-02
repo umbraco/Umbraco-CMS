@@ -45,7 +45,7 @@ namespace Umbraco.Core.PropertyEditors.Validators
             {
                 if (value.ToString().DetectIsEmptyJson())
                 {
-                    
+
                     yield return new ValidationResult(_textService?.Localize("validation", "invalidEmpty") ?? ValueCannotBeEmpty, new[] { "value" });
                 }
 

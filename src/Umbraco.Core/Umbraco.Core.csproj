@@ -188,6 +188,7 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\RenameMediaVersionTable.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\ValueListPreValueMigrator.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\UmbracoSliderPreValueMigrator.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_6_0\AddPropertyTypeValidationMessageColumns.cs" />
     <Compile Include="Migrations\Upgrade\V_8_1_0\FixContentNuCascade.cs" />
     <Compile Include="Migrations\Upgrade\V_8_1_0\RenameUserLoginDtoDateIndex.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_1\ChangeNuCacheJsonFormat.cs" />
@@ -239,8 +240,6 @@
     <Compile Include="Services\Implement\PropertyValidationService.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="Strings\DefaultUrlSegmentProvider.cs" />
-    <Compile Include="Strings\IUrlSegmentProvider.cs" />
-    <Compile Include="Strings\UrlSegmentProviderCollection.cs" />
     <Compile Include="Sync\RefreshInstructionEnvelope.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />
@@ -795,7 +794,6 @@
     <Compile Include="Compose\ManifestWatcherComponent.cs" />
     <Compile Include="Compose\RelateOnCopyComponent.cs" />
     <Compile Include="Compose\RelateOnTrashComponent.cs" />
-    <Compile Include="Strings\UrlSegmentProviderCollectionBuilder.cs" />
     <Compile Include="Sync\ApplicationUrlHelper.cs" />
     <Compile Include="Sync\DatabaseServerMessenger.cs" />
     <Compile Include="Sync\RefreshInstruction.cs" />

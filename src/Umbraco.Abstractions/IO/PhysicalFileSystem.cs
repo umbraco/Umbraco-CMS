@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.Composing;
 using System.Threading;
 using Umbraco.Core.Logging;
 
@@ -47,9 +48,11 @@ namespace Umbraco.Core.IO
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            if (string.IsNullOrEmpty(rootPath)) throw new ArgumentNullOrEmptyException(nameof(rootPath));
-            if (string.IsNullOrEmpty(rootUrl)) throw new ArgumentNullOrEmptyException(nameof(rootUrl));
-            if (rootPath.StartsWith("~/")) throw new ArgumentException("The rootPath argument cannot be a virtual path and cannot start with '~/'");
+            if (rootPath == null) throw new ArgumentNullException(nameof(rootPath));
+            if (string.IsNullOrEmpty(rootPath)) throw new ArgumentException("Value can't be empty.", nameof(rootPath));
+            if (rootUrl == null) throw new ArgumentNullException(nameof(rootUrl));
+            if (string.IsNullOrEmpty(rootUrl)) throw new ArgumentException("Value can't be empty.", nameof(rootUrl));
+            if (rootPath.StartsWith("~/")) throw new ArgumentException("Value can't be a virtual path and start with '~/'.", nameof(rootPath));
 
 
             // rootPath should be... rooted, as in, it's a root path!
@@ -323,7 +326,7 @@ namespace Umbraco.Core.IO
 
             // nothing prevents us to reach the file, security-wise, yet it is outside
             // this filesystem's root - throw
-            throw new FileSecurityException("File '" + opath + "' is outside this filesystem's root.");
+            throw new UnauthorizedAccessException("File '" + opath + "' is outside this filesystem's root.");
         }
 
         /// <summary>

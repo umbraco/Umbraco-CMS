@@ -1291,7 +1291,8 @@ namespace Umbraco.Core.Services.Implement
 
         private IMemberType GetMemberType(IScope scope, string memberTypeAlias)
         {
-            if (string.IsNullOrWhiteSpace(memberTypeAlias)) throw new ArgumentNullOrEmptyException(nameof(memberTypeAlias));
+            if (memberTypeAlias == null) throw new ArgumentNullException(nameof(memberTypeAlias));
+            if (string.IsNullOrWhiteSpace(memberTypeAlias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(memberTypeAlias));
 
             scope.ReadLock(Constants.Locks.MemberTypes);
 
@@ -1305,7 +1306,8 @@ namespace Umbraco.Core.Services.Implement
 
         private IMemberType GetMemberType(string memberTypeAlias)
         {
-            if (string.IsNullOrWhiteSpace(memberTypeAlias)) throw new ArgumentNullOrEmptyException(nameof(memberTypeAlias));
+            if (memberTypeAlias == null) throw new ArgumentNullException(nameof(memberTypeAlias));
+            if (string.IsNullOrWhiteSpace(memberTypeAlias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(memberTypeAlias));
 
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {

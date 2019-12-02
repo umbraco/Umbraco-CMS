@@ -272,6 +272,7 @@
     <key alias="scheduledPublishServerTime">Dette oversætter til den følgende tid på serveren:</key>
     <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Hvad betyder det?</a>]]></key>
     <key alias="nestedContentDeleteItem">Er du sikker på, at du vil slette dette element?</key>
+    <key alias="nestedContentDeleteAllItems">Er du sikker på, at du vil slette alle elementer?</key>
     <key alias="nestedContentEditorNotSupported">Egenskaben %0% anvender editoren %1% som ikke er understøttet af Nested Content.</key>
     <key alias="nestedContentNoContentTypes">Der er ikke konfigureret nogen indholdstyper for denne egenskab.</key>
     <key alias="nestedContentCopyAllItemsName">%0% fra %1%</key>
@@ -1772,6 +1773,7 @@ Mange hilsner fra Umbraco robotten
   <area alias="clipboard">
     <key alias="labelForCopyAllEntries">Kopier %0%</key>
     <key alias="labelForArrayOfItemsFrom">%0% fra %1%</key>
+    <key alias="labelForRemoveAllEntries">Fjern alle elementer</key>
   </area>
   <area alias="propertyActions">
     <key alias="tooltipForPropertyActionsMenu">Åben egenskabshandlinger</key>
