@@ -9,9 +9,7 @@ using Umbraco.Core.Dashboards;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
 using Umbraco.Core.Migrations.PostMigrations;
-using Umbraco.Web.Migrations.PostMigrations;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Services;
@@ -19,7 +17,6 @@ using Umbraco.Web.Actions;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing.CompositionExtensions;
 using Umbraco.Web.ContentApps;
-using Umbraco.Web.Dashboards;
 using Umbraco.Web.Dictionary;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
@@ -37,13 +34,10 @@ using Umbraco.Web.Security.Providers;
 using Umbraco.Web.Services;
 using Umbraco.Web.SignalR;
 using Umbraco.Web.Templates;
-using Umbraco.Web.Tour;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Web.PropertyEditors;
-using static Umbraco.Web.PropertyEditors.GridPropertyEditor;
-using Umbraco.Web.PropertyEditors.ValueReferences;
 
 namespace Umbraco.Web.Runtime
 {
@@ -279,19 +273,8 @@ namespace Umbraco.Web.Runtime
 
             // Used to determine if a datatype/editor should be storing/tracking
             // references to media item/s
-            composition.DataValueReferences()
-                .Append<ContentPickerPropertyValueReferences>()
-
-                // TODO: Unsure how to call other ValueReference in collection
-                // When looking at grid item cells for RTE or media found
-                //.Append<GridPropertyValueReferences>()
-                .Append<MediaPickerPropertyValueReferences>()
-                .Append<MultiNodeTreePickerPropertyValueReferences>()
-                .Append<MultiUrlPickerValueReferences>()
-
-                // TODO: LightInject problem
-                //.Append<NestedContentPropertyValueReferences>()
-                .Append<RichTextPropertyValueReferences>();
+            composition.DataValueReferenceFors();
+                //WB:TODO Try me out
 
             // replace with web implementation
             composition.RegisterUnique<IPublishedSnapshotRebuilder, Migrations.PostMigrations.PublishedSnapshotRebuilder>();

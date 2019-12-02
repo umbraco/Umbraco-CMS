@@ -29,8 +29,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly MediaByGuidReadRepository _mediaByGuidReadRepository;
 
         public MediaRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository, ILanguageRepository languageRepository, IRelationRepository relationRepository, IRelationTypeRepository relationTypeRepository,
-            Lazy<PropertyEditorCollection> propertyEditorCollection, DataValueReferenceCollection dataValueReferences)
-            : base(scopeAccessor, cache, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditorCollection, dataValueReferences)
+            Lazy<PropertyEditorCollection> propertyEditorCollection, DataValueReferenceForCollection dataValueReferenceFors)
+            : base(scopeAccessor, cache, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditorCollection, dataValueReferenceFors)
         {
             _mediaTypeRepository = mediaTypeRepository ?? throw new ArgumentNullException(nameof(mediaTypeRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));

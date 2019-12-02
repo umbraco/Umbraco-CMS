@@ -54,7 +54,7 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new GridConfigurationEditor();
 
-        internal class GridPropertyValueEditor : DataValueEditor
+        internal class GridPropertyValueEditor : DataValueEditor, IDataValueReference
         {
             private readonly IUmbracoContextAccessor _umbracoContextAccessor;
             private readonly HtmlImageSourceParser _imageSourceParser;
@@ -155,6 +155,25 @@ namespace Umbraco.Web.PropertyEditors
                 mediaValues = controls.Where(x => x.Editor.Alias.ToLowerInvariant() == "media");
 
                 return grid;
+            }
+
+            /// <summary>
+            /// Resolve references from <see cref="IDataValueEditor"/> values
+            /// </summary>
+            /// <param name="value"></param>
+            /// <returns></returns>
+            public IEnumerable<UmbracoEntityReference> GetReferences(object value)
+            {
+                var rawJson = value == null ? string.Empty : value is string str ? str : value.ToString();
+                DeserializeGridValue(rawJson, out var richTextEditorValues, out var mediaValues);
+
+                foreach (var umbracoEntityReference in richTextEditorValues.SelectMany(x =>
+                    _richTextPropertyValueEditor.GetReferences(x.Value)))
+                    yield return umbracoEntityReference;
+
+                foreach (var umbracoEntityReference in mediaValues.SelectMany(x =>
+                    _mediaPickerPropertyValueEditor.GetReferences(x.Value["udi"])))
+                    yield return umbracoEntityReference;
             }
         }
     }

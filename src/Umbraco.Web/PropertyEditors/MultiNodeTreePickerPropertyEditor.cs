@@ -23,11 +23,21 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override IDataValueEditor CreateValueEditor() => new MultiNodeTreePickerPropertyValueEditor(Attribute);
 
-        public class MultiNodeTreePickerPropertyValueEditor : DataValueEditor
+        public class MultiNodeTreePickerPropertyValueEditor : DataValueEditor, IDataValueReference
         {
             public MultiNodeTreePickerPropertyValueEditor(DataEditorAttribute attribute): base(attribute)
             {
 
+            }
+
+            public IEnumerable<UmbracoEntityReference> GetReferences(object value)
+            {
+                var asString = value == null ? string.Empty : value is string str ? str : value.ToString();
+
+                var udiPaths = asString.Split(',');
+                foreach (var udiPath in udiPaths)
+                    if (Udi.TryParse(udiPath, out var udi))
+                        yield return new UmbracoEntityReference(udi);
             }
         }
     }

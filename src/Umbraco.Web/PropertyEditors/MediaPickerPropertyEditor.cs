@@ -33,10 +33,20 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override IDataValueEditor CreateValueEditor() => new MediaPickerPropertyValueEditor(Attribute);
 
-        internal class MediaPickerPropertyValueEditor : DataValueEditor
+        internal class MediaPickerPropertyValueEditor : DataValueEditor, IDataValueReference
         {
             public MediaPickerPropertyValueEditor(DataEditorAttribute attribute) : base(attribute)
             {
+            }
+
+            public IEnumerable<UmbracoEntityReference> GetReferences(object value)
+            {
+                var asString = value is string str ? str : value?.ToString();
+
+                if (string.IsNullOrEmpty(asString)) yield break;
+
+                if (Udi.TryParse(asString, out var udi))
+                    yield return new UmbracoEntityReference(udi);
             }
         }
     }

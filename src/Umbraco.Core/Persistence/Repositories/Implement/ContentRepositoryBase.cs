@@ -36,7 +36,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         where TRepository : class, IRepository
     {
         private readonly Lazy<PropertyEditorCollection> _propertyEditors;
-        private readonly DataValueReferenceCollection _dataValueReferences;
+        private readonly DataValueReferenceForCollection _dataValueReferenceFors;
 
         /// <summary>
         ///
@@ -50,14 +50,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// </param>
         protected ContentRepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger,
             ILanguageRepository languageRepository, IRelationRepository relationRepository, IRelationTypeRepository relationTypeRepository,
-            Lazy<PropertyEditorCollection> propertyEditors, DataValueReferenceCollection dataValueReferences)
+            Lazy<PropertyEditorCollection> propertyEditors, DataValueReferenceForCollection dataValueReferenceFors)
             : base(scopeAccessor, cache, logger)
         {
             LanguageRepository = languageRepository;
             RelationRepository = relationRepository;
             RelationTypeRepository = relationTypeRepository;
             _propertyEditors = propertyEditors;
-            _dataValueReferences = dataValueReferences;
+            _dataValueReferenceFors = dataValueReferenceFors;
         }
 
         protected abstract TRepository This { get; }
@@ -828,20 +828,28 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             foreach (var p in entity.Properties)
             {
                 if (!PropertyEditors.TryGet(p.PropertyType.PropertyEditorAlias, out var editor)) continue;
+                var valueEditor = editor.GetValueEditor();
+                if (!(valueEditor is IDataValueReference reference)) continue;
 
                 //TODO: Support variants/segments! This is not required for this initial prototype which is why there is a check here
                 if (!p.PropertyType.VariesByNothing()) continue;
 
                 var val = p.GetValue(); // get the invariant value
+                var refs = reference.GetReferences(val);
+                trackedRelations.AddRange(refs);
 
-                // WB: Loop over our collection of references registered and add references
-                foreach (var item in _dataValueReferences)
+
+                // Loop over collection that may be add to existing property editors
+                // implementation of GetReferences in IDataValueReference.
+                // Allows developers to add support for references by a
+                // package /property editor that did not implement IDataValueReference themselves
+                foreach (var item in _dataValueReferenceFors)
                 {
                     // Check if this value reference is for this datatype/editor
                     // Then call it's GetReferences method - to see if the value stored
                     // in the dataeditor/property has referecnes to media items
                     if (item.IsForEditor(editor))
-                        trackedRelations.AddRange(item.GetReferences(val));
+                        trackedRelations.AddRange(item.GetDataValueReference().GetReferences(val));
                 }
             }
 

@@ -29,10 +29,20 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override IDataValueEditor CreateValueEditor() => new ContentPickerPropertyValueEditor(Attribute);
 
-        internal class ContentPickerPropertyValueEditor  : DataValueEditor
+        internal class ContentPickerPropertyValueEditor  : DataValueEditor, IDataValueReference
         {
             public ContentPickerPropertyValueEditor(DataEditorAttribute attribute) : base(attribute)
             {
+            }
+
+            public IEnumerable<UmbracoEntityReference> GetReferences(object value)
+            {
+                var asString = value is string str ? str : value?.ToString();
+
+                if (string.IsNullOrEmpty(asString)) yield break;
+
+                if (Udi.TryParse(asString, out var udi))
+                    yield return new UmbracoEntityReference(udi);
             }
         }
     }
