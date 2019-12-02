@@ -103,7 +103,7 @@ a, a:hover{
     text-align: center;
     vertical-align: middle;
     cursor: pointer;
-    background: #f2f2f2; //NOT IN VARIABLES
+    background: @gray-10;
     border: 1px solid @gray-8;
     border-radius: 2px;
     box-shadow: none;
@@ -157,7 +157,7 @@ a, a:hover{
     margin-bottom: 1px;
     list-style: none;
     background-color: @white;
-    border: 1px solid #ccc; //NOT IN VARIABLES
+    border: 1px solid @gray-8;
     border: 1px solid rgba(0, 0, 0, 0.2);
     border-radius: 6px;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
@@ -214,7 +214,7 @@ a, a:hover{
     font-size: 12px;
     color: @white;
     text-shadow: none;
-    background-color: #46a546; //Not in variables
+    background-color: @greenIcon;
     border: none;
     border-color: transparent;
     border-radius: 5px 0 0 5px;
@@ -452,7 +452,7 @@ ul.sections li:hover a span {
     display: block;
     padding: 5px 10px;
     margin: 0;
-    border: 0px solid #6B6B6B; //Not in variables
+    border: 0px solid @gray-4;
     font-weight: normal;
     font-size: 12px;
 }
@@ -484,7 +484,7 @@ ul.sections li:hover a span {
 h4.panel-title {
     cursor:pointer;
     background-color: @grayLighter;
-    color: #767676; //Not in variables
+    color: @grayMed;
 }
 
 .editor-category{
@@ -532,9 +532,9 @@ h4.panel-title {
     margin-top: 4px;
     clear: both;
     font-size: 18px;
-    color: #CDCDCD; //Not in variables
+    color: @gray-8;
     cursor: pointer;
-    border: 1px solid #CDCDCD; //Not in variables
+    border: 1px solid @gray-8;
     text-align: center;
     position: relative;
 }
@@ -548,18 +548,18 @@ h4.panel-title {
     position: absolute;
     margin: 5px 0 0 -15px;
     cursor: pointer;
-    color:#CDCDCD; //Not in variables
+    color: @gray-8;
     right: 0;
     top: 0;
 }
 
 .fontFamilyPickerPreview:hover {
-    border: 1px solid #979797; //Not in variables
-    color:#979797; //Not in variables
+    border: 1px solid @grayIcon;
+    color: @grayIcon;
 }
 
 .fontFamilyPickerPreview:hover .fontPickerDelete {
-    color:#979797; //Not in variables
+    color: @grayIcon;
 }
 
 .canvasdesigner-fontfamilypicker {
@@ -650,11 +650,11 @@ h4.panel-title {
     border: none;
     height: 26px;
     border-radius: 1px;
-    border: 1px solid #CDCDCD; //Not in variables
+    border: 1px solid @gray-8;
 }
 
 .canvasdesigner .sp-replacer:hover {
-    border: 1px solid #979797; //Not in variables
+    border: 1px solid @grayIcon;
 }
 
 .canvasdesigner .panel-body {
@@ -679,7 +679,7 @@ h4.panel-title {
 
 .canvasdesigner .color-picker-preview {
     height: 26px;
-    border: 1px solid #CDCDCD; //Not in variables
+    border: 1px solid @gray-8;
     border-radius: 1px;
     background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAIAAADZF8uwAAAAGUlEQVQYV2M4gwH+YwCGIasIUwhT25BVBADtzYNYrHvv4gAAAABJRU5ErkJggg==);
     cursor: pointer;
@@ -799,9 +799,9 @@ iframe {
     padding: 6px 0 0 0;
     cursor: pointer;
     background-size: cover;
-    border-radius:1px;
-    border: 1px solid #CDCDCD; //Not in variables
-    color: #CDCDCD; //Not in variables
+    border-radius: 1px;
+    border: 1px solid @gray-8;
+    color: @gray-8;
 }
 
 .sp-clear-display {
@@ -809,16 +809,16 @@ iframe {
 }
 
 .imagePickerPreview:hover {
-    border: 1px solid #979797; //Not in variables
+    border: 1px solid @grayIcon;
 }
 
 .imagePickerPreview:hover i {
-    color: #979797; //Not in variables
+    color: @grayIcon;
 }
 
 .imagePickerPreview i {
     font-size:24px;
-    color: #CDCDCD; //Not in variables
+    color: @gray-8;
 }
 
 .canvasdesignerImagePicker {
@@ -853,7 +853,7 @@ iframe {
     cursor: pointer;
     background-position: center center;
     background-size: cover;
-    border: 2px solid #F3F2F2; //Not in variables
+    border: 2px solid @gray-10;
 }
 
 .canvasdesignerImagePicker .media-preview .folder {
@@ -862,7 +862,7 @@ iframe {
     left: 0;
     width: 100%;
     font-size: 40px;
-    color: gainsboro; //Not in variables
+    color: @grayLight;
     text-align: center;
 }
 
@@ -876,7 +876,7 @@ iframe {
 
 .canvasdesignerImagePicker .media-preview:hover,
 .media-preview.selected {
-    border: 2px solid #84B8F0; //Not in variables
+    border: 2px solid @blueLight;
 }
 
 .canvasdesignerImagePicker .modal-dialog {
@@ -929,7 +929,7 @@ iframe {
 
 .bodyCanvasdesignerImagePicker .breadcrumb a.disabled,
 .bodyCanvasdesignerImagePicker .breadcrumb a.disabled:hover {
-  color: grey; //Not in variables
+  color: @gray;
   text-decoration: none;
   cursor: default;
 }
@@ -964,7 +964,7 @@ iframe {
 }
 
 .box-preview li.selected {
-    border-color:#53a93f !important; //Not in variables
+    border-color: @greenIcon !important;
 }
 
 .box-preview li.border-all {
@@ -1013,7 +1013,7 @@ iframe {
 }
 
 .box-preview li.selected span {
-    background-color:#53a93f; //Not in variables
+    background-color: @greenIcon;
 }
 
 .radius-top-left{

@@ -367,7 +367,7 @@
     background-image: -o-linear-gradient(@deg, @startColor, @endColor); // Opera 11.10
     background-image: linear-gradient(@deg, @startColor, @endColor); // Standard, IE10
   }
-  .horizontal-three-colors(@startColor: @lightBlueIcon, @midColor: @purple-l1, @colorStop: 50%, @endColor: #c3325f) { //Not in variables
+  .horizontal-three-colors(@startColor: @lightBlueIcon, @midColor: @purple-l1, @colorStop: 50%, @endColor: @pink) {
     background-color: mix(@midColor, @endColor, 80%);
     background-image: -webkit-gradient(left, linear, 0 0, 0 100%, from(@startColor), color-stop(@colorStop, @midColor), to(@endColor));
     background-image: -webkit-linear-gradient(left, @startColor, @midColor @colorStop, @endColor);
@@ -377,7 +377,7 @@
     background-repeat: no-repeat;
   }
 
-  .vertical-three-colors(@startColor: @lightBlueIcon, @midColor: #7a43b6, @colorStop: 50%, @endColor: #c3325f) { //Not in variables
+  .vertical-three-colors(@startColor: @lightBlueIcon, @midColor: @deepPurpleIcon, @colorStop: 50%, @endColor: @pink) {
     background-color: mix(@midColor, @endColor, 80%);
     background-image: -webkit-gradient(linear, 0 0, 0 100%, from(@startColor), color-stop(@colorStop, @midColor), to(@endColor));
     background-image: -webkit-linear-gradient(@startColor, @midColor @colorStop, @endColor);
@@ -404,7 +404,7 @@
   }
 }
 
-.checkeredBackground(@backgroundColor: #eee, @fillColor: @black, @fillOpacity: 0.25) { //Not in variables
+.checkeredBackground(@backgroundColor: @gray-9, @fillColor: @black, @fillOpacity: 0.25) {
     background-image: url('data:image/svg+xml;charset=utf-8,\
                         <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" fill="@{fillColor}" fill-opacity="@{fillOpacity}" >\
                             <rect x="50" width="50" height="50" />\
