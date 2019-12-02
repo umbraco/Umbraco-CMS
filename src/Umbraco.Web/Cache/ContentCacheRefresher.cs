@@ -139,6 +139,13 @@ namespace Umbraco.Web.Cache
 
         public class JsonPayload
         {
+            [Obsolete("Use the constructor specifying a GUID instead, using this constructor will result in not refreshing all caches")]
+            public JsonPayload(int id, TreeChangeTypes changeTypes)
+            {
+                Id = id;
+                ChangeTypes = changeTypes;
+            }
+
             public JsonPayload(int id, Guid? key, TreeChangeTypes changeTypes)
             {
                 Id = id;
