@@ -254,7 +254,7 @@ namespace Umbraco.Tests.IO
             var sfs = new PhysicalFileSystem(ioHelper, logger, path + "/ShadowSystem/", "ignore");
             var ss = new ShadowFileSystem(fs, sfs);
 
-            Assert.Throws<FileSecurityException>(() =>
+            Assert.Throws<UnauthorizedAccessException>(() =>
             {
                 using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                     ss.AddFile("../../f1.txt", ms);

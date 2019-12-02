@@ -622,7 +622,9 @@ namespace Umbraco.Tests.Models.Mapping
                 Validation = new PropertyTypeValidation()
                 {
                     Mandatory = true,
-                    Pattern = "xyz"
+                    MandatoryMessage = "Please enter a value",
+                    Pattern = "xyz",
+                    PatternMessage = "Please match the pattern",
                 }
             };
 
@@ -635,7 +637,9 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(basic.DataTypeId, result.DataTypeId);
             Assert.AreEqual(basic.Label, result.Name);
             Assert.AreEqual(basic.Validation.Mandatory, result.Mandatory);
+            Assert.AreEqual(basic.Validation.MandatoryMessage, result.MandatoryMessage);
             Assert.AreEqual(basic.Validation.Pattern, result.ValidationRegExp);
+            Assert.AreEqual(basic.Validation.PatternMessage, result.ValidationRegExpMessage);
         }
 
         [Test]
@@ -656,7 +660,9 @@ namespace Umbraco.Tests.Models.Mapping
                 Validation = new PropertyTypeValidation()
                 {
                     Mandatory = true,
-                    Pattern = "xyz"
+                    MandatoryMessage = "Please enter a value",
+                    Pattern = "xyz",
+                    PatternMessage = "Please match the pattern",
                 }
             };
 
@@ -669,7 +675,9 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(basic.DataTypeId, result.DataTypeId);
             Assert.AreEqual(basic.Label, result.Name);
             Assert.AreEqual(basic.Validation.Mandatory, result.Mandatory);
+            Assert.AreEqual(basic.Validation.MandatoryMessage, result.MandatoryMessage);
             Assert.AreEqual(basic.Validation.Pattern, result.ValidationRegExp);
+            Assert.AreEqual(basic.Validation.PatternMessage, result.ValidationRegExpMessage);
         }
 
         [Test]
@@ -952,7 +960,7 @@ namespace Umbraco.Tests.Models.Mapping
                         Name = "Tab 1",
                         SortOrder = 0,
                         Inherited = false,
-                        Properties = new []
+                        Properties = new[]
                         {
                             new MemberPropertyTypeBasic
                             {
@@ -966,7 +974,7 @@ namespace Umbraco.Tests.Models.Mapping
                                 Validation = new PropertyTypeValidation
                                 {
                                     Mandatory = false,
-                                    Pattern = ""
+                                    Pattern = string.Empty
                                 },
                                 SortOrder = 0,
                                 DataTypeId = 555
@@ -1001,7 +1009,7 @@ namespace Umbraco.Tests.Models.Mapping
                         Name = "Tab 1",
                         SortOrder = 0,
                         Inherited = false,
-                        Properties = new []
+                        Properties = new[]
                         {
                             new PropertyTypeBasic
                             {
@@ -1012,7 +1020,7 @@ namespace Umbraco.Tests.Models.Mapping
                                 Validation = new PropertyTypeValidation
                                 {
                                     Mandatory = false,
-                                    Pattern = ""
+                                    Pattern = string.Empty
                                 },
                                 SortOrder = 0,
                                 DataTypeId = 555
@@ -1053,7 +1061,7 @@ namespace Umbraco.Tests.Models.Mapping
                         Name = "Tab 1",
                         SortOrder = 0,
                         Inherited = false,
-                        Properties = new []
+                        Properties = new[]
                         {
                             new PropertyTypeBasic
                             {
@@ -1064,7 +1072,7 @@ namespace Umbraco.Tests.Models.Mapping
                                 Validation = new PropertyTypeValidation
                                 {
                                     Mandatory = false,
-                                    Pattern = ""
+                                    Pattern = string.Empty
                                 },
                                 SortOrder = 0,
                                 DataTypeId = 555
@@ -1110,7 +1118,7 @@ namespace Umbraco.Tests.Models.Mapping
                                 Validation = new PropertyTypeValidation
                                 {
                                     Mandatory = false,
-                                    Pattern = ""
+                                    Pattern = string.Empty
                                 },
                                 SortOrder = 0,
                                 DataTypeId = 555
@@ -1134,7 +1142,7 @@ namespace Umbraco.Tests.Models.Mapping
                                 Validation = new PropertyTypeValidation
                                 {
                                     Mandatory = false,
-                                    Pattern = ""
+                                    Pattern = string.Empty
                                 },
                                 SortOrder = 0,
                                 DataTypeId = 555
@@ -1188,7 +1196,7 @@ namespace Umbraco.Tests.Models.Mapping
                                 Validation = new PropertyTypeValidation
                                 {
                                     Mandatory = false,
-                                    Pattern = ""
+                                    Pattern = string.Empty
                                 },
                                 SortOrder = 0,
                                 DataTypeId = 555
@@ -1212,7 +1220,7 @@ namespace Umbraco.Tests.Models.Mapping
                                 Validation = new PropertyTypeValidation
                                 {
                                     Mandatory = false,
-                                    Pattern = ""
+                                    Pattern = string.Empty
                                 },
                                 SortOrder = 0,
                                 DataTypeId = 555

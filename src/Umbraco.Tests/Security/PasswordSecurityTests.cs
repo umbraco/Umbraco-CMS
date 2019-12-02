@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Security
 
             string salt;
             var pass = "ThisIsAHashedPassword";
-            var hashed = passwordSecurity.EncryptOrHashNewPassword(pass, out salt);
+            var hashed = passwordSecurity.HashNewPassword(pass, out salt);
             var storedPassword = passwordSecurity.FormatPasswordForStorage(hashed, salt);
 
             var result = passwordSecurity.CheckPassword("ThisIsAHashedPassword", storedPassword);
@@ -52,7 +52,7 @@ namespace Umbraco.Tests.Security
 
             string salt;
             var pass = "ThisIsAHashedPassword";
-            var hashed = passwordSecurity.EncryptOrHashNewPassword(pass, out salt);
+            var hashed = passwordSecurity.HashNewPassword(pass, out salt);
             var storedPassword = passwordSecurity.FormatPasswordForStorage(hashed, salt);
 
             var result = passwordSecurity.CheckPassword("ThisIsAHashedPassword", storedPassword);

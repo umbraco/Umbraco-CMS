@@ -49,7 +49,8 @@ namespace Umbraco.Web.Mvc
             bool isMvc = true,
             string areaPathPrefix = "")
         {
-            if (string.IsNullOrEmpty(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
+            if (controllerName == null) throw new ArgumentNullException(nameof(controllerName));
+            if (string.IsNullOrEmpty(controllerName)) throw new ArgumentException("Value can't be empty.", nameof(controllerName));
             if (controllerSuffixName == null) throw new ArgumentNullException(nameof(controllerSuffixName));
 
             if (controllerType == null) throw new ArgumentNullException(nameof(controllerType));

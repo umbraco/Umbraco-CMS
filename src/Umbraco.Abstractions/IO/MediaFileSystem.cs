@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 
@@ -91,7 +89,8 @@ namespace Umbraco.Core.IO
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (propertyType == null) throw new ArgumentNullException(nameof(propertyType));
-            if (string.IsNullOrWhiteSpace(filename)) throw new ArgumentNullOrEmptyException(nameof(filename));
+            if (filename == null) throw new ArgumentNullException(nameof(filename));
+            if (string.IsNullOrWhiteSpace(filename)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(filename));
             if (filestream == null) throw new ArgumentNullException(nameof(filestream));
 
             // clear the old file, if any
@@ -110,7 +109,8 @@ namespace Umbraco.Core.IO
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (propertyType == null) throw new ArgumentNullException(nameof(propertyType));
-            if (string.IsNullOrWhiteSpace(sourcepath)) throw new ArgumentNullOrEmptyException(nameof(sourcepath));
+            if (sourcepath == null) throw new ArgumentNullException(nameof(sourcepath));
+            if (string.IsNullOrWhiteSpace(sourcepath)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(sourcepath));
 
             // ensure we have a file to copy
             if (FileExists(sourcepath) == false) return null;
