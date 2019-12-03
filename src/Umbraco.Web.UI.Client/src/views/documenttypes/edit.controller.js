@@ -18,6 +18,8 @@
         var documentTypeId = $routeParams.id;
         var create = $routeParams.create;
         var noTemplate = $routeParams.notemplate;
+        var isElement = $routeParams.iselement;
+        var allowVaryByCulture = $routeParams.culturevary;
         var infiniteMode = $scope.model && $scope.model.infiniteMode;
 
         vm.save = save;
@@ -63,6 +65,8 @@
                 documentTypeId = $scope.model.id;
                 create = $scope.model.create;
                 noTemplate = $scope.model.notemplate;
+                isElement = $scope.model.isElement;
+                allowVaryByCulture = $scope.model.allowVaryByCulture;
                 vm.submitButtonKey = "buttons_saveAndClose";
                 vm.generateModelsKey = "buttons_generateModelsAndClose";
             }
@@ -430,7 +434,14 @@
                 contentType.defaultTemplate = contentTypeHelper.insertDefaultTemplatePlaceholder(contentType.defaultTemplate);
                 contentType.allowedTemplates = contentTypeHelper.insertTemplatePlaceholder(contentType.allowedTemplates);
             }
-
+            // set isElement checkbox by default
+            if (isElement) {
+                contentType.isElement = true;
+            }
+            // set vary by culture checkbox by default
+            if (allowVaryByCulture) {
+                contentType.allowCultureVariant = true;
+            }
             // convert icons for content type
             convertLegacyIcons(contentType);
 
@@ -508,11 +519,16 @@
         }));
 
         evts.push(eventsService.on("editors.documentType.saved", function(name, args) {
-            if(args.documentType.allowedTemplates.length > 0){
-                navigationService.syncTree({ tree: "templates", path: [], forceReload: true })
-                    .then(function (syncArgs) {
-                        navigationService.reloadNode(syncArgs.node)
-                    });
+            if(args.documentType.allowedTemplates.length > 0) {
+                navigationService.hasTree("templates").then(function (treeExists) {
+                    if (treeExists) {
+                        navigationService.syncTree({ tree: "templates", path: [], forceReload: true })
+                            .then(function (syncArgs) {
+                                navigationService.reloadNode(syncArgs.node)
+                            }
+                        );
+                    }
+                }); 
             }
         }));
 
