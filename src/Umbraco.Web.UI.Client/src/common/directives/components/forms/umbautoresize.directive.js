@@ -9,8 +9,6 @@ angular.module("umbraco.directives")
                 var umbTabsController = controllersArr[0];
                 var ngModelController = controllersArr[1];
 
-                element.width('0');// Set to zero for less jumping around when initilizing the view.
-
                 function resizeInput() {                    
                     if (domEl.scrollWidth !== domEl.clientWidth) {
                         if (ngModelController.$modelValue) {
