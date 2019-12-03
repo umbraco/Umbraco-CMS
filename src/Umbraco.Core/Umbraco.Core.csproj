@@ -792,8 +792,6 @@
     <Compile Include="Compose\ManifestWatcherComponent.cs" />
     <Compile Include="Compose\RelateOnCopyComponent.cs" />
     <Compile Include="Compose\RelateOnTrashComponent.cs" />
-    <Compile Include="Strings\UrlSegmentProviderCollectionBuilder.cs" />
-    <Compile Include="Sync\ApplicationUrlHelper.cs" />
     <Compile Include="Sync\DatabaseServerMessenger.cs" />
     <Compile Include="Sync\RefreshInstruction.cs" />
     <Compile Include="Sync\ServerMessengerBase.cs" />
