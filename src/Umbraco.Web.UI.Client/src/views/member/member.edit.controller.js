@@ -145,13 +145,6 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
 
             $scope.page.saveButtonState = "busy";
 
-            //anytime a user is changing a member's password without the oldPassword, we are in effect resetting it so we need to set that flag here
-            var passwordProp = _.find(contentEditingHelper.getAllProps($scope.content), function (e) { return e.alias === '_umb_password' });
-            if (passwordProp && passwordProp.value && (typeof passwordProp.value.reset !== 'undefined') && !passwordProp.value.reset) {
-                // if the admin is not explicitly resetting the password, flag it for resetting if a new password is being entered
-                passwordProp.value.reset = !passwordProp.value.oldPassword && passwordProp.config.allowManuallyChangingPassword;
-            }
-
             memberResource.save($scope.content, create, fileManager.getFiles())
                 .then(function(data) {
 

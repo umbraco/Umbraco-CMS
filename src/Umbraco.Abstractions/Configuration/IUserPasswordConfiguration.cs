@@ -5,6 +5,5 @@
     /// </summary>
     public interface IUserPasswordConfiguration : IPasswordConfiguration
     {
-
     }
 }

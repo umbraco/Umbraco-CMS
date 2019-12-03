@@ -28,7 +28,6 @@ namespace Umbraco.Web.Security
         private readonly RoleProvider _roleProvider;
         private readonly IMemberService _memberService;
         private readonly IMemberTypeService _memberTypeService;
-        private readonly IUserService _userService;
         private readonly IPublicAccessService _publicAccessService;
         private readonly AppCaches _appCaches;
         private readonly ILogger _logger;
@@ -43,7 +42,6 @@ namespace Umbraco.Web.Security
             RoleProvider roleProvider,
             IMemberService memberService,
             IMemberTypeService memberTypeService,
-            IUserService userService,
             IPublicAccessService publicAccessService,
             AppCaches appCaches,
             ILogger logger
@@ -53,7 +51,6 @@ namespace Umbraco.Web.Security
             MemberCache = memberCache;
             _memberService = memberService;
             _memberTypeService = memberTypeService;
-            _userService = userService;
             _publicAccessService = publicAccessService;
             _appCaches = appCaches;
             _logger = logger;
@@ -645,7 +642,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public virtual Attempt<PasswordChangedModel> ChangePassword(string username, ChangingPasswordModel passwordModel, MembershipProvider membershipProvider)
         {
-            var passwordChanger = new PasswordChanger(_logger, _userService, HttpContext);
+            var passwordChanger = new PasswordChanger(_logger);
             return passwordChanger.ChangePasswordWithMembershipProvider(username, passwordModel, membershipProvider);
         }
 

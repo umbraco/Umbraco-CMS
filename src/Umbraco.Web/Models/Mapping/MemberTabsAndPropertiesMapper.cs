@@ -155,14 +155,15 @@ namespace Umbraco.Web.Models.Mapping
 
         private Dictionary<string, object> GetPasswordConfig(MembersMembershipProvider membersProvider, IMember member)
         {
-            var result = new Dictionary<string, object>(membersProvider.PasswordConfiguration.GetConfiguration())
+            var result = new Dictionary<string, object>(membersProvider.PasswordConfiguration.GetConfiguration(true))
                 {
                     // the password change toggle will only be displayed if there is already a password assigned.
                     {"hasPassword", member.RawPasswordValue.IsNullOrWhiteSpace() == false}
                 };
 
-            result["enableReset"] = membersProvider.CanResetPassword(_userService);
-            result["allowManuallyChangingPassword"] = membersProvider.AllowManuallyChangingPassword;
+            // This will always be true for members since we always want to allow admins to change a password - so long as that
+            // user has access to edit members (but that security is taken care of separately)
+            result["allowManuallyChangingPassword"] = true;
 
             return result;
         }

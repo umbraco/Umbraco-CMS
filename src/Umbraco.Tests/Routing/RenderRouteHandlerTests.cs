@@ -148,7 +148,7 @@ namespace Umbraco.Tests.Routing
             var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContextAccessor, Mock.Of<ILogger>(), context =>
             {
                 var membershipHelper = new MembershipHelper(
-                    umbracoContext.HttpContext, Mock.Of<IPublishedMemberCache>(), Mock.Of<MembersMembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), AppCaches.Disabled, Mock.Of<ILogger>());
+                    umbracoContext.HttpContext, Mock.Of<IPublishedMemberCache>(), Mock.Of<MembersMembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IPublicAccessService>(), AppCaches.Disabled, Mock.Of<ILogger>());
                return new CustomDocumentController(Factory.GetInstance<IGlobalSettings>(),
                     umbracoContextAccessor,
                     Factory.GetInstance<ServiceContext>(),

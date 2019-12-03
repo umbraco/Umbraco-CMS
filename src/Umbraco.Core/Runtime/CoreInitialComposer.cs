@@ -135,7 +135,6 @@ namespace Umbraco.Core.Runtime
 
             composition.SetCultureDictionaryFactory<DefaultCultureDictionaryFactory>();
             composition.Register(f => f.GetInstance<ICultureDictionaryFactory>().CreateDictionary(), Lifetime.Singleton);
-            composition.RegisterUnique<IPasswordGenerator, PasswordGenerator>();
         }
     }
 }

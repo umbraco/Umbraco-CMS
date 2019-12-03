@@ -29,7 +29,6 @@ namespace Umbraco.Web
         protected IUmbracoSettingsSection UmbracoSettings => Current.Configs.Settings();
         protected IUserPasswordConfiguration UserPasswordConfig => Current.Configs.UserPasswordConfig();
         protected IRuntimeState RuntimeState => Core.Composing.Current.RuntimeState;
-        protected IPasswordGenerator PasswordGenerator => Core.Composing.Current.PasswordGenerator;
         protected ServiceContext Services => Current.Services;
         protected UmbracoMapper Mapper => Current.Mapper;
 
@@ -87,8 +86,7 @@ namespace Umbraco.Web
                 Mapper,
                 UmbracoSettings.Content,
                 GlobalSettings,
-                UserPasswordConfig,
-                PasswordGenerator);
+                UserPasswordConfig);
         }
 
         /// <summary>

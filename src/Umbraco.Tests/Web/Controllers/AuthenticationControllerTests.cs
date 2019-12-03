@@ -76,7 +76,7 @@ namespace Umbraco.Tests.Web.Controllers
                 }
                 Current.IOHelper.ForceNotHosted = true;
                 var usersController = new AuthenticationController(
-                    new DefaultUserPasswordConfig(),
+                    new DefaultPasswordConfig(),
                     Factory.GetInstance<IGlobalSettings>(),
                     umbracoContextAccessor,
                     Factory.GetInstance<ISqlContext>(),

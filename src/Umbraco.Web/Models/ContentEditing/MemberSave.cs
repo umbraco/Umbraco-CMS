@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Models;
@@ -19,6 +20,7 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "email", IsRequired = true)]
         [RequiredForPersistence(AllowEmptyStrings = false, ErrorMessage = "Required")]
+        [EmailAddress]
         public string Email { get; set; }
 
         [DataMember(Name = "password")]

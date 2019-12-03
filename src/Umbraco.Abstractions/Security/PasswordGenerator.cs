@@ -11,28 +11,34 @@ namespace Umbraco.Core.Security
     /// <remarks>
     /// This uses logic copied from the old MembershipProvider.GeneratePassword logic
     /// </remarks>
-    public class PasswordGenerator : IPasswordGenerator
+    public class PasswordGenerator
     {
-        public string GeneratePassword(IPasswordConfiguration passwordConfiguration)
+        private readonly IPasswordConfiguration _passwordConfiguration;
+
+        public PasswordGenerator(IPasswordConfiguration passwordConfiguration)
+        {
+            _passwordConfiguration = passwordConfiguration;
+        }
+        public string GeneratePassword()
         {
             var password = PasswordStore.GeneratePassword(
-                passwordConfiguration.RequiredLength,
-                passwordConfiguration.RequireNonLetterOrDigit ? 2 : 0);
+                _passwordConfiguration.RequiredLength,
+                _passwordConfiguration.RequireNonLetterOrDigit ? 2 : 0);
 
             var random = new Random();
 
             var passwordChars = password.ToCharArray();
 
-            if (passwordConfiguration.RequireDigit && passwordChars.ContainsAny(Enumerable.Range(48, 58).Select(x => (char)x)))
+            if (_passwordConfiguration.RequireDigit && passwordChars.ContainsAny(Enumerable.Range(48, 58).Select(x => (char)x)))
                 password += Convert.ToChar(random.Next(48, 58));  // 0-9
 
-            if (passwordConfiguration.RequireLowercase && passwordChars.ContainsAny(Enumerable.Range(97, 123).Select(x => (char)x)))
+            if (_passwordConfiguration.RequireLowercase && passwordChars.ContainsAny(Enumerable.Range(97, 123).Select(x => (char)x)))
                 password += Convert.ToChar(random.Next(97, 123));  // a-z
 
-            if (passwordConfiguration.RequireUppercase && passwordChars.ContainsAny(Enumerable.Range(65, 91).Select(x => (char)x)))
+            if (_passwordConfiguration.RequireUppercase && passwordChars.ContainsAny(Enumerable.Range(65, 91).Select(x => (char)x)))
                 password += Convert.ToChar(random.Next(65, 91));  // A-Z
 
-            if (passwordConfiguration.RequireNonLetterOrDigit && passwordChars.ContainsAny(Enumerable.Range(33, 48).Select(x => (char)x)))
+            if (_passwordConfiguration.RequireNonLetterOrDigit && passwordChars.ContainsAny(Enumerable.Range(33, 48).Select(x => (char)x)))
                 password += Convert.ToChar(random.Next(33, 48));  // symbols !"#$%&'()*+,-./
 
             return password;
