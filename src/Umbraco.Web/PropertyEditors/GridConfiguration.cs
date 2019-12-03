@@ -14,7 +14,7 @@ namespace Umbraco.Web.PropertyEditors
         public JObject Items { get; set; }
 
         // TODO: Make these strongly typed, for now this works though
-        [ConfigurationField("rte", "Rich text editor", "views/propertyeditors/rte/rte.prevalues.html", Description = "Rich text editor configuration")]
+        [ConfigurationField("rte", "Rich text editor", "views/propertyeditors/rte/rte.prevalues.html", Description = "Rich text editor configuration", HideLabel = true)]
         public JObject Rte { get; set; }
 
         [ConfigurationField(Core.Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes,
