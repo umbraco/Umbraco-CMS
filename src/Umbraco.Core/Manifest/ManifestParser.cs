@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
@@ -53,12 +52,13 @@ namespace Umbraco.Core.Manifest
             _localizationService = localizationService;
             _validators = validators ?? throw new ArgumentNullException(nameof(validators));
             _filters = filters ?? throw new ArgumentNullException(nameof(filters));
+            if (path == null) throw new ArgumentNullException(nameof(path));
+            if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(path));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _ioHelper = ioHelper;
-            if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullOrEmptyException(nameof(path));
 
             Path = path;
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
 
         }
 
@@ -170,8 +170,8 @@ namespace Umbraco.Core.Manifest
         /// </summary>
         public PackageManifest ParseManifest(string text)
         {
-            if (string.IsNullOrWhiteSpace(text))
-                throw new ArgumentNullOrEmptyException(nameof(text));
+            if (text == null) throw new ArgumentNullException(nameof(text));
+            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(text));
 
             var manifest = JsonConvert.DeserializeObject<PackageManifest>(text,
                 new DataEditorConverter(_logger, _ioHelper, _dataTypeService, _localizationService),

@@ -22,11 +22,16 @@ namespace Umbraco.Web.Editors.Filters
         private readonly IMemberTypeService _memberTypeService;
         private readonly IMemberService _memberService;
 
-        public MemberSaveModelValidator(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, IMemberTypeService memberTypeService, IMemberService memberService)
-            : base(logger, umbracoContextAccessor)
+        public MemberSaveModelValidator(
+            ILogger logger,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ILocalizedTextService textService,
+            IMemberTypeService memberTypeService,
+            IMemberService memberService)
+            : base(logger, umbracoContextAccessor, textService)
         {
-            _memberTypeService = memberTypeService;
-            _memberService = memberService;
+            _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
+            _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
         }
 
         /// <summary>
@@ -125,7 +130,7 @@ namespace Umbraco.Web.Editors.Filters
         internal bool ValidateUniqueLogin(MemberSave model)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
-            
+
             var existingByName = _memberService.GetByUsername(model.Username.Trim());
             switch (model.Action)
             {

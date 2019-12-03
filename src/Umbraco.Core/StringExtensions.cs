@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Strings;
 
@@ -106,7 +105,8 @@ namespace Umbraco.Core
         /// <returns>The safe url segment.</returns>
         public static string ToUrlSegment(this string text)
         {
-            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentNullOrEmptyException(nameof(text));
+            if (text == null) throw new ArgumentNullException(nameof(text));
+            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(text));
 
             return Current.ShortStringHelper.CleanStringForUrlSegment(text);
         }
@@ -119,7 +119,8 @@ namespace Umbraco.Core
         /// <returns>The safe url segment.</returns>
         public static string ToUrlSegment(this string text, string culture)
         {
-            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentNullOrEmptyException(nameof(text));
+            if (text == null) throw new ArgumentNullException(nameof(text));
+            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(text));
 
             return Current.ShortStringHelper.CleanStringForUrlSegment(text, culture);
         }

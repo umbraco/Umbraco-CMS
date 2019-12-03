@@ -75,5 +75,14 @@ namespace Umbraco.Core.Models
         /// <param name="wildcards">A value indicating whether wildcards are valid.</param>
         bool SupportsVariation(string culture, string segment, bool wildcards = false);
 
+        /// <summary>
+        /// Gets or sets the custom validation message used when a value for this PropertyType is required
+        /// </summary>
+        string MandatoryMessage { get; set; }
+
+        /// <summary>
+        /// Gets or sets the custom validation message used when a pattern for this PropertyType must be matched
+        /// </summary>
+        string ValidationRegExpMessage { get; set; }
     }
 }
