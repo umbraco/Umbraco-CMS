@@ -1,9 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using System.Web.Security;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
@@ -111,62 +109,6 @@ namespace Umbraco.Web.Editors
             return passwordSecurity.HashPasswordForStorage(passwordModel.NewPassword);
         }
 
-        /// <summary>
-        /// Changes password for a member/user given the membership provider and the password change model
-        /// </summary>
-        /// <param name="username">The username of the user having their password changed</param>
-        /// <param name="passwordModel"></param>
-        /// <param name="membershipProvider"></param>
-        /// <returns></returns>
-        public Attempt<PasswordChangedModel> ChangePasswordWithMembershipProvider(
-            string username,
-            ChangingPasswordModel passwordModel,
-            MembershipProvider membershipProvider)
-        {
-            var umbracoBaseProvider = membershipProvider as MembershipProviderBase;
-
-            // YES! It is completely insane how many options you have to take into account based on the membership provider. yikes!
-
-            if (passwordModel == null) throw new ArgumentNullException(nameof(passwordModel));
-            if (membershipProvider == null) throw new ArgumentNullException(nameof(membershipProvider));           
-            var userId = -1;
-
-
-            //we're not resetting it so we need to try to change it.
-
-            if (passwordModel.NewPassword.IsNullOrWhiteSpace())
-            {
-                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Cannot set an empty password", new[] { "value" }) });
-            }
-
-            if (membershipProvider.EnablePasswordRetrieval)
-            {
-                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Membership providers using encrypted passwords and password retrieval are not supported", new[] { "value" }) });
-            }
-
-            //without being able to retrieve the original password
-            if (passwordModel.OldPassword.IsNullOrWhiteSpace())
-            {
-                //if password retrieval is not enabled but there is no old password we cannot continue
-                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password cannot be changed without the old password", new[] { "oldPassword" }) });
-            }
-
-            //if an old password is supplied try to change it
-
-            try
-            {
-                var result = membershipProvider.ChangePassword(username, passwordModel.OldPassword, passwordModel.NewPassword);
-
-                return result == false
-                    ? Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, invalid username or password", new[] { "oldPassword" }) })
-                    : Attempt.Succeed(new PasswordChangedModel());
-            }
-            catch (Exception ex)
-            {
-                _logger.Warn<PasswordChanger>(ex, "Could not change member password");
-                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex.Message + " (see log for full details)", new[] { "value" }) });
-            }
-
-        }
+       
     }
 }

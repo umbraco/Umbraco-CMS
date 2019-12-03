@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Composing;
@@ -29,15 +28,17 @@ namespace Umbraco.Web.Models.Mapping
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IMemberTypeService _memberTypeService;
-        private readonly IUserService _userService;
+        private readonly IMemberService _memberService;
+        private readonly IMemberGroupService _memberGroupService;
 
-        public MemberTabsAndPropertiesMapper(ICultureDictionary cultureDictionary, IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService localizedTextService, IUserService userService, IMemberTypeService memberTypeService)
+        public MemberTabsAndPropertiesMapper(ICultureDictionary cultureDictionary, IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService localizedTextService, IMemberTypeService memberTypeService, IMemberService memberService, IMemberGroupService memberGroupService)
             : base(cultureDictionary, localizedTextService)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
+            _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
+            _memberGroupService = memberGroupService ?? throw new ArgumentNullException(nameof(memberGroupService));
         }
 
         /// <inheritdoc />
@@ -127,12 +128,10 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password",
                     Label = _localizedTextService.Localize("password"),
-                    // NOTE: The value here is a json value - but the only property we care about is the generatedPassword one if it exists, the newPassword exists
-                    // only when creating a new member and we want to have a generated password pre-filled.
+                    
                     Value = new Dictionary<string, object>
                     {
-                        // TODO: why ignoreCase, what are we doing here?!
-                        {"generatedPassword", member.GetAdditionalDataValueIgnoreCase("GeneratedPassword", null)},
+                        // TODO: why ignoreCase, what are we doing here?!                    
                         {"newPassword", member.GetAdditionalDataValueIgnoreCase("NewPassword", null)},
                     },
                     // TODO: Hard coding this because the changepassword doesn't necessarily need to be a resolvable (real) property editor
@@ -231,12 +230,13 @@ namespace Umbraco.Web.Models.Mapping
             return prop;
         }
 
-        internal static IDictionary<string, bool> GetMemberGroupValue(string username)
+        internal IDictionary<string, bool> GetMemberGroupValue(string username)
         {
-            var userRoles = username.IsNullOrWhiteSpace() ? null : Roles.GetRolesForUser(username);
+            var userRoles = username.IsNullOrWhiteSpace() ? null : _memberService.GetAllRoles(username);
 
             // create a dictionary of all roles (except internal roles) + "false"
-            var result = Roles.GetAllRoles().Distinct()
+            var result = _memberGroupService.GetAll()
+                .Select(x => x.Name)
                 // if a role starts with __umbracoRole we won't show it as it's an internal role used for public access
                 .Where(x => x.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false)
                 .OrderBy(x => x, StringComparer.OrdinalIgnoreCase)

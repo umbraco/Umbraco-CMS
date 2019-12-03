@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
@@ -32,43 +31,11 @@ namespace Umbraco.Web.Models.Mapping
 
         public void DefineMaps(UmbracoMapper mapper)
         {
-            mapper.Define<MembershipUser, MemberDisplay>((source, context) => new MemberDisplay(), Map);
-            mapper.Define<MembershipUser, IMember>((source, context) => MemberService.CreateGenericMembershipProviderMember(source.UserName, source.Email, source.UserName, ""), Map);
             mapper.Define<IMember, MemberDisplay>((source, context) => new MemberDisplay(), Map);
             mapper.Define<IMember, MemberBasic>((source, context) => new MemberBasic(), Map);
-            mapper.Define<MembershipUser, MemberBasic>((source, context) => new MemberBasic(), Map);
             mapper.Define<IMemberGroup, MemberGroupDisplay>((source, context) => new MemberGroupDisplay(), Map);
             mapper.Define<IMember, ContentPropertyCollectionDto>((source, context) => new ContentPropertyCollectionDto(), Map);
-        }
-
-        private void Map(MembershipUser source, MemberDisplay target, MapperContext context)
-        {
-            //first convert to IMember
-            var member = context.Map<IMember>(source);
-            //then convert to MemberDisplay
-            context.Map<IMember, MemberDisplay>(member);
-        }
-
-        // TODO: SD: I can't remember why this mapping is here?
-        // Umbraco.Code.MapAll -Properties -CreatorId -Level -Name -CultureInfos -ParentId
-        // Umbraco.Code.MapAll -Path -SortOrder -DeleteDate -WriterId -VersionId -PasswordQuestion
-        // Umbraco.Code.MapAll -RawPasswordAnswerValue -FailedPasswordAttempts
-        private void Map(MembershipUser source, IMember target, MapperContext context)
-        {
-            target.Comments = source.Comment;
-            target.CreateDate = source.CreationDate;
-            target.Email = source.Email;
-            target.Id = int.MaxValue;
-            target.IsApproved = source.IsApproved;
-            target.IsLockedOut = source.IsLockedOut;
-            target.Key = source.ProviderUserKey.TryConvertTo<Guid>().Result;
-            target.LastLockoutDate = source.LastLockoutDate;
-            target.LastLoginDate = source.LastLoginDate;
-            target.LastPasswordChangeDate = source.LastPasswordChangedDate;
-            target.RawPasswordValue = source.CreationDate > DateTime.MinValue ? Guid.NewGuid().ToString("N") : "";
-            target.UpdateDate = source.LastActivityDate;
-            target.Username = source.UserName;
-        }
+        }      
 
         // Umbraco.Code.MapAll -Properties -Errors -Edited -Updater -Alias -IsChildOfListView
         // Umbraco.Code.MapAll -Trashed -IsContainer -VariesByCulture
@@ -117,23 +84,6 @@ namespace Umbraco.Web.Models.Mapping
             target.UpdateDate = source.UpdateDate;
             target.Username = source.Username;
         }
-
-        //TODO: SD: I can't remember why this mapping is here?
-        // Umbraco.Code.MapAll -Udi -Properties -ParentId -Path -SortOrder -Edited -Updater
-        // Umbraco.Code.MapAll -Trashed -Alias -ContentTypeId -ContentTypeAlias -VariesByCulture
-        private void Map(MembershipUser source, MemberBasic target, MapperContext context)
-        {
-            target.CreateDate = source.CreationDate;
-            target.Email = source.Email;
-            target.Icon = Constants.Icons.Member;
-            target.Id = int.MaxValue;
-            target.Key = source.ProviderUserKey.TryConvertTo<Guid>().Result;
-            target.Name = source.UserName;
-            target.Owner = new UserProfile { Name = "Admin", UserId = -1 };
-            target.State = ContentSavedState.Draft;
-            target.UpdateDate = source.LastActivityDate;
-            target.Username = source.UserName;
-}
 
         // Umbraco.Code.MapAll -Icon -Trashed -ParentId -Alias
         private void Map(IMemberGroup source, MemberGroupDisplay target, MapperContext context)

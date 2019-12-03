@@ -150,6 +150,10 @@ namespace Umbraco.Core.Security
         public bool VerifyPassword(string password, string dbPassword)
         {
             if (string.IsNullOrWhiteSpace(dbPassword)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(dbPassword));
+
+            if (dbPassword.StartsWith(Constants.Security.EmptyPasswordPrefix))
+                return false;
+
             var storedHashedPass = ParseStoredHashPassword(dbPassword, out var salt);
             var hashed = HashPassword(password, salt);
             return storedHashedPass == hashed;

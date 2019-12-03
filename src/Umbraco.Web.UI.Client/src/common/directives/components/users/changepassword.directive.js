@@ -80,11 +80,7 @@
             }));
 
             unsubscribe.push($scope.$on("formSubmitting", function () {
-                //if there was a previously generated password displaying, clear it
-                if (vm.changing && vm.passwordValues) {
-                    vm.passwordValues.generatedPassword = null;
-                }
-                else if (!vm.changing) {
+                if (!vm.changing) {
                     //we are not changing, so the model needs to be null
                     vm.passwordValues = null;
                 }
@@ -105,8 +101,6 @@
         function doChange() {
             resetModel();
             vm.changing = true;
-            //if there was a previously generated password displaying, clear it
-            vm.passwordValues.generatedPassword = null;
             vm.passwordValues.confirm = null;
         };
 

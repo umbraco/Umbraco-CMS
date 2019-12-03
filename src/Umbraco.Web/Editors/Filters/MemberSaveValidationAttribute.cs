@@ -15,22 +15,24 @@ namespace Umbraco.Web.Editors.Filters
         private readonly ILogger _logger;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IMemberTypeService _memberTypeService;
+        private readonly IMemberService _memberService;
 
         public MemberSaveValidationAttribute()
-            : this(Current.Logger, Current.UmbracoContextAccessor, Current.Services.MemberTypeService)
+            : this(Current.Logger, Current.UmbracoContextAccessor, Current.Services.MemberTypeService, Current.Services.MemberService)
         { }
 
-        public MemberSaveValidationAttribute(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, IMemberTypeService memberTypeService)
+        public MemberSaveValidationAttribute(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, IMemberTypeService memberTypeService, IMemberService memberService)
         {
             _logger = logger;
             _umbracoContextAccessor = umbracoContextAccessor;
             _memberTypeService = memberTypeService;
+            _memberService = memberService;
         }
 
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
             var model = (MemberSave)actionContext.ActionArguments["contentItem"];
-            var contentItemValidator = new MemberSaveModelValidator(_logger, _umbracoContextAccessor, _memberTypeService);
+            var contentItemValidator = new MemberSaveModelValidator(_logger, _umbracoContextAccessor, _memberTypeService, _memberService);
             //now do each validation step
             if (contentItemValidator.ValidateExistingContent(model, actionContext))
                 if (contentItemValidator.ValidateProperties(model, model, actionContext))

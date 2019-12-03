@@ -5,7 +5,6 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
-using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -21,11 +20,13 @@ namespace Umbraco.Web.Editors.Filters
     internal class MemberSaveModelValidator : ContentModelValidator<IMember, MemberSave, IContentProperties<ContentPropertyBasic>>
     {
         private readonly IMemberTypeService _memberTypeService;
+        private readonly IMemberService _memberService;
 
-        public MemberSaveModelValidator(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, IMemberTypeService memberTypeService)
+        public MemberSaveModelValidator(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, IMemberTypeService memberTypeService, IMemberService memberService)
             : base(logger, umbracoContextAccessor)
         {
             _memberTypeService = memberTypeService;
+            _memberService = memberService;
         }
 
         /// <summary>
@@ -55,7 +56,7 @@ namespace Umbraco.Web.Editors.Filters
             //default provider!
             var membershipProvider = MembershipProviderExtensions.GetMembersMembershipProvider();
 
-            var validEmail = ValidateUniqueEmail(model, membershipProvider);
+            var validEmail = ValidateUniqueEmail(model);
             if (validEmail == false)
             {
                 modelState.AddPropertyError(
@@ -63,7 +64,7 @@ namespace Umbraco.Web.Editors.Filters
                     $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email");
             }
 
-            var validLogin = ValidateUniqueLogin(model, membershipProvider);
+            var validLogin = ValidateUniqueLogin(model);
             if (validLogin == false)
             {
                 modelState.AddPropertyError(
@@ -121,13 +122,11 @@ namespace Umbraco.Web.Editors.Filters
             return ValidateProperties(propertiesToValidate, model.PersistedContent.Properties.ToList(), actionContext);
         }
 
-        internal bool ValidateUniqueLogin(MemberSave model, MembershipProvider membershipProvider)
+        internal bool ValidateUniqueLogin(MemberSave model)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
-            if (membershipProvider == null) throw new ArgumentNullException(nameof(membershipProvider));
-
-            int totalRecs;
-            var existingByName = membershipProvider.FindUsersByName(model.Username.Trim(), 0, int.MaxValue, out totalRecs);
+            
+            var existingByName = _memberService.GetByUsername(model.Username.Trim());
             switch (model.Action)
             {
                 case ContentSaveAction.Save:
@@ -136,8 +135,7 @@ namespace Umbraco.Web.Editors.Filters
                     if (model.PersistedContent.Username.InvariantEquals(model.Username.Trim()) == false)
                     {
                         //they are changing their login name
-                        if (existingByName.Cast<MembershipUser>().Select(x => x.UserName)
-                            .Any(x => x == model.Username.Trim()))
+                        if (existingByName != null && existingByName.Username == model.Username.Trim())
                         {
                             //the user cannot use this login
                             return false;
@@ -146,8 +144,7 @@ namespace Umbraco.Web.Editors.Filters
                     break;
                 case ContentSaveAction.SaveNew:
                     //check if the user's login already exists
-                    if (existingByName.Cast<MembershipUser>().Select(x => x.UserName)
-                        .Any(x => x == model.Username.Trim()))
+                    if (existingByName != null && existingByName.Username == model.Username.Trim())
                     {
                         //the user cannot use this login
                         return false;
@@ -161,18 +158,11 @@ namespace Umbraco.Web.Editors.Filters
             return true;
         }
 
-        internal bool ValidateUniqueEmail(MemberSave model, MembershipProvider membershipProvider)
+        internal bool ValidateUniqueEmail(MemberSave model)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
-            if (membershipProvider == null) throw new ArgumentNullException(nameof(membershipProvider));
 
-            if (membershipProvider.RequiresUniqueEmail == false)
-            {
-                return true;
-            }
-
-            int totalRecs;
-            var existingByEmail = membershipProvider.FindUsersByEmail(model.Email.Trim(), 0, int.MaxValue, out totalRecs);
+            var existingByEmail = _memberService.GetByEmail(model.Email.Trim());
             switch (model.Action)
             {
                 case ContentSaveAction.Save:
@@ -180,8 +170,7 @@ namespace Umbraco.Web.Editors.Filters
                     if (model.PersistedContent.Email.InvariantEquals(model.Email.Trim()) == false)
                     {
                         //they are changing their email
-                        if (existingByEmail.Cast<MembershipUser>().Select(x => x.Email)
-                            .Any(x => x.InvariantEquals(model.Email.Trim())))
+                        if (existingByEmail != null && existingByEmail.Email.InvariantEquals(model.Email.Trim()))
                         {
                             //the user cannot use this email
                             return false;
@@ -190,8 +179,7 @@ namespace Umbraco.Web.Editors.Filters
                     break;
                 case ContentSaveAction.SaveNew:
                     //check if the user's email already exists
-                    if (existingByEmail.Cast<MembershipUser>().Select(x => x.Email)
-                        .Any(x => x.InvariantEquals(model.Email.Trim())))
+                    if (existingByEmail != null && existingByEmail.Email.InvariantEquals(model.Email.Trim()))
                     {
                         //the user cannot use this email
                         return false;
