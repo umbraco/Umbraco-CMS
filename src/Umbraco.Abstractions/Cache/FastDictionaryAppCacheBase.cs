@@ -275,7 +275,7 @@ namespace Umbraco.Core.Cache
             return $"{CacheItemPrefix}-{key}";
         }
 
-       
+
 
         #endregion
     }

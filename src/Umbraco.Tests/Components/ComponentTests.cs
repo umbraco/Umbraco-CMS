@@ -38,7 +38,7 @@ namespace Umbraco.Tests.Components
             var typeFinder = new TypeFinder(logger);
             var f = new UmbracoDatabaseFactory(logger, new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())), TestHelper.GetConfigs());
             var fs = new FileSystems(mock.Object, logger, IOHelper.Default, SettingsForTests.GenerateMockGlobalSettings());
-            var p = new ScopeProvider(f, fs, logger, typeFinder);
+            var p = new ScopeProvider(f, fs, logger, typeFinder, TestHelper.GetRequestCache());
 
             mock.Setup(x => x.GetInstance(typeof (ILogger))).Returns(logger);
             mock.Setup(x => x.GetInstance(typeof (IProfilingLogger))).Returns(new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));

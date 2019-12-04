@@ -296,5 +296,10 @@ namespace Umbraco.Tests.TestHelpers
         {
             return RegisterFactory.Create(GetConfigs().Global());
         }
+
+        public static IRequestCache GetRequestCache()
+        {
+            return new DictionaryAppCache();
+        }
     }
 }

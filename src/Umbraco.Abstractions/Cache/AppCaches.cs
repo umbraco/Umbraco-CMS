@@ -12,7 +12,7 @@ namespace Umbraco.Core.Cache
         /// </summary>
         public AppCaches(
             IAppPolicyCache runtimeCache,
-            IAppCache requestCache,
+            IRequestCache requestCache,
             IsolatedCaches isolatedCaches)
         {
             RuntimeCache = runtimeCache ?? throw new ArgumentNullException(nameof(runtimeCache));
@@ -45,7 +45,7 @@ namespace Umbraco.Core.Cache
         /// <para>The per-request caches works on top of the current HttpContext items.</para>
         /// <para>Outside a web environment, the behavior of that cache is unspecified.</para>
         /// </remarks>
-        public IAppCache RequestCache { get; }
+        public IRequestCache RequestCache { get; }
 
         /// <summary>
         /// Gets the runtime cache.
