@@ -45,6 +45,7 @@ using Umbraco.Web.Sections;
 using Current = Umbraco.Core.Composing.Current;
 using FileSystems = Umbraco.Core.IO.FileSystems;
 using Umbraco.Core.Dictionary;
+using Umbraco.Net;
 
 namespace Umbraco.Tests.Testing
 {

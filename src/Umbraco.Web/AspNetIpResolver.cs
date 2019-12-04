@@ -1,9 +1,10 @@
 using System.Web;
 using Umbraco.Core;
+using Umbraco.Net;
 
 namespace Umbraco.Web
 {
-    public class AspNetIpResolver : IIpResolver
+    internal class AspNetIpResolver : IIpResolver
     {
         public string GetCurrentRequestIpAddress()
         {

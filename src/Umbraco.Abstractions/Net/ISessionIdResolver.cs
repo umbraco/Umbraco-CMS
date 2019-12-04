@@ -1,4 +1,4 @@
-namespace Umbraco.Core
+namespace Umbraco.Net
 {
     public interface ISessionIdResolver
     {

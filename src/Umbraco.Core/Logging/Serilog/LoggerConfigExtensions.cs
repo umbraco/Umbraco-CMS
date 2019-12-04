@@ -10,6 +10,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging.Serilog.Enrichers;
+using Umbraco.Net;
 
 namespace Umbraco.Core.Logging.Serilog
 {

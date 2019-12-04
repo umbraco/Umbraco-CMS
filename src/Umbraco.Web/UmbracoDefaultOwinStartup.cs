@@ -7,6 +7,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
+using Umbraco.Net;
 using Umbraco.Web;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Security;

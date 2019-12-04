@@ -15,13 +15,13 @@ namespace Umbraco.Tests.CoreThings
         [SetUp]
         public void SetUp()
         {
-            _root = Current.IOHelper.Root;
+            _root = TestHelper.IOHelper.Root;
         }
 
         [TearDown]
         public void TearDown()
         {
-            Current.IOHelper.Root = _root;
+            TestHelper.IOHelper.Root = _root;
         }
 
         [TestCase("http://www.domain.com/umbraco", "", true)]

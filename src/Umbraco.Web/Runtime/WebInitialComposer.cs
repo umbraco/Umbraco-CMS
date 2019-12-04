@@ -16,6 +16,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Services;
+using Umbraco.Net;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing.CompositionExtensions;

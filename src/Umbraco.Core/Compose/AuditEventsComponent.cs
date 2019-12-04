@@ -9,6 +9,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Net;
 
 namespace Umbraco.Core.Compose
 {

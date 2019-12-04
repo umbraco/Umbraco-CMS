@@ -21,6 +21,7 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
+using Umbraco.Net;
 using Umbraco.Web;
 using Umbraco.Web.Hosting;
 using File = System.IO.File;

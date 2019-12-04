@@ -22,6 +22,7 @@ namespace Umbraco.Web
             _logger = logger;
         }
 
+        /// <inheritdoc />
         public string GetAbsoluteUrl => GetAbsoluteUrlFromConfig() ?? GetAbsoluteUrlFromCurrentRequest() ?? null;
 
         private string GetAbsoluteUrlFromConfig()

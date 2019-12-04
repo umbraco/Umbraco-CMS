@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.Models.PublishedContent
+﻿using Umbraco.Core.Strings;
+
+namespace Umbraco.Core.Models.PublishedContent
 {
     public class IndexedArrayItem<TContent>
     {

@@ -17,13 +17,5 @@ namespace Umbraco.Core.Sync
         /// </summary>
         ServerRole GetCurrentServerRole();
 
-        /// <summary>
-        /// Gets the current umbraco application url.
-        /// </summary>
-        /// <remarks>
-        /// <para>If the registrar does not provide the umbraco application url, should return null.</para>
-        /// <para>Must return null, or a url that ends with SystemDirectories.Umbraco, and contains a scheme, eg "http://www.mysite.com/umbraco".</para>
-        /// </remarks>
-        string GetCurrentServerUmbracoApplicationUrl();
     }
 }

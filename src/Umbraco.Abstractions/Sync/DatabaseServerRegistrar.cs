@@ -45,14 +45,5 @@ namespace Umbraco.Core.Sync
             return service.GetCurrentServerRole();
         }
 
-        /// <summary>
-        /// Gets the current umbraco application url.
-        /// </summary>
-        public string GetCurrentServerUmbracoApplicationUrl()
-        {
-            // this registrar does not provide the umbraco application url
-            return null;
-        }
-
     }
 }

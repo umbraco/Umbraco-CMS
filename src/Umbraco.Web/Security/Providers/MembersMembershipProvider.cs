@@ -10,6 +10,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Composing;
 using System;
+using Umbraco.Net;
 
 namespace Umbraco.Web.Security.Providers
 {

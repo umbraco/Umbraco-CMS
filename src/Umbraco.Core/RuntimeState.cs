@@ -102,8 +102,19 @@ namespace Umbraco.Core
         public RuntimeLevelReason Reason { get; internal set; } = RuntimeLevelReason.Unknown;
 
 
+        /// <summary>
+        /// Ensures that the <see cref="ApplicationUrl"/> property has a value.
+        /// </summary>
         internal void EnsureApplicationUrl()
         {
+            //Fixme: This causes problems with site swap on azure because azure pre-warms a site by calling into `localhost` and when it does that
+            // it changes the URL to `localhost:80` which actually doesn't work for pinging itself, it only works internally in Azure. The ironic part
+            // about this is that this is here specifically for the slot swap scenario https://issues.umbraco.org/issue/U4-10626
+
+
+            // see U4-10626 - in some cases we want to reset the application url
+            // (this is a simplified version of what was in 7.x)
+            // note: should this be optional? is it expensive?
             var url = _backOfficeInfo.GetAbsoluteUrl;
 
             var change = url != null && !_applicationUrls.Contains(url);
@@ -115,31 +126,6 @@ namespace Umbraco.Core
                 ApplicationUrl = new Uri(url);
             }
         }
-//        /// <summary>
-//        /// Ensures that the <see cref="ApplicationUrl"/> property has a value.
-//        /// </summary>
-//        /// <param name="request"></param>
-//        internal void EnsureApplicationUrl(HttpRequestBase request = null)
-//        {
-//            //Fixme: This causes problems with site swap on azure because azure pre-warms a site by calling into `localhost` and when it does that
-//            // it changes the URL to `localhost:80` which actually doesn't work for pinging itself, it only works internally in Azure. The ironic part
-//            // about this is that this is here specifically for the slot swap scenario https://issues.umbraco.org/issue/U4-10626
-//
-//
-//            // see U4-10626 - in some cases we want to reset the application url
-//            // (this is a simplified version of what was in 7.x)
-//            // note: should this be optional? is it expensive?
-//            var url = request == null ? null : ApplicationUrlHelper.GetApplicationUrlFromCurrentRequest(request, _globalSettings);
-//            var change = url != null && !_applicationUrls.Contains(url);
-//            if (change)
-//            {
-//                _logger.Info(typeof(ApplicationUrlHelper), "New url {Url} detected, re-discovering application url.", url);
-//                _applicationUrls.Add(url);
-//            }
-//
-//            if (ApplicationUrl != null && !change) return;
-//            ApplicationUrl = new Uri(ApplicationUrlHelper.GetApplicationUrl(_logger, _globalSettings, _settings, ServerRegistrar, request));
-//        }
 
         /// <inheritdoc />
         public BootFailedException BootFailedException { get; internal set; }

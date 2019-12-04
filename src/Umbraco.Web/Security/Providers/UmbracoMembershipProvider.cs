@@ -13,6 +13,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
+using Umbraco.Net;
 using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Security.Providers

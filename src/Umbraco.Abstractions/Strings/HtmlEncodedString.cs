@@ -1,14 +1,8 @@
-namespace Umbraco.Core
+namespace Umbraco.Core.Strings
 {
-    public interface IHtmlEncodedString
-    {
-        /// <summary>
-        ///     Returns an HTML-encoded string.
-        /// </summary>
-        /// <returns>An HTML-encoded string.</returns>
-        string ToHtmlString();
-    }
-
+    /// <summary>
+    /// Represents an HTML-encoded string that should not be encoded again.
+    /// </summary>
     public class HtmlEncodedString : IHtmlEncodedString
     {
 

@@ -7,6 +7,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using Newtonsoft.Json;
 using Umbraco.Core.Serialization;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
