@@ -18,10 +18,12 @@
             <div class="umb-grid-selector__item-content">
                 <i class="umb-grid-selector__item-icon {{ selectedItem.icon }}" aria-hidden="true"></i>
                 <div class="umb-grid-selector__item-label">{{ selectedItem.name }}</div>
-                <div><button class="umb-grid-selector__item-default-label -blue" ng-click="openTemplate(selectedItem)"><localize key="general_open">Open</localize></button></div>
-                <div><button class="umb-grid-selector__item-default-label -blue" ng-click="setAsDefaultItem(selectedItem)"><localize key="grid_setAsDefault">Set as default</localize></button></div>
+                <div><button class="umb-grid-selector__item-default-label btn-link -blue" ng-click="openTemplate(selectedItem)"><localize key="general_open">Open</localize></button></div>
+                <div><button class="umb-grid-selector__item-default-label btn-link -blue" ng-click="setAsDefaultItem(selectedItem)"><localize key="grid_setAsDefault">Set as default</localize></button></div>
             </div>
-            <i class="umb-grid-selector__item-remove icon-trash" ng-click="removeItem(selectedItem)"></i>
+            <i class="umb-grid-selector__item-remove icon-trash" ng-click="removeItem(selectedItem)" aria-role="button">
+                <span class="sr-only">Remove Template</span>
+            </i>
         </div>
 
         <button class="umb-grid-selector__item -placeholder" ng-if="(availableItems | compareArrays:selectedItems:'alias').length > 0" ng-click="openItemPicker($event)" hotkey="alt+shift+g">
