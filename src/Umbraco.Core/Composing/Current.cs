@@ -154,8 +154,8 @@ namespace Umbraco.Core.Composing
         public static DataEditorCollection DataEditors
             => Factory.GetInstance<DataEditorCollection>();
 
-        public static DataValueReferenceForCollection DataValueReferenceFors
-            => Factory.GetInstance<DataValueReferenceForCollection>();
+        public static DataValueReferenceFactoryCollection DataValueReferenceFactories
+            => Factory.GetInstance<DataValueReferenceFactoryCollection>();
 
         public static PropertyEditorCollection PropertyEditors
             => Factory.GetInstance<PropertyEditorCollection>();

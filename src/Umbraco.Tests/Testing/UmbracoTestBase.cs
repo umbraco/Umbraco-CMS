@@ -218,7 +218,7 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique<IPublishedRouter, PublishedRouter>();
             Composition.WithCollectionBuilder<ContentFinderCollectionBuilder>();
 
-            Composition.DataValueReferenceFors();
+            Composition.DataValueReferenceFactories();
 
             Composition.RegisterUnique<IContentLastChanceFinder, TestLastChanceFinder>();
             Composition.RegisterUnique<IVariationContextAccessor, TestVariationContextAccessor>();

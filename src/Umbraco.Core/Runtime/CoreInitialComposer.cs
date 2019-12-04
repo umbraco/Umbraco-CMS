@@ -77,8 +77,7 @@ namespace Umbraco.Core.Runtime
 
             // Used to determine if a datatype/editor should be storing/tracking
             // references to media item/s
-            composition.DataValueReferenceFors();
-                //WB:TODO Try me out & overide/add to an existing list
+            composition.DataValueReferenceFactories();
 
             // register a server registrar, by default it's the db registrar
             composition.RegisterUnique<IServerRegistrar>(f =>

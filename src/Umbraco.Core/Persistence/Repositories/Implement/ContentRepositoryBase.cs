@@ -36,7 +36,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         where TRepository : class, IRepository
     {
         private readonly Lazy<PropertyEditorCollection> _propertyEditors;
-        private readonly DataValueReferenceForCollection _dataValueReferenceFors;
+        private readonly DataValueReferenceFactoryCollection _dataValueReferenceFactories;
 
         /// <summary>
         ///
@@ -50,14 +50,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// </param>
         protected ContentRepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger,
             ILanguageRepository languageRepository, IRelationRepository relationRepository, IRelationTypeRepository relationTypeRepository,
-            Lazy<PropertyEditorCollection> propertyEditors, DataValueReferenceForCollection dataValueReferenceFors)
+            Lazy<PropertyEditorCollection> propertyEditors, DataValueReferenceFactoryCollection dataValueReferenceFactories)
             : base(scopeAccessor, cache, logger)
         {
             LanguageRepository = languageRepository;
             RelationRepository = relationRepository;
             RelationTypeRepository = relationTypeRepository;
             _propertyEditors = propertyEditors;
-            _dataValueReferenceFors = dataValueReferenceFors;
+            _dataValueReferenceFactories = dataValueReferenceFactories;
         }
 
         protected abstract TRepository This { get; }
@@ -843,7 +843,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 // implementation of GetReferences in IDataValueReference.
                 // Allows developers to add support for references by a
                 // package /property editor that did not implement IDataValueReference themselves
-                foreach (var item in _dataValueReferenceFors)
+                foreach (var item in _dataValueReferenceFactories)
                 {
                     // Check if this value reference is for this datatype/editor
                     // Then call it's GetReferences method - to see if the value stored

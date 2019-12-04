@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core.PropertyEditors
 {
-    public interface IDataValueReferenceFor
+    public interface IDataValueReferenceFactory
     {
         /// <summary>
         /// Gets a value indicating whether the DataValueReference lookup supports a datatype (data editor).
