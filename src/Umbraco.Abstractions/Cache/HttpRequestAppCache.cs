@@ -27,6 +27,8 @@ namespace Umbraco.Core.Cache
 
         private Func<IDictionary> ContextItems { get; }
 
+        public bool IsAvailable => TryGetContextItems(out _);
+
         private bool TryGetContextItems(out IDictionary items)
         {
             items = ContextItems?.Invoke();

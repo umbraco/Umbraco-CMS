@@ -8,9 +8,9 @@ using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
-
 #if DEBUG_SCOPES
 using System.Linq;
+using System.Text;
 #endif
 
 namespace Umbraco.Core.Scoping
@@ -187,26 +187,39 @@ namespace Umbraco.Core.Scoping
             where T : class
         {
 
-            var result = (T) _requestCache.Get(key);
+            if (!_requestCache.IsAvailable && required)
+                throw new Exception("Request cache is unavailable.");
 
-            if (result is null && required)
-            {
-                throw new Exception("HttpContext.Current is null.");
-            }
-
-            return result;
-
+            return (T)_requestCache.Get(key);
         }
 
         private bool SetHttpContextObject(string key, object value, bool required = true)
         {
-            var done = value is null ? _requestCache.Remove(key) : _requestCache.Set(key, value);
-
-            if (!done && required)
+            if (!_requestCache.IsAvailable)
             {
-                throw new Exception("HttpContext.Current is null.");
+                if (required)
+                    throw new Exception("Request cache is unavailable.");
+                return false;
             }
-            return done;
+
+#if DEBUG_SCOPES
+            // manage the 'context' that contains the scope (null, "http" or "call")
+            // only for scopes of course!
+            if (key == ScopeItemKey)
+            {
+                // first, null-register the existing value
+                var ambientScope = (IScope)_requestCache.Get(ScopeItemKey);
+                if (ambientScope != null) RegisterContext(ambientScope, null);
+                // then register the new value
+                var scope = value as IScope;
+                if (scope != null) RegisterContext(scope, "http");
+            }
+#endif
+            if (value == null)
+                _requestCache.Remove(key);
+            else
+                _requestCache.Set(key, value);
+            return true;
         }
 
 #endregion

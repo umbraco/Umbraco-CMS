@@ -18,6 +18,9 @@ namespace Umbraco.Core.Cache
         public int Count => _items.Count;
 
         /// <inheritdoc />
+        public bool IsAvailable => true;
+
+        /// <inheritdoc />
         public virtual object Get(string key)
         {
             return _items.TryGetValue(key, out var value) ? value : null;

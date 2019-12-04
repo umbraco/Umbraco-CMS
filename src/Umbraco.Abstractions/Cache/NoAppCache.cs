@@ -17,6 +17,9 @@ namespace Umbraco.Core.Cache
         public static NoAppCache Instance { get; } = new NoAppCache();
 
         /// <inheritdoc />
+        public bool IsAvailable => true;
+
+        /// <inheritdoc />
         public virtual object Get(string cacheKey)
         {
             return null;
