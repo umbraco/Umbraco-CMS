@@ -22,7 +22,7 @@ namespace Umbraco.Core
         private readonly ILogger _logger;
 
         // our own lock for local consistency
-        private readonly object _locko = new object();
+        private object _locko = new object();
 
         // async lock representing the main domain lock
         private readonly SystemLock _systemLock;
@@ -32,8 +32,9 @@ namespace Umbraco.Core
         // release the lock because a new domain wants to be the main domain
         private readonly EventWaitHandle _signal;
 
+        private bool _isInitialized;
         // indicates whether...
-        private volatile bool _isMainDom; // we are the main domain
+        private bool _isMainDom; // we are the main domain
         private volatile bool _signaled; // we have been signaled
 
         // actions to run before releasing the main domain
@@ -156,62 +157,57 @@ namespace Umbraco.Core
         }
 
         // acquires the main domain
-        internal bool Acquire()
+        private bool Acquire()
         {
-            lock (_locko) // we don't want the hosting environment to interfere by signaling
+            // if signaled, too late to acquire, give up
+            // the handler is not installed so that would be the hosting environment
+            if (_signaled)
             {
-                // if signaled, too late to acquire, give up
-                // the handler is not installed so that would be the hosting environment
-                if (_signaled)
-                {
-                    _logger.Info<MainDom>("Cannot acquire (signaled).");
-                    return false;
-                }
-
-                _logger.Info<MainDom>("Acquiring.");
-
-                // signal other instances that we want the lock, then wait one the lock,
-                // which may timeout, and this is accepted - see comments below
-
-                // signal, then wait for the lock, then make sure the event is
-                // reset (maybe there was noone listening..)
-                _signal.Set();
-
-                // if more than 1 instance reach that point, one will get the lock
-                // and the other one will timeout, which is accepted
-
-                //This can throw a TimeoutException - in which case should this be in a try/finally to ensure the signal is always reset.
-                try
-                {
-                    _systemLocker = _systemLock.Lock(LockTimeoutMilliseconds);
-                }                
-                finally
-                {
-                    // we need to reset the event, because otherwise we would end up
-                    // signaling ourselves and committing suicide immediately.
-                    // only 1 instance can reach that point, but other instances may
-                    // have started and be trying to get the lock - they will timeout,
-                    // which is accepted
-
-                    _signal.Reset();
-                }
-                _isMainDom = true;
-               
-
-                //WaitOneAsync (ext method) will wait for a signal without blocking the main thread, the waiting is done on a background thread
-
-                _signal.WaitOneAsync()
-                    .ContinueWith(_ => OnSignal("signal"));
-
-                _logger.Info<MainDom>("Acquired.");
-                return true;
+                _logger.Info<MainDom>("Cannot acquire (signaled).");
+                return false;
             }
+
+            _logger.Info<MainDom>("Acquiring.");
+
+            // signal other instances that we want the lock, then wait one the lock,
+            // which may timeout, and this is accepted - see comments below
+
+            // signal, then wait for the lock, then make sure the event is
+            // reset (maybe there was noone listening..)
+            _signal.Set();
+
+            // if more than 1 instance reach that point, one will get the lock
+            // and the other one will timeout, which is accepted
+
+            //This can throw a TimeoutException - in which case should this be in a try/finally to ensure the signal is always reset.
+            try
+            {
+                _systemLocker = _systemLock.Lock(LockTimeoutMilliseconds);
+            }
+            finally
+            {
+                // we need to reset the event, because otherwise we would end up
+                // signaling ourselves and committing suicide immediately.
+                // only 1 instance can reach that point, but other instances may
+                // have started and be trying to get the lock - they will timeout,
+                // which is accepted
+
+                _signal.Reset();
+            }
+            
+            //WaitOneAsync (ext method) will wait for a signal without blocking the main thread, the waiting is done on a background thread
+
+            _signal.WaitOneAsync()
+                .ContinueWith(_ => OnSignal("signal"));
+
+            _logger.Info<MainDom>("Acquired.");
+            return true;
         }
 
         /// <summary>
         /// Gets a value indicating whether the current domain is the main domain.
         /// </summary>
-        public bool IsMainDom => _isMainDom;
+        public bool IsMainDom => LazyInitializer.EnsureInitialized(ref _isMainDom, ref _isInitialized, ref _locko, () => Acquire());
 
         // IRegisteredObject
         void IRegisteredObject.Stop(bool immediate)
