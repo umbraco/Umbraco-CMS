@@ -737,7 +737,6 @@
     <Compile Include="Security\BackOfficeUserValidator.cs" />
     <Compile Include="Security\ContentPermissionsHelper.cs" />
     <Compile Include="Security\EmailService.cs" />
-    <Compile Include="Security\IUmbracoMemberTypeMembershipProvider.cs" />
     <Compile Include="Security\IUserAwarePasswordHasher.cs" />
     <Compile Include="Security\IUserSessionStore.cs" />
     <Compile Include="Security\MachineKeyGenerator.cs" />

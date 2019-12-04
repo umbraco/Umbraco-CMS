@@ -101,14 +101,5 @@ namespace Umbraco.Web.Editors
             return Attempt.Succeed(new PasswordChangedModel());
         }
 
-        public string ChangePassword(ChangingPasswordModel passwordModel, PasswordSecurity passwordSecurity)
-        {
-            if (passwordModel.NewPassword.IsNullOrWhiteSpace())
-                throw new InvalidOperationException("No password value");
-
-            return passwordSecurity.HashPasswordForStorage(passwordModel.NewPassword);
-        }
-
-       
     }
 }

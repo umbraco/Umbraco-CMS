@@ -58,9 +58,6 @@ namespace Umbraco.Web.Editors.Filters
                     $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email");
             }
 
-            //default provider!
-            var membershipProvider = MembershipProviderExtensions.GetMembersMembershipProvider();
-
             var validEmail = ValidateUniqueEmail(model);
             if (validEmail == false)
             {

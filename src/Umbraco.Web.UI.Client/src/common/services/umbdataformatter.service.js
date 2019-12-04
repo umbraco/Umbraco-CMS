@@ -304,33 +304,6 @@
                 }
                 saveModel.memberGroups = selectedGroups;
 
-                //turn the dictionary into an array of pairs
-                var memberProviderPropAliases = _.pairs(displayModel.fieldConfig);
-                _.each(displayModel.tabs, function (tab) {
-                    _.each(tab.properties, function (prop) {
-                        var foundAlias = _.find(memberProviderPropAliases, function (item) {
-                            return prop.alias === item[1];
-                        });
-                        if (foundAlias) {
-                            //we know the current property matches an alias, now we need to determine which membership provider property it was for
-                            // by looking at the key
-                            switch (foundAlias[0]) {
-                                case "umbracoMemberLockedOut":
-                                    saveModel.isLockedOut = Object.toBoolean(prop.value);
-                                    break;
-                                case "umbracoMemberApproved":
-                                    saveModel.isApproved = Object.toBoolean(prop.value);
-                                    break;
-                                case "umbracoMemberComments":
-                                    saveModel.comments = prop.value;
-                                    break;
-                            }
-                        }
-                    });
-                });
-
-
-
                 return saveModel;
             },
 

@@ -53,9 +53,7 @@ namespace Umbraco.Web.Editors
         private readonly IMemberPasswordConfiguration _passwordConfig;
         private readonly PropertyEditorCollection _propertyEditors;
         private PasswordSecurity _passwordSecurity;
-        private PasswordChanger _passwordChanger;
         private PasswordSecurity PasswordSecurity => _passwordSecurity ?? (_passwordSecurity = new PasswordSecurity(_passwordConfig));
-        private PasswordChanger PasswordChanger => _passwordChanger ?? (_passwordChanger = new PasswordChanger(Logger));
 
         public PagedResult<MemberBasic> GetPagedResults(
             int pageNumber = 1,
@@ -281,7 +279,10 @@ namespace Umbraco.Web.Editors
                 throw new InvalidOperationException($"No member type found with alias {contentItem.ContentTypeAlias}");
             var member = new Member(contentItem.Name, contentItem.Email, contentItem.Username, memberType, true)
             {
-                CreatorId = Security.CurrentUser.Id
+                CreatorId = Security.CurrentUser.Id,
+                RawPasswordValue = PasswordSecurity.HashPasswordForStorage(contentItem.Password.NewPassword),
+                Comments = contentItem.Comments,
+                IsApproved = contentItem.IsApproved
             };
 
             return member;            
@@ -298,9 +299,10 @@ namespace Umbraco.Web.Editors
         {
             contentItem.PersistedContent.WriterId = Security.CurrentUser.Id;
 
-            //if the user doesn't have access to sensitive values, then we need to check if any of the built in member property types
-            //have been marked as sensitive. If that is the case we cannot change these persisted values no matter what value has been posted.
-            //There's only 3 special ones we need to deal with that are part of the MemberSave instance
+            // If the user doesn't have access to sensitive values, then we need to check if any of the built in member property types
+            // have been marked as sensitive. If that is the case we cannot change these persisted values no matter what value has been posted.
+            // There's only 3 special ones we need to deal with that are part of the MemberSave instance: Comments, IsApproved, IsLockedOut
+            // but we will take care of this in a generic way below so that it works for all props.
             if (!Security.CurrentUser.HasAccessToSensitiveData())
             {
                 var memberType = Services.MemberTypeService.Get(contentItem.PersistedContent.ContentTypeId);
@@ -310,29 +312,25 @@ namespace Umbraco.Web.Editors
 
                 foreach (var sensitiveProperty in sensitiveProperties)
                 {
-                    //if found, change the value of the contentItem model to the persisted value so it remains unchanged
-                    switch (sensitiveProperty.Alias)
+                    var destProp = contentItem.Properties.FirstOrDefault(x => x.Alias == sensitiveProperty.Alias);
+                    if (destProp != null)
                     {
-                        case Constants.Conventions.Member.Comments:
-                            contentItem.Comments = contentItem.PersistedContent.Comments;
-                            break;
-                        case Constants.Conventions.Member.IsApproved:
-                            contentItem.IsApproved = contentItem.PersistedContent.IsApproved;
-                            break;
-                        case Constants.Conventions.Member.IsLockedOut:
-                            contentItem.IsLockedOut = contentItem.PersistedContent.IsLockedOut;
-                            break;
+                        //if found, change the value of the contentItem model to the persisted value so it remains unchanged
+                        var origValue = contentItem.PersistedContent.GetValue(sensitiveProperty.Alias);
+                        destProp.Value = origValue;
                     }
                 }
             }
 
+            var isLockedOut = contentItem.IsLockedOut;
+
             //if they were locked but now they are trying to be unlocked
-            if (contentItem.PersistedContent.IsLockedOut && contentItem.IsLockedOut == false)
+            if (contentItem.PersistedContent.IsLockedOut && isLockedOut == false)
             {
                 contentItem.PersistedContent.IsLockedOut = false;
                 contentItem.PersistedContent.FailedPasswordAttempts = 0;
             }
-            else if (!contentItem.PersistedContent.IsLockedOut && contentItem.IsLockedOut)
+            else if (!contentItem.PersistedContent.IsLockedOut && isLockedOut)
             {
                 //NOTE: This should not ever happen unless someone is mucking around with the request data.
                 //An admin cannot simply lock a user, they get locked out by password attempts, but an admin can un-approve them
@@ -343,8 +341,8 @@ namespace Umbraco.Web.Editors
             if (contentItem.Password == null)
                 return;
 
-            // change the password
-            contentItem.PersistedContent.RawPasswordValue = PasswordChanger.ChangePassword(contentItem.Password, PasswordSecurity);
+            // set the password
+            contentItem.PersistedContent.RawPasswordValue = PasswordSecurity.HashPasswordForStorage(contentItem.Password.NewPassword);
         }
 
         private static void UpdateName(MemberSave memberSave)

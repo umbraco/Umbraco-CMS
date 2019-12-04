@@ -1,16 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Umbraco.Core;
+﻿using Umbraco.Core;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Core.Services.Implement;
-using UserProfile = Umbraco.Web.Models.ContentEditing.UserProfile;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -49,7 +40,6 @@ namespace Umbraco.Web.Models.Mapping
             target.Icon = source.ContentType.Icon;
             target.Id = source.Id;
             target.Key = source.Key;
-            target.MemberProviderFieldMapping = GetMemberProviderFieldMapping();
             target.Name = source.Name;
             target.Owner = _commonMapper.GetOwner(source, context);
             target.ParentId = source.ParentId;
@@ -101,18 +91,5 @@ namespace Umbraco.Web.Models.Mapping
             target.Properties = context.MapEnumerable<IProperty, ContentPropertyDto>(source.Properties);
         }
 
-        private static IDictionary<string, string> GetMemberProviderFieldMapping()
-        {
-            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
-            
-            var umbracoProvider = (IUmbracoMemberTypeMembershipProvider)provider;
-
-            return new Dictionary<string, string>
-            {
-                {Constants.Conventions.Member.IsLockedOut, umbracoProvider.LockPropertyTypeAlias},
-                {Constants.Conventions.Member.IsApproved, umbracoProvider.ApprovedPropertyTypeAlias},
-                {Constants.Conventions.Member.Comments, umbracoProvider.CommentPropertyTypeAlias}
-            };
-        }
     }
 }

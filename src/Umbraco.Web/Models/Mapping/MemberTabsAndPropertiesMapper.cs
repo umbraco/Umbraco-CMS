@@ -5,13 +5,12 @@ using Umbraco.Core;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Core.Dictionary;
 using Umbraco.Web.Security;
 using Umbraco.Web.Security.Providers;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -30,8 +29,9 @@ namespace Umbraco.Web.Models.Mapping
         private readonly IMemberTypeService _memberTypeService;
         private readonly IMemberService _memberService;
         private readonly IMemberGroupService _memberGroupService;
+        private readonly IMemberPasswordConfiguration _memberPasswordConfiguration;
 
-        public MemberTabsAndPropertiesMapper(ICultureDictionary cultureDictionary, IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService localizedTextService, IMemberTypeService memberTypeService, IMemberService memberService, IMemberGroupService memberGroupService)
+        public MemberTabsAndPropertiesMapper(ICultureDictionary cultureDictionary, IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService localizedTextService, IMemberTypeService memberTypeService, IMemberService memberService, IMemberGroupService memberGroupService, IMemberPasswordConfiguration memberPasswordConfiguration)
             : base(cultureDictionary, localizedTextService)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
@@ -39,13 +39,13 @@ namespace Umbraco.Web.Models.Mapping
             _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
             _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
             _memberGroupService = memberGroupService ?? throw new ArgumentNullException(nameof(memberGroupService));
+            _memberPasswordConfiguration = memberPasswordConfiguration;
         }
 
         /// <inheritdoc />
         /// <remarks>Overridden to deal with custom member properties and permissions.</remarks>
         public override IEnumerable<Tab<ContentPropertyDisplay>> Map(IMember source, MapperContext context)
         {
-            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
 
             var memberType = _memberTypeService.Get(source.ContentTypeId);
 
@@ -56,12 +56,10 @@ namespace Umbraco.Web.Models.Mapping
 
             var resolved = base.Map(source, context);
 
-            var umbracoProvider = (IUmbracoMemberTypeMembershipProvider)provider;
-
             // This is kind of a hack because a developer is supposed to be allowed to set their property editor - would have been much easier
             // if we just had all of the membership provider fields on the member table :(
             // TODO: But is there a way to map the IMember.IsLockedOut to the property ? i dunno.
-            var isLockedOutProperty = resolved.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == umbracoProvider.LockPropertyTypeAlias);
+            var isLockedOutProperty = resolved.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == Constants.Conventions.Member.IsLockedOut);
             if (isLockedOutProperty?.Value != null && isLockedOutProperty.Value.ToString() != "1")
             {
                 isLockedOutProperty.View = "readonlyvalue";
@@ -97,7 +95,6 @@ namespace Umbraco.Web.Models.Mapping
         protected override IEnumerable<ContentPropertyDisplay> GetCustomGenericProperties(IContentBase content)
         {
             var member = (IMember)content;
-            var membersProvider = MembershipProviderExtensions.GetMembersMembershipProvider();
 
             var genericProperties = new List<ContentPropertyDisplay>
             {
@@ -137,7 +134,7 @@ namespace Umbraco.Web.Models.Mapping
                     // TODO: Hard coding this because the changepassword doesn't necessarily need to be a resolvable (real) property editor
                     View = "changepassword",
                     // initialize the dictionary with the configuration from the default membership provider
-                    Config = GetPasswordConfig(membersProvider, member)
+                    Config = GetPasswordConfig(member)
                 },
                 new ContentPropertyDisplay
                 {
@@ -152,9 +149,9 @@ namespace Umbraco.Web.Models.Mapping
             return genericProperties;
         }
 
-        private Dictionary<string, object> GetPasswordConfig(MembersMembershipProvider membersProvider, IMember member)
+        private Dictionary<string, object> GetPasswordConfig(IMember member)
         {
-            var result = new Dictionary<string, object>(membersProvider.PasswordConfiguration.GetConfiguration(true))
+            var result = new Dictionary<string, object>(_memberPasswordConfiguration.GetConfiguration(true))
                 {
                     // the password change toggle will only be displayed if there is already a password assigned.
                     {"hasPassword", member.RawPasswordValue.IsNullOrWhiteSpace() == false}

@@ -55,6 +55,9 @@ namespace Umbraco.Core.Security
         /// <returns></returns>
         public string HashPasswordForStorage(string password)
         {
+            if (string.IsNullOrWhiteSpace(password))
+                throw new ArgumentException("password cannot be empty", nameof(password));
+
             string salt;
             var hashed = HashNewPassword(password, out salt);
             return FormatPasswordForStorage(hashed, salt);
