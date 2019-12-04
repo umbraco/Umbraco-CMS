@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
@@ -17,15 +18,19 @@ namespace Umbraco.Web.PropertyEditors
         Icon = Constants.Icons.ListView)]
     public class ListViewPropertyEditor : DataEditor
     {
+        private readonly IIOHelper _iioHelper;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ListViewPropertyEditor"/> class.
         /// </summary>
         /// <param name="logger"></param>
-        public ListViewPropertyEditor(ILogger logger)
+        public ListViewPropertyEditor(ILogger logger, IIOHelper iioHelper)
             : base(logger)
-        { }
+        {
+            _iioHelper = iioHelper;
+        }
 
         /// <inheritdoc />
-        protected override IConfigurationEditor CreateConfigurationEditor() => new ListViewConfigurationEditor();
+        protected override IConfigurationEditor CreateConfigurationEditor() => new ListViewConfigurationEditor(_iioHelper);
     }
 }

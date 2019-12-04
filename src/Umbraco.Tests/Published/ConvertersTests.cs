@@ -4,6 +4,7 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -178,7 +179,7 @@ namespace Umbraco.Tests.Published
             Current.Reset();
             var register = TestHelper.GetRegister();
 
-            var composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs());
+            var composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
 
             composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>()
                 .Append<SimpleConverter3A>()

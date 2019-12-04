@@ -13,14 +13,17 @@ namespace Umbraco.ModelsBuilder.Embedded.Configuration
     /// </summary>
     public class ModelsBuilderConfig : IModelsBuilderConfig
     {
+        private readonly IIOHelper _ioHelper;
         public const string DefaultModelsNamespace = "Umbraco.Web.PublishedModels";
-        public const string DefaultModelsDirectory = "~/App_Data/Models";
+
+        public string DefaultModelsDirectory => _ioHelper.MapPath("~/App_Data/Models");
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ModelsBuilderConfig"/> class.
         /// </summary>
-        public ModelsBuilderConfig()
+        public ModelsBuilderConfig(IIOHelper ioHelper)
         {
+            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             const string prefix = "Umbraco.ModelsBuilder.";
 
             // giant kill switch, default: false
@@ -29,7 +32,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Configuration
 
             // ensure defaults are initialized for tests
             ModelsNamespace = DefaultModelsNamespace;
-            ModelsDirectory = Current.IOHelper.MapPath(DefaultModelsDirectory);
+            ModelsDirectory  = DefaultModelsDirectory;
             DebugLevel = 0;
 
             // stop here, everything is false
@@ -101,7 +104,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Configuration
         /// <summary>
         /// Initializes a new instance of the <see cref="ModelsBuilderConfig"/> class.
         /// </summary>
-        public ModelsBuilderConfig(
+        public ModelsBuilderConfig(IIOHelper ioHelper,
             bool enable = false,
             ModelsMode modelsMode = ModelsMode.Nothing,
             string modelsNamespace = null,
@@ -111,6 +114,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Configuration
             bool acceptUnsafeModelsDirectory = false,
             int debugLevel = 0)
         {
+            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             Enable = enable;
             ModelsMode = modelsMode;
 

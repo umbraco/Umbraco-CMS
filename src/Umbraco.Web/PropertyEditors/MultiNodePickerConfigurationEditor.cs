@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.IO;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
@@ -8,7 +9,7 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     public class MultiNodePickerConfigurationEditor : ConfigurationEditor<MultiNodePickerConfiguration>
     {
-        public MultiNodePickerConfigurationEditor()
+        public MultiNodePickerConfigurationEditor(IIOHelper ioHelper) : base(ioHelper)
         {
             Field(nameof(MultiNodePickerConfiguration.TreeSource))
                 .Config = new Dictionary<string, object> { { "idType", "udi" } };

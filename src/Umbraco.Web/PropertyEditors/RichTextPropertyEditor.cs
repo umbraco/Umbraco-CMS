@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -29,6 +30,7 @@ namespace Umbraco.Web.PropertyEditors
         private IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizationService _localizationService;
+        private readonly IIOHelper _ioHelper;
         private ILogger _logger;
 
         /// <summary>
@@ -40,13 +42,15 @@ namespace Umbraco.Web.PropertyEditors
             IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
             IUmbracoContextAccessor umbracoContextAccessor,
             IDataTypeService dataTypeService,
-            ILocalizationService localizationService) : base(logger)
+            ILocalizationService localizationService,
+            IIOHelper ioHelper) : base(logger)
         {
             _mediaService = mediaService;
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
             _umbracoContextAccessor = umbracoContextAccessor;
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
+            _ioHelper = ioHelper;
             _logger = logger;
         }
 
@@ -56,7 +60,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <returns></returns>
         protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider, _umbracoContextAccessor, _logger, _dataTypeService, _localizationService);
 
-        protected override IConfigurationEditor CreateConfigurationEditor() => new RichTextConfigurationEditor();
+        protected override IConfigurationEditor CreateConfigurationEditor() => new RichTextConfigurationEditor(_ioHelper);
 
         public override IPropertyIndexValueFactory PropertyIndexValueFactory => new RichTextPropertyIndexValueFactory();
 

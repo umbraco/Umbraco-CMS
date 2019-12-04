@@ -73,7 +73,8 @@ namespace Umbraco.Tests.Web.Mvc
                 globalSettings,
                 new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                 new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
-                Mock.Of<IUserService>());
+                Mock.Of<IUserService>(),
+                TestHelper.IOHelper);
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());
             var umbCtx = umbracoContextReference.UmbracoContext;
@@ -103,7 +104,8 @@ namespace Umbraco.Tests.Web.Mvc
                 globalSettings,
                 new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                 new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
-                Mock.Of<IUserService>());
+                Mock.Of<IUserService>(),
+                TestHelper.IOHelper);
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());
             var umbCtx = umbracoContextReference.UmbracoContext;
@@ -133,7 +135,8 @@ namespace Umbraco.Tests.Web.Mvc
                 globalSettings,
                 new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                 new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
-                Mock.Of<IUserService>());
+                Mock.Of<IUserService>(),
+                TestHelper.IOHelper);
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());
             var umbCtx = umbracoContextReference.UmbracoContext;
@@ -163,7 +166,8 @@ namespace Umbraco.Tests.Web.Mvc
                 globalSettings,
                 new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                 new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
-                Mock.Of<IUserService>());
+                Mock.Of<IUserService>(),
+                TestHelper.IOHelper);
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());
             var umbCtx = umbracoContextReference.UmbracoContext;

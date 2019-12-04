@@ -36,9 +36,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (provider.CreateScope())
             {
                 var dtRepo = CreateRepository();
-                IDataType dataType1 = new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService)) { Name = "dt1" };
+                IDataType dataType1 = new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService, IOHelper)) { Name = "dt1" };
                 dtRepo.Save(dataType1);
-                IDataType dataType2 = new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService)) { Name = "dt2" };
+                IDataType dataType2 = new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService, IOHelper)) { Name = "dt2" };
                 dtRepo.Save(dataType2);
 
                 var ctRepo = Factory.GetInstance<IContentTypeRepository>();
@@ -106,14 +106,14 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var container2 = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah2", ParentId = container1.Id };
                 containerRepository.Save(container2);
 
-                var dataType = (IDataType) new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService), container2.Id)
+                var dataType = (IDataType) new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService, IOHelper), container2.Id)
                 {
                     Name = "dt1"
                 };
                 repository.Save(dataType);
 
                 //create a
-                var dataType2 = (IDataType)new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService), dataType.Id)
+                var dataType2 = (IDataType)new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService, IOHelper), dataType.Id)
                 {
                     Name = "dt2"
                 };
@@ -185,7 +185,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
                 containerRepository.Save(container);
 
-                var dataTypeDefinition = new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService), container.Id) { Name = "test" };
+                var dataTypeDefinition = new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService, IOHelper), container.Id) { Name = "test" };
                 repository.Save(dataTypeDefinition);
 
                 Assert.AreEqual(container.Id, dataTypeDefinition.ParentId);
@@ -205,7 +205,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
                 containerRepository.Save(container);
 
-                IDataType dataType = new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService), container.Id) { Name = "test" };
+                IDataType dataType = new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService, IOHelper), container.Id) { Name = "test" };
                 repository.Save(dataType);
 
                 // Act
@@ -228,7 +228,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (provider.CreateScope())
             {
                 var repository = CreateRepository();
-                IDataType dataType = new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService)) {Name = "test"};
+                IDataType dataType = new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService, IOHelper)) {Name = "test"};
 
                 repository.Save(dataType);
 
@@ -349,7 +349,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (provider.CreateScope())
             {
                 var repository = CreateRepository();
-                var dataTypeDefinition = new DataType(new LabelPropertyEditor(Logger))
+                var dataTypeDefinition = new DataType(new LabelPropertyEditor(Logger, IOHelper))
                 {
                     DatabaseType = ValueStorageType.Integer,
                     Name = "AgeDataType",
@@ -398,7 +398,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var definition = repository.Get(dataTypeDefinition.Id);
                 definition.Name = "AgeDataType Updated";
-                definition.Editor = new LabelPropertyEditor(Logger); //change
+                definition.Editor = new LabelPropertyEditor(Logger, IOHelper); //change
                 repository.Save(definition);
 
                 var definitionUpdated = repository.Get(dataTypeDefinition.Id);
@@ -418,7 +418,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (provider.CreateScope())
             {
                 var repository = CreateRepository();
-                var dataTypeDefinition = new DataType(new LabelPropertyEditor(Logger))
+                var dataTypeDefinition = new DataType(new LabelPropertyEditor(Logger, IOHelper))
                 {
                     DatabaseType = ValueStorageType.Integer,
                     Name = "AgeDataType",

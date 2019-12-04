@@ -84,7 +84,7 @@ namespace Umbraco.Tests.Runtimes
         // test application
         public class TestUmbracoApplication : UmbracoApplicationBase
         {
-            public TestUmbracoApplication() : base(_logger, _configs, _ioHelper, _profiler, new AspNetHostingEnvironment(_globalSettings, _ioHelper), new AspNetBackOfficeInfo(_globalSettings, _ioHelper, _settings, _logger))
+            public TestUmbracoApplication() : base(_logger, _configs, _ioHelper, _profiler, new AspNetHostingEnvironment(new Lazy<IGlobalSettings>(() => _globalSettings)), new AspNetBackOfficeInfo(_globalSettings, _ioHelper, _settings, _logger))
             {
             }
 

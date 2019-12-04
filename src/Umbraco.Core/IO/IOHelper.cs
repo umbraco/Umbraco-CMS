@@ -4,13 +4,19 @@ using System.Globalization;
 using System.Reflection;
 using System.IO;
 using System.Linq;
-using System.Web;
-using System.Web.Hosting;
+using Umbraco.Core.Hosting;
 
 namespace Umbraco.Core.IO
 {
     public class IOHelper : IIOHelper
     {
+        private readonly IHostingEnvironment _hostingEnvironment;
+
+        public IOHelper(IHostingEnvironment hostingEnvironment)
+        {
+            _hostingEnvironment = hostingEnvironment;
+        }
+
         /// <summary>
         /// Gets or sets a value forcing Umbraco to consider it is non-hosted.
         /// </summary>
@@ -22,10 +28,6 @@ namespace Umbraco.Core.IO
         // static compiled regex for faster performance
         //private static readonly Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
-        /// <summary>
-        /// Gets a value indicating whether Umbraco is hosted.
-        /// </summary>
-	    public bool IsHosted => !ForceNotHosted && (HttpContext.Current != null || HostingEnvironment.IsHosted);
 
         public char DirSepChar => Path.DirectorySeparatorChar;
 
@@ -57,7 +59,7 @@ namespace Umbraco.Core.IO
             else if (Uri.IsWellFormedUriString(virtualPath, UriKind.Absolute))
                 return virtualPath;
             else
-                return VirtualPathUtility.ToAbsolute(virtualPath, Root);
+                return _hostingEnvironment.ToAbsolute(virtualPath, Root);
         }
 
         public Attempt<string> TryResolveUrl(string virtualPath)
@@ -68,7 +70,7 @@ namespace Umbraco.Core.IO
                     return Attempt.Succeed(virtualPath.Replace("~", Root).Replace("//", "/"));
                 if (Uri.IsWellFormedUriString(virtualPath, UriKind.Absolute))
                     return Attempt.Succeed(virtualPath);
-                return Attempt.Succeed(VirtualPathUtility.ToAbsolute(virtualPath, Root));
+                return Attempt.Succeed(_hostingEnvironment.ToAbsolute(virtualPath, Root));
             }
             catch (Exception ex)
             {
@@ -79,7 +81,7 @@ namespace Umbraco.Core.IO
         public string MapPath(string path, bool useHttpContext)
         {
             if (path == null) throw new ArgumentNullException("path");
-            useHttpContext = useHttpContext && IsHosted;
+            useHttpContext = useHttpContext && _hostingEnvironment.IsHosted;
 
             // Check if the path is already mapped
             if ((path.Length >= 2 && path[1] == Path.VolumeSeparatorChar)
@@ -90,14 +92,19 @@ namespace Umbraco.Core.IO
             // Check that we even have an HttpContext! otherwise things will fail anyways
             // http://umbraco.codeplex.com/workitem/30946
 
-            if (useHttpContext && HttpContext.Current != null)
+
+            if (useHttpContext && _hostingEnvironment.IsHosted)
             {
-                //string retval;
-                if (String.IsNullOrEmpty(path) == false && (path.StartsWith("~") || path.StartsWith(Root)))
-                    return HostingEnvironment.MapPath(path);
-                else
-                    return HostingEnvironment.MapPath("~/" + path.TrimStart('/'));
+                var result = (String.IsNullOrEmpty(path) == false && (path.StartsWith("~") || path.StartsWith(Root)))
+                        ?  _hostingEnvironment.MapPath(path)
+                    : _hostingEnvironment.MapPath("~/" + path.TrimStart('/'));
+
+                if (result != null) return result;
+
+
             }
+
+
 
             var root = GetRootDirectorySafe();
             var newPath = path.TrimStart('~', '/').Replace('/', DirSepChar);
@@ -294,7 +301,7 @@ namespace Umbraco.Core.IO
             {
                 if (_root != null) return _root;
 
-                var appPath = HostingEnvironment.ApplicationVirtualPath;
+                var appPath = _hostingEnvironment.ApplicationVirtualPath;
                 // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                 if (appPath == null || appPath == "/") appPath = string.Empty;
 

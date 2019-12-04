@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
@@ -14,17 +15,21 @@ namespace Umbraco.Web.PropertyEditors
         Icon = "icon-navigation-horizontal")]
     public class SliderPropertyEditor : DataEditor
     {
+        private readonly IIOHelper _ioHelper;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="SliderPropertyEditor"/> class.
         /// </summary>
-        public SliderPropertyEditor(ILogger logger)
+        public SliderPropertyEditor(ILogger logger, IIOHelper ioHelper)
             : base(logger)
-        { }
+        {
+            _ioHelper = ioHelper;
+        }
 
         /// <inheritdoc />
         protected override IConfigurationEditor CreateConfigurationEditor()
         {
-            return new SliderConfigurationEditor();
+            return new SliderConfigurationEditor(_ioHelper);
         }
     }
 }

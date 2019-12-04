@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
@@ -27,18 +28,22 @@ namespace Umbraco.Web.PropertyEditors
         Icon = "icon-ordered-list")]
     public class MultipleTextStringPropertyEditor : DataEditor
     {
+        private readonly IIOHelper _ioHelper;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="MultipleTextStringPropertyEditor"/> class.
         /// </summary>
-        public MultipleTextStringPropertyEditor(ILogger logger)
+        public MultipleTextStringPropertyEditor(ILogger logger, IIOHelper ioHelper)
             : base(logger)
-        { }
+        {
+            _ioHelper = ioHelper;
+        }
 
         /// <inheritdoc />
         protected override IDataValueEditor CreateValueEditor() => new MultipleTextStringPropertyValueEditor(Current.Services.DataTypeService, Current.Services.LocalizationService,Attribute);
 
         /// <inheritdoc />
-        protected override IConfigurationEditor CreateConfigurationEditor() => new MultipleTextStringConfigurationEditor();
+        protected override IConfigurationEditor CreateConfigurationEditor() => new MultipleTextStringConfigurationEditor(_ioHelper);
 
         /// <summary>
         /// Custom value editor so we can format the value for the editor and the database

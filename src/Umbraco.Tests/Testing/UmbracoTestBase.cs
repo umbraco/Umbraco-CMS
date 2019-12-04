@@ -148,7 +148,7 @@ namespace Umbraco.Tests.Testing
             var appCaches = GetAppCaches();
             var globalSettings = SettingsForTests.GetDefaultGlobalSettings();
             var settings = SettingsForTests.GetDefaultUmbracoSettings();
-            IHostingEnvironment hostingEnvironment = new AspNetHostingEnvironment(globalSettings, IOHelper);
+            IHostingEnvironment hostingEnvironment = new AspNetHostingEnvironment(new Lazy<IGlobalSettings>(() => globalSettings));
             IBackOfficeInfo backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, IOHelper, settings, logger);
             IIpResolver ipResolver = new AspNetIpResolver();
             UmbracoVersion = new UmbracoVersion(globalSettings);
@@ -156,7 +156,7 @@ namespace Umbraco.Tests.Testing
 
             var register = TestHelper.GetRegister();
 
-            Composition = new Composition(register, typeLoader, proflogger, ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs());
+            Composition = new Composition(register, typeLoader, proflogger, ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
 
 
             Composition.RegisterUnique(IOHelper);

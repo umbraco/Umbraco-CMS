@@ -6,11 +6,6 @@ namespace Umbraco.Core.IO
     {
         bool ForceNotHosted { get; set; }
 
-        /// <summary>
-        /// Gets a value indicating whether Umbraco is hosted.
-        /// </summary>
-        bool IsHosted { get; }
-
         char DirSepChar { get; }
         string FindFile(string virtualPath);
         string ResolveVirtualUrl(string path);

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
 
@@ -10,7 +11,7 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     internal class MultipleTextStringConfigurationEditor : ConfigurationEditor<MultipleTextStringConfiguration>
     {
-        public MultipleTextStringConfigurationEditor()
+        public MultipleTextStringConfigurationEditor(IIOHelper ioHelper) : base(ioHelper)
         {
             Fields.Add(new ConfigurationField(new IntegerValidator())
             {

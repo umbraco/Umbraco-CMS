@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
@@ -92,6 +93,10 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
         // dummy editor for deserialization
         protected class ValueListConfigurationEditor : ConfigurationEditor<ValueListConfiguration>
-        { }
+        {
+            public ValueListConfigurationEditor(IIOHelper ioHelper) : base(ioHelper)
+            {
+            }
+        }
     }
 }

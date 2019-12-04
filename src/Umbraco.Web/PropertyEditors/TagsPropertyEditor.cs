@@ -5,6 +5,7 @@ using System.Linq;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
@@ -25,16 +26,18 @@ namespace Umbraco.Web.PropertyEditors
     public class TagsPropertyEditor : DataEditor
     {
         private readonly ManifestValueValidatorCollection _validators;
+        private readonly IIOHelper _ioHelper;
 
-        public TagsPropertyEditor(ManifestValueValidatorCollection validators, ILogger logger)
+        public TagsPropertyEditor(ManifestValueValidatorCollection validators, ILogger logger, IIOHelper ioHelper)
             : base(logger)
         {
             _validators = validators;
+            _ioHelper = ioHelper;
         }
 
         protected override IDataValueEditor CreateValueEditor() => new TagPropertyValueEditor(Current.Services.DataTypeService, Current.Services.LocalizationService, Attribute);
 
-        protected override IConfigurationEditor CreateConfigurationEditor() => new TagConfigurationEditor(_validators);
+        protected override IConfigurationEditor CreateConfigurationEditor() => new TagConfigurationEditor(_validators, _ioHelper);
 
         internal class TagPropertyValueEditor : DataValueEditor
         {

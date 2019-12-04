@@ -36,7 +36,7 @@ namespace Umbraco.Tests.Web
         [TestCase("hello href=\"{localLink:umb^://document/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ", "hello href=\"{localLink:umb^://document/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ")]
         [TestCase("hello href=\"{localLink:umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ", "hello href=\"#\" world ")]
         public void ParseLocalLinks(string input, string result)
-        {            
+        {
             //setup a mock url provider which we'll use for testing
             var testUrlProvider = new Mock<IUrlProvider>();
             testUrlProvider
@@ -71,7 +71,8 @@ namespace Umbraco.Tests.Web
                 globalSettings,
                 new UrlProviderCollection(new[] { testUrlProvider.Object }),
                 new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
-                Mock.Of<IUserService>());
+                Mock.Of<IUserService>(),
+                TestHelper.IOHelper);
 
             using (var reference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>()))
             {

@@ -5,6 +5,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Composing;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Tests.Components;
@@ -23,7 +24,7 @@ namespace Umbraco.Tests.Composing
             Current.Reset();
 
             var register = TestHelper.GetRegister();
-            _composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs());
+            _composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
         }
 
         [TearDown]

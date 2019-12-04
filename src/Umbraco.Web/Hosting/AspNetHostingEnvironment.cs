@@ -10,21 +10,16 @@ namespace Umbraco.Web.Hosting
 {
     public class AspNetHostingEnvironment : IHostingEnvironment
     {
-        private readonly IGlobalSettings _globalSettings;
-        private readonly IIOHelper _ioHelper;
+        private readonly Lazy<IGlobalSettings> _globalSettings;
         private string _localTempPath;
 
-        public AspNetHostingEnvironment(IGlobalSettings globalSettings, IIOHelper ioHelper)
+        public AspNetHostingEnvironment(Lazy<IGlobalSettings> globalSettings)
         {
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
-            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
-
             SiteName = HostingEnvironment.SiteName;
             ApplicationId = HostingEnvironment.ApplicationID;
             ApplicationPhysicalPath = HostingEnvironment.ApplicationPhysicalPath;
             ApplicationVirtualPath = HostingEnvironment.ApplicationVirtualPath;
-
-            IsDebugMode = HttpContext.Current?.IsDebuggingEnabled ?? globalSettings.DebugMode;
         }
 
         public string SiteName { get; }
@@ -32,9 +27,16 @@ namespace Umbraco.Web.Hosting
         public string ApplicationPhysicalPath { get; }
 
         public string ApplicationVirtualPath { get; }
-        public bool IsDebugMode { get; }
-        public bool IsHosted => HostingEnvironment.IsHosted;
-        public string MapPath(string path) => HostingEnvironment.MapPath(path);
+        public bool IsDebugMode => HttpContext.Current?.IsDebuggingEnabled ?? _globalSettings.Value.DebugMode;
+        /// <inheritdoc/>
+        public bool IsHosted => (HttpContext.Current != null || HostingEnvironment.IsHosted);
+        public string MapPath(string path)
+        {
+            return HostingEnvironment.MapPath(path);
+        }
+
+        public string ToAbsolute(string virtualPath, string root) => VirtualPathUtility.ToAbsolute(virtualPath, root);
+
 
         public string LocalTempPath
         {
@@ -43,7 +45,7 @@ namespace Umbraco.Web.Hosting
                 if (_localTempPath != null)
                     return _localTempPath;
 
-                switch (_globalSettings.LocalTempStorageLocation)
+                switch (_globalSettings.Value.LocalTempStorageLocation)
                 {
                     case LocalTempStorage.AspNetTemp:
                         return _localTempPath = System.IO.Path.Combine(HttpRuntime.CodegenDir, "UmbracoData");
@@ -69,7 +71,7 @@ namespace Umbraco.Web.Hosting
                     //case LocalTempStorage.Default:
                     //case LocalTempStorage.Unknown:
                     default:
-                        return _localTempPath = _ioHelper.MapPath("~/App_Data/TEMP");
+                        return _localTempPath = MapPath("~/App_Data/TEMP");
                 }
             }
         }

@@ -10,7 +10,11 @@ namespace Umbraco.Core.Hosting
         string ApplicationVirtualPath { get; }
 
         bool IsDebugMode { get; }
+        /// <summary>
+        /// Gets a value indicating whether Umbraco is hosted.
+        /// </summary>
         bool IsHosted { get; }
         string MapPath(string path);
+        string ToAbsolute(string virtualPath, string root);
     }
 }

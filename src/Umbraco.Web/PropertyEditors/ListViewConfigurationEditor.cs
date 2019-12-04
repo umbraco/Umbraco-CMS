@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.PropertyEditors;
+﻿using Umbraco.Core.IO;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -6,5 +7,9 @@ namespace Umbraco.Web.PropertyEditors
     /// Represents the configuration editor for the listview value editor.
     /// </summary>
     public class ListViewConfigurationEditor : ConfigurationEditor<ListViewConfiguration>
-    { }
+    {
+        public ListViewConfigurationEditor(IIOHelper ioHelper) : base(ioHelper)
+        {
+        }
+    }
 }

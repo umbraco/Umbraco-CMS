@@ -3,6 +3,7 @@ using System.Threading;
 using Serilog.Core;
 using Serilog.Events;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Logging.Serilog.Enrichers
 {
@@ -14,6 +15,7 @@ namespace Umbraco.Core.Logging.Serilog.Enrichers
     /// </summary>
     internal class HttpRequestNumberEnricher : ILogEventEnricher
     {
+        private readonly Func<IFactory> _factoryFunc;
         private static int _lastRequestNumber;
         private static readonly string _requestNumberItemName = typeof(HttpRequestNumberEnricher).Name + "+RequestNumber";
 
@@ -22,11 +24,10 @@ namespace Umbraco.Core.Logging.Serilog.Enrichers
         /// </summary>
         private const string _httpRequestNumberPropertyName = "HttpRequestNumber";
 
-        private readonly Lazy<IAppCache> _requestCache;
 
-        public HttpRequestNumberEnricher(Lazy<IAppCache> requestCache)
+        public HttpRequestNumberEnricher(Func<IFactory> factoryFunc)
         {
-            _requestCache = requestCache;
+            _factoryFunc = factoryFunc;
         }
 
         /// <summary>
@@ -36,9 +37,13 @@ namespace Umbraco.Core.Logging.Serilog.Enrichers
         /// <param name="propertyFactory">Factory for creating new properties to add to the event.</param>
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
         {
-            if (logEvent == null) throw new ArgumentNullException("logEvent");
+            if (logEvent == null) throw new ArgumentNullException(nameof(logEvent));
 
-            var requestNumber = _requestCache.Value.Get(_requestNumberItemName,
+            var factory = _factoryFunc();
+            if (factory is null) return;
+
+            var requestCache = factory.GetInstance<IRequestCache>();
+            var requestNumber = requestCache.Get(_requestNumberItemName,
                     () => Interlocked.Increment(ref _lastRequestNumber));
 
             var requestNumberProperty = new LogEventProperty(_httpRequestNumberPropertyName, new ScalarValue(requestNumber));

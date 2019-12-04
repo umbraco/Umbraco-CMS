@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
@@ -16,14 +17,18 @@ namespace Umbraco.Web.PropertyEditors
         Icon = "icon-code")]
     public class MarkdownPropertyEditor : DataEditor
     {
+        private readonly IIOHelper _ioHelper;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="MarkdownPropertyEditor"/> class.
         /// </summary>
-        public MarkdownPropertyEditor(ILogger logger)
+        public MarkdownPropertyEditor(ILogger logger, IIOHelper ioHelper)
             : base(logger)
-        { }
+        {
+            _ioHelper = ioHelper;
+        }
 
         /// <inheritdoc />
-        protected override IConfigurationEditor CreateConfigurationEditor() => new MarkdownConfigurationEditor();
+        protected override IConfigurationEditor CreateConfigurationEditor() => new MarkdownConfigurationEditor(_ioHelper);
     }
 }

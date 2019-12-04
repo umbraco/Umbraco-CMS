@@ -3,6 +3,7 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.IO;
@@ -32,7 +33,7 @@ namespace Umbraco.Tests.Scoping
 
             var register = TestHelper.GetRegister();
 
-            var composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs());
+            var composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
 
             _testObjects = new TestObjects(register);
 

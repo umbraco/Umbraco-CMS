@@ -12,6 +12,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Macros;
 using System.Web;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
@@ -68,7 +69,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         {
             var converted = Convert(inter, preview);
 
-            return new HtmlString(converted == null ? string.Empty : converted);
+            return new HtmlEncodedString(converted == null ? string.Empty : converted);
         }
 
         private string Convert(object source, bool preview)

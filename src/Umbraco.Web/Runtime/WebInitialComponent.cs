@@ -32,14 +32,16 @@ namespace Umbraco.Web.Runtime
         private readonly UmbracoApiControllerTypeCollection _apiControllerTypes;
         private readonly IGlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IIOHelper _ioHelper;
 
-        public WebInitialComponent(IUmbracoContextAccessor umbracoContextAccessor, SurfaceControllerTypeCollection surfaceControllerTypes, UmbracoApiControllerTypeCollection apiControllerTypes, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
+        public WebInitialComponent(IUmbracoContextAccessor umbracoContextAccessor, SurfaceControllerTypeCollection surfaceControllerTypes, UmbracoApiControllerTypeCollection apiControllerTypes, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment, IIOHelper ioHelper)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _surfaceControllerTypes = surfaceControllerTypes;
             _apiControllerTypes = apiControllerTypes;
             _globalSettings = globalSettings;
             _hostingEnvironment = hostingEnvironment;
+            _ioHelper = ioHelper;
         }
 
         public void Initialize()
@@ -49,7 +51,7 @@ namespace Umbraco.Web.Runtime
 
             // When using a non-web runtime and this component is loaded ClientDependency explodes because it'll
             // want to access HttpContext.Current, which doesn't exist
-            if (Current.IOHelper.IsHosted)
+            if (Current.HostingEnvironment.IsHosted)
             {
                 ConfigureClientDependency();
             }
@@ -89,7 +91,7 @@ namespace Umbraco.Web.Runtime
             }
         }
 
-        private static void SetupMvcAndWebApi()
+        private void SetupMvcAndWebApi()
         {
             //don't output the MVC version header (security)
             MvcHandler.DisableMvcResponseHeader = true;
@@ -99,7 +101,7 @@ namespace Umbraco.Web.Runtime
             ControllerBuilder.Current.SetControllerFactory(controllerFactory);
 
             // set the render & plugin view engines
-            ViewEngines.Engines.Add(new RenderViewEngine());
+            ViewEngines.Engines.Add(new RenderViewEngine(_ioHelper));
             ViewEngines.Engines.Add(new PluginViewEngine());
 
             //set model binder

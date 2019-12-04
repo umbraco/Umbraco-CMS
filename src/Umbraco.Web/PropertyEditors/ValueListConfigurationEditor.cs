@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
+using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 using Umbraco.Core.PropertyEditors;
 
@@ -14,7 +15,7 @@ namespace Umbraco.Web.PropertyEditors
     /// </remarks>
     public class ValueListConfigurationEditor : ConfigurationEditor<ValueListConfiguration>
     {
-        public ValueListConfigurationEditor(ILocalizedTextService textService)
+        public ValueListConfigurationEditor(ILocalizedTextService textService, IIOHelper ioHelper) : base(ioHelper)
         {
             var items = Fields.First(x => x.Key == "items");
 

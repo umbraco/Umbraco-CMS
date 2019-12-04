@@ -1,6 +1,7 @@
 ﻿using System.Configuration;
 using NUnit.Framework;
 using Umbraco.ModelsBuilder.Embedded.Configuration;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.ModelsBuilder
 {
@@ -10,21 +11,21 @@ namespace Umbraco.Tests.ModelsBuilder
         [Test]
         public void Test1()
         {
-            var config = new ModelsBuilderConfig(modelsNamespace: "test1");
+            var config = new ModelsBuilderConfig(TestHelper.IOHelper, modelsNamespace: "test1");
             Assert.AreEqual("test1", config.ModelsNamespace);
         }
 
         [Test]
         public void Test2()
         {
-            var config = new ModelsBuilderConfig(modelsNamespace: "test2");
+            var config = new ModelsBuilderConfig(TestHelper.IOHelper, modelsNamespace: "test2");
             Assert.AreEqual("test2", config.ModelsNamespace);
         }
 
         [Test]
         public void DefaultModelsNamespace()
         {
-            var config = new ModelsBuilderConfig();
+            var config = new ModelsBuilderConfig(TestHelper.IOHelper);
             Assert.AreEqual(ModelsBuilderConfig.DefaultModelsNamespace, config.ModelsNamespace);
         }
 

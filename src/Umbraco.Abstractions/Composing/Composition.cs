@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Composing
@@ -19,6 +21,7 @@ namespace Umbraco.Core.Composing
         private readonly Dictionary<string, Action<IRegister>> _uniques = new Dictionary<string, Action<IRegister>>();
         private readonly IRegister _register;
 
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Composition"/> class.
         /// </summary>
@@ -27,13 +30,16 @@ namespace Umbraco.Core.Composing
         /// <param name="logger">A logger.</param>
         /// <param name="runtimeState">The runtime state.</param>
         /// <param name="configs">Optional configs.</param>
-        public Composition(IRegister register,  TypeLoader typeLoader, IProfilingLogger logger, IRuntimeState runtimeState, Configs configs)
+        /// <param name="ioHelper">An IOHelper</param>
+        public Composition(IRegister register,  TypeLoader typeLoader, IProfilingLogger logger, IRuntimeState runtimeState, Configs configs, IIOHelper ioHelper, AppCaches appCaches)
         {
             _register = register;
             TypeLoader = typeLoader;
             Logger = logger;
             RuntimeState = runtimeState;
             Configs = configs;
+            IOHelper = ioHelper;
+            AppCaches = appCaches;
         }
 
         #region Services
@@ -42,6 +48,9 @@ namespace Umbraco.Core.Composing
         /// Gets the logger.
         /// </summary>
         public IProfilingLogger Logger { get; }
+
+        public IIOHelper IOHelper { get; }
+        public AppCaches AppCaches { get; }
 
         /// <summary>
         /// Gets the type loader.

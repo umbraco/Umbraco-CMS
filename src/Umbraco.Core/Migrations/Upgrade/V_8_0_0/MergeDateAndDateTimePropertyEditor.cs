@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
@@ -9,9 +10,12 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 {
     public class MergeDateAndDateTimePropertyEditor : MigrationBase
     {
-        public MergeDateAndDateTimePropertyEditor(IMigrationContext context)
+        private readonly IIOHelper _ioHelper;
+
+        public MergeDateAndDateTimePropertyEditor(IMigrationContext context, IIOHelper ioHelper)
             : base(context)
         {
+            _ioHelper = ioHelper;
         }
 
         public override void Migrate()
@@ -23,7 +27,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 DateTimeConfiguration config;
                 try
                 {
-                    config = (DateTimeConfiguration) new CustomDateTimeConfigurationEditor().FromDatabase(
+                    config = (DateTimeConfiguration) new CustomDateTimeConfigurationEditor(_ioHelper).FromDatabase(
                         dataType.Configuration);
 
                     // If the Umbraco.Date type is the default from V7 and it has never been updated, then the
@@ -69,6 +73,9 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
         private class CustomDateTimeConfigurationEditor : ConfigurationEditor<DateTimeConfiguration>
         {
+            public CustomDateTimeConfigurationEditor(IIOHelper ioHelper) : base(ioHelper)
+            {
+            }
         }
     }
 }

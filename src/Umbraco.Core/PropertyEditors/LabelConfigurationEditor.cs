@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -7,6 +8,10 @@ namespace Umbraco.Core.PropertyEditors
     /// </summary>
     public class LabelConfigurationEditor : ConfigurationEditor<LabelConfiguration>
     {
+        public LabelConfigurationEditor(IIOHelper ioHelper) : base(ioHelper)
+        {
+        }
+
         /// <inheritdoc />
         public override LabelConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, LabelConfiguration configuration)
         {
@@ -24,5 +29,7 @@ namespace Umbraco.Core.PropertyEditors
 
             return newConfiguration;
         }
+
+
     }
 }

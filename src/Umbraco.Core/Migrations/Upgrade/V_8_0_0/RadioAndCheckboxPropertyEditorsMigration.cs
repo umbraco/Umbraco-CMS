@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.PostMigrations;
 using Umbraco.Core.Models;
@@ -12,9 +13,13 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 {
     public class RadioAndCheckboxPropertyEditorsMigration : PropertyEditorsMigrationBase
     {
-        public RadioAndCheckboxPropertyEditorsMigration(IMigrationContext context)
+        private readonly IIOHelper _ioHelper;
+
+        public RadioAndCheckboxPropertyEditorsMigration(IMigrationContext context, IIOHelper ioHelper)
             : base(context)
-        { }
+        {
+            _ioHelper = ioHelper;
+        }
 
         public override void Migrate()
         {
@@ -43,7 +48,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
                 // parse configuration, and update everything accordingly
                 if (configurationEditor == null)
-                    configurationEditor = new ValueListConfigurationEditor();
+                    configurationEditor = new ValueListConfigurationEditor(_ioHelper);
                 try
                 {
                     config = (ValueListConfiguration) configurationEditor.FromDatabase(dataType.Configuration);

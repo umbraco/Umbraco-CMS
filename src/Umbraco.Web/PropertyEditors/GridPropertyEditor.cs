@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
@@ -30,9 +31,10 @@ namespace Umbraco.Web.PropertyEditors
         private IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizationService _localizationService;
+        private readonly IIOHelper _ioHelper;
         private ILogger _logger;
 
-        public GridPropertyEditor(ILogger logger, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor, IDataTypeService dataTypeService, ILocalizationService localizationService)
+        public GridPropertyEditor(ILogger logger, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper)
             : base(logger)
         {
             _mediaService = mediaService;
@@ -40,6 +42,7 @@ namespace Umbraco.Web.PropertyEditors
             _umbracoContextAccessor = umbracoContextAccessor;
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
+            _ioHelper = ioHelper;
             _logger = logger;
         }
 
@@ -51,7 +54,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <returns></returns>
         protected override IDataValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider, _umbracoContextAccessor, _logger, _dataTypeService, _localizationService);
 
-        protected override IConfigurationEditor CreateConfigurationEditor() => new GridConfigurationEditor();
+        protected override IConfigurationEditor CreateConfigurationEditor() => new GridConfigurationEditor(_ioHelper);
 
         internal class GridPropertyValueEditor : DataValueEditor
         {

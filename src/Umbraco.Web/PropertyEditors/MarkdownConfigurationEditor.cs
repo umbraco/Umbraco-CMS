@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.PropertyEditors;
+﻿using Umbraco.Core.IO;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -6,5 +7,9 @@ namespace Umbraco.Web.PropertyEditors
     /// Represents the configuration editorfor the markdown value editor.
     /// </summary>
     internal class MarkdownConfigurationEditor : ConfigurationEditor<MarkdownConfiguration>
-    { }
+    {
+        public MarkdownConfigurationEditor(IIOHelper ioHelper) : base(ioHelper)
+        {
+        }
+    }
 }

@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
@@ -13,10 +14,14 @@ namespace Umbraco.Web.PropertyEditors
         Icon = "icon-page-add")]
     public class MultiNodeTreePickerPropertyEditor : DataEditor
     {
-        public MultiNodeTreePickerPropertyEditor(ILogger logger)
-            : base(logger)
-        { }
+        private readonly IIOHelper _ioHelper;
 
-        protected override IConfigurationEditor CreateConfigurationEditor() => new MultiNodePickerConfigurationEditor();
+        public MultiNodeTreePickerPropertyEditor(ILogger logger, IIOHelper ioHelper)
+            : base(logger)
+        {
+            _ioHelper = ioHelper;
+        }
+
+        protected override IConfigurationEditor CreateConfigurationEditor() => new MultiNodePickerConfigurationEditor(_ioHelper);
     }
 }

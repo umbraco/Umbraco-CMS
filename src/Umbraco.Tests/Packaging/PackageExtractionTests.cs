@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Packaging;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Packaging
 {
@@ -16,7 +17,7 @@ namespace Umbraco.Tests.Packaging
         private static FileInfo GetTestPackagePath(string packageName)
         {
             const string testPackagesDirName = "Packaging\\Packages";
-            string path = Path.Combine(Current.IOHelper.GetRootDirectorySafe(), testPackagesDirName, packageName);
+            string path = Path.Combine(TestHelper.IOHelper.GetRootDirectorySafe(), testPackagesDirName, packageName);
             return new FileInfo(path);
         }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.IO;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
@@ -12,9 +13,13 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 {
     public class DropDownPropertyEditorsMigration : PropertyEditorsMigrationBase
     {
-        public DropDownPropertyEditorsMigration(IMigrationContext context)
+        private readonly IIOHelper _ioHelper;
+
+        public DropDownPropertyEditorsMigration(IMigrationContext context, IIOHelper ioHelper)
             : base(context)
-        { }
+        {
+            _ioHelper = ioHelper;
+        }
 
         public override void Migrate()
         {
@@ -39,7 +44,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 {
                     // parse configuration, and update everything accordingly
                     if (configurationEditor == null)
-                        configurationEditor = new ValueListConfigurationEditor();
+                        configurationEditor = new ValueListConfigurationEditor(_ioHelper);
                     try
                     {
                         config = (ValueListConfiguration) configurationEditor.FromDatabase(dataType.Configuration);

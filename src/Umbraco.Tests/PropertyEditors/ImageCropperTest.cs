@@ -70,7 +70,7 @@ namespace Umbraco.Tests.PropertyEditors
             try
             {
                 var container = TestHelper.GetRegister();
-                var composition = new Composition(container, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs());
+                var composition = new Composition(container, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
 
                 composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>();
 
@@ -84,7 +84,7 @@ namespace Umbraco.Tests.PropertyEditors
                 var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), config, scheme, logger, ioHelper);
 
                 var dataTypeService = new TestObjects.TestDataTypeService(
-                    new DataType(new ImageCropperPropertyEditor(Mock.Of<ILogger>(), mediaFileSystem, Mock.Of<IContentSection>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>())) { Id = 1 });
+                    new DataType(new ImageCropperPropertyEditor(Mock.Of<ILogger>(), mediaFileSystem, Mock.Of<IContentSection>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), TestHelper.IOHelper)) { Id = 1 });
 
                 var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
 

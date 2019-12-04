@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
@@ -17,13 +18,17 @@ namespace Umbraco.Web.PropertyEditors
         Group = Constants.PropertyEditors.Groups.Pickers)]
     public class ContentPickerPropertyEditor : DataEditor
     {
-        public ContentPickerPropertyEditor(ILogger logger)
+        private readonly IIOHelper _ioHelper;
+
+        public ContentPickerPropertyEditor(ILogger logger, IIOHelper ioHelper)
             : base(logger)
-        { }
+        {
+            _ioHelper = ioHelper;
+        }
 
         protected override IConfigurationEditor CreateConfigurationEditor()
         {
-            return new ContentPickerConfigurationEditor();
+            return new ContentPickerConfigurationEditor(_ioHelper);
         }
     }
 }

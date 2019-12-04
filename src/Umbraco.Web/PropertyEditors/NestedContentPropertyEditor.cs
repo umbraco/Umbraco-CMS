@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
@@ -30,15 +31,17 @@ namespace Umbraco.Web.PropertyEditors
         private readonly Lazy<PropertyEditorCollection> _propertyEditors;
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizationService _localizationService;
+        private readonly IIOHelper _ioHelper;
 
         internal const string ContentTypeAliasPropertyKey = "ncContentTypeAlias";
 
-        public NestedContentPropertyEditor(ILogger logger, Lazy<PropertyEditorCollection> propertyEditors, IDataTypeService dataTypeService, ILocalizationService localizationService)
+        public NestedContentPropertyEditor(ILogger logger, Lazy<PropertyEditorCollection> propertyEditors, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper)
             : base (logger)
         {
             _propertyEditors = propertyEditors;
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
+            _ioHelper = ioHelper;
         }
 
         // has to be lazy else circular dep in ctor
@@ -46,7 +49,7 @@ namespace Umbraco.Web.PropertyEditors
 
         #region Pre Value Editor
 
-        protected override IConfigurationEditor CreateConfigurationEditor() => new NestedContentConfigurationEditor();
+        protected override IConfigurationEditor CreateConfigurationEditor() => new NestedContentConfigurationEditor(_ioHelper);
 
         #endregion
 

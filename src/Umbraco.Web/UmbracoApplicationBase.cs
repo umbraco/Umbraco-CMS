@@ -27,16 +27,21 @@ namespace Umbraco.Web
         private readonly IProfiler _profiler;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IBackOfficeInfo _backOfficeInfo;
+        private IFactory _factory;
 
         protected UmbracoApplicationBase()
         {
-            _ioHelper = new IOHelper();
+
+
+            IGlobalSettings globalSettings = null; //TODO, cleanup this circular dependency
+            _hostingEnvironment = new AspNetHostingEnvironment(new Lazy<IGlobalSettings>(() => globalSettings));
+            _ioHelper = new IOHelper(_hostingEnvironment);
             _configs = new ConfigsFactory(_ioHelper).Create();
-            var globalSettings = _configs.Global();
+            globalSettings = _configs.Global();
 
             _profiler = new LogProfiler(_logger);
-            _hostingEnvironment = new AspNetHostingEnvironment(globalSettings, _ioHelper);
-            _logger = SerilogLogger.CreateWithDefaultConfiguration(_hostingEnvironment);
+
+            _logger = SerilogLogger.CreateWithDefaultConfiguration(_hostingEnvironment, new AspNetSessionIdResolver(), () => _factory);
             _backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, _ioHelper, _configs.Settings(), _logger);
         }
 
@@ -100,7 +105,7 @@ namespace Umbraco.Web
             // the boot manager is responsible for registrations
             var register = GetRegister(globalSettings);
             _runtime = GetRuntime(_configs, umbracoVersion, _ioHelper, _logger, _profiler, _hostingEnvironment, _backOfficeInfo);
-            _runtime.Boot(register);
+            _factory = _runtime.Boot(register);
         }
 
         // called by ASP.NET (auto event wireup) once per app domain

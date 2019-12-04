@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
         {
             var register = TestHelper.GetRegister();
 
-            var composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs());
+            var composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
 
             composition.RegisterUnique<IServerRegistrar>(_ => new TestServerRegistrar());
             composition.RegisterUnique<IServerMessenger>(_ => new TestServerMessenger());

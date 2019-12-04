@@ -12,9 +12,9 @@ namespace Umbraco.Core.Logging.Serilog.Enrichers
     /// </summary>
     internal class HttpSessionIdEnricher : ILogEventEnricher
     {
-        private readonly Lazy<ISessionIdResolver> _sessionIdResolver;
+        private readonly ISessionIdResolver _sessionIdResolver;
 
-        public HttpSessionIdEnricher(Lazy<ISessionIdResolver> sessionIdResolver)
+        public HttpSessionIdEnricher(ISessionIdResolver sessionIdResolver)
         {
             _sessionIdResolver = sessionIdResolver;
         }
@@ -32,7 +32,7 @@ namespace Umbraco.Core.Logging.Serilog.Enrichers
         {
             if (logEvent == null) throw new ArgumentNullException(nameof(logEvent));
 
-            var sessionId = _sessionIdResolver.Value.SessionId;
+            var sessionId = _sessionIdResolver.SessionId;
             if (sessionId is null)
                 return;
 

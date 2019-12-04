@@ -15,6 +15,8 @@ namespace Umbraco.Web.Mvc
     /// </summary>
     public class RenderViewEngine : RazorViewEngine
     {
+        private readonly IIOHelper _ioHelper;
+
         private readonly IEnumerable<string> _supplementedViewLocations = new[] { "/{0}.cshtml" };
         //NOTE: we will make the main view location the last to be searched since if it is the first to be searched and there is both a view and a partial
         // view in both locations and the main view is rendering a partial view with the same name, we will get a stack overflow exception.
@@ -24,8 +26,10 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Constructor
         /// </summary>
-        public RenderViewEngine()
+        public RenderViewEngine(IIOHelper ioHelper)
         {
+            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
+
             const string templateFolder = Constants.ViewLocation;
 
             // the Render view engine doesn't support Area's so make those blank
@@ -41,9 +45,9 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Ensures that the correct web.config for razor exists in the /Views folder, the partials folder exist and the ViewStartPage exists.
         /// </summary>
-        private static void EnsureFoldersAndFiles()
+        private void EnsureFoldersAndFiles()
         {
-            var viewFolder = Current.IOHelper.MapPath(Constants.ViewLocation);
+            var viewFolder = _ioHelper.MapPath(Constants.ViewLocation);
 
             // ensure the web.config file is in the ~/Views folder
             Directory.CreateDirectory(viewFolder);

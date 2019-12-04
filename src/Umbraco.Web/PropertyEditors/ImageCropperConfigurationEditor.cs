@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.IO;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
@@ -15,6 +16,10 @@ namespace Umbraco.Web.PropertyEditors
             if (!d.ContainsKey("focalPoint")) d["focalPoint"] = new { left = 0.5, top = 0.5 };
             if (!d.ContainsKey("src")) d["src"] = "";
             return d;
+        }
+
+        public ImageCropperConfigurationEditor(IIOHelper ioHelper) : base(ioHelper)
+        {
         }
     }
 }

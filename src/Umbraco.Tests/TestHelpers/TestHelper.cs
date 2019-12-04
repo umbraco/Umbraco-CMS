@@ -82,7 +82,7 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-        public static IIOHelper IOHelper = new IOHelper();
+        public static IIOHelper IOHelper = new IOHelper(GetHostingEnvironment());
 
         /// <summary>
         /// Maps the given <paramref name="relativePath"/> making it rooted on <see cref="CurrentAssemblyDirectory"/>. <paramref name="relativePath"/> must start with <code>~/</code>
@@ -313,7 +313,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public static IHostingEnvironment GetHostingEnvironment()
         {
-            return new AspNetHostingEnvironment(SettingsForTests.GetDefaultGlobalSettings(), TestHelper.IOHelper);
+            return new AspNetHostingEnvironment(new Lazy<IGlobalSettings>(() => SettingsForTests.GetDefaultGlobalSettings()));
         }
 
         public static IIpResolver GetIpResolver()

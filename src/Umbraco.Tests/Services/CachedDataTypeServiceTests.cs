@@ -1,10 +1,8 @@
 ﻿using System.Threading;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.Testing;
-using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.Services
 {
@@ -25,7 +23,7 @@ namespace Umbraco.Tests.Services
         {
             var dataTypeService = ServiceContext.DataTypeService;
 
-            IDataType dataType = new DataType(new LabelPropertyEditor(Logger)) { Name = "Testing Textfield", DatabaseType = ValueStorageType.Ntext };
+            IDataType dataType = new DataType(new LabelPropertyEditor(Logger, IOHelper)) { Name = "Testing Textfield", DatabaseType = ValueStorageType.Ntext };
             dataTypeService.Save(dataType);
 
             //Get all the first time (no cache)

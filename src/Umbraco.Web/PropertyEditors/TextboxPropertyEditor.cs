@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -18,21 +19,23 @@ namespace Umbraco.Web.PropertyEditors
     {
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizationService _localizationService;
+        private readonly IIOHelper _ioHelper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TextboxPropertyEditor"/> class.
         /// </summary>
-        public TextboxPropertyEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService)
+        public TextboxPropertyEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper)
             : base(logger)
         {
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
+            _ioHelper = ioHelper;
         }
 
         /// <inheritdoc/>
         protected override IDataValueEditor CreateValueEditor() => new TextOnlyValueEditor(_dataTypeService, _localizationService, Attribute);
 
         /// <inheritdoc/>
-        protected override IConfigurationEditor CreateConfigurationEditor() => new TextboxConfigurationEditor();
+        protected override IConfigurationEditor CreateConfigurationEditor() => new TextboxConfigurationEditor(_ioHelper);
     }
 }

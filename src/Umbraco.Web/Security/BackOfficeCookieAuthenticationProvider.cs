@@ -11,6 +11,7 @@ using Microsoft.Owin.Security.Cookies;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 
@@ -21,12 +22,14 @@ namespace Umbraco.Web.Security
         private readonly IUserService _userService;
         private readonly IRuntimeState _runtimeState;
         private readonly IGlobalSettings _globalSettings;
+        private readonly IIOHelper _ioHelper;
 
-        public BackOfficeCookieAuthenticationProvider(IUserService userService, IRuntimeState runtimeState, IGlobalSettings globalSettings)
+        public BackOfficeCookieAuthenticationProvider(IUserService userService, IRuntimeState runtimeState, IGlobalSettings globalSettings, IIOHelper ioHelper)
         {
             _userService = userService;
             _runtimeState = runtimeState;
             _globalSettings = globalSettings;
+            _ioHelper = ioHelper;
         }
 
         public override void ResponseSignIn(CookieResponseSignInContext context)
@@ -113,7 +116,7 @@ namespace Umbraco.Web.Security
         protected virtual async Task EnsureValidSessionId(CookieValidateIdentityContext context)
         {
             if (_runtimeState.Level == RuntimeLevel.Run)
-                await SessionIdValidator.ValidateSessionAsync(TimeSpan.FromMinutes(1), context, _globalSettings);
+                await SessionIdValidator.ValidateSessionAsync(TimeSpan.FromMinutes(1), context, _globalSettings, _ioHelper);
         }
 
 

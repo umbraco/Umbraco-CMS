@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -18,20 +19,22 @@ namespace Umbraco.Web.PropertyEditors
     public class RadioButtonsPropertyEditor : DataEditor
     {
         private readonly ILocalizedTextService _textService;
+        private readonly IIOHelper _ioHelper;
 
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public RadioButtonsPropertyEditor(ILogger logger, ILocalizedTextService textService)
+        public RadioButtonsPropertyEditor(ILogger logger, ILocalizedTextService textService, IIOHelper ioHelper)
             : base(logger)
         {
             _textService = textService;
+            _ioHelper = ioHelper;
         }
 
         /// <summary>
         /// Return a custom pre-value editor
         /// </summary>
         /// <returns></returns>
-        protected override IConfigurationEditor CreateConfigurationEditor() => new ValueListConfigurationEditor(_textService);
+        protected override IConfigurationEditor CreateConfigurationEditor() => new ValueListConfigurationEditor(_textService, _ioHelper);
     }
 }

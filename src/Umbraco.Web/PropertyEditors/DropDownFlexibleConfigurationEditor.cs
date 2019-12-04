@@ -2,6 +2,7 @@
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 
@@ -9,7 +10,7 @@ namespace Umbraco.Web.PropertyEditors
 {
     internal class DropDownFlexibleConfigurationEditor : ConfigurationEditor<DropDownFlexibleConfiguration>
     {
-        public DropDownFlexibleConfigurationEditor(ILocalizedTextService textService)
+        public DropDownFlexibleConfigurationEditor(ILocalizedTextService textService, IIOHelper ioHelper): base(ioHelper)
         {
             var items = Fields.First(x => x.Key == "items");
 
@@ -33,7 +34,7 @@ namespace Umbraco.Web.PropertyEditors
                 {
                     output.Multiple = convertBool.Result;
                 }
-            }   
+            }
 
             // auto-assigning our ids, get next id from existing values
             var nextId = 1;
@@ -65,7 +66,7 @@ namespace Umbraco.Web.PropertyEditors
             // map to what the editor expects
             var i = 1;
             var items = configuration?.Items.ToDictionary(x => x.Id.ToString(), x => new { value = x.Value, sortOrder = i++ }) ?? new object();
-            
+
             var multiple = configuration?.Multiple ?? false;
 
             return new Dictionary<string, object>

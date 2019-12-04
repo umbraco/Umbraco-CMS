@@ -4,6 +4,7 @@ using System.Web;
 using Microsoft.Owin;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security
@@ -12,6 +13,7 @@ namespace Umbraco.Web.Security
     {
         private readonly UmbracoBackOfficeCookieAuthOptions _cookieOptions;
         private readonly IGlobalSettings _globalSettings;
+        private readonly IIOHelper _ioHelper;
 
         /// <summary>
         /// Instantiates the middleware with an optional pointer to the next component.
@@ -20,10 +22,11 @@ namespace Umbraco.Web.Security
         /// <param name="cookieOptions"></param>
         /// <param name="globalSettings"></param>
         public PreviewAuthenticationMiddleware(OwinMiddleware next,
-            UmbracoBackOfficeCookieAuthOptions cookieOptions, IGlobalSettings globalSettings) : base(next)
+            UmbracoBackOfficeCookieAuthOptions cookieOptions, IGlobalSettings globalSettings, IIOHelper ioHelper) : base(next)
         {
             _cookieOptions = cookieOptions;
             _globalSettings = globalSettings;
+            _ioHelper = ioHelper;
         }
 
         /// <summary>
@@ -40,7 +43,7 @@ namespace Umbraco.Web.Security
                 var isPreview = request.HasPreviewCookie()
                     && claimsPrincipal != null
                     && request.Uri != null
-                    && request.Uri.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath, _globalSettings) == false;
+                    && request.Uri.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath, _globalSettings, _ioHelper) == false;
                 if (isPreview)
                 {
                     //If we've gotten this far it means a preview cookie has been set and a front-end umbraco document request is executing.
