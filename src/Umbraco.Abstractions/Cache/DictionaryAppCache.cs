@@ -8,7 +8,7 @@ namespace Umbraco.Core.Cache
     /// <summary>
     /// Implements <see cref="IAppCache"/> on top of a concurrent dictionary.
     /// </summary>
-    public class DictionaryAppCache : IAppCache
+    public class DictionaryAppCache : IRequestCache
     {
         /// <summary>
         /// Gets the internal items dictionary, for tests only!
@@ -16,6 +16,9 @@ namespace Umbraco.Core.Cache
         private readonly ConcurrentDictionary<string, object> _items = new ConcurrentDictionary<string, object>();
 
         public int Count => _items.Count;
+
+        /// <inheritdoc />
+        public bool IsAvailable => true;
 
         /// <inheritdoc />
         public virtual object Get(string key)
@@ -28,6 +31,10 @@ namespace Umbraco.Core.Cache
         {
             return _items.GetOrAdd(key, _ => factory());
         }
+
+        public bool Set(string key, object value) => _items.TryAdd(key, value);
+
+        public bool Remove(string key) => _items.TryRemove(key, out _);
 
         /// <inheritdoc />
         public virtual IEnumerable<object> SearchByKey(string keyStartsWith)

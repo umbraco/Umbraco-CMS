@@ -1,17 +1,16 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Runtime.Remoting.Messaging;
-using System.Web;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
-
 #if DEBUG_SCOPES
 using System.Linq;
+using System.Text;
 #endif
 
 namespace Umbraco.Core.Scoping
@@ -23,14 +22,16 @@ namespace Umbraco.Core.Scoping
     {
         private readonly ILogger _logger;
         private readonly ITypeFinder _typeFinder;
+        private readonly IRequestCache _requestCache;
         private readonly FileSystems _fileSystems;
 
-        public ScopeProvider(IUmbracoDatabaseFactory databaseFactory, FileSystems fileSystems, ILogger logger, ITypeFinder typeFinder)
+        public ScopeProvider(IUmbracoDatabaseFactory databaseFactory, FileSystems fileSystems, ILogger logger, ITypeFinder typeFinder, IRequestCache requestCache)
         {
             DatabaseFactory = databaseFactory;
             _fileSystems = fileSystems;
             _logger = logger;
             _typeFinder = typeFinder;
+            _requestCache = requestCache;
 
             // take control of the FileSystems
             _fileSystems.IsScoped = () => AmbientScope != null && AmbientScope.ScopedFileSystems;
@@ -181,40 +182,33 @@ namespace Umbraco.Core.Scoping
             }
         }
 
-        // this is for tests exclusively until we have a proper accessor in v8
-        internal static Func<IDictionary> HttpContextItemsGetter { get; set; }
 
-        private static IDictionary HttpContextItems => HttpContextItemsGetter == null
-            ? HttpContext.Current?.Items
-            : HttpContextItemsGetter();
-
-        public static T GetHttpContextObject<T>(string key, bool required = true)
+        private T GetHttpContextObject<T>(string key, bool required = true)
             where T : class
         {
-            var httpContextItems = HttpContextItems;
-            if (httpContextItems != null)
-                return (T)httpContextItems[key];
-            if (required)
-                throw new Exception("HttpContext.Current is null.");
-            return null;
+
+            if (!_requestCache.IsAvailable && required)
+                throw new Exception("Request cache is unavailable.");
+
+            return (T)_requestCache.Get(key);
         }
 
-        private static bool SetHttpContextObject(string key, object value, bool required = true)
+        private bool SetHttpContextObject(string key, object value, bool required = true)
         {
-            var httpContextItems = HttpContextItems;
-            if (httpContextItems == null)
+            if (!_requestCache.IsAvailable)
             {
                 if (required)
-                    throw new Exception("HttpContext.Current is null.");
+                    throw new Exception("Request cache is unavailable.");
                 return false;
             }
+
 #if DEBUG_SCOPES
             // manage the 'context' that contains the scope (null, "http" or "call")
             // only for scopes of course!
             if (key == ScopeItemKey)
             {
                 // first, null-register the existing value
-                var ambientScope = (IScope)httpContextItems[ScopeItemKey];
+                var ambientScope = (IScope)_requestCache.Get(ScopeItemKey);
                 if (ambientScope != null) RegisterContext(ambientScope, null);
                 // then register the new value
                 var scope = value as IScope;
@@ -222,9 +216,9 @@ namespace Umbraco.Core.Scoping
             }
 #endif
             if (value == null)
-                httpContextItems.Remove(key);
+                _requestCache.Remove(key);
             else
-                httpContextItems[key] = value;
+                _requestCache.Set(key, value);
             return true;
         }
 

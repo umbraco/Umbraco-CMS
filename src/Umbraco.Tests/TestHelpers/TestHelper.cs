@@ -319,5 +319,10 @@ namespace Umbraco.Tests.TestHelpers
         {
             return new AspNetIpResolver();
         }
+
+        public static IRequestCache GetRequestCache()
+        {
+            return new DictionaryAppCache();
+        }
     }
 }
