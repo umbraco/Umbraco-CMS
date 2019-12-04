@@ -15,20 +15,13 @@
         var unsubscribe = [];
 
         function resetModel(isNew) {
-            //the model config will contain an object, if it does not we'll create defaults
-            //NOTE: We will not support doing the password regex on the client side because the regex on the server side
-            //based on the membership provider cannot always be ported to js from .net directly.        
+            //the model config will contain an object, if it does not we'll create defaults            
             /*
             {
                 hasPassword: true/false,
-                requiresQuestionAnswer: true/false,
-                enableReset: true/false,
-                enablePasswordRetrieval: true/false,
                 minPasswordLength: 10
             }
             */
-
-            vm.showReset = false;
 
             //set defaults if they are not available
             if (vm.config.disableToggle === undefined) {
@@ -37,20 +30,6 @@
             if (vm.config.hasPassword === undefined) {
                 vm.config.hasPassword = false;
             }
-            if (vm.config.enablePasswordRetrieval === undefined) {
-                vm.config.enablePasswordRetrieval = true;
-            }
-            if (vm.config.requiresQuestionAnswer === undefined) {
-                vm.config.requiresQuestionAnswer = false;
-            }
-            //don't enable reset if it is new - that doesn't make sense
-            if (isNew === "true") {
-                vm.config.enableReset = false;
-            }
-            else if (vm.config.enableReset === undefined) {
-                vm.config.enableReset = true;
-            }
-
             if (vm.config.minPasswordLength === undefined) {
                 vm.config.minPasswordLength = 0;
             }
@@ -60,9 +39,7 @@
                 //if it's not an object then just create a new one
                 vm.passwordValues = {
                     newPassword: null,
-                    oldPassword: null,
-                    reset: null,
-                    answer: null
+                    oldPassword: null
                 };
             }
             else {
@@ -73,8 +50,6 @@
                     vm.passwordValues.newPassword = null;
                     vm.passwordValues.oldPassword = null;
                 }
-                vm.passwordValues.reset = null;
-                vm.passwordValues.answer = null;
             }
 
             //the value to compare to match passwords
@@ -105,11 +80,7 @@
             }));
 
             unsubscribe.push($scope.$on("formSubmitting", function () {
-                //if there was a previously generated password displaying, clear it
-                if (vm.changing && vm.passwordValues) {
-                    vm.passwordValues.generatedPassword = null;
-                }
-                else if (!vm.changing) {
+                if (!vm.changing) {
                     //we are not changing, so the model needs to be null
                     vm.passwordValues = null;
                 }
@@ -130,8 +101,6 @@
         function doChange() {
             resetModel();
             vm.changing = true;
-            //if there was a previously generated password displaying, clear it
-            vm.passwordValues.generatedPassword = null;
             vm.passwordValues.confirm = null;
         };
 
@@ -143,8 +112,7 @@
 
         function showOldPass() {
             return vm.config.hasPassword &&
-                !vm.config.allowManuallyChangingPassword &&
-                !vm.config.enablePasswordRetrieval && !vm.showReset;
+                !vm.config.allowManuallyChangingPassword;
         };
 
         // TODO: I don't think we need this or the cancel button, this can be up to the editor rendering this component

@@ -43,7 +43,6 @@ namespace Umbraco.Web.Security
             IGlobalSettings globalSettings,
             // TODO: This could probably be optional?
             IPasswordConfiguration passwordConfiguration,
-            IPasswordGenerator passwordGenerator,
             IIpResolver ipResolver)
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
@@ -59,7 +58,6 @@ namespace Umbraco.Web.Security
                     contentSettings,
                     globalSettings,
                     passwordConfiguration,
-                    passwordGenerator,
                     ipResolver));
 
             app.SetBackOfficeUserManagerType<BackOfficeUserManager, BackOfficeIdentityUser>();
@@ -85,7 +83,6 @@ namespace Umbraco.Web.Security
             BackOfficeUserStore customUserStore,
             // TODO: This could probably be optional?
             IPasswordConfiguration passwordConfiguration,
-            IPasswordGenerator passwordGenerator,
             IIpResolver ipResolver)
         {
             if (runtimeState == null) throw new ArgumentNullException(nameof(runtimeState));
@@ -98,7 +95,6 @@ namespace Umbraco.Web.Security
                     customUserStore,
                     contentSettings,
                     passwordConfiguration,
-                    passwordGenerator,
                     ipResolver));
 
             app.SetBackOfficeUserManagerType<BackOfficeUserManager, BackOfficeIdentityUser>();

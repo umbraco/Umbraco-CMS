@@ -16,6 +16,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Security.Providers;
+using System.ComponentModel.DataAnnotations;
 
 namespace Umbraco.Web.Security
 {
@@ -28,7 +29,6 @@ namespace Umbraco.Web.Security
         private readonly RoleProvider _roleProvider;
         private readonly IMemberService _memberService;
         private readonly IMemberTypeService _memberTypeService;
-        private readonly IUserService _userService;
         private readonly IPublicAccessService _publicAccessService;
         private readonly AppCaches _appCaches;
         private readonly ILogger _logger;
@@ -43,7 +43,6 @@ namespace Umbraco.Web.Security
             RoleProvider roleProvider,
             IMemberService memberService,
             IMemberTypeService memberTypeService,
-            IUserService userService,
             IPublicAccessService publicAccessService,
             AppCaches appCaches,
             ILogger logger
@@ -53,7 +52,6 @@ namespace Umbraco.Web.Security
             MemberCache = memberCache;
             _memberService = memberService;
             _memberTypeService = memberTypeService;
-            _userService = userService;
             _publicAccessService = publicAccessService;
             _appCaches = appCaches;
             _logger = logger;
@@ -645,8 +643,8 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public virtual Attempt<PasswordChangedModel> ChangePassword(string username, ChangingPasswordModel passwordModel, MembershipProvider membershipProvider)
         {
-            var passwordChanger = new PasswordChanger(_logger, _userService, HttpContext);
-            return passwordChanger.ChangePasswordWithMembershipProvider(username, passwordModel, membershipProvider);
+            var passwordChanger = new PasswordChanger(_logger);
+            return ChangePasswordWithMembershipProvider(username, passwordModel, membershipProvider);
         }
 
         /// <summary>
@@ -733,6 +731,64 @@ namespace Umbraco.Web.Security
                 sb.Append(s);
             }
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// Changes password for a member/user given the membership provider and the password change model
+        /// </summary>
+        /// <param name="username">The username of the user having their password changed</param>
+        /// <param name="passwordModel"></param>
+        /// <param name="membershipProvider"></param>
+        /// <returns></returns>
+        private Attempt<PasswordChangedModel> ChangePasswordWithMembershipProvider(
+            string username,
+            ChangingPasswordModel passwordModel,
+            MembershipProvider membershipProvider)
+        {
+            var umbracoBaseProvider = membershipProvider as MembershipProviderBase;
+
+            // YES! It is completely insane how many options you have to take into account based on the membership provider. yikes!
+
+            if (passwordModel == null) throw new ArgumentNullException(nameof(passwordModel));
+            if (membershipProvider == null) throw new ArgumentNullException(nameof(membershipProvider));
+            var userId = -1;
+
+
+            //we're not resetting it so we need to try to change it.
+
+            if (passwordModel.NewPassword.IsNullOrWhiteSpace())
+            {
+                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Cannot set an empty password", new[] { "value" }) });
+            }
+
+            if (membershipProvider.EnablePasswordRetrieval)
+            {
+                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Membership providers using encrypted passwords and password retrieval are not supported", new[] { "value" }) });
+            }
+
+            //without being able to retrieve the original password
+            if (passwordModel.OldPassword.IsNullOrWhiteSpace())
+            {
+                //if password retrieval is not enabled but there is no old password we cannot continue
+                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password cannot be changed without the old password", new[] { "oldPassword" }) });
+            }
+
+            //if an old password is supplied try to change it
+
+            try
+            {
+                var result = membershipProvider.ChangePassword(username, passwordModel.OldPassword, passwordModel.NewPassword);
+
+                return result == false
+                    ? Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, invalid username or password", new[] { "oldPassword" }) })
+                    : Attempt.Succeed(new PasswordChangedModel());
+            }
+            catch (Exception ex)
+            {
+                _logger.Warn<PasswordChanger>(ex, "Could not change member password");
+                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex.Message + " (see log for full details)", new[] { "value" }) });
+            }
+
         }
 
     }

@@ -7,13 +7,10 @@ using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
-using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Web.WebApi;
@@ -32,6 +29,8 @@ using Umbraco.Web.Editors.Filters;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Dictionary;
 using Umbraco.Web.Security;
+using Umbraco.Core.Security;
+using System.Threading.Tasks;
 
 namespace Umbraco.Web.Editors
 {
@@ -44,15 +43,17 @@ namespace Umbraco.Web.Editors
     [OutgoingNoHyphenGuidFormat]
     public class MemberController : ContentControllerBase
     {
-        public MemberController(ICultureDictionary cultureDictionary, PropertyEditorCollection propertyEditors, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+        public MemberController(IMemberPasswordConfiguration passwordConfig, ICultureDictionary cultureDictionary, PropertyEditorCollection propertyEditors, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
             : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
+            _passwordConfig = passwordConfig ?? throw new ArgumentNullException(nameof(passwordConfig));
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
         }
 
-        private readonly MembershipProvider _provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+        private readonly IMemberPasswordConfiguration _passwordConfig;
         private readonly PropertyEditorCollection _propertyEditors;
-
+        private PasswordSecurity _passwordSecurity;
+        private PasswordSecurity PasswordSecurity => _passwordSecurity ?? (_passwordSecurity = new PasswordSecurity(_passwordConfig));
 
         public PagedResult<MemberBasic> GetPagedResults(
             int pageNumber = 1,
@@ -149,10 +150,10 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+            var passwordGenerator = new PasswordGenerator(_passwordConfig);
 
             emptyContent = new Member(contentType);
-            emptyContent.AdditionalData["NewPassword"] = Membership.GeneratePassword(provider.MinRequiredPasswordLength, provider.MinRequiredNonAlphanumericCharacters);
+            emptyContent.AdditionalData["NewPassword"] = passwordGenerator.GeneratePassword();
             return Mapper.Map<MemberDisplay>(emptyContent);
         }
 
@@ -163,7 +164,7 @@ namespace Umbraco.Web.Editors
         [FileUploadCleanupFilter]
         [OutgoingEditorModelEvent]
         [MemberSaveValidation]
-        public MemberDisplay PostSave(
+        public async Task<MemberDisplay> PostSave(
             [ModelBinder(typeof(MemberBinder))]
                 MemberSave contentItem)
         {
@@ -178,6 +179,8 @@ namespace Umbraco.Web.Editors
             //map the properties to the persisted entity
             MapPropertyValues(contentItem);
 
+            await ValidateMemberDataAsync(contentItem);
+
             //Unlike content/media - if there are errors for a member, we do NOT proceed to save them, we cannot so return the errors
             if (ModelState.IsValid == false)
             {
@@ -186,53 +189,31 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
             }
 
-            // TODO: WE need to support this! - requires UI updates, etc...
-            if (_provider.RequiresQuestionAndAnswer)
-            {
-                throw new NotSupportedException("Currently the member editor does not support providers that have RequiresQuestionAndAnswer specified");
-            }
-
             //We're gonna look up the current roles now because the below code can cause
             // events to be raised and developers could be manually adding roles to members in
             // their handlers. If we don't look this up now there's a chance we'll just end up
             // removing the roles they've assigned.
-            var currRoles = Roles.GetRolesForUser(contentItem.PersistedContent.Username);
+            var currRoles = Services.MemberService.GetAllRoles(contentItem.PersistedContent.Username);
             //find the ones to remove and remove them
             var rolesToRemove = currRoles.Except(contentItem.Groups).ToArray();
 
-            string generatedPassword = null;
             //Depending on the action we need to first do a create or update using the membership provider
             // this ensures that passwords are formatted correctly and also performs the validation on the provider itself.
             switch (contentItem.Action)
             {
                 case ContentSaveAction.Save:
-                    generatedPassword = UpdateWithMembershipProvider(contentItem);
+                    UpdateMemberData(contentItem);
                     break;
                 case ContentSaveAction.SaveNew:
-                    MembershipCreateStatus status;
-                    CreateWithMembershipProvider(contentItem, out status);
-
-                    // save the ID of the creator
-                    contentItem.PersistedContent.CreatorId = Security.CurrentUser.Id;
+                    contentItem.PersistedContent = CreateMemberData(contentItem);
                     break;
                 default:
                     //we don't support anything else for members
                     throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            //If we've had problems creating/updating the user with the provider then return the error
-            if (ModelState.IsValid == false)
-            {
-                var forDisplay = Mapper.Map<MemberDisplay>(contentItem.PersistedContent);
-                forDisplay.Errors = ModelState.ToErrorDictionary();
-                throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
-            }
-
-            //save the IMember -
-            //save the item
-            //NOTE: We are setting the password to NULL - this indicates to the system to not actually save the password
-            // so it will not get overwritten!
-            contentItem.PersistedContent.RawPasswordValue = null;
+            //TODO: There's 3 things saved here and we should do this all in one transaction, which we can do here by wrapping in a scope
+            // but it would be nicer to have this taken care of within the Save method itself
 
             //create/save the IMember
             Services.MemberService.Save(contentItem.PersistedContent);
@@ -241,20 +222,15 @@ namespace Umbraco.Web.Editors
             // if we are changing the username, it must be persisted before looking up the member roles).
             if (rolesToRemove.Any())
             {
-                Roles.RemoveUserFromRoles(contentItem.PersistedContent.Username, rolesToRemove);
+                Services.MemberService.DissociateRoles(new[] { contentItem.PersistedContent.Username }, rolesToRemove);
             }
             //find the ones to add and add them
             var toAdd = contentItem.Groups.Except(currRoles).ToArray();
             if (toAdd.Any())
             {
                 //add the ones submitted
-                Roles.AddUserToRoles(contentItem.PersistedContent.Username, toAdd);
+                Services.MemberService.AssignRoles(new[] { contentItem.PersistedContent.Username }, toAdd);
             }
-
-            //set the generated password (if there was one) - in order to do this we'll chuck the generated password into the
-            // additional data of the IUmbracoEntity of the persisted item - then we can retrieve this in the model mapper and set
-            // the value to be given to the UI. Hooray for AdditionalData :)
-            contentItem.PersistedContent.AdditionalData["GeneratedPassword"] = generatedPassword;
 
             //return the updated model
             var display = Mapper.Map<MemberDisplay>(contentItem.PersistedContent);
@@ -296,32 +272,38 @@ namespace Umbraco.Web.Editors
                 null); // member are all invariant
         }
 
+        private IMember CreateMemberData(MemberSave contentItem)
+        {
+            var memberType = Services.MemberTypeService.Get(contentItem.ContentTypeAlias);
+            if (memberType == null)
+                throw new InvalidOperationException($"No member type found with alias {contentItem.ContentTypeAlias}");
+            var member = new Member(contentItem.Name, contentItem.Email, contentItem.Username, memberType, true)
+            {
+                CreatorId = Security.CurrentUser.Id,
+                RawPasswordValue = PasswordSecurity.HashPasswordForStorage(contentItem.Password.NewPassword),
+                Comments = contentItem.Comments,
+                IsApproved = contentItem.IsApproved
+            };
+
+            return member;            
+        }
+
         /// <summary>
-        /// Update the membership user using the membership provider (for things like email, etc...)
-        /// If a password change is detected then we'll try that too.
+        /// Update the member security data
         /// </summary>
         /// <param name="contentItem"></param>
         /// <returns>
         /// If the password has been reset then this method will return the reset/generated password, otherwise will return null.
         /// </returns>
-        private string UpdateWithMembershipProvider(MemberSave contentItem)
+        private void UpdateMemberData(MemberSave contentItem)
         {
-            //Get the member from the provider
+            contentItem.PersistedContent.WriterId = Security.CurrentUser.Id;
 
-            var membershipUser = _provider.GetUser(contentItem.PersistedContent.Key, false);
-            if (membershipUser == null)
-            {
-                //This should never happen! so we'll let it YSOD if it does.
-                throw new InvalidOperationException("Could not get member from membership provider " + _provider.Name + " with key " + contentItem.PersistedContent.Key);
-            }
-
-            var shouldReFetchMember = false;
-            var providedUserName = contentItem.PersistedContent.Username;
-
-            //if the user doesn't have access to sensitive values, then we need to check if any of the built in member property types
-            //have been marked as sensitive. If that is the case we cannot change these persisted values no matter what value has been posted.
-            //There's only 3 special ones we need to deal with that are part of the MemberSave instance
-            if (Security.CurrentUser.HasAccessToSensitiveData() == false)
+            // If the user doesn't have access to sensitive values, then we need to check if any of the built in member property types
+            // have been marked as sensitive. If that is the case we cannot change these persisted values no matter what value has been posted.
+            // There's only 3 special ones we need to deal with that are part of the MemberSave instance: Comments, IsApproved, IsLockedOut
+            // but we will take care of this in a generic way below so that it works for all props.
+            if (!Security.CurrentUser.HasAccessToSensitiveData())
             {
                 var memberType = Services.MemberTypeService.Get(contentItem.PersistedContent.ContentTypeId);
                 var sensitiveProperties = memberType
@@ -330,161 +312,37 @@ namespace Umbraco.Web.Editors
 
                 foreach (var sensitiveProperty in sensitiveProperties)
                 {
-                    //if found, change the value of the contentItem model to the persisted value so it remains unchanged
-                    switch (sensitiveProperty.Alias)
+                    var destProp = contentItem.Properties.FirstOrDefault(x => x.Alias == sensitiveProperty.Alias);
+                    if (destProp != null)
                     {
-                        case Constants.Conventions.Member.Comments:
-                            contentItem.Comments = contentItem.PersistedContent.Comments;
-                            break;
-                        case Constants.Conventions.Member.IsApproved:
-                            contentItem.IsApproved = contentItem.PersistedContent.IsApproved;
-                            break;
-                        case Constants.Conventions.Member.IsLockedOut:
-                            contentItem.IsLockedOut = contentItem.PersistedContent.IsLockedOut;
-                            break;
+                        //if found, change the value of the contentItem model to the persisted value so it remains unchanged
+                        var origValue = contentItem.PersistedContent.GetValue(sensitiveProperty.Alias);
+                        destProp.Value = origValue;
                     }
                 }
             }
 
-            //Update the membership user if it has changed
-            try
-            {
-                var requiredUpdating = Members.UpdateMember(membershipUser, _provider,
-                    contentItem.Email.Trim(),
-                    contentItem.IsApproved,
-                    comment: contentItem.Comments);
-
-                if (requiredUpdating.Success)
-                {
-                    //re-map these values
-                    shouldReFetchMember = true;
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Warn<MemberController>(ex, "Could not update member, the provider returned an error");
-                ModelState.AddPropertyError(
-                    //specify 'default' just so that it shows up as a notification - is not assigned to a property
-                    new ValidationResult("Could not update member, the provider returned an error: " + ex.Message + " (see log for full details)"), "default");
-            }
+            var isLockedOut = contentItem.IsLockedOut;
 
             //if they were locked but now they are trying to be unlocked
-            if (membershipUser.IsLockedOut && contentItem.IsLockedOut == false)
+            if (contentItem.PersistedContent.IsLockedOut && isLockedOut == false)
             {
-                try
-                {
-                    var result = _provider.UnlockUser(membershipUser.UserName);
-                    if (result == false)
-                    {
-                        //it wasn't successful - but it won't really tell us why.
-                        ModelState.AddModelError("custom", "Could not unlock the user");
-                    }
-                    else
-                    {
-                        shouldReFetchMember = true;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("custom", ex);
-                }
+                contentItem.PersistedContent.IsLockedOut = false;
+                contentItem.PersistedContent.FailedPasswordAttempts = 0;
             }
-            else if (membershipUser.IsLockedOut == false && contentItem.IsLockedOut)
+            else if (!contentItem.PersistedContent.IsLockedOut && isLockedOut)
             {
                 //NOTE: This should not ever happen unless someone is mucking around with the request data.
                 //An admin cannot simply lock a user, they get locked out by password attempts, but an admin can un-approve them
                 ModelState.AddModelError("custom", "An admin cannot lock a user");
             }
 
-            //password changes ?
+            //no password changes then exit ?
             if (contentItem.Password == null)
-            {
-                //If the provider has changed some values, these values need to be reflected in the member object
-                //that will get mapped to the display object
-                if (shouldReFetchMember)
-                {
-                    RefetchMemberData(contentItem, LookupType.ByKey);
-                    RestoreProvidedUserName(contentItem, providedUserName);
-                }
+                return;
 
-                return null;
-            }
-
-            var passwordChangeResult = Members.ChangePassword(membershipUser.UserName, contentItem.Password, _provider);
-            if (passwordChangeResult.Success)
-            {
-                //If the provider has changed some values, these values need to be reflected in the member object
-                //that will get mapped to the display object
-                if (shouldReFetchMember)
-                {
-                    RefetchMemberData(contentItem, LookupType.ByKey);
-                    RestoreProvidedUserName(contentItem, providedUserName);
-                }
-
-                //even if we weren't resetting this, it is the correct value (null), otherwise if we were resetting then it will contain the new pword
-                return passwordChangeResult.Result.ResetPassword;
-            }
-
-            //it wasn't successful, so add the change error to the model state
-            ModelState.AddPropertyError(
-                passwordChangeResult.Result.ChangeError,
-                string.Format("{0}password", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
-
-            return null;
-        }
-
-        private enum LookupType
-        {
-            ByKey,
-            ByUserName
-        }
-
-        /// <summary>
-        /// Re-fetches the database data to map to the PersistedContent object and re-assigns the already mapped the posted properties so that the display object is up-to-date
-        /// </summary>
-        /// <param name="contentItem"></param>
-        /// <param name="lookup"></param>
-        /// <remarks>
-        /// This is done during an update if the membership provider has changed some underlying data - we need to ensure that our model is consistent with that data
-        /// </remarks>
-        private void RefetchMemberData(MemberSave contentItem, LookupType lookup)
-        {
-            var currProps = contentItem.PersistedContent.Properties.ToArray();
-
-            switch (lookup)
-            {
-                case LookupType.ByKey:
-                    //Go and re-fetch the persisted item
-                    contentItem.PersistedContent = Services.MemberService.GetByKey(contentItem.Key);
-                    break;
-                case LookupType.ByUserName:
-                    contentItem.PersistedContent = Services.MemberService.GetByUsername(contentItem.Username.Trim());
-                    break;
-            }
-
-            UpdateName(contentItem);
-
-            // re-assign the mapped values that are not part of the membership provider properties.
-            var builtInAliases = ConventionsHelper.GetStandardPropertyTypeStubs().Select(x => x.Key).ToArray();
-            foreach (var p in contentItem.PersistedContent.Properties)
-            {
-                var valueMapped = currProps.FirstOrDefault(x => x.Alias == p.Alias);
-                if (builtInAliases.Contains(p.Alias) == false && valueMapped != null)
-                {
-                    p.SetValue(valueMapped.GetValue());
-                }
-            }
-        }
-
-        /// <summary>
-        /// Following a refresh of member data called during an update if the membership provider has changed some underlying data,
-        /// we don't want to lose the provided, and potentially changed, username
-        /// </summary>
-        /// <param name="contentItem"></param>
-        /// <param name="providedUserName"></param>
-        private static void RestoreProvidedUserName(MemberSave contentItem, string providedUserName)
-        {
-            contentItem.PersistedContent.Username = providedUserName;
+            // set the password
+            contentItem.PersistedContent.RawPasswordValue = PasswordSecurity.HashPasswordForStorage(contentItem.Password.NewPassword);
         }
 
         private static void UpdateName(MemberSave memberSave)
@@ -496,111 +354,48 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        /// <summary>
-        /// This is going to create the user with the membership provider and check for validation
-        /// </summary>
-        /// <param name="contentItem"></param>
-        /// <param name="status"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// Depending on if the Umbraco membership provider is active or not, the process differs slightly:
-        ///
-        /// * If the umbraco membership provider is used - we create the membership user first with the membership provider, since
-        ///     it's the umbraco membership provider, this writes to the umbraco tables. When that is complete we re-fetch the IMember
-        ///     model data from the db. In this case we don't care what the provider user key is.
-        /// * If we're using a non-umbraco membership provider - we check if there is a 'Member' member type - if so
-        ///     we create an empty IMember instance first (of type 'Member'), this gives us a unique ID (GUID)
-        ///     that we then use to create the member in the custom membership provider. This acts as the link between Umbraco data and
-        ///     the custom membership provider data. This gives us the ability to eventually have custom membership properties but still use
-        ///     a custom membership provider. If there is no 'Member' member type, then we will simply just create the membership provider member
-        ///     with no link to our data.
-        ///
-        /// If this is successful, it will go and re-fetch the IMember from the db because it will now have an ID because the Umbraco provider
-        /// uses the umbraco data store - then of course we need to re-map it to the saved property values.
-        /// </remarks>
-        private MembershipUser CreateWithMembershipProvider(MemberSave contentItem, out MembershipCreateStatus status)
+        // TODO: This logic should be pulled into the service layer
+        private async Task<bool> ValidateMemberDataAsync(MemberSave contentItem)
         {
-            MembershipUser membershipUser;
-
-            //We are using the umbraco membership provider, create the member using the membership provider first.
-            var umbracoMembershipProvider = (UmbracoMembershipProviderBase)_provider;
-            // TODO: We are not supporting q/a - passing in empty here
-            membershipUser = umbracoMembershipProvider.CreateUser(
-                contentItem.ContentTypeAlias, contentItem.Username,
-                contentItem.Password.NewPassword,
-                contentItem.Email, "", "",
-                contentItem.IsApproved,
-                Guid.NewGuid(), //since it's the umbraco provider, the user key here doesn't make any difference
-                out status);
-
-            // TODO: Localize these!
-            switch (status)
+            if (contentItem.Name.IsNullOrWhiteSpace())
             {
-                case MembershipCreateStatus.Success:
-
-                    //map the key back
-                    contentItem.Key = membershipUser.ProviderUserKey.TryConvertTo<Guid>().Result;
-                    contentItem.PersistedContent.Key = contentItem.Key;
-
-                    //if the comments are there then we need to save them
-                    if (contentItem.Comments.IsNullOrWhiteSpace() == false)
-                    {
-                        membershipUser.Comment = contentItem.Comments;
-                        _provider.UpdateUser(membershipUser);
-                    }
-
-                    RefetchMemberData(contentItem, LookupType.ByUserName);
-
-                    break;
-                case MembershipCreateStatus.InvalidUserName:
-                    ModelState.AddPropertyError(
+                ModelState.AddPropertyError(
                         new ValidationResult("Invalid user name", new[] { "value" }),
                         string.Format("{0}login", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
-                    break;
-                case MembershipCreateStatus.InvalidPassword:
-                    ModelState.AddPropertyError(
-                        new ValidationResult("Invalid password", new[] { "value" }),
-                        string.Format("{0}password", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
-                    break;
-                case MembershipCreateStatus.InvalidQuestion:
-                case MembershipCreateStatus.InvalidAnswer:
-                    throw new NotSupportedException("Currently the member editor does not support providers that have RequiresQuestionAndAnswer specified");
-                case MembershipCreateStatus.InvalidEmail:
-                    ModelState.AddPropertyError(
-                        new ValidationResult("Invalid email", new[] { "value" }),
-                        string.Format("{0}email", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
-                    break;
-                case MembershipCreateStatus.DuplicateUserName:
-                    ModelState.AddPropertyError(
-                        new ValidationResult("Username is already in use", new[] { "value" }),
-                        string.Format("{0}login", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
-                    break;
-                case MembershipCreateStatus.DuplicateEmail:
-                    ModelState.AddPropertyError(
-                        new ValidationResult("Email address is already in use", new[] { "value" }),
-                        string.Format("{0}email", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
-                    break;
-                case MembershipCreateStatus.InvalidProviderUserKey:
-                    ModelState.AddPropertyError(
-                       //specify 'default' just so that it shows up as a notification - is not assigned to a property
-                       new ValidationResult("Invalid provider user key"), "default");
-                    break;
-                case MembershipCreateStatus.DuplicateProviderUserKey:
-                    ModelState.AddPropertyError(
-                       //specify 'default' just so that it shows up as a notification - is not assigned to a property
-                       new ValidationResult("Duplicate provider user key"), "default");
-                    break;
-                case MembershipCreateStatus.ProviderError:
-                case MembershipCreateStatus.UserRejected:
-                    ModelState.AddPropertyError(
-                        //specify 'default' just so that it shows up as a notification - is not assigned to a property
-                        new ValidationResult("User could not be created (rejected by provider)"), "default");
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                return false;
             }
 
-            return membershipUser;
+            if (contentItem.Password != null && !contentItem.Password.NewPassword.IsNullOrWhiteSpace())
+            {
+                var validPassword = await PasswordSecurity.IsValidPasswordAsync(contentItem.Password.NewPassword);
+                if (!validPassword)
+                {
+                    ModelState.AddPropertyError(
+                       new ValidationResult("Invalid password: " + string.Join(", ", validPassword.Result), new[] { "value" }),
+                       string.Format("{0}password", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
+                    return false;
+                }
+            }
+
+            var byUsername = Services.MemberService.GetByUsername(contentItem.Username);
+            if (byUsername != null && byUsername.Key != contentItem.Key)
+            {
+                ModelState.AddPropertyError(
+                        new ValidationResult("Username is already in use", new[] { "value" }),
+                        string.Format("{0}login", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
+                return false;
+            }
+
+            var byEmail = Services.MemberService.GetByEmail(contentItem.Email);
+            if (byEmail != null && byEmail.Key != contentItem.Key)
+            {
+                ModelState.AddPropertyError(
+                        new ValidationResult("Email address is already in use", new[] { "value" }),
+                        string.Format("{0}email", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>

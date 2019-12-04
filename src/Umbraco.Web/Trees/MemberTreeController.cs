@@ -6,7 +6,6 @@ using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
-using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -37,11 +36,9 @@ namespace Umbraco.Web.Trees
         public MemberTreeController(UmbracoTreeSearcher treeSearcher)
         {
             _treeSearcher = treeSearcher;
-            _provider = MembershipProviderExtensions.GetMembersMembershipProvider();
         }
 
         private readonly UmbracoTreeSearcher _treeSearcher;
-        private readonly MembershipProvider _provider;
 
         /// <summary>
         /// Gets an individual tree node

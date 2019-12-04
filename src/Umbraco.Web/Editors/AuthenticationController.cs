@@ -60,9 +60,9 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [WebApi.UmbracoAuthorize(requireApproval: false)]
-        public IDictionary<string, object> GetPasswordConfig()
+        public IDictionary<string, object> GetPasswordConfig(int userId)
         {
-            return _passwordConfiguration.GetConfiguration();
+            return _passwordConfiguration.GetConfiguration(userId != UmbracoContext.Security.CurrentUser.Id);
         }
 
         /// <summary>

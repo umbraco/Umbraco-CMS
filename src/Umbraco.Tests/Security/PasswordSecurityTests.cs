@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Security
             var hashed = passwordSecurity.HashNewPassword(pass, out salt);
             var storedPassword = passwordSecurity.FormatPasswordForStorage(hashed, salt);
 
-            var result = passwordSecurity.CheckPassword("ThisIsAHashedPassword", storedPassword);
+            var result = passwordSecurity.VerifyPassword("ThisIsAHashedPassword", storedPassword);
 
             Assert.IsTrue(result);
         }
@@ -55,7 +55,7 @@ namespace Umbraco.Tests.Security
             var hashed = passwordSecurity.HashNewPassword(pass, out salt);
             var storedPassword = passwordSecurity.FormatPasswordForStorage(hashed, salt);
 
-            var result = passwordSecurity.CheckPassword("ThisIsAHashedPassword", storedPassword);
+            var result = passwordSecurity.VerifyPassword("ThisIsAHashedPassword", storedPassword);
 
             Assert.IsTrue(result);
         }
@@ -82,7 +82,7 @@ namespace Umbraco.Tests.Security
             var stored = salt + "ThisIsAHashedPassword";
 
             string initSalt;
-            var result = passwordSecurity.StoredPassword(stored, out initSalt);
+            var result = passwordSecurity.ParseStoredHashPassword(stored, out initSalt);
 
             Assert.AreEqual("ThisIsAHashedPassword", result);
         }

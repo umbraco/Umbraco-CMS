@@ -14,7 +14,8 @@ namespace Umbraco.Web
         /// <param name="userService"></param>
         /// <returns></returns>
         public static IDictionary<string, object> GetConfiguration(
-            this IPasswordConfiguration passwordConfiguration)
+            this IPasswordConfiguration passwordConfiguration,
+            bool allowManuallyChangingPassword = false)
         {
             return new Dictionary<string, object>
                 {
@@ -24,15 +25,9 @@ namespace Umbraco.Web
                     // that we can consider with IPasswordConfiguration, but these are currently still based on how membership providers worked.
                     {"minNonAlphaNumericChars", passwordConfiguration.RequireNonLetterOrDigit ? 2 : 0},
 
-                    // TODO: These are legacy settings - we will always allow administrators to change another users password if the user
-                    // has permission to the user section to edit them. Similarly, when we have ASP.Net identity enabled for members, these legacy settings
-                    // will no longer exist and admins will just be able to change a members' password if they have access to the member section to edit them.
-                    {"allowManuallyChangingPassword", true},
-                    {"enableReset", false}, // TODO: Actually, this is still used for the member editor, see MemberTabsAndPropertiesMapper.GetPasswordConfig, need to remove that eventually
-                    {"enablePasswordRetrieval", false},
-                    {"requiresQuestionAnswer", false}
-
-
+                    // A flag to indicate if the current password box should be shown or not, only a user that has access to change other user/member passwords
+                    // doesn't have to specify the current password for the user/member. A user changing their own password must specify their current password.
+                    {"allowManuallyChangingPassword", allowManuallyChangingPassword},
                 };
         }
 

@@ -204,13 +204,13 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
      * @description
      * Gets the configuration of the user membership provider which is used to configure the change password form         
      */
-      getPasswordConfig: function () {
-      return umbRequestHelper.resourcePromise(
-        $http.get(
-          umbRequestHelper.getApiUrl(
-            "authenticationApiBaseUrl",
-            "GetPasswordConfig")),
-        'Failed to retrieve membership provider config');
+      getPasswordConfig: function (userId) {
+          return umbRequestHelper.resourcePromise(
+            $http.get(
+              umbRequestHelper.getApiUrl(
+                "authenticationApiBaseUrl",
+                  "GetPasswordConfig", { userId: userId })),
+            'Failed to retrieve membership provider config');
     },
 
     /**

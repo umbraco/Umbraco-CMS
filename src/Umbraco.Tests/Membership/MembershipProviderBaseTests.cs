@@ -18,28 +18,6 @@ namespace Umbraco.Tests.Membership
     public class MembershipProviderBaseTests : UmbracoTestBase
     {
         [Test]
-        public void Change_Password_Without_AllowManuallyChangingPassword_And_No_Pass_Validation()
-        {
-            var providerMock = new Mock<MembershipProviderBase>(TestHelper.GetHostingEnvironment()) { CallBase = true };
-            providerMock.Setup(@base => @base.AllowManuallyChangingPassword).Returns(false);
-            var provider = providerMock.Object;
-
-            Assert.Throws<NotSupportedException>(() => provider.ChangePassword("test", "", "test"));
-        }
-
-        [Test]
-        public void Change_Password_With_AllowManuallyChangingPassword_And_Invalid_Creds()
-        {
-            var providerMock = new Mock<MembershipProviderBase>(TestHelper.GetHostingEnvironment()) { CallBase = true };
-            providerMock.Setup(@base => @base.AllowManuallyChangingPassword).Returns(false);
-            providerMock.Setup(@base => @base.ValidateUser("test", "test")).Returns(false);
-            var provider = providerMock.Object;
-
-            Assert.IsFalse(provider.ChangePassword("test", "test", "test"));
-
-        }
-
-        [Test]
         public void ChangePasswordQuestionAndAnswer_Without_RequiresQuestionAndAnswer()
         {
             var providerMock = new Mock<MembershipProviderBase>(TestHelper.GetHostingEnvironment()) { CallBase = true };
@@ -47,18 +25,6 @@ namespace Umbraco.Tests.Membership
             var provider = providerMock.Object;
 
             Assert.Throws<NotSupportedException>(() => provider.ChangePasswordQuestionAndAnswer("test", "test", "test", "test"));
-        }
-
-        [Test]
-        public void ChangePasswordQuestionAndAnswer_Without_AllowManuallyChangingPassword_And_Invalid_Creds()
-        {
-            var providerMock = new Mock<MembershipProviderBase>(TestHelper.GetHostingEnvironment()) { CallBase = true };
-            providerMock.Setup(@base => @base.RequiresQuestionAndAnswer).Returns(true);
-            providerMock.Setup(@base => @base.AllowManuallyChangingPassword).Returns(false);
-            providerMock.Setup(@base => @base.ValidateUser("test", "test")).Returns(false);
-            var provider = providerMock.Object;
-
-            Assert.IsFalse(provider.ChangePasswordQuestionAndAnswer("test", "test", "test", "test"));
         }
 
         [Test]

@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
-using System.Web.Security;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security.DataProtection;
@@ -30,9 +28,8 @@ namespace Umbraco.Web.Security
             IdentityFactoryOptions<BackOfficeUserManager> options,
             IContentSection contentSectionConfig,
             IPasswordConfiguration passwordConfiguration,
-            IPasswordGenerator passwordGenerator,
             IIpResolver ipResolver)
-            : base(store, passwordConfiguration, passwordGenerator, ipResolver)
+            : base(store, passwordConfiguration, ipResolver)
         {
             if (options == null) throw new ArgumentNullException("options");
             InitUserManager(this, passwordConfiguration, options.DataProtectionProvider, contentSectionConfig);
@@ -60,7 +57,6 @@ namespace Umbraco.Web.Security
             IContentSection contentSectionConfig,
             IGlobalSettings globalSettings,
             IPasswordConfiguration passwordConfiguration,
-            IPasswordGenerator passwordGenerator,
             IIpResolver ipResolver)
         {
             if (options == null) throw new ArgumentNullException("options");
@@ -68,7 +64,7 @@ namespace Umbraco.Web.Security
             if (externalLoginService == null) throw new ArgumentNullException("externalLoginService");
 
             var store = new BackOfficeUserStore(userService, entityService, externalLoginService, globalSettings, mapper);
-            var manager = new BackOfficeUserManager(store, options, contentSectionConfig, passwordConfiguration, passwordGenerator, ipResolver);
+            var manager = new BackOfficeUserManager(store, options, contentSectionConfig, passwordConfiguration, ipResolver);
             return manager;
         }
 
@@ -85,10 +81,9 @@ namespace Umbraco.Web.Security
             BackOfficeUserStore customUserStore,
             IContentSection contentSectionConfig,
             IPasswordConfiguration passwordConfiguration,
-            IPasswordGenerator passwordGenerator,
             IIpResolver ipResolver)
         {
-            var manager = new BackOfficeUserManager(customUserStore, options, contentSectionConfig, passwordConfiguration, passwordGenerator, ipResolver);
+            var manager = new BackOfficeUserManager(customUserStore, options, contentSectionConfig, passwordConfiguration, ipResolver);
             return manager;
         }
         #endregion
@@ -102,14 +97,14 @@ namespace Umbraco.Web.Security
     public class BackOfficeUserManager<T> : UserManager<T, int>
         where T : BackOfficeIdentityUser
     {
+        private PasswordGenerator _passwordGenerator;
+
         public BackOfficeUserManager(IUserStore<T, int> store,
             IPasswordConfiguration passwordConfiguration,
-            IPasswordGenerator passwordGenerator,
             IIpResolver ipResolver)
             : base(store)
         {
             PasswordConfiguration = passwordConfiguration;
-            PasswordGenerator = passwordGenerator;
             IpResolver = ipResolver;
         }
 
@@ -149,24 +144,6 @@ namespace Umbraco.Web.Security
             var userIdentity = await CreateIdentityAsync(user, Core.Constants.Security.BackOfficeAuthenticationType);
             return userIdentity;
         }
-
-        ///// <summary>
-        ///// Initializes the user manager with the correct options
-        ///// </summary>
-        ///// <param name="manager"></param>
-        ///// <param name="passwordConfig"></param>
-        ///// <param name="contentSectionConfig"></param>
-        ///// <param name="options"></param>
-        ///// <returns></returns>
-        //protected void InitUserManager(
-        //    BackOfficeUserManager manager,
-        //    IPasswordConfiguration passwordConfig,
-        //    IContentSection contentSectionConfig,
-        //    IdentityFactoryOptions<BackOfficeUserManager> options)
-        //{
-        //    //NOTE: This method is mostly here for backwards compat
-        //    base.InitUserManager(manager, passwordConfig, options.DataProtectionProvider, contentSectionConfig);
-        //}
 
         /// <summary>
         /// Initializes the user manager with the correct options
@@ -265,7 +242,6 @@ namespace Umbraco.Web.Security
         /// </summary>
         public IBackOfficeUserPasswordChecker BackOfficeUserPasswordChecker { get; set; }
         public IPasswordConfiguration PasswordConfiguration { get; }
-        public IPasswordGenerator PasswordGenerator { get; }
         public IIpResolver IpResolver { get; }
 
         /// <summary>
@@ -274,7 +250,8 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public string GeneratePassword()
         {
-            var password = PasswordGenerator.GeneratePassword(PasswordConfiguration);
+            if (_passwordGenerator == null) _passwordGenerator = new PasswordGenerator(PasswordConfiguration);
+            var password = _passwordGenerator.GeneratePassword();
             return password;
         }
 
@@ -348,8 +325,6 @@ namespace Umbraco.Web.Security
         public override Task<IdentityResult> ResetPasswordAsync(int userId, string token, string newPassword)
         {
             var result = base.ResetPasswordAsync(userId, token, newPassword);
-            if (result.Result.Succeeded)
-                RaisePasswordResetEvent(userId);
             return result;
         }
 
@@ -583,12 +558,6 @@ namespace Umbraco.Web.Security
         internal void RaisePasswordChangedEvent(int userId)
         {
             OnPasswordChanged(new IdentityAuditEventArgs(AuditEvent.PasswordChanged, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
-        }
-
-        // TODO: I don't think this is required anymore since from 7.7 we no longer display the reset password checkbox since that didn't make sense.
-        internal void RaisePasswordResetEvent(int userId)
-        {
-            OnPasswordReset(new IdentityAuditEventArgs(AuditEvent.PasswordReset, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseResetAccessFailedCountEvent(int userId)

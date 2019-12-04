@@ -53,16 +53,6 @@ namespace Umbraco.Web.Security
         }
 
         /// <summary>
-        /// Providers can override this setting, by default this is false which means that the provider will
-        /// authenticate the username + password when ChangePassword is called. This property exists purely for
-        /// backwards compatibility.
-        /// </summary>
-        public virtual bool AllowManuallyChangingPassword
-        {
-            get { return false; }
-        }
-
-        /// <summary>
         /// Returns the raw password value for a given user
         /// </summary>
         /// <param name="username"></param>
@@ -307,24 +297,10 @@ namespace Umbraco.Web.Security
         /// <returns>
         /// true if the password was updated successfully; otherwise, false.
         /// </returns>
-        /// <remarks>
-        /// Checks to ensure the AllowManuallyChangingPassword rule is adhered to
-        /// </remarks>
         public override bool ChangePassword(string username, string oldPassword, string newPassword)
         {
             string rawPasswordValue = string.Empty;
-            if (oldPassword.IsNullOrWhiteSpace() && AllowManuallyChangingPassword == false)
-            {
-                //we need to lookup the member since this could be a brand new member without a password set
-                var rawPassword = GetRawPassword(username);
-                rawPasswordValue = rawPassword.Success ? rawPassword.Result : string.Empty;
-                if (rawPassword.Success == false || rawPasswordValue.StartsWith(Constants.Security.EmptyPasswordPrefix) == false)
-                {
-                    //If the old password is empty and AllowManuallyChangingPassword is false, than this provider cannot just arbitrarily change the password
-                    throw new NotSupportedException("This provider does not support manually changing the password");
-                }
-            }
-
+            
             var args = new ValidatePasswordEventArgs(username, newPassword, false);
             OnValidatingPassword(args);
 
@@ -339,14 +315,13 @@ namespace Umbraco.Web.Security
             // * the member is new and doesn't have a password set
             // * during installation to set the admin password
             var installing = Current.RuntimeState.Level == RuntimeLevel.Install;
-            if (AllowManuallyChangingPassword == false
-                && (rawPasswordValue.StartsWith(Constants.Security.EmptyPasswordPrefix)
-                    || (installing && oldPassword == "default")))
+            if (rawPasswordValue.StartsWith(Constants.Security.EmptyPasswordPrefix)
+                    || (installing && oldPassword == "default"))
             {
                 return PerformChangePassword(username, oldPassword, newPassword);
             }
 
-            if (AllowManuallyChangingPassword == false)
+            if (!oldPassword.IsNullOrWhiteSpace())
             {
                 if (ValidateUser(username, oldPassword) == false) return false;
             }
@@ -385,7 +360,7 @@ namespace Umbraco.Web.Security
                 throw new NotSupportedException("Updating the password Question and Answer is not available if requiresQuestionAndAnswer is not set in web.config");
             }
 
-            if (AllowManuallyChangingPassword == false)
+            if (!password.IsNullOrWhiteSpace())
             {
                 if (ValidateUser(username, password) == false)
                 {

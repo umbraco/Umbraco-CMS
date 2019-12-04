@@ -2,17 +2,12 @@
 using System.Collections.Generic;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
-using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using System.Linq;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services.Implement;
 using Umbraco.Web.Composing;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Editors.Binders
 {

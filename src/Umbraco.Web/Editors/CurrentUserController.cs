@@ -167,19 +167,12 @@ namespace Umbraco.Web.Editors
         /// </returns>
         public async Task<ModelWithNotifications<string>> PostChangePassword(ChangingPasswordModel data)
         {
-            var passwordChanger = new PasswordChanger(Logger, Services.UserService, UmbracoContext.HttpContext);
+            var passwordChanger = new PasswordChanger(Logger);
             var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(Security.CurrentUser, Security.CurrentUser, data, UserManager);
 
             if (passwordChangeResult.Success)
             {
                 var userMgr = this.TryGetOwinContext().Result.GetBackOfficeUserManager();
-
-                //raise the reset event
-                // TODO: I don't think this is required anymore since from 7.7 we no longer display the reset password checkbox since that didn't make sense.
-                if (data.Reset.HasValue && data.Reset.Value)
-                {
-                    userMgr.RaisePasswordResetEvent(Security.CurrentUser.Id);
-                }
 
                 //even if we weren't resetting this, it is the correct value (null), otherwise if we were resetting then it will contain the new pword
                 var result = new ModelWithNotifications<string>(passwordChangeResult.Result.ResetPassword);

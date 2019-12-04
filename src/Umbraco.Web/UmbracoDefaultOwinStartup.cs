@@ -30,7 +30,6 @@ namespace Umbraco.Web
         protected IUmbracoSettingsSection UmbracoSettings => Current.Configs.Settings();
         protected IUserPasswordConfiguration UserPasswordConfig => Current.Configs.UserPasswordConfig();
         protected IRuntimeState RuntimeState => Core.Composing.Current.RuntimeState;
-        protected IPasswordGenerator PasswordGenerator => Core.Composing.Current.PasswordGenerator;
         protected ServiceContext Services => Current.Services;
         protected UmbracoMapper Mapper => Current.Mapper;
         protected IIpResolver IpResolver => Current.IpResolver;
@@ -90,7 +89,6 @@ namespace Umbraco.Web
                 UmbracoSettings.Content,
                 GlobalSettings,
                 UserPasswordConfig,
-                PasswordGenerator,
                 IpResolver);
         }
 

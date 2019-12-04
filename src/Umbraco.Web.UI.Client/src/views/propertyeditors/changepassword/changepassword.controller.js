@@ -4,15 +4,10 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.ChangePasswordCont
     $scope.isNew = $routeParams.create;
 
     function resetModel() {
-      //the model config will contain an object, if it does not we'll create defaults
-      //NOTE: We will not support doing the password regex on the client side because the regex on the server side
-      //based on the membership provider cannot always be ported to js from .net directly.        
+      //the model config will contain an object, if it does not we'll create defaults      
       /*
       {
-          hasPassword: true/false,
-          requiresQuestionAnswer: true/false,
-          enableReset: true/false,
-          enablePasswordRetrieval: true/false,
+          hasPassword: true/false,          
           minPasswordLength: 10
       }
       */
@@ -23,16 +18,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.ChangePasswordCont
       }
       if (!$scope.model.config || $scope.model.config.hasPassword === undefined) {
         $scope.model.config.hasPassword = false;
-      }
-      if (!$scope.model.config || $scope.model.config.enablePasswordRetrieval === undefined) {
-        $scope.model.config.enablePasswordRetrieval = true;
-      }
-      if (!$scope.model.config || $scope.model.config.requiresQuestionAnswer === undefined) {
-        $scope.model.config.requiresQuestionAnswer = false;
-      }
-      if (!$scope.model.config || $scope.model.config.enableReset === undefined) {
-        $scope.model.config.enableReset = true;
-      }
+      }      
       if (!$scope.model.config || $scope.model.config.minPasswordLength === undefined) {
         $scope.model.config.minPasswordLength = 0;
       }
