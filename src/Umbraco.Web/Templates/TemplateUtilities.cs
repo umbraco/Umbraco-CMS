@@ -1,11 +1,17 @@
-﻿using System;
+﻿using HtmlAgilityPack;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Text.RegularExpressions;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
+using File = System.IO.File;
 
 namespace Umbraco.Web.Templates
 {
@@ -17,6 +23,8 @@ namespace Umbraco.Web.Templates
     /// </summary>
     public static class TemplateUtilities
     {
+        const string TemporaryImageDataAttribute = "data-tmpimg";
+
         internal static string ParseInternalLinks(string text, bool preview, UmbracoContext umbracoContext)
         {
             using (umbracoContext.ForcedPreview(preview)) // force for url provider
@@ -183,5 +191,106 @@ namespace Umbraco.Web.Templates
         internal static string RemoveMediaUrlsFromTextString(string text)
             // see comment in ResolveMediaFromTextString for group reference
             => ResolveImgPattern.Replace(text, "$1$3$4$5");
+
+        internal static string FindAndPersistPastedTempImages(string html, Guid mediaParentFolder, int userId, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, ILogger logger)
+        {
+            // Find all img's that has data-tmpimg attribute
+            // Use HTML Agility Pack - https://html-agility-pack.net
+            var htmlDoc = new HtmlDocument();
+            htmlDoc.LoadHtml(html);
+
+            var tmpImages = htmlDoc.DocumentNode.SelectNodes($"//img[@{TemporaryImageDataAttribute}]");
+            if (tmpImages == null || tmpImages.Count == 0)
+                return html;
+
+            // An array to contain a list of URLs that
+            // we have already processed to avoid dupes
+            var uploadedImages = new Dictionary<string, GuidUdi>();
+
+            foreach (var img in tmpImages)
+            {
+                // The data attribute contains the path to the tmp img to persist as a media item
+                var tmpImgPath = img.GetAttributeValue(TemporaryImageDataAttribute, string.Empty);
+
+                if (string.IsNullOrEmpty(tmpImgPath))
+                    continue;
+                                
+                var absoluteTempImagePath = IOHelper.MapPath(tmpImgPath);
+                var fileName = Path.GetFileName(absoluteTempImagePath);
+                var safeFileName = fileName.ToSafeFileName();
+
+                var mediaItemName = safeFileName.ToFriendlyName();
+                IMedia mediaFile;
+                GuidUdi udi;
+
+                if (uploadedImages.ContainsKey(tmpImgPath) == false)
+                {
+                    if (mediaParentFolder == Guid.Empty)
+                        mediaFile = mediaService.CreateMedia(mediaItemName, Constants.System.Root, Constants.Conventions.MediaTypes.Image, userId);
+                    else
+                        mediaFile = mediaService.CreateMedia(mediaItemName, mediaParentFolder, Constants.Conventions.MediaTypes.Image, userId);
+
+                    var fileInfo = new FileInfo(absoluteTempImagePath);
+
+                    var fileStream = fileInfo.OpenReadWithRetry();
+                    if (fileStream == null) throw new InvalidOperationException("Could not acquire file stream");
+                    using (fileStream)
+                    {
+                        mediaFile.SetValue(contentTypeBaseServiceProvider, Constants.Conventions.Media.File, safeFileName, fileStream);
+                    }
+
+                    mediaService.Save(mediaFile, userId);
+
+                    udi = mediaFile.GetUdi();
+                }
+                else
+                {
+                    // Already been uploaded & we have it's UDI
+                    udi = uploadedImages[tmpImgPath];
+                }                
+
+                // Add the UDI to the img element as new data attribute
+                img.SetAttributeValue("data-udi", udi.ToString());
+
+                // Get the new persisted image url
+                var mediaTyped = Current.UmbracoHelper.Media(udi.Guid);
+                var location = mediaTyped.Url;
+
+                // Find the width & height attributes as we need to set the imageprocessor QueryString
+                var width = img.GetAttributeValue("width", int.MinValue);
+                var height = img.GetAttributeValue("height", int.MinValue);
+
+                if(width != int.MinValue && height != int.MinValue)
+                {
+                    location = $"{location}?width={width}&height={height}&mode=max";
+                }
+                
+                img.SetAttributeValue("src", location);
+
+                // Remove the data attribute (so we do not re-process this)
+                img.Attributes.Remove(TemporaryImageDataAttribute);
+
+                // Add to the dictionary to avoid dupes
+                if(uploadedImages.ContainsKey(tmpImgPath) == false)
+                {
+                    uploadedImages.Add(tmpImgPath, udi);
+
+                    // Delete folder & image now its saved in media
+                    // The folder should contain one image - as a unique guid folder created
+                    // for each image uploaded from TinyMceController
+                    var folderName = Path.GetDirectoryName(absoluteTempImagePath);
+                    try
+                    {
+                        Directory.Delete(folderName, true);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Error(typeof(TemplateUtilities), ex, "Could not delete temp file or folder {FileName}", absoluteTempImagePath);
+                    }
+                }
+            }
+
+            return htmlDoc.DocumentNode.OuterHtml;
+        }
     }
 }

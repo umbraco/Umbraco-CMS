@@ -24,24 +24,30 @@
                                 label-key="general_retrieve">
                             </umb-button>
                         </umb-control-group>
-                
-                        <umb-control-group>
-                            <p ng-bind="model.embed.info"></p>
-                            <div ng-bind-html="vm.trustedPreview"></div>
-                        </umb-control-group>
-                
-                        <div ng-show="model.embed.supportsDimensions">
-                            <umb-control-group label="@general_width">
-                                <input type="number" pattern="[0-9]*" min="0" ng-model="model.embed.width" ng-blur="vm.changeSize('width')" />
+
+                        <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+                        <div ng-if="!vm.loading">
+
+                            <umb-control-group>
+                                <p ng-bind="model.embed.info"></p>
+                                <div ng-bind-html="vm.trustedPreview"></div>
                             </umb-control-group>
+                            
+                            <div ng-show="model.embed.supportsDimensions && model.embed.success">
+                                <umb-control-group label="@general_width">
+                                    <input type="number" pattern="[0-9]*" min="0" ng-model="model.embed.width" ng-blur="vm.changeSize('width')" />
+                                </umb-control-group>
                 
-                            <umb-control-group label="@general_height">
-                                <input type="number" pattern="[0-9]*" min="0" ng-model="model.embed.height" ng-blur="vm.changeSize('height')" />
-                            </umb-control-group>
+                                <umb-control-group label="@general_height">
+                                    <input type="number" pattern="[0-9]*" min="0" ng-model="model.embed.height" ng-blur="vm.changeSize('height')" />
+                                </umb-control-group>
                 
-                            <umb-control-group label="@general_constrain">
-                                <input id="constrain" type="checkbox" ng-model="model.embed.constrain" />
-                            </umb-control-group>
+                                <umb-control-group label="@general_constrain">
+                                    <umb-toggle checked="model.embed.constrain" on-click="vm.toggleConstrain()"></umb-toggle>
+                                </umb-control-group>
+                            </div>
+
                         </div>
                         
                     </umb-box-content>
@@ -62,6 +68,7 @@
                         button-style="success"
                         label-key="general_submit"
                         state="vm.saveButtonState"
+                        disabled="!model.embed.url.length || !model.embed.preview.length"
                         action="vm.submit(model)">
                     </umb-button>
                 </umb-editor-footer-content-right>

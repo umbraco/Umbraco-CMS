@@ -1,5 +1,5 @@
 <div data-element="media-grid" class="umb-media-grid">
-    <div data-element="media-grid-item-{{$index}}" class="umb-media-grid__item" title="{{item.name}}" ng-click="clickItem(item, $event, $index)" ng-repeat="item in items | filter:filterBy" ng-style="item.flexStyle" ng-class="{'-selected': item.selected, '-file': !item.thumbnail, '-svg': item.extension == 'svg'}">
+    <div data-element="media-grid-item-{{$index}}" class="umb-media-grid__item" title="{{item.name}}" ng-click="clickItem(item, $event, $index)" ng-repeat="item in items | filter:filterBy" ng-style="item.flexStyle" ng-class="{'-selected': item.selected, '-file': !item.thumbnail, '-svg': item.extension == 'svg', '-selectable': item.selectable, '-unselectable': !item.selectable}">
         <div>
             <!--<i ng-show="item.selected" class="icon-check umb-media-grid__checkmark"></i>-->
             <a ng-if="allowOnClickEdit === 'true'" ng-click="clickEdit(item, $event)" ng-href="" class="icon-edit umb-media-grid__edit"></a>
@@ -13,7 +13,7 @@
             <div class="umb-media-grid__image-background" ng-if="item.thumbnail || item.extension === 'svg'"></div>
 
             <!-- Image thumbnail -->
-            <img class="umb-media-grid__item-image" width="{{item.width}}" height="{{item.height}}" ng-if="item.thumbnail" ng-src="{{item.thumbnail}}" alt="{{item.name}}" draggable="false" />
+            <img umb-image-lazy-load="{{item.thumbnail}}" class="umb-media-grid__item-image" width="{{item.width}}" height="{{item.height}}" ng-if="item.thumbnail" alt="{{item.name}}" draggable="false" />
 
             <!-- SVG -->
             <img class="umb-media-grid__item-image" width="{{item.width}}" height="{{item.height}}" ng-if="!item.thumbnail && item.extension === 'svg'" ng-src="{{item.image}}" alt="{{item.name}}" draggable="false" />
@@ -22,10 +22,13 @@
             <img class="umb-media-grid__item-image-placeholder" ng-if="!item.thumbnail && item.extension !== 'svg'" src="assets/img/transparent.png" alt="{{item.name}}" draggable="false" />
 
             <!-- Icon for files -->
-            <span class="umb-media-grid__item-file-icon" ng-if="!item.thumbnail && item.extension !== 'svg'">
-                <i class="umb-media-grid__item-icon {{item.icon}}"></i>
-                <span ng-if="item.extension">.{{item.extension}}</span>
-            </span>
+            <umb-file-icon ng-if="!item.thumbnail && item.extension !== 'svg'"
+                           class="umb-media-grid__item-file-icon"
+                           extension="{{item.extension}}"
+                           icon="{{item.icon}}"
+                           size="s">
+            </umb-file-icon>
+
         </div>
     </div>
 </div>

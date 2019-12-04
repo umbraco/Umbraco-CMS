@@ -150,39 +150,46 @@ namespace Umbraco.Core
             culture = culture.NullOrWhiteSpaceAsNull();
             segment = segment.NullOrWhiteSpaceAsNull();
 
-            bool Validate(bool variesBy, string value)
-            {
-                if (variesBy)
-                {
-                    // varies by
-                    // in exact mode, the value cannot be null (but it can be a wildcard)
-                    // in !wildcards mode, the value cannot be a wildcard (but it can be null)
-                    if ((exact && value == null) || (!wildcards && value == "*"))
-                        return false;
-                }
-                else
-                {
-                    // does not vary by value
-                    // the value cannot have a value
-                    // unless wildcards and it's "*"
-                    if (value != null && (!wildcards || value != "*"))
-                        return false;
-                }
-
-                return true;
-            }
-
-            if (!Validate(variation.VariesByCulture(), culture))
+            // if wildcards are disabled, do not allow "*"
+            if (!wildcards && (culture == "*" || segment == "*"))
             {
                 if (throwIfInvalid)
-                    throw new NotSupportedException($"Culture value \"{culture ?? "<null>"}\" is invalid.");
+                    throw new NotSupportedException($"Variation wildcards are not supported.");
                 return false;
             }
 
-            if (!Validate(variation.VariesBySegment(), segment))
+            if (variation.VariesByCulture())
+            {
+                // varies by culture
+                // in exact mode, the culture cannot be null                
+                if (exact && culture == null)
+                {
+                    if (throwIfInvalid)
+                        throw new NotSupportedException($"Culture may not be null because culture variation is enabled.");
+                    return false;
+                }    
+            }
+            else
+            {
+                // does not vary by culture
+                // the culture cannot have a value
+                // unless wildcards and it's "*"
+                if (culture != null && !(wildcards && culture == "*"))
+                {
+                    if (throwIfInvalid)
+                        throw new NotSupportedException($"Culture \"{culture}\" is invalid because culture variation is disabled.");
+                    return false;
+                }
+            }          
+
+            // if it does not vary by segment
+            // the segment cannot have a value
+            // segment may always be null, even when the ContentVariation.Segment flag is set for this variation,
+            // therefore the exact parameter is not used in segment validation.
+            if (!variation.VariesBySegment() && segment != null && !(wildcards && segment == "*"))
             {
                 if (throwIfInvalid)
-                    throw new NotSupportedException($"Segment value \"{segment ?? "<null>"}\" is invalid.");
+                    throw new NotSupportedException($"Segment \"{segment}\" is invalid because segment variation is disabled.");
                 return false;
             }
 

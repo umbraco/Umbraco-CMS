@@ -20,17 +20,19 @@
                         <div class="form-search">
                             <i class="icon-search"></i>
                             <input type="text"
-                                    style="width: 100%"
-                                    ng-change="vm.filterItems()"
-                                    ng-model="vm.searchTerm"
-                                    class="umb-search-field search-query search-input input-block-level"
-                                    localize="placeholder"
-                                    placeholder="@placeholders_filter"
-                                    umb-auto-focus
-                                    no-dirty-check />
+                                   style="width: 100%"
+                                   ng-change="vm.filterItems()"
+                                   ng-model="vm.searchTerm"
+                                   class="umb-search-field search-query search-input input-block-level"
+                                   localize="placeholder"
+                                   placeholder="@placeholders_filter"
+                                   umb-auto-focus
+                                   no-dirty-check />
                         </div>
                     </div>
+
                     <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
                     <!-- TABS -->
                     <div ng-if="vm.showTabs">
                         <umb-tabs-nav
@@ -46,13 +48,14 @@
                                         <li ng-repeat="systemDataType in value | orderBy:'name'"
                                             data-element="editor-{{systemDataType.name}}"
                                             ng-mouseover="vm.showDetailsOverlay(systemDataType)"
-                                            ng-click="vm.pickEditor(systemDataType)">
-                                            <a class="umb-card-grid-item" href="" title="{{ systemDataType.name }}">
+                                            ng-click="vm.pickEditor(systemDataType)"
+                                            class="cursor-pointer">
+                                            <span class="umb-card-grid-item" title="{{ systemDataType.name }}">
                                                 <span>
                                                     <i class="{{ systemDataType.icon }}" ng-class="{'icon-autofill': systemDataType.icon == null}"></i>
                                                     {{ systemDataType.name }}
                                                 </span>
-                                            </a>
+                                            </span>
                                         </li>
                                     </ul>
                                 </div>
@@ -64,63 +67,75 @@
                                         <li ng-repeat="dataType in value | orderBy:'name'"
                                             data-element="editor-{{dataType.name}}"
                                             ng-mouseover="vm.showDetailsOverlay(dataType)"
-                                            ng-click="vm.pickDataType(dataType)">
+                                            ng-click="vm.pickDataType(dataType)"
+                                            class="cursor-pointer">
                                             <div ng-if="dataType.loading" class="umb-card-grid-item__loading">
                                                 <div class="umb-button__progress"></div>
                                             </div>
-                                            <a class="umb-card-grid-item" href="" title="{{ dataType.name }}">
+                                            <span class="umb-card-grid-item" title="{{ dataType.name }}">
                                                 <span>
                                                     <i class="{{ dataType.icon }}" ng-class="{'icon-autofill': dataType.icon == null}"></i>
                                                     {{ dataType.name }}
                                                 </span>
-                                            </a>
+                                            </span>
                                         </li>
                                     </ul>
                                 </div>
                             </div>
                         </umb-tab-content>
                     </div>
+
                     <!-- FILTER RESULTS -->
                     <div ng-if="vm.filterResult">
-                        <h5 class="-border-bottom -black"><localize key="contentTypeEditor_reuse"></localize></h5>
-                        <div ng-repeat="result in vm.filterResult.userConfigured">
-                            <div ng-if="result.dataTypes.length > 0">
-                                <h5>{{result.group}}</h5>
-                                <ul class="umb-card-grid -four-in-row" ng-mouseleave="vm.hideDetailsOverlay()">
-                                    <li ng-repeat="dataType in result.dataTypes | orderBy:'name'"
-                                        ng-mouseover="vm.showDetailsOverlay(dataType)"
-                                        ng-click="vm.pickDataType(dataType)">
-                                        <div ng-if="dataType.loading" class="umb-card-grid-item__loading">
-                                            <div class="umb-button__progress"></div>
-                                        </div>
-                                        <a class="umb-card-grid-item" href="" title="{{ dataType.name }}">
-                                            <span>
-                                                <i class="{{ dataType.icon }}" ng-class="{'icon-autofill': dataType.icon == null}"></i>
-                                                {{ dataType.name }}
+                        <div ng-if="vm.filterResult.totalResults > 0">
+                            <h5 class="-border-bottom -black"><localize key="contentTypeEditor_reuse"></localize></h5>
+                            <div ng-repeat="result in vm.filterResult.userConfigured">
+                                <div ng-if="result.dataTypes.length > 0">
+                                    <h5>{{result.group}}</h5>
+                                    <ul class="umb-card-grid -four-in-row" ng-mouseleave="vm.hideDetailsOverlay()">
+                                        <li ng-repeat="dataType in result.dataTypes | orderBy:'name'"
+                                            ng-mouseover="vm.showDetailsOverlay(dataType)"
+                                            ng-click="vm.pickDataType(dataType)"
+                                            class="cursor-pointer">
+                                            <div ng-if="dataType.loading" class="umb-card-grid-item__loading">
+                                                <div class="umb-button__progress"></div>
+                                            </div>
+                                            <span class="umb-card-grid-item" title="{{dataType.name}}">
+                                                <span>
+                                                    <i class="{{dataType.icon}}" ng-class="{'icon-autofill': dataType.icon == null}"></i>
+                                                    {{dataType.name}}
+                                                </span>
                                             </span>
-                                        </a>
-                                    </li>
-                                </ul>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
-                        <h5 class="-border-bottom -black"><localize key="contentTypeEditor_availableEditors"></localize></h5>
-                        <div ng-repeat="result in vm.filterResult.typesAndEditors">
-                            <div ng-if="result.dataTypes.length > 0">
-                                <h5>{{result.group}}</h5>
-                                <ul class="umb-card-grid -four-in-row" ng-mouseleave="vm.hideDetailsOverlay()">
-                                    <li ng-repeat="systemDataType in result.dataTypes | orderBy:'name'"
-                                        ng-mouseover="vm.showDetailsOverlay(systemDataType)"
-                                        ng-click="vm.pickEditor(systemDataType)">
-                                        <a class="umb-card-grid-item" href="" title="{{ systemDataType.name }}">
-                                            <span>
-                                                <i class="{{ systemDataType.icon }}" ng-class="{'icon-autofill': systemDataType.icon == null}"></i>
-                                                {{ systemDataType.name }}
+                        <div ng-if="vm.filterResult.totalResults > 0">
+                            <h5 class="-border-bottom -black"><localize key="contentTypeEditor_availableEditors"></localize></h5>
+                            <div ng-repeat="result in vm.filterResult.typesAndEditors">
+                                <div ng-if="result.dataTypes.length > 0">
+                                    <h5>{{result.group}}</h5>
+                                    <ul class="umb-card-grid -four-in-row" ng-mouseleave="vm.hideDetailsOverlay()">
+                                        <li ng-repeat="systemDataType in result.dataTypes | orderBy:'name'"
+                                            ng-mouseover="vm.showDetailsOverlay(systemDataType)"
+                                            ng-click="vm.pickEditor(systemDataType)"
+                                            class="cursor-pointer">
+                                            <span class="umb-card-grid-item" title="{{systemDataType.name}}">
+                                                <span>
+                                                    <i class="{{systemDataType.icon}}" ng-class="{'icon-autofill': systemDataType.icon == null}"></i>
+                                                    {{systemDataType.name}}
+                                                </span>
                                             </span>
-                                        </a>
-                                    </li>
-                                </ul>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
+
+                        <umb-empty-state position="center" ng-if="vm.filterResult.totalResults === 0">
+                            <localize key="general_searchNoResult"></localize>
+                        </umb-empty-state>
                     </div>
 
                 </umb-box-content>

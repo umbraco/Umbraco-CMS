@@ -1616,7 +1616,7 @@ namespace Umbraco.Tests.Services
             Assert.IsTrue(descendants.All(x => x.Path.StartsWith("-1,-20,")));
             Assert.True(descendants.All(x => x.Trashed));
 
-            contentService.EmptyRecycleBin();
+            contentService.EmptyRecycleBin(Constants.Security.SuperUserId);
             var trashed = contentService.GetPagedContentInRecycleBin(0, int.MaxValue, out var _).ToList();
             Assert.IsEmpty(trashed);
         }
@@ -1628,7 +1628,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
 
             // Act
-            contentService.EmptyRecycleBin();
+            contentService.EmptyRecycleBin(Constants.Security.SuperUserId);
             var contents = contentService.GetPagedContentInRecycleBin(0, int.MaxValue, out var _).ToList();
 
             // Assert
@@ -1804,7 +1804,7 @@ namespace Umbraco.Tests.Services
 
             // Act
             ServiceContext.ContentService.MoveToRecycleBin(content1);
-            ServiceContext.ContentService.EmptyRecycleBin();
+            ServiceContext.ContentService.EmptyRecycleBin(Constants.Security.SuperUserId);
             var contents = ServiceContext.ContentService.GetPagedContentInRecycleBin(0, int.MaxValue, out var _).ToList();
 
             // Assert

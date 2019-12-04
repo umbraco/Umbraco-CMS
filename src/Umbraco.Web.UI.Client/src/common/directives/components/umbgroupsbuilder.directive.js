@@ -257,7 +257,7 @@
             view: "views/common/infiniteeditors/compositions/compositions.html",
             size: "small",
             submit: function() {
-              
+
               // make sure that all tabs has an init property
               if (scope.model.groups.length !== 0) {
                 angular.forEach(scope.model.groups, function(group) {
@@ -341,7 +341,7 @@
         scope.compositionsButtonState = "busy";
         $q.all([
             //get available composite types
-            availableContentTypeResource(scope.model.id, [], propAliasesExisting).then(function (result) {
+            availableContentTypeResource(scope.model.id, [], propAliasesExisting, scope.model.isElement).then(function (result) {
                 setupAvailableContentTypesModel(result); 
             }),
                 //get where used document types
@@ -363,6 +363,22 @@
 
       };
 
+
+      scope.openDocumentType = function (documentTypeId) {
+          const editor = {
+              id: documentTypeId,
+              submit: function (model) {
+                  const args = { node: scope.model };
+                  eventsService.emit("editors.documentType.reload", args);
+                  editorService.close();
+              },
+              close: function () {
+                  editorService.close();
+              }
+          };
+          editorService.documentTypeEditor(editor);
+
+      };
 
       /* ---------- GROUPS ---------- */
 
@@ -401,6 +417,10 @@
         selectedGroup.tabState = "active";
 
       };
+
+      scope.canRemoveGroup = function(group){
+        return group.inherited !== true && _.find(group.properties, function(property) { return property.locked === true; }) == null;
+      }
 
       scope.removeGroup = function(groupIndex) {
         scope.model.groups.splice(groupIndex, 1);
@@ -454,6 +474,23 @@
       }
 
       /* ---------- PROPERTIES ---------- */
+
+      scope.addPropertyToActiveGroup = function () {
+        var group = _.find(scope.model.groups, group => group.tabState === "active");
+        if (!group && scope.model.groups.length) {
+          group = scope.model.groups[0];
+        }
+
+        if (!group || !group.name) {
+          return;
+        }
+
+        var property = _.find(group.properties, property => property.propertyState === "init");
+        if (!property) {
+          return;
+        }
+        scope.addProperty(property, group);
+      }
 
       scope.addProperty = function(property, group) {
 
@@ -512,7 +549,9 @@
               property.dataTypeIcon = propertyModel.dataTypeIcon;
               property.dataTypeName = propertyModel.dataTypeName;
               property.validation.mandatory = propertyModel.validation.mandatory;
+              property.validation.mandatoryMessage = propertyModel.validation.mandatoryMessage;
               property.validation.pattern = propertyModel.validation.pattern;
+              property.validation.patternMessage = propertyModel.validation.patternMessage;
               property.showOnMemberProfile = propertyModel.showOnMemberProfile;
               property.memberCanEdit = propertyModel.memberCanEdit;
               property.isSensitiveValue = propertyModel.isSensitiveValue;
@@ -582,6 +621,10 @@
         notifyChanged();
       };
 
+      function notifyChanged() {
+        eventsService.emit("editors.groupsBuilder.changed");
+      }
+
       function addInitProperty(group) {
 
         var addInitPropertyBool = true;
@@ -591,7 +634,9 @@
           propertyState: "init",
           validation: {
             mandatory: false,
-            pattern: null
+            mandatoryMessage: null,
+            pattern: null,
+            patternMessage: null
           }
         };
 

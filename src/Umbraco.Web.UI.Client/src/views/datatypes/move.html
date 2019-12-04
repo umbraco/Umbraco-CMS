@@ -43,9 +43,9 @@
     </div>
 
     <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="success">
-        <a class="btn btn-link" ng-click="close()" ng-show="!busy">
+        <button type="button" class="btn btn-link" ng-click="close()" ng-show="!busy">
             <localize key="general_cancel">Cancel</localize>
-        </a>
+        </button>
         <button class="btn btn-primary" ng-click="move()" ng-disabled="busy || !target">
             <localize key="actions_move">Move</localize>
         </button>

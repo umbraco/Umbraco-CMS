@@ -1,5 +1,4 @@
 ﻿using System;
-using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -28,13 +27,15 @@ namespace Umbraco.Core.PropertyEditors
         /// <param name="view">The view to use to render the field editor.</param>
         public ConfigurationFieldAttribute(string key, string name, string view)
         {
-            if (string.IsNullOrWhiteSpace(key)) throw new ArgumentNullOrEmptyException(nameof(key));
+            if (key == null) throw new ArgumentNullException(nameof(key));
+            if (string.IsNullOrWhiteSpace(key)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(key));
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
+            if (view == null) throw new ArgumentNullException(nameof(view));
+            if (string.IsNullOrWhiteSpace(view)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(view));
+
             Key = key;
-
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
             Name = name;
-
-            if (string.IsNullOrWhiteSpace(view)) throw new ArgumentNullOrEmptyException(nameof(view));
             View = view;
         }
 
@@ -47,10 +48,12 @@ namespace Umbraco.Core.PropertyEditors
         /// from the name of the property marked with this attribute.</remarks>
         public ConfigurationFieldAttribute(string name, string view)
         {
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
-            Name = name;
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
+            if (view == null) throw new ArgumentNullException(nameof(view));
+            if (string.IsNullOrWhiteSpace(view)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(view));
 
-            if (string.IsNullOrWhiteSpace(view)) throw new ArgumentNullOrEmptyException(nameof(view));
+            Name = name;
             View = view;
         }
 

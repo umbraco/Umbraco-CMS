@@ -16,7 +16,8 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 
     var vm = {
         labels: {
-            general_recycleBin: ""
+            general_recycleBin: "",
+            general_add: ""
         }
     };
 
@@ -77,6 +78,8 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 
     $scope.renderModel = [];
     $scope.sortableModel = [];
+
+    $scope.labels = vm.labels;
 
     $scope.dialogEditor = editorState && editorState.current && editorState.current.isDialogEditor === true;
 
@@ -200,7 +203,9 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             //now we need to filter based on what is stored in the pre-vals, this logic duplicates what is in the treepicker.controller,
             // but not much we can do about that since members require special filtering.
             var filterItem = currFilter.toLowerCase().split(',');
-            var found = filterItem.indexOf(i.metaData.contentType.toLowerCase()) >= 0;
+            // NOTE: when used in a mini list view, the item content type alias is metaData.ContentTypeAlias (in regular views it's metaData.contentType)
+            var itemContentType = i.metaData.contentType || i.metaData.ContentTypeAlias;
+            var found = filterItem.indexOf(itemContentType.toLowerCase()) >= 0;
             if (!currFilter.startsWith("!") && !found || currFilter.startsWith("!") && found) {
                 return true;
             }
@@ -479,9 +484,10 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     }
 
     function init() {
-        localizationService.localizeMany(["general_recycleBin"])
+        localizationService.localizeMany(["general_recycleBin", "general_add"])
             .then(function(data) {
                 vm.labels.general_recycleBin = data[0];
+                vm.labels.general_add = data[1];
 
                 syncRenderModel(false).then(function () {
                     //everything is loaded, start the watch on the model

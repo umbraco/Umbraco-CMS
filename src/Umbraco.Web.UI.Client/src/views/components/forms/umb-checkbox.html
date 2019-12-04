@@ -1,4 +1,4 @@
-<label class="checkbox umb-form-check umb-form-check--checkbox" ng-class="{ 'umb-form-check--disabled': vm.disabled }">
+<label class="checkbox umb-form-check umb-form-check--checkbox {{vm.cssClass}}" ng-class="{ 'umb-form-check--disabled': vm.disabled }">
     <input type="checkbox"
            id="{{vm.inputId}}"
            name="{{vm.name}}"
@@ -15,5 +15,6 @@
             <i class="umb-form-check__icon icon-check"></i>
         </span>
     </span>
+
     <span class="umb-form-check__text">{{vm.text}}</span>
 </label>

@@ -24,6 +24,9 @@
         vm.close = close;
 
         vm.currentNode = null;
+        vm.header = {};
+        vm.header.editorfor = "content_mediatype";
+        vm.header.setPageTitle = true;
         vm.contentType = {};
         vm.page = {};
         vm.page.loading = false;
@@ -429,6 +432,10 @@
 
         evts.push(eventsService.on("app.refreshEditor", function(name, error) {
             loadMediaType();
+        }));
+
+        evts.push(eventsService.on("editors.groupsBuilder.changed", function(name, args) {
+            angularHelper.getCurrentForm($scope).$setDirty();
         }));
 
         //ensure to unregister from all events!

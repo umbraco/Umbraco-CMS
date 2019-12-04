@@ -32,7 +32,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
     /// Represents the Xml storage for the Xml published cache.
     /// </summary>
     /// <remarks>
-    /// <para>One instance of <see cref="XmlStore"/> is instantiated by the <see cref="PublishedSnapshotService"/> and
+    /// <para>One instance of <see cref="XmlStore"/> is instantiated by the <see cref="XmlPublishedSnapshotService"/> and
     /// then passed to all <see cref="PublishedContentCache"/> instances that are created (one per request).</para>
     /// <para>This class should *not* be public.</para>
     /// </remarks>

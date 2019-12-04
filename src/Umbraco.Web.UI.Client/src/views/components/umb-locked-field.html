@@ -2,13 +2,13 @@
 
     <div class="umb-locked-field__wrapper">
 
-        <a ng-if="locked" href="" ng-click="unlock()" class="umb-locked-field__toggle">
-            <i class="umb-locked-field__lock-icon icon-lock"></i>
-        </a>
+        <button aria-label="Unlock" ng-if="locked" ng-click="unlock()" class="umb-locked-field__toggle">
+            <i class="umb-locked-field__lock-icon icon-lock" aria-hidden="true"></i>
+        </button>
 
-        <a ng-if="!locked" href="" ng-click="lock()" class="umb-locked-field__toggle">
-            <i class="umb-locked-field__lock-icon icon-unlocked -unlocked"></i>
-        </a>
+        <button aria-label="Lock" ng-if="!locked" ng-click="lock()" class="umb-locked-field__toggle">
+            <i class="umb-locked-field__lock-icon icon-unlocked -unlocked" aria-hidden="true"></i>
+        </button>
 
         <input type="text"
                no-password-manager

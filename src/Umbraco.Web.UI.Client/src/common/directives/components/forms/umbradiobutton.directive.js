@@ -22,9 +22,11 @@
 </pre>
 
 @param {boolean} model Set to <code>true</code> or <code>false</code> to set the radiobutton to checked or unchecked.
+@param {string} inputId Set the <code>id</code> of the radiobutton.
 @param {string} value Set the value of the radiobutton.
 @param {string} name Set the name of the radiobutton.
 @param {string} text Set the text for the radiobutton label.
+@param {string} labelKey Set a dictinary/localization string for the checkbox label
 @param {boolean} disabled Set the radiobutton to be disabled.
 @param {boolean} required Set the radiobutton to be required.
 @param {callback} onChange Callback when the value of the radiobutton change by interaction.
@@ -38,7 +40,19 @@
 
         var vm = this;
 
+        vm.$onInit = onInit;
         vm.change = change;
+
+        function onInit() {
+            // If a labelKey is passed let's update the returned text if it's does not contain an opening square bracket [
+            if (vm.labelKey) {
+                 localizationService.localize(vm.labelKey).then(function (data) {
+                      if(data.indexOf('[') === -1){
+                        vm.text = data;
+                      }
+                 });
+            }
+        }
 
         function change() {
             if (vm.onChange) {
@@ -46,7 +60,7 @@
                     vm.onChange({ model: vm.model, value: vm.value });
                 }, 0);
             }
-        }     
+        }
     }
 
     var component = {
@@ -55,11 +69,13 @@
         controllerAs: 'vm',
         bindings: {
             model: "=",
+            inputId: "@",
             value: "@",
             name: "@",
             text: "@",
-            disabled: "=",
-            required: "=",
+            labelKey: "@?",
+            disabled: "<",
+            required: "<",
             onChange: "&?"
         }
     };
