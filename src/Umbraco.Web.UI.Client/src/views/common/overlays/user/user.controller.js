@@ -87,6 +87,17 @@ angular.module("umbraco")
                             }
                         }
                     });
+
+                    //go get the config for the membership provider and add it to the model
+                    authResource.getPasswordConfig(user.id).then(function (data) {
+                        $scope.changePasswordModel.config = data;
+                        //ensure the hasPassword config option is set to true (the user of course has a password already assigned)
+                        //this will ensure the oldPassword is shown so they can change it
+                        // disable reset password functionality beacuse it does not make sense inside the backoffice
+                        $scope.changePasswordModel.config.hasPassword = true;
+                        $scope.changePasswordModel.config.disableToggle = true;
+                    });
+
                 }
             });
         }
@@ -103,6 +114,12 @@ angular.module("umbraco")
             });
         }
 
+        //create the initial model for change password
+        $scope.changePasswordModel = {
+            config: {},
+            value: {}
+        };
+
         updateUserInfo();
 
         //remove all event handlers
@@ -111,25 +128,6 @@ angular.module("umbraco")
                 evts[e]();
             }
 
-        });
-
-        /* ---------- UPDATE PASSWORD ---------- */
-
-        //create the initial model for change password
-        $scope.changePasswordModel = {
-           config: {},
-           value: {}
-        };
-
-        //go get the config for the membership provider and add it to the model
-        authResource.getPasswordConfig().then(function(data) {
-           $scope.changePasswordModel.config = data;
-           //ensure the hasPassword config option is set to true (the user of course has a password already assigned)
-           //this will ensure the oldPassword is shown so they can change it
-           // disable reset password functionality beacuse it does not make sense inside the backoffice
-           $scope.changePasswordModel.config.hasPassword = true;
-           $scope.changePasswordModel.config.disableToggle = true;
-           $scope.changePasswordModel.config.enableReset = false;
         });
 
         $scope.changePassword = function() {
@@ -142,11 +140,6 @@ angular.module("umbraco")
 
                     //reset old data 
                     clearPasswordFields();
-
-                    //if the password has been reset, then update our model
-                    if (data.value) {
-                        $scope.changePasswordModel.value.generatedPassword = data.value;
-                    }
 
                     formHelper.resetForm({ scope: $scope });
 

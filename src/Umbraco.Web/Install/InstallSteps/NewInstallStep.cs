@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
-using System.Web.Security;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
@@ -14,7 +13,6 @@ using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Services;
 using Umbraco.Web.Install.Models;
 using Umbraco.Web.Security;
-using System.Web;
 
 namespace Umbraco.Web.Install.InstallSteps
 {

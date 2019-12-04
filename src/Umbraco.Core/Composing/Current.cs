@@ -127,9 +127,6 @@ namespace Umbraco.Core.Composing
         public static IRuntimeState RuntimeState
             => Factory.GetInstance<IRuntimeState>();
 
-        public static IPasswordGenerator PasswordGenerator
-            => Factory.GetInstance<IPasswordGenerator>();
-
         public static TypeLoader TypeLoader
             => Factory.GetInstance<TypeLoader>();
 

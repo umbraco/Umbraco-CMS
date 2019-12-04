@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
-using System.Web.Security;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security.DataProtection;
@@ -28,9 +26,8 @@ namespace Umbraco.Web.Security
             IUserStore<BackOfficeIdentityUser, int> store,
             IdentityFactoryOptions<BackOfficeUserManager> options, 
             IContentSection contentSectionConfig,
-            IPasswordConfiguration passwordConfiguration,
-            IPasswordGenerator passwordGenerator)
-            : base(store, passwordConfiguration, passwordGenerator)
+            IPasswordConfiguration passwordConfiguration)
+            : base(store, passwordConfiguration)
         {
             if (options == null) throw new ArgumentNullException("options");
             InitUserManager(this, passwordConfiguration, options.DataProtectionProvider, contentSectionConfig);            
@@ -57,15 +54,14 @@ namespace Umbraco.Web.Security
             UmbracoMapper mapper,
             IContentSection contentSectionConfig,
             IGlobalSettings globalSettings,
-            IPasswordConfiguration passwordConfiguration,
-            IPasswordGenerator passwordGenerator)
+            IPasswordConfiguration passwordConfiguration)
         {
             if (options == null) throw new ArgumentNullException("options");
             if (userService == null) throw new ArgumentNullException("userService");
             if (externalLoginService == null) throw new ArgumentNullException("externalLoginService");
 
             var store = new BackOfficeUserStore(userService, entityService, externalLoginService, globalSettings, mapper);
-            var manager = new BackOfficeUserManager(store, options, contentSectionConfig, passwordConfiguration, passwordGenerator);
+            var manager = new BackOfficeUserManager(store, options, contentSectionConfig, passwordConfiguration);
             return manager;
         }
 
@@ -81,10 +77,9 @@ namespace Umbraco.Web.Security
             IdentityFactoryOptions<BackOfficeUserManager> options,
             BackOfficeUserStore customUserStore,            
             IContentSection contentSectionConfig,
-            IPasswordConfiguration passwordConfiguration,
-            IPasswordGenerator passwordGenerator)
+            IPasswordConfiguration passwordConfiguration)
         {
-            var manager = new BackOfficeUserManager(customUserStore, options, contentSectionConfig, passwordConfiguration, passwordGenerator);
+            var manager = new BackOfficeUserManager(customUserStore, options, contentSectionConfig, passwordConfiguration);
             return manager;
         }
         #endregion
@@ -98,13 +93,13 @@ namespace Umbraco.Web.Security
     public class BackOfficeUserManager<T> : UserManager<T, int>
         where T : BackOfficeIdentityUser
     {
+        private PasswordGenerator _passwordGenerator;
+
         public BackOfficeUserManager(IUserStore<T, int> store,
-            IPasswordConfiguration passwordConfiguration,
-            IPasswordGenerator passwordGenerator)
+            IPasswordConfiguration passwordConfiguration)
             : base(store)
         {
             PasswordConfiguration = passwordConfiguration;
-            PasswordGenerator = passwordGenerator;
         }
 
         #region What we support do not currently
@@ -143,24 +138,6 @@ namespace Umbraco.Web.Security
             var userIdentity = await CreateIdentityAsync(user, Core.Constants.Security.BackOfficeAuthenticationType);
             return userIdentity;
         }
-
-        ///// <summary>
-        ///// Initializes the user manager with the correct options
-        ///// </summary>
-        ///// <param name="manager"></param>
-        ///// <param name="passwordConfig"></param>
-        ///// <param name="contentSectionConfig"></param>
-        ///// <param name="options"></param>
-        ///// <returns></returns>
-        //protected void InitUserManager(
-        //    BackOfficeUserManager manager,
-        //    IPasswordConfiguration passwordConfig,
-        //    IContentSection contentSectionConfig,
-        //    IdentityFactoryOptions<BackOfficeUserManager> options)
-        //{
-        //    //NOTE: This method is mostly here for backwards compat
-        //    base.InitUserManager(manager, passwordConfig, options.DataProtectionProvider, contentSectionConfig);
-        //}
 
         /// <summary>
         /// Initializes the user manager with the correct options
@@ -259,15 +236,17 @@ namespace Umbraco.Web.Security
         /// </summary>
         public IBackOfficeUserPasswordChecker BackOfficeUserPasswordChecker { get; set; }
         public IPasswordConfiguration PasswordConfiguration { get; }
-        public IPasswordGenerator PasswordGenerator { get; }
+
+
 
         /// <summary>
         /// Helper method to generate a password for a user based on the current password validator
         /// </summary>
         /// <returns></returns>
         public string GeneratePassword()
-        {            
-            var password = PasswordGenerator.GeneratePassword(PasswordConfiguration);
+        {
+            if (_passwordGenerator == null) _passwordGenerator = new PasswordGenerator(PasswordConfiguration);
+            var password = _passwordGenerator.GeneratePassword();
             return password;
         }
 
@@ -341,8 +320,6 @@ namespace Umbraco.Web.Security
         public override Task<IdentityResult> ResetPasswordAsync(int userId, string token, string newPassword)
         {
             var result = base.ResetPasswordAsync(userId, token, newPassword);
-            if (result.Result.Succeeded)
-                RaisePasswordResetEvent(userId);
             return result;
         }
 
@@ -576,12 +553,6 @@ namespace Umbraco.Web.Security
         internal void RaisePasswordChangedEvent(int userId)
         {
             OnPasswordChanged(new IdentityAuditEventArgs(AuditEvent.PasswordChanged, GetCurrentRequestIpAddress(), affectedUser: userId));
-        }
-
-        // TODO: I don't think this is required anymore since from 7.7 we no longer display the reset password checkbox since that didn't make sense.
-        internal void RaisePasswordResetEvent(int userId)
-        {
-            OnPasswordReset(new IdentityAuditEventArgs(AuditEvent.PasswordReset, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseResetAccessFailedCountEvent(int userId)

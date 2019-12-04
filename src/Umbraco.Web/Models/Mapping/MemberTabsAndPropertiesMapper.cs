@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Core.Dictionary;
 using Umbraco.Web.Security;
 using Umbraco.Web.Security.Providers;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -29,22 +27,25 @@ namespace Umbraco.Web.Models.Mapping
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IMemberTypeService _memberTypeService;
-        private readonly IUserService _userService;
+        private readonly IMemberService _memberService;
+        private readonly IMemberGroupService _memberGroupService;
+        private readonly IMemberPasswordConfiguration _memberPasswordConfiguration;
 
-        public MemberTabsAndPropertiesMapper(ICultureDictionary cultureDictionary, IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService localizedTextService, IUserService userService, IMemberTypeService memberTypeService)
+        public MemberTabsAndPropertiesMapper(ICultureDictionary cultureDictionary, IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService localizedTextService, IMemberTypeService memberTypeService, IMemberService memberService, IMemberGroupService memberGroupService, IMemberPasswordConfiguration memberPasswordConfiguration)
             : base(cultureDictionary, localizedTextService)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
+            _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
+            _memberGroupService = memberGroupService ?? throw new ArgumentNullException(nameof(memberGroupService));
+            _memberPasswordConfiguration = memberPasswordConfiguration;
         }
 
         /// <inheritdoc />
         /// <remarks>Overridden to deal with custom member properties and permissions.</remarks>
         public override IEnumerable<Tab<ContentPropertyDisplay>> Map(IMember source, MapperContext context)
         {
-            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
 
             var memberType = _memberTypeService.Get(source.ContentTypeId);
 
@@ -55,12 +56,10 @@ namespace Umbraco.Web.Models.Mapping
 
             var resolved = base.Map(source, context);
 
-            var umbracoProvider = (IUmbracoMemberTypeMembershipProvider)provider;
-
             // This is kind of a hack because a developer is supposed to be allowed to set their property editor - would have been much easier
             // if we just had all of the membership provider fields on the member table :(
             // TODO: But is there a way to map the IMember.IsLockedOut to the property ? i dunno.
-            var isLockedOutProperty = resolved.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == umbracoProvider.LockPropertyTypeAlias);
+            var isLockedOutProperty = resolved.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == Constants.Conventions.Member.IsLockedOut);
             if (isLockedOutProperty?.Value != null && isLockedOutProperty.Value.ToString() != "1")
             {
                 isLockedOutProperty.View = "readonlyvalue";
@@ -96,7 +95,6 @@ namespace Umbraco.Web.Models.Mapping
         protected override IEnumerable<ContentPropertyDisplay> GetCustomGenericProperties(IContentBase content)
         {
             var member = (IMember)content;
-            var membersProvider = MembershipProviderExtensions.GetMembersMembershipProvider();
 
             var genericProperties = new List<ContentPropertyDisplay>
             {
@@ -127,18 +125,16 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password",
                     Label = _localizedTextService.Localize("password"),
-                    // NOTE: The value here is a json value - but the only property we care about is the generatedPassword one if it exists, the newPassword exists
-                    // only when creating a new member and we want to have a generated password pre-filled.
+                    
                     Value = new Dictionary<string, object>
                     {
-                        // TODO: why ignoreCase, what are we doing here?!
-                        {"generatedPassword", member.GetAdditionalDataValueIgnoreCase("GeneratedPassword", null)},
+                        // TODO: why ignoreCase, what are we doing here?!                    
                         {"newPassword", member.GetAdditionalDataValueIgnoreCase("NewPassword", null)},
                     },
                     // TODO: Hard coding this because the changepassword doesn't necessarily need to be a resolvable (real) property editor
                     View = "changepassword",
                     // initialize the dictionary with the configuration from the default membership provider
-                    Config = GetPasswordConfig(membersProvider, member)
+                    Config = GetPasswordConfig(member)
                 },
                 new ContentPropertyDisplay
                 {
@@ -153,16 +149,17 @@ namespace Umbraco.Web.Models.Mapping
             return genericProperties;
         }
 
-        private Dictionary<string, object> GetPasswordConfig(MembersMembershipProvider membersProvider, IMember member)
+        private Dictionary<string, object> GetPasswordConfig(IMember member)
         {
-            var result = new Dictionary<string, object>(membersProvider.PasswordConfiguration.GetConfiguration())
+            var result = new Dictionary<string, object>(_memberPasswordConfiguration.GetConfiguration(true))
                 {
                     // the password change toggle will only be displayed if there is already a password assigned.
                     {"hasPassword", member.RawPasswordValue.IsNullOrWhiteSpace() == false}
                 };
 
-            result["enableReset"] = membersProvider.CanResetPassword(_userService);
-            result["allowManuallyChangingPassword"] = membersProvider.AllowManuallyChangingPassword;
+            // This will always be true for members since we always want to allow admins to change a password - so long as that
+            // user has access to edit members (but that security is taken care of separately)
+            result["allowManuallyChangingPassword"] = true;
 
             return result;
         }
@@ -230,12 +227,13 @@ namespace Umbraco.Web.Models.Mapping
             return prop;
         }
 
-        internal static IDictionary<string, bool> GetMemberGroupValue(string username)
+        internal IDictionary<string, bool> GetMemberGroupValue(string username)
         {
-            var userRoles = username.IsNullOrWhiteSpace() ? null : Roles.GetRolesForUser(username);
+            var userRoles = username.IsNullOrWhiteSpace() ? null : _memberService.GetAllRoles(username);
 
             // create a dictionary of all roles (except internal roles) + "false"
-            var result = Roles.GetAllRoles().Distinct()
+            var result = _memberGroupService.GetAll()
+                .Select(x => x.Name)
                 // if a role starts with __umbracoRole we won't show it as it's an internal role used for public access
                 .Where(x => x.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false)
                 .OrderBy(x => x, StringComparer.OrdinalIgnoreCase)

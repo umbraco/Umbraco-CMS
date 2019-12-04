@@ -13,7 +13,7 @@ namespace Umbraco.Core.Configuration
             get
             {
                 var settings = ConfigurationManager.ConnectionStrings[key];
-
+                if (settings == null) return null;
                 return new ConfigConnectionString(settings.ConnectionString, settings.ProviderName, settings.Name);
             }
         }

@@ -25,7 +25,8 @@ namespace Umbraco.Core.Configuration
             configs.Add<IUmbracoSettingsSection>("umbracoConfiguration/settings");
             configs.Add<IHealthChecks>("umbracoConfiguration/HealthChecks");
 
-            configs.Add<IUserPasswordConfiguration>(() => new DefaultUserPasswordConfig());
+            configs.Add<IUserPasswordConfiguration>(() => new DefaultPasswordConfig());
+            configs.Add<IMemberPasswordConfiguration>(() => new DefaultPasswordConfig());
             configs.Add<ICoreDebug>(() => new CoreDebug());
             configs.Add<IConnectionStrings>(() => new ConnectionStrings());
             configs.AddCoreConfigs(_ioHelper);
@@ -34,9 +35,10 @@ namespace Umbraco.Core.Configuration
     }
 
     // Default/static user password configs
-    // TODO: Make this configurable somewhere - we've removed membership providers, so could be a section in the umbracosettings.config file?
-    // keeping in mind that we will also be removing the members membership provider so there will be 2x the same/similar configuration
-    internal class DefaultUserPasswordConfig : IUserPasswordConfiguration
+    // TODO: Make this configurable somewhere - we've removed membership providers for users, so could be a section in the umbracosettings.config file?
+    // keeping in mind that we will also be removing the members membership provider so there will be 2x the same/similar configuration.
+    // TODO: Currently it doesn't actually seem possible to replace any sub-configuration unless totally replacing the IConfigsFactory??
+    internal class DefaultPasswordConfig : IUserPasswordConfiguration, IMemberPasswordConfiguration
     {
         public int RequiredLength => 12;
         public bool RequireNonLetterOrDigit => false;
