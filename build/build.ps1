@@ -313,6 +313,10 @@
     $this.CopyFiles("$src\Umbraco.Web.UI\umbraco\js", "*", "$tmp\WebApp\umbraco\js")
     $this.CopyFiles("$src\Umbraco.Web.UI\umbraco\lib", "*", "$tmp\WebApp\umbraco\lib")
     $this.CopyFiles("$src\Umbraco.Web.UI\umbraco\views", "*", "$tmp\WebApp\umbraco\views")
+
+    # copied too much - delete the LESS map directory
+    # that was copied over into "$tmp\WebApp\umbraco\assets\css\maps"
+    Remove-Item "$tmp\WebApp\umbraco\assets\css\maps" -Force -Recurse -ErrorAction SilentlyContinue
   })
 
   $ubuild.DefineMethod("PackageZip",
@@ -456,10 +460,10 @@
   $ubuild.DefineMethod("PrepareAngularDocs",
   {
     Write-Host "Prepare Angular Documentation"
-    
+
     $src = "$($this.SolutionRoot)\src"
     $out = $this.BuildOutput
-	  
+
     "Moving to Umbraco.Web.UI.Docs folder"
     cd ..\src\Umbraco.Web.UI.Docs
 
