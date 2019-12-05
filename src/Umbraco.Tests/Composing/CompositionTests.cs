@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Composing
 
             var logger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
             var typeFinder = new TypeFinder(Mock.Of<ILogger>());
-            var ioHelper = IOHelper.Default;
+            var ioHelper = TestHelper.IOHelper;
             var typeLoader = new TypeLoader(ioHelper, typeFinder, Mock.Of<IAppPolicyCache>(), new DirectoryInfo(ioHelper.MapPath("~/App_Data/TEMP")), logger);
             var composition = new Composition(mockedRegister, typeLoader, logger, Mock.Of<IRuntimeState>(), TestHelper.GetConfigs());
 

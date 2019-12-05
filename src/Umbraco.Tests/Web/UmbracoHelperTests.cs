@@ -261,7 +261,7 @@ namespace Umbraco.Tests.Web
             // FIXME: bad in a unit test - but Udi has a static ctor that wants it?!
             var container = new Mock<IFactory>();
             var typeFinder = new TypeFinder(Mock.Of<ILogger>());
-            var ioHelper = IOHelper.Default;
+            var ioHelper = TestHelper.IOHelper;
             container
                 .Setup(x => x.GetInstance(typeof(TypeLoader)))
                 .Returns(new TypeLoader(

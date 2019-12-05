@@ -1,26 +1,31 @@
 ﻿using System;
 using System.Text;
-using System.Web;
 using Serilog;
 using Serilog.Configuration;
 using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting;
 using Serilog.Formatting.Compact;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging.Serilog.Enrichers;
+using Umbraco.Net;
 
 namespace Umbraco.Core.Logging.Serilog
 {
     public static class LoggerConfigExtensions
     {
         private const string AppDomainId = "AppDomainId";
+
         /// <summary>
         /// This configures Serilog with some defaults
         /// Such as adding ProcessID, Thread, AppDomain etc
         /// It is highly recommended that you keep/use this default in your own logging config customizations
         /// </summary>
         /// <param name="logConfig">A Serilog LoggerConfiguration</param>
-        public static LoggerConfiguration MinimalConfiguration(this LoggerConfiguration logConfig)
+        /// <param name="hostingEnvironment"></param>
+        public static LoggerConfiguration MinimalConfiguration(this LoggerConfiguration logConfig, IHostingEnvironment hostingEnvironment)
         {
             global::Serilog.Debugging.SelfLog.Enable(msg => System.Diagnostics.Debug.WriteLine(msg));
 
@@ -34,11 +39,11 @@ namespace Umbraco.Core.Logging.Serilog
                 .Enrich.WithProcessName()
                 .Enrich.WithThreadId()
                 .Enrich.WithProperty(AppDomainId, AppDomain.CurrentDomain.Id)
-                .Enrich.WithProperty("AppDomainAppId", HttpRuntime.AppDomainAppId.ReplaceNonAlphanumericChars(string.Empty))
+                .Enrich.WithProperty("AppDomainAppId", hostingEnvironment.ApplicationId.ReplaceNonAlphanumericChars(string.Empty))
                 .Enrich.WithProperty("MachineName", Environment.MachineName)
                 .Enrich.With<Log4NetLevelMapperEnricher>()
-                .Enrich.With<HttpSessionIdEnricher>()
-                .Enrich.With<HttpRequestNumberEnricher>()
+                .Enrich.With(new HttpSessionIdEnricher(new Lazy<ISessionIdResolver>(() => Current.SessionIdResolver)))
+                .Enrich.With(new HttpRequestNumberEnricher(new Lazy<IAppCache>(() => Current.AppCaches.RequestCache)))
                 .Enrich.With<HttpRequestIdEnricher>();
 
             return logConfig;

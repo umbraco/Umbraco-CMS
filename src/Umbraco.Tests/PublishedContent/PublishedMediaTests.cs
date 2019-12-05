@@ -70,7 +70,7 @@ namespace Umbraco.Tests.PublishedContent
         /// <returns></returns>
         internal IPublishedContent GetNode(int id, UmbracoContext umbracoContext)
         {
-            var cache = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null),
+            var cache = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null, HostingEnvironment),
                 ServiceContext.MediaService, ServiceContext.UserService, new DictionaryAppCache(), ContentTypesCache,
                 Factory.GetInstance<IEntityXmlSerializer>(), Factory.GetInstance<IUmbracoContextAccessor>());
             var doc = cache.GetById(id);
@@ -102,15 +102,15 @@ namespace Umbraco.Tests.PublishedContent
             var publishedMedia = GetNode(media.Id);
 
             var propVal = publishedMedia.Value("content");
-            Assert.IsInstanceOf<IHtmlString>(propVal);
+            Assert.IsInstanceOf<IHtmlEncodedString>(propVal);
             Assert.AreEqual("<div>This is some content</div>", propVal.ToString());
 
-            var propVal2 = publishedMedia.Value<IHtmlString>("content");
-            Assert.IsInstanceOf<IHtmlString>(propVal2);
+            var propVal2 = publishedMedia.Value<IHtmlEncodedString>("content");
+            Assert.IsInstanceOf<IHtmlEncodedString>(propVal2);
             Assert.AreEqual("<div>This is some content</div>", propVal2.ToString());
 
             var propVal3 = publishedMedia.Value("Content");
-            Assert.IsInstanceOf<IHtmlString>(propVal3);
+            Assert.IsInstanceOf<IHtmlEncodedString>(propVal3);
             Assert.AreEqual("<div>This is some content</div>", propVal3.ToString());
         }
 
@@ -485,7 +485,7 @@ namespace Umbraco.Tests.PublishedContent
             </Image>");
             var node = xml.DescendantsAndSelf("Image").Single(x => (int)x.Attribute("id") == nodeId);
 
-            var publishedMedia = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null), ServiceContext.MediaService, ServiceContext.UserService, new DictionaryAppCache(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>(), Factory.GetInstance<IUmbracoContextAccessor>());
+            var publishedMedia = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null, HostingEnvironment), ServiceContext.MediaService, ServiceContext.UserService, new DictionaryAppCache(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>(), Factory.GetInstance<IUmbracoContextAccessor>());
 
             var nav = node.CreateNavigator();
 
@@ -505,7 +505,7 @@ namespace Umbraco.Tests.PublishedContent
             var errorXml = new XElement("error", string.Format("No media is maching '{0}'", 1234));
             var nav = errorXml.CreateNavigator();
 
-            var publishedMedia = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null), ServiceContext.MediaService, ServiceContext.UserService, new DictionaryAppCache(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>(), Factory.GetInstance<IUmbracoContextAccessor>());
+            var publishedMedia = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null, HostingEnvironment), ServiceContext.MediaService, ServiceContext.UserService, new DictionaryAppCache(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>(), Factory.GetInstance<IUmbracoContextAccessor>());
             var converted = publishedMedia.ConvertFromXPathNodeIterator(nav.Select("/"), 1234);
 
             Assert.IsNull(converted);

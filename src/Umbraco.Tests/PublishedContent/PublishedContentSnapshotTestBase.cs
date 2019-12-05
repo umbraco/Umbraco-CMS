@@ -14,6 +14,7 @@ using Umbraco.Core.Composing;
 using Current = Umbraco.Core.Composing.Current;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -44,11 +45,11 @@ namespace Umbraco.Tests.PublishedContent
             Composition.RegisterUnique<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
         }
 
-        protected override TypeLoader CreateTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache, IGlobalSettings globalSettings, IProfilingLogger logger)
+        protected override TypeLoader CreateTypeLoader(IIOHelper ioHelper, ITypeFinder typeFinder, IAppPolicyCache runtimeCache,IProfilingLogger logger,  IHostingEnvironment hostingEnvironment)
         {
-            var baseLoader = base.CreateTypeLoader(ioHelper, typeFinder, runtimeCache, globalSettings, logger);
+            var baseLoader = base.CreateTypeLoader(ioHelper, typeFinder, runtimeCache, logger, hostingEnvironment);
 
-            return new TypeLoader(ioHelper, typeFinder, runtimeCache, new DirectoryInfo(globalSettings.LocalTempPath(ioHelper)), logger, false,
+            return new TypeLoader(ioHelper, typeFinder, runtimeCache, new DirectoryInfo(hostingEnvironment.LocalTempPath), logger, false,
                 // this is so the model factory looks into the test assembly
                 baseLoader.AssembliesToScan
                     .Union(new[] {typeof(PublishedContentMoreTests).Assembly})

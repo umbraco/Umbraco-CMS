@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Web;
+using System.Net;
 using System.Xml.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core.Composing;
@@ -180,7 +180,7 @@ namespace Umbraco.Core.Services.Implement
                 //get url encoded folder names
                 var folders = _dataTypeService.GetContainers(dataType)
                     .OrderBy(x => x.Level)
-                    .Select(x => HttpUtility.UrlEncode(x.Name));
+                    .Select(x => WebUtility.UrlEncode(x.Name));
 
                 folderNames = string.Join("/", folders.ToArray());
             }
@@ -521,7 +521,7 @@ namespace Umbraco.Core.Services.Implement
                 //get url encoded folder names
                 var folders = _contentTypeService.GetContainers(contentType)
                     .OrderBy(x => x.Level)
-                    .Select(x => HttpUtility.UrlEncode(x.Name));
+                    .Select(x => WebUtility.UrlEncode(x.Name));
 
                 folderNames = string.Join("/", folders.ToArray());
             }

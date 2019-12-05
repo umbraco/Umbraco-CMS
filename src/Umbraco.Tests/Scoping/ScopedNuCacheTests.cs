@@ -81,6 +81,7 @@ namespace Umbraco.Tests.Scoping
             var documentRepository = Mock.Of<IDocumentRepository>();
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
+            var hostingEnvironment = TestHelper.GetHostingEnvironment();
 
             var typeFinder = new TypeFinder(Mock.Of<ILogger>());
 
@@ -102,7 +103,8 @@ namespace Umbraco.Tests.Scoping
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }),
-                typeFinder);
+                typeFinder,
+                hostingEnvironment);
         }
 
         protected UmbracoContext GetUmbracoContextNu(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null)

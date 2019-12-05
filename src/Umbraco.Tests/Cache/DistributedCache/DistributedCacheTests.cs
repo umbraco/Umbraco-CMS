@@ -199,10 +199,6 @@ namespace Umbraco.Tests.Cache.DistributedCache
                 throw new NotImplementedException();
             }
 
-            public string GetCurrentServerUmbracoApplicationUrl()
-            {
-                throw new NotImplementedException();
-            }
         }
 
         public class TestServerAddress : IServerAddress

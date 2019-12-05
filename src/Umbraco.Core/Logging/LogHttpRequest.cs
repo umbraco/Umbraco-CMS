@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Web;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Logging
 {
@@ -14,17 +14,8 @@ namespace Umbraco.Core.Logging
         /// <returns><c>true</c> if there is a request in progress; <c>false</c> otherwise.</returns>
         public static bool TryGetCurrentHttpRequestId(out Guid requestId)
         {
-            if (HttpContext.Current == null)
-            {
-                requestId = default(Guid);
-                return false;
-            }
-
-            var requestIdItem = HttpContext.Current.Items[RequestIdItemName];
-            if (requestIdItem == null)
-                HttpContext.Current.Items[RequestIdItemName] = requestId = Guid.NewGuid();
-            else
-                requestId = (Guid)requestIdItem;
+            var requestIdItem = Current.AppCaches.RequestCache.Get(RequestIdItemName, () => Guid.NewGuid());
+            requestId = (Guid)requestIdItem;
 
             return true;
         }

@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Web.Security;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security
@@ -9,6 +10,10 @@ namespace Umbraco.Web.Security
     /// </summary>
     public abstract class UmbracoMembershipProviderBase : MembershipProviderBase
     {
+        protected UmbracoMembershipProviderBase(IHostingEnvironment hostingEnvironment) : base(hostingEnvironment)
+        {
+        }
+
         public abstract PasswordSecurity PasswordSecurity { get; }
         public abstract string DefaultMemberTypeAlias { get; }
 

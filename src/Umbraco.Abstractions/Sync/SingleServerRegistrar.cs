@@ -29,10 +29,6 @@ namespace Umbraco.Core.Sync
             return ServerRole.Single;
         }
 
-        public string GetCurrentServerUmbracoApplicationUrl()
-        {
-            return _runtime.ApplicationUrl?.ToString();
-        }
 
         private class ServerAddressImpl : IServerAddress
         {

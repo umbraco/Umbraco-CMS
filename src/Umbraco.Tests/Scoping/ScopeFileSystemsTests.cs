@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
@@ -8,6 +9,7 @@ using Umbraco.Core.IO;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using Umbraco.Core.Composing.CompositionExtensions;
+using Umbraco.Core.Logging;
 using FileSystems = Umbraco.Core.IO.FileSystems;
 
 namespace Umbraco.Tests.Scoping
@@ -53,7 +55,7 @@ namespace Umbraco.Tests.Scoping
         [TestCase(false)]
         public void CreateMediaTest(bool complete)
         {
-            var physMediaFileSystem = new PhysicalFileSystem(IOHelper, Logger, IOHelper.MapPath("media"), "ignore");
+            var physMediaFileSystem = new PhysicalFileSystem(IOHelper, Mock.Of<ILogger>(), IOHelper.MapPath("media"), "ignore");
             var mediaFileSystem = Current.MediaFileSystem;
 
             Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
@@ -86,7 +88,7 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void MultiThread()
         {
-            var physMediaFileSystem = new PhysicalFileSystem(IOHelper, Logger, IOHelper.MapPath("media"), "ignore");
+            var physMediaFileSystem = new PhysicalFileSystem(IOHelper, Mock.Of<ILogger>(),IOHelper.MapPath("media"), "ignore");
             var mediaFileSystem = Current.MediaFileSystem;
 
             var scopeProvider = ScopeProvider;

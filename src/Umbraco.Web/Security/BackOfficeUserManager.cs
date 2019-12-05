@@ -12,6 +12,7 @@ using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
+using Umbraco.Net;
 
 namespace Umbraco.Web.Security
 {
@@ -24,13 +25,14 @@ namespace Umbraco.Web.Security
 
         public BackOfficeUserManager(
             IUserStore<BackOfficeIdentityUser, int> store,
-            IdentityFactoryOptions<BackOfficeUserManager> options, 
+            IdentityFactoryOptions<BackOfficeUserManager> options,
             IContentSection contentSectionConfig,
-            IPasswordConfiguration passwordConfiguration)
-            : base(store, passwordConfiguration)
+            IPasswordConfiguration passwordConfiguration,
+            IIpResolver ipResolver)
+            : base(store, passwordConfiguration, ipResolver)
         {
             if (options == null) throw new ArgumentNullException("options");
-            InitUserManager(this, passwordConfiguration, options.DataProtectionProvider, contentSectionConfig);            
+            InitUserManager(this, passwordConfiguration, options.DataProtectionProvider, contentSectionConfig);
         }
 
         #region Static Create methods
@@ -50,18 +52,19 @@ namespace Umbraco.Web.Security
             IdentityFactoryOptions<BackOfficeUserManager> options,
             IUserService userService,
             IEntityService entityService,
-            IExternalLoginService externalLoginService,            
+            IExternalLoginService externalLoginService,
             UmbracoMapper mapper,
             IContentSection contentSectionConfig,
             IGlobalSettings globalSettings,
-            IPasswordConfiguration passwordConfiguration)
+            IPasswordConfiguration passwordConfiguration,
+            IIpResolver ipResolver)
         {
             if (options == null) throw new ArgumentNullException("options");
             if (userService == null) throw new ArgumentNullException("userService");
             if (externalLoginService == null) throw new ArgumentNullException("externalLoginService");
 
             var store = new BackOfficeUserStore(userService, entityService, externalLoginService, globalSettings, mapper);
-            var manager = new BackOfficeUserManager(store, options, contentSectionConfig, passwordConfiguration);
+            var manager = new BackOfficeUserManager(store, options, contentSectionConfig, passwordConfiguration, ipResolver);
             return manager;
         }
 
@@ -75,16 +78,17 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public static BackOfficeUserManager Create(
             IdentityFactoryOptions<BackOfficeUserManager> options,
-            BackOfficeUserStore customUserStore,            
+            BackOfficeUserStore customUserStore,
             IContentSection contentSectionConfig,
-            IPasswordConfiguration passwordConfiguration)
+            IPasswordConfiguration passwordConfiguration,
+            IIpResolver ipResolver)
         {
-            var manager = new BackOfficeUserManager(customUserStore, options, contentSectionConfig, passwordConfiguration);
+            var manager = new BackOfficeUserManager(customUserStore, options, contentSectionConfig, passwordConfiguration, ipResolver);
             return manager;
         }
         #endregion
 
-        
+
     }
 
     /// <summary>
@@ -96,10 +100,12 @@ namespace Umbraco.Web.Security
         private PasswordGenerator _passwordGenerator;
 
         public BackOfficeUserManager(IUserStore<T, int> store,
-            IPasswordConfiguration passwordConfiguration)
+            IPasswordConfiguration passwordConfiguration,
+            IIpResolver ipResolver)
             : base(store)
         {
             PasswordConfiguration = passwordConfiguration;
+            IpResolver = ipResolver;
         }
 
         #region What we support do not currently
@@ -236,8 +242,7 @@ namespace Umbraco.Web.Security
         /// </summary>
         public IBackOfficeUserPasswordChecker BackOfficeUserPasswordChecker { get; set; }
         public IPasswordConfiguration PasswordConfiguration { get; }
-
-
+        public IIpResolver IpResolver { get; }
 
         /// <summary>
         /// Helper method to generate a password for a user based on the current password validator
@@ -507,57 +512,57 @@ namespace Umbraco.Web.Security
 
         internal void RaiseAccountLockedEvent(int userId)
         {
-            OnAccountLocked(new IdentityAuditEventArgs(AuditEvent.AccountLocked, GetCurrentRequestIpAddress(), affectedUser: userId));
+            OnAccountLocked(new IdentityAuditEventArgs(AuditEvent.AccountLocked, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseAccountUnlockedEvent(int userId)
         {
-            OnAccountUnlocked(new IdentityAuditEventArgs(AuditEvent.AccountUnlocked, GetCurrentRequestIpAddress(), affectedUser: userId));
+            OnAccountUnlocked(new IdentityAuditEventArgs(AuditEvent.AccountUnlocked, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseForgotPasswordRequestedEvent(int userId)
         {
-            OnForgotPasswordRequested(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordRequested, GetCurrentRequestIpAddress(), affectedUser: userId));
+            OnForgotPasswordRequested(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordRequested, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseForgotPasswordChangedSuccessEvent(int userId)
         {
-            OnForgotPasswordChangedSuccess(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordChangedSuccess, GetCurrentRequestIpAddress(), affectedUser: userId));
+            OnForgotPasswordChangedSuccess(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordChangedSuccess, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseLoginFailedEvent(int userId)
         {
-            OnLoginFailed(new IdentityAuditEventArgs(AuditEvent.LoginFailed, GetCurrentRequestIpAddress(), affectedUser: userId));
+            OnLoginFailed(new IdentityAuditEventArgs(AuditEvent.LoginFailed, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseInvalidLoginAttemptEvent(string username)
         {
-            OnLoginFailed(new IdentityAuditEventArgs(AuditEvent.LoginFailed, GetCurrentRequestIpAddress(), username, string.Format("Attempted login for username '{0}' failed", username)));
+            OnLoginFailed(new IdentityAuditEventArgs(AuditEvent.LoginFailed, IpResolver.GetCurrentRequestIpAddress(), username, string.Format("Attempted login for username '{0}' failed", username)));
         }
 
         internal void RaiseLoginRequiresVerificationEvent(int userId)
         {
-            OnLoginRequiresVerification(new IdentityAuditEventArgs(AuditEvent.LoginRequiresVerification, GetCurrentRequestIpAddress(), affectedUser: userId));
+            OnLoginRequiresVerification(new IdentityAuditEventArgs(AuditEvent.LoginRequiresVerification, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseLoginSuccessEvent(int userId)
         {
-            OnLoginSuccess(new IdentityAuditEventArgs(AuditEvent.LoginSucces, GetCurrentRequestIpAddress(), affectedUser: userId));
+            OnLoginSuccess(new IdentityAuditEventArgs(AuditEvent.LoginSucces, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseLogoutSuccessEvent(int userId)
         {
-            OnLogoutSuccess(new IdentityAuditEventArgs(AuditEvent.LogoutSuccess, GetCurrentRequestIpAddress(), affectedUser: userId));
+            OnLogoutSuccess(new IdentityAuditEventArgs(AuditEvent.LogoutSuccess, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaisePasswordChangedEvent(int userId)
         {
-            OnPasswordChanged(new IdentityAuditEventArgs(AuditEvent.PasswordChanged, GetCurrentRequestIpAddress(), affectedUser: userId));
+            OnPasswordChanged(new IdentityAuditEventArgs(AuditEvent.PasswordChanged, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseResetAccessFailedCountEvent(int userId)
         {
-            OnResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.ResetAccessFailedCount, GetCurrentRequestIpAddress(), affectedUser: userId));
+            OnResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.ResetAccessFailedCount, IpResolver.GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         public static event EventHandler AccountLocked;
@@ -625,17 +630,6 @@ namespace Umbraco.Web.Security
         protected virtual void OnResetAccessFailedCount(IdentityAuditEventArgs e)
         {
             if (ResetAccessFailedCount != null) ResetAccessFailedCount(this, e);
-        }
-
-        /// <summary>
-        /// Returns the current request IP address for logging if there is one
-        /// </summary>
-        /// <returns></returns>
-        protected virtual string GetCurrentRequestIpAddress()
-        {
-            // TODO: inject a service to get this value, we should not be relying on the old HttpContext.Current especially in the ASP.NET Identity world.
-            var httpContext = HttpContext.Current == null ? (HttpContextBase)null : new HttpContextWrapper(HttpContext.Current);
-            return httpContext.GetCurrentRequestIpAddress();
         }
 
     }

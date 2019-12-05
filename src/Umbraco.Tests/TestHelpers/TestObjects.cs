@@ -246,7 +246,7 @@ namespace Umbraco.Tests.TestHelpers
             }
 
             typeFinder = typeFinder ?? new TypeFinder(logger);
-            fileSystems = fileSystems ?? new FileSystems(Current.Factory, logger, IOHelper.Default, SettingsForTests.GenerateMockGlobalSettings());
+            fileSystems = fileSystems ?? new FileSystems(Current.Factory, logger, TestHelper.IOHelper, SettingsForTests.GenerateMockGlobalSettings());
             var scopeProvider = new ScopeProvider(databaseFactory, fileSystems, logger, typeFinder, NoAppCache.Instance);
             return scopeProvider;
         }

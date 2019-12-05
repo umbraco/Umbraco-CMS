@@ -126,6 +126,8 @@
     </Compile>
     <Compile Include="AppBuilderExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
+    <Compile Include="AspNetBackOfficeInfo.cs" />
+    <Compile Include="AspNetSessionIdResolver.cs" />
     <Compile Include="AspNetHttpContextAccessor.cs" />
     <Compile Include="Cache\DistributedCacheBinder.cs" />
     <Compile Include="Cache\DistributedCacheBinderComposer.cs" />
@@ -163,6 +165,9 @@
     <Compile Include="Editors\MacrosController.cs" />
     <Compile Include="Editors\RelationTypeController.cs" />
     <Compile Include="Editors\TinyMceController.cs" />
+    <Compile Include="Hosting\AspNetHostingEnvironment.cs" />
+    <Compile Include="AspNetIpResolver.cs" />
+    <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="IUmbracoContextFactory.cs" />
     <Compile Include="Install\ChangesMonitor.cs" />
     <Compile Include="Logging\WebProfiler.cs" />
@@ -253,6 +258,7 @@
     <Compile Include="Routing\IPublishedRouter.cs" />
     <Compile Include="Routing\MediaUrlProviderCollection.cs" />
     <Compile Include="Routing\MediaUrlProviderCollectionBuilder.cs" />
+    <Compile Include="Runtime\AspNetUmbracoBootPermissionChecker.cs" />
     <Compile Include="Scheduling\TempFileCleanup.cs" />
     <Compile Include="Search\BackgroundIndexRebuilder.cs" />
     <Compile Include="Search\ExamineFinalComponent.cs" />
@@ -1263,7 +1269,6 @@
       <CachedSettingsPropName>umbraco_org_umbraco_update_CheckForUpgrade</CachedSettingsPropName>
     </WebReferenceUrl>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!--
     copied from Microsoft.CSharp.targets

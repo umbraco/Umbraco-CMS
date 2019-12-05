@@ -2,8 +2,8 @@
 using System.Security.Principal;
 using System.Threading;
 using System.Web;
-using System.Web.Hosting;
 using System.Web.Security;
+using Umbraco.Core.Composing;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -70,7 +70,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         internal static string GetCurrentUserName(this MembershipProvider membershipProvider)
         {
-            if (HostingEnvironment.IsHosted)
+            if (Current.HostingEnvironment.IsHosted)
             {
                 HttpContext current = HttpContext.Current;
                 if (current != null && current.User != null && current.User.Identity != null)
@@ -81,6 +81,6 @@ namespace Umbraco.Web.Security
                 return string.Empty;
             else
                 return currentPrincipal.Identity.Name;
-        }       
+        }
     }
 }

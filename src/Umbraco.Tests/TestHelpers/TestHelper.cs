@@ -13,6 +13,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -20,6 +21,9 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
+using Umbraco.Net;
+using Umbraco.Web;
+using Umbraco.Web.Hosting;
 using File = System.IO.File;
 
 namespace Umbraco.Tests.TestHelpers
@@ -32,7 +36,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public static TypeLoader GetMockedTypeLoader()
         {
-            return new TypeLoader(IOHelper.Default, Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(IOHelper.Default.MapPath("~/App_Data/TEMP")), Mock.Of<IProfilingLogger>());
+            return new TypeLoader(IOHelper, Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(IOHelper.MapPath("~/App_Data/TEMP")), Mock.Of<IProfilingLogger>());
         }
 
         public static Configs GetConfigs()
@@ -47,12 +51,20 @@ namespace Umbraco.Tests.TestHelpers
                 Mock.Of<IGlobalSettings>(),
                 new Lazy<IMainDom>(),
                 new Lazy<IServerRegistrar>(),
-                TestHelper.GetUmbracoVersion());
+                TestHelper.GetUmbracoVersion(),
+                TestHelper.GetHostingEnvironment(),
+                TestHelper.GetBackOfficeInfo()
+                );
+        }
+
+        public static IBackOfficeInfo GetBackOfficeInfo()
+        {
+            return new AspNetBackOfficeInfo(SettingsForTests.GenerateMockGlobalSettings(), TestHelper.IOHelper, SettingsForTests.GenerateMockUmbracoSettings(), Mock.Of<ILogger>());
         }
 
         public static IConfigsFactory GetConfigsFactory()
         {
-            return new ConfigsFactory(IOHelper.Default);
+            return new ConfigsFactory(IOHelper);
         }
 
         /// <summary>
@@ -69,6 +81,8 @@ namespace Umbraco.Tests.TestHelpers
                 return Path.GetDirectoryName(path);
             }
         }
+
+        public static IIOHelper IOHelper = new IOHelper();
 
         /// <summary>
         /// Maps the given <paramref name="relativePath"/> making it rooted on <see cref="CurrentAssemblyDirectory"/>. <paramref name="relativePath"/> must start with <code>~/</code>
@@ -97,9 +111,9 @@ namespace Umbraco.Tests.TestHelpers
         {
             foreach (var directory in directories)
             {
-                var directoryInfo = new DirectoryInfo(Current.IOHelper.MapPath(directory));
+                var directoryInfo = new DirectoryInfo(IOHelper.MapPath(directory));
                 if (directoryInfo.Exists == false)
-                    Directory.CreateDirectory(Current.IOHelper.MapPath(directory));
+                    Directory.CreateDirectory(IOHelper.MapPath(directory));
             }
         }
 
@@ -111,7 +125,7 @@ namespace Umbraco.Tests.TestHelpers
             };
             foreach (var directory in directories)
             {
-                var directoryInfo = new DirectoryInfo(Current.IOHelper.MapPath(directory));
+                var directoryInfo = new DirectoryInfo(IOHelper.MapPath(directory));
                 var preserve = preserves.ContainsKey(directory) ? preserves[directory] : null;
                 if (directoryInfo.Exists)
                     foreach (var x in directoryInfo.GetFiles().Where(x => preserve == null || preserve.Contains(x.Name) == false))
@@ -295,6 +309,16 @@ namespace Umbraco.Tests.TestHelpers
         public static IRegister GetRegister()
         {
             return RegisterFactory.Create(GetConfigs().Global());
+        }
+
+        public static IHostingEnvironment GetHostingEnvironment()
+        {
+            return new AspNetHostingEnvironment(SettingsForTests.GetDefaultGlobalSettings(), TestHelper.IOHelper);
+        }
+
+        public static IIpResolver GetIpResolver()
+        {
+            return new AspNetIpResolver();
         }
 
         public static IRequestCache GetRequestCache()

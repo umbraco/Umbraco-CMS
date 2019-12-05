@@ -7,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging.Viewer;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Logging
 {
@@ -33,7 +34,7 @@ namespace Umbraco.Tests.Logging
         {
             //Create an example JSON log file to check results
             //As a one time setup for all tets in this class/fixture
-            var ioHelper = new IOHelper();
+            var ioHelper = TestHelper.IOHelper;
 
             var exampleLogfilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"Logging\", _logfileName);
             _newLogfileDirPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"App_Data\Logs\");

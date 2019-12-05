@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Web.Hosting;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core
@@ -46,14 +47,14 @@ namespace Umbraco.Core
         #region Ctor
 
         // initializes a new instance of MainDom
-        public MainDom(ILogger logger)
+        public MainDom(ILogger logger, IHostingEnvironment hostingEnvironment)
         {
             _logger = logger;
 
             var appId = string.Empty;
             // HostingEnvironment.ApplicationID is null in unit tests, making ReplaceNonAlphanumericChars fail
-            if (HostingEnvironment.ApplicationID != null)
-                appId = HostingEnvironment.ApplicationID.ReplaceNonAlphanumericChars(string.Empty);
+            if (hostingEnvironment.ApplicationId != null)
+                appId = hostingEnvironment.ApplicationId.ReplaceNonAlphanumericChars(string.Empty);
 
             // combining with the physical path because if running on eg IIS Express,
             // two sites could have the same appId even though they are different.
@@ -64,7 +65,7 @@ namespace Umbraco.Core
             // we *cannot* use the process ID here because when an AppPool restarts it is
             // a new process for the same application path
 
-            var appPath = HostingEnvironment.ApplicationPhysicalPath;
+            var appPath = hostingEnvironment.ApplicationPhysicalPath;
             var hash = (appId + ":::" + appPath).GenerateHash<SHA1>();
 
             var lockName = "UMBRACO-" + hash + "-MAINDOM-LCK";

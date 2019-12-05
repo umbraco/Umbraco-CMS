@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading;
-using System.Web;
 using Semver;
 using Umbraco.Core.Collections;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
@@ -26,12 +26,16 @@ namespace Umbraco.Core
         private readonly Lazy<IMainDom> _mainDom;
         private readonly Lazy<IServerRegistrar> _serverRegistrar;
         private readonly IUmbracoVersion _umbracoVersion;
+        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IBackOfficeInfo _backOfficeInfo;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RuntimeState"/> class.
         /// </summary>
         public RuntimeState(ILogger logger, IUmbracoSettingsSection settings, IGlobalSettings globalSettings,
-            Lazy<IMainDom> mainDom, Lazy<IServerRegistrar> serverRegistrar, IUmbracoVersion umbracoVersion)
+            Lazy<IMainDom> mainDom, Lazy<IServerRegistrar> serverRegistrar, IUmbracoVersion umbracoVersion,
+            IHostingEnvironment hostingEnvironment,
+            IBackOfficeInfo backOfficeInfo)
         {
             _logger = logger;
             _settings = settings;
@@ -39,6 +43,10 @@ namespace Umbraco.Core
             _mainDom = mainDom;
             _serverRegistrar = serverRegistrar;
             _umbracoVersion = umbracoVersion;
+            _hostingEnvironment = hostingEnvironment;
+            _backOfficeInfo = backOfficeInfo;
+
+            ApplicationVirtualPath = _hostingEnvironment.ApplicationVirtualPath;
         }
 
         /// <summary>
@@ -67,7 +75,7 @@ namespace Umbraco.Core
         public SemVersion SemanticVersion => _umbracoVersion.SemanticVersion;
 
         /// <inheritdoc />
-        public bool Debug => HttpContext.Current != null ? HttpContext.Current.IsDebuggingEnabled : _globalSettings.DebugMode;
+        public bool Debug => _hostingEnvironment.IsDebugMode;
 
         /// <inheritdoc />
         public bool IsMainDom => MainDom.IsMainDom;
@@ -79,7 +87,7 @@ namespace Umbraco.Core
         public Uri ApplicationUrl { get; private set; }
 
         /// <inheritdoc />
-        public string ApplicationVirtualPath { get; } = HttpRuntime.AppDomainAppVirtualPath;
+        public string ApplicationVirtualPath { get; }
 
         /// <inheritdoc />
         public string CurrentMigrationState { get; internal set; }
@@ -93,11 +101,11 @@ namespace Umbraco.Core
         /// <inheritdoc />
         public RuntimeLevelReason Reason { get; internal set; } = RuntimeLevelReason.Unknown;
 
+
         /// <summary>
         /// Ensures that the <see cref="ApplicationUrl"/> property has a value.
         /// </summary>
-        /// <param name="request"></param>
-        internal void EnsureApplicationUrl(HttpRequestBase request = null)
+        internal void EnsureApplicationUrl()
         {
             //Fixme: This causes problems with site swap on azure because azure pre-warms a site by calling into `localhost` and when it does that
             // it changes the URL to `localhost:80` which actually doesn't work for pinging itself, it only works internally in Azure. The ironic part
@@ -107,16 +115,16 @@ namespace Umbraco.Core
             // see U4-10626 - in some cases we want to reset the application url
             // (this is a simplified version of what was in 7.x)
             // note: should this be optional? is it expensive?
-            var url = request == null ? null : ApplicationUrlHelper.GetApplicationUrlFromCurrentRequest(request, _globalSettings);
+            var url = _backOfficeInfo.GetAbsoluteUrl;
+
             var change = url != null && !_applicationUrls.Contains(url);
+
             if (change)
             {
-                _logger.Info(typeof(ApplicationUrlHelper), "New url {Url} detected, re-discovering application url.", url);
+                _logger.Info<RuntimeState>("New url {Url} detected, re-discovering application url.", url);
                 _applicationUrls.Add(url);
+                ApplicationUrl = new Uri(url);
             }
-
-            if (ApplicationUrl != null && !change) return;
-            ApplicationUrl = new Uri(ApplicationUrlHelper.GetApplicationUrl(_logger, _globalSettings, _settings, ServerRegistrar, request));
         }
 
         /// <inheritdoc />

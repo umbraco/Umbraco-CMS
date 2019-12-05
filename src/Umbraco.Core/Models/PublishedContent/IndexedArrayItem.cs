@@ -1,4 +1,4 @@
-﻿using System.Web;
+﻿using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
@@ -21,14 +21,14 @@ namespace Umbraco.Core.Models.PublishedContent
             return Index == 0;
         }
 
-        public HtmlString IsFirst(string valueIfTrue)
+        public IHtmlEncodedString IsFirst(string valueIfTrue)
         {
             return IsFirst(valueIfTrue, string.Empty);
         }
 
-        public HtmlString IsFirst(string valueIfTrue, string valueIfFalse)
+        public IHtmlEncodedString IsFirst(string valueIfTrue, string valueIfFalse)
         {
-            return new HtmlString(IsFirst() ? valueIfTrue : valueIfFalse);
+            return new HtmlEncodedString(IsFirst() ? valueIfTrue : valueIfFalse);
         }
 
         public bool IsNotFirst()
@@ -36,14 +36,14 @@ namespace Umbraco.Core.Models.PublishedContent
             return IsFirst() == false;
         }
 
-        public HtmlString IsNotFirst(string valueIfTrue)
+        public IHtmlEncodedString IsNotFirst(string valueIfTrue)
         {
             return IsNotFirst(valueIfTrue, string.Empty);
         }
 
-        public HtmlString IsNotFirst(string valueIfTrue, string valueIfFalse)
+        public IHtmlEncodedString IsNotFirst(string valueIfTrue, string valueIfFalse)
         {
-            return new HtmlString(IsNotFirst() ? valueIfTrue : valueIfFalse);
+            return new HtmlEncodedString(IsNotFirst() ? valueIfTrue : valueIfFalse);
         }
 
         public bool IsIndex(int index)
@@ -51,14 +51,14 @@ namespace Umbraco.Core.Models.PublishedContent
             return Index == index;
         }
 
-        public HtmlString IsIndex(int index, string valueIfTrue)
+        public IHtmlEncodedString IsIndex(int index, string valueIfTrue)
         {
             return IsIndex(index, valueIfTrue, string.Empty);
         }
 
-        public HtmlString IsIndex(int index, string valueIfTrue, string valueIfFalse)
+        public IHtmlEncodedString IsIndex(int index, string valueIfTrue, string valueIfFalse)
         {
-            return new HtmlString(IsIndex(index) ? valueIfTrue : valueIfFalse);
+            return new HtmlEncodedString(IsIndex(index) ? valueIfTrue : valueIfFalse);
         }
 
         public bool IsModZero(int modulus)
@@ -66,14 +66,14 @@ namespace Umbraco.Core.Models.PublishedContent
             return Index % modulus == 0;
         }
 
-        public HtmlString IsModZero(int modulus, string valueIfTrue)
+        public IHtmlEncodedString IsModZero(int modulus, string valueIfTrue)
         {
             return IsModZero(modulus, valueIfTrue, string.Empty);
         }
 
-        public HtmlString IsModZero(int modulus, string valueIfTrue, string valueIfFalse)
+        public IHtmlEncodedString IsModZero(int modulus, string valueIfTrue, string valueIfFalse)
         {
-            return new HtmlString(IsModZero(modulus) ? valueIfTrue : valueIfFalse);
+            return new HtmlEncodedString(IsModZero(modulus) ? valueIfTrue : valueIfFalse);
         }
 
         public bool IsNotModZero(int modulus)
@@ -81,14 +81,14 @@ namespace Umbraco.Core.Models.PublishedContent
             return IsModZero(modulus) == false;
         }
 
-        public HtmlString IsNotModZero(int modulus, string valueIfTrue)
+        public IHtmlEncodedString IsNotModZero(int modulus, string valueIfTrue)
         {
             return IsNotModZero(modulus, valueIfTrue, string.Empty);
         }
 
-        public HtmlString IsNotModZero(int modulus, string valueIfTrue, string valueIfFalse)
+        public IHtmlEncodedString IsNotModZero(int modulus, string valueIfTrue, string valueIfFalse)
         {
-            return new HtmlString(IsNotModZero(modulus) ? valueIfTrue : valueIfFalse);
+            return new HtmlEncodedString(IsNotModZero(modulus) ? valueIfTrue : valueIfFalse);
         }
 
         public bool IsNotIndex(int index)
@@ -96,14 +96,14 @@ namespace Umbraco.Core.Models.PublishedContent
             return IsIndex(index) == false;
         }
 
-        public HtmlString IsNotIndex(int index, string valueIfTrue)
+        public IHtmlEncodedString IsNotIndex(int index, string valueIfTrue)
         {
             return IsNotIndex(index, valueIfTrue, string.Empty);
         }
 
-        public HtmlString IsNotIndex(int index, string valueIfTrue, string valueIfFalse)
+        public IHtmlEncodedString IsNotIndex(int index, string valueIfTrue, string valueIfFalse)
         {
-            return new HtmlString(IsNotIndex(index) ? valueIfTrue : valueIfFalse);
+            return new HtmlEncodedString(IsNotIndex(index) ? valueIfTrue : valueIfFalse);
         }
 
         public bool IsLast()
@@ -111,14 +111,14 @@ namespace Umbraco.Core.Models.PublishedContent
             return Index == TotalCount - 1;
         }
 
-        public HtmlString IsLast(string valueIfTrue)
+        public IHtmlEncodedString IsLast(string valueIfTrue)
         {
             return IsLast(valueIfTrue, string.Empty);
         }
 
-        public HtmlString IsLast(string valueIfTrue, string valueIfFalse)
+        public IHtmlEncodedString IsLast(string valueIfTrue, string valueIfFalse)
         {
-            return new HtmlString(IsLast() ? valueIfTrue : valueIfFalse);
+            return new HtmlEncodedString(IsLast() ? valueIfTrue : valueIfFalse);
         }
 
         public bool IsNotLast()
@@ -126,14 +126,14 @@ namespace Umbraco.Core.Models.PublishedContent
             return IsLast() == false;
         }
 
-        public HtmlString IsNotLast(string valueIfTrue)
+        public IHtmlEncodedString IsNotLast(string valueIfTrue)
         {
             return IsNotLast(valueIfTrue, string.Empty);
         }
 
-        public HtmlString IsNotLast(string valueIfTrue, string valueIfFalse)
+        public IHtmlEncodedString IsNotLast(string valueIfTrue, string valueIfFalse)
         {
-            return new HtmlString(IsNotLast() ? valueIfTrue : valueIfFalse);
+            return new HtmlEncodedString(IsNotLast() ? valueIfTrue : valueIfFalse);
         }
 
         public bool IsEven()
@@ -141,14 +141,14 @@ namespace Umbraco.Core.Models.PublishedContent
             return Index % 2 == 0;
         }
 
-        public HtmlString IsEven(string valueIfTrue)
+        public IHtmlEncodedString IsEven(string valueIfTrue)
         {
             return IsEven(valueIfTrue, string.Empty);
         }
 
-        public HtmlString IsEven(string valueIfTrue, string valueIfFalse)
+        public IHtmlEncodedString IsEven(string valueIfTrue, string valueIfFalse)
         {
-            return new HtmlString(IsEven() ? valueIfTrue : valueIfFalse);
+            return new HtmlEncodedString(IsEven() ? valueIfTrue : valueIfFalse);
         }
 
         public bool IsOdd()
@@ -156,14 +156,14 @@ namespace Umbraco.Core.Models.PublishedContent
             return Index % 2 == 1;
         }
 
-        public HtmlString IsOdd(string valueIfTrue)
+        public IHtmlEncodedString IsOdd(string valueIfTrue)
         {
             return IsOdd(valueIfTrue, string.Empty);
         }
 
-        public HtmlString IsOdd(string valueIfTrue, string valueIfFalse)
+        public IHtmlEncodedString IsOdd(string valueIfTrue, string valueIfFalse)
         {
-            return new HtmlString(IsOdd() ? valueIfTrue : valueIfFalse);
+            return new HtmlEncodedString(IsOdd() ? valueIfTrue : valueIfFalse);
         }
     }
 }

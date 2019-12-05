@@ -1,5 +1,6 @@
 ﻿using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Tests.TestHelpers;
@@ -15,13 +16,13 @@ namespace Umbraco.Tests.Configurations
         public override void SetUp()
         {
             base.SetUp();
-            _root = Current.IOHelper.Root;
+            _root = TestHelper.IOHelper.Root;
         }
 
         public override void TearDown()
         {
             base.TearDown();
-            Current.IOHelper.Root = _root;
+            TestHelper.IOHelper.Root = _root;
         }
 
         [TestCase("~/umbraco", "/", "umbraco")]
@@ -34,9 +35,9 @@ namespace Umbraco.Tests.Configurations
             var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
 
             var globalSettingsMock = Mock.Get(globalSettings);
-            globalSettingsMock.Setup(x => x.Path).Returns(() => Current.IOHelper.ResolveUrl(path));
+            globalSettingsMock.Setup(x => x.Path).Returns(() => TestHelper.IOHelper.ResolveUrl(path));
 
-            Current.IOHelper.Root = rootPath;
+            TestHelper.IOHelper.Root = rootPath;
             Assert.AreEqual(outcome, globalSettings.GetUmbracoMvcAreaNoCache(IOHelper));
         }
 

@@ -6,9 +6,11 @@ using System.Web.Hosting;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
+using Umbraco.Web.Hosting;
 
 namespace Umbraco.Web
 {
@@ -19,29 +21,40 @@ namespace Umbraco.Web
     {
         private IRuntime _runtime;
 
-        public readonly ILogger _logger;
+        private readonly ILogger _logger;
         private readonly Configs _configs;
         private readonly IIOHelper _ioHelper;
+        private readonly IProfiler _profiler;
+        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IBackOfficeInfo _backOfficeInfo;
 
         protected UmbracoApplicationBase()
         {
-            _logger = SerilogLogger.CreateWithDefaultConfiguration();
-            _ioHelper = IOHelper.Default;
+            _ioHelper = new IOHelper();
             _configs = new ConfigsFactory(_ioHelper).Create();
+            var globalSettings = _configs.Global();
+
+            _profiler = new LogProfiler(_logger);
+            _hostingEnvironment = new AspNetHostingEnvironment(globalSettings, _ioHelper);
+            _logger = SerilogLogger.CreateWithDefaultConfiguration(_hostingEnvironment);
+            _backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, _ioHelper, _configs.Settings(), _logger);
         }
 
-        protected UmbracoApplicationBase(ILogger logger, Configs configs)
+        protected UmbracoApplicationBase(ILogger logger, Configs configs, IIOHelper ioHelper, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
         {
             _logger = logger;
             _configs = configs;
-            _ioHelper = IOHelper.Default;
+            _ioHelper = ioHelper;
+            _profiler = profiler;
+            _hostingEnvironment = hostingEnvironment;
+            _backOfficeInfo = backOfficeInfo;
         }
 
 
         /// <summary>
         /// Gets a runtime.
         /// </summary>
-        protected abstract IRuntime GetRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger);
+        protected abstract IRuntime GetRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo);
 
         /// <summary>
         /// Gets the application register.
@@ -86,7 +99,7 @@ namespace Umbraco.Web
             // create the register for the application, and boot
             // the boot manager is responsible for registrations
             var register = GetRegister(globalSettings);
-            _runtime = GetRuntime(_configs, umbracoVersion, _ioHelper, _logger);
+            _runtime = GetRuntime(_configs, umbracoVersion, _ioHelper, _logger, _profiler, _hostingEnvironment, _backOfficeInfo);
             _runtime.Boot(register);
         }
 

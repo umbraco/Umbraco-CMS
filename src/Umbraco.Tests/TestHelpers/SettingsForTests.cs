@@ -18,11 +18,10 @@ namespace Umbraco.Tests.TestHelpers
                     settings.ConfigurationStatus == TestHelper.GetUmbracoVersion().SemanticVersion.ToSemanticString() &&
                     settings.UseHttps == false &&
                     settings.HideTopLevelNodeFromPath == false &&
-                    settings.Path == Current.IOHelper.ResolveUrl("~/umbraco") &&
+                    settings.Path == TestHelper.IOHelper.ResolveUrl("~/umbraco") &&
                     settings.TimeOutInMinutes == 20 &&
                     settings.DefaultUILanguage == "en" &&
                     settings.LocalTempStorageLocation == LocalTempStorage.Default &&
-                    //settings.LocalTempPath == Current.IOHelper.MapPath("~/App_Data/TEMP") &&
                     settings.ReservedPaths == (GlobalSettings.StaticReservedPaths + "~/umbraco") &&
                     settings.ReservedUrls == GlobalSettings.StaticReservedUrls &&
                     settings.UmbracoPath == "~/umbraco" &&

@@ -3,12 +3,14 @@ using System.Configuration.Provider;
 using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Composing;
 using System;
+using Umbraco.Net;
 
 namespace Umbraco.Web.Security.Providers
 {
@@ -18,11 +20,11 @@ namespace Umbraco.Web.Security.Providers
     public class MembersMembershipProvider : UmbracoMembershipProvider<IMembershipMemberService, IMember>
     {
         public MembersMembershipProvider()
-            : this(Current.Services.MemberService, Current.Services.MemberTypeService, Current.UmbracoVersion)
+            : this(Current.Services.MemberService, Current.Services.MemberTypeService, Current.UmbracoVersion, Current.HostingEnvironment, Current.IpResolver)
         { }
 
-        public MembersMembershipProvider(IMembershipMemberService<IMember> memberService, IMemberTypeService memberTypeService, IUmbracoVersion umbracoVersion)
-            : base(memberService, umbracoVersion)
+        public MembersMembershipProvider(IMembershipMemberService<IMember> memberService, IMemberTypeService memberTypeService, IUmbracoVersion umbracoVersion, IHostingEnvironment hostingEnvironment, IIpResolver ipResolver)
+            : base(memberService, umbracoVersion, hostingEnvironment, ipResolver)
         {
             LockPropertyTypeAlias = Constants.Conventions.Member.IsLockedOut;
             LastLockedOutPropertyTypeAlias = Constants.Conventions.Member.LastLockoutDate;

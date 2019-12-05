@@ -136,7 +136,7 @@ SELECT '4CountOfLockedOut' AS colName, COUNT(id) AS num FROM umbracoUser WHERE u
 UNION
 SELECT '5CountOfInvited' AS colName, COUNT(id) AS num FROM umbracoUser WHERE lastLoginDate IS NULL AND userDisabled = 1 AND invitedDate IS NOT NULL
 UNION
-SELECT '6CountOfDisabled' AS colName, COUNT(id) AS num FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NULL 
+SELECT '6CountOfDisabled' AS colName, COUNT(id) AS num FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NULL
 ORDER BY colName";
 
             var result = Database.Fetch<dynamic>(sql);

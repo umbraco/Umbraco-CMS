@@ -9,6 +9,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.PackageActions;
 using Umbraco.Core.Packaging;
@@ -17,6 +18,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
+using Umbraco.Net;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Editors;
@@ -225,6 +227,8 @@ namespace Umbraco.Web.Composing
         public static IVariationContextAccessor VariationContextAccessor => CoreCurrent.VariationContextAccessor;
 
         public static IIOHelper IOHelper => CoreCurrent.IOHelper;
+        public static IHostingEnvironment HostingEnvironment => CoreCurrent.HostingEnvironment;
+        public static IIpResolver IpResolver => Factory.GetInstance<IIpResolver>();
         public static IUmbracoVersion UmbracoVersion => Factory.GetInstance<IUmbracoVersion>();
 
         #endregion

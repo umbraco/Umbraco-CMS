@@ -7,6 +7,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Services;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers;
@@ -64,7 +65,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 
             _xml = new XmlDocument();
             _xml.LoadXml(GetXml());
-            var xmlStore = new XmlStore(() => _xml, null, null, null);
+            var xmlStore = new XmlStore(() => _xml, null, null, null, HostingEnvironment);
             var appCache = new DictionaryAppCache();
             var domainCache = new DomainCache(ServiceContext.DomainService, DefaultCultureAccessor);
             var publishedShapshot = new PublishedSnapshot(

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -20,7 +20,7 @@ namespace Umbraco.Core.Services.Implement
         private readonly IServerRegistrationRepository _serverRegistrationRepository;
 
         private static readonly string CurrentServerIdentityValue = NetworkHelper.MachineName // eg DOMAIN\SERVER
-                                                            + "/" + HttpRuntime.AppDomainAppId; // eg /LM/S3SVC/11/ROOT
+                                                            + "/" + Current.HostingEnvironment.ApplicationId; // eg /LM/S3SVC/11/ROOT
 
         private ServerRole _currentServerRole = ServerRole.Unknown;
 

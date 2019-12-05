@@ -1,7 +1,7 @@
 ﻿using Serilog.Core;
 using Serilog.Events;
 using System;
-using System.Web;
+using Umbraco.Net;
 
 namespace Umbraco.Core.Logging.Serilog.Enrichers
 {
@@ -12,6 +12,13 @@ namespace Umbraco.Core.Logging.Serilog.Enrichers
     /// </summary>
     internal class HttpSessionIdEnricher : ILogEventEnricher
     {
+        private readonly Lazy<ISessionIdResolver> _sessionIdResolver;
+
+        public HttpSessionIdEnricher(Lazy<ISessionIdResolver> sessionIdResolver)
+        {
+            _sessionIdResolver = sessionIdResolver;
+        }
+
         /// <summary>
         /// The property name added to enriched log events.
         /// </summary>
@@ -23,15 +30,12 @@ namespace Umbraco.Core.Logging.Serilog.Enrichers
         /// <param name="propertyFactory">Factory for creating new properties to add to the event.</param>
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
         {
-            if (logEvent == null) throw new ArgumentNullException("logEvent");
+            if (logEvent == null) throw new ArgumentNullException(nameof(logEvent));
 
-            if (HttpContext.Current == null)
+            var sessionId = _sessionIdResolver.Value.SessionId;
+            if (sessionId is null)
                 return;
 
-            if (HttpContext.Current.Session == null)
-                return;
-
-            var sessionId = HttpContext.Current.Session.SessionID;
             var sessionIdProperty = new LogEventProperty(HttpSessionIdPropertyName, new ScalarValue(sessionId));
             logEvent.AddPropertyIfAbsent(sessionIdProperty);
         }

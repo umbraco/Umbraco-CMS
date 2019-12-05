@@ -6,10 +6,13 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Hosting;
+using System.Web.Configuration;
 using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security
 {
@@ -18,6 +21,13 @@ namespace Umbraco.Web.Security
     /// </summary>
     public abstract class MembershipProviderBase : MembershipProvider
     {
+        private readonly IHostingEnvironment _hostingEnvironment;
+
+        protected MembershipProviderBase(IHostingEnvironment hostingEnvironment)
+        {
+            _hostingEnvironment = hostingEnvironment;
+        }
+
         /// <summary>
         /// Providers can override this setting, default is 10
         /// </summary>
@@ -218,7 +228,7 @@ namespace Umbraco.Web.Security
 
             _applicationName = config["applicationName"];
             if (string.IsNullOrEmpty(_applicationName))
-                _applicationName = GetDefaultAppName();
+                _applicationName = GetDefaultAppName(_hostingEnvironment);
 
             //by default we will continue using the legacy encoding.
             UseLegacyEncoding = config.GetValue("useLegacyEncoding", DefaultUseLegacyEncoding);
@@ -549,11 +559,11 @@ namespace Umbraco.Web.Security
         /// Gets the name of the default app.
         /// </summary>
         /// <returns></returns>
-        internal static string GetDefaultAppName()
+        internal static string GetDefaultAppName(IHostingEnvironment hostingEnvironment)
         {
             try
             {
-                string applicationVirtualPath = HostingEnvironment.ApplicationVirtualPath;
+                string applicationVirtualPath = hostingEnvironment.ApplicationVirtualPath;
                 if (string.IsNullOrEmpty(applicationVirtualPath))
                 {
                     return "/";
@@ -668,14 +678,5 @@ namespace Umbraco.Web.Security
             return sb.ToString();
         }
 
-        /// <summary>
-        /// Returns the current request IP address for logging if there is one
-        /// </summary>
-        /// <returns></returns>
-        protected string GetCurrentRequestIpAddress()
-        {
-            var httpContext = HttpContext.Current == null ? (HttpContextBase)null : new HttpContextWrapper(HttpContext.Current);
-            return httpContext.GetCurrentRequestIpAddress();
-        }
     }
 }

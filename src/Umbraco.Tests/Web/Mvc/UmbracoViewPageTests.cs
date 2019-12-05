@@ -425,7 +425,9 @@ namespace Umbraco.Tests.Web.Mvc
                 null, null,
                 umbracoContextAccessor, null, null, null,
                 new TestDefaultCultureAccessor(),
-                Current.Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper(),
+                Current.Logger, TestObjects.GetGlobalSettings(),
+                TestHelper.GetHostingEnvironment(),
+                new SiteDomainHelper(),
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 null, true, false
                 ); // no events

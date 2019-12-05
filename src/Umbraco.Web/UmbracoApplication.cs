@@ -2,6 +2,7 @@
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Runtime;
@@ -13,9 +14,9 @@ namespace Umbraco.Web
     /// </summary>
     public class UmbracoApplication : UmbracoApplicationBase
     {
-        protected override IRuntime GetRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger)
+        protected override IRuntime GetRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
         {
-            return new WebRuntime(this, configs, umbracoVersion, ioHelper, logger);
+            return new WebRuntime(this, configs, umbracoVersion, ioHelper, logger, profiler, hostingEnvironment, backOfficeInfo);
         }
 
         /// <summary>

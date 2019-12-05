@@ -52,7 +52,7 @@ namespace Umbraco.Tests.PublishedContent
 
             var configs = TestHelper.GetConfigs();
             Mock.Get(factory).Setup(x => x.GetInstance(typeof(Configs))).Returns(configs);
-            var globalSettings = new GlobalSettings(IOHelper.Default);
+            var globalSettings = new GlobalSettings(TestHelper.IOHelper);
             configs.Add(SettingsForTests.GenerateMockUmbracoSettings);
             configs.Add<IGlobalSettings>(() => globalSettings);
 
@@ -205,7 +205,8 @@ namespace Umbraco.Tests.PublishedContent
                 Mock.Of<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }),
-                typeFinder);
+                typeFinder,
+                TestHelper.GetHostingEnvironment());
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();

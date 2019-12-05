@@ -17,6 +17,7 @@ using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
+using Umbraco.Net;
 using Umbraco.Web.Composing;
 using Constants = Umbraco.Core.Constants;
 
@@ -41,7 +42,8 @@ namespace Umbraco.Web.Security
             IContentSection contentSettings,
             IGlobalSettings globalSettings,
             // TODO: This could probably be optional?
-            IPasswordConfiguration passwordConfiguration)
+            IPasswordConfiguration passwordConfiguration,
+            IIpResolver ipResolver)
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
 
@@ -55,7 +57,8 @@ namespace Umbraco.Web.Security
                     mapper,
                     contentSettings,
                     globalSettings,
-                    passwordConfiguration));
+                    passwordConfiguration,
+                    ipResolver));
 
             app.SetBackOfficeUserManagerType<BackOfficeUserManager, BackOfficeIdentityUser>();
 
@@ -72,13 +75,15 @@ namespace Umbraco.Web.Security
         /// <param name="userMembershipProvider"></param>
         /// <param name="customUserStore"></param>
         /// <param name="contentSettings"></param>
+        /// <param name="ipResolver"></param>
         public static void ConfigureUserManagerForUmbracoBackOffice(this IAppBuilder app,
             IRuntimeState runtimeState,
             IContentSection contentSettings,
             IGlobalSettings globalSettings,
             BackOfficeUserStore customUserStore,
             // TODO: This could probably be optional?
-            IPasswordConfiguration passwordConfiguration)
+            IPasswordConfiguration passwordConfiguration,
+            IIpResolver ipResolver)
         {
             if (runtimeState == null) throw new ArgumentNullException(nameof(runtimeState));
             if (customUserStore == null) throw new ArgumentNullException(nameof(customUserStore));
@@ -89,7 +94,8 @@ namespace Umbraco.Web.Security
                     options,
                     customUserStore,
                     contentSettings,
-                    passwordConfiguration));
+                    passwordConfiguration,
+                    ipResolver));
 
             app.SetBackOfficeUserManagerType<BackOfficeUserManager, BackOfficeIdentityUser>();
 

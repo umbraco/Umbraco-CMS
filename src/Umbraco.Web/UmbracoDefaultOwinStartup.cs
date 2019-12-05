@@ -7,6 +7,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
+using Umbraco.Net;
 using Umbraco.Web;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Security;
@@ -31,6 +32,7 @@ namespace Umbraco.Web
         protected IRuntimeState RuntimeState => Core.Composing.Current.RuntimeState;
         protected ServiceContext Services => Current.Services;
         protected UmbracoMapper Mapper => Current.Mapper;
+        protected IIpResolver IpResolver => Current.IpResolver;
 
         /// <summary>
         /// Main startup method
@@ -86,7 +88,8 @@ namespace Umbraco.Web
                 Mapper,
                 UmbracoSettings.Content,
                 GlobalSettings,
-                UserPasswordConfig);
+                UserPasswordConfig,
+                IpResolver);
         }
 
         /// <summary>

@@ -8,6 +8,7 @@ using System.Xml;
 using NPoco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -43,6 +44,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private readonly IMemberRepository _memberRepository;
         private readonly IGlobalSettings _globalSettings;
         private readonly IEntityXmlSerializer _entitySerializer;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private XmlStoreFilePersister _persisterTask;
         private volatile bool _released;
         private bool _withRepositoryEvents;
@@ -61,8 +63,8 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         /// </summary>
         /// <remarks>The default constructor will boot the cache, load data from file or database, /// wire events in order to manage changes, etc.</remarks>
         public XmlStore(IContentTypeService contentTypeService, IContentService contentService, IScopeProvider scopeProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache,
-            IPublishedSnapshotAccessor publishedSnapshotAccessor, MainDom mainDom, IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository, IGlobalSettings globalSettings, IEntityXmlSerializer entitySerializer)
-            : this(contentTypeService, contentService, scopeProvider, routesCache, contentTypeCache, publishedSnapshotAccessor, mainDom, false, false, documentRepository, mediaRepository, memberRepository, globalSettings, entitySerializer)
+            IPublishedSnapshotAccessor publishedSnapshotAccessor, MainDom mainDom, IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository, IGlobalSettings globalSettings, IEntityXmlSerializer entitySerializer, IHostingEnvironment hostingEnvironment)
+            : this(contentTypeService, contentService, scopeProvider, routesCache, contentTypeCache, publishedSnapshotAccessor, mainDom, false, false, documentRepository, mediaRepository, memberRepository, globalSettings, entitySerializer, hostingEnvironment)
         { }
 
         // internal for unit tests
@@ -70,7 +72,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         // TODO: er, we DO have a DB?
         internal XmlStore(IContentTypeService contentTypeService, IContentService contentService, IScopeProvider scopeProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache,
             IPublishedSnapshotAccessor publishedSnapshotAccessor, MainDom mainDom,
-            bool testing, bool enableRepositoryEvents, IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository, IGlobalSettings globalSettings, IEntityXmlSerializer entitySerializer)
+            bool testing, bool enableRepositoryEvents, IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository, IGlobalSettings globalSettings, IEntityXmlSerializer entitySerializer, IHostingEnvironment hostingEnvironment)
         {
             if (testing == false)
                 EnsureConfigurationIsValid();
@@ -86,7 +88,9 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             _memberRepository = memberRepository;
             _globalSettings = globalSettings;
             _entitySerializer = entitySerializer;
-            _xmlFileName = Current.IOHelper.MapPath(SystemFiles.GetContentCacheXml(_globalSettings));
+            _hostingEnvironment = hostingEnvironment;
+
+            _xmlFileName = Current.IOHelper.MapPath(SystemFiles.GetContentCacheXml(_hostingEnvironment));
 
             if (testing)
             {
@@ -103,28 +107,28 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         // internal for unit tests
         // initialize with an xml document
         // no events, no file nor db, no config check
-        internal XmlStore(XmlDocument xmlDocument, IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository)
+        internal XmlStore(XmlDocument xmlDocument, IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository, IHostingEnvironment hostingEnvironment)
         {
             _xmlDocument = xmlDocument;
             _documentRepository = documentRepository;
             _mediaRepository = mediaRepository;
             _memberRepository = memberRepository;
             _xmlFileEnabled = false;
-            _xmlFileName = Current.IOHelper.MapPath(SystemFiles.GetContentCacheXml(Current.Configs.Global()));
+            _xmlFileName = Current.IOHelper.MapPath(SystemFiles.GetContentCacheXml(hostingEnvironment));
             // do not plug events, we may not have what it takes to handle them
         }
 
         // internal for unit tests
         // initialize with a function returning an xml document
         // no events, no file nor db, no config check
-        internal XmlStore(Func<XmlDocument> getXmlDocument, IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository)
+        internal XmlStore(Func<XmlDocument> getXmlDocument, IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository, IHostingEnvironment hostingEnvironment)
         {
             _documentRepository = documentRepository;
             _mediaRepository = mediaRepository;
             _memberRepository = memberRepository;
             GetXmlDocument = getXmlDocument ?? throw new ArgumentNullException(nameof(getXmlDocument));
             _xmlFileEnabled = false;
-            _xmlFileName = Current.IOHelper.MapPath(SystemFiles.GetContentCacheXml(Current.Configs.Global()));
+            _xmlFileName = Current.IOHelper.MapPath(SystemFiles.GetContentCacheXml(hostingEnvironment));
             // do not plug events, we may not have what it takes to handle them
         }
 

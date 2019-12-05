@@ -8,6 +8,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Dashboards;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Migrations.PostMigrations;
 using Umbraco.Web.Migrations.PostMigrations;
 using Umbraco.Core.Models.PublishedContent;
@@ -15,6 +16,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Services;
+using Umbraco.Net;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing.CompositionExtensions;
@@ -23,6 +25,7 @@ using Umbraco.Web.Dashboards;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
+using Umbraco.Web.Hosting;
 using Umbraco.Web.Macros;
 using Umbraco.Web.Media.EmbedProviders;
 using Umbraco.Web.Models.PublishedContent;
@@ -53,6 +56,10 @@ namespace Umbraco.Web.Runtime
             base.Compose(composition);
 
             composition.Register<UmbracoInjectedModule>();
+            composition.Register<IIpResolver, AspNetIpResolver>();
+            composition.Register<ISessionIdResolver, AspNetSessionIdResolver>();
+            composition.Register<IHostingEnvironment, AspNetHostingEnvironment>();
+            composition.Register<IBackOfficeInfo, AspNetBackOfficeInfo>();
 
             composition.RegisterUnique<IHttpContextAccessor, AspNetHttpContextAccessor>(); // required for hybrid accessors
 
@@ -72,7 +79,7 @@ namespace Umbraco.Web.Runtime
             // register accessors for cultures
             composition.RegisterUnique<IDefaultCultureAccessor, DefaultCultureAccessor>();
             composition.RegisterUnique<IVariationContextAccessor, HybridVariationContextAccessor>();
-            
+
             // register the http context and umbraco context accessors
             // we *should* use the HttpContextUmbracoContextAccessor, however there are cases when
             // we have no http context, eg when booting Umbraco or in background threads, so instead
@@ -265,7 +272,7 @@ namespace Umbraco.Web.Runtime
                 .Append<Issuu>()
                 .Append<Hulu>()
                 .Append<Giphy>();
-            
+
 
             // replace with web implementation
             composition.RegisterUnique<IPublishedSnapshotRebuilder, Migrations.PostMigrations.PublishedSnapshotRebuilder>();

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Web;
 using System.Xml.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -128,14 +127,6 @@ namespace Umbraco.Core
         }
 
         #region SetValue for setting file contents
-
-        /// <summary>
-        /// Sets the posted file value of a property.
-        /// </summary>
-        public static void SetValue(this IContentBase content, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, string propertyTypeAlias, string filename, HttpPostedFileBase postedFile, string culture = null, string segment = null)
-        {
-            content.SetValue(contentTypeBaseServiceProvider, propertyTypeAlias, postedFile.FileName, postedFile.InputStream, culture, segment);
-        }
 
         /// <summary>
         /// Sets the posted file value of a property.

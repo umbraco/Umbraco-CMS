@@ -2,6 +2,7 @@
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
@@ -15,6 +16,7 @@ using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
+using Umbraco.Net;
 
 namespace Umbraco.Core.Composing
 {
@@ -206,8 +208,12 @@ namespace Umbraco.Core.Composing
         public static IVariationContextAccessor VariationContextAccessor
             => Factory.GetInstance<IVariationContextAccessor>();
 
-        public static readonly IIOHelper IOHelper = Umbraco.Core.IO.IOHelper.Default;
+        public static IIOHelper IOHelper = new IOHelper();
 
+
+        public static IHostingEnvironment HostingEnvironment => Factory.GetInstance<IHostingEnvironment>();
+        public static IBackOfficeInfo BackOfficeInfo => Factory.GetInstance<IBackOfficeInfo>();
+        public static ISessionIdResolver SessionIdResolver  => Factory.GetInstance<ISessionIdResolver>();
 
         #endregion
     }
