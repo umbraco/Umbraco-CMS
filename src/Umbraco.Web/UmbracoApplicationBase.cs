@@ -10,6 +10,7 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Hosting;
 
 namespace Umbraco.Web

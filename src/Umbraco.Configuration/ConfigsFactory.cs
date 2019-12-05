@@ -13,6 +13,7 @@ namespace Umbraco.Core.Configuration
         }
 
         public IHostingSettings HostingSettings { get; } = new HostingSettings();
+        public IUmbracoSettingsSection UmbracoSettings { get; }
 
         public Configs Create(IIOHelper ioHelper)
         {

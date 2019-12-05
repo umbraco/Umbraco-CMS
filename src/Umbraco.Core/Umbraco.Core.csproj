@@ -159,7 +159,6 @@
     <Compile Include="Composing\Current.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="Composing\LightInject\MixedLightInjectScopeManagerProvider.cs" />
-    <Compile Include="IO\IOHelper.cs" />
     <Compile Include="Logging\Viewer\LogTimePeriod.cs" />
     <Compile Include="Manifest\IPackageManifest.cs" />
     <Compile Include="Manifest\ManifestParser.cs" />

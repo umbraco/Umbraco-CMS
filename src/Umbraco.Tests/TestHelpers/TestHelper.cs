@@ -20,6 +20,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Net;
 using Umbraco.Web;
@@ -81,6 +82,8 @@ namespace Umbraco.Tests.TestHelpers
                 return Path.GetDirectoryName(path);
             }
         }
+
+        public static IShortStringHelper ShortStringHelper => new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
 
         public static IIOHelper IOHelper = new IOHelper(GetHostingEnvironment());
 

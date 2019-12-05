@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.IO
 {
@@ -15,20 +16,18 @@ namespace Umbraco.Core.IO
     public class MediaFileSystem : FileSystemWrapper, IMediaFileSystem
     {
         private readonly IMediaPathScheme _mediaPathScheme;
-        private readonly IContentSection _contentConfig;
         private readonly ILogger _logger;
-        private readonly IIOHelper _ioHelper;
+        private readonly IShortStringHelper _shortStringHelper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MediaFileSystem"/> class.
         /// </summary>
-        public MediaFileSystem(IFileSystem innerFileSystem, IContentSection contentConfig, IMediaPathScheme mediaPathScheme, ILogger logger, IIOHelper ioHelper)
+        public MediaFileSystem(IFileSystem innerFileSystem, IMediaPathScheme mediaPathScheme, ILogger logger, IShortStringHelper shortStringHelper)
             : base(innerFileSystem)
         {
-            _contentConfig = contentConfig;
             _mediaPathScheme = mediaPathScheme;
             _logger = logger;
-            _ioHelper = ioHelper;
+            _shortStringHelper = shortStringHelper;
         }
 
         /// <inheritoc />
@@ -65,7 +64,7 @@ namespace Umbraco.Core.IO
         {
             filename = Path.GetFileName(filename);
             if (filename == null) throw new ArgumentException("Cannot become a safe filename.", nameof(filename));
-            filename = _ioHelper.SafeFileName(filename.ToLowerInvariant());
+            filename = _shortStringHelper.CleanStringForSafeFileName(filename.ToLowerInvariant());
 
             return _mediaPathScheme.GetFilePath(this, cuid, puid, filename);
         }
@@ -75,7 +74,7 @@ namespace Umbraco.Core.IO
         {
             filename = Path.GetFileName(filename);
             if (filename == null) throw new ArgumentException("Cannot become a safe filename.", nameof(filename));
-            filename = _ioHelper.SafeFileName(filename.ToLowerInvariant());
+            filename = _shortStringHelper.CleanStringForSafeFileName(filename.ToLowerInvariant());
 
             return _mediaPathScheme.GetFilePath(this, cuid, puid, filename, prevpath);
         }

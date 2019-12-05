@@ -59,13 +59,6 @@ namespace Umbraco.Core.IO
         /// <param name="rootPath"></param>
         void SetRootDirectory(string rootPath);
 
-        /// <summary>
-        /// Check to see if filename passed has any special chars in it and strips them to create a safe filename.  Used to overcome an issue when Umbraco is used in IE in an intranet environment.
-        /// </summary>
-        /// <param name="filePath">The filename passed to the file handler from the upload field.</param>
-        /// <returns>A safe filename without any path specific chars.</returns>
-        string SafeFileName(string filePath);
-
         void EnsurePathExists(string path);
 
         /// <summary>

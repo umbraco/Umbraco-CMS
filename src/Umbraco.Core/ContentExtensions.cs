@@ -11,6 +11,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core
 {
@@ -136,9 +137,9 @@ namespace Umbraco.Core
             if (filename == null || filestream == null) return;
 
             // get a safe & clean filename
-            var ioHelper = Current.Factory.GetInstance<IIOHelper>();
+            var shortStringHelper = Current.Factory.GetInstance<IShortStringHelper>();
 
-            filename = ioHelper.SafeFileName(filename);
+            filename = shortStringHelper.CleanStringForSafeFileName(filename);
             if (string.IsNullOrWhiteSpace(filename)) return;
             filename = filename.ToLower();
 

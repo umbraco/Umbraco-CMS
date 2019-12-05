@@ -16,6 +16,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Models;
@@ -78,10 +79,9 @@ namespace Umbraco.Tests.PropertyEditors
 
                 var logger = Mock.Of<ILogger>();
                 var scheme = Mock.Of<IMediaPathScheme>();
-                var config = Mock.Of<IContentSection>();
-                var ioHelper = Mock.Of<IIOHelper>();
+                var shortStringHelper = Mock.Of<IShortStringHelper>();
 
-                var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), config, scheme, logger, ioHelper);
+                var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), scheme, logger, shortStringHelper);
 
                 var dataTypeService = new TestObjects.TestDataTypeService(
                     new DataType(new ImageCropperPropertyEditor(Mock.Of<ILogger>(), mediaFileSystem, Mock.Of<IContentSection>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), TestHelper.IOHelper)) { Id = 1 });

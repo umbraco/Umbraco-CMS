@@ -104,6 +104,7 @@ namespace Umbraco.Tests.Testing
         protected ILogger Logger => Factory.GetInstance<ILogger>();
 
         protected IIOHelper IOHelper { get; private set; }
+        protected IShortStringHelper ShortStringHelper { get; private set; }
         protected IUmbracoVersion UmbracoVersion { get; private set; }
 
         protected ITypeFinder TypeFinder { get; private set; }
@@ -143,6 +144,7 @@ namespace Umbraco.Tests.Testing
             var (logger, profiler) = GetLoggers(Options.Logger);
             var proflogger = new ProfilingLogger(logger, profiler);
             IOHelper = TestHelper.IOHelper;
+            ShortStringHelper = TestHelper.ShortStringHelper;
 
             TypeFinder = new TypeFinder(logger);
             var appCaches = GetAppCaches();
@@ -160,6 +162,7 @@ namespace Umbraco.Tests.Testing
             Composition = new Composition(register, typeLoader, proflogger, ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
 
 
+            Composition.RegisterUnique(ShortStringHelper);
             Composition.RegisterUnique(IOHelper);
             Composition.RegisterUnique(UmbracoVersion);
             Composition.RegisterUnique(TypeFinder);
@@ -364,10 +367,8 @@ namespace Umbraco.Tests.Testing
 
             var logger = Mock.Of<ILogger>();
             var scheme = Mock.Of<IMediaPathScheme>();
-            var config = Mock.Of<IContentSection>();
-            var ioHelper = Mock.Of<IIOHelper>();
 
-            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), config, scheme, logger, ioHelper);
+            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), scheme, logger, ShortStringHelper);
             Composition.RegisterUnique<IMediaFileSystem>(factory => mediaFileSystem);
 
             // no factory (noop)
