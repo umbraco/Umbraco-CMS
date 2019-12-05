@@ -13,11 +13,6 @@ namespace Umbraco.Core.PropertyEditors.Validators
         private readonly ILocalizedTextService _textService;
         const string ValueCannotBeNull = "Value cannot be null";
         const string ValueCannotBeEmpty = "Value cannot be empty";
-
-        public RequiredValidator() : this(Current.HasFactory ? Current.Services.TextService : null)
-        {
-        }
-
         public RequiredValidator(ILocalizedTextService textService)
         {
             _textService = textService;

@@ -7,7 +7,7 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Manifest
 {
-    internal class ManifestWatcher : DisposableObjectSlim
+    public class ManifestWatcher : DisposableObjectSlim
     {
         private static readonly object Locker = new object();
         private static volatile bool _isRestarting;

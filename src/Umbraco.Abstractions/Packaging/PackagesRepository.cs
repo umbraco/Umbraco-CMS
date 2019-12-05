@@ -5,7 +5,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Xml.Linq;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -19,7 +18,7 @@ namespace Umbraco.Core.Packaging
     /// <summary>
     /// Manages the storage of installed/created package definitions
     /// </summary>
-    internal class PackagesRepository : ICreatedPackagesRepository, IInstalledPackagesRepository
+    public class PackagesRepository : ICreatedPackagesRepository, IInstalledPackagesRepository
     {
         private readonly IContentService _contentService;
         private readonly IContentTypeService _contentTypeService;
@@ -61,6 +60,7 @@ namespace Umbraco.Core.Packaging
             IIOHelper ioHelper,
             IEntityXmlSerializer serializer, ILogger logger,
             IUmbracoVersion umbracoVersion,
+            IGlobalSettings globalSettings,
             string packageRepositoryFileName,
             string tempFolderPath = null, string packagesFolderPath = null, string mediaFolderPath = null)
         {
@@ -78,7 +78,7 @@ namespace Umbraco.Core.Packaging
 
             _tempFolderPath = tempFolderPath ?? Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "PackageFiles";
             _packagesFolderPath = packagesFolderPath ?? Constants.SystemDirectories.Packages;
-            _mediaFolderPath = mediaFolderPath ?? Current.Configs.Global().UmbracoMediaPath + "/created-packages";
+            _mediaFolderPath = mediaFolderPath ?? globalSettings.UmbracoMediaPath + "/created-packages";
 
             _parser = new PackageDefinitionXmlParser(logger, umbracoVersion);
             _umbracoVersion = umbracoVersion;

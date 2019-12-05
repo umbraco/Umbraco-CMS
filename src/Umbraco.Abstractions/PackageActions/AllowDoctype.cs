@@ -1,8 +1,8 @@
 ﻿using System.Collections;
 using System.Linq;
 using System.Xml.Linq;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.PackageActions
 {
@@ -12,6 +12,12 @@ namespace Umbraco.Core.PackageActions
     /// </summary>
     public class AllowDoctype : IPackageAction
     {
+        private readonly IContentTypeService _contentTypeService;
+
+        public AllowDoctype(IContentTypeService contentTypeService)
+        {
+            _contentTypeService = contentTypeService;
+        }
 
         #region IPackageAction Members
 
@@ -31,8 +37,8 @@ namespace Umbraco.Core.PackageActions
 
             //global::umbraco.cms.businesslogic.ContentType ct = global::umbraco.cms.businesslogic.ContentType.GetByAlias(doctypeName);
             //global::umbraco.cms.businesslogic.ContentType parentct = global::umbraco.cms.businesslogic.ContentType.GetByAlias(parentDoctypeName);
-            var ct = Current.Services.ContentTypeService.Get(doctypeName);
-            var parentct = Current.Services.ContentTypeService.Get(parentDoctypeName);
+            var ct = _contentTypeService.Get(doctypeName);
+            var parentct = _contentTypeService.Get(parentDoctypeName);
 
             if (ct != null && parentct != null)
             {
@@ -57,7 +63,7 @@ namespace Umbraco.Core.PackageActions
                     var so = 0;
                     parentct.AllowedContentTypes = ids.Select(x => new ContentTypeSort(x, so++));
                     //parentct.Save();
-                    Current.Services.ContentTypeService.Save(parentct);
+                    _contentTypeService.Save(parentct);
                     return true;
                 }
             }
@@ -85,6 +91,6 @@ namespace Umbraco.Core.PackageActions
         }
 
         #endregion
-        
+
     }
 }

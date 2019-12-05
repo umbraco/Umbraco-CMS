@@ -301,12 +301,17 @@ namespace Umbraco.Core.Configuration
             {
                 try
                 {
-                    return int.Parse(ConfigurationManager.AppSettings[Constants.AppSettings.VersionCheckPeriod]);
+                    var val = ConfigurationManager.AppSettings[Constants.AppSettings.VersionCheckPeriod];
+                    if (!(val is null))
+                    {
+                        return int.Parse(val);
+                    }
                 }
                 catch
                 {
-                    return 7;
+                    // Ignore
                 }
+                return 7;
             }
         }
 

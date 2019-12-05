@@ -2,15 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Umbraco.Core.PropertyEditors.Validators
 {
     /// <summary>
     /// A validator that validates a delimited set of values against a common regex
     /// </summary>
-    internal sealed class DelimitedValueValidator : IManifestValueValidator
+    public sealed class DelimitedValueValidator : IManifestValueValidator
     {
         /// <inheritdoc />
         public string ValidationName => "Delimited";
@@ -18,7 +16,8 @@ namespace Umbraco.Core.PropertyEditors.Validators
         /// <summary>
         /// Gets or sets the configuration, when parsed as <see cref="IManifestValueValidator"/>.
         /// </summary>
-        public JObject Configuration { get; set; }
+        public DelimitedValueValidatorConfig Configuration { get; set; }
+
 
         /// <inheritdoc />
         public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)
@@ -26,20 +25,8 @@ namespace Umbraco.Core.PropertyEditors.Validators
             // TODO: localize these!
             if (value != null)
             {
-                var delimiter = ",";
-                Regex regex = null;
-                if (Configuration is JObject jobject)
-                {
-                    if (jobject["delimiter"] != null)
-                    {
-                        delimiter = jobject["delimiter"].ToString();
-                    }
-                    if (jobject["pattern"] != null)
-                    {
-                        var regexPattern = jobject["pattern"].ToString();
-                        regex = new Regex(regexPattern);
-                    }
-                }
+                var delimiter = Configuration?.Delimiter ?? ",";
+                var regex = (Configuration?.Pattern != null) ? new Regex(Configuration.Pattern) : null;
 
                 var stringVal = value.ToString();
                 var split = stringVal.Split(new[] { delimiter }, StringSplitOptions.RemoveEmptyEntries);
@@ -62,5 +49,11 @@ namespace Umbraco.Core.PropertyEditors.Validators
                 }
             }
         }
+    }
+
+    public class DelimitedValueValidatorConfig
+    {
+        public string Delimiter { get; set; }
+        public string Pattern { get; set; }
     }
 }

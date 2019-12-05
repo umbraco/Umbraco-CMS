@@ -1,5 +1,5 @@
 ﻿using System.Xml.Linq;
-using Umbraco.Core.Composing;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.PackageActions
 {
@@ -9,6 +9,13 @@ namespace Umbraco.Core.PackageActions
     /// </summary>
     public class PublishRootDocument : IPackageAction
     {
+        private readonly IContentService _contentService;
+
+        public PublishRootDocument(IContentService contentService)
+        {
+            _contentService = contentService;
+        }
+
         #region IPackageAction Members
 
         /// <summary>
@@ -25,14 +32,14 @@ namespace Umbraco.Core.PackageActions
 
             string documentName = xmlData.AttributeValue<string>("documentName");
 
-            var rootDocs = Current.Services.ContentService.GetRootContent();
+            var rootDocs = _contentService.GetRootContent();
 
             foreach (var rootDoc in rootDocs)
             {
                 if (rootDoc.Name.Trim() == documentName.Trim() && rootDoc.ContentType != null)
                 {
                     // TODO: variants?
-                    Current.Services.ContentService.SaveAndPublishBranch(rootDoc, true);
+                    _contentService.SaveAndPublishBranch(rootDoc, true);
                     break;
                 }
             }
@@ -59,6 +66,6 @@ namespace Umbraco.Core.PackageActions
             return "publishRootDocument";
         }
         #endregion
-        
+
     }
 }

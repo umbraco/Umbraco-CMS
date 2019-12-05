@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Core.Deploy
 {
     /// <summary>
     /// Provides a base class to all artifacts.
     /// </summary>
+    [DataContract]
     public abstract class ArtifactBase<TUdi> : IArtifact
         where TUdi : Udi
     {
@@ -34,14 +35,16 @@ namespace Umbraco.Core.Deploy
             get { return Udi; }
         }
 
+        [DataMember]
         public TUdi Udi { get; set; }
 
-        [JsonIgnore]
+        [IgnoreDataMember]
         public string Checksum
         {
             get { return _checksum.Value; }
         }
 
+        [DataMember]
         public IEnumerable<ArtifactDependency> Dependencies
         {
             get { return _dependencies; }
@@ -50,7 +53,9 @@ namespace Umbraco.Core.Deploy
 
         #endregion
 
+        [DataMember]
         public string Name { get; set; }
+        [DataMember]
         public string Alias { get; set; }
     }
 }

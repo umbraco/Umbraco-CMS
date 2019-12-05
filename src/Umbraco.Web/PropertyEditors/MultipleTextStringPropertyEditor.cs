@@ -29,18 +29,24 @@ namespace Umbraco.Web.PropertyEditors
     public class MultipleTextStringPropertyEditor : DataEditor
     {
         private readonly IIOHelper _ioHelper;
+        private readonly IDataTypeService _dataTypeService;
+        private readonly ILocalizationService _localizationService;
+        private readonly ILocalizedTextService _localizedTextService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MultipleTextStringPropertyEditor"/> class.
         /// </summary>
-        public MultipleTextStringPropertyEditor(ILogger logger, IIOHelper ioHelper)
+        public MultipleTextStringPropertyEditor(ILogger logger, IIOHelper ioHelper, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService)
             : base(logger)
         {
             _ioHelper = ioHelper;
+            _dataTypeService = dataTypeService;
+            _localizationService = localizationService;
+            _localizedTextService = localizedTextService;
         }
 
         /// <inheritdoc />
-        protected override IDataValueEditor CreateValueEditor() => new MultipleTextStringPropertyValueEditor(Current.Services.DataTypeService, Current.Services.LocalizationService,Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new MultipleTextStringPropertyValueEditor(_dataTypeService, _localizationService,Attribute, _localizedTextService);
 
         /// <inheritdoc />
         protected override IConfigurationEditor CreateConfigurationEditor() => new MultipleTextStringConfigurationEditor(_ioHelper);
@@ -50,9 +56,13 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         internal class MultipleTextStringPropertyValueEditor : DataValueEditor
         {
-            public MultipleTextStringPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute)
+            private readonly ILocalizedTextService _localizedTextService;
+
+            public MultipleTextStringPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute, ILocalizedTextService localizedTextService)
                 : base(dataTypeService, localizationService, attribute)
-            { }
+            {
+                _localizedTextService = localizedTextService;
+            }
 
             /// <summary>
             /// The value passed in from the editor will be an array of simple objects so we'll need to parse them to get the string
@@ -112,11 +122,18 @@ namespace Umbraco.Web.PropertyEditors
             /// A custom FormatValidator is used as for multiple text strings, each string should individually be checked
             /// against the configured regular expression, rather than the JSON representing all the strings as a whole.
             /// </summary>
-            public override IValueFormatValidator FormatValidator => new MultipleTextStringFormatValidator();
+            public override IValueFormatValidator FormatValidator => new MultipleTextStringFormatValidator(_localizedTextService);
         }
 
         internal class MultipleTextStringFormatValidator : IValueFormatValidator
         {
+            private readonly ILocalizedTextService _localizedTextService;
+
+            public MultipleTextStringFormatValidator(ILocalizedTextService localizedTextService)
+            {
+                _localizedTextService = localizedTextService;
+            }
+
             public IEnumerable<ValidationResult> ValidateFormat(object value, string valueType, string format)
             {
                 var asArray = value as JArray;
@@ -128,7 +145,7 @@ namespace Umbraco.Web.PropertyEditors
                 var textStrings = asArray.OfType<JObject>()
                     .Where(x => x["value"] != null)
                     .Select(x => x["value"].Value<string>());
-                var textStringValidator = new RegexValidator();
+                var textStringValidator = new RegexValidator(_localizedTextService);
                 foreach (var textString in textStrings)
                 {
                     var validationResults = textStringValidator.ValidateFormat(textString, valueType, format).ToList();

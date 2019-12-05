@@ -20,14 +20,16 @@ namespace Umbraco.Core.PropertyEditors
     /// </summary>
     public class DataValueEditor : IDataValueEditor
     {
+        private readonly ILocalizedTextService _localizedTextService;
         protected IDataTypeService DataTypeService { get; }
         protected ILocalizationService LocalizationService { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataValueEditor"/> class.
         /// </summary>
-        public DataValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService) // for tests, and manifest
+        public DataValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService) // for tests, and manifest
         {
+            _localizedTextService = localizedTextService;
             ValueType = ValueTypes.String;
             Validators = new List<IValueValidator>();
             DataTypeService = dataTypeService;
@@ -110,12 +112,12 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Gets the validator used to validate the special property type -level "required".
         /// </summary>
-        public virtual IValueRequiredValidator RequiredValidator => new RequiredValidator(); //TODO: Pass in the ILocalizedTextService here and not rely on Current!
+        public virtual IValueRequiredValidator RequiredValidator => new RequiredValidator(_localizedTextService);
 
         /// <summary>
         /// Gets the validator used to validate the special property type -level "format".
         /// </summary>
-        public virtual IValueFormatValidator FormatValidator => new RegexValidator(); //TODO: Pass in the ILocalizedTextService here and not rely on Current!
+        public virtual IValueFormatValidator FormatValidator => new RegexValidator(_localizedTextService);
 
         /// <summary>
         /// If this is true than the editor will be displayed full width without a label

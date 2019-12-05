@@ -144,6 +144,10 @@
     <Compile Include="Composing\CompositionExtensions\Installer.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComponent.cs" />
+    <Compile Include="ContentApps\ContentAppFactoryCollection.cs" />
+    <Compile Include="ContentApps\ContentAppFactoryCollectionBuilder.cs" />
+    <Compile Include="ContentApps\ContentEditorContentAppFactory.cs" />
+    <Compile Include="ContentApps\ContentInfoContentAppFactory.cs" />
     <Compile Include="ContentApps\ListViewContentAppFactory.cs" />
     <Compile Include="Dashboards\ContentDashboard.cs" />
     <Compile Include="Dashboards\DashboardCollection.cs" />
@@ -306,10 +310,6 @@
     <Compile Include="Models\ContentEditing\SearchResult.cs" />
     <Compile Include="Models\ContentEditing\SearchResults.cs" />
     <Compile Include="Models\ContentEditing\UnpublishContent.cs" />
-    <Compile Include="ContentApps\ContentAppFactoryCollection.cs" />
-    <Compile Include="ContentApps\ContentAppFactoryCollectionBuilder.cs" />
-    <Compile Include="ContentApps\ContentEditorContentAppFactory.cs" />
-    <Compile Include="ContentApps\ContentInfoContentAppFactory.cs" />
     <Compile Include="Services\ITreeService.cs" />
     <Compile Include="Services\ISectionService.cs" />
     <Compile Include="Sections\SectionCollection.cs" />

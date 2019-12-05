@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Newtonsoft.Json;
+using System.Runtime.Serialization;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 
@@ -16,6 +16,7 @@ namespace Umbraco.Core.PropertyEditors
     /// </remarks>
     [DebuggerDisplay("{" + nameof(DebuggerDisplay) + "(),nq}")]
     [HideFromTypeFinder]
+    [DataContract]
     public class DataEditor : IDataEditor
     {
         private IDictionary<string, object> _defaultConfiguration;
@@ -55,27 +56,27 @@ namespace Umbraco.Core.PropertyEditors
         protected ILogger Logger { get; }
 
         /// <inheritdoc />
-        [JsonProperty("alias", Required = Required.Always)]
+        [DataMember(Name = "alias", IsRequired = true)]
         public string Alias { get; internal set; }
 
         /// <inheritdoc />
-        [JsonIgnore]
+        [IgnoreDataMember]
         public EditorType Type { get; }
 
         /// <inheritdoc />
-        [JsonProperty("name", Required = Required.Always)]
+        [DataMember(Name = "name", IsRequired = true)]
         public string Name { get; internal set; }
 
         /// <inheritdoc />
-        [JsonProperty("icon")]
+        [DataMember(Name = "icon")]
         public string Icon { get; internal set; }
 
         /// <inheritdoc />
-        [JsonProperty("group")]
+        [DataMember(Name = "group")]
         public string Group { get; internal set; }
 
         /// <inheritdoc />
-        [JsonIgnore]
+        [IgnoreDataMember]
         public bool IsDeprecated { get; }
 
         /// <inheritdoc />
@@ -121,7 +122,7 @@ namespace Umbraco.Core.PropertyEditors
         /// Gets or sets an explicit value editor.
         /// </summary>
         /// <remarks>Used for manifest data editors.</remarks>
-        [JsonProperty("editor")]
+        [DataMember(Name = "editor")]
         public IDataValueEditor ExplicitValueEditor { get; set; }
 
         /// <inheritdoc />
@@ -139,11 +140,11 @@ namespace Umbraco.Core.PropertyEditors
         /// Gets or sets an explicit configuration editor.
         /// </summary>
         /// <remarks>Used for manifest data editors.</remarks>
-        [JsonProperty("config")]
+        [DataMember(Name = "config")]
         public IConfigurationEditor ExplicitConfigurationEditor { get; set; }
 
         /// <inheritdoc />
-        [JsonProperty("defaultConfig")]
+        [DataMember(Name = "defaultConfig")]
         public IDictionary<string, object> DefaultConfiguration
         {
             // for property value editors, get the ConfigurationEditor.DefaultConfiguration

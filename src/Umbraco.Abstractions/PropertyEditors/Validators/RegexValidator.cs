@@ -27,7 +27,7 @@ namespace Umbraco.Core.PropertyEditors.Validators
         /// and the regular expression is supplied at validation time. This constructor is also used when
         /// the validator is used as an <see cref="IManifestValueValidator"/> and the regular expression
         /// is supplied via the <see cref="Configuration"/> method.</remarks>
-        public RegexValidator() : this(Current.HasFactory ? Current.Services.TextService : null, null)
+        public RegexValidator(ILocalizedTextService textService) : this(textService, null)
         { }
 
         /// <summary>

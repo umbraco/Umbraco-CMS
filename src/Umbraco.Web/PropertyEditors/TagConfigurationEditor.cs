@@ -6,6 +6,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -14,10 +15,10 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     public class TagConfigurationEditor : ConfigurationEditor<TagConfiguration>
     {
-        public TagConfigurationEditor(ManifestValueValidatorCollection validators, IIOHelper ioHelper) : base(ioHelper)
+        public TagConfigurationEditor(ManifestValueValidatorCollection validators, IIOHelper ioHelper, ILocalizedTextService localizedTextService) : base(ioHelper)
         {
-            Field(nameof(TagConfiguration.Group)).Validators.Add(new RequiredValidator());
-            Field(nameof(TagConfiguration.StorageType)).Validators.Add(new RequiredValidator());
+            Field(nameof(TagConfiguration.Group)).Validators.Add(new RequiredValidator(localizedTextService));
+            Field(nameof(TagConfiguration.StorageType)).Validators.Add(new RequiredValidator(localizedTextService));
         }
 
         public override Dictionary<string, object> ToConfigurationEditor(TagConfiguration configuration)

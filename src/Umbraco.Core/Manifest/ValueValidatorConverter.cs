@@ -26,7 +26,7 @@ namespace Umbraco.Core.Manifest
             if (string.IsNullOrWhiteSpace(type))
                 throw new InvalidOperationException("Could not get the type of the validator.");
 
-            return _validators.Create(type);
+            return _validators.GetByName(type);
 
             // jObject["configuration"] is going to be deserialized in a Configuration property, if any
         }
