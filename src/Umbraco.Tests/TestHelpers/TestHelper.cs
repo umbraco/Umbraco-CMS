@@ -41,7 +41,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public static Configs GetConfigs()
         {
-            return GetConfigsFactory().Create();
+            return GetConfigsFactory().Create(IOHelper);
         }
         public static IRuntimeState GetRuntimeState()
         {
@@ -64,7 +64,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public static IConfigsFactory GetConfigsFactory()
         {
-            return new ConfigsFactory(IOHelper);
+            return new ConfigsFactory();
         }
 
         /// <summary>
@@ -313,7 +313,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public static IHostingEnvironment GetHostingEnvironment()
         {
-            return new AspNetHostingEnvironment(new Lazy<IGlobalSettings>(() => SettingsForTests.GetDefaultGlobalSettings()));
+            return new AspNetHostingEnvironment(SettingsForTests.GetDefaultHostingSettings());
         }
 
         public static IIpResolver GetIpResolver()

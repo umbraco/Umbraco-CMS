@@ -10,12 +10,12 @@ namespace Umbraco.Web.Hosting
 {
     public class AspNetHostingEnvironment : IHostingEnvironment
     {
-        private readonly Lazy<IGlobalSettings> _globalSettings;
+        private readonly IHostingSettings _hostingSettings;
         private string _localTempPath;
 
-        public AspNetHostingEnvironment(Lazy<IGlobalSettings> globalSettings)
+        public AspNetHostingEnvironment(IHostingSettings hostingSettings)
         {
-            _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
+            _hostingSettings = hostingSettings ?? throw new ArgumentNullException(nameof(hostingSettings));
             SiteName = HostingEnvironment.SiteName;
             ApplicationId = HostingEnvironment.ApplicationID;
             ApplicationPhysicalPath = HostingEnvironment.ApplicationPhysicalPath;
@@ -27,7 +27,7 @@ namespace Umbraco.Web.Hosting
         public string ApplicationPhysicalPath { get; }
 
         public string ApplicationVirtualPath { get; }
-        public bool IsDebugMode => HttpContext.Current?.IsDebuggingEnabled ?? _globalSettings.Value.DebugMode;
+        public bool IsDebugMode => HttpContext.Current?.IsDebuggingEnabled ?? _hostingSettings.DebugMode;
         /// <inheritdoc/>
         public bool IsHosted => (HttpContext.Current != null || HostingEnvironment.IsHosted);
         public string MapPath(string path)
@@ -49,7 +49,7 @@ namespace Umbraco.Web.Hosting
                 if (_localTempPath != null)
                     return _localTempPath;
 
-                switch (_globalSettings.Value.LocalTempStorageLocation)
+                switch (_hostingSettings.LocalTempStorageLocation)
                 {
                     case LocalTempStorage.AspNetTemp:
                         return _localTempPath = System.IO.Path.Combine(HttpRuntime.CodegenDir, "UmbracoData");

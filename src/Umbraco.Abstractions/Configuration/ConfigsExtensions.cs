@@ -19,6 +19,9 @@ namespace Umbraco.Core
         public static IGlobalSettings Global(this Configs configs)
             => configs.GetConfig<IGlobalSettings>();
 
+        public static IHostingSettings Hosting(this Configs configs)
+            => configs.GetConfig<IHostingSettings>();
+
         public static IConnectionStrings ConnectionStrings(this Configs configs)
             => configs.GetConfig<IConnectionStrings>();
 

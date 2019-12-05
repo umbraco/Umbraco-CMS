@@ -33,16 +33,19 @@ namespace Umbraco.Web
         {
 
 
-            IGlobalSettings globalSettings = null; //TODO, cleanup this circular dependency
-            _hostingEnvironment = new AspNetHostingEnvironment(new Lazy<IGlobalSettings>(() => globalSettings));
+
+            var configFactory = new ConfigsFactory();
+
+            var hostingSettings = configFactory.HostingSettings;
+
+            _hostingEnvironment = new AspNetHostingEnvironment(hostingSettings);
             _ioHelper = new IOHelper(_hostingEnvironment);
-            _configs = new ConfigsFactory(_ioHelper).Create();
-            globalSettings = _configs.Global();
+            _configs = configFactory.Create(_ioHelper);
 
             _profiler = new LogProfiler(_logger);
 
             _logger = SerilogLogger.CreateWithDefaultConfiguration(_hostingEnvironment, new AspNetSessionIdResolver(), () => _factory);
-            _backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, _ioHelper, _configs.Settings(), _logger);
+            _backOfficeInfo = new AspNetBackOfficeInfo(_configs.Global(), _ioHelper, _configs.Settings(), _logger);
         }
 
         protected UmbracoApplicationBase(ILogger logger, Configs configs, IIOHelper ioHelper, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)

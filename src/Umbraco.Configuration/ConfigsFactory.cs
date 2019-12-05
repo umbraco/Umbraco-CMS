@@ -7,20 +7,18 @@ namespace Umbraco.Core.Configuration
 {
     public class ConfigsFactory : IConfigsFactory
     {
-        private readonly IIOHelper _ioHelper;
 
-        public ConfigsFactory(IIOHelper ioHelper)
+        public ConfigsFactory()
         {
-            _ioHelper = ioHelper;
-            GlobalSettings = new GlobalSettings(_ioHelper);
         }
 
-        public IGlobalSettings GlobalSettings { get; }
+        public IHostingSettings HostingSettings { get; } = new HostingSettings();
 
-        public Configs Create()
+        public Configs Create(IIOHelper ioHelper)
         {
             var configs =  new Configs(section => ConfigurationManager.GetSection(section));
-            configs.Add<IGlobalSettings>(() => GlobalSettings);
+            configs.Add<IGlobalSettings>(() => new GlobalSettings(ioHelper));
+            configs.Add<IHostingSettings>(() => HostingSettings);
 
             configs.Add<IUmbracoSettingsSection>("umbracoConfiguration/settings");
             configs.Add<IHealthChecks>("umbracoConfiguration/HealthChecks");
@@ -29,7 +27,7 @@ namespace Umbraco.Core.Configuration
             configs.Add<IMemberPasswordConfiguration>(() => new DefaultPasswordConfig());
             configs.Add<ICoreDebug>(() => new CoreDebug());
             configs.Add<IConnectionStrings>(() => new ConnectionStrings());
-            configs.AddCoreConfigs(_ioHelper);
+            configs.AddCoreConfigs(ioHelper);
             return configs;
         }
     }

@@ -6,6 +6,48 @@ using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Configuration
 {
+    public class HostingSettings : IHostingSettings
+    {
+        /// <inheritdoc />
+        public LocalTempStorage LocalTempStorageLocation
+        {
+            get
+            {
+                var setting = ConfigurationManager.AppSettings[Constants.AppSettings.LocalTempStorage];
+                if (!string.IsNullOrWhiteSpace(setting))
+                    return Enum<LocalTempStorage>.Parse(setting);
+
+                return LocalTempStorage.Default;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether umbraco is running in [debug mode].
+        /// </summary>
+        /// <value><c>true</c> if [debug mode]; otherwise, <c>false</c>.</value>
+        public bool DebugMode
+        {
+            get
+            {
+                try
+                {
+                    if (ConfigurationManager.GetSection("system.web/compilation") is ConfigurationSection compilation)
+                    {
+                        var debugElement = compilation.ElementInformation.Properties["debug"];
+
+                        return debugElement != null && (debugElement.Value is bool debug && debug);
+                    }
+                }
+                catch
+                {
+                    // ignored
+                }
+
+                return false;
+            }
+        }
+    }
+
     // TODO:  Replace checking for if the app settings exist and returning an empty string, instead return the defaults!
     // TODO: need to massively cleanup these configuration classes
 
@@ -229,31 +271,6 @@ namespace Umbraco.Core.Configuration
             }
         }
 
-        /// <summary>
-        /// Gets a value indicating whether umbraco is running in [debug mode].
-        /// </summary>
-        /// <value><c>true</c> if [debug mode]; otherwise, <c>false</c>.</value>
-        public bool DebugMode
-        {
-            get
-            {
-                try
-                {
-                    if (ConfigurationManager.GetSection("system.web/compilation") is ConfigurationSection compilation)
-                    {
-                        var debugElement = compilation.ElementInformation.Properties["debug"];
-
-                        return debugElement != null && (debugElement.Value is bool debug && debug);
-                    }
-                }
-                catch
-                {
-                    // ignored
-                }
-
-                return false;
-            }
-        }
 
         /// <summary>
         /// Gets the time out in minutes.
@@ -293,18 +310,7 @@ namespace Umbraco.Core.Configuration
             }
         }
 
-        /// <inheritdoc />
-        public LocalTempStorage LocalTempStorageLocation
-        {
-            get
-            {
-                var setting = ConfigurationManager.AppSettings[Constants.AppSettings.LocalTempStorage];
-                if (!string.IsNullOrWhiteSpace(setting))
-                    return Enum<LocalTempStorage>.Parse(setting);
 
-                return LocalTempStorage.Default;
-            }
-        }
 
 
         /// <summary>

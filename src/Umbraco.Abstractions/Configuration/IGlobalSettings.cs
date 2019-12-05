@@ -1,12 +1,21 @@
 ﻿namespace Umbraco.Core.Configuration
 {
+    public interface IHostingSettings
+    {
+        bool DebugMode { get; }
+        /// <summary>
+        /// Gets the configuration for the location of temporary files.
+        /// </summary>
+        LocalTempStorage LocalTempStorageLocation { get; }
+    }
+
     /// <summary>
     /// Contains general settings information for the entire Umbraco instance based on information from  web.config appsettings
     /// </summary>
     public interface IGlobalSettings
     {
         // fixme: Review this class, it is now just a dumping ground for config options (based basically on whatever might be in appSettings),
-        //          our config classes should be named according to what they are configuring. 
+        //          our config classes should be named according to what they are configuring.
 
         /// <summary>
         /// Gets the reserved urls from web.config.
@@ -61,16 +70,10 @@
         /// <value>The version check period in days (0 = never).</value>
         int VersionCheckPeriod { get; }
 
-        /// <summary>
-        /// Gets the configuration for the location of temporary files.
-        /// </summary>
-        LocalTempStorage LocalTempStorageLocation { get; }
-
         string UmbracoPath { get; }
         string UmbracoCssPath { get; }
         string UmbracoScriptsPath { get; }
         string UmbracoMediaPath { get; }
-        bool DebugMode { get; }
 
         bool IsSmtpServerConfigured { get; }
 

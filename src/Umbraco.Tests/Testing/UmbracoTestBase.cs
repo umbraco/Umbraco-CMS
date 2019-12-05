@@ -147,8 +147,9 @@ namespace Umbraco.Tests.Testing
             TypeFinder = new TypeFinder(logger);
             var appCaches = GetAppCaches();
             var globalSettings = SettingsForTests.GetDefaultGlobalSettings();
+            var hostingSettings = SettingsForTests.GetDefaultHostingSettings();
             var settings = SettingsForTests.GetDefaultUmbracoSettings();
-            IHostingEnvironment hostingEnvironment = new AspNetHostingEnvironment(new Lazy<IGlobalSettings>(() => globalSettings));
+            IHostingEnvironment hostingEnvironment = new AspNetHostingEnvironment(hostingSettings);
             IBackOfficeInfo backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, IOHelper, settings, logger);
             IIpResolver ipResolver = new AspNetIpResolver();
             UmbracoVersion = new UmbracoVersion(globalSettings);

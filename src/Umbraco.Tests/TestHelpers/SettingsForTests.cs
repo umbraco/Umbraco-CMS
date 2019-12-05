@@ -21,7 +21,6 @@ namespace Umbraco.Tests.TestHelpers
                     settings.Path == TestHelper.IOHelper.ResolveUrl("~/umbraco") &&
                     settings.TimeOutInMinutes == 20 &&
                     settings.DefaultUILanguage == "en" &&
-                    settings.LocalTempStorageLocation == LocalTempStorage.EnvironmentTemp &&
                     settings.ReservedPaths == (GlobalSettings.StaticReservedPaths + "~/umbraco") &&
                     settings.ReservedUrls == GlobalSettings.StaticReservedUrls &&
                     settings.UmbracoPath == "~/umbraco" &&
@@ -116,6 +115,7 @@ namespace Umbraco.Tests.TestHelpers
 
         private static IUmbracoSettingsSection _defaultUmbracoSettings;
         private static IGlobalSettings _defaultGlobalSettings;
+        private static IHostingSettings _defaultHostingSettings;
 
         internal static IGlobalSettings GetDefaultGlobalSettings()
         {
@@ -124,6 +124,25 @@ namespace Umbraco.Tests.TestHelpers
                 _defaultGlobalSettings = GenerateMockGlobalSettings();
             }
             return _defaultGlobalSettings;
+        }
+
+        internal static IHostingSettings GetDefaultHostingSettings()
+        {
+            if (_defaultHostingSettings == null)
+            {
+                _defaultHostingSettings = GenerateMockHostingSettings();
+            }
+            return _defaultHostingSettings;
+        }
+
+        private static IHostingSettings GenerateMockHostingSettings()
+        {
+            var config = Mock.Of<IHostingSettings>(
+                settings =>
+                    settings.LocalTempStorageLocation == LocalTempStorage.EnvironmentTemp &&
+                    settings.DebugMode == false
+            );
+            return config;
         }
 
         internal static IUmbracoSettingsSection GetDefaultUmbracoSettings()
