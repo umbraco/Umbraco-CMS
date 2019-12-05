@@ -17,8 +17,6 @@ namespace Umbraco.Core.PropertyEditors
 
             foreach (var p in properties)
             {
-                // Injecting propertyEditorCollection is causing LightInject to throw a Recursive Dependancy error
-                // Hence using Current.PropertyEditors
                 if (!propertyEditors.TryGet(p.PropertyType.PropertyEditorAlias, out var editor)) continue;
 
                 //TODO: Support variants/segments! This is not required for this initial prototype which is why there is a check here
