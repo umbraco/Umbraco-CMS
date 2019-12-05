@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Scheduling;
 
 namespace Umbraco.Tests.Scheduling
@@ -21,7 +22,7 @@ namespace Umbraco.Tests.Scheduling
         [OneTimeSetUp]
         public void InitializeFixture()
         {
-            _logger = new DebugDiagnosticsLogger();
+            _logger = new ConsoleLogger();
         }
 
         [Test]
@@ -102,12 +103,12 @@ namespace Umbraco.Tests.Scheduling
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions(), _logger))
             {
-                MyTask t;
+                MyTask t1, t2, t3;
 
                 Assert.IsFalse(runner.IsRunning); // because AutoStart is false
-                runner.Add(new MyTask(5000));
-                runner.Add(new MyTask());
-                runner.Add(t = new MyTask());
+                runner.Add(t1 = new MyTask(5000));
+                runner.Add(t2 = new MyTask());
+                runner.Add(t3 = new MyTask());
                 Assert.IsTrue(runner.IsRunning); // is running tasks
 
                 // shutdown -force => run all queued tasks
@@ -115,7 +116,7 @@ namespace Umbraco.Tests.Scheduling
                 Assert.IsTrue(runner.IsRunning); // is running tasks
                 await runner.StoppedAwaitable; // runner stops, within test's timeout
 
-                Assert.AreNotEqual(DateTime.MinValue, t.Ended); // t has run
+                Assert.AreNotEqual(DateTime.MinValue, t3.Ended); // t3 has run
             }
         }
 
@@ -124,20 +125,25 @@ namespace Umbraco.Tests.Scheduling
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions(), _logger))
             {
-                MyTask t;
+                MyTask t1, t2, t3;
 
                 Assert.IsFalse(runner.IsRunning); // because AutoStart is false
-                runner.Add(new MyTask(5000));
-                runner.Add(new MyTask());
-                runner.Add(t = new MyTask());
+                runner.Add(t1 = new MyTask(5000));
+                runner.Add(t2 = new MyTask());
+                runner.Add(t3 = new MyTask());
                 Assert.IsTrue(runner.IsRunning); // is running tasks
+
+                Thread.Sleep(1000); // since we are forcing shutdown, we need to give it a chance to start, else it will be canceled before the queue is started
 
                 // shutdown +force => tries to cancel the current task, ignores queued tasks
                 runner.Shutdown(true, false); // +force -wait
                 Assert.IsTrue(runner.IsRunning); // is running that long task it cannot cancel
-                await runner.StoppedAwaitable; // runner stops, within test's timeout
 
-                Assert.AreEqual(DateTime.MinValue, t.Ended); // t has *not* run
+                await runner.StoppedAwaitable; // runner stops, within test's timeout (no cancelation token used, no need to catch OperationCanceledException)
+
+                Assert.AreNotEqual(DateTime.MinValue, t1.Ended); // t1 *has* run
+                Assert.AreEqual(DateTime.MinValue, t2.Ended); // t2 has *not* run
+                Assert.AreEqual(DateTime.MinValue, t3.Ended); // t3 has *not* run
             }
         }
 
@@ -163,7 +169,15 @@ namespace Umbraco.Tests.Scheduling
 
                 // shutdown +force => tries to cancel the current task, ignores queued tasks
                 runner.Shutdown(true, false); // +force -wait
-                await runner.StoppedAwaitable; // runner stops, within test's timeout
+                try
+                {
+                    await runner.StoppedAwaitable; // runner stops, within test's timeout ... maybe
+                }
+                catch (OperationCanceledException)
+                {
+                    // catch exception, this can occur because we are +force shutting down which will
+                    // cancel a pending task if the queue hasn't completed in time
+                }
             }
         }
 
@@ -188,7 +202,8 @@ namespace Umbraco.Tests.Scheduling
                 runner.Add(t = new MyTask());  // sleeps 500 ms ... total = 1500 ms until it's done
                 Assert.IsTrue(runner.IsRunning); // is running the task
 
-                await runner.StopInternal(false); // -immediate = -force, -wait (max 2000 ms delay before +immediate)
+                runner.Stop(false); // -immediate = -force, -wait (max 2000 ms delay before +immediate)
+                await runner.TerminatedAwaitable;
 
                 Assert.IsTrue(stopped); // raised that one
                 Assert.IsTrue(terminating); // has raised that event
@@ -221,7 +236,8 @@ namespace Umbraco.Tests.Scheduling
                 runner.Add(t = new MyTask());  // sleeps 500 ms ... total = 1500 ms until it's done
                 Assert.IsTrue(runner.IsRunning); // is running the task
 
-                await runner.StopInternal(true); // +immediate = +force, +wait (no delay)
+                runner.Stop(true); // +immediate = +force, +wait (no delay)
+                await runner.TerminatedAwaitable;
 
                 Assert.IsTrue(stopped); // raised that one
                 Assert.IsTrue(terminating); // has raised that event
@@ -255,8 +271,7 @@ namespace Umbraco.Tests.Scheduling
             }, _logger))
             {
                 Assert.IsTrue(runner.IsRunning); // because AutoStart is true
-                runner.Stop(false); // keepalive = must be stopped
-                await runner.StoppedAwaitable; // runner stops, within test's timeout
+                await runner.StopInternal(false); // keepalive = must be stopped
             }
         }
 
@@ -282,13 +297,9 @@ namespace Umbraco.Tests.Scheduling
                 // dispose will stop it
             }
 
-            await runner.StoppedAwaitable; // runner stops, within test's timeout
-            //await runner.TerminatedAwaitable; // NO! see note below
+            await runner.StoppedAwaitable; 
             Assert.Throws<InvalidOperationException>(() => runner.Add(new MyTask()));
 
-            // but do NOT await on TerminatedAwaitable - disposing just shuts the runner down
-            // so that we don't have a runaway task in tests, etc - but it does NOT terminate
-            // the runner - it really is NOT a nice way to end a runner - it's there for tests
         }
 
         [Test]
@@ -575,7 +586,7 @@ namespace Umbraco.Tests.Scheduling
                 Thread.Sleep(5000);
                 Assert.IsTrue(runner.IsRunning); // still waiting for the task to release
                 Assert.IsFalse(task.HasRun);
-                runner.Shutdown(false, false);
+                runner.Shutdown(false, false); // -force, -wait
                 await runner.StoppedAwaitable; // wait for the entire runner operation to complete
                 Assert.IsTrue(task.HasRun);
             }
@@ -871,7 +882,9 @@ namespace Umbraco.Tests.Scheduling
 
             public override void PerformRun()
             {
+                Console.WriteLine($"Sleeping {_milliseconds}...");
                 Thread.Sleep(_milliseconds);
+                Console.WriteLine("Wake up!");
             }
         }
 
@@ -988,7 +1001,9 @@ namespace Umbraco.Tests.Scheduling
             public DateTime Ended { get; set; }
 
             public virtual void Dispose()
-            { }
+            {
+
+            }
         }
     }
 }

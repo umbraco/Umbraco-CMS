@@ -199,7 +199,7 @@ namespace Umbraco.Web.Scheduling
             {
                 lock (_locker)
                 {
-                    var task = _runningTask ?? Task.FromResult(0);
+                    var task = _runningTask ?? Task.CompletedTask;
                     return new ThreadingTaskImmutable(task);
                 }
             }
@@ -211,8 +211,9 @@ namespace Umbraco.Web.Scheduling
         /// <returns>An awaitable object.</returns>
         /// <remarks>
         /// <para>Used to wait until the runner has terminated.</para>
-        /// <para>This is for unit tests and should not be used otherwise. In most cases when the runner
-        /// has terminated, the application domain is going down and it is not the right time to do things.</para>
+        /// <para>
+        /// The only time the runner will be terminated is by the Hosting Environment when the application is being shutdown. 
+        /// </para>
         /// </remarks>
         internal ThreadingTaskImmutable TerminatedAwaitable
         {
@@ -347,14 +348,18 @@ namespace Umbraco.Web.Scheduling
             // will stop waiting on the queue or on a latch
             _tasks.Complete();
 
-            if (!hasTasks || force)
+            if (force)
             {
                 // we must bring everything down, now                
                 lock (_locker)
                 {
                     // was Complete() enough?
-                    if (_isRunning == false) return;
+                    // if _tasks.Complete() ended up triggering code to stop the runner and reset
+                    // the _isRunning flag, then there's no need to initiate a cancel on the cancelation token.
+                    if (_isRunning == false)
+                        return; 
                 }
+
                 // try to cancel running async tasks (cannot do much about sync tasks)
                 // break latched tasks
                 // stop processing the queue
@@ -586,17 +591,18 @@ namespace Umbraco.Web.Scheduling
         // triggers when the hosting environment requests that the runner terminates
         internal event TypedEventHandler<BackgroundTaskRunner<T>, EventArgs> Terminating;
 
-        // triggers when the runner has terminated (no task can be added, no task is running)
+        // triggers when the hosting environment has terminated (no task can be added, no task is running)
         internal event TypedEventHandler<BackgroundTaskRunner<T>, EventArgs> Terminated;
 
         private void OnEvent(TypedEventHandler<BackgroundTaskRunner<T>, EventArgs> handler, string name)
         {
-            if (handler == null) return;
             OnEvent(handler, name, EventArgs.Empty);
         }
 
         private void OnEvent<TArgs>(TypedEventHandler<BackgroundTaskRunner<T>, TArgs> handler, string name, TArgs e)
         {
+            _logger.Debug<BackgroundTaskRunner>("{LogPrefix} OnEvent {EventName}", _logPrefix, name);
+
             if (handler == null) return;
 
             try
@@ -672,6 +678,15 @@ namespace Umbraco.Web.Scheduling
 
         #endregion
 
+        #region IRegisteredObject.Stop
+
+        /// <summary>
+        /// Used by IRegisteredObject.Stop and shutdown on threadpool threads to not block shutdown times.
+        /// </summary>
+        /// <param name="immediate"></param>
+        /// <returns>
+        /// An awaitable Task that is used to handle the shutdown.
+        /// </returns>
         internal Task StopInternal(bool immediate)
         {
             // the first time the hosting environment requests that the runner terminates,
@@ -701,7 +716,7 @@ namespace Umbraco.Web.Scheduling
             {
                 lock (_locker)
                 {
-                    if (_terminated) return Task.FromResult(0);
+                    if (_terminated) return Task.CompletedTask;
                     return Task.Run(StopImmediate, CancellationToken.None);
                 }
             }
@@ -810,5 +825,7 @@ namespace Umbraco.Web.Scheduling
 
             terminatedSource.TrySetResult(0);
         }
+
+        #endregion
     }
 }
