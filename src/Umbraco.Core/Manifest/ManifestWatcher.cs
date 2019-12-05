@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Web;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Manifest
@@ -13,11 +13,13 @@ namespace Umbraco.Core.Manifest
         private static volatile bool _isRestarting;
 
         private readonly ILogger _logger;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly List<FileSystemWatcher> _fws = new List<FileSystemWatcher>();
 
-        public ManifestWatcher(ILogger logger)
+        public ManifestWatcher(ILogger logger, IHostingEnvironment hostingEnvironment)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _hostingEnvironment = hostingEnvironment;
         }
 
         public void Start(params string[] packageFolders)
@@ -55,7 +57,7 @@ namespace Umbraco.Core.Manifest
 
                 _isRestarting = true;
                 _logger.Info<ManifestWatcher>("Manifest has changed, app pool is restarting ({Path})", e.FullPath);
-                HttpRuntime.UnloadAppDomain();
+                _hostingEnvironment.LazyRestartApplication();
                 Dispose(); // uh? if the app restarts then this should be disposed anyways?
             }
         }

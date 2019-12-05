@@ -36,6 +36,10 @@ namespace Umbraco.Web.Hosting
         }
 
         public string ToAbsolute(string virtualPath, string root) => VirtualPathUtility.ToAbsolute(virtualPath, root);
+        public void LazyRestartApplication()
+        {
+            HttpRuntime.UnloadAppDomain();
+        }
 
 
         public string LocalTempPath

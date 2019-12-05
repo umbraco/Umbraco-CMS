@@ -16,5 +16,10 @@ namespace Umbraco.Core.Hosting
         bool IsHosted { get; }
         string MapPath(string path);
         string ToAbsolute(string virtualPath, string root);
+
+        /// <summary>
+        /// Terminates the current application. The application restarts the next time a request is received for it.
+        /// </summary>
+        void LazyRestartApplication();
     }
 }
