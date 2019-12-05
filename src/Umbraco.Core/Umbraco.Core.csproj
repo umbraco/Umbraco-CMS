@@ -342,7 +342,6 @@
     <Compile Include="Events\UninstallPackageEventArgs.cs" />
     <Compile Include="Composing\LightInject\LightInjectException.cs" />
     <Compile Include="FileResources\Files.Designer.cs" />
-    <Compile Include="IO\SystemFiles.cs" />
     <Compile Include="Logging\Serilog\SerilogLogger.cs" />
     <Compile Include="Logging\OwinLogger.cs" />
     <Compile Include="Logging\OwinLoggerFactory.cs" />
@@ -813,6 +812,5 @@
       <Name>Umbraco.Abstractions</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
