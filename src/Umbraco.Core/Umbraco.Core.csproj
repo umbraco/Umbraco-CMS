@@ -281,7 +281,10 @@
     <Compile Include="Models\PublishedContent\IPublishedContentType.cs" />
     <Compile Include="Models\PublishedContent\IPublishedPropertyType.cs" />
     <Compile Include="PropertyEditors\ConfigurationFieldsExtensions.cs" />
+    <Compile Include="PropertyEditors\DataValueReferenceFactoryCollection.cs" />
+    <Compile Include="PropertyEditors\DataValueReferenceFactoryCollectionBuilder.cs" />
     <Compile Include="PropertyEditors\IDataValueReference.cs" />
+    <Compile Include="PropertyEditors\IDataValueReferenceFactory.cs" />
     <Compile Include="PropertyEditors\IIgnoreUserStartNodesConfig.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="Models\PublishedContent\UrlMode.cs" />

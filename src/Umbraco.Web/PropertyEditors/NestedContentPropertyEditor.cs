@@ -227,6 +227,7 @@ namespace Umbraco.Web.PropertyEditors
                 // return json
                 return JsonConvert.SerializeObject(deserialized);
             }
+            #endregion
 
             public IEnumerable<UmbracoEntityReference> GetReferences(object value)
             {
@@ -252,8 +253,6 @@ namespace Umbraco.Web.PropertyEditors
 
                 return result;
             }
-
-            #endregion
         }
 
         internal class NestedContentValidator : IValueValidator

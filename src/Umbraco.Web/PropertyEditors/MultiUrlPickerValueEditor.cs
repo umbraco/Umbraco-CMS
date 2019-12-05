@@ -190,9 +190,6 @@ namespace Umbraco.Web.PropertyEditors
                 }
 
             }
-
-
-
         }
     }
 }
