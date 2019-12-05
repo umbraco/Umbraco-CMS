@@ -338,7 +338,7 @@ namespace Umbraco.Web.Scheduling
                 if (_isRunning == false) return; // done already
             }
 
-            var hasTasks = _tasks.Count > 0;
+            var hasTasks = TaskCount > 0;
 
             if (!force && hasTasks)
                 _logger.Info<BackgroundTaskRunner>("{LogPrefix} Waiting for tasks to complete", _logPrefix);
@@ -432,7 +432,7 @@ namespace Umbraco.Web.Scheduling
                 lock (_locker)
                 {
                     // deal with race condition
-                    if (_shutdownToken.IsCancellationRequested == false && _tasks.Count > 0) continue;
+                    if (_shutdownToken.IsCancellationRequested == false && TaskCount > 0) continue;
 
                     // if we really have nothing to do, stop
                     _logger.Debug<BackgroundTaskRunner>("{LogPrefix} Stopping", _logPrefix);
@@ -457,7 +457,7 @@ namespace Umbraco.Web.Scheduling
             // if KeepAlive is false then don't block, exit if there is
             // no task in the buffer - yes, there is a race condition, which
             // we'll take care of
-            if (_options.KeepAlive == false && _tasks.Count == 0)
+            if (_options.KeepAlive == false && TaskCount == 0)
                 return null;
 
             try
@@ -514,8 +514,12 @@ namespace Umbraco.Web.Scheduling
             if (task == latched.Latch)
                 return bgTask;
 
+            // we are shutting down if the _tasks.Complete(); was called or the shutdown token was cancelled
+            var isShuttingDown = _shutdownToken.IsCancellationRequested || task == _tasks.Completion;
+
             // if shutting down, return the task only if it runs on shutdown
-            if (_shutdownToken.IsCancellationRequested == false && latched.RunsOnShutdown) return bgTask;
+            if (isShuttingDown && latched.RunsOnShutdown)
+                return bgTask;
 
             // else, either it does not run on shutdown or it's been cancelled, dispose
             latched.Dispose();
@@ -668,17 +672,7 @@ namespace Umbraco.Web.Scheduling
 
         #endregion
 
-        /// <summary>
-        /// Requests a registered object to un-register.
-        /// </summary>
-        /// <param name="immediate">true to indicate the registered object should un-register from the hosting
-        /// environment before returning; otherwise, false.</param>
-        /// <remarks>
-        /// <para>"When the application manager needs to stop a registered object, it will call the Stop method."</para>
-        /// <para>The application manager will call the Stop method to ask a registered object to un-register. During
-        /// processing of the Stop method, the registered object must call the HostingEnvironment.UnregisterObject method.</para>
-        /// </remarks>
-        public void Stop(bool immediate)
+        internal Task StopInternal(bool immediate)
         {
             // the first time the hosting environment requests that the runner terminates,
             // raise the Terminating event - that could be used to prevent any process that
@@ -701,17 +695,29 @@ namespace Umbraco.Web.Scheduling
             // with a single aspnet thread during shutdown and we don't want to delay other calls to IRegisteredObject.Stop.
             if (!immediate)
             {
-                Task.Run(StopInitial, CancellationToken.None);
+                return Task.Run(StopInitial, CancellationToken.None);
             }
             else
             {
-                lock(_locker)
+                lock (_locker)
                 {
-                    if (_terminated) return;
-                    Task.Run(StopImmediate, CancellationToken.None);
+                    if (_terminated) return Task.FromResult(0);
+                    return Task.Run(StopImmediate, CancellationToken.None);
                 }
             }
         }
+
+        /// <summary>
+        /// Requests a registered object to un-register.
+        /// </summary>
+        /// <param name="immediate">true to indicate the registered object should un-register from the hosting
+        /// environment before returning; otherwise, false.</param>
+        /// <remarks>
+        /// <para>"When the application manager needs to stop a registered object, it will call the Stop method."</para>
+        /// <para>The application manager will call the Stop method to ask a registered object to un-register. During
+        /// processing of the Stop method, the registered object must call the HostingEnvironment.UnregisterObject method.</para>
+        /// </remarks>
+        public void Stop(bool immediate) => StopInternal(immediate);
 
         /// <summary>
         /// Called when immediate == false for IRegisteredObject.Stop(bool immediate)

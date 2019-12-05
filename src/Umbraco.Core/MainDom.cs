@@ -52,11 +52,9 @@ namespace Umbraco.Core
 
             _logger = logger;
 
-            var appId = string.Empty;
             // HostingEnvironment.ApplicationID is null in unit tests, making ReplaceNonAlphanumericChars fail
-            if (HostingEnvironment.ApplicationID != null)
-                appId = HostingEnvironment.ApplicationID.ReplaceNonAlphanumericChars(string.Empty);
-
+            var appId = HostingEnvironment.ApplicationID?.ReplaceNonAlphanumericChars(string.Empty) ?? string.Empty;
+            
             // combining with the physical path because if running on eg IIS Express,
             // two sites could have the same appId even though they are different.
             //
@@ -66,7 +64,7 @@ namespace Umbraco.Core
             // we *cannot* use the process ID here because when an AppPool restarts it is
             // a new process for the same application path
 
-            var appPath = HostingEnvironment.ApplicationPhysicalPath.ToLowerInvariant();
+            var appPath = HostingEnvironment.ApplicationPhysicalPath?.ToLowerInvariant() ?? string.Empty;
             var hash = (appId + ":::" + appPath).GenerateHash<SHA1>();
 
             var lockName = "UMBRACO-" + hash + "-MAINDOM-LCK";
