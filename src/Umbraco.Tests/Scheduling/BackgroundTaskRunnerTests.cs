@@ -183,25 +183,19 @@ namespace Umbraco.Tests.Scheduling
                 runner.Terminated += (sender, args) => { terminated = true; };
 
                 Assert.IsFalse(runner.IsRunning); // because AutoStart is false
-                runner.Add(new MyTask(5000));
-                runner.Add(new MyTask());
-                runner.Add(t = new MyTask());
+                runner.Add(new MyTask()); // sleeps 500 ms
+                runner.Add(new MyTask());  // sleeps 500 ms
+                runner.Add(t = new MyTask());  // sleeps 500 ms ... total = 1500 ms until it's done
                 Assert.IsTrue(runner.IsRunning); // is running the task
 
-                runner.Stop(false); // -immediate = -force, -wait
+                await runner.StopInternal(false); // -immediate = -force, -wait (max 2000 ms delay before +immediate)
+
+                Assert.IsTrue(stopped); // raised that one
                 Assert.IsTrue(terminating); // has raised that event
-                Assert.IsFalse(terminated); // but not terminated yet
+                Assert.IsTrue(terminated);  // and that event
 
-                // all this before we await because -wait
                 Assert.IsTrue(runner.IsCompleted); // shutdown completes the runner
-                Assert.IsTrue(runner.IsRunning); // still running the task
-
-                await runner.StoppedAwaitable; // runner stops, within test's timeout
-                Assert.IsFalse(runner.IsRunning);
-                Assert.IsTrue(stopped);
-
-                await runner.TerminatedAwaitable; // runner terminates, within test's timeout
-                Assert.IsTrue(terminated); // has raised that event
+                Assert.IsFalse(runner.IsRunning); // done running
 
                 Assert.AreNotEqual(DateTime.MinValue, t.Ended); // t has run
             }
@@ -222,22 +216,19 @@ namespace Umbraco.Tests.Scheduling
                 runner.Terminated += (sender, args) => { terminated = true; };
 
                 Assert.IsFalse(runner.IsRunning); // because AutoStart is false
-                runner.Add(new MyTask(5000));
-                runner.Add(new MyTask());
-                runner.Add(t = new MyTask());
+                runner.Add(new MyTask()); // sleeps 500 ms
+                runner.Add(new MyTask());  // sleeps 500 ms
+                runner.Add(t = new MyTask());  // sleeps 500 ms ... total = 1500 ms until it's done
                 Assert.IsTrue(runner.IsRunning); // is running the task
 
-                runner.Stop(true); // +immediate = +force, +wait
+                await runner.StopInternal(true); // +immediate = +force, +wait (no delay)
+
+                Assert.IsTrue(stopped); // raised that one
                 Assert.IsTrue(terminating); // has raised that event
                 Assert.IsTrue(terminated); // and that event
-                Assert.IsTrue(stopped); // and that one
-
-                // and all this before we await because +wait
+                
                 Assert.IsTrue(runner.IsCompleted); // shutdown completes the runner
                 Assert.IsFalse(runner.IsRunning); // done running
-
-                await runner.StoppedAwaitable; // runner stops, within test's timeout
-                await runner.TerminatedAwaitable; // runner terminates, within test's timeout
 
                 Assert.AreEqual(DateTime.MinValue, t.Ended); // t has *not* run
             }
@@ -564,7 +555,7 @@ namespace Umbraco.Tests.Scheduling
                 Thread.Sleep(1000);
                 Assert.IsTrue(runner.IsRunning); // still waiting for the task to release
                 Assert.IsFalse(task.HasRun);
-                task.Release();
+                task.Release(); // unlatch
                 var runnerTask = runner.CurrentThreadingTask; // may be null if things go fast enough
                 if (runnerTask != null)
                     await runnerTask; // wait for current task to complete
@@ -574,7 +565,7 @@ namespace Umbraco.Tests.Scheduling
         }
 
         [Test]
-        public async Task LatchedTaskStops()
+        public async Task LatchedTaskStops_Runs_On_Shutdown()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions(), _logger))
             {
