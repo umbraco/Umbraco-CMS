@@ -11,7 +11,7 @@ namespace Umbraco.Web
         /// Returns the configuration of the membership provider used to configure change password editors
         /// </summary>
         /// <param name="passwordConfiguration"></param>
-        /// <param name="userService"></param>
+        /// <param name="allowManuallyChangingPassword"></param>
         /// <returns></returns>
         public static IDictionary<string, object> GetConfiguration(
             this IPasswordConfiguration passwordConfiguration,
