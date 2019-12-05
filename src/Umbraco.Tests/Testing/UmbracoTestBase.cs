@@ -338,6 +338,7 @@ namespace Umbraco.Tests.Testing
         {
             Composition.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
             Composition.Configs.Add(SettingsForTests.GetDefaultGlobalSettings);
+            Composition.Configs.Add(SettingsForTests.GetDefaultHostingSettings);
             //Composition.Configs.Add<IUserPasswordConfiguration>(() => new DefaultUserPasswordConfig());
         }
 
