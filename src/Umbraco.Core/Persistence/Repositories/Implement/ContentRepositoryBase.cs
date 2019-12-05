@@ -823,35 +823,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected void PersistRelations(TEntity entity)
         {
+            // Get all references from our core built in DataEditors/Property Editors
+            // Along with seeing if deverlopers want to collect additional references from the DataValueReferenceFactories collection
             var trackedRelations = new List<UmbracoEntityReference>();
-
-            foreach (var p in entity.Properties)
-            {
-                if (!PropertyEditors.TryGet(p.PropertyType.PropertyEditorAlias, out var editor)) continue;
-                var valueEditor = editor.GetValueEditor();
-                if (!(valueEditor is IDataValueReference reference)) continue;
-
-                //TODO: Support variants/segments! This is not required for this initial prototype which is why there is a check here
-                if (!p.PropertyType.VariesByNothing()) continue;
-
-                var val = p.GetValue(); // get the invariant value
-                var refs = reference.GetReferences(val);
-                trackedRelations.AddRange(refs);
-
-
-                // Loop over collection that may be add to existing property editors
-                // implementation of GetReferences in IDataValueReference.
-                // Allows developers to add support for references by a
-                // package /property editor that did not implement IDataValueReference themselves
-                foreach (var item in _dataValueReferenceFactories)
-                {
-                    // Check if this value reference is for this datatype/editor
-                    // Then call it's GetReferences method - to see if the value stored
-                    // in the dataeditor/property has referecnes to media items
-                    if (item.IsForEditor(editor))
-                        trackedRelations.AddRange(item.GetDataValueReference().GetReferences(val));
-                }
-            }
+            trackedRelations.AddRange(_dataValueReferenceFactories.GetAllReferences(entity.Properties, PropertyEditors));
 
             //First delete all auto-relations for this entity
             RelationRepository.DeleteByParent(entity.Id, Constants.Conventions.RelationTypes.AutomaticRelationTypes);
