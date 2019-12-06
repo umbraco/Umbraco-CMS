@@ -25,7 +25,7 @@ namespace Umbraco.Core.Logging.Serilog
         /// </summary>
         /// <param name="logConfig">A Serilog LoggerConfiguration</param>
         /// <param name="hostingEnvironment"></param>
-        public static LoggerConfiguration MinimalConfiguration(this LoggerConfiguration logConfig, IHostingEnvironment hostingEnvironment, ISessionIdResolver sessionIdResolver, Func<IFactory> factoryFunc)
+        public static LoggerConfiguration MinimalConfiguration(this LoggerConfiguration logConfig, IHostingEnvironment hostingEnvironment, ISessionIdResolver sessionIdResolver, Func<IRequestCache> requestCacheGetter)
         {
             global::Serilog.Debugging.SelfLog.Enable(msg => System.Diagnostics.Debug.WriteLine(msg));
 
@@ -43,8 +43,8 @@ namespace Umbraco.Core.Logging.Serilog
                 .Enrich.WithProperty("MachineName", Environment.MachineName)
                 .Enrich.With<Log4NetLevelMapperEnricher>()
                 .Enrich.With(new HttpSessionIdEnricher(sessionIdResolver))
-                .Enrich.With(new HttpRequestNumberEnricher(factoryFunc))
-                .Enrich.With(new HttpRequestIdEnricher(factoryFunc));
+                .Enrich.With(new HttpRequestNumberEnricher(requestCacheGetter))
+                .Enrich.With(new HttpRequestIdEnricher(requestCacheGetter));
 
             return logConfig;
         }

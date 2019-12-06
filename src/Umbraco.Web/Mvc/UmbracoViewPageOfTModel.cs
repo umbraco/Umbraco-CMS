@@ -5,10 +5,6 @@ using System.Web.Mvc;
 using System.Web.WebPages;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Dictionary;
-using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
@@ -238,9 +234,9 @@ namespace Umbraco.Web.Mvc
 
         public override void Write(object value)
         {
-            if (value is IHtmlEncodedString)
+            if (value is IHtmlEncodedString htmlEncodedString)
             {
-                base.WriteLiteral(value);
+                base.WriteLiteral(htmlEncodedString.ToHtmlString());
             }
             else
             {

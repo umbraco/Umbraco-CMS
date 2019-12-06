@@ -38,11 +38,11 @@ namespace Umbraco.Core.Logging.Serilog
         /// Creates a logger with some pre-defined configuration and remainder from config file
         /// </summary>
         /// <remarks>Used by UmbracoApplicationBase to get its logger.</remarks>
-        public static SerilogLogger CreateWithDefaultConfiguration(IHostingEnvironment hostingEnvironment, ISessionIdResolver sessionIdResolver, Func<IFactory> factoryFunc)
+        public static SerilogLogger CreateWithDefaultConfiguration(IHostingEnvironment hostingEnvironment, ISessionIdResolver sessionIdResolver, Func<IRequestCache> requestCacheGetter)
         {
             var loggerConfig = new LoggerConfiguration();
             loggerConfig
-                .MinimalConfiguration(hostingEnvironment, sessionIdResolver, factoryFunc)
+                .MinimalConfiguration(hostingEnvironment, sessionIdResolver, requestCacheGetter)
                 .ReadFromConfigFile()
                 .ReadFromUserConfigFile();
 

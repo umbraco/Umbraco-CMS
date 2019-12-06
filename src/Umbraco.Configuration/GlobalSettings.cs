@@ -8,6 +8,8 @@ namespace Umbraco.Core.Configuration
 {
     public class HostingSettings : IHostingSettings
     {
+        private bool? _debugMode;
+
         /// <inheritdoc />
         public LocalTempStorage LocalTempStorageLocation
         {
@@ -29,21 +31,25 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                try
+                if (!_debugMode.HasValue)
                 {
-                    if (ConfigurationManager.GetSection("system.web/compilation") is ConfigurationSection compilation)
+                    try
                     {
-                        var debugElement = compilation.ElementInformation.Properties["debug"];
+                        if (ConfigurationManager.GetSection("system.web/compilation") is ConfigurationSection compilation)
+                        {
+                            var debugElement = compilation.ElementInformation.Properties["debug"];
 
-                        return debugElement != null && (debugElement.Value is bool debug && debug);
+                            _debugMode = debugElement != null && (debugElement.Value is bool debug && debug);
+
+                        }
+                    }
+                    catch
+                    {
+                        _debugMode = false;
                     }
                 }
-                catch
-                {
-                    // ignored
-                }
 
-                return false;
+                return _debugMode.GetValueOrDefault();
             }
         }
     }

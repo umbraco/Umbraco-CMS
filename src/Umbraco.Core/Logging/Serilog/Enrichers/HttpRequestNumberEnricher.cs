@@ -15,7 +15,7 @@ namespace Umbraco.Core.Logging.Serilog.Enrichers
     /// </summary>
     internal class HttpRequestNumberEnricher : ILogEventEnricher
     {
-        private readonly Func<IFactory> _factoryFunc;
+        private readonly Func<IRequestCache> _requestCacheGetter;
         private static int _lastRequestNumber;
         private static readonly string _requestNumberItemName = typeof(HttpRequestNumberEnricher).Name + "+RequestNumber";
 
@@ -25,9 +25,9 @@ namespace Umbraco.Core.Logging.Serilog.Enrichers
         private const string _httpRequestNumberPropertyName = "HttpRequestNumber";
 
 
-        public HttpRequestNumberEnricher(Func<IFactory> factoryFunc)
+        public HttpRequestNumberEnricher(Func<IRequestCache> requestCacheGetter)
         {
-            _factoryFunc = factoryFunc;
+            _requestCacheGetter = requestCacheGetter;
         }
 
         /// <summary>
@@ -39,10 +39,9 @@ namespace Umbraco.Core.Logging.Serilog.Enrichers
         {
             if (logEvent == null) throw new ArgumentNullException(nameof(logEvent));
 
-            var factory = _factoryFunc();
-            if (factory is null) return;
+            var requestCache = _requestCacheGetter();
+            if (requestCache is null) return;
 
-            var requestCache = factory.GetInstance<IRequestCache>();
             var requestNumber = requestCache.Get(_requestNumberItemName,
                     () => Interlocked.Increment(ref _lastRequestNumber));
 

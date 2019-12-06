@@ -13,11 +13,11 @@ namespace Umbraco.Core.Logging.Serilog.Enrichers
     /// </summary>
     internal class HttpRequestIdEnricher : ILogEventEnricher
     {
-        private readonly Func<IFactory> _factoryGetter;
+        private readonly Func<IRequestCache> _requestCacheGetter;
 
-        public HttpRequestIdEnricher(Func<IFactory> factoryGetter)
+        public HttpRequestIdEnricher(Func<IRequestCache> requestCacheGetter)
         {
-            _factoryGetter = factoryGetter;
+            _requestCacheGetter = requestCacheGetter;
         }
 
         /// <summary>
@@ -32,12 +32,10 @@ namespace Umbraco.Core.Logging.Serilog.Enrichers
         /// <param name="propertyFactory">Factory for creating new properties to add to the event.</param>
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
         {
-            if (logEvent == null) throw new ArgumentNullException("logEvent");
+            if (logEvent == null) throw new ArgumentNullException(nameof(logEvent));
 
-            var factory = _factoryGetter();
-            if(factory is null) return;
-
-            var requestCache = factory.GetInstance<IRequestCache>();
+            var requestCache = _requestCacheGetter();
+            if(requestCache is null) return;
 
             Guid requestId;
             if (!LogHttpRequest.TryGetCurrentHttpRequestId(out requestId, requestCache))
