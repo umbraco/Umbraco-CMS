@@ -18,7 +18,7 @@ namespace Umbraco.Core
     /// <para>Supports emitting constructors, instance and static methods, instance property getters and
     /// setters. Does not support static properties yet.</para>
     /// </remarks>
-    public static partial class ReflectionUtilities
+    public static class ReflectionUtilities
     {
         #region Fields
 

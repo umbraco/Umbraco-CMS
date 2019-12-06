@@ -5,12 +5,12 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace Umbraco.Core
+namespace Umbraco.Tests.Benchmarks
 {
     /// <summary>
     /// Provides utilities to simplify reflection.
     /// </summary>
-    public static partial class ReflectionUtilities
+    public static class ReflectionUtilitiesForTest
     {
         // the code below should NOT be used
         //

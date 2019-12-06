@@ -2,6 +2,7 @@
 using System.Net.Mail;
 using System.Threading.Tasks;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 
 namespace Umbraco.Core
@@ -13,21 +14,22 @@ namespace Umbraco.Core
     {
         // TODO: This should encapsulate a BackgroundTaskRunner with a queue to send these emails!
 
+        private readonly IGlobalSettings _globalSettings;
         private readonly bool _enableEvents;
 
-        /// <summary>
-        /// Default constructor
-        /// </summary>
-        public EmailSender() : this(false)
+        public EmailSender(IGlobalSettings globalSettings) : this(globalSettings, false)
         {
         }
 
-        internal EmailSender(bool enableEvents)
+        internal EmailSender(IGlobalSettings globalSettings, bool enableEvents)
         {
+            _globalSettings = globalSettings;
             _enableEvents = enableEvents;
+
+            _smtpConfigured = new Lazy<bool>(() => _globalSettings.IsSmtpServerConfigured);
         }
 
-        private static readonly Lazy<bool> SmtpConfigured = new Lazy<bool>(() => Current.Configs.Global().IsSmtpServerConfigured);
+        private readonly Lazy<bool> _smtpConfigured;
 
         /// <summary>
         /// Sends the message non-async
@@ -35,7 +37,7 @@ namespace Umbraco.Core
         /// <param name="message"></param>
         public void Send(MailMessage message)
         {
-            if (SmtpConfigured.Value == false && _enableEvents)
+            if (_smtpConfigured.Value == false && _enableEvents)
             {
                 OnSendEmail(new SendEmailEventArgs(message));
             }
@@ -55,7 +57,7 @@ namespace Umbraco.Core
         /// <returns></returns>
         public async Task SendAsync(MailMessage message)
         {
-            if (SmtpConfigured.Value == false && _enableEvents)
+            if (_smtpConfigured.Value == false && _enableEvents)
             {
                 OnSendEmail(new SendEmailEventArgs(message));
             }
@@ -81,10 +83,7 @@ namespace Umbraco.Core
         /// <remarks>
         /// We assume this is possible if either an event handler is registered or an smtp server is configured
         /// </remarks>
-        internal static bool CanSendRequiredEmail
-        {
-            get { return EventHandlerRegistered || SmtpConfigured.Value; }
-        }
+        internal static bool CanSendRequiredEmail(IGlobalSettings globalSettings) => EventHandlerRegistered || globalSettings.IsSmtpServerConfigured;
 
         /// <summary>
         /// returns true if an event handler has been registered

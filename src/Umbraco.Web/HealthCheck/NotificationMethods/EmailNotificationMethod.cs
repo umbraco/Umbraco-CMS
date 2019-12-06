@@ -17,8 +17,9 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
         private readonly ILocalizedTextService _textService;
         private readonly IRuntimeState _runtimeState;
         private readonly ILogger _logger;
+        private readonly IGlobalSettings _globalSettings;
 
-        public EmailNotificationMethod(ILocalizedTextService textService, IRuntimeState runtimeState, ILogger logger)
+        public EmailNotificationMethod(ILocalizedTextService textService, IRuntimeState runtimeState, ILogger logger, IGlobalSettings globalSettings)
         {
             var recipientEmail = Settings["recipientEmail"]?.Value;
             if (string.IsNullOrWhiteSpace(recipientEmail))
@@ -32,6 +33,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
             _textService = textService ?? throw new ArgumentNullException(nameof(textService));
             _runtimeState = runtimeState;
             _logger = logger;
+            _globalSettings = globalSettings;
         }
 
         public string RecipientEmail { get; }
@@ -61,7 +63,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
 
             var subject = _textService.Localize("healthcheck/scheduledHealthCheckEmailSubject", new[] { host.ToString() });
 
-            var mailSender = new EmailSender();
+            var mailSender = new EmailSender(_globalSettings);
             using (var mailMessage = CreateMailMessage(subject, message))
             {
                 await mailSender.SendAsync(mailMessage);

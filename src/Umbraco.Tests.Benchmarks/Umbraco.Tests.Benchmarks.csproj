@@ -57,6 +57,7 @@
     <Compile Include="ModelToSqlExpressionHelperBenchmarks.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReflectionUtilities-Unused.cs" />
     <Compile Include="SqlTemplatesBenchmark.cs" />
     <Compile Include="StringReplaceManyBenchmarks.cs" />
     <Compile Include="TryConvertToBenchmarks.cs" />

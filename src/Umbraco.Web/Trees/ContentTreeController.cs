@@ -39,6 +39,7 @@ namespace Umbraco.Web.Trees
     {
         private readonly UmbracoTreeSearcher _treeSearcher;
         private readonly ActionCollection _actions;
+        private readonly IGlobalSettings _globalSettings;
 
         protected override int RecycleBinId => Constants.System.RecycleBinContent;
 
@@ -53,6 +54,7 @@ namespace Umbraco.Web.Trees
         {
             _treeSearcher = treeSearcher;
             _actions = actions;
+            _globalSettings = globalSettings;
         }
 
         /// <inheritdoc />
@@ -240,7 +242,7 @@ namespace Umbraco.Web.Trees
             AddActionNode<ActionRights>(item, menu, opensDialog: true);
             AddActionNode<ActionProtect>(item, menu, true, opensDialog: true);
 
-            if (EmailSender.CanSendRequiredEmail)
+            if (EmailSender.CanSendRequiredEmail(_globalSettings))
             {
 	            menu.Items.Add(new MenuItem("notify", Services.TextService)
 	            {

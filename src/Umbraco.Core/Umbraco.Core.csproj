@@ -314,7 +314,6 @@
     <Compile Include="PropertyEditors\ConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\LabelConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\LabelPropertyEditor.cs" />
-    <Compile Include="ReflectionUtilities-Unused.cs" />
     <Compile Include="RuntimeOptions.cs" />
     <Compile Include="Runtime\CoreRuntime.cs" />
     <Compile Include="Runtime\CoreInitialComponent.cs" />
@@ -325,7 +324,6 @@
     <Compile Include="Migrations\Expressions\Delete\KeysAndIndexes\DeleteKeysAndIndexesBuilder.cs" />
     <Compile Include="Migrations\Install\DatabaseBuilder.cs" />
     <Compile Include="Diagnostics\MiniDump.cs" />
-    <Compile Include="EmailSender.cs" />
     <Compile Include="Composing\LightInject\LightInjectException.cs" />
     <Compile Include="FileResources\Files.Designer.cs" />
     <Compile Include="Logging\Serilog\SerilogLogger.cs" />
@@ -701,7 +699,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyEditors\DataEditor.cs" />
     <Compile Include="PropertyEditors\DataValueEditor.cs" />
-    <Compile Include="ReflectionUtilities.cs" />
     <Compile Include="RuntimeState.cs" />
     <Compile Include="Runtime\CoreInitialComposer.cs" />
     <Compile Include="Scoping\IScope.cs" />
