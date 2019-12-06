@@ -19,14 +19,22 @@ module.exports = function(files, out) {
 
     console.log("LESS: ", files, " -> ", config.root + config.targets.css + out)
 
-    var task = gulp.src(files)
-        .pipe(sourcemaps.init())
-        .pipe(less())
-        .pipe(cleanCss())
-        .pipe(postcss(processors))
-        .pipe(rename(out))
-        .pipe(sourcemaps.write('./maps'))
-        .pipe(gulp.dest(config.root + config.targets.css));
+    var task = gulp.src(files);
+
+    if(config.compile.current.sourcemaps === true) {
+        task = task.pipe(sourcemaps.init());
+    }
+
+    task = task.pipe(less());
+    task = task.pipe(cleanCss());
+    task = task.pipe(postcss(processors));
+    task = task.pipe(rename(out));
+
+    if(config.compile.current.sourcemaps === true) {
+        task = task.pipe(sourcemaps.write('./maps'));
+    }
+
+    task = task.pipe(gulp.dest(config.root + config.targets.css));
 
     return task;
 
