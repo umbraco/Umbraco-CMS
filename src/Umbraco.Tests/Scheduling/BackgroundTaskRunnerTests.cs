@@ -297,7 +297,17 @@ namespace Umbraco.Tests.Scheduling
                 // dispose will stop it
             }
 
-            await runner.StoppedAwaitable; 
+            try
+            {
+                await runner.StoppedAwaitable;
+            }
+            catch (OperationCanceledException)
+            {
+                // swallow this exception, it can be expected to throw since when disposing we are calling Shutdown +force
+                // which depending on a timing operation may cancel the cancelation token
+            }
+
+
             Assert.Throws<InvalidOperationException>(() => runner.Add(new MyTask()));
 
         }

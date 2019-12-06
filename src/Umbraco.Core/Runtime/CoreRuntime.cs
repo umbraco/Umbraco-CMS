@@ -27,6 +27,17 @@ namespace Umbraco.Core.Runtime
         private IFactory _factory;
         private RuntimeState _state;
 
+        [Obsolete("Use the ctor with all parameters instead")]
+        public CoreRuntime()
+        {
+        }
+
+        public CoreRuntime(ILogger logger, IMainDom mainDom)
+        {
+            MainDom = mainDom;
+            Logger = logger;
+        }
+
         /// <summary>
         /// Gets the logger.
         /// </summary>
@@ -45,14 +56,22 @@ namespace Umbraco.Core.Runtime
         /// <inheritdoc />
         public IRuntimeState State => _state;
 
+        public IMainDom MainDom { get; private set; }
+
         /// <inheritdoc/>
         public virtual IFactory Boot(IRegister register)
         {
             // create and register the essential services
             // ie the bare minimum required to boot
 
+#pragma warning disable CS0618 // Type or member is obsolete
             // loggers
-            var logger = Logger = GetLogger();
+            // TODO: Removes this in netcore, this is purely just backwards compat ugliness
+            var logger = GetLogger();
+            if (logger != Logger)
+                Logger = logger;
+#pragma warning restore CS0618 // Type or member is obsolete
+
             var profiler = Profiler = GetProfiler();
             var profilingLogger = ProfilingLogger = new ProfilingLogger(logger, profiler);
 
@@ -125,12 +144,16 @@ namespace Umbraco.Core.Runtime
                     Level = RuntimeLevel.Boot
                 };
 
-                // main dom
-                var mainDom = new MainDom(Logger);
+                // TODO: remove this in netcore, this is purely backwards compat hacks with the empty ctor
+                if (MainDom == null)
+                {
+                    MainDom = new MainDom(Logger);
+                }
+                
 
                 // create the composition
                 composition = new Composition(register, typeLoader, ProfilingLogger, _state, configs);
-                composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, mainDom, appCaches, databaseFactory, typeLoader, _state);
+                composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, MainDom, appCaches, databaseFactory, typeLoader, _state);
 
                 // run handlers
                 RuntimeOptions.DoRuntimeEssentials(composition, appCaches, typeLoader, databaseFactory);
@@ -140,7 +163,7 @@ namespace Umbraco.Core.Runtime
                 Compose(composition);
 
                 // acquire the main domain - if this fails then anything that should be registered with MainDom will not operate
-                AcquireMainDom(mainDom);
+                AcquireMainDom(MainDom);
 
                 // determine our runtime level
                 DetermineRuntimeLevel(databaseFactory, ProfilingLogger);
@@ -220,13 +243,13 @@ namespace Umbraco.Core.Runtime
                 IOHelper.SetRootDirectory(path);
         }
 
-        private bool AcquireMainDom(MainDom mainDom)
+        private bool AcquireMainDom(IMainDom mainDom)
         {
             using (var timer = ProfilingLogger.DebugDuration<CoreRuntime>("Acquiring MainDom.", "Acquired."))
             {
                 try
                 {
-                    return mainDom.Acquire();
+                    return mainDom.IsMainDom;
                 }
                 catch
                 {
@@ -303,11 +326,9 @@ namespace Umbraco.Core.Runtime
         protected virtual IEnumerable<Type> GetComposerTypes(TypeLoader typeLoader)
             => typeLoader.GetTypes<IComposer>();
 
-        /// <summary>
-        /// Gets a logger.
-        /// </summary>
+        [Obsolete("Don't use this method, the logger should be injected into the " + nameof(CoreRuntime))]
         protected virtual ILogger GetLogger()
-            => SerilogLogger.CreateWithDefaultConfiguration();
+            => Logger ?? SerilogLogger.CreateWithDefaultConfiguration(); // TODO: Remove this in netcore, this purely just backwards compat ugliness
 
         /// <summary>
         /// Gets a profiler.
