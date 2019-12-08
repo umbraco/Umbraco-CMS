@@ -1,0 +1,34 @@
+﻿.umb-code-snippet {
+    .umb-code-snippet__header {
+        box-sizing: content-box;
+        background-color: #f2f2f2;
+        display: flex;
+        flex-direction: row;
+        font-size: .8rem;
+        border: 1px solid #e3e3e3;
+        border-bottom: 0;
+        margin-top: 16px;
+        min-height: 30px;
+
+        .language {
+            padding: 2px 16px;
+            flex-grow: 1;
+        }
+
+        button {
+            background-color: transparent;
+            border: 1px solid #bbb;
+            border-radius: 0;
+            color: #000;
+
+            &:hover {
+                background-color: @grayLighter;
+            }
+        }
+    }
+
+    pre {
+        overflow: auto;
+        white-space: nowrap;
+    }
+}
