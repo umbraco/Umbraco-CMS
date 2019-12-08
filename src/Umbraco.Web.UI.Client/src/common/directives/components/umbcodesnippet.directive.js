@@ -11,7 +11,7 @@
 	<div ng-controller="My.Controller as vm">
 
         <umb-code-snippet 
-            language="charp">
+            language="'csharp'">
             {{code}}
         </umb-code-snippet>
 
