@@ -34,7 +34,7 @@
 	})();
 </pre>
 
-@param {object} language (<code>binding</code>): Language of the code snippet.
+@param {string=} language Language of the code snippet, e.g csharp, html, css.
 **/
 
 
@@ -45,7 +45,6 @@
         templateUrl: 'views/components/umb-code-snippet.html',
         controller: UmbCodeSnippetController,
         controllerAs: 'vm',
-        //replace: true,
         transclude: true,
         bindings: {
             language: '<'
