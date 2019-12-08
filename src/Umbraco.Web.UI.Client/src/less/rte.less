@@ -3,7 +3,7 @@
 
 .umb-rte {
     position: relative;
-    
+
     .umb-property-editor--limit-width();
 }
 
@@ -83,10 +83,6 @@
     }
 }
 
-.umb-rte .mce-fullscreen {
-    position:absolute;
-}
-
 .umb-rte .mce-toolbar .mce-btn-group {
     padding: 0;
 }
@@ -120,7 +116,7 @@
     }
 }
 
-.umb-rte .mce-btn.mce-active, .umb-rte .mce-btn.mce-active:active, 
+.umb-rte .mce-btn.mce-active, .umb-rte .mce-btn.mce-active:active,
 .umb-rte .mce-btn.mce-active:hover, .umb-rte .mce-btn.mce-active:focus {
     background: @gray-9;
     border-color: transparent;
@@ -162,6 +158,10 @@
 }
 
 .umb-grid .umb-rte {
-    border: 1px solid #d8d7d9;
+    border: 1px solid @gray-8;
     max-width: none;
+}
+
+.mce-fullscreen {
+    position: absolute;
 }

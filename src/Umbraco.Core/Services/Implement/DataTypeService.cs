@@ -466,6 +466,14 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        public IReadOnlyDictionary<Udi, IEnumerable<string>> GetReferences(int id)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete:true))
+            {
+                return _dataTypeRepository.FindUsages(id);
+            }
+        }
+
         private void Audit(AuditType type, int userId, int objectId)
         {
             _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.DataType)));

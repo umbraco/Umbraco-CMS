@@ -1589,7 +1589,7 @@
     <key alias="insertControl">Neues Element</key>
     <key alias="chooseLayout">Layout auswählen</key>
     <key alias="addRows">Neue Zeile</key>
-    <key alias="addElement">Neuer Inhalt</key>
+    <key alias="addElement">Inhalt hinzufügen</key>
     <key alias="dropElement">Inhalt entfernen</key>
     <key alias="settingsApplied">Einstellungen anwenden</key>
     <key alias="contentNotAllowed"><![CDATA[Dieser Inhalt ist hier <strong>nicht</strong> zugelassen]]></key>

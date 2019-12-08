@@ -1,28 +1,36 @@
 'use strict';
 
 module.exports = {
+    compile: {
+        build: {
+            sourcemaps: false
+        },
+        dev: {
+            sourcemaps: true
+        }
+    },
     sources: {
 
-        //less files used by backoffice and preview
-        //processed in the less task
+        // less files used by backoffice and preview
+        // processed in the less task
         less: {
-            installer: { files: ["./src/less/installer.less"], out: "installer.css" },
-            nonodes: { files: ["./src/less/pages/nonodes.less"], out: "nonodes.style.min.css"},
-            preview: { files: ["./src/less/canvas-designer.less"], out: "canvasdesigner.css" },
-            umbraco: { files: ["./src/less/belle.less"], out: "umbraco.css" },
-            rteContent: { files: ["./src/less/rte-content.less"], out: "rte-content.css" }
+            installer: { files: "./src/less/installer.less", watch: "./src/less/**/*.less", out: "installer.css" },
+            nonodes: { files: "./src/less/pages/nonodes.less", watch: "./src/less/**/*.less", out: "nonodes.style.min.css"},
+            preview: { files: "./src/less/canvas-designer.less", watch: "./src/less/**/*.less", out: "canvasdesigner.css" },
+            umbraco: { files: "./src/less/belle.less", watch: "./src/less/**/*.less", out: "umbraco.css" },
+            rteContent: { files: "./src/less/rte-content.less", watch: "./src/less/**/*.less", out: "rte-content.css" }
         },
 
-        //js files for backoffie
-        //processed in the js task
+        // js files for backoffice
+        // processed in the js task
         js: {
-            preview: { files: ["./src/preview/**/*.js"], out: "umbraco.preview.js" },
-            installer: { files: ["./src/installer/**/*.js"], out: "umbraco.installer.js" },
-            filters: { files: ["./src/common/filters/**/*.js"], out: "umbraco.filters.js" },
-            resources: { files: ["./src/common/resources/**/*.js"], out: "umbraco.resources.js" },
-            services: { files: ["./src/common/services/**/*.js"], out: "umbraco.services.js" },
-            security: { files: ["./src/common/interceptors/**/*.js"], out: "umbraco.interceptors.js" },
-
+            preview: { files: "./src/preview/**/*.js", out: "umbraco.preview.js" },
+            installer: { files: "./src/installer/**/*.js", out: "umbraco.installer.js" },
+            filters: { files: "./src/common/filters/**/*.js", out: "umbraco.filters.js" },
+            resources: { files: "./src/common/resources/**/*.js", out: "umbraco.resources.js" },
+            services: { files: "./src/common/services/**/*.js", out: "umbraco.services.js" },
+            security: { files: "./src/common/interceptors/**/*.js", out: "umbraco.interceptors.js" },
+            
             //the controllers for views
             controllers: {
                 files: [
@@ -42,13 +50,16 @@ module.exports = {
                 ],
                 out: "umbraco.directives.js"
             }
+            
         },
 
         //selectors for copying all views into the build
         //processed in the views task
         views:{
-            umbraco: {files: ["./src/views/**/*.html"], folder: ""},
-            installer: {files: ["./src/installer/steps/*.html"], folder: "install/"}
+            views: {files: "./src/views/**/*.html", folder: ""},
+            directives: {files: "./src/common/directives/**/*.html", folder: ""},
+            components: {files: "./src/common/components/**/*.html", folder: ""},
+            installer: {files: "./src/installer/steps/*.html", folder: "install/"}
         },
 
         //globs for file-watching
