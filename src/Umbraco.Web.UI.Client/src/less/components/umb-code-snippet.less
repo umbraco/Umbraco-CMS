@@ -11,13 +11,17 @@
         min-height: 30px;
 
         .language {
-            padding: 2px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
             flex-grow: 1;
+            padding: 2px 16px;
         }
 
         button {
             background-color: transparent;
-            border: 1px solid #bbb;
+            border: none;
+            border-left: 1px solid #bbb;
             border-radius: 0;
             color: #000;
 
@@ -28,6 +32,7 @@
     }
 
     pre {
+        border-radius: 0;
         overflow: auto;
         white-space: nowrap;
     }
