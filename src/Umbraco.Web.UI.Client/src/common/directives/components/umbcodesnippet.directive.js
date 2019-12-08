@@ -64,6 +64,26 @@
 
         function onInit() {
             vm.guid = String.CreateGuid();
+
+            if (vm.language)
+            {
+                switch (vm.language.toLowerCase()) {
+                    case "csharp":
+                    case "c#":
+                        vm.language = "C#";
+                        break;
+                    case "html":
+                        vm.language = "HTML";
+                        break;
+                    case "css":
+                        vm.language = "CSS";
+                        break;
+                    case "javascript":
+                        vm.language = "JavaScript";
+                        break;
+                }
+            }
+            
         }
 
         // copy to clip board success

@@ -1,6 +1,6 @@
 ﻿<div class="umb-code-snippet">
     <div class="umb-code-snippet__header">
-        <span class="language">{{vm.language}}</span>
+        <span class="language" ng-if="vm.language">{{vm.language}}</span>
 
         <umb-button umb-clipboard
                     umb-clipboard-success="vm.copySuccess()"
