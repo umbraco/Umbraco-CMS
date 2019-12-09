@@ -9,7 +9,7 @@ namespace Umbraco.Core.Serialization
     /// Provides a base class for custom <see cref="JsonConverter"/> implementations.
     /// </summary>
     /// <typeparam name="T">The type of the converted object.</typeparam>
-    internal abstract class JsonReadConverter<T> : JsonConverter
+    public abstract class JsonReadConverter<T> : JsonConverter
     {
         /// <summary>
         /// Create an instance of objectType, based properties in the JSON object

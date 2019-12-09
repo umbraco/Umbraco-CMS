@@ -8,6 +8,7 @@
       <PackageReference Include="LightInject" Version="6.2.0" />
       <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
       <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-19554-01" />
+      <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
       <PackageReference Include="NPoco" Version="4.0.2" />
       <PackageReference Include="Serilog" Version="2.9.0" />
       <PackageReference Include="Serilog.Enrichers.Process" Version="2.0.1" />
@@ -22,6 +23,22 @@
 
     <ItemGroup>
       <_UnmanagedRegistrationCache Remove="obj\Umbraco.Infrastructure.csproj.UnmanagedRegistration.cache" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="obj\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="obj\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="obj\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Umbraco.Abstractions\Umbraco.Abstractions.csproj" />
     </ItemGroup>
 
 </Project>

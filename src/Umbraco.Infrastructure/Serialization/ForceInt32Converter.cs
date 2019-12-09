@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Umbraco.Core.Serialization
 {
-    internal class ForceInt32Converter : JsonConverter
+    public class ForceInt32Converter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {

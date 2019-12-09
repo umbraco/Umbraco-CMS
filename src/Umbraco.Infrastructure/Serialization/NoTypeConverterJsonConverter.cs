@@ -16,7 +16,7 @@ namespace Umbraco.Core.Serialization
     /// don't require this because to convert to string, we just override ToString().
     /// I'll leave this class here for the future though.
     /// </remarks>
-    internal class NoTypeConverterJsonConverter<T> : JsonConverter
+    public class NoTypeConverterJsonConverter<T> : JsonConverter
     {
         static readonly IContractResolver resolver = new NoTypeConverterContractResolver();
 
