@@ -29,7 +29,7 @@ namespace Umbraco.Tests.Services
             var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType("test", ValueStorageType.Ntext, "tags")
+                new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
                 {
                     DataTypeId = 1041
                 });
@@ -77,7 +77,7 @@ namespace Umbraco.Tests.Services
             var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType(Constants.PropertyEditors.Aliases.Tags, ValueStorageType.Ntext, "tags")
+                new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.Tags, ValueStorageType.Ntext, "tags")
                 {
                     DataTypeId = Constants.DataTypes.Tags
                 });

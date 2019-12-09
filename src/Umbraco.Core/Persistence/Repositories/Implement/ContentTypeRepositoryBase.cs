@@ -15,6 +15,7 @@ using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -26,9 +27,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal abstract class ContentTypeRepositoryBase<TEntity> : NPocoRepositoryBase<int, TEntity>, IReadRepository<Guid, TEntity>
         where TEntity : class, IContentTypeComposition
     {
-        protected ContentTypeRepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IContentTypeCommonRepository commonRepository, ILanguageRepository languageRepository)
+        private readonly IShortStringHelper _shortStringHelper;
+
+        protected ContentTypeRepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IContentTypeCommonRepository commonRepository, ILanguageRepository languageRepository, IShortStringHelper shortStringHelper)
             : base(scopeAccessor, cache, logger)
         {
+            _shortStringHelper = shortStringHelper;
             CommonRepository = commonRepository;
             LanguageRepository = languageRepository;
         }
@@ -88,7 +92,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected virtual PropertyType CreatePropertyType(string propertyEditorAlias, ValueStorageType storageType, string propertyTypeAlias)
         {
-            return new PropertyType(propertyEditorAlias, storageType, propertyTypeAlias);
+            return new PropertyType(_shortStringHelper, propertyEditorAlias, storageType, propertyTypeAlias);
         }
 
         protected override void PersistDeletedItem(TEntity entity)

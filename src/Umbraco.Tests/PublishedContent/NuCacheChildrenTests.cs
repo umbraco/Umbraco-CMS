@@ -77,12 +77,12 @@ namespace Umbraco.Tests.PublishedContent
                 dataType
             };
 
-            var propertyType = new PropertyType("Umbraco.Void.Editor", ValueStorageType.Nvarchar) { Alias = "prop", DataTypeId = 3, Variations = ContentVariation.Nothing };
-            _contentTypeInvariant = new ContentType(-1) { Id = 2, Alias = "itype", Variations = ContentVariation.Nothing };
+            var propertyType = new PropertyType(TestHelper.ShortStringHelper, "Umbraco.Void.Editor", ValueStorageType.Nvarchar) { Alias = "prop", DataTypeId = 3, Variations = ContentVariation.Nothing };
+            _contentTypeInvariant = new ContentType(TestHelper.ShortStringHelper, -1) { Id = 2, Alias = "itype", Variations = ContentVariation.Nothing };
             _contentTypeInvariant.AddPropertyType(propertyType);
 
-            propertyType = new PropertyType("Umbraco.Void.Editor", ValueStorageType.Nvarchar) { Alias = "prop", DataTypeId = 3, Variations = ContentVariation.Culture };
-            _contentTypeVariant = new ContentType(-1) { Id = 3, Alias = "vtype", Variations = ContentVariation.Culture };
+            propertyType = new PropertyType(TestHelper.ShortStringHelper, "Umbraco.Void.Editor", ValueStorageType.Nvarchar) { Alias = "prop", DataTypeId = 3, Variations = ContentVariation.Culture };
+            _contentTypeVariant = new ContentType(TestHelper.ShortStringHelper, -1) { Id = 3, Alias = "vtype", Variations = ContentVariation.Culture };
             _contentTypeVariant.AddPropertyType(propertyType);
 
             var contentTypes = new[]
@@ -163,7 +163,7 @@ namespace Umbraco.Tests.PublishedContent
                 globalSettings,
                 Mock.Of<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
-                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }),
+                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }),
                 typeFinder,
                 hostingEnvironment);
 

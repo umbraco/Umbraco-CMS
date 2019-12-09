@@ -15,7 +15,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
         public static PropertyType CreateDecimalProperty(string alias, string name, int dtdId)
         {
             return
-                new PropertyType("test", ValueStorageType.Decimal, alias)
+                new PropertyType(TestHelper.ShortStringHelper, "test", ValueStorageType.Decimal, alias)
                 {
                     Name = name,
                     Description = "Decimal property type",
@@ -34,7 +34,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
         public static PropertyType CreateIntegerProperty(string alias, string name)
         {
             return
-                new PropertyType("test", ValueStorageType.Integer, alias)
+                new PropertyType(TestHelper.ShortStringHelper, "test", ValueStorageType.Integer, alias)
                 {
                     Name = name,
                     Description = "Integer property type",
@@ -53,7 +53,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
         public static PropertyType CreateDateTimeProperty(string alias, string name)
         {
             return
-                new PropertyType("test", ValueStorageType.Date, alias)
+                new PropertyType(TestHelper.ShortStringHelper, "test", ValueStorageType.Date, alias)
                 {
                     Name = name,
                     Description = "DateTime property type",

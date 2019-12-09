@@ -17,10 +17,10 @@ namespace Umbraco.Tests.Issues
         public void Test()
         {
             // create a content type and some properties
-            var contentType = new ContentType(-1);
+            var contentType = new ContentType(ShortStringHelper, -1);
             contentType.Alias = "test";
             contentType.Name = "test";
-            var propertyType = new PropertyType("test", ValueStorageType.Ntext, "prop") { Name = "Prop", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88 };
+            var propertyType = new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "prop") { Name = "Prop", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88 };
             contentType.PropertyTypeCollection.Add(propertyType);
             Core.Composing.Current.Services.ContentTypeService.Save(contentType);
 

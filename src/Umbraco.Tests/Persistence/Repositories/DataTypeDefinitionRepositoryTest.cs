@@ -42,7 +42,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 dtRepo.Save(dataType2);
 
                 var ctRepo = Factory.GetInstance<IContentTypeRepository>();
-                IContentType ct = new ContentType(-1)
+                IContentType ct = new ContentType(ShortStringHelper, -1)
                 {
                     Alias = "ct1",
                     Name = "CT1",
@@ -55,15 +55,15 @@ namespace Umbraco.Tests.Persistence.Repositories
                             Name = "PG1",
                             PropertyTypes = new PropertyTypeCollection(true)
                             {
-                                new PropertyType(dataType1, "pt1")
+                                new PropertyType(ShortStringHelper, dataType1, "pt1")
                                 {
                                     Name = "PT1"
                                 },
-                                new PropertyType(dataType1, "pt2")
+                                new PropertyType(ShortStringHelper, dataType1, "pt2")
                                 {
                                     Name = "PT2"
                                 },
-                                new PropertyType(dataType2, "pt3")
+                                new PropertyType(ShortStringHelper, dataType2, "pt3")
                                 {
                                     Name = "PT3"
                                 }

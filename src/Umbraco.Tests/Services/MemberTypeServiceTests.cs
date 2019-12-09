@@ -86,7 +86,7 @@ namespace Umbraco.Tests.Services
             var initProps = member.Properties.Count;
 
             //remove a property (NOT ONE OF THE DEFAULTS)
-            var standardProps = ConventionsHelper.GetStandardPropertyTypeStubs();
+            var standardProps = ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper);
             memberType.RemovePropertyType(memberType.PropertyTypes.First(x => standardProps.ContainsKey(x.Alias) == false).Alias);
             ServiceContext.MemberTypeService.Save(memberType);
 
@@ -132,7 +132,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Rebuild_Member_Xml_On_Property_Removal()
         {
-            var standardProps = ConventionsHelper.GetStandardPropertyTypeStubs();
+            var standardProps = ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper);
 
             var contentType1 = MockedContentTypes.CreateSimpleMemberType("test1", "Test1");
             ServiceContext.MemberTypeService.Save(contentType1);

@@ -18,6 +18,7 @@ namespace Umbraco.Tests.Models
         [SetUp]
         public void Setup()
         {
+            Umbraco.Composing.Current.Logger = Current.Logger;
             Current.Reset();
             Current.UnlockConfigs(TestHelper.GetConfigsFactory(), TestHelper.IOHelper);
             Current.Configs.Add(SettingsForTests.GetDefaultGlobalSettings);

@@ -7,6 +7,13 @@ namespace Umbraco.Core.Strings
     /// </summary>
     public class DefaultUrlSegmentProvider : IUrlSegmentProvider
     {
+        private readonly IShortStringHelper _shortStringHelper;
+
+        public DefaultUrlSegmentProvider(IShortStringHelper shortStringHelper)
+        {
+            _shortStringHelper = shortStringHelper;
+        }
+
         /// <summary>
         /// Gets the url segment for a specified content and culture.
         /// </summary>
@@ -15,7 +22,7 @@ namespace Umbraco.Core.Strings
         /// <returns>The url segment.</returns>
         public string GetUrlSegment(IContentBase content, string culture = null)
         {
-            return GetUrlSegmentSource(content, culture).ToUrlSegment(culture);
+            return GetUrlSegmentSource(content, culture).ToUrlSegment(_shortStringHelper, culture);
         }
 
         private static string GetUrlSegmentSource(IContentBase content, string culture)

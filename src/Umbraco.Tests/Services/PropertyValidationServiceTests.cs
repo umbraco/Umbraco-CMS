@@ -44,13 +44,13 @@ namespace Umbraco.Tests.Services
         {
             MockObjects(out var validationService, out var dataType);
 
-            var p1 = new Property(new PropertyType(dataType, "test1") { Mandatory = true, Variations = ContentVariation.Culture});
+            var p1 = new Property(new PropertyType(ShortStringHelper, dataType, "test1") { Mandatory = true, Variations = ContentVariation.Culture});
             p1.SetValue("Hello", "en-US");
-            var p2 = new Property(new PropertyType(dataType, "test2") { Mandatory = true, Variations = ContentVariation.Nothing });
+            var p2 = new Property(new PropertyType(ShortStringHelper, dataType, "test2") { Mandatory = true, Variations = ContentVariation.Nothing });
             p2.SetValue("Hello", null);
-            var p3 = new Property(new PropertyType(dataType, "test3") { Mandatory = true, Variations = ContentVariation.Culture });
+            var p3 = new Property(new PropertyType(ShortStringHelper, dataType, "test3") { Mandatory = true, Variations = ContentVariation.Culture });
             p3.SetValue(null, "en-US"); //invalid
-            var p4 = new Property(new PropertyType(dataType, "test4") { Mandatory = true, Variations = ContentVariation.Nothing });
+            var p4 = new Property(new PropertyType(ShortStringHelper, dataType, "test4") { Mandatory = true, Variations = ContentVariation.Nothing });
             p4.SetValue(null, null); //invalid
 
             var content = Mock.Of<IContent>(
@@ -68,13 +68,13 @@ namespace Umbraco.Tests.Services
         {
             MockObjects(out var validationService, out var dataType);
 
-            var p1 = new Property(new PropertyType(dataType, "test1") { Mandatory = true, Variations = ContentVariation.Culture });
+            var p1 = new Property(new PropertyType(ShortStringHelper, dataType, "test1") { Mandatory = true, Variations = ContentVariation.Culture });
             p1.SetValue("Hello", "en-US");
-            var p2 = new Property(new PropertyType(dataType, "test2") { Mandatory = true, Variations = ContentVariation.Nothing });
+            var p2 = new Property(new PropertyType(ShortStringHelper, dataType, "test2") { Mandatory = true, Variations = ContentVariation.Nothing });
             p2.SetValue("Hello", null);
-            var p3 = new Property(new PropertyType(dataType, "test3") { Mandatory = true, Variations = ContentVariation.Culture });
+            var p3 = new Property(new PropertyType(ShortStringHelper, dataType, "test3") { Mandatory = true, Variations = ContentVariation.Culture });
             p3.SetValue(null, "en-US"); //invalid
-            var p4 = new Property(new PropertyType(dataType, "test4") { Mandatory = true, Variations = ContentVariation.Nothing });
+            var p4 = new Property(new PropertyType(ShortStringHelper, dataType, "test4") { Mandatory = true, Variations = ContentVariation.Nothing });
             p4.SetValue(null, null); //invalid
 
             var content = Mock.Of<IContent>(
@@ -92,13 +92,13 @@ namespace Umbraco.Tests.Services
         {
             MockObjects(out var validationService, out var dataType);
 
-            var p1 = new Property(new PropertyType(dataType, "test1") { Mandatory = true, Variations = ContentVariation.Culture });
+            var p1 = new Property(new PropertyType(ShortStringHelper, dataType, "test1") { Mandatory = true, Variations = ContentVariation.Culture });
             p1.SetValue(null, "en-US"); //invalid
-            var p2 = new Property(new PropertyType(dataType, "test2") { Mandatory = true, Variations = ContentVariation.Nothing });
+            var p2 = new Property(new PropertyType(ShortStringHelper, dataType, "test2") { Mandatory = true, Variations = ContentVariation.Nothing });
             p2.SetValue(null, null); //invalid
-            var p3 = new Property(new PropertyType(dataType, "test3") { Mandatory = true, Variations = ContentVariation.Culture });
+            var p3 = new Property(new PropertyType(ShortStringHelper, dataType, "test3") { Mandatory = true, Variations = ContentVariation.Culture });
             p3.SetValue(null, "en-US"); //ignored because the impact isn't the default lang + the content is published
-            var p4 = new Property(new PropertyType(dataType, "test4") { Mandatory = true, Variations = ContentVariation.Nothing });
+            var p4 = new Property(new PropertyType(ShortStringHelper, dataType, "test4") { Mandatory = true, Variations = ContentVariation.Nothing });
             p4.SetValue(null, null); //ignored because the impact isn't the default lang + the content is published
 
             var content = Mock.Of<IContent>(
@@ -116,13 +116,13 @@ namespace Umbraco.Tests.Services
         {
             MockObjects(out var validationService, out var dataType);
 
-            var p1 = new Property(new PropertyType(dataType, "test1") { Mandatory = true, Variations = ContentVariation.Culture });
+            var p1 = new Property(new PropertyType(ShortStringHelper, dataType, "test1") { Mandatory = true, Variations = ContentVariation.Culture });
             p1.SetValue(null, "en-US"); //ignored since this is variant
-            var p2 = new Property(new PropertyType(dataType, "test2") { Mandatory = true, Variations = ContentVariation.Nothing });
+            var p2 = new Property(new PropertyType(ShortStringHelper, dataType, "test2") { Mandatory = true, Variations = ContentVariation.Nothing });
             p2.SetValue(null, null); //invalid
-            var p3 = new Property(new PropertyType(dataType, "test3") { Mandatory = true, Variations = ContentVariation.Culture });
+            var p3 = new Property(new PropertyType(ShortStringHelper, dataType, "test3") { Mandatory = true, Variations = ContentVariation.Culture });
             p3.SetValue("Hello", "en-US"); //ignored since this is variant
-            var p4 = new Property(new PropertyType(dataType, "test4") { Mandatory = true, Variations = ContentVariation.Nothing });
+            var p4 = new Property(new PropertyType(ShortStringHelper, dataType, "test4") { Mandatory = true, Variations = ContentVariation.Nothing });
             p4.SetValue(null, null); //invalid
 
             var content = Mock.Of<IContent>(
@@ -139,13 +139,13 @@ namespace Umbraco.Tests.Services
         {
             MockObjects(out var validationService, out var dataType);
 
-            var p1 = new Property(new PropertyType(dataType, "test1") { Mandatory = true, Variations = ContentVariation.Culture });
+            var p1 = new Property(new PropertyType(ShortStringHelper, dataType, "test1") { Mandatory = true, Variations = ContentVariation.Culture });
             p1.SetValue(null, "en-US"); //invalid
-            var p2 = new Property(new PropertyType(dataType, "test2") { Mandatory = true, Variations = ContentVariation.Nothing });
+            var p2 = new Property(new PropertyType(ShortStringHelper, dataType, "test2") { Mandatory = true, Variations = ContentVariation.Nothing });
             p2.SetValue(null, null); //invalid
-            var p3 = new Property(new PropertyType(dataType, "test3") { Mandatory = true, Variations = ContentVariation.Culture });
+            var p3 = new Property(new PropertyType(ShortStringHelper, dataType, "test3") { Mandatory = true, Variations = ContentVariation.Culture });
             p3.SetValue(null, "en-US"); //invalid
-            var p4 = new Property(new PropertyType(dataType, "test4") { Mandatory = true, Variations = ContentVariation.Nothing });
+            var p4 = new Property(new PropertyType(ShortStringHelper, dataType, "test4") { Mandatory = true, Variations = ContentVariation.Nothing });
             p4.SetValue(null, null); //invalid
 
             var content = Mock.Of<IContent>(

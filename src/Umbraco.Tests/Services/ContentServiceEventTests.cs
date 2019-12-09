@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Services
         {
             var languageService = ServiceContext.LocalizationService;
 
-            languageService.Save(new Language("fr-FR"));
+            languageService.Save(new Language(TestObjects.GetGlobalSettings(), "fr-FR"));
 
             var contentTypeService = ServiceContext.ContentTypeService;
 
@@ -104,7 +104,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
 
             IContent document = new Content("content", -1, contentType);
-            
+
             void OnSaving(IContentService sender, ContentSavingEventArgs e)
             {
                 var saved = e.SavedEntities.First();
@@ -122,7 +122,7 @@ namespace Umbraco.Tests.Services
 
                 //we're only dealing with invariant here
                 var propValue = saved.Properties["title"].Values.First(x => x.Culture == null && x.Segment == null);
-                
+
                 Assert.AreEqual("title", propValue.EditedValue);
                 Assert.IsNull(propValue.PublishedValue);
             }
@@ -138,7 +138,7 @@ namespace Umbraco.Tests.Services
                 ContentService.Saving -= OnSaving;
                 ContentService.Saved -= OnSaved;
             }
-            
+
         }
 
         [Test]
@@ -146,7 +146,7 @@ namespace Umbraco.Tests.Services
         {
             var languageService = ServiceContext.LocalizationService;
 
-            languageService.Save(new Language("fr-FR"));
+            languageService.Save(new Language(TestObjects.GetGlobalSettings(), "fr-FR"));
 
             var contentTypeService = ServiceContext.ContentTypeService;
 
@@ -244,7 +244,7 @@ namespace Umbraco.Tests.Services
                 Assert.AreEqual("title", propValue.PublishedValue);
             }
 
-            //We are binding to Saving (not Publishing), because the Publishing event is really just used for cancelling, it should not be 
+            //We are binding to Saving (not Publishing), because the Publishing event is really just used for cancelling, it should not be
             //used for setting values and it won't actually work! This is because the Publishing event is raised AFTER the values on the model
             //are published, but Saving is raised BEFORE.
             ContentService.Saving += OnSaving;
@@ -292,7 +292,7 @@ namespace Umbraco.Tests.Services
                 saved.SetValue("title", "title");
             }
 
-            //We are binding to Saving (not Publishing), because the Publishing event is really just used for cancelling, it should not be 
+            //We are binding to Saving (not Publishing), because the Publishing event is really just used for cancelling, it should not be
             //used for setting values and it won't actually work! This is because the Publishing event is raised AFTER the values on the model
             //are published, but Saving is raised BEFORE.
             ContentService.Saving += OnSaving;
@@ -312,7 +312,7 @@ namespace Umbraco.Tests.Services
         {
             var languageService = ServiceContext.LocalizationService;
 
-            languageService.Save(new Language("fr-FR"));
+            languageService.Save(new Language(TestObjects.GetGlobalSettings(), "fr-FR"));
 
             var contentTypeService = ServiceContext.ContentTypeService;
 

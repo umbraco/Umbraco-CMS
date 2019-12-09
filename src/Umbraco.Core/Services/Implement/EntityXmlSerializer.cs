@@ -23,6 +23,7 @@ namespace Umbraco.Core.Services.Implement
         private readonly IUserService _userService;
         private readonly ILocalizationService _localizationService;
         private readonly UrlSegmentProviderCollection _urlSegmentProviders;
+        private readonly IShortStringHelper _shortStringHelper;
 
         public EntityXmlSerializer(
             IContentService contentService,
@@ -31,7 +32,8 @@ namespace Umbraco.Core.Services.Implement
             IUserService userService,
             ILocalizationService localizationService,
             IContentTypeService contentTypeService,
-            UrlSegmentProviderCollection urlSegmentProviders)
+            UrlSegmentProviderCollection urlSegmentProviders,
+            IShortStringHelper shortStringHelper)
         {
             _contentTypeService = contentTypeService;
             _mediaService = mediaService;
@@ -40,6 +42,7 @@ namespace Umbraco.Core.Services.Implement
             _userService = userService;
             _localizationService = localizationService;
             _urlSegmentProviders = urlSegmentProviders;
+            _shortStringHelper = shortStringHelper;
         }
 
         /// <summary>
@@ -53,7 +56,7 @@ namespace Umbraco.Core.Services.Implement
 
             var nodeName = content.ContentType.Alias.ToSafeAlias();
 
-            var xml = SerializeContentBase(content, content.GetUrlSegment(_urlSegmentProviders), nodeName, published);
+            var xml = SerializeContentBase(content, content.GetUrlSegment(_shortStringHelper, _urlSegmentProviders), nodeName, published);
 
             xml.Add(new XAttribute("nodeType", content.ContentType.Id));
             xml.Add(new XAttribute("nodeTypeAlias", content.ContentType.Alias));
@@ -100,7 +103,7 @@ namespace Umbraco.Core.Services.Implement
             var nodeName = media.ContentType.Alias.ToSafeAlias();
 
             const bool published = false; // always false for media
-            var xml = SerializeContentBase(media, media.GetUrlSegment(_urlSegmentProviders), nodeName, published);
+            var xml = SerializeContentBase(media, media.GetUrlSegment(_shortStringHelper, _urlSegmentProviders), nodeName, published);
 
             xml.Add(new XAttribute("nodeType", media.ContentType.Id));
             xml.Add(new XAttribute("nodeTypeAlias", media.ContentType.Alias));

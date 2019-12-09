@@ -13,6 +13,7 @@ namespace Umbraco.Core.Models.Membership
     [DataContract(IsReference = true)]
     public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     {
+        private readonly IShortStringHelper _shortStringHelper;
         private int? _startContentId;
         private int? _startMediaId;
         private string _alias;
@@ -30,8 +31,9 @@ namespace Umbraco.Core.Models.Membership
         /// <summary>
         /// Constructor to create a new user group
         /// </summary>
-        public UserGroup()
+        public UserGroup(IShortStringHelper shortStringHelper)
         {
+            _shortStringHelper = shortStringHelper;
             _sectionCollection = new List<string>();
         }
 
@@ -43,8 +45,8 @@ namespace Umbraco.Core.Models.Membership
         /// <param name="name"></param>
         /// <param name="permissions"></param>
         /// <param name="icon"></param>
-        public UserGroup(int userCount, string alias, string name, IEnumerable<string> permissions, string icon)
-            : this()
+        public UserGroup(IShortStringHelper shortStringHelper, int userCount, string alias, string name, IEnumerable<string> permissions, string icon)
+            : this(shortStringHelper)
         {
             UserCount = userCount;
             _alias = alias;
@@ -78,7 +80,7 @@ namespace Umbraco.Core.Models.Membership
         public string Alias
         {
             get => _alias;
-            set => SetPropertyValueAndDetectChanges(value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase), ref _alias, nameof(Alias));
+            set => SetPropertyValueAndDetectChanges(value.ToCleanString(_shortStringHelper, CleanStringType.Alias | CleanStringType.UmbracoCase), ref _alias, nameof(Alias));
         }
 
         [DataMember]

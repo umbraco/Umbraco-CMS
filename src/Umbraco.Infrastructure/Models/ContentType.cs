@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models
 {
@@ -23,7 +24,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <remarks>Only use this for creating ContentTypes at the root (with ParentId -1).</remarks>
         /// <param name="parentId"></param>
-        public ContentType(int parentId) : base(parentId)
+        public ContentType(IShortStringHelper shortStringHelper, int parentId) : base(shortStringHelper, parentId)
         {
             _allowedTemplates = new List<ITemplate>();
         }
@@ -35,8 +36,8 @@ namespace Umbraco.Core.Models
         /// <remarks>Use this to ensure inheritance from parent.</remarks>
         /// <param name="parent"></param>
         /// <param name="alias"></param>
-        public ContentType(IContentType parent, string alias)
-            : base(parent, alias)
+        public ContentType(IShortStringHelper shortStringHelper, IContentType parent, string alias)
+            : base(shortStringHelper, parent, alias)
         {
             _allowedTemplates = new List<ITemplate>();
         }

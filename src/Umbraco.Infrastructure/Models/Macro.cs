@@ -16,8 +16,11 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class Macro : EntityBase, IMacro
     {
-        public Macro()
+        private readonly IShortStringHelper _shortStringHelper;
+
+        public Macro(IShortStringHelper shortStringHelper)
         {
+            _shortStringHelper = shortStringHelper;
             _properties = new MacroPropertyCollection();
             _properties.CollectionChanged += PropertiesChanged;
             _addedProperties = new List<string>();
@@ -37,14 +40,14 @@ namespace Umbraco.Core.Models
         /// <param name="cacheByMember"></param>
         /// <param name="dontRender"></param>
         /// <param name="macroSource"></param>
-        public Macro(int id, Guid key, bool useInEditor, int cacheDuration, string @alias, string name, bool cacheByPage, bool cacheByMember, bool dontRender, string macroSource, MacroTypes macroType)
-            : this()
+        public Macro(IShortStringHelper shortStringHelper, int id, Guid key, bool useInEditor, int cacheDuration, string @alias, string name, bool cacheByPage, bool cacheByMember, bool dontRender, string macroSource, MacroTypes macroType)
+            : this(shortStringHelper)
         {
             Id = id;
             Key = key;
             UseInEditor = useInEditor;
             CacheDuration = cacheDuration;
-            Alias = alias.ToCleanString(CleanStringType.Alias);
+            Alias = alias.ToCleanString(shortStringHelper,CleanStringType.Alias);
             Name = name;
             CacheByPage = cacheByPage;
             CacheByMember = cacheByMember;
@@ -64,7 +67,7 @@ namespace Umbraco.Core.Models
         /// <param name="cacheByMember"></param>
         /// <param name="dontRender"></param>
         /// <param name="macroSource"></param>
-        public Macro(string @alias, string name,
+        public Macro(IShortStringHelper shortStringHelper, string @alias, string name,
             string macroSource,
             MacroTypes macroType,
             bool cacheByPage = false,
@@ -72,11 +75,11 @@ namespace Umbraco.Core.Models
             bool dontRender = true,
             bool useInEditor = false,
             int cacheDuration = 0)
-            : this()
+            : this(shortStringHelper)
         {
             UseInEditor = useInEditor;
             CacheDuration = cacheDuration;
-            Alias = alias.ToCleanString(CleanStringType.Alias);
+            Alias = alias.ToCleanString(shortStringHelper, CleanStringType.Alias);
             Name = name;
             CacheByPage = cacheByPage;
             CacheByMember = cacheByMember;
@@ -142,7 +145,7 @@ namespace Umbraco.Core.Models
         }
 
         public override void ResetDirtyProperties(bool rememberDirty)
-        {   
+        {
             base.ResetDirtyProperties(rememberDirty);
 
             _addedProperties.Clear();
@@ -171,7 +174,7 @@ namespace Umbraco.Core.Models
         public string Alias
         {
             get => _alias;
-            set => SetPropertyValueAndDetectChanges(value.ToCleanString(CleanStringType.Alias), ref _alias, nameof(Alias));
+            set => SetPropertyValueAndDetectChanges(value.ToCleanString(_shortStringHelper, CleanStringType.Alias), ref _alias, nameof(Alias));
         }
 
         /// <summary>
@@ -265,13 +268,13 @@ namespace Umbraco.Core.Models
             base.PerformDeepClone(clone);
 
             var clonedEntity = (Macro)clone;
-            
+
             clonedEntity._addedProperties = new List<string>();
             clonedEntity._removedProperties = new List<string>();
             clonedEntity._properties = (MacroPropertyCollection)Properties.DeepClone();
             //re-assign the event handler
             clonedEntity._properties.CollectionChanged += clonedEntity.PropertiesChanged;
-            
+
         }
     }
 }

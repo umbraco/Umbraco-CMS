@@ -76,7 +76,7 @@ namespace Umbraco.Tests.Services
                 Factory.GetInstance<IGlobalSettings>(),
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
-                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }),
+                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(ShortStringHelper) }),
                 typeFinder,
                 hostingEnvironment);
         }
@@ -307,7 +307,7 @@ namespace Umbraco.Tests.Services
             var nlContentName = "Content nl-NL";
             var nlCulture = "nl-NL";
 
-            ServiceContext.LocalizationService.Save(new Language(nlCulture));
+            ServiceContext.LocalizationService.Save(new Language(TestObjects.GetGlobalSettings(), nlCulture));
 
             var includeCultureNames = contentType.Variations.HasFlag(ContentVariation.Culture);
 
@@ -663,9 +663,9 @@ namespace Umbraco.Tests.Services
             // can change it to variant and back
             // can then switch one property to variant
 
-            var languageEn = new Language("en") { IsDefault = true };
+            var languageEn = new Language(TestObjects.GetGlobalSettings(), "en") { IsDefault = true };
             ServiceContext.LocalizationService.Save(languageEn);
-            var languageFr = new Language("fr");
+            var languageFr = new Language(TestObjects.GetGlobalSettings(), "fr");
             ServiceContext.LocalizationService.Save(languageFr);
 
             var contentType = CreateContentType(ContentVariation.Nothing);
@@ -1256,13 +1256,13 @@ namespace Umbraco.Tests.Services
 
         private void CreateFrenchAndEnglishLangs()
         {
-            var languageEn = new Language("en") { IsDefault = true };
+            var languageEn = new Language(TestObjects.GetGlobalSettings(), "en") { IsDefault = true };
             ServiceContext.LocalizationService.Save(languageEn);
-            var languageFr = new Language("fr");
+            var languageFr = new Language(TestObjects.GetGlobalSettings(), "fr");
             ServiceContext.LocalizationService.Save(languageFr);
         }
 
-        private IContentType CreateContentType(ContentVariation variance, string alias = "contentType") => new ContentType(-1)
+        private IContentType CreateContentType(ContentVariation variance, string alias = "contentType") => new ContentType(ShortStringHelper, -1)
         {
             Alias = alias,
             Name = alias,
@@ -1274,7 +1274,7 @@ namespace Umbraco.Tests.Services
             var propertyCollection = new PropertyTypeCollection(true);
 
             foreach (var (alias, variance) in props)
-                propertyCollection.Add(new PropertyType(alias, ValueStorageType.Ntext)
+                propertyCollection.Add(new PropertyType(ShortStringHelper, alias, ValueStorageType.Ntext)
                 {
                     Alias = alias,
                     DataTypeId = -88,

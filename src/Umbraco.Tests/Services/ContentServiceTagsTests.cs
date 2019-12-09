@@ -47,7 +47,7 @@ namespace Umbraco.Tests.Services
             var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType("test", ValueStorageType.Ntext, "tags")
+                new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
                 {
                     DataTypeId = 1041
                 });
@@ -79,14 +79,14 @@ namespace Umbraco.Tests.Services
         public void TagsCanBeVariant()
         {
             var languageService = ServiceContext.LocalizationService;
-            languageService.Save(new Language("fr-FR")); // en-US is already there
+            languageService.Save(new Language(TestObjects.GetGlobalSettings(), "fr-FR")); // en-US is already there
 
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType("test", ValueStorageType.Ntext, "tags")
+                new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
                 {
                     DataTypeId = 1041,
                     Variations = ContentVariation.Culture
@@ -140,7 +140,7 @@ namespace Umbraco.Tests.Services
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             PropertyType propertyType;
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                propertyType = new PropertyType("test", ValueStorageType.Ntext, "tags")
+                propertyType = new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
                 {
                     DataTypeId = 1041
                 });
@@ -203,7 +203,7 @@ namespace Umbraco.Tests.Services
         public void TagsCanBecomeInvariant()
         {
             var languageService = ServiceContext.LocalizationService;
-            languageService.Save(new Language("fr-FR")); // en-US is already there
+            languageService.Save(new Language(TestObjects.GetGlobalSettings(), "fr-FR")); // en-US is already there
 
             var enId = ServiceContext.LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
 
@@ -213,7 +213,7 @@ namespace Umbraco.Tests.Services
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             PropertyType propertyType;
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                propertyType = new PropertyType("test", ValueStorageType.Ntext, "tags")
+                propertyType = new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
                 {
                     DataTypeId = 1041,
                     Variations = ContentVariation.Culture
@@ -260,7 +260,7 @@ namespace Umbraco.Tests.Services
         public void TagsCanBecomeInvariant2()
         {
             var languageService = ServiceContext.LocalizationService;
-            languageService.Save(new Language("fr-FR")); // en-US is already there
+            languageService.Save(new Language(TestObjects.GetGlobalSettings(), "fr-FR")); // en-US is already there
 
             var enId = ServiceContext.LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
 
@@ -270,7 +270,7 @@ namespace Umbraco.Tests.Services
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             PropertyType propertyType;
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                propertyType = new PropertyType("test", ValueStorageType.Ntext, "tags")
+                propertyType = new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
                 {
                     DataTypeId = 1041,
                     Variations = ContentVariation.Culture
@@ -307,7 +307,7 @@ namespace Umbraco.Tests.Services
         public void TagsCanBecomeInvariantByPropertyType()
         {
             var languageService = ServiceContext.LocalizationService;
-            languageService.Save(new Language("fr-FR")); // en-US is already there
+            languageService.Save(new Language(TestObjects.GetGlobalSettings(), "fr-FR")); // en-US is already there
 
             var enId = ServiceContext.LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
 
@@ -317,7 +317,7 @@ namespace Umbraco.Tests.Services
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             PropertyType propertyType;
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                propertyType = new PropertyType("test", ValueStorageType.Ntext, "tags")
+                propertyType = new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
                 {
                     DataTypeId = 1041,
                     Variations = ContentVariation.Culture
@@ -364,7 +364,7 @@ namespace Umbraco.Tests.Services
         public void TagsCanBecomeInvariantByPropertyTypeAndBackToVariant()
         {
             var languageService = ServiceContext.LocalizationService;
-            languageService.Save(new Language("fr-FR")); // en-US is already there
+            languageService.Save(new Language(TestObjects.GetGlobalSettings(), "fr-FR")); // en-US is already there
 
             var enId = ServiceContext.LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
 
@@ -374,7 +374,7 @@ namespace Umbraco.Tests.Services
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             PropertyType propertyType;
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                propertyType = new PropertyType("test", ValueStorageType.Ntext, "tags")
+                propertyType = new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
                 {
                     DataTypeId = 1041,
                     Variations = ContentVariation.Culture
@@ -407,7 +407,7 @@ namespace Umbraco.Tests.Services
             var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType("test", ValueStorageType.Ntext, "tags")
+                new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
                 {
                     DataTypeId = 1041
                 });
@@ -438,7 +438,7 @@ namespace Umbraco.Tests.Services
             var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType("test", ValueStorageType.Ntext, "tags")
+                new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
                 {
                     DataTypeId = 1041
                 });
@@ -471,7 +471,7 @@ namespace Umbraco.Tests.Services
             var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType("test", ValueStorageType.Ntext, "tags")
+                new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
                 {
                     DataTypeId = 1041
                 });
@@ -547,7 +547,7 @@ namespace Umbraco.Tests.Services
             var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType("test", ValueStorageType.Ntext, "tags")
+                new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
                 {
                     DataTypeId = 1041
                 });
@@ -574,7 +574,7 @@ namespace Umbraco.Tests.Services
             var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType("test", ValueStorageType.Ntext, "tags")
+                new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
                 {
                     DataTypeId = 1041
                 });
@@ -628,7 +628,7 @@ namespace Umbraco.Tests.Services
 
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType("test", ValueStorageType.Ntext, "tags")
+                new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
                 {
                     DataTypeId = 1041
                 });
@@ -679,7 +679,7 @@ namespace Umbraco.Tests.Services
 
             // create content type with a tag property
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
-            contentType.PropertyGroups.First().PropertyTypes.Add(new PropertyType("test", ValueStorageType.Ntext, "tags") { DataTypeId = 1041 });
+            contentType.PropertyGroups.First().PropertyTypes.Add(new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags") { DataTypeId = 1041 });
             contentTypeService.Save(contentType);
 
             // create a content with tags and publish
@@ -713,7 +713,7 @@ namespace Umbraco.Tests.Services
             var contentTypeService = ServiceContext.ContentTypeService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType("test", ValueStorageType.Ntext, "tags")
+                new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
                 {
                     DataTypeId = 1041
                 });
@@ -747,7 +747,7 @@ namespace Umbraco.Tests.Services
             var contentTypeService = ServiceContext.ContentTypeService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType("test", ValueStorageType.Ntext, "tags")
+                new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
                 {
                     DataTypeId = 1041
                 });
@@ -781,7 +781,7 @@ namespace Umbraco.Tests.Services
             var contentTypeService = ServiceContext.ContentTypeService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType("test", ValueStorageType.Ntext, "tags")
+                new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
                 {
                     DataTypeId = 1041
                 });

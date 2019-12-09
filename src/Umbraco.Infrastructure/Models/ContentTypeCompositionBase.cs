@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models
 {
@@ -16,15 +17,15 @@ namespace Umbraco.Core.Models
         private List<IContentTypeComposition> _contentTypeComposition = new List<IContentTypeComposition>();
         internal List<int> RemovedContentTypeKeyTracker = new List<int>();
 
-        protected ContentTypeCompositionBase(int parentId) : base(parentId)
+        protected ContentTypeCompositionBase(IShortStringHelper shortStringHelper, int parentId) : base(shortStringHelper, parentId)
         { }
 
-        protected ContentTypeCompositionBase(IContentTypeComposition parent)
-            : this(parent, null)
+        protected ContentTypeCompositionBase(IShortStringHelper shortStringHelper,IContentTypeComposition parent)
+            : this(shortStringHelper, parent, null)
         { }
 
-        protected ContentTypeCompositionBase(IContentTypeComposition parent, string alias)
-            : base(parent, alias)
+        protected ContentTypeCompositionBase(IShortStringHelper shortStringHelper, IContentTypeComposition parent, string alias)
+            : base(shortStringHelper, parent, alias)
         {
             AddContentType(parent);
         }

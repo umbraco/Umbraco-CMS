@@ -127,8 +127,8 @@ namespace Umbraco.Tests.PublishedContent
                 dataType
             };
 
-            _propertyType = new PropertyType("Umbraco.Void.Editor", ValueStorageType.Nvarchar) { Alias = "prop", DataTypeId = 3, Variations = ContentVariation.Culture };
-            _contentType = new ContentType(-1) { Id = 2, Alias = "alias-ct", Variations = ContentVariation.Culture };
+            _propertyType = new PropertyType(TestHelper.ShortStringHelper, "Umbraco.Void.Editor", ValueStorageType.Nvarchar) { Alias = "prop", DataTypeId = 3, Variations = ContentVariation.Culture };
+            _contentType = new ContentType(TestHelper.ShortStringHelper, -1) { Id = 2, Alias = "alias-ct", Variations = ContentVariation.Culture };
             _contentType.AddPropertyType(_propertyType);
 
             var contentTypes = new[]
@@ -204,7 +204,7 @@ namespace Umbraco.Tests.PublishedContent
                 globalSettings,
                 Mock.Of<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
-                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }),
+                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }),
                 typeFinder,
                 TestHelper.GetHostingEnvironment());
 

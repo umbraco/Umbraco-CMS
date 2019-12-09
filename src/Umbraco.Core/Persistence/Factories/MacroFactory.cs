@@ -2,14 +2,15 @@
 using System.Globalization;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Persistence.Factories
 {
     internal static class MacroFactory
     {
-        public static IMacro BuildEntity(MacroDto dto)
+        public static IMacro BuildEntity(IShortStringHelper shortStringHelper, MacroDto dto)
         {
-            var model = new Macro(dto.Id, dto.UniqueId, dto.UseInEditor, dto.RefreshRate, dto.Alias, dto.Name, dto.CacheByPage, dto.CachePersonalized, dto.DontRender, dto.MacroSource, (MacroTypes)dto.MacroType);
+            var model = new Macro(shortStringHelper, dto.Id, dto.UniqueId, dto.UseInEditor, dto.RefreshRate, dto.Alias, dto.Name, dto.CacheByPage, dto.CachePersonalized, dto.DontRender, dto.MacroSource, (MacroTypes)dto.MacroType);
 
             try
             {

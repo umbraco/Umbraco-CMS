@@ -88,7 +88,7 @@ namespace Umbraco.Tests.Scoping
             Assert.AreSame(XmlStore, ((PublishedContentCache) umbracoContext.Content).XmlStore);
 
             // create document type, document
-            var contentType = new ContentType(-1) { Alias = "CustomDocument", Name = "Custom Document" };
+            var contentType = new ContentType(ShortStringHelper, -1) { Alias = "CustomDocument", Name = "Custom Document" };
             Current.Services.ContentTypeService.Save(contentType);
             var item = new Content("name", -1, contentType);
 
@@ -202,7 +202,7 @@ namespace Umbraco.Tests.Scoping
             Assert.AreSame(XmlStore, ((PublishedContentCache)umbracoContext.Content).XmlStore);
 
             // create document type
-            var contentType = new ContentType(-1) { Alias = "CustomDocument", Name = "Custom Document" };
+            var contentType = new ContentType(ShortStringHelper,-1) { Alias = "CustomDocument", Name = "Custom Document" };
             Current.Services.ContentTypeService.Save(contentType);
 
             // wire cache refresher

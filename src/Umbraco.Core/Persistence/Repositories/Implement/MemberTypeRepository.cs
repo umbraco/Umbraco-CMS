@@ -11,6 +11,7 @@ using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -19,9 +20,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IMemberTypeRepository
     {
-        public MemberTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IContentTypeCommonRepository commonRepository, ILanguageRepository languageRepository)
-            : base(scopeAccessor, cache, logger, commonRepository, languageRepository)
-        { }
+        private readonly IShortStringHelper _shortStringHelper;
+
+        public MemberTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IContentTypeCommonRepository commonRepository, ILanguageRepository languageRepository, IShortStringHelper shortStringHelper)
+            : base(scopeAccessor, cache, logger, commonRepository, languageRepository, shortStringHelper)
+        {
+            _shortStringHelper = shortStringHelper;
+        }
 
         protected override bool SupportsPublishing => MemberType.SupportsPublishingConst;
 
@@ -143,7 +148,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             //By Convention we add 9 standard PropertyTypes to an Umbraco MemberType
             entity.AddPropertyGroup(Constants.Conventions.Member.StandardPropertiesGroupName);
-            var standardPropertyTypes = ConventionsHelper.GetStandardPropertyTypeStubs();
+            var standardPropertyTypes = ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper);
             foreach (var standardPropertyType in standardPropertyTypes)
             {
                 entity.AddPropertyType(standardPropertyType.Value, Constants.Conventions.Member.StandardPropertiesGroupName);
@@ -206,10 +211,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override PropertyType CreatePropertyType(string propertyEditorAlias, ValueStorageType storageType, string propertyTypeAlias)
         {
             //custom property type constructor logic to set explicit dbtype's for built in properties
-            var builtinProperties = ConventionsHelper.GetStandardPropertyTypeStubs();
+            var builtinProperties = ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper);
             var readonlyStorageType = builtinProperties.TryGetValue(propertyTypeAlias, out var propertyType);
             storageType = readonlyStorageType ? propertyType.ValueStorageType : storageType;
-            return new PropertyType(propertyEditorAlias, storageType, readonlyStorageType, propertyTypeAlias);
+            return new PropertyType(_shortStringHelper, propertyEditorAlias, storageType, readonlyStorageType, propertyTypeAlias);
         }
 
         /// <summary>
@@ -217,9 +222,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// and property editors assigned. This occurs prior to saving so that the correct values are persisted.
         /// </summary>
         /// <param name="memberType"></param>
-        private static void EnsureExplicitDataTypeForBuiltInProperties(IContentTypeBase memberType)
+        private void EnsureExplicitDataTypeForBuiltInProperties(IContentTypeBase memberType)
         {
-            var builtinProperties = ConventionsHelper.GetStandardPropertyTypeStubs();
+            var builtinProperties = ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper);
             foreach (var propertyType in memberType.PropertyTypes)
             {
                 if (builtinProperties.ContainsKey(propertyType.Alias))

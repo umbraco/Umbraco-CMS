@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models
 {
@@ -17,7 +18,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <remarks>Only use this for creating MediaTypes at the root (with ParentId -1).</remarks>
         /// <param name="parentId"></param>
-        public MediaType(int parentId) : base(parentId)
+        public MediaType(IShortStringHelper shortStringHelper, int parentId) : base(shortStringHelper, parentId)
         {
         }
 
@@ -26,7 +27,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <remarks>Use this to ensure inheritance from parent.</remarks>
         /// <param name="parent"></param>
-        public MediaType(IMediaType parent) : this(parent, null)
+        public MediaType(IShortStringHelper shortStringHelper,IMediaType parent) : this(shortStringHelper, parent, null)
         {
         }
 
@@ -36,8 +37,8 @@ namespace Umbraco.Core.Models
         /// <remarks>Use this to ensure inheritance from parent.</remarks>
         /// <param name="parent"></param>
         /// <param name="alias"></param>
-        public MediaType(IMediaType parent, string alias)
-            : base(parent, alias)
+        public MediaType(IShortStringHelper shortStringHelper, IMediaType parent, string alias)
+            : base(shortStringHelper, parent, alias)
         {
         }
 

@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.Membership;
@@ -41,7 +42,7 @@ namespace Umbraco.Web.Models.Mapping
 
         public void DefineMaps(UmbracoMapper mapper)
         {
-            mapper.Define<UserGroupSave, IUserGroup>((source, context) => new UserGroup { CreateDate = DateTime.UtcNow }, Map);
+            mapper.Define<UserGroupSave, IUserGroup>((source, context) => new UserGroup(Current.ShortStringHelper) { CreateDate = DateTime.UtcNow }, Map);
             mapper.Define<UserInvite, IUser>(Map);
             mapper.Define<IProfile, ContentEditing.UserProfile>((source, context) => new ContentEditing.UserProfile(), Map);
             mapper.Define<IReadOnlyUserGroup, UserGroupBasic>((source, context) => new UserGroupBasic(), Map);

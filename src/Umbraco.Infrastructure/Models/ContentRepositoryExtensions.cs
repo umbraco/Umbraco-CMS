@@ -7,7 +7,7 @@ namespace Umbraco.Core.Models
     /// <summary>
     /// Extension methods used to manipulate content variations by the document repository
     /// </summary>
-    internal static class ContentRepositoryExtensions
+    public static class ContentRepositoryExtensions
     {
         /// <summary>
         /// Gets the cultures that have been flagged for unpublishing.

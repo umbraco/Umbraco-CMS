@@ -50,7 +50,9 @@ namespace Umbraco.Tests.Packaging
             ServiceContext.ContentTypeService, ServiceContext.ContentService,
             Factory.GetInstance<PropertyEditorCollection>(),
             Factory.GetInstance<IScopeProvider>(),
-            Factory.GetInstance<IShortStringHelper>());
+            Factory.GetInstance<IShortStringHelper>(),
+            Factory.GetInstance<IGlobalSettings>()
+            );
 
         private IPackageInstallation PackageInstallation => new PackageInstallation(
             PackageDataInstallation,

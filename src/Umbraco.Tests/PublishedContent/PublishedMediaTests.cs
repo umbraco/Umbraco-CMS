@@ -51,7 +51,7 @@ namespace Umbraco.Tests.PublishedContent
 
         private IMediaType MakeNewMediaType(IUser user, string text, int parentId = -1)
         {
-            var mt = new MediaType(parentId) { Name = text, Alias = text, Thumbnail = "icon-folder", Icon = "icon-folder" };
+            var mt = new MediaType(ShortStringHelper, parentId) { Name = text, Alias = text, Thumbnail = "icon-folder", Icon = "icon-folder" };
             ServiceContext.MediaTypeService.Save(mt);
             return mt;
         }
@@ -89,7 +89,7 @@ namespace Umbraco.Tests.PublishedContent
             var mType = MockedContentTypes.CreateImageMediaType("image2");
             //lets add an RTE to this
             mType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType("test", ValueStorageType.Nvarchar, "content")
+                new PropertyType(ShortStringHelper, "test", ValueStorageType.Nvarchar, "content")
                     {
                         Name = "Rich Text",
                         DataTypeId = -87 //tiny mce

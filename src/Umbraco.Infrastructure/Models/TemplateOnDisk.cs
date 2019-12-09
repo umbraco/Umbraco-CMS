@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models
 {
@@ -15,8 +16,8 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="name">The name of the template.</param>
         /// <param name="alias">The alias of the template.</param>
-        public TemplateOnDisk(string name, string alias)
-            : base(name, alias)
+        public TemplateOnDisk(IShortStringHelper shortStringHelper, string name, string alias)
+            : base(shortStringHelper, name, alias)
         {
             IsOnDisk = true;
         }

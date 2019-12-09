@@ -179,7 +179,7 @@ namespace Umbraco.Tests.Runtimes
             Assert.IsNull(content);
 
             // create a document type and a document
-            var contentType = new ContentType(-1) { Alias = "ctype", Name = "ctype" };
+            var contentType = new ContentType(TestHelper.ShortStringHelper, -1) { Alias = "ctype", Name = "ctype" };
             factory.GetInstance<IContentTypeService>().Save(contentType);
             content = new Content("test", -1, contentType);
             contentService.Save(content);

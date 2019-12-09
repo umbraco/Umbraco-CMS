@@ -26,11 +26,11 @@ namespace Umbraco.Tests.Services
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var repository = new MacroRepository((IScopeAccessor) provider, AppCaches.Disabled, Mock.Of<ILogger>());
+                var repository = new MacroRepository((IScopeAccessor) provider, AppCaches.Disabled, Mock.Of<ILogger>(), ShortStringHelper);
 
-                repository.Save(new Macro("test1", "Test1", "~/views/macropartials/test1.cshtml", MacroTypes.PartialView));
-                repository.Save(new Macro("test2", "Test2", "~/views/macropartials/test2.cshtml", MacroTypes.PartialView));
-                repository.Save(new Macro("test3", "Tet3", "~/views/macropartials/test3.cshtml", MacroTypes.PartialView));
+                repository.Save(new Macro(ShortStringHelper, "test1", "Test1", "~/views/macropartials/test1.cshtml", MacroTypes.PartialView));
+                repository.Save(new Macro(ShortStringHelper, "test2", "Test2", "~/views/macropartials/test2.cshtml", MacroTypes.PartialView));
+                repository.Save(new Macro(ShortStringHelper, "test3", "Tet3", "~/views/macropartials/test3.cshtml", MacroTypes.PartialView));
                 scope.Complete();
             }
         }
@@ -75,7 +75,7 @@ namespace Umbraco.Tests.Services
             var macroService = ServiceContext.MacroService;
 
             // Act
-            var macro = new Macro("test", "Test", "~/Views/MacroPartials/Test.cshtml", MacroTypes.PartialView, cacheDuration: 1234);
+            var macro = new Macro(ShortStringHelper, "test", "Test", "~/Views/MacroPartials/Test.cshtml", MacroTypes.PartialView, cacheDuration: 1234);
             macroService.Save(macro);
 
             //assert
@@ -100,7 +100,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var macroService = ServiceContext.MacroService;
-            var macro = new Macro("test", "Test", "~/Views/MacroPartials/Test.cshtml", MacroTypes.PartialView, cacheDuration: 1234);
+            var macro = new Macro(ShortStringHelper, "test", "Test", "~/Views/MacroPartials/Test.cshtml", MacroTypes.PartialView, cacheDuration: 1234);
             macroService.Save(macro);
 
             // Act
@@ -119,7 +119,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var macroService = ServiceContext.MacroService;
-            IMacro macro = new Macro("test", "Test", "~/Views/MacroPartials/Test.cshtml", MacroTypes.PartialView, cacheDuration: 1234);
+            IMacro macro = new Macro(ShortStringHelper, "test", "Test", "~/Views/MacroPartials/Test.cshtml", MacroTypes.PartialView, cacheDuration: 1234);
             macroService.Save(macro);
 
             // Act
@@ -143,7 +143,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var macroService = ServiceContext.MacroService;
-            IMacro macro = new Macro("test", "Test", "~/Views/MacroPartials/Test.cshtml", MacroTypes.PartialView, cacheDuration: 1234);
+            IMacro macro = new Macro(ShortStringHelper, "test", "Test", "~/Views/MacroPartials/Test.cshtml", MacroTypes.PartialView, cacheDuration: 1234);
             macro.Properties.Add(new MacroProperty("blah", "Blah", 0, "blah"));
             macroService.Save(macro);
 
@@ -174,7 +174,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var macroService = ServiceContext.MacroService;
-            IMacro macro = new Macro("test", "Test", "~/Views/MacroPartials/Test.cshtml", MacroTypes.PartialView, cacheDuration: 1234);
+            IMacro macro = new Macro(ShortStringHelper, "test", "Test", "~/Views/MacroPartials/Test.cshtml", MacroTypes.PartialView, cacheDuration: 1234);
             macro.Properties.Add(new MacroProperty("blah1", "Blah1", 0, "blah1"));
             macro.Properties.Add(new MacroProperty("blah2", "Blah2", 1, "blah2"));
             macro.Properties.Add(new MacroProperty("blah3", "Blah3", 2, "blah3"));
@@ -218,7 +218,7 @@ namespace Umbraco.Tests.Services
         public void Can_Add_And_Remove_Properties()
         {
             var macroService = ServiceContext.MacroService;
-            var macro = new Macro("test", "Test", "~/Views/MacroPartials/Test.cshtml", MacroTypes.PartialView, cacheDuration: 1234);
+            var macro = new Macro(ShortStringHelper, "test", "Test", "~/Views/MacroPartials/Test.cshtml", MacroTypes.PartialView, cacheDuration: 1234);
 
             //adds some properties
             macro.Properties.Add(new MacroProperty("blah1", "Blah1", 0, "blah1"));
@@ -253,7 +253,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var macroService = ServiceContext.MacroService;
-            var macro = new Macro("test", string.Empty, "~/Views/MacroPartials/Test.cshtml", MacroTypes.PartialView, cacheDuration: 1234);
+            var macro = new Macro(ShortStringHelper, "test", string.Empty, "~/Views/MacroPartials/Test.cshtml", MacroTypes.PartialView, cacheDuration: 1234);
 
             // Act & Assert
             Assert.Throws<ArgumentException>(() => macroService.Save(macro));

@@ -57,9 +57,9 @@ namespace Umbraco.Tests.Web.Controllers
 
             var userServiceMock = new Mock<IUserService>();
             userServiceMock.Setup(service => service.GetUserById(It.IsAny<int>()))
-                .Returns((int id) => id == 1234 ? new User(1234, "Test", "test@test.com", "test@test.com", "", new List<IReadOnlyUserGroup>(), new int[0], new int[0]) : null);
+                .Returns((int id) => id == 1234 ? new User(TestObjects.GetGlobalSettings(), 1234, "Test", "test@test.com", "test@test.com", "", new List<IReadOnlyUserGroup>(), new int[0], new int[0]) : null);
             userServiceMock.Setup(x => x.GetProfileById(It.IsAny<int>()))
-                .Returns((int id) => id == 1234 ? new User(1234, "Test", "test@test.com", "test@test.com", "", new List<IReadOnlyUserGroup>(), new int[0], new int[0]) : null);
+                .Returns((int id) => id == 1234 ? new User(TestObjects.GetGlobalSettings(), 1234, "Test", "test@test.com", "test@test.com", "", new List<IReadOnlyUserGroup>(), new int[0], new int[0]) : null);
             userServiceMock.Setup(service => service.GetPermissionsForPath(It.IsAny<IUser>(), It.IsAny<string>()))
                 .Returns(new EntityPermissionSet(123, new EntityPermissionCollection(new[]
                 {

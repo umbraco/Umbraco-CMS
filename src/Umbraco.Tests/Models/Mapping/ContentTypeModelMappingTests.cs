@@ -696,7 +696,7 @@ namespace Umbraco.Tests.Models.Mapping
 
             var ctMain = MockedContentTypes.CreateSimpleMediaType("parent", "Parent");
             //not assigned to tab
-            ctMain.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
+            ctMain.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
             {
                 Alias = "umbracoUrlName",
                 Name = "Slug",
@@ -707,7 +707,7 @@ namespace Umbraco.Tests.Models.Mapping
             });
             MockedContentTypes.EnsureAllIds(ctMain, 8888);
             var ctChild1 = MockedContentTypes.CreateSimpleMediaType("child1", "Child 1", ctMain, true);
-            ctChild1.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
+            ctChild1.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
             {
                 Alias = "someProperty",
                 Name = "Some Property",
@@ -719,7 +719,7 @@ namespace Umbraco.Tests.Models.Mapping
             MockedContentTypes.EnsureAllIds(ctChild1, 7777);
             var contentType = MockedContentTypes.CreateSimpleMediaType("child2", "Child 2", ctChild1, true, "CustomGroup");
             //not assigned to tab
-            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
+            contentType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
             {
                 Alias = "umbracoUrlAlias",
                 Name = "AltUrl",
@@ -789,13 +789,13 @@ namespace Umbraco.Tests.Models.Mapping
 
             var ctMain = MockedContentTypes.CreateSimpleContentType();
             //not assigned to tab
-            ctMain.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
+            ctMain.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
             {
                 Alias = "umbracoUrlName", Name = "Slug", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88
             });
             MockedContentTypes.EnsureAllIds(ctMain, 8888);
             var ctChild1 = MockedContentTypes.CreateSimpleContentType("child1", "Child 1", ctMain, true);
-            ctChild1.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
+            ctChild1.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
             {
                 Alias = "someProperty",
                 Name = "Some Property",
@@ -807,7 +807,7 @@ namespace Umbraco.Tests.Models.Mapping
             MockedContentTypes.EnsureAllIds(ctChild1, 7777);
             var contentType = MockedContentTypes.CreateSimpleContentType("child2", "Child 2", ctChild1, true, "CustomGroup");
             //not assigned to tab
-            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
+            contentType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
             {
                 Alias = "umbracoUrlAlias", Name = "AltUrl", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88
             });

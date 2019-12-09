@@ -425,30 +425,30 @@ namespace Umbraco.Tests.Services
 
         private void CreateTypes(out IContentType iContentType, out IContentType vContentType)
         {
-            var langDe = new Language("de") { IsDefault = true };
+            var langDe = new Language(TestObjects.GetGlobalSettings(), "de") { IsDefault = true };
             ServiceContext.LocalizationService.Save(langDe);
-            var langRu = new Language("ru");
+            var langRu = new Language(TestObjects.GetGlobalSettings(), "ru");
             ServiceContext.LocalizationService.Save(langRu);
-            var langEs = new Language("es");
+            var langEs = new Language(TestObjects.GetGlobalSettings(), "es");
             ServiceContext.LocalizationService.Save(langEs);
 
-            iContentType = new ContentType(-1)
+            iContentType = new ContentType(ShortStringHelper, -1)
             {
                 Alias = "ict",
                 Name = "Invariant Content Type",
                 Variations = ContentVariation.Nothing
             };
-            iContentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar, "ip") { Variations = ContentVariation.Nothing });
+            iContentType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar, "ip") { Variations = ContentVariation.Nothing });
             ServiceContext.ContentTypeService.Save(iContentType);
 
-            vContentType = new ContentType(-1)
+            vContentType = new ContentType(ShortStringHelper, -1)
             {
                 Alias = "vct",
                 Name = "Variant Content Type",
                 Variations = ContentVariation.Culture
             };
-            vContentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar, "ip") { Variations = ContentVariation.Nothing });
-            vContentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar, "vp") { Variations = ContentVariation.Culture });
+            vContentType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar, "ip") { Variations = ContentVariation.Nothing });
+            vContentType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar, "vp") { Variations = ContentVariation.Culture });
             ServiceContext.ContentTypeService.Save(vContentType);
         }
 

@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Models
             ServiceContext.ContentService.Save(content, Constants.Security.SuperUserId);
 
             var nodeName = content.ContentType.Alias.ToSafeAlias();
-            var urlName = content.GetUrlSegment(new[]{new DefaultUrlSegmentProvider() });
+            var urlName = content.GetUrlSegment(ShortStringHelper, new[]{new DefaultUrlSegmentProvider(ShortStringHelper) });
 
             // Act
             XElement element = content.ToXml(Factory.GetInstance<IEntityXmlSerializer>());

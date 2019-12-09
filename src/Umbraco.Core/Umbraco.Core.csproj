@@ -186,23 +186,16 @@
     <Compile Include="Migrations\Upgrade\V_8_1_0\RenameUserLoginDtoDateIndex.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_1\ChangeNuCacheJsonFormat.cs" />
     <Compile Include="Migrations\Upgrade\V_8_1_0\ConvertTinyMceAndGridMediaUrlsToLocalLink.cs" />
-    <Compile Include="Models\ContentBaseExtensions.cs" />
-    <Compile Include="Models\Identity\IdentityMapDefinition.cs" />
-    <Compile Include="Models\Identity\UserLoginInfoWrapper.cs" />
-    <Compile Include="Models\Language.cs" />
-    <Compile Include="Models\Macro.cs" />
-    <Compile Include="Models\Media.cs" />
-    <Compile Include="Models\Membership\UserGroup.cs" />
-    <Compile Include="Models\Membership\UserGroupExtensions.cs" />
-    <Compile Include="Models\ObjectTypes.cs" />
-    <Compile Include="Models\Property.cs" />
-    <Compile Include="Models\PropertyCollection.cs" />
-    <Compile Include="Models\PropertyType.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\FixLanguageIsoCodeLength.cs" />
-    <Compile Include="Models\PublishedContent\IndexedArrayItem.cs" />
-    <Compile Include="Models\PublishedContent\VariationContextAccessorExtensions.cs" />
-    <Compile Include="Models\Template.cs" />
-    <Compile Include="Models\TemplateOnDisk.cs" />
+    <Compile Include="Models\ContentTagsExtensions.cs" />
+    <Compile Include="Models\Identity\BackOfficeIdentityUser.cs" />
+    <Compile Include="Models\Identity\IdentityMapDefinition.cs" />
+    <Compile Include="Models\Identity\IdentityUser.cs" />
+    <Compile Include="Models\Membership\UserGroupExtensions.cs" />
+    <Compile Include="Models\PathValidationExtensions.cs" />
+    <Compile Include="Models\PropertyTagsExtensions.cs" />
+    <Compile Include="Models\PublishedContent\PublishedContentExtensionsForModels.cs" />
+    <Compile Include="Models\UserExtensions.cs" />
     <Compile Include="Packaging\PackageDataInstallation.cs" />
     <Compile Include="Packaging\PackageInstallation.cs" />
     <Compile Include="Persistence\Mappers\SimpleContentTypeMapper.cs" />
@@ -216,7 +209,6 @@
     <Compile Include="Security\PasswordSecurity.cs" />
     <Compile Include="Services\Implement\PropertyValidationService.cs" />
     <Compile Include="StringExtensions.cs" />
-    <Compile Include="Strings\DefaultUrlSegmentProvider.cs" />
     <Compile Include="Sync\RefreshInstructionEnvelope.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />
@@ -275,10 +267,6 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\UpdatePickerIntegerValuesToUdi.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\UserForeignKeys.cs" />
     <Compile Include="Migrations\Upgrade\Common\CreateKeysAndIndexes.cs" />
-    <Compile Include="Models\ContentRepositoryExtensions.cs" />
-    <Compile Include="Models\ContentTagsExtensions.cs" />
-    <Compile Include="Models\PathValidationExtensions.cs" />
-    <Compile Include="Models\PropertyTagsExtensions.cs" />
     <Compile Include="Persistence\Dtos\AuditEntryDto.cs" />
     <Compile Include="Persistence\Dtos\ConsentDto.cs" />
     <Compile Include="Persistence\Dtos\ContentScheduleDto.cs" />
@@ -320,24 +308,7 @@
     <Compile Include="Migrations\Upgrade\UmbracoPlan.cs" />
     <Compile Include="Migrations\Upgrade\Upgrader.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DropMigrationsTable.cs" />
-    <Compile Include="Models\Content.cs" />
     <Compile Include="ContentExtensions.cs" />
-    <Compile Include="Models\ContentType.cs" />
-    <Compile Include="Models\ContentTypeBase.cs" />
-    <Compile Include="Models\ContentTypeCompositionBase.cs" />
-    <Compile Include="Models\DataType.cs" />
-    <Compile Include="Models\GridValue.cs" />
-    <Compile Include="Models\Identity\BackOfficeIdentityUser.cs" />
-    <Compile Include="Models\Identity\IdentityUser.cs" />
-    <Compile Include="Models\MediaExtensions.cs" />
-    <Compile Include="Models\MediaType.cs" />
-    <Compile Include="Models\Member.cs" />
-    <Compile Include="Models\Membership\User.cs" />
-    <Compile Include="Models\MemberType.cs" />
-    <Compile Include="Models\PublishedContent\PublishedContentTypeFactory.cs" />
-    <Compile Include="Models\PublishedContent\PublishedContentExtensionsForModels.cs" />
-    <Compile Include="Models\PublishedContent\PublishedContentModel.cs" />
-    <Compile Include="Models\PublishedContent\PublishedModelFactory.cs" />
     <Compile Include="Persistence\Dtos\AccessDto.cs" />
     <Compile Include="Persistence\Dtos\AccessRuleDto.cs" />
     <Compile Include="Persistence\Dtos\CacheInstructionDto.cs" />
@@ -385,7 +356,6 @@
     <Compile Include="Persistence\Dtos\UserGroup2NodePermissionDto.cs" />
     <Compile Include="Persistence\Dtos\UserGroupDto.cs" />
     <Compile Include="Persistence\Dtos\UserStartNodeDto.cs" />
-    <Compile Include="Models\UserExtensions.cs" />
     <Compile Include="Persistence\BulkDataReader.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\ConstraintAttribute.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\ForeignKeyAttribute.cs" />
@@ -765,6 +735,9 @@
       <Project>{3ae7bf57-966b-45a5-910a-954d7c554441}</Project>
       <Name>Umbraco.Infrastructure</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Strings" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

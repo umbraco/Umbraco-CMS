@@ -64,11 +64,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             appCaches = appCaches ?? AppCaches;
 
-            templateRepository = new TemplateRepository(scopeAccessor, appCaches, Logger, TestObjects.GetFileSystemsMock(), IOHelper);
+            templateRepository = new TemplateRepository(scopeAccessor, appCaches, Logger, TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
             var tagRepository = new TagRepository(scopeAccessor, appCaches, Logger);
-            var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository, appCaches);
-            var languageRepository = new LanguageRepository(scopeAccessor, appCaches, Logger);
-            contentTypeRepository = new ContentTypeRepository(scopeAccessor, appCaches, Logger, commonRepository, languageRepository);
+            var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository, appCaches, ShortStringHelper);
+            var languageRepository = new LanguageRepository(scopeAccessor, appCaches, Logger, TestObjects.GetGlobalSettings());
+            contentTypeRepository = new ContentTypeRepository(scopeAccessor, appCaches, Logger, commonRepository, languageRepository, ShortStringHelper);
             var repository = new DocumentRepository(scopeAccessor, appCaches, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository);
             return repository;
         }
@@ -421,7 +421,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out TemplateRepository templateRepository);
 
-                var template = new Template("hello", "hello");
+                var template = new Template(ShortStringHelper, "hello", "hello");
                 templateRepository.Save(template);
 
 

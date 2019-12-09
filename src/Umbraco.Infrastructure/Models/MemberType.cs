@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models
 {
@@ -11,23 +12,26 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class MemberType : ContentTypeCompositionBase, IMemberType
     {
+        private readonly IShortStringHelper _shortStringHelper;
         public const bool SupportsPublishingConst = false;
 
         //Dictionary is divided into string: PropertyTypeAlias, Tuple: MemberCanEdit, VisibleOnProfile, PropertyTypeId
         private string _alias;
 
-        public MemberType(int parentId) : base(parentId)
+        public MemberType(IShortStringHelper shortStringHelper, int parentId) : base(shortStringHelper, parentId)
         {
+            _shortStringHelper = shortStringHelper;
             MemberTypePropertyTypes = new Dictionary<string, MemberTypePropertyProfileAccess>();
         }
 
-        public MemberType(IContentTypeComposition parent) : this(parent, null)
+        public MemberType(IShortStringHelper shortStringHelper, IContentTypeComposition parent) : this(shortStringHelper, parent, null)
         {
         }
 
-        public MemberType(IContentTypeComposition parent, string alias)
-            : base(parent, alias)
+        public MemberType(IShortStringHelper shortStringHelper, IContentTypeComposition parent, string alias)
+            : base(shortStringHelper, parent, alias)
         {
+            _shortStringHelper = shortStringHelper;
             MemberTypePropertyTypes = new Dictionary<string, MemberTypePropertyProfileAccess>();
         }
 
@@ -67,7 +71,7 @@ namespace Umbraco.Core.Models
 
                 var newVal = value == "_umbracoSystemDefaultProtectType"
                         ? value
-                        : (value == null ? string.Empty : value.ToSafeAlias());
+                        : (value == null ? string.Empty : value.ToSafeAlias(_shortStringHelper));
 
                 SetPropertyValueAndDetectChanges(newVal, ref _alias, nameof(Alias));
             }

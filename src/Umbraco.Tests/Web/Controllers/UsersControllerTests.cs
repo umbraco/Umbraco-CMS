@@ -74,7 +74,7 @@ namespace Umbraco.Tests.Web.Controllers
                 userServiceMock.Setup(service => service.GetUserGroupsByAlias(It.IsAny<string[]>()))
                     .Returns(new[] { Mock.Of<IUserGroup>(group => group.Id == 123 && group.Alias == "writers" && group.Name == "Writers") });
                 userServiceMock.Setup(service => service.GetUserById(It.IsAny<int>()))
-                    .Returns((int id) => id == 1234 ? new User(1234, "Test", "test@test.com", "test@test.com", "", new List<IReadOnlyUserGroup>(), new int[0], new int[0]) : null);
+                    .Returns((int id) => id == 1234 ? new User(TestObjects.GetGlobalSettings(), 1234, "Test", "test@test.com", "test@test.com", "", new List<IReadOnlyUserGroup>(), new int[0], new int[0]) : null);
 
                 var usersController = new UsersController(
                     Factory.GetInstance<IGlobalSettings>(),

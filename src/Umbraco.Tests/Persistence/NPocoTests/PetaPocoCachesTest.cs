@@ -133,7 +133,7 @@ namespace Umbraco.Tests.Persistence.NPocoTests
 
             contentService.GetContentForRelease(DateTime.Now);
 
-            ((ContentService)contentService).GetPublishedDescendants(new Content("Test", -1, new ContentType(-1))
+            ((ContentService)contentService).GetPublishedDescendants(new Content("Test", -1, new ContentType(ShortStringHelper, -1))
             {
                 Id = id1,
                 Path = "-1," + id1
@@ -174,7 +174,7 @@ namespace Umbraco.Tests.Persistence.NPocoTests
             }
             contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory" + Guid.NewGuid().ToString("N"), "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType("test", ValueStorageType.Ntext, "tags")
+                new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
                 {
                     DataTypeId = 1041
                 });

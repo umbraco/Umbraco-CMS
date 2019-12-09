@@ -12,6 +12,7 @@ using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -20,12 +21,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class UserGroupRepository : NPocoRepositoryBase<int, IUserGroup>, IUserGroupRepository
     {
+        private readonly IShortStringHelper _shortStringHelper;
         private readonly UserGroupWithUsersRepository _userGroupWithUsersRepository;
         private readonly PermissionRepository<IContent> _permissionRepository;
 
-        public UserGroupRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger)
+        public UserGroupRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger, IShortStringHelper shortStringHelper)
             : base(scopeAccessor, appCaches, logger)
         {
+            _shortStringHelper = shortStringHelper;
             _userGroupWithUsersRepository = new UserGroupWithUsersRepository(this, scopeAccessor, appCaches, logger);
             _permissionRepository = new PermissionRepository<IContent>(scopeAccessor, appCaches, logger);
         }
@@ -79,7 +82,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             sql.Where($"umbracoUserGroup.id IN ({innerSql.SQL})");
             AppendGroupBy(sql);
 
-            return Database.Fetch<UserGroupDto>(sql).Select(UserGroupFactory.BuildEntity);
+            return Database.Fetch<UserGroupDto>(sql).Select(x => UserGroupFactory.BuildEntity(_shortStringHelper, x));
         }
 
         public void AddOrUpdateGroupWithUsers(IUserGroup userGroup, int[] userIds)
@@ -179,7 +182,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (dto == null)
                 return null;
 
-            var userGroup = UserGroupFactory.BuildEntity(dto);
+            var userGroup = UserGroupFactory.BuildEntity(_shortStringHelper, dto);
             return userGroup;
         }
 
@@ -196,7 +199,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             sql.OrderBy<UserGroupDto>(x => x.Id); // required for references
 
             var dtos = Database.FetchOneToMany<UserGroupDto>(x => x.UserGroup2AppDtos, sql);
-            return dtos.Select(UserGroupFactory.BuildEntity);
+            return dtos.Select(x=>UserGroupFactory.BuildEntity(_shortStringHelper, x));
         }
 
         protected override IEnumerable<IUserGroup> PerformGetByQuery(IQuery<IUserGroup> query)
@@ -209,7 +212,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             sql.OrderBy<UserGroupDto>(x => x.Id); // required for references
 
             var dtos = Database.FetchOneToMany<UserGroupDto>(x => x.UserGroup2AppDtos, sql);
-            return dtos.Select(UserGroupFactory.BuildEntity);
+            return dtos.Select(x => UserGroupFactory.BuildEntity(_shortStringHelper, x));
         }
 
         #endregion

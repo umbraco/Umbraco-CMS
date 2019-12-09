@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private ITemplateRepository CreateRepository(IScopeProvider provider)
         {
-            return new TemplateRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, _fileSystems, IOHelper);
+            return new TemplateRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, _fileSystems, IOHelper, ShortStringHelper);
         }
 
         public override void SetUp()
@@ -62,7 +62,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(ScopeProvider);
 
                 // Act
-                var template = new Template("test", "test");
+                var template = new Template(ShortStringHelper, "test", "test");
                 repository.Save(template);
 
 
@@ -81,7 +81,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(ScopeProvider);
 
                 // Act
-                var template = new Template("test", "test")
+                var template = new Template(ShortStringHelper, "test", "test")
                 {
                     Content = ViewHelper.GetDefaultFileContent()
                 };
@@ -105,11 +105,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(ScopeProvider);
 
                 //NOTE: This has to be persisted first
-                var template = new Template("test", "test");
+                var template = new Template(ShortStringHelper, "test", "test");
                 repository.Save(template);
 
                 // Act
-                var template2 = new Template("test2", "test2");
+                var template2 = new Template(ShortStringHelper, "test2", "test2");
                 template2.SetMasterTemplate(template);
                 repository.Save(template2);
 
@@ -131,13 +131,13 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(ScopeProvider);
 
                 // Act
-                var template = new Template("test", "test")
+                var template = new Template(ShortStringHelper, "test", "test")
                 {
                     Content = ViewHelper.GetDefaultFileContent()
                 };
                 repository.Save(template);
 
-                var template2 = new Template("test", "test")
+                var template2 = new Template(ShortStringHelper, "test", "test")
                 {
                     Content = ViewHelper.GetDefaultFileContent()
                 };
@@ -157,13 +157,13 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(ScopeProvider);
 
                 // Act
-                var template = new Template("test", "test")
+                var template = new Template(ShortStringHelper, "test", "test")
                 {
                     Content = ViewHelper.GetDefaultFileContent()
                 };
                 repository.Save(template);
 
-                var template2 = new Template("test1", "test1")
+                var template2 = new Template(ShortStringHelper, "test1", "test1")
                 {
                     Content = ViewHelper.GetDefaultFileContent()
                 };
@@ -188,7 +188,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(ScopeProvider);
 
                 // Act
-                var template = new Template("test", "test")
+                var template = new Template(ShortStringHelper, "test", "test")
                 {
                     Content = ViewHelper.GetDefaultFileContent()
                 };
@@ -213,7 +213,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository(ScopeProvider);
 
-                var template = new Template("test", "test")
+                var template = new Template(ShortStringHelper, "test", "test")
                 {
                     Content = ViewHelper.GetDefaultFileContent()
                 };
@@ -239,9 +239,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var templateRepository = CreateRepository(ScopeProvider);
 
                 var tagRepository = new TagRepository((IScopeAccessor) ScopeProvider, AppCaches.Disabled, Logger);
-                var commonRepository = new ContentTypeCommonRepository(ScopeProvider, templateRepository, AppCaches);
-                var languageRepository = new LanguageRepository((IScopeAccessor) ScopeProvider, AppCaches.Disabled, Logger);
-                var contentTypeRepository = new ContentTypeRepository((IScopeAccessor) ScopeProvider, AppCaches.Disabled, Logger, commonRepository, languageRepository);
+                var commonRepository = new ContentTypeCommonRepository(ScopeProvider, templateRepository, AppCaches, ShortStringHelper);
+                var languageRepository = new LanguageRepository((IScopeAccessor) ScopeProvider, AppCaches.Disabled, Logger, TestObjects.GetGlobalSettings());
+                var contentTypeRepository = new ContentTypeRepository((IScopeAccessor) ScopeProvider, AppCaches.Disabled, Logger, commonRepository, languageRepository, ShortStringHelper);
                 var contentRepo = new DocumentRepository((IScopeAccessor) ScopeProvider, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository);
 
                 var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");
@@ -250,7 +250,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var textpage = MockedContent.CreateSimpleContent(contentType);
                 contentRepo.Save(textpage);
 
-                var template = new Template("test", "test")
+                var template = new Template(ShortStringHelper, "test", "test")
                 {
                     Content = @"<%@ Master Language=""C#"" %>"
                 };
@@ -276,15 +276,15 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository(ScopeProvider);
 
-                var parent = new Template("parent", "parent")
+                var parent = new Template(ShortStringHelper, "parent", "parent")
                 {
                     Content = @"<%@ Master Language=""C#"" %>"
                 };
-                var child = new Template("child", "child")
+                var child = new Template(ShortStringHelper, "child", "child")
                 {
                     Content = @"<%@ Master Language=""C#"" %>"
                 };
-                var baby = new Template("baby", "baby")
+                var baby = new Template(ShortStringHelper, "baby", "baby")
                 {
                     Content = @"<%@ Master Language=""C#"" %>"
                 };
@@ -403,15 +403,15 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository(ScopeProvider);
 
-                var parent = new Template("parent", "parent");
-                var child1 = new Template("child1", "child1");
-                var toddler1 = new Template("toddler1", "toddler1");
-                var toddler2 = new Template("toddler2", "toddler2");
-                var baby1 = new Template("baby1", "baby1");
-                var child2 = new Template("child2", "child2");
-                var toddler3 = new Template("toddler3", "toddler3");
-                var toddler4 = new Template("toddler4", "toddler4");
-                var baby2 = new Template("baby2", "baby2");
+                var parent = new Template(ShortStringHelper, "parent", "parent");
+                var child1 = new Template(ShortStringHelper, "child1", "child1");
+                var toddler1 = new Template(ShortStringHelper, "toddler1", "toddler1");
+                var toddler2 = new Template(ShortStringHelper, "toddler2", "toddler2");
+                var baby1 = new Template(ShortStringHelper, "baby1", "baby1");
+                var child2 = new Template(ShortStringHelper, "child2", "child2");
+                var toddler3 = new Template(ShortStringHelper, "toddler3", "toddler3");
+                var toddler4 = new Template(ShortStringHelper, "toddler4", "toddler4");
+                var baby2 = new Template(ShortStringHelper, "baby2", "baby2");
 
                 child1.MasterTemplateAlias = parent.Alias;
                 child1.MasterTemplateId = new Lazy<int>(() => parent.Id);
@@ -463,11 +463,11 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository(ScopeProvider);
 
-                var parent = new Template("parent", "parent");
-                var child1 = new Template("child1", "child1");
-                var child2 = new Template("child2", "child2");
-                var toddler1 = new Template("toddler1", "toddler1");
-                var toddler2 = new Template("toddler2", "toddler2");
+                var parent = new Template(ShortStringHelper, "parent", "parent");
+                var child1 = new Template(ShortStringHelper, "child1", "child1");
+                var child2 = new Template(ShortStringHelper, "child2", "child2");
+                var toddler1 = new Template(ShortStringHelper, "toddler1", "toddler1");
+                var toddler2 = new Template(ShortStringHelper, "toddler2", "toddler2");
 
                 child1.MasterTemplateAlias = parent.Alias;
                 child1.MasterTemplateId = new Lazy<int>(() => parent.Id);
@@ -501,8 +501,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository(ScopeProvider);
 
-                var parent = new Template("parent", "parent");
-                var child1 = new Template("child1", "child1");
+                var parent = new Template(ShortStringHelper, "parent", "parent");
+                var child1 = new Template(ShortStringHelper, "child1", "child1");
 
                 child1.MasterTemplateAlias = parent.Alias;
                 child1.MasterTemplateId = new Lazy<int>(() => parent.Id);
@@ -546,41 +546,41 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private IEnumerable<ITemplate> CreateHierarchy(ITemplateRepository repository)
         {
-            var parent = new Template("parent", "parent")
+            var parent = new Template(ShortStringHelper, "parent", "parent")
             {
                 Content = @"<%@ Master Language=""C#"" %>"
             };
 
-            var child1 = new Template("child1", "child1")
+            var child1 = new Template(ShortStringHelper, "child1", "child1")
             {
                 Content = @"<%@ Master Language=""C#"" %>"
             };
-            var toddler1 = new Template("toddler1", "toddler1")
+            var toddler1 = new Template(ShortStringHelper, "toddler1", "toddler1")
             {
                 Content = @"<%@ Master Language=""C#"" %>"
             };
-            var toddler2 = new Template("toddler2", "toddler2")
+            var toddler2 = new Template(ShortStringHelper, "toddler2", "toddler2")
             {
                 Content = @"<%@ Master Language=""C#"" %>"
             };
-            var baby1 = new Template("baby1", "baby1")
+            var baby1 = new Template(ShortStringHelper, "baby1", "baby1")
             {
                 Content = @"<%@ Master Language=""C#"" %>"
             };
 
-            var child2 = new Template("child2", "child2")
+            var child2 = new Template(ShortStringHelper, "child2", "child2")
             {
                 Content = @"<%@ Master Language=""C#"" %>"
             };
-            var toddler3 = new Template("toddler3", "toddler3")
+            var toddler3 = new Template(ShortStringHelper, "toddler3", "toddler3")
             {
                 Content = @"<%@ Master Language=""C#"" %>"
             };
-            var toddler4 = new Template("toddler4", "toddler4")
+            var toddler4 = new Template(ShortStringHelper, "toddler4", "toddler4")
             {
                 Content = @"<%@ Master Language=""C#"" %>"
             };
-            var baby2 = new Template("baby2", "baby2")
+            var baby2 = new Template(ShortStringHelper, "baby2", "baby2")
             {
                 Content = @"<%@ Master Language=""C#"" %>"
             };

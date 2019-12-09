@@ -11,6 +11,7 @@ using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -19,8 +20,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, IContentTypeRepository
     {
-        public ContentTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IContentTypeCommonRepository commonRepository, ILanguageRepository languageRepository)
-            : base(scopeAccessor, cache, logger, commonRepository, languageRepository)
+        public ContentTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IContentTypeCommonRepository commonRepository, ILanguageRepository languageRepository, IShortStringHelper shortStringHelper)
+            : base(scopeAccessor, cache, logger, commonRepository, languageRepository, shortStringHelper)
         { }
 
         protected override bool SupportsPublishing => ContentType.SupportsPublishingConst;

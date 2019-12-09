@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models.Membership
@@ -17,11 +18,11 @@ namespace Umbraco.Core.Models.Membership
         /// <summary>
         /// Constructor for creating a new/empty user
         /// </summary>
-        public User()
+        public User(IGlobalSettings globalSettings)
         {
             SessionTimeout = 60;
             _userGroups = new HashSet<IReadOnlyUserGroup>();
-            _language = Current.Configs.Global().DefaultUILanguage; // TODO: inject
+            _language = globalSettings.DefaultUILanguage;
             _isApproved = true;
             _isLockedOut = false;
             _startContentIds = new int[] { };
@@ -37,8 +38,8 @@ namespace Umbraco.Core.Models.Membership
         /// <param name="email"></param>
         /// <param name="username"></param>
         /// <param name="rawPasswordValue"></param>
-        public User(string name, string email, string username, string rawPasswordValue)
-            : this()
+        public User(IGlobalSettings globalSettings, string name, string email, string username, string rawPasswordValue)
+            : this(globalSettings)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
             if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException("Value cannot be null or whitespace.", "email");
@@ -67,8 +68,8 @@ namespace Umbraco.Core.Models.Membership
         /// <param name="userGroups"></param>
         /// <param name="startContentIds"></param>
         /// <param name="startMediaIds"></param>
-        public User(int id, string name, string email, string username, string rawPasswordValue, IEnumerable<IReadOnlyUserGroup> userGroups, int[] startContentIds, int[] startMediaIds)
-            : this()
+        public User(IGlobalSettings globalSettings, int id, string name, string email, string username, string rawPasswordValue, IEnumerable<IReadOnlyUserGroup> userGroups, int[] startContentIds, int[] startMediaIds)
+            : this(globalSettings)
         {
             //we allow whitespace for this value so just check null
             if (rawPasswordValue == null) throw new ArgumentNullException("rawPasswordValue");

@@ -7,6 +7,7 @@ using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Current = Umbraco.Web.Composing.Current;
@@ -33,21 +34,22 @@ namespace Umbraco.Tests.PublishedContent
 
         private static void MockLocalizationService(ServiceContext serviceContext)
         {
+            var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
             // Set up languages.
             // Spanish falls back to English and Italian to Spanish (and then to English).
             // French has no fall back.
             // Danish, Swedish and Norweigan create an invalid loop.
             var languages = new List<Language>
                 {
-                    new Language("en-US") { Id = 1, CultureName = "English", IsDefault = true },
-                    new Language("fr") { Id = 2, CultureName = "French" },
-                    new Language("es") { Id = 3, CultureName = "Spanish", FallbackLanguageId = 1 },
-                    new Language("it") { Id = 4, CultureName = "Italian", FallbackLanguageId = 3 },
-                    new Language("de") { Id = 5, CultureName = "German" },
-                    new Language("da") { Id = 6, CultureName = "Danish", FallbackLanguageId = 8 },
-                    new Language("sv") { Id = 7, CultureName = "Swedish", FallbackLanguageId = 6 },
-                    new Language("no") { Id = 8, CultureName = "Norweigan", FallbackLanguageId = 7 },
-                    new Language("nl") { Id = 9, CultureName = "Dutch", FallbackLanguageId = 1 }
+                    new Language(globalSettings, "en-US") { Id = 1, CultureName = "English", IsDefault = true },
+                    new Language(globalSettings, "fr") { Id = 2, CultureName = "French" },
+                    new Language(globalSettings, "es") { Id = 3, CultureName = "Spanish", FallbackLanguageId = 1 },
+                    new Language(globalSettings, "it") { Id = 4, CultureName = "Italian", FallbackLanguageId = 3 },
+                    new Language(globalSettings, "de") { Id = 5, CultureName = "German" },
+                    new Language(globalSettings, "da") { Id = 6, CultureName = "Danish", FallbackLanguageId = 8 },
+                    new Language(globalSettings, "sv") { Id = 7, CultureName = "Swedish", FallbackLanguageId = 6 },
+                    new Language(globalSettings, "no") { Id = 8, CultureName = "Norweigan", FallbackLanguageId = 7 },
+                    new Language(globalSettings, "nl") { Id = 9, CultureName = "Dutch", FallbackLanguageId = 1 }
                 };
 
             var localizationService = Mock.Get(serviceContext.LocalizationService);

@@ -16,6 +16,7 @@ namespace Umbraco.Core.Models
     [DebuggerDisplay("Id: {Id}, Name: {Name}, Alias: {Alias}")]
     public class PropertyType : EntityBase, IPropertyType, IEquatable<PropertyType>
     {
+        private readonly IShortStringHelper _shortStringHelper;
         private readonly bool _forceValueStorageType;
         private string _name;
         private string _alias;
@@ -35,9 +36,10 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyType"/> class.
         /// </summary>
-        public PropertyType(IDataType dataType)
+        public PropertyType(IShortStringHelper shortStringHelper, IDataType dataType)
         {
             if (dataType == null) throw new ArgumentNullException(nameof(dataType));
+            _shortStringHelper = shortStringHelper;
 
             if (dataType.HasIdentity)
                 _dataTypeId = dataType.Id;
@@ -50,8 +52,8 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyType"/> class.
         /// </summary>
-        public PropertyType(IDataType dataType, string propertyTypeAlias)
-            : this(dataType)
+        public PropertyType(IShortStringHelper shortStringHelper, IDataType dataType, string propertyTypeAlias)
+            : this(shortStringHelper, dataType)
         {
             _alias = SanitizeAlias(propertyTypeAlias);
         }
@@ -59,16 +61,16 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyType"/> class.
         /// </summary>
-        public PropertyType(string propertyEditorAlias, ValueStorageType valueStorageType)
-            : this(propertyEditorAlias, valueStorageType, false)
+        public PropertyType(IShortStringHelper shortStringHelper,string propertyEditorAlias, ValueStorageType valueStorageType)
+            : this(shortStringHelper, propertyEditorAlias, valueStorageType, false)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyType"/> class.
         /// </summary>
-        public PropertyType(string propertyEditorAlias, ValueStorageType valueStorageType, string propertyTypeAlias)
-            : this(propertyEditorAlias, valueStorageType, false, propertyTypeAlias)
+        public PropertyType(IShortStringHelper shortStringHelper,string propertyEditorAlias, ValueStorageType valueStorageType, string propertyTypeAlias)
+            : this(shortStringHelper, propertyEditorAlias, valueStorageType, false, propertyTypeAlias)
         {
         }
 
@@ -77,8 +79,9 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <remarks>Set <paramref name="forceValueStorageType"/> to true to force the value storage type. Values assigned to
         /// the property, eg from the underlying datatype, will be ignored.</remarks>
-        internal PropertyType(string propertyEditorAlias, ValueStorageType valueStorageType, bool forceValueStorageType, string propertyTypeAlias = null)
+        internal PropertyType(IShortStringHelper shortStringHelper, string propertyEditorAlias, ValueStorageType valueStorageType, bool forceValueStorageType, string propertyTypeAlias = null)
         {
+            _shortStringHelper = shortStringHelper;
             _propertyEditorAlias = propertyEditorAlias;
             _valueStorageType = valueStorageType;
             _forceValueStorageType = forceValueStorageType;
@@ -234,7 +237,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Sanitizes a property type alias.
         /// </summary>
-        private static string SanitizeAlias(string value)
+        private string SanitizeAlias(string value)
         {
             //NOTE: WE are doing this because we don't want to do a ToSafeAlias when the alias is the special case of
             // being prefixed with Constants.PropertyEditors.InternalGenericPropertiesPrefix
@@ -242,7 +245,7 @@ namespace Umbraco.Core.Models
 
             return value.StartsWith(Constants.PropertyEditors.InternalGenericPropertiesPrefix)
                 ? value
-                : value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase);
+                : value.ToCleanString(_shortStringHelper, CleanStringType.Alias | CleanStringType.UmbracoCase);
         }
 
         /// <inheritdoc />

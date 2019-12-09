@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Services
         public void Can_Export_Macro()
         {
             // Arrange
-            var macro = new Macro("test1", "Test", "~/views/macropartials/test.cshtml", MacroTypes.PartialView);
+            var macro = new Macro(ShortStringHelper, "test1", "Test", "~/views/macropartials/test.cshtml", MacroTypes.PartialView);
             ServiceContext.MacroService.Save(macro);
 
             // Act
@@ -56,10 +56,10 @@ namespace Umbraco.Tests.Services
         public void Can_Export_Languages()
         {
             // Arrange
-            var languageNbNo = new Language("nb-NO") { CultureName = "Norwegian" };
+            var languageNbNo = new Language(TestObjects.GetGlobalSettings(), "nb-NO") { CultureName = "Norwegian" };
             ServiceContext.LocalizationService.Save(languageNbNo);
 
-            var languageEnGb = new Language("en-GB") { CultureName = "English (United Kingdom)" };
+            var languageEnGb = new Language(TestObjects.GetGlobalSettings(), "en-GB") { CultureName = "English (United Kingdom)" };
             ServiceContext.LocalizationService.Save(languageEnGb);
 
             var newPackageXml = XElement.Parse(ImportResources.Dictionary_Package);
@@ -74,10 +74,10 @@ namespace Umbraco.Tests.Services
 
         private void CreateDictionaryData()
         {
-            var languageNbNo = new Language("nb-NO") { CultureName = "nb-NO" };
+            var languageNbNo = new Language(TestObjects.GetGlobalSettings(), "nb-NO") { CultureName = "nb-NO" };
             ServiceContext.LocalizationService.Save(languageNbNo);
 
-            var languageEnGb = new Language("en-GB") { CultureName = "en-GB" };
+            var languageEnGb = new Language(TestObjects.GetGlobalSettings(), "en-GB") { CultureName = "en-GB" };
             ServiceContext.LocalizationService.Save(languageEnGb);
 
             var parentItem = new DictionaryItem("Parent");

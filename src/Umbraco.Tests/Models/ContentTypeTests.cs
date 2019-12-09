@@ -7,6 +7,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Serialization;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
@@ -24,12 +25,12 @@ namespace Umbraco.Tests.Models
 
             contentType.PropertyGroups.Add(new PropertyGroup(new PropertyTypeCollection(false, new[]
             {
-                new PropertyType("testPropertyEditor", ValueStorageType.Nvarchar){ Alias = "myPropertyType" }
+                new PropertyType(TestHelper.ShortStringHelper, "testPropertyEditor", ValueStorageType.Nvarchar){ Alias = "myPropertyType" }
             })));
 
             Assert.Throws<InvalidOperationException>(() =>
                 contentType.PropertyTypeCollection.Add(
-                    new PropertyType("testPropertyEditor", ValueStorageType.Nvarchar) { Alias = "myPropertyType" }));
+                    new PropertyType(TestHelper.ShortStringHelper, "testPropertyEditor", ValueStorageType.Nvarchar) { Alias = "myPropertyType" }));
 
         }
 
@@ -41,10 +42,10 @@ namespace Umbraco.Tests.Models
 
             contentType.PropertyGroups.Add(new PropertyGroup(new PropertyTypeCollection(false, new[]
             {
-                new PropertyType("testPropertyEditor", ValueStorageType.Nvarchar){ Alias = "myPropertyType" }
+                new PropertyType(TestHelper.ShortStringHelper, "testPropertyEditor", ValueStorageType.Nvarchar){ Alias = "myPropertyType" }
             })));
 
-            contentType.PropertyTypeCollection.Add(new PropertyType("testPropertyEditor", ValueStorageType.Nvarchar) { Alias = "myPropertyType2" });
+            contentType.PropertyTypeCollection.Add(new PropertyType(TestHelper.ShortStringHelper, "testPropertyEditor", ValueStorageType.Nvarchar) { Alias = "myPropertyType2" });
 
             var toUpdate = contentType.PropertyTypeCollection["myPropertyType2"];
 
@@ -82,14 +83,14 @@ namespace Umbraco.Tests.Models
             }
             //add a property type without a property group
             contentType.PropertyTypeCollection.Add(
-                new PropertyType("test", ValueStorageType.Ntext, "title2") { Name = "Title2", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88 });
+                new PropertyType(TestHelper.ShortStringHelper, "test", ValueStorageType.Ntext, "title2") { Name = "Title2", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88 });
 
-            contentType.AllowedTemplates = new[] { new Template("Name", "name") { Id = 200 }, new Template("Name2", "name2") { Id = 201 } };
+            contentType.AllowedTemplates = new[] { new Template(TestHelper.ShortStringHelper, "Name", "name") { Id = 200 }, new Template(TestHelper.ShortStringHelper, "Name2", "name2") { Id = 201 } };
             contentType.AllowedContentTypes = new[] { new ContentTypeSort(new Lazy<int>(() => 888), 8, "sub"), new ContentTypeSort(new Lazy<int>(() => 889), 9, "sub2") };
             contentType.Id = 10;
             contentType.CreateDate = DateTime.Now;
             contentType.CreatorId = 22;
-            contentType.SetDefaultTemplate(new Template((string)"Test Template", (string)"testTemplate")
+            contentType.SetDefaultTemplate(new Template(TestHelper.ShortStringHelper, (string)"Test Template", (string)"testTemplate")
             {
                 Id = 88
             });
@@ -152,12 +153,12 @@ namespace Umbraco.Tests.Models
             {
                 group.Id = ++i;
             }
-            contentType.AllowedTemplates = new[] { new Template((string)"Name", (string)"name") { Id = 200 }, new Template((string)"Name2", (string)"name2") { Id = 201 } };
+            contentType.AllowedTemplates = new[] { new Template(TestHelper.ShortStringHelper, (string)"Name", (string)"name") { Id = 200 }, new Template(TestHelper.ShortStringHelper, (string)"Name2", (string)"name2") { Id = 201 } };
             contentType.AllowedContentTypes = new[] { new ContentTypeSort(new Lazy<int>(() => 888), 8, "sub"), new ContentTypeSort(new Lazy<int>(() => 889), 9, "sub2") };
             contentType.Id = 10;
             contentType.CreateDate = DateTime.Now;
             contentType.CreatorId = 22;
-            contentType.SetDefaultTemplate(new Template((string)"Test Template", (string)"testTemplate")
+            contentType.SetDefaultTemplate(new Template(TestHelper.ShortStringHelper, (string)"Test Template", (string)"testTemplate")
             {
                 Id = 88
             });
@@ -202,12 +203,12 @@ namespace Umbraco.Tests.Models
             {
                 group.Id = ++i;
             }
-            contentType.AllowedTemplates = new[] { new Template((string)"Name", (string)"name") { Id = 200 }, new Template((string)"Name2", (string)"name2") { Id = 201 } };
+            contentType.AllowedTemplates = new[] { new Template(TestHelper.ShortStringHelper, (string)"Name", (string)"name") { Id = 200 }, new Template(TestHelper.ShortStringHelper, (string)"Name2", (string)"name2") { Id = 201 } };
             contentType.AllowedContentTypes = new[] { new ContentTypeSort(new Lazy<int>(() => 888), 8, "sub"), new ContentTypeSort(new Lazy<int>(() => 889), 9, "sub2") };
             contentType.Id = 10;
             contentType.CreateDate = DateTime.Now;
             contentType.CreatorId = 22;
-            contentType.SetDefaultTemplate(new Template((string)"Test Template", (string)"testTemplate")
+            contentType.SetDefaultTemplate(new Template(TestHelper.ShortStringHelper, (string)"Test Template", (string)"testTemplate")
             {
                 Id = 88
             });
@@ -278,7 +279,7 @@ namespace Umbraco.Tests.Models
             var asDirty = (ICanBeDirty)clone;
 
             Assert.IsFalse(asDirty.IsPropertyDirty("PropertyTypes"));
-            clone.AddPropertyType(new PropertyType("test", ValueStorageType.Nvarchar, "blah"));
+            clone.AddPropertyType(new PropertyType(TestHelper.ShortStringHelper, "test", ValueStorageType.Nvarchar, "blah"));
             Assert.IsTrue(asDirty.IsPropertyDirty("PropertyTypes"));
             Assert.IsFalse(asDirty.IsPropertyDirty("PropertyGroups"));
             clone.AddPropertyGroup("hello");
@@ -297,12 +298,12 @@ namespace Umbraco.Tests.Models
             {
                 propertyType.Id = ++i;
             }
-            contentType.AllowedTemplates = new[] { new Template((string)"Name", (string)"name") { Id = 200 }, new Template((string)"Name2", (string)"name2") { Id = 201 } };
+            contentType.AllowedTemplates = new[] { new Template(TestHelper.ShortStringHelper, (string)"Name", (string)"name") { Id = 200 }, new Template(TestHelper.ShortStringHelper, (string)"Name2", (string)"name2") { Id = 201 } };
             contentType.AllowedContentTypes = new[] { new ContentTypeSort(new Lazy<int>(() => 888), 8, "sub"), new ContentTypeSort(new Lazy<int>(() => 889), 9, "sub2") };
             contentType.Id = 10;
             contentType.CreateDate = DateTime.Now;
             contentType.CreatorId = 22;
-            contentType.SetDefaultTemplate(new Template((string)"Test Template", (string)"testTemplate")
+            contentType.SetDefaultTemplate(new Template(TestHelper.ShortStringHelper, (string)"Test Template", (string)"testTemplate")
             {
                 Id = 88
             });

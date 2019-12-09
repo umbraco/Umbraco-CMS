@@ -17,6 +17,8 @@ namespace Umbraco.Core.Models
     [DebuggerDisplay("Id: {Id}, Name: {Name}, Alias: {Alias}")]
     public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
     {
+        private readonly IShortStringHelper _shortStringHelper;
+
         private string _alias;
         private string _description;
         private string _icon = "icon-folder";
@@ -30,8 +32,9 @@ namespace Umbraco.Core.Models
         private bool _hasPropertyTypeBeenRemoved;
         private ContentVariation _variations;
 
-        protected ContentTypeBase(int parentId)
+        protected ContentTypeBase(IShortStringHelper shortStringHelper, int parentId)
         {
+            _shortStringHelper = shortStringHelper;
             if (parentId == 0) throw new ArgumentOutOfRangeException(nameof(parentId));
             ParentId = parentId;
 
@@ -46,15 +49,16 @@ namespace Umbraco.Core.Models
             _variations = ContentVariation.Nothing;
         }
 
-        protected ContentTypeBase(IContentTypeBase parent)
-            : this(parent, null)
+        protected ContentTypeBase(IShortStringHelper shortStringHelper, IContentTypeBase parent)
+            : this(shortStringHelper, parent, null)
         { }
 
-        protected ContentTypeBase(IContentTypeBase parent, string alias)
+        protected ContentTypeBase(IShortStringHelper shortStringHelper, IContentTypeBase parent, string alias)
         {
             if (parent == null) throw new ArgumentNullException(nameof(parent));
             SetParent(parent);
 
+            _shortStringHelper = shortStringHelper;
             _alias = alias;
             _allowedContentTypes = new List<ContentTypeSort>();
             _propertyGroups = new PropertyGroupCollection();
@@ -121,7 +125,7 @@ namespace Umbraco.Core.Models
         {
             get => _alias;
             set => SetPropertyValueAndDetectChanges(
-                value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase),
+                value.ToCleanString(_shortStringHelper, CleanStringType.Alias | CleanStringType.UmbracoCase),
                 ref _alias,
                 nameof(Alias));
         }

@@ -14,7 +14,7 @@ namespace Umbraco.Core.Models.PublishedContent
 
         public int Index { get; }
 
-        public int TotalCount { get; internal set; }
+        public int TotalCount { get; set; }
 
         public bool IsFirst()
         {

@@ -14,15 +14,18 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class Language : EntityBase, ILanguage
     {
+        private readonly IGlobalSettings _globalSettings;
+
         private string _isoCode;
         private string _cultureName;
         private bool _isDefaultVariantLanguage;
         private bool _mandatory;
         private int? _fallbackLanguageId;
 
-        public Language(string isoCode)
+        public Language(IGlobalSettings globalSettings, string isoCode)
         {
             IsoCode = isoCode;
+            _globalSettings = globalSettings;
         }
 
         /// <inheritdoc />
@@ -74,8 +77,7 @@ namespace Umbraco.Core.Models
 
                 try
                 {
-                    var globalSettings = (IGlobalSettings) Composing.Current.Factory.GetInstance(typeof(IGlobalSettings));
-                    var defaultUiCulture = CultureInfo.GetCultureInfo(globalSettings.DefaultUILanguage);
+                    var defaultUiCulture = CultureInfo.GetCultureInfo(_globalSettings.DefaultUILanguage);
                     Thread.CurrentThread.CurrentUICulture = defaultUiCulture;
 
                     // get name - new-ing an instance to get proper display name

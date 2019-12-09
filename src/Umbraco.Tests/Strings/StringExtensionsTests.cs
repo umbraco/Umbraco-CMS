@@ -7,6 +7,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Strings;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
 
@@ -269,7 +270,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void ToUrlSegmentWithCulture()
         {
-            var output = "JUST-ANYTHING".ToUrlSegment(null);
+            var output = "JUST-ANYTHING".ToUrlSegment((string)null);
             Assert.AreEqual("URL-SEGMENT-CULTURE::JUST-ANYTHING", output);
         }
 

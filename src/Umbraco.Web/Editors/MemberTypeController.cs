@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Logging;
@@ -97,7 +98,7 @@ namespace Umbraco.Web.Editors
         [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
         public MemberTypeDisplay GetEmpty()
         {
-            var ct = new MemberType(-1);
+            var ct = new MemberType(Current.ShortStringHelper, -1);
             ct.Icon = Constants.Icons.Member;
 
             var dto = Mapper.Map<IMemberType, MemberTypeDisplay>(ct);

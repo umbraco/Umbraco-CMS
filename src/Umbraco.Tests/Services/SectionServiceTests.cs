@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Services
 
         private IUser CreateTestUser()
         {
-            var user = new User
+            var user = new User(TestObjects.GetGlobalSettings())
             {
                 Name = "Test user",
                 Username = "testUser",
@@ -42,7 +42,7 @@ namespace Umbraco.Tests.Services
             };
             ServiceContext.UserService.Save(user, false);
 
-            var userGroupA = new UserGroup
+            var userGroupA = new UserGroup(ShortStringHelper)
             {
                 Alias = "GroupA",
                 Name = "Group A"
@@ -52,7 +52,7 @@ namespace Umbraco.Tests.Services
             // TODO: This is failing the test
             ServiceContext.UserService.Save(userGroupA, new[] { user.Id }, false);
 
-            var userGroupB = new UserGroup
+            var userGroupB = new UserGroup(ShortStringHelper)
             {
                 Alias = "GroupB",
                 Name = "Group B"

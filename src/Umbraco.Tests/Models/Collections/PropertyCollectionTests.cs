@@ -3,6 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 
@@ -16,8 +17,8 @@ namespace Umbraco.Tests.Models.Collections
         {
             var collection = new PropertyCollection();
 
-            collection.Add(new Property(new PropertyType("propEditor", ValueStorageType.Nvarchar, "test")));
-            collection.Add(new Property(new PropertyType("propEditor", ValueStorageType.Nvarchar, "Test")));
+            collection.Add(new Property(new PropertyType(TestHelper.ShortStringHelper, "propEditor", ValueStorageType.Nvarchar, "test")));
+            collection.Add(new Property(new PropertyType(TestHelper.ShortStringHelper, "propEditor", ValueStorageType.Nvarchar, "Test")));
 
             Assert.AreEqual(1, collection.Count);
         }
@@ -27,7 +28,7 @@ namespace Umbraco.Tests.Models.Collections
         {
             var collection = new PropertyCollection();
 
-            collection.Add(new Property(new PropertyType("propEditor", ValueStorageType.Nvarchar, "test")));
+            collection.Add(new Property(new PropertyType(TestHelper.ShortStringHelper, "propEditor", ValueStorageType.Nvarchar, "test")));
 
             Assert.IsTrue(collection.Contains("Test"));
         }

@@ -58,7 +58,7 @@ namespace Umbraco.Tests.Routing
             base.Initialize();
 
             if (FirstTestInFixture)
-                ServiceContext.ContentTypeService.Save(new ContentType(-1) { Alias = "Doc", Name = "name" });
+                ServiceContext.ContentTypeService.Save(new ContentType(ShortStringHelper, -1) { Alias = "Doc", Name = "name" });
         }
 
         #endregion

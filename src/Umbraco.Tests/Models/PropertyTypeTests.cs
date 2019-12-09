@@ -14,7 +14,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Deep_Clone()
         {
-            var pt = new PropertyType("TestPropertyEditor", ValueStorageType.Nvarchar, "test")
+            var pt = new PropertyType(ShortStringHelper, "TestPropertyEditor", ValueStorageType.Nvarchar, "test")
             {
                 Id = 3,
                 CreateDate = DateTime.Now,
@@ -69,7 +69,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Serialize_Without_Error()
         {
-            var pt = new PropertyType("TestPropertyEditor", ValueStorageType.Nvarchar, "test")
+            var pt = new PropertyType(ShortStringHelper, "TestPropertyEditor", ValueStorageType.Nvarchar, "test")
             {
                 Id = 3,
                 CreateDate = DateTime.Now,

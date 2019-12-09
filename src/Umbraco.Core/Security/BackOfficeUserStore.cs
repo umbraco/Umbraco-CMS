@@ -78,7 +78,7 @@ namespace Umbraco.Core.Security
             var emptyPasswordValue = Constants.Security.EmptyPasswordPrefix +
                                       aspHasher.HashPassword(Guid.NewGuid().ToString("N"));
 
-            var userEntity = new User(user.Name, user.Email, user.UserName, emptyPasswordValue)
+            var userEntity = new User(_globalSettings, user.Name, user.Email, user.UserName, emptyPasswordValue)
             {
                 DefaultToLiveEditing = false,
                 Language = user.Culture ?? _globalSettings.DefaultUILanguage,

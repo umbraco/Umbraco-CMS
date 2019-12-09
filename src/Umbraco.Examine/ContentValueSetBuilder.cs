@@ -16,15 +16,18 @@ namespace Umbraco.Examine
     {
         private readonly UrlSegmentProviderCollection _urlSegmentProviders;
         private readonly IUserService _userService;
+        private readonly IShortStringHelper _shortStringHelper;
 
         public ContentValueSetBuilder(PropertyEditorCollection propertyEditors,
             UrlSegmentProviderCollection urlSegmentProviders,
             IUserService userService,
+            IShortStringHelper shortStringHelper,
             bool publishedValuesOnly)
             : base(propertyEditors, publishedValuesOnly)
         {
             _urlSegmentProviders = urlSegmentProviders;
             _userService = userService;
+            _shortStringHelper = shortStringHelper;
         }
 
         /// <inheritdoc />
@@ -39,7 +42,7 @@ namespace Umbraco.Examine
             {
                 var isVariant = c.ContentType.VariesByCulture();
 
-                var urlValue = c.GetUrlSegment(_urlSegmentProviders); //Always add invariant urlName
+                var urlValue = c.GetUrlSegment(_shortStringHelper, _urlSegmentProviders); //Always add invariant urlName
                 var values = new Dictionary<string, IEnumerable<object>>
                 {
                     {"icon", c.ContentType.Icon?.Yield() ?? Enumerable.Empty<string>()},
@@ -71,7 +74,7 @@ namespace Umbraco.Examine
 
                     foreach (var culture in c.AvailableCultures)
                     {
-                        var variantUrl = c.GetUrlSegment(_urlSegmentProviders, culture);
+                        var variantUrl = c.GetUrlSegment(_shortStringHelper, _urlSegmentProviders, culture);
                         var lowerCulture = culture.ToLowerInvariant();
                         values[$"urlName_{lowerCulture}"] = variantUrl?.Yield() ?? Enumerable.Empty<string>();
                         values[$"nodeName_{lowerCulture}"] = (PublishedValuesOnly

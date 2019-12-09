@@ -21,10 +21,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         private MediaTypeRepository CreateRepository(IScopeProvider provider)
         {
             var cacheHelper = AppCaches.Disabled;
-            var templateRepository = new TemplateRepository((IScopeAccessor)provider, cacheHelper, Logger, TestObjects.GetFileSystemsMock(), IOHelper);
-            var commonRepository = new ContentTypeCommonRepository((IScopeAccessor)provider, templateRepository, AppCaches);
-            var languageRepository = new LanguageRepository((IScopeAccessor)provider, AppCaches, Logger);
-            return new MediaTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, commonRepository, languageRepository);
+            var templateRepository = new TemplateRepository((IScopeAccessor)provider, cacheHelper, Logger, TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
+            var commonRepository = new ContentTypeCommonRepository((IScopeAccessor)provider, templateRepository, AppCaches, ShortStringHelper);
+            var languageRepository = new LanguageRepository((IScopeAccessor)provider, AppCaches, Logger, TestObjects.GetGlobalSettings());
+            return new MediaTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, commonRepository, languageRepository, ShortStringHelper);
         }
 
         private EntityContainerRepository CreateContainerRepository(IScopeProvider provider)
@@ -56,7 +56,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
 
                 //create a
-                var contentType2 = (IMediaType)new MediaType(contentType, "hello")
+                var contentType2 = (IMediaType)new MediaType(ShortStringHelper, contentType, "hello")
                 {
                     Name = "Blahasdfsadf"
                 };
@@ -218,7 +218,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var mediaType = repository.Get(NodeDto.NodeIdSeed);
 
                 mediaType.Thumbnail = "Doc2.png";
-                mediaType.PropertyGroups["Media"].PropertyTypes.Add(new PropertyType("test", ValueStorageType.Ntext, "subtitle")
+                mediaType.PropertyGroups["Media"].PropertyTypes.Add(new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "subtitle")
                     {
                         Name = "Subtitle",
                         Description = "Optional Subtitle",

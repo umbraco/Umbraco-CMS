@@ -47,7 +47,7 @@ namespace Umbraco.Tests.PropertyEditors
 
             var dataTypeService = new TestObjects.TestDataTypeService(dataType);
 
-            var prop = new Property(1, new PropertyType(dataType));
+            var prop = new Property(1, new PropertyType(TestHelper.ShortStringHelper, dataType));
             prop.SetValue("Value 1,Value 2,Value 3");
 
             var valueEditor = dataType.Editor.GetValueEditor();
@@ -76,7 +76,7 @@ namespace Umbraco.Tests.PropertyEditors
 
             var dataTypeService = new TestObjects.TestDataTypeService(dataType);
 
-            var prop = new Property(1, new PropertyType(dataType));
+            var prop = new Property(1, new PropertyType(TestHelper.ShortStringHelper, dataType));
             prop.SetValue("Value 2");
 
             var result = dataType.Editor.GetValueEditor().ConvertDbToString(prop.PropertyType, prop.GetValue());

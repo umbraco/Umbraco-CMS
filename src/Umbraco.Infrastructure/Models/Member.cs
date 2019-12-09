@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Umbraco.Core.Composing;
+using Umbraco.Composing;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Models

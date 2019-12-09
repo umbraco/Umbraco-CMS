@@ -10,6 +10,7 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -18,8 +19,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType>, IMediaTypeRepository
     {
-        public MediaTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IContentTypeCommonRepository commonRepository, ILanguageRepository languageRepository)
-            : base(scopeAccessor, cache, logger, commonRepository, languageRepository)
+        public MediaTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IContentTypeCommonRepository commonRepository, ILanguageRepository languageRepository, IShortStringHelper shortStringHelper)
+            : base(scopeAccessor, cache, logger, commonRepository, languageRepository, shortStringHelper)
         { }
 
         protected override bool SupportsPublishing => MediaType.SupportsPublishingConst;

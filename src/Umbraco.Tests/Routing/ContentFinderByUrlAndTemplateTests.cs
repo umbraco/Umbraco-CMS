@@ -17,7 +17,7 @@ namespace Umbraco.Tests.Routing
     {
         Template CreateTemplate(string alias)
         {
-            var template = new Template(alias, alias);
+            var template = new Template(ShortStringHelper, alias, alias);
             template.Content = ""; // else saving throws with a dirty internal error
             Current.Services.FileService.SaveTemplate(template);
             return template;

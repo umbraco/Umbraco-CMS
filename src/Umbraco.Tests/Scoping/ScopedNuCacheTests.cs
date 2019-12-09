@@ -102,7 +102,7 @@ namespace Umbraco.Tests.Scoping
                 Factory.GetInstance<IGlobalSettings>(),
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
-                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }),
+                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(ShortStringHelper) }),
                 typeFinder,
                 hostingEnvironment);
         }
@@ -143,7 +143,7 @@ namespace Umbraco.Tests.Scoping
             _distributedCacheBinder.BindEvents(true);
 
             // create document type, document
-            var contentType = new ContentType(-1) { Alias = "CustomDocument", Name = "Custom Document" };
+            var contentType = new ContentType(ShortStringHelper, -1) { Alias = "CustomDocument", Name = "Custom Document" };
             Current.Services.ContentTypeService.Save(contentType);
             var item = new Content("name", -1, contentType);
 

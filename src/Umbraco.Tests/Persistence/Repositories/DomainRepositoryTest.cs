@@ -20,11 +20,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         private DomainRepository CreateRepository(IScopeProvider provider, out ContentTypeRepository contentTypeRepository, out DocumentRepository documentRepository, out LanguageRepository languageRepository)
         {
             var accessor = (IScopeAccessor) provider;
-            var templateRepository = new TemplateRepository(accessor, Core.Cache.AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock(), IOHelper);
+            var templateRepository = new TemplateRepository(accessor, Core.Cache.AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
             var tagRepository = new TagRepository(accessor, Core.Cache.AppCaches.Disabled, Logger);
-            var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches);
-            languageRepository = new LanguageRepository(accessor, Core.Cache.AppCaches.Disabled, Logger);
-            contentTypeRepository = new ContentTypeRepository(accessor, Core.Cache.AppCaches.Disabled, Logger, commonRepository, languageRepository);
+            var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches, ShortStringHelper);
+            languageRepository = new LanguageRepository(accessor, Core.Cache.AppCaches.Disabled, Logger, TestObjects.GetGlobalSettings());
+            contentTypeRepository = new ContentTypeRepository(accessor, Core.Cache.AppCaches.Disabled, Logger, commonRepository, languageRepository, ShortStringHelper);
             documentRepository = new DocumentRepository(accessor, Core.Cache.AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository);
             var domainRepository = new DomainRepository(accessor, Core.Cache.AppCaches.Disabled, Logger);
             return domainRepository;
@@ -41,7 +41,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var repo = CreateRepository(provider, out contentTypeRepo, out documentRepo, out langRepo);
 
-                var lang = new Language(isoName);
+                var lang = new Language(TestObjects.GetGlobalSettings(), isoName);
                 langRepo.Save(lang);
 
                 ct = MockedContentTypes.CreateBasicContentType("test", "Test");
@@ -196,7 +196,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //more test data
                 var lang1 = langRepo.GetByIsoCode("en-AU");
-                var lang2 = new Language("es");
+                var lang2 = new Language(TestObjects.GetGlobalSettings(), "es");
                 langRepo.Save(lang2);
                 var content2 = new Content("test", -1, ct) { CreatorId = 0, WriterId = 0 };
                 documentRepo.Save(content2);

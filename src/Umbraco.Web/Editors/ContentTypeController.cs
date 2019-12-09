@@ -49,6 +49,7 @@ namespace Umbraco.Web.Editors
     public class ContentTypeController : ContentTypeControllerBase<IContentType>
     {
         private readonly IEntityXmlSerializer _serializer;
+        private readonly IGlobalSettings _globalSettings;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IScopeProvider _scopeProvider;
         private readonly IShortStringHelper _shortStringHelper;
@@ -65,6 +66,7 @@ namespace Umbraco.Web.Editors
             : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _serializer = serializer;
+            _globalSettings = globalSettings;
             _propertyEditors = propertyEditors;
             _scopeProvider = scopeProvider;
             _shortStringHelper = shortStringHelper;
@@ -227,7 +229,7 @@ namespace Umbraco.Web.Editors
         public CreatedContentTypeCollectionResult PostCreateCollection(int parentId, string collectionName, bool collectionCreateTemplate, string collectionItemName, bool collectionItemCreateTemplate, string collectionIcon, string collectionItemIcon)
         {
             // create item doctype
-            var itemDocType = new ContentType(parentId);
+            var itemDocType = new ContentType(_shortStringHelper, parentId);
             itemDocType.Name = collectionItemName;
             itemDocType.Alias = collectionItemName.ToSafeAlias(true);
             itemDocType.Icon = collectionItemIcon;
@@ -243,7 +245,7 @@ namespace Umbraco.Web.Editors
             Services.ContentTypeService.Save(itemDocType);
 
             // create collection doctype
-            var collectionDocType = new ContentType(parentId);
+            var collectionDocType = new ContentType(_shortStringHelper, parentId);
             collectionDocType.Name = collectionName;
             collectionDocType.Alias = collectionName.ToSafeAlias(true);
             collectionDocType.Icon = collectionIcon;
@@ -378,10 +380,10 @@ namespace Umbraco.Web.Editors
             if (parentId != Constants.System.Root)
             {
                 var parent = Services.ContentTypeService.Get(parentId);
-                ct = parent != null ? new ContentType(parent, string.Empty) : new ContentType(parentId);
+                ct = parent != null ? new ContentType(_shortStringHelper, parent, string.Empty) : new ContentType(_shortStringHelper, parentId);
             }
             else
-                ct = new ContentType(parentId);
+                ct = new ContentType(_shortStringHelper, parentId);
 
             ct.Icon = Constants.Icons.Content;
 
@@ -526,7 +528,7 @@ namespace Umbraco.Web.Editors
             }
 
             var dataInstaller = new PackageDataInstallation(Logger, Services.FileService, Services.MacroService, Services.LocalizationService,
-                Services.DataTypeService, Services.EntityService, Services.ContentTypeService, Services.ContentService, _propertyEditors, _scopeProvider, _shortStringHelper);
+                Services.DataTypeService, Services.EntityService, Services.ContentTypeService, Services.ContentService, _propertyEditors, _scopeProvider, _shortStringHelper, _globalSettings);
 
             var xd = new XmlDocument {XmlResolver = null};
             xd.Load(filePath);

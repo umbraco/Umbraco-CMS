@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
@@ -18,12 +19,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class LanguageRepository : NPocoRepositoryBase<int, ILanguage>, ILanguageRepository
     {
+        private readonly IGlobalSettings _globalSettings;
         private readonly Dictionary<string, int> _codeIdMap = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<int, string> _idCodeMap = new Dictionary<int, string>();
 
-        public LanguageRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
+        public LanguageRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IGlobalSettings globalSettings)
             : base(scopeAccessor, cache, logger)
-        { }
+        {
+            _globalSettings = globalSettings;
+        }
 
         protected override IRepositoryCachePolicy<ILanguage, int> CreateCachePolicy()
         {
@@ -233,7 +237,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected ILanguage ConvertFromDto(LanguageDto dto)
         {
-            var entity = LanguageFactory.BuildEntity(dto);
+            var entity = LanguageFactory.BuildEntity(_globalSettings, dto);
             return entity;
         }
 

@@ -1400,7 +1400,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     cultureData[cultureInfo.Culture] = new CultureVariation
                     {
                         Name = cultureInfo.Name,
-                        UrlSegment = content.GetUrlSegment(_urlSegmentProviders, cultureInfo.Culture),
+                        UrlSegment = content.GetUrlSegment(Current.ShortStringHelper, _urlSegmentProviders, cultureInfo.Culture),
                         Date = content.GetUpdateDate(cultureInfo.Culture) ?? DateTime.MinValue,
                         IsDraft = cultureIsDraft
                     };
@@ -1412,7 +1412,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 PropertyData = propertyData,
                 CultureData = cultureData,
-                UrlSegment = content.GetUrlSegment(_urlSegmentProviders)
+                UrlSegment = content.GetUrlSegment(Current.ShortStringHelper, _urlSegmentProviders)
             };
 
             var dto = new ContentNuDto
