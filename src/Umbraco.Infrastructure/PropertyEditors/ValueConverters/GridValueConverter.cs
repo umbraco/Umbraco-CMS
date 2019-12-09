@@ -6,6 +6,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Composing;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {

@@ -9,6 +9,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using Umbraco.Core.IO;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core
 {
@@ -1289,5 +1290,41 @@ namespace Umbraco.Core
             return Attempt.Fail(input);
         }
 
+
+          // FORMAT STRINGS
+
+          /// <summary>
+          /// Cleans a string to produce a string that can safely be used in an alias.
+          /// </summary>
+          /// <param name="alias">The text to filter.</param>
+          /// <returns>The safe alias.</returns>
+          public static string ToSafeAlias(this string alias, IShortStringHelper shortStringHelper)
+          {
+              return shortStringHelper.CleanStringForSafeAlias(alias);
+          }
+
+          /// <summary>
+          /// Cleans a string to produce a string that can safely be used in an alias.
+          /// </summary>
+          /// <param name="alias">The text to filter.</param>
+          /// <param name="camel">A value indicating that we want to camel-case the alias.</param>
+          /// <returns>The safe alias.</returns>
+          public static string ToSafeAlias(this string alias, IShortStringHelper shortStringHelper, bool camel)
+          {
+              var a = shortStringHelper.CleanStringForSafeAlias(alias);
+              if (string.IsNullOrWhiteSpace(a) || camel == false) return a;
+              return char.ToLowerInvariant(a[0]) + a.Substring(1);
+          }
+
+          /// <summary>
+          /// Cleans a string, in the context of a specified culture, to produce a string that can safely be used in an alias.
+          /// </summary>
+          /// <param name="alias">The text to filter.</param>
+          /// <param name="culture">The culture.</param>
+          /// <returns>The safe alias.</returns>
+          public static string ToSafeAlias(this string alias, IShortStringHelper shortStringHelper, string culture)
+          {
+              return shortStringHelper.CleanStringForSafeAlias(alias, culture);
+          }
     }
 }

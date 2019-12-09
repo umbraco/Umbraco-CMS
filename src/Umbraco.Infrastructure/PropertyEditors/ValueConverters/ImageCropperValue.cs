@@ -59,7 +59,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 : Crops.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
         }
 
-        internal void AppendCropBaseUrl(StringBuilder url, ImageCropperCrop crop, bool defaultCrop, bool preferFocalPoint)
+        public void AppendCropBaseUrl(StringBuilder url, ImageCropperCrop crop, bool defaultCrop, bool preferFocalPoint)
         {
             if (preferFocalPoint && HasFocalPoint()
                 || crop != null && crop.Coordinates == null && HasFocalPoint()
@@ -155,7 +155,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         /// Applies a configuration.
         /// </summary>
         /// <remarks>Ensures that all crops defined in the configuration exists in the value.</remarks>
-        internal void ApplyConfiguration(ImageCropperConfiguration configuration)
+        public void ApplyConfiguration(ImageCropperConfiguration configuration)
         {
             // merge the crop values - the alias + width + height comes from
             // configuration, but each crop can store its own coordinates

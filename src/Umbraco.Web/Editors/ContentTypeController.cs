@@ -24,6 +24,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
@@ -50,6 +51,7 @@ namespace Umbraco.Web.Editors
         private readonly IEntityXmlSerializer _serializer;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IScopeProvider _scopeProvider;
+        private readonly IShortStringHelper _shortStringHelper;
 
         public ContentTypeController(IEntityXmlSerializer serializer,
             ICultureDictionary cultureDictionary,
@@ -58,12 +60,14 @@ namespace Umbraco.Web.Editors
             ISqlContext sqlContext, PropertyEditorCollection propertyEditors,
             ServiceContext services, AppCaches appCaches,
             IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper,
-            IScopeProvider scopeProvider)
+            IScopeProvider scopeProvider,
+            IShortStringHelper shortStringHelper)
             : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _serializer = serializer;
             _propertyEditors = propertyEditors;
             _scopeProvider = scopeProvider;
+            _shortStringHelper = shortStringHelper;
         }
 
         public int GetCount()
@@ -522,7 +526,7 @@ namespace Umbraco.Web.Editors
             }
 
             var dataInstaller = new PackageDataInstallation(Logger, Services.FileService, Services.MacroService, Services.LocalizationService,
-                Services.DataTypeService, Services.EntityService, Services.ContentTypeService, Services.ContentService, _propertyEditors, _scopeProvider);
+                Services.DataTypeService, Services.EntityService, Services.ContentTypeService, Services.ContentService, _propertyEditors, _scopeProvider, _shortStringHelper);
 
             var xd = new XmlDocument {XmlResolver = null};
             xd.Load(filePath);

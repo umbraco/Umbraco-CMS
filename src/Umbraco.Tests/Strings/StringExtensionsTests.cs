@@ -255,7 +255,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void ToSafeAliasWithCulture()
         {
-            var output = "JUST-ANYTHING".ToSafeAlias(null);
+            var output = "JUST-ANYTHING".ToSafeAlias((string)null);
             Assert.AreEqual("SAFE-ALIAS-CULTURE::JUST-ANYTHING", output);
         }
 

@@ -15,6 +15,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Dashboards;
 using Umbraco.Core.IO;
 using Umbraco.Core.Serialization;
+using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Manifest
@@ -33,7 +34,7 @@ namespace Umbraco.Tests.Manifest
                 new RegexValidator(Mock.Of<ILocalizedTextService>(), null),
                 new DelimitedValueValidator(),
             };
-            _parser = new ManifestParser(AppCaches.Disabled, new ManifestValueValidatorCollection(validators), new ManifestFilterCollection(Array.Empty<IManifestFilter>()),  Mock.Of<ILogger>(), TestHelper.IOHelper, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), new JsonNetSerializer(), Mock.Of<ILocalizedTextService>());
+            _parser = new ManifestParser(AppCaches.Disabled, new ManifestValueValidatorCollection(validators), new ManifestFilterCollection(Array.Empty<IManifestFilter>()),  Mock.Of<ILogger>(), TestHelper.IOHelper, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), new JsonNetSerializer(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>());
         }
 
         [Test]

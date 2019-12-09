@@ -14,6 +14,8 @@ using Umbraco.Tests.TestHelpers;
 using System.Linq;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Tests.Persistence.Querying
 {
@@ -23,7 +25,7 @@ namespace Umbraco.Tests.Persistence.Querying
         [Test]
         public void Equals_Claus_With_Two_Entity_Values()
         {
-            var dataType = new DataType(new VoidEditor(Mock.Of<ILogger>()))
+            var dataType = new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>()))
             {
                 Id = 12345
             };
@@ -160,7 +162,7 @@ namespace Umbraco.Tests.Persistence.Querying
             Assert.AreEqual("upper([umbracoUser].[userLogin]) = upper(@0)", result);
             Assert.AreEqual("hello@world.com", modelToSqlExpressionHelper.GetSqlParameters()[0]);
         }
-        
+
         [Test]
         public void Sql_Replace_Mapped()
         {

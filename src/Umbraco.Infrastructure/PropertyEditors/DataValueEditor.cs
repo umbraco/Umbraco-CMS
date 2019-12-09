@@ -6,12 +6,14 @@ using System.Linq;
 using System.Xml.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Composing;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors.Validators;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -21,15 +23,17 @@ namespace Umbraco.Core.PropertyEditors
     public class DataValueEditor : IDataValueEditor
     {
         private readonly ILocalizedTextService _localizedTextService;
+        private readonly IShortStringHelper _shortStringHelper;
         protected IDataTypeService DataTypeService { get; }
         protected ILocalizationService LocalizationService { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataValueEditor"/> class.
         /// </summary>
-        public DataValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService) // for tests, and manifest
+        public DataValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper) // for tests, and manifest
         {
             _localizedTextService = localizedTextService;
+            _shortStringHelper = shortStringHelper;
             ValueType = ValueTypes.String;
             Validators = new List<IValueValidator>();
             DataTypeService = dataTypeService;
@@ -39,9 +43,10 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Initializes a new instance of the <see cref="DataValueEditor"/> class.
         /// </summary>
-        public DataValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute)
+        public DataValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute)
         {
             if (attribute == null) throw new ArgumentNullException(nameof(attribute));
+            _shortStringHelper = shortStringHelper;
 
             var view = attribute.View;
             if (string.IsNullOrWhiteSpace(view))
@@ -284,7 +289,7 @@ namespace Umbraco.Core.PropertyEditors
         {
             published &= property.PropertyType.SupportsPublishing;
 
-            var nodeName = property.PropertyType.Alias.ToSafeAlias();
+            var nodeName = property.PropertyType.Alias.ToSafeAlias(_shortStringHelper);
 
             foreach (var pvalue in property.Values)
             {

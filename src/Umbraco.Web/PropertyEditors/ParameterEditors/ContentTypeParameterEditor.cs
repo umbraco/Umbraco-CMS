@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Logging;
+﻿using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors.ParameterEditors
@@ -17,7 +18,7 @@ namespace Umbraco.Web.PropertyEditors.ParameterEditors
         /// Initializes a new instance of the <see cref="ContentTypeParameterEditor"/> class.
         /// </summary>
         public ContentTypeParameterEditor(ILogger logger)
-            : base(logger)
+            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService, Current.ShortStringHelper)
         {
             // configure
             DefaultConfiguration.Add("multiple", false);

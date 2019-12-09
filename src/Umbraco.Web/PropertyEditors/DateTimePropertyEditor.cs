@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
@@ -23,7 +24,7 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         /// <param name="logger"></param>
         public DateTimePropertyEditor(ILogger logger, IIOHelper ioHelper)
-            : base(logger)
+            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService, Current.ShortStringHelper)
         {
             _ioHelper = ioHelper;
         }

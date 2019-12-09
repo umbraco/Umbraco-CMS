@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
@@ -21,7 +22,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Initializes a new instance of the <see cref="SliderPropertyEditor"/> class.
         /// </summary>
         public SliderPropertyEditor(ILogger logger, IIOHelper ioHelper)
-            : base(logger)
+            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService, Current.ShortStringHelper)
         {
             _ioHelper = ioHelper;
         }

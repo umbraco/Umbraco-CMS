@@ -72,7 +72,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
         private static readonly ConcurrentDictionary<int, bool> Storages = new ConcurrentDictionary<int, bool>();
 
-        internal static void ClearCaches()
+        public static void ClearCaches()
         {
             Storages.Clear();
         }

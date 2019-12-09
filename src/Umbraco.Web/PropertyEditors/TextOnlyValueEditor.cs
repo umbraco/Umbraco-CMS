@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -12,7 +13,7 @@ namespace Umbraco.Web.PropertyEditors
     public class TextOnlyValueEditor : DataValueEditor
     {
         public TextOnlyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute)
-            : base(dataTypeService, localizationService, attribute)
+            : base(dataTypeService, localizationService, Current.ShortStringHelper, attribute)
         { }
 
         /// <summary>

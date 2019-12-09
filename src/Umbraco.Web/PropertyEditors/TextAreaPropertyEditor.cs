@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
@@ -26,7 +27,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Initializes a new instance of the <see cref="TextAreaPropertyEditor"/> class.
         /// </summary>
         public TextAreaPropertyEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper)
-            : base(logger)
+            : base(logger, dataTypeService, localizationService, Current.ShortStringHelper)
         {
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;

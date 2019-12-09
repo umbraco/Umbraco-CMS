@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.Serialization;
+using Umbraco.Composing;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -19,13 +22,19 @@ namespace Umbraco.Core.PropertyEditors
     [DataContract]
     public class DataEditor : IDataEditor
     {
+        private readonly IDataTypeService _dataTypeService;
+        private readonly ILocalizationService _localizationService;
+        private readonly IShortStringHelper _shortStringHelper;
         private IDictionary<string, object> _defaultConfiguration;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataEditor"/> class.
         /// </summary>
-        public DataEditor(ILogger logger, EditorType type = EditorType.PropertyValue)
+        public DataEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, IShortStringHelper shortStringHelper, EditorType type = EditorType.PropertyValue)
         {
+            _dataTypeService = dataTypeService;
+            _localizationService = localizationService;
+            _shortStringHelper = shortStringHelper;
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             // defaults
@@ -166,7 +175,7 @@ namespace Umbraco.Core.PropertyEditors
             if (Attribute == null)
                 throw new InvalidOperationException("The editor does not specify a view.");
 
-            return new DataValueEditor(Current.Services.DataTypeService, Current.Services.LocalizationService, Attribute);
+            return new DataValueEditor(_dataTypeService, _localizationService, _shortStringHelper, Attribute);
         }
 
         /// <summary>

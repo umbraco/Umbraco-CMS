@@ -2,11 +2,13 @@
 using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Umbraco.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
+using Current = Umbraco.Core.Composing.Current;
 
 namespace Umbraco.Core.Persistence.Factories
 {
@@ -19,7 +21,7 @@ namespace Umbraco.Core.Persistence.Factories
                 logger.Warn(typeof(DataType), "Could not find an editor with alias {EditorAlias}, treating as Label."
                                                      +" The site may fail to boot and / or load data types and run.", dto.EditorAlias);
                 //convert to label
-                editor = new LabelPropertyEditor(logger, ioHelper);
+                editor = new LabelPropertyEditor(logger, ioHelper, Current.Services.DataTypeService, Current.Services.LocalizationService, Current.ShortStringHelper);
             }
 
             var dataType = new DataType(editor);

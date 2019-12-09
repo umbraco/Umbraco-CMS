@@ -7,6 +7,8 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
+using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Tests.Models
 {
@@ -16,7 +18,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Deep_Clone()
         {
-            var dtd = new DataType(new VoidEditor(Mock.Of<ILogger>()), 9)
+            var dtd = new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>()), 9)
             {
                 CreateDate = DateTime.Now,
                 CreatorId = 5,
@@ -59,7 +61,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Serialize_Without_Error()
         {
-            var dtd = new DataType(new VoidEditor(Mock.Of<ILogger>()), 9)
+            var dtd = new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>()), 9)
             {
                 CreateDate = DateTime.Now,
                 CreatorId = 5,

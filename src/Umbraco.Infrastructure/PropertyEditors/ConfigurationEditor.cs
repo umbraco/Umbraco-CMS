@@ -66,7 +66,7 @@ namespace Umbraco.Core.PropertyEditors
         [JsonProperty("defaultConfig")]
         public virtual IDictionary<string, object> DefaultConfiguration {
             get => _defaultConfiguration;
-            internal set => _defaultConfiguration = value;
+            set => _defaultConfiguration = value;
         }
 
         /// <inheritdoc />

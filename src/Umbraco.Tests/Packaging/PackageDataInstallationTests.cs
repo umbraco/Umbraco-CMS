@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using System.Xml.Linq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
@@ -16,6 +17,7 @@ using Umbraco.Tests.Services;
 using Umbraco.Tests.Services.Importing;
 using Umbraco.Tests.Testing;
 using Umbraco.Core.Composing.CompositionExtensions;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Tests.Packaging
 {
@@ -29,7 +31,7 @@ namespace Umbraco.Tests.Packaging
         public class Editor1 : DataEditor
         {
             public Editor1(ILogger logger)
-                : base(logger)
+                : base(logger, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>())
             {
                 Alias = "7e062c13-7c41-4ad9-b389-41d88aeef87c";
             }
@@ -39,7 +41,7 @@ namespace Umbraco.Tests.Packaging
         public class Editor2 : DataEditor
         {
             public Editor2(ILogger logger)
-                : base(logger)
+                : base(logger, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>())
             {
                 Alias = "d15e1281-e456-4b24-aa86-1dda3e4299d5";
             }

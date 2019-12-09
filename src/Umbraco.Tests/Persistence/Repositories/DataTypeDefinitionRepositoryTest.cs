@@ -349,7 +349,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (provider.CreateScope())
             {
                 var repository = CreateRepository();
-                var dataTypeDefinition = new DataType(new LabelPropertyEditor(Logger, IOHelper))
+                var dataTypeDefinition = new DataType(new LabelPropertyEditor(Logger, IOHelper, DataTypeService, LocalizationService, ShortStringHelper))
                 {
                     DatabaseType = ValueStorageType.Integer,
                     Name = "AgeDataType",
@@ -387,7 +387,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (provider.CreateScope())
             {
                 var repository = CreateRepository();
-                var dataTypeDefinition = new DataType(new IntegerPropertyEditor(Logger))
+                var dataTypeDefinition = new DataType(new IntegerPropertyEditor(Logger, DataTypeService, LocalizationService, ShortStringHelper))
                 {
                     DatabaseType = ValueStorageType.Integer,
                     Name = "AgeDataType",
@@ -398,7 +398,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var definition = repository.Get(dataTypeDefinition.Id);
                 definition.Name = "AgeDataType Updated";
-                definition.Editor = new LabelPropertyEditor(Logger, IOHelper); //change
+                definition.Editor = new LabelPropertyEditor(Logger, IOHelper, DataTypeService, LocalizationService, ShortStringHelper); //change
                 repository.Save(definition);
 
                 var definitionUpdated = repository.Get(dataTypeDefinition.Id);
@@ -418,7 +418,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (provider.CreateScope())
             {
                 var repository = CreateRepository();
-                var dataTypeDefinition = new DataType(new LabelPropertyEditor(Logger, IOHelper))
+                var dataTypeDefinition = new DataType(new LabelPropertyEditor(Logger, IOHelper, DataTypeService, LocalizationService, ShortStringHelper))
                 {
                     DatabaseType = ValueStorageType.Integer,
                     Name = "AgeDataType",

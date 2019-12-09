@@ -1,5 +1,7 @@
 ﻿using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -19,8 +21,8 @@ namespace Umbraco.Core.PropertyEditors
         /// <param name="logger">A logger.</param>
         /// <remarks>The default alias of the editor is "Umbraco.Void". When a suffix is provided,
         /// it is appended to the alias. Eg if the suffix is "Foo" the alias is "Umbraco.Void.Foo".</remarks>
-        public VoidEditor(string aliasSuffix, ILogger logger)
-            : base(logger)
+        public VoidEditor(string aliasSuffix, ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, IShortStringHelper shortStringHelper)
+            : base(logger, dataTypeService, localizationService, shortStringHelper)
         {
             Alias = "Umbraco.Void";
             if (string.IsNullOrWhiteSpace(aliasSuffix)) return;
@@ -32,8 +34,8 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         /// <param name="logger">A logger.</param>
         /// <remarks>The alias of the editor is "Umbraco.Void".</remarks>
-        public VoidEditor(ILogger logger)
-            : this(null, logger)
+        public VoidEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, IShortStringHelper shortStringHelper)
+            : this(null, logger, dataTypeService, localizationService, shortStringHelper)
         { }
     }
 }

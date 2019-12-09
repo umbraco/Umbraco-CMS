@@ -45,6 +45,7 @@ using Umbraco.Web.Sections;
 using Current = Umbraco.Core.Composing.Current;
 using FileSystems = Umbraco.Core.IO.FileSystems;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.Services;
 using Umbraco.Net;
 
 namespace Umbraco.Tests.Testing
@@ -104,6 +105,8 @@ namespace Umbraco.Tests.Testing
         protected ILogger Logger => Factory.GetInstance<ILogger>();
 
         protected IIOHelper IOHelper { get; private set; }
+        protected IDataTypeService DataTypeService => Factory.GetInstance<IDataTypeService>();
+        protected ILocalizationService LocalizationService => Factory.GetInstance<ILocalizationService>();
         protected IShortStringHelper ShortStringHelper { get; private set; }
         protected IUmbracoVersion UmbracoVersion { get; private set; }
 
@@ -325,7 +328,8 @@ namespace Umbraco.Tests.Testing
             {
                 Assembly.Load("Umbraco.Core"),
                 Assembly.Load("Umbraco.Web"),
-                Assembly.Load("Umbraco.Tests")
+                Assembly.Load("Umbraco.Tests"),
+                Assembly.Load("Umbraco.Infrastructure")
             });
         }
 

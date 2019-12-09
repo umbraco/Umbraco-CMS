@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
@@ -16,7 +17,7 @@ namespace Umbraco.Web.PropertyEditors
     public class UserPickerPropertyEditor : DataEditor
     {
         public UserPickerPropertyEditor(ILogger logger)
-            : base(logger)
+            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService, Current.ShortStringHelper)
         { }
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new UserPickerConfiguration();

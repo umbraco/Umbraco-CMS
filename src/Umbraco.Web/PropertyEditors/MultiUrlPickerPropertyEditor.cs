@@ -1,5 +1,6 @@
 using System;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Logging;
@@ -24,7 +25,8 @@ namespace Umbraco.Web.PropertyEditors
         private readonly ILocalizationService _localizationService;
         private readonly IIOHelper _ioHelper;
 
-        public MultiUrlPickerPropertyEditor(ILogger logger, IEntityService entityService, IPublishedSnapshotAccessor publishedSnapshotAccessor, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper) : base(logger, EditorType.PropertyValue)
+        public MultiUrlPickerPropertyEditor(ILogger logger, IEntityService entityService, IPublishedSnapshotAccessor publishedSnapshotAccessor, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper)
+            : base(logger, dataTypeService, localizationService, Current.ShortStringHelper, EditorType.PropertyValue)
         {
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
             _publishedSnapshotAccessor = publishedSnapshotAccessor ?? throw new ArgumentNullException(nameof(publishedSnapshotAccessor));

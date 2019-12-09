@@ -10,6 +10,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web;
 
 namespace Umbraco.Tests.PublishedContent
@@ -46,7 +47,9 @@ namespace Umbraco.Tests.PublishedContent
                     Mock.Of<IContentTypeBaseServiceProvider>(),
                     Mock.Of<IUmbracoContextAccessor>(),
                     Mock.Of<IDataTypeService>(),
-                    Mock.Of<ILocalizationService>(), IOHelper)) { Id = 1 });
+                    Mock.Of<ILocalizationService>(),
+                    Mock.Of<IShortStringHelper>(),
+                    IOHelper)) { Id = 1 });
 
             var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeService);
 

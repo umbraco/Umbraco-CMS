@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
@@ -21,7 +22,7 @@ namespace Umbraco.Web.PropertyEditors
         private readonly IIOHelper _ioHelper;
 
         public ContentPickerPropertyEditor(ILogger logger, IIOHelper ioHelper)
-            : base(logger)
+            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService, Current.ShortStringHelper)
         {
             _ioHelper = ioHelper;
         }

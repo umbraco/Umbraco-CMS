@@ -3,6 +3,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -20,17 +21,19 @@ namespace Umbraco.Web.PropertyEditors
         private readonly ILocalizedTextService _textService;
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizationService _localizationService;
+        private readonly IShortStringHelper _shortStringHelper;
         private readonly IIOHelper _ioHelper;
 
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public CheckBoxListPropertyEditor(ILogger logger, ILocalizedTextService textService, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper)
-            : base(logger)
+        public CheckBoxListPropertyEditor(ILogger logger, ILocalizedTextService textService, IDataTypeService dataTypeService, ILocalizationService localizationService, IShortStringHelper shortStringHelper, IIOHelper ioHelper)
+            : base(logger, dataTypeService, localizationService, shortStringHelper)
         {
             _textService = textService;
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
+            _shortStringHelper = shortStringHelper;
             _ioHelper = ioHelper;
         }
 
@@ -38,6 +41,6 @@ namespace Umbraco.Web.PropertyEditors
         protected override IConfigurationEditor CreateConfigurationEditor() => new ValueListConfigurationEditor(_textService, _ioHelper);
 
         /// <inheritdoc />
-        protected override IDataValueEditor CreateValueEditor() => new MultipleValueEditor(Logger, _dataTypeService, _localizationService, Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new MultipleValueEditor(Logger, _dataTypeService, _localizationService, _shortStringHelper, Attribute);
     }
 }

@@ -13,6 +13,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -35,8 +36,8 @@ namespace Umbraco.Web.PropertyEditors
 
         internal const string ContentTypeAliasPropertyKey = "ncContentTypeAlias";
 
-        public NestedContentPropertyEditor(ILogger logger, Lazy<PropertyEditorCollection> propertyEditors, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper)
-            : base (logger)
+        public NestedContentPropertyEditor(ILogger logger, Lazy<PropertyEditorCollection> propertyEditors, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper, IShortStringHelper shortStringHelper)
+            : base (logger, dataTypeService, localizationService, shortStringHelper)
         {
             _propertyEditors = propertyEditors;
             _dataTypeService = dataTypeService;
@@ -66,7 +67,7 @@ namespace Umbraco.Web.PropertyEditors
             );
 
             public NestedContentPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute, PropertyEditorCollection propertyEditors)
-                : base(dataTypeService, localizationService, attribute)
+                : base(dataTypeService, localizationService, Current.ShortStringHelper, attribute)
             {
                 _propertyEditors = propertyEditors;
                 Validators.Add(new NestedContentValidator(propertyEditors, GetElementType));

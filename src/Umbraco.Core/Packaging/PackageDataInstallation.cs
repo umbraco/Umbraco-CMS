@@ -14,6 +14,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Packaging
 {
@@ -26,13 +27,14 @@ namespace Umbraco.Core.Packaging
         private readonly IDataTypeService _dataTypeService;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IScopeProvider _scopeProvider;
+        private readonly IShortStringHelper _shortStringHelper;
         private readonly IEntityService _entityService;
         private readonly IContentTypeService _contentTypeService;
         private readonly IContentService _contentService;
 
         public PackageDataInstallation(ILogger logger, IFileService fileService, IMacroService macroService, ILocalizationService localizationService,
             IDataTypeService dataTypeService, IEntityService entityService, IContentTypeService contentTypeService,
-            IContentService contentService, PropertyEditorCollection propertyEditors, IScopeProvider scopeProvider)
+            IContentService contentService, PropertyEditorCollection propertyEditors, IScopeProvider scopeProvider, IShortStringHelper shortStringHelper)
         {
             _logger = logger;
             _fileService = fileService;
@@ -41,6 +43,7 @@ namespace Umbraco.Core.Packaging
             _dataTypeService = dataTypeService;
             _propertyEditors = propertyEditors;
             _scopeProvider = scopeProvider;
+            _shortStringHelper = shortStringHelper;
             _entityService = entityService;
             _contentTypeService = contentTypeService;
             _contentService = contentService;
@@ -893,7 +896,7 @@ namespace Umbraco.Core.Packaging
 
                     var editorAlias = dataTypeElement.Attribute("Id")?.Value?.Trim();
                     if (!_propertyEditors.TryGet(editorAlias, out var editor))
-                        editor = new VoidEditor(_logger) { Alias = editorAlias };
+                        editor = new VoidEditor(_logger, _dataTypeService, _localizationService, _shortStringHelper) { Alias = editorAlias };
 
                     var dataType = new DataType(editor)
                     {
