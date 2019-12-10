@@ -155,6 +155,10 @@ namespace Umbraco.Core.Runtime
         /// <summary>
         /// Gets a value indicating whether the current domain is the main domain.
         /// </summary>
+        /// <remarks>
+        /// The lazy initializer call will only call the Acquire callback when it's not been initialized, else it will just return
+        /// the value from _isMainDom which means when we set _isMainDom to false again after being signaled, this will return false;
+        /// </remarks>
         public bool IsMainDom => LazyInitializer.EnsureInitialized(ref _isMainDom, ref _isInitialized, ref _locko, () => Acquire());
 
         // IRegisteredObject
