@@ -161,7 +161,7 @@ namespace Umbraco.Web.PropertyEditors
         }
 
 
-        public override string ConvertDbToString(IPropertyType propertyType, object value)
+        public override string ConvertDbToString(IPropertyType propertyType,  object value, IDataTypeService dataTypeService)
         {
             if (value == null || string.IsNullOrEmpty(value.ToString()))
                 return null;
