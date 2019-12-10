@@ -185,6 +185,7 @@ namespace Umbraco.Core.Migrations.Upgrade
 
             // to 8.6.0
             To<AddPropertyTypeValidationMessageColumns>("{3D67D2C8-5E65-47D0-A9E1-DC2EE0779D6B}");
+            To<AddMainDomLock>("{2AB29964-02A1-474D-BD6B-72148D2A53A2}");
 
             //FINAL
         }
