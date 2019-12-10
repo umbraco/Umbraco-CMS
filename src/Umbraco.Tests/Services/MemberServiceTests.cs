@@ -57,7 +57,7 @@ namespace Umbraco.Tests.Services
 
             var publishedSnapshotAccessor = new TestPublishedSnapshotAccessor();
             var variationContextAccessor = new TestVariationContextAccessor();
-            var pmember = PublishedMember.Create(member, pmemberType, false, publishedSnapshotAccessor, variationContextAccessor);
+            var pmember = PublishedMember.Create(member, pmemberType, false, publishedSnapshotAccessor, variationContextAccessor, Current.PublishedModelFactory);
 
             // contains the umbracoMember... properties created when installing, on the member type
             // contains the other properties, that PublishedContentType adds (BuiltinMemberProperties)

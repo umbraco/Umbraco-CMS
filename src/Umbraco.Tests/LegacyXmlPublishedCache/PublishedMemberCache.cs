@@ -2,6 +2,7 @@
 using System.Text;
 using System.Xml.XPath;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Security;
@@ -36,7 +37,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                     var result = _memberService.GetByProviderKey(key);
                     if (result == null) return null;
                     var type = _contentTypeCache.Get(PublishedItemType.Member, result.ContentTypeId);
-                    return new PublishedMember(result, type).CreateModel();
+                    return new PublishedMember(result, type).CreateModel(Current.PublishedModelFactory);
                 });
         }
 
@@ -50,7 +51,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                     var result = _memberService.GetById(memberId);
                     if (result == null) return null;
                     var type = _contentTypeCache.Get(PublishedItemType.Member, result.ContentTypeId);
-                    return new PublishedMember(result, type).CreateModel();
+                    return new PublishedMember(result, type).CreateModel(Current.PublishedModelFactory);
                 });
         }
 
@@ -64,7 +65,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                     var result = _memberService.GetByUsername(username);
                     if (result == null) return null;
                     var type = _contentTypeCache.Get(PublishedItemType.Member, result.ContentTypeId);
-                    return new PublishedMember(result, type).CreateModel();
+                    return new PublishedMember(result, type).CreateModel(Current.PublishedModelFactory);
                 });
         }
 
@@ -78,14 +79,14 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                     var result = _memberService.GetByEmail(email);
                     if (result == null) return null;
                     var type = _contentTypeCache.Get(PublishedItemType.Member, result.ContentTypeId);
-                    return new PublishedMember(result, type).CreateModel();
+                    return new PublishedMember(result, type).CreateModel(Current.PublishedModelFactory);
                 });
         }
 
         public IPublishedContent GetByMember(IMember member)
         {
             var type = _contentTypeCache.Get(PublishedItemType.Member, member.ContentTypeId);
-            return new PublishedMember(member, type).CreateModel();
+            return new PublishedMember(member, type).CreateModel(Current.PublishedModelFactory);
         }
 
         public XPathNavigator CreateNavigator()

@@ -106,6 +106,7 @@ namespace Umbraco.Tests.Testing
 
         protected IIOHelper IOHelper { get; private set; }
         protected IDataTypeService DataTypeService => Factory.GetInstance<IDataTypeService>();
+        protected Lazy<PropertyEditorCollection> PropertyEditorCollection => new Lazy<PropertyEditorCollection>(() => Factory.GetInstance<PropertyEditorCollection>());
         protected ILocalizationService LocalizationService => Factory.GetInstance<ILocalizationService>();
         protected IShortStringHelper ShortStringHelper { get; private set; }
         protected IUmbracoVersion UmbracoVersion { get; private set; }
@@ -279,6 +280,7 @@ namespace Umbraco.Tests.Testing
             // ah...
             Composition.WithCollectionBuilder<ActionCollectionBuilder>();
             Composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>();
+            Composition.RegisterUnique<PropertyEditorCollection>();
             Composition.RegisterUnique<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
 
             Composition.RegisterUnique<IMediaPathScheme, UniqueMediaPathScheme>();

@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var languageRepository = new LanguageRepository(scopeAccessor, appCaches, Logger, TestObjects.GetGlobalSettings());
             mediaTypeRepository = new MediaTypeRepository(scopeAccessor, appCaches, Logger, commonRepository, languageRepository, ShortStringHelper);
             var tagRepository = new TagRepository(scopeAccessor, appCaches, Logger);
-            var repository = new MediaRepository(scopeAccessor, appCaches, Logger, mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>());
+            var repository = new MediaRepository(scopeAccessor, appCaches, Logger, mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>(), DataTypeService, PropertyEditorCollection);
             return repository;
         }
 

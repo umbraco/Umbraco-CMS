@@ -236,8 +236,8 @@ namespace Umbraco.Tests.Published
                 Properties = new[] { new SolidPublishedProperty { Alias = "prop2", SolidHasValue = true, SolidValue = "1003" } }
             };
 
-            cacheContent[cnt1.Id] = cnt1.CreateModel();
-            cacheContent[cnt2.Id] = cnt2.CreateModel();
+            cacheContent[cnt1.Id] = cnt1.CreateModel(Current.PublishedModelFactory);
+            cacheContent[cnt2.Id] = cnt2.CreateModel(Current.PublishedModelFactory);
 
             // can get the actual property Clr type
             // ie ModelType gets properly mapped by IPublishedContentModelFactory

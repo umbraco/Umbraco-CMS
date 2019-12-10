@@ -5,6 +5,7 @@ using System.Linq;
 using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -56,7 +57,7 @@ namespace Umbraco.Tests.PublishedContent
 
         public void Add(SolidPublishedContent content)
         {
-            _content[content.Id] = content.CreateModel();
+            _content[content.Id] = content.CreateModel(Current.PublishedModelFactory);
         }
 
         public void Clear()

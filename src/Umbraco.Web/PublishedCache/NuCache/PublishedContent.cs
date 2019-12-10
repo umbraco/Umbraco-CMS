@@ -15,6 +15,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
     internal class PublishedContent : PublishedContentBase
     {
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+        private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly ContentNode _contentNode;
         private readonly string _urlSegment;
 
@@ -24,11 +25,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
             ContentNode contentNode,
             ContentData contentData,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
-            IVariationContextAccessor variationContextAccessor)
+            IVariationContextAccessor variationContextAccessor,
+            IPublishedModelFactory publishedModelFactory)
         {
             _contentNode = contentNode ?? throw new ArgumentNullException(nameof(contentNode));
             ContentData = contentData ?? throw new ArgumentNullException(nameof(contentData));
             _publishedSnapshotAccessor = publishedSnapshotAccessor ?? throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
+            _publishedModelFactory = publishedModelFactory;
             VariationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
 
             _urlSegment = ContentData.UrlSegment;
@@ -378,8 +381,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return this;
 
             var cache = GetAppropriateCache();
-            if (cache == null) return new PublishedContent(this).CreateModel();
-            return (IPublishedContent)cache.Get(AsPreviewingCacheKey, () => new PublishedContent(this).CreateModel());
+            if (cache == null) return new PublishedContent(this).CreateModel(_publishedModelFactory);
+            return (IPublishedContent)cache.Get(AsPreviewingCacheKey, () => new PublishedContent(this).CreateModel(_publishedModelFactory));
         }
 
         // used by Navigable.Source,...

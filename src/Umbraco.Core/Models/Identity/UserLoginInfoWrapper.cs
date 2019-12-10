@@ -1,12 +1,14 @@
-﻿namespace Umbraco.Core.Models.Identity
+﻿using Microsoft.AspNet.Identity;
+
+namespace Umbraco.Core.Models.Identity
 {
     internal class UserLoginInfoWrapper : IUserLoginInfo
     {
-        private readonly IUserLoginInfo _info;
+        private readonly UserLoginInfo _info;
 
-        public static IUserLoginInfo Wrap(IUserLoginInfo info) => new UserLoginInfoWrapper(info);
+        public static IUserLoginInfo Wrap(UserLoginInfo info) => new UserLoginInfoWrapper(info);
 
-        private UserLoginInfoWrapper(IUserLoginInfo info)
+        private UserLoginInfoWrapper(UserLoginInfo info)
         {
             _info = info;
         }

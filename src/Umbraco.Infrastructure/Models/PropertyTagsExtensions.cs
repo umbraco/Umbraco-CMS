@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Core.Composing;
+using Umbraco.Composing;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 
@@ -14,21 +14,17 @@ namespace Umbraco.Core.Models
     /// </summary>
     public static class PropertyTagsExtensions
     {
-        // TODO: inject
-        private static PropertyEditorCollection PropertyEditors => Current.PropertyEditors;
-        private static IDataTypeService DataTypeService => Current.Services.DataTypeService;
-
         // gets the tag configuration for a property
         // from the datatype configuration, and the editor tag configuration attribute
-        internal static TagConfiguration GetTagConfiguration(this IProperty property)
+        internal static TagConfiguration GetTagConfiguration(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
 
-            var editor = PropertyEditors[property.PropertyType.PropertyEditorAlias];
+            var editor = propertyEditors[property.PropertyType.PropertyEditorAlias];
             var tagAttribute = editor.GetTagAttribute();
             if (tagAttribute == null) return null;
 
-            var configurationObject = DataTypeService.GetDataType(property.PropertyType.DataTypeId).Configuration;
+            var configurationObject = dataTypeService.GetDataType(property.PropertyType.DataTypeId).Configuration;
             var configuration = ConfigurationEditor.ConfigurationAs<TagConfiguration>(configurationObject);
 
             if (configuration.Delimiter == default)
@@ -44,11 +40,11 @@ namespace Umbraco.Core.Models
         /// <param name="tags">The tags.</param>
         /// <param name="merge">A value indicating whether to merge the tags with existing tags instead of replacing them.</param>
         /// <param name="culture">A culture, for multi-lingual properties.</param>
-        public static void AssignTags(this IProperty property, IEnumerable<string> tags, bool merge = false, string culture = null)
+        public static void AssignTags(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IEnumerable<string> tags, bool merge = false, string culture = null)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
 
-            var configuration = property.GetTagConfiguration();
+            var configuration = property.GetTagConfiguration(propertyEditors, dataTypeService);
             if (configuration == null)
                 throw new NotSupportedException($"Property with alias \"{property.Alias}\" does not support tags.");
 
@@ -97,11 +93,11 @@ namespace Umbraco.Core.Models
         /// <param name="property">The property.</param>
         /// <param name="tags">The tags.</param>
         /// <param name="culture">A culture, for multi-lingual properties.</param>
-        public static void RemoveTags(this IProperty property, IEnumerable<string> tags, string culture = null)
+        public static void RemoveTags(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IEnumerable<string> tags, string culture = null)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
 
-            var configuration = property.GetTagConfiguration();
+            var configuration = property.GetTagConfiguration(propertyEditors, dataTypeService);
             if (configuration == null)
                 throw new NotSupportedException($"Property with alias \"{property.Alias}\" does not support tags.");
 
@@ -131,11 +127,11 @@ namespace Umbraco.Core.Models
         }
 
         // used by ContentRepositoryBase
-        internal static IEnumerable<string> GetTagsValue(this IProperty property, string culture = null)
+        internal static IEnumerable<string> GetTagsValue(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, string culture = null)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
 
-            var configuration = property.GetTagConfiguration();
+            var configuration = property.GetTagConfiguration(propertyEditors, dataTypeService);
             if (configuration == null)
                 throw new NotSupportedException($"Property with alias \"{property.Alias}\" does not support tags.");
 
@@ -182,7 +178,7 @@ namespace Umbraco.Core.Models
         /// <para>This is used both by the content repositories to initialize a property with some tag values, and by the
         /// content controllers to update a property with values received from the property editor.</para>
         /// </remarks>
-        internal static void SetTagsValue(this IProperty property, object value, TagConfiguration tagConfiguration, string culture)
+        public static void SetTagsValue(this IProperty property, object value, TagConfiguration tagConfiguration, string culture)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
             if (tagConfiguration == null) throw new ArgumentNullException(nameof(tagConfiguration));

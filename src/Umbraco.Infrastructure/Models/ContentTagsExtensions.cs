@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Models
 {
@@ -16,9 +18,9 @@ namespace Umbraco.Core.Models
         /// <param name="tags">The tags.</param>
         /// <param name="merge">A value indicating whether to merge the tags with existing tags instead of replacing them.</param>
         /// <param name="culture">A culture, for multi-lingual properties.</param>
-        public static void AssignTags(this IContentBase content, string propertyTypeAlias, IEnumerable<string> tags, bool merge = false, string culture = null)
+        public static void AssignTags(this IContentBase content, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, string propertyTypeAlias, IEnumerable<string> tags, bool merge = false, string culture = null)
         {
-            content.GetTagProperty(propertyTypeAlias).AssignTags(tags, merge, culture);
+            content.GetTagProperty(propertyTypeAlias).AssignTags(propertyEditors, dataTypeService, tags, merge, culture);
         }
 
         /// <summary>
@@ -28,9 +30,9 @@ namespace Umbraco.Core.Models
         /// <param name="propertyTypeAlias">The property alias.</param>
         /// <param name="tags">The tags.</param>
         /// <param name="culture">A culture, for multi-lingual properties.</param>
-        public static void RemoveTags(this IContentBase content, string propertyTypeAlias, IEnumerable<string> tags, string culture = null)
+        public static void RemoveTags(this IContentBase content, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, string propertyTypeAlias, IEnumerable<string> tags, string culture = null)
         {
-            content.GetTagProperty(propertyTypeAlias).RemoveTags(tags, culture);
+            content.GetTagProperty(propertyTypeAlias).RemoveTags(propertyEditors, dataTypeService, tags, culture);
         }
 
         // gets and validates the property

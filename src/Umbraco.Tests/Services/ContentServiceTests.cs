@@ -1910,7 +1910,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentTypeService.Save(contentType);
 
             var content = MockedContent.CreateSimpleContent(contentType, "Simple Tags Page", Constants.System.Root);
-            content.AssignTags(propAlias, new[] {"hello", "world"});
+            content.AssignTags(PropertyEditorCollection.Value, DataTypeService, propAlias, new[] {"hello", "world"});
             contentService.Save(content);
 
             // value has been set but no tags have been created (not published)
@@ -3166,7 +3166,7 @@ namespace Umbraco.Tests.Services
             var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches, ShortStringHelper);
             var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, Logger, TestObjects.GetGlobalSettings());
             contentTypeRepository = new ContentTypeRepository(accessor, AppCaches.Disabled, Logger, commonRepository, languageRepository, ShortStringHelper);
-            var repository = new DocumentRepository(accessor, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository);
+            var repository = new DocumentRepository(accessor, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, DataTypeService, PropertyEditorCollection);
             return repository;
         }
 

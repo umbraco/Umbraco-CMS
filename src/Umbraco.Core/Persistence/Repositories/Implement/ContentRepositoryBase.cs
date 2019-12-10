@@ -32,15 +32,20 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         where TEntity : class, IUmbracoEntity
         where TRepository : class, IRepository
     {
-        protected ContentRepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache, ILanguageRepository languageRepository, ILogger logger)
+
+        protected ContentRepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache, ILanguageRepository languageRepository, ILogger logger, IDataTypeService dataTypeService, Lazy<PropertyEditorCollection> propertyEditorCollection)
             : base(scopeAccessor, cache, logger)
         {
+            DataTypeService = dataTypeService;
+            PropertyEditorCollection = propertyEditorCollection;
             LanguageRepository = languageRepository;
         }
 
         protected abstract TRepository This { get; }
 
         protected ILanguageRepository LanguageRepository { get; }
+        protected IDataTypeService DataTypeService { get; }
+        protected Lazy<PropertyEditorCollection> PropertyEditorCollection { get; }
 
         protected PropertyEditorCollection PropertyEditors => Current.PropertyEditors; // TODO: inject
 
@@ -215,7 +220,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             foreach (var property in entity.Properties)
             {
-                var tagConfiguration = property.GetTagConfiguration();
+                var tagConfiguration = property.GetTagConfiguration(PropertyEditorCollection.Value, DataTypeService);
                 if (tagConfiguration == null) continue; // not a tags property
 
                 if (property.PropertyType.VariesByCulture())
@@ -223,7 +228,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     var tags = new List<ITag>();
                     foreach (var pvalue in property.Values)
                     {
-                        var tagsValue = property.GetTagsValue(pvalue.Culture);
+                        var tagsValue = property.GetTagsValue(PropertyEditorCollection.Value, DataTypeService, pvalue.Culture);
                         var languageId = LanguageRepository.GetIdByIsoCode(pvalue.Culture);
                         var cultureTags = tagsValue.Select(x => new Tag { Group = tagConfiguration.Group, Text = x, LanguageId = languageId });
                         tags.AddRange(cultureTags);
@@ -232,7 +237,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 }
                 else
                 {
-                    var tagsValue = property.GetTagsValue(); // strings
+                    var tagsValue = property.GetTagsValue(PropertyEditorCollection.Value, DataTypeService); // strings
                     var tags = tagsValue.Select(x => new Tag { Group = tagConfiguration.Group, Text = x });
                     tagRepo.Assign(entity.Id, property.PropertyTypeId, tags);
                 }

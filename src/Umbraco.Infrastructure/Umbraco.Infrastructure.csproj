@@ -53,4 +53,8 @@
         </AssemblyAttribute>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Models\Identity" />
+    </ItemGroup>
+
 </Project>

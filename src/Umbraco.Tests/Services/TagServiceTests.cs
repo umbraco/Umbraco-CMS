@@ -2,8 +2,10 @@
 using System.Threading;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -21,6 +23,8 @@ namespace Umbraco.Tests.Services
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class TagServiceTests : TestWithSomeContentBase
     {
+        public PropertyEditorCollection PropertyEditorCollection => Factory.GetInstance<PropertyEditorCollection>();
+
         [Test]
         public void TagApiConsistencyTest()
         {
@@ -36,18 +40,18 @@ namespace Umbraco.Tests.Services
             contentTypeService.Save(contentType);
 
             IContent content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
-            content1.AssignTags("tags", new[] { "cow", "pig", "goat" });
+            content1.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "cow", "pig", "goat" });
             contentService.SaveAndPublish(content1);
 
             // change
-            content1.AssignTags("tags", new[] { "elephant" }, true);
-            content1.RemoveTags("tags", new[] { "cow" });
+            content1.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "elephant" }, true);
+            content1.RemoveTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "cow" });
             contentService.SaveAndPublish(content1);
 
             // more changes
-            content1.AssignTags("tags", new[] { "mouse" }, true);
+            content1.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "mouse" }, true);
             contentService.SaveAndPublish(content1);
-            content1.RemoveTags("tags", new[] { "mouse" });
+            content1.RemoveTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "mouse" });
             contentService.SaveAndPublish(content1);
 
             // get it back
@@ -84,15 +88,15 @@ namespace Umbraco.Tests.Services
             contentTypeService.Save(contentType);
 
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
-            content1.AssignTags("tags", new[] { "cow", "pig", "goat" });
+            content1.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "cow", "pig", "goat" });
             contentService.SaveAndPublish(content1);
 
             var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
-            content2.AssignTags("tags", new[] { "cow", "pig" });
+            content2.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "cow", "pig" });
             contentService.SaveAndPublish(content2);
 
             var content3 = MockedContent.CreateSimpleContent(contentType, "Tagged content 3", -1);
-            content3.AssignTags("tags", new[] { "cow" });
+            content3.AssignTags(PropertyEditorCollection, DataTypeService, "tags", new[] { "cow" });
             contentService.SaveAndPublish(content3);
 
             // Act

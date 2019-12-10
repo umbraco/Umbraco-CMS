@@ -25,7 +25,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches, ShortStringHelper);
             languageRepository = new LanguageRepository(accessor, Core.Cache.AppCaches.Disabled, Logger, TestObjects.GetGlobalSettings());
             contentTypeRepository = new ContentTypeRepository(accessor, Core.Cache.AppCaches.Disabled, Logger, commonRepository, languageRepository, ShortStringHelper);
-            documentRepository = new DocumentRepository(accessor, Core.Cache.AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository);
+            documentRepository = new DocumentRepository(accessor, Core.Cache.AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, DataTypeService, PropertyEditorCollection);
             var domainRepository = new DomainRepository(accessor, Core.Cache.AppCaches.Disabled, Logger);
             return domainRepository;
         }
