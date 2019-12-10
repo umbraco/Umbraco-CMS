@@ -7,8 +7,29 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
 
     .controller("previewController", function ($scope, $window, $location) {
         
+        $scope.currentCulture = {iso:'', title:'...', icon:'icon-loading'}
+        var cultures = [];
 
-        console.log($scope);
+        $scope.tabbingActive = false;
+        // There are a number of ways to detect when a focus state should be shown when using the tab key and this seems to be the simplest solution. 
+        // For more information about this approach, see https://hackernoon.com/removing-that-ugly-focus-ring-and-keeping-it-too-6c8727fefcd2
+        function handleFirstTab(evt) {
+            if (evt.keyCode === 9) {
+                $scope.tabbingActive = true;
+                $scope.$digest();
+                window.removeEventListener('keydown', handleFirstTab);
+                window.addEventListener('mousedown', disableTabbingActive);
+            }
+        }
+        
+        function disableTabbingActive(evt) {
+            $scope.tabbingActive = false;
+            $scope.$digest();
+            window.removeEventListener('mousedown', disableTabbingActive);
+            window.addEventListener("keydown", handleFirstTab);
+        }
+
+        window.addEventListener("keydown", handleFirstTab);
 
 
         //gets a real query string value
@@ -89,6 +110,45 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
         ];
         $scope.previewDevice = $scope.devices[0];
 
+        $scope.sizeOpen = false;
+        $scope.cultureOpen = false;
+
+        $scope.toggleSizeOpen = function() {
+            $scope.sizeOpen = toggleMenu($scope.sizeOpen);
+        }
+        $scope.toggleCultureOpen = function() {
+            $scope.cultureOpen = toggleMenu($scope.cultureOpen);
+        }
+
+        function toggleMenu(isCurrentlyOpen) {
+            if (isCurrentlyOpen === false) {
+                closeOthers();
+                return true;
+            } else {
+                return false;
+            }
+        }
+        function closeOthers() {
+            $scope.sizeOpen = false;
+            $scope.cultureOpen = false;
+        }
+        
+        $scope.windowClickHandler = function() {
+            closeOthers();
+        }
+        function windowBlurHandler() {
+            closeOthers();
+            $scope.$digest();
+        }
+
+        var win = angular.element($window);
+
+        win.on("blur", windowBlurHandler);
+        
+        $scope.$on("$destroy", function () {
+            win.off("blur", handleBlwindowBlurHandlerur );
+        });
+
         
         function setPageUrl(){
             $scope.pageId = $location.search().id || getParameterByName("id");
@@ -128,6 +188,8 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
         $scope.onFrameLoaded = function (iframe) {
             $scope.frameLoaded = true;
             configureSignalR(iframe);
+
+            $scope.currentCultureIso = $location.search().culture;
         };
 
         /*****************************************************************************/
@@ -141,17 +203,30 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
         /*****************************************************************************/
         /* Change culture */
         /*****************************************************************************/
-        $scope.changeCulture = function (culture) {
-            if($location.search().culture !== culture){
+        $scope.changeCulture = function (iso) {
+            if($location.search().culture !== iso) {
                 $scope.frameLoaded = false;
-                $location.search("culture", culture);
+                $scope.currentCultureIso = iso;
+                $location.search("culture", iso);
                 setPageUrl();
             }
         };
-
+        /*
         $scope.isCurrentCulture = function(culture) {
             return $location.search().culture === culture;
         }
+        */
+        $scope.registerCulture = function(iso, title, icon) {
+            var cultureObject = {iso: iso, title: title, icon: icon};
+            cultures.push(cultureObject);
+        }
+
+        $scope.$watch("currentCultureIso", function(oldIso, newIso) {
+            $scope.currentCulture = cultures.find(function(culture) {
+                return culture.iso === $scope.currentCultureIso;
+            })
+        });
+
     })
 
 
@@ -194,15 +269,4 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
     .config(function ($locationProvider) {
         $locationProvider.html5Mode(false); //turn html5 mode off
         $locationProvider.hashPrefix('');
-    })
-
-    .controller('previewDropdownMenuController',
-        function ($element, $scope, angularHelper) {
-
-            var vm = this;
-
-            vm.onItemClicked = function (item) {
-                console.log("clicked", item)
-            };
-        }
-    )
+    });

@@ -1,6 +1,7 @@
 
 @import "helveticons.less";
 @import "variables.less";
+@import "application/umb-outline.less";
 
 /******* font-face *******/
 
@@ -43,7 +44,7 @@ body {
 
 }
 
-.menu-bar--right-part {
+.menu-bar__right-part {
     float: right;
     display: flex;
     flex: row;
@@ -53,13 +54,13 @@ body {
     }
 }
 
-.menu-bar--title {
+.menu-bar__title {
     display: inline-block;
     padding: 11px 15px;
     font-weight: bold;
 }
 
-.menu-bar--button {
+.menu-bar__button {
     display: inline-block;
     padding: 11px 15px;
     border:none;
@@ -73,7 +74,7 @@ body {
 
     .icon {
         margin-right: 10px;
-        font-size: 14px;
+        font-size: 18px;
         vertical-align: middle;
     }
 
@@ -83,8 +84,8 @@ body {
 
     > svg {
         display: inline-block;
-        width: 12px;
-        height: 12px;
+        width: 14px;
+        height: 14px;
         fill: #fff;
         margin-right: 10px;
         vertical-align: middle;
@@ -93,6 +94,8 @@ body {
 
     &:hover {
         background-color: lighten(@blueExtraDark, 4%);
+    }
+    &.--active {
         color: @pinkLight;
         > svg {
             fill: @pinkLight;
@@ -104,25 +107,34 @@ body {
 
     display: inline-block;
 
+    > .menu-bar__button {
+        position: relative;
+    }
+
     .dropdown-menu {
         display:none;
 
         position: absolute;
         float: left;
-        min-width: 320px;
+        min-width: 200px;
+
+        border-radius: 0 3px 3px 3px;
+        overflow: hidden;
 
         background-color: @blueExtraDark;
 
         > button {
-            display: block;
+            position: relative;
+            display: list-item;
             text-align: left;
+            width: 100%;
 
             &.--active {
-                &::after {
+                &::before {
                     content: '';
                     position: absolute;
                     left:0;
-                    width: 4px;
+                    width: 3px;
                     top: 0;
                     bottom: 0;
                     border-top-right-radius: 3px;
@@ -133,9 +145,16 @@ body {
         }
     }
 
-    &:hover, &:focus, &:focus-within {
+    &.--open {
+        z-index:1;
+        box-shadow: 0 5px 10px 0 rgba(0,0,0,.26);
+        > .menu-bar__button {
+            z-index: @zindexDropdown + 1;
+        }
         .dropdown-menu {
             display:block;
+            z-index: @zindexDropdown;
+            box-shadow: 0 5px 10px 0 rgba(0,0,0,.26);
         }
     }
 
@@ -190,7 +209,7 @@ body {
 }
 
 .shadow {
-    margin: 75px auto;
+    margin: 10px auto;
     background-color: @white;
     border-radius: 3px;
     overflow: hidden;
