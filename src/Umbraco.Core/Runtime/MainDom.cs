@@ -144,9 +144,16 @@ namespace Umbraco.Core.Runtime
             // Get the lock 
             _mainDomLock.AcquireLockAsync(LockTimeoutMilliseconds).Wait();
 
-            // Listen for the signal from another AppDomain coming online to release the lock
-            _mainDomLock.ListenAsync()
-                .ContinueWith(_ => OnSignal("signal"));
+            try
+            {
+                // Listen for the signal from another AppDomain coming online to release the lock
+                _mainDomLock.ListenAsync()
+                    .ContinueWith(_ => OnSignal("signal"));
+            }
+            catch (OperationCanceledException)
+            {
+                // the waiting task could be canceled if this appdomain is naturally shutting down, we'll just swallow this exception
+            }
 
             _logger.Info<MainDom>("Acquired.");
             return true;
