@@ -53,8 +53,8 @@
         });
 
         function setCurrentNode(node) {
-            vm.currentNode = node;
             updateModel();
+            vm.currentNode = node;
         }
         
         var copyAllEntries = function() {
