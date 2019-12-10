@@ -14,728 +14,154 @@
 /****************************/
 
 body {
+    position: absolute;
     overflow: hidden;
     height: 100%;
-    width: 100%;
-    width: calc(~"100% - 80px"); // 80px is the fixed left menu for toggling the different browser sizes
-    position: absolute;
+    height: calc(~"100% - 40px");
+    width: 100%; // 80px is the fixed left menu for toggling the different browser sizes
     padding: 0;
     margin: 0;
-    font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-size: 14px;
-    line-height: 20px;
-    color: @grayDark;
-    transition: all 0.2s ease-in-out;
-    padding-left:80px;
+    padding-top:40px;
+    background-color: @brownGrayExtraLight;
 }
-
-h4 {
-    margin: 0;
-    font-size: 16px;
-    background-color: @gray-3;
-    color: @gray-7;
-    text-transform: uppercase;
-    position: initial;
-    display: block;
-    padding: 5px 10px;
-    font-size: 12px;
-    font-weight: normal;
-}
-
-h5 {
-    margin: 0 0 6px 0;
-    font-size: 12px;
-}
-
-ul {
-    list-style:none;
-    margin:0;
-    padding:0;
-}
-
-a, a:hover{
-    color: @grayDark;
-    text-decoration:none;
-}
-
 
 /****************************/
 /* General class */
 /****************************/
 
-.right {
-    float:right;
-    display:inline-block;
-}
-
-.left {
-    float:left;
-    display:inline-block;
-}
-
-.leftOpen {
-    padding-left: 330px
-}
-
-.wait {
-    display: block;
-    height: 100%;
-    width: 100%;
-    background:@white center center url(../img/loader.gif) no-repeat;
-}
-
-/****************************/
-/* Group button */
-/****************************/
-
-.btn-group {
-    float: right;
-    margin-right: 10px;
-}
-
-.btn {
-    display: inline-block;
-    padding: 4px 12px;
-    margin-bottom: 0;
-    font-size: 14px;
-    line-height: 20px;
-    color: @black;
-    text-align: center;
-    vertical-align: middle;
-    cursor: pointer;
-    background: @gray-10;
-    border: 1px solid @gray-8;
-    border-radius: 2px;
-    box-shadow: none;
-}
-
-.btn-group > .btn + .dropdown-toggle {
-    box-shadow: none;
-}
-
-.btn-group > .btn + .btn {
-    margin-left: -6px;
-}
-
-.btn-group > .btn + .dropdown-toggle {
-    padding-right: 8px;
-    padding-left: 8px;
-    box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.125), inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.btn-group > .btn:last-child, .btn-group > .dropdown-toggle {
-    border-top-right-radius: 2px;
-    border-bottom-right-radius: 2px;
-}
-
-.caret {
-    display: inline-block;
-    width: 0;
-    height: 0;
-    vertical-align: top;
-    border-top: 4px solid @white;
-    border-right: 4px solid transparent;
-    border-left: 4px solid transparent;
-    content: "";
-    border-top: 0;
-    border-bottom: 4px solid @white;
-    margin-top: 8px;
-    margin-left: 0;
-}
-
-.dropdown-menu {
+.menu-bar {
     position: absolute;
-    display: block;
-    top: auto;
-    right: 0;
-    z-index: 1000;
-    display: block;
-    float: left;
-    min-width: 160px;
-    padding: 5px 0;
-    margin: -96px 10px 0 0;
-    margin-bottom: 1px;
-    list-style: none;
-    background-color: @white;
-    border: 1px solid @gray-8;
-    border: 1px solid rgba(0, 0, 0, 0.2);
-    border-radius: 6px;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-    background-clip: padding-box;
-}
-
-.dropdown-menu > li > a,
-.dropdown-menu > li > button {
-    display: block;
-    padding: 3px 20px;
-    clear: both;
-    font-weight: normal;
-    line-height: 20px;
-    color:@black;
-    white-space: nowrap;
-    cursor:pointer;
-}
-
-.dropdown-menu > li > a:hover,
-.dropdown-menu > li > a:focus,
-.dropdown-menu > li > button:hover,
-.dropdown-menu > li > button:focus,
-.dropdown-submenu:hover > a,
-.dropdown-submenu:focus > a {
-    color: @black;
-    background: @brownLight;
-}
-
-/****************************/
-/* Speech bubble */
-/****************************/
-
-#speechbubble {
-    position: absolute;
-    right: 0;
-    bottom: 40px;
+    top:0;
     left: 0;
-    z-index: 9999;
-    display: none;
-    padding: 0;
-    margin: auto;
-    margin-left: 300px;
-    text-align: left;
-    background: none;
-    border: none;
-    border-bottom: none;
-}
+    right: 0;
+    background-color: @blueExtraDark;
+    color:@white;
 
-#speechbubble p {
-    position: relative;
-    padding: 8px 30px 8px 20px;
-    margin: auto;
-    margin-top: 5px;
-    font-size: 12px;
-    color: @white;
-    text-shadow: none;
-    background-color: @greenIcon;
-    border: none;
-    border-color: transparent;
-    border-radius: 5px 0 0 5px;
-}
-
-
-/****************************/
-/* Main section menu */
-/****************************/
-
-.more-options i {
-    display: inline-block;
-    width: 5px !important;
-    height: 5px !important;
-    margin: 5px 1px 7px 0;
-    background: @grayLight;
-    border-radius: 20px;
-}
-
-.fix-left-menu {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 80px;
-    height: 100%;
-    padding: 0;
-    margin-left: -80px;
     font-family: "Lato", Helvetica, Arial, sans-serif;
-    font-size: 13px;
+    font-size: 12px;
     line-height: 16px;
-    background: @blueExtraDark;
-    transition: all 0.2s ease-in-out;
-    z-index: 9999;
+
 }
 
-.avatar {
-    text-align:center;
-    padding: 27px 0 29px 0;
-    border-bottom: 1px solid @purple-d1;
-}
+.menu-bar--right-part {
+    float: right;
+    display: flex;
+    flex: row;
 
-.help {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    display: block;
-    width: 100%;
-    margin: 0;
-    font-size: 30px;
-    text-align: center;
-    color: @gray-8;
-    opacity: 0.4;
-    transition: all .3s linear;
-}
-
-ul.sections {
-    display: block;
-    background: @blueExtraDark;
-    position:absolute;
-    top: 90px;
-    width: 80px;
-    transition: all 0.2s ease-in-out;
-    list-style:none;
-    margin:0;
-    padding:0;
-    margin-left: -80px;
-    overflow: auto;
-    overflow-x: hidden;
-    height: calc(100% - 91px);
-
-    &::-webkit-scrollbar {
-        width: 0px;
-        background: transparent;
+    > div, > button {
+        border-left: 1px solid rgba(255, 255, 255, .25);
     }
 }
 
-ul.sections li {
-    display: block;
-    border-left: 4px @blueExtraDark solid;
-    transition: all .3s linear;
+.menu-bar--title {
+    display: inline-block;
+    padding: 11px 15px;
+    font-weight: bold;
+}
+
+.menu-bar--button {
+    display: inline-block;
+    padding: 11px 15px;
+    border:none;
+    background-color: @blueExtraDark;
+
+    font: inherit;
+    color: inherit;
     cursor: pointer;
-}
 
-.fix-left-menu ul.sections li a span,
-.fix-left-menu ul.sections li a i {
-    color: @white;
-    opacity: .7;
-    transition: all .3s linear;
-}
+    transition: color 120ms linear, background-color 120ms linear;
 
-ul.sections li a {
-    display: block;
-    width: 100%;
-    height: 100%;
-    padding: 20px 4px 15px 0;
-    margin: 0 0 0 -4px;
-    text-align: center;
-    text-decoration: none;
-    border-bottom: 1px solid @purple-d1;
+    .icon {
+        margin-right: 10px;
+        font-size: 14px;
+        vertical-align: middle;
+    }
+
+    span {
+        vertical-align: middle;
+    }
+
+    > svg {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        fill: #fff;
+        margin-right: 10px;
+        vertical-align: middle;
+        transition: fill 120ms linear;
+    }
+
     &:hover {
-        span, i {
-            opacity: 1;
-            color:@white;
+        background-color: lighten(@blueExtraDark, 4%);
+        color: @pinkLight;
+        > svg {
+            fill: @pinkLight;
         }
     }
 }
 
-ul.sections li a i {
-    font-size: 30px;
-    opacity: 0.8;
-}
+.preview-menu-option {
 
-ul.sections li a span {
-    display: block;
-    font-size: 10px;
-    line-height: 1.4em;
-    opacity: 0.8;
-}
-
-ul.sections li.current {
-    border-left: 4px @pinkLight solid;
-}
-
-ul.sections li.current a i {
-    color: @pinkLight;
-}
-
-ul.sections li.current {
-    border-left: 4px @pinkLight solid;
-}
-
-ul.sections li:hover a i,
-ul.sections li:hover a span {
-    opacity: 1;
-}
-
-.fix-left-menu:hover .help {
-    opacity: 1;
-}
-
-.fix-left-menu.selected,
-.sections.selected {
-     margin-left:0px;
-}
-
-/*************************************************/
-/* Main panel */
-/*************************************************/
-
-.main-panel {
-    position: fixed;
-    top: 0;
-    left: 0;
-    margin-left: -330px;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-size: 13px;
-    line-height: 16px;
-    background: @white;
-    transition: all 0.2s ease-in-out;
-    width: 250px;
-    height: 100%;
-    padding: 0;
-    z-index: 999;
-    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
-}
-
-.main-panel .header {
-    padding: 28px 20px 32px 20px;
-    font-weight: bold;
-    background: @grayLighter;
-    border-bottom: 1px solid @grayLight;
-}
-
-.main-panel .header h3 {
-    color: rgba(179, 179, 179, 0.49);
-    font-size: 24px;
-    margin:0;
-}
-
-.main-panel .header h3 i {
-    position: absolute;
-    right: 20px;
-    cursor:pointer;
-    transition: all 0.2s ease-in-out;
-}
-
-.main-panel .header h3 i:hover {
-    color: @grayDark;
-}
-
-.main-panel.selected {
-    margin-left: 80px;
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    overflow: auto;
-}
-
-.main-panel .content {
-    padding:20px 0;
-}
-
-/*************************************************/
-/* float-panel */
-/*************************************************/
-
-.float-panel {
-    position: fixed;
-    top: 0;
-    z-index: 99;
-    width: 250px;
-    height: 100%;
-    padding: 0;
-    padding: 20px;
-    margin-left: -480px;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-size: 13px;
-    line-height: 16px;
-    background: @white;
-    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
-    transition: all 0.2s ease-in-out;
-}
-
-.float-panel.selected{
-     margin-left: 0px;
-}
-
-/*************************************************/
-/* sample palette color */
-/*************************************************/
-
-.samples h4 {
-    position: initial;
-    display: block;
-    padding: 5px 10px;
-    margin: 0;
-    border: 0px solid @gray-4;
-    font-weight: normal;
-    font-size: 12px;
-}
-
-.samples > li {
-    padding: 6px 20px;
-    cursor: pointer;
-}
-
-.samples > li:hover, .samples > li.hover {
-    background: @grayLighter;
-}
-
-.samples > li ul {
-    display:table;
-    width:100%;
-}
-
-.samples > li ul > li {
-    display: table-cell;
-    height: 15px;
-    padding: 0;
-}
-
-/*************************************************/
-/* canvas designer panel */
-/*************************************************/
-
-h4.panel-title {
-    cursor:pointer;
-    background-color: @grayLighter;
-    color: @grayMed;
-}
-
-.editor-category{
-    margin: 5px 10px;
-    border: 1px solid @grayLight;
-}
-
-.canvasdesigner-panel-container {
-    padding: 10px 10px;
-}
-
-.canvasdesigner-panel-property {
-    clear: both;
-    overflow: hidden;
-    margin: 0 0 10px 0;
-}
-
-.canvasdesigner .box-slider {
-    padding: 0px 0px 6px 0px;
-    overflow: hidden;
-    clear: both;
-}
-
-.field-title {
-    float: left;
-    margin-right: 10px;
-    font-size: 12px;
-    color: @grayLight;
-}
-
-.div-field {
-    margin-bottom: 10px;
-    overflow: hidden;
-    clear: both;
-}
-
-/*************************************************/
-/* font family picker */
-/*************************************************/
-
-.fontFamilyPickerPreview {
-    float: left;
-    width: 90%;
-    padding: 8px;
-    margin-top: 4px;
-    clear: both;
-    font-size: 18px;
-    color: @gray-8;
-    cursor: pointer;
-    border: 1px solid @gray-8;
-    text-align: center;
-    position: relative;
-}
-
-.fontFamilyPickerPreview span {
-    font-size: 32px;
-    line-height: 32px;
-}
-
-.fontPickerDelete {
-    position: absolute;
-    margin: 5px 0 0 -15px;
-    cursor: pointer;
-    color: @gray-8;
-    right: 0;
-    top: 0;
-}
-
-.fontFamilyPickerPreview:hover {
-    border: 1px solid @grayIcon;
-    color: @grayIcon;
-}
-
-.fontFamilyPickerPreview:hover .fontPickerDelete {
-    color: @grayIcon;
-}
-
-.canvasdesigner-fontfamilypicker {
-    margin-bottom:30px;
-}
-
-.canvasdesigner-fontfamilypicker select {
-    font-size: 12px;
-    padding: 2px;
-}
-
-.canvasdesigner-fontfamilypicker select.font-list {
-    width:170px;
-}
-
-.canvasdesigner-fontfamilypicker select.variant-list {
-    width:60px;
-}
-
-.canvasdesigner-fontfamilypicker {
-    font-size: 42px;
-    line-height: 50px;
-    margin-bottom:40px;
-}
-
-/*************************************************/
-/* slider */
-/*************************************************/
-
-.canvasdesigner .ui-widget-content {
-    background: rgba(0, 0, 0, 0.27) !important;
-    border: 0 solid @white !important;
-    border-radius: 1px !important;
-}
-
-.canvasdesigner .ui-slider-horizontal {
-    margin: 14px 11px 0 11px;
-}
-
-.ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default,
-.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover,
-.ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus {
-    border: 1px solid @gray-3  !important;
-    background: @gray-3  !important;
-    background-color:none !important;
-    outline:none;
-}
-
-.canvasdesigner .ui-slider .ui-slider-handle:hover,
-.canvasdesigner .ui-slider .ui-slider-handle:focus {
-    color: @grayLight !important;
-}
-
-.canvasdesigner .ui-slider .ui-slider-handle span {
-    position: absolute !important;
-    margin: -15px 0 0 -8px !important;
-    color: @gray-3 !important;
-    font-size: 9px !important;
-    text-align: -webkit-center !important;
-    display: block !important;
-    width: 30px !important;
-}
-
-.canvasdesigner .slider-input {
-    float: right;
-    width: 25px;
-    padding: 0;
-    margin-top: -9px;
-    margin-right: 1px;
-    font-size: 12px;
-    color: @grayLight;
-    text-align: right;
-    background-color: transparent;
-    border: none;
-
-}
-
-@-moz-document url-prefix() {
-  .canvasdesigner .slider-input {
-    margin-top: -6px;
-  }
-}
-
-.canvasdesigner .sp-replacer {
-    padding: 0;
-    margin: 0;
-    display: block;
-    border: none;
-    height: 26px;
-    border-radius: 1px;
-    border: 1px solid @gray-8;
-}
-
-.canvasdesigner .sp-replacer:hover {
-    border: 1px solid @grayIcon;
-}
-
-.canvasdesigner .panel-body {
-  border-top: none !important;
-}
-
-.canvasdesigner select {
-  font-size: 12px;
-}
-
-.canvasdesigner .sp-dd {
-  display: none;
-}
-
-.canvasdesigner .sp-preview {
-    width: 100%;
-    height: 100%;
-    margin-right: 0;
-    border: none;
-    display: block;
-}
-
-.canvasdesigner .color-picker-preview {
-    height: 26px;
-    border: 1px solid @gray-8;
-    border-radius: 1px;
-    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAIAAADZF8uwAAAAGUlEQVQYV2M4gwH+YwCGIasIUwhT25BVBADtzYNYrHvv4gAAAABJRU5ErkJggg==);
-    cursor: pointer;
-}
-
-.canvasdesigner .float-panel .sp-container.sp-flat {
-    background-color: transparent;
-    border: none;
-    padding: 10px;
-    width: 100%;
-}
-
-.canvasdesigner .float-panel .sp-container.sp-flat .sp-picker-container {
-    padding: 0;
-    margin: 0px;
-    margin-bottom: 10px;
-    border: none;
-    width: 100%;
-}
-
-.canvasdesigner .float-panel .sp-container.sp-flat .sp-palette-container {
-    padding: 0;
-    height: 32px;
-    width: 100%;
-    float: left;
-    margin: 0;
-    border: none;
-}
-
-.canvasdesigner .float-panel .sp-container.sp-flat .sp-button-container {
-    display: none;
-}
-
-.colorPickerDelete {
-    position: absolute;
-    margin: -23px 0 0 0;
-    cursor: pointer;
-}
-
-.borderStyleSelect
-{
     display: inline-block;
-    float: right;
-    width: 75px;
-    height: 28px;
+
+    .dropdown-menu {
+        display:none;
+
+        position: absolute;
+        float: left;
+        min-width: 320px;
+
+        background-color: @blueExtraDark;
+
+        > button {
+            display: block;
+            text-align: left;
+
+            &.--active {
+                &::after {
+                    content: '';
+                    position: absolute;
+                    left:0;
+                    width: 4px;
+                    top: 0;
+                    bottom: 0;
+                    border-top-right-radius: 3px;
+                    border-bottom-right-radius: 3px;
+                    background-color: @pinkLight;
+                }
+            }
+        }
+    }
+
+    &:hover, &:focus, &:focus-within {
+        .dropdown-menu {
+            display:block;
+        }
+    }
+
 }
+
+
+
 
 /*************************************************/
 /* IFrame size */
 /*************************************************/
 
-.desktop {
+#demo-iframe-wrapper {
+    transition: all 240ms cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.fullsize {
     width: 100%;
     height: 100%;
     margin: 0 auto;
     overflow: hidden;
+}
+
+.desktop {
+    width: 1920px;
+    height: 1080px;
 }
 
 .laptop {
@@ -763,13 +189,13 @@ h4.panel-title {
     height: 360px;
 }
 
-.border {
+.shadow {
     margin: 75px auto;
     background-color: @white;
-    border-radius: 10px;
+    border-radius: 3px;
+    overflow: hidden;
     opacity: 1.0;
-    box-shadow: 0 0 0 29px @gray-9, 0 0 0 30px @gray-8;
-    transition: all 0.5s ease-in-out;
+    box-shadow: 0 5px 20px 0 rgba(0,0,0,.26);
 }
 
 iframe {
@@ -786,252 +212,4 @@ iframe {
 
 .flip:before {
     transform: rotate(90deg);
-}
-
-/*************************************************/
-/* Image picker */
-/*************************************************/
-
-.imagePickerPreview {
-    height: 20px;
-    text-align: center;
-    background-color: @white;
-    padding: 6px 0 0 0;
-    cursor: pointer;
-    background-size: cover;
-    border-radius: 1px;
-    border: 1px solid @gray-8;
-    color: @gray-8;
-}
-
-.sp-clear-display {
-    background-image: none !important;
-}
-
-.imagePickerPreview:hover {
-    border: 1px solid @grayIcon;
-}
-
-.imagePickerPreview:hover i {
-    color: @grayIcon;
-}
-
-.imagePickerPreview i {
-    font-size:24px;
-    color: @gray-8;
-}
-
-.canvasdesignerImagePicker {
-    padding: 0;
-    margin-top: 10px;
-    overflow: auto;
-    text-align: left;
-    list-style: none;
-}
-
-.canvasdesignerImagePicker ul {
-    padding: 0;
-    margin: 0;
-    margin-left: 20px;
-    list-style: none;
-}
-
-.canvasdesignerImagePicker li {
-    display: inline-block;
-    margin-bottom: 10px;
-}
-
-.canvasdesignerImagePicker ul.media-items li {
-    margin-right: 20px;
-}
-
-.canvasdesignerImagePicker .media-preview {
-    position: relative;
-    display: inline-block;
-    width: 91px;
-    height: 78px;
-    cursor: pointer;
-    background-position: center center;
-    background-size: cover;
-    border: 2px solid @gray-10;
-}
-
-.canvasdesignerImagePicker .media-preview .folder {
-    position: absolute;
-    top: 30px;
-    left: 0;
-    width: 100%;
-    font-size: 40px;
-    color: @grayLight;
-    text-align: center;
-}
-
-.canvasdesignerImagePicker .media-preview .folder-name {
-    margin-top: -5px;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-size: 13px;
-    line-height: 0;
-    color: grey;
-}
-
-.canvasdesignerImagePicker .media-preview:hover,
-.media-preview.selected {
-    border: 2px solid @blueLight;
-}
-
-.canvasdesignerImagePicker .modal-dialog {
-    width: 618px;
-    font-weight: normal;
-}
-
-.bodyCanvasdesignerImagePicker .breadcrumb {
-    margin-top: 4px;
-    margin-bottom: 10px;
-    font-size: 16px;
-    text-align: left;
-}
-
-.bodyCanvasdesignerImagePicker .breadcrumb > li {
-  display: inline;
-}
-
-.breadcrumb{
-    font-size: 12px;
-}
-
-.bodyCanvasdesignerImagePicker .breadcrumb > li a {
-    cursor: pointer;
-}
-
-.bodyCanvasdesignerImagePicker .breadcrumb input {
-  padding: 0;
-  margin: -4px -4px;
-}
-
-.bodyCanvasdesignerImagePicker .fileinput-button {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 19px;
-}
-
-.bodyCanvasdesignerImagePicker input.input-media {
-  position: absolute;
-  top: 0;
-  right: 0;
-  margin: 0;
-  font-size: 23px;
-  cursor: pointer;
-  opacity: 0;
-  transform: translate(-300px, 0) scale(4);
-  direction: ltr;
-}
-
-.bodyCanvasdesignerImagePicker .breadcrumb a.disabled,
-.bodyCanvasdesignerImagePicker .breadcrumb a.disabled:hover {
-  color: @gray;
-  text-decoration: none;
-  cursor: default;
-}
-
-.canvasdesignerImagePicker h3 {
-  font-size: 18px;
-  color: @gray;
-}
-
-/*************************************************/
-/* Border editor */
-/*************************************************/
-
-.box-preview {
-    display:inline-block;
-}
-
-.box-preview li {
-    height: 30px;
-    width: 30px;
-    border-radius: 1px;
-    border: none;
-    display: inline-block;
-    background-color: @gray-3;
-    cursor: pointer;
-    margin-right: 6px;
-    position: relative;
-}
-
-.box-preview li:last-child{
-    margin-right: 0px;
-}
-
-.box-preview li.selected {
-    border-color: @greenIcon !important;
-}
-
-.box-preview li.border-all {
-    border: 6px solid @gray-7;
-    height: 18px;
-    width: 18px;
-    margin-left: 0px
-}
-
-.box-preview li.border-left {
-    border-left: 6px solid @gray-7;
-    width: 24px;
-}
-
-.box-preview li.border-right {
-    border-right: 6px solid @gray-7;
-    width: 24px;
-}
-
-.box-preview li.border-top {
-    border-top: 6px solid @gray-7;
-    height: 24px;
-}
-
-.box-preview li.border-bottom {
-    border-bottom: 6px solid @gray-7;
-    height: 24px;
-}
-
-.bordereditor .color-picker-preview {
-    display: inline-block;
-    width: 120px;
-    float: left;
-}
-
-/*************************************************/
-/* Radius editor */
-/*************************************************/
-
-.radius-top-left, .radius-top-right, .radius-bottom-left, .radius-bottom-right {
-    display: block;
-    position: absolute;
-    background-color: @gray-7;
-    width: 7px;
-    height: 7px;
-}
-
-.box-preview li.selected span {
-    background-color: @greenIcon;
-}
-
-.radius-top-left{
-    top:0;
-    left:0;
-}
-
-.radius-top-right{
-    top:0;
-    right:0;
-}
-
-.radius-bottom-left{
-    bottom:0;
-    left:0;
-}
-
-.radius-bottom-right{
-    bottom:0;
-    right:0
 }

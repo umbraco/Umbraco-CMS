@@ -7,6 +7,10 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
 
     .controller("previewController", function ($scope, $window, $location) {
         
+
+        console.log($scope);
+
+
         //gets a real query string value
         function getParameterByName(name, url) {
             if (!url) url = $window.location.href;
@@ -75,12 +79,13 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
 
         $scope.valueAreLoaded = false;
         $scope.devices = [
-            { name: "desktop", css: "desktop", icon: "icon-display", title: "Desktop" },
-            { name: "laptop - 1366px", css: "laptop border", icon: "icon-laptop", title: "Laptop" },
-            { name: "iPad portrait - 768px", css: "iPad-portrait border", icon: "icon-ipad", title: "Tablet portrait" },
-            { name: "iPad landscape - 1024px", css: "iPad-landscape border", icon: "icon-ipad flip", title: "Tablet landscape" },
-            { name: "smartphone portrait - 480px", css: "smartphone-portrait border", icon: "icon-iphone", title: "Smartphone portrait" },
-            { name: "smartphone landscape  - 320px", css: "smartphone-landscape border", icon: "icon-iphone flip", title: "Smartphone landscape" }
+            { name: "fullsize", css: "fullsize", icon: "icon-application-window-alt", title: "Browser" },
+            { name: "desktop", css: "desktop shadow", icon: "icon-display", title: "Desktop" },
+            { name: "laptop - 1366px", css: "laptop shadow", icon: "icon-laptop", title: "Laptop" },
+            { name: "iPad portrait - 768px", css: "iPad-portrait shadow", icon: "icon-ipad", title: "Tablet portrait" },
+            { name: "iPad landscape - 1024px", css: "iPad-landscape shadow", icon: "icon-ipad flip", title: "Tablet landscape" },
+            { name: "smartphone portrait - 480px", css: "smartphone-portrait shadow", icon: "icon-iphone", title: "Smartphone portrait" },
+            { name: "smartphone landscape  - 320px", css: "smartphone-landscape shadow", icon: "icon-iphone flip", title: "Smartphone landscape" }
         ];
         $scope.previewDevice = $scope.devices[0];
 
@@ -189,4 +194,15 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
     .config(function ($locationProvider) {
         $locationProvider.html5Mode(false); //turn html5 mode off
         $locationProvider.hashPrefix('');
-    });
+    })
+
+    .controller('previewDropdownMenuController',
+        function ($element, $scope, angularHelper) {
+
+            var vm = this;
+
+            vm.onItemClicked = function (item) {
+                console.log("clicked", item)
+            };
+        }
+    )
