@@ -181,9 +181,9 @@ namespace Umbraco.Core.Runtime
 
                             return true; 
                         }
-                        else if (mainDomRows.Count == 1 && mainDomRows[0].Value.EndsWith("_updated"))
+                        else if (mainDomRows.Count == 1 && !mainDomRows[0].Value.StartsWith(tempId))
                         {
-                            // in this case, there is a suffixed _updated value but it's not for our ID which means
+                            // in this case, the prefixed ID is different which  means
                             // another new AppDomain has come online and is wanting to take over. In that case, we will not
                             // acquire.
 
