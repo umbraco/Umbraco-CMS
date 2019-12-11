@@ -15,16 +15,11 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_6_0
                 .OnTable(ContentVersionDto.TableName)
                 .OnColumn("nodeId")
                 .Ascending()
-                .WithOptions().NonClustered()
-                .Do();
-
-            Create
-                .Index("IX_" + ContentVersionDto.TableName + "_Current")
-                .OnTable(ContentVersionDto.TableName)
                 .OnColumn("current")
                 .Ascending()
                 .WithOptions().NonClustered()
                 .Do();
+
         }
     }
 }
