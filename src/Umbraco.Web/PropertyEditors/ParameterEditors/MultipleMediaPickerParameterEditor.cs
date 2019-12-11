@@ -20,7 +20,7 @@ namespace Umbraco.Web.PropertyEditors.ParameterEditors
         /// Initializes a new instance of the <see cref="MultipleMediaPickerParameterEditor"/> class.
         /// </summary>
         public MultipleMediaPickerParameterEditor(ILogger logger)
-            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService, Current.ShortStringHelper)
+            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService, Current.Services.TextService,Current.ShortStringHelper)
         {
             DefaultConfiguration.Add("multiPicker", "1");
         }

@@ -38,7 +38,7 @@ namespace Umbraco.Tests.Models.Mapping
             Composition.Register(_ => Mock.Of<IContentSection>());
 
             // all this is required so we can validate properties...
-            var editor = new TextboxPropertyEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), IOHelper, TestHelper.ShortStringHelper) { Alias = "test" };
+            var editor = new TextboxPropertyEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), IOHelper, ShortStringHelper, LocalizedTextService) { Alias = "test" };
             Composition.Register(_ => new DataEditorCollection(new[] { editor }));
             Composition.Register<PropertyEditorCollection>();
             var dataType = Mock.Of<IDataType>();
@@ -61,7 +61,7 @@ namespace Umbraco.Tests.Models.Mapping
             /// <summary>
             /// The constructor will setup the property editor based on the attribute if one is found
             /// </summary>
-            public TestPropertyEditor(ILogger logger) : base(logger, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>())
+            public TestPropertyEditor(ILogger logger) : base(logger, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(),Mock.Of<IShortStringHelper>())
             { }
         }
 

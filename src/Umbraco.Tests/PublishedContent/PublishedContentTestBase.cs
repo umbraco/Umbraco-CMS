@@ -12,6 +12,7 @@ using Umbraco.Web.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web;
+using Umbraco.Web.Templates;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -39,7 +40,12 @@ namespace Umbraco.Tests.PublishedContent
             base.Initialize();
 
             var converters = Factory.GetInstance<PropertyValueConverterCollection>();
+            var umbracoContextAccessor = Mock.Of<IUmbracoContextAccessor>();
+            var logger = Mock.Of<ILogger>();
 
+            var imageSourceParser = new HtmlImageSourceParser(umbracoContextAccessor);
+            var pastedImages = new RichTextEditorPastedImages(umbracoContextAccessor, logger, IOHelper,  Mock.Of<IMediaService>(), Mock.Of<IContentTypeBaseServiceProvider>());
+            var localLinkParser = new HtmlLocalLinkParser(umbracoContextAccessor);
             var dataTypeService = new TestObjects.TestDataTypeService(
                 new DataType(new RichTextPropertyEditor(
                     Mock.Of<ILogger>(),
@@ -48,8 +54,13 @@ namespace Umbraco.Tests.PublishedContent
                     Mock.Of<IUmbracoContextAccessor>(),
                     Mock.Of<IDataTypeService>(),
                     Mock.Of<ILocalizationService>(),
-                    Mock.Of<IShortStringHelper>(),
-                    IOHelper)) { Id = 1 });
+                    imageSourceParser,
+                    localLinkParser,
+                    pastedImages,
+                    ShortStringHelper,
+                    IOHelper,
+                    LocalizedTextService)) { Id = 1 });
+
 
             var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeService);
 

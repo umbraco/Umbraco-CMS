@@ -13,7 +13,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Deep_Clone()
         {
-            var item = new Relation(9, 8, new RelationType(Guid.NewGuid(), Guid.NewGuid(), "test")
+            var item = new Relation(9, 8, new RelationType("test", "test", false, Guid.NewGuid(), Guid.NewGuid())
             {
                 Id = 66
             })
@@ -51,7 +51,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Serialize_Without_Error()
         {
-            var item = new Relation(9, 8, new RelationType(Guid.NewGuid(), Guid.NewGuid(), "test")
+            var item = new Relation(9, 8, new RelationType("test", "test", false, Guid.NewGuid(), Guid.NewGuid())
             {
                 Id = 66
             })

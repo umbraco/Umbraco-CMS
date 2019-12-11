@@ -3,9 +3,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Xml.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.PropertyEditors
 {
+
     /// <summary>
     /// Represents an editor for editing data values.
     /// </summary>
@@ -62,8 +64,26 @@ namespace Umbraco.Core.PropertyEditors
 
         // TODO: / deal with this when unplugging the xml cache
         // why property vs propertyType? services should be injected! etc...
-        IEnumerable<XElement> ConvertDbToXml(IProperty property, bool published);
-        XNode ConvertDbToXml(IPropertyType propertyType, object value);
-        string ConvertDbToString(IPropertyType propertyType, object value);
+
+        /// <summary>
+        /// Used for serializing an <see cref="IContent"/> item for packaging
+        /// </summary>
+        /// <param name="property"></param>
+        /// <param name="dataTypeService"></param>
+        /// <param name="localizationService"></param>
+        /// <param name="published"></param>
+        /// <returns></returns>
+        IEnumerable<XElement> ConvertDbToXml(IProperty property, IDataTypeService dataTypeService, ILocalizationService localizationService, bool published);
+
+        /// <summary>
+        /// Used for serializing an <see cref="IContent"/> item for packaging
+        /// </summary>
+        /// <param name="propertyType"></param>
+        /// <param name="value"></param>
+        /// <param name="dataTypeService"></param>
+        /// <returns></returns>
+        XNode ConvertDbToXml(IPropertyType propertyType, object value, IDataTypeService dataTypeService);
+
+        string ConvertDbToString(IPropertyType propertyType, object value, IDataTypeService dataTypeService);
     }
 }

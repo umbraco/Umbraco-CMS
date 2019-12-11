@@ -18,8 +18,8 @@ namespace Umbraco.Web.PropertyEditors
     {
         private readonly IIOHelper _ioHelper;
 
-        public ColorPickerPropertyEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper, IShortStringHelper shortStringHelper)
-            : base(logger, dataTypeService, localizationService, shortStringHelper)
+        public ColorPickerPropertyEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper, IShortStringHelper shortStringHelper, ILocalizedTextService localizedTextService)
+            : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             _ioHelper = ioHelper;
         }

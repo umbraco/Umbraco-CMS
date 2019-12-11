@@ -30,7 +30,7 @@ namespace Umbraco.Web.PropertyEditors
         private readonly ILocalizedTextService _localizedTextService;
 
         public TagsPropertyEditor(ManifestValueValidatorCollection validators, ILogger logger, IIOHelper ioHelper, ILocalizedTextService localizedTextService)
-            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService, Current.ShortStringHelper)
+            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService, Current.Services.TextService,Current.ShortStringHelper)
         {
             _validators = validators;
             _ioHelper = ioHelper;
@@ -44,7 +44,7 @@ namespace Umbraco.Web.PropertyEditors
         internal class TagPropertyValueEditor : DataValueEditor
         {
             public TagPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute)
-                : base(dataTypeService, localizationService, Current.ShortStringHelper, attribute)
+                : base(dataTypeService, localizationService,Current.Services.TextService, Current.ShortStringHelper, attribute)
             { }
 
             /// <inheritdoc />

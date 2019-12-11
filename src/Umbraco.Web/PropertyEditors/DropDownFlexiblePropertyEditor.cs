@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
@@ -22,7 +23,7 @@ namespace Umbraco.Web.PropertyEditors
         private readonly IIOHelper _ioHelper;
 
         public DropDownFlexiblePropertyEditor(ILocalizedTextService textService, ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, IShortStringHelper shortStringHelper,  IIOHelper ioHelper)
-            : base(logger, dataTypeService, localizationService, shortStringHelper)
+            : base(logger, dataTypeService, localizationService, textService, shortStringHelper)
         {
             _textService = textService;
             _dataTypeService = dataTypeService;
@@ -33,7 +34,7 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override IDataValueEditor CreateValueEditor()
         {
-            return new MultipleValueEditor(Logger, _dataTypeService, _localizationService, _shortStringHelper, Attribute);
+            return new MultipleValueEditor(Logger, _dataTypeService, _localizationService, _textService, _shortStringHelper, Attribute);
         }
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new DropDownFlexibleConfigurationEditor(_textService, _ioHelper);

@@ -16,6 +16,8 @@ namespace Umbraco.Web.Trees
     {
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
+            //TODO: Do not allow deleting built in types
+
             var menu = new MenuItemCollection();
 
             if (id == Constants.System.RootString)

@@ -31,6 +31,19 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly ContentByGuidReadRepository _contentByGuidReadRepository;
         private readonly IScopeAccessor _scopeAccessor;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="scopeAccessor"></param>
+        /// <param name="appCaches"></param>
+        /// <param name="logger"></param>
+        /// <param name="contentTypeRepository"></param>
+        /// <param name="templateRepository"></param>
+        /// <param name="tagRepository"></param>
+        /// <param name="languageRepository"></param>
+        /// <param name="propertyEditors">
+        ///     Lazy property value collection - must be lazy because we have a circular dependency since some property editors require services, yet these services require property editors
+        /// </param>
         public DocumentRepository(
             IScopeAccessor scopeAccessor,
             AppCaches appCaches,
@@ -39,9 +52,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             ITemplateRepository templateRepository,
             ITagRepository tagRepository,
             ILanguageRepository languageRepository,
-            IDataTypeService dataTypeService,
-            Lazy<PropertyEditorCollection> propertyEditorCollection)
-            : base(scopeAccessor, appCaches, languageRepository, logger, dataTypeService, propertyEditorCollection)
+            IRelationRepository relationRepository,
+            IRelationTypeRepository relationTypeRepository,
+            Lazy<PropertyEditorCollection> propertyEditors,
+            DataValueReferenceFactoryCollection dataValueReferenceFactories,
+            IDataTypeService dataTypeService)
+            : base(scopeAccessor, appCaches, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferenceFactories, dataTypeService)
         {
             _contentTypeRepository = contentTypeRepository ?? throw new ArgumentNullException(nameof(contentTypeRepository));
             _templateRepository = templateRepository ?? throw new ArgumentNullException(nameof(templateRepository));
@@ -478,6 +494,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 ClearEntityTags(entity, _tagRepository);
             }
 
+            PersistRelations(entity);
+
             entity.ResetDirtyProperties();
 
             // troubleshooting
@@ -680,6 +698,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 ClearEntityTags(entity, _tagRepository);
             }
+
+            PersistRelations(entity);
 
             // TODO: note re. tags: explicitly unpublished entities have cleared tags, but masked or trashed entities *still* have tags in the db - so what?
 

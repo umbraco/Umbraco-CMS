@@ -19,8 +19,8 @@ namespace Umbraco.Web.PropertyEditors
         ValueType = ValueTypes.Integer)]
     public class IntegerPropertyEditor : DataEditor
     {
-        public IntegerPropertyEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, IShortStringHelper shortStringHelper)
-            : base(logger, dataTypeService, localizationService, shortStringHelper)
+        public IntegerPropertyEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, IShortStringHelper shortStringHelper, ILocalizedTextService localizedTextService)
+            : base(logger, dataTypeService, localizationService,localizedTextService, shortStringHelper)
         { }
 
         /// <inheritdoc />

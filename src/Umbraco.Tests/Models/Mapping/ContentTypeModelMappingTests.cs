@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Models.Mapping
             base.Compose();
 
             // create and register a fake property editor collection to return fake property editors
-            var editors = new DataEditor[] { new TextboxPropertyEditor(Mock.Of<ILogger>(), _dataTypeService.Object, _localizationService.Object, IOHelper, ShortStringHelper), };
+            var editors = new DataEditor[] { new TextboxPropertyEditor(Mock.Of<ILogger>(), _dataTypeService.Object, _localizationService.Object, IOHelper, ShortStringHelper, LocalizedTextService), };
             var dataEditors = new DataEditorCollection(editors);
             _editorsMock = new Mock<PropertyEditorCollection>(dataEditors);
             _editorsMock.Setup(x => x[It.IsAny<string>()]).Returns(editors[0]);
@@ -297,7 +297,7 @@ namespace Umbraco.Tests.Models.Mapping
         {
             //Arrange
             _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>())));
+                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())));
 
             // setup the mocks to return the data we want to test against...
 
@@ -357,7 +357,7 @@ namespace Umbraco.Tests.Models.Mapping
         {
             //Arrange
             _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>())));
+                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())));
 
             // setup the mocks to return the data we want to test against...
 
@@ -412,7 +412,7 @@ namespace Umbraco.Tests.Models.Mapping
         {
             //Arrange
             _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>())));
+                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())));
 
             // setup the mocks to return the data we want to test against...
 
@@ -473,7 +473,7 @@ namespace Umbraco.Tests.Models.Mapping
         public void MemberPropertyGroupBasic_To_MemberPropertyGroup()
         {
             _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>())));
+                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())));
 
             var basic = new PropertyGroupBasic<MemberPropertyTypeBasic>
             {
@@ -544,7 +544,7 @@ namespace Umbraco.Tests.Models.Mapping
         public void PropertyGroupBasic_To_PropertyGroup()
         {
             _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>())));
+                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())));
 
             var basic = new PropertyGroupBasic<PropertyTypeBasic>
             {
@@ -610,7 +610,7 @@ namespace Umbraco.Tests.Models.Mapping
         public void MemberPropertyTypeBasic_To_PropertyType()
         {
             _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>())));
+                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())));
 
             var basic = new MemberPropertyTypeBasic()
             {
@@ -648,7 +648,7 @@ namespace Umbraco.Tests.Models.Mapping
         public void PropertyTypeBasic_To_PropertyType()
         {
             _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>())));
+                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())));
 
             var basic = new PropertyTypeBasic()
             {
@@ -687,7 +687,7 @@ namespace Umbraco.Tests.Models.Mapping
         {
             //Arrange
             _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>())));
+                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())));
 
             // setup the mocks to return the data we want to test against...
 
@@ -780,7 +780,7 @@ namespace Umbraco.Tests.Models.Mapping
         {
             //Arrange
             _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>())));
+                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())));
 
             // setup the mocks to return the data we want to test against...
 
@@ -868,7 +868,7 @@ namespace Umbraco.Tests.Models.Mapping
         public void MemberPropertyTypeBasic_To_MemberPropertyTypeDisplay()
         {
             _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>())));
+                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())));
 
             var basic = new MemberPropertyTypeBasic()
             {
@@ -908,7 +908,7 @@ namespace Umbraco.Tests.Models.Mapping
         public void PropertyTypeBasic_To_PropertyTypeDisplay()
         {
             _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>())));
+                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())));
 
             var basic = new PropertyTypeBasic()
             {

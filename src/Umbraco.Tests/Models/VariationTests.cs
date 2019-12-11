@@ -45,7 +45,7 @@ namespace Umbraco.Tests.Models
 
             var dataEditors = new DataEditorCollection(new IDataEditor[]
             {
-                new DataEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>()) { Alias = "editor", ExplicitValueEditor = TestHelper.CreateDataValueEditor("view") }
+                new DataEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()) { Alias = "editor", ExplicitValueEditor = TestHelper.CreateDataValueEditor("view") }
             });
             var propertyEditors = new PropertyEditorCollection(dataEditors);
 

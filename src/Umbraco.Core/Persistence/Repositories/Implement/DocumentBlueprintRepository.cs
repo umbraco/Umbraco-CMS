@@ -27,9 +27,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             ITemplateRepository templateRepository,
             ITagRepository tagRepository,
             ILanguageRepository languageRepository,
+            IRelationRepository relationRepository,
+            IRelationTypeRepository relationTypeRepository,
+            Lazy<PropertyEditorCollection> propertyEditorCollection,
             IDataTypeService dataTypeService,
-            Lazy<PropertyEditorCollection> propertyEditorCollection)
-            : base(scopeAccessor, appCaches, logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, dataTypeService, propertyEditorCollection)
+            DataValueReferenceFactoryCollection dataValueReferenceFactories)
+            : base(scopeAccessor, appCaches, logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditorCollection, dataValueReferenceFactories, dataTypeService)
         {
         }
 

@@ -61,7 +61,7 @@ namespace Umbraco.Core.Manifest
                 type = EditorType.MacroParameter;
             }
 
-            return new DataEditor(_logger, _dataTypeService, _localizationService, _shortStringHelper, type);
+            return new DataEditor(_logger, _dataTypeService, _localizationService, _textService, _shortStringHelper, type);
         }
 
         /// <inheritdoc />

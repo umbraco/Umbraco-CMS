@@ -12,7 +12,7 @@ namespace Umbraco.Web.PropertyEditors.ParameterEditors
     public class MultipleContentTypeParameterEditor : DataEditor
     {
         public MultipleContentTypeParameterEditor(ILogger logger)
-            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService, Current.ShortStringHelper)
+            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService,Current.Services.TextService, Current.ShortStringHelper)
         {
             // configure
             DefaultConfiguration.Add("multiple", true);

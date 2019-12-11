@@ -295,6 +295,7 @@ namespace Umbraco.Tests.TestHelpers
             return new DataValueEditor(
                 Mock.Of<IDataTypeService>(),
                 Mock.Of<ILocalizationService>(),
+                Mock.Of<ILocalizedTextService>(),
                 Mock.Of<IShortStringHelper>(),
                 new DataEditorAttribute(name, name, name)
                 {

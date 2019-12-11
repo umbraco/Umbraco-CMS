@@ -15,7 +15,7 @@
             //  need to keep it around in a field nor to make it readonly
 
 
-            public const string Unknown = "unknown";
+          public const string Unknown = "unknown";
 
             // guid entity types
 

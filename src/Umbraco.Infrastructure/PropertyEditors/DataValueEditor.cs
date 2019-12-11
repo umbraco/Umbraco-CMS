@@ -43,9 +43,10 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Initializes a new instance of the <see cref="DataValueEditor"/> class.
         /// </summary>
-        public DataValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute)
+        public DataValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService,  ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute)
         {
             if (attribute == null) throw new ArgumentNullException(nameof(attribute));
+            _localizedTextService = localizedTextService;
             _shortStringHelper = shortStringHelper;
 
             var view = attribute.View;
@@ -280,12 +281,14 @@ namespace Umbraco.Core.PropertyEditors
             }
         }
 
+
         // TODO: the methods below should be replaced by proper property value convert ToXPath usage!
 
         /// <summary>
         /// Converts a property to Xml fragments.
         /// </summary>
-        public IEnumerable<XElement> ConvertDbToXml(IProperty property, bool published)
+        public IEnumerable<XElement> ConvertDbToXml(IProperty property, IDataTypeService dataTypeService,
+            ILocalizationService localizationService, bool published)
         {
             published &= property.PropertyType.SupportsPublishing;
 
@@ -303,7 +306,7 @@ namespace Umbraco.Core.PropertyEditors
                 if (pvalue.Segment != null)
                     xElement.Add(new XAttribute("segment", pvalue.Segment));
 
-                var xValue = ConvertDbToXml(property.PropertyType, value);
+                var xValue = ConvertDbToXml(property.PropertyType, value, dataTypeService);
                 xElement.Add(xValue);
 
                 yield return xElement;
@@ -319,12 +322,12 @@ namespace Umbraco.Core.PropertyEditors
         /// <para>Returns an XText or XCData instance which must be wrapped in a element.</para>
         /// <para>If the value is empty we will not return as CDATA since that will just take up more space in the file.</para>
         /// </remarks>
-        public XNode ConvertDbToXml(IPropertyType propertyType, object value)
+        public XNode ConvertDbToXml(IPropertyType propertyType, object value, IDataTypeService dataTypeService)
         {
             //check for null or empty value, we don't want to return CDATA if that is the case
             if (value == null || value.ToString().IsNullOrWhiteSpace())
             {
-                return new XText(ConvertDbToString(propertyType, value));
+                return new XText(ConvertDbToString(propertyType, value, dataTypeService));
             }
 
             switch (ValueTypes.ToStorageType(ValueType))
@@ -332,11 +335,11 @@ namespace Umbraco.Core.PropertyEditors
                 case ValueStorageType.Date:
                 case ValueStorageType.Integer:
                 case ValueStorageType.Decimal:
-                    return new XText(ConvertDbToString(propertyType, value));
+                    return new XText(ConvertDbToString(propertyType, value, dataTypeService));
                 case ValueStorageType.Nvarchar:
                 case ValueStorageType.Ntext:
                     //put text in cdata
-                    return new XCData(ConvertDbToString(propertyType, value));
+                    return new XCData(ConvertDbToString(propertyType, value, dataTypeService));
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -345,7 +348,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Converts a property value to a string.
         /// </summary>
-        public virtual string ConvertDbToString(IPropertyType propertyType, object value)
+        public virtual string ConvertDbToString(IPropertyType propertyType, object value, IDataTypeService dataTypeService)
         {
             if (value == null)
                 return string.Empty;

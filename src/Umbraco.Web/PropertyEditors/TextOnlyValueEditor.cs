@@ -3,6 +3,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -12,8 +13,8 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     public class TextOnlyValueEditor : DataValueEditor
     {
-        public TextOnlyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute)
-            : base(dataTypeService, localizationService, Current.ShortStringHelper, attribute)
+        public TextOnlyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper)
+            : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, attribute)
         { }
 
         /// <summary>

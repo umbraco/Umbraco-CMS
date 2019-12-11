@@ -25,7 +25,7 @@ namespace Umbraco.Tests.Persistence.Querying
         [Test]
         public void Equals_Claus_With_Two_Entity_Values()
         {
-            var dataType = new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>()))
+            var dataType = new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()))
             {
                 Id = 12345
             };

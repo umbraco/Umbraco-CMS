@@ -21,7 +21,7 @@ namespace Umbraco.Web.PropertyEditors
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
         public EmailAddressPropertyEditor(ILogger logger, IIOHelper ioHelper)
-            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService, Current.ShortStringHelper)
+            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService, Current.Services.TextService,Current.ShortStringHelper)
         {
             _ioHelper = ioHelper;
         }

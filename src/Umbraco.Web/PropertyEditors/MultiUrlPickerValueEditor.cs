@@ -16,13 +16,14 @@ using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    public class MultiUrlPickerValueEditor : DataValueEditor
+    public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
     {
         private readonly IEntityService _entityService;
         private readonly ILogger _logger;
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
-        public MultiUrlPickerValueEditor(IEntityService entityService, IPublishedSnapshotAccessor publishedSnapshotAccessor, ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute) : base(dataTypeService, localizationService, Current.ShortStringHelper, attribute)
+        public MultiUrlPickerValueEditor(IEntityService entityService, IPublishedSnapshotAccessor publishedSnapshotAccessor, ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute)
+            : base(dataTypeService, localizationService, Current.Services.TextService,Current.ShortStringHelper, attribute)
         {
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
             _publishedSnapshotAccessor = publishedSnapshotAccessor ?? throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
@@ -174,6 +175,23 @@ namespace Umbraco.Web.PropertyEditors
 
             [DataMember(Name = "queryString")]
             public string QueryString { get; set; }
+        }
+
+        public IEnumerable<UmbracoEntityReference> GetReferences(object value)
+        {
+            var asString = value == null ? string.Empty : value is string str ? str : value.ToString();
+
+            if (string.IsNullOrEmpty(asString)) yield break;
+
+            var links = JsonConvert.DeserializeObject<List<LinkDto>>(asString);
+            foreach (var link in links)
+            {
+                if (link.Udi != null) // Links can be absolute links without a Udi
+                {
+                    yield return new UmbracoEntityReference(link.Udi);
+                }
+
+            }
         }
     }
 }

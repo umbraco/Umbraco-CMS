@@ -9,6 +9,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
@@ -23,31 +24,57 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal sealed class ContentRepositoryBase
     {
         /// <summary>
+        ///
         /// This is used for unit tests ONLY
         /// </summary>
         public static bool ThrowOnWarning = false;
     }
 
     internal abstract class ContentRepositoryBase<TId, TEntity, TRepository> : NPocoRepositoryBase<TId, TEntity>, IContentRepository<TId, TEntity>
-        where TEntity : class, IUmbracoEntity
+        where TEntity : class, IContentBase
         where TRepository : class, IRepository
     {
+        private readonly Lazy<PropertyEditorCollection> _propertyEditors;
+        private readonly DataValueReferenceFactoryCollection _dataValueReferenceFactories;
 
-        protected ContentRepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache, ILanguageRepository languageRepository, ILogger logger, IDataTypeService dataTypeService, Lazy<PropertyEditorCollection> propertyEditorCollection)
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="scopeAccessor"></param>
+        /// <param name="cache"></param>
+        /// <param name="logger"></param>
+        /// <param name="languageRepository"></param>
+        /// <param name="propertyEditors">
+        ///     Lazy property value collection - must be lazy because we have a circular dependency since some property editors require services, yet these services require property editors
+        /// </param>
+        protected ContentRepositoryBase(
+            IScopeAccessor scopeAccessor,
+            AppCaches cache
+            , ILogger logger,
+            ILanguageRepository languageRepository,
+            IRelationRepository relationRepository,
+            IRelationTypeRepository relationTypeRepository,
+            Lazy<PropertyEditorCollection> propertyEditors,
+            DataValueReferenceFactoryCollection dataValueReferenceFactories,
+            IDataTypeService dataTypeService)
             : base(scopeAccessor, cache, logger)
         {
             DataTypeService = dataTypeService;
-            PropertyEditorCollection = propertyEditorCollection;
             LanguageRepository = languageRepository;
+            RelationRepository = relationRepository;
+            RelationTypeRepository = relationTypeRepository;
+            _propertyEditors = propertyEditors;
+            _dataValueReferenceFactories = dataValueReferenceFactories;
         }
 
         protected abstract TRepository This { get; }
 
         protected ILanguageRepository LanguageRepository { get; }
         protected IDataTypeService DataTypeService { get; }
-        protected Lazy<PropertyEditorCollection> PropertyEditorCollection { get; }
+        protected IRelationRepository RelationRepository { get; }
+        protected IRelationTypeRepository RelationTypeRepository { get; }
 
-        protected PropertyEditorCollection PropertyEditors => Current.PropertyEditors; // TODO: inject
+        protected PropertyEditorCollection PropertyEditors => _propertyEditors.Value;
 
         #region Versions
 
@@ -220,7 +247,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             foreach (var property in entity.Properties)
             {
-                var tagConfiguration = property.GetTagConfiguration(PropertyEditorCollection.Value, DataTypeService);
+                var tagConfiguration = property.GetTagConfiguration(PropertyEditors, DataTypeService);
                 if (tagConfiguration == null) continue; // not a tags property
 
                 if (property.PropertyType.VariesByCulture())
@@ -228,7 +255,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     var tags = new List<ITag>();
                     foreach (var pvalue in property.Values)
                     {
-                        var tagsValue = property.GetTagsValue(PropertyEditorCollection.Value, DataTypeService, pvalue.Culture);
+                        var tagsValue = property.GetTagsValue(PropertyEditors, DataTypeService, pvalue.Culture);
                         var languageId = LanguageRepository.GetIdByIsoCode(pvalue.Culture);
                         var cultureTags = tagsValue.Select(x => new Tag { Group = tagConfiguration.Group, Text = x, LanguageId = languageId });
                         tags.AddRange(cultureTags);
@@ -237,7 +264,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 }
                 else
                 {
-                    var tagsValue = property.GetTagsValue(PropertyEditorCollection.Value, DataTypeService); // strings
+                    var tagsValue = property.GetTagsValue(PropertyEditors, DataTypeService); // strings
                     var tags = tagsValue.Select(x => new Tag { Group = tagConfiguration.Group, Text = x });
                     tagRepo.Assign(entity.Id, property.PropertyTypeId, tags);
                 }
@@ -801,5 +828,56 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         }
 
         #endregion
+
+        protected void PersistRelations(TEntity entity)
+        {
+            // Get all references from our core built in DataEditors/Property Editors
+            // Along with seeing if deverlopers want to collect additional references from the DataValueReferenceFactories collection
+            var trackedRelations = new List<UmbracoEntityReference>();
+            trackedRelations.AddRange(_dataValueReferenceFactories.GetAllReferences(entity.Properties, PropertyEditors));
+
+            //First delete all auto-relations for this entity
+            RelationRepository.DeleteByParent(entity.Id, Constants.Conventions.RelationTypes.AutomaticRelationTypes);
+
+            if (trackedRelations.Count == 0) return;
+
+            trackedRelations = trackedRelations.Distinct().ToList();
+            var udiToGuids = trackedRelations.Select(x => x.Udi as GuidUdi)
+                .ToDictionary(x => (Udi)x, x => x.Guid);
+
+            //lookup in the DB all INT ids for the GUIDs and chuck into a dictionary
+            var keyToIds = Database.Fetch<NodeIdKey>(Sql().Select<NodeDto>(x => x.NodeId, x => x.UniqueId).From<NodeDto>().WhereIn<NodeDto>(x => x.UniqueId, udiToGuids.Values))
+                .ToDictionary(x => x.UniqueId, x => x.NodeId);
+
+            var allRelationTypes = RelationTypeRepository.GetMany(Array.Empty<int>())
+                .ToDictionary(x => x.Alias, x => x);
+
+            var toSave = trackedRelations.Select(rel =>
+                {
+                    if (!allRelationTypes.TryGetValue(rel.RelationTypeAlias, out var relationType))
+                        throw new InvalidOperationException($"The relation type {rel.RelationTypeAlias} does not exist");
+
+                    if (!udiToGuids.TryGetValue(rel.Udi, out var guid))
+                        return null; // This shouldn't happen!
+
+                    if (!keyToIds.TryGetValue(guid, out var id))
+                        return null; // This shouldn't happen!
+
+                    return new Relation(entity.Id, id, relationType);
+                }).WhereNotNull();
+
+            // Save bulk relations
+            RelationRepository.Save(toSave);
+
+        }
+
+        private class NodeIdKey
+        {
+            [Column("id")]
+            public int NodeId { get; set; }
+
+            [Column("uniqueId")]
+            public Guid UniqueId { get; set; }
+        }
     }
 }

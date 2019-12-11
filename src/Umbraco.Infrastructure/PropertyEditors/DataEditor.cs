@@ -24,16 +24,19 @@ namespace Umbraco.Core.PropertyEditors
     {
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizationService _localizationService;
+        private readonly ILocalizedTextService _localizedTextService;
         private readonly IShortStringHelper _shortStringHelper;
         private IDictionary<string, object> _defaultConfiguration;
+        private IDataValueEditor _dataValueEditor;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataEditor"/> class.
         /// </summary>
-        public DataEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, IShortStringHelper shortStringHelper, EditorType type = EditorType.PropertyValue)
+        public DataEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, EditorType type = EditorType.PropertyValue)
         {
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
+            _localizedTextService = localizedTextService;
             _shortStringHelper = shortStringHelper;
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
@@ -100,7 +103,7 @@ namespace Umbraco.Core.PropertyEditors
         /// simple enough for now.</para>
         /// </remarks>
         // TODO: point of that one? shouldn't we always configure?
-        public IDataValueEditor GetValueEditor() => ExplicitValueEditor ?? CreateValueEditor();
+        public IDataValueEditor GetValueEditor() => ExplicitValueEditor ?? (_dataValueEditor ?? (_dataValueEditor = CreateValueEditor()));
 
         /// <inheritdoc />
         /// <remarks>
@@ -123,7 +126,7 @@ namespace Umbraco.Core.PropertyEditors
                 return ExplicitValueEditor;
 
             var editor = CreateValueEditor();
-            ((DataValueEditor) editor).Configuration = configuration; // TODO: casting is bad
+            ((DataValueEditor)editor).Configuration = configuration; // TODO: casting is bad
             return editor;
         }
 
@@ -173,9 +176,9 @@ namespace Umbraco.Core.PropertyEditors
         protected virtual IDataValueEditor CreateValueEditor()
         {
             if (Attribute == null)
-                throw new InvalidOperationException("The editor does not specify a view.");
+                throw new InvalidOperationException($"The editor is not attributed with {nameof(DataEditorAttribute)}");
 
-            return new DataValueEditor(_dataTypeService, _localizationService, _shortStringHelper, Attribute);
+            return new DataValueEditor(_dataTypeService, _localizationService, _localizedTextService, _shortStringHelper, Attribute);
         }
 
         /// <summary>
@@ -185,7 +188,7 @@ namespace Umbraco.Core.PropertyEditors
         {
             var editor = new ConfigurationEditor();
             // pass the default configuration if this is not a property value editor
-            if((Type & EditorType.PropertyValue) == 0)
+            if ((Type & EditorType.PropertyValue) == 0)
             {
                 editor.DefaultConfiguration = _defaultConfiguration;
             }

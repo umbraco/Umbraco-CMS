@@ -22,20 +22,24 @@ namespace Umbraco.Web.PropertyEditors
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizationService _localizationService;
         private readonly IIOHelper _ioHelper;
+        private readonly IShortStringHelper _shortStringHelper;
+        private readonly ILocalizedTextService _localizedTextService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TextboxPropertyEditor"/> class.
         /// </summary>
-        public TextboxPropertyEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper, IShortStringHelper shortStringHelper)
-            : base(logger, dataTypeService, localizationService, shortStringHelper)
+        public TextboxPropertyEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper, IShortStringHelper shortStringHelper, ILocalizedTextService localizedTextService)
+            : base(logger, dataTypeService, localizationService,localizedTextService, shortStringHelper)
         {
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
             _ioHelper = ioHelper;
+            _shortStringHelper = shortStringHelper;
+            _localizedTextService = localizedTextService;
         }
 
         /// <inheritdoc/>
-        protected override IDataValueEditor CreateValueEditor() => new TextOnlyValueEditor(_dataTypeService, _localizationService, Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new TextOnlyValueEditor(_dataTypeService, _localizationService, Attribute, _localizedTextService, _shortStringHelper);
 
         /// <inheritdoc/>
         protected override IConfigurationEditor CreateConfigurationEditor() => new TextboxConfigurationEditor(_ioHelper);

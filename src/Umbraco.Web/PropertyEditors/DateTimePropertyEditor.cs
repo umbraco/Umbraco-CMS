@@ -24,7 +24,7 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         /// <param name="logger"></param>
         public DateTimePropertyEditor(ILogger logger, IIOHelper ioHelper)
-            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService, Current.ShortStringHelper)
+            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService,Current.Services.TextService, Current.ShortStringHelper)
         {
             _ioHelper = ioHelper;
         }

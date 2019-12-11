@@ -23,7 +23,7 @@ namespace Umbraco.Web.PropertyEditors
         private readonly IMediaFileSystem _mediaFileSystem;
 
         public ImageCropperPropertyValueEditor(DataEditorAttribute attribute, ILogger logger, IMediaFileSystem mediaFileSystem, IDataTypeService dataTypeService, ILocalizationService localizationService)
-            : base(dataTypeService, localizationService, Current.ShortStringHelper, attribute)
+            : base(dataTypeService, localizationService, Current.Services.TextService, Current.ShortStringHelper, attribute)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
@@ -162,7 +162,7 @@ namespace Umbraco.Web.PropertyEditors
         }
 
 
-        public override string ConvertDbToString(IPropertyType propertyType, object value)
+        public override string ConvertDbToString(IPropertyType propertyType,  object value, IDataTypeService dataTypeService)
         {
             if (value == null || string.IsNullOrEmpty(value.ToString()))
                 return null;

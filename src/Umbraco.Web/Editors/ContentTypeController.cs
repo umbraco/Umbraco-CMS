@@ -528,7 +528,7 @@ namespace Umbraco.Web.Editors
             }
 
             var dataInstaller = new PackageDataInstallation(Logger, Services.FileService, Services.MacroService, Services.LocalizationService,
-                Services.DataTypeService, Services.EntityService, Services.ContentTypeService, Services.ContentService, _propertyEditors, _scopeProvider, _shortStringHelper, _globalSettings);
+                Services.DataTypeService, Services.EntityService, Services.ContentTypeService, Services.ContentService, _propertyEditors, _scopeProvider, _shortStringHelper, _globalSettings, Services.TextService);
 
             var xd = new XmlDocument {XmlResolver = null};
             xd.Load(filePath);

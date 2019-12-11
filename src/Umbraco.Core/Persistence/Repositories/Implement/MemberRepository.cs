@@ -26,10 +26,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly ITagRepository _tagRepository;
         private readonly IMemberGroupRepository _memberGroupRepository;
 
-        public MemberRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository, ILanguageRepository languageRepository,
-            IDataTypeService dataTypeService,
-            Lazy<PropertyEditorCollection> propertyEditorCollection)
-            : base(scopeAccessor, cache, languageRepository, logger, dataTypeService, propertyEditorCollection)
+        public MemberRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger,
+            IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository, ILanguageRepository languageRepository, IRelationRepository relationRepository, IRelationTypeRepository relationTypeRepository,
+            Lazy<PropertyEditorCollection> propertyEditors,
+            DataValueReferenceFactoryCollection dataValueReferenceFactories,
+            IDataTypeService dataTypeService)
+            : base(scopeAccessor, cache, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferenceFactories, dataTypeService)
         {
             _memberTypeRepository = memberTypeRepository ?? throw new ArgumentNullException(nameof(memberTypeRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
@@ -320,6 +322,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             SetEntityTags(entity, _tagRepository);
 
+            PersistRelations(entity);
+
             OnUowRefreshedEntity(new ScopedEntityEventArgs(AmbientScope, entity));
 
             entity.ResetDirtyProperties();
@@ -384,6 +388,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 Database.Insert(propertyDataDto);
 
             SetEntityTags(entity, _tagRepository);
+
+            PersistRelations(entity);
 
             OnUowRefreshedEntity(new ScopedEntityEventArgs(AmbientScope, entity));
 

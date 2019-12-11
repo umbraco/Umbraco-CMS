@@ -29,7 +29,7 @@ namespace Umbraco.Web.PropertyEditors
         private readonly ILocalizationService _localizationService;
 
         public FileUploadPropertyEditor(ILogger logger, IMediaFileSystem mediaFileSystem, IContentSection contentSection, IDataTypeService dataTypeService, ILocalizationService localizationService)
-            : base(logger, dataTypeService, localizationService, Current.ShortStringHelper)
+            : base(logger, dataTypeService, localizationService, Current.Services.TextService,Current.ShortStringHelper)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
             _contentSection = contentSection;

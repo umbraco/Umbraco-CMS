@@ -18,7 +18,7 @@ namespace Umbraco.Web.PropertyEditors.ParameterEditors
         /// Initializes a new instance of the <see cref="ContentTypeParameterEditor"/> class.
         /// </summary>
         public ContentTypeParameterEditor(ILogger logger)
-            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService, Current.ShortStringHelper)
+            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService,Current.Services.TextService, Current.ShortStringHelper)
         {
             // configure
             DefaultConfiguration.Add("multiple", false);

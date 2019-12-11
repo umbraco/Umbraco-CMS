@@ -15,7 +15,7 @@ namespace Umbraco.Web.PropertyEditors
     public class MemberPickerPropertyEditor : DataEditor
     {
         public MemberPickerPropertyEditor(ILogger logger)
-            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService, Current.ShortStringHelper)
+            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService, Current.Services.TextService,Current.ShortStringHelper)
         { }
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new MemberPickerConfiguration();

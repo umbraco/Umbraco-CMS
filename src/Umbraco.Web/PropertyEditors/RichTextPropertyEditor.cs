@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
@@ -27,13 +29,16 @@ namespace Umbraco.Web.PropertyEditors
         Icon = "icon-browser-window")]
     public class RichTextPropertyEditor : DataEditor
     {
-        private IMediaService _mediaService;
-        private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
         private IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly HtmlImageSourceParser _imageSourceParser;
+        private readonly HtmlLocalLinkParser _localLinkParser;
+        private readonly RichTextEditorPastedImages _pastedImages;
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizationService _localizationService;
         private readonly IIOHelper _ioHelper;
         private ILogger _logger;
+        private readonly IMediaService _mediaService;
+        private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
 
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
@@ -45,23 +50,31 @@ namespace Umbraco.Web.PropertyEditors
             IUmbracoContextAccessor umbracoContextAccessor,
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
+            HtmlImageSourceParser imageSourceParser,
+            HtmlLocalLinkParser localLinkParser,
+            RichTextEditorPastedImages pastedImages,
             IShortStringHelper shortStringHelper,
-            IIOHelper ioHelper) : base(logger, dataTypeService, localizationService, shortStringHelper)
+            IIOHelper ioHelper,
+            ILocalizedTextService localizedTextService)
+            : base(logger, dataTypeService, localizationService, localizedTextService,shortStringHelper)
         {
-            _mediaService = mediaService;
-            _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
             _umbracoContextAccessor = umbracoContextAccessor;
+            _imageSourceParser = imageSourceParser;
+            _localLinkParser = localLinkParser;
+            _pastedImages = pastedImages;
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
             _ioHelper = ioHelper;
             _logger = logger;
+            _mediaService = mediaService;
+            _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
         }
 
         /// <summary>
         /// Create a custom value editor
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider, _umbracoContextAccessor, _logger, _dataTypeService, _localizationService);
+        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider, _umbracoContextAccessor, _logger, _dataTypeService, _localizationService, _imageSourceParser, _localLinkParser, _pastedImages);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new RichTextConfigurationEditor(_ioHelper);
 
@@ -70,20 +83,20 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// A custom value editor to ensure that macro syntax is parsed when being persisted and formatted correctly for display in the editor
         /// </summary>
-        internal class RichTextPropertyValueEditor : DataValueEditor
+        internal class RichTextPropertyValueEditor : DataValueEditor, IDataValueReference
         {
-            private IMediaService _mediaService;
-            private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
             private IUmbracoContextAccessor _umbracoContextAccessor;
-            private ILogger _logger;
+            private readonly HtmlImageSourceParser _imageSourceParser;
+            private readonly HtmlLocalLinkParser _localLinkParser;
+            private readonly RichTextEditorPastedImages _pastedImages;
 
-            public RichTextPropertyValueEditor(DataEditorAttribute attribute, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor, ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService)
-                : base(dataTypeService, localizationService, Current.ShortStringHelper, attribute)
+            public RichTextPropertyValueEditor(DataEditorAttribute attribute, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor, ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, HtmlImageSourceParser imageSourceParser, HtmlLocalLinkParser localLinkParser, RichTextEditorPastedImages pastedImages)
+                : base(dataTypeService, localizationService,Current.Services.TextService, Current.ShortStringHelper, attribute)
             {
-                _mediaService = mediaService;
-                _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
                 _umbracoContextAccessor = umbracoContextAccessor;
-                _logger = logger;
+                _imageSourceParser = imageSourceParser;
+                _localLinkParser = localLinkParser;
+                _pastedImages = pastedImages;
             }
 
             /// <inheritdoc />
@@ -115,7 +128,7 @@ namespace Umbraco.Web.PropertyEditors
                 if (val == null)
                     return null;
 
-                var propertyValueWithMediaResolved = TemplateUtilities.ResolveMediaFromTextString(val.ToString());
+                var propertyValueWithMediaResolved = _imageSourceParser.EnsureImageSources(val.ToString());
                 var parsed = MacroTagParser.FormatRichTextPersistedDataForEditor(propertyValueWithMediaResolved, new Dictionary<string, string>());
                 return parsed;
             }
@@ -137,11 +150,29 @@ namespace Umbraco.Web.PropertyEditors
                 var mediaParent = config?.MediaParentId;
                 var mediaParentId = mediaParent == null ? Guid.Empty : mediaParent.Guid;
 
-                var parseAndSavedTempImages = TemplateUtilities.FindAndPersistPastedTempImages(editorValue.Value.ToString(), mediaParentId, userId, _mediaService, _contentTypeBaseServiceProvider, _logger);
-                var editorValueWithMediaUrlsRemoved = TemplateUtilities.RemoveMediaUrlsFromTextString(parseAndSavedTempImages);
+                var parseAndSavedTempImages = _pastedImages.FindAndPersistPastedTempImages(editorValue.Value.ToString(), mediaParentId, userId);
+                var editorValueWithMediaUrlsRemoved = _imageSourceParser.RemoveImageSources(parseAndSavedTempImages);
                 var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValueWithMediaUrlsRemoved);
 
                 return parsed;
+            }
+
+            /// <summary>
+            /// Resolve references from <see cref="IDataValueEditor"/> values
+            /// </summary>
+            /// <param name="value"></param>
+            /// <returns></returns>
+            public IEnumerable<UmbracoEntityReference> GetReferences(object value)
+            {
+                var asString = value == null ? string.Empty : value is string str ? str : value.ToString();
+
+                foreach (var udi in _imageSourceParser.FindUdisFromDataAttributes(asString))
+                    yield return new UmbracoEntityReference(udi);
+
+                foreach (var udi in _localLinkParser.FindUdisFromLocalLinks(asString))
+                    yield return new UmbracoEntityReference(udi);
+
+                //TODO: Detect Macros too ... but we can save that for a later date, right now need to do media refs
             }
         }
 

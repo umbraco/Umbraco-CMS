@@ -6,6 +6,9 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache;
+using System.Collections.Generic;
+using Umbraco.Core.Models.Editors;
+using Newtonsoft.Json;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -26,7 +29,7 @@ namespace Umbraco.Web.PropertyEditors
         private readonly IIOHelper _ioHelper;
 
         public MultiUrlPickerPropertyEditor(ILogger logger, IEntityService entityService, IPublishedSnapshotAccessor publishedSnapshotAccessor, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper)
-            : base(logger, dataTypeService, localizationService, Current.ShortStringHelper, EditorType.PropertyValue)
+            : base(logger, dataTypeService, localizationService, Current.Services.TextService,Current.ShortStringHelper, EditorType.PropertyValue)
         {
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
             _publishedSnapshotAccessor = publishedSnapshotAccessor ?? throw new ArgumentNullException(nameof(publishedSnapshotAccessor));

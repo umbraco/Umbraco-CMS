@@ -26,8 +26,8 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// Initializes a new instance of the <see cref="TrueFalsePropertyEditor"/> class.
         /// </summary>
-        public TrueFalsePropertyEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper, IShortStringHelper shortStringHelper)
-            : base(logger, dataTypeService, localizationService, shortStringHelper)
+        public TrueFalsePropertyEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper, IShortStringHelper shortStringHelper, ILocalizedTextService localizedTextService)
+            : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             _ioHelper = ioHelper;
         }

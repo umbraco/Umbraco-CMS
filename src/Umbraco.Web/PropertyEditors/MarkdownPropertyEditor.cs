@@ -24,7 +24,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Initializes a new instance of the <see cref="MarkdownPropertyEditor"/> class.
         /// </summary>
         public MarkdownPropertyEditor(ILogger logger, IIOHelper ioHelper)
-            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService, Current.ShortStringHelper)
+            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService, Current.Services.TextService,Current.ShortStringHelper)
         {
             _ioHelper = ioHelper;
         }

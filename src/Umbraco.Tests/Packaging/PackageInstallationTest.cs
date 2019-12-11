@@ -13,6 +13,7 @@ using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
@@ -51,7 +52,8 @@ namespace Umbraco.Tests.Packaging
             Factory.GetInstance<PropertyEditorCollection>(),
             Factory.GetInstance<IScopeProvider>(),
             Factory.GetInstance<IShortStringHelper>(),
-            Factory.GetInstance<IGlobalSettings>()
+            Factory.GetInstance<IGlobalSettings>(),
+            Factory.GetInstance<ILocalizedTextService>()
             );
 
         private IPackageInstallation PackageInstallation => new PackageInstallation(

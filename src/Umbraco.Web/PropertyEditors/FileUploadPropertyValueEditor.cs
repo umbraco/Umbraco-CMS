@@ -20,7 +20,7 @@ namespace Umbraco.Web.PropertyEditors
         private readonly IMediaFileSystem _mediaFileSystem;
 
         public FileUploadPropertyValueEditor(DataEditorAttribute attribute, IMediaFileSystem mediaFileSystem, IDataTypeService dataTypeService, ILocalizationService localizationService)
-            : base(dataTypeService, localizationService, Current.ShortStringHelper, attribute)
+            : base(dataTypeService, localizationService, Current.Services.TextService,Current.ShortStringHelper, attribute)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
         }
