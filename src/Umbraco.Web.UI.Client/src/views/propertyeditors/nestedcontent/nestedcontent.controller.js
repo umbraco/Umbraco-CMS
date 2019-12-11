@@ -134,7 +134,7 @@
         };
 
         vm.openNodeTypePicker = function ($event) {
-            if (vm.nodes.length >= vm.maxItems) {
+            if (vm.overlayMenu || vm.nodes.length >= vm.maxItems) {
                 return;
             }
 
