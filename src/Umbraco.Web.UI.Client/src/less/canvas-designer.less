@@ -17,12 +17,15 @@
 body {
     position: absolute;
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     height: 100%;
     height: calc(~"100% - 40px");
     width: 100%; // 80px is the fixed left menu for toggling the different browser sizes
     padding: 0;
     margin: 0;
-    padding-top:40px;
+    padding-bottom:40px;
     background-color: @brownGrayExtraLight;
 }
 
@@ -32,7 +35,7 @@ body {
 
 .menu-bar {
     position: absolute;
-    top:0;
+    bottom:0;
     left: 0;
     right: 0;
     background-color: @blueExtraDark;
@@ -58,11 +61,13 @@ body {
     display: inline-block;
     padding: 11px 15px;
     font-weight: bold;
+    font-size: 13px;
 }
 
 .menu-bar__button {
     display: inline-block;
     padding: 11px 15px;
+    height: 40px;
     border:none;
     background-color: @blueExtraDark;
 
@@ -115,10 +120,11 @@ body {
         display:none;
 
         position: absolute;
+        bottom: 100%;
         float: left;
         min-width: 200px;
 
-        border-radius: 0 3px 3px 3px;
+        border-radius: 3px 3px 3px 0;
         overflow: hidden;
 
         background-color: @blueExtraDark;
