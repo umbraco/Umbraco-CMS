@@ -82,7 +82,7 @@ namespace Umbraco.Web.Profiling
             if (isBootRequest)
                 _provider.EndBootRequest();
             if (isBootRequest || ShouldProfile(sender))
-                Stop();
+                Stop(!GlobalSettings.DebugMode);
         }
 
         private bool ShouldProfile(object sender)
