@@ -172,13 +172,20 @@
             }
         }
 
+        function initUserStateSelections() {
+            initUsersOptionsFilterSelections(vm.userStatesFilter, vm.usersOptions.userStates, "key");
+        }
+
         function initUserGroupSelections() {
-            if (vm.usersOptions.userGroups && vm.usersOptions.userGroups.length > 0 &&
-                vm.userGroups && vm.userGroups.length > 0) {
-                for (var i = 0; i < vm.usersOptions.userGroups.length; i++) {
-                    for (var j = 0; j < vm.userGroups.length; j++) {
-                        if (vm.userGroups[j].alias === vm.usersOptions.userGroups[i]) {
-                            vm.userGroups[j].selected = true;
+            initUsersOptionsFilterSelections(vm.userGroups, vm.usersOptions.userGroups, "alias");
+        }
+
+        function initUsersOptionsFilterSelections(filterCollection, selectedCollection, keyField) {
+            if (selectedCollection && selectedCollection.length > 0 && filterCollection && filterCollection.length > 0) {
+                for (var i = 0; i < selectedCollection.length; i++) {
+                    for (var j = 0; j < filterCollection.length; j++) {
+                        if (filterCollection[j][keyField] === selectedCollection[i]) {
+                            filterCollection[j].selected = true;
                         }
                     }
                 }
@@ -621,27 +628,46 @@
         }
 
         function goToUser(user) {
-            $location.url(pathToUser(user)).search("create", null).search("invite", null);
+            $location.path(pathToUser(user))
+                .search("orderBy", vm.usersOptions.orderBy)
+                .search("orderDirection", vm.usersOptions.orderDirection)
+                .search("pageNumber", vm.usersOptions.pageNumber)
+                .search("userStates", getUsersOptionsFilterCollectionAsDelimitedStringOrNull(vm.usersOptions.userStates))
+                .search("userGroups", getUsersOptionsFilterCollectionAsDelimitedStringOrNull(vm.usersOptions.userGroups))
+                .search("create", null)
+                .search("invite", null);
+        }
+
+        function getUsersOptionsFilterCollectionAsDelimitedStringOrNull(collection) {
+            if (collection && collection.length > 0) {
+                return collection.join(",");
+            }
+
+            return null;
         }
         
         function getEditPath(user) {
-            return pathToUser(user) + "&mculture=" + $location.search().mculture;
+            return pathToUser(user) + usersOptionsAsQueryString();
         }
-        
+
         function pathToUser(user) {
-            var path = "/users/users/user/" +
-                user.id +
-                "?orderBy=" + vm.usersOptions.orderBy +
+            return "/users/users/user/" + user.id;
+        }
+
+        function usersOptionsAsQueryString() {
+            var qs = "?orderBy=" + vm.usersOptions.orderBy +
                 "&orderDirection=" + vm.usersOptions.orderDirection +
                 "&pageNumber=" + vm.usersOptions.pageNumber;
 
-            path += addFilterCollectionToPathToUser("userStates", vm.usersOptions.userStates);
-            path += addFilterCollectionToPathToUser("userGroups", vm.usersOptions.userGroups);
+            qs += addUsersOptionsFilterCollectionToQueryString("userStates", vm.usersOptions.userStates);
+            qs += addUsersOptionsFilterCollectionToQueryString("userGroups", vm.usersOptions.userGroups);
 
-            return path;
+            qs += "&mculture=" + $location.search().mculture;
+
+            return qs;
         }
 
-        function addFilterCollectionToPathToUser(name, collection) {
+        function addUsersOptionsFilterCollectionToQueryString(name, collection) {
             if (collection && collection.length > 0) {
                 return "&" + name + "=" + collection.join(",");
             }
@@ -667,6 +693,7 @@
                 formatDates(vm.users);
                 setUserDisplayState(vm.users);
                 vm.userStatesFilter = usersHelper.getUserStatesFilter(data.userStates);
+                initUserStateSelections();
 
                 vm.loading = false;
 
