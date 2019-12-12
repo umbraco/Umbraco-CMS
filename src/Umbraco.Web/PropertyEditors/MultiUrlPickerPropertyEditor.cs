@@ -5,6 +5,9 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache;
+using System.Collections.Generic;
+using Umbraco.Core.Models.Editors;
+using Newtonsoft.Json;
 
 namespace Umbraco.Web.PropertyEditors
 {

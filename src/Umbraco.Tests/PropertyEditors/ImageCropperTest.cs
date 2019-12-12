@@ -25,6 +25,7 @@ using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.PropertyEditors
 {
+
     [TestFixture]
     public class ImageCropperTest
     {

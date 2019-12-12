@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core
 {
-    internal class UnknownTypeUdi : Udi
+    public class UnknownTypeUdi : Udi
     {
         private UnknownTypeUdi()
             : base("unknown", "umb://unknown/")

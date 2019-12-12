@@ -44,6 +44,8 @@ using Umbraco.Web.Hosting;
 using Umbraco.Web.Sections;
 using Current = Umbraco.Core.Composing.Current;
 using FileSystems = Umbraco.Core.IO.FileSystems;
+using Umbraco.Web.Templates;
+using Umbraco.Web.PropertyEditors;
 using Umbraco.Core.Dictionary;
 using Umbraco.Net;
 
@@ -248,6 +250,9 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique(_ => Umbraco.Web.Composing.Current.UmbracoContextAccessor);
             Composition.RegisterUnique<IPublishedRouter, PublishedRouter>();
             Composition.WithCollectionBuilder<ContentFinderCollectionBuilder>();
+
+            Composition.DataValueReferenceFactories();
+
             Composition.RegisterUnique<IContentLastChanceFinder, TestLastChanceFinder>();
             Composition.RegisterUnique<IVariationContextAccessor, TestVariationContextAccessor>();
             Composition.RegisterUnique<IPublishedSnapshotAccessor, TestPublishedSnapshotAccessor>();
@@ -263,6 +268,11 @@ namespace Umbraco.Tests.Testing
                 .Append<FormsSection>()
                 .Append<TranslationSection>();
             Composition.RegisterUnique<ISectionService, SectionService>();
+
+            Composition.RegisterUnique<HtmlLocalLinkParser>();
+            Composition.RegisterUnique<HtmlUrlParser>();
+            Composition.RegisterUnique<HtmlImageSourceParser>();
+            Composition.RegisterUnique<RichTextEditorPastedImages>();
 
         }
 

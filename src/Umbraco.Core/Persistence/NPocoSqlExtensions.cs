@@ -14,10 +14,6 @@ namespace Umbraco.Core.Persistence
     public static partial class NPocoSqlExtensions
     {
 
-#region Special extensions
-
-        #endregion
-
         #region Where
 
         /// <summary>
