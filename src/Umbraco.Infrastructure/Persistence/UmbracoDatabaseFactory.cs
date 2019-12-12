@@ -39,7 +39,6 @@ namespace Umbraco.Core.Persistence
         private IPocoDataFactory _pocoDataFactory;
         private string _connectionString;
         private string _providerName;
-        private DbProviderFactory _dbProviderFactory;
         private DatabaseType _databaseType;
         private ISqlSyntaxProvider _sqlSyntax;
         private RetryPolicy _connectionRetryPolicy;
@@ -48,6 +47,23 @@ namespace Umbraco.Core.Persistence
         private SqlContext _sqlContext;
         private bool _upgrading;
         private bool _initialized;
+
+        private DbProviderFactory _dbProviderFactory = null;
+
+        private DbProviderFactory DbProviderFactory
+        {
+            get
+            {
+                if (_dbProviderFactory == null)
+                {
+                    _dbProviderFactory = string.IsNullOrWhiteSpace(_providerName)
+                        ? null
+                        : _dbProviderFactoryCreator.CreateFactory(_providerName);
+                }
+
+                return _dbProviderFactory;
+            }
+        }
 
         #region Constructors
 
@@ -141,7 +157,7 @@ namespace Umbraco.Core.Persistence
         public bool CanConnect =>
             // actually tries to connect to the database (regardless of configured/initialized)
             !_connectionString.IsNullOrWhiteSpace() && !_providerName.IsNullOrWhiteSpace() &&
-            DbConnectionExtensions.IsConnectionAvailable(_connectionString, _dbProviderFactory);
+            DbConnectionExtensions.IsConnectionAvailable(_connectionString, DbProviderFactory);
 
         private void UpdateSqlServerDatabaseType()
         {
@@ -225,19 +241,18 @@ namespace Umbraco.Core.Persistence
             if (_connectionString.IsNullOrWhiteSpace()) throw new InvalidOperationException("The factory has not been configured with a proper connection string.");
             if (_providerName.IsNullOrWhiteSpace()) throw new InvalidOperationException("The factory has not been configured with a proper provider name.");
 
-            _dbProviderFactory = _dbProviderFactoryCreator.CreateFactory(_providerName);
-            if (_dbProviderFactory == null)
+            if (DbProviderFactory == null)
                 throw new Exception($"Can't find a provider factory for provider name \"{_providerName}\".");
 
             // cannot initialize without being able to talk to the database
-            if (!DbConnectionExtensions.IsConnectionAvailable(_connectionString, _dbProviderFactory))
+            if (!DbConnectionExtensions.IsConnectionAvailable(_connectionString, DbProviderFactory))
                 throw new Exception("Cannot connect to the database.");
 
             _connectionRetryPolicy = RetryPolicyFactory.GetDefaultSqlConnectionRetryPolicyByConnectionString(_connectionString);
             _commandRetryPolicy = RetryPolicyFactory.GetDefaultSqlCommandRetryPolicyByConnectionString(_connectionString);
 
 
-            _databaseType = DatabaseType.Resolve(_dbProviderFactory.GetType().Name, _providerName);
+            _databaseType = DatabaseType.Resolve(DbProviderFactory.GetType().Name, _providerName);
             if (_databaseType == null)
                 throw new Exception($"Can't find an NPoco database type for provider name \"{_providerName}\".");
 
@@ -285,7 +300,7 @@ namespace Umbraco.Core.Persistence
         // method used by NPoco's UmbracoDatabaseFactory to actually create the database instance
         private UmbracoDatabase CreateDatabaseInstance()
         {
-            return new UmbracoDatabase(_connectionString, SqlContext, _dbProviderFactory, _logger, _bulkSqlInsertProvider, _connectionRetryPolicy, _commandRetryPolicy);
+            return new UmbracoDatabase(_connectionString, SqlContext, DbProviderFactory, _logger, _bulkSqlInsertProvider, _connectionRetryPolicy, _commandRetryPolicy);
         }
 
         protected override void DisposeResources()
