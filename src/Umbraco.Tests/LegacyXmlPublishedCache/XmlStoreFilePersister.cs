@@ -24,7 +24,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private bool _released;
         private Timer _timer;
         private DateTime _initialTouch;
-        private readonly AsyncLock _runLock = new AsyncLock(); // ensure we run once at a time
+        private readonly SystemLock _runLock = new SystemLock(); // ensure we run once at a time
 
         // note:
         // as long as the runner controls the runs, we know that we run once at a time, but
