@@ -8,6 +8,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Core
 {
@@ -1213,5 +1214,65 @@ namespace Umbraco.Core
         /// </summary>
         public static string NullOrWhiteSpaceAsNull(this string text)
             => string.IsNullOrWhiteSpace(text) ? null : text;
+
+
+        /// <summary>
+        /// Checks if a given path is a full path including drive letter
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        // From: http://stackoverflow.com/a/35046453/5018
+        public static bool IsFullPath(this string path)
+        {
+            return string.IsNullOrWhiteSpace(path) == false
+                   && path.IndexOfAny(Path.GetInvalidPathChars().ToArray()) == -1
+                   && Path.IsPathRooted(path)
+                   && Path.GetPathRoot(path).Equals(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal) == false;
+        }
+
+          /// <summary>
+        /// Based on the input string, this will detect if the string is a JS path or a JS snippet.
+        /// If a path cannot be determined, then it is assumed to be a snippet the original text is returned
+        /// with an invalid attempt, otherwise a valid attempt is returned with the resolved path
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This is only used for legacy purposes for the Action.JsSource stuff and shouldn't be needed in v8
+        /// </remarks>
+        internal static Attempt<string> DetectIsJavaScriptPath(this string input, IIOHelper ioHelper)
+        {
+            //validate that this is a url, if it is not, we'll assume that it is a text block and render it as a text
+            //block instead.
+            var isValid = true;
+
+            if (Uri.IsWellFormedUriString(input, UriKind.RelativeOrAbsolute))
+            {
+                //ok it validates, but so does alert('hello'); ! so we need to do more checks
+
+                //here are the valid chars in a url without escaping
+                if (Regex.IsMatch(input, @"[^a-zA-Z0-9-._~:/?#\[\]@!$&'\(\)*\+,%;=]"))
+                    isValid = false;
+
+                //we'll have to be smarter and just check for certain js patterns now too!
+                var jsPatterns = new[] { @"\+\s*\=", @"\);", @"function\s*\(", @"!=", @"==" };
+                if (jsPatterns.Any(p => Regex.IsMatch(input, p)))
+                    isValid = false;
+
+                if (isValid)
+                {
+                    var resolvedUrlResult = ioHelper.TryResolveUrl(input);
+                    //if the resolution was success, return it, otherwise just return the path, we've detected
+                    // it's a path but maybe it's relative and resolution has failed, etc... in which case we're just
+                    // returning what was given to us.
+                    return resolvedUrlResult.Success
+                        ? resolvedUrlResult
+                        : Attempt.Succeed(input);
+                }
+            }
+
+            return Attempt.Fail(input);
+        }
+
     }
 }

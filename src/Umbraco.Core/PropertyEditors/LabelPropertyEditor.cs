@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core.Composing;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 
@@ -14,18 +15,22 @@ namespace Umbraco.Core.PropertyEditors
         Icon = "icon-readonly")]
     public class LabelPropertyEditor : DataEditor
     {
+        private readonly IIOHelper _ioHelper;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="LabelPropertyEditor"/> class.
         /// </summary>
-        public LabelPropertyEditor(ILogger logger)
+        public LabelPropertyEditor(ILogger logger, IIOHelper ioHelper)
             : base(logger)
-        { }
+        {
+            _ioHelper = ioHelper;
+        }
 
         /// <inheritdoc />
         protected override IDataValueEditor CreateValueEditor() => new LabelPropertyValueEditor(Current.Services.DataTypeService, Current.Services.LocalizationService, Attribute);
 
         /// <inheritdoc />
-        protected override IConfigurationEditor CreateConfigurationEditor() => new LabelConfigurationEditor();
+        protected override IConfigurationEditor CreateConfigurationEditor() => new LabelConfigurationEditor(_ioHelper);
 
         // provides the property value editor
         internal class LabelPropertyValueEditor : DataValueEditor

@@ -375,7 +375,7 @@ namespace Umbraco.Web
             {
                 var httpContext = ((HttpApplication) sender).Context;
 
-                LogHttpRequest.TryGetCurrentHttpRequestId(out var httpRequestId);
+                LogHttpRequest.TryGetCurrentHttpRequestId(out var httpRequestId, Current.AppCaches.RequestCache);
 
                 _logger.Verbose<UmbracoModule>("Begin request [{HttpRequestId}]: {RequestUrl}", httpRequestId, httpContext.Request.Url);
                 BeginRequest(new HttpContextWrapper(httpContext));
@@ -420,7 +420,7 @@ namespace Umbraco.Web
 
                 if (Current.UmbracoContext != null && Current.UmbracoContext.IsFrontEndUmbracoRequest)
                 {
-                    LogHttpRequest.TryGetCurrentHttpRequestId(out var httpRequestId);
+                    LogHttpRequest.TryGetCurrentHttpRequestId(out var httpRequestId, Current.AppCaches.RequestCache);
 
                     _logger.Verbose<UmbracoModule>("End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)", httpRequestId, httpContext.Request.Url, DateTime.Now.Subtract(Current.UmbracoContext.ObjectCreated).TotalMilliseconds);
                 }

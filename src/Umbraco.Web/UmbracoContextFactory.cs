@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Hosting;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache;
@@ -31,11 +32,12 @@ namespace Umbraco.Web
         private readonly UrlProviderCollection _urlProviders;
         private readonly MediaUrlProviderCollection _mediaUrlProviders;
         private readonly IUserService _userService;
+        private readonly IIOHelper _ioHelper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoContextFactory"/> class.
         /// </summary>
-        public UmbracoContextFactory(IUmbracoContextAccessor umbracoContextAccessor, IPublishedSnapshotService publishedSnapshotService, IVariationContextAccessor variationContextAccessor, IDefaultCultureAccessor defaultCultureAccessor, IUmbracoSettingsSection umbracoSettings, IGlobalSettings globalSettings, UrlProviderCollection urlProviders, MediaUrlProviderCollection mediaUrlProviders, IUserService userService)
+        public UmbracoContextFactory(IUmbracoContextAccessor umbracoContextAccessor, IPublishedSnapshotService publishedSnapshotService, IVariationContextAccessor variationContextAccessor, IDefaultCultureAccessor defaultCultureAccessor, IUmbracoSettingsSection umbracoSettings, IGlobalSettings globalSettings, UrlProviderCollection urlProviders, MediaUrlProviderCollection mediaUrlProviders, IUserService userService, IIOHelper ioHelper)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _publishedSnapshotService = publishedSnapshotService ?? throw new ArgumentNullException(nameof(publishedSnapshotService));
@@ -47,6 +49,7 @@ namespace Umbraco.Web
             _urlProviders = urlProviders ?? throw new ArgumentNullException(nameof(urlProviders));
             _mediaUrlProviders = mediaUrlProviders ?? throw new ArgumentNullException(nameof(mediaUrlProviders));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _ioHelper = ioHelper;
         }
 
         private UmbracoContext CreateUmbracoContext(HttpContextBase httpContext)
@@ -65,7 +68,7 @@ namespace Umbraco.Web
 
             var webSecurity = new WebSecurity(httpContext, _userService, _globalSettings);
 
-            return new UmbracoContext(httpContext, _publishedSnapshotService, webSecurity, _umbracoSettings, _urlProviders, _mediaUrlProviders, _globalSettings, _variationContextAccessor);
+            return new UmbracoContext(httpContext, _publishedSnapshotService, webSecurity, _umbracoSettings, _urlProviders, _mediaUrlProviders, _globalSettings, _variationContextAccessor, _ioHelper);
         }
 
         /// <inheritdoc />

@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Newtonsoft.Json;
+using Umbraco.Core.IO;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
 
@@ -12,7 +13,7 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     public class GridConfigurationEditor : ConfigurationEditor<GridConfiguration>
     {
-        public GridConfigurationEditor()
+        public GridConfigurationEditor(IIOHelper ioHelper) : base(ioHelper)
         {
             var items = Fields.First(x => x.Key == "items");
 

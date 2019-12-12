@@ -7,7 +7,6 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Hosting;
 using Umbraco.Core.Services;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers;
@@ -84,7 +83,8 @@ namespace Umbraco.Tests.Cache.PublishedCache
                 Enumerable.Empty<IUrlProvider>(),
                 Enumerable.Empty<IMediaUrlProvider>(),
                 globalSettings,
-                new TestVariationContextAccessor());
+                new TestVariationContextAccessor(),
+                IOHelper);
 
             _cache = _umbracoContext.Content;
         }

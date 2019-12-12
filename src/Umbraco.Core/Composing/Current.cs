@@ -96,11 +96,11 @@ namespace Umbraco.Core.Composing
         /// <para>Unlocks <see cref="Configs"/> so that it is possible to add configurations
         /// directly to <see cref="Current"/> without having to wire composition.</para>
         /// </remarks>
-        public static void UnlockConfigs(IConfigsFactory configsFactory)
+        public static void UnlockConfigs(IConfigsFactory configsFactory, IIOHelper ioHelper)
         {
             if (_factory != null)
                 throw new InvalidOperationException("Cannot unlock configs when a factory has been set.");
-            _configs = configsFactory.Create();
+            _configs = configsFactory.Create(ioHelper);
         }
 
         internal static event EventHandler Resetted;
@@ -211,7 +211,7 @@ namespace Umbraco.Core.Composing
         public static IVariationContextAccessor VariationContextAccessor
             => Factory.GetInstance<IVariationContextAccessor>();
 
-        public static IIOHelper IOHelper = new IOHelper();
+        public static IIOHelper IOHelper => Factory.GetInstance<IIOHelper>();
 
 
         public static IHostingEnvironment HostingEnvironment => Factory.GetInstance<IHostingEnvironment>();

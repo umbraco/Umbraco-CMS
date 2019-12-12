@@ -5,6 +5,7 @@ using Microsoft.Owin.Security.Cookies;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Security
 {
@@ -21,7 +22,8 @@ namespace Umbraco.Web.Security
             ISecuritySection securitySection,
             IGlobalSettings globalSettings,
             IRuntimeState runtimeState,
-            ISecureDataFormat<AuthenticationTicket> secureDataFormat)
+            ISecureDataFormat<AuthenticationTicket> secureDataFormat,
+            IIOHelper ioHelper)
         {
             var secureDataFormat1 = secureDataFormat ?? throw new ArgumentNullException(nameof(secureDataFormat));
             LoginTimeoutMinutes = globalSettings.TimeOutInMinutes;
@@ -38,7 +40,7 @@ namespace Umbraco.Web.Security
             TicketDataFormat = new UmbracoSecureDataFormat(LoginTimeoutMinutes, secureDataFormat1);
 
             //Custom cookie manager so we can filter requests
-            CookieManager = new BackOfficeCookieManager(umbracoContextAccessor, runtimeState, globalSettings, explicitPaths);
+            CookieManager = new BackOfficeCookieManager(umbracoContextAccessor, runtimeState, globalSettings, ioHelper, explicitPaths);
         }
 
         /// <summary>

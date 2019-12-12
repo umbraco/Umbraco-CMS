@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.PropertyEditors;
+﻿using Umbraco.Core.IO;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -6,5 +7,9 @@ namespace Umbraco.Web.PropertyEditors
     /// Represents the configuration editor for the email address value editor.
     /// </summary>
     public class EmailAddressConfigurationEditor : ConfigurationEditor<EmailAddressConfiguration>
-    { }
+    {
+        public EmailAddressConfigurationEditor(IIOHelper ioHelper) : base(ioHelper)
+        {
+        }
+    }
 }

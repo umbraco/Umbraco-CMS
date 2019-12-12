@@ -3,6 +3,7 @@ using System.Reflection;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Composing;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded.Building;
 using Umbraco.ModelsBuilder.Embedded.Configuration;
@@ -28,9 +29,10 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
                 return;
             }
 
+
             composition.Components().Append<ModelsBuilderComponent>();
             composition.Register<UmbracoServices>(Lifetime.Singleton);
-            composition.Configs.Add<IModelsBuilderConfig>(() => new ModelsBuilderConfig());
+            composition.Configs.Add<IModelsBuilderConfig>(() => new ModelsBuilderConfig(composition.IOHelper));
             composition.RegisterUnique<ModelsGenerator>();
             composition.RegisterUnique<LiveModelsProvider>();
             composition.RegisterUnique<OutOfDateModelsStatus>();

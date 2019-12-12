@@ -106,6 +106,7 @@ namespace Umbraco.Tests.Testing
         protected ILogger Logger => Factory.GetInstance<ILogger>();
 
         protected IIOHelper IOHelper { get; private set; }
+        protected IShortStringHelper ShortStringHelper { get; private set; }
         protected IUmbracoVersion UmbracoVersion { get; private set; }
 
         protected ITypeFinder TypeFinder { get; private set; }
@@ -145,12 +146,14 @@ namespace Umbraco.Tests.Testing
             var (logger, profiler) = GetLoggers(Options.Logger);
             var proflogger = new ProfilingLogger(logger, profiler);
             IOHelper = TestHelper.IOHelper;
+            ShortStringHelper = TestHelper.ShortStringHelper;
 
             TypeFinder = new TypeFinder(logger);
             var appCaches = GetAppCaches();
             var globalSettings = SettingsForTests.GetDefaultGlobalSettings();
+            var hostingSettings = SettingsForTests.GetDefaultHostingSettings();
             var settings = SettingsForTests.GetDefaultUmbracoSettings();
-            IHostingEnvironment hostingEnvironment = new AspNetHostingEnvironment(globalSettings, IOHelper);
+            IHostingEnvironment hostingEnvironment = new AspNetHostingEnvironment(hostingSettings);
             IBackOfficeInfo backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, IOHelper, settings, logger);
             IIpResolver ipResolver = new AspNetIpResolver();
             UmbracoVersion = new UmbracoVersion(globalSettings);
@@ -158,9 +161,10 @@ namespace Umbraco.Tests.Testing
 
             var register = TestHelper.GetRegister();
 
-            Composition = new Composition(register, typeLoader, proflogger, ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs());
+            Composition = new Composition(register, typeLoader, proflogger, ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
 
 
+            Composition.RegisterUnique(ShortStringHelper);
             Composition.RegisterUnique(IOHelper);
             Composition.RegisterUnique(UmbracoVersion);
             Composition.RegisterUnique(TypeFinder);
@@ -347,6 +351,7 @@ namespace Umbraco.Tests.Testing
         {
             Composition.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
             Composition.Configs.Add(SettingsForTests.GetDefaultGlobalSettings);
+            Composition.Configs.Add(SettingsForTests.GetDefaultHostingSettings);
             //Composition.Configs.Add<IUserPasswordConfiguration>(() => new DefaultUserPasswordConfig());
         }
 
@@ -372,10 +377,8 @@ namespace Umbraco.Tests.Testing
 
             var logger = Mock.Of<ILogger>();
             var scheme = Mock.Of<IMediaPathScheme>();
-            var config = Mock.Of<IContentSection>();
-            var ioHelper = Mock.Of<IIOHelper>();
 
-            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), config, scheme, logger, ioHelper);
+            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), scheme, logger, ShortStringHelper);
             Composition.RegisterUnique<IMediaFileSystem>(factory => mediaFileSystem);
 
             // no factory (noop)

@@ -4,6 +4,7 @@ using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Composing;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -16,14 +17,14 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigurationEditor{TConfiguration}"/> class.
         /// </summary>
-        protected ConfigurationEditor()
-            : base(DiscoverFields())
+        protected ConfigurationEditor(IIOHelper ioHelper)
+            : base(DiscoverFields(ioHelper))
         { }
 
         /// <summary>
         /// Discovers fields from configuration properties marked with the field attribute.
         /// </summary>
-        private static List<ConfigurationField> DiscoverFields()
+        private static List<ConfigurationField> DiscoverFields(IIOHelper ioHelper)
         {
             var fields = new List<ConfigurationField>();
             var properties = TypeHelper.CachedDiscoverableProperties(typeof(TConfiguration));
@@ -35,7 +36,7 @@ namespace Umbraco.Core.PropertyEditors
 
                 ConfigurationField field;
 
-                var attributeView = Current.IOHelper.ResolveVirtualUrl(attribute.View);
+                var attributeView = ioHelper.ResolveVirtualUrl(attribute.View);
                 // if the field does not have its own type, use the base type
                 if (attribute.Type == null)
                 {

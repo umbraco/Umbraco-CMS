@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
@@ -32,6 +33,7 @@ namespace Umbraco.Web.PropertyEditors
         private readonly RichTextEditorPastedImages _pastedImages;
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizationService _localizationService;
+        private readonly IIOHelper _ioHelper;
         private ILogger _logger;
         private readonly IMediaService _mediaService;
         private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
@@ -46,7 +48,10 @@ namespace Umbraco.Web.PropertyEditors
             IUmbracoContextAccessor umbracoContextAccessor,
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
-            HtmlImageSourceParser imageSourceParser, HtmlLocalLinkParser localLinkParser, RichTextEditorPastedImages pastedImages) : base(logger)
+            HtmlImageSourceParser imageSourceParser,
+            HtmlLocalLinkParser localLinkParser,
+            RichTextEditorPastedImages pastedImages,
+            IIOHelper ioHelper) : base(logger)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _imageSourceParser = imageSourceParser;
@@ -54,6 +59,7 @@ namespace Umbraco.Web.PropertyEditors
             _pastedImages = pastedImages;
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
+            _ioHelper = ioHelper;
             _logger = logger;
             _mediaService = mediaService;
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
@@ -65,7 +71,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <returns></returns>
         protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider, _umbracoContextAccessor, _logger, _dataTypeService, _localizationService, _imageSourceParser, _localLinkParser, _pastedImages);
 
-        protected override IConfigurationEditor CreateConfigurationEditor() => new RichTextConfigurationEditor();
+        protected override IConfigurationEditor CreateConfigurationEditor() => new RichTextConfigurationEditor(_ioHelper);
 
         public override IPropertyIndexValueFactory PropertyIndexValueFactory => new RichTextPropertyIndexValueFactory();
 

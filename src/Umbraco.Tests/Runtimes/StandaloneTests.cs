@@ -74,7 +74,7 @@ namespace Umbraco.Tests.Runtimes
 
             // create the register and the composition
             var register = TestHelper.GetRegister();
-            var composition = new Composition(register, typeLoader, profilingLogger, runtimeState, configs);
+            var composition = new Composition(register, typeLoader, profilingLogger, runtimeState, configs, ioHelper, appCaches);
             composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper, umbracoVersion);
 
             // create the core runtime and have it compose itself
@@ -268,7 +268,7 @@ namespace Umbraco.Tests.Runtimes
 
             // create the register and the composition
             var register = TestHelper.GetRegister();
-            var composition = new Composition(register, typeLoader, profilingLogger, runtimeState, configs);
+            var composition = new Composition(register, typeLoader, profilingLogger, runtimeState, configs, ioHelper, appCaches);
             var umbracoVersion = TestHelper.GetUmbracoVersion();
             composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper, umbracoVersion);
 

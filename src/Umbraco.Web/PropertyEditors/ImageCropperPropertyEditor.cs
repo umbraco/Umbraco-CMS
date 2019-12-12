@@ -33,18 +33,20 @@ namespace Umbraco.Web.PropertyEditors
         private readonly IContentSection _contentSettings;
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizationService _localizationService;
+        private readonly IIOHelper _ioHelper;
         private readonly UploadAutoFillProperties _autoFillProperties;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ImageCropperPropertyEditor"/> class.
         /// </summary>
-        public ImageCropperPropertyEditor(ILogger logger, IMediaFileSystem mediaFileSystem, IContentSection contentSettings, IDataTypeService dataTypeService, ILocalizationService localizationService)
+        public ImageCropperPropertyEditor(ILogger logger, IMediaFileSystem mediaFileSystem, IContentSection contentSettings, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper)
             : base(logger)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
             _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
+            _ioHelper = ioHelper;
 
             // TODO: inject?
             _autoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, logger, _contentSettings);
@@ -60,7 +62,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Creates the corresponding preValue editor.
         /// </summary>
         /// <returns>The corresponding preValue editor.</returns>
-        protected override IConfigurationEditor CreateConfigurationEditor() => new ImageCropperConfigurationEditor();
+        protected override IConfigurationEditor CreateConfigurationEditor() => new ImageCropperConfigurationEditor(_ioHelper);
 
         /// <summary>
         /// Gets a value indicating whether a property is an image cropper field.

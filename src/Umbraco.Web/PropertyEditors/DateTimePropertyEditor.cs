@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
@@ -15,13 +16,17 @@ namespace Umbraco.Web.PropertyEditors
         Icon = "icon-time")]
     public class DateTimePropertyEditor : DataEditor
     {
+        private readonly IIOHelper _ioHelper;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DateTimePropertyEditor"/> class.
         /// </summary>
         /// <param name="logger"></param>
-        public DateTimePropertyEditor(ILogger logger)
+        public DateTimePropertyEditor(ILogger logger, IIOHelper ioHelper)
             : base(logger)
-        { }
+        {
+            _ioHelper = ioHelper;
+        }
 
         /// <inheritdoc />
         protected override IDataValueEditor CreateValueEditor()
@@ -32,6 +37,6 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         /// <inheritdoc />
-        protected override IConfigurationEditor CreateConfigurationEditor() => new DateTimeConfigurationEditor();
+        protected override IConfigurationEditor CreateConfigurationEditor() => new DateTimeConfigurationEditor(_ioHelper);
     }
 }

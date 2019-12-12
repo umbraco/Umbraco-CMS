@@ -5,13 +5,14 @@ using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
     internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerConfiguration>
     {
-        public ColorPickerConfigurationEditor()
+        public ColorPickerConfigurationEditor(IIOHelper ioHelper) : base(ioHelper)
         {
             var items = Fields.First(x => x.Key == "items");
 
@@ -109,7 +110,7 @@ namespace Umbraco.Web.PropertyEditors
                 var convertBool = useLabelObj.TryConvertTo<bool>();
                 if (convertBool.Success)
                     output.UseLabel = convertBool.Result;
-            }   
+            }
 
             // auto-assigning our ids, get next id from existing values
             var nextId = 1;

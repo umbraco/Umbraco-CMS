@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.IO;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
     internal class ContentPickerConfigurationEditor : ConfigurationEditor<ContentPickerConfiguration>
     {
-        public ContentPickerConfigurationEditor()
+        public ContentPickerConfigurationEditor(IIOHelper ioHelper) : base(ioHelper)
         {
             // configure fields
             // this is not part of ContentPickerConfiguration,
@@ -23,7 +24,7 @@ namespace Umbraco.Web.PropertyEditors
             // not part of ContentPickerConfiguration but used to configure the UI editor
             d["showEditButton"] = false;
             d["showPathOnHover"] = false;
-            d["idType"] = "udi"; 
+            d["idType"] = "udi";
 
             return d;
         }

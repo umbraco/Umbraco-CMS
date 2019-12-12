@@ -1,7 +1,10 @@
-﻿using Umbraco.Core.Models.PublishedContent;
+﻿using System.Web.WebPages;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Mvc
 {
     public abstract class UmbracoViewPage : UmbracoViewPage<IPublishedContent>
-    { }
+    {
+
+    }
 }

@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Web.Mvc;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Runtime;
 
@@ -14,7 +16,7 @@ namespace Umbraco.Tests.Runtimes
         {
             IList<IViewEngine> engines = new List<IViewEngine>
                 {
-                    new RenderViewEngine(),
+                    new RenderViewEngine(TestHelper.IOHelper),
                     new PluginViewEngine()
                 };
 
@@ -30,7 +32,7 @@ namespace Umbraco.Tests.Runtimes
         {
             IList<IViewEngine> engines = new List<IViewEngine>
                 {
-                    new RenderViewEngine(),
+                    new RenderViewEngine(TestHelper.IOHelper),
                     new PluginViewEngine()
                 };
 

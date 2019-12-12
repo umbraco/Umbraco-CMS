@@ -53,7 +53,10 @@ namespace Umbraco.Tests.PublishedContent
                     Mock.Of<IUmbracoContextAccessor>(),
                     Mock.Of<IDataTypeService>(),
                     Mock.Of<ILocalizationService>(),
-                    imageSourceParser, localLinkParser, pastedImages)) { Id = 1 });
+                    imageSourceParser,
+                    localLinkParser,
+                    pastedImages,
+                    IOHelper)) { Id = 1 });
 
 
             var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeService);

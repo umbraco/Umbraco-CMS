@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.IO;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
@@ -11,7 +12,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// Initializes a new instance of the <see cref="MediaPickerConfigurationEditor"/> class.
         /// </summary>
-        public MediaPickerConfigurationEditor()
+        public MediaPickerConfigurationEditor(IIOHelper ioHelper): base(ioHelper)
         {
             // configure fields
             // this is not part of ContentPickerConfiguration,

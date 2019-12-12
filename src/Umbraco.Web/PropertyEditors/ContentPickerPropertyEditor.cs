@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
@@ -21,17 +22,19 @@ namespace Umbraco.Web.PropertyEditors
     {
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizationService _localizationService;
+        private readonly IIOHelper _ioHelper;
 
-        public ContentPickerPropertyEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, ILogger logger)
+        public ContentPickerPropertyEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, ILogger logger, IIOHelper ioHelper)
             : base(logger)
         {
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
+            _ioHelper = ioHelper;
         }
 
         protected override IConfigurationEditor CreateConfigurationEditor()
         {
-            return new ContentPickerConfigurationEditor();
+            return new ContentPickerConfigurationEditor(_ioHelper);
         }
 
         protected override IDataValueEditor CreateValueEditor() => new ContentPickerPropertyValueEditor(_dataTypeService, _localizationService, Attribute);

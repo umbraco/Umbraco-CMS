@@ -5,12 +5,9 @@ using System.Web.Mvc;
 using System.Web.WebPages;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Dictionary;
-using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
@@ -233,6 +230,18 @@ namespace Umbraco.Web.Mvc
             }
 
             base.WriteLiteral(value);
+        }
+
+        public override void Write(object value)
+        {
+            if (value is IHtmlEncodedString htmlEncodedString)
+            {
+                base.WriteLiteral(htmlEncodedString.ToHtmlString());
+            }
+            else
+            {
+                base.Write(value);
+            }
         }
 
         public HelperResult RenderSection(string name, Func<dynamic, HelperResult> defaultContents)

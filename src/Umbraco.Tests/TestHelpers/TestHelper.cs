@@ -20,6 +20,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Net;
 using Umbraco.Web;
@@ -41,7 +42,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public static Configs GetConfigs()
         {
-            return GetConfigsFactory().Create();
+            return GetConfigsFactory().Create(IOHelper);
         }
         public static IRuntimeState GetRuntimeState()
         {
@@ -64,7 +65,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public static IConfigsFactory GetConfigsFactory()
         {
-            return new ConfigsFactory(IOHelper);
+            return new ConfigsFactory();
         }
 
         /// <summary>
@@ -82,7 +83,9 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-        public static IIOHelper IOHelper = new IOHelper();
+        public static IShortStringHelper ShortStringHelper => new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
+
+        public static IIOHelper IOHelper = new IOHelper(GetHostingEnvironment());
 
         /// <summary>
         /// Maps the given <paramref name="relativePath"/> making it rooted on <see cref="CurrentAssemblyDirectory"/>. <paramref name="relativePath"/> must start with <code>~/</code>
@@ -313,7 +316,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public static IHostingEnvironment GetHostingEnvironment()
         {
-            return new AspNetHostingEnvironment(SettingsForTests.GetDefaultGlobalSettings(), TestHelper.IOHelper);
+            return new AspNetHostingEnvironment(SettingsForTests.GetDefaultHostingSettings());
         }
 
         public static IIpResolver GetIpResolver()

@@ -45,10 +45,11 @@ namespace Umbraco.Tests.CoreThings
         [TestCase("http://www.domain.com/umbraco/test/legacyAjaxCalls.ashx?some=query&blah=js", "", true)]
         public void Is_Back_Office_Request(string input, string virtualPath, bool expected)
         {
-            Current.IOHelper.Root = virtualPath;
+            var ioHelper = TestHelper.IOHelper;
+            ioHelper.Root = virtualPath;
             var globalConfig = SettingsForTests.GenerateMockGlobalSettings();
             var source = new Uri(input);
-            Assert.AreEqual(expected, source.IsBackOfficeRequest(virtualPath, globalConfig));
+            Assert.AreEqual(expected, source.IsBackOfficeRequest(virtualPath, globalConfig, ioHelper));
         }
 
         [TestCase("http://www.domain.com/install", true)]
@@ -63,7 +64,7 @@ namespace Umbraco.Tests.CoreThings
         public void Is_Installer_Request(string input, bool expected)
         {
             var source = new Uri(input);
-            Assert.AreEqual(expected, source.IsInstallerRequest());
+            Assert.AreEqual(expected, source.IsInstallerRequest(TestHelper.IOHelper));
         }
 
         [TestCase("http://www.domain.com/foo/bar", "/", "http://www.domain.com/")]

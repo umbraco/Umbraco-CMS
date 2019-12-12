@@ -30,16 +30,20 @@ namespace Umbraco.Web.Runtime
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly SurfaceControllerTypeCollection _surfaceControllerTypes;
         private readonly UmbracoApiControllerTypeCollection _apiControllerTypes;
+        private readonly IHostingSettings _hostingSettings;
         private readonly IGlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IIOHelper _ioHelper;
 
-        public WebInitialComponent(IUmbracoContextAccessor umbracoContextAccessor, SurfaceControllerTypeCollection surfaceControllerTypes, UmbracoApiControllerTypeCollection apiControllerTypes, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
+        public WebInitialComponent(IUmbracoContextAccessor umbracoContextAccessor, SurfaceControllerTypeCollection surfaceControllerTypes, UmbracoApiControllerTypeCollection apiControllerTypes, IHostingSettings hostingSettings, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment, IIOHelper ioHelper)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _surfaceControllerTypes = surfaceControllerTypes;
             _apiControllerTypes = apiControllerTypes;
+            _hostingSettings = hostingSettings;
             _globalSettings = globalSettings;
             _hostingEnvironment = hostingEnvironment;
+            _ioHelper = ioHelper;
         }
 
         public void Initialize()
@@ -49,7 +53,7 @@ namespace Umbraco.Web.Runtime
 
             // When using a non-web runtime and this component is loaded ClientDependency explodes because it'll
             // want to access HttpContext.Current, which doesn't exist
-            if (Current.IOHelper.IsHosted)
+            if (Current.HostingEnvironment.IsHosted)
             {
                 ConfigureClientDependency();
             }
@@ -89,7 +93,7 @@ namespace Umbraco.Web.Runtime
             }
         }
 
-        private static void SetupMvcAndWebApi()
+        private void SetupMvcAndWebApi()
         {
             //don't output the MVC version header (security)
             MvcHandler.DisableMvcResponseHeader = true;
@@ -99,7 +103,7 @@ namespace Umbraco.Web.Runtime
             ControllerBuilder.Current.SetControllerFactory(controllerFactory);
 
             // set the render & plugin view engines
-            ViewEngines.Engines.Add(new RenderViewEngine());
+            ViewEngines.Engines.Add(new RenderViewEngine(_ioHelper));
             ViewEngines.Engines.Add(new PluginViewEngine());
 
             //set model binder
@@ -120,7 +124,7 @@ namespace Umbraco.Web.Runtime
 
             // Now we need to detect if we are running 'Umbraco.Core.LocalTempStorage' as EnvironmentTemp and in that case we want to change the CDF file
             // location to be there
-            if (_globalSettings.LocalTempStorageLocation == LocalTempStorage.EnvironmentTemp)
+            if (_hostingSettings.LocalTempStorageLocation == LocalTempStorage.EnvironmentTemp)
             {
                 var cachePath = _hostingEnvironment.LocalTempPath;
 

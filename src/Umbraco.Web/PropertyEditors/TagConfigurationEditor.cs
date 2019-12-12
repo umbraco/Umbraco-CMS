@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
@@ -13,7 +14,7 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     public class TagConfigurationEditor : ConfigurationEditor<TagConfiguration>
     {
-        public TagConfigurationEditor(ManifestValueValidatorCollection validators)
+        public TagConfigurationEditor(ManifestValueValidatorCollection validators, IIOHelper ioHelper) : base(ioHelper)
         {
             Field(nameof(TagConfiguration.Group)).Validators.Add(new RequiredValidator());
             Field(nameof(TagConfiguration.StorageType)).Validators.Add(new RequiredValidator());

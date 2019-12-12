@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Macros
             //Current.ApplicationContext = new ApplicationContext(cacheHelper, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             Current.Reset();
-            Current.UnlockConfigs(TestHelper.GetConfigsFactory());
+            Current.UnlockConfigs(TestHelper.GetConfigsFactory(), TestHelper.IOHelper);
             Current.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
         }
 

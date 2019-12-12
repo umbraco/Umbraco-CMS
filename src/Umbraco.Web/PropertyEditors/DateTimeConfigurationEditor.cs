@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
@@ -18,6 +19,10 @@ namespace Umbraco.Web.PropertyEditors
             d["pickTime"] = format.ContainsAny(new string[] { "H", "m", "s" });
 
             return d;
+        }
+
+        public DateTimeConfigurationEditor(IIOHelper ioHelper) : base(ioHelper)
+        {
         }
     }
 }

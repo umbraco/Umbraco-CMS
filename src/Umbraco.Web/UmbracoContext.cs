@@ -8,6 +8,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
@@ -23,6 +24,7 @@ namespace Umbraco.Web
     public class UmbracoContext : DisposableObjectSlim, IDisposeOnRequestEnd
     {
         private readonly IGlobalSettings _globalSettings;
+        private readonly IIOHelper _ioHelper;
         private readonly Lazy<IPublishedSnapshot> _publishedSnapshot;
         private string _previewToken;
         private bool? _previewing;
@@ -38,7 +40,8 @@ namespace Umbraco.Web
             IEnumerable<IUrlProvider> urlProviders,
             IEnumerable<IMediaUrlProvider> mediaUrlProviders,
             IGlobalSettings globalSettings,
-            IVariationContextAccessor variationContextAccessor)
+            IVariationContextAccessor variationContextAccessor,
+            IIOHelper ioHelper)
         {
             if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
             if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
@@ -48,6 +51,7 @@ namespace Umbraco.Web
             if (mediaUrlProviders == null) throw new ArgumentNullException(nameof(mediaUrlProviders));
             VariationContextAccessor = variationContextAccessor ??  throw new ArgumentNullException(nameof(variationContextAccessor));
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
+            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
 
             // ensure that this instance is disposed when the request terminates, though we *also* ensure
             // this happens in the Umbraco module since the UmbracoCOntext is added to the HttpContext items.
@@ -282,7 +286,7 @@ namespace Umbraco.Web
         {
             var request = GetRequestFromContext();
             if (request?.Url != null
-                && request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath, _globalSettings) == false
+                && request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath, _globalSettings, _ioHelper) == false
                 && Security.CurrentUser != null)
             {
                 var previewToken = request.GetPreviewCookieValue(); // may be null or empty

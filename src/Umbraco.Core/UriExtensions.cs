@@ -20,7 +20,8 @@ namespace Umbraco.Core
         ///  The current application path or VirtualPath
         ///  </param>
         /// <param name="globalSettings"></param>
-        /// <returns></returns>
+        ///  <param name="ioHelper"></param>
+        ///  <returns></returns>
         ///  <remarks>
         ///  There are some special routes we need to check to properly determine this:
         ///
@@ -39,7 +40,7 @@ namespace Umbraco.Core
         ///      But if we've got this far we'll just have to assume it's front-end anyways.
         ///
         ///  </remarks>
-        internal static bool IsBackOfficeRequest(this Uri url, string applicationPath, IGlobalSettings globalSettings)
+        internal static bool IsBackOfficeRequest(this Uri url, string applicationPath, IGlobalSettings globalSettings, IIOHelper ioHelper)
         {
             applicationPath = applicationPath ?? string.Empty;
 
@@ -52,7 +53,7 @@ namespace Umbraco.Core
             //if not, then def not back office
             if (isUmbracoPath == false) return false;
 
-            var mvcArea = globalSettings.GetUmbracoMvcArea(Current.IOHelper);
+            var mvcArea = globalSettings.GetUmbracoMvcArea(ioHelper);
             //if its the normal /umbraco path
             if (urlPath.InvariantEquals("/" + mvcArea)
                 || urlPath.InvariantEquals("/" + mvcArea + "/"))
@@ -107,8 +108,9 @@ namespace Umbraco.Core
         /// Checks if the current uri is an install request
         /// </summary>
         /// <param name="url"></param>
+        /// <param name="ioHelper"></param>
         /// <returns></returns>
-        internal static bool IsInstallerRequest(this Uri url)
+        internal static bool IsInstallerRequest(this Uri url, IIOHelper ioHelper)
         {
             var authority = url.GetLeftPart(UriPartial.Authority);
             var afterAuthority = url.GetLeftPart(UriPartial.Query)
@@ -116,7 +118,7 @@ namespace Umbraco.Core
                                     .TrimStart("/");
 
             //check if this is in the umbraco back office
-            return afterAuthority.InvariantStartsWith(Current.IOHelper.ResolveUrl("~/install").TrimStart("/"));
+            return afterAuthority.InvariantStartsWith(ioHelper.ResolveUrl("~/install").TrimStart("/"));
         }
 
         /// <summary>

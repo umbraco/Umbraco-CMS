@@ -58,11 +58,11 @@ namespace Umbraco.Tests.PublishedContent
 
             var dataTypeService = new TestObjects.TestDataTypeService(
                 new DataType(new VoidEditor(logger)) { Id = 1 },
-                new DataType(new TrueFalsePropertyEditor(logger)) { Id = 1001 },
-                new DataType(new RichTextPropertyEditor(logger, mediaService, contentTypeBaseServiceProvider, umbracoContextAccessor, Mock.Of<IDataTypeService>(), localizationService, imageSourceParser, linkParser, pastedImages)) { Id = 1002 },
+                new DataType(new TrueFalsePropertyEditor(logger, IOHelper)) { Id = 1001 },
+                new DataType(new RichTextPropertyEditor(logger, mediaService, contentTypeBaseServiceProvider, umbracoContextAccessor, Mock.Of<IDataTypeService>(), localizationService, imageSourceParser, linkParser, pastedImages, IOHelper)) { Id = 1002 },
                 new DataType(new IntegerPropertyEditor(logger)) { Id = 1003 },
-                new DataType(new TextboxPropertyEditor(logger, Mock.Of<IDataTypeService>(), localizationService)) { Id = 1004 },
-                new DataType(new MediaPickerPropertyEditor(logger, Mock.Of<IDataTypeService>(), localizationService)) { Id = 1005 });
+                new DataType(new TextboxPropertyEditor(logger, Mock.Of<IDataTypeService>(), localizationService, IOHelper)) { Id = 1004 },
+                new DataType(new MediaPickerPropertyEditor(logger, Mock.Of<IDataTypeService>(), localizationService, IOHelper)) { Id = 1005 });
             Composition.RegisterUnique<IDataTypeService>(f => dataTypeService);
         }
 

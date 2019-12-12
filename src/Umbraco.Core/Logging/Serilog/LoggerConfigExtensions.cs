@@ -25,7 +25,7 @@ namespace Umbraco.Core.Logging.Serilog
         /// </summary>
         /// <param name="logConfig">A Serilog LoggerConfiguration</param>
         /// <param name="hostingEnvironment"></param>
-        public static LoggerConfiguration MinimalConfiguration(this LoggerConfiguration logConfig, IHostingEnvironment hostingEnvironment)
+        public static LoggerConfiguration MinimalConfiguration(this LoggerConfiguration logConfig, IHostingEnvironment hostingEnvironment, ISessionIdResolver sessionIdResolver, Func<IRequestCache> requestCacheGetter)
         {
             global::Serilog.Debugging.SelfLog.Enable(msg => System.Diagnostics.Debug.WriteLine(msg));
 
@@ -42,9 +42,9 @@ namespace Umbraco.Core.Logging.Serilog
                 .Enrich.WithProperty("AppDomainAppId", hostingEnvironment.ApplicationId.ReplaceNonAlphanumericChars(string.Empty))
                 .Enrich.WithProperty("MachineName", Environment.MachineName)
                 .Enrich.With<Log4NetLevelMapperEnricher>()
-                .Enrich.With(new HttpSessionIdEnricher(new Lazy<ISessionIdResolver>(() => Current.SessionIdResolver)))
-                .Enrich.With(new HttpRequestNumberEnricher(new Lazy<IAppCache>(() => Current.AppCaches.RequestCache)))
-                .Enrich.With<HttpRequestIdEnricher>();
+                .Enrich.With(new HttpSessionIdEnricher(sessionIdResolver))
+                .Enrich.With(new HttpRequestNumberEnricher(requestCacheGetter))
+                .Enrich.With(new HttpRequestIdEnricher(requestCacheGetter));
 
             return logConfig;
         }

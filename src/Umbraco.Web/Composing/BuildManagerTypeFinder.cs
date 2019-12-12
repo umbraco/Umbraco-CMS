@@ -11,6 +11,7 @@ using System.Web.Compilation;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 
@@ -24,15 +25,16 @@ namespace Umbraco.Web.Composing
     /// </remarks>
     internal class BuildManagerTypeFinder : TypeFinder, ITypeFinder
     {
-        
-        public BuildManagerTypeFinder(IIOHelper ioHelper, ILogger logger, ITypeFinderConfig typeFinderConfig = null) : base(logger, typeFinderConfig)
+
+        public BuildManagerTypeFinder(IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, ILogger logger, ITypeFinderConfig typeFinderConfig = null) : base(logger, typeFinderConfig)
         {
             if (ioHelper == null) throw new ArgumentNullException(nameof(ioHelper));
+            if (hostingEnvironment == null) throw new ArgumentNullException(nameof(hostingEnvironment));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
 
             _allAssemblies = new Lazy<HashSet<Assembly>>(() =>
             {
-                var isHosted = ioHelper.IsHosted;
+                var isHosted = hostingEnvironment.IsHosted;
                 try
                 {
                     if (isHosted)

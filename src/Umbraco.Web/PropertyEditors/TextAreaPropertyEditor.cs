@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -19,21 +20,23 @@ namespace Umbraco.Web.PropertyEditors
     {
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizationService _localizationService;
+        private readonly IIOHelper _ioHelper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TextAreaPropertyEditor"/> class.
         /// </summary>
-        public TextAreaPropertyEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService)
+        public TextAreaPropertyEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper)
             : base(logger)
         {
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
+            _ioHelper = ioHelper;
         }
 
         /// <inheritdoc />
         protected override IDataValueEditor CreateValueEditor() => new TextOnlyValueEditor(_dataTypeService, _localizationService, Attribute);
 
         /// <inheritdoc />
-        protected override IConfigurationEditor CreateConfigurationEditor() => new TextAreaConfigurationEditor();
+        protected override IConfigurationEditor CreateConfigurationEditor() => new TextAreaConfigurationEditor(_ioHelper);
     }
 }

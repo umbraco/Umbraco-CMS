@@ -4,9 +4,11 @@ using System.Reflection;
 using System.Threading;
 using Serilog;
 using Serilog.Events;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Diagnostics;
 using Umbraco.Core.Hosting;
+using Umbraco.Net;
 
 namespace Umbraco.Core.Logging.Serilog
 {
@@ -36,11 +38,11 @@ namespace Umbraco.Core.Logging.Serilog
         /// Creates a logger with some pre-defined configuration and remainder from config file
         /// </summary>
         /// <remarks>Used by UmbracoApplicationBase to get its logger.</remarks>
-        public static SerilogLogger CreateWithDefaultConfiguration(IHostingEnvironment hostingEnvironment)
+        public static SerilogLogger CreateWithDefaultConfiguration(IHostingEnvironment hostingEnvironment, ISessionIdResolver sessionIdResolver, Func<IRequestCache> requestCacheGetter)
         {
             var loggerConfig = new LoggerConfiguration();
             loggerConfig
-                .MinimalConfiguration(hostingEnvironment)
+                .MinimalConfiguration(hostingEnvironment, sessionIdResolver, requestCacheGetter)
                 .ReadFromConfigFile()
                 .ReadFromUserConfigFile();
 

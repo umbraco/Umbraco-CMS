@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
@@ -18,15 +19,17 @@ namespace Umbraco.Web.PropertyEditors
     {
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizationService _localizationService;
+        private readonly IIOHelper _ioHelper;
 
-        public MultiNodeTreePickerPropertyEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService)
+        public MultiNodeTreePickerPropertyEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper)
             : base(logger)
         {
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
+            _ioHelper = ioHelper;
         }
 
-        protected override IConfigurationEditor CreateConfigurationEditor() => new MultiNodePickerConfigurationEditor();
+        protected override IConfigurationEditor CreateConfigurationEditor() => new MultiNodePickerConfigurationEditor(_ioHelper);
 
         protected override IDataValueEditor CreateValueEditor() => new MultiNodeTreePickerPropertyValueEditor(_dataTypeService, _localizationService, Attribute);
 

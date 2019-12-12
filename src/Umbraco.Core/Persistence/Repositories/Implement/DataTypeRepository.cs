@@ -7,6 +7,7 @@ using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
@@ -26,12 +27,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal class DataTypeRepository : NPocoRepositoryBase<int, IDataType>, IDataTypeRepository
     {
         private readonly Lazy<PropertyEditorCollection> _editors;
+        private readonly IIOHelper _ioHelper;
 
         // TODO: https://github.com/umbraco/Umbraco-CMS/issues/4237 - get rid of Lazy injection and fix circular dependencies
-        public DataTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, Lazy<PropertyEditorCollection> editors, ILogger logger)
+        public DataTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, Lazy<PropertyEditorCollection> editors, ILogger logger, IIOHelper ioHelper)
             : base(scopeAccessor, cache, logger)
         {
             _editors = editors;
+            _ioHelper = ioHelper;
         }
 
         #region Overrides of RepositoryBase<int,DataTypeDefinition>
@@ -55,7 +58,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             var dtos = Database.Fetch<DataTypeDto>(dataTypeSql);
-            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors.Value, Logger)).ToArray();
+            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors.Value, Logger,_ioHelper)).ToArray();
         }
 
         protected override IEnumerable<IDataType> PerformGetByQuery(IQuery<IDataType> query)
@@ -66,7 +69,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             var dtos = Database.Fetch<DataTypeDto>(sql);
 
-            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors.Value, Logger)).ToArray();
+            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors.Value, Logger, _ioHelper)).ToArray();
         }
 
         #endregion

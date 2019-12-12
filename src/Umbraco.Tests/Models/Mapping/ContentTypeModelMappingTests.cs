@@ -7,6 +7,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Models.ContentEditing;
@@ -32,7 +33,7 @@ namespace Umbraco.Tests.Models.Mapping
             base.Compose();
 
             // create and register a fake property editor collection to return fake property editors
-            var editors = new DataEditor[] { new TextboxPropertyEditor(Mock.Of<ILogger>(), _dataTypeService.Object, _localizationService.Object), };
+            var editors = new DataEditor[] { new TextboxPropertyEditor(Mock.Of<ILogger>(), _dataTypeService.Object, _localizationService.Object, IOHelper), };
             var dataEditors = new DataEditorCollection(editors);
             _editorsMock = new Mock<PropertyEditorCollection>(dataEditors);
             _editorsMock.Setup(x => x[It.IsAny<string>()]).Returns(editors[0]);

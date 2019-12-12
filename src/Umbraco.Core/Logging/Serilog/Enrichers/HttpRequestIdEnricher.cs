@@ -1,6 +1,8 @@
 ﻿using System;
 using Serilog.Core;
 using Serilog.Events;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Logging.Serilog.Enrichers
 {
@@ -11,6 +13,13 @@ namespace Umbraco.Core.Logging.Serilog.Enrichers
     /// </summary>
     internal class HttpRequestIdEnricher : ILogEventEnricher
     {
+        private readonly Func<IRequestCache> _requestCacheGetter;
+
+        public HttpRequestIdEnricher(Func<IRequestCache> requestCacheGetter)
+        {
+            _requestCacheGetter = requestCacheGetter;
+        }
+
         /// <summary>
         /// The property name added to enriched log events.
         /// </summary>
@@ -23,14 +32,17 @@ namespace Umbraco.Core.Logging.Serilog.Enrichers
         /// <param name="propertyFactory">Factory for creating new properties to add to the event.</param>
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
         {
-            if (logEvent == null) throw new ArgumentNullException("logEvent");
+            if (logEvent == null) throw new ArgumentNullException(nameof(logEvent));
+
+            var requestCache = _requestCacheGetter();
+            if(requestCache is null) return;
 
             Guid requestId;
-            if (!LogHttpRequest.TryGetCurrentHttpRequestId(out requestId))
+            if (!LogHttpRequest.TryGetCurrentHttpRequestId(out requestId, requestCache))
                 return;
 
             var requestIdProperty = new LogEventProperty(HttpRequestIdPropertyName, new ScalarValue(requestId));
             logEvent.AddPropertyIfAbsent(requestIdProperty);
-        }        
+        }
     }
 }

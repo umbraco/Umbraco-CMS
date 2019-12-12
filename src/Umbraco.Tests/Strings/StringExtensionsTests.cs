@@ -57,7 +57,7 @@ namespace Umbraco.Tests.Strings
         [TestCase("/Test.js function(){return true;}", false)]
         public void Detect_Is_JavaScript_Path(string input, bool result)
         {
-            var output = input.DetectIsJavaScriptPath();
+            var output = input.DetectIsJavaScriptPath(IOHelper);
             Assert.AreEqual(result, output.Success);
         }
 

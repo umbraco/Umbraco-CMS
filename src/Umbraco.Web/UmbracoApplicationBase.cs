@@ -4,12 +4,14 @@ using System.Threading;
 using System.Web;
 using System.Web.Hosting;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Hosting;
 
 namespace Umbraco.Web
@@ -27,17 +29,25 @@ namespace Umbraco.Web
         private readonly IProfiler _profiler;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IBackOfficeInfo _backOfficeInfo;
+        private IFactory _factory;
 
         protected UmbracoApplicationBase()
         {
-            _ioHelper = new IOHelper();
-            _configs = new ConfigsFactory(_ioHelper).Create();
-            var globalSettings = _configs.Global();
+
+
+
+            var configFactory = new ConfigsFactory();
+
+            var hostingSettings = configFactory.HostingSettings;
+
+            _hostingEnvironment = new AspNetHostingEnvironment(hostingSettings);
+            _ioHelper = new IOHelper(_hostingEnvironment);
+            _configs = configFactory.Create(_ioHelper);
 
             _profiler = new LogProfiler(_logger);
-            _hostingEnvironment = new AspNetHostingEnvironment(globalSettings, _ioHelper);
-            _logger = SerilogLogger.CreateWithDefaultConfiguration(_hostingEnvironment);
-            _backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, _ioHelper, _configs.Settings(), _logger);
+
+            _logger = SerilogLogger.CreateWithDefaultConfiguration(_hostingEnvironment, new AspNetSessionIdResolver(), () => _factory?.GetInstance<IRequestCache>());
+            _backOfficeInfo = new AspNetBackOfficeInfo(_configs.Global(), _ioHelper, _configs.Settings(), _logger);
         }
 
         protected UmbracoApplicationBase(ILogger logger, Configs configs, IIOHelper ioHelper, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
@@ -100,7 +110,7 @@ namespace Umbraco.Web
             // the boot manager is responsible for registrations
             var register = GetRegister(globalSettings);
             _runtime = GetRuntime(_configs, umbracoVersion, _ioHelper, _logger, _profiler, _hostingEnvironment, _backOfficeInfo);
-            _runtime.Boot(register);
+            _factory = _runtime.Boot(register);
         }
 
         // called by ASP.NET (auto event wireup) once per app domain

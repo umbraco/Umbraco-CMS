@@ -4,6 +4,7 @@ using System.Text;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
@@ -13,6 +14,7 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Core.Composing.CompositionExtensions;
+using Umbraco.Core.Strings;
 using FileSystems = Umbraco.Core.IO.FileSystems;
 
 namespace Umbraco.Tests.IO
@@ -28,11 +30,12 @@ namespace Umbraco.Tests.IO
         {
             _register = TestHelper.GetRegister();
 
-            var composition = new Composition(_register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs());
+            var composition = new Composition(_register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
 
             composition.Register(_ => Mock.Of<ILogger>());
             composition.Register(_ => Mock.Of<IDataTypeService>());
             composition.Register(_ => Mock.Of<IContentSection>());
+            composition.Register(_ => TestHelper.ShortStringHelper);
             composition.Register(_ => TestHelper.IOHelper);
             composition.RegisterUnique<IMediaPathScheme, UniqueMediaPathScheme>();
             composition.RegisterUnique(TestHelper.IOHelper);

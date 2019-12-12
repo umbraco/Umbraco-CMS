@@ -108,9 +108,10 @@ namespace Umbraco.Tests.TestHelpers
             if (eventMessagesFactory == null) throw new ArgumentNullException(nameof(eventMessagesFactory));
 
             var scheme = Mock.Of<IMediaPathScheme>();
-            var config = Mock.Of<IContentSection>();
 
-            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), config, scheme, logger, ioHelper);
+            var shortStringHelper = Mock.Of<IShortStringHelper>();
+
+            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), scheme, logger, shortStringHelper);
 
             var externalLoginService = GetLazyService<IExternalLoginService>(factory, c => new ExternalLoginService(scopeProvider, logger, eventMessagesFactory, GetRepo<IExternalLoginRepository>(c)));
             var publicAccessService = GetLazyService<IPublicAccessService>(factory, c => new PublicAccessService(scopeProvider, logger, eventMessagesFactory, GetRepo<IPublicAccessRepository>(c)));
