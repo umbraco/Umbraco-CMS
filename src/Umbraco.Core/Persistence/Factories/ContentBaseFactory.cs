@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories;
@@ -10,7 +11,7 @@ namespace Umbraco.Core.Persistence.Factories
 {
     internal class ContentBaseFactory
     {
-        private static readonly Regex MediaPathPattern = new Regex(@"(/media/.+?)(?:['""]|$)", RegexOptions.Compiled);
+        private static readonly Regex MediaPathPattern = new Regex("(" + SystemDirectories.Media.TrimStart("~").EnsureEndsWith("/") + ".+?)(?:['\"]|$)", RegexOptions.IgnoreCase);
 
         /// <summary>
         /// Builds an IContent item from a dto and content type.
