@@ -79,34 +79,6 @@ namespace Umbraco.Core.Persistence
 
             return unwrapped;
         }
-
-        public static string GetConnStringExSecurityInfo(this IDbConnection connection)
-        {
-            try
-            {
-                switch (connection)
-                {
-                    case SqlConnection _:
-                    {
-                        var builder = new SqlConnectionStringBuilder(connection.ConnectionString);
-                        return $"DataSource: {builder.DataSource}, InitialCatalog: {builder.InitialCatalog}";
-                    }
-                    // case SqlCeConnection _:
-                    // {
-                    //     var builder = new SqlCeConnectionStringBuilder(connection.ConnectionString);
-                    //     return $"DataSource: {builder.DataSource}";
-                    // }
-                    default:
-                        throw new NotSupportedException("TODO"); //TODO fix SqlCeConnection
-                }
-            }
-            catch (Exception ex)
-            {
-                Current.Logger.Warn(typeof(DbConnectionExtensions), ex, "Could not resolve connection string parameters");
-                return "(Could not resolve)";
-            }
-
-            throw new ArgumentException($"The connection type {connection.GetType()} is not supported");
-        }
+        
     }
 }

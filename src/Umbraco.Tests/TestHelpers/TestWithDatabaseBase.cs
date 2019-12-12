@@ -87,7 +87,7 @@ namespace Umbraco.Tests.TestHelpers
                     return TestObjects.GetDatabaseFactoryMock();
 
                 var lazyMappers = new Lazy<IMapperCollection>(f.GetInstance<IMapperCollection>);
-                var factory = new UmbracoDatabaseFactory(GetDbConnectionString(), GetDbProviderName(), f.GetInstance<ILogger>(), lazyMappers);
+                var factory = new UmbracoDatabaseFactory(GetDbConnectionString(), GetDbProviderName(), f.GetInstance<ILogger>(), lazyMappers, TestHelper.DbProviderFactoryCreator);
                 factory.ResetForTests();
                 return factory;
             });

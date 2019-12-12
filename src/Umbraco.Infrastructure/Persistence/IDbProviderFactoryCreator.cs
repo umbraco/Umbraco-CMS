@@ -1,5 +1,6 @@
 using System.Data.Common;
 using StackExchange.Profiling.Internal;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence
 {
@@ -7,5 +8,6 @@ namespace Umbraco.Core.Persistence
     {
         DbProviderFactory CreateFactory();
         DbProviderFactory CreateFactory(string providerName);
+        ISqlSyntaxProvider GetSqlSyntaxProvider(string providerName);
     }
 }

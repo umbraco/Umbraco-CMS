@@ -33,7 +33,8 @@ namespace Umbraco.Tests.Benchmarks
                 "server=.\\SQLExpress;database=YOURDB;user id=YOURUSER;password=YOURPASS",
                 Constants.DatabaseProviders.SqlServer,
                 logger,
-                new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())));
+                 new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())),
+                TestHelper.DbProviderFactoryCreator);
             return factory.CreateDatabase();
         }
 
@@ -43,7 +44,8 @@ namespace Umbraco.Tests.Benchmarks
                 cstr,
                 Constants.DatabaseProviders.SqlCe,
                 logger,
-                new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())));
+                new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())),
+                TestHelper.DbProviderFactoryCreator);
             return f.CreateDatabase();
         }
 

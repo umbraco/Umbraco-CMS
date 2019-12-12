@@ -99,10 +99,11 @@ namespace Umbraco.Core.Persistence
         /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
         /// </summary>
         /// <remarks>Used in tests.</remarks>
-        public UmbracoDatabaseFactory(string connectionString, string providerName, ILogger logger, Lazy<IMapperCollection> mappers)
+        public UmbracoDatabaseFactory(string connectionString, string providerName, ILogger logger, Lazy<IMapperCollection> mappers, IDbProviderFactoryCreator dbProviderFactoryCreator)
         {
             _mappers = mappers ?? throw new ArgumentNullException(nameof(mappers));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _dbProviderFactoryCreator = dbProviderFactoryCreator ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
 
             if (string.IsNullOrWhiteSpace(connectionString) || string.IsNullOrWhiteSpace(providerName))
             {
@@ -237,7 +238,7 @@ namespace Umbraco.Core.Persistence
             if (_databaseType == null)
                 throw new Exception($"Can't find an NPoco database type for provider name \"{_providerName}\".");
 
-            _sqlSyntax = GetSqlSyntaxProvider(_providerName);
+            _sqlSyntax = _dbProviderFactoryCreator.GetSqlSyntaxProvider(_providerName);
             if (_sqlSyntax == null)
                 throw new Exception($"Can't find a sql syntax provider for provider name \"{_providerName}\".");
 
@@ -276,19 +277,7 @@ namespace Umbraco.Core.Persistence
         private InitializedPocoDataBuilder GetPocoDataFactoryResolver(Type type, IPocoDataFactory factory)
             => new UmbracoPocoDataBuilder(type, _pocoMappers, _upgrading).Init();
 
-        // gets the sql syntax provider that corresponds, from attribute
-        private ISqlSyntaxProvider GetSqlSyntaxProvider(string providerName)
-        {
-            switch (providerName)
-            {
-                // case Constants.DbProviderNames.SqlCe:
-                //     return new SqlCeSyntaxProvider();
-                case Constants.DbProviderNames.SqlServer:
-                    return new SqlServerSyntaxProvider();
-                default:
-                    throw new InvalidOperationException($"Unknown provider name \"{providerName}\"");
-            }
-        }
+
 
         // method used by NPoco's UmbracoDatabaseFactory to actually create the database instance
         private UmbracoDatabase CreateDatabaseInstance()
