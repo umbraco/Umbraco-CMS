@@ -4,6 +4,7 @@ using System.Threading;
 using System.Web;
 using System.Web.Hosting;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
@@ -45,7 +46,7 @@ namespace Umbraco.Web
 
             _profiler = new LogProfiler(_logger);
 
-            _logger = SerilogLogger.CreateWithDefaultConfiguration(_hostingEnvironment, new AspNetSessionIdResolver(), () => _factory);
+            _logger = SerilogLogger.CreateWithDefaultConfiguration(_hostingEnvironment, new AspNetSessionIdResolver(), () => _factory?.GetInstance<IRequestCache>());
             _backOfficeInfo = new AspNetBackOfficeInfo(_configs.Global(), _ioHelper, _configs.Settings(), _logger);
 
             Umbraco.Composing.Current.Logger = _logger;

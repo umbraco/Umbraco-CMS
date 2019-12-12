@@ -48,7 +48,8 @@ namespace Umbraco.Web.PropertyEditors
             ILocalizationService localizationService,
             HtmlImageSourceParser imageSourceParser,
             RichTextEditorPastedImages pastedImages,
-            HtmlLocalLinkParser localLinkParser)
+            HtmlLocalLinkParser localLinkParser,
+            IIOHelper ioHelper)
             : base(logger, dataTypeService, localizationService, Current.Services.TextService, Current.ShortStringHelper)
         {
             _umbracoContextAccessor = umbracoContextAccessor;

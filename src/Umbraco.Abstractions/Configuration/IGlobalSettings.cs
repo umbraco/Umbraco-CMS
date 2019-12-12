@@ -1,14 +1,5 @@
 ﻿namespace Umbraco.Core.Configuration
 {
-    public interface IHostingSettings
-    {
-        bool DebugMode { get; }
-        /// <summary>
-        /// Gets the configuration for the location of temporary files.
-        /// </summary>
-        LocalTempStorage LocalTempStorageLocation { get; }
-    }
-
     /// <summary>
     /// Contains general settings information for the entire Umbraco instance based on information from  web.config appsettings
     /// </summary>

@@ -5,6 +5,7 @@ using System.Reflection;
 using System.IO;
 using System.Linq;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.IO
 {
@@ -78,10 +79,9 @@ namespace Umbraco.Core.IO
             }
         }
 
-        public string MapPath(string path, bool useHttpContext)
+        public string MapPath(string path)
         {
-            if (path == null) throw new ArgumentNullException("path");
-            useHttpContext = useHttpContext && _hostingEnvironment.IsHosted;
+            if (path == null) throw new ArgumentNullException(nameof(path));
 
             // Check if the path is already mapped
             if ((path.Length >= 2 && path[1] == Path.VolumeSeparatorChar)
@@ -93,7 +93,7 @@ namespace Umbraco.Core.IO
             // http://umbraco.codeplex.com/workitem/30946
 
 
-            if (useHttpContext && _hostingEnvironment.IsHosted)
+            if (_hostingEnvironment.IsHosted)
             {
                 var result = (String.IsNullOrEmpty(path) == false && (path.StartsWith("~") || path.StartsWith(Root)))
                         ?  _hostingEnvironment.MapPath(path)
@@ -113,10 +113,6 @@ namespace Umbraco.Core.IO
             return retval;
         }
 
-        public string MapPath(string path)
-        {
-            return MapPath(path, true);
-        }
 
         /// <summary>
         /// Verifies that the current filepath matches a directory where the user is allowed to edit a file.
@@ -276,7 +272,7 @@ namespace Umbraco.Core.IO
                 path = relativePath;
             }
 
-            return path.EnsurePathIsApplicationRootPrefixed();
+            return PathUtility.EnsurePathIsApplicationRootPrefixed(path);
         }
 
         private string _root;

@@ -11,7 +11,6 @@ namespace Umbraco.Core.IO
         string ResolveVirtualUrl(string path);
         string ResolveUrl(string virtualPath);
         Attempt<string> TryResolveUrl(string virtualPath);
-        string MapPath(string path, bool useHttpContext);
         string MapPath(string path);
 
 

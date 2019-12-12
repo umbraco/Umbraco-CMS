@@ -71,7 +71,7 @@ namespace Umbraco.Tests.Web.Controllers
                 }
                 else
                 {
-                    var baseDir = IOHelper.MapPath("", false).TrimEnd(IOHelper.DirSepChar);
+                    var baseDir = IOHelper.MapPath("").TrimEnd(IOHelper.DirSepChar);
                     HttpContext.Current = new HttpContext(new SimpleWorkerRequest("/", baseDir, "", "", new StringWriter()));
                 }
                 IOHelper.ForceNotHosted = true;

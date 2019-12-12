@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -31,7 +32,13 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// Initializes a new instance of the <see cref="MediaPickerPropertyEditor"/> class.
         /// </summary>
-        public MediaPickerPropertyEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper, IShortStringHelper shortStringHelper, ILocalizedTextService localizedTextService)
+        public MediaPickerPropertyEditor(
+            ILogger logger,
+            IDataTypeService dataTypeService,
+            ILocalizationService localizationService,
+            IIOHelper ioHelper,
+            IShortStringHelper shortStringHelper,
+            ILocalizedTextService localizedTextService)
             : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             _dataTypeService = dataTypeService;
