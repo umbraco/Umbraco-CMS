@@ -16,9 +16,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     /// </summary>
     public class SqlServerSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlServerSyntaxProvider>
     {
-        internal ServerVersionInfo ServerVersion { get; private set; }
+        public ServerVersionInfo ServerVersion { get; private set; }
 
-        internal enum VersionName
+        public enum VersionName
         {
             Invalid = -1,
             Unknown = 0,
@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             Other = 99
         }
 
-        internal enum EngineEdition
+        public enum EngineEdition
         {
             Unknown = 0,
             Desktop = 1,
@@ -43,7 +43,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             Azure = 5
         }
 
-        internal class ServerVersionInfo
+        public class ServerVersionInfo
         {
             public ServerVersionInfo()
             {
@@ -102,7 +102,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         internal ServerVersionInfo GetSetVersion(string connectionString, string providerName, ILogger logger)
         {
-            var factory = DbProviderFactories.GetFactory(providerName);
+            //var factory = DbProviderFactories.GetFactory(providerName);
+            var factory = SqlClientFactory.Instance;
             var connection = factory.CreateConnection();
 
             if (connection == null)

@@ -2,10 +2,9 @@
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
-using System.Data.SqlServerCe;
 using System.Linq;
 using StackExchange.Profiling.Data;
-using Umbraco.Core.Composing;
+using Umbraco.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.FaultHandling;
 
@@ -28,17 +27,13 @@ namespace Umbraco.Core.Persistence
             return Constants.DbProviderNames.SqlServer;
         }
 
-        public static bool IsConnectionAvailable(string connectionString, string providerName)
+    public static bool IsConnectionAvailable(string connectionString, DbProviderFactory factory)
         {
-            if (providerName != Constants.DbProviderNames.SqlCe
-                && providerName != Constants.DbProviderNames.SqlServer)
-                throw new NotSupportedException($"Provider \"{providerName}\" is not supported.");
 
-            var factory = DbProviderFactories.GetFactory(providerName);
             var connection = factory.CreateConnection();
 
             if (connection == null)
-                throw new InvalidOperationException($"Could not create a connection for provider \"{providerName}\".");
+                throw new InvalidOperationException($"Could not create a connection for provider \"{factory}\".");
 
             connection.ConnectionString = connectionString;
             using (connection)
@@ -46,6 +41,7 @@ namespace Umbraco.Core.Persistence
                 return connection.IsAvailable();
             }
         }
+
 
         public static bool IsAvailable(this IDbConnection connection)
         {
@@ -95,11 +91,13 @@ namespace Umbraco.Core.Persistence
                         var builder = new SqlConnectionStringBuilder(connection.ConnectionString);
                         return $"DataSource: {builder.DataSource}, InitialCatalog: {builder.InitialCatalog}";
                     }
-                    case SqlCeConnection _:
-                    {
-                        var builder = new SqlCeConnectionStringBuilder(connection.ConnectionString);
-                        return $"DataSource: {builder.DataSource}";
-                    }
+                    // case SqlCeConnection _:
+                    // {
+                    //     var builder = new SqlCeConnectionStringBuilder(connection.ConnectionString);
+                    //     return $"DataSource: {builder.DataSource}";
+                    // }
+                    default:
+                        throw new NotSupportedException("TODO"); //TODO fix SqlCeConnection
                 }
             }
             catch (Exception ex)

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Data.SqlServerCe;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -26,6 +25,7 @@ namespace Umbraco.Core.Persistence
         /// </remarks>
         public static void ConfigureNPocoBulkExtensions()
         {
+
             SqlBulkCopyHelper.SqlConnectionResolver = dbConn => GetTypedConnection<SqlConnection>(dbConn);
             SqlBulkCopyHelper.SqlTransactionResolver = dbTran => GetTypedTransaction<SqlTransaction>(dbTran);
         }
@@ -67,14 +67,15 @@ namespace Umbraco.Core.Persistence
             var pocoData = database.PocoDataFactory.ForType(typeof(T));
             if (pocoData == null) throw new InvalidOperationException("Could not find PocoData for " + typeof(T));
 
-            if (database.DatabaseType.IsSqlCe())
-            {
-                if (useNativeBulkInsert) return BulkInsertRecordsSqlCe(database, pocoData, recordsA);
-                // else, no other choice
-                foreach (var record in recordsA)
-                    database.Insert(record);
-                return recordsA.Length;
-            }
+            // if (database.DatabaseType.IsSqlCe())
+            // {
+            //     if (useNativeBulkInsert) return BulkInsertRecordsSqlCe(database, pocoData, recordsA);
+            //     // else, no other choice
+            //     foreach (var record in recordsA)
+            //         database.Insert(record);
+            //     return recordsA.Length;
+            // }
+            //TODO FIX Sql CE
 
             if (database.DatabaseType.IsSqlServer())
             {
@@ -166,61 +167,12 @@ namespace Umbraco.Core.Persistence
         /// <param name="column">The column.</param>
         /// <returns>A value indicating whether the column should be part of the bulk-insert.</returns>
         /// <remarks>Columns that are primary keys and auto-incremental, or result columns, are excluded from bulk-inserts.</remarks>
-        private static bool IncludeColumn(PocoData pocoData, KeyValuePair<string, PocoColumn> column)
+        public static bool IncludeColumn(PocoData pocoData, KeyValuePair<string, PocoColumn> column)
         {
             return column.Value.ResultColumn == false
                    && (pocoData.TableInfo.AutoIncrement == false || column.Key != pocoData.TableInfo.PrimaryKey);
         }
 
-        /// <summary>
-        /// Bulk-insert records using SqlCE TableDirect method.
-        /// </summary>
-        /// <typeparam name="T">The type of the records.</typeparam>
-        /// <param name="database">The database.</param>
-        /// <param name="pocoData">The PocoData object corresponding to the record's type.</param>
-        /// <param name="records">The records.</param>
-        /// <returns>The number of records that were inserted.</returns>
-        internal static int BulkInsertRecordsSqlCe<T>(IUmbracoDatabase database, PocoData pocoData, IEnumerable<T> records)
-        {
-            var columns = pocoData.Columns.ToArray();
-
-            // create command against the original database.Connection
-            using (var command = database.CreateCommand(database.Connection, CommandType.TableDirect, string.Empty))
-            {
-                command.CommandText = pocoData.TableInfo.TableName;
-                command.CommandType = CommandType.TableDirect; // TODO: why repeat?
-                // TODO: not supporting transactions?
-                //cmd.Transaction = GetTypedTransaction<SqlCeTransaction>(db.Connection.);
-
-                var count = 0;
-                var tCommand = GetTypedCommand<SqlCeCommand>(command); // execute on the real command
-
-                // seems to cause problems, I think this is primarily used for retrieval, not inserting.
-                // see: https://msdn.microsoft.com/en-us/library/system.data.sqlserverce.sqlcecommand.indexname%28v=vs.100%29.aspx?f=255&MSPPError=-2147217396
-                //tCommand.IndexName = pd.TableInfo.PrimaryKey;
-
-                using (var resultSet = tCommand.ExecuteResultSet(ResultSetOptions.Updatable))
-                {
-                    var updatableRecord = resultSet.CreateRecord();
-                    foreach (var record in records)
-                    {
-                        for (var i = 0; i < columns.Length; i++)
-                        {
-                            // skip the index if this shouldn't be included (i.e. PK)
-                            if (IncludeColumn(pocoData, columns[i]))
-                            {
-                                var val = columns[i].Value.GetValue(record);
-                                updatableRecord.SetValue(i, val);
-                            }
-                        }
-                        resultSet.Insert(updatableRecord);
-                        count++;
-                    }
-                }
-
-                return count;
-            }
-        }
 
         /// <summary>
         /// Bulk-insert records using SqlServer BulkCopy method.

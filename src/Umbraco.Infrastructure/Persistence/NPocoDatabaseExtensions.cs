@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.Data.SqlClient;
-using System.Data.SqlServerCe;
-using System.Linq;
 using System.Text.RegularExpressions;
 using NPoco;
 using StackExchange.Profiling.Data;
@@ -49,7 +46,7 @@ namespace Umbraco.Core.Persistence
         /// <para>Note that with proper transactions, if T2 begins after T1 then we are sure that the database will contain T2's value
         /// once T1 and T2 have completed. Whereas here, it could contain T1's value.</para>
         /// </remarks>
-        internal static RecordPersistenceType InsertOrUpdate<T>(this IUmbracoDatabase db, T poco)
+        public static RecordPersistenceType InsertOrUpdate<T>(this IUmbracoDatabase db, T poco)
             where T : class
         {
             return db.InsertOrUpdate(poco, null, null);
@@ -72,7 +69,7 @@ namespace Umbraco.Core.Persistence
         /// <para>Note that with proper transactions, if T2 begins after T1 then we are sure that the database will contain T2's value
         /// once T1 and T2 have completed. Whereas here, it could contain T1's value.</para>
         /// </remarks>
-        internal static RecordPersistenceType InsertOrUpdate<T>(this IUmbracoDatabase db,
+        public static RecordPersistenceType InsertOrUpdate<T>(this IUmbracoDatabase db,
             T poco,
             string updateCommand,
             object updateArgs)
@@ -197,7 +194,7 @@ namespace Umbraco.Core.Persistence
         /// <typeparam name="TCommand"></typeparam>
         /// <param name="command"></param>
         /// <returns></returns>
-        private static TCommand GetTypedCommand<TCommand>(IDbCommand command)
+        public static TCommand GetTypedCommand<TCommand>(IDbCommand command)
             where TCommand : class, IDbCommand
         {
             var c = command;

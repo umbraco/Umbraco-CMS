@@ -143,14 +143,14 @@ namespace Umbraco.Core.Persistence.FaultHandling.Strategies
                 {
                     return true;
                 }
-                else
-                {
-                    EntityException entityException;
-                    if ((entityException = ex as EntityException) != null)
-                    {
-                        return this.IsTransient(entityException.InnerException);
-                    }
-                }
+                // else
+                // {
+                //     EntityException entityException;
+                //     if ((entityException = ex as EntityException) != null)
+                //     {
+                //         return this.IsTransient(entityException.InnerException);
+                //     }
+                // }
             }
 
             return false;

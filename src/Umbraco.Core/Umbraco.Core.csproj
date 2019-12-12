@@ -91,7 +91,7 @@
     </PackageReference>
     <PackageReference Include="MiniProfiler" Version="4.0.138" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
-    <PackageReference Include="NPoco" Version="3.9.4" />
+    <PackageReference Include="NPoco" Version="4.0.2" />
     <PackageReference Include="Serilog">
       <Version>2.9.0</Version>
     </PackageReference>
@@ -200,7 +200,10 @@
     <Compile Include="Models\UserExtensions.cs" />
     <Compile Include="Packaging\PackageDataInstallation.cs" />
     <Compile Include="Packaging\PackageInstallation.cs" />
+    <Compile Include="Persistence\Mappers\MapperCollectionBuilder.cs" />
     <Compile Include="Persistence\Mappers\SimpleContentTypeMapper.cs" />
+    <Compile Include="Persistence\NPocoDatabaseExtensionsSqlCe.cs" />
+    <Compile Include="Persistence\SqlSyntax\SqlCeSyntaxProvider.cs" />
     <Compile Include="PropertyEditors\DataValueReferenceFactoryCollection.cs" />
     <Compile Include="PropertyEditors\DataValueReferenceFactoryCollectionBuilder.cs" />
     <Compile Include="PropertyEditors\IDataValueReference.cs" />
@@ -212,6 +215,12 @@
     <Compile Include="Persistence\Repositories\Implement\LanguageRepositoryExtensions.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RenameLabelAndRichTextPropertyEditorAliases.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
+    <Compile Include="Scoping\IScopeAccessor.cs" />
+    <Compile Include="Scoping\Scope.cs" />
+    <Compile Include="Scoping\ScopeContext.cs" />
+    <Compile Include="Scoping\ScopeContextualBase.cs" />
+    <Compile Include="Scoping\ScopeProvider.cs" />
+    <Compile Include="Scoping\ScopeReference.cs" />
     <Compile Include="Security\PasswordSecurity.cs" />
     <Compile Include="Services\Implement\PropertyValidationService.cs" />
     <Compile Include="StringExtensions.cs" />
@@ -287,9 +296,6 @@
     <Compile Include="Persistence\Mappers\ConsentMapper.cs" />
     <Compile Include="Persistence\Repositories\Implement\AuditEntryRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\ConsentRepository.cs" />
-    <Compile Include="Persistence\SqlContextExtensions.cs" />
-    <Compile Include="Persistence\SqlSyntaxExtensions.cs" />
-    <Compile Include="Persistence\UmbracoPocoDataBuilder.cs" />
     <Compile Include="RuntimeOptions.cs" />
     <Compile Include="Runtime\CoreRuntime.cs" />
     <Compile Include="Runtime\CoreInitialComponent.cs" />
@@ -340,7 +346,6 @@
     <Compile Include="Persistence\Dtos\Member2MemberGroupDto.cs" />
     <Compile Include="Persistence\Dtos\MemberDto.cs" />
     <Compile Include="Persistence\Dtos\MemberPropertyTypeDto.cs" />
-    <Compile Include="Persistence\Dtos\NodeDto.cs" />
     <Compile Include="Persistence\Dtos\PropertyDataDto.cs" />
     <Compile Include="Persistence\Dtos\PropertyTypeDto.cs" />
     <Compile Include="Persistence\Dtos\PropertyTypeGroupDto.cs" />
@@ -355,39 +360,9 @@
     <Compile Include="Persistence\Dtos\TemplateDto.cs" />
     <Compile Include="Persistence\Dtos\User2NodeNotifyDto.cs" />
     <Compile Include="Persistence\Dtos\User2UserGroupDto.cs" />
-    <Compile Include="Persistence\Dtos\UserDto.cs" />
-    <Compile Include="Persistence\Dtos\UserGroup2AppDto.cs" />
     <Compile Include="Persistence\Dtos\UserGroup2NodePermissionDto.cs" />
-    <Compile Include="Persistence\Dtos\UserGroupDto.cs" />
-    <Compile Include="Persistence\Dtos\UserStartNodeDto.cs" />
-    <Compile Include="Persistence\BulkDataReader.cs" />
-    <Compile Include="Persistence\DatabaseAnnotations\ConstraintAttribute.cs" />
-    <Compile Include="Persistence\DatabaseAnnotations\ForeignKeyAttribute.cs" />
-    <Compile Include="Persistence\DatabaseAnnotations\IndexAttribute.cs" />
-    <Compile Include="Persistence\DatabaseAnnotations\IndexTypes.cs" />
-    <Compile Include="Persistence\DatabaseAnnotations\LengthAttribute.cs" />
-    <Compile Include="Persistence\DatabaseAnnotations\NullSettingAttribute.cs" />
-    <Compile Include="Persistence\DatabaseAnnotations\NullSettings.cs" />
-    <Compile Include="Persistence\DatabaseAnnotations\PrimaryKeyColumnAttribute.cs" />
-    <Compile Include="Persistence\DatabaseAnnotations\ReferencesAttribute.cs" />
-    <Compile Include="Persistence\DatabaseAnnotations\SpecialDbTypeAttribute.cs" />
-    <Compile Include="Persistence\DatabaseAnnotations\SpecialDbTypes.cs" />
     <Compile Include="Persistence\DatabaseDebugHelper.cs" />
-    <Compile Include="Persistence\DatabaseModelDefinitions\ColumnDefinition.cs" />
-    <Compile Include="Persistence\DatabaseModelDefinitions\ConstraintDefinition.cs" />
-    <Compile Include="Persistence\DatabaseModelDefinitions\ConstraintType.cs" />
-    <Compile Include="Persistence\DatabaseModelDefinitions\DbIndexDefinition.cs" />
-    <Compile Include="Persistence\DatabaseModelDefinitions\DefinitionFactory.cs" />
-    <Compile Include="Persistence\DatabaseModelDefinitions\DeletionDataDefinition.cs" />
-    <Compile Include="Persistence\DatabaseModelDefinitions\ForeignKeyDefinition.cs" />
-    <Compile Include="Persistence\DatabaseModelDefinitions\IndexColumnDefinition.cs" />
-    <Compile Include="Persistence\DatabaseModelDefinitions\IndexDefinition.cs" />
-    <Compile Include="Persistence\DatabaseModelDefinitions\InsertionDataDefinition.cs" />
-    <Compile Include="Persistence\DatabaseModelDefinitions\ModificationType.cs" />
-    <Compile Include="Persistence\DatabaseModelDefinitions\SystemMethods.cs" />
-    <Compile Include="Persistence\DatabaseModelDefinitions\TableDefinition.cs" />
     <Compile Include="Persistence\DbCommandExtensions.cs" />
-    <Compile Include="Persistence\DbConnectionExtensions.cs" />
     <Compile Include="Persistence\EntityNotFoundException.cs" />
     <Compile Include="Persistence\Factories\ContentTypeFactory.cs" />
     <Compile Include="Persistence\Factories\DataTypeFactory.cs" />
@@ -407,24 +382,8 @@
     <Compile Include="Persistence\Factories\TemplateFactory.cs" />
     <Compile Include="Persistence\Factories\UserFactory.cs" />
     <Compile Include="Persistence\Factories\UserGroupFactory.cs" />
-    <Compile Include="Persistence\FaultHandling\ITransientErrorDetectionStrategy.cs" />
-    <Compile Include="Persistence\FaultHandling\RetryingEventArgs.cs" />
-    <Compile Include="Persistence\FaultHandling\RetryLimitExceededException.cs" />
-    <Compile Include="Persistence\FaultHandling\RetryPolicy.cs" />
-    <Compile Include="Persistence\FaultHandling\RetryPolicyFactory.cs" />
-    <Compile Include="Persistence\FaultHandling\RetryStrategy.cs" />
-    <Compile Include="Persistence\FaultHandling\Strategies\ExponentialBackoff.cs" />
-    <Compile Include="Persistence\FaultHandling\Strategies\FixedInterval.cs" />
-    <Compile Include="Persistence\FaultHandling\Strategies\Incremental.cs" />
-    <Compile Include="Persistence\FaultHandling\Strategies\NetworkConnectivityErrorDetectionStrategy.cs" />
-    <Compile Include="Persistence\FaultHandling\Strategies\SqlAzureTransientErrorDetectionStrategy.cs" />
-    <Compile Include="Persistence\FaultHandling\ThrottlingCondition.cs" />
-    <Compile Include="Persistence\ISqlContext.cs" />
-    <Compile Include="Persistence\IUmbracoDatabase.cs" />
-    <Compile Include="Persistence\IUmbracoDatabaseFactory.cs" />
     <Compile Include="Persistence\LocalDb.cs" />
     <Compile Include="Persistence\Mappers\AccessMapper.cs" />
-    <Compile Include="Persistence\Mappers\BaseMapper.cs" />
     <Compile Include="Persistence\Mappers\ContentMapper.cs" />
     <Compile Include="Persistence\Mappers\ContentTypeMapper.cs" />
     <Compile Include="Persistence\Mappers\DataTypeMapper.cs" />
@@ -432,18 +391,13 @@
     <Compile Include="Persistence\Mappers\DictionaryTranslationMapper.cs" />
     <Compile Include="Persistence\Mappers\DomainMapper.cs" />
     <Compile Include="Persistence\Mappers\ExternalLoginMapper.cs" />
-    <Compile Include="Persistence\Mappers\IMapperCollection.cs" />
     <Compile Include="Persistence\Mappers\LanguageMapper.cs" />
     <Compile Include="Persistence\Mappers\MacroMapper.cs" />
-    <Compile Include="Persistence\Mappers\MapperCollection.cs" />
-    <Compile Include="Persistence\Mappers\MapperCollectionBuilder.cs" />
-    <Compile Include="Persistence\Mappers\MapperForAttribute.cs" />
     <Compile Include="Persistence\Mappers\MediaMapper.cs" />
     <Compile Include="Persistence\Mappers\MediaTypeMapper.cs" />
     <Compile Include="Persistence\Mappers\MemberGroupMapper.cs" />
     <Compile Include="Persistence\Mappers\MemberMapper.cs" />
     <Compile Include="Persistence\Mappers\MemberTypeMapper.cs" />
-    <Compile Include="Persistence\Mappers\PocoMapper.cs" />
     <Compile Include="Persistence\Mappers\PropertyGroupMapper.cs" />
     <Compile Include="Persistence\Mappers\PropertyMapper.cs" />
     <Compile Include="Persistence\Mappers\PropertyTypeMapper.cs" />
@@ -565,21 +519,6 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\AddLockObjects.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\VariantsMigration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\ContentVariationMigration.cs" />
-    <Compile Include="Persistence\NPocoDatabaseExtensions-Bulk.cs" />
-    <Compile Include="Persistence\NPocoDatabaseExtensions.cs" />
-    <Compile Include="Persistence\NPocoDatabaseTypeExtensions.cs" />
-    <Compile Include="Persistence\NPocoSqlExtensions.cs" />
-    <Compile Include="Persistence\PocoDataDataReader.cs" />
-    <Compile Include="Persistence\Querying\CachedExpression.cs" />
-    <Compile Include="Persistence\Querying\ExpressionVisitorBase.cs" />
-    <Compile Include="Persistence\Querying\ModelToSqlExpressionVisitor.cs" />
-    <Compile Include="Persistence\Querying\PocoToSqlExpressionVisitor.cs" />
-    <Compile Include="Persistence\Querying\Query.cs" />
-    <Compile Include="Persistence\Querying\QueryExtensions.cs" />
-    <Compile Include="Persistence\Querying\SqlExpressionExtensions.cs" />
-    <Compile Include="Persistence\Querying\SqlTranslator.cs" />
-    <Compile Include="Persistence\Querying\TextColumnType.cs" />
-    <Compile Include="Persistence\RecordPersistenceType.cs" />
     <Compile Include="Persistence\Repositories\Implement\AuditRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\DocumentBlueprintRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\DocumentRepository.cs" />
@@ -637,33 +576,10 @@
     <Compile Include="Persistence\Repositories\Implement\UserGroupRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\UserRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\ContentRepositoryBase.cs" />
-    <Compile Include="Persistence\SqlContext.cs" />
-    <Compile Include="Persistence\SqlSyntax\ColumnInfo.cs" />
-    <Compile Include="Persistence\SqlSyntax\DbTypes.cs" />
-    <Compile Include="Persistence\SqlSyntax\ISqlSyntaxProvider.cs" />
-    <Compile Include="Persistence\SqlSyntax\MicrosoftSqlSyntaxProviderBase.cs" />
-    <Compile Include="Persistence\SqlSyntax\SqlCeSyntaxProvider.cs" />
-    <Compile Include="Persistence\SqlSyntax\SqlServerSyntaxProvider.cs" />
-    <Compile Include="Persistence\SqlSyntax\SqlServerVersionName.cs" />
-    <Compile Include="Persistence\SqlSyntax\SqlSyntaxProviderBase.cs" />
-    <Compile Include="Persistence\SqlSyntax\SqlSyntaxProviderExtensions.cs" />
-    <Compile Include="Persistence\SqlTemplate.cs" />
-    <Compile Include="Persistence\SqlTemplates.cs" />
-    <Compile Include="Persistence\UmbracoDatabase.cs" />
     <Compile Include="Persistence\UmbracoDatabaseExtensions.cs" />
-    <Compile Include="Persistence\UmbracoDatabaseFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RuntimeState.cs" />
     <Compile Include="Runtime\CoreInitialComposer.cs" />
-    <Compile Include="Scoping\IScope.cs" />
-    <Compile Include="Scoping\IScopeAccessor.cs" />
-    <Compile Include="Scoping\IScopeProvider.cs" />
-    <Compile Include="Scoping\RepositoryCacheMode.cs" />
-    <Compile Include="Scoping\Scope.cs" />
-    <Compile Include="Scoping\ScopeContext.cs" />
-    <Compile Include="Scoping\ScopeContextualBase.cs" />
-    <Compile Include="Scoping\ScopeProvider.cs" />
-    <Compile Include="Scoping\ScopeReference.cs" />
     <Compile Include="Security\AuthenticationExtensions.cs" />
     <Compile Include="Security\BackOfficeUserStore.cs" />
     <Compile Include="Security\BackOfficeUserValidator.cs" />
@@ -718,9 +634,6 @@
     <Compile Include="Sync\ServerMessengerBase.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="UriExtensions.cs" />
-    <Compile Include="Persistence\FaultHandling\RetryDbConnection.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
@@ -740,6 +653,12 @@
       <Project>{3ae7bf57-966b-45a5-910a-954d7c554441}</Project>
       <Name>Umbraco.Infrastructure</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Persistence\DatabaseAnnotations" />
+    <Folder Include="Persistence\DatabaseModelDefinitions" />
+    <Folder Include="Persistence\FaultHandling" />
+    <Folder Include="Persistence\Querying" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

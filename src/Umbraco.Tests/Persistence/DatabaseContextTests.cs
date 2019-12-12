@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Persistence
             _sqlSyntaxProviders = new[] { (ISqlSyntaxProvider) _sqlCeSyntaxProvider };
             _logger = Mock.Of<ILogger>();
             _umbracoVersion = TestHelper.GetUmbracoVersion();
-            _databaseFactory = new UmbracoDatabaseFactory(_logger, new Lazy<IMapperCollection>(() => Mock.Of<IMapperCollection>()), TestHelper.GetConfigs());
+            _databaseFactory = new UmbracoDatabaseFactory(_logger, new Lazy<IMapperCollection>(() => Mock.Of<IMapperCollection>()), TestHelper.GetConfigs(), TestHelper.DbProviderFactoryCreator);
         }
 
         [TearDown]

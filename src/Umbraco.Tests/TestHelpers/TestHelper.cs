@@ -18,6 +18,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
@@ -84,6 +85,7 @@ namespace Umbraco.Tests.TestHelpers
         }
 
         public static IShortStringHelper ShortStringHelper => new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
+        public static IDbProviderFactoryCreator DbProviderFactoryCreator => new UmbracoDbProviderFactoryCreator(Constants.DbProviderNames.SqlCe);
 
         public static IIOHelper IOHelper = new IOHelper(GetHostingEnvironment());
 

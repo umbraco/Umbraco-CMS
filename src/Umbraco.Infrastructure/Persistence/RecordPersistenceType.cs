@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core.Persistence
 {
-    internal enum RecordPersistenceType
+    public enum RecordPersistenceType
     {
         Insert,
         Update,

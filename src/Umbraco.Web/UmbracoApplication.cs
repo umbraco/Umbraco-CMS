@@ -16,7 +16,7 @@ namespace Umbraco.Web
     {
         protected override IRuntime GetRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
         {
-            return new WebRuntime(this, configs, umbracoVersion, ioHelper, logger, profiler, hostingEnvironment, backOfficeInfo);
+            return new WebRuntime(this, configs, umbracoVersion, ioHelper, logger, profiler, hostingEnvironment, backOfficeInfo, new UmbracoDbProviderFactoryCreator(Constants.DbProviderNames.SqlCe));
         }
 
         /// <summary>

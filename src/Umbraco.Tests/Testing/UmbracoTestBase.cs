@@ -409,7 +409,8 @@ namespace Umbraco.Tests.Testing
                 Constants.System.UmbracoConnectionName,
                 Logger,
                 new Lazy<IMapperCollection>(f.GetInstance<IMapperCollection>),
-                TestHelper.GetConfigs()));
+                TestHelper.GetConfigs(),
+                TestHelper.DbProviderFactoryCreator));
             Composition.RegisterUnique(f => f.TryGetInstance<IUmbracoDatabaseFactory>().SqlContext);
 
             Composition.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty

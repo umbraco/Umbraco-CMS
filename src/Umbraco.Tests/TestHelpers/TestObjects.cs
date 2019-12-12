@@ -243,7 +243,7 @@ namespace Umbraco.Tests.TestHelpers
                 // mappersBuilder.AddCore();
                 // var mappers = mappersBuilder.CreateCollection();
                 var mappers = Current.Factory.GetInstance<IMapperCollection>();
-                databaseFactory = new UmbracoDatabaseFactory(Constants.System.UmbracoConnectionName, logger, new Lazy<IMapperCollection>(() => mappers), TestHelper.GetConfigs());
+                databaseFactory = new UmbracoDatabaseFactory(Constants.System.UmbracoConnectionName, logger, new Lazy<IMapperCollection>(() => mappers), TestHelper.GetConfigs(), TestHelper.DbProviderFactoryCreator);
             }
 
             typeFinder = typeFinder ?? new TypeFinder(logger);

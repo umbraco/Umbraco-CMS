@@ -1165,19 +1165,19 @@ namespace Umbraco.Core.Persistence
             return string.IsNullOrWhiteSpace(attr?.Name) ? column.Name : attr.Name;
         }
 
-        internal static string ToText(this Sql sql)
+        public static string ToText(this Sql sql)
         {
             var text = new StringBuilder();
             sql.ToText(text);
             return text.ToString();
         }
 
-        internal static void ToText(this Sql sql, StringBuilder text)
+        public static void ToText(this Sql sql, StringBuilder text)
         {
             ToText(sql.SQL, sql.Arguments, text);
         }
 
-        internal static void ToText(string sql, object[] arguments, StringBuilder text)
+        public static void ToText(string sql, object[] arguments, StringBuilder text)
         {
             text.AppendLine(sql);
 

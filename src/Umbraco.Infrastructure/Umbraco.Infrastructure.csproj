@@ -7,6 +7,7 @@
     <ItemGroup>
       <PackageReference Include="LightInject" Version="6.2.0" />
       <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
+      <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
       <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-19554-01" />
       <PackageReference Include="MiniProfiler.Shared" Version="4.1.0" />
       <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
@@ -20,6 +21,7 @@
       <PackageReference Include="Serilog.Sinks.Async" Version="1.4.0" />
       <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
       <PackageReference Include="Serilog.Sinks.Map" Version="1.0.0" />
+      <PackageReference Include="System.Data.SqlClient" Version="4.8.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -31,49 +33,10 @@
       <Compile Remove="Scoping\ScopeReference.cs" />
       <Compile Remove="Scoping\ScopeProvider.cs" />
       <Compile Remove="Scoping\ScopeContext.cs" />
-      <Compile Remove="Scoping\RepositoryCacheMode.cs" />
-      <Compile Remove="Scoping\IScopeProvider.cs" />
-      <Compile Remove="Scoping\IScope.cs" />
-      <Compile Remove="Persistence\UmbracoDatabase.cs" />
-      <Compile Remove="Persistence\SqlTemplates.cs" />
-      <Compile Remove="Persistence\SqlSyntaxExtensions.cs" />
-      <Compile Remove="Persistence\SqlSyntax\SqlServerSyntaxProvider.cs" />
-      <Compile Remove="Persistence\SqlSyntax\MicrosoftSqlSyntaxProviderBase.cs" />
-      <Compile Remove="Persistence\SqlSyntax\ISqlSyntaxProvider.cs" />
-      <Compile Remove="Persistence\RecordPersistenceType.cs" />
-      <Compile Remove="Persistence\Querying\TextColumnType.cs" />
-      <Compile Remove="Persistence\Querying\PocoToSqlExpressionVisitor.cs" />
-      <Compile Remove="Persistence\Querying\ModelToSqlExpressionVisitor.cs" />
-      <Compile Remove="Persistence\PocoDataDataReader.cs" />
-      <Compile Remove="Persistence\NPocoSqlExtensions.cs" />
-      <Compile Remove="Persistence\NPocoDatabaseTypeExtensions.cs" />
-      <Compile Remove="Persistence\NPocoDatabaseExtensions.cs" />
-      <Compile Remove="Persistence\Mappers\MapperForAttribute.cs" />
-      <Compile Remove="Persistence\Mappers\MapperCollection.cs" />
-      <Compile Remove="Persistence\Mappers\IMapperCollection.cs" />
-      <Compile Remove="Persistence\IUmbracoDatabase.cs" />
-      <Compile Remove="Persistence\ISqlContext.cs" />
-      <Compile Remove="Persistence\FaultHandling\ThrottlingCondition.cs" />
       <Compile Remove="Persistence\FaultHandling\SqlAzureTransientErrorDetectionStrategy.cs" />
-      <Compile Remove="Persistence\FaultHandling\RetryStrategy.cs" />
-      <Compile Remove="Persistence\FaultHandling\RetryPolicyFactory.cs" />
-      <Compile Remove="Persistence\FaultHandling\RetryLimitExceededException.cs" />
-      <Compile Remove="Persistence\FaultHandling\RetryDbConnection.cs" />
       <Compile Remove="Persistence\FaultHandling\NetworkConnectivityErrorDetectionStrategy.cs" />
       <Compile Remove="Persistence\FaultHandling\Incremental.cs" />
       <Compile Remove="Persistence\FaultHandling\FixedInterval.cs" />
-      <Compile Remove="Persistence\DatabaseModelDefinitions\TableDefinition.cs" />
-      <Compile Remove="Persistence\DatabaseModelDefinitions\SystemMethods.cs" />
-      <Compile Remove="Persistence\DatabaseModelDefinitions\InsertionDataDefinition.cs" />
-      <Compile Remove="Persistence\DatabaseModelDefinitions\IndexColumnDefinition.cs" />
-      <Compile Remove="Persistence\DatabaseModelDefinitions\ForeignKeyDefinition.cs" />
-      <Compile Remove="Persistence\DatabaseModelDefinitions\DbIndexDefinition.cs" />
-      <Compile Remove="Persistence\DatabaseModelDefinitions\ConstraintType.cs" />
-      <Compile Remove="Persistence\DatabaseAnnotations\ReferencesAttribute.cs" />
-      <Compile Remove="Persistence\DatabaseAnnotations\NullSettingAttribute.cs" />
-      <Compile Remove="Persistence\DatabaseAnnotations\LengthAttribute.cs" />
-      <Compile Remove="Persistence\DatabaseAnnotations\IndexTypes.cs" />
-      <Compile Remove="Persistence\BulkDataReader.cs" />
     </ItemGroup>
 
     <ItemGroup>
@@ -103,11 +66,6 @@
     <ItemGroup>
       <Folder Include="Events" />
       <Folder Include="Models\Identity" />
-      <Folder Include="Persistence\DatabaseAnnotations" />
-      <Folder Include="Persistence\DatabaseModelDefinitions" />
-      <Folder Include="Persistence\FaultHandling" />
-      <Folder Include="Persistence\Mappers" />
-      <Folder Include="Persistence\Querying" />
     </ItemGroup>
 
 </Project>
