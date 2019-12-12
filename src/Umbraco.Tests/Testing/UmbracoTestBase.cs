@@ -410,7 +410,8 @@ namespace Umbraco.Tests.Testing
                 Logger,
                 new Lazy<IMapperCollection>(f.GetInstance<IMapperCollection>),
                 TestHelper.GetConfigs(),
-                TestHelper.DbProviderFactoryCreator));
+                TestHelper.DbProviderFactoryCreator,
+                TestHelper.BulkSqlInsertProvider));
             Composition.RegisterUnique(f => f.TryGetInstance<IUmbracoDatabaseFactory>().SqlContext);
 
             Composition.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty

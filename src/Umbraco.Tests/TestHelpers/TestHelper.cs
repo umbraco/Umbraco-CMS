@@ -86,6 +86,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public static IShortStringHelper ShortStringHelper => new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
         public static IDbProviderFactoryCreator DbProviderFactoryCreator => new UmbracoDbProviderFactoryCreator(Constants.DbProviderNames.SqlCe);
+        public static IBulkSqlInsertProvider BulkSqlInsertProvider => new SqlCeBulkSqlInsertProvider();
 
         public static IIOHelper IOHelper = new IOHelper(GetHostingEnvironment());
 

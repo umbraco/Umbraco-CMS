@@ -49,7 +49,7 @@ namespace Umbraco.Tests.TestHelpers
             var syntax = new SqlCeSyntaxProvider();
             var connection = GetDbConnection();
             var sqlContext = new SqlContext(syntax, DatabaseType.SQLCe, Mock.Of<IPocoDataFactory>());
-            return new UmbracoDatabase(connection, sqlContext, logger);
+            return new UmbracoDatabase(connection, sqlContext, logger, TestHelper.BulkSqlInsertProvider);
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace Umbraco.Tests.TestHelpers
             var syntax = new SqlServerSyntaxProvider(); // do NOT try to get the server's version!
             var connection = GetDbConnection();
             var sqlContext = new SqlContext(syntax, DatabaseType.SqlServer2008, Mock.Of<IPocoDataFactory>());
-            return new UmbracoDatabase(connection, sqlContext, logger);
+            return new UmbracoDatabase(connection, sqlContext, logger, TestHelper.BulkSqlInsertProvider);
         }
 
         public void RegisterServices(IRegister register)
@@ -243,7 +243,7 @@ namespace Umbraco.Tests.TestHelpers
                 // mappersBuilder.AddCore();
                 // var mappers = mappersBuilder.CreateCollection();
                 var mappers = Current.Factory.GetInstance<IMapperCollection>();
-                databaseFactory = new UmbracoDatabaseFactory(Constants.System.UmbracoConnectionName, logger, new Lazy<IMapperCollection>(() => mappers), TestHelper.GetConfigs(), TestHelper.DbProviderFactoryCreator);
+                databaseFactory = new UmbracoDatabaseFactory(Constants.System.UmbracoConnectionName, logger, new Lazy<IMapperCollection>(() => mappers), TestHelper.GetConfigs(), TestHelper.DbProviderFactoryCreator, TestHelper.BulkSqlInsertProvider);
             }
 
             typeFinder = typeFinder ?? new TypeFinder(logger);

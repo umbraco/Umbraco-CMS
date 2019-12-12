@@ -105,6 +105,9 @@ namespace Umbraco.Tests.Testing
         public ISqlContext SqlContext { get; }
         public string InstanceId { get; }
         public bool InTransaction { get; }
+        public bool EnableSqlCount { get; set; }
+        public int SqlCount { get; }
+        public int BulkInsertRecords<T>(IEnumerable<T> records, bool useNativeBulkInsert = true) => throw new NotImplementedException();
 
         public DbParameter CreateParameter()
         {

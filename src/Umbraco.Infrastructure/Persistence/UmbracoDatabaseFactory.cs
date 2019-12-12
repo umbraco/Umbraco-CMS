@@ -29,6 +29,7 @@ namespace Umbraco.Core.Persistence
     {
         private readonly Configs _configs;
         private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
+        private readonly IBulkSqlInsertProvider _bulkSqlInsertProvider;
         private readonly Lazy<IMapperCollection> _mappers;
         private readonly ILogger _logger;
 
@@ -54,8 +55,8 @@ namespace Umbraco.Core.Persistence
         /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
         /// </summary>
         /// <remarks>Used by core runtime.</remarks>
-        public UmbracoDatabaseFactory(ILogger logger, Lazy<IMapperCollection> mappers, Configs configs, IDbProviderFactoryCreator dbProviderFactoryCreator)
-            : this(Constants.System.UmbracoConnectionName, logger, mappers, configs, dbProviderFactoryCreator)
+        public UmbracoDatabaseFactory(ILogger logger, Lazy<IMapperCollection> mappers, Configs configs, IDbProviderFactoryCreator dbProviderFactoryCreator, IBulkSqlInsertProvider bulkSqlInsertProvider)
+            : this(Constants.System.UmbracoConnectionName, logger, mappers, configs, dbProviderFactoryCreator, bulkSqlInsertProvider)
         {
             _configs = configs;
         }
@@ -64,7 +65,7 @@ namespace Umbraco.Core.Persistence
         /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
         /// </summary>
         /// <remarks>Used by the other ctor and in tests.</remarks>
-        public UmbracoDatabaseFactory(string connectionStringName, ILogger logger, Lazy<IMapperCollection> mappers, Configs configs, IDbProviderFactoryCreator dbProviderFactoryCreator)
+        public UmbracoDatabaseFactory(string connectionStringName, ILogger logger, Lazy<IMapperCollection> mappers, Configs configs, IDbProviderFactoryCreator dbProviderFactoryCreator, IBulkSqlInsertProvider bulkSqlInsertProvider)
         {
             if (connectionStringName == null) throw new ArgumentNullException(nameof(connectionStringName));
             if (string.IsNullOrWhiteSpace(connectionStringName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(connectionStringName));
@@ -72,6 +73,7 @@ namespace Umbraco.Core.Persistence
             _mappers = mappers ?? throw new ArgumentNullException(nameof(mappers));
             _configs = configs;
             _dbProviderFactoryCreator = dbProviderFactoryCreator  ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
+            _bulkSqlInsertProvider = bulkSqlInsertProvider ?? throw new ArgumentNullException(nameof(bulkSqlInsertProvider));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             var settings = configs.ConnectionStrings()[connectionStringName];
@@ -99,11 +101,12 @@ namespace Umbraco.Core.Persistence
         /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
         /// </summary>
         /// <remarks>Used in tests.</remarks>
-        public UmbracoDatabaseFactory(string connectionString, string providerName, ILogger logger, Lazy<IMapperCollection> mappers, IDbProviderFactoryCreator dbProviderFactoryCreator)
+        public UmbracoDatabaseFactory(string connectionString, string providerName, ILogger logger, Lazy<IMapperCollection> mappers, IDbProviderFactoryCreator dbProviderFactoryCreator, IBulkSqlInsertProvider bulkSqlInsertProvider)
         {
             _mappers = mappers ?? throw new ArgumentNullException(nameof(mappers));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _dbProviderFactoryCreator = dbProviderFactoryCreator ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
+            _bulkSqlInsertProvider = bulkSqlInsertProvider ?? throw new ArgumentNullException(nameof(bulkSqlInsertProvider));
 
             if (string.IsNullOrWhiteSpace(connectionString) || string.IsNullOrWhiteSpace(providerName))
             {
@@ -282,7 +285,7 @@ namespace Umbraco.Core.Persistence
         // method used by NPoco's UmbracoDatabaseFactory to actually create the database instance
         private UmbracoDatabase CreateDatabaseInstance()
         {
-            return new UmbracoDatabase(_connectionString, SqlContext, _dbProviderFactory, _logger, _connectionRetryPolicy, _commandRetryPolicy);
+            return new UmbracoDatabase(_connectionString, SqlContext, _dbProviderFactory, _logger, _bulkSqlInsertProvider, _connectionRetryPolicy, _commandRetryPolicy);
         }
 
         protected override void DisposeResources()

@@ -92,7 +92,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, appCaches: realCache);
 
-                var udb = (UmbracoDatabase)scope.Database;
+                var udb = scope.Database;
 
                 udb.EnableSqlCount = false;
 

@@ -1,4 +1,5 @@
-﻿using NPoco;
+﻿using System.Collections.Generic;
+using NPoco;
 
 namespace Umbraco.Core.Persistence
 {
@@ -20,5 +21,9 @@ namespace Umbraco.Core.Persistence
         /// Gets a value indicating whether the database is currently in a transaction.
         /// </summary>
         bool InTransaction { get; }
+
+        bool EnableSqlCount { get; set; }
+        int SqlCount { get; }
+        int BulkInsertRecords<T>(IEnumerable<T> records, bool useNativeBulkInsert = true);
     }
 }

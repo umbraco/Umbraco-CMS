@@ -10,7 +10,7 @@ using Umbraco.Core.Persistence.FaultHandling;
 
 namespace Umbraco.Core.Persistence
 {
-    internal static class DbConnectionExtensions
+    public static class DbConnectionExtensions
     {
         public static string DetectProviderNameFromConnectionString(string connectionString)
         {
@@ -79,6 +79,6 @@ namespace Umbraco.Core.Persistence
 
             return unwrapped;
         }
-        
+
     }
 }

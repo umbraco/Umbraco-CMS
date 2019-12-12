@@ -20,7 +20,7 @@ namespace Umbraco.Tests.Persistence.FaultHandling
         {
             const string connectionString = @"server=.\SQLEXPRESS;database=EmptyForTest;user id=x;password=umbraco";
             const string providerName = Constants.DbProviderNames.SqlServer;
-            var factory = new UmbracoDatabaseFactory(connectionString, providerName, Mock.Of<ILogger>(), new Lazy<IMapperCollection>(() => Mock.Of<IMapperCollection>()), TestHelper.DbProviderFactoryCreator);
+            var factory = new UmbracoDatabaseFactory(connectionString, providerName, Mock.Of<ILogger>(), new Lazy<IMapperCollection>(() => Mock.Of<IMapperCollection>()), TestHelper.DbProviderFactoryCreator, TestHelper.BulkSqlInsertProvider);
 
             using (var database = factory.CreateDatabase())
             {
@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Persistence.FaultHandling
         {
             const string connectionString = @"server=.\SQLEXPRESS;database=EmptyForTest;user id=umbraco;password=umbraco";
             const string providerName = Constants.DbProviderNames.SqlServer;
-            var factory = new UmbracoDatabaseFactory(connectionString, providerName, Mock.Of<ILogger>(), new Lazy<IMapperCollection>(() => Mock.Of<IMapperCollection>()), TestHelper.DbProviderFactoryCreator);
+            var factory = new UmbracoDatabaseFactory(connectionString, providerName, Mock.Of<ILogger>(), new Lazy<IMapperCollection>(() => Mock.Of<IMapperCollection>()), TestHelper.DbProviderFactoryCreator, TestHelper.BulkSqlInsertProvider);
 
             using (var database = factory.CreateDatabase())
             {

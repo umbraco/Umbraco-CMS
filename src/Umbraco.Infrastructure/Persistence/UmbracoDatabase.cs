@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using NPoco;
 using StackExchange.Profiling;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.FaultHandling;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence
 {
@@ -21,6 +24,7 @@ namespace Umbraco.Core.Persistence
     public class UmbracoDatabase : Database, IUmbracoDatabase
     {
         private readonly ILogger _logger;
+        private readonly IBulkSqlInsertProvider _bulkSqlInsertProvider;
         private readonly RetryPolicy _connectionRetryPolicy;
         private readonly RetryPolicy _commandRetryPolicy;
         private readonly Guid _instanceGuid = Guid.NewGuid();
@@ -34,12 +38,13 @@ namespace Umbraco.Core.Persistence
         /// <para>Used by UmbracoDatabaseFactory to create databases.</para>
         /// <para>Also used by DatabaseBuilder for creating databases and installing/upgrading.</para>
         /// </remarks>
-        public UmbracoDatabase(string connectionString, ISqlContext sqlContext, DbProviderFactory provider, ILogger logger, RetryPolicy connectionRetryPolicy = null, RetryPolicy commandRetryPolicy = null)
+        public UmbracoDatabase(string connectionString, ISqlContext sqlContext, DbProviderFactory provider, ILogger logger, IBulkSqlInsertProvider bulkSqlInsertProvider, RetryPolicy connectionRetryPolicy = null, RetryPolicy commandRetryPolicy = null)
             : base(connectionString, sqlContext.DatabaseType, provider, sqlContext.SqlSyntax.DefaultIsolationLevel)
         {
             SqlContext = sqlContext;
 
             _logger = logger;
+            _bulkSqlInsertProvider = bulkSqlInsertProvider;
             _connectionRetryPolicy = connectionRetryPolicy;
             _commandRetryPolicy = commandRetryPolicy;
 
@@ -52,11 +57,12 @@ namespace Umbraco.Core.Persistence
         /// Initializes a new instance of the <see cref="UmbracoDatabase"/> class.
         /// </summary>
         /// <remarks>Internal for unit tests only.</remarks>
-        internal UmbracoDatabase(DbConnection connection, ISqlContext sqlContext, ILogger logger)
+        internal UmbracoDatabase(DbConnection connection, ISqlContext sqlContext, ILogger logger, IBulkSqlInsertProvider bulkSqlInsertProvider)
             : base(connection, sqlContext.DatabaseType, sqlContext.SqlSyntax.DefaultIsolationLevel)
         {
             SqlContext = sqlContext;
             _logger = logger;
+            _bulkSqlInsertProvider = bulkSqlInsertProvider;
 
             EnableSqlTrace = EnableSqlTraceDefault;
 
@@ -140,7 +146,7 @@ namespace Umbraco.Core.Persistence
         /// <summary>
         /// Gets or sets a value indicating whether to count all executed Sql statements.
         /// </summary>
-        internal bool EnableSqlCount
+        public bool EnableSqlCount
         {
             get => _enableCount;
             set
@@ -154,7 +160,15 @@ namespace Umbraco.Core.Persistence
         /// <summary>
         /// Gets the count of all executed Sql statements.
         /// </summary>
-        internal int SqlCount { get; private set; }
+        public int SqlCount { get; private set; }
+
+        public int BulkInsertRecords<T>(IEnumerable<T> records, bool useNativeBulkInsert = true)
+        {
+            return _bulkSqlInsertProvider.BulkInsertRecords(this, records, useNativeBulkInsert);
+
+        }
+
+
 
         #endregion
 

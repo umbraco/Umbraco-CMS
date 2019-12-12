@@ -34,7 +34,8 @@ namespace Umbraco.Tests.Benchmarks
                 Constants.DatabaseProviders.SqlServer,
                 logger,
                  new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())),
-                TestHelper.DbProviderFactoryCreator);
+                TestHelper.DbProviderFactoryCreator,
+                TestHelper.BulkSqlInsertProvider);
             return factory.CreateDatabase();
         }
 
@@ -45,7 +46,8 @@ namespace Umbraco.Tests.Benchmarks
                 Constants.DatabaseProviders.SqlCe,
                 logger,
                 new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())),
-                TestHelper.DbProviderFactoryCreator);
+                TestHelper.DbProviderFactoryCreator,
+                TestHelper.BulkSqlInsertProvider);
             return f.CreateDatabase();
         }
 

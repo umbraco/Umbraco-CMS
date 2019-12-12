@@ -1,21 +1,30 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Data.SqlServerCe;
 using System.Linq;
 using NPoco;
-using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence
 {
-    /// <summary>
-    /// Provides extension methods to NPoco Database class.
-    /// </summary>
-    public static class NPocoDatabaseExtensionsSqlCe
+    public class SqlCeBulkSqlInsertProvider : IBulkSqlInsertProvider
     {
+        public int BulkInsertRecords<T>(IUmbracoDatabase database, IEnumerable<T> records, bool useNativeBulkInsert)
+        {
+            var recordsA = records.ToArray();
+            if (recordsA.Length == 0) return 0;
 
-        /// <summary>
+            var pocoData = database.PocoDataFactory.ForType(typeof(T));
+            if (pocoData == null) throw new InvalidOperationException("Could not find PocoData for " + typeof(T));
+
+            if (useNativeBulkInsert) return BulkInsertRecordsSqlCe(database, pocoData, recordsA);
+            // else, no other choice
+            foreach (var record in recordsA)
+                database.Insert(record);
+            return recordsA.Length;
+        }
+
+         /// <summary>
         /// Bulk-insert records using SqlCE TableDirect method.
         /// </summary>
         /// <typeparam name="T">The type of the records.</typeparam>
@@ -23,7 +32,7 @@ namespace Umbraco.Core.Persistence
         /// <param name="pocoData">The PocoData object corresponding to the record's type.</param>
         /// <param name="records">The records.</param>
         /// <returns>The number of records that were inserted.</returns>
-        internal static int BulkInsertRecordsSqlCe<T>(IUmbracoDatabase database, PocoData pocoData, IEnumerable<T> records)
+        private static int BulkInsertRecordsSqlCe<T>(IUmbracoDatabase database, PocoData pocoData, IEnumerable<T> records)
         {
             var columns = pocoData.Columns.ToArray();
 
@@ -64,7 +73,5 @@ namespace Umbraco.Core.Persistence
                 return count;
             }
         }
-
-
     }
 }

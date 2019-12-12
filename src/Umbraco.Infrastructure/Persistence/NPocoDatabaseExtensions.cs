@@ -141,7 +141,7 @@ namespace Umbraco.Core.Persistence
         /// <typeparam name="TConnection"></typeparam>
         /// <param name="connection"></param>
         /// <returns></returns>
-        private static TConnection GetTypedConnection<TConnection>(IDbConnection connection)
+        public static TConnection GetTypedConnection<TConnection>(IDbConnection connection)
             where TConnection : class, IDbConnection
         {
             var c = connection;
@@ -169,7 +169,7 @@ namespace Umbraco.Core.Persistence
         /// <typeparam name="TTransaction"></typeparam>
         /// <param name="transaction"></param>
         /// <returns></returns>
-        private static TTransaction GetTypedTransaction<TTransaction>(IDbTransaction transaction)
+        public static TTransaction GetTypedTransaction<TTransaction>(IDbTransaction transaction)
             where TTransaction : class, IDbTransaction
         {
             var t = transaction;

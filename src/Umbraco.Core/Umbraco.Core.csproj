@@ -202,7 +202,7 @@
     <Compile Include="Packaging\PackageInstallation.cs" />
     <Compile Include="Persistence\Mappers\MapperCollectionBuilder.cs" />
     <Compile Include="Persistence\Mappers\SimpleContentTypeMapper.cs" />
-    <Compile Include="Persistence\NPocoDatabaseExtensionsSqlCe.cs" />
+    <Compile Include="Persistence\SqlCeBulkSqlInsertProvider.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlCeSyntaxProvider.cs" />
     <Compile Include="PropertyEditors\DataValueReferenceFactoryCollection.cs" />
     <Compile Include="PropertyEditors\DataValueReferenceFactoryCollectionBuilder.cs" />
