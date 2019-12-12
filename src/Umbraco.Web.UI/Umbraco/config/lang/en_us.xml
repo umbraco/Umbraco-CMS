@@ -277,6 +277,7 @@
     <key alias="scheduledPublishServerTime">This translates to the following time on the server:</key>
     <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">What does this mean?</a>]]></key>
     <key alias="nestedContentDeleteItem">Are you sure you want to delete this item?</key>
+    <key alias="nestedContentDeleteAllItems">Are you sure you want to delete all items?</key>
     <key alias="nestedContentEditorNotSupported">Property %0% uses editor %1% which is not supported by Nested Content.</key>
     <key alias="nestedContentNoContentTypes">No content types are configured for this property.</key>
     <key alias="nestedContentAddElementType">Add element type</key>
@@ -1991,7 +1992,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="validateAsUrl">Validate as a URL</key>
     <key alias="enterCustomValidation">...or enter a custom validation</key>
     <key alias="fieldIsMandatory">Field is mandatory</key>
+    <key alias="mandatoryMessage">Enter a custom validation error message (optional)</key>
     <key alias="validationRegExp">Enter a regular expression</key>
+    <key alias="validationRegExpMessage">Enter a custom validation error message (optional)</key>
     <key alias="minCount">You need to add at least</key>
     <key alias="maxCount">You can only have</key>
     <key alias="items">items</key>
@@ -2235,6 +2238,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   <area alias="clipboard">
     <key alias="labelForCopyAllEntries">Copy %0%</key>
     <key alias="labelForArrayOfItemsFrom">%0% from %1%</key>
+    <key alias="labelForRemoveAllEntries">Remove all items</key>
   </area>
   <area alias="propertyActions">
     <key alias="tooltipForPropertyActionsMenu">Open Property Actions</key>
@@ -2319,5 +2323,35 @@ To manage your website, simply open the Umbraco back office and start adding con
     ]]>
     </key>
     <key alias="getStarted">To get you started</key>
+  </area>
+  <area alias="settingsDashboard">
+    <key alias="start">Start here</key>
+    <key alias="startDescription">This section contains the building blocks for your Umbraco site. Follow the below links to find out more about working with the items in the Settings section</key>
+    <key alias="more">Find out more</key>
+    <key alias="bulletPointOne">
+        <![CDATA[
+            Read more about working with the items in Settings <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank">in the Documentation section</a> of Our Umbraco
+        ]]>
+    </key>
+    <key alias="bulletPointTwo">
+        <![CDATA[
+            Ask a question in the <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank">Community Forum</a>
+        ]]>
+    </key>
+    <key alias="bulletPointThree">
+        <![CDATA[
+            Watch our <a class="btn-link -underline" href="https://umbraco.tv" target="_blank">tutorial videos</a> (some are free, some require a subscription)
+        ]]>
+    </key>
+    <key alias="bulletPointFour">
+        <![CDATA[
+            Find out about our <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank">productivity boosting tools and commercial support</a>
+        ]]>
+    </key>
+    <key alias="bulletPointFive">
+        <![CDATA[
+            Find out about real-life <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank">training and certification</a> opportunities
+        ]]>
+    </key>
   </area>
 </language>

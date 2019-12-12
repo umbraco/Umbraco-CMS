@@ -1,12 +1,12 @@
 /**
  * @ngdoc controller
- * @name Umbraco.Editors.DataType.ReferencesController
+ * @name Umbraco.Editors.DataType.InfoController
  * @function
  *
  * @description
- * The controller for the references view of the datatype editor
+ * The controller for the info view of the datatype editor
  */
-function DataTypeReferencesController($scope, $routeParams, dataTypeResource, eventsService, $timeout) {
+function DataTypeInfoController($scope, $routeParams, dataTypeResource, eventsService, $timeout) {
 
     var vm = this;
     var evts = [];
@@ -34,7 +34,7 @@ function DataTypeReferencesController($scope, $routeParams, dataTypeResource, ev
     // load data type references when the references tab is activated
     evts.push(eventsService.on("app.tabChange", function (event, args) {
         $timeout(function () {
-            if (args.alias === "references") {
+            if (args.alias === "info") {
                 loadRelations();
             }
         });
@@ -52,4 +52,4 @@ function DataTypeReferencesController($scope, $routeParams, dataTypeResource, ev
 
 }
 
-angular.module("umbraco").controller("Umbraco.Editors.DataType.ReferencesController", DataTypeReferencesController);
+angular.module("umbraco").controller("Umbraco.Editors.DataType.InfoController", DataTypeInfoController);

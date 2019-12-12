@@ -14,6 +14,9 @@ namespace Umbraco.Core
         /// <summary>
         /// Gets a value indicating whether the current domain is the main domain.
         /// </summary>
+        /// <remarks>
+        /// When the first call is made to this there will generally be some logic executed to acquire a distributed lock lease.
+        /// </remarks>
         bool IsMainDom { get; }
 
         /// <summary>
