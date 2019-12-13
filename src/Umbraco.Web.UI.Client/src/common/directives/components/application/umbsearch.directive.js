@@ -31,7 +31,7 @@
 
         vm.activeResult = null;
         vm.activeResultGroup = null;
-        
+
         function onInit() {
             vm.searchQuery = "";
             vm.searchResults = [];
