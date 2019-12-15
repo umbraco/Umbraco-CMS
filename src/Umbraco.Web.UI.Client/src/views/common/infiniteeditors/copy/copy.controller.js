@@ -130,11 +130,12 @@
         function toggleHandler(type) {
             // If the relateToOriginal toggle is clicked
             if (type === "relate") {
-                if ($scope.model.relateToOriginal) {
-                    $scope.model.relateToOriginal = false;
-                    return;
-                }
-                $scope.model.relateToOriginal = true;
+                //if ($scope.model.relateToOriginal) {
+                //    $scope.model.relateToOriginal = false;
+                //    return;
+                //}
+                //$scope.model.relateToOriginal = true;
+                $scope.model.relateToOriginal = !$scope.model.relateToOriginal;
             }
         }
 
