@@ -225,8 +225,10 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
         retainQueryStrings: function (currRouteParams, nextRouteParams) {
             var toRetain = angular.copy(nextRouteParams);
             var updated = false;
+
             _.each(retainedQueryStrings, function (r) {
-                if (currRouteParams[r] && !nextRouteParams[r]) {
+                // if mculture is set to null in nextRouteParams, the value will be undefined and we will not retain any query string that has a value of "null"
+                if (currRouteParams[r] && nextRouteParams[r] !== undefined && !nextRouteParams[r]) {
                     toRetain[r] = currRouteParams[r];
                     updated = true;
                 }
@@ -333,6 +335,22 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
 
             return navReadyPromise.promise.then(function () {
                 return mainTreeApi.syncTree(args);
+            });
+        },
+
+        /**     
+         * @ngdoc method
+         * @name umbraco.services.navigationService#hasTree
+         * @methodOf umbraco.services.navigationService
+         *
+         * @description
+         * Checks if a tree with the given alias exists.
+         * 
+         * @param {String} treeAlias the tree alias to check
+         */
+        hasTree: function (treeAlias) {
+            return navReadyPromise.promise.then(function () {
+                return mainTreeApi.hasTree(treeAlias);
             });
         },
 
@@ -462,6 +480,8 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
             if (!section) {
                 throw "section cannot be null";
             }
+
+            appState.setMenuState("currentNode", node);
 
             if (action.metaData && action.metaData["actionRoute"] && angular.isString(action.metaData["actionRoute"])) {
                 //first check if the menu item simply navigates to a route
