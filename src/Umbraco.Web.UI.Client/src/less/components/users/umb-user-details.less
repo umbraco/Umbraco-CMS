@@ -1,7 +1,7 @@
 .umb-user-details-avatar {
     margin-bottom: 20px;
     padding-bottom: 20px;
-    border-bottom: 1px solid #d8d7d9;
+    border-bottom: 1px solid @gray-8;
 }
 
 div.umb-user-details-actions > div {
@@ -63,6 +63,10 @@ a.umb-user-details-details__back-link {
 
 .umb-user-details-details__sidebar {
     flex: 0 0 @sidebarwidth;
+
+    .umb-button{
+        margin-left:0px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -77,7 +81,7 @@ a.umb-user-details-details__back-link {
         margin-bottom: 30px;
         margin-right: 0;
     }
-   
+
     .umb-user-details-details__sidebar {
         flex: 1 1 auto;
         width: 100%;
@@ -101,6 +105,7 @@ a.umb-user-details-details__back-link {
 .umb-user-details-details__information-item {
     margin-bottom: 10px;
     font-size: 13px;
+    margin-top:10px;
 }
 
 .umb-user-details-details__information-item-label {

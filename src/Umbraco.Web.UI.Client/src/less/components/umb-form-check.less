@@ -12,6 +12,14 @@
     line-height: 22px;
     cursor: pointer !important;
 
+    &.-small-text{
+        font-size: 13px;
+    }
+
+    &.-bold{
+        font-weight: 700;
+    }
+
     &__text {
         margin: 0 0 0 26px;
         position: relative;
@@ -72,7 +80,7 @@
         outline: 2px solid @inputBorderTabFocus;
     }
     .tabbing-active &.umb-form-check--checkbox &__input:checked:focus ~ .umb-form-check__state .umb-form-check__check {
-        border-color: white;
+        border-color: @white;
     }
 
     // add spacing between when flexed/inline, equal to the width of the input
