@@ -274,9 +274,10 @@
     <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">What does this mean?</a>]]></key>
     <key alias="nestedContentDeleteItem">Are you sure you want to delete this item?</key>
     <key alias="nestedContentEditorNotSupported">Property %0% uses editor %1% which is not supported by Nested Content.</key>
+    <key alias="nestedContentDeleteAllItems">Are you sure you want to delete all items?</key>
     <key alias="nestedContentNoContentTypes">No content types are configured for this property.</key>
     <key alias="nestedContentAddElementType">Add element type</key>
-    <key alias="nestedContentSelectElementTypeModalTitle">Select element type</key>	
+    <key alias="nestedContentSelectElementTypeModalTitle">Select element type</key>
     <key alias="addTextBox">Add another text box</key>
     <key alias="removeTextBox">Remove this text box</key>
     <key alias="contentRoot">Content root</key>
@@ -520,6 +521,10 @@
     <key alias="tools">Tools</key>
     <key alias="toolsDescription">Tools to manage the index</key>
     <key alias="fields">fields</key>
+    <key alias="indexCannotRead">The index cannot be read and will need to be rebuilt</key>
+    <key alias="processIsTakingLonger">The process is taking longer than expected, check the umbraco log to see if there have been any errors during this operation</key>
+    <key alias="indexCannotRebuild">This index cannot be rebuilt because it has no assigned</key>
+    <key alias="iIndexPopulator">IIndexPopulator</key>
   </area>
   <area alias="placeholders">
     <key alias="username">Enter your username</key>
@@ -1635,6 +1640,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="noFallbackLanguageOption">No fall back language</key>
     <key alias="fallbackLanguageDescription">To allow multi-lingual content to fall back to another language if not present in the requested language, select it here.</key>
     <key alias="fallbackLanguage">Fall back language</key>
+    <key alias="none">none</key>
   </area>
 
   <area alias="macro">
@@ -1973,7 +1979,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="validateAsUrl">Validate as a URL</key>
     <key alias="enterCustomValidation">...or enter a custom validation</key>
     <key alias="fieldIsMandatory">Field is mandatory</key>
+    <key alias="mandatoryMessage">Enter a custom validation error message (optional)</key>
     <key alias="validationRegExp">Enter a regular expression</key>
+    <key alias="validationRegExpMessage">Enter a custom validation error message (optional)</key>
     <key alias="minCount">You need to add at least</key>
     <key alias="maxCount">You can only have</key>
     <key alias="items">items</key>
@@ -1982,6 +1990,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="invalidNumber">Not a number</key>
     <key alias="invalidEmail">Invalid email</key>
     <key alias="customValidation">Custom validation</key>
+    <key alias="entriesShort"><![CDATA[Minimum %0% entries, requires <strong>%1%</strong> more.]]></key>
+    <key alias="entriesExceed"><![CDATA[Maximum %0% entries, <strong>%1%</strong> too many.]]></key>
   </area>
   <area alias="healthcheck">
     <!-- The following keys get these tokens passed in:
@@ -2167,7 +2177,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="createNewFolder">Create new folder</key>
     <key alias="newPartialView">Partial View</key>
     <key alias="newPartialViewMacro">Partial View Macro</key>
-    <key alias="newMember">Member</key>	
+    <key alias="newMember">Member</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>
@@ -2208,5 +2218,123 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="findLogsWithMachineName">Find Logs with Machine Name</key>
     <key alias="open">Open</key>
   </area>
-
+  <area alias="clipboard">
+    <key alias="labelForCopyAllEntries">Copy %0%</key>
+    <key alias="labelForArrayOfItemsFrom">%0% from %1%</key>
+    <key alias="labelForRemoveAllEntries">Remove all items</key>
+  </area>
+  <area alias="propertyActions">
+    <key alias="tooltipForPropertyActionsMenu">Open Property Actions</key>
+  </area>
+  <area alias="nuCache">
+    <key alias="wait">Wait</key>
+    <key alias="refreshStatus">Refresh status</key>
+    <key alias="memoryCache">Memory Cache</key>
+    <key alias="memoryCacheDescription">
+        <![CDATA[
+            This button lets you reload the in-memory cache, by entirely reloading it from the database
+    cache (but it does not rebuild that database cache). This is relatively fast.
+    Use it when you think that the memory cache has not been properly refreshed, after some events
+    triggered&mdash;which would indicate a minor Umbraco issue.
+    (note: triggers the reload on all servers in an LB environment).
+    ]]>
+    </key>
+    <key alias="reload">Reload</key>
+    <key alias="databaseCache">Database Cache</key>
+    <key alias="databaseCacheDescription">
+        <![CDATA[
+    This button lets you rebuild the database cache, ie the content of the cmsContentNu table.
+    <strong>Rebuilding can be expensive.</strong>
+    Use it when reloading is not enough, and you think that the database cache has not been
+    properly generated&mdash;which would indicate some critical Umbraco issue.
+    ]]>
+    </key>
+    <key alias="rebuild">Rebuild</key>
+    <key alias="internals">Internals</key>
+    <key alias="internalsDescription">
+        <![CDATA[
+    This button lets you trigger a NuCache snapshots collection (after running a fullCLR GC).
+    Unless you know what that means, you probably do <em>not</em> need to use it.
+    ]]>
+    </key>
+    <key alias="collect">Collect</key>
+    <key alias="publishedCacheStatus">Published Cache Status</key>
+    <key alias="caches">Caches</key>
+  </area>
+  <area alias="profiling">
+    <key alias="performanceProfiling">Performance profiling</key>
+    <key alias="performanceProfilingDescription">
+        <![CDATA[
+            <p>
+                Umbraco currently runs in debug mode. This means you can use the built-in performance profiler to assess the performance when rendering pages.
+            </p>
+            <p>
+                If you want to activate the profiler for a specific page rendering, simply add <b>umbDebug=true</b> to the querystring when requesting the page.
+            </p>
+            <p>
+                If you want the profiler to be activated by default for all page renderings, you can use the toggle below.
+                It will set a cookie in your browser, which then activates the profiler automatically.
+                In other words, the profiler will only be active by default in <i>your</i> browser - not everyone else's.
+            </p>
+    ]]>
+    </key>
+    <key alias="activateByDefault">Activate the profiler by default</key>
+    <key alias="reminder">Friendly reminder</key>
+    <key alias="reminderDescription">
+        <![CDATA[
+        <p>
+            You should never let a production site run in debug mode. Debug mode is turned off by setting <b>debug="false"</b> on the <b>&lt;compilation /&gt;</b> element in web.config.
+        </p>
+    ]]>
+    </key>
+    <key alias="profilerEnabledDescription">
+        <![CDATA[
+        <p>
+            Umbraco currently does not run in debug mode, so you can't use the built-in profiler. This is how it should be for a production site.
+        </p>
+        <p>
+            Debug mode is turned on by setting <b>debug="true"</b> on the <b>&lt;compilation /&gt;</b> element in web.config.
+        </p>
+    ]]>
+    </key>
+  </area>
+  <area alias="settingsDashboardVideos">
+    <key alias="trainingHeadline">Hours of Umbraco training videos are only a click away</key>
+    <key alias="trainingDescription">
+        <![CDATA[
+            <p>Want to master Umbraco? Spend a couple of minutes learning some best practices by watching one of these videos about using Umbraco. And visit <a href="http://umbraco.tv" target="_blank">umbraco.tv</a> for even more Umbraco videos</p>
+        ]]>
+    </key>
+    <key alias="getStarted">To get you started</key>
+  </area>
+  <area alias="settingsDashboard">
+    <key alias="start">Start here</key>
+    <key alias="startDescription">This section contains the building blocks for your Umbraco site. Follow the below links to find out more about working with the items in the Settings section</key>
+    <key alias="more">Find out more</key>
+    <key alias="bulletPointOne">
+        <![CDATA[
+        Read more about working with the items in Settings <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank">in the Documentation section</a> of Our Umbraco
+    ]]>
+    </key>
+    <key alias="bulletPointTwo">
+        <![CDATA[
+        Ask a question in the <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank">Community Forum</a>
+    ]]>
+    </key>
+    <key alias="bulletPointThree">
+        <![CDATA[
+        Watch our <a class="btn-link -underline" href="https://umbraco.tv" target="_blank">tutorial videos</a> (some are free, some require a subscription)
+    ]]>
+    </key>
+    <key alias="bulletPointFour">
+        <![CDATA[
+        Find out about our <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank">productivity boosting tools and commercial support</a>
+    ]]>
+    </key>
+    <key alias="bulletPointFive">
+        <![CDATA[
+        Find out about real-life <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank">training and certification</a> opportunities
+    ]]>
+    </key>
+  </area>
 </language>
