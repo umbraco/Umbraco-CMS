@@ -189,7 +189,7 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
             $scope.frameLoaded = true;
             configureSignalR(iframe);
 
-            $scope.currentCultureIso = $location.search().culture;
+            $scope.currentCultureIso = $location.search().culture || null;
         };
 
         /*****************************************************************************/
@@ -211,12 +211,19 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
                 setPageUrl();
             }
         };
-        $scope.registerCulture = function(iso, title, icon) {
-            var cultureObject = {iso: iso, title: title, icon: icon};
+        $scope.registerCulture = function(iso, title, isDefault) {
+            var cultureObject = {iso: iso, title: title, isDefault: isDefault};
             cultures.push(cultureObject);
         }
 
         $scope.$watch("currentCultureIso", function(oldIso, newIso) {
+            // if no culture is selected, we will pick the default one:
+            if ($scope.currentCultureIso === null) {
+                $scope.currentCulture = cultures.find(function(culture) {
+                    return culture.isDefault === true;
+                })
+                return;
+            }
             $scope.currentCulture = cultures.find(function(culture) {
                 return culture.iso === $scope.currentCultureIso;
             })

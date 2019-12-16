@@ -50,22 +50,20 @@
                     </div>
                 </div>
 
-
-                <div class="preview-menu-option" ng-class="{'--open': cultureOpen === true}" ng-click="$event.stopPropagation()">
-                    <button class="menu-bar__button umb-outline" ng-click="toggleCultureOpen()"><i class="icon {{currentCulture.icon}}"></i><span>{{currentCulture.title}}</span></button>
-                    <div class="dropdown-menu">
-
-                        @if (Model.Languages != null && Model.Languages.Count() > 1)
-                        {
-                            foreach (var language in Model.Languages)
+                @if (Model.Languages != null && Model.Languages.Count() > 1)
+                {
+                    <div class="preview-menu-option" ng-class="{'--open': cultureOpen === true}" ng-click="$event.stopPropagation()">
+                        <button class="menu-bar__button umb-outline" ng-click="toggleCultureOpen()"><i class="icon icon-globe-europe---africa"></i><span>{{currentCulture.title}}</span></button>
+                        <div class="dropdown-menu">
+                            @foreach (var language in Model.Languages)
                             {
-                                <button class="menu-bar__button umb-outline" ng-class="{ '--active':'@language.IsoCode' === currentCultureIso }" ng-click="changeCulture('@language.IsoCode')" ng-init="registerCulture('@language.IsoCode', '@language.CultureName', 'icon-globe-europe---africa')">
+                                <button class="menu-bar__button umb-outline" ng-class="{ '--active': currentCultureIso === '@language.IsoCode' || (@language.IsDefault.ToString().ToLower() && currentCultureIso === null) }" ng-click="changeCulture('@language.IsoCode')" ng-init="registerCulture('@language.IsoCode', '@language.CultureName', @language.IsDefault.ToString().ToLower())">
                                     <i class="icon icon-globe-europe---africa"></i><span>@language.CultureName</span>
                                 </button>
                             }
-                        }
+                        </div>
                     </div>
-                </div>
+                }
 
                 <button ng-click="exitPreview()" title="Exit Preview" class="menu-bar__button umb-outline"><i class="icon icon-power"></i><span>Exit</span>
                 </button>

@@ -126,6 +126,7 @@ body {
 
 .preview-menu-option {
 
+    position: relative;
     display: inline-block;
 
     > .menu-bar__button {
@@ -136,11 +137,11 @@ body {
         display:none;
 
         position: absolute;
+        right: 0;
         bottom: 100%;
-        float: left;
         min-width: 200px;
 
-        border-radius: 3px 3px 3px 0;
+        border-radius: 3px 3px 0 3px;
         overflow: hidden;
 
         background-color: @blueExtraDark;
