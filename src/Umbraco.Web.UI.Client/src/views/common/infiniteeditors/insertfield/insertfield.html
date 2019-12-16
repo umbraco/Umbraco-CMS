@@ -33,10 +33,9 @@
 
                     <!-- Default value -->
                     <div>
-                        <div style="margin-bottom: 20px;">
-                            <i class="icon icon-add blue" ng-hide="vm.showDefaultValue"></i>
-                            <a href="" ng-click="vm.showDefaultValue=true" ng-hide="vm.showDefaultValue"><localize key="templateEditor_addDefaultValue">Add default value</localize></a>
-                        </div>
+                        <button type="button" class="umb-node-preview-add mb3" ng-click="vm.showDefaultValue=true" ng-hide="vm.showDefaultValue">
+                            <localize key="templateEditor_addDefaultValue">Add default value</localize>
+                        </button>
 
                         <div class="control-group umb-control-group -no-border" ng-hide="!vm.showDefaultValue">
                             <div class="umb-el-wrap">
@@ -52,13 +51,17 @@
                     <div class="control-group umb-control-group">
                         <div class="umb-el-wrap">
                             <div class="controls">
-                                <label class="control-label" >
+                                <label class="control-label">
                                     <localize key="templateEditor_recursive">Recursive</localize>
                                 </label>
-                                <label for="recursive">
-                                    <input id="recursive" type="checkbox" name="recursive" ng-model="vm.recursive">
-                                    <localize key="templateEditor_recursiveDescr">Yes, make it recursive</localize>
-                                </label>
+                                <div class="flex">
+                                    <umb-checkbox name="recursive"
+                                                  disabled="!vm.field"
+                                                  model="vm.recursive"
+                                                  text="Yes, make it recursive"
+                                                  label-key="templateEditor_recursiveDescr">
+                                    </umb-checkbox>
+                                </div>
                             </div>
                         </div>
                     </div>

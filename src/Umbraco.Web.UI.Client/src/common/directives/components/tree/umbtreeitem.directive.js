@@ -34,8 +34,9 @@ angular.module("umbraco.directives")
         },
         
         link: function (scope, element, attrs, umbTreeCtrl) {
-            localizationService.localize("general_search").then(function (value) {
-                scope.searchAltText = value;
+            localizationService.localizeMany(["general_search", "visuallyHiddenTexts_openContextMenu"]).then(function (value) {
+                scope.searchAltText = value[0];
+                scope.optionsText = value[1];
             });
             
             // updates the node's DOM/styles
@@ -89,7 +90,9 @@ angular.module("umbraco.directives")
                     css.push("umb-tree-item--deleted");
                 }
 
-                if (actionNode) {
+                // checking the nodeType to ensure that this node and actionNode is from the same treeAlias
+                if (actionNode && actionNode.nodeType === node.nodeType) {
+
                     if (actionNode.id === node.id && String(node.id) !== "-1") {
                         css.push("active");
                     }

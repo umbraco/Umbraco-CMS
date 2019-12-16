@@ -31,6 +31,7 @@
 @param {boolean} disabled Set the checkbox to be disabled.
 @param {boolean} required Set the checkbox to be required.
 @param {callback} onChange Callback when the value of the checkbox change by interaction.
+@param {string} cssClass Set a css class modifier
 
 **/
 
@@ -78,7 +79,8 @@
             serverValidationField: "@",
             disabled: "<",
             required: "<",
-            onChange: "&?"
+            onChange: "&?",
+            cssClass: "@?"
         }
     };
 
