@@ -20,14 +20,14 @@ function watchTask(cb) {
     //Setup a watcher for all groups of JS files
     _.forEach(config.sources.js, function (group) {
         if(group.watch !== false) {
-            watch(group.files, { ignoreInitial: true, interval: watchInterval }, function JS_Group_Compile() { return processJs(group.files, group.out) });
+            watch(group.files, { ignoreInitial: true, interval: watchInterval }, function JS_Group_Compile() { return processJs(group.files, group.out);});
         }
     });
 
     //Setup a watcher for all groups of LESS files
     _.forEach(config.sources.less, function (group) {
         if(group.watch !== false) {
-            watch(group.watch, { ignoreInitial: true, interval: watchInterval }, function Less_Group_Compile() { processLess(group.files, group.out) });
+            watch(group.watch, { ignoreInitial: true, interval: watchInterval }, function Less_Group_Compile() { return processLess(group.files, group.out); });
         }
     });
     
@@ -38,7 +38,7 @@ function watchTask(cb) {
             viewWatcher = watch(group.files, { ignoreInitial: true, interval: watchInterval });
             viewWatcher.on('change', function(path, stats) {
                 console.log("copying " + group.files + " to " + config.root + config.targets.views + group.folder);
-                src(group.files).pipe( dest(config.root + config.targets.views + group.folder) )
+                src(group.files).pipe( dest(config.root + config.targets.views + group.folder) );
             });
         }
     });

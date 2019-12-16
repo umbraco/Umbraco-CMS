@@ -787,7 +787,14 @@ namespace Umbraco.Core.Packaging
                     Mandatory = property.Element("Mandatory") != null
                         ? property.Element("Mandatory").Value.ToLowerInvariant().Equals("true")
                         : false,
+                    MandatoryMessage = property.Element("MandatoryMessage") != null
+                        ? (string)property.Element("MandatoryMessage")
+                        : string.Empty,
+
                     ValidationRegExp = (string)property.Element("Validation"),
+                    ValidationRegExpMessage = property.Element("ValidationRegExpMessage") != null
+                        ? (string)property.Element("ValidationRegExpMessage")
+                        : string.Empty,
                     SortOrder = sortOrder,
                     Variations = property.Element("Variations") != null
                         ? (ContentVariation)Enum.Parse(typeof(ContentVariation), property.Element("Variations").Value)

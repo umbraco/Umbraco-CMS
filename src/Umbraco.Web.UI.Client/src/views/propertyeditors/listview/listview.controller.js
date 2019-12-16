@@ -403,6 +403,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
         const dialog = {
             view: "views/propertyeditors/listview/overlays/delete.html",
             deletesVariants: selectionHasVariants(),
+            isTrashed: $scope.isTrashed,
             submitButtonLabelKey: "contentTypeEditor_yesDelete",
             submitButtonStyle: "danger",
             submit: function (model) {
@@ -766,10 +767,11 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
 
 
         $scope.contentId = id;
-        $scope.isTrashed = id === "-20" || id === "-21";
+        $scope.isTrashed = editorState.current ? editorState.current.trashed : id === "-20" || id === "-21";
 
         $scope.options.allowBulkPublish = $scope.options.allowBulkPublish && !$scope.isTrashed;
         $scope.options.allowBulkUnpublish = $scope.options.allowBulkUnpublish && !$scope.isTrashed;
+        $scope.options.allowBulkCopy = $scope.options.allowBulkCopy && !$scope.isTrashed;
 
         $scope.options.bulkActionsAllowed = $scope.options.allowBulkPublish ||
             $scope.options.allowBulkUnpublish ||

@@ -466,6 +466,99 @@
 }
 
 .usky-cell-rte {
+    text-decoration:none;
+ }
+
+ .usky-grid  .iconBox a:hover {
+     text-decoration:none;
+     color: @white !important;
+ }
+
+ .usky-grid  .iconBox.selected {
+     -webkit-appearance: none;
+     background-image: -webkit-gradient(linear,0 0,0 100%,from(@gray-9),to(@gray-7));
+     background-image: -webkit-linear-gradient(top,@gray-9,@gray-7);
+     background-image: linear-gradient(to bottom,@gray-9,@gray-7);
+     background-repeat: repeat-x;
+     zoom: 1;
+     border-color: @gray-7 @gray-7 @gray-6;
+     border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.1) rgba(0,0,0,0.25);
+     box-shadow: inset 0 2px 4px rgba(0,0,0,0.15),0 1px 2px rgba(0,0,0,0.05);
+     border-radius: 3px;
+     background: transparent;
+ }
+
+ .usky-grid  .iconBox i {
+     font-size:16px !important;
+     color: @gray-4;
+     display:block;
+ }
+
+
+ .usky-grid  ul {
+     display:inline-block;
+     list-style:none;
+     padding:0;
+     margin: 10px 0 0 0;
+     text-align:center;
+ }
+
+ .usky-grid  .help-text {
+     background: @gray-10;
+     color: @gray-3;
+     font-size: 14px;
+     padding: 10px 20px 10px 20px;
+     border-radius: 15px;
+     display: inline-block;
+     clear: both;
+ }
+
+ .usky-grid  ul li {
+     display: inline-block;
+     width: 120px;
+     margin: 8px 8px 0px 8px;
+ }
+
+
+
+
+ // TINYMCE EDITOR
+ // -------------------------
+ .usky-grid .mce-panel {
+     border: none !important;
+     clear:both;
+ }
+
+ .usky-grid .mce-btn button {
+     padding: 8px 6px;
+     line-height: inherit;
+ }
+
+ .usky-grid .mce-toolbar {
+     border: 1px solid @gray-8;
+     background-color: @gray-10;
+     z-index: 100;
+     display: inline-block;
+     float: left;
+     padding: -1px;
+     position: absolute;
+     margin: -1px -1px 0 -1px;
+     box-shadow: 2px 2px 10px 0px rgba(50, 50, 50, 0.14);
+     z-index: 9999999;
+ }
+
+ .mce-flow-layout-item {
+     margin: 0;
+ }
+
+ .usky-grid  .mce-panel {
+     background: transparent !important;
+ }
+ .usky-grid  .mce-floatpanel {
+     background-color: @gray-10 !important;
+ }
+
+.usky-cell-rte{
     border: 1px solid @gray-10;
 }
 
