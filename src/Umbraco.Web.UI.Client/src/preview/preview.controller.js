@@ -211,11 +211,6 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
                 setPageUrl();
             }
         };
-        /*
-        $scope.isCurrentCulture = function(culture) {
-            return $location.search().culture === culture;
-        }
-        */
         $scope.registerCulture = function(iso, title, icon) {
             var cultureObject = {iso: iso, title: title, icon: icon};
             cultures.push(cultureObject);
