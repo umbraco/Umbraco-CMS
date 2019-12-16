@@ -45,7 +45,22 @@ body {
     font-size: 12px;
     line-height: 16px;
 
+    animation: menu-bar-animation 1.2s;
+    animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+
 }
+
+@keyframes menu-bar-animation {
+    0% {
+        bottom: -50px;
+    }
+    40% {
+        bottom: -50px;
+    }
+    80% {
+        bottom: 0px;
+    }
+  }
 
 .menu-bar__right-part {
     float: right;
@@ -71,6 +86,7 @@ body {
     border:none;
     background-color: @blueExtraDark;
 
+    text-align: left;
     font: inherit;
     color: inherit;
     cursor: pointer;
