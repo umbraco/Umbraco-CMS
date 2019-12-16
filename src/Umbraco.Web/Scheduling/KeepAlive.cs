@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
 
@@ -12,14 +13,16 @@ namespace Umbraco.Web.Scheduling
     internal class KeepAlive : RecurringTaskBase
     {
         private readonly IRuntimeState _runtime;
+        private readonly IKeepAliveSection _keepAliveSection;
         private readonly IProfilingLogger _logger;
         private static HttpClient _httpClient;
 
         public KeepAlive(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRuntimeState runtime, IProfilingLogger logger)
+            IRuntimeState runtime, IKeepAliveSection keepAliveSection, IProfilingLogger logger)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _runtime = runtime;
+            _keepAliveSection = keepAliveSection;
             _logger = logger;
             if (_httpClient == null)
                 _httpClient = new HttpClient();
@@ -47,8 +50,7 @@ namespace Umbraco.Web.Scheduling
 
             using (_logger.DebugDuration<KeepAlive>("Keep alive executing", "Keep alive complete"))
             {
-                string keepAlivePingUrl = Current.Configs.Settings().KeepAlive.KeepAlivePingUrl;
-
+                var keepAlivePingUrl = _keepAliveSection.KeepAlivePingUrl;
                 try
                 {
                     if (keepAlivePingUrl.Contains("{umbracoApplicationUrl}"))

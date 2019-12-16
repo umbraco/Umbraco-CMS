@@ -2,7 +2,7 @@
 {
     public interface IKeepAliveSection : IUmbracoConfigurationSection
     {
-        bool EnableKeepAliveTask { get; }
+        bool DisableKeepAliveTask { get; }
         string KeepAlivePingUrl { get; }
     }
 }
