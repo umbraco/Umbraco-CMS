@@ -30,11 +30,6 @@ namespace Umbraco.Web.Editors
             {
                 Logger.Info(GetType(), $"Check your network connection, exception: {rex.Message}");
             }
-            catch (System.Exception ex)
-            {
-
-                throw ex;
-            }
 
             return new List<HelpPage>();
         }
