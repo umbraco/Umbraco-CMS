@@ -195,6 +195,7 @@ Use this directive to construct a header inside the main editor window.
 @param {string=} icon Show and edit the content icon. Opens an overlay to change the icon.
 @param {boolean=} hideIcon Set to <code>true</code> to hide icon.
 @param {string=} alias show and edit the content alias.
+@param {boolean=} aliasLocked Set to <code>true</code> to lock the alias.
 @param {boolean=} hideAlias Set to <code>true</code> to hide alias.
 @param {string=} description Add a description to the content.
 @param {boolean=} hideDescription Set to <code>true</code> to hide description.
@@ -239,12 +240,13 @@ Use this directive to construct a header inside the main editor window.
                 if (scope.editorfor) {
                     localizeVars.push(scope.editorfor);
                 }
-                localizationService.localizeMany(localizeVars).then(function (data) {
+                localizationService.localizeMany(localizeVars).then(function(data) {
                     setAccessibilityForEditor(data);
                     scope.loading = false;
                 });
+            } else {
+                scope.loading = false;
             }
-
             scope.goBack = function () {
                 if (scope.onBack) {
                     scope.onBack();
@@ -346,6 +348,7 @@ Use this directive to construct a header inside the main editor window.
                 icon: "=",
                 hideIcon: "@",
                 alias: "=",
+                aliasLocked: "<",
                 hideAlias: "=",
                 description: "=",
                 hideDescription: "@",

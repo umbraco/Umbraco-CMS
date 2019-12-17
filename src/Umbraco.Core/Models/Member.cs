@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Models
@@ -43,7 +42,8 @@ namespace Umbraco.Core.Models
         public Member(string name, IMemberType contentType)
             : base(name, -1, contentType, new PropertyCollection())
         {
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
 
             IsApproved = true;
 
@@ -63,9 +63,12 @@ namespace Umbraco.Core.Models
         public Member(string name, string email, string username, IMemberType contentType, bool isApproved = true)
             : base(name, -1, contentType, new PropertyCollection())
         {
-            if (string.IsNullOrWhiteSpace(email)) throw new ArgumentNullOrEmptyException(nameof(email));
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullOrEmptyException(nameof(username));
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
+            if (email == null) throw new ArgumentNullException(nameof(email));
+            if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(email));
+            if (username == null) throw new ArgumentNullException(nameof(username));
+            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(username));
 
             _email = email;
             _username = username;
