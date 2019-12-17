@@ -7,7 +7,7 @@ namespace Umbraco.Core.Persistence.Dtos
     [TableName(Constants.DatabaseSchema.Tables.NodeData)]
     [PrimaryKey("nodeId", AutoIncrement = false)]
     [ExplicitColumns]
-    internal class ContentNuDto
+    public class ContentNuDto
     {
         [Column("nodeId")]
         [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsContentNu", OnColumns = "nodeId, published")]

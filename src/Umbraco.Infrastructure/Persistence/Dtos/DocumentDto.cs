@@ -7,7 +7,7 @@ namespace Umbraco.Core.Persistence.Dtos
     [TableName(TableName)]
     [PrimaryKey("nodeId", AutoIncrement = false)]
     [ExplicitColumns]
-    internal class DocumentDto
+    public class DocumentDto
     {
         private const string TableName = Constants.DatabaseSchema.Tables.Document;
 

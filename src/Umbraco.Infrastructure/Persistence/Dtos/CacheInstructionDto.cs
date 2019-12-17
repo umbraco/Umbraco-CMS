@@ -7,7 +7,7 @@ namespace Umbraco.Core.Persistence.Dtos
     [TableName(Constants.DatabaseSchema.Tables.CacheInstruction)]
     [PrimaryKey("id")]
     [ExplicitColumns]
-    internal class CacheInstructionDto
+    public class CacheInstructionDto
     {
         [Column("id")]
         [NullSetting(NullSetting = NullSettings.NotNull)]

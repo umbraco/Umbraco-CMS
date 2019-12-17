@@ -8,7 +8,7 @@ namespace Umbraco.Core.Persistence.Dtos
     [TableName(TableName)]
     [PrimaryKey("id")]
     [ExplicitColumns]
-    internal class ContentVersionDto
+    public class ContentVersionDto
     {
         public const string TableName = Constants.DatabaseSchema.Tables.ContentVersion;
         private int? _userId;
