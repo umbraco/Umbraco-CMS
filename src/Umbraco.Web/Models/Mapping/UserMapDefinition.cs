@@ -148,7 +148,7 @@ namespace Umbraco.Web.Models.Mapping
             target.ParentId = -1;
             target.Path = "-1," + source.Id;
             target.IsSystemUserGroup = source.IsSystemUserGroup();
-            target.UpdateDate = source.UpdateDate;
+
             MapUserGroupBasic(target, source.AllowedSections, source.StartContentId, source.StartMediaId, context);
         }
 
@@ -165,7 +165,6 @@ namespace Umbraco.Web.Models.Mapping
             target.Path = "-1," + source.Id;
             target.UserCount = source.UserCount;
             target.IsSystemUserGroup = source.IsSystemUserGroup();
-            target.UpdateDate = source.UpdateDate;
 
             MapUserGroupBasic(target, source.AllowedSections, source.StartContentId, source.StartMediaId, context);
         }
@@ -180,7 +179,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Name = source.Name;
             target.ParentId = -1;
             target.Path = "-1," + source.Id;
-            target.UpdateDate = source.UpdateDate;
+
             target.DefaultPermissions = MapUserGroupDefaultPermissions(source);
 
             if (target.Icon.IsNullOrWhiteSpace())
@@ -197,7 +196,7 @@ namespace Umbraco.Web.Models.Mapping
             target.ParentId = source.ParentId;
             target.Path = source.Path;
             target.Udi = Udi.Create(ObjectTypes.GetUdiType(source.NodeObjectType), source.Key);
-            target.UpdateDate = source.UpdateDate;
+
             if (source.NodeObjectType == Constants.ObjectTypes.Member && target.Icon.IsNullOrWhiteSpace())
                 target.Icon = Constants.Icons.Member;
         }
@@ -292,6 +291,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Path = "-1," + source.Id;
             target.StartContentIds = GetStartNodes(source.StartContentIds.ToArray(), UmbracoObjectTypes.Document, "content/contentRoot", context);
             target.StartMediaIds = GetStartNodes(source.StartMediaIds.ToArray(), UmbracoObjectTypes.Media, "media/mediaRoot", context);
+            target.UpdateDate = source.UpdateDate;
             target.UserGroups = context.MapEnumerable<IReadOnlyUserGroup, UserGroupBasic>(source.Groups);
             target.Username = source.Username;
             target.UserState = source.UserState;

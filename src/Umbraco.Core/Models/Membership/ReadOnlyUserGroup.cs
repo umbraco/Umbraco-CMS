@@ -7,7 +7,7 @@ namespace Umbraco.Core.Models.Membership
     public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGroup>
     {
         public ReadOnlyUserGroup(int id, string name, string icon, int? startContentId, int? startMediaId, string @alias,
-            IEnumerable<string> allowedSections, IEnumerable<string> permissions, DateTime updateDate)
+            IEnumerable<string> allowedSections, IEnumerable<string> permissions)
         {
             Name = name;
             Icon = icon;
@@ -15,8 +15,6 @@ namespace Umbraco.Core.Models.Membership
             Alias = alias;
             AllowedSections = allowedSections.ToArray();
             Permissions = permissions.ToArray();
-            UpdateDate = updateDate;
-            
 
             //Zero is invalid and will be treated as Null
             StartContentId = startContentId == 0 ? null : startContentId;
@@ -29,8 +27,6 @@ namespace Umbraco.Core.Models.Membership
         public int? StartContentId { get; private set; }
         public int? StartMediaId { get; private set; }
         public string Alias { get; private set; }
-
-        public DateTime UpdateDate { get; private set; }
 
         /// <summary>
         /// The set of default permissions
