@@ -564,6 +564,7 @@ When building a custom infinite editor view you can use the same components as a
          * @description
          * Opens a media picker in infinite editing, the submit callback returns an array of selected media items
          * @param {Object} editor rendering options
+         * @param {Int} editor.startNodeId Set the startnode of the picker (optional)
          * @param {Boolean} editor.multiPicker Pick one or multiple items
          * @param {Boolean} editor.onlyImages Only display files that have an image file-extension
          * @param {Boolean} editor.disableFolderSelect Disable folder selection
