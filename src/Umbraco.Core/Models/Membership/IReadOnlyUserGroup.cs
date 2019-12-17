@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Umbraco.Core.Models.Membership
 {
@@ -12,6 +13,8 @@ namespace Umbraco.Core.Models.Membership
         int Id { get; }
         int? StartContentId { get; }
         int? StartMediaId { get; }
+        DateTime UpdateDate { get; }
+
 
         /// <summary>
         /// The alias
