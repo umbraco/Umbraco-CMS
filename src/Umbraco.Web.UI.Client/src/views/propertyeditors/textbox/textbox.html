@@ -12,7 +12,7 @@
         <div ng-messages="textboxFieldForm.textbox.$error" show-validation-on-submit>
             <p class="sr-only" ng-message="valServer" tabindex="0">{{model.label}} {{textboxFieldForm.textbox.errorMsg}}</p>
             <p class="help-inline" ng-message="valServer" tabindex="0" aria-hidden="true">{{textboxFieldForm.textbox.errorMsg}}</p>
-            <p class="help-inline" ng-message="required"><localize key="general_required">Required</localize></p>
+            <p class="help-inline" ng-message="required">{{mandatoryMessage}}</p>
         </div>
 
         <div class="help" ng-if="model.count >= (model.config.maxChars*.8) && model.count <= model.config.maxChars">

@@ -5,10 +5,10 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
-using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Editors.Filters
@@ -43,8 +43,11 @@ namespace Umbraco.Web.Editors.Filters
         where TModelSave: IContentSave<TPersisted>
         where TModelWithProperties : IContentProperties<ContentPropertyBasic>
     {
-        protected ContentModelValidator(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor) : base(logger, umbracoContextAccessor)
+        private readonly ILocalizedTextService _textService;
+
+        protected ContentModelValidator(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService textService) : base(logger, umbracoContextAccessor)
         {
+            _textService = textService ?? throw new ArgumentNullException(nameof(textService));
         }
         
         /// <summary>
@@ -122,6 +125,18 @@ namespace Umbraco.Web.Editors.Filters
         {
             var properties = modelWithProperties.Properties.ToDictionary(x => x.Alias, x => x);
 
+            // Retrieve default messages used for required and regex validatation.  We'll replace these
+            // if set with custom ones if they've been provided for a given property.
+            var requiredDefaultMessages = new[]
+                {
+                    _textService.Localize("validation", "invalidNull"),
+                    _textService.Localize("validation", "invalidEmpty")
+                };
+            var formatDefaultMessages = new[]
+                {
+                    _textService.Localize("validation", "invalidPattern"),
+                };
+
             foreach (var p in dto.Properties)
             {
                 var editor = p.PropertyEditor;
@@ -141,7 +156,7 @@ namespace Umbraco.Web.Editors.Filters
 
                 var postedValue = postedProp.Value;
 
-                ValidatePropertyValue(model, modelWithProperties, editor, p, postedValue, modelState);
+                ValidatePropertyValue(model, modelWithProperties, editor, p, postedValue, modelState, requiredDefaultMessages, formatDefaultMessages);
     
             }
 
@@ -157,22 +172,34 @@ namespace Umbraco.Web.Editors.Filters
         /// <param name="property"></param>
         /// <param name="postedValue"></param>
         /// <param name="modelState"></param>
+        /// <param name="requiredDefaultMessages"></param>
+        /// <param name="formatDefaultMessages"></param>
         protected virtual void ValidatePropertyValue(
             TModelSave model,
             TModelWithProperties modelWithProperties,
             IDataEditor editor,
             ContentPropertyDto property,
             object postedValue,
-            ModelStateDictionary modelState)
+            ModelStateDictionary modelState,
+            string[] requiredDefaultMessages,
+            string[] formatDefaultMessages)
         {
-            // validate
             var valueEditor = editor.GetValueEditor(property.DataType.Configuration);
             foreach (var r in valueEditor.Validate(postedValue, property.IsRequired, property.ValidationRegExp))
             {
+                // If we've got custom error messages, we'll replace the default ones that will have been applied in the call to Validate().
+                if (property.IsRequired && !string.IsNullOrWhiteSpace(property.IsRequiredMessage) && requiredDefaultMessages.Contains(r.ErrorMessage, StringComparer.OrdinalIgnoreCase))
+                {
+                    r.ErrorMessage = property.IsRequiredMessage;
+                }
+
+                if (!string.IsNullOrWhiteSpace(property.ValidationRegExp) && !string.IsNullOrWhiteSpace(property.ValidationRegExpMessage) && formatDefaultMessages.Contains(r.ErrorMessage, StringComparer.OrdinalIgnoreCase))
+                {
+                    r.ErrorMessage = property.ValidationRegExpMessage;
+                }
+
                 modelState.AddPropertyError(r, property.Alias, property.Culture);
             }
         }
-
-
     }
 }
