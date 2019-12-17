@@ -28,7 +28,6 @@ namespace Umbraco.TestData
         private const string MediaPickerDataTypeName = "UmbracoTestDataContent.MediaPicker";
         private const string TextDataTypeName = "UmbracoTestDataContent.Text";
         private const string TestDataContentTypeAlias = "umbTestDataContent";
-        private const int IdealPerBranch = 5;
         private readonly IScopeProvider _scopeProvider;
         private readonly PropertyEditorCollection _propertyEditors;
 
@@ -101,48 +100,59 @@ namespace Umbraco.TestData
         /// <param name="parent"></param>
         /// <param name="count"></param>
         /// <param name="depth"></param>
-        /// <param name="creator">
+        /// <param name="create">
         /// A callback that returns a tuple of Content and another callback to produce a Container.
         /// For media, a container will be another folder, for content the container will be the Content itself.
         /// </param>
         /// <returns></returns>
         private IEnumerable<Udi> CreateHierarchy<T>(
             T parent, int count, int depth,
-            Func<T, (T content, Func<T> container)> creator)
+            Func<T, (T content, Func<T> container)> create)
             where T: class, IContentBase
         {
             yield return parent.GetUdi();
 
+            // This will not calculate a balanced tree but it will ensure that there will be enough nodes deep enough to not fill up the tree.
             var totalDescendants = count - 1;
-            int perLevel = totalDescendants / depth;
-            var branchCount = perLevel / IdealPerBranch;
-            var perBranch = perLevel / branchCount;
+            var perLevel = Math.Ceiling(totalDescendants / (double)depth);
+            var perBranch = Math.Ceiling(perLevel / depth);
 
-            var currentPerBranchCount = 0;
+            var tracked = new Stack<(T parent, int childCount)>();
 
-            T lastParent = null;
+            var currChildCount = 0;
 
             for (int i = 0; i < count; i++)
             {
-                var created = creator(parent);
+                var created = create(parent);
                 var contentItem = created.content;
 
                 yield return contentItem.GetUdi();
 
-                currentPerBranchCount++;
+                currChildCount++;
 
-                if (contentItem.Level < depth)
+                if (currChildCount == perBranch)
                 {
+                    // move back up...
+
+                    var prev = tracked.Pop();
+
+                    // restore child count
+                    currChildCount = prev.childCount;
+                    // restore the parent
+                    parent = prev.parent;
+                    
+                }
+                else if (contentItem.Level < depth)
+                {
+                    // track the current parent and it's current child count
+                    tracked.Push((parent, currChildCount));
+
                     // not at max depth, create below
-                    lastParent = parent;
                     parent = created.container();
-                    currentPerBranchCount = 0;
+                    
+                    currChildCount = 0;
                 }
-                else if (currentPerBranchCount == perBranch)
-                {
-                    parent = lastParent;
-                    currentPerBranchCount = 0;
-                }
+                
             }
         }
 
@@ -167,7 +177,7 @@ namespace Umbraco.TestData
                 return (media, () =>
                 {
                     // create a folder to contain child media
-                    var container = Services.MediaService.CreateMediaWithIdentity(faker.Commerce.Department(), parent, Constants.Conventions.MediaTypes.Folder);
+                    var container = Services.MediaService.CreateMediaWithIdentity(faker.Commerce.Department(), currParent, Constants.Conventions.MediaTypes.Folder);
                     return container;
                 });
             });
