@@ -647,11 +647,5 @@
       <Name>Umbraco.Infrastructure</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Persistence\DatabaseAnnotations" />
-    <Folder Include="Persistence\DatabaseModelDefinitions" />
-    <Folder Include="Persistence\FaultHandling" />
-    <Folder Include="Persistence\Querying" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
