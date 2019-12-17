@@ -205,7 +205,6 @@
     <Compile Include="PropertyEditors\IDataValueReference.cs" />
     <Compile Include="PropertyEditors\IDataValueReferenceFactory.cs" />
     <Compile Include="Persistence\Repositories\Implement\ContentTypeCommonRepository.cs" />
-    <Compile Include="Persistence\Repositories\IContentTypeCommonRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\LanguageRepositoryExtensions.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RenameLabelAndRichTextPropertyEditorAliases.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
@@ -294,10 +293,6 @@
     <Compile Include="Migrations\Upgrade\Upgrader.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DropMigrationsTable.cs" />
     <Compile Include="ContentExtensions.cs" />
-    <Compile Include="Persistence\DatabaseDebugHelper.cs" />
-    <Compile Include="Persistence\DbCommandExtensions.cs" />
-    <Compile Include="Persistence\EntityNotFoundException.cs" />
-    <Compile Include="Persistence\LocalDb.cs" />
     <Compile Include="Migrations\IMigrationContext.cs" />
     <Compile Include="Migrations\IMigrationExpression.cs" />
     <Compile Include="Migrations\Install\DatabaseDataCreator.cs" />
@@ -421,18 +416,6 @@
     <Compile Include="Persistence\Repositories\Implement\EntityRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\ExternalLoginRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\FileRepository.cs" />
-    <Compile Include="Persistence\Repositories\IDocumentBlueprintRepository.cs" />
-    <Compile Include="Persistence\Repositories\IDocumentRepository.cs" />
-    <Compile Include="Persistence\Repositories\IContentTypeRepository.cs" />
-    <Compile Include="Persistence\Repositories\IContentTypeRepositoryBase.cs" />
-    <Compile Include="Persistence\Repositories\IDataTypeRepository.cs" />
-    <Compile Include="Persistence\Repositories\IEntityRepository.cs" />
-    <Compile Include="Persistence\Repositories\IMediaRepository.cs" />
-    <Compile Include="Persistence\Repositories\IMediaTypeRepository.cs" />
-    <Compile Include="Persistence\Repositories\IMemberRepository.cs" />
-    <Compile Include="Persistence\Repositories\IMemberTypeRepository.cs" />
-    <Compile Include="Persistence\Repositories\IPublicAccessRepository.cs" />
-    <Compile Include="Persistence\Repositories\IContentRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\LanguageRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\MacroRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\MediaRepository.cs" />
@@ -464,7 +447,6 @@
     <Compile Include="Persistence\Repositories\Implement\UserGroupRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\UserRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\ContentRepositoryBase.cs" />
-    <Compile Include="Persistence\UmbracoDatabaseExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RuntimeState.cs" />
     <Compile Include="Runtime\CoreInitialComposer.cs" />
