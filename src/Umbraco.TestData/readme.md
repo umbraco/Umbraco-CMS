@@ -8,6 +8,8 @@ in Debug mode (i.e. when testing within Visual Studio).
 
 ## Usage
 
+You must use SQL Server for this, using SQLCE will die if you try to bulk create huge amounts of data.
+
 It has to be enabled by an appSetting:
 
 ```xml
