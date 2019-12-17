@@ -155,7 +155,6 @@
     <Compile Include="Composing\Current.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="Composing\LightInject\MixedLightInjectScopeManagerProvider.cs" />
-    <Compile Include="Events\QueuingEventDispatcher.cs" />
     <Compile Include="Logging\Viewer\LogTimePeriod.cs" />
     <Compile Include="Manifest\ManifestParser.cs" />
     <Compile Include="Manifest\ValueValidatorConverter.cs" />
@@ -215,12 +214,6 @@
     <Compile Include="Persistence\Repositories\Implement\LanguageRepositoryExtensions.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RenameLabelAndRichTextPropertyEditorAliases.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
-    <Compile Include="Scoping\IScopeAccessor.cs" />
-    <Compile Include="Scoping\Scope.cs" />
-    <Compile Include="Scoping\ScopeContext.cs" />
-    <Compile Include="Scoping\ScopeContextualBase.cs" />
-    <Compile Include="Scoping\ScopeProvider.cs" />
-    <Compile Include="Scoping\ScopeReference.cs" />
     <Compile Include="Security\PasswordSecurity.cs" />
     <Compile Include="Services\Implement\PropertyValidationService.cs" />
     <Compile Include="StringExtensions.cs" />

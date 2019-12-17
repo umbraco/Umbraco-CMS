@@ -28,18 +28,7 @@
     <ItemGroup>
       <_UnmanagedRegistrationCache Remove="obj\Umbraco.Infrastructure.csproj.UnmanagedRegistration.cache" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Compile Remove="obj\**" />
-      <Compile Remove="Scoping\ScopeReference.cs" />
-      <Compile Remove="Scoping\ScopeProvider.cs" />
-      <Compile Remove="Scoping\ScopeContext.cs" />
-      <Compile Remove="Persistence\FaultHandling\SqlAzureTransientErrorDetectionStrategy.cs" />
-      <Compile Remove="Persistence\FaultHandling\NetworkConnectivityErrorDetectionStrategy.cs" />
-      <Compile Remove="Persistence\FaultHandling\Incremental.cs" />
-      <Compile Remove="Persistence\FaultHandling\FixedInterval.cs" />
-    </ItemGroup>
-
+    
     <ItemGroup>
       <EmbeddedResource Remove="obj\**" />
     </ItemGroup>
@@ -65,8 +54,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Events" />
       <Folder Include="Models\Identity" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="obj\**" />
     </ItemGroup>
 
 </Project>

@@ -8,7 +8,7 @@ namespace Umbraco.Core.Scoping
     /// <remarks>A scope context can enlist objects that will be attached to the scope, and available
     /// for the duration of the scope. In addition, it can enlist actions, that will run when the
     /// scope is exiting, and after the database transaction has been committed.</remarks>
-    public interface IScopeContext
+    public interface IScopeContext : IInstanceIdentifiable
     {
         /// <summary>
         /// Enlists an action.
@@ -46,5 +46,7 @@ namespace Umbraco.Core.Scoping
         /// <param name="key">The object unique identifier.</param>
         /// <returns>The enlisted object, if any, else the default value.</returns>
         T GetEnlisted<T>(string key);
+
+        void ScopeExit(bool completed);
     }
 }

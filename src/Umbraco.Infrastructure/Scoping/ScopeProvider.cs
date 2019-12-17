@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Runtime.Remoting.Messaging;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Current = Umbraco.Composing.Current;
+
 #if DEBUG_SCOPES
 using System.Linq;
 using System.Text;
@@ -24,15 +26,18 @@ namespace Umbraco.Core.Scoping
         private readonly ITypeFinder _typeFinder;
         private readonly IRequestCache _requestCache;
         private readonly FileSystems _fileSystems;
+        private readonly ICoreDebug _coreDebug;
+        private readonly IMediaFileSystem _mediaFileSystem;
 
-        public ScopeProvider(IUmbracoDatabaseFactory databaseFactory, FileSystems fileSystems, ILogger logger, ITypeFinder typeFinder, IRequestCache requestCache)
+        public ScopeProvider(IUmbracoDatabaseFactory databaseFactory, FileSystems fileSystems, ICoreDebug coreDebug, IMediaFileSystem mediaFileSystem, ILogger logger, ITypeFinder typeFinder, IRequestCache requestCache)
         {
             DatabaseFactory = databaseFactory;
             _fileSystems = fileSystems;
+            _coreDebug = coreDebug;
+            _mediaFileSystem = mediaFileSystem;
             _logger = logger;
             _typeFinder = typeFinder;
             _requestCache = requestCache;
-
             // take control of the FileSystems
             _fileSystems.IsScoped = () => AmbientScope != null && AmbientScope.ScopedFileSystems;
 
@@ -105,12 +110,12 @@ namespace Umbraco.Core.Scoping
         private static T GetCallContextObject<T>(string key)
             where T : class
         {
-            var objectKey = CallContext.LogicalGetData(key).AsGuid();
-            if (objectKey == Guid.Empty) return null;
+            var objectKey = CallContext.GetData(key);
+            if (objectKey is null) return null;
 
             lock (StaticCallContextObjectsLock)
             {
-                if (StaticCallContextObjects.TryGetValue(objectKey, out object callContextObject))
+                if (StaticCallContextObjects.TryGetValue(objectKey.Value, out object callContextObject))
                 {
 #if DEBUG_SCOPES
                     Current.Logger.Debug<ScopeProvider>("Got " + typeof(T).Name + " Object " + objectKey.ToString("N").Substring(0, 8));
@@ -120,7 +125,7 @@ namespace Umbraco.Core.Scoping
                 }
 
                 // hard to inject into a static method :(
-                Current.Logger.Warn<ScopeProvider>("Missed {TypeName} Object {ObjectKey}", typeof(T).Name, objectKey.ToString("N").Substring(0, 8));
+                Current.Logger.Warn<ScopeProvider>("Missed {TypeName} Object {ObjectKey}", typeof(T).Name, objectKey.Value.ToString("N").Substring(0, 8));
 #if DEBUG_SCOPES
                 //Current.Logger.Debug<ScopeProvider>("At:\r\n" + Head(Environment.StackTrace, 24));
 #endif
@@ -136,7 +141,7 @@ namespace Umbraco.Core.Scoping
             if (key == ScopeItemKey)
             {
                 // first, null-register the existing value
-                var ambientKey = CallContext.LogicalGetData(ScopeItemKey).AsGuid();
+                var ambientKey = CallContext.GetData(ScopeItemKey).AsGuid();
                 object o = null;
                 lock (StaticCallContextObjectsLock)
                 {
@@ -152,16 +157,16 @@ namespace Umbraco.Core.Scoping
 #endif
             if (value == null)
             {
-                var objectKey = CallContext.LogicalGetData(key).AsGuid();
-                CallContext.FreeNamedDataSlot(key);
-                if (objectKey == default) return;
+                var objectKey = CallContext.GetData(key);
+                CallContext.RemoveData(key);
+                if (objectKey is null) return;
                 lock (StaticCallContextObjectsLock)
                 {
 #if DEBUG_SCOPES
                     Current.Logger.Debug<ScopeProvider>("Remove Object " + objectKey.ToString("N").Substring(0, 8));
                     //Current.Logger.Debug<ScopeProvider>("At:\r\n" + Head(Environment.StackTrace, 24));
 #endif
-                    StaticCallContextObjects.Remove(objectKey);
+                    StaticCallContextObjects.Remove(objectKey.Value);
                 }
             }
             else
@@ -178,7 +183,7 @@ namespace Umbraco.Core.Scoping
 #endif
                     StaticCallContextObjects.Add(objectKey, value);
                 }
-                CallContext.LogicalSetData(key, objectKey);
+                CallContext.SetData(key, objectKey);
             }
         }
 
@@ -228,13 +233,13 @@ namespace Umbraco.Core.Scoping
 
         internal const string ContextItemKey = "Umbraco.Core.Scoping.ScopeContext";
 
-        public ScopeContext AmbientContext
+        public IScopeContext AmbientContext
         {
             get
             {
                 // try http context, fallback onto call context
-                var value = GetHttpContextObject<ScopeContext>(ContextItemKey, false);
-                return value ?? GetCallContextObject<ScopeContext>(ContextItemKey);
+                var value = GetHttpContextObject<IScopeContext>(ContextItemKey, false);
+                return value ?? GetCallContextObject<IScopeContext>(ContextItemKey);
             }
             set
             {
@@ -285,7 +290,7 @@ namespace Umbraco.Core.Scoping
 
         #endregion
 
-        public void SetAmbient(Scope scope, ScopeContext context = null)
+        public void SetAmbient(Scope scope, IScopeContext context = null)
         {
             // clear all
             SetHttpContextObject(ScopeItemKey, null, false);
@@ -319,7 +324,7 @@ namespace Umbraco.Core.Scoping
             IEventDispatcher eventDispatcher = null,
             bool? scopeFileSystems = null)
         {
-            return new Scope(this, _logger, _typeFinder, _fileSystems, true, null, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems);
+            return new Scope(this, _coreDebug, _mediaFileSystem, _logger, _typeFinder, _fileSystems, true, null, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems);
         }
 
         /// <inheritdoc />
@@ -375,13 +380,13 @@ namespace Umbraco.Core.Scoping
             {
                 var ambientContext = AmbientContext;
                 var newContext = ambientContext == null ? new ScopeContext() : null;
-                var scope = new Scope(this, _logger, _typeFinder, _fileSystems, false, newContext, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete);
+                var scope = new Scope(this, _coreDebug, _mediaFileSystem, _logger, _typeFinder, _fileSystems, false, newContext, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete);
                 // assign only if scope creation did not throw!
                 SetAmbient(scope, newContext ?? ambientContext);
                 return scope;
             }
 
-            var nested = new Scope(this, _logger, _typeFinder, _fileSystems, ambientScope, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete);
+            var nested = new Scope(this, _coreDebug, _mediaFileSystem, _logger, _typeFinder, _fileSystems, ambientScope, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete);
             SetAmbient(nested, AmbientContext);
             return nested;
         }

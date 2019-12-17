@@ -8,7 +8,10 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
-using ScopeProviderStatic = Umbraco.Core.Scoping.ScopeProvider;
+using CallContext = Umbraco.Core.Scoping.CallContext;
+
+//using CallContext = Umbraco.Core.Scoping.CallContext;
+
 
 namespace Umbraco.Tests.Scoping
 {
@@ -123,7 +126,7 @@ namespace Umbraco.Tests.Scoping
                     Assert.AreSame(scope, ((Scope) nested).ParentScope);
 
                     // it's moved over to call context
-                    var callContextKey = CallContext.LogicalGetData(ScopeProviderStatic.ScopeItemKey).AsGuid();
+                    var callContextKey = CallContext.GetData(ScopeProvider.ScopeItemKey).AsGuid();
                     Assert.AreNotEqual(Guid.Empty, callContextKey);
 
                     // only if Core.DEBUG_SCOPES are defined
@@ -485,7 +488,7 @@ namespace Umbraco.Tests.Scoping
 
             bool? completed = null;
             IScope ambientScope = null;
-            ScopeContext ambientContext = null;
+            IScopeContext ambientContext = null;
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (var scope = scopeProvider.CreateScope())

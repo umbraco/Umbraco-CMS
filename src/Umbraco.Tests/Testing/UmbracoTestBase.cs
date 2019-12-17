@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using System.Xml.Linq;
 using Examine;
 using Moq;
@@ -64,6 +65,7 @@ namespace Umbraco.Tests.Testing
     /// provides all the necessary environment, through DI. Yes, DI is bad in tests - unit tests.
     /// But it is OK in integration tests.
     /// </remarks>
+    [Apartment(ApartmentState.STA)]
     public abstract class UmbracoTestBase
     {
         // this class
