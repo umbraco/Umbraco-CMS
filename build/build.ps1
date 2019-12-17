@@ -456,10 +456,10 @@
   $ubuild.DefineMethod("PrepareAngularDocs",
   {
     Write-Host "Prepare Angular Documentation"
-    
+
     $src = "$($this.SolutionRoot)\src"
     $out = $this.BuildOutput
-	  
+
     "Moving to Umbraco.Web.UI.Docs folder"
     cd ..\src\Umbraco.Web.UI.Docs
 

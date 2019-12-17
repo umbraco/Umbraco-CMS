@@ -73,7 +73,10 @@ angular.module("umbraco")
                     ui.item.find(".umb-rte").each(function (key, value) {
                         // remove all RTEs in the dragged row and save their settings
                         var rteId = value.id;
-                        draggedRteSettings[rteId] = _.findWhere(tinyMCE.editors, { id: rteId }).settings;
+                        var editor = _.findWhere(tinyMCE.editors, { id: rteId });
+                        if (editor) {
+                            draggedRteSettings[rteId] = editor.settings;
+                        }
                     });
                 },
 
@@ -85,9 +88,17 @@ angular.module("umbraco")
                     // reset all RTEs affected by the dragging
                     ui.item.parents(".umb-column").find(".umb-rte").each(function (key, value) {
                         var rteId = value.id;
-                        draggedRteSettings[rteId] = draggedRteSettings[rteId] || _.findWhere(tinyMCE.editors, { id: rteId }).settings;
-                        tinyMCE.execCommand("mceRemoveEditor", false, rteId);
-                        tinyMCE.init(draggedRteSettings[rteId]);
+                        var settings = draggedRteSettings[rteId];
+                        if (!settings) {
+                            var editor = _.findWhere(tinyMCE.editors, { id: rteId });
+                            if (editor) {
+                                settings = editor.settings;
+                            }
+                        }
+                        if (settings) {
+                            tinyMCE.execCommand("mceRemoveEditor", false, rteId);
+                            tinyMCE.init(settings);
+                        }
                     });
                     currentForm.$setDirty();
                 }
@@ -662,6 +673,7 @@ angular.module("umbraco")
                 return ((spans / $scope.model.config.items.columns) * 100).toFixed(8);
             };
 
+
             $scope.clearPrompt = function (scopedObject, e) {
                 scopedObject.deletePrompt = false;
                 e.preventDefault();
@@ -681,8 +693,15 @@ angular.module("umbraco")
             };
 
             $scope.getTemplateName = function (control) {
-                if (control.editor.nameExp) return control.editor.nameExp(control)
-                return control.editor.name;
+                var templateName = control.editor.name;
+                if (control.editor.nameExp) {
+                    var valueOfTemplate = control.editor.nameExp(control);
+                    if (valueOfTemplate != "") {
+                        templateName += ": ";
+                        templateName += valueOfTemplate;
+                    }
+                }
+                return templateName;
             }
 
             // *********************************************
