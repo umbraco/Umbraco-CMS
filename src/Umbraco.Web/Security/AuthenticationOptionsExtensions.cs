@@ -75,7 +75,8 @@ namespace Umbraco.Web.Security
         /// </param>
         public static void ForUmbracoBackOffice(this AuthenticationOptions options, string style, string icon, string callbackPath = null)
         {
-            if (string.IsNullOrEmpty(options.AuthenticationType)) throw new ArgumentNullOrEmptyException("options.AuthenticationType");
+            if (options == null) throw new ArgumentNullException(nameof(options));
+            if (string.IsNullOrEmpty(options.AuthenticationType)) throw new InvalidOperationException("The authentication type can't be null or empty.");
 
             //Ensure the prefix is set
             if (options.AuthenticationType.StartsWith(Constants.Security.BackOfficeExternalAuthenticationTypePrefix) == false)
