@@ -3,7 +3,7 @@ using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Models.Membership
 {
-    internal static class UserGroupExtensions
+    public static class UserGroupExtensions
     {
         public static IReadOnlyUserGroup ToReadOnlyGroup(this IUserGroup group)
         {

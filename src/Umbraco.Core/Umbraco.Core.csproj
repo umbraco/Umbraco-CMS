@@ -194,7 +194,6 @@
     <Compile Include="Models\Identity\IdentityMapDefinition.cs" />
     <Compile Include="Models\Identity\IdentityUser.cs" />
     <Compile Include="Models\Identity\UserLoginInfoWrapper.cs" />
-    <Compile Include="Models\Membership\UserGroupExtensions.cs" />
     <Compile Include="Models\PathValidationExtensions.cs" />
     <Compile Include="Models\UserExtensions.cs" />
     <Compile Include="Packaging\PackageDataInstallation.cs" />
@@ -205,7 +204,6 @@
     <Compile Include="PropertyEditors\DataValueReferenceFactoryCollectionBuilder.cs" />
     <Compile Include="PropertyEditors\IDataValueReference.cs" />
     <Compile Include="PropertyEditors\IDataValueReferenceFactory.cs" />
-    <Compile Include="Persistence\Factories\MacroFactory.cs" />
     <Compile Include="Persistence\Repositories\Implement\ContentTypeCommonRepository.cs" />
     <Compile Include="Persistence\Repositories\IContentTypeCommonRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\LanguageRepositoryExtensions.cs" />
@@ -271,8 +269,6 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\UpdatePickerIntegerValuesToUdi.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\UserForeignKeys.cs" />
     <Compile Include="Migrations\Upgrade\Common\CreateKeysAndIndexes.cs" />
-    <Compile Include="Persistence\Factories\AuditEntryFactory.cs" />
-    <Compile Include="Persistence\Factories\ConsentFactory.cs" />
     <Compile Include="Persistence\Repositories\Implement\AuditEntryRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\ConsentRepository.cs" />
     <Compile Include="RuntimeOptions.cs" />
@@ -301,24 +297,6 @@
     <Compile Include="Persistence\DatabaseDebugHelper.cs" />
     <Compile Include="Persistence\DbCommandExtensions.cs" />
     <Compile Include="Persistence\EntityNotFoundException.cs" />
-    <Compile Include="Persistence\Factories\ContentTypeFactory.cs" />
-    <Compile Include="Persistence\Factories\DataTypeFactory.cs" />
-    <Compile Include="Persistence\Factories\DictionaryItemFactory.cs" />
-    <Compile Include="Persistence\Factories\DictionaryTranslationFactory.cs" />
-    <Compile Include="Persistence\Factories\ExternalLoginFactory.cs" />
-    <Compile Include="Persistence\Factories\LanguageFactory.cs" />
-    <Compile Include="Persistence\Factories\ContentBaseFactory.cs" />
-    <Compile Include="Persistence\Factories\MemberGroupFactory.cs" />
-    <Compile Include="Persistence\Factories\PropertyFactory.cs" />
-    <Compile Include="Persistence\Factories\PropertyGroupFactory.cs" />
-    <Compile Include="Persistence\Factories\PublicAccessEntryFactory.cs" />
-    <Compile Include="Persistence\Factories\RelationFactory.cs" />
-    <Compile Include="Persistence\Factories\RelationTypeFactory.cs" />
-    <Compile Include="Persistence\Factories\ServerRegistrationFactory.cs" />
-    <Compile Include="Persistence\Factories\TagFactory.cs" />
-    <Compile Include="Persistence\Factories\TemplateFactory.cs" />
-    <Compile Include="Persistence\Factories\UserFactory.cs" />
-    <Compile Include="Persistence\Factories\UserGroupFactory.cs" />
     <Compile Include="Persistence\LocalDb.cs" />
     <Compile Include="Migrations\IMigrationContext.cs" />
     <Compile Include="Migrations\IMigrationExpression.cs" />
@@ -563,9 +541,6 @@
       <Project>{3ae7bf57-966b-45a5-910a-954d7c554441}</Project>
       <Name>Umbraco.Infrastructure</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Persistence\Mappers" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

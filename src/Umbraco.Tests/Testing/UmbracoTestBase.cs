@@ -51,6 +51,7 @@ using FileSystems = Umbraco.Core.IO.FileSystems;
 using Umbraco.Web.Templates;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Services;
 using Umbraco.Net;
 
