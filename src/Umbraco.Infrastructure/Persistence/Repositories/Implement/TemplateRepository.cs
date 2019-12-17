@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -635,7 +634,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private void EnsureValidAlias(ITemplate template)
         {
             //ensure unique alias
-            template.Alias = template.Alias.ToCleanString(CleanStringType.UnderscoreAlias);
+            template.Alias = template.Alias.ToCleanString(_shortStringHelper, CleanStringType.UnderscoreAlias);
 
             if (template.Alias.Length > 100)
                 template.Alias = template.Alias.Substring(0, 95);

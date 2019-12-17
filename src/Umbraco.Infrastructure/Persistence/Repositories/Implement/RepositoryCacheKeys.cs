@@ -6,7 +6,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// <summary>
     /// Provides cache keys for repositories.
     /// </summary>
-    internal static class RepositoryCacheKeys
+    public static class RepositoryCacheKeys
     {
         private static readonly Dictionary<Type, string> Keys = new Dictionary<Type, string>();
 

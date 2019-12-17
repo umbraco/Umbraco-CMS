@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNet.Identity;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
@@ -152,7 +151,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override void PersistUpdatedItem(IIdentityUserLogin entity)
         {
             entity.UpdatingEntity();
-            
+
             var dto = ExternalLoginFactory.BuildDto(entity);
 
             Database.Update(dto);

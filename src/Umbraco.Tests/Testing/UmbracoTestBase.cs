@@ -52,6 +52,7 @@ using Umbraco.Web.Templates;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Net;
 
@@ -114,6 +115,7 @@ namespace Umbraco.Tests.Testing
 
         protected IIOHelper IOHelper { get; private set; }
         protected IDataTypeService DataTypeService => Factory.GetInstance<IDataTypeService>();
+        protected IPasswordHasher PasswordHasher => Factory.GetInstance<IPasswordHasher>();
         protected Lazy<PropertyEditorCollection> PropertyEditorCollection => new Lazy<PropertyEditorCollection>(() => Factory.GetInstance<PropertyEditorCollection>());
         protected ILocalizationService LocalizationService => Factory.GetInstance<ILocalizationService>();
         protected ILocalizedTextService LocalizedTextService  { get; private set; }
@@ -193,6 +195,7 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique(hostingEnvironment);
             Composition.RegisterUnique(backOfficeInfo);
             Composition.RegisterUnique(ipResolver);
+            Composition.RegisterUnique<IPasswordHasher, AspNetPasswordHasher>();
 
             TestObjects = new TestObjects(register);
             Compose();

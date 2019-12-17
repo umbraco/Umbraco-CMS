@@ -126,10 +126,6 @@
       <DependentUpon>Constants.cs</DependentUpon>
     </Compile>
     -->
-    <Compile Include="Cache\DefaultRepositoryCachePolicy.cs" />
-    <Compile Include="Cache\FullDataSetRepositoryCachePolicy.cs" />
-    <Compile Include="Cache\RepositoryCachePolicyBase.cs" />
-    <Compile Include="Cache\SingleItemsOnlyRepositoryCachePolicy.cs" />
     <Compile Include="Compose\AuditEventsComponent.cs" />
     <Compile Include="Compose\AuditEventsComposer.cs" />
     <Compile Include="Compose\ManifestWatcherComponent.cs" />
@@ -147,7 +143,6 @@
     <Compile Include="Composing\CompositionExtensions\Services.cs" />
     <Compile Include="CompositionExtensions_Essentials.cs" />
     <Compile Include="CompositionExtensions_FileSystems.cs" />
-    <Compile Include="ConventionsHelper.cs" />
     <Compile Include="Deploy\IGridCellValueConnector.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionary.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionaryFactory.cs" />
@@ -177,7 +172,6 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\MergeDateAndDateTimePropertyEditor.cs" />
     <Compile Include="Migrations\Upgrade\V_8_6_0\AddNewRelationTypes.cs" />
     <Compile Include="Migrations\Upgrade\V_8_6_0\UpdateRelationTypeTable.cs" />
-    <Compile Include="Models\Editors\UmbracoEntityReference.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\PreValueMigratorBase.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\PreValueDto.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\PropertyEditorsMigrationBase.cs" />
@@ -194,18 +188,11 @@
     <Compile Include="Models\Identity\IdentityMapDefinition.cs" />
     <Compile Include="Models\Identity\IdentityUser.cs" />
     <Compile Include="Models\Identity\UserLoginInfoWrapper.cs" />
-    <Compile Include="Models\PathValidationExtensions.cs" />
     <Compile Include="Models\UserExtensions.cs" />
     <Compile Include="Packaging\PackageDataInstallation.cs" />
     <Compile Include="Packaging\PackageInstallation.cs" />
     <Compile Include="Persistence\SqlCeBulkSqlInsertProvider.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlCeSyntaxProvider.cs" />
-    <Compile Include="PropertyEditors\DataValueReferenceFactoryCollection.cs" />
-    <Compile Include="PropertyEditors\DataValueReferenceFactoryCollectionBuilder.cs" />
-    <Compile Include="PropertyEditors\IDataValueReference.cs" />
-    <Compile Include="PropertyEditors\IDataValueReferenceFactory.cs" />
-    <Compile Include="Persistence\Repositories\Implement\ContentTypeCommonRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\LanguageRepositoryExtensions.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RenameLabelAndRichTextPropertyEditorAliases.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="Security\PasswordSecurity.cs" />
@@ -268,8 +255,6 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\UpdatePickerIntegerValuesToUdi.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\UserForeignKeys.cs" />
     <Compile Include="Migrations\Upgrade\Common\CreateKeysAndIndexes.cs" />
-    <Compile Include="Persistence\Repositories\Implement\AuditEntryRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\ConsentRepository.cs" />
     <Compile Include="RuntimeOptions.cs" />
     <Compile Include="Runtime\CoreRuntime.cs" />
     <Compile Include="Runtime\CoreInitialComponent.cs" />
@@ -402,51 +387,6 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\AddLockObjects.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\VariantsMigration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\ContentVariationMigration.cs" />
-    <Compile Include="Persistence\Repositories\Implement\AuditRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\DocumentBlueprintRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\DocumentRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\ContentTypeRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\ContentTypeRepositoryBase.cs" />
-    <Compile Include="Persistence\Repositories\Implement\DataTypeContainerRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\DataTypeRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\DictionaryRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\DocumentTypeContainerRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\DomainRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\EntityContainerRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\EntityRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\ExternalLoginRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\FileRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\LanguageRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\MacroRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\MediaRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\MediaTypeContainerRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\MediaTypeRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\MemberGroupRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\MemberRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\MemberTypeRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\NotificationsRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\NPocoRepositoryBase.cs" />
-    <Compile Include="Persistence\Repositories\Implement\PartialViewMacroRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\PartialViewRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\PermissionRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\PublicAccessRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\QueryType.cs" />
-    <Compile Include="Persistence\Repositories\Implement\RedirectUrlRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\RelationRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\RelationTypeRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\RepositoryCacheKeys.cs" />
-    <Compile Include="Persistence\Repositories\Implement\RepositoryBaseOfTIdTEntity.cs" />
-    <Compile Include="Persistence\Repositories\Implement\ScriptRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\ServerRegistrationRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\SimilarNodeName.cs" />
-    <Compile Include="Persistence\Repositories\Implement\SimpleGetRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\StylesheetRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\TagRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\TemplateRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\TupleExtensions.cs" />
-    <Compile Include="Persistence\Repositories\Implement\UserGroupRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\UserRepository.cs" />
-    <Compile Include="Persistence\Repositories\Implement\ContentRepositoryBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RuntimeState.cs" />
     <Compile Include="Runtime\CoreInitialComposer.cs" />
@@ -523,6 +463,11 @@
       <Project>{3ae7bf57-966b-45a5-910a-954d7c554441}</Project>
       <Name>Umbraco.Infrastructure</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Models\Editors" />
+    <Folder Include="Persistence\Repositories\Implement" />
+    <Folder Include="PropertyEditors" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

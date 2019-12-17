@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private IScriptRepository CreateRepository()
         {
-            return new ScriptRepository(_fileSystems, IOHelper);
+            return new ScriptRepository(_fileSystems, IOHelper, TestObjects.GetGlobalSettings());
         }
 
         protected override void Compose()

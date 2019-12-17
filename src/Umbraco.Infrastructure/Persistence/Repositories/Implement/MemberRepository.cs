@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNet.Identity;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
@@ -12,6 +11,7 @@ using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using static Umbraco.Core.Persistence.SqlExtensionsStatics;
 
@@ -20,14 +20,16 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="IMember"/>
     /// </summary>
-    internal class MemberRepository : ContentRepositoryBase<int, IMember, MemberRepository>, IMemberRepository
+    public class MemberRepository : ContentRepositoryBase<int, IMember, MemberRepository>, IMemberRepository
     {
         private readonly IMemberTypeRepository _memberTypeRepository;
         private readonly ITagRepository _tagRepository;
+        private readonly IPasswordHasher _passwordHasher;
         private readonly IMemberGroupRepository _memberGroupRepository;
 
         public MemberRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger,
             IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository, ILanguageRepository languageRepository, IRelationRepository relationRepository, IRelationTypeRepository relationTypeRepository,
+            IPasswordHasher passwordHasher,
             Lazy<PropertyEditorCollection> propertyEditors,
             DataValueReferenceFactoryCollection dataValueReferenceFactories,
             IDataTypeService dataTypeService)
@@ -35,6 +37,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             _memberTypeRepository = memberTypeRepository ?? throw new ArgumentNullException(nameof(memberTypeRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
+            _passwordHasher = passwordHasher;
             _memberGroupRepository = memberGroupRepository;
         }
 
@@ -308,8 +311,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // this will hash the guid with a salt so should be nicely random
             if (entity.RawPasswordValue.IsNullOrWhiteSpace())
             {
-                var aspHasher = new PasswordHasher();
-                dto.Password = Constants.Security.EmptyPasswordPrefix + aspHasher.HashPassword(Guid.NewGuid().ToString("N"));
+
+                dto.Password = Constants.Security.EmptyPasswordPrefix + _passwordHasher.HashPassword(Guid.NewGuid().ToString("N"));
                 entity.RawPasswordValue = dto.Password;
             }
 

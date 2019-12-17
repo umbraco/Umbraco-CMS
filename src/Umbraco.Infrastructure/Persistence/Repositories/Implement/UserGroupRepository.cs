@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
@@ -19,7 +18,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// <summary>
     /// Represents the UserGroupRepository for doing CRUD operations for <see cref="IUserGroup"/>
     /// </summary>
-    internal class UserGroupRepository : NPocoRepositoryBase<int, IUserGroup>, IUserGroupRepository
+    public class UserGroupRepository : NPocoRepositoryBase<int, IUserGroup>, IUserGroupRepository
     {
         private readonly IShortStringHelper _shortStringHelper;
         private readonly UserGroupWithUsersRepository _userGroupWithUsersRepository;

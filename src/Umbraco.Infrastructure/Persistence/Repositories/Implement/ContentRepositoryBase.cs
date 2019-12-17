@@ -30,7 +30,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         public static bool ThrowOnWarning = false;
     }
 
-    internal abstract class ContentRepositoryBase<TId, TEntity, TRepository> : NPocoRepositoryBase<TId, TEntity>, IContentRepository<TId, TEntity>
+    public abstract class ContentRepositoryBase<TId, TEntity, TRepository> : NPocoRepositoryBase<TId, TEntity>, IContentRepository<TId, TEntity>
         where TEntity : class, IContentBase
         where TRepository : class, IRepository
     {

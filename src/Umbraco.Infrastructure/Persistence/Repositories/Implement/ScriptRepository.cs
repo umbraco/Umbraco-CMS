@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 
@@ -15,11 +14,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal class ScriptRepository : FileRepository<string, IScript>, IScriptRepository
     {
         private readonly IIOHelper _ioHelper;
+        private readonly IGlobalSettings _globalSettings;
 
-        public ScriptRepository(IFileSystems fileSystems, IIOHelper ioHelper)
+        public ScriptRepository(IFileSystems fileSystems, IIOHelper ioHelper, IGlobalSettings globalSettings)
             : base(fileSystems.ScriptsFileSystem)
         {
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
+            _globalSettings = globalSettings;
         }
 
         #region Implementation of IRepository<string,Script>
@@ -104,7 +105,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             // validate path & extension
-            var validDir = Current.Configs.Global().UmbracoScriptsPath;
+            var validDir = _globalSettings.UmbracoScriptsPath;
             var isValidPath = _ioHelper.VerifyEditPath(fullPath, validDir);
             var validExts = new[] {"js"};
             var isValidExtension = _ioHelper.VerifyFileExtension(script.Path, validExts);

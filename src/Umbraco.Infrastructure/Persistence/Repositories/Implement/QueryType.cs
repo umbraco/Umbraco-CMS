@@ -3,7 +3,7 @@
     /// <summary>
     /// Specifies the type of base query.
     /// </summary>
-    internal enum QueryType
+    public enum QueryType
     {
         /// <summary>
         /// Get one single complete item.

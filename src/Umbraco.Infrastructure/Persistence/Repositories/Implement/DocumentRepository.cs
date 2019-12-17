@@ -21,7 +21,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="IContent"/>.
     /// </summary>
-    internal class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentRepository>, IDocumentRepository
+    public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentRepository>, IDocumentRepository
     {
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly ITemplateRepository _templateRepository;

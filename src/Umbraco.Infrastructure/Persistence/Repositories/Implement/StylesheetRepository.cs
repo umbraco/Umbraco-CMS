@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 
@@ -13,11 +13,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal class StylesheetRepository : FileRepository<string, IStylesheet>, IStylesheetRepository
     {
         private readonly IIOHelper _ioHelper;
+        private readonly IGlobalSettings _globalSettings;
 
-        public StylesheetRepository(IFileSystems fileSystems, IIOHelper ioHelper)
+        public StylesheetRepository(IFileSystems fileSystems, IIOHelper ioHelper, IGlobalSettings globalSettings)
             : base(fileSystems.StylesheetsFileSystem)
         {
             _ioHelper = ioHelper;
+            _globalSettings = globalSettings;
         }
 
         #region Overrides of FileRepository<string,Stylesheet>
@@ -121,7 +123,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             // validate path and extension
-            var validDir = Current.Configs.Global().UmbracoCssPath;
+            var validDir = _globalSettings.UmbracoCssPath;
             var isValidPath = _ioHelper.VerifyEditPath(fullPath, validDir);
             var isValidExtension = _ioHelper.VerifyFileExtension(stylesheet.Path, ValidExtensions);
             return isValidPath && isValidExtension;

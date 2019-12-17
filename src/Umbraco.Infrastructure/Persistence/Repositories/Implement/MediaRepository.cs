@@ -21,7 +21,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="IMedia"/>
     /// </summary>
-    internal class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepository>, IMediaRepository
+    public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepository>, IMediaRepository
     {
         private readonly IMediaTypeRepository _mediaTypeRepository;
         private readonly ITagRepository _tagRepository;

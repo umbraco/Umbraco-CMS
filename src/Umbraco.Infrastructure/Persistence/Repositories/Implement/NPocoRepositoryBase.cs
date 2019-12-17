@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     /// <typeparam name="TId"></typeparam>
     /// <typeparam name="TEntity"></typeparam>
-    internal abstract class NPocoRepositoryBase<TId, TEntity> : RepositoryBase<TId, TEntity>
+    public abstract class NPocoRepositoryBase<TId, TEntity> : RepositoryBase<TId, TEntity>
         where TEntity : class, IEntity
     {
         /// <summary>

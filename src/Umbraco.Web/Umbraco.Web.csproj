@@ -130,9 +130,6 @@
     </Compile>
     <Compile Include="AppBuilderExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
-    <Compile Include="AspNetBackOfficeInfo.cs" />
-    <Compile Include="AspNetSessionIdResolver.cs" />
-    <Compile Include="AspNetHttpContextAccessor.cs" />
     <Compile Include="Cache\DistributedCacheBinder.cs" />
     <Compile Include="Cache\DistributedCacheBinderComposer.cs" />
     <Compile Include="Cache\DistributedCacheBinder_Handlers.cs" />
@@ -174,7 +171,6 @@
     <Compile Include="Editors\RelationTypeController.cs" />
     <Compile Include="Editors\TinyMceController.cs" />
     <Compile Include="Hosting\AspNetHostingEnvironment.cs" />
-    <Compile Include="AspNetIpResolver.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="IUmbracoContextFactory.cs" />
     <Compile Include="Install\ChangesMonitor.cs" />
@@ -254,6 +250,11 @@
     <Compile Include="Mvc\StatusCodeFilterAttribute.cs" />
     <Compile Include="Mvc\SurfaceControllerTypeCollectionBuilder.cs" />
     <Compile Include="Mvc\ValidateUmbracoFormRouteStringAttribute.cs" />
+    <Compile Include="Net\AspNetBackOfficeInfo.cs" />
+    <Compile Include="Net\AspNetHttpContextAccessor.cs" />
+    <Compile Include="Net\AspNetIpResolver.cs" />
+    <Compile Include="Net\AspNetPasswordHasher.cs" />
+    <Compile Include="Net\AspNetSessionIdResolver.cs" />
     <Compile Include="Profiling\WebProfilingController.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
