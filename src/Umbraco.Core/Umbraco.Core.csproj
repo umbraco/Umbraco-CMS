@@ -199,8 +199,6 @@
     <Compile Include="Models\UserExtensions.cs" />
     <Compile Include="Packaging\PackageDataInstallation.cs" />
     <Compile Include="Packaging\PackageInstallation.cs" />
-    <Compile Include="Persistence\Mappers\MapperCollectionBuilder.cs" />
-    <Compile Include="Persistence\Mappers\SimpleContentTypeMapper.cs" />
     <Compile Include="Persistence\SqlCeBulkSqlInsertProvider.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlCeSyntaxProvider.cs" />
     <Compile Include="PropertyEditors\DataValueReferenceFactoryCollection.cs" />
@@ -275,9 +273,6 @@
     <Compile Include="Migrations\Upgrade\Common\CreateKeysAndIndexes.cs" />
     <Compile Include="Persistence\Factories\AuditEntryFactory.cs" />
     <Compile Include="Persistence\Factories\ConsentFactory.cs" />
-    <Compile Include="Persistence\Mappers\AuditEntryMapper.cs" />
-    <Compile Include="Persistence\Mappers\AuditItemMapper.cs" />
-    <Compile Include="Persistence\Mappers\ConsentMapper.cs" />
     <Compile Include="Persistence\Repositories\Implement\AuditEntryRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\ConsentRepository.cs" />
     <Compile Include="RuntimeOptions.cs" />
@@ -325,33 +320,6 @@
     <Compile Include="Persistence\Factories\UserFactory.cs" />
     <Compile Include="Persistence\Factories\UserGroupFactory.cs" />
     <Compile Include="Persistence\LocalDb.cs" />
-    <Compile Include="Persistence\Mappers\AccessMapper.cs" />
-    <Compile Include="Persistence\Mappers\ContentMapper.cs" />
-    <Compile Include="Persistence\Mappers\ContentTypeMapper.cs" />
-    <Compile Include="Persistence\Mappers\DataTypeMapper.cs" />
-    <Compile Include="Persistence\Mappers\DictionaryMapper.cs" />
-    <Compile Include="Persistence\Mappers\DictionaryTranslationMapper.cs" />
-    <Compile Include="Persistence\Mappers\DomainMapper.cs" />
-    <Compile Include="Persistence\Mappers\ExternalLoginMapper.cs" />
-    <Compile Include="Persistence\Mappers\LanguageMapper.cs" />
-    <Compile Include="Persistence\Mappers\MacroMapper.cs" />
-    <Compile Include="Persistence\Mappers\MediaMapper.cs" />
-    <Compile Include="Persistence\Mappers\MediaTypeMapper.cs" />
-    <Compile Include="Persistence\Mappers\MemberGroupMapper.cs" />
-    <Compile Include="Persistence\Mappers\MemberMapper.cs" />
-    <Compile Include="Persistence\Mappers\MemberTypeMapper.cs" />
-    <Compile Include="Persistence\Mappers\PropertyGroupMapper.cs" />
-    <Compile Include="Persistence\Mappers\PropertyMapper.cs" />
-    <Compile Include="Persistence\Mappers\PropertyTypeMapper.cs" />
-    <Compile Include="Persistence\Mappers\RelationMapper.cs" />
-    <Compile Include="Persistence\Mappers\RelationTypeMapper.cs" />
-    <Compile Include="Persistence\Mappers\ServerRegistrationMapper.cs" />
-    <Compile Include="Persistence\Mappers\TagMapper.cs" />
-    <Compile Include="Persistence\Mappers\TemplateMapper.cs" />
-    <Compile Include="Persistence\Mappers\UmbracoEntityMapper.cs" />
-    <Compile Include="Persistence\Mappers\UserGroupMapper.cs" />
-    <Compile Include="Persistence\Mappers\UserMapper.cs" />
-    <Compile Include="Persistence\Mappers\UserSectionMapper.cs" />
     <Compile Include="Migrations\IMigrationContext.cs" />
     <Compile Include="Migrations\IMigrationExpression.cs" />
     <Compile Include="Migrations\Install\DatabaseDataCreator.cs" />
@@ -595,6 +563,9 @@
       <Project>{3ae7bf57-966b-45a5-910a-954d7c554441}</Project>
       <Name>Umbraco.Infrastructure</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Persistence\Mappers" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
