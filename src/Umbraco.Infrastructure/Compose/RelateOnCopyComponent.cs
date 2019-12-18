@@ -8,6 +8,15 @@ namespace Umbraco.Core.Compose
     // TODO: This should just exist in the content service/repo!
     public sealed class RelateOnCopyComponent : IComponent
     {
+        private readonly IRelationService _relationService;
+        private readonly IAuditService _auditService;
+
+        public RelateOnCopyComponent(IRelationService relationService, IAuditService auditService)
+        {
+            _relationService = relationService;
+            _auditService = auditService;
+        }
+
         public void Initialize()
         {
             ContentService.Copied += ContentServiceCopied;
@@ -16,13 +25,12 @@ namespace Umbraco.Core.Compose
         public void Terminate()
         { }
 
-        private static void ContentServiceCopied(IContentService sender, Events.CopyEventArgs<IContent> e)
+        private void ContentServiceCopied(IContentService sender, Events.CopyEventArgs<IContent> e)
         {
             if (e.RelateToOriginal == false) return;
 
-            var relationService = Current.Services.RelationService;
 
-            var relationType = relationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias);
+            var relationType = _relationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias);
 
             if (relationType == null)
             {
@@ -32,13 +40,13 @@ namespace Umbraco.Core.Compose
                     Constants.ObjectTypes.Document,
                     Constants.ObjectTypes.Document);
 
-                relationService.Save(relationType);
+                _relationService.Save(relationType);
             }
 
             var relation = new Relation(e.Original.Id, e.Copy.Id, relationType);
-            relationService.Save(relation);
+            _relationService.Save(relation);
 
-            Current.Services.AuditService.Add(
+            _auditService.Add(
                 AuditType.Copy,
                 e.Copy.WriterId,
                 e.Copy.Id, ObjectTypes.GetName(UmbracoObjectTypes.Document),

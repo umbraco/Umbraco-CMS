@@ -12,20 +12,22 @@ namespace Umbraco.Core.Compose
         private readonly IRelationService _relationService;
         private readonly IEntityService _entityService;
         private readonly ILocalizedTextService _textService;
+        private readonly IAuditService _auditService;
 
-        public RelateOnTrashComponent(IRelationService relationService, IEntityService entityService, ILocalizedTextService textService)
+        public RelateOnTrashComponent(IRelationService relationService, IEntityService entityService, ILocalizedTextService textService, IAuditService auditService)
         {
             _relationService = relationService;
             _entityService = entityService;
             _textService = textService;
+            _auditService = auditService;
         }
 
         public void Initialize()
         {
             ContentService.Moved += (sender, args) =>  ContentService_Moved(sender, args, _relationService);
-            ContentService.Trashed += (sender, args) =>  ContentService_Trashed(sender, args, _relationService, _entityService, _textService);
+            ContentService.Trashed += (sender, args) =>  ContentService_Trashed(sender, args, _relationService, _entityService, _textService, _auditService);
             MediaService.Moved += (sender, args) =>  MediaService_Moved(sender, args, _relationService);
-            MediaService.Trashed += (sender, args) =>   MediaService_Trashed(sender, args, _relationService, _entityService, _textService);
+            MediaService.Trashed += (sender, args) =>   MediaService_Trashed(sender, args, _relationService, _entityService, _textService, _auditService);
         }
 
         public void Terminate()
@@ -59,7 +61,7 @@ namespace Umbraco.Core.Compose
             }
         }
 
-        private static void ContentService_Trashed(IContentService sender, MoveEventArgs<IContent> e, IRelationService relationService, IEntityService entityService, ILocalizedTextService textService)
+        private static void ContentService_Trashed(IContentService sender, MoveEventArgs<IContent> e, IRelationService relationService, IEntityService entityService, ILocalizedTextService textService, IAuditService auditService)
         {
             const string relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
             var relationType = relationService.GetRelationTypeByAlias(relationTypeAlias);
@@ -90,7 +92,7 @@ namespace Umbraco.Core.Compose
                     var relation = new Relation(originalParentId, item.Entity.Id, relationType);
                     relationService.Save(relation);
 
-                    Current.Services.AuditService.Add(AuditType.Delete,
+                    auditService.Add(AuditType.Delete,
                         item.Entity.WriterId,
                         item.Entity.Id,
                         ObjectTypes.GetName(UmbracoObjectTypes.Document),
@@ -101,7 +103,7 @@ namespace Umbraco.Core.Compose
             }
         }
 
-        private static void MediaService_Trashed(IMediaService sender, MoveEventArgs<IMedia> e, IRelationService relationService, IEntityService entityService, ILocalizedTextService textService)
+        private static void MediaService_Trashed(IMediaService sender, MoveEventArgs<IMedia> e, IRelationService relationService, IEntityService entityService, ILocalizedTextService textService, IAuditService auditService)
         {
             const string relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias;
             var relationType = relationService.GetRelationTypeByAlias(relationTypeAlias);
@@ -126,7 +128,7 @@ namespace Umbraco.Core.Compose
                     // Add a relation for the item being deleted, so that we can know the original parent for if we need to restore later
                     var relation = new Relation(originalParentId, item.Entity.Id, relationType);
                     relationService.Save(relation);
-                    Current.Services.AuditService.Add(AuditType.Delete,
+                    auditService.Add(AuditType.Delete,
                         item.Entity.CreatorId,
                         item.Entity.Id,
                         ObjectTypes.GetName(UmbracoObjectTypes.Media),

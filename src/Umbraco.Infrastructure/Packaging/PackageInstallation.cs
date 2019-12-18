@@ -11,7 +11,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Packaging
 {
-    internal class PackageInstallation : IPackageInstallation
+    public class PackageInstallation : IPackageInstallation
     {
         private readonly PackageExtraction _packageExtraction;
         private readonly PackageDataInstallation _packageDataInstallation;
@@ -95,7 +95,7 @@ namespace Umbraco.Core.Packaging
             installationSummary.Actions = CompiledPackageXmlParser.GetPackageActions(XElement.Parse(compiledPackage.Actions), compiledPackage.Name);
             installationSummary.MetaData = compiledPackage;
             installationSummary.FilesInstalled = packageDefinition.Files;
-            
+
             //make sure the definition is up to date with everything
             foreach (var x in installationSummary.DataTypesInstalled) packageDefinition.DataTypes.Add(x.Id.ToInvariantString());
             foreach (var x in installationSummary.LanguagesInstalled) packageDefinition.Languages.Add(x.Id.ToInvariantString());
@@ -117,7 +117,7 @@ namespace Umbraco.Core.Packaging
         {
             foreach (var n in actions)
             {
-                //if there is an undo section then save it to the definition so we can run it at uninstallation 
+                //if there is an undo section then save it to the definition so we can run it at uninstallation
                 var undo = n.Undo;
                 if (undo)
                     packageDefinition.Actions += n.XmlData.ToString();
@@ -189,7 +189,7 @@ namespace Umbraco.Core.Packaging
             }
         }
 
-        
-        
+
+
     }
 }

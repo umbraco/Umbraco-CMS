@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using Umbraco.Composing;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
@@ -66,7 +67,7 @@ namespace Umbraco.Core.Sync
 
         public void PerformRefresh(ICacheRefresher refresher, string jsonPayload)
         {
-            
+
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
             if (jsonPayload == null) throw new ArgumentNullException(nameof(jsonPayload));
 
@@ -75,7 +76,7 @@ namespace Umbraco.Core.Sync
 
         public void PerformRefresh<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
         {
-            
+
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
             if (getNumericId == null) throw new ArgumentNullException(nameof(getNumericId));
             if (instances == null || instances.Length == 0) return;
@@ -86,7 +87,7 @@ namespace Umbraco.Core.Sync
 
         public void PerformRefresh<T>(ICacheRefresher refresher, Func<T, Guid> getGuidId, params T[] instances)
         {
-            
+
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
             if (getGuidId == null) throw new ArgumentNullException(nameof(getGuidId));
             if (instances == null || instances.Length == 0) return;
@@ -97,7 +98,7 @@ namespace Umbraco.Core.Sync
 
         public void PerformRemove<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
         {
-            
+
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
             if (getNumericId == null) throw new ArgumentNullException(nameof(getNumericId));
             if (instances == null || instances.Length == 0) return;
@@ -108,7 +109,7 @@ namespace Umbraco.Core.Sync
 
         public void PerformRemove(ICacheRefresher refresher, params int[] numericIds)
         {
-            
+
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
             if (numericIds == null || numericIds.Length == 0) return;
 
@@ -117,7 +118,7 @@ namespace Umbraco.Core.Sync
 
         public void PerformRefresh(ICacheRefresher refresher, params int[] numericIds)
         {
-            
+
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
             if (numericIds == null || numericIds.Length == 0) return;
 
@@ -126,7 +127,7 @@ namespace Umbraco.Core.Sync
 
         public void PerformRefresh(ICacheRefresher refresher, params Guid[] guidIds)
         {
-            
+
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
             if (guidIds == null || guidIds.Length == 0) return;
 
@@ -135,7 +136,7 @@ namespace Umbraco.Core.Sync
 
         public void PerformRefreshAll(ICacheRefresher refresher)
         {
-            
+
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
 
             Deliver(refresher, MessageType.RefreshAll);
@@ -288,7 +289,7 @@ namespace Umbraco.Core.Sync
 
         protected virtual void Deliver<TPayload>(ICacheRefresher refresher, TPayload[] payload)
         {
-            
+
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
 
             // deliver local
@@ -305,7 +306,7 @@ namespace Umbraco.Core.Sync
 
         protected virtual void Deliver(ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)
         {
-            
+
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
 
             var idsA = ids?.ToArray();
@@ -323,7 +324,7 @@ namespace Umbraco.Core.Sync
 
         protected virtual void Deliver<T>(ICacheRefresher refresher, MessageType messageType, Func<T, object> getId, IEnumerable<T> instances)
         {
-            
+
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
 
             var instancesA = instances.ToArray();

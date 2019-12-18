@@ -33,6 +33,7 @@ namespace Umbraco.Core.Sync
         private readonly object _locko = new object();
         private readonly IProfilingLogger _profilingLogger;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly CacheRefresherCollection _cacheRefreshers;
         private readonly ISqlContext _sqlContext;
         private readonly Lazy<string> _distCacheFilePath;
         private int _lastId = -1;
@@ -46,7 +47,7 @@ namespace Umbraco.Core.Sync
 
         public DatabaseServerMessenger(
             IRuntimeState runtime, IScopeProvider scopeProvider, ISqlContext sqlContext, IProfilingLogger proflog,
-            bool distributedEnabled, DatabaseServerMessengerOptions options,  IHostingEnvironment hostingEnvironment)
+            bool distributedEnabled, DatabaseServerMessengerOptions options,  IHostingEnvironment hostingEnvironment, CacheRefresherCollection cacheRefreshers)
             : base(distributedEnabled)
         {
             ScopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
@@ -54,6 +55,7 @@ namespace Umbraco.Core.Sync
             _runtime = runtime;
             _profilingLogger = proflog ?? throw new ArgumentNullException(nameof(proflog));
             _hostingEnvironment = hostingEnvironment;
+            _cacheRefreshers = cacheRefreshers;
             Logger = proflog;
             Options = options ?? throw new ArgumentNullException(nameof(options));
             _lastPruned = _lastSync = DateTime.UtcNow;
@@ -123,10 +125,12 @@ namespace Umbraco.Core.Sync
             // the service will *not* be able to properly handle our notifications anymore
             const int weight = 10;
 
-            if (!(_runtime is RuntimeState runtime))
-                throw new NotSupportedException($"Unsupported IRuntimeState implementation {_runtime.GetType().FullName}, expecting {typeof(RuntimeState).FullName}.");
 
-            var registered = runtime.MainDom.Register(
+            //TODO Why do we have interface if we expect to be exact type!!!?
+            // if (!(_runtime is RuntimeState runtime))
+            //     throw new NotSupportedException($"Unsupported IRuntimeState implementation {_runtime.GetType().FullName}, expecting {typeof(RuntimeState).FullName}.");
+
+            var registered = _runtime.MainDom.Register(
                 () =>
                 {
                     lock (_locko)
@@ -226,7 +230,7 @@ namespace Umbraco.Core.Sync
         /// <summary>
         /// Synchronize the server (throttled).
         /// </summary>
-        protected internal void Sync()
+        public void Sync()
         {
             lock (_locko)
             {
@@ -262,7 +266,7 @@ namespace Umbraco.Core.Sync
 
                     _lastPruned = _lastSync;
 
-                    switch (Current.RuntimeState.ServerRole)
+                    switch (_runtime.ServerRole)
                     {
                         case ServerRole.Single:
                         case ServerRole.Master:
@@ -524,8 +528,8 @@ namespace Umbraco.Core.Sync
         /// <para>Practically, all we really need is the guid, the other infos are here for information
         /// and debugging purposes.</para>
         /// </remarks>
-        protected static readonly string LocalIdentity = NetworkHelper.MachineName // eg DOMAIN\SERVER
-            + "/" + Current.HostingEnvironment.ApplicationId // eg /LM/S3SVC/11/ROOT
+        protected string LocalIdentity => NetworkHelper.MachineName // eg DOMAIN\SERVER
+            + "/" + _hostingEnvironment.ApplicationId // eg /LM/S3SVC/11/ROOT
             + " [P" + Process.GetCurrentProcess().Id // eg 1234
             + "/D" + AppDomain.CurrentDomain.Id // eg 22
             + "] " + Guid.NewGuid().ToString("N").ToUpper(); // make it truly unique
@@ -550,15 +554,15 @@ namespace Umbraco.Core.Sync
 
         #region Notify refreshers
 
-        private static ICacheRefresher GetRefresher(Guid id)
+        private ICacheRefresher GetRefresher(Guid id)
         {
-            var refresher = Current.CacheRefreshers[id];
+            var refresher = _cacheRefreshers[id];
             if (refresher == null)
                 throw new InvalidOperationException("Cache refresher with ID \"" + id + "\" does not exist.");
             return refresher;
         }
 
-        private static IJsonCacheRefresher GetJsonRefresher(Guid id)
+        private IJsonCacheRefresher GetJsonRefresher(Guid id)
         {
             return GetJsonRefresher(GetRefresher(id));
         }
@@ -647,38 +651,38 @@ namespace Umbraco.Core.Sync
             return true;
         }
 
-        private static void RefreshAll(Guid uniqueIdentifier)
+        private void RefreshAll(Guid uniqueIdentifier)
         {
             var refresher = GetRefresher(uniqueIdentifier);
             refresher.RefreshAll();
         }
 
-        private static void RefreshByGuid(Guid uniqueIdentifier, Guid id)
+        private void RefreshByGuid(Guid uniqueIdentifier, Guid id)
         {
             var refresher = GetRefresher(uniqueIdentifier);
             refresher.Refresh(id);
         }
 
-        private static void RefreshById(Guid uniqueIdentifier, int id)
+        private void RefreshById(Guid uniqueIdentifier, int id)
         {
             var refresher = GetRefresher(uniqueIdentifier);
             refresher.Refresh(id);
         }
 
-        private static void RefreshByIds(Guid uniqueIdentifier, string jsonIds)
+        private void RefreshByIds(Guid uniqueIdentifier, string jsonIds)
         {
             var refresher = GetRefresher(uniqueIdentifier);
             foreach (var id in JsonConvert.DeserializeObject<int[]>(jsonIds))
                 refresher.Refresh(id);
         }
 
-        private static void RefreshByJson(Guid uniqueIdentifier, string jsonPayload)
+        private void RefreshByJson(Guid uniqueIdentifier, string jsonPayload)
         {
             var refresher = GetJsonRefresher(uniqueIdentifier);
             refresher.Refresh(jsonPayload);
         }
 
-        private static void RemoveById(Guid uniqueIdentifier, int id)
+        private void RemoveById(Guid uniqueIdentifier, int id)
         {
             var refresher = GetRefresher(uniqueIdentifier);
             refresher.Remove(id);

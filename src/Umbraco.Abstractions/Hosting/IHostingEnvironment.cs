@@ -9,6 +9,8 @@ namespace Umbraco.Core.Hosting
         string LocalTempPath { get; }
         string ApplicationVirtualPath { get; }
 
+        int CurrentDomainId { get; }
+
         bool IsDebugMode { get; }
         /// <summary>
         /// Gets a value indicating whether Umbraco is hosted.

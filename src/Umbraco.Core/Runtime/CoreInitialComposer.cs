@@ -110,8 +110,9 @@ namespace Umbraco.Core.Runtime
                     factory.GetInstance<ISqlContext>(),
                     factory.GetInstance<IProfilingLogger>(),
                     true, new DatabaseServerMessengerOptions(),
-                    factory.GetInstance<IHostingEnvironment>()
-                    ));
+                    factory.GetInstance<IHostingEnvironment>(),
+                    factory.GetInstance<CacheRefresherCollection>()
+                ));
 
             composition.CacheRefreshers()
                 .Add(() => composition.TypeLoader.GetCacheRefreshers());
