@@ -140,6 +140,8 @@
     <Compile Include="Runtime\CoreInitialComposer.cs" />
     <Compile Include="Runtime\CoreRuntime.cs" />
     <Compile Include="Security\AuthenticationExtensions.cs" />
+    <Compile Include="Security\BackOfficeUserValidator.cs" />
+    <Compile Include="Security\ConfiguredPasswordValidator.cs" />
     <Compile Include="Security\PasswordSecurity.cs" />
     <Compile Include="Security\UmbracoBackOfficeIdentity.cs" />
     <Compile Include="StringExtensions.cs" />
@@ -147,15 +149,11 @@
     <Compile Include="RuntimeOptions.cs" />
     <Compile Include="FileResources\Files.Designer.cs" />
     <Compile Include="MainDom.cs" />
-    <Compile Include="ContentExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Security\BackOfficeUserStore.cs" />
-    <Compile Include="Security\BackOfficeUserValidator.cs" />
     <Compile Include="Security\EmailService.cs" />
     <Compile Include="Security\IUserAwarePasswordHasher.cs" />
     <Compile Include="Security\IUserSessionStore.cs" />
-    <Compile Include="Security\MachineKeyGenerator.cs" />
-    <Compile Include="Security\ConfiguredPasswordValidator.cs" />
     <Compile Include="Security\UmbracoEmailMessage.cs" />
     <Compile Include="Security\UserAwarePasswordHasher.cs" />
     <Compile Include="ServiceContextExtensions.cs" />

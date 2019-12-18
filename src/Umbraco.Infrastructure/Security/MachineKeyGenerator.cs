@@ -10,7 +10,7 @@ namespace Umbraco.Core.Security
     /// <summary>
     /// Used to generate a machine key
     /// </summary>
-    internal class MachineKeyGenerator
+    public class MachineKeyGenerator
     {
         /// <summary>
         /// Generates the string to be stored in the web.config

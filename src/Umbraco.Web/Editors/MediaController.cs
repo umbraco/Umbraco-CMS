@@ -38,6 +38,7 @@ using Umbraco.Web.Editors.Filters;
 using Umbraco.Core.Models.Entities;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Web.Editors
 {
@@ -50,10 +51,24 @@ namespace Umbraco.Web.Editors
     [MediaControllerControllerConfiguration]
     public class MediaController : ContentControllerBase
     {
-        public MediaController(ICultureDictionary cultureDictionary, PropertyEditorCollection propertyEditors, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+        public MediaController(
+            ICultureDictionary cultureDictionary,
+            PropertyEditorCollection propertyEditors,
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoHelper umbracoHelper,
+            IMediaFileSystem mediaFileSystem,
+            IShortStringHelper shortStringHelper)
             : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
+            _mediaFileSystem = mediaFileSystem;
+            _shortStringHelper = shortStringHelper;
         }
 
         /// <summary>
@@ -237,6 +252,8 @@ namespace Umbraco.Web.Editors
 
         private int[] _userStartNodes;
         private readonly PropertyEditorCollection _propertyEditors;
+        private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly IShortStringHelper _shortStringHelper;
 
         protected int[] UserStartNodes
         {
@@ -724,7 +741,7 @@ namespace Umbraco.Web.Editors
                     if (fs == null) throw new InvalidOperationException("Could not acquire file stream");
                     using (fs)
                     {
-                        f.SetValue(Services.ContentTypeBaseServices, Constants.Conventions.Media.File,fileName, fs);
+                        f.SetValue(_mediaFileSystem, _shortStringHelper, Services.ContentTypeBaseServices, Constants.Conventions.Media.File,fileName, fs);
                     }
 
                     var saveResult = mediaService.Save(f, Security.CurrentUser.Id);

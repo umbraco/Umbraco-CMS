@@ -6,6 +6,7 @@ using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Tests.TestHelpers;
 using Moq;
 using Umbraco.Core.Composing;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web.PropertyEditors;
@@ -44,7 +45,7 @@ namespace Umbraco.Tests.PublishedContent
             var logger = Mock.Of<ILogger>();
 
             var imageSourceParser = new HtmlImageSourceParser(umbracoContextAccessor);
-            var pastedImages = new RichTextEditorPastedImages(umbracoContextAccessor, logger, IOHelper,  Mock.Of<IMediaService>(), Mock.Of<IContentTypeBaseServiceProvider>());
+            var pastedImages = new RichTextEditorPastedImages(umbracoContextAccessor, logger, IOHelper,  Mock.Of<IMediaService>(), Mock.Of<IContentTypeBaseServiceProvider>(), Mock.Of<IMediaFileSystem>(), ShortStringHelper);
             var localLinkParser = new HtmlLocalLinkParser(umbracoContextAccessor);
             var dataTypeService = new TestObjects.TestDataTypeService(
                 new DataType(new RichTextPropertyEditor(

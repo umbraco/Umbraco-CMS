@@ -8,6 +8,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Templates;
 
 namespace Umbraco.Web.PropertyEditors
@@ -19,16 +20,20 @@ namespace Umbraco.Web.PropertyEditors
         private readonly IIOHelper _ioHelper;
         private readonly IMediaService _mediaService;
         private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+        private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly IShortStringHelper _shortStringHelper;
 
         const string TemporaryImageDataAttribute = "data-tmpimg";
 
-        public RichTextEditorPastedImages(IUmbracoContextAccessor umbracoContextAccessor, ILogger logger, IIOHelper ioHelper, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
+        public RichTextEditorPastedImages(IUmbracoContextAccessor umbracoContextAccessor, ILogger logger, IIOHelper ioHelper, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _ioHelper = ioHelper;
             _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider ?? throw new ArgumentNullException(nameof(contentTypeBaseServiceProvider));
+            _mediaFileSystem = mediaFileSystem;
+            _shortStringHelper = shortStringHelper;
         }
 
         /// <summary>
@@ -82,7 +87,7 @@ namespace Umbraco.Web.PropertyEditors
                     if (fileStream == null) throw new InvalidOperationException("Could not acquire file stream");
                     using (fileStream)
                     {
-                        mediaFile.SetValue(_contentTypeBaseServiceProvider, Constants.Conventions.Media.File, safeFileName, fileStream);
+                        mediaFile.SetValue(_mediaFileSystem, _shortStringHelper, _contentTypeBaseServiceProvider, Constants.Conventions.Media.File, safeFileName, fileStream);
                     }
 
                     _mediaService.Save(mediaFile, userId);
