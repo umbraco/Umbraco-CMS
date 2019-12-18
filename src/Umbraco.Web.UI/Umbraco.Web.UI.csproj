@@ -248,6 +248,7 @@
     <Content Include="Config\ClientDependency.config">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Umbraco\service-worker.js" />
     <Content Include="Umbraco\Views\Default.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\EditProfile.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\Empty.cshtml" />
