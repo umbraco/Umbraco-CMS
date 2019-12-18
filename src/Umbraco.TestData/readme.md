@@ -47,5 +47,5 @@ For media, the normal folder and image is used
 ## Media
 
 This does not upload physical files, it just uses a randomized online image as the `umbracoFile` value.
-This works when viewing the media item in the media section and the image will show up, however when viewing a content item
-that has these media items picked, the thumbnail will not show up (which is due to a bug in the CMS that will be fixed in 8.6).
+This works when viewing the media item in the media section and the image will show up and with recent changes this will also work
+when editing content to view the thumbnail for the picked media. 
