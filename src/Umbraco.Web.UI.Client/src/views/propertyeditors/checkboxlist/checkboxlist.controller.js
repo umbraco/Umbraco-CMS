@@ -1,64 +1,97 @@
 angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListController",
-    function($scope) {
+    function ($scope) {
         
-        if (angular.isObject($scope.model.config.items)) {
+        var vm = this;
+        
+        vm.configItems = [];
+        vm.viewItems = [];
+        vm.change = change;
+        
+        function init() {
             
-            //now we need to format the items in the dictionary because we always want to have an array
-            var newItems = [];
-            var vals = _.values($scope.model.config.items);
-            var keys = _.keys($scope.model.config.items);
-            for (var i = 0; i < vals.length; i++) {
-                newItems.push({ id: keys[i], sortOrder: vals[i].sortOrder, value: vals[i].value });
+            // currently the property editor will onyl work if our input is an object.
+            if (angular.isObject($scope.model.config.items)) {
+
+                // formatting the items in the dictionary into an array
+                var sortedItems = [];
+                var vals = _.values($scope.model.config.items);
+                var keys = _.keys($scope.model.config.items);
+                for (var i = 0; i < vals.length; i++) {
+                    sortedItems.push({ key: keys[i], sortOrder: vals[i].sortOrder, value: vals[i].value});
+                }
+
+                // ensure the items are sorted by the provided sort order
+                sortedItems.sort(function (a, b) { return (a.sortOrder > b.sortOrder) ? 1 : ((b.sortOrder > a.sortOrder) ? -1 : 0); });
+                
+                vm.configItems = sortedItems;
+                
+                if ($scope.model.value === null || $scope.model.value === undefined) {
+                    $scope.model.value = [];
+                }
+                
+                // update view model.
+                generateViewModel($scope.model.value);
+                
+                //watch the model.value in case it changes so that we can keep our view model in sync
+                $scope.$watchCollection("model.value", updateViewModel);
             }
-
-            //ensure the items are sorted by the provided sort order
-            newItems.sort(function (a, b) { return (a.sortOrder > b.sortOrder) ? 1 : ((b.sortOrder > a.sortOrder) ? -1 : 0); });
-
-            //re-assign
-            $scope.model.config.items = newItems;
-
+            
         }
-
-        function setupViewModel() {
-            $scope.selectedItems = [];
-
-            //now we need to check if the value is null/undefined, if it is we need to set it to "" so that any value that is set
-            // to "" gets selected by default
-            if ($scope.model.value === null || $scope.model.value === undefined) {
-                $scope.model.value = [];
-            }
-
-            for (var i = 0; i < $scope.model.config.items.length; i++) {
-                var isChecked = _.contains($scope.model.value, $scope.model.config.items[i].id);
-                $scope.selectedItems.push({
-                    checked: isChecked,
-                    key: $scope.model.config.items[i].id,
-                    val: $scope.model.config.items[i].value
-                });
-            }
-
-        }
-
-        setupViewModel();
         
-
-        //update the model when the items checked changes
-        $scope.$watch("selectedItems", function(newVal, oldVal) {
-
-            $scope.model.value = [];
-            for (var x = 0; x < $scope.selectedItems.length; x++) {
-                if ($scope.selectedItems[x].checked) {
-                    $scope.model.value.push($scope.selectedItems[x].key);
+        function updateViewModel(newVal) {
+            
+            var i = vm.configItems.length;
+            while(i--) {
+                
+                var item = vm.configItems[i];
+                
+                // are this item the same in the model
+                if (item.checked !== (newVal.indexOf(item.value) !== -1)) {
+                    
+                    // if not lets update the full model.
+                    generateViewModel(newVal);
+                    
+                    return;
                 }
             }
+            
+        }
+            
+        function generateViewModel(newVal) {
+            
+            vm.viewItems = [];
+            
+            var iConfigItem;
+            for (var i = 0; i < vm.configItems.length; i++) {
+                iConfigItem = vm.configItems[i];
+                var isChecked = _.contains(newVal, iConfigItem.value);
+                vm.viewItems.push({
+                    checked: isChecked,
+                    key: iConfigItem.key,
+                    value: iConfigItem.value
+                });
+            }
+            
+        }
 
-        }, true);
-        
-        //here we declare a special method which will be called whenever the value has changed from the server
-        //this is instead of doing a watch on the model.value = faster
-        $scope.model.onValueChanged = function (newVal, oldVal) {
-            //update the display val again if it has changed from the server
-            setupViewModel();
-        };
+        function change(model, value) {
+            
+            var index = $scope.model.value.indexOf(value);
+            
+            if (model === true) {
+                //if it doesn't exist in the model, then add it
+                if (index < 0) {
+                    $scope.model.value.push(value);
+                }
+            } else {
+                //if it exists in the model, then remove it
+                if (index >= 0) {
+                    $scope.model.value.splice(index, 1);
+                }
+            }
+            
+        }
+
+        init();
 
     });

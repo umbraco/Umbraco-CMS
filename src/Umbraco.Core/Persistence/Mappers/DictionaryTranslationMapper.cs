@@ -1,43 +1,28 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Linq.Expressions;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
     /// <summary>
-    /// Represents a <see cref="DictionaryTranslation"/> to DTO mapper used to translate the properties of the public api 
+    /// Represents a <see cref="DictionaryTranslation"/> to DTO mapper used to translate the properties of the public api
     /// implementation to that of the database's DTO as sql: [tableName].[columnName].
     /// </summary>
     [MapperFor(typeof(DictionaryTranslation))]
     [MapperFor(typeof(IDictionaryTranslation))]
-    public class DictionaryTranslationMapper : BaseMapper
+    public sealed class DictionaryTranslationMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
+        public DictionaryTranslationMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+            : base(sqlContext, maps)
+        { }
 
-        //NOTE: its an internal class but the ctor must be public since we're using Activator.CreateInstance to create it
-        // otherwise that would fail because there is no public constructor.
-        public DictionaryTranslationMapper()
+        protected override void DefineMaps()
         {
-            BuildMap();
+            DefineMap<DictionaryTranslation, LanguageTextDto>(nameof(DictionaryTranslation.Id), nameof(LanguageTextDto.PrimaryKey));
+            DefineMap<DictionaryTranslation, LanguageTextDto>(nameof(DictionaryTranslation.Key), nameof(LanguageTextDto.UniqueId));
+            DefineMap<DictionaryTranslation, LanguageTextDto>(nameof(DictionaryTranslation.Language), nameof(LanguageTextDto.LanguageId));
+            DefineMap<DictionaryTranslation, LanguageTextDto>(nameof(DictionaryTranslation.Value), nameof(LanguageTextDto.Value));
         }
-
-        #region Overrides of BaseMapper
-
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache
-        {
-            get { return PropertyInfoCacheInstance; }
-        }
-
-        internal override void BuildMap()
-        {
-            CacheMap<DictionaryTranslation, LanguageTextDto>(src => src.Id, dto => dto.PrimaryKey);
-            CacheMap<DictionaryTranslation, LanguageTextDto>(src => src.Key, dto => dto.UniqueId);
-            CacheMap<DictionaryTranslation, LanguageTextDto>(src => src.Language, dto => dto.LanguageId);
-            CacheMap<DictionaryTranslation, LanguageTextDto>(src => src.Value, dto => dto.Value);
-        }
-
-        #endregion
     }
 }

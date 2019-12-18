@@ -1,4 +1,7 @@
-﻿namespace Umbraco.Web.HealthCheck.Checks.Security
+﻿using Umbraco.Core;
+using Umbraco.Core.Services;
+
+namespace Umbraco.Web.HealthCheck.Checks.Security
 {
     [HealthCheck(
         "ED0D7E40-971E-4BE8-AB6D-8CC5D0A6A5B0",
@@ -7,8 +10,8 @@
         Group = "Security")]
     public class ClickJackingCheck : BaseHttpHeaderCheck
     {
-        public ClickJackingCheck(HealthCheckContext healthCheckContext)
-            : base(healthCheckContext, "X-Frame-Options", "sameorigin", "clickJacking", true)
+        public ClickJackingCheck(IRuntimeState runtime, ILocalizedTextService textService)
+            : base(runtime, textService, "X-Frame-Options", "sameorigin", "clickJacking", true)
         {
         }
     }

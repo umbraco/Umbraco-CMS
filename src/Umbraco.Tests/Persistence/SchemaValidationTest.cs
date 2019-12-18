@@ -1,42 +1,35 @@
-﻿using Moq;
+﻿using System.Linq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence.Migrations.Initial;
+using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Persistence
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
     [TestFixture]
-    public class SchemaValidationTest : BaseDatabaseFactoryTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
+    public class SchemaValidationTest : TestWithDatabaseBase
     {
-        [SetUp]
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
         [Test]
         public void DatabaseSchemaCreation_Produces_DatabaseSchemaResult_With_Zero_Errors()
         {
-            // Arrange
-            var db = DatabaseContext.Database;
-            var schema = new DatabaseSchemaCreation(db, Logger, new SqlCeSyntaxProvider());
+            DatabaseSchemaResult result;
 
-            // Act
-            var result = schema.ValidateSchema();
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                var schema = new DatabaseSchemaCreator(scope.Database, Logger);
+                result = schema.ValidateSchema(
+                    //TODO: When we remove the xml cache from tests we can remove this too
+                    DatabaseSchemaCreator.OrderedTables.Concat(new []{typeof(ContentXmlDto), typeof(PreviewXmlDto)}));
+            }
 
             // Assert
             Assert.That(result.Errors.Count, Is.EqualTo(0));
-            Assert.AreEqual(result.DetermineInstalledVersion(), UmbracoVersion.Current);
         }
     }
 }

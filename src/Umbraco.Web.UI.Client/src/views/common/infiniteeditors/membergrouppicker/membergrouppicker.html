@@ -1,0 +1,50 @@
+<div ng-controller="Umbraco.Editors.MemberGroupPickerController as vm">
+
+	<umb-editor-view>
+		<umb-editor-header
+            name="model.title"
+            name-locked="true"
+            hide-alias="true"
+            hide-icon="true"
+            hide-description="true">
+        </umb-editor-header>
+
+        <umb-editor-container>
+			<umb-box>
+				<umb-box-content>
+					<umb-tree 
+						section="member"
+						treealias="memberGroups"
+						hideheader="true"
+						hideoptions="true"
+						isdialog="true"
+						api="dialogTreeApi"
+						on-init="onTreeInit()"
+						enablecheckboxes="{{model.multiPicker}}">
+					</umb-tree>
+				</umb-box-content>
+			</umb-box>
+		</umb-editor-container>
+
+		<umb-editor-footer>
+				<umb-editor-footer-content-right>
+					<umb-button
+						type="button"
+						button-style="link"
+						label-key="general_close"
+					    shortcut="esc"
+						action="vm.close()">
+					</umb-button>
+					<umb-button
+						type="button"
+						button-style="success"
+						label-key="general_submit"
+						state="vm.saveButtonState"
+						action="vm.submit(model)">
+					</umb-button>
+				</umb-editor-footer-content-right>
+			</umb-editor-footer>
+
+	</umb-editor-view>
+
+</div>

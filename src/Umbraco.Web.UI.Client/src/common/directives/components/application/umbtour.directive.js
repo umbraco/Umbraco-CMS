@@ -137,7 +137,7 @@ In the following example you see how to run some custom logic before a step goes
                 <div>
                     <umb-button 
                         size="xs" 
-                        button-style="success" 
+                        button-style="action" 
                         type="button" 
                         action="vm.initNextStep()" 
                         label="Next">
@@ -327,10 +327,24 @@ In the following example you see how to run some custom logic before a step goes
                     }
 
                     var scrollParent = element.scrollParent();
-                    var scrollToCenterOfContainer = element[0].offsetTop - (scrollParent[0].clientHeight / 2 ) + (element[0].clientHeight / 2);
+                    var el = element;
+                    var offsetTop = 0;
+                    if (scrollParent[0] === document) {
+                        offsetTop = el[0].offsetTop;
+                    } else {
+                        while ($.contains(scrollParent[0], el[0])) {
+                            offsetTop += el[0].offsetTop;
+                            el = el.offsetParent();
+                        }
+                    }
+                    
+                    var scrollToCenterOfContainer = offsetTop - (scrollParent[0].clientHeight / 2);
+                    if (element[0].clientHeight < scrollParent[0].clientHeight) {
+                        scrollToCenterOfContainer += (element[0].clientHeight / 2);
+                    }
 
                     // Detect if scroll is needed
-                    if (element[0].offsetTop > scrollParent[0].clientHeight) {
+                    if (offsetTop > scrollParent[0].clientHeight - 200) {
                         scrollParent.animate({
                             scrollTop: scrollToCenterOfContainer
                         }, function () {
@@ -391,7 +405,7 @@ In the following example you see how to run some custom logic before a step goes
                         }
 
                         if (position === "right") {
-                            if (offset.top < documentHeight / 2) {
+                            if (offset.top + popoverHeight < documentHeight) {
                                 css.top = offset.top;
                                 css.left = offset.left + width + margin;
                             } else {
@@ -411,7 +425,7 @@ In the following example you see how to run some custom logic before a step goes
                         }
 
                         if (position === "left") {
-                            if (offset.top < documentHeight / 2) {
+                            if (offset.top + popoverHeight < documentHeight) {
                                 css.top = offset.top;
                                 css.left = offset.left - popoverWidth - margin;
                             } else {
@@ -455,13 +469,28 @@ In the following example you see how to run some custom logic before a step goes
             function waitForPendingRerequests() {
                 var deferred = $q.defer();
                 var timer = window.setInterval(function(){
+                    
+                    var requestsReady = false;
+                    var animationsDone = false;
+
                     // check for pending requests both in angular and on the document
                     if($http.pendingRequests.length === 0 && document.readyState === "complete") {
+                        requestsReady = true;
+                    }
+
+                    // check for animations. ng-enter and ng-leave are default angular animations. 
+                    // Also check for infinite editors animating
+                    if(document.querySelectorAll(".ng-enter, .ng-leave, .umb-editor--animating").length === 0) {
+                        animationsDone = true;
+                    }
+
+                    if(requestsReady && animationsDone) {
                         $timeout(function(){
                             deferred.resolve();
                             clearInterval(timer);
                         });
                     }
+
                 }, 50);
                 return deferred.promise;
             }

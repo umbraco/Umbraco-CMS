@@ -1,0 +1,24 @@
+<div data-element="editor-packages" ng-controller="Umbraco.Editors.Packages.OverviewController as vm" class="clearfix">
+
+    <umb-editor-view footer="false">
+
+        <umb-editor-header
+            name="vm.page.name"
+            name-locked="true"
+            hide-icon="true"
+            hide-description="true"
+            navigation="vm.page.navigation"
+            hide-alias="true">
+        </umb-editor-header>
+
+        <umb-editor-container>
+
+            <umb-editor-sub-views
+                sub-views="vm.page.navigation" model="vm.page">
+            </umb-editor-sub-views>
+
+        </umb-editor-container>
+
+    </umb-editor-view>
+
+</div>

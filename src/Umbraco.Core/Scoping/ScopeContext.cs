@@ -4,30 +4,33 @@ using System.Linq;
 
 namespace Umbraco.Core.Scoping
 {
-    public class ScopeContext : IInstanceIdentifiable
+    internal class ScopeContext : IScopeContext, IInstanceIdentifiable
     {
         private Dictionary<string, IEnlistedObject> _enlisted;
-        private bool _exiting;
 
         public void ScopeExit(bool completed)
         {
             if (_enlisted == null)
                 return;
 
-            _exiting = true;
-
+            // TODO: can we create infinite loops? - what about nested events? will they just be plainly ignored = really bad?
             List<Exception> exceptions = null;
-            foreach (var enlisted in _enlisted.Values.OrderBy(x => x.Priority))
+            List<IEnlistedObject> orderedEnlisted;
+            while ((orderedEnlisted = _enlisted.Values.OrderBy(x => x.Priority).ToList()).Count > 0)
             {
-                try
+                _enlisted.Clear();
+                foreach (var enlisted in orderedEnlisted)
                 {
-                    enlisted.Execute(completed);
-                }
-                catch (Exception e)
-                {
-                    if (exceptions == null)
-                        exceptions = new List<Exception>();
-                    exceptions.Add(e);
+                    try
+                    {
+                        enlisted.Execute(completed);
+                    }
+                    catch (Exception e)
+                    {
+                        if (exceptions == null)
+                            exceptions = new List<Exception>();
+                        exceptions.Add(e);
+                    }
                 }
             }
 
@@ -35,17 +38,10 @@ namespace Umbraco.Core.Scoping
                 throw new AggregateException("Exceptions were thrown by listed actions.", exceptions);
         }
 
-        private readonly Guid _instanceId = Guid.NewGuid();
-        public Guid InstanceId { get { return _instanceId; } }
+        public Guid InstanceId { get; } = Guid.NewGuid();
 
-        private IDictionary<string, IEnlistedObject> Enlisted
-        {
-            get
-            {
-                return _enlisted ?? (_enlisted
-                    = new Dictionary<string, IEnlistedObject>());
-            }
-        }
+        private IDictionary<string, IEnlistedObject> Enlisted => _enlisted
+            ?? (_enlisted = new Dictionary<string, IEnlistedObject>());
 
         private interface IEnlistedObject
         {
@@ -64,9 +60,9 @@ namespace Umbraco.Core.Scoping
                 _action = action;
             }
 
-            public T Item { get; private set; }
+            public T Item { get; }
 
-            public int Priority { get; private set; }
+            public int Priority { get; }
 
             public void Execute(bool completed)
             {
@@ -74,45 +70,24 @@ namespace Umbraco.Core.Scoping
             }
         }
 
-        // todo: replace with optional parameters when we can break things
-        public T Enlist<T>(string key, Func<T> creator)
-        {
-            return Enlist(key, creator, null, 100);
-        }
-
-        // todo: replace with optional parameters when we can break things
-        public T Enlist<T>(string key, Func<T> creator, Action<bool, T> action)
-        {
-            return Enlist(key, creator, action, 100);
-        }
-
-        // todo: replace with optional parameters when we can break things
-        public void Enlist(string key, Action<bool> action)
-        {
-            Enlist<object>(key, null, (completed, item) => action(completed), 100);
-        }
-
-        public void Enlist(string key, Action<bool> action, int priority)
+        public void Enlist(string key, Action<bool> action, int priority = 100)
         {
             Enlist<object>(key, null, (completed, item) => action(completed), priority);
         }
 
-        public T Enlist<T>(string key, Func<T> creator, Action<bool, T> action, int priority)
+        public T Enlist<T>(string key, Func<T> creator, Action<bool, T> action = null, int priority = 100)
         {
-            if (_exiting)
-                throw new InvalidOperationException("Cannot enlist now, context is exiting.");
-
             var enlistedObjects = _enlisted ?? (_enlisted = new Dictionary<string, IEnlistedObject>());
 
-            IEnlistedObject enlisted;
-            if (enlistedObjects.TryGetValue(key, out enlisted))
+            if (enlistedObjects.TryGetValue(key, out var enlisted))
             {
-                var enlistedAs = enlisted as EnlistedObject<T>;
-                if (enlistedAs == null) throw new InvalidOperationException("An item with the key already exists, but with a different type.");
-                if (enlistedAs.Priority != priority) throw new InvalidOperationException("An item with the key already exits, but with a different priority.");
+                if (!(enlisted is EnlistedObject<T> enlistedAs))
+                    throw new InvalidOperationException("An item with the key already exists, but with a different type.");
+                if (enlistedAs.Priority != priority)
+                    throw new InvalidOperationException("An item with the key already exits, but with a different priority.");
                 return enlistedAs.Item;
             }
-            var enlistedOfT = new EnlistedObject<T>(creator == null ? default(T) : creator(), action, priority);
+            var enlistedOfT = new EnlistedObject<T>(creator == null ? default : creator(), action, priority);
             Enlisted[key] = enlistedOfT;
             return enlistedOfT.Item;
         }
@@ -120,14 +95,13 @@ namespace Umbraco.Core.Scoping
         public T GetEnlisted<T>(string key)
         {
             var enlistedObjects = _enlisted;
-            if (enlistedObjects == null) return default (T);
+            if (enlistedObjects == null) return default;
 
-            IEnlistedObject enlisted;
-            if (enlistedObjects.TryGetValue(key, out enlisted) == false)
-                return default (T);
+            if (enlistedObjects.TryGetValue(key, out var enlisted) == false)
+                return default;
 
-            var enlistedAs = enlisted as EnlistedObject<T>;
-            if (enlistedAs == null) throw new InvalidOperationException("An item with the key exists, but with a different type.");
+            if (!(enlisted is EnlistedObject<T> enlistedAs))
+                throw new InvalidOperationException("An item with the key exists, but with a different type.");
             return enlistedAs.Item;
         }
     }

@@ -1,37 +1,21 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Linq.Expressions;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
     [MapperFor(typeof(Property))]
     public sealed class PropertyMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
+        public PropertyMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+            : base(sqlContext, maps)
+        { }
 
-        //NOTE: its an internal class but the ctor must be public since we're using Activator.CreateInstance to create it
-        // otherwise that would fail because there is no public constructor.
-        public PropertyMapper()
+        protected override void DefineMaps()
         {
-            BuildMap();
+            DefineMap<Property, PropertyDataDto>(nameof(Property.Id), nameof(PropertyDataDto.Id));
+            DefineMap<Property, PropertyDataDto>(nameof(Property.PropertyTypeId), nameof(PropertyDataDto.PropertyTypeId));
         }
-
-        #region Overrides of BaseMapper
-
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache
-        {
-            get { return PropertyInfoCacheInstance; }
-        }
-
-        internal override void BuildMap()
-        {
-            CacheMap<Property, PropertyDataDto>(src => src.Id, dto => dto.Id);
-            CacheMap<Property, PropertyDataDto>(src => src.Version, dto => dto.VersionId);
-            CacheMap<Property, PropertyDataDto>(src => src.PropertyTypeId, dto => dto.PropertyTypeId);
-        }
-
-        #endregion
     }
 }

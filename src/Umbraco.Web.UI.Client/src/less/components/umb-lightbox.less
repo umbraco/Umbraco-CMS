@@ -64,6 +64,11 @@
     justify-content: center;
     cursor: pointer;
     position: absolute;
+    &:hover {
+        .umb-lightbox__control-icon, &::before {
+            color: @ui-active-type-hover;
+        }
+    }
 }
 
 .umb-lightbox__control.-next {
@@ -79,6 +84,7 @@
 }
 
 .umb-lightbox__control-icon {
-    color: @turquoise;
+    color: @ui-active-type;
     font-size: 20px;
+    
 }

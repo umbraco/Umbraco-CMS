@@ -5,12 +5,14 @@ angular.module("umbraco.directives")
             var update = function() {
                 //if it uses its default naming
                 if(element.val() === "" || attr.focusOnFilled){
-                    element.focus();
+                    element.trigger("focus");
                 }
             };
 
-            $timeout(function() {
-                update();
-            });
+            if (attr.umbAutoFocus !== "false") {
+                $timeout(function() {
+                    update();
+                });
+            }
     };
 });

@@ -1,8 +1,6 @@
-using System;
-using System.Reflection;
+﻿using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
@@ -11,7 +9,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class MacroProperty : TracksChangesEntityBase, IMacroProperty, IRememberBeingDirty, IDeepCloneable
+    public class MacroProperty : BeingDirtyBase, IMacroProperty, IRememberBeingDirty, IDeepCloneable
     {
         public MacroProperty()
         {
@@ -31,14 +29,6 @@ namespace Umbraco.Core.Models
             _name = name;
             _sortOrder = sortOrder;
             _key = Guid.NewGuid();
-
-            //try to get the new mapped parameter editor
-            var mapped = LegacyParameterEditorAliasConverter.GetNewAliasFromLegacyAlias(editorAlias, false);
-            if (mapped.IsNullOrWhiteSpace() == false)
-            {
-                editorAlias = mapped;
-            }
-
             _editorAlias = editorAlias;
         }
 
@@ -58,14 +48,6 @@ namespace Umbraco.Core.Models
             _name = name;
             _sortOrder = sortOrder;
             _key = key;
-
-            //try to get the new mapped parameter editor
-            var mapped = LegacyParameterEditorAliasConverter.GetNewAliasFromLegacyAlias(editorAlias, false);
-            if (mapped.IsNullOrWhiteSpace() == false)
-            {
-                editorAlias = mapped;
-            }
-
             _editorAlias = editorAlias;
         }
 
@@ -75,27 +57,15 @@ namespace Umbraco.Core.Models
         private int _sortOrder;
         private int _id;
         private string _editorAlias;
-
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo KeySelector = ExpressionHelper.GetPropertyInfo<MacroProperty, Guid>(x => x.Key);
-            public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, string>(x => x.Alias);
-            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, string>(x => x.Name);
-            public readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, int>(x => x.SortOrder);
-            public readonly PropertyInfo IdSelector = ExpressionHelper.GetPropertyInfo<Entity, int>(x => x.Id);
-            public readonly PropertyInfo PropertyTypeSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, string>(x => x.EditorAlias);
-        }
-
+        
         /// <summary>
         /// Gets or sets the Key of the Property
         /// </summary>
         [DataMember]
         public Guid Key
         {
-            get { return _key; }
-            set { SetPropertyValueAndDetectChanges(value, ref _key, Ps.Value.KeySelector); }
+            get => _key;
+            set => SetPropertyValueAndDetectChanges(value, ref _key, nameof(Key));
         }
 
         /// <summary>
@@ -104,8 +74,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public int Id
         {
-            get { return _id; }
-            set { SetPropertyValueAndDetectChanges(value, ref _id, Ps.Value.IdSelector); }
+            get => _id;
+            set => SetPropertyValueAndDetectChanges(value, ref _id, nameof(Id));
         }
 
         /// <summary>
@@ -114,8 +84,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public string Alias
         {
-            get { return _alias; }
-            set { SetPropertyValueAndDetectChanges(value, ref _alias, Ps.Value.AliasSelector); }
+            get => _alias;
+            set => SetPropertyValueAndDetectChanges(value, ref _alias, nameof(Alias));
         }
 
         /// <summary>
@@ -124,8 +94,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public string Name
         {
-            get { return _name; }
-            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
+            get => _name;
+            set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
         }
 
         /// <summary>
@@ -134,8 +104,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public int SortOrder
         {
-            get { return _sortOrder; }
-            set { SetPropertyValueAndDetectChanges(value, ref _sortOrder, Ps.Value.SortOrderSelector); }
+            get => _sortOrder;
+            set => SetPropertyValueAndDetectChanges(value, ref _sortOrder, nameof(SortOrder));
         }
 
         /// <summary>
@@ -148,14 +118,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public string EditorAlias
         {
-            get { return _editorAlias; }
-            set
-            {
-                //try to get the new mapped parameter editor
-                var mapped = LegacyParameterEditorAliasConverter.GetNewAliasFromLegacyAlias(value, false);
-                var newVal = mapped.IsNullOrWhiteSpace() == false ? mapped : value;
-                SetPropertyValueAndDetectChanges(newVal, ref _editorAlias, Ps.Value.PropertyTypeSelector);                
-            }
+            get => _editorAlias;
+            set => SetPropertyValueAndDetectChanges(value, ref _editorAlias, nameof(EditorAlias));
         }
 
         public object DeepClone()

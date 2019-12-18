@@ -1,11 +1,9 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Repositories;
 
 namespace Umbraco.Core.Services
 {
@@ -14,6 +12,42 @@ namespace Umbraco.Core.Services
     /// </summary>
     public static class ContentServiceExtensions
     {
+        #region RTE Anchor values
+
+        private static readonly Regex AnchorRegex = new Regex("<a id=\"(.*?)\">", RegexOptions.Compiled);
+
+        internal static IEnumerable<string> GetAnchorValuesFromRTEs(this IContentService contentService, int id, string culture = "*")
+        {
+            var result = new List<string>();
+            var content = contentService.GetById(id);
+
+            foreach (var contentProperty in content.Properties)
+            {
+                if (contentProperty.PropertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.TinyMce))
+                {
+                    var value = contentProperty.GetValue(culture)?.ToString();
+                    if (!string.IsNullOrEmpty(value))
+                    {
+                        result.AddRange(contentService.GetAnchorValuesFromRTEContent(value));
+                    }
+                }
+            }
+            return result;
+        }
+
+
+        internal static IEnumerable<string> GetAnchorValuesFromRTEContent(this IContentService contentService, string rteContent)
+        {
+            var result = new List<string>();
+            var matches = AnchorRegex.Matches(rteContent);
+            foreach (Match match in matches)
+            {
+                result.Add(match.Value.Split('\"')[1]);
+            }
+            return result;
+        }
+        #endregion
+
         public static IEnumerable<IContent> GetByIds(this IContentService contentService, IEnumerable<Udi> ids)
         {
             var guids = new List<GuidUdi>();
@@ -34,16 +68,16 @@ namespace Umbraco.Core.Services
         /// <param name="contentService"></param>
         /// <param name="name"></param>
         /// <param name="parentId"></param>
-        /// <param name="mediaTypeAlias"></param>
+        /// <param name="contentTypeAlias"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public static IContent CreateContent(this IContentService contentService, string name, Udi parentId, string mediaTypeAlias, int userId = 0)
+        public static IContent CreateContent(this IContentService contentService, string name, Udi parentId, string contentTypeAlias, int userId = Constants.Security.SuperUserId)
         {
             var guidUdi = parentId as GuidUdi;
             if (guidUdi == null)
                 throw new InvalidOperationException("The UDI provided isn't of type " + typeof(GuidUdi) + " which is required by content");
             var parent = contentService.GetById(guidUdi.Guid);
-            return contentService.CreateContent(name, parent, mediaTypeAlias, userId);
+            return contentService.Create(name, parent, contentTypeAlias, userId);
         }
 
         /// <summary>
@@ -53,7 +87,7 @@ namespace Umbraco.Core.Services
         /// <param name="contentId"></param>
         public static void RemoveContentPermissions(this IContentService contentService, int contentId)
         {
-            contentService.ReplaceContentPermissions(new EntityPermissionSet(contentId, new EntityPermissionCollection()));
+            contentService.SetPermissions(new EntityPermissionSet(contentId, new EntityPermissionCollection()));
         }
 
         /// <summary>
@@ -74,146 +108,6 @@ namespace Umbraco.Core.Services
         public static bool RecycleBinSmells(this IMediaService mediaService)
         {
             return mediaService.CountChildren(Constants.System.RecycleBinMedia) > 0;
-        }
-
-        /// <summary>
-        /// Used for the DeleteContentOfType(s) methods to find content items to be deleted based on the content type ids passed in
-        /// </summary>
-        /// <typeparam name="TContent"></typeparam>
-        /// <param name="contentService"></param>
-        /// <param name="contentTypeIds">The content type ids being deleted</param>
-        /// <param name="repository"></param>
-        /// <param name="rootItems">
-        /// Returns a dictionary (path, TContent) of the root items discovered in the data set of items to be deleted, this can then be used
-        /// to search for content that needs to be trashed as a result of this.
-        /// </param>
-        /// <returns>
-        /// The content items to be deleted
-        /// </returns>
-        /// <remarks>
-        /// An internal extension method used for the DeleteContentOfTypes (DeleteMediaOfTypes) methods so that logic can be shared to avoid code duplication.
-        /// </remarks>
-        internal static IEnumerable<TContent> TrackDeletionsForDeleteContentOfTypes<TContent>(this IContentServiceBase contentService,
-            IEnumerable<int> contentTypeIds, 
-            IRepositoryVersionable<int, TContent> repository,
-            out IDictionary<string, TContent> rootItems)
-            where TContent: IContentBase
-        {
-            var contentToDelete = new List<TContent>();
-
-            //track the 'root' items of the collection of nodes discovered to delete, we need to use
-            //these items to lookup descendants that are not of this doc type so they can be transfered
-            //to the recycle bin
-            rootItems = new Dictionary<string, TContent>();
-
-            var query = Query<TContent>.Builder.Where(x => contentTypeIds.Contains(x.ContentTypeId));
-
-            //TODO: What about content that has the contenttype as part of its composition?
-
-            long pageIndex = 0;
-            const int pageSize = 10000;
-            int currentPageSize;
-            do
-            {
-                long total;
-
-                //start at the highest level
-                var contents = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out total, "umbracoNode.level", Direction.Ascending, true).ToArray();
-
-                // need to store decendants count before filtering, in order for loop to work correctly
-                currentPageSize = contents.Length;
-
-                //loop through the items, check if if the item exists already in the hierarchy of items tracked
-                //and if not, we need to add it as a 'root' item to be used to lookup later
-                foreach (var content in contents)
-                {
-                    var pathParts = content.Path.Split(',');
-                    var found = false;
-
-                    for (int i = 1; i < pathParts.Length; i++)
-                    {
-                        var currPath = "-1," + string.Join(",", Enumerable.Range(1, i).Select(x => pathParts[x]));
-                        if (rootItems.Keys.Contains(currPath))
-                        {
-                            //this content item's ancestor already exists in the root collection
-                            found = true;
-                            break;
-                        }
-                    }
-
-                    if (found == false)
-                    {
-                        rootItems[content.Path] = content;
-                    }
-
-                    //track content for deletion
-                    contentToDelete.Add(content);
-                }
-
-                pageIndex++;
-            } while (currentPageSize == pageSize);
-
-            return contentToDelete;
-        }
-
-        /// <summary>
-        /// Used for the DeleteContentOfType(s) methods to find content items to be trashed based on the content type ids passed in
-        /// </summary>
-        /// <typeparam name="TContent"></typeparam>
-        /// <param name="contentService"></param>
-        /// <param name="contentTypeIds">The content type ids being deleted</param>
-        /// <param name="rootItems"></param>
-        /// <param name="repository"></param>
-        /// <returns>
-        /// The content items to be trashed
-        /// </returns>
-        /// <remarks>
-        /// An internal extension method used for the DeleteContentOfTypes (DeleteMediaOfTypes) methods so that logic can be shared to avoid code duplication.
-        /// </remarks>
-        internal static IEnumerable<TContent> TrackTrashedForDeleteContentOfTypes<TContent>(this IContentServiceBase contentService,
-            IEnumerable<int> contentTypeIds,
-            IDictionary<string, TContent> rootItems,
-            IRepositoryVersionable<int, TContent> repository)
-            where TContent : IContentBase
-        {
-            const int pageSize = 10000;
-            var contentToRecycle = new List<TContent>();
-
-            //iterate over the root items found in the collection to be deleted, then discover which descendant items
-            //need to be moved to the recycle bin
-            foreach (var content in rootItems)
-            {
-                //Look for children of current content and move that to trash before the current content is deleted
-                var c = content;
-                var pathMatch = string.Format("{0},", c.Value.Path);
-                var descendantQuery = Query<TContent>.Builder.Where(x => x.Path.StartsWith(pathMatch));
-
-                long pageIndex = 0;                
-                int currentPageSize;
-
-                do
-                {
-                    long total;
-
-                    var descendants = repository.GetPagedResultsByQuery(descendantQuery, pageIndex, pageSize, out total, "umbracoNode.id", Direction.Ascending, true).ToArray();
-
-                    foreach (var d in descendants)
-                    {
-                        //track for recycling if this item is not of a contenttype that is being deleted
-                        if (contentTypeIds.Contains(d.ContentTypeId) == false)
-                        {
-                            contentToRecycle.Add(d);
-                        }
-                    }
-
-                    // need to store decendants count before filtering, in order for loop to work correctly
-                    currentPageSize = descendants.Length;
-
-                    pageIndex++;
-                } while (currentPageSize == pageSize);
-            }
-
-            return contentToRecycle;
         }
     }
 }

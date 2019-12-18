@@ -1,13 +1,14 @@
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
     /// <summary>
     /// Defines a Macro
     /// </summary>
-    public interface IMacro : IAggregateRoot, IRememberBeingDirty, ICanBeDirty
+    public interface IMacro : IEntity, IRememberBeingDirty
     {
         /// <summary>
         /// Gets or sets the alias of the Macro
@@ -50,33 +51,18 @@ namespace Umbraco.Core.Models
         /// </summary>
         [DataMember]
         bool DontRender { get; set; }
-
+                
         /// <summary>
-        /// Gets or sets the path to user control or the Control Type to render
+        /// Gets or set the path to the macro source to render
         /// </summary>
         [DataMember]
-        string ControlType { get; set; }
+        string MacroSource { get; set; }
 
         /// <summary>
-        /// Gets or sets the name of the assembly, which should be used by the Macro
+        /// Gets or set the macro type
         /// </summary>
-        /// <remarks>Will usually only be filled if the ScriptFile is a Usercontrol</remarks>
         [DataMember]
-        string ControlAssembly { get; set; }
-
-        /// <summary>
-        /// Gets or set the path to the Python file in use
-        /// </summary>
-        /// <remarks>Optional: Can only be one of three Script, Python or Xslt</remarks>
-        [DataMember]
-        string ScriptPath { get; set; }
-
-        /// <summary>
-        /// Gets or sets the path to the Xslt file in use
-        /// </summary>
-        /// <remarks>Optional: Can only be one of three Script, Python or Xslt</remarks>
-        [DataMember]
-        string XsltPath { get; set; }
+        MacroTypes MacroType { get; set; }
 
         /// <summary>
         /// Gets or sets a list of Macro Properties

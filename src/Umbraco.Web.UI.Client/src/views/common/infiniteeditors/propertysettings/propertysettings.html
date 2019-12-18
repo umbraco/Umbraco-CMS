@@ -1,0 +1,218 @@
+<div ng-controller="Umbraco.Editors.PropertySettingsController as vm">
+
+<form name="propertySettingsForm" novalidate val-form-manager>
+
+    <umb-editor-view data-element="editor-property-settings">
+
+        <umb-editor-header
+            name="model.title"
+            name-locked="true"
+            hide-alias="true"
+            hide-icon="true"
+            hide-description="true">
+        </umb-editor-header>
+
+        <umb-editor-container>
+            <umb-box>
+                <umb-box-content>
+
+                    <div class="content-type-editor-dialog edit-property-settings">
+
+                        <div class="umb-control-group" ng-if="!model.property.locked">
+                            <div class="control-group">
+                                <textarea class="editor-label"
+                                          data-element="property-name"
+                                          name="propertyLabel"
+                                          ng-model="model.property.label"
+                                          localize="placeholder"
+                                          placeholder="@placeholders_entername"
+                                          umb-auto-focus
+                                          focus-on-filled="true"
+                                          umb-auto-resize
+                                          required
+                                          ng-keypress="vm.submitOnEnter($event)">
+                                </textarea>
+                                <div ng-messages="propertySettingsForm.propertyLabel.$error" show-validation-on-submit>
+                                    <span class="umb-validation-label" ng-message="required">Required label</span>
+                                </div>
+                            </div>
+                            <div class="control-group -no-margin">
+                                <umb-generate-alias enable-lock="true" alias-from="model.property.label" alias="model.property.alias"></umb-generate-alias>
+                            </div>
+                        </div>
+                    
+                        <div class="umb-control-group control-group">
+                            <textarea data-element="property-description"
+                                    class="editor-description"
+                                    ng-model="model.property.description"
+                                    localize="placeholder"
+                                    placeholder="@placeholders_enterDescription"
+                                    ng-keypress="vm.submitOnEnter($event)"
+                                    umb-auto-resize>
+                        </textarea>
+                        </div>
+                    
+                        <div class="editor-wrapper umb-control-group control-group" ng-model="model.property.editor" val-require-component ng-if="!model.property.locked">
+                    
+                            <a data-element="editor-add" href="" ng-if="!model.property.editor" class="editor-placeholder" hotkey="alt+shift+e" ng-click="vm.openDataTypePicker(model.property)">
+                                <localize key="shortcuts_addEditor"></localize>
+                            </a>
+                    
+                            <div class="editor clearfix" ng-if="model.property.editor">
+                    
+                                <a href="" class="editor-icon-wrapper" ng-click="vm.openDataTypePicker(model.property)">
+                                    <i class="icon {{ model.property.dataTypeIcon }}" ng-class="{'icon-autofill': model.property.dataTypeIcon == null}"></i>
+                                </a>
+                    
+                                <div class="editor-details">
+                                    <a href="" class="editor-name" ng-click="vm.openDataTypePicker(model.property)">{{ model.property.dataTypeName }}</a>
+                                    <a href="" class="editor-editor" ng-click="vm.openDataTypePicker(model.property)">{{ model.property.editor }}</a>
+                                </div>
+                    
+                                <a href class="editor-settings-icon pull-right"
+                                ng-click="vm.openDataTypeSettings(model.property)"
+                                hotkey="alt+shift+d"
+                                ng-if="model.property.editor">
+                                    <i class="icon icon-settings"></i>
+                                </a>
+                    
+                            </div>
+                    
+                        </div>
+                    
+                        <div class="umb-control-group clearfix" ng-if="!model.property.locked">
+
+                            <h5><localize key="validation_validation"></localize></h5>
+
+                            <label>
+                                <localize key="validation_fieldIsMandatory"></localize>
+                            </label>
+
+                            <umb-toggle data-element="validation_mandatory"
+                                        checked="model.property.validation.mandatory"
+                                        on-click="vm.toggleValidation()">
+                                        focus-when="{{vm.focusOnMandatoryField}}"
+                            </umb-toggle>
+
+                            <input type="text"
+                                   class="editor-validation-message"
+                                   localize="placeholder"
+                                   placeholder="@validation_mandatoryMessage"
+                                   ng-model="model.property.validation.mandatoryMessage"
+                                   ng-if="model.property.validation.mandatory"
+                                   ng-keypress="vm.submitOnEnter($event)">
+                            </input>
+
+                            <label class="mt3">
+                                <localize key="validation_customValidation"></localize>
+                            </label>
+
+                            <select class="umb-dropdown" ng-options="validationType.name for validationType in vm.validationTypes" ng-model="vm.selectedValidationType" ng-change="vm.changeValidationType(vm.selectedValidationType)">
+                                <option value=""><localize key="validation_noValidation">No validation</localize></option>
+                            </select>
+
+                            <textarea class="editor-validation-pattern"
+                                      localize="placeholder"
+                                      placeholder="@validation_validationRegExp"
+                                      ng-model="model.property.validation.pattern"
+                                      ng-change="vm.changeValidationPattern()"
+                                      ng-if="vm.showValidationPattern"
+                                      umb-auto-resize
+                                      focus-when="{{vm.focusOnPatternField}}"
+                                      ng-keypress="vm.submitOnEnter($event)">
+                            </textarea>
+
+                            <input type="text"
+                                   class="editor-validation-message"
+                                   localize="placeholder"
+                                   placeholder="@validation_validationRegExpMessage"
+                                   ng-model="model.property.validation.patternMessage"
+                                   ng-if="vm.showValidationPattern"
+                                   ng-keypress="vm.submitOnEnter($event)" />
+
+                        </div>
+                        <div class="umb-control-group clearfix" ng-if="model.contentType === 'documentType' && model.contentTypeAllowCultureVariant">
+                           
+                                    <h5><localize key="contentTypeEditor_variantsHeading" /></h5>
+                             
+                                    <umb-toggle data-element="permissions-allow-culture-variant"
+                                                checked="model.property.allowCultureVariant"
+                                                on-click="vm.toggleAllowCultureVariants()"
+                                    >
+                                    </umb-toggle>
+
+                        </div>
+                    
+                        <div class="umb-control-group clearfix" ng-if="model.contentType === 'memberType'">
+
+                            <h5><localize key="general_options"></localize></h5>
+
+                            <label class="mt3">
+                                <localize key="contentTypeEditor_showOnMemberProfile"></localize>
+                                <small><localize key="contentTypeEditor_showOnMemberProfileDescription"></localize></small>
+                            </label>
+
+                            <umb-toggle data-element="settings_show_member_on_profile"
+                                        checked="model.property.showOnMemberProfile"
+                                        on-click="vm.toggleShowOnMemberProfile()">
+                            </umb-toggle>
+
+                            <label class="mt3">
+                                <localize key="contentTypeEditor_memberCanEdit"></localize>
+                                <small><localize key="contentTypeEditor_memberCanEditDescription"></localize></small>
+                            </label>
+
+                            <umb-toggle data-element="settings_member_can_edit"
+                                        checked="model.property.memberCanEdit"
+                                        on-click="vm.toggleMemberCanEdit()">
+                            </umb-toggle>
+
+                            <label class="mt3" ng-if="vm.showSensitiveData">
+                                <localize key="contentTypeEditor_isSensitiveData"></localize>
+                                <small><localize key="contentTypeEditor_isSensitiveDataDescription"></localize></small>
+                            </label>
+
+                            <umb-toggle ng-if="vm.showSensitiveData" data-element="settings_is_sensitive_data"
+                                        checked="model.property.isSensitiveData"
+                                        on-click="vm.toggleIsSensitiveData()">
+                            </umb-toggle>
+                                                      
+
+                        </div>
+                    </div>
+
+                </umb-box-content>
+
+            </umb-box>
+
+        </umb-editor-container>
+
+        <umb-editor-footer>
+
+            <umb-editor-footer-content-right>
+
+                <umb-button
+                    type="button"
+                    button-style="link"
+                    label-key="general_close"
+                    shortcut="esc"
+                    action="vm.close()">
+                </umb-button>
+
+                <umb-button
+                    alias="submit"
+                    type="button"
+                    button-style="success"
+                    label-key="general_submit"
+                    action="vm.submit(model)">
+                </umb-button>
+        
+            </umb-editor-footer-content-right>
+
+        </umb-editor-footer>
+
+    </umb-editor-view>
+
+</form>
+
+</div>

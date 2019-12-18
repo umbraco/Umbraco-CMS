@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
@@ -43,8 +44,15 @@ namespace Umbraco.Web.Models.ContentEditing
         [Required]
         public int DataTypeId { get; set; }
 
+        [DataMember(Name = "dataTypeKey")]
+        [ReadOnly(true)]
+        public Guid DataTypeKey { get; set; }
+
         //SD: Is this really needed ?
         [DataMember(Name = "groupId")]
         public int GroupId { get; set; }
+
+        [DataMember(Name = "allowCultureVariant")]
+        public bool AllowCultureVariant { get; set; }
     }
 }

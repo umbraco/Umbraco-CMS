@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Umbraco.Core.Models.Editors;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models
@@ -10,16 +11,10 @@ namespace Umbraco.Web.Models
     [DataContract(Name = "localPackageInstallModel")]
     public class LocalPackageInstallModel : PackageInstallModel, IHaveUploadedFiles, INotificationModel
     {
-        public LocalPackageInstallModel()
-        {
-            UploadedFiles = new List<ContentItemFile>();
-            Notifications = new List<Notification>();
-        }
-        
-        public List<ContentItemFile> UploadedFiles { get; private set; }
-        
+        public List<ContentPropertyFile> UploadedFiles { get; } = new List<ContentPropertyFile>();
+
         [DataMember(Name = "notifications")]
-        public List<Notification> Notifications { get; private set; }
+        public List<Notification> Notifications { get; } = new List<Notification>();
 
         /// <summary>
         /// A flag to determine if this package is compatible to be installed
@@ -42,35 +37,44 @@ namespace Umbraco.Web.Models
         [DataMember(Name = "version")]
         public string Version { get; set; }
 
+        /// <summary>
+        /// If this is not null then it means the package is being from this version
+        /// </summary>
+        [DataMember(Name = "originalVersion")]
+        public string OriginalVersion { get; set; }
+
         [DataMember(Name = "containsUnsecureFiles")]
         public bool ContainsUnsecureFiles { get; set; }
 
         [DataMember(Name = "containsTemplateConflicts")]
-        public bool ContainsTemplateConflicts { get; set; }
+        public bool ContainsTemplateConflicts => ConflictingTemplateAliases != null && ConflictingTemplateAliases.Count > 0;
 
         [DataMember(Name = "containsStyleSheetConflicts")]
-        public bool ContainsStyleSheetConflicts { get; set; }
+        public bool ContainsStyleSheetConflicts => ConflictingStyleSheetNames != null && ConflictingStyleSheetNames.Count > 0;
 
         [DataMember(Name = "containsMacroConflict")]
-        public bool ContainsMacroConflict { get; set; }
+        public bool ContainsMacroConflict => ConflictingMacroAliases != null && ConflictingMacroAliases.Count > 0;
 
-        [DataMember(Name = "containsLegacyPropertyEditors")]
-        public bool ContainsLegacyPropertyEditors { get; set; }
-
-        [DataMember(Name = "containsBinaryFileErrors")]
-        public bool ContainsBinaryFileErrors { get; set; }
-
+        /// <summary>
+        /// Key value of name + alias
+        /// </summary>
         [DataMember(Name = "conflictingTemplateAliases")]
         public IDictionary<string, string> ConflictingTemplateAliases { get; set; }
 
+        /// <summary>
+        /// Key value of name + alias
+        /// </summary>
         [DataMember(Name = "conflictingStyleSheetNames")]
         public IDictionary<string, string> ConflictingStyleSheetNames { get; set; }
 
+        /// <summary>
+        /// Key value of name + alias
+        /// </summary>
         [DataMember(Name = "conflictingMacroAliases")]
         public IDictionary<string, string> ConflictingMacroAliases { get; set; }
 
-        [DataMember(Name = "readMe")]
-        public string ReadMe { get; set; }
+        [DataMember(Name = "readme")]
+        public string Readme { get; set; }
 
         [DataMember(Name = "licenseUrl")]
         public string LicenseUrl { get; set; }
@@ -83,6 +87,9 @@ namespace Umbraco.Web.Models
 
         [DataMember(Name = "author")]
         public string Author { get; set; }
+
+        [DataMember(Name = "contributors")]
+        public IList<string> Contributors { get; set; }
 
         [DataMember(Name = "iconUrl")]
         public string IconUrl { get; set; }

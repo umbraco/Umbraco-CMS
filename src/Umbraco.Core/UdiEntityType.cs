@@ -20,7 +20,7 @@ namespace Umbraco.Core
 
             internal static Dictionary<string, UdiType> GetTypes()
             {
-                return new Dictionary<string,UdiType>
+                return new Dictionary<string, UdiType>
                 {
                     { Unknown, UdiType.Unknown },
 
@@ -54,9 +54,7 @@ namespace Umbraco.Core
                     { Script, UdiType.StringUdi},
                     { PartialView, UdiType.StringUdi},
                     { PartialViewMacro, UdiType.StringUdi},
-                    { Stylesheet, UdiType.StringUdi},
-                    { UserControl, UdiType.StringUdi},
-                    { Xslt, UdiType.StringUdi},
+                    { Stylesheet, UdiType.StringUdi}
                 };
             }
 
@@ -80,7 +78,7 @@ namespace Umbraco.Core
             public const string DocumentType = "document-type";
             public const string DocumentTypeContainer = "document-type-container";
 
-            //TODO: What is this? This alias is only used for the blue print tree to render the blueprint's document type, it's not a real udi type
+            // TODO: What is this? This alias is only used for the blue print tree to render the blueprint's document type, it's not a real udi type
             public const string DocumentTypeBluePrints = "document-type-blueprints";
             public const string MediaType = "media-type";
             public const string MediaTypeContainer = "media-type-container";
@@ -109,8 +107,6 @@ namespace Umbraco.Core
             public const string Stylesheet = "stylesheet";
             public const string PartialView = "partial-view";
             public const string PartialViewMacro = "partial-view-macro";
-            public const string UserControl = "usercontrol";
-            public const string Xslt = "xslt";
 
             public static string FromUmbracoObjectType(UmbracoObjectTypes umbracoObjectType)
             {

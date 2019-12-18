@@ -1,5 +1,5 @@
 angular.module("umbraco.directives")
-.directive('umbContextMenu', function (navigationService) {
+.directive('umbContextMenu', function (navigationService, keyboardService) {
     return {
         scope: {
             menuDialogTitle: "@",
@@ -17,6 +17,20 @@ angular.module("umbraco.directives")
             scope.executeMenuItem = function (action) {
                 navigationService.executeMenuAction(action, scope.currentNode, scope.currentSection);
             };
+
+            scope.outSideClick = function() {
+                navigationService.hideNavigation();
+            };
+
+            keyboardService.bind("esc", function() {
+                navigationService.hideNavigation();
+            });
+
+            //ensure to unregister from all events!
+            scope.$on('$destroy', function () {
+                keyboardService.unbind("esc");
+            });
+
         }
     };
 });

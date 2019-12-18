@@ -1,25 +1,6 @@
 // Listview
 // -------------------------
 
-.umb-listview{width: auto !important;}
-.umb-listview .dropdown-menu {
-  border: 1px solid @gray-7;
-  -webkit-border-radius: 0px;
-  -moz-border-radius: 0px;
-  border-radius: 0px;
-  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0);
-  -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0);
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0);
-}
-
-.dropdown-menu > li > a:hover,
-.dropdown-menu > li > a:focus,
-.dropdown-submenu:hover > a,
-.dropdown-submenu:focus > a {
-  color: @black;
-  background: @gray-10;
-}
-
 .umb-listview table {
 	border: 1px solid @gray-8;
 }
@@ -47,7 +28,7 @@
             position: absolute;
             padding: 5px 8px;
             pointer-events: none;
-            top: 0;
+            top: 2px;
         }
 
         input[type="text"] {
@@ -71,9 +52,6 @@
 
 .umb-listview table input[type="text"] {
   background: none;
-  -webkit-transition: all .5s;
-  -moz-transition: all .5s;
-  -o-transition: all .5s;
   transition: all .5s;
   width: 60px;
   padding: 4px 0 4px 20px;
@@ -198,10 +176,6 @@
 
 /* ---------- LAYOUTS ---------- */
 
-.list-view-layouts {
-
-}
-
 .list-view-layout {
    display: flex;
    align-items: center;
@@ -229,9 +203,9 @@
 .list-view-layout__name-text {
    margin-right: 3px;
 }
-
+ 
 .list-view-layout__system {
-   font-size: 10px;
+   font-size: 10px; 
    font-weight: normal;
 }
 
@@ -262,9 +236,11 @@
 }
 
 .list-view-add-layout {
+   width:100%; 
+   background:0 0;
    margin-top: 10px;
-   color: @turquoise-d1;
-   border: 1px dashed @gray-8;
+   color: @ui-action-discreet-type;
+   border: 1px dashed @ui-action-discreet-border;
    display: flex;
    align-items: center;
    justify-content: center;
@@ -274,4 +250,6 @@
 
 .list-view-add-layout:hover {
    text-decoration: none;
+   color: @ui-action-discreet-type-hover;
+   border-color: @ui-action-discreet-border-hover;
 }

@@ -1,32 +1,23 @@
-using System;
+﻿using System;
+using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Services
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
-    [TestFixture, RequiresSTA]
-    public class RelationServiceTests : BaseServiceTest
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
+    public class RelationServiceTests : TestWithSomeContentBase
     {
-        [SetUp]
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
         [Test]
         public void Can_Create_RelationType_Without_Name()
         {
             var rs = ServiceContext.RelationService;
-            var rt = new RelationType(new Guid(Constants.ObjectTypes.Document), new Guid(Constants.ObjectTypes.Document), "repeatedEventOccurence");
+            var rt = new RelationType(Constants.ObjectTypes.Document, Constants.ObjectTypes.Document, "repeatedEventOccurence");
 
             Assert.DoesNotThrow(() => rs.Save(rt));
 

@@ -13,12 +13,15 @@ function serverValidationManager($timeout) {
     var callbacks = [];
     
     /** calls the callback specified with the errors specified, used internally */
-    function executeCallback(self, errorsForCallback, callback) {
+    function executeCallback(self, errorsForCallback, callback, culture) {
 
         callback.apply(self, [
-                 false,                  //pass in a value indicating it is invalid
-                 errorsForCallback,      //pass in the errors for this item
-                 self.items]);           //pass in all errors in total
+                false,                 // pass in a value indicating it is invalid
+                errorsForCallback,     // pass in the errors for this item
+                self.items,            // pass in all errors in total
+                culture                // pass the culture that we are listing for.
+            ]
+        );
     }
 
     function getFieldErrors(self, fieldName) {
@@ -28,29 +31,71 @@ function serverValidationManager($timeout) {
 
         //find errors for this field name
         return _.filter(self.items, function (item) {
-            return (item.propertyAlias === null && item.fieldName === fieldName);
+            return (item.propertyAlias === null && item.culture === "invariant" && item.fieldName === fieldName);
         });
     }
     
-    function getPropertyErrors(self, propertyAlias, fieldName) {
+    function getPropertyErrors(self, propertyAlias, culture, fieldName) {
         if (!angular.isString(propertyAlias)) {
             throw "propertyAlias must be a string";
         }
         if (fieldName && !angular.isString(fieldName)) {
             throw "fieldName must be a string";
         }
+        
+        if (!culture) {
+            culture = "invariant";
+        }
 
         //find all errors for this property
-        return _.filter(self.items, function (item) {            
-            return (item.propertyAlias === propertyAlias && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
+        return _.filter(self.items, function (item) {
+            return (item.propertyAlias === propertyAlias && item.culture === culture && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
+        });
+    }
+    
+    function getCultureErrors(self, culture) {
+        
+        if (!culture) {
+            culture = "invariant";
+        }
+        
+        //find all errors for this property
+        return _.filter(self.items, function (item) {
+            return (item.culture === culture);
         });
     }
 
+    function notifyCallbacks(self) {
+        for (var cb in callbacks) {
+            if (callbacks[cb].propertyAlias === null && callbacks[cb].fieldName !== null) {
+                //its a field error callback
+                var fieldErrors = getFieldErrors(self, callbacks[cb].fieldName);
+                if (fieldErrors.length > 0) {
+                    executeCallback(self, fieldErrors, callbacks[cb].callback, callbacks[cb].culture);
+                }
+            }
+            else if (callbacks[cb].propertyAlias != null) {
+                //its a property error
+                var propErrors = getPropertyErrors(self, callbacks[cb].propertyAlias, callbacks[cb].culture, callbacks[cb].fieldName);
+                if (propErrors.length > 0) {
+                    executeCallback(self, propErrors, callbacks[cb].callback, callbacks[cb].culture);
+                }
+            }
+            else {
+                //its a culture error
+                var cultureErrors = getCultureErrors(self, callbacks[cb].culture);
+                if (cultureErrors.length > 0) {
+                    executeCallback(self, cultureErrors, callbacks[cb].callback, callbacks[cb].culture);
+                }
+            }
+        }
+    }
+    
     return {
         
         /**
          * @ngdoc function
-         * @name umbraco.services.serverValidationManager#subscribe
+         * @name notifyAndClearAllSubscriptions
          * @methodOf umbraco.services.serverValidationManager
          * @function
          *
@@ -63,28 +108,12 @@ function serverValidationManager($timeout) {
          *   so that any persisted validation errors are re-bound to their controls. Once they are re-binded this then clears the validation
          *   colleciton so that if another route change occurs, the previously persisted validation errors are not re-bound to the new item.
          */
-        executeAndClearAllSubscriptions: function() {
+        notifyAndClearAllSubscriptions: function() {
 
             var self = this;
 
             $timeout(function () {
-                
-                for (var cb in callbacks) {
-                    if (callbacks[cb].propertyAlias === null) {
-                        //its a field error callback
-                        var fieldErrors = getFieldErrors(self, callbacks[cb].fieldName);
-                        if (fieldErrors.length > 0) {
-                            executeCallback(self, fieldErrors, callbacks[cb].callback);
-                        }
-                    }
-                    else {
-                        //its a property error
-                        var propErrors = getPropertyErrors(self, callbacks[cb].propertyAlias, callbacks[cb].fieldName);
-                        if (propErrors.length > 0) {
-                            executeCallback(self, propErrors, callbacks[cb].callback);
-                        }
-                    }
-                }
+                notifyCallbacks(self);
                 //now that they are all executed, we're gonna clear all of the errors we have
                 self.clear();
             });
@@ -92,10 +121,27 @@ function serverValidationManager($timeout) {
 
         /**
          * @ngdoc function
-         * @name umbraco.services.serverValidationManager#subscribe
+         * @name notify
          * @methodOf umbraco.services.serverValidationManager
          * @function
          *
+         * @description
+         * This method isn't used very often but can be used if all subscriptions need to be notified again. This can be
+         * handy if a view needs to be reloaded/rebuild like when switching variants in the content editor.
+         */
+        notify: function() {
+            var self = this;
+
+            $timeout(function () {
+                notifyCallbacks(self);
+            });
+        },
+
+        /**
+         * @ngdoc function
+         * @name subscribe
+         * @methodOf umbraco.services.serverValidationManager
+         * @function
          * @description
          *  Adds a callback method that is executed whenever validation changes for the field name + property specified.
          *  This is generally used for server side validation in order to match up a server side validation error with 
@@ -104,52 +150,78 @@ function serverValidationManager($timeout) {
          *  field alias to listen for.
          *  If propertyAlias is null, then this subscription is for a field property (not a user defined property).
          */
-        subscribe: function (propertyAlias, fieldName, callback) {
+        subscribe: function (propertyAlias, culture, fieldName, callback) {
             if (!callback) {
                 return;
             }
+
+            var id = String.CreateGuid();
+            if (!culture) {
+                culture = "invariant";
+            }
             
             if (propertyAlias === null) {
-                //don't add it if it already exists
-                var exists1 = _.find(callbacks, function (item) {
-                    return item.propertyAlias === null && item.fieldName === fieldName;
+                callbacks.push({
+                    propertyAlias: null,
+                    culture: culture,
+                    fieldName: fieldName,
+                    callback: callback,
+                    id: id
                 });
-                if (!exists1) {
-                    callbacks.push({ propertyAlias: null, fieldName: fieldName, callback: callback });
-                }
             }
             else if (propertyAlias !== undefined) {
-                //don't add it if it already exists
-                var exists2 = _.find(callbacks, function (item) {
-                    return item.propertyAlias === propertyAlias && item.fieldName === fieldName;
+                //normalize culture to null
+                
+                callbacks.push({
+                    propertyAlias: propertyAlias,
+                    culture: culture, 
+                    fieldName: fieldName,
+                    callback: callback,
+                    id: id
                 });
-                if (!exists2) {
-                    callbacks.push({ propertyAlias: propertyAlias, fieldName: fieldName, callback: callback });
-                }
             }
+
+            function unsubscribeId() {
+                //remove all callbacks for the content field
+                callbacks = _.reject(callbacks, function (item) {
+                    return item.id === id;
+                });
+            }
+
+            //return a function to unsubscribe this subscription by uniqueId
+            return unsubscribeId;
         },
-        
-        unsubscribe: function (propertyAlias, fieldName) {
+
+        /**
+         * Removes all callbacks registered for the propertyALias, culture and fieldName combination
+         * @param {} propertyAlias 
+         * @param {} culture 
+         * @param {} fieldName 
+         * @returns {} 
+         */
+        unsubscribe: function (propertyAlias, culture, fieldName) {
+            
+            //normalize culture to null
+            if (!culture) {
+                culture = "invariant";
+            }
             
             if (propertyAlias === null) {
 
                 //remove all callbacks for the content field
                 callbacks = _.reject(callbacks, function (item) {
-                    return item.propertyAlias === null && item.fieldName === fieldName;
+                    return item.propertyAlias === null && item.culture === culture && item.fieldName === fieldName;
                 });
 
             }
             else if (propertyAlias !== undefined) {
-                
                 //remove all callbacks for the content property
                 callbacks = _.reject(callbacks, function (item) {
-                    return item.propertyAlias === propertyAlias &&
+                    return item.propertyAlias === propertyAlias && item.culture === culture &&
                     (item.fieldName === fieldName ||
                         ((item.fieldName === undefined || item.fieldName === "") && (fieldName === undefined || fieldName === "")));
                 });
             }
-
-            
         },
         
         
@@ -164,10 +236,16 @@ function serverValidationManager($timeout) {
          * This will always return any callbacks registered for just the property (i.e. field name is empty) and for ones with an 
          * explicit field name set.
          */
-        getPropertyCallbacks: function (propertyAlias, fieldName) {
+        getPropertyCallbacks: function (propertyAlias, culture, fieldName) {
+
+            //normalize culture to null
+            if (!culture) {
+                culture = "invariant";
+            }
+
             var found = _.filter(callbacks, function (item) {
                 //returns any callback that have been registered directly against the field and for only the property
-                return (item.propertyAlias === propertyAlias && (item.fieldName === fieldName || (item.fieldName === undefined || item.fieldName === "")));
+                return (item.propertyAlias === propertyAlias && item.culture === culture && (item.fieldName === fieldName || (item.fieldName === undefined || item.fieldName === "")));
             });
             return found;
         },
@@ -184,7 +262,24 @@ function serverValidationManager($timeout) {
         getFieldCallbacks: function (fieldName) {
             var found = _.filter(callbacks, function (item) {
                 //returns any callback that have been registered directly against the field
-                return (item.propertyAlias === null && item.fieldName === fieldName);
+                return (item.propertyAlias === null && item.culture === "invariant" && item.fieldName === fieldName);
+            });
+            return found;
+        },
+        
+        /**
+         * @ngdoc function
+         * @name getCultureCallbacks
+         * @methodOf umbraco.services.serverValidationManager
+         * @function
+         *
+         * @description
+         * Gets all callbacks that has been registered using the subscribe method for the culture.         
+         */
+        getCultureCallbacks: function (culture) {
+            var found = _.filter(callbacks, function (item) {
+                //returns any callback that have been registered directly/ONLY against the culture
+                return (item.culture === culture && item.propertyAlias === null && item.fieldName === null);
             });
             return found;
         },
@@ -207,6 +302,7 @@ function serverValidationManager($timeout) {
             if (!this.hasFieldError(fieldName)) {
                 this.items.push({
                     propertyAlias: null,
+                    culture: "invariant",
                     fieldName: fieldName,
                     errorMsg: errorMsg
                 });
@@ -218,7 +314,7 @@ function serverValidationManager($timeout) {
             var cbs = this.getFieldCallbacks(fieldName);
             //call each callback for this error
             for (var cb in cbs) {
-                executeCallback(this, errorsForCallback, cbs[cb].callback);
+                executeCallback(this, errorsForCallback, cbs[cb].callback, null);
             }
         },
 
@@ -231,29 +327,42 @@ function serverValidationManager($timeout) {
          * @description
          * Adds an error message for the content property
          */
-        addPropertyError: function (propertyAlias, fieldName, errorMsg) {
+        addPropertyError: function (propertyAlias, culture, fieldName, errorMsg) {
             if (!propertyAlias) {
                 return;
             }
-            
+
+            //normalize culture to "invariant"
+            if (!culture) {
+                culture = "invariant";
+            }
+
             //only add the item if it doesn't exist                
-            if (!this.hasPropertyError(propertyAlias, fieldName)) {
+            if (!this.hasPropertyError(propertyAlias, culture, fieldName)) {
                 this.items.push({
                     propertyAlias: propertyAlias,
+                    culture: culture,
                     fieldName: fieldName,
                     errorMsg: errorMsg
                 });
             }
             
             //find all errors for this item
-            var errorsForCallback = getPropertyErrors(this, propertyAlias, fieldName);
+            var errorsForCallback = getPropertyErrors(this, propertyAlias, culture, fieldName);
             //we should now call all of the call backs registered for this error
-            var cbs = this.getPropertyCallbacks(propertyAlias, fieldName);
+            var cbs = this.getPropertyCallbacks(propertyAlias, culture, fieldName);
             //call each callback for this error
             for (var cb in cbs) {
-                executeCallback(this, errorsForCallback, cbs[cb].callback);
+                executeCallback(this, errorsForCallback, cbs[cb].callback, culture);
             }
-        },        
+
+            //execute culture specific callbacks here too when a propery error is added
+            var cultureCbs = this.getCultureCallbacks(culture);
+            //call each callback for this error
+            for (var cb in cultureCbs) {
+                executeCallback(this, errorsForCallback, cultureCbs[cb].callback, culture);
+            }
+        },      
         
         /**
          * @ngdoc function
@@ -264,14 +373,20 @@ function serverValidationManager($timeout) {
          * @description
          * Removes an error message for the content property
          */
-        removePropertyError: function (propertyAlias, fieldName) {
+        removePropertyError: function (propertyAlias, culture, fieldName) {
 
             if (!propertyAlias) {
                 return;
             }
+
+            //normalize culture to null
+            if (!culture) {
+                culture = "invariant";
+            }
+
             //remove the item
             this.items = _.reject(this.items, function (item) {
-                return (item.propertyAlias === propertyAlias && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
+                return (item.propertyAlias === propertyAlias && item.culture === culture && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
             });
         },
         
@@ -316,10 +431,16 @@ function serverValidationManager($timeout) {
          * @description
          * Gets the error message for the content property
          */
-        getPropertyError: function (propertyAlias, fieldName) {
+        getPropertyError: function (propertyAlias, culture, fieldName) {
+
+            //normalize culture to null
+            if (!culture) {
+                culture = "invariant";
+            }
+
             var err = _.find(this.items, function (item) {
                 //return true if the property alias matches and if an empty field name is specified or the field name matches
-                return (item.propertyAlias === propertyAlias && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
+                return (item.propertyAlias === propertyAlias && item.culture === culture && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
             });
             return err;
         },
@@ -336,7 +457,7 @@ function serverValidationManager($timeout) {
         getFieldError: function (fieldName) {
             var err = _.find(this.items, function (item) {
                 //return true if the property alias matches and if an empty field name is specified or the field name matches
-                return (item.propertyAlias === null && item.fieldName === fieldName);
+                return (item.propertyAlias === null && item.culture === "invariant" && item.fieldName === fieldName);
             });
             return err;
         },
@@ -348,12 +469,18 @@ function serverValidationManager($timeout) {
          * @function
          *
          * @description
-         * Checks if the content property + field name combo has an error
+         * Checks if the content property + culture + field name combo has an error
          */
-        hasPropertyError: function (propertyAlias, fieldName) {
+        hasPropertyError: function (propertyAlias, culture, fieldName) {
+
+            //normalize culture to null
+            if (!culture) {
+                culture = "invariant";
+            }
+
             var err = _.find(this.items, function (item) {
                 //return true if the property alias matches and if an empty field name is specified or the field name matches
-                return (item.propertyAlias === propertyAlias && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
+                return (item.propertyAlias === propertyAlias && item.culture === culture && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
             });
             return err ? true : false;
         },
@@ -370,11 +497,33 @@ function serverValidationManager($timeout) {
         hasFieldError: function (fieldName) {
             var err = _.find(this.items, function (item) {
                 //return true if the property alias matches and if an empty field name is specified or the field name matches
-                return (item.propertyAlias === null && item.fieldName === fieldName);
+                return (item.propertyAlias === null && item.culture === "invariant" && item.fieldName === fieldName);
             });
             return err ? true : false;
         },
         
+        
+        /**
+         * @ngdoc function
+         * @name hasCultureError
+         * @methodOf umbraco.services.serverValidationManager
+         * @function
+         *
+         * @description
+         * Checks if the given culture has an error
+         */
+        hasCultureError: function (culture) {
+            
+            //normalize culture to null
+            if (!culture) {
+                culture = "invariant";
+            }
+            
+            var err = _.find(this.items, function (item) {
+                return item.culture === culture;
+            });
+            return err ? true : false;
+        },
         /** The array of error messages */
         items: []
     };

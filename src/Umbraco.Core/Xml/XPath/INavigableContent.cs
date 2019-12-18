@@ -45,8 +45,8 @@ namespace Umbraco.Core.Xml.XPath
         /// </remarks>
         object Value(int index);
 
-        // TODO implement the following one
-        
+        // TODO: implement the following one
+
         ///// <summary>
         ///// Gets the value of a field of the navigable content, for a specified language.
         ///// </summary>

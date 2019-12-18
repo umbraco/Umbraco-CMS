@@ -10,7 +10,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// A model representing a member to be displayed in the back office
     /// </summary>
     [DataContract(Name = "content", Namespace = "")]
-    public class MemberDisplay : ListViewAwareContentItemDisplayBase<ContentPropertyDisplay, IMember>
+    public class MemberDisplay : ListViewAwareContentItemDisplayBase<ContentPropertyDisplay>
     {
         public MemberDisplay()
         {
@@ -28,11 +28,11 @@ namespace Umbraco.Web.Models.ContentEditing
 
         /// <summary>
         /// This is used to indicate how to map the membership provider properties to the save model, this mapping
-        /// will change if a developer has opted to have custom member property aliases specified in their membership provider config, 
+        /// will change if a developer has opted to have custom member property aliases specified in their membership provider config,
         /// or if we are editing a member that is not an Umbraco member (custom provider)
         /// </summary>
         [DataMember(Name = "fieldConfig")]
         public IDictionary<string, string> MemberProviderFieldMapping { get; set; }
-        
+
     }
 }

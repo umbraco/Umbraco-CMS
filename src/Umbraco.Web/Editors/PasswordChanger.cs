@@ -1,12 +1,9 @@
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http.ModelBinding;
 using System.Web.Security;
-using Microsoft.AspNet.Identity;
-using umbraco.cms.businesslogic.packager;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -46,16 +43,15 @@ namespace Umbraco.Web.Editors
             ChangingPasswordModel passwordModel,
             BackOfficeUserManager<BackOfficeIdentityUser> userMgr)
         {
-            if (passwordModel == null) throw new ArgumentNullException("passwordModel");
-            if (userMgr == null) throw new ArgumentNullException("userMgr");
+            if (passwordModel == null) throw new ArgumentNullException(nameof(passwordModel));
+            if (userMgr == null) throw new ArgumentNullException(nameof(userMgr));
 
             //check if this identity implementation is powered by an underlying membership provider (it will be in most cases)
             var membershipPasswordHasher = userMgr.PasswordHasher as IMembershipProviderPasswordHasher;
 
             //check if this identity implementation is powered by an IUserAwarePasswordHasher (it will be by default in 7.7+ but not for upgrades)
-            var userAwarePasswordHasher = userMgr.PasswordHasher as IUserAwarePasswordHasher<BackOfficeIdentityUser, int>;
 
-            if (membershipPasswordHasher != null && userAwarePasswordHasher == null)
+            if (membershipPasswordHasher != null && !(userMgr.PasswordHasher is IUserAwarePasswordHasher<BackOfficeIdentityUser, int>))
             {
                 //if this isn't using an IUserAwarePasswordHasher, then fallback to the old way
                 if (membershipPasswordHasher.MembershipProvider.RequiresQuestionAndAnswer)
@@ -99,7 +95,7 @@ namespace Umbraco.Web.Editors
                 if (resetResult.Succeeded == false)
                 {
                     var errors = string.Join(". ", resetResult.Errors);
-                    _logger.Warn<PasswordChanger>(string.Format("Could not reset user password {0}", errors));
+                    _logger.Warn<PasswordChanger>("Could not reset user password {PasswordErrors}", errors);
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult(errors, new[] { "resetPassword" }) });
                 }
 
@@ -140,7 +136,7 @@ namespace Umbraco.Web.Editors
             {
                 //no, fail with error messages for "password"
                 var errors = string.Join(". ", changeResult.Errors);
-                _logger.Warn<PasswordChanger>(string.Format("Could not change user password {0}", errors));
+                _logger.Warn<PasswordChanger>("Could not change user password {PasswordErrors}", errors);
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult(errors, new[] { "password" }) });
             }
             return Attempt.Succeed(new PasswordChangedModel());
@@ -155,10 +151,12 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public Attempt<PasswordChangedModel> ChangePasswordWithMembershipProvider(string username, ChangingPasswordModel passwordModel, MembershipProvider membershipProvider)
         {
+            var umbracoBaseProvider = membershipProvider as MembershipProviderBase;
+
             // YES! It is completely insane how many options you have to take into account based on the membership provider. yikes!
 
-            if (passwordModel == null) throw new ArgumentNullException("passwordModel");
-            if (membershipProvider == null) throw new ArgumentNullException("membershipProvider");
+            if (passwordModel == null) throw new ArgumentNullException(nameof(passwordModel));
+            if (membershipProvider == null) throw new ArgumentNullException(nameof(membershipProvider));
 
             BackOfficeUserManager<BackOfficeIdentityUser> backofficeUserManager = null;
             var userId = -1;
@@ -183,7 +181,7 @@ namespace Umbraco.Web.Editors
                 //this is only possible when using a membership provider if the membership provider supports AllowManuallyChangingPassword
                 if (passwordModel.NewPassword.IsNullOrWhiteSpace() == false)
                 {
-                    if (membershipProvider is MembershipProviderBase umbracoBaseProvider && umbracoBaseProvider.AllowManuallyChangingPassword)
+                    if (umbracoBaseProvider !=null && umbracoBaseProvider.AllowManuallyChangingPassword)
                     {
                         //this provider allows manually changing the password without the old password, so we can just do it
                         try
@@ -199,7 +197,7 @@ namespace Umbraco.Web.Editors
                         }
                         catch (Exception ex)
                         {
-                            _logger.WarnWithException<PasswordChanger>("Could not change member password", ex);
+                            _logger.Warn<PasswordChanger>("Could not change member password", ex);
                             return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex.Message + " (see log for full details)", new[] { "value" }) });
                         }
                     }
@@ -236,7 +234,7 @@ namespace Umbraco.Web.Editors
                 }
                 catch (Exception ex)
                 {
-                    _logger.WarnWithException<PasswordChanger>("Could not reset member password", ex);
+                    _logger.Warn<PasswordChanger>(ex, "Could not reset member password");
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not reset password, error: " + ex.Message + " (see log for full details)", new[] { "resetPassword" }) });
                 }
             }
@@ -258,7 +256,7 @@ namespace Umbraco.Web.Editors
 
             if (passwordModel.OldPassword.IsNullOrWhiteSpace() == false)
             {
-                //if an old password is suplied try to change it
+                //if an old password is supplied try to change it
 
                 try
                 {
@@ -273,7 +271,7 @@ namespace Umbraco.Web.Editors
                 }
                 catch (Exception ex)
                 {
-                    _logger.WarnWithException<PasswordChanger>("Could not change member password", ex);
+                    _logger.Warn<PasswordChanger>(ex, "Could not change member password");
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex.Message + " (see log for full details)", new[] { "value" }) });
                 }
             }
@@ -305,14 +303,14 @@ namespace Umbraco.Web.Editors
                 }
                 catch (Exception ex1)
                 {
-                    _logger.WarnWithException<PasswordChanger>("Could not change member password", ex1);
+                    _logger.Warn<PasswordChanger>(ex1, "Could not change member password");
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex1.Message + " (see log for full details)", new[] { "value" }) });
                 }
 
             }
             catch (Exception ex2)
             {
-                _logger.WarnWithException<PasswordChanger>("Could not retrieve member password", ex2);
+                _logger.Warn<PasswordChanger>(ex2, "Could not retrieve member password");
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex2.Message + " (see log for full details)", new[] { "value" }) });
             }
         }

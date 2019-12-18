@@ -17,23 +17,23 @@ namespace Umbraco.Core.Persistence
     /// A base implementation of <see cref="IDataReader"/> that is suitable for <see cref="SqlBulkCopy.WriteToServer(IDataReader)"/>.
     /// </summary>
     /// <remarks>
-    /// 
+    ///
     /// Borrowed from Microsoft:
     /// See: https://blogs.msdn.microsoft.com/anthonybloesch/2013/01/23/bulk-loading-data-with-idatareader-and-sqlbulkcopy/
-    /// 
+    ///
     /// This implementation is designed to be very memory efficient requiring few memory resources and to support
     /// rapid transfer of data to SQL Server.
     ///
     /// Subclasses should implement <see cref="BulkDataReader.SchemaName"/>, <see cref="BulkDataReader.TableName"/>,
     /// <see cref="BulkDataReader.AddSchemaTableRows()"/>, <see cref="BulkDataReader.Read()"/>, <see cref="BulkDataReader.GetValue(Int32)"/>.
     /// If they contain disposable resources they should override <see cref="BulkDataReader.Dispose(Boolean)"/>.
-    /// 
+    ///
     /// SD: Alternatively, we could have used a LinqEntityDataReader which is nicer to use but it uses quite a lot of reflection and
     /// I thought this would just be quicker.
     /// Simple example of that: https://github.com/gridsum/DataflowEx/blob/master/Gridsum.DataflowEx/Databases/BulkDataReader.cs
     /// Full example of that: https://github.com/matthewschrager/Repository/blob/master/Repository.EntityFramework/EntityDataReader.cs
     ///  So we know where to find that if we ever need it, these would convert any Linq data source to an IDataReader
-    /// 
+    ///
     /// </remarks>
     internal abstract class BulkDataReader : IDataReader
     {
@@ -160,7 +160,7 @@ namespace Umbraco.Core.Persistence
         /// A helper method to support <see cref="AddSchemaTableRows"/>.
         /// </summary>
         /// <remarks>
-        /// This methds does extensive argument checks. These errors will cause hard to diagnose exceptions in latter
+        /// This methods does extensive argument checks. These errors will cause hard to diagnose exceptions in latter
         /// processing so it is important to detect them when they can be easily associated with the code defect.
         /// </remarks>
         /// <exception cref="ArgumentException">
@@ -470,7 +470,7 @@ namespace Umbraco.Core.Persistence
                     break;
 
                 case SqlDbType.SmallInt:
-                    dataType = typeof(Int16);
+                    dataType = typeof(short);
                     dataTypeName = "smallint";
                     break;
 
@@ -688,34 +688,34 @@ namespace Umbraco.Core.Persistence
 
             DataColumnCollection columns = _schemaTable.Columns;
 
-            columns.Add(SchemaTableColumn.ColumnName, typeof(System.String));
-            columns.Add(SchemaTableColumn.ColumnOrdinal, typeof(System.Int32));
-            columns.Add(SchemaTableColumn.ColumnSize, typeof(System.Int32));
-            columns.Add(SchemaTableColumn.NumericPrecision, typeof(System.Int16));
-            columns.Add(SchemaTableColumn.NumericScale, typeof(System.Int16));
-            columns.Add(SchemaTableColumn.IsUnique, typeof(System.Boolean));
-            columns.Add(SchemaTableColumn.IsKey, typeof(System.Boolean));
-            columns.Add(SchemaTableOptionalColumn.BaseServerName, typeof(System.String));
-            columns.Add(SchemaTableOptionalColumn.BaseCatalogName, typeof(System.String));
-            columns.Add(SchemaTableColumn.BaseColumnName, typeof(System.String));
-            columns.Add(SchemaTableColumn.BaseSchemaName, typeof(System.String));
-            columns.Add(SchemaTableColumn.BaseTableName, typeof(System.String));
-            columns.Add(SchemaTableColumn.DataType, typeof(System.Type));
-            columns.Add(SchemaTableColumn.AllowDBNull, typeof(System.Boolean));
-            columns.Add(SchemaTableColumn.ProviderType, typeof(System.Int32));
-            columns.Add(SchemaTableColumn.IsAliased, typeof(System.Boolean));
-            columns.Add(SchemaTableColumn.IsExpression, typeof(System.Boolean));
-            columns.Add(BulkDataReader.IsIdentitySchemaColumn, typeof(System.Boolean));
-            columns.Add(SchemaTableOptionalColumn.IsAutoIncrement, typeof(System.Boolean));
-            columns.Add(SchemaTableOptionalColumn.IsRowVersion, typeof(System.Boolean));
-            columns.Add(SchemaTableOptionalColumn.IsHidden, typeof(System.Boolean));
-            columns.Add(SchemaTableColumn.IsLong, typeof(System.Boolean));
-            columns.Add(SchemaTableOptionalColumn.IsReadOnly, typeof(System.Boolean));
-            columns.Add(SchemaTableOptionalColumn.ProviderSpecificDataType, typeof(System.Type));
-            columns.Add(BulkDataReader.DataTypeNameSchemaColumn, typeof(System.String));
-            columns.Add(BulkDataReader.XmlSchemaCollectionDatabaseSchemaColumn, typeof(System.String));
-            columns.Add(BulkDataReader.XmlSchemaCollectionOwningSchemaSchemaColumn, typeof(System.String));
-            columns.Add(BulkDataReader.XmlSchemaCollectionNameSchemaColumn, typeof(System.String));
+            columns.Add(SchemaTableColumn.ColumnName, typeof(string));
+            columns.Add(SchemaTableColumn.ColumnOrdinal, typeof(int));
+            columns.Add(SchemaTableColumn.ColumnSize, typeof(int));
+            columns.Add(SchemaTableColumn.NumericPrecision, typeof(short));
+            columns.Add(SchemaTableColumn.NumericScale, typeof(short));
+            columns.Add(SchemaTableColumn.IsUnique, typeof(bool));
+            columns.Add(SchemaTableColumn.IsKey, typeof(bool));
+            columns.Add(SchemaTableOptionalColumn.BaseServerName, typeof(string));
+            columns.Add(SchemaTableOptionalColumn.BaseCatalogName, typeof(string));
+            columns.Add(SchemaTableColumn.BaseColumnName, typeof(string));
+            columns.Add(SchemaTableColumn.BaseSchemaName, typeof(string));
+            columns.Add(SchemaTableColumn.BaseTableName, typeof(string));
+            columns.Add(SchemaTableColumn.DataType, typeof(Type));
+            columns.Add(SchemaTableColumn.AllowDBNull, typeof(bool));
+            columns.Add(SchemaTableColumn.ProviderType, typeof(int));
+            columns.Add(SchemaTableColumn.IsAliased, typeof(bool));
+            columns.Add(SchemaTableColumn.IsExpression, typeof(bool));
+            columns.Add(BulkDataReader.IsIdentitySchemaColumn, typeof(bool));
+            columns.Add(SchemaTableOptionalColumn.IsAutoIncrement, typeof(bool));
+            columns.Add(SchemaTableOptionalColumn.IsRowVersion, typeof(bool));
+            columns.Add(SchemaTableOptionalColumn.IsHidden, typeof(bool));
+            columns.Add(SchemaTableColumn.IsLong, typeof(bool));
+            columns.Add(SchemaTableOptionalColumn.IsReadOnly, typeof(bool));
+            columns.Add(SchemaTableOptionalColumn.ProviderSpecificDataType, typeof(Type));
+            columns.Add(BulkDataReader.DataTypeNameSchemaColumn, typeof(string));
+            columns.Add(BulkDataReader.XmlSchemaCollectionDatabaseSchemaColumn, typeof(string));
+            columns.Add(BulkDataReader.XmlSchemaCollectionOwningSchemaSchemaColumn, typeof(string));
+            columns.Add(BulkDataReader.XmlSchemaCollectionNameSchemaColumn, typeof(string));
         }
 
         #endregion
@@ -1090,7 +1090,7 @@ namespace Umbraco.Core.Persistence
         /// <seealso cref="IDataRecord.GetDecimal(Int32)"/>
         public decimal GetDecimal(int i)
         {
-            return (Decimal)GetValue(i);
+            return (decimal)GetValue(i);
         }
 
         /// <summary>

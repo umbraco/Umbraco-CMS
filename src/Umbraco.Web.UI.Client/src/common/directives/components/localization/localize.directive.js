@@ -31,15 +31,28 @@ angular.module("umbraco.directives")
         return {
             restrict: 'E',
             scope:{
-                key: '@'
+                key: '@',
+                tokens: '=',
+                watchTokens: '@'
             },
             replace: true,
 
             link: function (scope, element, attrs) {
                 var key = scope.key;
+                scope.text = "";
+                
+                // A render function to be able to update tokens as values update.
+                function render() {
+                    element.html(localizationService.tokenReplace(scope.text, scope.tokens || null));
+                }
+                
                 localizationService.localize(key).then(function(value){
-                    element.html(value);
+                    scope.text = value;
+                    render();
                 });
+                if (scope.watchTokens === 'true') {
+                    scope.$watch("tokens", render, true);
+                }
             }
         };
     })

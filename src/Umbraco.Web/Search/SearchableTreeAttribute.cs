@@ -1,35 +1,53 @@
-using System;
+﻿using System;
 
 namespace Umbraco.Web.Search
 {
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class SearchableTreeAttribute : Attribute
     {
-        /// <summary>
-        /// This constructor defines both the angular service and method name to use
-        /// </summary>
-        /// <param name="serviceName"></param>
-        /// <param name="methodName"></param>
-        public SearchableTreeAttribute(string serviceName, string methodName)
-        {
-            if (string.IsNullOrWhiteSpace(serviceName)) throw new ArgumentException("Value cannot be null or whitespace.", "serviceName");
-            if (string.IsNullOrWhiteSpace(methodName)) throw new ArgumentException("Value cannot be null or whitespace.", "methodName");
-            MethodName = methodName;
-            ServiceName = serviceName;
-        }
+        public const int DefaultSortOrder = 1000;
+
+        public string ServiceName { get; }
+
+        public string MethodName { get; }
+
+        public int SortOrder { get; }
 
         /// <summary>
-        /// This constructor will assume that the method name equals `format(searchResult, appAlias, treeAlias)`
+        /// This constructor will assume that the method name equals `format(searchResult, appAlias, treeAlias)`.
         /// </summary>
-        /// <param name="serviceName"></param>
+        /// <param name="serviceName">Name of the service.</param>
         public SearchableTreeAttribute(string serviceName)
-        {
-            if (string.IsNullOrWhiteSpace(serviceName)) throw new ArgumentException("Value cannot be null or whitespace.", "serviceName");
-            MethodName = "";
-            ServiceName = serviceName;
-        }
+            : this(serviceName, string.Empty)
+        { }
 
-        public string MethodName { get; private set; }
-        public string ServiceName { get; private set; }
+        /// <summary>
+        /// This constructor defines both the Angular service and method name to use.
+        /// </summary>
+        /// <param name="serviceName">Name of the service.</param>
+        /// <param name="methodName">Name of the method.</param>
+        public SearchableTreeAttribute(string serviceName, string methodName)
+            : this(serviceName, methodName, DefaultSortOrder)
+        { }
+
+        /// <summary>
+        /// This constructor defines both the Angular service and method name to use and explicitly defines a sort order for the results
+        /// </summary>
+        /// <param name="serviceName">Name of the service.</param>
+        /// <param name="methodName">Name of the method.</param>
+        /// <param name="sortOrder">The sort order.</param>
+        /// <exception cref="ArgumentNullException">serviceName
+        /// or
+        /// methodName</exception>
+        /// <exception cref="ArgumentException">Value can't be empty or consist only of white-space characters. - serviceName</exception>
+        public SearchableTreeAttribute(string serviceName, string methodName, int sortOrder)
+        {
+            if (serviceName == null) throw new ArgumentNullException(nameof(serviceName));
+            if (string.IsNullOrWhiteSpace(serviceName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(serviceName));
+
+            ServiceName = serviceName;
+            MethodName = methodName ?? throw new ArgumentNullException(nameof(methodName));
+            SortOrder = sortOrder;
+        }
     }
 }

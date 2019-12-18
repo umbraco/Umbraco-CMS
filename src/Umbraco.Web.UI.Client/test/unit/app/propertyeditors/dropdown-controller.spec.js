@@ -14,7 +14,7 @@ describe('Drop down controller tests', function () {
 
         it('should define the default properties on construction', function () {
              
-            controllerFactory('Umbraco.PropertyEditors.DropdownController', {
+            controllerFactory('Umbraco.PropertyEditors.DropdownFlexibleController', {
                 $scope: scope,
                 $routeParams: routeParams
             });
@@ -32,12 +32,12 @@ describe('Drop down controller tests', function () {
                 }
             };
 
-            controllerFactory('Umbraco.PropertyEditors.DropdownController', {
+            controllerFactory('Umbraco.PropertyEditors.DropdownFlexibleController', {
                 $scope: scope,
                 $routeParams: routeParams
             });
              
-            //this should be the expected format based on the changes made to the sortable prevalues
+            // this should be the expected format based on the changes made to the sortable prevalues
             expect(scope.model.config.items[0].value).toBe("value0");
             expect(scope.model.config.items[1].value).toBe("value1");
             expect(scope.model.config.items[2].value).toBe("value2"); 
@@ -57,7 +57,7 @@ describe('Drop down controller tests', function () {
             };
 
             var test = function() {
-                controllerFactory('Umbraco.PropertyEditors.DropdownController', {
+                controllerFactory('Umbraco.PropertyEditors.DropdownFlexibleController', {
                     $scope: scope,
                     $routeParams: routeParams
                 });
@@ -76,7 +76,7 @@ describe('Drop down controller tests', function () {
             };
 
             var test = function () {
-                controllerFactory('Umbraco.PropertyEditors.DropdownController', {
+                controllerFactory('Umbraco.PropertyEditors.DropdownFlexibleController', {
                     $scope: scope,
                     $routeParams: routeParams
                 });

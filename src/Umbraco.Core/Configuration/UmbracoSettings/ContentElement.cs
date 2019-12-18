@@ -1,363 +1,65 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Configuration;
+using Umbraco.Core.Macros;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     internal class ContentElement : UmbracoConfigurationElement, IContentSection
     {
-        [ConfigurationProperty("imaging")]
-        internal ContentImagingElement Imaging
-        {
-            get { return (ContentImagingElement)this["imaging"]; }
-        }
+        private const string DefaultPreviewBadge = @"<div id=""umbracoPreviewBadge"" class=""umbraco-preview-badge""><span class=""umbraco-preview-badge__header"">Preview mode</span><a href=""{0}/preview/end?redir={1}"" class=""umbraco-preview-badge__end""><svg viewBox=""0 0 100 100"" xmlns=""http://www.w3.org/2000/svg""><title>Click to end</title><path d=""M5273.1 2400.1v-2c0-2.8-5-4-9.7-4s-9.7 1.3-9.7 4v2a7 7 0 002 4.9l5 4.9c.3.3.4.6.4 1v6.4c0 .4.2.7.6.8l2.9.9c.5.1 1-.2 1-.8v-7.2c0-.4.2-.7.4-1l5.1-5a7 7 0 002-4.9zm-9.7-.1c-4.8 0-7.4-1.3-7.5-1.8.1-.5 2.7-1.8 7.5-1.8s7.3 1.3 7.5 1.8c-.2.5-2.7 1.8-7.5 1.8z""/><path d=""M5268.4 2410.3c-.6 0-1 .4-1 1s.4 1 1 1h4.3c.6 0 1-.4 1-1s-.4-1-1-1h-4.3zM5272.7 2413.7h-4.3c-.6 0-1 .4-1 1s.4 1 1 1h4.3c.6 0 1-.4 1-1s-.4-1-1-1zM5272.7 2417h-4.3c-.6 0-1 .4-1 1s.4 1 1 1h4.3c.6 0 1-.4 1-1 0-.5-.4-1-1-1z""/><path d=""M78.2 13l-8.7 11.7a32.5 32.5 0 11-51.9 25.8c0-10.3 4.7-19.7 12.9-25.8L21.8 13a47 47 0 1056.4 0z""/><path d=""M42.7 2.5h14.6v49.4H42.7z""/></svg></a></div><style type=""text/css"">.umbraco-preview-badge {{position: absolute;top: 1em;right: 1em;display: inline-flex;background: #1b264f;color: #fff;padding: 1em;font-size: 12px;z-index: 99999999;justify-content: center;align-items: center;box-shadow: 0 10px 50px rgba(0, 0, 0, .1), 0 6px 20px rgba(0, 0, 0, .16);line-height: 1;}}.umbraco-preview-badge__header {{font-weight: bold;}}.umbraco-preview-badge__end {{width: 3em;padding: 1em;margin: -1em -1em -1em 2em;display: flex;flex-shrink: 0;align-items: center;align-self: stretch;}}.umbraco-preview-badge__end:hover,.umbraco-preview-badge__end:focus {{background: #f5c1bc;}}.umbraco-preview-badge__end svg {{fill: #fff;width:1em;}}</style>";
 
-        [ConfigurationProperty("scripteditor")]
-        internal ContentScriptEditorElement ScriptEditor
-        {
-            get { return (ContentScriptEditorElement)this["scripteditor"]; }
-        }
+        [ConfigurationProperty("imaging")]
+        internal ContentImagingElement Imaging => (ContentImagingElement) this["imaging"];
 
         [ConfigurationProperty("ResolveUrlsFromTextString")]
-        internal InnerTextConfigurationElement<bool> ResolveUrlsFromTextString
-        {
-            get { return GetOptionalTextElement<bool>("ResolveUrlsFromTextString", false); }
-        }
+        internal InnerTextConfigurationElement<bool> ResolveUrlsFromTextString => GetOptionalTextElement("ResolveUrlsFromTextString", false);
 
-        [ConfigurationProperty("UploadAllowDirectories")]
-        internal InnerTextConfigurationElement<bool> UploadAllowDirectories
-        {
-            get { return GetOptionalTextElement("UploadAllowDirectories", true); }
-        }
-
-        public IEnumerable<IContentErrorPage> Error404Collection
-        {
-            get { return Errors.Error404Collection; }
-        }
+        public IEnumerable<IContentErrorPage> Error404Collection => Errors.Error404Collection;
 
         [ConfigurationProperty("errors", IsRequired = true)]
-        internal ContentErrorsElement Errors
-        {
-            get { return (ContentErrorsElement) base["errors"]; }
-        }
+        internal ContentErrorsElement Errors => (ContentErrorsElement) base["errors"];
 
         [ConfigurationProperty("notifications", IsRequired = true)]
-        internal NotificationsElement Notifications
-        {
-            get { return (NotificationsElement)base["notifications"]; }
-        }
-
-        [ConfigurationProperty("ensureUniqueNaming")]
-        internal InnerTextConfigurationElement<bool> EnsureUniqueNaming
-        {
-            get { return GetOptionalTextElement("ensureUniqueNaming", true); }
-        }
-
-        [ConfigurationProperty("TidyEditorContent")]
-        internal InnerTextConfigurationElement<bool> TidyEditorContent
-        {
-            get { return GetOptionalTextElement("TidyEditorContent", false); }
-        }
-
-        [ConfigurationProperty("TidyCharEncoding")]
-        internal InnerTextConfigurationElement<string> TidyCharEncoding
-        {
-            get { return GetOptionalTextElement("TidyCharEncoding", "UTF8"); }
-        }
-
-        [ConfigurationProperty("XmlCacheEnabled")]
-        internal InnerTextConfigurationElement<bool> XmlCacheEnabled
-        {
-            get { return GetOptionalTextElement("XmlCacheEnabled", true); }
-        }
-
-        [ConfigurationProperty("ContinouslyUpdateXmlDiskCache")]
-        internal InnerTextConfigurationElement<bool> ContinouslyUpdateXmlDiskCache
-        {
-            get { return GetOptionalTextElement("ContinouslyUpdateXmlDiskCache", true); }
-        }
-
-        [ConfigurationProperty("XmlContentCheckForDiskChanges")]
-        internal InnerTextConfigurationElement<bool> XmlContentCheckForDiskChanges
-        {
-            get { return GetOptionalTextElement("XmlContentCheckForDiskChanges", false); }
-        }
-
-        [ConfigurationProperty("EnableSplashWhileLoading")]
-        internal InnerTextConfigurationElement<bool> EnableSplashWhileLoading
-        {
-            get { return GetOptionalTextElement("EnableSplashWhileLoading", false); }
-        }
-
-        [ConfigurationProperty("PropertyContextHelpOption")]
-        internal InnerTextConfigurationElement<string> PropertyContextHelpOption
-        {
-            get { return GetOptionalTextElement("PropertyContextHelpOption", "text"); }
-        }
-
-        [ConfigurationProperty("UseLegacyXmlSchema")]
-        internal InnerTextConfigurationElement<bool> UseLegacyXmlSchema
-        {
-            get { return GetOptionalTextElement("UseLegacyXmlSchema", false); }
-        }
-        
-        [ConfigurationProperty("ForceSafeAliases")]
-        internal InnerTextConfigurationElement<bool> ForceSafeAliases
-        {
-            get { return GetOptionalTextElement("ForceSafeAliases", true); }
-        }
+        internal NotificationsElement Notifications => (NotificationsElement) base["notifications"];
 
         [ConfigurationProperty("PreviewBadge")]
-        internal InnerTextConfigurationElement<string> PreviewBadge
-        {
-            get
-            {
-                return GetOptionalTextElement("PreviewBadge", @"<a id=""umbracoPreviewBadge"" style=""z-index:99999; position: absolute; top: 0; right: 0; border: 0; width: 149px; height: 149px; background: url('{1}/preview/previewModeBadge.png') no-repeat;"" href=""{0}/endPreview.aspx?redir={2}""><span style=""display:none;"">In Preview Mode - click to end</span></a>");                
-            }
-        }
-
-        [ConfigurationProperty("UmbracoLibraryCacheDuration")]
-        internal InnerTextConfigurationElement<int> UmbracoLibraryCacheDuration
-        {
-            get { return GetOptionalTextElement("UmbracoLibraryCacheDuration", 1800); }
-        }
+        internal InnerTextConfigurationElement<string> PreviewBadge => GetOptionalTextElement("PreviewBadge", DefaultPreviewBadge);
 
         [ConfigurationProperty("MacroErrors")]
-        internal InnerTextConfigurationElement<MacroErrorBehaviour> MacroErrors
-        {
-            get { return GetOptionalTextElement("MacroErrors", MacroErrorBehaviour.Inline); }
-        }
-
-        [Obsolete("This is here so that if this config element exists we won't get a YSOD, it is not used whatsoever and will be removed in future versions")]
-        [ConfigurationProperty("DocumentTypeIconList")]
-        internal InnerTextConfigurationElement<IconPickerBehaviour> DocumentTypeIconList
-        {
-            get { return GetOptionalTextElement("DocumentTypeIconList", IconPickerBehaviour.HideFileDuplicates); }
-        }
+        internal InnerTextConfigurationElement<MacroErrorBehaviour> MacroErrors => GetOptionalTextElement("MacroErrors", MacroErrorBehaviour.Inline);
 
         [ConfigurationProperty("disallowedUploadFiles")]
-        internal CommaDelimitedConfigurationElement DisallowedUploadFiles
-        {
-            get { return GetOptionalDelimitedElement("disallowedUploadFiles", new[] {"ashx", "aspx", "ascx", "config", "cshtml", "vbhtml", "asmx", "air", "axd"}); }
-        }
+        internal CommaDelimitedConfigurationElement DisallowedUploadFiles => GetOptionalDelimitedElement("disallowedUploadFiles", new[] {"ashx", "aspx", "ascx", "config", "cshtml", "vbhtml", "asmx", "air", "axd"});
 
         [ConfigurationProperty("allowedUploadFiles")]
-        internal CommaDelimitedConfigurationElement AllowedUploadFiles
-        {
-            get { return GetOptionalDelimitedElement("allowedUploadFiles", new string[0]); }
-        }
-
-        [ConfigurationProperty("cloneXmlContent")]
-        internal InnerTextConfigurationElement<bool> CloneXmlContent
-        {
-            get { return GetOptionalTextElement("cloneXmlContent", true); }
-        }
-
-        [ConfigurationProperty("GlobalPreviewStorageEnabled")]
-        internal InnerTextConfigurationElement<bool> GlobalPreviewStorageEnabled
-        {
-            get { return GetOptionalTextElement("GlobalPreviewStorageEnabled", false); }
-        }
-
-        [ConfigurationProperty("defaultDocumentTypeProperty")]
-        internal InnerTextConfigurationElement<string> DefaultDocumentTypeProperty
-        {
-            get { return GetOptionalTextElement("defaultDocumentTypeProperty", "Textstring"); }
-        }
-
+        internal CommaDelimitedConfigurationElement AllowedUploadFiles => GetOptionalDelimitedElement("allowedUploadFiles", new string[0]);
+        
         [ConfigurationProperty("showDeprecatedPropertyEditors")]
-        internal InnerTextConfigurationElement<bool> ShowDeprecatedPropertyEditors
-        {
-            get { return GetOptionalTextElement("showDeprecatedPropertyEditors", false); }
-        }
-
-        [ConfigurationProperty("EnableInheritedDocumentTypes")]
-        internal InnerTextConfigurationElement<bool> EnableInheritedDocumentTypes
-        {
-            get { return GetOptionalTextElement("EnableInheritedDocumentTypes", true); }
-        }
-
-        [ConfigurationProperty("EnableInheritedMediaTypes")]
-        internal InnerTextConfigurationElement<bool> EnableInheritedMediaTypes
-        {
-            get { return GetOptionalTextElement("EnableInheritedMediaTypes", true); }
-        }
-
-        [ConfigurationProperty("EnablePropertyValueConverters")]
-        internal InnerTextConfigurationElement<bool> EnablePropertyValueConverters
-        {
-            get { return GetOptionalTextElement("EnablePropertyValueConverters", false); }
-        }
+        internal InnerTextConfigurationElement<bool> ShowDeprecatedPropertyEditors => GetOptionalTextElement("showDeprecatedPropertyEditors", false);
 
         [ConfigurationProperty("loginBackgroundImage")]
-        internal InnerTextConfigurationElement<string> LoginBackgroundImage
-        {
-            get { return GetOptionalTextElement("loginBackgroundImage", string.Empty); }
-        }
+        internal InnerTextConfigurationElement<string> LoginBackgroundImage => GetOptionalTextElement("loginBackgroundImage", string.Empty);
 
-        string IContentSection.NotificationEmailAddress
-        {
-            get { return Notifications.NotificationEmailAddress; }
-        }
+        string IContentSection.NotificationEmailAddress => Notifications.NotificationEmailAddress;
 
-        bool IContentSection.DisableHtmlEmail
-        {
-            get { return Notifications.DisableHtmlEmail; }
-        }
+        bool IContentSection.DisableHtmlEmail => Notifications.DisableHtmlEmail;
 
-        IEnumerable<string> IContentSection.ImageFileTypes
-        {
-            get { return Imaging.ImageFileTypes; }
-        }
+        IEnumerable<string> IContentSection.ImageFileTypes => Imaging.ImageFileTypes;
 
-        IEnumerable<string> IContentSection.ImageTagAllowedAttributes
-        {
-            get { return Imaging.ImageTagAllowedAttributes; }
-        }
+        IEnumerable<IImagingAutoFillUploadField> IContentSection.ImageAutoFillProperties => Imaging.ImageAutoFillProperties;
 
-        IEnumerable<IImagingAutoFillUploadField> IContentSection.ImageAutoFillProperties
-        {
-            get { return Imaging.ImageAutoFillProperties; }
-        }
+        bool IContentSection.ResolveUrlsFromTextString => ResolveUrlsFromTextString;
 
-        bool IContentSection.ScriptEditorDisable
-        {
-            get { return ScriptEditor.ScriptEditorDisable; }
-        }
+        string IContentSection.PreviewBadge => PreviewBadge;
 
-        string IContentSection.ScriptFolderPath
-        {
-            get { return ScriptEditor.ScriptFolderPath; }
-        }
+        MacroErrorBehaviour IContentSection.MacroErrorBehaviour => MacroErrors;
 
-        IEnumerable<string> IContentSection.ScriptFileTypes
-        {
-            get { return ScriptEditor.ScriptFileTypes; }
-        }
+        IEnumerable<string> IContentSection.DisallowedUploadFiles => DisallowedUploadFiles;
 
-        bool IContentSection.ResolveUrlsFromTextString
-        {
-            get { return ResolveUrlsFromTextString; }
-        }
+        IEnumerable<string> IContentSection.AllowedUploadFiles => AllowedUploadFiles;
 
-        bool IContentSection.UploadAllowDirectories
-        {
-            get { return UploadAllowDirectories; }
-        }        
+        bool IContentSection.ShowDeprecatedPropertyEditors => ShowDeprecatedPropertyEditors;
 
-        bool IContentSection.EnsureUniqueNaming
-        {
-            get { return EnsureUniqueNaming; }
-        }
-
-        bool IContentSection.TidyEditorContent
-        {
-            get { return TidyEditorContent; }
-        }
-
-        string IContentSection.TidyCharEncoding
-        {
-            get { return TidyCharEncoding; }
-        }
-
-        bool IContentSection.XmlCacheEnabled
-        {
-            get { return XmlCacheEnabled; }
-        }
-
-        bool IContentSection.ContinouslyUpdateXmlDiskCache
-        {
-            get { return ContinouslyUpdateXmlDiskCache; }
-        }
-
-        bool IContentSection.XmlContentCheckForDiskChanges
-        {
-            get { return XmlContentCheckForDiskChanges; }
-        }
-
-        bool IContentSection.EnableSplashWhileLoading
-        {
-            get { return EnableSplashWhileLoading; }
-        }
-
-        string IContentSection.PropertyContextHelpOption
-        {
-            get { return PropertyContextHelpOption; }
-        }
-
-        bool IContentSection.UseLegacyXmlSchema
-        {
-            get { return UseLegacyXmlSchema; }
-        }
-
-        bool IContentSection.ForceSafeAliases
-        {
-            get { return ForceSafeAliases; }
-        }
-
-        string IContentSection.PreviewBadge
-        {
-            get { return PreviewBadge; }
-        }
-
-        int IContentSection.UmbracoLibraryCacheDuration
-        {
-            get { return UmbracoLibraryCacheDuration; }
-        }
-
-        MacroErrorBehaviour IContentSection.MacroErrorBehaviour
-        {
-            get { return MacroErrors; }
-        }
-
-        IEnumerable<string> IContentSection.DisallowedUploadFiles
-        {
-            get { return DisallowedUploadFiles; }
-        }
-
-        IEnumerable<string> IContentSection.AllowedUploadFiles
-        {
-            get { return AllowedUploadFiles; }
-        }
-
-        bool IContentSection.CloneXmlContent
-        {
-            get { return CloneXmlContent; }
-        }
-
-        bool IContentSection.GlobalPreviewStorageEnabled
-        {
-            get { return GlobalPreviewStorageEnabled; }
-        }
-
-        string IContentSection.DefaultDocumentTypeProperty
-        {
-            get { return DefaultDocumentTypeProperty; }
-        }
-
-        bool IContentSection.ShowDeprecatedPropertyEditors
-        {
-            get { return ShowDeprecatedPropertyEditors; }
-        }
-
-        bool IContentSection.EnableInheritedDocumentTypes
-        {
-            get { return EnableInheritedDocumentTypes; }
-        }
-
-        bool IContentSection.EnableInheritedMediaTypes
-        {
-            get { return EnableInheritedMediaTypes; }
-        }
-        bool IContentSection.EnablePropertyValueConverters
-        {
-            get { return EnablePropertyValueConverters; }
-        }
-
-        string IContentSection.LoginBackgroundImage
-        {
-            get { return LoginBackgroundImage; }
-        }
-        
+        string IContentSection.LoginBackgroundImage => LoginBackgroundImage;
     }
 }

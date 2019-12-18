@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using System.IO;
 using System.Security.Cryptography;
@@ -10,8 +10,8 @@ namespace Umbraco.Core
     /// Used to generate a string hash using crypto libraries over multiple objects
     /// </summary>
     /// <remarks>
-    /// This should be used to generate a reliable hash that survives AppDomain restarts. 
-    /// This will use the crypto libs to generate the hash and will try to ensure that 
+    /// This should be used to generate a reliable hash that survives AppDomain restarts.
+    /// This will use the crypto libs to generate the hash and will try to ensure that
     /// strings, etc... are not re-allocated so it's not consuming much memory.
     /// </remarks>
     internal class HashGenerator : DisposableObjectSlim
@@ -54,13 +54,13 @@ namespace Umbraco.Core
         {
             //I've tried to no allocate a new string with this which can be done if we use the CompareInfo.GetSortKey method which will create a new
             //byte array that we can use to write to the output, however this also allocates new objects so i really don't think the performance
-            //would be much different. In any case, i'll leave this here for reference. We could write the bytes out based on the sort key,
+            //would be much different. In any case, I'll leave this here for reference. We could write the bytes out based on the sort key,
             //this is how we could deal with case insensitivity without allocating another string
             //for reference see: https://stackoverflow.com/a/10452967/694494
             //we could go a step further and s.Normalize() but we're not really dealing with crazy unicode with this class so far.
 
             if (s != null)
-                _writer.Write(s.ToUpperInvariant());            
+                _writer.Write(s.ToUpperInvariant());
         }
 
         internal void AddFileSystemItem(FileSystemInfo f)
@@ -73,7 +73,7 @@ namespace Umbraco.Core
             AddDateTime(f.CreationTimeUtc);
             AddDateTime(f.LastWriteTimeUtc);
 
-            //check if it is a file or folder 
+            //check if it is a file or folder
             var fileInfo = f as FileInfo;
             if (fileInfo != null)
             {
@@ -131,7 +131,7 @@ namespace Umbraco.Core
                 //create a StringBuilder object
                 var stringBuilder = new StringBuilder();
 
-                //loop to each each byte
+                //loop to each byte
                 foreach (var b in hashedByteArray)
                 {
                     //append it to our StringBuilder

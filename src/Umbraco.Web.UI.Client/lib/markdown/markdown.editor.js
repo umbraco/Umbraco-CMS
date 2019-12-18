@@ -1239,6 +1239,11 @@
         // Perform the button's action.
         function doClick(button) {
 
+            // don't do anything if the editor input or button bar isn't the currently active element
+            if (document.activeElement !== panels.input && !panels.buttonBar.contains(document.activeElement)) {
+                return;
+            }
+
             inputBox.focus();
 
             if (button.textOp) {
@@ -1390,7 +1395,7 @@
                 "Redo - Ctrl+Y" :
                 "Redo - Ctrl+Shift+Z"; // mac and other non-Windows platforms
 
-            buttons.redo = makeButton("wmd-redo-button", redoTitle, "icon-share-alt", null, group4);
+            buttons.redo = makeButton("wmd-redo-button", redoTitle, "icon-redo", null, group4);
             buttons.redo.execute = function (manager) { if (manager) manager.redo(); };
 
             if (helpOptions) {

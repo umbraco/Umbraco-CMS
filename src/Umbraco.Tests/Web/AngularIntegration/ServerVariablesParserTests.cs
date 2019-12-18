@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
-using Umbraco.Web.UI.JavaScript;
 using Umbraco.Core;
+using Umbraco.Web.JavaScript;
 
 namespace Umbraco.Tests.Web.AngularIntegration
 {
     [TestFixture]
     public class ServerVariablesParserTests
     {
-       
+
 
         [Test]
         public void Parse()

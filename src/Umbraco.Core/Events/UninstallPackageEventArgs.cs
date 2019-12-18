@@ -1,31 +1,15 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Packaging.Models;
+using Umbraco.Core.Models.Packaging;
 
 namespace Umbraco.Core.Events
 {
-    public class UninstallPackageEventArgs<TEntity> : CancellableObjectEventArgs<IEnumerable<TEntity>>
+    public class UninstallPackageEventArgs: CancellableObjectEventArgs<IEnumerable<UninstallationSummary>>
     {
-        private readonly MetaData _packageMetaData;
-
-        public UninstallPackageEventArgs(TEntity eventObject, bool canCancel)
-            : base(new[] { eventObject }, canCancel)
+        public UninstallPackageEventArgs(IEnumerable<UninstallationSummary> eventObject, bool canCancel)
+            : base(eventObject, canCancel)
         {
         }
 
-        public UninstallPackageEventArgs(TEntity eventObject, MetaData packageMetaData)
-            : base(new[] { eventObject })
-        {
-            _packageMetaData = packageMetaData;
-        }
-
-        public MetaData PackageMetaData
-        {
-            get { return _packageMetaData; }
-        }
-
-        public IEnumerable<TEntity> UninstallationSummary
-        {
-            get { return EventObject; }
-        }
+        public IEnumerable<UninstallationSummary> UninstallationSummary => EventObject;
     }
 }

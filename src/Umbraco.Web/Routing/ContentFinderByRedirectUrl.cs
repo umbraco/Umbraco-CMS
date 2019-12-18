@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Routing
 {
@@ -14,51 +15,58 @@ namespace Umbraco.Web.Routing
     /// </remarks>
     public class ContentFinderByRedirectUrl : IContentFinder
     {
+        private readonly IRedirectUrlService _redirectUrlService;
+        private readonly ILogger _logger;
+
+        public ContentFinderByRedirectUrl(IRedirectUrlService redirectUrlService, ILogger logger)
+        {
+            _redirectUrlService = redirectUrlService;
+            _logger = logger;
+        }
+
         /// <summary>
-        /// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
+        /// Tries to find and assign an Umbraco document to a <c>PublishedRequest</c>.
         /// </summary>
-        /// <param name="contentRequest">The <c>PublishedContentRequest</c>.</param>
+        /// <param name="frequest">The <c>PublishedRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
         /// <remarks>Optionally, can also assign the template or anything else on the document request, although that is not required.</remarks>
-        public bool TryFindContent(PublishedContentRequest contentRequest)
+        public bool TryFindContent(PublishedRequest frequest)
         {
-            var route = contentRequest.HasDomain
-                ? contentRequest.UmbracoDomain.RootContentId + DomainHelper.PathRelativeToDomain(contentRequest.DomainUri, contentRequest.Uri.GetAbsolutePathDecoded())
-                : contentRequest.Uri.GetAbsolutePathDecoded();
+            var route = frequest.HasDomain
+                ? frequest.Domain.ContentId + DomainUtilities.PathRelativeToDomain(frequest.Domain.Uri, frequest.Uri.GetAbsolutePathDecoded())
+                : frequest.Uri.GetAbsolutePathDecoded();
 
-            var service = contentRequest.RoutingContext.UmbracoContext.Application.Services.RedirectUrlService;
-            var redirectUrl = service.GetMostRecentRedirectUrl(route);
+            var redirectUrl = _redirectUrlService.GetMostRecentRedirectUrl(route);
 
             if (redirectUrl == null)
             {
-                LogHelper.Debug<ContentFinderByRedirectUrl>("No match for route: \"{0}\".", () => route);
+                _logger.Debug<ContentFinderByRedirectUrl>("No match for route: {Route}", route);
                 return false;
             }
 
-            var content = contentRequest.RoutingContext.UmbracoContext.ContentCache.GetById(redirectUrl.ContentId);
-            var url = content == null ? "#" : content.Url;
+            var content = frequest.UmbracoContext.Content.GetById(redirectUrl.ContentId);
+            var url = content == null ? "#" : content.Url(redirectUrl.Culture);
             if (url.StartsWith("#"))
             {
-                LogHelper.Debug<ContentFinderByRedirectUrl>("Route \"{0}\" matches content {1} which has no url.",
-                    () => route, () => redirectUrl.ContentId);
+                _logger.Debug<ContentFinderByRedirectUrl>("Route {Route} matches content {ContentId} which has no url.", route, redirectUrl.ContentId);
                 return false;
             }
 
-            // Apending any querystring from the incoming request to the redirect url.
-            url = string.IsNullOrEmpty(contentRequest.Uri.Query) ? url : url + contentRequest.Uri.Query;
+            // Appending any querystring from the incoming request to the redirect url.
+            url = string.IsNullOrEmpty(frequest.Uri.Query) ? url : url + frequest.Uri.Query;
 
-            LogHelper.Debug<ContentFinderByRedirectUrl>("Route \"{0}\" matches content {1} with url \"{2}\", redirecting.",
-                () => route, () => content.Id, () => url);
-                
+            _logger.Debug<ContentFinderByRedirectUrl>("Route {Route} matches content {ContentId} with url '{Url}', redirecting.", route, content.Id, url);
+            frequest.SetRedirectPermanent(url);
+
+
             // From: http://stackoverflow.com/a/22468386/5018
             // See http://issues.umbraco.org/issue/U4-8361#comment=67-30532
-            // Setting automatic 301 redirects to not be cached because browsers cache these very aggressively which then leads 
+            // Setting automatic 301 redirects to not be cached because browsers cache these very aggressively which then leads
             // to problems if you rename a page back to it's original name or create a new page with the original name
-            contentRequest.Cacheability = HttpCacheability.NoCache;
-            contentRequest.CacheExtensions = new List<string> { "no-store, must-revalidate" };
-            contentRequest.Headers = new Dictionary<string, string> { { "Pragma", "no-cache" }, { "Expires", "0" } };
+            frequest.Cacheability = HttpCacheability.NoCache;
+            frequest.CacheExtensions = new List<string> { "no-store, must-revalidate" };
+            frequest.Headers = new Dictionary<string, string> { { "Pragma", "no-cache" }, { "Expires", "0" } };
 
-            contentRequest.SetRedirectPermanent(url);
             return true;
         }
     }

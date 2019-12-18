@@ -1,15 +1,16 @@
 (function () {
     "use strict";
 
-    function UserGroupsController($scope, $timeout, $location, userService, userGroupsResource, formHelper, localizationService) {
+    function UserGroupsController($scope, $timeout, $location, $filter, userService, userGroupsResource, 
+        formHelper, localizationService, listViewHelper, overlayService) {
 
         var vm = this;
 
         vm.userGroups = [];
         vm.selection = [];
 
+        vm.clickUserGroupName = clickUserGroupName;
         vm.createUserGroup = createUserGroup;
-        vm.clickUserGroup = clickUserGroup;
         vm.clearSelection = clearSelection;
         vm.selectUserGroup = selectUserGroup;
         vm.deleteUserGroups = deleteUserGroups;
@@ -27,8 +28,10 @@
 
                     // only allow editing and selection if user is member of the group or admin
                     vm.userGroups = _.map(userGroups, function (ug) {
-                        return { group: ug, hasAccess: user.userGroups.indexOf(ug.alias) !== -1 || user.userGroups.indexOf("admin") !== -1}
+                        ug.hasAccess = user.userGroups.indexOf(ug.alias) !== -1 || user.userGroups.indexOf("admin") !== -1;
+                        return ug;
                     });
+                    vm.filteredUserGroups = vm.userGroups;
 
                     vm.loading = false;
                 });
@@ -42,43 +45,48 @@
             // go to create user group
             $location.path('users/users/group/-1').search("create", "true");;
         }
-
-        function clickUserGroup(userGroup) {
-
+        
+        function goToUserGroup(userGroup, $event) {
+            
             // only allow editing if user is member of the group or admin
-            if (currentUser.userGroups.indexOf(userGroup.group.alias) === -1 && currentUser.userGroups.indexOf("admin") === -1) {
+            if (currentUser.userGroups.indexOf(userGroup.alias) === -1 && currentUser.userGroups.indexOf("admin") === -1) {
                 return;
             }
-
-            if (vm.selection.length > 0) {
-                selectUserGroup(userGroup, vm.selection);
-            } else {
-                goToUserGroup(userGroup.group.id);
+            $location.path(getEditPath(userGroup)).search("create", null);
+        }
+        
+        function clickUserGroupName(item, $event) {
+           if(!($event.metaKey || $event.ctrlKey)) {
+              goToUserGroup(item, $event);
+              $event.preventDefault();
+           }
+           $event.stopPropagation();
+        };
+        
+        function getEditPath(userGroup) {
+            
+            // only allow editing if user is member of the group or admin
+            if (currentUser.userGroups.indexOf(userGroup.alias) === -1 && currentUser.userGroups.indexOf("admin") === -1) {
+                return "";
             }
+            
+            return 'users/users/group/' + userGroup.id;
         }
 
-        function selectUserGroup(userGroup, selection, event) {
-
+        function selectUserGroup(userGroup, $index, $event) {
+            
             // Only allow selection if user is member of the group or admin
-            if (currentUser.userGroups.indexOf(userGroup.group.alias) === -1 && currentUser.userGroups.indexOf("admin") === -1) {
+            if (currentUser.userGroups.indexOf(userGroup.alias) === -1 && currentUser.userGroups.indexOf("admin") === -1) {
                 return;
             }
             // Disallow selection of the admin/translators group, the checkbox is not visible in the UI, but clicking(and thus selecting) is still possible.
             // Currently selection can only be used for deleting, and the Controller will also disallow deleting the admin group.
-            if (userGroup.group.alias === "admin" || userGroup.group.alias === "translator")
+            if (userGroup.isSystemUserGroup)
                 return;
-
-            if (userGroup.selected) {
-                var index = selection.indexOf(userGroup.group.id);
-                selection.splice(index, 1);
-                userGroup.selected = false;
-            } else {
-                userGroup.selected = true;
-                vm.selection.push(userGroup.group.id);
-            }
-
-            if(event){
-                event.preventDefault();
+            
+            listViewHelper.selectHandler(userGroup, $index, vm.userGroups, vm.selection, $event);
+            
+            if(event) {
                 event.stopPropagation();
             }
         }
@@ -87,21 +95,26 @@
 
             if(vm.selection.length > 0) {
 
-                localizationService.localize("defaultdialogs_confirmdelete")
-                    .then(function(value) {
-
-                        var confirmResponse = confirm(value);
-
-                        if (confirmResponse === true) {
-                            userGroupsResource.deleteUserGroups(vm.selection).then(function (data) {
-                                clearSelection();
-                                onInit();
-                                formHelper.showNotifications(data);
-                            }, function(error) {
-                                formHelper.showNotifications(error.data);
-                            });
-                        }
-
+                localizationService.localizeMany(["general_delete", "defaultdialogs_confirmdelete", "general_cancel", "contentTypeEditor_yesDelete"])
+                    .then(function (data) {
+                        const overlay = {
+                            title: data[0],
+                            content: data[1] + "?",
+                            closeButtonLabel: data[2],
+                            submitButtonLabel: data[3],
+                            submitButtonStyle: "danger",
+                            close: function () {
+                                overlayService.close();
+                            },
+                            submit: function () {
+                                userGroupsResource.deleteUserGroups(_.pluck(vm.selection, "id")).then(function (data) {
+                                    clearSelection();
+                                    onInit();
+                                }, angular.noop);
+                                overlayService.close();
+                            }
+                        };
+                        overlayService.open(overlay);
                     });
 
             }
@@ -114,9 +127,13 @@
             vm.selection = [];
         }
 
-        function goToUserGroup(userGroupId) {
-            $location.path('users/users/group/' + userGroupId).search("create", null);
-        }
+        var unbindFilterWatcher = $scope.$watch("vm.filter", function (newVal, oldVal) {
+            vm.filteredUserGroups = $filter('filter')(vm.userGroups, vm.filter);
+        });
+
+        $scope.$on("$destroy", function () {
+            unbindFilterWatcher();
+        });
 
         onInit();
 

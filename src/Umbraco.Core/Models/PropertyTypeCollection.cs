@@ -5,32 +5,33 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
-using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
     /// <summary>
-    /// Represents a collection of <see cref="PropertyType"/> objects
+    /// Represents a collection of <see cref="PropertyType"/> objects.
     /// </summary>
     [Serializable]
     [DataContract]
+    // TODO: Change this to ObservableDictionary so we can reduce the INotifyCollectionChanged implementation details
     public class PropertyTypeCollection : KeyedCollection<string, PropertyType>, INotifyCollectionChanged, IDeepCloneable
     {
         [IgnoreDataMember]
         private readonly ReaderWriterLockSlim _addLocker = new ReaderWriterLockSlim();
 
-        [IgnoreDataMember]
-        internal Action OnAdd;
 
-        internal PropertyTypeCollection()
+        internal PropertyTypeCollection(bool supportsPublishing)
         {
-            
+            SupportsPublishing = supportsPublishing;
         }
 
-        public PropertyTypeCollection(IEnumerable<PropertyType> properties)
+        public PropertyTypeCollection(bool supportsPublishing, IEnumerable<PropertyType> properties)
+            : this(supportsPublishing)
         {
             Reset(properties);
         }
+
+        public bool SupportsPublishing { get; }
 
         /// <summary>
         /// Resets the collection to only contain the <see cref="PropertyType"/> instances referenced in the <paramref name="properties"/> parameter.
@@ -39,64 +40,94 @@ namespace Umbraco.Core.Models
         /// <remarks></remarks>
         internal void Reset(IEnumerable<PropertyType> properties)
         {
+            //collection events will be raised in each of these calls
             Clear();
-            properties.ForEach(Add);
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+
+            //collection events will be raised in each of these calls
+            foreach (var property in properties)
+                Add(property);            
         }
 
         protected override void SetItem(int index, PropertyType item)
         {
-            base.SetItem(index, item);
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index));
+            item.SupportsPublishing = SupportsPublishing;
+            var oldItem = index >= 0 ? this[index] : item;
+            base.SetItem(index, item);            
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, item, oldItem));
+            item.PropertyChanged += Item_PropertyChanged;
         }
 
         protected override void RemoveItem(int index)
         {
             var removed = this[index];
             base.RemoveItem(index);
+            removed.PropertyChanged -= Item_PropertyChanged;
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, removed));
         }
 
         protected override void InsertItem(int index, PropertyType item)
         {
-            base.InsertItem(index, item);
+            item.SupportsPublishing = SupportsPublishing;
+            base.InsertItem(index, item);            
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
+            item.PropertyChanged += Item_PropertyChanged;
         }
 
         protected override void ClearItems()
         {
             base.ClearItems();
+            foreach (var item in this)
+                item.PropertyChanged -= Item_PropertyChanged;
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
-        //TODO: Instead of 'new' this should explicitly implement one of the collection interfaces members
+        // TODO: Instead of 'new' this should explicitly implement one of the collection interfaces members
         internal new void Add(PropertyType item)
         {
-            using (new WriteLock(_addLocker))
+            item.SupportsPublishing = SupportsPublishing;
+
+            // TODO: this is not pretty and should be refactored
+            try
             {
+                _addLocker.EnterWriteLock();
                 var key = GetKeyForItem(item);
                 if (key != null)
                 {
-                    var exists = this.Contains(key);
+                    var exists = Contains(key);
                     if (exists)
                     {
+                        //collection events will be raised in SetItem
                         SetItem(IndexOfKey(key), item);
                         return;
                     }
                 }
 
-                //check if the item's sort order is already in use				
+                //check if the item's sort order is already in use
                 if (this.Any(x => x.SortOrder == item.SortOrder))
                 {
                     //make it the next iteration
                     item.SortOrder = this.Max(x => x.SortOrder) + 1;
                 }
 
+                //collection events will be raised in InsertItem
                 base.Add(item);
-                OnAdd.IfNotNull(x => x.Invoke());//Could this not be replaced by a Mandate/Contract for ensuring item is not null
-
-                OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
             }
+            finally
+            {
+                if (_addLocker.IsWriteLockHeld)
+                    _addLocker.ExitWriteLock();
+            }
+        }
+
+        /// <summary>
+        /// Occurs when a property changes on a PropertyType that exists in this collection
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Item_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            var propType = (PropertyType)sender;
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, propType, propType));
         }
 
         /// <summary>
@@ -110,23 +141,18 @@ namespace Umbraco.Core.Models
             return this.Any(x => x.Alias == propertyAlias);
         }
 
-        public void RemoveItem(string propertyTypeAlias)
+        public bool RemoveItem(string propertyTypeAlias)
         {
             var key = IndexOfKey(propertyTypeAlias);
-            //Only removes an item if the key was found
-            if(key != -1)
-                RemoveItem(key);
+            if (key != -1) RemoveItem(key);
+            return key != -1;
         }
 
         public int IndexOfKey(string key)
         {
-            for (var i = 0; i < this.Count; i++)
-            {
+            for (var i = 0; i < Count; i++)
                 if (this[i].Alias == key)
-                {
                     return i;
-                }
-            }
             return -1;
         }
 
@@ -139,20 +165,15 @@ namespace Umbraco.Core.Models
 
         protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
         {
-            if (CollectionChanged != null)
-            {
-                CollectionChanged(this, args);
-            }
+            CollectionChanged?.Invoke(this, args);
         }
 
         public object DeepClone()
         {
-            var newGroup = new PropertyTypeCollection();
-            foreach (var p in this)
-            {
-                newGroup.Add((PropertyType)p.DeepClone());
-            }
-            return newGroup;
+            var clone = new PropertyTypeCollection(SupportsPublishing);
+            foreach (var propertyType in this)
+                clone.Add((PropertyType) propertyType.DeepClone());
+            return clone;
         }
     }
 }

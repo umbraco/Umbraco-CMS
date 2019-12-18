@@ -5,7 +5,10 @@
 
         var vm = this;
         var currentPosition = null;
-        var localizeSaving = localizationService.localize("general_saving");
+
+        vm.header = {};
+        vm.header.editorfor = "settings_script";
+        vm.header.setPageTitle = true;
 
         vm.page = {};
         vm.page.loading = true;
@@ -20,9 +23,14 @@
 
         //Keyboard shortcuts for help dialog
         vm.page.keyboardShortcutsOverview = [];
-        vm.page.keyboardShortcutsOverview.push(templateHelper.getGeneralShortcuts());
-        vm.page.keyboardShortcutsOverview.push(templateHelper.getEditorShortcuts());
-        
+
+        templateHelper.getGeneralShortcuts().then(function(shortcuts){
+            vm.page.keyboardShortcutsOverview.push(shortcuts);
+        });
+
+        templateHelper.getEditorShortcuts().then(function(shortcuts){
+            vm.page.keyboardShortcutsOverview.push(shortcuts);
+        });
 
         vm.script = {};
 
@@ -38,14 +46,9 @@
             vm.script.content = vm.editor.getValue();
 
             contentEditingHelper.contentEditorPerformSave({
-                statusMessage: localizeSaving,
                 saveMethod: codefileResource.save,
                 scope: $scope,
                 content: vm.script,
-                // We do not redirect on failure for scripts - this is because it is not possible to actually save the script
-                // when server side validation fails - as opposed to content where we are capable of saving the content
-                // item if server side validation fails
-                redirectOnFailure: false,
                 rebindCallback: function (orignal, saved) {}
             }).then(function (saved) {
 
@@ -142,7 +145,7 @@
                     //As conflicts with our own tree search shortcut
                     _editor.commands.bindKey("ctrl-space", null);
 
-                    //TODO: Move all these keybinding config out into some helper/service
+                    // TODO: Move all these keybinding config out into some helper/service
                     _editor.commands.addCommands([
                         //Disable (alt+shift+K)
                         //Conflicts with our own show shortcuts dialog - this overrides it

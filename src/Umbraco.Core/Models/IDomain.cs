@@ -1,8 +1,8 @@
-using Umbraco.Core.Models.EntityBase;
+﻿using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
-    public interface IDomain : IAggregateRoot, IRememberBeingDirty, ICanBeDirty
+    public interface IDomain : IEntity, IRememberBeingDirty
     {
         int? LanguageId { get; set; }
         string DomainName { get; set; }

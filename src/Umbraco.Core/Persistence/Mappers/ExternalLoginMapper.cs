@@ -1,6 +1,7 @@
+﻿using System;
 using System.Collections.Concurrent;
 using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
@@ -8,28 +9,17 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(IdentityUserLogin))]
     public sealed class ExternalLoginMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
-        public ExternalLoginMapper()
+        public ExternalLoginMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+            : base(sqlContext, maps)
+        { }
+
+        protected override void DefineMaps()
         {
-            BuildMap();
+            DefineMap<IdentityUserLogin, ExternalLoginDto>(nameof(IdentityUserLogin.Id), nameof(ExternalLoginDto.Id));
+            DefineMap<IdentityUserLogin, ExternalLoginDto>(nameof(IdentityUserLogin.CreateDate), nameof(ExternalLoginDto.CreateDate));
+            DefineMap<IdentityUserLogin, ExternalLoginDto>(nameof(IdentityUserLogin.LoginProvider), nameof(ExternalLoginDto.LoginProvider));
+            DefineMap<IdentityUserLogin, ExternalLoginDto>(nameof(IdentityUserLogin.ProviderKey), nameof(ExternalLoginDto.ProviderKey));
+            DefineMap<IdentityUserLogin, ExternalLoginDto>(nameof(IdentityUserLogin.UserId), nameof(ExternalLoginDto.UserId));
         }
-
-        #region Overrides of BaseMapper
-
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache
-        {
-            get { return PropertyInfoCacheInstance; }
-        }
-
-        internal override void BuildMap()
-        {
-            CacheMap<IdentityUserLogin, ExternalLoginDto>(src => src.Id, dto => dto.Id);
-            CacheMap<IdentityUserLogin, ExternalLoginDto>(src => src.CreateDate, dto => dto.CreateDate);
-            CacheMap<IdentityUserLogin, ExternalLoginDto>(src => src.LoginProvider, dto => dto.LoginProvider);
-            CacheMap<IdentityUserLogin, ExternalLoginDto>(src => src.ProviderKey, dto => dto.ProviderKey);
-            CacheMap<IdentityUserLogin, ExternalLoginDto>(src => src.UserId, dto => dto.UserId);
-        }
-
-        #endregion
     }
 }

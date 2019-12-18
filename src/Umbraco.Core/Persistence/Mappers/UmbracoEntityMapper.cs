@@ -1,44 +1,29 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Linq.Expressions;
-using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
     [MapperFor(typeof (IUmbracoEntity))]
     public sealed class UmbracoEntityMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
+        public UmbracoEntityMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+            : base(sqlContext, maps)
+        { }
 
-        //NOTE: its an internal class but the ctor must be public since we're using Activator.CreateInstance to create it
-        // otherwise that would fail because there is no public constructor.
-        public UmbracoEntityMapper()
+        protected override void DefineMaps()
         {
-            BuildMap();
+            DefineMap<IUmbracoEntity, NodeDto>(nameof(IUmbracoEntity.Id), nameof(NodeDto.NodeId));
+            DefineMap<IUmbracoEntity, NodeDto>(nameof(IUmbracoEntity.CreateDate), nameof(NodeDto.CreateDate));
+            DefineMap<IUmbracoEntity, NodeDto>(nameof(IUmbracoEntity.Level), nameof(NodeDto.Level));
+            DefineMap<IUmbracoEntity, NodeDto>(nameof(IUmbracoEntity.ParentId), nameof(NodeDto.ParentId));
+            DefineMap<IUmbracoEntity, NodeDto>(nameof(IUmbracoEntity.Path), nameof(NodeDto.Path));
+            DefineMap<IUmbracoEntity, NodeDto>(nameof(IUmbracoEntity.SortOrder), nameof(NodeDto.SortOrder));
+            DefineMap<IUmbracoEntity, NodeDto>(nameof(IUmbracoEntity.Name), nameof(NodeDto.Text));
+            DefineMap<IUmbracoEntity, NodeDto>(nameof(IUmbracoEntity.Trashed), nameof(NodeDto.Trashed));
+            DefineMap<IUmbracoEntity, NodeDto>(nameof(IUmbracoEntity.Key), nameof(NodeDto.UniqueId));
+            DefineMap<IUmbracoEntity, NodeDto>(nameof(IUmbracoEntity.CreatorId), nameof(NodeDto.UserId));
         }
-
-        #region Overrides of BaseMapper
-
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache
-        {
-            get { return PropertyInfoCacheInstance; }
-        }
-
-        internal override void BuildMap()
-        {
-            CacheMap<IUmbracoEntity, NodeDto>(src => src.Id, dto => dto.NodeId);
-            CacheMap<IUmbracoEntity, NodeDto>(src => src.CreateDate, dto => dto.CreateDate);
-            CacheMap<IUmbracoEntity, NodeDto>(src => src.Level, dto => dto.Level);
-            CacheMap<IUmbracoEntity, NodeDto>(src => src.ParentId, dto => dto.ParentId);
-            CacheMap<IUmbracoEntity, NodeDto>(src => src.Path, dto => dto.Path);
-            CacheMap<IUmbracoEntity, NodeDto>(src => src.SortOrder, dto => dto.SortOrder);
-            CacheMap<IUmbracoEntity, NodeDto>(src => src.Name, dto => dto.Text);
-            CacheMap<IUmbracoEntity, NodeDto>(src => src.Trashed, dto => dto.Trashed);
-            CacheMap<IUmbracoEntity, NodeDto>(src => src.Key, dto => dto.UniqueId);
-            CacheMap<IUmbracoEntity, NodeDto>(src => src.CreatorId, dto => dto.UserId);
-        }
-        
-        #endregion
     }
 }

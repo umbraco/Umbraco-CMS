@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models
@@ -15,7 +14,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class Macro : Entity, IMacro
+    public class Macro : EntityBase, IMacro
     {
         public Macro()
         {
@@ -34,14 +33,11 @@ namespace Umbraco.Core.Models
         /// <param name="cacheDuration"></param>
         /// <param name="alias"></param>
         /// <param name="name"></param>
-        /// <param name="controlType"></param>
-        /// <param name="controlAssembly"></param>
-        /// <param name="xsltPath"></param>
         /// <param name="cacheByPage"></param>
         /// <param name="cacheByMember"></param>
         /// <param name="dontRender"></param>
-        /// <param name="scriptPath"></param>
-        public Macro(int id, Guid key, bool useInEditor, int cacheDuration, string @alias, string name, string controlType, string controlAssembly, string xsltPath, bool cacheByPage, bool cacheByMember, bool dontRender, string scriptPath)
+        /// <param name="macroSource"></param>
+        public Macro(int id, Guid key, bool useInEditor, int cacheDuration, string @alias, string name, bool cacheByPage, bool cacheByMember, bool dontRender, string macroSource, MacroTypes macroType)
             : this()
         {
             Id = id;
@@ -50,13 +46,11 @@ namespace Umbraco.Core.Models
             CacheDuration = cacheDuration;
             Alias = alias.ToCleanString(CleanStringType.Alias);
             Name = name;
-            ControlType = controlType;
-            ControlAssembly = controlAssembly;
-            XsltPath = xsltPath;
             CacheByPage = cacheByPage;
             CacheByMember = cacheByMember;
             DontRender = dontRender;
-            ScriptPath = scriptPath;
+            MacroSource = macroSource;
+            MacroType = macroType;
         }
 
         /// <summary>
@@ -66,18 +60,13 @@ namespace Umbraco.Core.Models
         /// <param name="cacheDuration"></param>
         /// <param name="alias"></param>
         /// <param name="name"></param>
-        /// <param name="controlType"></param>
-        /// <param name="controlAssembly"></param>
-        /// <param name="xsltPath"></param>
         /// <param name="cacheByPage"></param>
         /// <param name="cacheByMember"></param>
         /// <param name="dontRender"></param>
-        /// <param name="scriptPath"></param>
+        /// <param name="macroSource"></param>
         public Macro(string @alias, string name,
-            string controlType = "",
-            string controlAssembly = "",
-            string xsltPath = "",
-            string scriptPath = "",
+            string macroSource,
+            MacroTypes macroType,
             bool cacheByPage = false,
             bool cacheByMember = false,
             bool dontRender = true,
@@ -89,13 +78,11 @@ namespace Umbraco.Core.Models
             CacheDuration = cacheDuration;
             Alias = alias.ToCleanString(CleanStringType.Alias);
             Name = name;
-            ControlType = controlType;
-            ControlAssembly = controlAssembly;
-            XsltPath = xsltPath;
             CacheByPage = cacheByPage;
             CacheByMember = cacheByMember;
             DontRender = dontRender;
-            ScriptPath = scriptPath;
+            MacroSource = macroSource;
+            MacroType = macroType;
         }
 
         private string _alias;
@@ -105,35 +92,15 @@ namespace Umbraco.Core.Models
         private bool _cacheByPage;
         private bool _cacheByMember;
         private bool _dontRender;
-        private string _scriptFile;
-        private string _scriptAssembly;
-        private string _scriptPath;
-        private string _xslt;
+        private string _macroSource;
+        private MacroTypes _macroType = MacroTypes.Unknown;
         private MacroPropertyCollection _properties;
         private List<string> _addedProperties;
         private List<string> _removedProperties;
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.Alias);
-            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.Name);
-            public readonly PropertyInfo UseInEditorSelector = ExpressionHelper.GetPropertyInfo<Macro, bool>(x => x.UseInEditor);
-            public readonly PropertyInfo CacheDurationSelector = ExpressionHelper.GetPropertyInfo<Macro, int>(x => x.CacheDuration);
-            public readonly PropertyInfo CacheByPageSelector = ExpressionHelper.GetPropertyInfo<Macro, bool>(x => x.CacheByPage);
-            public readonly PropertyInfo CacheByMemberSelector = ExpressionHelper.GetPropertyInfo<Macro, bool>(x => x.CacheByMember);
-            public readonly PropertyInfo DontRenderSelector = ExpressionHelper.GetPropertyInfo<Macro, bool>(x => x.DontRender);
-            public readonly PropertyInfo ControlPathSelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.ControlType);
-            public readonly PropertyInfo ControlAssemblySelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.ControlAssembly);
-            public readonly PropertyInfo ScriptPathSelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.ScriptPath);
-            public readonly PropertyInfo XsltPathSelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.XsltPath);
-            public readonly PropertyInfo PropertiesSelector = ExpressionHelper.GetPropertyInfo<Macro, MacroPropertyCollection>(x => x.Properties);
-        }
-
         void PropertiesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            OnPropertyChanged(Ps.Value.PropertiesSelector);
+            OnPropertyChanged(nameof(Properties));
 
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
@@ -171,35 +138,31 @@ namespace Umbraco.Core.Models
         /// <param name="e"></param>
         void PropertyDataChanged(object sender, PropertyChangedEventArgs e)
         {
-            OnPropertyChanged(Ps.Value.PropertiesSelector);
+            OnPropertyChanged(nameof(Properties));
         }
-        
-        public override void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
-        {
+
+        public override void ResetDirtyProperties(bool rememberDirty)
+        {   
+            base.ResetDirtyProperties(rememberDirty);
+
             _addedProperties.Clear();
             _removedProperties.Clear();
-            base.ResetDirtyProperties(rememberPreviouslyChangedProperties);
+
             foreach (var prop in Properties)
             {
-                ((TracksChangesEntityBase)prop).ResetDirtyProperties(rememberPreviouslyChangedProperties);
+                prop.ResetDirtyProperties(rememberDirty);
             }
         }
 
         /// <summary>
         /// Used internally to check if we need to add a section in the repository to the db
         /// </summary>
-        internal IEnumerable<string> AddedProperties
-        {
-            get { return _addedProperties; }
-        }
+        internal IEnumerable<string> AddedProperties => _addedProperties;
 
         /// <summary>
         /// Used internally to check if we need to remove  a section in the repository to the db
         /// </summary>
-        internal IEnumerable<string> RemovedProperties
-        {
-            get { return _removedProperties; }
-        }
+        internal IEnumerable<string> RemovedProperties => _removedProperties;
 
         /// <summary>
         /// Gets or sets the alias of the Macro
@@ -207,8 +170,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public string Alias
         {
-            get { return _alias; }
-            set { SetPropertyValueAndDetectChanges(value.ToCleanString(CleanStringType.Alias), ref _alias, Ps.Value.AliasSelector); }
+            get => _alias;
+            set => SetPropertyValueAndDetectChanges(value.ToCleanString(CleanStringType.Alias), ref _alias, nameof(Alias));
         }
 
         /// <summary>
@@ -217,8 +180,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public string Name
         {
-            get { return _name; }
-            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
+            get => _name;
+            set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
         }
 
         /// <summary>
@@ -227,8 +190,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public bool UseInEditor
         {
-            get { return _useInEditor; }
-            set { SetPropertyValueAndDetectChanges(value, ref _useInEditor, Ps.Value.UseInEditorSelector); }
+            get => _useInEditor;
+            set => SetPropertyValueAndDetectChanges(value, ref _useInEditor, nameof(UseInEditor));
         }
 
         /// <summary>
@@ -237,8 +200,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public int CacheDuration
         {
-            get { return _cacheDuration; }
-            set { SetPropertyValueAndDetectChanges(value, ref _cacheDuration, Ps.Value.CacheDurationSelector); }
+            get => _cacheDuration;
+            set => SetPropertyValueAndDetectChanges(value, ref _cacheDuration, nameof(CacheDuration));
         }
 
         /// <summary>
@@ -247,8 +210,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public bool CacheByPage
         {
-            get { return _cacheByPage; }
-            set { SetPropertyValueAndDetectChanges(value, ref _cacheByPage, Ps.Value.CacheByPageSelector); }
+            get => _cacheByPage;
+            set => SetPropertyValueAndDetectChanges(value, ref _cacheByPage, nameof(CacheByPage));
         }
 
         /// <summary>
@@ -257,8 +220,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public bool CacheByMember
         {
-            get { return _cacheByMember; }
-            set { SetPropertyValueAndDetectChanges(value, ref _cacheByMember, Ps.Value.CacheByMemberSelector); }
+            get => _cacheByMember;
+            set => SetPropertyValueAndDetectChanges(value, ref _cacheByMember, nameof(CacheByMember));
         }
 
         /// <summary>
@@ -267,78 +230,48 @@ namespace Umbraco.Core.Models
         [DataMember]
         public bool DontRender
         {
-            get { return _dontRender; }
-            set { SetPropertyValueAndDetectChanges(value, ref _dontRender, Ps.Value.DontRenderSelector); }
+            get => _dontRender;
+            set => SetPropertyValueAndDetectChanges(value, ref _dontRender, nameof(DontRender));
         }
 
         /// <summary>
-        /// Gets or sets the path to user control or the Control Type to render
+        /// Gets or set the path to the Partial View to render
         /// </summary>
         [DataMember]
-        public string ControlType
+        public string MacroSource
         {
-            get { return _scriptFile; }
-            set { SetPropertyValueAndDetectChanges(value, ref _scriptFile, Ps.Value.ControlPathSelector); }
+            get => _macroSource;
+            set => SetPropertyValueAndDetectChanges(value, ref _macroSource, nameof(MacroSource));
         }
 
         /// <summary>
-        /// Gets or sets the name of the assembly, which should be used by the Macro
+        /// Gets or set the path to the Partial View to render
         /// </summary>
-        /// <remarks>Will usually only be filled if the ControlType is a Usercontrol</remarks>
         [DataMember]
-        public string ControlAssembly
+        public MacroTypes MacroType
         {
-            get { return _scriptAssembly; }
-            set { SetPropertyValueAndDetectChanges(value, ref _scriptAssembly, Ps.Value.ControlAssemblySelector); }
-        }
-
-        /// <summary>
-        /// Gets or set the path to the Python file in use
-        /// </summary>
-        /// <remarks>Optional: Can only be one of three Script, Python or Xslt</remarks>
-        [DataMember]
-        public string ScriptPath
-        {
-            get { return _scriptPath; }
-            set { SetPropertyValueAndDetectChanges(value, ref _scriptPath, Ps.Value.ScriptPathSelector); }
-        }
-
-        /// <summary>
-        /// Gets or sets the path to the Xslt file in use
-        /// </summary>
-        /// <remarks>Optional: Can only be one of three Script, Python or Xslt</remarks>
-        [DataMember]
-        public string XsltPath
-        {
-            get { return _xslt; }
-            set { SetPropertyValueAndDetectChanges(value, ref _xslt, Ps.Value.XsltPathSelector); }
+            get => _macroType;
+            set => SetPropertyValueAndDetectChanges(value, ref _macroType, nameof(MacroType));
         }
 
         /// <summary>
         /// Gets or sets a list of Macro Properties
         /// </summary>
         [DataMember]
-        public MacroPropertyCollection Properties
-        {
-            get { return _properties; }            
-        }
+        public MacroPropertyCollection Properties => _properties;
 
-        public override object DeepClone()
+        protected override void PerformDeepClone(object clone)
         {
-            var clone = (Macro)base.DeepClone();
-            //turn off change tracking
-            clone.DisableChangeTracking();
-            clone._addedProperties = new List<string>();
-            clone._removedProperties = new List<string>();
-            clone._properties = (MacroPropertyCollection)Properties.DeepClone();
+            base.PerformDeepClone(clone);
+
+            var clonedEntity = (Macro)clone;
+            
+            clonedEntity._addedProperties = new List<string>();
+            clonedEntity._removedProperties = new List<string>();
+            clonedEntity._properties = (MacroPropertyCollection)Properties.DeepClone();
             //re-assign the event handler
-            clone._properties.CollectionChanged += clone.PropertiesChanged;
-            //this shouldn't really be needed since we're not tracking
-            clone.ResetDirtyProperties(false);
-            //re-enable tracking
-            clone.EnableChangeTracking();
-
-            return clone;
+            clonedEntity._properties.CollectionChanged += clonedEntity.PropertiesChanged;
+            
         }
     }
 }

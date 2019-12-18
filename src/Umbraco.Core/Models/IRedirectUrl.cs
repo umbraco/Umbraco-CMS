@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
     /// <summary>
     /// Represents a redirect url.
     /// </summary>
-    public interface IRedirectUrl : IAggregateRoot, IRememberBeingDirty
+    public interface IRedirectUrl : IEntity, IRememberBeingDirty
     {
         /// <summary>
         /// Gets or sets the identifier of the content item.
@@ -28,10 +28,17 @@ namespace Umbraco.Core.Models
         DateTime CreateDateUtc { get; set; }
 
         /// <summary>
+        /// Gets or sets the culture.
+        /// </summary>
+        [DataMember]
+        string Culture { get; set; }
+
+        /// <summary>
         /// Gets or sets the redirect url route.
         /// </summary>
         /// <remarks>Is a proper Umbraco route eg /path/to/foo or 123/path/tofoo.</remarks>
         [DataMember]
         string Url { get; set; }
+
     }
 }

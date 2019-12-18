@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -24,9 +21,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         [TestCase("Alpha (10)", "Alpha (2)", +1)] // this is the real stuff
         [TestCase("Kilo", "Golf (2)", +1)]
         [TestCase("Kilo (1)", "Golf (2)", +1)]
-		[TestCase("", "", 0)]
-		[TestCase(null, null, 0)]
-		public void ComparerTest(string name1, string name2, int expected)
+        [TestCase("", "", 0)]
+        [TestCase(null, null, 0)]
+        public void ComparerTest(string name1, string name2, int expected)
         {
             var comparer = new SimilarNodeName.Comparer();
 
@@ -38,6 +35,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             else if (expected > 0)
                 Assert.IsTrue(result > 0, "Expected >0 but was " + result);
         }
+
+        
 
         [Test]
         public void OrderByTest()
@@ -78,9 +77,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         [TestCase(0, "Alpha", "Alpha (3)")]
         [TestCase(0, "Kilo (1)", "Kilo (1) (1)")] // though... we might consider "Kilo (2)"
         [TestCase(6, "Kilo (1)", "Kilo (1)")] // because of the id
-		[TestCase(0, "", " (1)")]
-		[TestCase(0, null, " (1)")]
-		public void Test(int nodeId, string nodeName, string expected)
+        [TestCase(0, "alpha", "alpha (3)")]
+        [TestCase(0, "", " (1)")]
+        [TestCase(0, null, " (1)")]
+        public void Test(int nodeId, string nodeName, string expected)
         {
             var names = new[]
             {
@@ -97,6 +97,23 @@ namespace Umbraco.Tests.Persistence.Repositories
             };
 
             Assert.AreEqual(expected, SimilarNodeName.GetUniqueName(names, nodeId, nodeName));
+        }
+
+        [Test]
+        [Explicit("This test fails! We need to fix up the logic")]
+        public void TestMany()
+        {
+            var names = new[]
+            {
+                new SimilarNodeName { Id = 1, Name = "Alpha (2)" },
+                new SimilarNodeName { Id = 2, Name = "Test" },
+                new SimilarNodeName { Id = 3, Name = "Test (1)" },
+                new SimilarNodeName { Id = 4, Name = "Test (2)" },
+                new SimilarNodeName { Id = 22, Name = "Test (1) (1)" },
+            };
+
+            //fixme - this will yield "Test (2)" which is already in use
+            Assert.AreEqual("Test (3)", SimilarNodeName.GetUniqueName(names, 0, "Test"));
         }
     }
 }

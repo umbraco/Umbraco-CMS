@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -15,21 +15,33 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
 {
     public class TestRunner
     {
-        private readonly Func<HttpRequestMessage, UmbracoHelper, ApiController> _controllerFactory;
+        private readonly Func<HttpRequestMessage, IUmbracoContextAccessor, UmbracoHelper, ApiController> _controllerFactory;
 
-        public TestRunner(Func<HttpRequestMessage, UmbracoHelper, ApiController> controllerFactory)
+        public TestRunner(Func<HttpRequestMessage, IUmbracoContextAccessor, UmbracoHelper, ApiController> controllerFactory)
         {
             _controllerFactory = controllerFactory;
         }
 
-        public async Task<Tuple<HttpResponseMessage, string>> Execute(string controllerName, string actionName, HttpMethod method, HttpContent content = null)
+        public async Task<Tuple<HttpResponseMessage, string>> Execute(string controllerName, string actionName, HttpMethod method,
+            HttpContent content = null,
+            MediaTypeWithQualityHeaderValue mediaTypeHeader = null,
+            bool assertOkResponse = true, object routeDefaults = null, string url = null)
         {
+            if (mediaTypeHeader == null)
+            {
+                mediaTypeHeader = new MediaTypeWithQualityHeaderValue("application/json");
+            }
+            if (routeDefaults == null)
+            {
+                routeDefaults = new { controller = controllerName, action = actionName, id = RouteParameter.Optional };
+            }
+
             var startup = new TestStartup(
                 configuration =>
                 {
                     configuration.Routes.MapHttpRoute("Default",
                         routeTemplate: "{controller}/{action}/{id}",
-                        defaults: new { controller = controllerName, action = actionName, id = RouteParameter.Optional });
+                        defaults: routeDefaults);
                 },
                 _controllerFactory);
 
@@ -37,32 +49,36 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             {
                 var request = new HttpRequestMessage
                 {
-                    RequestUri = new Uri("https://testserver/"),
+                    RequestUri = new Uri("https://testserver/" + (url ?? "")),
                     Method = method
                 };
 
                 if (content != null)
                     request.Content = content;
 
-                request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                request.Headers.Accept.Add(mediaTypeHeader);
 
                 Console.WriteLine(request);
                 var response = await server.HttpClient.SendAsync(request);
                 Console.WriteLine(response);
 
-                string json = "";
                 if (response.IsSuccessStatusCode == false)
                 {
                     WriteResponseError(response);
                 }
-                else
+
+                var json = (await ((StreamContent)response.Content).ReadAsStringAsync()).TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
+                if (!json.IsNullOrWhiteSpace())
                 {
-                    json = (await ((StreamContent)response.Content).ReadAsStringAsync()).TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
                     var deserialized = JsonConvert.DeserializeObject(json);
                     Console.Write(JsonConvert.SerializeObject(deserialized, Formatting.Indented));
                 }
 
-                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+                if (assertOkResponse)
+                {
+                    Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+                }
+
                 return Tuple.Create(response, json);
             }
         }
@@ -71,8 +87,8 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
         {
             var result = response.Content.ReadAsStringAsync().Result;
             Console.Out.WriteLine("Http operation unsuccessfull");
-            Console.Out.WriteLine(string.Format("Status: '{0}'", response.StatusCode));
-            Console.Out.WriteLine(string.Format("Reason: '{0}'", response.ReasonPhrase));
+            Console.Out.WriteLine($"Status: '{response.StatusCode}'");
+            Console.Out.WriteLine($"Reason: '{response.ReasonPhrase}'");
             Console.Out.WriteLine(result);
         }
     }

@@ -1,33 +1,48 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
     [DefaultPropertyValueConverter]
-    [PropertyValueType(typeof(decimal))]
-    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class DecimalValueConverter : PropertyValueConverterBase
     {
-        public override bool IsConverter(PublishedPropertyType propertyType)
-        {
-            return Constants.PropertyEditors.DecimalAlias.Equals(propertyType.PropertyEditorAlias);
-        }
+        public override bool IsConverter(IPublishedPropertyType propertyType)
+            => Constants.PropertyEditors.Aliases.Decimal.Equals(propertyType.EditorAlias);
 
-        public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
-        {
-            if (source == null) return 0M;
+        public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
+            => typeof (decimal);
 
-            // in XML a decimal is a string
-            var sourceString = source as string;
-            if (sourceString != null)
+        public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
+            => PropertyCacheLevel.Element;
+
+        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
+        {
+            if (source == null)
             {
-                decimal d;
-                return (decimal.TryParse(sourceString, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture,  out d)) ? d : 0M;
+                return 0M;
             }
 
-            // in the database an a decimal is an a decimal 
-            // default value is zero
-            return (source is decimal) ? source : 0M;
+            // is it already a decimal?
+            if(source is decimal)
+            {
+                return source;
+            }
+
+            // is it a double?
+            if(source is double sourceDouble)
+            {
+                return Convert.ToDecimal(sourceDouble);
+            }
+
+            // is it a string?
+            if (source is string sourceString)
+            {
+                return decimal.TryParse(sourceString, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out decimal d) ? d : 0M;
+            }
+
+            // couldn't convert the source value - default to zero
+            return 0M;
         }
     }
 }

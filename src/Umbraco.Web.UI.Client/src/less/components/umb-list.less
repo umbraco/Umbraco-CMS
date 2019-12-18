@@ -1,3 +1,10 @@
+.umb-list--condensed {
+    .umb-list-item {
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+}
+
 .umb-list-item {
     border-bottom: 1px solid @gray-9;
     padding-top: 15px;
@@ -15,9 +22,22 @@ a.umb-list-item:focus {
     opacity: 0.6;
 }
 
+.umb-list-item--error {
+    color: @red;
+}
+
 .umb-list-item:hover .umb-list-checkbox,
 .umb-list-item--selected .umb-list-checkbox {
     opacity: 1;
+}
+
+.umb-list-item__description {
+    font-size: 13px;
+    color: @gray-4;
+}
+
+.umb-list-item__description--checkbox{
+    margin: 0 0 0 26px;
 }
 
 .umb-list-checkbox {

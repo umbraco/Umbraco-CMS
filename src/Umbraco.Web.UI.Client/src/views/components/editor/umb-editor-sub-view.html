@@ -1,0 +1,11 @@
+<div class="umb-editor-sub-view"
+    ng-class="'sub-view-' + model.name"
+    val-sub-view>
+
+    <div
+        class="umb-editor-sub-view__content"
+        ng-show="model.active === true"
+        ng-include="model.view">
+    </div>
+
+</div>

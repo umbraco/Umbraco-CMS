@@ -1,20 +1,17 @@
 ﻿using NUnit.Framework;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Tests.Persistence.Mappers
 {
     [TestFixture]
-    public class ContentTypeMapperTest
+    public class ContentTypeMapperTest : MapperTestBase
     {
         [Test]
         public void Can_Map_Id_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             // Act
-            string column = new ContentTypeMapper().Map("Id");
+            string column = new ContentTypeMapper(MockSqlContext(), CreateMaps()).Map("Id");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoNode].[id]"));
@@ -23,11 +20,9 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_Name_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             // Act
-            string column = new ContentTypeMapper().Map("Name");
+            string column = new ContentTypeMapper(MockSqlContext(), CreateMaps()).Map("Name");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoNode].[text]"));
@@ -36,11 +31,9 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_Thumbnail_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             // Act
-            string column = new ContentTypeMapper().Map("Thumbnail");
+            string column = new ContentTypeMapper(MockSqlContext(), CreateMaps()).Map("Thumbnail");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsContentType].[thumbnail]"));
@@ -49,11 +42,9 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_Description_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             // Act
-            string column = new ContentTypeMapper().Map("Description");
+            string column = new ContentTypeMapper(MockSqlContext(), CreateMaps()).Map("Description");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsContentType].[description]"));

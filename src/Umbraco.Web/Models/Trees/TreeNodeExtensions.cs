@@ -54,7 +54,7 @@
         /// Sets the node style to show that it is has unpublished versions (but is currently published)
         /// </summary>
         /// <param name="treeNode"></param>
-        public static void SetHasUnpublishedVersionStyle(this TreeNode treeNode)
+        public static void SetHasPendingVersionStyle(this TreeNode treeNode)
         {
             if (treeNode.CssClasses.Contains("has-unpublished-version") == false)
             {
@@ -63,7 +63,7 @@
         }
 
         /// <summary>
-        /// Sets the node style to show that it is is not published
+        /// Sets the node style to show that it is not published
         /// </summary>
         /// <param name="treeNode"></param>
         public static void SetNotPublishedStyle(this TreeNode treeNode)

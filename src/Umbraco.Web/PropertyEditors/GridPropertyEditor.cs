@@ -1,181 +1,149 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Examine;
-using Lucene.Net.Documents;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
-using UmbracoExamine;
+using Umbraco.Web.Templates;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Core.Constants.PropertyEditors.GridAlias, "Grid layout", "grid", HideLabel = true, IsParameterEditor = false, ValueType = PropertyEditorValueTypes.Json, Group="rich content", Icon="icon-layout")]
-    public class GridPropertyEditor : PropertyEditor, IApplicationEventHandler
-    {        
+    /// <summary>
+    /// Represents a grid property and parameter editor.
+    /// </summary>
+    [DataEditor(
+        Constants.PropertyEditors.Aliases.Grid,
+        "Grid layout",
+        "grid",
+        HideLabel = true,
+        ValueType = ValueTypes.Json,
+        Icon = "icon-layout",
+        Group = Constants.PropertyEditors.Groups.RichContent)]
+    public class GridPropertyEditor : DataEditor
+    {
+        private IMediaService _mediaService;
+        private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+        private IUmbracoContextAccessor _umbracoContextAccessor;
+        private ILogger _logger;
 
-        private static void DocumentWriting(object sender, Examine.LuceneEngine.DocumentWritingEventArgs e)
+        public GridPropertyEditor(ILogger logger, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor)
+            : base(logger)
         {
-            var indexer = (BaseUmbracoIndexer)sender;
-            foreach (var field in indexer.IndexerData.UserFields)
-            {
-                if (e.Fields.ContainsKey(field.Name))
-                {
-                    if (e.Fields[field.Name].DetectIsJson())
-                    {
-                        try
-                        {
-                            //TODO: We should deserialize this to Umbraco.Core.Models.GridValue instead of doing the below
-
-                            var json = JsonConvert.DeserializeObject<JObject>(e.Fields[field.Name]);
-
-                            //check if this is formatted for grid json
-                            JToken name;
-                            JToken sections;
-                            if (json.HasValues && json.TryGetValue("name", out name) && json.TryGetValue("sections", out sections))
-                            {
-                                //get all values and put them into a single field (using JsonPath)
-                                var sb = new StringBuilder();
-                                foreach (var row in json.SelectTokens("$.sections[*].rows[*]"))
-                                {
-                                    var rowName = row["name"].Value<string>();
-                                    var areaVals = row.SelectTokens("$.areas[*].controls[*].value");
-
-                                    foreach (var areaVal in areaVals)
-                                    {
-                                        //TODO: If it's not a string, then it's a json formatted value - 
-                                        // we cannot really index this in a smart way since it could be 'anything'
-                                        if (areaVal.Type == JTokenType.String)
-                                        {
-                                            var str = areaVal.Value<string>();
-                                            str = XmlHelper.CouldItBeXml(str) ? str.StripHtml() : str;
-                                            sb.Append(str);
-                                            sb.Append(" ");
-
-                                            //add the row name as an individual field
-                                            e.Document.Add(
-                                                new Field(
-                                                    string.Format("{0}.{1}", field.Name, rowName), str, Field.Store.YES, Field.Index.ANALYZED));
-                                        }
-
-                                    }
-                                }
-
-                                if (sb.Length > 0)
-                                {
-                                    //First save the raw value to a raw field
-                                    e.Document.Add(
-                                        new Field(
-                                            string.Format("{0}{1}", UmbracoContentIndexer.RawFieldPrefix, field.Name),
-                                            e.Fields[field.Name], Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS, Field.TermVector.NO));
-
-                                    //now replace the original value with the combined/cleaned value
-                                    e.Document.RemoveField(field.Name);
-                                    e.Document.Add(
-                                        new Field(
-                                            field.Name,
-                                            sb.ToString(), Field.Store.YES, Field.Index.ANALYZED));
-                                }
-                            }
-                        }
-                        catch (InvalidCastException)
-                        {
-                            //swallow...on purpose, there's a chance that this isn't the json format we are looking for
-                            // and we don't want that to affect the website. 
-                        }
-                        catch (JsonException)
-                        {
-                            //swallow...on purpose, there's a chance that this isn't json and we don't want that to affect 
-                            // the website. 
-                        }
-                        catch (ArgumentException)
-                        {
-                            //swallow on purpose to prevent this error:
-                            // Can not add Newtonsoft.Json.Linq.JValue to Newtonsoft.Json.Linq.JObject.
-
-                        }
-                    }
-                }
-            }
+            _mediaService = mediaService;
+            _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
+            _umbracoContextAccessor = umbracoContextAccessor;
+            _logger = logger;
         }
+
+        public override IPropertyIndexValueFactory PropertyIndexValueFactory => new GridPropertyIndexValueFactory();
 
         /// <summary>
         /// Overridden to ensure that the value is validated
         /// </summary>
         /// <returns></returns>
-        protected override PropertyValueEditor CreateValueEditor()
-        {
-            var baseEditor = base.CreateValueEditor();
-            return new GridPropertyValueEditor(baseEditor);
-        }
+        protected override IDataValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider, _umbracoContextAccessor, _logger);
 
-        protected override PreValueEditor CreatePreValueEditor()
-        {
-            return new GridPreValueEditor();
-        }
+        protected override IConfigurationEditor CreateConfigurationEditor() => new GridConfigurationEditor();
 
-        internal class GridPropertyValueEditor : PropertyValueEditorWrapper
+        internal class GridPropertyValueEditor : DataValueEditor
         {
-            public GridPropertyValueEditor(PropertyValueEditor wrapped)
-                : base(wrapped)
+            private IMediaService _mediaService;
+            private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+            private IUmbracoContextAccessor _umbracoContextAccessor;
+            private ILogger _logger;
+
+            public GridPropertyValueEditor(DataEditorAttribute attribute, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor, ILogger logger)
+                : base(attribute)
             {
+                _mediaService = mediaService;
+                _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
+                _umbracoContextAccessor = umbracoContextAccessor;
+                _logger = logger;
             }
 
-        }
-
-        internal class GridPreValueEditor : PreValueEditor
-        {
-            [PreValueField("items", "Grid", "views/propertyeditors/grid/grid.prevalues.html", Description = "Grid configuration")]
-            public string Items { get; set; }
-
-            [PreValueField("rte", "Rich text editor", "views/propertyeditors/rte/rte.prevalues.html", Description = "Rich text editor configuration")]
-            public string Rte { get; set; }
-        }
-
-        #region Application event handler, used to bind to events on startup
-
-        private readonly GridPropertyEditorApplicationStartup _applicationStartup = new GridPropertyEditorApplicationStartup();
-
-        /// <summary>
-        /// we're using a sub -class because this has the logic to prevent it from executing if the application is not configured
-        /// </summary>
-        private class GridPropertyEditorApplicationStartup : ApplicationEventHandler
-        {
             /// <summary>
-            /// We're going to bind to the Examine events so we can ensure grid data is index nicely.
-            /// </summary>        
-            protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+            /// Format the data for persistence
+            /// This to ensure if a RTE is used in a Grid cell/control that we parse it for tmp stored images
+            /// to persist to the media library when we go to persist this to the DB
+            /// </summary>
+            /// <param name="editorValue"></param>
+            /// <param name="currentValue"></param>
+            /// <returns></returns>
+            public override object FromEditor(ContentPropertyData editorValue, object currentValue)
             {
-                foreach (var i in ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>())
+                if (editorValue.Value == null)
+                    return null;
+
+                // editorValue.Value is a JSON string of the grid
+                var rawJson = editorValue.Value.ToString();
+                if (rawJson.IsNullOrWhiteSpace())
+                    return null;
+
+                var config = editorValue.DataTypeConfiguration as GridConfiguration;
+                var mediaParent = config?.MediaParentId;
+                var mediaParentId = mediaParent == null ? Guid.Empty : mediaParent.Guid;
+
+                var grid = DeserializeGridValue(rawJson, out var rtes);
+
+                var userId = _umbracoContextAccessor.UmbracoContext?.Security?.CurrentUser?.Id ?? Constants.Security.SuperUserId;
+
+                // Process the rte values
+                foreach (var rte in rtes)
                 {
-                    i.DocumentWriting += DocumentWriting;
+                    // Parse the HTML
+                    var html = rte.Value?.ToString();
+
+                    var parseAndSavedTempImages = TemplateUtilities.FindAndPersistPastedTempImages(html, mediaParentId, userId, _mediaService, _contentTypeBaseServiceProvider, _logger);
+                    var editorValueWithMediaUrlsRemoved = TemplateUtilities.RemoveMediaUrlsFromTextString(parseAndSavedTempImages);
+
+                    rte.Value = editorValueWithMediaUrlsRemoved;
                 }
+
+                // Convert back to raw JSON for persisting
+                return JsonConvert.SerializeObject(grid);
+            }
+
+            /// <summary>
+            /// Ensures that the rich text editor values are processed within the grid
+            /// </summary>
+            /// <param name="property"></param>
+            /// <param name="dataTypeService"></param>
+            /// <param name="culture"></param>
+            /// <param name="segment"></param>
+            /// <returns></returns>
+            public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
+            {
+                var val = property.GetValue(culture, segment);
+                if (val == null) return string.Empty;
+
+                var grid = DeserializeGridValue(val.ToString(), out var rtes);
+
+                //process the rte values
+                foreach (var rte in rtes.ToList())
+                {
+                    var html = rte.Value?.ToString();
+
+                    var propertyValueWithMediaResolved = TemplateUtilities.ResolveMediaFromTextString(html);
+                    rte.Value = propertyValueWithMediaResolved;
+                }
+
+                return grid;
+            }
+
+            private GridValue DeserializeGridValue(string rawJson, out IEnumerable<GridValue.GridControl> richTextValues)
+            {
+                var grid = JsonConvert.DeserializeObject<GridValue>(rawJson);
+
+                // Find all controls that use the RTE editor
+                var controls = grid.Sections.SelectMany(x => x.Rows.SelectMany(r => r.Areas).SelectMany(a => a.Controls));
+                richTextValues = controls.Where(x => x.Editor.Alias.ToLowerInvariant() == "rte");
+
+                return grid;
             }
         }
-
-        public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
-        {
-            //wrap
-            _applicationStartup.OnApplicationInitialized(umbracoApplication, applicationContext);
-        }
-        public void OnApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
-        {
-            //wrap
-            _applicationStartup.OnApplicationStarting(umbracoApplication, applicationContext);
-        }
-        public void OnApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
-        {
-            //wrap
-            _applicationStartup.OnApplicationStarted(umbracoApplication, applicationContext);            
-        }
-        #endregion
     }
-
-
 }

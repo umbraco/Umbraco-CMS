@@ -1,14 +1,20 @@
 var app = angular.module('umbraco', [
-	'umbraco.filters',
-	'umbraco.directives',
-	'umbraco.resources',
-	'umbraco.services',
+    'umbraco.filters',
+    'umbraco.directives',
+    'umbraco.resources',
+    'umbraco.services',
+    
 	'umbraco.mocks',
-	'umbraco.security',
-    'ngCookies',
-    'LocalStorageModule' 
-]);
+	'umbraco.interceptors',
 
-/* For Angular 1.2: we need to load in Routing separately
-	    'ngRoute'
-*/
+    'ngRoute',
+    'ngAnimate',
+    'ngCookies',
+    'ngSanitize',
+    
+    //'ngMessages',
+    'tmh.dynamicLocale'
+    //'ngFileUpload',
+    //'LocalStorageModule',
+    //'chart.js'
+]);

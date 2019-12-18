@@ -25,12 +25,12 @@
             items="items"
             allow-select-all="options.bulkActionsAllowed"
             item-properties="options.includeProperties"
-            on-select="vm.selectItem"
-            on-click="vm.clickItem"
-            on-select-all="vm.selectAll"
-            on-selected-all="vm.isSelectedAll"
-            on-sorting-direction="vm.isSortDirection"
-            on-sort="vm.sort">
+            on-select="vm.selectItem(item, $index, $event)"
+            on-click="vm.clickItem(item)"
+            on-select-all="vm.selectAll($event)"
+            on-selected-all="vm.isSelectedAll()"
+            on-sorting-direction="vm.isSortDirection(col, direction)"
+            on-sort="vm.sort(field, allow, isSystem)">
         </umb-table>
 
     </div>
@@ -42,19 +42,19 @@
             items="items"
             allow-select-all="options.bulkActionsAllowed"
             item-properties="options.includeProperties"
-            on-select="vm.selectItem"
-            on-click="vm.clickItem"
-            on-select-all="vm.selectAll"
-            on-selected-all="vm.isSelectedAll"
-            on-sorting-direction="vm.isSortDirection"
-            on-sort="vm.sort">
+            on-select="vm.selectItem(item, $index, $event)"
+            on-click="vm.clickItem(item)"
+            on-select-all="vm.selectAll($event)"
+            on-selected-all="vm.isSelectedAll()"
+            on-sorting-direction="vm.isSortDirection(col, direction)"
+            on-sort="vm.sort(field, allow, isSystem)">
         </umb-table>
 
         <umb-empty-state
             ng-if="!items && options.filter.length === 0 && !vm.isRecycleBin"
             position="center">
-            <div ng-if="entityType === 'content'"><localize key="content_listViewNoContent">No content has been added</localize></div>
-            <div ng-if="entityType === 'member'"><localize key="content_listViewNoMembers">No members have been added</localize></div>
+            <div ng-show="entityType === 'content'"><localize key="content_listViewNoContent">No content has been added</localize></div>
+            <div ng-show="entityType === 'member'"><localize key="content_listViewNoMembers">No members have been added</localize></div>
         </umb-empty-state>
 
     </div>

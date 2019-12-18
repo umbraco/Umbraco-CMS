@@ -5,16 +5,13 @@ using Umbraco.Core.Persistence.SqlSyntax;
 namespace Umbraco.Tests.Persistence.Mappers
 {
     [TestFixture]
-    public class RelationTypeMapperTest
+    public class RelationTypeMapperTest : MapperTestBase
     {
         [Test]
         public void Can_Map_Id_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
-
             // Act
-            string column = new RelationTypeMapper().Map("Id");
+            string column = new RelationTypeMapper(MockSqlContext(), CreateMaps()).Map("Id");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelationType].[id]"));
@@ -23,11 +20,8 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_Alias_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
-
             // Act
-            string column = new RelationTypeMapper().Map("Alias");
+            string column = new RelationTypeMapper(MockSqlContext(), CreateMaps()).Map("Alias");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelationType].[alias]"));
@@ -36,11 +30,9 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_ChildObjectType_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             // Act
-            string column = new RelationTypeMapper().Map("ChildObjectType");
+            string column = new RelationTypeMapper(MockSqlContext(), CreateMaps()).Map("ChildObjectType");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelationType].[childObjectType]"));
@@ -49,11 +41,9 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_IsBidirectional_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             // Act
-            string column = new RelationTypeMapper().Map("IsBidirectional");
+            string column = new RelationTypeMapper(MockSqlContext(), CreateMaps()).Map("IsBidirectional");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelationType].[dual]"));

@@ -1,0 +1,34 @@
+<div>
+    <ng-form name="vm.tagEditorForm">
+        <div ng-if="vm.isLoading">
+            <localize key="loading">Loading</localize>...
+        </div>
+
+        <div ng-if="!isLoading">
+
+            <input type="hidden" name="tagCount" ng-model="vm.viewModel.length" val-property-validator="vm.validateMandatory" />
+
+            <span ng-repeat="tag in vm.viewModel track by $index" class="label label-primary tag" ng-keyup="vm.onKeyUpOnTag(tag, $event)" tabindex="0">
+                <span ng-bind-html="tag"></span>
+
+                <i class="icon-trash" ng-click="vm.showPrompt($index, tag)" localize="title" title="@buttons_deleteTag"></i>
+
+                <umb-confirm-action ng-if="vm.promptIsVisible === $index"
+                                    direction="left"
+                                    on-confirm="vm.removeTag(tag)"
+                                    on-cancel="vm.hidePrompt()">
+                </umb-confirm-action>
+            </span>
+
+            <input type="text"
+                   id="{{vm.inputId}}"
+                   class="typeahead tags-{{vm.inputId}}"
+                   ng-model="vm.tagToAdd"
+                   ng-keydown="vm.addTagOnEnter($event)"
+                   ng-blur="vm.addTag()"
+                   localize="placeholder"
+                   placeholder="@placeholders_enterTags" />
+
+        </div>
+    </ng-form>
+</div>

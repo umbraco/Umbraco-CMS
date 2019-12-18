@@ -1,0 +1,8 @@
+﻿<div id="published" ng-controller="Umbraco.Dashboard.PublishedStatusController as vm">
+    <div ng-show="vm.loading">
+        <umb-load-indicator></umb-load-indicator>
+    </div>
+
+    <div ng-include="vm.includeUrl"></div>
+
+</div>

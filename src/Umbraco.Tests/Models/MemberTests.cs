@@ -1,10 +1,11 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Serialization;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Models
@@ -12,6 +13,15 @@ namespace Umbraco.Tests.Models
     [TestFixture]
     public class MemberTests
     {
+        [SetUp]
+        public void Setup()
+        {
+            Current.Reset();
+            Current.UnlockConfigs();
+            Current.Configs.Add(SettingsForTests.GetDefaultGlobalSettings);
+            Current.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
+        }
+
         [Test]
         public void Can_Deep_Clone()
         {
@@ -45,9 +55,8 @@ namespace Umbraco.Tests.Models
             member.SortOrder = 5;
             member.Trashed = false;
             member.UpdateDate = DateTime.Now;
-            member.Version = Guid.NewGuid();            
-            ((IUmbracoEntity)member).AdditionalData.Add("test1", 123);
-            ((IUmbracoEntity)member).AdditionalData.Add("test2", "hello");
+            member.AdditionalData.Add("test1", 123);
+            member.AdditionalData.Add("test2", "hello");
 
             // Act
             var clone = (Member)member.DeepClone();
@@ -56,22 +65,9 @@ namespace Umbraco.Tests.Models
             Assert.AreNotSame(clone, member);
             Assert.AreEqual(clone, member);
             Assert.AreEqual(clone.Id, member.Id);
-            Assert.AreEqual(clone.Version, member.Version);
-            Assert.AreEqual(((IUmbracoEntity)clone).AdditionalData, ((IUmbracoEntity)member).AdditionalData);
-            Assert.AreNotSame(clone.ContentType, member.ContentType);
+            Assert.AreEqual(clone.VersionId, member.VersionId);
+            Assert.AreEqual(clone.AdditionalData, member.AdditionalData);
             Assert.AreEqual(clone.ContentType, member.ContentType);
-            Assert.AreEqual(clone.ContentType.PropertyGroups.Count, member.ContentType.PropertyGroups.Count);
-            for (var index = 0; index < member.ContentType.PropertyGroups.Count; index++)
-            {
-                Assert.AreNotSame(clone.ContentType.PropertyGroups[index], member.ContentType.PropertyGroups[index]);
-                Assert.AreEqual(clone.ContentType.PropertyGroups[index], member.ContentType.PropertyGroups[index]);
-            }
-            Assert.AreEqual(clone.ContentType.PropertyTypes.Count(), member.ContentType.PropertyTypes.Count());
-            for (var index = 0; index < member.ContentType.PropertyTypes.Count(); index++)
-            {
-                Assert.AreNotSame(clone.ContentType.PropertyTypes.ElementAt(index), member.ContentType.PropertyTypes.ElementAt(index));
-                Assert.AreEqual(clone.ContentType.PropertyTypes.ElementAt(index), member.ContentType.PropertyTypes.ElementAt(index));
-            }
             Assert.AreEqual(clone.ContentTypeId, member.ContentTypeId);
             Assert.AreEqual(clone.CreateDate, member.CreateDate);
             Assert.AreEqual(clone.CreatorId, member.CreatorId);
@@ -90,7 +86,7 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone.LastPasswordChangeDate, member.LastPasswordChangeDate);
             Assert.AreEqual(clone.Trashed, member.Trashed);
             Assert.AreEqual(clone.UpdateDate, member.UpdateDate);
-            Assert.AreEqual(clone.Version, member.Version);
+            Assert.AreEqual(clone.VersionId, member.VersionId);
             Assert.AreEqual(clone.PasswordQuestion, member.PasswordQuestion);
             Assert.AreEqual(clone.ProviderUserKey, member.ProviderUserKey);
             Assert.AreEqual(clone.RawPasswordAnswerValue, member.RawPasswordAnswerValue);
@@ -102,6 +98,9 @@ namespace Umbraco.Tests.Models
                 Assert.AreNotSame(clone.Properties[index], member.Properties[index]);
                 Assert.AreEqual(clone.Properties[index], member.Properties[index]);
             }
+
+            // this can be the same, it is immutable
+            Assert.AreSame(clone.ContentType, member.ContentType);
 
             //This double verifies by reflection
             var allProps = clone.GetType().GetProperties();
@@ -145,9 +144,8 @@ namespace Umbraco.Tests.Models
             member.SortOrder = 5;
             member.Trashed = false;
             member.UpdateDate = DateTime.Now;
-            member.Version = Guid.NewGuid();
-            ((IUmbracoEntity)member).AdditionalData.Add("test1", 123);
-            ((IUmbracoEntity)member).AdditionalData.Add("test2", "hello");
+            member.AdditionalData.Add("test1", 123);
+            member.AdditionalData.Add("test2", "hello");
 
             var result = ss.ToStream(member);
             var json = result.ResultStream.ToJsonString();

@@ -14,19 +14,13 @@ namespace Umbraco.Core.Security
     {
         private readonly string _notificationEmailAddress;
         private readonly IEmailSender _defaultEmailSender;
-        
+
         public EmailService(string notificationEmailAddress, IEmailSender defaultEmailSender)
         {
             _notificationEmailAddress = notificationEmailAddress;
             _defaultEmailSender = defaultEmailSender;
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use the constructor specifying all dependencies")]
-        public EmailService()
-            : this(UmbracoConfig.For.UmbracoSettings().Content.NotificationEmailAddress, new EmailSender())
-        {
-        }
 
         public async Task SendAsync(IdentityMessage message)
         {

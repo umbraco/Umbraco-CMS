@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using Umbraco.Core.Persistence;
 
@@ -28,37 +24,37 @@ namespace Umbraco.Tests.Persistence
         /// <summary>
         /// The <see cref="BulkDataReaderSubclass"/> schema name.
         /// </summary>
-        private const string testSchemaName = "TestSchema";
+        private const string TestSchemaName = "TestSchema";
 
         /// <summary>
         /// The <see cref="BulkDataReaderSubclass"/> table name.
         /// </summary>
-        private const string testTableName = "TestTable";
+        private const string TestTableName = "TestTable";
 
         /// <summary>
         /// The test UDT schema name.
         /// </summary>
-        private const string testUdtSchemaName = "UdtSchema";
+        private const string TestUdtSchemaName = "UdtSchema";
 
         /// <summary>
         /// The test UDT name.
         /// </summary>
-        private const string testUdtName = "TestUdt";
+        private const string TestUdtName = "TestUdt";
 
         /// <summary>
         /// The test XML schema collection database name.
         /// </summary>
-        private const string testXmlSchemaCollectionDatabaseName = "XmlDatabase";
+        private const string TestXmlSchemaCollectionDatabaseName = "XmlDatabase";
 
         /// <summary>
         /// The test XML schema collection owning schema name.
         /// </summary>
-        private const string testXMLSchemaCollectionSchemaName = "XmlSchema";
+        private const string TestXmlSchemaCollectionSchemaName = "XmlSchema";
 
         /// <summary>
         /// The test XML schema collection name.
         /// </summary>
-        private const string testXMLSchemaCollectionName = "Xml";
+        private const string TestXmlSchemaCollectionName = "Xml";
 
         #endregion
 
@@ -71,14 +67,14 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void ColumnMappingsTest()
         {
-            using (BulkDataReaderSubclass testReader = new BulkDataReaderSubclass())
+            using (var testReader = new BulkDataReaderSubclass())
             {
-                ReadOnlyCollection<SqlBulkCopyColumnMapping> columnMappings = testReader.ColumnMappings;
+                var columnMappings = testReader.ColumnMappings;
 
                 Assert.IsTrue(columnMappings.Count > 0);
                 Assert.AreEqual(columnMappings.Count, testReader.FieldCount);
 
-                foreach (SqlBulkCopyColumnMapping columnMapping in columnMappings)
+                foreach (var columnMapping in columnMappings)
                 {
                     Assert.AreEqual(columnMapping.SourceColumn, columnMapping.DestinationColumn);
                 }
@@ -92,13 +88,15 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void GetDataTypeNameTest()
         {
-            using (BulkDataReaderSubclass testReader = new BulkDataReaderSubclass())
+            using (var testReader = new BulkDataReaderSubclass())
             {
                 Assert.IsTrue(testReader.FieldCount > 0);
 
-                for (int currentColumn = 0; currentColumn < testReader.FieldCount; currentColumn++)
+                for (var currentColumn = 0; currentColumn < testReader.FieldCount; currentColumn++)
                 {
-                    Assert.AreEqual(testReader.GetDataTypeName(currentColumn), ((Type)testReader.GetSchemaTable().Rows[currentColumn][SchemaTableColumn.DataType]).Name);
+                    var schemaTable = testReader.GetSchemaTable();
+                    Assert.IsNotNull(schemaTable);
+                    Assert.AreEqual(testReader.GetDataTypeName(currentColumn), ((Type) schemaTable.Rows[currentColumn][SchemaTableColumn.DataType]).Name);
                 }
             }
         }
@@ -110,13 +108,15 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void GetFieldTypeTest()
         {
-            using (BulkDataReaderSubclass testReader = new BulkDataReaderSubclass())
+            using (var testReader = new BulkDataReaderSubclass())
             {
                 Assert.IsTrue(testReader.FieldCount > 0);
 
-                for (int currentColumn = 0; currentColumn < testReader.FieldCount; currentColumn++)
+                for (var currentColumn = 0; currentColumn < testReader.FieldCount; currentColumn++)
                 {
-                    Assert.AreEqual(testReader.GetFieldType(currentColumn), testReader.GetSchemaTable().Rows[currentColumn][SchemaTableColumn.DataType]);
+                    var schemaTable = testReader.GetSchemaTable();
+                    Assert.IsNotNull(schemaTable);
+                    Assert.AreEqual(testReader.GetFieldType(currentColumn), schemaTable.Rows[currentColumn][SchemaTableColumn.DataType]);
                 }
             }
         }
@@ -128,14 +128,13 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void GetOrdinalTest()
         {
-            using (BulkDataReaderSubclass testReader = new BulkDataReaderSubclass())
+            using (var testReader = new BulkDataReaderSubclass())
             {
                 Assert.IsTrue(testReader.FieldCount > 0);
 
-                for (int currentColumn = 0; currentColumn < testReader.FieldCount; currentColumn++)
+                for (var currentColumn = 0; currentColumn < testReader.FieldCount; currentColumn++)
                 {
                     Assert.AreEqual(testReader.GetOrdinal(testReader.GetName(currentColumn)), currentColumn);
-
                     Assert.AreEqual(testReader.GetOrdinal(testReader.GetName(currentColumn).ToUpperInvariant()), currentColumn);
                 }
             }
@@ -151,9 +150,9 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void GetSchemaTableTest()
         {
-            using (BulkDataReaderSubclass testReader = new BulkDataReaderSubclass())
+            using (var testReader = new BulkDataReaderSubclass())
             {
-                DataTable schemaTable = testReader.GetSchemaTable();
+                var schemaTable = testReader.GetSchemaTable();
 
                 Assert.IsNotNull(schemaTable);
                 Assert.IsTrue(schemaTable.Rows.Count > 0);
@@ -170,10 +169,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public void AddSchemaTableRowNullColumnNameTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = null;
@@ -189,7 +187,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -202,10 +203,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public void AddSchemaTableRowEmptyColumnNameTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = string.Empty;
@@ -221,7 +221,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -234,10 +237,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void AddSchemaTableRowNonpositiveColumnSizeTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -253,7 +255,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentOutOfRangeException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -266,10 +271,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void AddSchemaTableRowNonpositiveNumericPrecisionTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -285,7 +289,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentOutOfRangeException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -298,10 +305,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void AddSchemaTableRowNegativeNumericScaleTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -317,7 +323,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentOutOfRangeException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -330,10 +339,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public void AddSchemaTableRowBinaryWithoutSizeTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -349,7 +357,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -362,10 +373,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void AddSchemaTableRowBinaryWithTooLargeSizeTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -381,7 +391,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentOutOfRangeException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -394,10 +407,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public void AddSchemaTableRowCharWithoutSizeTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -413,7 +425,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -426,10 +441,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void AddSchemaTableRowCharWithTooLargeSizeTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -445,7 +459,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentOutOfRangeException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -458,10 +475,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public void AddSchemaTableRowDecimalWithoutPrecisionTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -477,7 +493,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -490,10 +509,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public void AddSchemaTableRowDecimalWithoutScaleTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -509,7 +527,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -522,10 +543,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void AddSchemaTableRowDecimalWithTooLargePrecisionTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -541,7 +561,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentOutOfRangeException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -554,10 +577,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public void AddSchemaTableRowDecimalWithTooLargeScaleTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -573,7 +595,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -586,10 +611,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void AddSchemaTableRowDateTime2WithTooLargePrecisionTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -605,7 +629,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentOutOfRangeException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -618,10 +645,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void AddSchemaTableRowDateTimeOffsetWithTooLargePrecisionTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -637,7 +663,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentOutOfRangeException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -650,10 +679,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public void AddSchemaTableRowFloatWithoutPrecisionTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -669,7 +697,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -682,10 +713,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void AddSchemaTableRowFloatWithTooLargePrecisionTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -701,7 +731,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentOutOfRangeException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -714,10 +747,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public void AddSchemaTableRowNCharWithoutSizeTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -733,7 +765,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -746,10 +781,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void AddSchemaTableRowNCharWithTooLargeSizeTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -765,7 +799,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentOutOfRangeException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -778,10 +815,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void AddSchemaTableRowNVarCharWithTooLargeSizeTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -797,7 +833,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentOutOfRangeException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -810,10 +849,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void AddSchemaTableRowTimeWithTooLargePrecisionTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -829,7 +867,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentOutOfRangeException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -842,10 +883,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public void AddSchemaTableRowUdtMissingSchemaNameTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -861,7 +901,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -874,10 +917,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public void AddSchemaTableRowUdtEmptySchemaNameTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -893,7 +935,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -906,10 +951,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public void AddSchemaTableRowUdtMissingNameTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -925,7 +969,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -938,10 +985,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public void AddSchemaTableRowUdtEmptyNameTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -957,7 +1003,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -970,10 +1019,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void AddSchemaTableRowVarBinaryWithTooLargeSizeTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -989,7 +1037,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentOutOfRangeException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -1002,10 +1053,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void AddSchemaTableRowVarCharWithTooLargeSizeTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -1021,7 +1071,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentOutOfRangeException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -1034,10 +1087,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public void AddSchemaTableRowXmlNullNameWithDatabaseNameTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -1053,7 +1105,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -1066,10 +1121,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public void AddSchemaTableRowXmlNullNameWithOwningSchemaNameTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -1085,7 +1139,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = "Schema";
                 testReader.XmlSchemaCollectionName = null;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -1098,10 +1155,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public void AddSchemaTableRowXmlEmptyDatabaseNameTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -1117,7 +1173,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = "Schema";
                 testReader.XmlSchemaCollectionName = "Xml";
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -1130,10 +1189,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public void AddSchemaTableRowXmlEmptyOwningSchemaNameTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -1149,7 +1207,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = string.Empty;
                 testReader.XmlSchemaCollectionName = "Xml";
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -1162,10 +1223,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public void AddSchemaTableRowXmlEmptyNameTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -1181,7 +1241,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = "Schema";
                 testReader.XmlSchemaCollectionName = string.Empty;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -1194,10 +1257,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void AddSchemaTableRowStructuredTypeTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -1213,7 +1275,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentOutOfRangeException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -1226,10 +1291,9 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void AddSchemaTableRowTimestampTypeTest()
         {
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -1245,7 +1309,10 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                DataTable schemaTable = testReader.GetSchemaTable(); ;
+                Assert.Throws<ArgumentOutOfRangeException>(() =>
+                {
+                    var unused = testReader.GetSchemaTable();
+                });
             }
         }
 
@@ -1262,7 +1329,7 @@ namespace Umbraco.Tests.Persistence
         {
 
             // Column size set
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -1277,7 +1344,7 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                foreach (SqlDbType dbtype in new List<SqlDbType> { SqlDbType.BigInt, SqlDbType.Bit, SqlDbType.Date, SqlDbType.DateTime, SqlDbType.DateTime2,
+                foreach (var dbtype in new List<SqlDbType> { SqlDbType.BigInt, SqlDbType.Bit, SqlDbType.Date, SqlDbType.DateTime, SqlDbType.DateTime2,
                                                                    SqlDbType.DateTimeOffset, SqlDbType.Image, SqlDbType.Int, SqlDbType.Money, SqlDbType.Real,
                                                                    SqlDbType.SmallDateTime, SqlDbType.SmallInt, SqlDbType.SmallMoney, SqlDbType.Structured, SqlDbType.Text,
                                                                    SqlDbType.Time, SqlDbType.Timestamp, SqlDbType.TinyInt, SqlDbType.Udt, SqlDbType.UniqueIdentifier,
@@ -1287,7 +1354,7 @@ namespace Umbraco.Tests.Persistence
 
                     try
                     {
-                        DataTable schemaTable = testReader.GetSchemaTable();
+                        var unused = testReader.GetSchemaTable();
 
                         Assert.Fail();
                     }
@@ -1298,7 +1365,7 @@ namespace Umbraco.Tests.Persistence
             }
 
             // Numeric precision set
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -1313,7 +1380,7 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                foreach (SqlDbType dbtype in new List<SqlDbType> { SqlDbType.BigInt, SqlDbType.Binary, SqlDbType.Bit, SqlDbType.Char, SqlDbType.Date,
+                foreach (var dbtype in new List<SqlDbType> { SqlDbType.BigInt, SqlDbType.Binary, SqlDbType.Bit, SqlDbType.Char, SqlDbType.Date,
                                                                    SqlDbType.DateTime, SqlDbType.Image, SqlDbType.Int, SqlDbType.Money, SqlDbType.NChar,
                                                                    SqlDbType.NText, SqlDbType.NVarChar, SqlDbType.Real, SqlDbType.SmallDateTime, SqlDbType.SmallInt,
                                                                    SqlDbType.SmallMoney, SqlDbType.Structured, SqlDbType.Text, SqlDbType.Timestamp, SqlDbType.TinyInt,
@@ -1324,7 +1391,7 @@ namespace Umbraco.Tests.Persistence
 
                     try
                     {
-                        DataTable schemaTable = testReader.GetSchemaTable();
+                        var unused = testReader.GetSchemaTable();
 
                         Assert.Fail();
                     }
@@ -1335,7 +1402,7 @@ namespace Umbraco.Tests.Persistence
             }
 
             // Numeric scale set
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -1350,7 +1417,7 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                foreach (SqlDbType dbtype in new List<SqlDbType> { SqlDbType.BigInt, SqlDbType.Binary, SqlDbType.Bit, SqlDbType.Char, SqlDbType.Date,
+                foreach (var dbtype in new List<SqlDbType> { SqlDbType.BigInt, SqlDbType.Binary, SqlDbType.Bit, SqlDbType.Char, SqlDbType.Date,
                                                                    SqlDbType.DateTime, SqlDbType.DateTime2, SqlDbType.DateTimeOffset, SqlDbType.Image, SqlDbType.Int,
                                                                    SqlDbType.Money, SqlDbType.NChar, SqlDbType.NText, SqlDbType.NVarChar, SqlDbType.Real,
                                                                    SqlDbType.SmallDateTime, SqlDbType.SmallInt, SqlDbType.SmallMoney, SqlDbType.Structured, SqlDbType.Text,
@@ -1361,7 +1428,7 @@ namespace Umbraco.Tests.Persistence
 
                     try
                     {
-                        DataTable schemaTable = testReader.GetSchemaTable();
+                        var unused = testReader.GetSchemaTable();
 
                         Assert.Fail();
                     }
@@ -1372,7 +1439,7 @@ namespace Umbraco.Tests.Persistence
             }
 
             // Numeric scale set
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -1387,7 +1454,7 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                foreach (SqlDbType dbtype in new List<SqlDbType> { SqlDbType.BigInt, SqlDbType.Binary, SqlDbType.Bit, SqlDbType.Char, SqlDbType.Date,
+                foreach (var dbtype in new List<SqlDbType> { SqlDbType.BigInt, SqlDbType.Binary, SqlDbType.Bit, SqlDbType.Char, SqlDbType.Date,
                                                                    SqlDbType.DateTime, SqlDbType.DateTime2, SqlDbType.DateTimeOffset, SqlDbType.Image, SqlDbType.Int,
                                                                    SqlDbType.Money, SqlDbType.NChar, SqlDbType.NText, SqlDbType.NVarChar, SqlDbType.Real,
                                                                    SqlDbType.SmallDateTime, SqlDbType.SmallInt, SqlDbType.SmallMoney, SqlDbType.Structured, SqlDbType.Text,
@@ -1398,7 +1465,7 @@ namespace Umbraco.Tests.Persistence
 
                     try
                     {
-                        DataTable schemaTable = testReader.GetSchemaTable();
+                        var unused = testReader.GetSchemaTable();
 
                         Assert.Fail();
                     }
@@ -1409,7 +1476,7 @@ namespace Umbraco.Tests.Persistence
             }
 
             // UDT type name set
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -1424,7 +1491,7 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                foreach (SqlDbType dbtype in new List<SqlDbType> { SqlDbType.BigInt, SqlDbType.Binary, SqlDbType.Bit, SqlDbType.Char, SqlDbType.Date,
+                foreach (var dbtype in new List<SqlDbType> { SqlDbType.BigInt, SqlDbType.Binary, SqlDbType.Bit, SqlDbType.Char, SqlDbType.Date,
                                                                    SqlDbType.DateTime, SqlDbType.DateTime2, SqlDbType.DateTimeOffset, SqlDbType.Decimal, SqlDbType.Float,
                                                                    SqlDbType.Image, SqlDbType.Int, SqlDbType.Money, SqlDbType.NChar, SqlDbType.NText,
                                                                    SqlDbType.NVarChar, SqlDbType.Real, SqlDbType.SmallDateTime, SqlDbType.SmallInt, SqlDbType.SmallMoney,
@@ -1435,7 +1502,7 @@ namespace Umbraco.Tests.Persistence
 
                     try
                     {
-                        DataTable schemaTable = testReader.GetSchemaTable();
+                        var unused = testReader.GetSchemaTable();
 
                         Assert.Fail();
                     }
@@ -1446,7 +1513,7 @@ namespace Umbraco.Tests.Persistence
             }
 
             // UDT schema and type name set
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -1461,7 +1528,7 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = null;
 
-                foreach (SqlDbType dbtype in new List<SqlDbType> { SqlDbType.BigInt, SqlDbType.Binary, SqlDbType.Bit, SqlDbType.Char, SqlDbType.Date,
+                foreach (var dbtype in new List<SqlDbType> { SqlDbType.BigInt, SqlDbType.Binary, SqlDbType.Bit, SqlDbType.Char, SqlDbType.Date,
                                                                    SqlDbType.DateTime, SqlDbType.DateTime2, SqlDbType.DateTimeOffset, SqlDbType.Decimal, SqlDbType.Float,
                                                                    SqlDbType.Image, SqlDbType.Int, SqlDbType.Money, SqlDbType.NChar, SqlDbType.NText,
                                                                    SqlDbType.NVarChar, SqlDbType.Real, SqlDbType.SmallDateTime, SqlDbType.SmallInt, SqlDbType.SmallMoney,
@@ -1472,7 +1539,7 @@ namespace Umbraco.Tests.Persistence
 
                     try
                     {
-                        DataTable schemaTable = testReader.GetSchemaTable();
+                        var unused = testReader.GetSchemaTable();
 
                         Assert.Fail();
                     }
@@ -1483,7 +1550,7 @@ namespace Umbraco.Tests.Persistence
             }
 
             // XML type name set
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -1498,7 +1565,7 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = null;
                 testReader.XmlSchemaCollectionName = "Name";
 
-                foreach (SqlDbType dbtype in new List<SqlDbType> { SqlDbType.BigInt, SqlDbType.Binary, SqlDbType.Bit, SqlDbType.Char, SqlDbType.Date,
+                foreach (var dbtype in new List<SqlDbType> { SqlDbType.BigInt, SqlDbType.Binary, SqlDbType.Bit, SqlDbType.Char, SqlDbType.Date,
                                                                    SqlDbType.DateTime, SqlDbType.DateTime2, SqlDbType.DateTimeOffset, SqlDbType.Decimal, SqlDbType.Float,
                                                                    SqlDbType.Image, SqlDbType.Int, SqlDbType.Money, SqlDbType.NChar, SqlDbType.NText,
                                                                    SqlDbType.NVarChar, SqlDbType.Real, SqlDbType.SmallDateTime, SqlDbType.SmallInt, SqlDbType.SmallMoney,
@@ -1509,7 +1576,7 @@ namespace Umbraco.Tests.Persistence
 
                     try
                     {
-                        DataTable schemaTable = testReader.GetSchemaTable();
+                        var unused = testReader.GetSchemaTable();
 
                         Assert.Fail();
                     }
@@ -1520,7 +1587,7 @@ namespace Umbraco.Tests.Persistence
             }
 
             // XML owning schema and type name set
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -1535,7 +1602,7 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = "Schema";
                 testReader.XmlSchemaCollectionName = "Name";
 
-                foreach (SqlDbType dbtype in new List<SqlDbType> { SqlDbType.BigInt, SqlDbType.Binary, SqlDbType.Bit, SqlDbType.Char, SqlDbType.Date,
+                foreach (var dbtype in new List<SqlDbType> { SqlDbType.BigInt, SqlDbType.Binary, SqlDbType.Bit, SqlDbType.Char, SqlDbType.Date,
                                                                    SqlDbType.DateTime, SqlDbType.DateTime2, SqlDbType.DateTimeOffset, SqlDbType.Decimal, SqlDbType.Float,
                                                                    SqlDbType.Image, SqlDbType.Int, SqlDbType.Money, SqlDbType.NChar, SqlDbType.NText,
                                                                    SqlDbType.NVarChar, SqlDbType.Real, SqlDbType.SmallDateTime, SqlDbType.SmallInt, SqlDbType.SmallMoney,
@@ -1546,7 +1613,7 @@ namespace Umbraco.Tests.Persistence
 
                     try
                     {
-                        DataTable schemaTable = testReader.GetSchemaTable();
+                        var unused = testReader.GetSchemaTable();
 
                         Assert.Fail();
                     }
@@ -1557,7 +1624,7 @@ namespace Umbraco.Tests.Persistence
             }
 
             // XML database, owning schema and type name set
-            using (BulkDataReaderSchemaTest testReader = new BulkDataReaderSchemaTest())
+            using (var testReader = new BulkDataReaderSchemaTest())
             {
                 testReader.AllowDBNull = false;
                 testReader.ColumnName = "Name";
@@ -1572,7 +1639,7 @@ namespace Umbraco.Tests.Persistence
                 testReader.XmlSchemaCollectionOwningSchema = "Schema";
                 testReader.XmlSchemaCollectionName = "Name";
 
-                foreach (SqlDbType dbtype in new List<SqlDbType> { SqlDbType.BigInt, SqlDbType.Binary, SqlDbType.Bit, SqlDbType.Char, SqlDbType.Date,
+                foreach (var dbtype in new List<SqlDbType> { SqlDbType.BigInt, SqlDbType.Binary, SqlDbType.Bit, SqlDbType.Char, SqlDbType.Date,
                                                                    SqlDbType.DateTime, SqlDbType.DateTime2, SqlDbType.DateTimeOffset, SqlDbType.Decimal, SqlDbType.Float,
                                                                    SqlDbType.Image, SqlDbType.Int, SqlDbType.Money, SqlDbType.NChar, SqlDbType.NText,
                                                                    SqlDbType.NVarChar, SqlDbType.Real, SqlDbType.SmallDateTime, SqlDbType.SmallInt, SqlDbType.SmallMoney,
@@ -1583,7 +1650,7 @@ namespace Umbraco.Tests.Persistence
 
                     try
                     {
-                        DataTable schemaTable = testReader.GetSchemaTable();
+                        var unused = testReader.GetSchemaTable();
 
                         Assert.Fail();
                     }
@@ -1605,7 +1672,7 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void CloseTest()
         {
-            BulkDataReaderSubclass testReader = new BulkDataReaderSubclass();
+            var testReader = new BulkDataReaderSubclass();
 
             testReader.Close();
 
@@ -1622,7 +1689,7 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void DepthTest()
         {
-            using (BulkDataReaderSubclass testReader = new BulkDataReaderSubclass())
+            using (var testReader = new BulkDataReaderSubclass())
             {
                 Assert.IsTrue(testReader.Read());
 
@@ -1640,7 +1707,7 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void GetDataTest()
         {
-            using (BulkDataReaderSubclass testReader = new BulkDataReaderSubclass())
+            using (var testReader = new BulkDataReaderSubclass())
             {
                 Assert.IsTrue(testReader.Read());
 
@@ -1659,18 +1726,18 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void GetValueTest()
         {
-            using (BulkDataReaderSubclass testReader = new BulkDataReaderSubclass())
+            using (var testReader = new BulkDataReaderSubclass())
             {
                 Assert.IsTrue(testReader.Read());
 
                 // this[int]
-                for (int column = 0; column < BulkDataReaderSubclass.ExpectedResultSet.Count; column++)
+                for (var column = 0; column < BulkDataReaderSubclass.ExpectedResultSet.Count; column++)
                 {
                     Assert.AreEqual(testReader[column], BulkDataReaderSubclass.ExpectedResultSet[column]);
                 }
 
                 // this[string]
-                for (int column = 0; column < BulkDataReaderSubclass.ExpectedResultSet.Count; column++)
+                for (var column = 0; column < BulkDataReaderSubclass.ExpectedResultSet.Count; column++)
                 {
                     Assert.AreEqual(testReader[testReader.GetName(column)], BulkDataReaderSubclass.ExpectedResultSet[column]);
 
@@ -1679,31 +1746,31 @@ namespace Umbraco.Tests.Persistence
 
                 // GetValues
                 {
-                    object[] values = new object[BulkDataReaderSubclass.ExpectedResultSet.Count];
-                    object[] expectedValues = new object[BulkDataReaderSubclass.ExpectedResultSet.Count];
+                    var values = new object[BulkDataReaderSubclass.ExpectedResultSet.Count];
+                    var expectedValues = new object[BulkDataReaderSubclass.ExpectedResultSet.Count];
 
                     Assert.AreEqual(testReader.GetValues(values), values.Length);
 
                     BulkDataReaderSubclass.ExpectedResultSet.CopyTo(expectedValues, 0);
 
-                    Assert.IsTrue(BulkDataReaderTest.ArraysMatch<object>(values, expectedValues));
+                    Assert.IsTrue(ArraysMatch(values, expectedValues));
                 }
 
                 // Typed getters
                 {
-                    int currentColumn = 0;
+                    var currentColumn = 0;
 
                     Assert.AreEqual(testReader.GetInt64(currentColumn), BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
                     currentColumn++;
 
                     {
-                        byte[] expectedResult = (byte[])BulkDataReaderSubclass.ExpectedResultSet[currentColumn];
-                        int expectedLength = expectedResult.Length;
-                        byte[] buffer = new byte[expectedLength];
+                        var expectedResult = (byte[])BulkDataReaderSubclass.ExpectedResultSet[currentColumn];
+                        var expectedLength = expectedResult.Length;
+                        var buffer = new byte[expectedLength];
 
                         Assert.AreEqual(testReader.GetBytes(currentColumn, 0, buffer, 0, expectedLength), expectedLength);
 
-                        Assert.IsTrue(BulkDataReaderTest.ArraysMatch<byte>(buffer, expectedResult));
+                        Assert.IsTrue(ArraysMatch(buffer, expectedResult));
                     }
                     currentColumn++;
 
@@ -1725,13 +1792,13 @@ namespace Umbraco.Tests.Persistence
                     Assert.AreEqual(testReader.GetString(currentColumn), BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
 
                     {
-                        char[] expectedResult = ((string)BulkDataReaderSubclass.ExpectedResultSet[currentColumn]).ToCharArray();
-                        int expectedLength = expectedResult.Length;
-                        char[] buffer = new char[expectedLength];
+                        var expectedResult = ((string)BulkDataReaderSubclass.ExpectedResultSet[currentColumn]).ToCharArray();
+                        var expectedLength = expectedResult.Length;
+                        var buffer = new char[expectedLength];
 
                         Assert.AreEqual(testReader.GetChars(currentColumn, 0, buffer, 0, expectedLength), expectedLength);
 
-                        Assert.IsTrue(BulkDataReaderTest.ArraysMatch<char>(buffer, expectedResult));
+                        Assert.IsTrue(ArraysMatch(buffer, expectedResult));
                     }
 
                     currentColumn++;
@@ -1767,7 +1834,7 @@ namespace Umbraco.Tests.Persistence
 
                         Assert.AreEqual(testReader.GetBytes(currentColumn, 0, buffer, 0, expectedLength), expectedLength);
 
-                        Assert.IsTrue(BulkDataReaderTest.ArraysMatch<byte>(buffer, expectedResult));
+                        Assert.IsTrue(ArraysMatch(buffer, expectedResult));
                     }
                     currentColumn++;
 
@@ -1820,24 +1887,24 @@ namespace Umbraco.Tests.Persistence
                     currentColumn++;
 
                     {
-                        byte[] expectedResult = (byte[])BulkDataReaderSubclass.ExpectedResultSet[currentColumn];
-                        int expectedLength = expectedResult.Length;
-                        byte[] buffer = new byte[expectedLength];
+                        var expectedResult = (byte[])BulkDataReaderSubclass.ExpectedResultSet[currentColumn];
+                        var expectedLength = expectedResult.Length;
+                        var buffer = new byte[expectedLength];
 
                         Assert.AreEqual(testReader.GetBytes(currentColumn, 0, buffer, 0, expectedLength), expectedLength);
 
-                        Assert.IsTrue(BulkDataReaderTest.ArraysMatch<byte>(buffer, expectedResult));
+                        Assert.IsTrue(ArraysMatch(buffer, expectedResult));
                     }
                     currentColumn++;
 
                     {
-                        byte[] expectedResult = (byte[])BulkDataReaderSubclass.ExpectedResultSet[currentColumn];
+                        var expectedResult = (byte[])BulkDataReaderSubclass.ExpectedResultSet[currentColumn];
                         int expectedLength = expectedResult.Length;
                         byte[] buffer = new byte[expectedLength];
 
                         Assert.AreEqual(testReader.GetBytes(currentColumn, 0, buffer, 0, expectedLength), expectedLength);
 
-                        Assert.IsTrue(BulkDataReaderTest.ArraysMatch<byte>(buffer, expectedResult));
+                        Assert.IsTrue(ArraysMatch(buffer, expectedResult));
                     }
                     currentColumn++;
 
@@ -1863,7 +1930,6 @@ namespace Umbraco.Tests.Persistence
                     currentColumn++;
 
                     Assert.AreEqual(testReader.GetString(currentColumn), BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
-                    currentColumn++;
                 }
             }
         }
@@ -1877,14 +1943,16 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.GetValue(Int32)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void GetValueIndexTooSmallTest()
         {
-            using (BulkDataReaderSubclass testReader = new BulkDataReaderSubclass())
+            using (var testReader = new BulkDataReaderSubclass())
             {
                 Assert.IsTrue(testReader.Read());
 
-                object result = testReader.GetValue(-1);
+                Assert.Throws<ArgumentOutOfRangeException>(() =>
+                {
+                    var unused = testReader.GetValue(-1);
+                });
             }
         }
 
@@ -1897,14 +1965,16 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.GetValue(Int32)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void GetValueIndexTooLargeTest()
         {
-            using (BulkDataReaderSubclass testReader = new BulkDataReaderSubclass())
+            using (var testReader = new BulkDataReaderSubclass())
             {
                 Assert.IsTrue(testReader.Read());
 
-                object result = testReader.GetValue(testReader.FieldCount);
+                Assert.Throws<ArgumentOutOfRangeException>(() =>
+                {
+                    var unused = testReader.GetValue(testReader.FieldCount);
+                });
             }
         }
 
@@ -1917,14 +1987,16 @@ namespace Umbraco.Tests.Persistence
         /// </remarks>
         /// <seealso cref="BulkDataReader.GetValue(Int32)"/>
         [Test]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void GetDataIndexTooSmallTest()
         {
-            using (BulkDataReaderSubclass testReader = new BulkDataReaderSubclass())
+            using (var testReader = new BulkDataReaderSubclass())
             {
                 Assert.IsTrue(testReader.Read());
 
-                object result = testReader.GetData(-1);
+                Assert.Throws<ArgumentOutOfRangeException>(() =>
+                {
+                    var unused = testReader.GetData(-1);
+                });
             }
         }
 
@@ -1936,14 +2008,16 @@ namespace Umbraco.Tests.Persistence
         /// Uses <see cref="BulkDataReaderSubclass"/> to test the method.
         /// </remarks>
         [Test]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void GetDataIndexTooLargeTest()
         {
-            using (BulkDataReaderSubclass testReader = new BulkDataReaderSubclass())
+            using (var testReader = new BulkDataReaderSubclass())
             {
                 Assert.IsTrue(testReader.Read());
 
-                object result = testReader.GetData(testReader.FieldCount);
+                Assert.Throws<ArgumentOutOfRangeException>(() =>
+                {
+                    var unused = testReader.GetData(testReader.FieldCount);
+                });
             }
         }
 
@@ -1952,11 +2026,11 @@ namespace Umbraco.Tests.Persistence
         /// </summary>
         /// <seealso cref="BulkDataReader.IsDBNull(Int32)"/>
         [Test]
-        public void IsDBNullTest()
+        public void IsDbNullTest()
         {
-            using (BulkDataReaderSubclass testReader = new BulkDataReaderSubclass())
+            using (var testReader = new BulkDataReaderSubclass())
             {
-                for (int currentColumn = 0; currentColumn < testReader.FieldCount; currentColumn++)
+                for (var currentColumn = 0; currentColumn < testReader.FieldCount; currentColumn++)
                 {
                     Assert.AreEqual(testReader.IsDBNull(currentColumn), BulkDataReaderSubclass.ExpectedResultSet[currentColumn] == null);
                 }
@@ -1973,7 +2047,7 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void NextResultTest()
         {
-            using (BulkDataReaderSubclass testReader = new BulkDataReaderSubclass())
+            using (var testReader = new BulkDataReaderSubclass())
             {
                 Assert.IsFalse(testReader.NextResult());
             }
@@ -1989,7 +2063,7 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void RecordsAffectedTest()
         {
-            using (BulkDataReaderSubclass testReader = new BulkDataReaderSubclass())
+            using (var testReader = new BulkDataReaderSubclass())
             {
                 Assert.IsTrue(testReader.Read());
 
@@ -2007,11 +2081,11 @@ namespace Umbraco.Tests.Persistence
         /// <seealso cref="BulkDataReader.Dispose()"/>
         /// <seealso cref="IDisposable"/>
         [Test]
-        public void IDisposableTest()
+        public void DisposableTest()
         {
             // Test the Dispose method
             {
-                BulkDataReaderSubclass testReader = new BulkDataReaderSubclass();
+                var testReader = new BulkDataReaderSubclass();
 
                 testReader.Dispose();
 
@@ -2020,7 +2094,7 @@ namespace Umbraco.Tests.Persistence
 
             // Test the finalizer method
             {
-                BulkDataReaderSubclass testReader = new BulkDataReaderSubclass();
+                var testReader = new BulkDataReaderSubclass();
 
                 testReader = null;
 
@@ -2105,22 +2179,22 @@ namespace Umbraco.Tests.Persistence
             /// See <see cref="BulkDataReader.SchemaName"/>.
             /// </summary>
             /// <remarks>
-            /// Returns <see cref="BulkDataReaderTest.testSchemaName"/>.
+            /// Returns <see cref="BulkDataReaderTest.TestSchemaName"/>.
             /// </remarks>
             protected override string SchemaName
             {
-                get { return BulkDataReaderTest.testSchemaName; }
+                get { return BulkDataReaderTest.TestSchemaName; }
             }
 
             /// <summary>
             /// See <see cref="BulkDataReader.TableName"/>.
             /// </summary>
             /// <remarks>
-            /// Returns <see cref="BulkDataReaderTest.testTableName"/>.
+            /// Returns <see cref="BulkDataReaderTest.TestTableName"/>.
             /// </remarks>
             protected override string TableName
             {
-                get { return BulkDataReaderTest.testTableName; }
+                get { return BulkDataReaderTest.TestTableName; }
             }
 
             /// <summary>
@@ -2162,17 +2236,17 @@ namespace Umbraco.Tests.Persistence
                 AddSchemaTableRow("Time", null, null, null, false, false, false, SqlDbType.Time, null, null, null, null, null);
                 AddSchemaTableRow("Time_5", null, 5, null, false, false, false, SqlDbType.Time, null, null, null, null, null);
                 AddSchemaTableRow("TinyInt", null, null, null, false, false, false, SqlDbType.TinyInt, null, null, null, null, null);
-                AddSchemaTableRow("Udt", null, null, null, false, false, false, SqlDbType.Udt, BulkDataReaderTest.testUdtSchemaName, BulkDataReaderTest.testUdtName, null, null, null);
+                AddSchemaTableRow("Udt", null, null, null, false, false, false, SqlDbType.Udt, BulkDataReaderTest.TestUdtSchemaName, BulkDataReaderTest.TestUdtName, null, null, null);
                 AddSchemaTableRow("UniqueIdentifier", null, null, null, false, false, false, SqlDbType.UniqueIdentifier, null, null, null, null, null);
                 AddSchemaTableRow("VarBinary_20", 20, null, null, false, false, false, SqlDbType.VarBinary, null, null, null, null, null);
                 AddSchemaTableRow("VarBinary_Max", null, null, null, false, false, false, SqlDbType.VarBinary, null, null, null, null, null);
                 AddSchemaTableRow("VarChar_20", 20, null, null, false, false, false, SqlDbType.VarChar, null, null, null, null, null);
                 AddSchemaTableRow("VarChar_Max", null, null, null, false, false, false, SqlDbType.VarChar, null, null, null, null, null);
                 AddSchemaTableRow("Variant", null, null, null, false, false, false, SqlDbType.Variant, null, null, null, null, null);
-                AddSchemaTableRow("Xml_Database", null, null, null, false, false, false, SqlDbType.Xml, null, null, BulkDataReaderTest.testXmlSchemaCollectionDatabaseName, BulkDataReaderTest.testXMLSchemaCollectionSchemaName, BulkDataReaderTest.testXMLSchemaCollectionName);
-                AddSchemaTableRow("Xml_Database_XML", null, null, null, false, false, false, SqlDbType.Xml, null, null, BulkDataReaderTest.testXmlSchemaCollectionDatabaseName, BulkDataReaderTest.testXMLSchemaCollectionSchemaName, BulkDataReaderTest.testXMLSchemaCollectionName);
-                AddSchemaTableRow("Xml_Schema", null, null, null, false, false, false, SqlDbType.Xml, null, null, null, BulkDataReaderTest.testXMLSchemaCollectionSchemaName, BulkDataReaderTest.testXMLSchemaCollectionName);
-                AddSchemaTableRow("Xml_Xml", null, null, null, false, false, false, SqlDbType.Xml, null, null, null, null, BulkDataReaderTest.testXMLSchemaCollectionName);
+                AddSchemaTableRow("Xml_Database", null, null, null, false, false, false, SqlDbType.Xml, null, null, BulkDataReaderTest.TestXmlSchemaCollectionDatabaseName, BulkDataReaderTest.TestXmlSchemaCollectionSchemaName, BulkDataReaderTest.TestXmlSchemaCollectionName);
+                AddSchemaTableRow("Xml_Database_XML", null, null, null, false, false, false, SqlDbType.Xml, null, null, BulkDataReaderTest.TestXmlSchemaCollectionDatabaseName, BulkDataReaderTest.TestXmlSchemaCollectionSchemaName, BulkDataReaderTest.TestXmlSchemaCollectionName);
+                AddSchemaTableRow("Xml_Schema", null, null, null, false, false, false, SqlDbType.Xml, null, null, null, BulkDataReaderTest.TestXmlSchemaCollectionSchemaName, BulkDataReaderTest.TestXmlSchemaCollectionName);
+                AddSchemaTableRow("Xml_Xml", null, null, null, false, false, false, SqlDbType.Xml, null, null, null, null, BulkDataReaderTest.TestXmlSchemaCollectionName);
                 AddSchemaTableRow("Xml", null, null, null, false, false, false, SqlDbType.Xml, null, null, null, null, null);
             }
 
@@ -2351,22 +2425,22 @@ namespace Umbraco.Tests.Persistence
             /// See <see cref="BulkDataReader.SchemaName"/>.
             /// </summary>
             /// <remarks>
-            /// Returns <see cref="BulkDataReaderTest.testSchemaName"/>.
+            /// Returns <see cref="BulkDataReaderTest.TestSchemaName"/>.
             /// </remarks>
             protected override string SchemaName
             {
-                get { return BulkDataReaderTest.testSchemaName; }
+                get { return BulkDataReaderTest.TestSchemaName; }
             }
 
             /// <summary>
             /// See <see cref="BulkDataReader.TableName"/>.
             /// </summary>
             /// <remarks>
-            /// Returns <see cref="BulkDataReaderTest.testTableName"/>.
+            /// Returns <see cref="BulkDataReaderTest.TestTableName"/>.
             /// </remarks>
             protected override string TableName
             {
-                get { return BulkDataReaderTest.testTableName; }
+                get { return BulkDataReaderTest.TestTableName; }
             }
 
             /// <summary>

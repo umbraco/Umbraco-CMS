@@ -4,9 +4,13 @@ namespace Umbraco.Web.Editors
 {
     public sealed class EditorModelEventArgs<T> : EditorModelEventArgs
     {
+        private readonly EditorModelEventArgs _baseArgs;
+        private T _model;
+
         public EditorModelEventArgs(EditorModelEventArgs baseArgs)
             : base(baseArgs.Model, baseArgs.UmbracoContext)
         {
+            _baseArgs = baseArgs;
             Model = (T)baseArgs.Model;
         }
 
@@ -16,7 +20,16 @@ namespace Umbraco.Web.Editors
             Model = model;
         }
 
-        public new T Model { get; private set; }
+        public new T Model
+        {
+            get => _model;
+            set
+            {
+                _model = value;
+                if (_baseArgs != null)
+                    _baseArgs.Model = _model;
+            }
+        }
     }
 
     public class EditorModelEventArgs : EventArgs
@@ -27,7 +40,7 @@ namespace Umbraco.Web.Editors
             UmbracoContext = umbracoContext;
         }
 
-        public object Model { get; private set; }
-        public UmbracoContext UmbracoContext { get; private set; }
+        public object Model { get; set; }
+        public UmbracoContext UmbracoContext { get; }
     }
 }

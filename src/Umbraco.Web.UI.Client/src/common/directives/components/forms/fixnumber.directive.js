@@ -46,7 +46,7 @@ function fixNumber($parse) {
                 return;
             }
 
-            elem.bind('input', function (e) {
+            elem.on('input', function (e) {
                 var validity = elem.prop('validity');
                 scope.$apply(function () {
                     ctrl.$setValidity('number', !validity.badInput);

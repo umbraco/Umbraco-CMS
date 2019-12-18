@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
@@ -13,7 +12,7 @@ namespace Umbraco.Core.Models
     /// </remarks>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class StylesheetProperty : TracksChangesEntityBase, IValueObject
+    public class StylesheetProperty : BeingDirtyBase, IValueObject
     {
         private string _alias;
         private string _value;
@@ -23,14 +22,6 @@ namespace Umbraco.Core.Models
             Name = name;
             _alias = alias;
             _value = value;
-        }
-
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<StylesheetProperty, string>(x => x.Alias);
-            public readonly PropertyInfo ValueSelector = ExpressionHelper.GetPropertyInfo<StylesheetProperty, string>(x => x.Value);
         }
 
         /// <summary>
@@ -43,8 +34,8 @@ namespace Umbraco.Core.Models
         /// </summary>
         public string Alias
         {
-            get { return _alias; }
-            set { SetPropertyValueAndDetectChanges(value, ref _alias, Ps.Value.AliasSelector); }
+            get => _alias;
+            set => SetPropertyValueAndDetectChanges(value, ref _alias, nameof(Alias));
         }
 
         /// <summary>
@@ -52,8 +43,8 @@ namespace Umbraco.Core.Models
         /// </summary>
         public string Value
         {
-            get { return _value; }
-            set { SetPropertyValueAndDetectChanges(value, ref _value, Ps.Value.ValueSelector); }
+            get => _value;
+            set => SetPropertyValueAndDetectChanges(value, ref _value, nameof(Value));
         }
 
     }

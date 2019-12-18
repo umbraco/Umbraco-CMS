@@ -1,49 +1,40 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Web.Http;
 using System.Web.Security;
-using AutoMapper;
+using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Dictionary;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Services;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Security;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
-using System.Web.Http;
-using System.Net;
-using System;
-using System.Net.Http;
 
 namespace Umbraco.Web.Editors
 {
-    
+
     /// <summary>
-    /// An API controller used for dealing with content types
+    /// An API controller used for dealing with member types
     /// </summary>
     [PluginController("UmbracoApi")]
-    [UmbracoTreeAuthorize(new string[] { Constants.Trees.MemberTypes, Constants.Trees.Members})]    
-    public class MemberTypeController : ContentTypeControllerBase
+    [UmbracoTreeAuthorize(new string[] { Constants.Trees.MemberTypes, Constants.Trees.Members})]
+    public class MemberTypeController : ContentTypeControllerBase<IMemberType>
     {
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        public MemberTypeController()
-            : this(UmbracoContext.Current)
+        public MemberTypeController(ICultureDictionaryFactory cultureDictionaryFactory, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+            : base(cultureDictionaryFactory, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
-            _provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="umbracoContext"></param>
-        public MemberTypeController(UmbracoContext umbracoContext)
-            : base(umbracoContext)
-        {
-            _provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-        }
-
-        private readonly MembershipProvider _provider;
+        private readonly MembershipProvider _provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
 
         [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
         public MemberTypeDisplay GetById(int id)
@@ -59,7 +50,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Deletes a document type wth a given ID
+        /// Deletes a document type with a given ID
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -79,7 +70,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Returns the avilable compositions for this content type
+        /// Returns the available compositions for this content type
         /// </summary>
         /// <param name="contentTypeId"></param>
         /// <param name="filterContentTypes">
@@ -98,7 +89,7 @@ namespace Umbraco.Web.Editors
             [FromUri]string[] filterContentTypes,
             [FromUri]string[] filterPropertyTypes)
         {
-            var result = PerformGetAvailableCompositeContentTypes(contentTypeId, UmbracoObjectTypes.MemberType, filterContentTypes, filterPropertyTypes)
+            var result = PerformGetAvailableCompositeContentTypes(contentTypeId, UmbracoObjectTypes.MemberType, filterContentTypes, filterPropertyTypes, false)
                 .Select(x => new
                 {
                     contentType = x.Item1,
@@ -111,13 +102,13 @@ namespace Umbraco.Web.Editors
         public MemberTypeDisplay GetEmpty()
         {
             var ct = new MemberType(-1);
-            ct.Icon = "icon-user";
+            ct.Icon = Constants.Icons.Member;
 
             var dto = Mapper.Map<IMemberType, MemberTypeDisplay>(ct);
             return dto;
         }
 
-       
+
         /// <summary>
         /// Returns all member types
         /// </summary>
@@ -126,7 +117,7 @@ namespace Umbraco.Web.Editors
             if (_provider.IsUmbracoMembershipProvider())
             {
                 return Services.MemberTypeService.GetAll()
-                               .Select(Mapper.Map<IMemberType, ContentTypeBasic>);    
+                               .Select(Mapper.Map<IMemberType, ContentTypeBasic>);
             }
             return Enumerable.Empty<ContentTypeBasic>();
         }
@@ -150,7 +141,7 @@ namespace Umbraco.Web.Editors
                         // Id 0 means the property was just added, no need to look it up
                         if (prop.Id == 0)
                             continue;
-                        
+
                         var foundOnContentType = ct.PropertyTypes.FirstOrDefault(x => x.Id == prop.Id);
                         if (foundOnContentType == null)
                             throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.NotFound, "No property type with id " + prop.Id + " found on the content type"));
@@ -170,9 +161,9 @@ namespace Umbraco.Web.Editors
                     }
                 }
             }
-           
 
-            var savedCt = PerformPostSave<IMemberType, MemberTypeDisplay, MemberTypeSave, MemberPropertyTypeBasic>(
+
+            var savedCt = PerformPostSave<MemberTypeDisplay, MemberTypeSave, MemberPropertyTypeBasic>(
                 contentTypeSave:            contentTypeSave,
                 getContentType:             i => ct,
                 saveContentType:            type => Services.MemberTypeService.Save(type));
@@ -185,5 +176,7 @@ namespace Umbraco.Web.Editors
 
             return display;
         }
+
+
     }
 }

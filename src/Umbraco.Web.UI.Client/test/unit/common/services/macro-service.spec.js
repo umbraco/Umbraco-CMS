@@ -13,7 +13,6 @@ describe('macro service tests', function () {
 
             var result = macroService.parseMacroSyntax("<?UMBRACO_MACRO macroAlias='Map' test=\"asdf\" test2='hello' />");
 
-            console.log(result.macroParamsDictionary.test);
 
             expect(result).not.toBeNull();
             expect(result.macroAlias).toBe("Map");
@@ -107,34 +106,6 @@ describe('macro service tests', function () {
 
             expect(syntax).
                 toBe("<?UMBRACO_MACRO macroAlias=\"myMacro\" />");
-
-        });
-
-        it('can generate syntax for webforms', function () {
-
-            var syntax = macroService.generateWebFormsSyntax({
-                macroAlias: "myMacro",
-                macroParamsDictionary: {
-                    param1: "value1",
-                    param2: "value2",
-                    param3: "value3"
-                }
-            });
-            
-            expect(syntax).
-                toBe("<umbraco:Macro param1=\"value1\" param2=\"value2\" param3=\"value3\" Alias=\"myMacro\" runat=\"server\"></umbraco:Macro>");
-            
-        });
-        
-        it('can generate syntax for webforms with no params', function () {
-
-            var syntax = macroService.generateWebFormsSyntax({
-                macroAlias: "myMacro",
-                macroParamsDictionary: {}
-            });
-
-            expect(syntax).
-                toBe("<umbraco:Macro Alias=\"myMacro\" runat=\"server\"></umbraco:Macro>");
 
         });
         

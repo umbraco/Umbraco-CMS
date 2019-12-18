@@ -1,19 +1,24 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Http.Formatting;
-using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Services;
+using Umbraco.Web.Actions;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Trees
 {
-    [UmbracoTreeAuthorize(Constants.Trees.Dictionary)]
+
+    [UmbracoTreeAuthorize(
+        Constants.Trees.Dictionary,
+        Constants.Trees.Templates
+        // We are allowed to see the dictionary tree, if we are allowed to manage templates, such that se can use the
+        // dictionary items in templates, even when we dont have authorization to manage the dictionary items
+        )]
     [Mvc.PluginController("UmbracoTrees")]
     [CoreTree]
-    [Tree(Constants.Applications.Settings, Constants.Trees.Dictionary, null, sortOrder: 3)]
+    [Tree(Constants.Applications.Translation, Constants.Trees.Dictionary, TreeGroup = Constants.Trees.Groups.Settings)]
     public class DictionaryTreeController : TreeController
     {
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
@@ -22,7 +27,7 @@ namespace Umbraco.Web.Trees
 
             // the default section is settings, falling back to this if we can't
             // figure out where we are from the querystring parameters
-            var section = Constants.Applications.Settings;
+            var section = Constants.Applications.Translation;
             if (queryStrings["application"] != null)
                 section = queryStrings["application"];
 
@@ -40,7 +45,7 @@ namespace Umbraco.Web.Trees
         /// All of the query string parameters passed from jsTree
         /// </param>
         /// <remarks>
-        /// We are allowing an arbitrary number of query strings to be pased in so that developers are able to persist custom data from the front-end
+        /// We are allowing an arbitrary number of query strings to be passed in so that developers are able to persist custom data from the front-end
         /// to the back end to be used in the query for model data.
         /// </remarks>
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
@@ -53,7 +58,7 @@ namespace Umbraco.Web.Trees
 
             Func<IDictionaryItem, string> ItemSort() => item => item.ItemKey;
 
-            if (id == Constants.System.Root.ToInvariantString())
+            if (id == Constants.System.RootString)
             {
                 nodes.AddRange(
                     Services.LocalizationService.GetRootDictionaryItems().OrderBy(ItemSort()).Select(
@@ -97,14 +102,12 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
 
-            menu.Items.Add<ActionNew>(Services.TextService.Localize($"actions/{ActionNew.Instance.Alias}"));
+            menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
 
-            if (id != Constants.System.Root.ToInvariantString())
-                menu.Items.Add<ActionDelete>(Services.TextService.Localize(
-                    $"actions/{ActionDelete.Instance.Alias}"), true);
+            if (id != Constants.System.RootString)
+                menu.Items.Add<ActionDelete>(Services.TextService, true, opensDialog: true);
 
-            menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(
-                $"actions/{ActionRefresh.Instance.Alias}"), true);
+            menu.Items.Add(new RefreshNode(Services.TextService, true));
 
             return menu;
         }

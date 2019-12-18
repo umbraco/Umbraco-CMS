@@ -1,15 +1,17 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 
 namespace Umbraco.Web.WebApi.Filters
 {
+    // TODO: remove this since we don't need it, see notes in EnableOverrideAuthorizationAttribute
+
     /// <summary>
     /// Abstract auth filter class that can be used to enable overriding class auth filters at the action level
     /// </summary>
     /// <remarks>
-    /// To enable a class auth filter to be overridden by an action auth filter the EnableOverrideAuthorizationAttribute can be applied 
+    /// To enable a class auth filter to be overridden by an action auth filter the EnableOverrideAuthorizationAttribute can be applied
     /// to the class.
     /// </remarks>
     public abstract class OverridableAuthorizationAttribute : AuthorizeAttribute
@@ -35,7 +37,7 @@ namespace Umbraco.Web.WebApi.Filters
                 return;
             }
 
-            //if the controller is allowing overridable authorization at the action level and there are action level authorization attributes
+            //if the controller is allowing authorization to be overridden at the action level and there are action level authorization attributes
             // then exit and let the action level auth attribute(s) execute.
 
             if (actionContext.ActionDescriptor.ControllerDescriptor.GetCustomAttributes<EnableOverrideAuthorizationAttribute>().Any()

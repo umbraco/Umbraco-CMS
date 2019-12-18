@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Linq;
 using System.Threading;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Dictionary;
 
 namespace Umbraco.Core.Services
@@ -11,6 +12,12 @@ namespace Umbraco.Core.Services
     /// </summary>
     public static class LocalizedTextServiceExtensions
     {
+        public static string Localize(this ILocalizedTextService manager, string area, string key)
+        {
+            var fullKey = string.Join("/", area, key);
+            return manager.Localize(fullKey, Thread.CurrentThread.CurrentUICulture);
+        }
+
         /// <summary>
         /// Localize using the current thread culture
         /// </summary>
@@ -49,7 +56,7 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Convert an array of strings to a dictionary of indicies -> values
+        /// Convert an array of strings to a dictionary of indices -> values
         /// </summary>
         /// <param name="variables"></param>
         /// <returns></returns>
@@ -76,10 +83,10 @@ namespace Umbraco.Core.Services
         internal static string UmbracoDictionaryTranslate(this ILocalizedTextService manager, string text)
         {
             var cultureDictionary = CultureDictionary;
-            return UmbracoDictionaryTranslate(text, cultureDictionary);
+            return manager.UmbracoDictionaryTranslate(text, cultureDictionary);
         }
 
-        private static string UmbracoDictionaryTranslate(string text, ICultureDictionary cultureDictionary)
+        private static string UmbracoDictionaryTranslate(this ILocalizedTextService manager, string text, ICultureDictionary cultureDictionary)
         {
             if (text == null)
                 return null;
@@ -88,16 +95,17 @@ namespace Umbraco.Core.Services
                 return text;
 
             text = text.Substring(1);
-            return cultureDictionary[text].IfNullOrWhiteSpace(text);
+            var value = cultureDictionary[text];
+            if (value.IsNullOrWhiteSpace() == false)
+            {
+                return value;
+            }
+
+            value = manager.Localize(text.Replace('_', '/'));
+            return value.StartsWith("[") ? text : value;
         }
 
         private static ICultureDictionary CultureDictionary
-        {
-            get
-            {
-                return _cultureDictionary
-                    ?? (_cultureDictionary = CultureDictionaryFactoryResolver.Current.Factory.CreateDictionary());
-            }
-        }
+            => _cultureDictionary ?? (_cultureDictionary = Current.CultureDictionaryFactory.CreateDictionary());
     }
 }

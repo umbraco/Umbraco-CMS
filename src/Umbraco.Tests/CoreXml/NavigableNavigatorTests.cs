@@ -4,20 +4,18 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Xml;
 using System.Xml.XPath;
 using System.Xml.Xsl;
-using umbraco;
-using Umbraco.Core;
 using Umbraco.Core.Xml;
 using Umbraco.Core.Xml.XPath;
 using NUnit.Framework;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.CoreXml
 {
     [TestFixture]
-    public class NavigableNavigatorTests
+    public class NavigableNavigatorTests : UmbracoTestBase
     {
         [Test]
         public void NewNavigatorIsAtRoot()
@@ -496,7 +494,7 @@ namespace Umbraco.Tests.CoreXml
         {
             var source = new TestSource5();
             var nav = new NavigableNavigator(source);
-            
+
             var iter = nav.Select("//* [@id=$id]", new XPathVariable("id", id.ToString(CultureInfo.InvariantCulture)));
             Assert.IsTrue(iter.MoveNext());
             var current = iter.Current as NavigableNavigator;
@@ -555,15 +553,25 @@ namespace Umbraco.Tests.CoreXml
             Assert.AreEqual(NavigableNavigator.StatePosition.Root, nav.InternalState.Position);
             Assert.IsFalse(nav.MoveToParent());
 
+            // move to /root
+            Assert.IsTrue(nav.MoveToId("-1"));
+            Assert.AreEqual(NavigableNavigator.StatePosition.Element, nav.InternalState.Position);
+            Assert.AreEqual(-1, (nav.UnderlyingObject as TestContent).Id);
+
+            // move down
+            Assert.IsTrue(nav.MoveToFirstChild());
+            Assert.AreEqual(NavigableNavigator.StatePosition.Element, nav.InternalState.Position);
+            Assert.AreEqual(1, (nav.UnderlyingObject as TestContent).Id);
+
             // get lost
             Assert.IsFalse(nav.MoveToId("666"));
         }
 
         [Test]
-        public void RootedNavigator()
+        public void RootedNavigator1()
         {
             var source = new TestSource5();
-            var nav = new NavigableNavigator(source, source.Get(1));
+            var nav = new NavigableNavigator(source, rootId: 1);
 
             // go to (/root) /1
             Assert.IsTrue(nav.MoveToFirstChild());
@@ -591,6 +599,82 @@ namespace Umbraco.Tests.CoreXml
 
             // can't go there
             Assert.IsFalse(nav.MoveToId("2"));
+        }
+
+        [Test]
+        public void RootedNavigator2()
+        {
+            var source = new TestSource5();
+            var nav = new NavigableNavigator(source, rootId: 3);
+
+            // go to (/root/1) /3
+            Assert.IsTrue(nav.MoveToFirstChild());
+            Assert.AreEqual(NavigableNavigator.StatePosition.Element, nav.InternalState.Position);
+            Assert.AreEqual(3, (nav.UnderlyingObject as TestContent).Id);
+
+            // go to (/root/1)
+            Assert.IsTrue(nav.MoveToParent());
+            Assert.AreEqual(NavigableNavigator.StatePosition.Root, nav.InternalState.Position);
+            Assert.IsFalse(nav.MoveToParent());
+
+            // can't go there
+            Assert.IsFalse(nav.MoveToId("1"));
+        }
+
+        [Test]
+        public void RootedMaxDepthNavigator()
+        {
+            var source = new TestSource5();
+            var nav = new NavigableNavigator(source, rootId: 1, maxDepth: 0);
+
+            // go to (/root) /1
+            Assert.IsTrue(nav.MoveToFirstChild());
+            Assert.AreEqual(NavigableNavigator.StatePosition.Element, nav.InternalState.Position);
+            Assert.AreEqual(1, (nav.UnderlyingObject as TestContent).Id);
+
+            // go to (/root)
+            Assert.IsTrue(nav.MoveToParent());
+            Assert.AreEqual(NavigableNavigator.StatePosition.Root, nav.InternalState.Position);
+            Assert.IsFalse(nav.MoveToParent());
+
+            // go to (/root) /1
+            Assert.IsTrue(nav.MoveToId("1"));
+            Assert.AreEqual(NavigableNavigator.StatePosition.Element, nav.InternalState.Position);
+            Assert.AreEqual(1, (nav.UnderlyingObject as TestContent).Id);
+
+            // can't go there
+            Assert.IsFalse(nav.MoveToId("-1"));
+            Assert.IsFalse(nav.MoveToId("3"));
+        }
+
+        [Test]
+        public void MaxDepthNavigator()
+        {
+            var source = new TestSource5();
+            var nav = new NavigableNavigator(source, maxDepth: 1);
+
+            // go to /root
+            Assert.IsTrue(nav.MoveToFirstChild());
+            Assert.AreEqual(NavigableNavigator.StatePosition.Element, nav.InternalState.Position);
+            Assert.AreEqual(-1, (nav.UnderlyingObject as TestContent).Id);
+
+            // go to /root/1
+            Assert.IsTrue(nav.MoveToFirstChild());
+            Assert.AreEqual(NavigableNavigator.StatePosition.Element, nav.InternalState.Position);
+            Assert.AreEqual(1, (nav.UnderlyingObject as TestContent).Id);
+            Assert.IsTrue(nav.MoveToId("1"));
+            Assert.AreEqual(NavigableNavigator.StatePosition.Element, nav.InternalState.Position);
+            Assert.AreEqual(1, (nav.UnderlyingObject as TestContent).Id);
+
+            // go to /root/1/prop1
+            Assert.IsTrue(nav.MoveToFirstChild());
+            // go to /root/1/prop2
+            Assert.IsTrue(nav.MoveToNext());
+            // can't go to /root/1/3
+            Assert.IsFalse(nav.MoveToNext());
+            Assert.IsFalse(nav.MoveToId("3"));
+            //Assert.AreEqual(NavigableNavigator.StatePosition.Element, nav.InternalState.Position);
+            //Assert.AreEqual(3, (nav.UnderlyingObject as TestContent).Id);
         }
 
         [TestCase(true, true)]
@@ -636,27 +720,27 @@ namespace Umbraco.Tests.CoreXml
   version=""1.0""
   xmlns:xsl=""http://www.w3.org/1999/XSL/Transform""
   xmlns:msxml=""urn:schemas-microsoft-com:xslt""
-	xmlns:umbraco.library=""urn:umbraco.library"" xmlns:Exslt.ExsltCommon=""urn:Exslt.ExsltCommon"" xmlns:Exslt.ExsltDatesAndTimes=""urn:Exslt.ExsltDatesAndTimes"" xmlns:Exslt.ExsltMath=""urn:Exslt.ExsltMath"" xmlns:Exslt.ExsltRegularExpressions=""urn:Exslt.ExsltRegularExpressions"" xmlns:Exslt.ExsltStrings=""urn:Exslt.ExsltStrings"" xmlns:Exslt.ExsltSets=""urn:Exslt.ExsltSets"" xmlns:Examine=""urn:Examine"" 
-	exclude-result-prefixes=""msxml umbraco.library Exslt.ExsltCommon Exslt.ExsltDatesAndTimes Exslt.ExsltMath Exslt.ExsltRegularExpressions Exslt.ExsltStrings Exslt.ExsltSets Examine "">
+    xmlns:umbraco.library=""urn:umbraco.library"" xmlns:Exslt.ExsltCommon=""urn:Exslt.ExsltCommon"" xmlns:Exslt.ExsltDatesAndTimes=""urn:Exslt.ExsltDatesAndTimes"" xmlns:Exslt.ExsltMath=""urn:Exslt.ExsltMath"" xmlns:Exslt.ExsltRegularExpressions=""urn:Exslt.ExsltRegularExpressions"" xmlns:Exslt.ExsltStrings=""urn:Exslt.ExsltStrings"" xmlns:Exslt.ExsltSets=""urn:Exslt.ExsltSets"" xmlns:Examine=""urn:Examine""
+    exclude-result-prefixes=""msxml umbraco.library Exslt.ExsltCommon Exslt.ExsltDatesAndTimes Exslt.ExsltMath Exslt.ExsltRegularExpressions Exslt.ExsltStrings Exslt.ExsltSets Examine "">
 
     <xsl:output method=""xml"" omit-xml-declaration=""yes"" />
     <xsl:param name=""currentPage""/>
 
     <xsl:template match=""/"">
-		<!-- <xsl:for-each select=""/root/* [@isDoc]""> -->
+        <!-- <xsl:for-each select=""/root/* [@isDoc]""> -->
         <!-- <xsl:for-each select=""$currentPage/root/* [@isDoc]""> -->
         <xsl:for-each select=""/macro/nav/root/* [@isDoc]"">
 <xsl:text>! </xsl:text><xsl:value-of select=""title"" /><xsl:text>
 </xsl:text>
-			<xsl:for-each select=""./* [@isDoc]"">
+            <xsl:for-each select=""./* [@isDoc]"">
 <xsl:text>!! </xsl:text><xsl:value-of select=""title"" /><xsl:text>
 </xsl:text>
-    			<xsl:for-each select=""./* [@isDoc]"">
+                <xsl:for-each select=""./* [@isDoc]"">
 <xsl:text>!!! </xsl:text><xsl:value-of select=""title"" /><xsl:text>
 </xsl:text>
-	    		</xsl:for-each>
-			</xsl:for-each>
-		</xsl:for-each>
+                </xsl:for-each>
+            </xsl:for-each>
+        </xsl:for-each>
     </xsl:template>
 
 </xsl:stylesheet>
@@ -697,7 +781,7 @@ namespace Umbraco.Tests.CoreXml
 
                 var x = new XmlDocument();
                 x.LoadXml(xml);
-                
+
                 macro = new MacroNavigator(new[]
                 {
                     // it even fails like that => macro nav. issue?
@@ -744,10 +828,10 @@ namespace Umbraco.Tests.CoreXml
                         <item><prop/></item>
                         <item><prop></prop></item>
                         <item><prop> </prop></item>
-                        <item><prop> 
+                        <item><prop>
                             </prop></item>
                         <item><prop> ooo </prop></item>
-                        <item><prop> ooo 
+                        <item><prop> ooo
                             </prop></item>
                         <item x=""""/>
                         <item x="" ""/>
@@ -772,7 +856,7 @@ namespace Umbraco.Tests.CoreXml
     <prop> ooo </prop>
   </item>
   <item>
-    <prop> ooo 
+    <prop> ooo
                             </prop>
   </item>
   <item x="""" />
@@ -890,11 +974,11 @@ namespace Umbraco.Tests.CoreXml
             // null => return null
             if (value == null) return null;
 
-			// attribute => return string value
+            // attribute => return string value
             if (isAttr) return value.ToString();
-            
-			// has a converter => use the converter
-            if (fieldType.XmlStringConverter != null) 
+
+            // has a converter => use the converter
+            if (fieldType.XmlStringConverter != null)
                 return fieldType.XmlStringConverter(value);
 
             // not a string => return value as a string
@@ -1018,7 +1102,7 @@ namespace Umbraco.Tests.CoreXml
             Content[2] = new TestContent(type1, 2, 1).WithValues("2:p1", "2:p2", "2:p3");
 
             Root = new TestRootContent(type).WithChildren(1);
-        }    
+        }
     }
 
     class TestSource4 : TestSourceBase
@@ -1081,13 +1165,13 @@ namespace Umbraco.Tests.CoreXml
         //        </item5>
         //    </wrap>
         //</root>
-        
+
         public TestSource6()
         {
             LastAttributeIndex = -1;
 
             var type = new TestRootContentType(this);
-            var type1 = type.CreateType("wrap", 
+            var type1 = type.CreateType("wrap",
                 new TestPropertyType("item1"),
                 new TestPropertyType("item2"),
                 new TestPropertyType("item2a"),
@@ -1102,11 +1186,11 @@ namespace Umbraco.Tests.CoreXml
             Content[1] = new TestContent(type1, 1, -1)
                 .WithValues(
                     null,
-                    null, 
-                    null, 
-                    null, 
-                    "\n        ", 
-                    "blah", 
+                    null,
+                    null,
+                    null,
+                    "\n        ",
+                    "blah",
                     "\n            blah\n        ",
                     "<subitem x=\"1\">bam</subitem>",
                     "\n        "

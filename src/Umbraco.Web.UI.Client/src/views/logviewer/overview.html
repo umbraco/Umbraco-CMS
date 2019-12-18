@@ -1,0 +1,128 @@
+<div data-element="editor-logs" ng-controller="Umbraco.Editors.LogViewer.OverviewController as vm" class="clearfix" id="logview">
+
+    <umb-editor-view footer="false">
+
+        <umb-editor-header
+            name="vm.dateRangeLabel"
+            name-locked="true"
+            hide-icon="true"
+            hide-description="true"
+            hide-alias="true">
+        </umb-editor-header>
+
+        <umb-editor-container>
+            <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+            <!-- Warning message (if unable to view log files) -->
+            <div class="umb-logviewer" ng-show="!vm.loading">
+                <div class="umb-logviewer__main-content">
+                    <div ng-show="!vm.canLoadLogs">
+                        <umb-box>
+                            <umb-box-header title="Unable to view logs"/>
+                            <umb-box-content>
+                                <p>Today's log file is too large to be viewed and would cause performance problems.</p>
+                                <p>If you need to view the log files, try opening them manually</p>
+                            </umb-box-content>
+                        </umb-box>
+                    </div>
+                    <div ng-show="vm.canLoadLogs">
+                        <!-- Saved Searches -->
+                        <umb-box>
+                            <umb-box-header title="Saved Searches"></umb-box-header>
+                            <umb-box-content>
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <a ng-click="vm.searchLogQuery()" title="View all Logs" class="btn btn-link">All Logs <i class="icon-search"></i></a>
+                                        </td>
+                                    </tr>
+                                    <!-- Fetch saved searches  -->
+                                    <tr ng-repeat="search in vm.searches">
+                                        <td>
+                                            <a ng-click="vm.searchLogQuery(search.query)" title="{{search.name}}" class="btn btn-link">{{search.name}} <i class="icon-search"></i></a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </umb-box-content>
+                        </umb-box>
+
+                        <!-- List of top X common log messages -->
+                        <umb-box>
+                            <umb-box-header title="Common Log Messages"></umb-box-header>
+                            <umb-box-content class="block-form">
+                                <em>Total Unique Message types</em>: {{ vm.commonLogMessages.length }}
+                                <table class="table table-hover">
+                                    <tbody>
+                                        <tr ng-repeat="template in vm.commonLogMessages | limitTo:vm.commonLogMessagesCount" ng-click="vm.findMessageTemplate(template)" style="cursor: pointer;">
+                                            <td>
+                                                {{ template.MessageTemplate }}
+                                            </td>
+                                            <td>
+                                                {{ template.Count }}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <umb-button ng-if="vm.commonLogMessagesCount < vm.commonLogMessages.length"
+                                            button-style="action"
+                                            type="button"
+                                            action="vm.showMore()"
+                                            label="Show More">
+                                </umb-button>
+                            </umb-box-content>
+                        </umb-box>
+                    </div>
+                </div>
+                <div class="umb-logviewer__sidebar">
+
+                    <!-- Time period -->
+                    <umb-box>
+                        <umb-box-header title="Time Period"></umb-box-header>
+
+                        <umb-date-time-picker class="datepicker"
+                                       ng-model="vm.period"
+                                       options="vm.config"
+                                       on-close="vm.dateRangeChange(selectedDates, dateStr, instance)">
+                        </umb-date-time-picker>
+                    </umb-box>
+
+                    <div ng-show=" vm.canLoadLogs">
+                        <div class="umb-box-row">
+                        <!-- No of Errors -->                        
+                            <umb-box ng-click="vm.searchErrors()" style="cursor:pointer;">
+                                <umb-box-header title="Number of Errors"></umb-box-header>
+                                <umb-box-content class="block-form" style="font-size: 40px; font-weight:900; text-align:center; color:#fe6561;">
+                                    {{ vm.numberOfErrors }}
+                                </umb-box-content>
+                            </umb-box>     
+                            
+                            <umb-box>
+                                <umb-box-header title="Log level"></umb-box-header>
+                                <umb-box-content class="block-form" style="font-weight:900; text-align:center; color: {{ vm.logLevelColor }}">
+                                    {{ vm.logLevel }}
+                                </umb-box-content>
+                            </umb-box>                                                                            
+                        </div>
+
+                        <!-- Chart of diff log types -->
+                        <umb-box>
+                            <umb-box-header title="Log Types"></umb-box-header>
+                            <umb-box-content class="block-form">
+
+                                <canvas chart-doughnut
+                                        chart-data="vm.logTypeData"
+                                        chart-labels="vm.logTypeLabels"
+                                        chart-colors="vm.logTypeColors"
+                                        chart-options="vm.chartOptions">
+                                </canvas>
+
+                            </umb-box-content>
+                        </umb-box>                        
+                      
+                    </div>
+                </div>
+            </div>
+
+        </umb-editor-container>
+    </umb-editor-view>
+</div>

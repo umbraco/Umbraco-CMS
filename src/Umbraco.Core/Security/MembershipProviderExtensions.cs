@@ -4,6 +4,7 @@ using System.Threading;
 using System.Web;
 using System.Web.Hosting;
 using System.Web.Security;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -24,7 +25,7 @@ namespace Umbraco.Core.Security
         internal static bool CanResetPassword(this MembershipProvider provider, IUserService userService)
         {
             if (provider == null) throw new ArgumentNullException("provider");
-            
+
             var canReset = provider.EnablePasswordReset;
 
             if (userService == null) return canReset;
@@ -87,11 +88,11 @@ namespace Umbraco.Core.Security
         /// <returns></returns>
         public static MembershipProvider GetUsersMembershipProvider()
         {
-            if (Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider] == null)
+            if (Membership.Providers[Constants.Security.UserMembershipProviderName] == null)
             {
-                throw new InvalidOperationException("No membership provider found with name " + UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider);
+                throw new InvalidOperationException("No membership provider found with name " + Constants.Security.UserMembershipProviderName);
             }
-            return Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider];
+            return Membership.Providers[Constants.Security.UserMembershipProviderName];
         }
 
         /// <summary>
@@ -160,7 +161,7 @@ namespace Umbraco.Core.Security
             return (membershipProvider is UmbracoMembershipProviderBase);
         }
 
-        //TODO: Add role provider checks too
+        // TODO: Add role provider checks too
 
         public static UmbracoMembershipProviderBase AsUmbracoMembershipProvider(this MembershipProvider membershipProvider)
         {

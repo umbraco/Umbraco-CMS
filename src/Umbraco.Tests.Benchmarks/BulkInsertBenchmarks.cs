@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using System.Data.SqlServerCe;
 using System.IO;
+using System.Linq;
 using BenchmarkDotNet.Attributes;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Migrations.Initial;
-using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.Benchmarks.Config;
 using Umbraco.Tests.TestHelpers;
 using ILogger = Umbraco.Core.Logging.ILogger;
@@ -18,16 +20,37 @@ namespace Umbraco.Tests.Benchmarks
     [QuickRunWithMemoryDiagnoserConfig]
     public class BulkInsertBenchmarks
     {
-        private static byte[] _initDbBytes = null;
+        private static byte[] _initDbBytes;
+
+        // FIXME: should run on LocalDb same as NPoco tests!
+
+        private IUmbracoDatabase GetSqlServerDatabase(ILogger logger)
+        {
+            IScopeProvider f = null;
+            var l = new Lazy<IScopeProvider>(() => f);
+            var factory = new UmbracoDatabaseFactory(
+                "server=.\\SQLExpress;database=YOURDB;user id=YOURUSER;password=YOURPASS",
+                Constants.DatabaseProviders.SqlServer,
+                logger,
+                new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())));
+            return factory.CreateDatabase();
+        }
+
+        private IUmbracoDatabase GetSqlCeDatabase(string cstr, ILogger logger)
+        {
+            var f = new UmbracoDatabaseFactory(
+                cstr,
+                Constants.DatabaseProviders.SqlCe,
+                logger,
+                new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())));
+            return f.CreateDatabase();
+        }
 
         [GlobalSetup]
         public void Setup()
         {
             var logger = new DebugDiagnosticsLogger();
             var path = TestHelper.CurrentAssemblyDirectory;
-
-            _sqlCeSyntax = new SqlCeSyntaxProvider();
-            _sqlServerSyntax = new SqlServerSyntaxProvider();
 
             SetupSqlCe(path, logger);
             SetupSqlServer(logger);
@@ -38,10 +61,7 @@ namespace Umbraco.Tests.Benchmarks
         private void SetupSqlServer(ILogger logger)
         {
             //create the db
-            _dbSqlServer = new UmbracoDatabase(
-                "server=.\\SQLExpress;database=YOURDB;user id=YOURUSER;password=YOURPASS",
-                Constants.DatabaseProviders.SqlServer,
-                logger);
+            _dbSqlServer = GetSqlServerDatabase(logger);
 
             //drop the table
             // note: DROP TABLE IF EXISTS is SQL 2016+
@@ -49,16 +69,16 @@ namespace Umbraco.Tests.Benchmarks
 
             //re-create it
             _dbSqlServer.Execute(@"CREATE TABLE [umbracoServer](
-	[id] [int] IDENTITY(1,1) NOT NULL,
-	[address] [nvarchar](500) NOT NULL,
-	[computerName] [nvarchar](255) NOT NULL,
-	[registeredDate] [datetime] NOT NULL CONSTRAINT [DF_umbracoServer_registeredDate]  DEFAULT (getdate()),
-	[lastNotifiedDate] [datetime] NOT NULL,
-	[isActive] [bit] NOT NULL,
-	[isMaster] [bit] NOT NULL,
+    [id] [int] IDENTITY(1,1) NOT NULL,
+    [address] [nvarchar](500) NOT NULL,
+    [computerName] [nvarchar](255) NOT NULL,
+    [registeredDate] [datetime] NOT NULL CONSTRAINT [DF_umbracoServer_registeredDate]  DEFAULT (getdate()),
+    [lastNotifiedDate] [datetime] NOT NULL,
+    [isActive] [bit] NOT NULL,
+    [isMaster] [bit] NOT NULL,
  CONSTRAINT [PK_umbracoServer] PRIMARY KEY CLUSTERED
 (
-	[id] ASC
+    [id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 )");
         }
@@ -80,12 +100,9 @@ namespace Umbraco.Tests.Benchmarks
                 }
 
                 //use the db  to create the initial schema so we can reuse in each bench
-                using (_dbSqlCe = new UmbracoDatabase(
-                    sqlCeConnectionString,
-                    Constants.DatabaseProviders.SqlCe,
-                    logger))
+                using (_dbSqlCe = GetSqlCeDatabase(sqlCeConnectionString, logger))
                 {
-                    var creation = new DatabaseSchemaCreation(_dbSqlCe, logger, _sqlCeSyntax);
+                    var creation = new DatabaseSchemaCreator(_dbSqlCe, logger);
                     creation.InitializeDatabaseSchema();
                 }
                 _initDbBytes = File.ReadAllBytes(_dbFile);
@@ -96,10 +113,7 @@ namespace Umbraco.Tests.Benchmarks
             }
 
             //create the db
-            _dbSqlCe = new UmbracoDatabase(
-                sqlCeConnectionString,
-                Constants.DatabaseProviders.SqlCe,
-                logger);
+            _dbSqlCe = GetSqlCeDatabase(sqlCeConnectionString, logger);
         }
 
         private List<ServerRegistrationDto> GetData()
@@ -128,10 +142,8 @@ namespace Umbraco.Tests.Benchmarks
         }
 
         private string _dbFile;
-        private UmbracoDatabase _dbSqlCe;
-        private UmbracoDatabase _dbSqlServer;
-        private ISqlSyntaxProvider _sqlCeSyntax;
-        private ISqlSyntaxProvider _sqlServerSyntax;
+        private IUmbracoDatabase _dbSqlCe;
+        private IUmbracoDatabase _dbSqlServer;
 
         /// <summary>
         /// Tests updating the existing XML way
@@ -141,7 +153,7 @@ namespace Umbraco.Tests.Benchmarks
         {
             using (var tr = _dbSqlCe.GetTransaction())
             {
-                _dbSqlCe.BulkInsertRecords(GetData(), tr, _sqlCeSyntax, useNativeSqlPlatformBulkInsert: false);
+                _dbSqlCe.BulkInsertRecords(GetData(), false);
                 tr.Complete();
             }
         }
@@ -154,7 +166,7 @@ namespace Umbraco.Tests.Benchmarks
         {
             using (var tr = _dbSqlCe.GetTransaction())
             {
-                _dbSqlCe.BulkInsertRecords(GetData(), tr, _sqlCeSyntax, useNativeSqlPlatformBulkInsert: true);
+                _dbSqlCe.BulkInsertRecords(GetData());
                 tr.Complete();
             }
         }
@@ -164,7 +176,7 @@ namespace Umbraco.Tests.Benchmarks
         {
             using (var tr = _dbSqlServer.GetTransaction())
             {
-                _dbSqlServer.BulkInsertRecords(GetData(), tr, _sqlServerSyntax, useNativeSqlPlatformBulkInsert: false);
+                _dbSqlServer.BulkInsertRecords(GetData(), false);
                 tr.Complete();
             }
         }
@@ -174,7 +186,7 @@ namespace Umbraco.Tests.Benchmarks
         {
             using (var tr = _dbSqlServer.GetTransaction())
             {
-                _dbSqlServer.BulkInsertRecords(GetData(), tr, _sqlServerSyntax, useNativeSqlPlatformBulkInsert: true);
+                _dbSqlServer.BulkInsertRecords(GetData());
                 tr.Complete();
             }
         }

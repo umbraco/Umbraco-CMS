@@ -1,0 +1,18 @@
+<div>
+
+    <table class="table table-bordered table-condensed">
+        <thead>
+            <tr>
+                <th class="score"><localize key="general_field">Field</localize></th>
+                <th class="id"><localize key="general_value">Value</localize></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="(key, val) in model.searchResultValues track by key">
+                <td>{{key}}</td>
+                <td>{{val}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>

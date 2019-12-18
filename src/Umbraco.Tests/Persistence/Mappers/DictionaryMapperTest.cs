@@ -5,16 +5,14 @@ using Umbraco.Core.Persistence.SqlSyntax;
 namespace Umbraco.Tests.Persistence.Mappers
 {
     [TestFixture]
-    public class DictionaryMapperTest
+    public class DictionaryMapperTest : MapperTestBase
     {
         [Test]
         public void Can_Map_Id_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             // Act
-            string column = new DictionaryMapper().Map("Id");
+            string column = new DictionaryMapper(MockSqlContext(), CreateMaps()).Map("Id");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsDictionary].[pk]"));
@@ -23,11 +21,9 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_Key_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             // Act
-            string column = new DictionaryMapper().Map("Key");
+            string column = new DictionaryMapper(MockSqlContext(), CreateMaps()).Map("Key");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsDictionary].[id]"));
@@ -36,11 +32,9 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_ItemKey_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             // Act
-            string column = new DictionaryMapper().Map("ItemKey");
+            string column = new DictionaryMapper(MockSqlContext(), CreateMaps()).Map("ItemKey");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsDictionary].[key]"));

@@ -1,9 +1,11 @@
 ﻿using System;
-using System.Diagnostics;
 using Examine;
 using Examine.Providers;
-using Umbraco.Core;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Composing;
+using Umbraco.Examine;
 using Umbraco.Web.Cache;
+using Umbraco.Web.Search;
 
 namespace Umbraco.Web
 {
@@ -24,19 +26,13 @@ namespace Umbraco.Web
                 }
             }
 
-            public static bool CanUpdateDocumentCache
-            {
-                get
-                {
-                    // trying a partial update
-                    // ok if not suspended, or if we haven't done a full already
-                    return _suspended == false || _tried == false;
-                }
-            }
+            // trying a partial update
+            // ok if not suspended, or if we haven't done a full already
+            public static bool CanUpdateDocumentCache => _suspended == false || _tried == false;
 
             public static void SuspendDocumentCache()
             {
-                ApplicationContext.Current.ProfilingLogger.Logger.Info(typeof (PageCacheRefresher), "Suspend document cache.");
+                Current.Logger.Info(typeof (PageCacheRefresher), "Suspend document cache.");
                 _suspended = true;
             }
 
@@ -44,16 +40,18 @@ namespace Umbraco.Web
             {
                 _suspended = false;
 
-                ApplicationContext.Current.ProfilingLogger.Logger.Info(typeof (PageCacheRefresher), string.Format("Resume document cache (reload:{0}).", _tried ? "true" : "false"));
+                Current.Logger.Info(typeof (PageCacheRefresher), "Resume document cache (reload:{Tried}).", _tried);
 
                 if (_tried == false) return;
                 _tried = false;
 
-                var pageRefresher = CacheRefreshersResolver.Current.GetById(new Guid(DistributedCache.PageCacheRefresherId));
+                var pageRefresher = Current.CacheRefreshers[ContentCacheRefresher.UniqueId];
                 pageRefresher.RefreshAll();
             }
         }
 
+        //This is really needed at all since the only place this is used is in ExamineComponent and that already maintains a flag of whether it suspsended or not
+        // AHH... but Deploy probably uses this?
         public static class ExamineEvents
         {
             private static bool _tried, _suspended;
@@ -68,26 +66,23 @@ namespace Umbraco.Web
                 }
             }
 
-            public static void SuspendIndexers()
+            public static void SuspendIndexers(ILogger logger)
             {
-                ApplicationContext.Current.ProfilingLogger.Logger.Info(typeof (ExamineEvents), "Suspend indexers.");
+                logger.Info(typeof (ExamineEvents), "Suspend indexers.");
                 _suspended = true;
             }
 
-            public static void ResumeIndexers()
+            public static void ResumeIndexers(IndexRebuilder indexRebuilder, ILogger logger)
             {
                 _suspended = false;
 
-                ApplicationContext.Current.ProfilingLogger.Logger.Info(typeof (ExamineEvents), string.Format("Resume indexers (rebuild:{0}).", _tried ? "true" : "false"));
+                logger.Info(typeof (ExamineEvents), "Resume indexers (rebuild:{Tried}).", _tried);
 
                 if (_tried == false) return;
                 _tried = false;
 
-                // fixme - could we fork this on a background thread?
-                foreach (BaseIndexProvider indexer in ExamineManager.Instance.IndexProviderCollection)
-                {
-                    indexer.RebuildIndex();
-                }
+                // TODO: when resuming do we always want a full rebuild of all indexes?
+                ExamineComponent.RebuildIndexes(indexRebuilder, logger, false);
             }
         }
 
@@ -95,20 +90,17 @@ namespace Umbraco.Web
         {
             private static bool _suspended;
 
-            public static bool CanRun
-            {
-                get { return _suspended == false; }
-            }
+            public static bool CanRun => _suspended == false;
 
             public static void Suspend()
             {
-                ApplicationContext.Current.ProfilingLogger.Logger.Info(typeof (ScheduledPublishing), "Suspend scheduled publishing.");
+                Current.Logger.Info(typeof (ScheduledPublishing), "Suspend scheduled publishing.");
                 _suspended = true;
             }
 
             public static void Resume()
             {
-                ApplicationContext.Current.ProfilingLogger.Logger.Info(typeof (ScheduledPublishing), "Resume scheduled publishing.");
+                Current.Logger.Info(typeof (ScheduledPublishing), "Resume scheduled publishing.");
                 _suspended = false;
             }
         }

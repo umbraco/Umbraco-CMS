@@ -1,6 +1,4 @@
-﻿using Umbraco.Core.Models.EntityBase;
-
-namespace Umbraco.Core.Sync
+﻿namespace Umbraco.Core.Sync
 {
     /// <summary>
     /// Provides the address of a server.
@@ -12,6 +10,6 @@ namespace Umbraco.Core.Sync
         /// </summary>
         string ServerAddress { get; }
 
-        //TODO : Should probably add things like port, protocol, server name, app id
+        // TODO: Should probably add things like port, protocol, server name, app id
     }
 }

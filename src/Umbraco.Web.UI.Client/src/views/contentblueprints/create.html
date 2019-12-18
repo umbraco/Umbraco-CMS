@@ -10,16 +10,16 @@
             <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
             <ul class="umb-actions umb-actions-child">
-                <li ng-repeat="documentType in vm.documentTypes | orderBy:'name':false">
-                    <a href="" ng-click="vm.createBlueprint(documentType)" prevent-default>
-                        <i class="large {{documentType.icon}}"></i>
+                <li class="umb-action" ng-repeat="documentType in vm.documentTypes | orderBy:'name':false">
+                    <button href="" class="umb-action-link umb-outline btn-reset" ng-click="vm.createBlueprint(documentType)" prevent-default>
+                        <i class="large icon {{documentType.icon}}"></i>
                         <span class="menu-label">
                             {{documentType.name}}
                             <small>
                                 {{documentType.description}}
                             </small>
                         </span>
-                    </a>
+                    </button>
                 </li>
             </ul>
 
@@ -31,7 +31,7 @@
 
         <umb-button
             label-key="buttons_somethingElse"
-            action="nav.hideDialog(true)"
+            action="vm.close()"
             type="button"
             button-style="info">
         </umb-button>

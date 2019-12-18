@@ -1,404 +1,167 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.IO;
 using System.Web;
+using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Events;
+using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
-using umbraco.BusinessLogic;
-using umbraco.presentation.preview;
-using Umbraco.Core.CodeAnnotations;
-using GlobalSettings = umbraco.GlobalSettings;
-using IOHelper = Umbraco.Core.IO.IOHelper;
-using SystemDirectories = Umbraco.Core.IO.SystemDirectories;
 
 namespace Umbraco.Web
 {
+
     /// <summary>
     /// Class that encapsulates Umbraco information of a specific HTTP request
     /// </summary>
     public class UmbracoContext : DisposableObjectSlim, IDisposeOnRequestEnd
     {
-        internal const string HttpContextItemName = "Umbraco.Web.UmbracoContext";
-        private static readonly object Locker = new object();
-
-        private bool _replacing;
+        private readonly IGlobalSettings _globalSettings;
+        private readonly Lazy<IPublishedSnapshot> _publishedSnapshot;
+        private string _previewToken;
         private bool? _previewing;
-        private readonly Lazy<ContextualPublishedContentCache> _contentCache;
-        private readonly Lazy<ContextualPublishedMediaCache> _mediaCache;
 
-        /// <summary>
-        /// Used if not running in a web application (no real HttpContext)
-        /// </summary>
-        [ThreadStatic]
-        private static UmbracoContext _umbracoContext;
-
-        #region EnsureContext methods
-
-        #region Obsolete
-        [Obsolete("Use the method that specifies IUmbracoSettings instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static UmbracoContext EnsureContext(
-            HttpContextBase httpContext,
-            ApplicationContext applicationContext,
-            WebSecurity webSecurity)
-        {
-            return EnsureContext(httpContext, applicationContext, webSecurity, false);
-        }
-        [Obsolete("Use the method that specifies IUmbracoSettings instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static UmbracoContext EnsureContext(
-            HttpContextBase httpContext,
-            ApplicationContext applicationContext)
-        {
-            return EnsureContext(httpContext, applicationContext, new WebSecurity(httpContext, applicationContext), false);
-        }
-        [Obsolete("Use the method that specifies IUmbracoSettings instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static UmbracoContext EnsureContext(
-            HttpContextBase httpContext,
-            ApplicationContext applicationContext,
-            bool replaceContext)
-        {
-            return EnsureContext(httpContext, applicationContext, new WebSecurity(httpContext, applicationContext), replaceContext);
-        }
-        [Obsolete("Use the method that specifies IUmbracoSettings instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static UmbracoContext EnsureContext(
-            HttpContextBase httpContext,
-            ApplicationContext applicationContext,
-            WebSecurity webSecurity,
-            bool replaceContext)
-        {
-            return EnsureContext(httpContext, applicationContext, new WebSecurity(httpContext, applicationContext), replaceContext, null);
-        }
-        [Obsolete("Use the method that specifies IUmbracoSettings instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static UmbracoContext EnsureContext(
-            HttpContextBase httpContext,
-            ApplicationContext applicationContext,
-            WebSecurity webSecurity,
-            bool replaceContext,
-            bool? preview)
-        {
-            return EnsureContext(httpContext, applicationContext, webSecurity, UmbracoConfig.For.UmbracoSettings(), UrlProviderResolver.Current.Providers, replaceContext, preview);
-        } 
-        #endregion
-
-        /// <summary>
-        /// This is a helper method which is called to ensure that the singleton context is created
-        /// </summary>
-        /// <param name="httpContext"></param>
-        /// <param name="applicationContext"></param>
-        /// <param name="webSecurity"></param>
-        /// <param name="umbracoSettings"></param>
-        /// <param name="urlProviders"></param>
-        /// <param name="replaceContext">
-        /// if set to true will replace the current singleton with a new one, this is generally only ever used because
-        /// during application startup the base url domain will not be available so after app startup we'll replace the current
-        /// context with a new one in which we can access the httpcontext.Request object.
-        /// </param>
-        /// <param name="preview"></param>
-        /// <returns>
-        /// The Singleton context object
-        /// </returns>
-        /// <remarks>
-        /// This is created in order to standardize the creation of the singleton. Normally it is created during a request
-        /// in the UmbracoModule, however this module does not execute during application startup so we need to ensure it
-        /// during the startup process as well.
-        /// See: http://issues.umbraco.org/issue/U4-1890, http://issues.umbraco.org/issue/U4-1717
-        /// </remarks>
-        public static UmbracoContext EnsureContext(
-            HttpContextBase httpContext,
-            ApplicationContext applicationContext,
+        // initializes a new instance of the UmbracoContext class
+        // internal for unit tests
+        // otherwise it's used by EnsureContext above
+        // warn: does *not* manage setting any IUmbracoContextAccessor
+        internal UmbracoContext(HttpContextBase httpContext,
+            IPublishedSnapshotService publishedSnapshotService,
             WebSecurity webSecurity,
             IUmbracoSettingsSection umbracoSettings,
             IEnumerable<IUrlProvider> urlProviders,
-            bool replaceContext,
-            bool? preview = null)
+            IEnumerable<IMediaUrlProvider> mediaUrlProviders,
+            IGlobalSettings globalSettings,
+            IVariationContextAccessor variationContextAccessor)
         {
-            if (httpContext == null) throw new ArgumentNullException("httpContext");
-            if (applicationContext == null) throw new ArgumentNullException("applicationContext");
-            if (webSecurity == null) throw new ArgumentNullException("webSecurity");
-            if (umbracoSettings == null) throw new ArgumentNullException("umbracoSettings");
-            if (urlProviders == null) throw new ArgumentNullException("urlProviders");
+            if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
+            if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
+            if (webSecurity == null) throw new ArgumentNullException(nameof(webSecurity));
+            if (umbracoSettings == null) throw new ArgumentNullException(nameof(umbracoSettings));
+            if (urlProviders == null) throw new ArgumentNullException(nameof(urlProviders));
+            if (mediaUrlProviders == null) throw new ArgumentNullException(nameof(mediaUrlProviders));
+            VariationContextAccessor = variationContextAccessor ??  throw new ArgumentNullException(nameof(variationContextAccessor));
+            _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
 
-            //if there's already a singleton, and we're not replacing then there's no need to ensure anything
-            if (UmbracoContext.Current != null)
-            {
-                if (replaceContext == false)
-                    return UmbracoContext.Current;
-                UmbracoContext.Current._replacing = true;
-            }
-
-            var umbracoContext = CreateContext(httpContext, applicationContext, webSecurity, umbracoSettings, urlProviders, preview);
-
-            //assign the singleton
-            UmbracoContext.Current = umbracoContext;
-            return UmbracoContext.Current;
-        }
-
-        /// <summary>
-        /// Creates a standalone UmbracoContext instance
-        /// </summary>
-        /// <param name="httpContext"></param>
-        /// <param name="applicationContext"></param>
-        /// <param name="webSecurity"></param>
-        /// <param name="umbracoSettings"></param>
-        /// <param name="urlProviders"></param>        
-        /// <param name="preview"></param>
-        /// <returns>
-        /// A new instance of UmbracoContext
-        /// </returns>        
-        public static UmbracoContext CreateContext(
-            HttpContextBase httpContext,
-            ApplicationContext applicationContext,
-            WebSecurity webSecurity,
-            IUmbracoSettingsSection umbracoSettings,
-            IEnumerable<IUrlProvider> urlProviders,        
-            bool? preview)
-        {
-            if (httpContext == null) throw new ArgumentNullException("httpContext");
-            if (applicationContext == null) throw new ArgumentNullException("applicationContext");
-            if (webSecurity == null) throw new ArgumentNullException("webSecurity");
-            if (umbracoSettings == null) throw new ArgumentNullException("umbracoSettings");
-            if (urlProviders == null) throw new ArgumentNullException("urlProviders");          
-
-            var umbracoContext = new UmbracoContext(
-                httpContext,
-                applicationContext,
-                new Lazy<IPublishedCaches>(() => PublishedCachesResolver.Current.Caches, false),
-                webSecurity,
-                preview);
-
-            // create the RoutingContext, and assign
-            var routingContext = new RoutingContext(
-                umbracoContext,
-
-                //TODO: Until the new cache is done we can't really expose these to override/mock
-                new Lazy<IEnumerable<IContentFinder>>(() => ContentFinderResolver.Current.Finders),
-                new Lazy<IContentFinder>(() => ContentLastChanceFinderResolver.Current.Finder),
-
-                // create the nice urls provider
-                // there's one per request because there are some behavior parameters that can be changed
-                new Lazy<UrlProvider>(
-                    () => new UrlProvider(
-                        umbracoContext,
-                        umbracoSettings.WebRouting,
-                        urlProviders),
-                    false));
-
-            //assign the routing context back
-            umbracoContext.RoutingContext = routingContext;
-
-            return umbracoContext;
-        }
-
-        /// <summary>
-        /// Creates a new Umbraco context.
-        /// </summary>
-        /// <param name="httpContext"></param>
-        /// <param name="applicationContext"> </param>
-        /// <param name="publishedCaches">The published caches.</param>
-        /// <param name="webSecurity"></param>
-        /// <param name="preview">An optional value overriding detection of preview mode.</param>
-        internal UmbracoContext(
-            HttpContextBase httpContext,
-            ApplicationContext applicationContext,
-            IPublishedCaches publishedCaches,
-            WebSecurity webSecurity,
-            bool? preview = null)
-            : this(httpContext, applicationContext, new Lazy<IPublishedCaches>(() => publishedCaches), webSecurity, preview)
-        {
-        }
-
-        /// <summary>
-        /// Creates a new Umbraco context.
-        /// </summary>
-        /// <param name="httpContext"></param>
-        /// <param name="applicationContext"> </param>
-        /// <param name="publishedCaches">The published caches.</param>
-        /// <param name="webSecurity"></param>
-        /// <param name="preview">An optional value overriding detection of preview mode.</param>
-        internal UmbracoContext(
-			HttpContextBase httpContext, 
-			ApplicationContext applicationContext,
-            Lazy<IPublishedCaches> publishedCaches,
-            WebSecurity webSecurity,
-            bool? preview = null)
-        {
-            //This ensures the dispose method is called when the request terminates, though
-            // we also ensure this happens in the Umbraco module because the UmbracoContext is added to the
-            // http context items.
+            // ensure that this instance is disposed when the request terminates, though we *also* ensure
+            // this happens in the Umbraco module since the UmbracoCOntext is added to the HttpContext items.
+            //
+            // also, it *can* be returned by the container with a PerRequest lifetime, meaning that the
+            // container *could* also try to dispose it.
+            //
+            // all in all, this context may be disposed more than once, but DisposableObject ensures that
+            // it is ok and it will be actually disposed only once.
             httpContext.DisposeOnPipelineCompleted(this);
-
-            if (httpContext == null) throw new ArgumentNullException("httpContext");
-            if (applicationContext == null) throw new ArgumentNullException("applicationContext");
 
             ObjectCreated = DateTime.Now;
             UmbracoRequestId = Guid.NewGuid();
-
             HttpContext = httpContext;
-            Application = applicationContext;
             Security = webSecurity;
 
-            _contentCache = new Lazy<ContextualPublishedContentCache>(() => publishedCaches.Value.CreateContextualContentCache(this));
-            _mediaCache = new Lazy<ContextualPublishedMediaCache>(() => publishedCaches.Value.CreateContextualMediaCache(this));
-            _previewing = preview;
-            
+            // beware - we cannot expect a current user here, so detecting preview mode must be a lazy thing
+            _publishedSnapshot = new Lazy<IPublishedSnapshot>(() => publishedSnapshotService.CreatePublishedSnapshot(PreviewToken));
+
             // set the urls...
-            //original request url
-            //NOTE: The request will not be available during app startup so we can only set this to an absolute URL of localhost, this
+            // NOTE: The request will not be available during app startup so we can only set this to an absolute URL of localhost, this
             // is a work around to being able to access the UmbracoContext during application startup and this will also ensure that people
             // 'could' still generate URLs during startup BUT any domain driven URL generation will not work because it is NOT possible to get
             // the current domain during application startup.
             // see: http://issues.umbraco.org/issue/U4-1890
-
-            var requestUrl = new Uri("http://localhost");
-            var request = GetRequestFromContext();
-            if (request != null && request.Url != null)
-            {
-                requestUrl = request.Url;
-            }
-            this.OriginalRequestUrl = requestUrl;
-            //cleaned request url
-            this.CleanedUmbracoUrl = UriUtility.UriToUmbraco(this.OriginalRequestUrl);
-
-        } 
-        #endregion
-
-        /// <summary>
-        /// Gets the current Umbraco Context.
-        /// </summary>
-		public static UmbracoContext Current
-        {
-            get
-            {
-                //if we have a real context then return the request based object
-                if (System.Web.HttpContext.Current != null)
-                {
-                    return (UmbracoContext)System.Web.HttpContext.Current.Items[HttpContextItemName];
-                }
-
-                //return the object if not running in a real HttpContext
-                return _umbracoContext;
-            }
-
-            internal set
-            {
-                lock (Locker)
-                {
-                    //if running in a real HttpContext, this can only be set once
-                    if (System.Web.HttpContext.Current != null && Current != null && !Current._replacing)
-                    {
-                        throw new ApplicationException("The current UmbracoContext can only be set once during a request.");
-                    }
-
-                    //if there is an HttpContext, return the item
-                    if (System.Web.HttpContext.Current != null)
-                    {
-                        System.Web.HttpContext.Current.Items[HttpContextItemName] = value;
-                    }
-                    else
-                    {
-                        _umbracoContext = value;
-                    }
-                }
-            }
+            //
+            OriginalRequestUrl = GetRequestFromContext()?.Url ?? new Uri("http://localhost");
+            CleanedUmbracoUrl = UriUtility.UriToUmbraco(OriginalRequestUrl);
+            UrlProvider = new UrlProvider(this, umbracoSettings.WebRouting, urlProviders, mediaUrlProviders, variationContextAccessor);
         }
 
-		/// <summary>
-		/// This is used internally for performance calculations, the ObjectCreated DateTime is set as soon as this
-		/// object is instantiated which in the web site is created during the BeginRequest phase.
-		/// We can then determine complete rendering time from that.
-		/// </summary>
-		internal DateTime ObjectCreated { get; private set; }
-
-		/// <summary>
-		/// This is used internally for debugging and also used to define anything required to distinguish this request from another.
-		/// </summary>
-		internal Guid UmbracoRequestId { get; private set; }
+        /// <summary>
+        /// This is used internally for performance calculations, the ObjectCreated DateTime is set as soon as this
+        /// object is instantiated which in the web site is created during the BeginRequest phase.
+        /// We can then determine complete rendering time from that.
+        /// </summary>
+        internal DateTime ObjectCreated { get; }
 
         /// <summary>
-        /// Gets the current ApplicationContext
+        /// This is used internally for debugging and also used to define anything required to distinguish this request from another.
         /// </summary>
-        [UmbracoWillObsolete("Do not access the ApplicationContext via the UmbracoContext, either inject the ApplicationContext into the services you need or access it via it's own Singleton accessor ApplicationContext.Current")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public ApplicationContext Application { get; private set; }
+        internal Guid UmbracoRequestId { get; }
 
         /// <summary>
         /// Gets the WebSecurity class
         /// </summary>
-        public WebSecurity Security { get; private set; }
-
-	    /// <summary>
-	    /// Gets the uri that is handled by ASP.NET after server-side rewriting took place.
-	    /// </summary>
-		internal Uri OriginalRequestUrl { get; private set; }
-
-		/// <summary>
-		/// Gets the cleaned up url that is handled by Umbraco.
-		/// </summary>
-		/// <remarks>That is, lowercase, no trailing slash after path, no .aspx...</remarks>
-		internal Uri CleanedUmbracoUrl { get; private set; }
+        public WebSecurity Security { get; }
 
         /// <summary>
-        /// Gets or sets the published content cache.
+        /// Gets the uri that is handled by ASP.NET after server-side rewriting took place.
         /// </summary>
-        public ContextualPublishedContentCache ContentCache
-        {
-            get { return _contentCache.Value; }
-        }
+        internal Uri OriginalRequestUrl { get; }
 
         /// <summary>
-        /// Gets or sets the published media cache.
+        /// Gets the cleaned up url that is handled by Umbraco.
         /// </summary>
-        public ContextualPublishedMediaCache MediaCache
-        {
-            get { return _mediaCache.Value; }
-        }
+        /// <remarks>That is, lowercase, no trailing slash after path, no .aspx...</remarks>
+        internal Uri CleanedUmbracoUrl { get; }
+
+        /// <summary>
+        /// Gets the published snapshot.
+        /// </summary>
+        public IPublishedSnapshot PublishedSnapshot => _publishedSnapshot.Value;
+
+        /// <summary>
+        /// Gets the published content cache.
+        /// </summary>
+        [Obsolete("Use the Content property.")]
+        public IPublishedContentCache ContentCache => PublishedSnapshot.Content;
+
+        /// <summary>
+        /// Gets the published content cache.
+        /// </summary>
+        public IPublishedContentCache Content => PublishedSnapshot.Content;
+
+        /// <summary>
+        /// Gets the published media cache.
+        /// </summary>
+        [Obsolete("Use the Media property.")]
+        public IPublishedMediaCache MediaCache => PublishedSnapshot.Media;
+
+        /// <summary>
+        /// Gets the published media cache.
+        /// </summary>
+        public IPublishedMediaCache Media => PublishedSnapshot.Media;
+
+        /// <summary>
+        /// Gets the domains cache.
+        /// </summary>
+        public IDomainCache Domains => PublishedSnapshot.Domains;
 
         /// <summary>
         /// Boolean value indicating whether the current request is a front-end umbraco request
         /// </summary>
-        public bool IsFrontEndUmbracoRequest
-		{
-			get { return PublishedContentRequest != null; }
-		}
+        public bool IsFrontEndUmbracoRequest => PublishedRequest != null;
 
-		/// <summary>
-		/// A shortcut to the UmbracoContext's RoutingContext's NiceUrlProvider
-		/// </summary>
-		/// <remarks>
-		/// If the RoutingContext is null, this will throw an exception.
-		/// </remarks>
-    	public UrlProvider UrlProvider
-    	{
-    		get
-    		{
-    			if (RoutingContext == null)
-					throw new InvalidOperationException("Cannot access the UrlProvider when the UmbracoContext's RoutingContext is null");
-    			return RoutingContext.UrlProvider;
-    		}
-    	}
+        /// <summary>
+        /// Gets the url provider.
+        /// </summary>
+        public UrlProvider UrlProvider { get; }
 
-		/// <summary>
-		/// Gets/sets the RoutingContext object
-		/// </summary>
-		public RoutingContext RoutingContext { get; internal set; }	
-
-		/// <summary>
-		/// Gets/sets the PublishedContentRequest object
-		/// </summary>
-		public PublishedContentRequest PublishedContentRequest { get; set; }	
+        /// <summary>
+        /// Gets/sets the PublishedRequest object
+        /// </summary>
+        public PublishedRequest PublishedRequest { get; set; }
 
         /// <summary>
         /// Exposes the HttpContext for the current request
         /// </summary>
-        public HttpContextBase HttpContext { get; private set; }
+        public HttpContextBase HttpContext { get; }
+
+        /// <summary>
+        /// Gets the variation context accessor.
+        /// </summary>
+        public IVariationContextAccessor VariationContextAccessor { get; }
 
         /// <summary>
         /// Gets a value indicating whether the request has debugging enabled
@@ -410,91 +173,156 @@ namespace Umbraco.Web
             {
                 var request = GetRequestFromContext();
                 //NOTE: the request can be null during app startup!
-                return GlobalSettings.DebugMode && request != null
-                    && (!string.IsNullOrEmpty(request["umbdebugshowtrace"]) || !string.IsNullOrEmpty(request["umbdebug"]));
+                return GlobalSettings.DebugMode
+                    && request != null
+                    && (string.IsNullOrEmpty(request["umbdebugshowtrace"]) == false
+                        || string.IsNullOrEmpty(request["umbdebug"]) == false
+                        || string.IsNullOrEmpty(request.Cookies["UMB-DEBUG"]?.Value) == false);
             }
-        }
-
-        /// <summary>
-        /// Gets the current page ID, or <c>null</c> if no page ID is available (e.g. a custom page).
-        /// </summary>
-        public int? PageId
-        {
-            // TODO - this is dirty old legacy tricks, we should clean it up at some point
-            // also, what is a "custom page" and when should this be either null, or different
-            // from PublishedContentRequest.PublishedContent.Id ??
-            // SD: Have found out it can be different when rendering macro contents in the back office, but really youshould just be able
-            // to pass a page id to the macro renderer instead but due to all the legacy bits that's real difficult.
-            get
-            {
-                try
-                {
-                    //TODO: this should be done with a wrapper: http://issues.umbraco.org/issue/U4-61
-                    return int.Parse(HttpContext.Items["pageID"].ToString());
-                }
-                catch
-                {
-                    return null;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets the current logged in Umbraco user (editor).
-        /// </summary>
-        /// <value>The Umbraco user object or null</value>
-        [Obsolete("This should no longer be used since it returns the legacy user object, use The Security.CurrentUser instead to return the proper user object")]
-        public User UmbracoUser
-        {
-            get
-            {
-                var user = Security.CurrentUser;
-                return user == null ? null : new User(user);
-            }
-
         }
 
         /// <summary>
         /// Determines whether the current user is in a preview mode and browsing the site (ie. not in the admin UI)
         /// </summary>
-        /// <remarks>Can be internally set by the RTE macro rendering to render macros in the appropriate mode.</remarks>
         public bool InPreviewMode
         {
-            get { return _previewing ?? (_previewing = DetectInPreviewModeFromRequest()).Value; }
-			set { _previewing = value; }
+            get
+            {
+                if (_previewing.HasValue == false) DetectPreviewMode();
+                return _previewing ?? false;
+            }
+            private set => _previewing = value;
         }
 
-        private bool DetectInPreviewModeFromRequest()
+        #region Urls
+
+        /// <summary>
+        /// Gets the url of a content identified by its identifier.
+        /// </summary>
+        /// <param name="contentId">The content identifier.</param>
+        /// <param name="culture"></param>
+        /// <returns>The url for the content.</returns>
+        public string Url(int contentId, string culture = null)
+        {
+            return UrlProvider.GetUrl(contentId, culture: culture);
+        }
+
+        /// <summary>
+        /// Gets the url of a content identified by its identifier.
+        /// </summary>
+        /// <param name="contentId">The content identifier.</param>
+        /// <param name="culture"></param>
+        /// <returns>The url for the content.</returns>
+        public string Url(Guid contentId, string culture = null)
+        {
+            return UrlProvider.GetUrl(contentId, culture: culture);
+        }
+
+        /// <summary>
+        /// Gets the url of a content identified by its identifier, in a specified mode.
+        /// </summary>
+        /// <param name="contentId">The content identifier.</param>
+        /// <param name="mode">The mode.</param>
+        /// <param name="culture"></param>
+        /// <returns>The url for the content.</returns>
+        public string Url(int contentId, UrlMode mode, string culture = null)
+        {
+            return UrlProvider.GetUrl(contentId, mode, culture);
+        }
+
+        /// <summary>
+        /// Gets the url of a content identified by its identifier, in a specified mode.
+        /// </summary>
+        /// <param name="contentId">The content identifier.</param>
+        /// <param name="mode">The mode.</param>
+        /// <param name="culture"></param>
+        /// <returns>The url for the content.</returns>
+        public string Url(Guid contentId, UrlMode mode, string culture = null)
+        {
+            return UrlProvider.GetUrl(contentId, mode, culture);
+        }
+
+        /// <summary>
+        /// Gets the absolute url of a content identified by its identifier.
+        /// </summary>
+        /// <param name="contentId">The content identifier.</param>
+        /// <param name="culture"></param>
+        /// <returns>The absolute url for the content.</returns>
+        [Obsolete("Use the Url() method with UrlMode.Absolute.")]
+        public string UrlAbsolute(int contentId, string culture = null)
+        {
+            return UrlProvider.GetUrl(contentId, UrlMode.Absolute, culture);
+        }
+
+        /// <summary>
+        /// Gets the absolute url of a content identified by its identifier.
+        /// </summary>
+        /// <param name="contentId">The content identifier.</param>
+        /// <param name="culture"></param>
+        /// <returns>The absolute url for the content.</returns>
+        [Obsolete("Use the Url() method with UrlMode.Absolute.")]
+        public string UrlAbsolute(Guid contentId, string culture = null)
+        {
+            return UrlProvider.GetUrl(contentId, UrlMode.Absolute, culture);
+        }
+
+        #endregion
+
+        private string PreviewToken
+        {
+            get
+            {
+                if (_previewing.HasValue == false) DetectPreviewMode();
+                return _previewToken;
+            }
+        }
+
+        private void DetectPreviewMode()
         {
             var request = GetRequestFromContext();
-            if (request == null || request.Url == null)
-                return false;
-            
-            return
-                HttpContext.Request.HasPreviewCookie()
-                && request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath) == false
-                && Security.CurrentUser != null; // has user
+            if (request?.Url != null
+                && request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath, _globalSettings) == false
+                && Security.CurrentUser != null)
+            {
+                var previewToken = request.GetPreviewCookieValue(); // may be null or empty
+                _previewToken = previewToken.IsNullOrWhiteSpace() ? null : previewToken;
+            }
+
+            _previewing = _previewToken.IsNullOrWhiteSpace() == false;
         }
         
+        // say we render a macro or RTE in a give 'preview' mode that might not be the 'current' one,
+        // then due to the way it all works at the moment, the 'current' published snapshot need to be in the proper
+        // default 'preview' mode - somehow we have to force it. and that could be recursive.
+        internal IDisposable ForcedPreview(bool preview)
+        {
+            InPreviewMode = preview;
+            return PublishedSnapshot.ForcedPreview(preview, orig => InPreviewMode = orig);
+        }
+
         private HttpRequestBase GetRequestFromContext()
         {
             try
             {
                 return HttpContext.Request;
             }
-            catch (System.Web.HttpException)
+            catch (HttpException)
             {
                 return null;
             }
         }
 
-
         protected override void DisposeResources()
         {
+            // DisposableObject ensures that this runs only once
+
             Security.DisposeIfDisposable();
 
-            //If not running in a web ctx, ensure the thread based instance is nulled
-            _umbracoContext = null;
+            // help caches release resources
+            // (but don't create caches just to dispose them)
+            // context is not multi-threaded
+            if (_publishedSnapshot.IsValueCreated)
+                _publishedSnapshot.Value.Dispose();
         }
     }
 }

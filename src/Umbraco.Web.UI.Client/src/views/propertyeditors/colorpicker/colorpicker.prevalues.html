@@ -1,9 +1,9 @@
-<div class="umb-editor umb-prevalues-multivalues" ng-controller="Umbraco.PrevalueEditors.MultiColorPickerController">
+<div class="umb-property-editor umb-prevalues-multivalues" ng-controller="Umbraco.PrevalueEditors.MultiColorPickerController">
     <div class="control-group  umb-prevalues-multivalues__add color-picker-preval">
         <div class="umb-prevalues-multivalues__left">
             <input name="newColor" type="hidden" />
             <label for="newColor" val-highlight="{{hasError}}">#{{newColor}}</label>
-            <input name="newLabel" type="text" ng-model="newLabel" focus-when="{{focusOnNew}}" class="umb-editor color-label" placeholder="Label" ng-show="labelEnabled" />
+            <input name="newLabel" type="text" ng-model="newLabel" focus-when="{{focusOnNew}}" class="umb-property-editor color-label" placeholder="Label" ng-show="labelEnabled" />
         </div>
         <div class="umb-prevalues-multivalues__right">
             <button class="btn btn-info add" ng-click="add($event)"><localize key="general_add">Add</localize></button>

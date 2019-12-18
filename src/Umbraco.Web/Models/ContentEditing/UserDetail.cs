@@ -25,13 +25,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "emailHash")]
         public string EmailHash { get; set; }
-
-        [Obsolete("This should not be used it exists for legacy reasons only, use user groups instead, it will be removed in future versions")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [ReadOnly(true)]
-        [DataMember(Name = "userType")]
-        public string UserType { get; set; }
-
+        
         [ReadOnly(true)]
         [DataMember(Name = "userGroups")]
         public string[] UserGroups { get; set; }
@@ -65,7 +59,5 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "allowedSections")]
         public IEnumerable<string> AllowedSections { get; set; }
-
-
     }
 }

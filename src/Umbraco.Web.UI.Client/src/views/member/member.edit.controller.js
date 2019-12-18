@@ -6,7 +6,17 @@
  * @description
  * The controller for the member editor
  */
-function MemberEditController($scope, $routeParams, $location, $q, $window, appState, memberResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper, umbModelMapper, editorState, umbRequestHelper, $http) {
+function MemberEditController($scope, $routeParams, $location, appState, memberResource, entityResource, navigationService, notificationsService, localizationService, serverValidationManager, contentEditingHelper, fileManager, formHelper, editorState, umbRequestHelper, $http) {
+
+    var infiniteMode = $scope.model && $scope.model.infiniteMode;
+    var id = infiniteMode ? $scope.model.id : $routeParams.id;
+    var create = infiniteMode ? $scope.model.create : $routeParams.create;
+    var listName = infiniteMode ? $scope.model.listname : $routeParams.listName;
+    var docType = infiniteMode ? $scope.model.doctype : $routeParams.doctype;
+
+    $scope.header = {};
+    $scope.header.editorfor = "visuallyHiddenTexts_newMember";
+    $scope.header.setPageTitle = true;
 
     //setup scope vars
     $scope.page = {};
@@ -15,28 +25,22 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
     $scope.page.menu.currentSection = appState.getSectionState("currentSection");
     $scope.page.menu.currentNode = null; //the editors affiliated node
     $scope.page.nameLocked = false;
-    $scope.page.listViewPath = null;
     $scope.page.saveButtonState = "init";
     $scope.page.exportButton = "init";
-    $scope.busy = false;
-
-    $scope.page.listViewPath = ($routeParams.page && $routeParams.listName)
-        ? "/member/member/list/" + $routeParams.listName + "?page=" + $routeParams.page
-        : null;
 
     //build a path to sync the tree with
     function buildTreePath(data) {
-        return $routeParams.listName ? "-1," + $routeParams.listName : "-1";
+        return listName ? "-1," + listName : "-1";
     }
 
-    if ($routeParams.create) {
+    if (create) {
 
         //if there is no doc type specified then we are going to assume that
         // we are not using the umbraco membership provider
-        if ($routeParams.doctype) {
+        if (docType) {
 
             //we are creating so get an empty member item
-            memberResource.getScaffold($routeParams.doctype)
+            memberResource.getScaffold(docType)
                 .then(function(data) {
 
                     $scope.content = data;
@@ -67,21 +71,21 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
     }
     else {
         //so, we usually refernce all editors with the Int ID, but with members we have
-        //a different pattern, adding a route-redirect here to handle this:
-        //isNumber doesnt work here since its seen as a string
+        //a different pattern, adding a route-redirect here to handle this just in case.
+        //(isNumber doesnt work here since its seen as a string)
+        //The reason this might be an INT is due to the routing used for the member list view
+        //but this is now configured to use the key, so this is just a fail safe
 
-        //TODO: Why is this here - I don't understand why this would ever be an integer? This will not work when we support non-umbraco membership providers.
+        if (id && id.length < 9) {
 
-        if ($routeParams.id && $routeParams.id.length < 9) {
-
-            entityResource.getById($routeParams.id, "Member").then(function(entity) {
+            entityResource.getById(id, "Member").then(function(entity) {
                 $location.path("/member/member/edit/" + entity.key);
             });
         }
         else {
 
             //we are editing so get the content item from the server
-            memberResource.getByKey($routeParams.id)
+            memberResource.getByKey(id)
                 .then(function(data) {
 
                     $scope.content = data;
@@ -90,11 +94,12 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
 
                     editorState.set($scope.content);
 
-                    var path = buildTreePath(data);
+                    if (!infiniteMode) {
+                        var path = buildTreePath(data);
 
-                    //sync the tree (only for ui purposes)
-                    navigationService.syncTree({ tree: "member", path: path.split(",") });
-
+                        //sync the tree (only for ui purposes)
+                        navigationService.syncTree({ tree: "member", path: path.split(",") });
+                    }
                     //it's the initial load of the editor, we need to get the tree node
                     // from the server so that we can load in the actions menu.
                     umbRequestHelper.resourcePromise(
@@ -107,7 +112,7 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                     // route but there might be server validation errors in the collection which we need to display
                     // after the redirect, so we will bind all subscriptions which will show the server validation errors
                     // if there are any and then clear them so the collection no longer persists them.
-                    serverValidationManager.executeAndClearAllSubscriptions();
+                    serverValidationManager.notifyAndClearAllSubscriptions();
 
                     $scope.page.loading = false;
 
@@ -121,20 +126,39 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
       if(content.membershipScenario === 0) {
          $scope.page.nameLocked = true;
       }
+    }
 
+    /** Just shows a simple notification that there are client side validation issues to be fixed */
+    function showValidationNotification() {
+        //TODO: We need to make the validation UI much better, there's a lot of inconsistencies in v8 including colors, issues with the property groups and validation errors between variants
+
+        //need to show a notification else it's not clear there was an error.
+        localizationService.localizeMany([
+                "speechBubbles_validationFailedHeader",
+                "speechBubbles_validationFailedMessage"
+            ]
+        ).then(function (data) {
+            notificationsService.error(data[0], data[1]);
+        });
     }
 
     $scope.save = function() {
 
-        if (!$scope.busy && formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
+        if (formHelper.submitForm({ scope: $scope })) {
 
-            $scope.busy = true;
             $scope.page.saveButtonState = "busy";
 
-            memberResource.save($scope.content, $routeParams.create, fileManager.getFiles())
+            //anytime a user is changing a member's password without the oldPassword, we are in effect resetting it so we need to set that flag here
+            var passwordProp = _.find(contentEditingHelper.getAllProps($scope.content), function (e) { return e.alias === '_umb_password' });
+            if (passwordProp && passwordProp.value && (typeof passwordProp.value.reset !== 'undefined') && !passwordProp.value.reset) {
+                //so if the admin is not explicitly resetting the password, flag it for resetting if a new password is being entered
+                passwordProp.value.reset = !passwordProp.value.oldPassword && passwordProp.config.allowManuallyChangingPassword;
+            }
+
+            memberResource.save($scope.content, create, fileManager.getFiles())
                 .then(function(data) {
 
-                    formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+                    formHelper.resetForm({ scope: $scope });
 
                     contentEditingHelper.handleSuccessfulSave({
                         scope: $scope,
@@ -145,7 +169,6 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                     });
 
                     editorState.set($scope.content);
-                    $scope.busy = false;
                     $scope.page.saveButtonState = "success";
 
                     var path = buildTreePath(data);
@@ -156,20 +179,32 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
             }, function (err) {
 
                     contentEditingHelper.handleSaveError({
-                        redirectOnFailure: false,
                         err: err,
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, err.data)
                     });
 
                     editorState.set($scope.content);
-                    $scope.busy = false;
                     $scope.page.saveButtonState = "error";
 
                 });
-        }else{
-            $scope.busy = false;
+        }
+        else {
+            showValidationNotification();
         }
 
+    };
+
+    $scope.showBack = function () {
+        return !!listName;
+    }
+
+    /** Callback for when user clicks the back-icon */
+    $scope.onBack = function () {
+        $location.path("/member/member/list/" + listName);
+        $location.search("listName", null);
+        if ($routeParams.page) {
+            $location.search("page", $routeParams.page);
+        }
     };
 
     $scope.export = function() {

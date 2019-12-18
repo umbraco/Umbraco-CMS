@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
-    public interface IRelationType : IAggregateRoot, IRememberBeingDirty, ICanBeDirty
+    public interface IRelationType : IEntity, IRememberBeingDirty
     {
         /// <summary>
         /// Gets or sets the Name of the RelationType

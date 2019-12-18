@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
-using Umbraco.Core.Models.Validation;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -21,10 +15,6 @@ namespace Umbraco.Web.Models.ContentEditing
         }
 
         //name, alias, icon, thumb, desc, inherited from basic
-
-        //List view
-        [DataMember(Name = "isContainer")]
-        public bool IsContainer { get; set; }
 
         [DataMember(Name = "listViewEditorName")]
         [ReadOnly(true)]
@@ -59,7 +49,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// A content item can be invalid but still be saved. This occurs when there's property validation errors, we will
         /// still save the item but it cannot be published. So we need a way of returning validation errors as well as the
         /// updated model.
-        /// 
+        ///
         /// NOTE: The ProperCase is important because when we return ModeState normally it will always be proper case.
         /// </remarks>
         [DataMember(Name = "ModelState")]
@@ -80,6 +70,5 @@ namespace Umbraco.Web.Models.ContentEditing
         //Tabs
         [DataMember(Name = "groups")]
         public IEnumerable<PropertyGroupDisplay<TPropertyTypeDisplay>> Groups { get; set; }
-        
     }
 }

@@ -1,11 +1,11 @@
-namespace Umbraco.Web.Scheduling
+﻿namespace Umbraco.Web.Scheduling
 {
     /// <summary>
     /// Provides options to the <see cref="BackgroundTaskRunner{T}"/> class.
     /// </summary>
     public class BackgroundTaskRunnerOptions
     {
-        //TODO: Could add options for using a stack vs queue if required
+        // TODO: Could add options for using a stack vs queue if required
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BackgroundTaskRunnerOptions"/> class.

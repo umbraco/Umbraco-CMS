@@ -1,104 +1,158 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Collections;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
     /// <summary>
-    /// A Property contains a single piece of data
+    /// Represents a property.
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class Property : Entity
+    public class Property : EntityBase
     {
-        private PropertyType _propertyType;
-        private Guid _version;
-        private object _value;
-        private readonly PropertyTags _tagSupport = new PropertyTags();
+        // _values contains all property values, including the invariant-neutral value
+        private List<PropertyValue> _values = new List<PropertyValue>();
 
+        // _pvalue contains the invariant-neutral property value
+        private PropertyValue _pvalue;
+
+        // _vvalues contains the (indexed) variant property values
+        private Dictionary<CompositeNStringNStringKey, PropertyValue> _vvalues;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Property"/> class.
+        /// </summary>
         protected Property()
-        {
-            
-        }
+        { }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Property"/> class.
+        /// </summary>
         public Property(PropertyType propertyType)
         {
-            _propertyType = propertyType;
+            PropertyType = propertyType;
         }
 
-        public Property(PropertyType propertyType, object value)
-        {
-            _propertyType = propertyType;
-            Value = value;
-        }
-
-        public Property(int id, Guid version, PropertyType propertyType, object value)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Property"/> class.
+        /// </summary>
+        public Property(int id, PropertyType propertyType)
         {
             Id = id;
-            _propertyType = propertyType;
-            _version = version;
-            Value = value;
+            PropertyType = propertyType;
         }
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo ValueSelector = ExpressionHelper.GetPropertyInfo<Property, object>(x => x.Value);
-            public readonly PropertyInfo VersionSelector = ExpressionHelper.GetPropertyInfo<Property, Guid>(x => x.Version);
-
-            public readonly DelegateEqualityComparer<object> PropertyValueComparer = new DelegateEqualityComparer<object>(
-                (o, o1) =>
-                {
-                    if (o == null && o1 == null) return true;
-
-                    //custom comparer for strings.                        
-                    if (o is string || o1 is string)
-                    {
-                        //if one is null and another is empty then they are the same
-                        if ((o as string).IsNullOrWhiteSpace() && (o1 as string).IsNullOrWhiteSpace())
-                        {
-                            return true;
-                        }
-                        if (o == null || o1 == null) return false;
-                        return o.Equals(o1);
-                    }
-
-                    if (o == null || o1 == null) return false;
-
-                    //Custom comparer for enumerable if it is enumerable
-                    var enum1 = o as IEnumerable;
-                    var enum2 = o1 as IEnumerable;
-                    if (enum1 != null && enum2 != null)
-                    {
-                        return enum1.Cast<object>().UnsortedSequenceEqual(enum2.Cast<object>());
-                    }
-                    return o.Equals(o1);
-                }, o => o.GetHashCode());
-        }
-        
         /// <summary>
-        /// Returns the instance of the tag support, by default tags are not enabled
+        /// Represents a property value.
         /// </summary>
-        public PropertyTags TagSupport
+        public class PropertyValue
         {
-            get { return _tagSupport; }
+            // TODO: Either we allow change tracking at this class level, or we add some special change tracking collections to the Property
+            // class to deal with change tracking which variants have changed
+
+            private string _culture;
+            private string _segment;
+
+            /// <summary>
+            /// Gets or sets the culture of the property.
+            /// </summary>
+            /// <remarks>The culture is either null (invariant) or a non-empty string. If the property is
+            /// set with an empty or whitespace value, its value is converted to null.</remarks>
+            public string Culture
+            {
+                get => _culture;
+                internal set => _culture = value.IsNullOrWhiteSpace() ? null : value.ToLowerInvariant();
+            }
+
+            /// <summary>
+            /// Gets or sets the segment of the property.
+            /// </summary>
+            /// <remarks>The segment is either null (neutral) or a non-empty string. If the property is
+            /// set with an empty or whitespace value, its value is converted to null.</remarks>
+            public string Segment
+            {
+                get => _segment;
+                internal set => _segment = value?.ToLowerInvariant();
+            }
+
+            /// <summary>
+            /// Gets or sets the edited value of the property.
+            /// </summary>
+            public object EditedValue { get; internal set; }
+
+            /// <summary>
+            /// Gets or sets the published value of the property.
+            /// </summary>
+            public object PublishedValue { get; internal set; }
+
+            /// <summary>
+            /// Clones the property value.
+            /// </summary>
+            public PropertyValue Clone()
+                => new PropertyValue { _culture = _culture, _segment = _segment, PublishedValue = PublishedValue, EditedValue = EditedValue };
+        }
+
+        private static readonly DelegateEqualityComparer<object> PropertyValueComparer = new DelegateEqualityComparer<object>(
+            (o, o1) =>
+            {
+                if (o == null && o1 == null) return true;
+
+                // custom comparer for strings.
+                // if one is null and another is empty then they are the same
+                if (o is string || o1 is string)
+                    return ((o as string).IsNullOrWhiteSpace() && (o1 as string).IsNullOrWhiteSpace()) || (o != null && o1 != null && o.Equals(o1));
+
+                if (o == null || o1 == null) return false;
+
+                // custom comparer for enumerable
+                // ReSharper disable once MergeCastWithTypeCheck
+                if (o is IEnumerable && o1 is IEnumerable enumerable)
+                    return ((IEnumerable)o).Cast<object>().UnsortedSequenceEqual(enumerable.Cast<object>());
+
+                return o.Equals(o1);
+            }, o => o.GetHashCode());
+
+        /// <summary>
+        /// Returns the PropertyType, which this Property is based on
+        /// </summary>
+        [IgnoreDataMember]
+        public PropertyType PropertyType { get; private set; }
+
+        /// <summary>
+        /// Gets the list of values.
+        /// </summary>
+        [DataMember]
+        public IReadOnlyCollection<PropertyValue> Values
+        {
+            get => _values;
+            set
+            {
+                // make sure we filter out invalid variations
+                // make sure we leave _vvalues null if possible
+                _values = value.Where(x => PropertyType.SupportsVariation(x.Culture, x.Segment)).ToList();
+                _pvalue = _values.FirstOrDefault(x => x.Culture == null && x.Segment == null);
+                _vvalues = _values.Count > (_pvalue == null ? 0 : 1)
+                    ? _values.Where(x => x != _pvalue).ToDictionary(x => new CompositeNStringNStringKey(x.Culture, x.Segment), x => x)
+                    : null;
+            }
         }
 
         /// <summary>
         /// Returns the Alias of the PropertyType, which this Property is based on
         /// </summary>
         [DataMember]
-        public string Alias { get { return _propertyType.Alias; } }
+        public string Alias => PropertyType.Alias;
 
         /// <summary>
         /// Returns the Id of the PropertyType, which this Property is based on
         /// </summary>
         [IgnoreDataMember]
-        internal int PropertyTypeId { get { return _propertyType.Id; } }
+        internal int PropertyTypeId => PropertyType.Id;
 
         /// <summary>
         /// Returns the DatabaseType that the underlaying DataType is using to store its values
@@ -107,139 +161,185 @@ namespace Umbraco.Core.Models
         /// Only used internally when saving the property value.
         /// </remarks>
         [IgnoreDataMember]
-        internal DataTypeDatabaseType DataTypeDatabaseType
+        internal ValueStorageType ValueStorageType => PropertyType.ValueStorageType;
+
+        /// <summary>
+        /// Gets the value.
+        /// </summary>
+        public object GetValue(string culture = null, string segment = null, bool published = false)
         {
-            get { return _propertyType.DataTypeDatabaseType; }
+            // ensure null or whitespace are nulls
+            culture = culture.NullOrWhiteSpaceAsNull();
+            segment = segment.NullOrWhiteSpaceAsNull();
+
+            if (!PropertyType.SupportsVariation(culture, segment)) return null;
+            if (culture == null && segment == null) return GetPropertyValue(_pvalue, published);
+            if (_vvalues == null) return null;
+            return _vvalues.TryGetValue(new CompositeNStringNStringKey(culture, segment), out var pvalue)
+                ? GetPropertyValue(pvalue, published)
+                : null;
+        }
+
+        private object GetPropertyValue(PropertyValue pvalue, bool published)
+        {
+            if (pvalue == null) return null;
+
+            return PropertyType.SupportsPublishing
+                ? (published ? pvalue.PublishedValue : pvalue.EditedValue)
+                : pvalue.EditedValue;
+        }
+
+        // internal - must be invoked by the content item
+        // does *not* validate the value - content item must validate first
+        internal void PublishValues(string culture = "*", string segment = "*")
+        {
+            culture = culture.NullOrWhiteSpaceAsNull();
+            segment = segment.NullOrWhiteSpaceAsNull();
+
+            // if invariant or all, and invariant-neutral is supported, publish invariant-neutral
+            if ((culture == null || culture == "*") && (segment == null || segment == "*") && PropertyType.SupportsVariation(null, null))
+                PublishValue(_pvalue);
+
+            // then deal with everything that varies
+            if (_vvalues == null) return;
+
+            // get the property values that are still relevant (wrt the property type variation),
+            // and match the specified culture and segment (or anything when '*').
+            var pvalues = _vvalues.Where(x =>
+                    PropertyType.SupportsVariation(x.Value.Culture, x.Value.Segment, true) && // the value variation is ok
+                    (culture == "*" || x.Value.Culture.InvariantEquals(culture)) && // the culture matches
+                    (segment == "*" || x.Value.Segment.InvariantEquals(segment))) // the segment matches
+                .Select(x => x.Value);
+
+            foreach (var pvalue in pvalues)
+                PublishValue(pvalue);
+        }
+
+        // internal - must be invoked by the content item
+        internal void UnpublishValues(string culture = "*", string segment = "*")
+        {
+            culture = culture.NullOrWhiteSpaceAsNull();
+            segment = segment.NullOrWhiteSpaceAsNull();
+
+            // if invariant or all, and invariant-neutral is supported, publish invariant-neutral
+            if ((culture == null || culture == "*") && (segment == null || segment == "*") && PropertyType.SupportsVariation(null, null))
+                UnpublishValue(_pvalue);
+
+            // then deal with everything that varies
+            if (_vvalues == null) return;
+
+            // get the property values that are still relevant (wrt the property type variation),
+            // and match the specified culture and segment (or anything when '*').
+            var pvalues = _vvalues.Where(x =>
+                    PropertyType.SupportsVariation(x.Value.Culture, x.Value.Segment, true) && // the value variation is ok
+                    (culture == "*" || x.Value.Culture.InvariantEquals(culture)) && // the culture matches
+                    (segment == "*" || x.Value.Segment.InvariantEquals(segment))) // the segment matches
+                .Select(x => x.Value);
+
+            foreach (var pvalue in pvalues)
+                UnpublishValue(pvalue);
+        }
+
+        private void PublishValue(PropertyValue pvalue)
+        {
+            if (pvalue == null) return;
+
+            if (!PropertyType.SupportsPublishing)
+                throw new NotSupportedException("Property type does not support publishing.");
+            var origValue = pvalue.PublishedValue;
+            pvalue.PublishedValue = PropertyType.ConvertAssignedValue(pvalue.EditedValue);
+            DetectChanges(pvalue.EditedValue, origValue, nameof(Values), PropertyValueComparer, false);
+        }
+
+        private void UnpublishValue(PropertyValue pvalue)
+        {
+            if (pvalue == null) return;
+
+            if (!PropertyType.SupportsPublishing)
+                throw new NotSupportedException("Property type does not support publishing.");
+            var origValue = pvalue.PublishedValue;
+            pvalue.PublishedValue = PropertyType.ConvertAssignedValue(null);
+            DetectChanges(pvalue.EditedValue, origValue, nameof(Values), PropertyValueComparer, false);
         }
 
         /// <summary>
-        /// Returns the PropertyType, which this Property is based on
+        /// Sets a value.
         /// </summary>
-        [IgnoreDataMember]
-        public PropertyType PropertyType { get { return _propertyType; } }
-        
-        /// <summary>
-        /// Gets or Sets the version id for the Property
-        /// </summary>
-        /// <remarks>
-        /// The version will be the same for all Property objects in a collection on a Content 
-        /// object, so not sure how much this makes sense but adding it to align with:
-        /// umbraco.interfaces.IProperty
-        /// </remarks>
-        [DataMember]
-        public Guid Version
+        public void SetValue(object value, string culture = null, string segment = null)
         {
-            get { return _version; }
-            set { SetPropertyValueAndDetectChanges(value, ref _version, Ps.Value.VersionSelector); }
+            culture = culture.NullOrWhiteSpaceAsNull();
+            segment = segment.NullOrWhiteSpaceAsNull();
+
+            if (!PropertyType.SupportsVariation(culture, segment))
+                throw new NotSupportedException($"Variation \"{culture??"<null>"},{segment??"<null>"}\" is not supported by the property type.");
+
+            var (pvalue, change) = GetPValue(culture, segment, true);
+
+            var origValue = pvalue.EditedValue;
+            var setValue = PropertyType.ConvertAssignedValue(value);
+
+            pvalue.EditedValue = setValue;
+
+            DetectChanges(setValue, origValue, nameof(Values), PropertyValueComparer, change);
         }
 
-        private static void ThrowTypeException(object value, Type expected, string alias)
+        // bypasses all changes detection and is the *only* way to set the published value
+        internal void FactorySetValue(string culture, string segment, bool published, object value)
         {
-            throw new InvalidOperationException(string.Format("Value \"{0}\" of type \"{1}\" could not be converted"
-                + " to type \"{2}\" which is expected by property type \"{3}\".",
-                value, value.GetType(), expected, alias));
+            var (pvalue, _) = GetPValue(culture, segment, true);
+
+            if (published && PropertyType.SupportsPublishing)
+                pvalue.PublishedValue = value;
+            else
+                pvalue.EditedValue = value;
         }
 
-        /// <summary>
-        /// Gets or Sets the value of the Property
-        /// </summary>
-        /// <remarks>
-        /// Setting the value will trigger a type validation. 
-        /// The type of the value has to be valid in order to be saved.
-        /// </remarks>
-        [DataMember]
-        public object Value
+        private (PropertyValue, bool) GetPValue(bool create)
         {
-            get { return _value; }
-            set
+            var change = false;
+            if (_pvalue == null)
             {
-                var isOfExpectedType = _propertyType.IsPropertyTypeValid(value);
-
-                if (isOfExpectedType == false) // isOfExpectedType is true if value is null - so if false, value is *not* null
-                {
-                    // "garbage-in", accept what we can & convert
-                    // throw only if conversion is not possible
-
-                    var s = value.ToString();
-
-                    switch (_propertyType.DataTypeDatabaseType)
-                    {
-                        case DataTypeDatabaseType.Nvarchar:
-                        case DataTypeDatabaseType.Ntext:
-                            value = s;
-                            break;
-                        case DataTypeDatabaseType.Integer:
-                            if (s.IsNullOrWhiteSpace()) value = null; // assume empty means null
-                            else
-                            {
-                                var convInt = value.TryConvertTo<int>();
-                                if (convInt == false) ThrowTypeException(value, typeof(int), _propertyType.Alias);
-                                value = convInt.Result;
-                            }
-                            break;
-                        case DataTypeDatabaseType.Decimal:
-                            if (s.IsNullOrWhiteSpace()) value = null; // assume empty means null
-                            else
-                            {
-                                var convDecimal = value.TryConvertTo<decimal>();
-                                if (convDecimal == false) ThrowTypeException(value, typeof (decimal), _propertyType.Alias);
-                                // need to normalize the value (change the scaling factor and remove trailing zeroes)
-                                // because the underlying database is going to mess with the scaling factor anyways.
-                                value = convDecimal.Result.Normalize();
-                            }
-                            break;
-                        case DataTypeDatabaseType.Date:
-                            if (s.IsNullOrWhiteSpace()) value = null; // assume empty means null
-                            else
-                            {
-                                var convDateTime = value.TryConvertTo<DateTime>();
-                                if (convDateTime == false) ThrowTypeException(value, typeof (DateTime), _propertyType.Alias);
-                                value = convDateTime.Result;
-                            }
-                            break;
-                    }
-                }
-
-                SetPropertyValueAndDetectChanges(value, ref _value, Ps.Value.ValueSelector, Ps.Value.PropertyValueComparer);
+                if (!create) return (null, false);
+                _pvalue = new PropertyValue();
+                _values.Add(_pvalue);
+                change = true;
             }
+            return (_pvalue, change);
         }
 
-        /// <summary>
-        /// Boolean indicating whether the current value is valid
-        /// </summary>
-        /// <remarks>
-        /// A valid value implies that it is ready for publishing.
-        /// Invalid property values can be saved, but not published.
-        /// </remarks>
-        /// <returns>True is property value is valid, otherwise false</returns>
-        public bool IsValid()
+        private (PropertyValue, bool) GetPValue(string culture, string segment, bool create)
         {
-            return IsValid(Value);
+            if (culture == null && segment == null)
+                return GetPValue(create);
+
+            var change = false;
+            if (_vvalues == null)
+            {
+                if (!create) return (null, false);
+                _vvalues = new Dictionary<CompositeNStringNStringKey, PropertyValue>();
+                change = true;
+            }
+            var k = new CompositeNStringNStringKey(culture, segment);
+            if (!_vvalues.TryGetValue(k, out var pvalue))
+            {
+                if (!create) return (null, false);
+                pvalue = _vvalues[k] = new PropertyValue();
+                pvalue.Culture = culture;
+                pvalue.Segment = segment;
+                _values.Add(pvalue);
+                change = true;
+            }
+            return (pvalue, change);
         }
 
-        /// <summary>
-        /// Boolean indicating whether the passed in value is valid
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns>True is property value is valid, otherwise false</returns>
-        public bool IsValid(object value)
+        protected override void PerformDeepClone(object clone)
         {
-            return _propertyType.IsPropertyValueValid(value);
-        }
+            base.PerformDeepClone(clone);
 
-        public override object DeepClone()
-        {
-            var clone = (Property)base.DeepClone();
-            //turn off change tracking
-            clone.DisableChangeTracking();
+            var clonedEntity = (Property)clone;
+
             //need to manually assign since this is a readonly property
-            clone._propertyType = (PropertyType)PropertyType.DeepClone();
-            //this shouldn't really be needed since we're not tracking
-            clone.ResetDirtyProperties(false);
-            //re-enable tracking
-            clone.EnableChangeTracking();
-            
-            return clone;
+            clonedEntity.PropertyType = (PropertyType) PropertyType.DeepClone();
         }
     }
 }

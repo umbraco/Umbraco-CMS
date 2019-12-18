@@ -21,32 +21,71 @@
 
     margin: 10px;
     position: relative;
-    overflow: hidden;
-    cursor: pointer;
-
+    user-select: none;
     box-shadow: 0 1px 1px 0 rgba(0,0,0,.2);
+    transition: box-shadow 150ms ease-in-out;
+}
 
-    transition: box-shadow 100ms;
+.umb-media-grid__item.-unselectable {
+    &::before {
+        content: "";
+        position: absolute;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(230, 230, 230, .5);
+        pointer-events: none;
+    }
+}
+
+.umb-media-grid__item.-selectable {
+    cursor: pointer;
 }
 
 .umb-media-grid__item.-file {
-    background-color: @gray-10;
-}
-
-.umb-media-grid__item-file-icon > span {
-    color: @white;
-    background: @gray-4;
-    padding: 1px 3px;
-    font-size: 10px;
-    line-height: 130%;
-    display: block;
-    margin-top: -30px;
-    margin-left: -10px;
-    position: relative;
+    background-color: @white;
 }
 
 .umb-media-grid__item.-selected {
-    box-shadow: 0 2px 8px 0 rgba(0,0,0,.35);
+    color:@ui-selected-type;
+    .umb-media-grid__item-overlay {
+        color: @ui-selected-type;
+    }
+}
+.umb-media-grid__item.-selected,
+.umb-media-grid__item.-selectable:hover {
+    &::before {
+        content: "";
+        position: absolute;
+        z-index:2;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        border: 2px solid @ui-selected-border;
+        border-radius: 5px;
+        box-shadow: 0 0 4px 0 darken(@ui-selected-border, 20), inset 0 0 2px 0 darken(@ui-selected-border, 20);
+        pointer-events: none;
+    }
+}
+.umb-media-grid__item.-selectable:hover {
+    &::before {
+        opacity: .33;
+    }
+}
+.umb-media-grid__item.-selected:hover {
+    &::before {
+        opacity: .75;
+    }
+}
+
+.umb-media-grid__item-file-icon {
+    transform: translate(-50%,-50%);
+    position: absolute;
+    top: 45%;
+    left: 50%;
 }
 
 .umb-media-grid__item:hover {
@@ -54,28 +93,27 @@
 }
 
 .umb-media-grid__item-image {
-   max-width: 100% !important;
-   height: auto;
    position: relative;
+   object-fit: contain;
+   height: 100%;
 }
 
 .umb-media-grid__item-image-placeholder {
     width: 100%;
-    max-width: 100%;
-    height: auto;
     position: relative;
+    object-fit: contain;
+    height: 100%;
 }
 
 .umb-media-grid__image-background {
     content: "";
-    background: url("../img/checkered-background.png");
-    background-repeat: repeat;
     opacity: 0.5;
     top: 0;
     left: 0;
     bottom: 0;
     right: 0;
     position: absolute;
+    .checkeredBackground();
 }
 
 .umb-media-grid__item-overlay {
@@ -85,27 +123,20 @@
    right: 0;
    bottom: 0;
    left: 0;
-   z-index: 100;
+   z-index: 1;
    padding: 5px 10px;
    box-sizing: border-box;
    font-size: 12px;
    overflow: hidden;
-   color: @white;
+   color: @black;
    white-space: nowrap;
-   background: @purple;
+   border-top:1px solid fade(@black, 4%);
+   background: fade(@white, 92%);
    transition: opacity 150ms;
-}
 
-.umb-media-grid__item.-file .umb-media-grid__item-overlay {
-    opacity: 1;
-    color: @gray-4;
-    background: @gray-10;
-}
-
-.umb-media-grid__item.-file:hover .umb-media-grid__item-overlay,
-.umb-media-grid__item.-file.-selected .umb-media-grid__item-overlay {
-    color: @white;
-    background: @purple;
+   &:hover {
+       text-decoration: underline;
+   }
 }
 
 .umb-media-grid__info {
@@ -118,6 +149,13 @@
 
 .umb-media-grid__item:hover .umb-media-grid__item-overlay {
    opacity: 1;
+   i {
+       text-decoration: none;
+   }
+}
+
+.umb-media-grid__item-name {
+   cursor: pointer;
 }
 
 .umb-media-grid__item-name {
@@ -126,30 +164,31 @@
    text-overflow: ellipsis;
 }
 
-.umb-media-grid__item-icon {
-   color: @gray-4;
-   position: absolute;
-   top: 45%;
-   left: 50%;
-   font-size: 40px !important;
-   transform: translate(-50%,-50%);
-}
 
-.umb-media-grid__checkmark {
+.umb-media-grid__edit {
     position: absolute;
+    opacity: 0;
     z-index: 2;
     top: 10px;
     right: 10px;
     width: 26px;
     height: 26px;
-    border: 2px solid @white;
-    background: @green;
+    background: @white;
     border-radius: 50px;
     box-sizing: border-box;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: @white;
-    margin-left: 7px;
-    transition: background 100ms;
+    color: @black;
+    transition: opacity 150ms;
+
+    &:hover {
+        color: @ui-action-discreet-type-hover;
+    }
+}
+
+.umb-media-grid__item:hover .umb-media-grid__edit {
+    opacity: 1;
+    text-decoration: none;
+    box-shadow: 0 1px 2px rgba(0,0,0,.2);
 }

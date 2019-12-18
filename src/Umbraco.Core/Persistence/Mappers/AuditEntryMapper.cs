@@ -1,6 +1,7 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
@@ -11,31 +12,21 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(AuditEntry))]
     public sealed class AuditEntryMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance
-            = new ConcurrentDictionary<string, DtoMapModel>();
+        public AuditEntryMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+            : base(sqlContext, maps)
+        { }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AuditEntryMapper"/> class.
-        /// </summary>
-        public AuditEntryMapper()
+        protected override void DefineMaps()
         {
-            // note: why the base ctor does not invoke BuildMap is a mystery to me
-            BuildMap();
-        }
-
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
-
-        internal override void BuildMap()
-        {
-            CacheMap<AuditEntry, AuditEntryDto>(entity => entity.Id, dto => dto.Id);
-            CacheMap<AuditEntry, AuditEntryDto>(entity => entity.PerformingUserId, dto => dto.PerformingUserId);
-            CacheMap<AuditEntry, AuditEntryDto>(entity => entity.PerformingDetails, dto => dto.PerformingDetails);
-            CacheMap<AuditEntry, AuditEntryDto>(entity => entity.PerformingIp, dto => dto.PerformingIp);
-            CacheMap<AuditEntry, AuditEntryDto>(entity => entity.EventDateUtc, dto => dto.EventDateUtc);
-            CacheMap<AuditEntry, AuditEntryDto>(entity => entity.AffectedUserId, dto => dto.AffectedUserId);
-            CacheMap<AuditEntry, AuditEntryDto>(entity => entity.AffectedDetails, dto => dto.AffectedDetails);
-            CacheMap<AuditEntry, AuditEntryDto>(entity => entity.EventType, dto => dto.EventType);
-            CacheMap<AuditEntry, AuditEntryDto>(entity => entity.EventDetails, dto => dto.EventDetails);
+            DefineMap<AuditEntry, AuditEntryDto>(nameof(AuditEntry.Id), nameof(AuditEntryDto.Id));
+            DefineMap<AuditEntry, AuditEntryDto>(nameof(AuditEntry.PerformingUserId), nameof(AuditEntryDto.PerformingUserId));
+            DefineMap<AuditEntry, AuditEntryDto>(nameof(AuditEntry.PerformingDetails), nameof(AuditEntryDto.PerformingDetails));
+            DefineMap<AuditEntry, AuditEntryDto>(nameof(AuditEntry.PerformingIp), nameof(AuditEntryDto.PerformingIp));
+            DefineMap<AuditEntry, AuditEntryDto>(nameof(AuditEntry.EventDateUtc), nameof(AuditEntryDto.EventDateUtc));
+            DefineMap<AuditEntry, AuditEntryDto>(nameof(AuditEntry.AffectedUserId), nameof(AuditEntryDto.AffectedUserId));
+            DefineMap<AuditEntry, AuditEntryDto>(nameof(AuditEntry.AffectedDetails), nameof(AuditEntryDto.AffectedDetails));
+            DefineMap<AuditEntry, AuditEntryDto>(nameof(AuditEntry.EventType), nameof(AuditEntryDto.EventType));
+            DefineMap<AuditEntry, AuditEntryDto>(nameof(AuditEntry.EventDetails), nameof(AuditEntryDto.EventDetails));
         }
     }
 }

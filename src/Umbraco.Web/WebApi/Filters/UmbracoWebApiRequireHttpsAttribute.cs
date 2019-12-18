@@ -4,17 +4,19 @@ using System.Net.Http;
 using System.Text;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
+using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.WebApi.Filters
 {
     /// <summary>
-    /// If umbracoUseSSL property in web.config is set to true, this filter will redirect any http access to https.
+    /// If Umbraco.Core.UseHttps property in web.config is set to true, this filter will redirect any http access to https.
     /// </summary>
     /// <remarks>
     /// This will only redirect Head/Get requests, otherwise will respond with text
-    /// 
-    /// References: 
+    ///
+    /// References:
     /// http://issues.umbraco.org/issue/U4-8542
     /// https://blogs.msdn.microsoft.com/carlosfigueira/2012/03/09/implementing-requirehttps-with-asp-net-web-api/
     /// </remarks>
@@ -23,7 +25,7 @@ namespace Umbraco.Web.WebApi.Filters
         public override void OnAuthorization(HttpActionContext actionContext)
         {
             var request = actionContext.Request;
-            if (GlobalSettings.UseSSL && request.RequestUri.Scheme != Uri.UriSchemeHttps)
+            if (Current.Configs.Global().UseHttps && request.RequestUri.Scheme != Uri.UriSchemeHttps)
             {
                 HttpResponseMessage response;
                 var uri = new UriBuilder(request.RequestUri)

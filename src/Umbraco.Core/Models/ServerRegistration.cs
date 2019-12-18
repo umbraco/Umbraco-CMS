@@ -1,38 +1,27 @@
 ﻿using System;
 using System.Globalization;
-using System.Reflection;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
     /// <summary>
     /// Represents a registered server in a multiple-servers environment.
     /// </summary>
-    public class ServerRegistration : Entity, IServerRegistration
+    public class ServerRegistration : EntityBase, IServerRegistration
     {
         private string _serverAddress;
         private string _serverIdentity;
         private bool _isActive;
         private bool _isMaster;
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo ServerAddressSelector = ExpressionHelper.GetPropertyInfo<ServerRegistration, string>(x => x.ServerAddress);
-            public readonly PropertyInfo ServerIdentitySelector = ExpressionHelper.GetPropertyInfo<ServerRegistration, string>(x => x.ServerIdentity);
-            public readonly PropertyInfo IsActiveSelector = ExpressionHelper.GetPropertyInfo<ServerRegistration, bool>(x => x.IsActive);
-            public readonly PropertyInfo IsMasterSelector = ExpressionHelper.GetPropertyInfo<ServerRegistration, bool>(x => x.IsMaster);
-        }
-
         /// <summary>
-        /// Initialiazes a new instance of the <see cref="ServerRegistration"/> class.
+        /// Initializes a new instance of the <see cref="ServerRegistration"/> class.
         /// </summary>
         public ServerRegistration()
         { }
 
         /// <summary>
-        /// Initialiazes a new instance of the <see cref="ServerRegistration"/> class.
+        /// Initializes a new instance of the <see cref="ServerRegistration"/> class.
         /// </summary>
         /// <param name="id">The unique id of the server registration.</param>
         /// <param name="serverAddress">The server url.</param>
@@ -54,7 +43,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Initialiazes a new instance of the <see cref="ServerRegistration"/> class.
+        /// Initializes a new instance of the <see cref="ServerRegistration"/> class.
         /// </summary>
         /// <param name="serverAddress">The server url.</param>
         /// <param name="serverIdentity">The unique server identity.</param>
@@ -73,8 +62,8 @@ namespace Umbraco.Core.Models
         /// </summary>
         public string ServerAddress
         {
-            get { return _serverAddress; }
-            set { SetPropertyValueAndDetectChanges(value, ref _serverAddress, Ps.Value.ServerAddressSelector); }
+            get => _serverAddress;
+            set => SetPropertyValueAndDetectChanges(value, ref _serverAddress, nameof(ServerAddress));
         }
 
         /// <summary>
@@ -82,8 +71,8 @@ namespace Umbraco.Core.Models
         /// </summary>
         public string ServerIdentity
         {
-            get { return _serverIdentity; }
-            set { SetPropertyValueAndDetectChanges(value, ref _serverIdentity, Ps.Value.ServerIdentitySelector); }
+            get => _serverIdentity;
+            set => SetPropertyValueAndDetectChanges(value, ref _serverIdentity, nameof(ServerIdentity));
         }
 
         /// <summary>
@@ -91,8 +80,8 @@ namespace Umbraco.Core.Models
         /// </summary>
         public bool IsActive
         {
-            get { return _isActive; }
-            set { SetPropertyValueAndDetectChanges(value, ref _isActive, Ps.Value.IsActiveSelector); }
+            get => _isActive;
+            set => SetPropertyValueAndDetectChanges(value, ref _isActive, nameof(IsActive));
         }
 
         /// <summary>
@@ -100,19 +89,27 @@ namespace Umbraco.Core.Models
         /// </summary>
         public bool IsMaster
         {
-            get { return _isMaster; }
-            set { SetPropertyValueAndDetectChanges(value, ref _isMaster, Ps.Value.IsMasterSelector); }
+            get => _isMaster;
+            set => SetPropertyValueAndDetectChanges(value, ref _isMaster, nameof(IsMaster));
         }
 
         /// <summary>
         /// Gets the date and time the registration was created.
         /// </summary>
-        public DateTime Registered { get { return CreateDate; } set { CreateDate = value; }}
+        public DateTime Registered
+        {
+            get => CreateDate;
+            set => CreateDate = value;
+        }
 
         /// <summary>
         /// Gets the date and time the registration was last accessed.
         /// </summary>
-        public DateTime Accessed { get { return UpdateDate; } set { UpdateDate = value; }}
+        public DateTime Accessed
+        {
+            get => UpdateDate;
+            set => UpdateDate = value;
+        }
 
         /// <summary>
         /// Converts the value of this instance to its equivalent string representation.

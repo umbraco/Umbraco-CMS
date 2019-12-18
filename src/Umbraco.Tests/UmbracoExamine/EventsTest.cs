@@ -1,55 +1,49 @@
 ﻿using System;
 using System.Linq;
 using Examine;
-using Lucene.Net.Analysis.Standard;
-using Lucene.Net.Index;
+using LightInject;
 using Lucene.Net.Store;
 using NUnit.Framework;
-using Umbraco.Tests.TestHelpers;
-using UmbracoExamine;
+using Umbraco.Tests.Testing;
+using Umbraco.Examine;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
+
     [TestFixture]
-	public class EventsTest : ExamineBaseTest
-	{
-		[Test]
-		public void Events_Ignoring_Node()
-		{
-            using (var luceneDir = new RandomIdRAMDirectory())
-            using (var writer = new IndexWriter(luceneDir, new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29), IndexWriter.MaxFieldLength.LIMITED))
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(writer))
-		    using (var searcher = IndexInitializer.GetUmbracoSearcher(writer))
-		    {
-                //change the parent id so that they are all ignored
-                var existingCriteria = indexer.IndexerData;
-                indexer.IndexerData = new IndexCriteria(existingCriteria.StandardFields, existingCriteria.UserFields, existingCriteria.IncludeNodeTypes, existingCriteria.ExcludeNodeTypes,
-                    999); //change to 999
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    public class EventsTest : ExamineBaseTest
+    {
+        [Test]
+        public void Events_Ignoring_Node()
+        {
+            using (var luceneDir = new RandomIdRamDirectory())
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
+                //make parent id 999 so all are ignored
+                validator: new ContentValueSetValidator(false, 999)))
+            using (indexer.ProcessNonAsync())
+            {
+                var searcher = indexer.GetSearcher();
 
-                var isIgnored = false;
-
-                EventHandler<IndexingNodeDataEventArgs> ignoringNode = (s, e) =>
-                {
-                    isIgnored = true;
-                };
-
-                indexer.IgnoringNode += ignoringNode;
-
+                var contentService = new ExamineDemoDataContentService();
                 //get a node from the data repo
-                var node = _contentService.GetPublishedContentByXPath("//*[string-length(@id)>0 and number(@id)>0]")
+                var node = contentService.GetPublishedContentByXPath("//*[string-length(@id)>0 and number(@id)>0]")
                                           .Root
                                           .Elements()
                                           .First();
 
-                indexer.ReIndexNode(node, IndexTypes.Content);
+                var valueSet = node.ConvertToValueSet(IndexTypes.Content);
+                indexer.IndexItems(new[] { valueSet });
 
+                var found = searcher.CreateQuery().Id((string)node.Attribute("id")).Execute();
 
-                Assert.IsTrue(isIgnored);
+                Assert.AreEqual(0, found.TotalItemCount);
             }
-		}
 
-		private readonly TestContentService _contentService = new TestContentService();
-        
-	}
+
+
+        }
+
+    }
 }

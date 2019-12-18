@@ -7,7 +7,34 @@
     * @description A helper object used to format/transform JSON Umbraco data, mostly used for persisting data to the server
     **/
     function umbDataFormatter() {
-        
+
+        /**
+         * maps the display properties to a property collection for persisting/POSTing
+         * @param {any} tabs
+         */
+        function getContentProperties(tabs) {
+
+            var properties = [];
+
+            _.each(tabs, function (tab) {
+
+                _.each(tab.properties, function (prop) {
+
+                    //don't include the custom generic tab properties
+                    //don't include a property that is marked readonly
+                    if (!prop.alias.startsWith("_umb_") && !prop.readonly) {
+                        properties.push({
+                            id: prop.id,
+                            alias: prop.alias,
+                            value: prop.value
+                        });
+                    }
+                });
+            });
+
+            return properties;
+        }
+
         return {
 
             formatChangePasswordModel: function(model) {
@@ -37,9 +64,9 @@
                 var saveModel = _.pick(displayModel,
                     'compositeContentTypes', 'isContainer', 'allowAsRoot', 'allowedTemplates', 'allowedContentTypes',
                     'alias', 'description', 'thumbnail', 'name', 'id', 'icon', 'trashed',
-                    'key', 'parentId', 'alias', 'path');
+                    'key', 'parentId', 'alias', 'path', 'allowCultureVariant', 'isElement');
 
-                //TODO: Map these
+                // TODO: Map these
                 saveModel.allowedTemplates = _.map(displayModel.allowedTemplates, function (t) { return t.alias; });
                 saveModel.defaultTemplate = displayModel.defaultTemplate ? displayModel.defaultTemplate.alias : null;
                 var realGroups = _.reject(displayModel.groups, function (g) {
@@ -56,7 +83,7 @@
                     });
 
                     var saveProperties = _.map(realProperties, function (p) {
-                        var saveProperty = _.pick(p, 'id', 'alias', 'description', 'validation', 'label', 'sortOrder', 'dataTypeId', 'groupId', 'memberCanEdit', 'showOnMemberProfile', 'isSensitiveData');
+                        var saveProperty = _.pick(p, 'id', 'alias', 'description', 'validation', 'label', 'sortOrder', 'dataTypeId', 'groupId', 'memberCanEdit', 'showOnMemberProfile', 'isSensitiveData', 'allowCultureVariant');
                         return saveProperty;
                     });
 
@@ -235,7 +262,7 @@
                     saveModel[props[m]] = startId.id;
                 }
 
-                saveModel.parentId = -1; 
+                saveModel.parentId = -1;
                 return saveModel;
             },
 
@@ -266,7 +293,7 @@
                 });
                 saveModel.email = propEmail.value.trim();
                 saveModel.username = propLogin.value.trim();
-                
+
                 saveModel.password = this.formatChangePasswordModel(propPass.value);
 
                 var selectedGroups = [];
@@ -289,10 +316,10 @@
                             // by looking at the key
                             switch (foundAlias[0]) {
                                 case "umbracoMemberLockedOut":
-                                    saveModel.isLockedOut = prop.value ? (prop.value.toString() === "1" ? true : false) : false;
+                                    saveModel.isLockedOut = Object.toBoolean(prop.value);
                                     break;
                                 case "umbracoMemberApproved":
-                                    saveModel.isApproved = prop.value ? (prop.value.toString() === "1" ? true : false) : true;
+                                    saveModel.isApproved = Object.toBoolean(prop.value);
                                     break;
                                 case "umbracoMemberComments":
                                     saveModel.comments = prop.value;
@@ -309,11 +336,11 @@
 
             /** formats the display model used to display the media to the model used to save the media */
             formatMediaPostData: function (displayModel, action) {
-                //NOTE: the display model inherits from the save model so we can in theory just post up the display model but 
+                //NOTE: the display model inherits from the save model so we can in theory just post up the display model but
                 // we don't want to post all of the data as it is unecessary.
                 var saveModel = {
                     id: displayModel.id,
-                    properties: [],
+                    properties: getContentProperties(displayModel.tabs),
                     name: displayModel.name,
                     contentTypeAlias: displayModel.contentTypeAlias,
                     parentId: displayModel.parentId,
@@ -321,38 +348,105 @@
                     action: action
                 };
 
-                _.each(displayModel.tabs, function (tab) {
-
-                    _.each(tab.properties, function (prop) {
-
-                        //don't include the custom generic tab properties
-                        //don't include a property that is marked readonly
-                        if (!prop.alias.startsWith("_umb_") && !prop.readonly) {
-                            saveModel.properties.push({
-                                id: prop.id,
-                                alias: prop.alias,
-                                value: prop.value
-                            });
-                        }
-                    });
-                });
-
                 return saveModel;
             },
 
             /** formats the display model used to display the content to the model used to save the content  */
             formatContentPostData: function (displayModel, action) {
 
-                //this is basically the same as for media but we need to explicitly add some extra properties
-                var saveModel = this.formatMediaPostData(displayModel, action);
+                //NOTE: the display model inherits from the save model so we can in theory just post up the display model but
+                // we don't want to post all of the data as it is unecessary.
+                var saveModel = {
+                    id: displayModel.id,
+                    name: displayModel.name,
+                    contentTypeAlias: displayModel.contentTypeAlias,
+                    parentId: displayModel.parentId,
+                    //set the action on the save model
+                    action: action,
+                    variants: _.map(displayModel.variants, function(v) {
+                        return {
+                            name: v.name || "", //if its null/empty,we must pass up an empty string else we get json converter errors
+                            properties: getContentProperties(v.tabs),
+                            culture: v.language ? v.language.culture : null,
+                            publish: v.publish,
+                            save: v.save,
+                            releaseDate: v.releaseDate,
+                            expireDate: v.expireDate
+                        };
+                    })
+                };
 
                 var propExpireDate = displayModel.removeDate;
                 var propReleaseDate = displayModel.releaseDate;
                 var propTemplate = displayModel.template;
-            
+
                 saveModel.expireDate = propExpireDate ? propExpireDate : null;
                 saveModel.releaseDate = propReleaseDate ? propReleaseDate : null;
                 saveModel.templateAlias = propTemplate ? propTemplate : null;
+
+                return saveModel;
+            },
+
+            /**
+             * This formats the server GET response for a content display item
+             * @param {} displayModel
+             * @returns {}
+             */
+            formatContentGetData: function(displayModel) {
+
+                //We need to check for invariant properties among the variant variants.
+                //When we detect this, we want to make sure that the property object instance is the
+                //same reference object between all variants instead of a copy (which it will be when
+                //return from the JSON structure).
+
+                if (displayModel.variants && displayModel.variants.length > 1) {
+
+                    var invariantProperties = [];
+
+                    //collect all invariant properties on the first first variant
+                    var firstVariant = displayModel.variants[0];
+                    _.each(firstVariant.tabs, function(tab, tabIndex) {
+                        _.each(tab.properties, function (property, propIndex) {
+                            //in theory if there's more than 1 variant, that means they would all have a language
+                            //but we'll do our safety checks anyways here
+                            if (firstVariant.language && !property.culture) {
+                                invariantProperties.push({
+                                    tabIndex: tabIndex,
+                                    propIndex: propIndex,
+                                    property: property
+                                });
+                            }
+                        });
+                    });
+
+
+                    //now assign this same invariant property instance to the same index of the other variants property array
+                    for (var j = 1; j < displayModel.variants.length; j++) {
+                        var variant = displayModel.variants[j];
+
+                        _.each(invariantProperties, function (invProp) {
+                            variant.tabs[invProp.tabIndex].properties[invProp.propIndex] = invProp.property;
+                        });
+                    }
+                }
+
+                return displayModel;
+            },
+
+            /**
+             * Formats the display model used to display the relation type to a model used to save the relation type.
+             * @param {Object} relationType
+             */
+            formatRelationTypePostData : function(relationType) {
+                var saveModel = {
+                    id: relationType.id,
+                    name: relationType.name,
+                    alias: relationType.alias,
+                    key : relationType.key,
+                    isBidirectional: relationType.isBidirectional,
+                    parentObjectType: relationType.parentObjectType,
+                    childObjectType: relationType.childObjectType
+                };
 
                 return saveModel;
             }

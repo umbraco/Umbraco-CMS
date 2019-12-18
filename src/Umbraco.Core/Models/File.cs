@@ -1,10 +1,6 @@
 ﻿using System;
-using System.IO;
-using System.Reflection;
 using System.Runtime.Serialization;
-using System.Text;
-using Umbraco.Core.IO;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
@@ -13,7 +9,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public abstract class File : Entity, IFile
+    public abstract class File : EntityBase, IFile
     {
         private string _path;
         private string _originalPath;
@@ -31,14 +27,6 @@ namespace Umbraco.Core.Models
             _originalPath = _path;
             GetFileContent = getFileContent;
             _content = getFileContent != null ? null : string.Empty;
-        }
-
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo ContentSelector = ExpressionHelper.GetPropertyInfo<File, string>(x => x.Content);
-            public readonly PropertyInfo PathSelector = ExpressionHelper.GetPropertyInfo<File, string>(x => x.Path);
         }
 
         private string _alias;
@@ -73,7 +61,7 @@ namespace Umbraco.Core.Models
             get
             {
                 if (_alias == null)
-                {                   
+                {
                     var name = System.IO.Path.GetFileName(Path);
                     if (name == null) return string.Empty;
                     var lastIndexOf = name.LastIndexOf(".", StringComparison.InvariantCultureIgnoreCase);
@@ -96,7 +84,7 @@ namespace Umbraco.Core.Models
                 _alias = null;
                 _name = null;
 
-                SetPropertyValueAndDetectChanges(SanitizePath(value), ref _path, Ps.Value.PathSelector);                
+                SetPropertyValueAndDetectChanges(SanitizePath(value), ref _path, nameof(Path));
             }
         }
 
@@ -138,7 +126,7 @@ namespace Umbraco.Core.Models
             {
                 SetPropertyValueAndDetectChanges(
                     value ?? string.Empty, // cannot set to null
-                    ref _content, Ps.Value.ContentSelector);                
+                    ref _content, nameof(Content));
             }
         }
 
@@ -146,13 +134,7 @@ namespace Umbraco.Core.Models
         /// Gets or sets the file's virtual path (i.e. the file path relative to the root of the website)
         /// </summary>
         public string VirtualPath { get; set; }
-
-        [Obsolete("This is no longer used and will be removed from the codebase in future versions")]
-        public virtual bool IsValid()
-        {
-            return true;
-        }
-
+        
         // this exists so that class that manage name and alias differently, eg Template,
         // can implement their own cloning - (though really, not sure it's even needed)
         protected virtual void DeepCloneNameAndAlias(File clone)
@@ -162,26 +144,17 @@ namespace Umbraco.Core.Models
             clone._alias = Alias;
         }
 
-        public override object DeepClone()
+        protected override void PerformDeepClone(object clone)
         {
-            var clone = (File) base.DeepClone();
+            base.PerformDeepClone(clone);
+
+            var clonedFile = (File)clone;
 
             // clear fields that were memberwise-cloned and that we don't want to clone
-            clone._content = null;
-
-            // turn off change tracking
-            clone.DisableChangeTracking();
+            clonedFile._content = null;
 
             // ...
-            DeepCloneNameAndAlias(clone);
-
-            // this shouldn't really be needed since we're not tracking
-            clone.ResetDirtyProperties(false);
-
-            // re-enable tracking
-            clone.EnableChangeTracking();
-
-            return clone;
+            DeepCloneNameAndAlias(clonedFile);
         }
     }
 }

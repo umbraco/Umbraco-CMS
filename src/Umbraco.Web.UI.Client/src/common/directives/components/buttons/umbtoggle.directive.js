@@ -54,7 +54,7 @@
 </pre>
 
 @param {boolean} checked Set to <code>true</code> or <code>false</code> to toggle the switch.
-@param {boolean} disabled Set to <code>true</code> or <code>false</code> to disable/enable the switch.
+@param {string} inputId Set the <code>id</code> of the toggle.
 @param {callback} onClick The function which should be called when the toggle is clicked.
 @param {string=} showLabels Set to <code>true</code> or <code>false</code> to show a "On" or "Off" label next to the switch.
 @param {string=} labelOn Set a custom label for when the switched is turned on. It will default to "On".
@@ -67,7 +67,7 @@
 (function () {
     'use strict';
 
-    function ToggleDirective(localizationService, eventsService) {
+    function ToggleDirective(localizationService, eventsService, $timeout) {
 
         function link(scope, el, attr, ctrl) {
 
@@ -76,7 +76,11 @@
 
             function onInit() {
                 setLabelText();
-                eventsService.emit("toggleValue", { value: scope.checked });
+                // must wait until the current digest cycle is finished before we emit this event on init, 
+                // otherwise other property editors might not yet be ready to receive the event
+                $timeout(function () {
+                    eventsService.emit("toggleValue", { value: scope.checked });
+                }, 100);
             }
 
             function setLabelText() {
@@ -119,6 +123,7 @@
             scope: {
                 checked: "=",
                 disabled: "=",
+                inputId: "@",
                 onClick: "&",
                 labelOn: "@?",
                 labelOff: "@?",

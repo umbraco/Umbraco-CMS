@@ -1,0 +1,70 @@
+<div ng-controller="Umbraco.Overlays.PublishController as vm">
+
+    <div class="mb3">
+        <p>{{vm.headline}}</p>
+    </div>
+
+    <div ng-if="vm.loading" style="min-height: 50px; position: relative;">
+        <umb-load-indicator></umb-load-indicator>
+    </div>
+
+    <div class="umb-list umb-list--condensed" ng-if="!vm.loading">
+
+        <div class="umb-list-item"
+             ng-repeat="variant in vm.variants | filter:vm.dirtyVariantFilter track by variant.compositeId">
+            <ng-form name="publishVariantSelectorForm">
+                <div ng-class="{'umb-list-item--error': publishVariantSelectorForm.publishVariantSelector.$invalid}">
+
+                    <umb-checkbox input-id="{{variant.htmlId}}"
+                                  name="publishVariantSelector"
+                                  model="variant.publish"
+                                  on-change="vm.changeSelection(variant)"
+                                  disabled="(variant.canPublish === false)"
+                                  server-validation-field="{{variant.htmlId}}" 
+                                  text="{{ variant.language.name }}"
+                    />
+                    <div>
+                            <span class="db umb-list-item__description umb-list-item__description--checkbox" ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
+                                <umb-variant-state variant="variant"></umb-variant-state>
+                                <span ng-if="variant.language.isMandatory"> - </span>
+                                <span ng-if="variant.language.isMandatory" ng-class="{'text-error': (variant.language.isMandatory && variant.willPublish === false) }"><localize key="languages_mandatoryLanguage"></localize></span>
+                            </span>
+
+                            <span class="db" ng-messages="publishVariantSelectorForm.publishVariantSelector.$error" show-validation-on-submit>
+                                <span class="db umb-list-item__description umb-list-item__description--checkbox text-error" ng-message="valServerField">{{publishVariantSelectorForm.publishVariantSelector.errorMsg}}</span>
+                            </span>
+
+                            <umb-variant-notification-list notifications="variant.notifications"></umb-variant-notification-list>
+                    </div>
+                </div>
+
+            </ng-form>
+        </div>
+        <br />
+    </div>
+
+    <div class="umb-list umb-list--condensed" ng-if="!vm.loading && vm.hasPristineVariants">
+        <div class="bold mb3">
+            <p><localize key="content_publishedLanguages"></localize></p>
+        </div>
+
+        <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.pristineVariantFilter">
+            <div>
+                <div style="margin-bottom: 2px;">
+                    <span>{{variant.language.name}}</span>
+                    <strong ng-if="variant.language.isMandatory" class="umb-control-required">*</strong>
+                </div>
+
+                <div ng-if="!(variant.notifications && variant.notifications.length > 0)">
+                    <umb-variant-state class="umb-list-item__description" variant="variant"></umb-variant-state>
+                </div>
+
+                <div ng-repeat="notification in variant.notifications">
+                    <div class="umb-list-item__description text-success">{{notification.message}}</div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>

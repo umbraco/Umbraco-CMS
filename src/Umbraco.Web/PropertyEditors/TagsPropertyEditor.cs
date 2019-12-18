@@ -1,156 +1,93 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Runtime.InteropServices;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [SupportTags(typeof(TagPropertyEditorTagDefinition), ValueType = TagValueType.CustomTagList)]
-    [PropertyEditor(Constants.PropertyEditors.TagsAlias, "Tags", "tags", Icon="icon-tags")]
-    public class TagsPropertyEditor : PropertyEditor
+    /// <summary>
+    /// Represents a tags property editor.
+    /// </summary>
+    [TagsPropertyEditor]
+    [DataEditor(
+        Constants.PropertyEditors.Aliases.Tags,
+        "Tags",
+        "tags",
+        Icon = "icon-tags")]
+    public class TagsPropertyEditor : DataEditor
     {
-        public TagsPropertyEditor()
+        private readonly ManifestValueValidatorCollection _validators;
+
+        public TagsPropertyEditor(ManifestValueValidatorCollection validators, ILogger logger)
+            : base(logger)
         {
-            _defaultPreVals = new Dictionary<string, object>
+            _validators = validators;
+        }
+
+        protected override IDataValueEditor CreateValueEditor() => new TagPropertyValueEditor(Attribute);
+
+        protected override IConfigurationEditor CreateConfigurationEditor() => new TagConfigurationEditor(_validators);
+
+        internal class TagPropertyValueEditor : DataValueEditor
+        {
+            public TagPropertyValueEditor(DataEditorAttribute attribute)
+                : base(attribute)
+            { }
+
+            /// <inheritdoc />
+            public override object FromEditor(ContentPropertyData editorValue, object currentValue)
+            {
+                var value = editorValue?.Value?.ToString();
+
+                if (string.IsNullOrEmpty(value))
                 {
-                    {"group", "default"},
-                    {"storageType", TagCacheStorageType.Json.ToString()}
-                };
-        }
+                    return null;
+                }
 
-        private IDictionary<string, object> _defaultPreVals;
+                if (editorValue.Value is JArray json)
+                {
+                    return json.Select(x => x.Value<string>());
+                }
 
-        /// <summary>
-        /// Override to supply the default group
-        /// </summary>
-        public override IDictionary<string, object> DefaultPreValues
-        {
-            get { return _defaultPreVals; }
-            set { _defaultPreVals = value; }
-        }
+                if (string.IsNullOrWhiteSpace(value) == false)
+                {
+                    return value.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                }
 
-        protected override PropertyValueEditor CreateValueEditor()
-        {
-            return new TagPropertyValueEditor(base.CreateValueEditor());
-        }
-
-        protected override PreValueEditor CreatePreValueEditor()
-        {
-            return new TagPreValueEditor();
-        }
-
-        internal class TagPropertyValueEditor : PropertyValueEditorWrapper
-        {
-            public TagPropertyValueEditor(PropertyValueEditor wrapped)
-                : base(wrapped)
-            {
+                return null;
             }
 
-            /// <summary>
-            /// This needs to return IEnumerable{string}
-            /// </summary>
-            /// <param name="editorValue"></param>
-            /// <param name="currentValue"></param>
-            /// <returns></returns>
-            public override object ConvertEditorToDb(ContentPropertyData editorValue, object currentValue)
-            {
-                var json = editorValue.Value as JArray;
-                return json == null ? null : json.Select(x => x.Value<string>());
-            }
+            /// <inheritdoc />
+            public override IValueRequiredValidator RequiredValidator => new RequiredJsonValueValidator();
 
             /// <summary>
-            /// Returns the validator used for the required field validation which is specified on the PropertyType
+            /// Custom validator to validate a required value against an empty json value.
             /// </summary>
             /// <remarks>
-            /// This will become legacy as soon as we implement overridable pre-values.
-            /// 
-            /// The default validator used is the RequiredValueValidator but this can be overridden by property editors
-            /// if they need to do some custom validation, or if the value being validated is a json object.
+            /// <para>This validator is required because the default RequiredValidator uses ValueType to
+            /// determine whether a property value is JSON, and for tags the ValueType is string although
+            /// the underlying data is JSON. Yes, this makes little sense.</para>
             /// </remarks>
-            public override ManifestValueValidator RequiredValidator
+            private class RequiredJsonValueValidator : IValueRequiredValidator
             {
-                get { return new RequiredTagsValueValidator(); }
-            }
-            
-            /// <summary>
-            /// Custom validator to validate a required value against an empty json value
-            /// </summary>
-            /// <remarks>
-            /// This is required because the Tags property editor is not of type 'JSON', it's just string so the underlying
-            /// validator does not validate against an empty json string
-            /// </remarks>
-            [ValueValidator("Required")]
-            private class RequiredTagsValueValidator : ManifestValueValidator
-            {
-                /// <summary>
-                /// Validates a null value or an empty json value
-                /// </summary>
-                /// <param name="value"></param>
-                /// <param name="config"></param>
-                /// <param name="preValues"></param>
-                /// <param name="editor"></param>
-                /// <returns></returns>
-                public override IEnumerable<ValidationResult> Validate(object value, string config, PreValueCollection preValues, PropertyEditor editor)
+                /// <inheritdoc />
+                public IEnumerable<ValidationResult> ValidateRequired(object value, string valueType)
                 {
                     if (value == null)
                     {
-                        yield return new ValidationResult("Value cannot be null", new[] { "value" });
+                        yield return new ValidationResult("Value cannot be null", new[] {"value"});
+                        yield break;
                     }
-                    else
-                    {
-                        var asString = value.ToString();
 
-                        if (asString.DetectIsEmptyJson())
-                        {
-                            yield return new ValidationResult("Value cannot be empty", new[] { "value" });
-                        }
-
-                        if (asString.IsNullOrWhiteSpace())
-                        {
-                            yield return new ValidationResult("Value cannot be empty", new[] { "value" });
-                        }
-                    }
+                    if (value.ToString().DetectIsEmptyJson())
+                        yield return new ValidationResult("Value cannot be empty", new[] { "value" });
                 }
-            }
-        }
-
-        internal class TagPreValueEditor : PreValueEditor
-        {
-            public TagPreValueEditor()
-            {
-                Fields.Add(new PreValueField(new ManifestPropertyValidator { Type = "Required" })
-                {
-                    Description = "Define a tag group",
-                    Key = "group",
-                    Name = "Tag group",
-                    View = "requiredfield"
-                });
-
-                Fields.Add(new PreValueField(new ManifestPropertyValidator {Type = "Required"})
-                {
-                    Description = "Select whether to store the tags in cache as JSON (default) or as CSV (Legacy).",
-                    Key = "storageType",
-                    Name = "Storage Type",
-                    View = "views/propertyeditors/tags/tags.prevalues.html"
-                });
-            }
-
-            public override IDictionary<string, object> ConvertDbToEditor(IDictionary<string, object> defaultPreVals, PreValueCollection persistedPreVals)
-            {
-                var result = base.ConvertDbToEditor(defaultPreVals, persistedPreVals);
-
-                //This is required because we've added this pre-value so old installs that don't have it will need to have a default.
-                if (result.ContainsKey("storageType") == false || result["storageType"] == null || result["storageType"].ToString().IsNullOrWhiteSpace())
-                {
-                    result["storageType"] = TagCacheStorageType.Csv.ToString();
-                }
-
-                return result;
             }
         }
     }

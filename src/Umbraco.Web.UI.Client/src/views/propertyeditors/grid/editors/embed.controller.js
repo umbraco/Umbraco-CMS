@@ -1,28 +1,50 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.Grid.EmbedController",
-    function ($scope, $rootScope, $timeout) {
+    function ($scope, $timeout, $sce, editorService) {
 
-    	$scope.setEmbed = function(){
-            $scope.embedDialog = {};
-            $scope.embedDialog.view = "embed";
-            $scope.embedDialog.show = true;
+        function onInit() {
+            
+            var embedPreview = angular.isObject($scope.control.value) && $scope.control.value.preview ? $scope.control.value.preview : $scope.control.value;
 
-            $scope.embedDialog.submit = function(model) {
-                $scope.control.value = model.embed.preview;
-                $scope.embedDialog.show = false;
-                $scope.embedDialog = null;
+            $scope.trustedValue = embedPreview ? $sce.trustAsHtml(embedPreview) : null;
+
+            if(!$scope.control.value) {
+                $timeout(function(){
+                    if($scope.control.$initializing){
+                        $scope.setEmbed();
+                    }
+                }, 200);
+            }
+        }
+
+        $scope.setEmbed = function () {
+
+            var original = angular.isObject($scope.control.value) ? $scope.control.value : null;
+
+            var embed = {
+                original: original,
+                submit: function (model) {
+
+                    var embed = {
+                        constrain: model.embed.constrain,
+                        height: model.embed.height,
+                        width: model.embed.width,
+                        url: model.embed.url,
+                        info: model.embed.info,
+                        preview: model.embed.preview
+                    };
+
+                    $scope.control.value = embed;
+                    $scope.trustedValue = $sce.trustAsHtml(embed.preview);
+
+                    editorService.close();
+                },
+                close: function() {
+                    editorService.close();
+                }
             };
+            editorService.embed(embed);
+        };
 
-            $scope.embedDialog.close = function(oldModel) {
-                $scope.embedDialog.show = false;
-                $scope.embedDialog = null;
-            };
-
-    	};
-
-    	$timeout(function(){
-    		if($scope.control.$initializing){
-    			$scope.setEmbed();
-    		}
-    	}, 200);
+        onInit();
 });

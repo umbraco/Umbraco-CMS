@@ -12,6 +12,7 @@ describe('Content picker controller tests', function () {
 
         httpBackend = $httpBackend;
         scope = $rootScope.$new();
+
         scope.model = {
                         alias: "property",
                         value:"1233,1231,23121",
@@ -52,11 +53,15 @@ describe('Content picker controller tests', function () {
 
     describe('content edit controller save and publish', function () {
         
-        var item = {
-            name: "meh",
-            id: 666,
-            icon: "woop"
-        };
+        var item;
+
+        beforeEach(function () {
+            item = {
+                name: "meh",
+                id: 666,
+                icon: "woop"
+            };
+        });
 
         it('should define the default properties on construction', function () {
             expect(scope.model.value).not.toBeUndefined();            
@@ -82,28 +87,27 @@ describe('Content picker controller tests', function () {
         });
 
         it("Adding an item should update renderModel, ids and model.value", function(){
+            
             scope.add(item);
             scope.$apply();
-            setTimeout(function(){
-                expect(scope.renderModel.length).toBe(4);
-                expect(scope.model.value).toBe("1233,1231,23121,666");
-            }, 1000);
+            httpBackend.flush();
+
+            expect(scope.renderModel.length).toBe(4);
+            expect(scope.model.value).toBe("1233,1231,23121,666");
         });
 
         it("Adding a duplicate item should note update renderModel, ids and model.value", function(){
             scope.add(item);
             scope.$apply();
-            setTimeout(function(){
-                expect(scope.renderModel.length).toBe(4);
-                expect(scope.model.value).toBe("1233,1231,23121,666");
-            }, 1000);
+            httpBackend.flush();
+            expect(scope.renderModel.length).toBe(4);
+            expect(scope.model.value).toBe("1233,1231,23121,666");
 
             scope.add(item);
             scope.$apply();
-            setTimeout(function(){
-                expect(scope.renderModel.length).toBe(4);
-                expect(scope.model.value).toBe("1233,1231,23121,666");
-            }, 1000);
+            
+            expect(scope.renderModel.length).toBe(4);
+            expect(scope.model.value).toBe("1233,1231,23121,666");
 
         });  
     });

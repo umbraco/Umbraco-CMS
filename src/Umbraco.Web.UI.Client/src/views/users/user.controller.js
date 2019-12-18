@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserEditController($scope, eventsService, $q, $timeout, $location, $routeParams, formHelper, usersResource, userService, contentEditingHelper, localizationService, notificationsService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource, dateHelper) {
+    function UserEditController($scope, eventsService, $q, $location, $routeParams, formHelper, usersResource, userService, contentEditingHelper, localizationService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource, dateHelper, editorService, overlayService) {
 
         var vm = this;
 
@@ -11,6 +11,7 @@
           changePassword: null
         };
         vm.breadcrumbs = [];
+        vm.showBackButton = true;
         vm.avatarFile = {};
         vm.labels = {};
         vm.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB";
@@ -131,11 +132,14 @@
 
         function save() {
 
-            if (formHelper.submitForm({ scope: $scope, statusMessage: vm.labels.saving })) {
+            if (formHelper.submitForm({ scope: $scope })) {
 
                 //anytime a user is changing another user's password, we are in effect resetting it so we need to set that flag here
                 if (vm.user.changePassword) {
-                    vm.user.changePassword.reset = !vm.user.changePassword.oldPassword && !vm.user.isCurrentUser;
+                    //NOTE: the check for allowManuallyChangingPassword is due to this legacy user membership provider setting, if that is true, then the current user
+                    //can change their own password without entering their current one (this is a legacy setting since that is a security issue but we need to maintain compat).
+                    //if allowManuallyChangingPassword=false, then we are using default settings and the user will need to enter their old password to change their own password.
+                    vm.user.changePassword.reset = (!vm.user.changePassword.oldPassword && !vm.user.isCurrentUser) || vm.changePasswordModel.config.allowManuallyChangingPassword;
                 }
 
                 vm.page.saveButtonState = "busy";
@@ -150,11 +154,8 @@
                         //if the user saved, then try to execute all extended save options
                         extendedSave(saved).then(function(result) {
                             //if all is good, then reset the form
-                            formHelper.resetForm({ scope: $scope, notifications: saved.notifications });
-                        }, function(err) {
-                            //otherwise show the notifications for the user being saved
-                            formHelper.showNotifications(saved);
-                        });
+                            formHelper.resetForm({ scope: $scope });
+                        }, angular.noop);
                         
                         vm.user = _.omit(saved, "navigation");
                         //restore
@@ -171,13 +172,10 @@
                     }, function (err) {
 
                         contentEditingHelper.handleSaveError({
-                            redirectOnFailure: false,
-                            err: err
+                            err: err,
+                            showNotifications: true
                         });
-                        //show any notifications
-                        if (err.data) {
-                            formHelper.showNotifications(err.data);
-                        }
+                        
                         vm.page.saveButtonState = "error";
                     });
             }
@@ -211,42 +209,36 @@
         }
 
         function goToPage(ancestor) {
-            $location.path(ancestor.path).search("subview", ancestor.subView);
+            $location.path(ancestor.path);
         }
 
         function openUserGroupPicker() {
-            vm.userGroupPicker = {
-                view: "usergrouppicker",
-                selection: vm.user.userGroups,
-                closeButtonLabel: vm.labels.cancel,
-                show: true,
+            var currentSelection = [];
+            angular.copy(vm.user.userGroups, currentSelection);
+            var userGroupPicker = {
+                selection: currentSelection,
                 submit: function (model) {
                     // apply changes
                     if (model.selection) {
                         vm.user.userGroups = model.selection;
                     }
-                    vm.userGroupPicker.show = false;
-                    vm.userGroupPicker = null;
+                    editorService.close();
                 },
-                close: function (oldModel) {
-                    // rollback on close
-                    if (oldModel.selection) {
-                        vm.user.userGroups = oldModel.selection;
-                    }
-                    vm.userGroupPicker.show = false;
-                    vm.userGroupPicker = null;
+                close: function () {        
+                    editorService.close();
                 }
             };
+            editorService.userGroupPicker(userGroupPicker);
         }
 
         function openContentPicker() {
-            vm.contentPicker = {
+            var contentPicker = {
                 title: vm.labels.selectContentStartNode,
-                view: "contentpicker",
+                section: "content",
+                treeAlias: "content",
                 multiPicker: true,
                 selection: vm.user.startContentIds,
                 hideHeader: false,
-                show: true,
                 submit: function (model) {
                     // select items
                     if (model.selection) {
@@ -258,22 +250,18 @@
                             multiSelectItem(item, vm.user.startContentIds);
                         });
                     }
-                    // close overlay
-                    vm.contentPicker.show = false;
-                    vm.contentPicker = null;
+                    editorService.close();
                 },
-                close: function (oldModel) {
-                    // close overlay
-                    vm.contentPicker.show = false;
-                    vm.contentPicker = null;
+                close: function () {
+                    editorService.close();
                 }
             };
+            editorService.treePicker(contentPicker);
         }
 
         function openMediaPicker() {
-            vm.mediaPicker = {
+            var mediaPicker = {
                 title: vm.labels.selectMediaStartNode,
-                view: "treepicker",
                 section: "media",
                 treeAlias: "media",
                 entityType: "media",
@@ -292,15 +280,14 @@
                         });
                     }
                     // close overlay
-                    vm.mediaPicker.show = false;
-                    vm.mediaPicker = null;
+                    editorService.close();
                 },
-                close: function (oldModel) {
+                close: function () {
                     // close overlay
-                    vm.mediaPicker.show = false;
-                    vm.mediaPicker = null;
+                    editorService.close();
                 }
             };
+            editorService.treePicker(mediaPicker);
         }
 
         function multiSelectItem(item, selection) {
@@ -329,10 +316,10 @@
                 vm.user.userState = 1;
                 setUserDisplayState();
                 vm.disableUserButtonState = "success";
-                formHelper.showNotifications(data);
+                
             }, function (error) {
                 vm.disableUserButtonState = "error";
-                formHelper.showNotifications(error.data);
+                
             });
         }
 
@@ -342,10 +329,8 @@
                 vm.user.userState = 0;
                 setUserDisplayState();
                 vm.enableUserButtonState = "success";
-                formHelper.showNotifications(data);
             }, function (error) {
                 vm.enableUserButtonState = "error";
-                formHelper.showNotifications(error.data);
             });
         }
 
@@ -357,10 +342,8 @@
                 setUserDisplayState();
                 vm.unlockUserButtonState = "success";
                 
-                formHelper.showNotifications(data);
             }, function (error) {
                 vm.unlockUserButtonState = "error";
-                formHelper.showNotifications(error.data);
             });
         }
 
@@ -388,11 +371,32 @@
             vm.deleteNotLoggedInUserButtonState = "busy";
 
             var confirmationMessage = vm.labels.deleteUserConfirmation;
-            if (!confirm(confirmationMessage)) {
-                vm.deleteNotLoggedInUserButtonState = "danger";
-                return;
-            }
 
+            localizationService.localizeMany(["general_delete", "general_cancel", "contentTypeEditor_yesDelete"])
+                .then(function (data) {
+
+                    const overlay = {
+                        view: "confirm",
+                        title: data[0],
+                        content: confirmationMessage,
+                        closeButtonLabel: data[1],
+                        submitButtonLabel: data[2],
+                        submitButtonStyle: "danger",
+                        close: function () {
+                            vm.deleteNotLoggedInUserButtonState = "danger";
+                            overlayService.close();
+                        },
+                        submit: function () {
+                            performDelete();
+                            overlayService.close();
+                        }
+                    };
+                    overlayService.open(overlay);
+
+                });
+        }
+
+        function performDelete() {
             usersResource.deleteNonLoggedInUser(vm.user.id).then(function (data) {
                 formHelper.showNotifications(data);
                 goToPage(vm.breadcrumbs[0]);
@@ -478,8 +482,7 @@
             vm.breadcrumbs = [
                 {
                     "name": vm.labels.users,
-                    "path": "/users/users/overview",
-                    "subView": "users"
+                    "path": "/users/users/users"
                 },
                 {
                     "name": vm.user.name

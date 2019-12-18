@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
@@ -11,7 +9,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class DictionaryTranslation : Entity, IDictionaryTranslation
+    public class DictionaryTranslation : EntityBase, IDictionaryTranslation
     {
         internal Func<int, ILanguage> GetLanguage { get; set; }
 
@@ -19,7 +17,7 @@ namespace Umbraco.Core.Models
         private string _value;
         //note: this will be memberwise cloned
         private int _languageId;
-        
+
         public DictionaryTranslation(ILanguage language, string value)
         {
             if (language == null) throw new ArgumentNullException("language");
@@ -38,24 +36,16 @@ namespace Umbraco.Core.Models
         }
 
         internal DictionaryTranslation(int languageId, string value)
-        {            
+        {
             _languageId = languageId;
             _value = value;
         }
 
         internal DictionaryTranslation(int languageId, string value, Guid uniqueId)
-        {            
+        {
             _languageId = languageId;
             _value = value;
             Key = uniqueId;
-        }
-
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo LanguageSelector = ExpressionHelper.GetPropertyInfo<DictionaryTranslation, ILanguage>(x => x.Language);
-            public readonly PropertyInfo ValueSelector = ExpressionHelper.GetPropertyInfo<DictionaryTranslation, string>(x => x.Value);
         }
 
         /// <summary>
@@ -65,7 +55,7 @@ namespace Umbraco.Core.Models
         /// Marked as DoNotClone - TODO: this member shouldn't really exist here in the first place, the DictionaryItem
         /// class will have a deep hierarchy of objects which all get deep cloned which we don't want. This should have simply
         /// just referenced a language ID not the actual language object. In v8 we need to fix this.
-        /// We're going to have to do the same hacky stuff we had to do with the Template/File contents so that this is returned 
+        /// We're going to have to do the same hacky stuff we had to do with the Template/File contents so that this is returned
         /// on a callback.
         /// </remarks>
         [DataMember]
@@ -84,8 +74,8 @@ namespace Umbraco.Core.Models
             }
             set
             {
-                SetPropertyValueAndDetectChanges(value, ref _language, Ps.Value.LanguageSelector);
-                _languageId = _language == null ? -1 : _language.Id;                
+                SetPropertyValueAndDetectChanges(value, ref _language, nameof(Language));
+                _languageId = _language == null ? -1 : _language.Id;
             }
         }
 
@@ -101,26 +91,17 @@ namespace Umbraco.Core.Models
         public string Value
         {
             get { return _value; }
-            set { SetPropertyValueAndDetectChanges(value, ref _value, Ps.Value.ValueSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _value, nameof(Value)); }
         }
 
-        public override object DeepClone()
+        protected override void PerformDeepClone(object clone)
         {
-            var clone = (DictionaryTranslation)base.DeepClone();
+            base.PerformDeepClone(clone);
+
+            var clonedEntity = (DictionaryTranslation)clone;
 
             // clear fields that were memberwise-cloned and that we don't want to clone
-            clone._language = null;
-
-            // turn off change tracking
-            clone.DisableChangeTracking();
-            
-            // this shouldn't really be needed since we're not tracking
-            clone.ResetDirtyProperties(false);
-
-            // re-enable tracking
-            clone.EnableChangeTracking();
-
-            return clone;
+            clonedEntity._language = null;
         }
     }
 }

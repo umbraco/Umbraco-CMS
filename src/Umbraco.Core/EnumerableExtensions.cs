@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
-using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core
 {
@@ -14,6 +10,32 @@ namespace Umbraco.Core
     ///</summary>
     public static class EnumerableExtensions
     {
+        internal static bool IsCollectionEmpty<T>(this IReadOnlyCollection<T> list) => list == null || list.Count == 0;
+
+        internal static bool HasDuplicates<T>(this IEnumerable<T> items, bool includeNull)
+        {
+            var hs = new HashSet<T>();
+            foreach (var item in items)
+            {
+                if ((item != null || includeNull) && !hs.Add(item))
+                    return true;
+            }
+            return false;
+        }
+
+
+        /// <summary>
+        /// Wraps this object instance into an IEnumerable{T} consisting of a single item.
+        /// </summary>
+        /// <typeparam name="T"> Type of the object. </typeparam>
+        /// <param name="item"> The instance that will be wrapped. </param>
+        /// <returns> An IEnumerable{T} consisting of a single item. </returns>
+        public static IEnumerable<T> Yield<T>(this T item)
+        {
+            // see EnumeratorBenchmarks - this is faster, and allocates less, than returning an array
+            yield return item;
+        }
+
         public static IEnumerable<IEnumerable<T>> InGroupsOf<T>(this IEnumerable<T> source, int groupSize)
         {
             if (source == null)
@@ -21,9 +43,33 @@ namespace Umbraco.Core
             if (groupSize <= 0)
                 throw new ArgumentException("Must be greater than zero.", "groupSize");
 
-            return source
-                .Select((x, i) => Tuple.Create(i / groupSize, x))
-                .GroupBy(t => t.Item1, t => t.Item2);
+
+            // following code derived from MoreLinq and does not allocate bazillions of tuples
+
+            T[] temp = null;
+            var count = 0;
+
+            foreach (var item in source)
+            {
+                if (temp == null) temp = new T[groupSize];
+                temp[count++] = item;
+                if (count != groupSize) continue;
+                yield return temp/*.Select(x => x)*/;
+                temp = null;
+                count = 0;
+            }
+
+            if (temp != null && count > 0)
+                yield return temp.Take(count);
+        }
+
+        public static IEnumerable<TResult> SelectByGroups<TResult, TSource>(this IEnumerable<TSource> source, Func<IEnumerable<TSource>, IEnumerable<TResult>> selector, int groupSize)
+        {
+            // don't want to use a SelectMany(x => x) here - isn't this better?
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (var resultGroup in source.InGroupsOf(groupSize).Select(selector))
+                foreach (var result in resultGroup)
+                    yield return result;
         }
 
         /// <summary>The distinct by.</summary>
@@ -66,40 +112,6 @@ namespace Umbraco.Core
                     item.IfNotNull(action);
                 }
             }
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use a normal foreach loop instead, this adds more allocations than necessary")]
-        public static TResult[] ForEach<TItem, TResult>(this IEnumerable<TItem> items, Func<TItem, TResult> func)
-        {
-            return items.Select(func).ToArray();
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use a normal foreach loop instead, this adds more allocations than necessary")]
-        public static IEnumerable<TItem> ForEach<TItem>(this IEnumerable<TItem> items, Action<TItem> action)
-        {
-            if (items != null)
-            {
-                foreach (TItem item in items)
-                {
-                    action(item);
-                }
-            }
-
-            return items;
-        }
-
-        /// <summary>The flatten list.</summary>
-        /// <param name="e">The items.</param>
-        /// <param name="f">The select child.</param>
-        /// <typeparam name="T">Item type</typeparam>
-        /// <returns>list of TItem</returns>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Do not use, use SelectRecursive instead which has far less potential of re-iterating an iterator which may cause significantly more SQL queries")]
-        public static IEnumerable<T> FlattenList<T>(this IEnumerable<T> e, Func<T, IEnumerable<T>> f)
-        {
-            return e.SelectMany(c => f(c).FlattenList(f)).Concat(e);
         }
 
         /// <summary>
@@ -266,7 +278,7 @@ namespace Umbraco.Core
             return -1;
         }
 
-        ///<summary>Finds the index of the first occurence of an item in an enumerable.</summary>
+        ///<summary>Finds the index of the first occurrence of an item in an enumerable.</summary>
         ///<param name="items">The enumerable to search.</param>
         ///<param name="item">The item to find.</param>
         ///<returns>The index of the first matching item, or -1 if the item was not found.</returns>
@@ -285,7 +297,7 @@ namespace Umbraco.Core
         /// <remarks>
         /// The logic for this is taken from:
         /// http://stackoverflow.com/questions/4576723/test-whether-two-ienumerablet-have-the-same-values-with-the-same-frequencies
-        /// 
+        ///
         /// There's a few answers, this one seems the best for it's simplicity and based on the comment of Eamon
         /// </remarks>
         public static bool UnsortedSequenceEqual<T>(this IEnumerable<T> source, IEnumerable<T> other)
@@ -299,6 +311,36 @@ namespace Umbraco.Core
                && list1Groups.All(g => g.Count() == list2Groups[g.Key].Count());
         }
 
+        /// <summary>
+        /// Transforms an enumerable.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="transform"></param>
+        /// <returns></returns>
+        public static IEnumerable<TTarget> Transform<TSource, TTarget>(this IEnumerable<TSource> source, Func<IEnumerable<TSource>, IEnumerable<TTarget>> transform)
+        {
+            return transform(source);
+        }
+
+        /// <summary>
+        /// Gets a null IEnumerable as an empty IEnumerable.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="items"></param>
+        /// <returns></returns>
+        public static IEnumerable<T> EmptyNull<T>(this IEnumerable<T> items)
+        {
+            return items ?? Enumerable.Empty<T>();
+        }
+
+        // the .OfType<T>() filter is nice when there's only one type
+        // this is to support filtering with multiple types
+        public static IEnumerable<T> OfTypes<T>(this IEnumerable<T> contents, params Type[] types)
+        {
+            return contents.Where(x => types.Contains(x.GetType()));
+        }
+
         public static IEnumerable<T> SkipLast<T>(this IEnumerable<T> source)
         {
             using (var e = source.GetEnumerator())
@@ -308,6 +350,11 @@ namespace Umbraco.Core
                 for (var value = e.Current; e.MoveNext(); value = e.Current)
                     yield return value;
             }
+        }
+
+        public static IOrderedEnumerable<TSource> OrderBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector, Direction sortOrder)
+        {
+            return sortOrder == Direction.Ascending ? source.OrderBy(keySelector) : source.OrderByDescending(keySelector);
         }
     }
 }

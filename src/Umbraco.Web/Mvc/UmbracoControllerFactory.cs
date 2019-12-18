@@ -1,8 +1,9 @@
-using System;
+﻿using System;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.SessionState;
 using Umbraco.Core;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Mvc
 {
@@ -14,7 +15,7 @@ namespace Umbraco.Web.Mvc
         private readonly OverridenDefaultControllerFactory _innerFactory = new OverridenDefaultControllerFactory();
 
         public abstract bool CanHandle(RequestContext request);
-        
+
         public virtual Type GetControllerType(RequestContext requestContext, string controllerName)
         {
             return _innerFactory.GetControllerType(requestContext, controllerName);
@@ -30,10 +31,9 @@ namespace Umbraco.Web.Mvc
         public virtual IController CreateController(RequestContext requestContext, string controllerName)
         {
             var controllerType = GetControllerType(requestContext, controllerName) ??
-                                 _innerFactory.GetControllerType(
-                                     requestContext,
-                                     ControllerExtensions.GetControllerName(
-                                         DefaultRenderMvcControllerResolver.Current.GetDefaultControllerType()));
+                _innerFactory.GetControllerType(
+                    requestContext,
+                    ControllerExtensions.GetControllerName(Current.DefaultRenderMvcControllerType));
 
             return _innerFactory.GetControllerInstance(requestContext, controllerType);
         }
@@ -65,8 +65,12 @@ namespace Umbraco.Web.Mvc
         /// this nested class changes the visibility of <see cref="DefaultControllerFactory"/>'s internal methods in order to not have to rely on a try-catch.
         /// </summary>
         /// <remarks></remarks>
-        internal class OverridenDefaultControllerFactory : DefaultControllerFactory
+        internal class OverridenDefaultControllerFactory : ContainerControllerFactory
         {
+            public OverridenDefaultControllerFactory()
+                : base(Current.Factory)
+            { }
+
             public new IController GetControllerInstance(RequestContext requestContext, Type controllerType)
             {
                 return base.GetControllerInstance(requestContext, controllerType);
@@ -74,11 +78,9 @@ namespace Umbraco.Web.Mvc
 
             public new Type GetControllerType(RequestContext requestContext, string controllerName)
             {
-                if (controllerName.IsNullOrWhiteSpace())
-                {
-                    return null;
-                }
-                return base.GetControllerType(requestContext, controllerName);
+                return controllerName.IsNullOrWhiteSpace()
+                    ? null
+                    : base.GetControllerType(requestContext, controllerName);
             }
         }
     }

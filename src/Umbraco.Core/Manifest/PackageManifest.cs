@@ -1,35 +1,70 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System;
+using Newtonsoft.Json;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Manifest
 {
     /// <summary>
-    /// Represents a manifest file for packages
+    /// Represents the content of a package manifest.
     /// </summary>
-    internal class PackageManifest
+    public class PackageManifest
     {
         /// <summary>
-        /// The json array used to initialize the application with the JS dependencies required
+        /// Gets the source path of the manifest.
         /// </summary>
-        public JArray JavaScriptInitialize { get; set; }
+        /// <remarks>
+        /// <para>Gets the full absolute file path of the manifest,
+        /// using system directory separators.</para>
+        /// </remarks>
+        [JsonIgnore]
+        public string Source { get; set; }
 
         /// <summary>
-        /// The json array used to initialize the application with the CSS dependencies required
+        /// Gets or sets the scripts listed in the manifest.
         /// </summary>
-        public JArray StylesheetInitialize { get; set; }
+        [JsonProperty("javascript")]
+        public string[] Scripts { get; set; } = Array.Empty<string>();
 
         /// <summary>
-        /// The json array of property editors
+        /// Gets or sets the stylesheets listed in the manifest.
         /// </summary>
-        public JArray PropertyEditors { get; set; }
+        [JsonProperty("css")]
+        public string[] Stylesheets { get; set; } = Array.Empty<string>();
 
         /// <summary>
-        /// The json array of parameter editors
+        /// Gets or sets the property editors listed in the manifest.
         /// </summary>
-        public JArray ParameterEditors { get; set; }
+        [JsonProperty("propertyEditors")]
+        public IDataEditor[] PropertyEditors { get; set; } = Array.Empty<IDataEditor>();
 
         /// <summary>
-        /// The json array of grid editors
+        /// Gets or sets the parameter editors listed in the manifest.
         /// </summary>
-        public JArray GridEditors { get; set; }
+        [JsonProperty("parameterEditors")]
+        public IDataEditor[] ParameterEditors { get; set; } = Array.Empty<IDataEditor>();
+
+        /// <summary>
+        /// Gets or sets the grid editors listed in the manifest.
+        /// </summary>
+        [JsonProperty("gridEditors")]
+        public GridEditor[] GridEditors { get; set; } = Array.Empty<GridEditor>();
+
+        /// <summary>
+        /// Gets or sets the content apps listed in the manifest.
+        /// </summary>
+        [JsonProperty("contentApps")]
+        public ManifestContentAppDefinition[] ContentApps { get; set; } = Array.Empty<ManifestContentAppDefinition>();
+
+        /// <summary>
+        /// Gets or sets the dashboards listed in the manifest.
+        /// </summary>
+        [JsonProperty("dashboards")]
+        public ManifestDashboard[] Dashboards { get; set; } = Array.Empty<ManifestDashboard>();
+
+        /// <summary>
+        /// Gets or sets the sections listed in the manifest.
+        /// </summary>
+        [JsonProperty("sections")]
+        public ManifestSection[] Sections { get; set; } = Array.Empty<ManifestSection>();
     }
 }

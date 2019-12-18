@@ -1,0 +1,26 @@
+<div class="umb-editors">
+
+    <div class="umb-editor"
+        ng-repeat="model in editors"
+        ng-class="{'umb-editor--small': model.size === 'small',
+        'umb-editor--medium': model.size === 'medium',
+        'umb-editor--animating': model.animating,
+        'umb-editor--notInFront': model.inFront !== true,
+        'umb-editor--infiniteMode': model.infiniteMode,
+        'umb-editor--moveRight': model.moveRight,
+        'umb-editor--n0': model.styleIndex === 0,
+        'umb-editor--n1': model.styleIndex === 1,
+        'umb-editor--n2': model.styleIndex === 2,
+        'umb-editor--n3': model.styleIndex === 3,
+        'umb-editor--outOfRange': model.level === -1,
+        'umb-editor--level0': model.level === 0,
+        'umb-editor--level1': model.level === 1,
+        'umb-editor--level2': model.level === 2,
+        'umb-editor--level3': model.level === 3}"
+        >
+        <div ng-if="!model.view && !model.animating" ng-transclude></div>
+        <div ng-if="model.view && !model.animating" ng-include="model.view"></div>
+        <div class="umb-editor__overlay"></div>
+    </div>
+
+</div>

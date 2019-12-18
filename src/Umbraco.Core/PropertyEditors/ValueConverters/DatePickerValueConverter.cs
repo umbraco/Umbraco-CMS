@@ -1,5 +1,4 @@
-using System;
-using System.Globalization;
+﻿using System;
 using System.Linq;
 using System.Xml;
 using Umbraco.Core.Models.PublishedContent;
@@ -7,22 +6,18 @@ using Umbraco.Core.Models.PublishedContent;
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
     [DefaultPropertyValueConverter]
-    [PropertyValueType(typeof(DateTime))]
-    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class DatePickerValueConverter : PropertyValueConverterBase
-	{
-	    private static readonly string[] PropertyEditorAliases =
-	    {
-	        Constants.PropertyEditors.DateTimeAlias,
-	        Constants.PropertyEditors.DateAlias
-	    };
+    {
+        public override bool IsConverter(IPublishedPropertyType propertyType)
+            => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.DateTime);
 
-        public override bool IsConverter(PublishedPropertyType propertyType)
-        {
-            return PropertyEditorAliases.Contains(propertyType.PropertyEditorAlias);
-        }
+        public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
+            => typeof (DateTime);
 
-        public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
+        public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
+            => PropertyCacheLevel.Element;
+
+        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null) return DateTime.MinValue;
 
@@ -30,8 +25,8 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             // Actually, not always sometimes it is formatted in UTC style with 'Z' suffixed on the end but that is due to this bug:
             // http://issues.umbraco.org/issue/U4-4145, http://issues.umbraco.org/issue/U4-3894
             // We should just be using TryConvertTo instead.
-            var sourceString = source as string;
-            if (sourceString != null)
+
+            if (source is string sourceString)
             {
                 var attempt = sourceString.TryConvertTo<DateTime>();
                 return attempt.Success == false ? DateTime.MinValue : attempt.Result;
@@ -39,17 +34,15 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
             // in the database a DateTime is: DateTime
             // default value is: DateTime.MinValue
-            return (source is DateTime) 
-                ? source 
-                : DateTime.MinValue;
+            return source is DateTime ? source : DateTime.MinValue;
         }
 
         // default ConvertSourceToObject just returns source ie a DateTime value
 
-        public override object ConvertSourceToXPath(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
             // source should come from ConvertSource and be a DateTime already
-            return XmlConvert.ToString((DateTime)source, XmlDateTimeSerializationMode.Unspecified);
+            return XmlConvert.ToString((DateTime) inter, XmlDateTimeSerializationMode.Unspecified);
         }
     }
 }

@@ -40,7 +40,7 @@ angular.module('umbraco.directives')
             
                 $timeout(function(){
                     // get list of all links in the list
-                    listItems = element.find("li a");
+                    listItems = element.find("li :tabbable");
                 });
 
                 // Handle keydown events
@@ -87,7 +87,7 @@ angular.module('umbraco.directives')
                         if (focusSet) {
                             currentIndex++;
                         }
-                        listItems[currentIndex].focus();
+                        listItems[currentIndex].trigger("focus");
                         focusSet = true;
                     }
                 }
@@ -95,7 +95,7 @@ angular.module('umbraco.directives')
                 function arrowUp() {
                     if (currentIndex > 0) {
                         currentIndex--;
-                        listItems[currentIndex].focus();
+                        listItems[currentIndex].trigger("focus");
                     }
                 }
 

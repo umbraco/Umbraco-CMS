@@ -7,10 +7,12 @@
 }
 
 .umb-modalcolumn-header {
-  background: @gray-10;
-  border-bottom: 1px solid @purple-l3;
-  height: 94px;
-  padding: 5px 20px 0px 20px;
+  border-bottom: 1px solid @gray-9;
+  height: @editorHeaderHeight;
+  box-sizing: border-box;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
   white-space: nowrap
 }
 
@@ -19,13 +21,12 @@
   white-space: nowrap;
   font-size: @fontSizeLarge;
   font-weight: 400;
-  padding-top: 10px !important;
 }
 
 .umb-modalcolumn-body {
 	padding: 0px;
 	background: @white;
-	top: 100px;
+	top: @editorHeaderHeight;
 	position: absolute;
 	left: 0px;
 	right: 0px;
@@ -51,12 +52,22 @@
 	bottom: 0px;
 	left: 0px;
 	right: 0px;
-	position: absolute;;	
+	position: absolute;
+}
+
+.--notInFront .umb-modalcolumn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background: rgba(0,0,0,.4);
 }
 
 /* re-align loader */
 .umb-modal .umb-loader-wrapper, .umb-modalcolumn .umb-loader-wrapper, .umb-dialog .umb-loader-wrapper{
-    position:relative; 
+    position:relative;
     margin: 20px -20px;
 }
 
@@ -74,6 +85,7 @@
 	bottom: 0px;
 	position: absolute;
 	padding: 0px;
+  	background: @white;
 }
 
 .umb-dialog .umb-btn-toolbar .umb-control-group{
@@ -87,22 +99,24 @@
     top: 0px;
     left: 0px;
     right: 0px;
-    bottom: 52px;
+    bottom: 49px;
 }
 .umb-dialog-body .umb-pane{margin-top: 15px;}
 
 .umb-dialog-footer{
 	position: absolute;
 	overflow:auto;
-	text-align: right; 
+	text-align: right;
 	height: 32px;
 	left: 0px;
 	right: 0px;
 	bottom: 0px;
-    padding: 10px 20px;
+    padding: 8px;
     margin: 0;
-    background: @gray-10;
-    border-top: 1px solid @purple-l3;
+
+    .btn.umb-outline {
+        position: relative
+    }
 }
 
 /*we will always make sure to wrap iframe dialogs in proper padding*/
@@ -116,7 +130,7 @@
 .umbracoDialog form{height: 100%;}
 
 /*ensures dialogs doesnt have side-by-side labels*/
-.umbracoDialog .controls-row, 
+.umbracoDialog .controls-row,
 .umb-modal .controls-row{margin-left: 0px !important;}
 
 /* modal and umb-modal are used for right.hand dialogs */
@@ -129,10 +143,7 @@
 	outline: none;
 	top: 0 !important;
 	left: -100% !important;
-	width: 0px !important;
-	-webkit-transition: left 0.3s linear, left 0.3s ease-out;
-	-moz-transition: opacity 0.3s linear, top 0.3s ease-out;
-	-o-transition: opacity 0.3s linear, top 0.3s ease-out;
+	width: 0 !important;
 	transition: opacity 0.3s linear, top 0.3s ease-out;
 	height: 100% !important;
 }
@@ -149,10 +160,7 @@
 .umb-modal-left.fade {
 	top: 0 !important;
 	left: -100% !important;
-	width: 0px !important;
-	-webkit-transition: left 0.3s linear, left 0.3s ease-out;
-	-moz-transition: opacity 0.3s linear, top 0.3s ease-out;
-	-o-transition: opacity 0.3s linear, top 0.3s ease-out;
+	width: 0 !important;
 	transition: opacity 0.3s linear, top 0.3s ease-out;
 	height: 100% !important;
 }
@@ -170,7 +178,7 @@
   padding: 20px;
   background: @white;
   border: none;
-  height: auto; 
+  height: auto;
 }
 .umb-modal .umb-panel-body{
 	padding: 0px 20px 0px 20px;
@@ -182,7 +190,7 @@
 }
 .umb-modal i {
   font-size: 20px;
-} 
+}
 .umb-modal .breadcrumb {
 	background: none;
 	padding: 0

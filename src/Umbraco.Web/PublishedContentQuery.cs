@@ -1,21 +1,14 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Xml.XPath;
 using Examine;
-using Examine.LuceneEngine.Providers;
-using Examine.LuceneEngine.SearchCriteria;
-using Examine.Providers;
-using Examine.SearchCriteria;
-using umbraco;
+using Examine.Search;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Dynamics;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
-using Umbraco.Web.Models;
+using Umbraco.Examine;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web
@@ -23,524 +16,312 @@ namespace Umbraco.Web
     /// <summary>
     /// A class used to query for published content, media items
     /// </summary>
-    public class PublishedContentQuery : ITypedPublishedContentQuery, IDynamicPublishedContentQuery
+    public class PublishedContentQuery : IPublishedContentQuery
     {
-        private readonly ITypedPublishedContentQuery _typedContentQuery;
-        private readonly IDynamicPublishedContentQuery _dynamicContentQuery;
-        private readonly ContextualPublishedContentCache _contentCache;
-        private readonly ContextualPublishedMediaCache _mediaCache;
+        private readonly IPublishedSnapshot _publishedSnapshot;
+        private readonly IVariationContextAccessor _variationContextAccessor;
+        private readonly IExamineManager _examineManager;
 
-        /// <summary>
-        /// Constructor used to return results from the caches
-        /// </summary>
-        /// <param name="contentCache"></param>
-        /// <param name="mediaCache"></param>
-        public PublishedContentQuery(ContextualPublishedContentCache contentCache, ContextualPublishedMediaCache mediaCache)
+        [Obsolete("Use the constructor with all parameters instead")]
+        public PublishedContentQuery(IPublishedSnapshot publishedSnapshot, IVariationContextAccessor variationContextAccessor)
+            : this (publishedSnapshot, variationContextAccessor, ExamineManager.Instance)
         {
-            if (contentCache == null) throw new ArgumentNullException("contentCache");
-            if (mediaCache == null) throw new ArgumentNullException("mediaCache");
-            _contentCache = contentCache;
-            _mediaCache = mediaCache;
         }
 
         /// <summary>
-        /// Constructor used to wrap the ITypedPublishedContentQuery and IDynamicPublishedContentQuery objects passed in
+        /// Initializes a new instance of the <see cref="PublishedContentQuery"/> class.
         /// </summary>
-        /// <param name="typedContentQuery"></param>
-        /// <param name="dynamicContentQuery"></param>
-        public PublishedContentQuery(ITypedPublishedContentQuery typedContentQuery, IDynamicPublishedContentQuery dynamicContentQuery)
+        public PublishedContentQuery(IPublishedSnapshot publishedSnapshot, IVariationContextAccessor variationContextAccessor, IExamineManager examineManager)
         {
-            if (typedContentQuery == null) throw new ArgumentNullException("typedContentQuery");
-            if (dynamicContentQuery == null) throw new ArgumentNullException("dynamicContentQuery");
-            _typedContentQuery = typedContentQuery;
-            _dynamicContentQuery = dynamicContentQuery;
+            _publishedSnapshot = publishedSnapshot ?? throw new ArgumentNullException(nameof(publishedSnapshot));
+            _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
+            _examineManager = examineManager ?? throw new ArgumentNullException(nameof(examineManager));
         }
 
         #region Content
 
-        public IPublishedContent TypedContent(int id)
+        public IPublishedContent Content(int id)
         {
-            return _typedContentQuery == null
-                ? TypedDocumentById(id, _contentCache)
-                : _typedContentQuery.TypedContent(id);
+            return ItemById(id, _publishedSnapshot.Content);
         }
 
-        public IPublishedContent TypedContent(Guid id)
+        public IPublishedContent Content(Guid id)
         {
-            return _typedContentQuery == null
-                ? TypedDocumentById(id, _contentCache)
-                : _typedContentQuery.TypedContent(id);
+            return ItemById(id, _publishedSnapshot.Content);
         }
 
-        public IPublishedContent TypedContentSingleAtXPath(string xpath, params XPathVariable[] vars)
+        public IPublishedContent Content(Udi id)
         {
-            return _typedContentQuery == null
-                ? TypedDocumentByXPath(xpath, vars, _contentCache)
-                : _typedContentQuery.TypedContentSingleAtXPath(xpath, vars);
-        }
-        
-        public IEnumerable<IPublishedContent> TypedContent(IEnumerable<int> ids)
-        {
-            return _typedContentQuery == null
-                ? TypedDocumentsByIds(_contentCache, ids)
-                : _typedContentQuery.TypedContent(ids);
+            if (!(id is GuidUdi udi)) return null;
+            return ItemById(udi.Guid, _publishedSnapshot.Content);
         }
 
-        public IEnumerable<IPublishedContent> TypedContent(IEnumerable<Guid> ids)
+        public IPublishedContent ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
         {
-            return _typedContentQuery == null
-                ? TypedDocumentsByIds(_contentCache, ids)
-                : _typedContentQuery.TypedContent(ids);
+            return ItemByXPath(xpath, vars, _publishedSnapshot.Content);
         }
 
-        public IEnumerable<IPublishedContent> TypedContentAtXPath(string xpath, params XPathVariable[] vars)
+        public IEnumerable<IPublishedContent> Content(IEnumerable<int> ids)
         {
-            return _typedContentQuery == null
-                ? TypedDocumentsByXPath(xpath, vars, _contentCache)
-                : _typedContentQuery.TypedContentAtXPath(xpath, vars);
+            return ItemsByIds(_publishedSnapshot.Content, ids);
         }
 
-        public IEnumerable<IPublishedContent> TypedContentAtXPath(XPathExpression xpath, params XPathVariable[] vars)
+        public IEnumerable<IPublishedContent> Content(IEnumerable<Guid> ids)
         {
-            return _typedContentQuery == null
-                ? TypedDocumentsByXPath(xpath, vars, _contentCache)
-                : _typedContentQuery.TypedContentAtXPath(xpath, vars);
+            return ItemsByIds(_publishedSnapshot.Content, ids);
         }
 
-        public IEnumerable<IPublishedContent> TypedContentAtRoot()
+        public IEnumerable<IPublishedContent> ContentAtXPath(string xpath, params XPathVariable[] vars)
         {
-            return _typedContentQuery == null
-                ? TypedDocumentsAtRoot(_contentCache)
-                : _typedContentQuery.TypedContentAtRoot();
+            return ItemsByXPath(xpath, vars, _publishedSnapshot.Content);
         }
 
-        public dynamic Content(int id)
+        public IEnumerable<IPublishedContent> ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars)
         {
-            return _dynamicContentQuery == null
-                ? DocumentById(id, _contentCache, DynamicNull.Null)
-                : _dynamicContentQuery.Content(id);
+            return ItemsByXPath(xpath, vars, _publishedSnapshot.Content);
         }
 
-        public dynamic Content(Guid id)
+        public IEnumerable<IPublishedContent> ContentAtRoot()
         {
-            return _dynamicContentQuery == null
-                ? DocumentById(id, _contentCache, DynamicNull.Null)
-                : _dynamicContentQuery.Content(id);
-        }
-
-        public dynamic ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
-        {
-            return _dynamicContentQuery == null
-                ? DocumentByXPath(xpath, vars, _contentCache, DynamicNull.Null)
-                : _dynamicContentQuery.ContentSingleAtXPath(xpath, vars);
-        }
-
-        public dynamic ContentSingleAtXPath(XPathExpression xpath, params XPathVariable[] vars)
-        {
-            return _dynamicContentQuery == null
-                ? DocumentByXPath(xpath, vars, _contentCache, DynamicNull.Null)
-                : _dynamicContentQuery.ContentSingleAtXPath(xpath, vars);
-        }
-        
-        public dynamic Content(IEnumerable<int> ids)
-        {
-            return _dynamicContentQuery == null
-                ? DocumentByIds(_contentCache, ids.ToArray())
-                : _dynamicContentQuery.Content(ids);
-        }
-
-        public dynamic Content(IEnumerable<Guid> ids)
-        {
-            return _dynamicContentQuery == null
-                ? DocumentByIds(_contentCache, ids.ToArray())
-                : _dynamicContentQuery.Content(ids);
-        }
-
-        public dynamic ContentAtXPath(string xpath, params XPathVariable[] vars)
-        {
-            return _dynamicContentQuery == null
-                ? DocumentsByXPath(xpath, vars, _contentCache)
-                : _dynamicContentQuery.ContentAtXPath(xpath, vars);
-        }
-
-        public dynamic ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars)
-        {
-            return _dynamicContentQuery == null
-                ? DocumentsByXPath(xpath, vars, _contentCache)
-                : _dynamicContentQuery.ContentAtXPath(xpath, vars);
-        }
-
-        public dynamic ContentAtRoot()
-        {
-            return _dynamicContentQuery == null
-                ? DocumentsAtRoot(_contentCache)
-                : _dynamicContentQuery.ContentAtRoot();
+            return ItemsAtRoot(_publishedSnapshot.Content);
         }
 
         #endregion
 
         #region Media
-        
-        public IPublishedContent TypedMedia(int id)
+
+        public IPublishedContent Media(int id)
         {
-            return _typedContentQuery == null
-                ? TypedDocumentById(id, _mediaCache)
-                : _typedContentQuery.TypedMedia(id);
+            return ItemById(id, _publishedSnapshot.Media);
         }
 
-        public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<int> ids)
+        public IPublishedContent Media(Guid id)
         {
-            return _typedContentQuery == null
-                ? TypedDocumentsByIds(_mediaCache, ids)
-                : _typedContentQuery.TypedMedia(ids);
+            return ItemById(id, _publishedSnapshot.Media);
         }
 
-        public IEnumerable<IPublishedContent> TypedMediaAtRoot()
+        public IPublishedContent Media(Udi id)
         {
-            return _typedContentQuery == null
-                ? TypedDocumentsAtRoot(_mediaCache)
-                : _typedContentQuery.TypedMediaAtRoot();
+            if (!(id is GuidUdi udi)) return null;
+            return ItemById(udi.Guid, _publishedSnapshot.Media);
         }
 
-        public dynamic Media(int id)
+        public IEnumerable<IPublishedContent> Media(IEnumerable<int> ids)
         {
-            return _dynamicContentQuery == null
-                ? DocumentById(id, _mediaCache, DynamicNull.Null)
-                : _dynamicContentQuery.Media(id);
-        }
-        
-        public dynamic Media(IEnumerable<int> ids)
-        {
-            return _dynamicContentQuery == null
-                ? DocumentByIds(_mediaCache, ids)
-                : _dynamicContentQuery.Media(ids);
+            return ItemsByIds(_publishedSnapshot.Media, ids);
         }
 
-        public dynamic MediaAtRoot()
+        public IEnumerable<IPublishedContent> Media(IEnumerable<Guid> ids)
         {
-            return _dynamicContentQuery == null
-                ? DocumentsAtRoot(_mediaCache)
-                : _dynamicContentQuery.MediaAtRoot();
+            return ItemsByIds(_publishedSnapshot.Media, ids);
         }
+
+        public IEnumerable<IPublishedContent> MediaAtRoot()
+        {
+            return ItemsAtRoot(_publishedSnapshot.Media);
+        }
+
 
         #endregion
 
         #region Used by Content/Media
 
-        private IPublishedContent TypedDocumentById(int id, ContextualPublishedCache cache)
+        private static IPublishedContent ItemById(int id, IPublishedCache cache)
         {
             var doc = cache.GetById(id);
             return doc;
         }
 
-        private IPublishedContent TypedDocumentById(Guid key, ContextualPublishedCache cache)
+        private static IPublishedContent ItemById(Guid id, IPublishedCache cache)
         {
-            return cache.GetById(key);
+            var doc = cache.GetById(id);
+            return doc;
         }
 
-        private IPublishedContent TypedDocumentByXPath(string xpath, XPathVariable[] vars, ContextualPublishedContentCache cache)
+        private static IPublishedContent ItemByXPath(string xpath, XPathVariable[] vars, IPublishedCache cache)
         {
             var doc = cache.GetSingleByXPath(xpath, vars);
             return doc;
         }
 
         //NOTE: Not used?
-        //private IPublishedContent TypedDocumentByXPath(XPathExpression xpath, XPathVariable[] vars, ContextualPublishedContentCache cache)
+        //private IPublishedContent ItemByXPath(XPathExpression xpath, XPathVariable[] vars, IPublishedCache cache)
         //{
         //    var doc = cache.GetSingleByXPath(xpath, vars);
         //    return doc;
-        //}        
+        //}
 
-        private IEnumerable<IPublishedContent> TypedDocumentsByIds(ContextualPublishedCache cache, IEnumerable<int> ids)
+        private static IEnumerable<IPublishedContent> ItemsByIds(IPublishedCache cache, IEnumerable<int> ids)
         {
-            return ids.Select(eachId => TypedDocumentById(eachId, cache)).WhereNotNull();
+            return ids.Select(eachId => ItemById(eachId, cache)).WhereNotNull();
         }
 
-        private IEnumerable<IPublishedContent> TypedDocumentsByIds(ContextualPublishedCache cache, IEnumerable<Guid> ids)
+        private IEnumerable<IPublishedContent> ItemsByIds(IPublishedCache cache, IEnumerable<Guid> ids)
         {
-            return ids.Select(eachId => TypedDocumentById(eachId, cache)).WhereNotNull();
+            return ids.Select(eachId => ItemById(eachId, cache)).WhereNotNull();
         }
 
-        private IEnumerable<IPublishedContent> TypedDocumentsByXPath(string xpath, XPathVariable[] vars, ContextualPublishedContentCache cache)
-        {
-            var doc = cache.GetByXPath(xpath, vars);
-            return doc;
-        }
-
-        private IEnumerable<IPublishedContent> TypedDocumentsByXPath(XPathExpression xpath, XPathVariable[] vars, ContextualPublishedContentCache cache)
+        private static IEnumerable<IPublishedContent> ItemsByXPath(string xpath, XPathVariable[] vars, IPublishedCache cache)
         {
             var doc = cache.GetByXPath(xpath, vars);
             return doc;
         }
 
-        private IEnumerable<IPublishedContent> TypedDocumentsAtRoot(ContextualPublishedCache cache)
+        private static IEnumerable<IPublishedContent> ItemsByXPath(XPathExpression xpath, XPathVariable[] vars, IPublishedCache cache)
+        {
+            var doc = cache.GetByXPath(xpath, vars);
+            return doc;
+        }
+
+        private static IEnumerable<IPublishedContent> ItemsAtRoot(IPublishedCache cache)
         {
             return cache.GetAtRoot();
-        }
-
-        private dynamic DocumentById(int id, ContextualPublishedCache cache, object ifNotFound)
-        {
-            var doc = cache.GetById(id);
-            return doc == null
-                       ? ifNotFound
-                       : new DynamicPublishedContent(doc).AsDynamic();
-        }
-
-        private dynamic DocumentById(Guid id, ContextualPublishedCache cache, object ifNotFound)
-        {
-            var doc = TypedDocumentById(id, cache);
-            return doc == null
-                       ? ifNotFound
-                       : new DynamicPublishedContent(doc).AsDynamic();
-        }
-
-        private dynamic DocumentByXPath(string xpath, XPathVariable[] vars, ContextualPublishedCache cache, object ifNotFound)
-        {
-            var doc = cache.GetSingleByXPath(xpath, vars);
-            return doc == null
-                       ? ifNotFound
-                       : new DynamicPublishedContent(doc).AsDynamic();
-        }
-
-        private dynamic DocumentByXPath(XPathExpression xpath, XPathVariable[] vars, ContextualPublishedCache cache, object ifNotFound)
-        {
-            var doc = cache.GetSingleByXPath(xpath, vars);
-            return doc == null
-                       ? ifNotFound
-                       : new DynamicPublishedContent(doc).AsDynamic();
-        }
-
-        private dynamic DocumentByIds(ContextualPublishedCache cache, IEnumerable<int> ids)
-        {
-            var dNull = DynamicNull.Null;
-            var nodes = ids.Select(eachId => DocumentById(eachId, cache, dNull))
-                           .Where(x => TypeHelper.IsTypeAssignableFrom<DynamicNull>(x) == false)
-                           .Cast<DynamicPublishedContent>();
-            return new DynamicPublishedContentList(nodes);
-        }
-
-        private dynamic DocumentByIds(ContextualPublishedCache cache, IEnumerable<Guid> ids)
-        {
-            var dNull = DynamicNull.Null;
-            var nodes = ids.Select(eachId => DocumentById(eachId, cache, dNull))
-                           .Where(x => TypeHelper.IsTypeAssignableFrom<DynamicNull>(x) == false)
-                           .Cast<DynamicPublishedContent>();
-            return new DynamicPublishedContentList(nodes);
-        }
-
-        private dynamic DocumentsByXPath(string xpath, XPathVariable[] vars, ContextualPublishedCache cache)
-        {
-            return new DynamicPublishedContentList(
-                cache.GetByXPath(xpath, vars)
-                     .Select(publishedContent => new DynamicPublishedContent(publishedContent))
-                );
-        }
-
-        private dynamic DocumentsByXPath(XPathExpression xpath, XPathVariable[] vars, ContextualPublishedCache cache)
-        {
-            return new DynamicPublishedContentList(
-                cache.GetByXPath(xpath, vars)
-                     .Select(publishedContent => new DynamicPublishedContent(publishedContent))
-                );
-        }
-
-        private dynamic DocumentsAtRoot(ContextualPublishedCache cache)
-        {
-            return new DynamicPublishedContentList(
-                cache.GetAtRoot()
-                     .Select(publishedContent => new DynamicPublishedContent(publishedContent))
-                );
         }
 
         #endregion
 
         #region Search
 
-        /// <summary>
-        /// Searches content
-        /// </summary>
-        /// <param name="term"></param>
-        /// <param name="useWildCards"></param>
-        /// <param name="searchProvider"></param>
-        /// <returns></returns>
-        public dynamic Search(string term, bool useWildCards = true, string searchProvider = null)
+        /// <inheritdoc />
+        public IEnumerable<PublishedSearchResult> Search(string term, string culture = "*", string indexName = null)
         {
-            return _dynamicContentQuery == null
-                ? new DynamicPublishedContentList(
-                    TypedSearch(term, useWildCards, searchProvider))
-                : _dynamicContentQuery.Search(term, useWildCards, searchProvider);
+            return Search(term, 0, 0, out _, culture, indexName);
         }
 
-        /// <summary>
-        /// Searhes content
-        /// </summary>
-        /// <param name="criteria"></param>
-        /// <param name="searchProvider"></param>
-        /// <returns></returns>
-        public dynamic Search(ISearchCriteria criteria, BaseSearchProvider searchProvider = null)
+        /// <inheritdoc />
+        public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = null)
         {
-            return _dynamicContentQuery == null
-                ? new DynamicPublishedContentList(
-                    TypedSearch(criteria, searchProvider))
-                : _dynamicContentQuery.Search(criteria, searchProvider);
-        }
+            indexName = string.IsNullOrEmpty(indexName)
+                ? Constants.UmbracoIndexes.ExternalIndexName
+                : indexName;
 
-        /// <summary>
-        /// Searches content
-        /// </summary>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
-        /// <param name="totalRecords"></param>
-        /// <param name="term"></param>
-        /// <param name="useWildCards"></param>
-        /// <param name="searchProvider"></param>
-        /// <returns></returns>
-        public IEnumerable<IPublishedContent> TypedSearch(int skip, int take, out int totalRecords, string term, bool useWildCards = true, string searchProvider = null)
-        {
-            if (_typedContentQuery != null) return _typedContentQuery.TypedSearch(skip, take, out totalRecords, term, useWildCards, searchProvider);
+            if (!_examineManager.TryGetIndex(indexName, out var index) || !(index is IUmbracoIndex umbIndex))
+                throw new InvalidOperationException($"No index found by name {indexName} or is not of type {typeof(IUmbracoIndex)}");
 
-            var searcher = ExamineManager.Instance.DefaultSearchProvider;
-            if (string.IsNullOrEmpty(searchProvider) == false)
-                searcher = ExamineManager.Instance.SearchProviderCollection[searchProvider];
-            
-            //if both are zero, use the native Examine API
-            if (skip == 0 && take == 0)
+            var searcher = umbIndex.GetSearcher();
+
+            // default to max 500 results
+            var count = skip == 0 && take == 0 ? 500 : skip + take;
+
+            ISearchResults results;
+            if (culture == "*")
             {
-                var results = searcher.Search(term, useWildCards);
-                totalRecords = results.TotalItemCount;
-                return results.ConvertSearchResultToPublishedContent(_contentCache);
-            }
+                //search everything
 
-            var luceneSearcher = searcher as BaseLuceneSearcher;
-            //if the searcher is not a base lucene searcher, we'll have to use Linq Take (edge case)
-            if (luceneSearcher == null)
+                results = searcher.Search(term, count);
+            }
+            else if (culture.IsNullOrWhiteSpace())
             {
-                var results = searcher.Search(term, useWildCards);
-                totalRecords = results.TotalItemCount;
-                return results
-                    .Skip(skip) //uses Examine Skip
-                    .ConvertSearchResultToPublishedContent(_contentCache)
-                    .Take(take); //uses Linq Take
+                //only search invariant
+
+                var qry = searcher.CreateQuery().Field(UmbracoContentIndex.VariesByCultureFieldName, "n"); //must not vary by culture
+                qry = qry.And().ManagedQuery(term);
+                results = qry.Execute(count);
             }
-
-            //create criteria for all fields
-            var allSearchFieldCriteria = SearchAllFields(term, useWildCards, luceneSearcher);
-
-            return TypedSearch(skip, take, out totalRecords, allSearchFieldCriteria, searcher);
-        }
-
-
-        /// <summary>
-        /// Searches content
-        /// </summary>
-        /// <param name="term"></param>
-        /// <param name="useWildCards"></param>
-        /// <param name="searchProvider"></param>
-        /// <returns></returns>
-        public IEnumerable<IPublishedContent> TypedSearch(string term, bool useWildCards = true, string searchProvider = null)
-        {
-            int total;
-            return TypedSearch(0, 0, out total, term, useWildCards, searchProvider);
-        }
-
-        /// <summary>
-        /// Searhes content
-        /// </summary>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
-        /// <param name="totalRecords"></param>
-        /// <param name="criteria"></param>
-        /// <param name="searchProvider"></param>
-        /// <returns></returns>
-        public IEnumerable<IPublishedContent> TypedSearch(int skip, int take, out int totalRecords, ISearchCriteria criteria, BaseSearchProvider searchProvider = null)
-        {
-            if (_typedContentQuery != null) return _typedContentQuery.TypedSearch(skip, take, out totalRecords, criteria, searchProvider);
-
-            var s = ExamineManager.Instance.DefaultSearchProvider;
-            if (searchProvider != null)
-                s = searchProvider;
-
-            //if both are zero, use the simple native Examine API
-            if (skip == 0 && take == 0)
+            else
             {
-                var r = s.Search(criteria);
-                totalRecords = r.TotalItemCount;
-                return r.ConvertSearchResultToPublishedContent(_contentCache);
+                //search only the specified culture
+
+                //get all index fields suffixed with the culture name supplied
+                var cultureFields = umbIndex.GetCultureAndInvariantFields(culture).ToArray();
+                var qry = searcher.CreateQuery().ManagedQuery(term, cultureFields);
+                results = qry.Execute(count);
             }
-
-            var maxResults = skip + take;
-
-            var results = s.Search(criteria,
-                //don't return more results than we need for the paging
-                //this is the 'trick' - we need to be able to load enough search results to fill
-                //all items to the maxResults
-                maxResults: maxResults);
 
             totalRecords = results.TotalItemCount;
 
-            //use examine to skip, this will ensure the lucene data is not loaded for those items
-            var records = results.Skip(skip);
-            
-            return records.ConvertSearchResultToPublishedContent(_contentCache);
+            return new CultureContextualSearchResults(results.ToPublishedSearchResults(_publishedSnapshot.Content), _variationContextAccessor, culture);
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<PublishedSearchResult> Search(IQueryExecutor query)
+        {
+            return Search(query, 0, 0, out _);
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<PublishedSearchResult> Search(IQueryExecutor query, int skip, int take, out long totalRecords)
+        {
+            var results = skip == 0 && take == 0
+                ? query.Execute()
+                : query.Execute(maxResults: skip + take);
+
+            totalRecords = results.TotalItemCount;
+            return results.ToPublishedSearchResults(_publishedSnapshot.Content);
         }
 
         /// <summary>
-        /// Searhes content
+        /// This is used to contextualize the values in the search results when enumerating over them so that the correct culture values are used
         /// </summary>
-        /// <param name="criteria"></param>
-        /// <param name="searchProvider"></param>
-        /// <returns></returns>
-        public IEnumerable<IPublishedContent> TypedSearch(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
+        private class CultureContextualSearchResults : IEnumerable<PublishedSearchResult>
         {
-            var total = 0;
-            return TypedSearch(0, 0, out total, criteria, searchProvider);
-        }
+            private readonly IEnumerable<PublishedSearchResult> _wrapped;
+            private readonly IVariationContextAccessor _variationContextAccessor;
+            private readonly string _culture;
 
-        /// <summary>
-        /// Helper method to create an ISearchCriteria for searching all fields in a <see cref="BaseLuceneSearcher"/>
-        /// </summary>
-        /// <param name="searchText"></param>
-        /// <param name="useWildcards"></param>
-        /// <param name="searcher"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// This is here because some of this stuff is internal in Examine
-        /// </remarks>
-        private ISearchCriteria SearchAllFields(string searchText, bool useWildcards, BaseLuceneSearcher searcher)
-        {
-            var sc = searcher.CreateSearchCriteria();
-
-            if (_examineGetSearchFields == null)
+            public CultureContextualSearchResults(IEnumerable<PublishedSearchResult> wrapped, IVariationContextAccessor variationContextAccessor, string culture)
             {
-                //get the GetSearchFields method from BaseLuceneSearcher
-                _examineGetSearchFields = typeof(BaseLuceneSearcher).GetMethod("GetSearchFields", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+                _wrapped = wrapped;
+                _variationContextAccessor = variationContextAccessor;
+                _culture = culture;
             }
-            //get the results of searcher.BaseLuceneSearcher() using ugly reflection since it's not public
-            var searchFields = (IEnumerable<string>)_examineGetSearchFields.Invoke(searcher, null);
 
-            //this is what Examine does internally to create ISearchCriteria for searching all fields
-            var strArray = searchText.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            sc = useWildcards == false
-                ? sc.GroupedOr(searchFields, strArray).Compile()
-                : sc.GroupedOr(searchFields, strArray.Select(x => new CustomExamineValue(Examineness.ComplexWildcard, x.MultipleCharacterWildcard().Value)).ToArray<IExamineValue>()).Compile();
-            return sc;
-        }
-
-        private static MethodInfo _examineGetSearchFields;
-
-        //support class since Examine doesn't expose it's own ExamineValue class publicly
-        private class CustomExamineValue : IExamineValue
-        {
-            public CustomExamineValue(Examineness vagueness, string value)
+            public IEnumerator<PublishedSearchResult> GetEnumerator()
             {
-                this.Examineness = vagueness;
-                this.Value = value;
-                this.Level = 1f;
+                //We need to change the current culture to what is requested and then change it back
+                var originalContext = _variationContextAccessor.VariationContext;
+                if (!_culture.IsNullOrWhiteSpace() && !_culture.InvariantEquals(originalContext.Culture))
+                    _variationContextAccessor.VariationContext = new VariationContext(_culture);
+
+                //now the IPublishedContent returned will be contextualized to the culture specified and will be reset when the enumerator is disposed
+                return new CultureContextualSearchResultsEnumerator(_wrapped.GetEnumerator(), _variationContextAccessor, originalContext);
             }
-            public Examineness Examineness { get; private set; }
-            public string Value { get; private set; }
-            public float Level { get; private set; }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
+
+            /// <summary>
+            /// Resets the variation context when this is disposed
+            /// </summary>
+            private class CultureContextualSearchResultsEnumerator : IEnumerator<PublishedSearchResult>
+            {
+                private readonly IEnumerator<PublishedSearchResult> _wrapped;
+                private readonly IVariationContextAccessor _variationContextAccessor;
+                private readonly VariationContext _originalContext;
+
+                public CultureContextualSearchResultsEnumerator(IEnumerator<PublishedSearchResult> wrapped, IVariationContextAccessor variationContextAccessor, VariationContext originalContext)
+                {
+                    _wrapped = wrapped;
+                    _variationContextAccessor = variationContextAccessor;
+                    _originalContext = originalContext;
+                }
+
+                public void Dispose()
+                {
+                    _wrapped.Dispose();
+                    //reset
+                    _variationContextAccessor.VariationContext = _originalContext;
+                }
+
+                public bool MoveNext()
+                {
+                    return _wrapped.MoveNext();
+                }
+
+                public void Reset()
+                {
+                    _wrapped.Reset();
+                }
+
+                public PublishedSearchResult Current => _wrapped.Current;
+                object IEnumerator.Current => Current;
+            }
         }
+
+
+
 
         #endregion
     }

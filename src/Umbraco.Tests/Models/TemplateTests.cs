@@ -1,16 +1,16 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Serialization;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Models
 {
     [TestFixture]
-    public class TemplateTests : BaseUmbracoConfigurationTest
+    public class TemplateTests : UmbracoTestBase
     {
         [Test]
         public void Can_Deep_Clone()
@@ -18,14 +18,14 @@ namespace Umbraco.Tests.Models
             var item = new Template("Test", "test")
             {
                 Id = 3,
-                CreateDate = DateTime.Now,                
+                CreateDate = DateTime.Now,
                 Key = Guid.NewGuid(),
                 UpdateDate = DateTime.Now,
                 Content = "blah",
                 Path = "-1,3",
-                IsMasterTemplate = true,                
+                IsMasterTemplate = true,
                 MasterTemplateAlias = "master",
-                MasterTemplateId = new Lazy<int>(() => 88)                
+                MasterTemplateId = new Lazy<int>(() => 88)
             };
 
             var clone = (Template)item.DeepClone();

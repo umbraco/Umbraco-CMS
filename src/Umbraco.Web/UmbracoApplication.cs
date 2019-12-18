@@ -1,58 +1,61 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
+﻿using System.Threading;
 using System.Web;
-using System.Web.Hosting;
-using System.Web.Mvc;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Manifest;
-using Umbraco.Web.Routing;
-using umbraco.businesslogic;
+using Umbraco.Core.Logging.Serilog;
+using Umbraco.Web.Runtime;
 
 namespace Umbraco.Web
 {
-	/// <summary>
-	/// The Umbraco global.asax class
-	/// </summary>
+    /// <summary>
+    /// Represents the Umbraco global.asax class.
+    /// </summary>
     public class UmbracoApplication : UmbracoApplicationBase
-	{
-	    private ManifestWatcher _mw;
+    {
+        protected override IRuntime GetRuntime()
+        {
+            var logger = SerilogLogger.CreateWithDefaultConfiguration();
+            return new WebRuntime(this, logger, new MainDom(logger));
+        }
 
-	    protected override void OnApplicationStarted(object sender, EventArgs e)
-	    {
-	        base.OnApplicationStarted(sender, e);
+        /// <summary>
+        /// Restarts the Umbraco application.
+        /// </summary>
+        public static void Restart()
+        {
+            // see notes in overload
 
-	        if (ApplicationContext.Current.IsConfigured && GlobalSettings.DebugMode)
-	        {                   
-	            var appPluginFolder = IOHelper.MapPath("~/App_Plugins/");
-	            if (Directory.Exists(appPluginFolder))
-	            {
-                        _mw = new ManifestWatcher(LoggerResolver.Current.Logger);
-                        _mw.Start(Directory.GetDirectories(appPluginFolder));
-                    }
-	        }
-	    }
+            var httpContext = HttpContext.Current;
+            if (httpContext != null)
+            {
+                httpContext.Application.Add("AppPoolRestarting", true);
+                httpContext.User = null;
+            }
+            Thread.CurrentPrincipal = null;
+            HttpRuntime.UnloadAppDomain();
+        }
 
-	    protected override void OnApplicationEnd(object sender, EventArgs e)
-	    {
-	        base.OnApplicationEnd(sender, e);
+        /// <summary>
+        /// Restarts the Umbraco application.
+        /// </summary>
+        public static void Restart(HttpContextBase httpContext)
+        {
+            if (httpContext != null)
+            {
+                // we're going to put an application wide flag to show that the application is about to restart.
+                // we're doing this because if there is a script checking if the app pool is fully restarted, then
+                // it can check if this flag exists...  if it does it means the app pool isn't restarted yet.
+                httpContext.Application.Add("AppPoolRestarting", true);
 
-	        if (_mw != null)
-	        {
-                _mw.Dispose();    
-	        }
-	    }
+                // unload app domain - we must null out all identities otherwise we get serialization errors
+                // http://www.zpqrtbnk.net/posts/custom-iidentity-serialization-issue
+                httpContext.User = null;
+            }
 
-	    protected override IBootManager GetBootManager()
-	    {
-            return new WebBootManager(this);	        
-	    }
-	}
+            if (HttpContext.Current != null)
+                HttpContext.Current.User = null;
+
+            Thread.CurrentPrincipal = null;
+            HttpRuntime.UnloadAppDomain();
+        }
+    }
 }

@@ -1,0 +1,51 @@
+<div ng-controller="Umbraco.Overlays.ListViewUnpublishController as vm">
+
+        <!-- Single language -->
+        <div ng-if="!vm.languages">
+            <p><localize key="prompt_confirmListViewUnpublish"></localize></p>
+        </div>
+
+        <div ng-if="vm.loading" style="min-height: 50px; position: relative;">
+                <umb-load-indicator></umb-load-indicator>
+        </div>
+
+        <!-- Multiple languages -->
+        <div ng-if="vm.languages.length > 1 && !vm.loading">
+
+            <div class="mb3">
+                <p><localize key="content_languagesToUnpublish"></localize></p>
+            </div>
+
+            <div class="umb-list umb-list--condensed">
+
+                <div class="bold mb1">
+                    <localize key="treeHeaders_languages"></localize>
+                </div>
+
+                <div class="umb-list-item" ng-repeat="language in vm.languages track by language.id">
+                    <ng-form name="unpublishLanguageSelectorForm">
+                        <div>
+
+                            <umb-checkbox name="unpublishLanguageSelector"
+                                          model="language.unpublish"
+                                          on-change="vm.changeSelection(language)"
+                                          text="{{language.name}}"
+                                          disabled="language.disabled"
+                                          />
+
+                            <div>
+                                <span class="db umb-list-item__description umb-list-item__description--checkbox">
+                                    <span ng-if="language.isMandatory"><localize key="languages_mandatoryLanguage"></localize></span>
+                                </span>
+                            </div>
+
+                        </div>
+
+                    </ng-form>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>

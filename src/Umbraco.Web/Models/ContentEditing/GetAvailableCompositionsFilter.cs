@@ -1,4 +1,4 @@
-namespace Umbraco.Web.Models.ContentEditing
+﻿namespace Umbraco.Web.Models.ContentEditing
 {
     public class GetAvailableCompositionsFilter
     {
@@ -16,5 +16,10 @@ namespace Umbraco.Web.Models.ContentEditing
         /// along with any content types that have matching property types that are included in the filtered content types
         /// </summary>
         public string[] FilterContentTypes { get; set; }
+
+        /// <summary>
+        /// Wether the content type is currently marked as an element type
+        /// </summary>
+        public bool IsElement { get; set; }
     }
 }

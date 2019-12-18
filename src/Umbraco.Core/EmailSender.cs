@@ -17,7 +17,7 @@ namespace Umbraco.Core
     /// </summary>
     public class EmailSender : IEmailSender
     {
-        //TODO: This should encapsulate a BackgroundTaskRunner with a queue to send these emails!
+        // TODO: This should encapsulate a BackgroundTaskRunner with a queue to send these emails!
 
         private readonly bool _enableEvents;
 
@@ -78,7 +78,7 @@ namespace Umbraco.Core
                         client.Send(message);
                     }
                 }
-            }            
+            }
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace Umbraco.Core
         {
             get { return SendEmail != null; }
         }
-        
+
         /// <summary>
         /// An event that is raised when no smtp server is configured if events are enabled
         /// </summary>

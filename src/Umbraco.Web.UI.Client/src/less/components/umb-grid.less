@@ -1,9 +1,10 @@
-// TODO General cleanup in !important (Round 2)
+// TODO: General cleanup in !important (Round 2)
 
 // Gridview
 // -------------------------
 .umb-grid IFRAME {
     overflow: hidden;
+    width: 100%;
 }
 
 
@@ -14,7 +15,7 @@
 // sortable-helper
 .umb-grid .ui-sortable-helper {
     position: absolute !important;
-    background-color: @turquoise !important;
+    background-color: @blueMid !important;
     height: 42px !important;
     width: 42px !important;
     overflow: hidden;
@@ -46,7 +47,7 @@
     position: absolute;
     left: 0;
     right: 0;
-    background-color: @turquoise;
+    background-color: @blueMid;
     height: 2px;
     margin-bottom: 20px;
 
@@ -55,7 +56,7 @@
         top: -9px;
         font-family: "icomoon";
         font-size: 18px;
-        color: @turquoise;
+        color: @blueMid;
     }
 
     &:before {
@@ -127,9 +128,10 @@
     position: relative;
     margin-bottom: 40px;
     padding-top: 10px;
+    border: 1px solid @grayLighter;
 
     &:hover {
-        background-color: @grayLighter;
+        border-color: @grayLight;
     }
 
     &[ng-click],
@@ -160,15 +162,16 @@
 }
 
 .umb-grid .umb-row .umb-cell-placeholder {
-    min-height: 130px;
-    background-color: @gray-10;
-    border-width: 2px;
+    min-height: 88px;
+    border-width: 1px;
     border-style: dashed;
-    border-color: @gray-8;
+    border-color: @ui-action-discreet-border;
+    color: @ui-action-discreet-type;
     transition: border-color 100ms linear;
 
     &:hover {
-        border-color: @turquoise;
+        border-color: @ui-action-discreet-border-hover;
+        color: @ui-action-discreet-type-hover;
         cursor: pointer;
     }
 }
@@ -201,13 +204,14 @@
     cursor: pointer;
     float: right;
     &:hover {
-        color: @turquoise-d1;
+        color: @ui-action-type-hover;
     }
 }
 
 .umb-grid .cell-tools-add {
-    color: @turquoise-d1;
+    color: @ui-action-discreet-type;
     &:focus, &:hover {
+        color: @ui-action-discreet-type-hover;
         text-decoration: none;
     }
 }
@@ -217,16 +221,18 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: @turquoise-d1;
+    color: @ui-action-discreet-type;
 }
 
 .umb-grid .cell-tools-add.-bar {
     display: block;
-    background: @gray-10;
     text-align: center;
     padding: 5px;
-    border: 1px dashed @gray-7;
+    border: 1px dashed @ui-action-discreet-border;
     margin: 10px;
+    &:focus, &:hover {
+        border-color: @ui-action-discreet-border-hover;
+    }
 }
 
 
@@ -247,7 +253,6 @@
 
 .umb-grid .cell-tools-edit {
     display: inline-block;
-    color: @white;
 }
 
 .umb-grid .drop-overlay {
@@ -305,7 +310,7 @@
 }
 
 .umb-control-collapsed:hover {
-    border-color: @turquoise;
+    border-color: @ui-action-border-hover
 }
 
 .umb-grid .umb-control-click-overlay {
@@ -318,7 +323,7 @@
     opacity: 0;
     cursor: pointer;
     &:hover {
-        background-color: @turquoise;
+        background-color: @ui-action-type-hover;
         opacity: 0.1;
         transition: opacity 0.1s;
     }
@@ -403,36 +408,29 @@
     margin-bottom: 10px;
 }
 
+.umb-grid .umb-editor-preview {
+    position: relative;
 
+    .umb-editor-preview-overlay {
+        cursor: pointer;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1;
+    }
+}
 
 // Active states
 // -------------------------
 
 // Row states
 .umb-grid .umb-row.-active {
-    background-color: @turquoise-d1;
+    border-color: @ui-action-type;
 
     .umb-row-title-bar {
         cursor: move;
-    }
-
-    .row-tool,
-    .umb-row-title {
-        color: @white;
-    }
-
-    .umb-grid-has-config {
-        color: fade(@white, 66);
-    }
-
-    .umb-cell {
-        .umb-grid-has-config {
-            color: fade(@black, 44);
-        }
-    }
-
-    .umb-cell .umb-cell-content {
-        border-color: transparent;
     }
 }
 
@@ -448,21 +446,6 @@
         color: @gray-3;
     }
 
-    .row-tool {
-        color: fade(@black, 23);
-    }
-
-    .umb-grid-has-config {
-        color: fade(@black, 44);
-    }
-
-    .umb-cell-content.-placeholder {
-        border-color: @gray-8;
-
-        &:hover {
-            border-color: fade(@gray, 44);
-        }
-    }
 }
 
 
@@ -473,7 +456,7 @@
 
     .umb-cell-content.-has-editors {
         box-shadow: 3px 3px 6px rgba(0, 0, 0, .07);
-        border-color: @turquoise;
+        border-color: @ui-action-border;
     }
 }
 
@@ -571,14 +554,13 @@
     display: inline-block;
     cursor: pointer;
     border-radius: 200px;
-    background: @gray-10;
-    border: 1px solid @gray-7;
+    border: 1px solid @ui-action-discreet-border;
     margin: 2px;
 
     &:hover, &:hover * {
-        background: @turquoise !important;
+        background: @ui-action-discreet-type-hover !important;
         color: @white !important;
-        border-color: @turquoise !important;
+        border-color: @ui-action-discreet-border-hover !important;
         text-decoration: none;
     }
 }
@@ -600,11 +582,10 @@
 
 .umb-grid .iconBox.selected {
     -webkit-appearance: none;
-    background-image: linear-gradient(to bottom,#e6e6e6,#bfbfbf);
+    background-image: linear-gradient(to bottom,@gray-9,@gray-7);
     background-repeat: repeat-x;
-    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffe6e6e6',endColorstr='#ffbfbfbf',GradientType=0);
     zoom: 1;
-    border-color: #bfbfbf #bfbfbf #999;
+    border-color: @gray-7 @gray-7 @gray-6;
     border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.1) rgba(0,0,0,0.25);
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.15),0 1px 2px rgba(0,0,0,0.05);
     border-radius: 3px;
@@ -642,6 +623,10 @@
         padding-bottom: 8px;
         padding-left: 6px;
         line-height: inherit;
+
+        .mce-caret {
+            margin-top: 6px;
+        }
     }
 
     &:not(.mce-menubtn) {
@@ -652,9 +637,12 @@
 }
 
 .umb-grid .mce-toolbar {
-    border-bottom: 1px solid @gray-8;
-    background-color: rgba(250, 250, 250, 1);
+    border-bottom: 1px solid @gray-7;
+    background-color: @white;
     display: none;
+
+    left: 0;
+    right: 0;
 }
 
 .umb-grid .umb-control.-active .mce-toolbar {
@@ -667,6 +655,13 @@
 
 .umb-grid .mceContentBody {
     overflow-y: hidden!important;
+}
+
+// had to overwrite defaults from TinyMCE, needed for buttons panel to float to new line in narrow space.
+.umb-grid .mce-container > div {
+    white-space: normal;
+    left:0;
+    right:0;
 }
 
 
@@ -708,7 +703,7 @@
 }
 
 .umb-grid .umb-control.-active {
-    border-color: @turquoise;
+    border-color: @ui-action-border;
 }
 
 .umb-grid .umb-templates-columns {
@@ -721,7 +716,7 @@
 
 .umb-grid .umb-control-bar {
     opacity: 0;
-    background: @turquoise;
+    background: @ui-action-type;
     padding: 2px 5px;
     color: @white;
     font-size: 12px;
@@ -774,7 +769,7 @@
 }
 
 .umb-grid .umb-templates-template a.tb:hover {
-    border: 5px solid @turquoise;
+    border: 5px solid @blueMid;
 }
 
 .umb-grid .umb-templates-template .tb {
@@ -804,7 +799,7 @@
 
 .umb-grid a.umb-templates-column:hover,
 .umb-grid a.umb-templates-column.selected {
-    background-color: @turquoise;
+    background-color: @blueMid;
 }
 
 
@@ -834,8 +829,6 @@
     .preview-rows {
         display: inline-block;
         position: relative;
-        -webkit-box-sizing: border-box;
-        -moz-box-sizing: border-box;
         box-sizing: border-box;
         width: 125px;
         margin: 15px;
@@ -854,7 +847,7 @@
         }
 
         &:hover {
-            border-color: @turquoise;
+            border-color: @blueMid;
             cursor: pointer;
         }
 
@@ -899,8 +892,6 @@
         .preview-col {
             display: block;
             float: left;
-            -webkit-box-sizing: border-box;
-            -moz-box-sizing: border-box;
             box-sizing: border-box;
             width: 33.3%;
 
@@ -996,7 +987,7 @@
     font-size: 12px;
 
     &:hover, &:hover * {
-        background: @turquoise;
+        background: @blueMid;
         color: @white;
     }
 }

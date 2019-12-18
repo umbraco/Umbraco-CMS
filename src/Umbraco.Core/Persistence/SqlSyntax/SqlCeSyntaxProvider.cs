@@ -1,26 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlServerCe;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
     /// <summary>
     /// Represents an SqlSyntaxProvider for Sql Ce
     /// </summary>
-    [SqlSyntaxProvider(Constants.DatabaseProviders.SqlCe)]
     public class SqlCeSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlCeSyntaxProvider>
     {
-        public SqlCeSyntaxProvider()
+        public override Sql<ISqlContext> SelectTop(Sql<ISqlContext> sql, int top)
         {
-            
-        }
-
-        public override Sql SelectTop(Sql sql, int top)
-        {
-            return new Sql(sql.SQL.Insert(sql.SQL.IndexOf(' '), " TOP " + top), sql.Arguments);
+            return new Sql<ISqlContext>(sql.SqlContext, sql.SQL.Insert(sql.SQL.IndexOf(' '), " TOP " + top), sql.Arguments);
         }
 
         public override bool SupportsClustered()
@@ -53,22 +49,12 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return indexType;
         }
 
-        [Obsolete("Use the overload with the parameter index instead")]
-        public override string GetStringColumnEqualComparison(string column, string value, TextColumnType columnType)
+        public override string GetConcat(params string[] args)
         {
-            switch (columnType)
-            {
-                case TextColumnType.NVarchar:
-                    return base.GetStringColumnEqualComparison(column, value, columnType);
-                case TextColumnType.NText:
-                    //MSSQL doesn't allow for = comparison with NText columns but allows this syntax
-                    return string.Format("{0} LIKE '{1}'", column, value);
-                default:
-                    throw new ArgumentOutOfRangeException("columnType");
-            }   
+            return "(" + string.Join("+", args) + ")";
         }
 
-        
+        public override System.Data.IsolationLevel DefaultIsolationLevel => System.Data.IsolationLevel.RepeatableRead;
 
         public override string FormatColumnRename(string tableName, string oldName, string newName)
         {
@@ -107,13 +93,13 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                                  columns);
         }
 
-        public override IEnumerable<string> GetTablesInSchema(Database db)
+        public override IEnumerable<string> GetTablesInSchema(IDatabase db)
         {
             var items = db.Fetch<dynamic>("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES");
             return items.Select(x => x.TABLE_NAME).Cast<string>().ToList();
         }
 
-        public override IEnumerable<ColumnInfo> GetColumnsInSchema(Database db)
+        public override IEnumerable<ColumnInfo> GetColumnsInSchema(IDatabase db)
         {
             var items = db.Fetch<dynamic>("SELECT TABLE_NAME, COLUMN_NAME, ORDINAL_POSITION, COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS");
             return
@@ -124,25 +110,25 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         }
 
         /// <inheritdoc />
-        public override IEnumerable<Tuple<string, string>> GetConstraintsPerTable(Database db)
+        public override IEnumerable<Tuple<string, string>> GetConstraintsPerTable(IDatabase db)
         {
             var items = db.Fetch<dynamic>("SELECT TABLE_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS");
             return items.Select(item => new Tuple<string, string>(item.TABLE_NAME, item.CONSTRAINT_NAME)).ToList();
         }
 
         /// <inheritdoc />
-        public override IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(Database db)
+        public override IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(IDatabase db)
         {
             var items = db.Fetch<dynamic>("SELECT TABLE_NAME, COLUMN_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE");
             return items.Select(item => new Tuple<string, string, string>(item.TABLE_NAME, item.COLUMN_NAME, item.CONSTRAINT_NAME)).ToList();
         }
 
         /// <inheritdoc />
-        public override IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(Database db)
+        public override IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(IDatabase db)
         {
             var items =
                 db.Fetch<dynamic>(
-                    @"SELECT TABLE_NAME, INDEX_NAME, COLUMN_NAME, [UNIQUE] FROM INFORMATION_SCHEMA.INDEXES 
+                    @"SELECT TABLE_NAME, INDEX_NAME, COLUMN_NAME, [UNIQUE] FROM INFORMATION_SCHEMA.INDEXES
 WHERE PRIMARY_KEY=0
 ORDER BY TABLE_NAME, INDEX_NAME");
             return
@@ -150,13 +136,57 @@ ORDER BY TABLE_NAME, INDEX_NAME");
                     item => new Tuple<string, string, string, bool>(item.TABLE_NAME, item.INDEX_NAME, item.COLUMN_NAME, item.UNIQUE));
         }
 
-        public override bool DoesTableExist(Database db, string tableName)
+        /// <inheritdoc />
+        public override bool TryGetDefaultConstraint(IDatabase db, string tableName, string columnName, out string constraintName)
+        {
+            // cannot return a true default constraint name (does not exist on SqlCe)
+            // but we won't really need it anyways - just check whether there is a constraint
+            constraintName = null;
+            var hasDefault = db.Fetch<bool>(@"select column_hasdefault from information_schema.columns
+where table_name=@0 and column_name=@1", tableName, columnName).FirstOrDefault();
+            return hasDefault;
+        }
+
+        public override bool DoesTableExist(IDatabase db, string tableName)
         {
             var result =
                 db.ExecuteScalar<long>("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = @TableName",
                                        new { TableName = tableName });
 
             return result > 0;
+        }
+
+        public override void WriteLock(IDatabase db, params int[] lockIds)
+        {
+            // soon as we get Database, a transaction is started
+
+            if (db.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
+                throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
+
+            db.Execute(@"SET LOCK_TIMEOUT 1800;");
+            // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
+            foreach (var lockId in lockIds)
+            {
+                var i = db.Execute(@"UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id", new { id = lockId });
+                if (i == 0) // ensure we are actually locking!
+                    throw new ArgumentException($"LockObject with id={lockId} does not exist.");
+            }
+        }
+
+        public override void ReadLock(IDatabase db, params int[] lockIds)
+        {
+            // soon as we get Database, a transaction is started
+
+            if (db.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
+                throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
+
+            // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
+            foreach (var lockId in lockIds)
+            {
+                var i = db.ExecuteScalar<int?>("SELECT value FROM umbracoLock WHERE id=@id", new { id = lockId });
+                if (i == null) // ensure we are actually locking!
+                    throw new ArgumentException($"LockObject with id={lockId} does not exist.");
+            }
         }
 
         protected override string FormatIdentity(ColumnDefinition column)
@@ -177,7 +207,7 @@ ORDER BY TABLE_NAME, INDEX_NAME");
             switch (systemMethod)
             {
                 case SystemMethods.NewGuid:
-                    return "NEWID()";                
+                    return "NEWID()";
                 case SystemMethods.CurrentDateTime:
                     return "GETDATE()";
                 //case SystemMethods.NewSequentialId:
@@ -193,13 +223,13 @@ ORDER BY TABLE_NAME, INDEX_NAME");
         {
             get
             {
-                return "ALTER TABLE [{0}] ALTER COLUMN [{1}] DROP DEFAULT";
+                return "ALTER TABLE {0} ALTER COLUMN {1} DROP DEFAULT";
             }
         }
 
-        
+
 
         public override string DropIndex { get { return "DROP INDEX {1}.{0}"; } }
-        
+
     }
 }

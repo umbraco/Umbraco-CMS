@@ -1,11 +1,16 @@
-﻿using AutoMapper;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
@@ -17,6 +22,11 @@ namespace Umbraco.Web.Editors
     [UmbracoTreeAuthorize(Constants.Trees.Templates)]
     public class TemplateController : BackOfficeNotificationsController
     {
+        public TemplateController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        {
+        }
+
         /// <summary>
         /// Gets data type by alias
         /// </summary>
@@ -47,12 +57,12 @@ namespace Umbraco.Web.Editors
             var template = Services.FileService.GetTemplate(id);
             if (template == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
-            
+
             return Mapper.Map<ITemplate, TemplateDisplay>(template);
         }
 
         /// <summary>
-        /// Deletes a template wth a given ID
+        /// Deletes a template with a given ID
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -85,7 +95,7 @@ namespace Umbraco.Web.Editors
 
             var content = ViewHelper.GetDefaultFileContent( layoutPageAlias: dt.MasterTemplateAlias );
             var scaffold = Mapper.Map<ITemplate, TemplateDisplay>(dt);
-           
+
             scaffold.Content =  content + "\r\n\r\n@* the fun starts here *@\r\n\r\n";
             return scaffold;
         }
@@ -103,7 +113,7 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
-            
+
             if (display.Id > 0)
             {
                 // update
@@ -136,13 +146,13 @@ namespace Umbraco.Web.Editors
                             {
                                 //template ID to find
                                 var templateIdInPath = "," + display.Id + ",";
-                                
+
                                 if (string.IsNullOrEmpty(childTemplate.Path))
                                 {
                                     continue;
                                 }
 
-                                //Find position in current comma seperate string path (so we get the correct children path)
+                                //Find position in current comma separate string path (so we get the correct children path)
                                 var positionInPath = childTemplate.Path.IndexOf(templateIdInPath) + templateIdInPath.Length;
 
                                 //Get the substring of the child & any children (descendants it may have too)
@@ -184,7 +194,7 @@ namespace Umbraco.Web.Editors
                         throw new HttpResponseException(HttpStatusCode.NotFound);
                 }
 
-                var template = Services.FileService.CreateTemplateWithIdentity(display.Name, display.Content, master);
+                var template = Services.FileService.CreateTemplateWithIdentity(display.Name, display.Alias, display.Content, master);
                 Mapper.Map(template, display);
             }
 

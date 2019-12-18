@@ -1,8 +1,9 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Models.ContentEditing
@@ -22,7 +23,7 @@ namespace Umbraco.Web.Models.ContentEditing
         [EmailAddress]
         public string Email { get; set; }
 
-        [DataMember(Name = "username")]        
+        [DataMember(Name = "username")]
         public string Username { get; set; }
 
         [DataMember(Name = "message")]
@@ -33,7 +34,7 @@ namespace Umbraco.Web.Models.ContentEditing
             if (UserGroups.Any() == false)
                 yield return new ValidationResult("A user must be assigned to at least one group", new[] { "UserGroups" });
 
-            if (UmbracoConfig.For.UmbracoSettings().Security.UsernameIsEmail == false && Username.IsNullOrWhiteSpace())
+            if (Current.Configs.Settings().Security.UsernameIsEmail == false && Username.IsNullOrWhiteSpace())
                 yield return new ValidationResult("A username cannot be empty", new[] { "Username" });
         }
     }

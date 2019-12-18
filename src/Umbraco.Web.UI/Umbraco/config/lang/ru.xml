@@ -1,0 +1,1844 @@
+<?xml version="1.0" encoding="utf-8"?>
+<language alias="ru" intName="Russian" localName="русский" lcid="" culture="ru-RU">
+  <creator>
+    <name>The Umbraco community</name>
+    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+  </creator>
+  <area alias="actions">
+    <key alias="assignDomain">Языки и домены</key>
+    <key alias="auditTrail">История исправлений</key>
+    <key alias="browse">Просмотреть</key>
+    <key alias="changeDocType">Изменить тип документа</key>
+    <key alias="copy">Копировать</key>
+    <key alias="create">Создать</key>
+    <key alias="createblueprint">Создать шаблон содержимого</key>
+    <key alias="createGroup">Создать группу</key>
+    <key alias="createPackage">Создать пакет</key>
+    <key alias="defaultValue">Значение по умолчанию</key>
+    <key alias="delete">Удалить</key>
+    <key alias="disable">Отключить</key>
+    <key alias="emptyRecycleBin">Очистить корзину</key>
+    <key alias="enable">Включить</key>
+    <key alias="export">Экспорт</key>
+    <key alias="exportDocumentType">Экспортировать</key>
+    <key alias="importDocumentType">Импортировать</key>
+    <key alias="importPackage">Импортировать пакет</key>
+    <key alias="liveEdit">Править на месте</key>
+    <key alias="logout">Выйти</key>
+    <key alias="move">Переместить</key>
+    <key alias="notify">Уведомления</key>
+    <key alias="protect">Публичный доступ</key>
+    <key alias="publish">Опубликовать</key>
+    <key alias="refreshNode">Обновить узлы</key>
+    <key alias="rename" version="7.3.0">Переименовать</key>
+    <key alias="republish">Опубликовать весь сайт</key>
+    <key alias="SetPermissionsForThePage">Установить разрешения для страницы '%0%'</key>
+    <key alias="restore" version="7.3.0">Восстановить</key>
+    <key alias="rights">Разрешения</key>
+    <key alias="rollback">Откатить</key>
+    <key alias="sendtopublish">Направить на публикацию</key>
+    <key alias="sendToTranslate">Направить на перевод</key>
+    <key alias="setGroup">Задать группу</key>
+    <key alias="setPermissions">Задать права</key>
+    <key alias="sort">Сортировать</key>
+    <key alias="translate">Перевести</key>
+    <key alias="unpublish">Скрыть</key>
+    <key alias="unlock">Разблокировать</key>
+    <key alias="update">Обновить</key>
+  </area>
+  <area alias="actionCategories">
+    <key alias="content">Содержимое</key>
+    <key alias="administration">Администрирование</key>
+    <key alias="structure">Структура</key>
+    <key alias="other">Другое</key>
+  </area>
+  <area alias="actionDescriptions">
+    <key alias="assignDomain">Разрешить доступ к назначению языков и доменов</key>
+    <key alias="auditTrail">Разрешить доступ к просмотру журнала истории узла</key>
+    <key alias="browse">Разрешить доступ на просмотр узла</key>
+    <key alias="changeDocType">Разрешить доступ на смену типа документа для узла</key>
+    <key alias="copy">Разрешить доступ к копированию узла</key>
+    <key alias="create">Разрешить доступ к созданию узлов</key>
+    <key alias="delete">Разрешить доступ к удалению узлов</key>
+    <key alias="move">Разрешить доступ к перемещению узла</key>
+    <key alias="protect">Разрешить доступ к установке и изменению правил публичного доступа для узла</key>
+    <key alias="publish">Разрешить доступ к публикации узла</key>
+    <key alias="rights">Разрешить доступ к изменению прав доступа к узлу</key>
+    <key alias="rollback">Разрешить доступ на возврат к предыдущим состояниям узла</key>
+    <key alias="sendtopublish">Разрешить доступ к отправке узла на одобрение перед публикацией</key>
+    <key alias="sendToTranslate">Разрешить доступ к отправке узла на перевод данных</key>
+    <key alias="sort">Разрешить доступ к изменению порядка сортировки узлов</key>
+    <key alias="translate">Разрешить доступ к переводу данных узла</key>
+    <key alias="update">Разрешить доступ к сохранению узла</key>
+    <key alias="createblueprint">Разрешить доступ к созданию шаблона содержимого</key>
+  </area>
+  <area alias="assignDomain">
+    <key alias="addNew">Добавить новый домен</key>
+    <key alias="domain">Домен</key>
+    <key alias="domainCreated">Создан новый домен '%0%'</key>
+    <key alias="domainDeleted">Домен '%0%' удален</key>
+    <key alias="domainExists">Домен с именем '%0%' уже существует</key>
+    <key alias="domainUpdated">Домен '%0%' обновлен</key>
+    <key alias="duplicateDomain">Такой домен уже назначен.</key>
+    <key alias="inherit">Унаследовать</key>
+    <key alias="invalidDomain">Недопустимый формат домена.</key>
+    <key alias="invalidNode">Недопустимый узел.</key>
+    <key alias="language">Язык</key>
+    <key alias="orEdit">Править существующие домены</key>
+    <key alias="permissionDenied">Недостаточно полномочий.</key>
+    <key alias="remove">удалить</key>
+    <key alias="setDomains">Домены</key>
+    <key alias="setLanguage">Язык (культура)</key>
+    <key alias="setLanguageHelp"><![CDATA[Установите язык (культуру) для всех дочерних узлов,<br /> или унаследуйте язык от родительских узлов.<br />
+		Эта установка будет применена также и к текущему узлу, если только для него ниже явно не задан домен.]]></key>
+  </area>
+  <area alias="auditTrails">
+    <key alias="atViewingFor">Наблюдать за</key>
+  </area>
+  <area alias="blueprints">
+    <key alias="createBlueprintFrom">Создать новый шаблон содержимого из '%0%'</key>
+    <key alias="blankBlueprint">Пустой</key>
+    <key alias="selectBlueprint">Выбрать шаблон содержимого</key>
+    <key alias="createdBlueprintHeading">Шаблон содержимого создан</key>
+    <key alias="createdBlueprintMessage">Создан шаблон содержимого из '%0%'</key>
+    <key alias="duplicateBlueprintMessage">Другой шаблон содержимого с таким же названием уже существует</key>
+    <key alias="blueprintDescription">Шаблон содержимого — это предопределенный набор данных, который редактор может использовать для начального заполнения свойств при создании узлов содержимого</key>
+  </area>
+  <area alias="bulk">
+    <key alias="done">Завершено</key>
+    <key alias="deletedItem">Удален %0% элемент</key>
+    <key alias="deletedItems">Удалено %0% элементов</key>
+    <key alias="deletedItemOfItem">Удален %0% из %1% элементов</key>
+    <key alias="deletedItemOfItems">Удалено %0% из %1% элементов</key>
+    <key alias="publishedItem">Опубликован %0% элемент</key>
+    <key alias="publishedItems">Опубликовано %0% элементов</key>
+    <key alias="publishedItemOfItem">Опубликован %0% из %1% элементов</key>
+    <key alias="publishedItemOfItems">Опубликовано %0% из %1% элементов</key>
+    <key alias="unpublishedItem">Скрыт %0% элемент</key>
+    <key alias="unpublishedItems">Скрыто %0% элементов</key>
+    <key alias="unpublishedItemOfItem">Скрыт %0% из %1% элементов</key>
+    <key alias="unpublishedItemOfItems">Скрыто %0% из %1% элементов</key>
+    <key alias="movedItem">Перенесен %0% элемент</key>
+    <key alias="movedItems">Перенесено %0% элементов</key>
+    <key alias="movedItemOfItem">Перенесен %0% из %1% элементов</key>
+    <key alias="movedItemOfItems">Перенесено %0% из %1% элементов</key>
+    <key alias="copiedItem">Скопирован %0% элемент</key>
+    <key alias="copiedItems">Скопировано %0% элементов</key>
+    <key alias="copiedItemOfItem">Скопирован %0% из %1% элементов</key>
+    <key alias="copiedItemOfItems">Скопировано %0% из %1% элементов</key>
+  </area>
+  <area alias="buttons">
+    <key alias="bold">Полужирный</key>
+    <key alias="clearSelection">Снять выбор</key>
+    <key alias="deindent">Уменьшить отступ</key>
+    <key alias="formFieldInsert">Вставить поле формы</key>
+    <key alias="graphicHeadline">Вставить графический заголовок</key>
+    <key alias="htmlEdit">Править исходный код HTML</key>
+    <key alias="indent">Увеличить отступ</key>
+    <key alias="italic">Курсив</key>
+    <key alias="justifyCenter">По центру</key>
+    <key alias="justifyLeft">По левому краю</key>
+    <key alias="justifyRight">По правому краю</key>
+    <key alias="linkInsert">Вставить ссылку</key>
+    <key alias="linkLocal">Вставить якорь (локальную ссылку)</key>
+    <key alias="listBullet">Маркированный список</key>
+    <key alias="listNumeric">Нумерованный список</key>
+    <key alias="macroInsert">Вставить макрос</key>
+    <key alias="pictureInsert">Вставить изображение</key>
+    <key alias="redo">Повторить</key>
+    <key alias="relations">Править связи</key>
+    <key alias="returnToList">Вернуться к списку</key>
+    <key alias="save">Сохранить</key>
+    <key alias="saveAndGenerateModels">Сохранить и построить модели</key>
+    <key alias="saveAndPublish">Опубликовать</key>
+    <key alias="saveAndSchedule">Запланировать</key>
+    <key alias="saveToPublish">Направить на публикацию</key>
+    <key alias="saveListView">Сохранить список</key>
+    <key alias="select">Выбрать</key>
+    <key alias="showPage">Предварительный просмотр</key>
+    <key alias="showPageDisabled">Предварительный просмотр запрещен, так как документу не сопоставлен шаблон</key>
+    <key alias="somethingElse">Другие действия</key>
+    <key alias="styleChoose">Выбрать стиль</key>
+    <key alias="styleShow">Показать стили</key>
+    <key alias="tableInsert">Вставить таблицу</key>
+    <key alias="undo">Отменить</key>
+  </area>
+  <area alias="changeDocType">
+    <key alias="changeDocTypeInstruction">Чтобы сменить тип документа для выбранного узла, сначала выберите тип из списка разрешенных для данного расположения.</key>
+    <key alias="changeDocTypeInstruction2">Затем подтвердите и/или исправьте сопоставление свойств текущего типа документа свойствам нового и нажмите "Сохранить".</key>
+    <key alias="contentRepublished">Документ переопубликован.</key>
+    <key alias="currentProperty">Текущее свойство</key>
+    <key alias="currentType">Текущий тип</key>
+    <key alias="docTypeCannotBeChanged">Тип документа не может быть изменен, так как для данного расположения нет разрешенных альтернатив.
+		Альтернативный тип станет доступным, если его разрешить как тип, пригодный для создания дочерних узлов внутри родительского узла данного документа.</key>
+    <key alias="docTypeChanged">Тип документа изменен</key>
+    <key alias="mapProperties">Сопоставление свойств</key>
+    <key alias="mapToProperty">Сопоставлено свойству</key>
+    <key alias="newTemplate">Новый шаблон</key>
+    <key alias="newType">Новый тип</key>
+    <key alias="none">нет</key>
+    <key alias="selectedContent">Узел</key>
+    <key alias="selectNewDocType">Выберите новый тип документа</key>
+    <key alias="successMessage">Тип документа выбранного узла успешно изменен на [new type] и следующие свойства были перенесены:</key>
+    <key alias="to">в</key>
+    <key alias="validationErrorPropertyWithMoreThanOneMapping">Невозможно закончить перенос свойств, так как одно или более свойства имеют больше чем одно сопоставление.</key>
+    <key alias="validDocTypesNote">Показаны только допустимые для данного расположения альтернативные типы.</key>
+  </area>
+  <area alias="colorpicker">
+    <key alias="noColors">Вы не указали ни одного допустимого цвета</key>
+  </area>
+  <area alias="colors">
+    <key alias="blue">Синий</key>
+  </area>
+  <area alias="content">
+    <key alias="about">Об этой странице</key>
+    <key alias="alias">Алиас</key>
+    <key alias="alternativeTextHelp">(как бы Вы описали изображение по телефону)</key>
+    <key alias="alternativeUrls">Альтернативные ссылки</key>
+    <key alias="altTextOptional">Альтернативный текст (необязательно)</key>
+    <key alias="childItems" version="7.0">Элементы списка</key>
+    <key alias="clickToEdit">Нажмите для правки этого элемента</key>
+    <key alias="contentRoot">Начальный узел содержимого</key>
+    <key alias="createBy">Создано пользователем</key>
+    <key alias="createByDesc" version="7.0">Исходный автор</key>
+    <key alias="createDate">Дата создания</key>
+    <key alias="createDateDesc" version="7.0">Дата/время создания документа</key>
+    <key alias="documentType">Тип документа</key>
+    <key alias="editing">Редактирование</key>
+    <key alias="expireDate">Скрыть</key>
+    <key alias="getUrlException">ВНИМАНИЕ: невозможно получить URL документа (внутренняя ошибка - подробности в системном журнале)</key>
+    <key alias="isPublished" version="7.2">Опубликовано</key>
+    <key alias="isSensitiveValue">Это значение скрыто. Если Вам нужен доступ к просмотру этого значения, свяжитесь с администратором веб-сайта.</key>
+    <key alias="isSensitiveValue_short">Это значение скрыто.</key>
+    <key alias="itemChanged">Этот документ был изменен после публикации</key>
+    <key alias="itemNotPublished">Этот документ не опубликован</key>
+    <key alias="lastPublished">Документ опубликован</key>
+    <key alias="noItemsToShow">Здесь еще нет элементов.</key>
+    <key alias="listViewNoItems" version="7.1.5">В этом списке пока нет элементов.</key>
+    <key alias="listViewNoContent">Содержимое пока еще не добавлено</key>
+    <key alias="listViewNoMembers">Участники пока еще не добавлены</key>
+    <key alias="mediaLinks">Ссылка на медиа-элементы</key>
+    <key alias="mediatype">Тип медиа-контента</key>
+    <key alias="membergroup">Группа участников</key>
+    <key alias="memberof">Включен в группу(ы)</key>
+    <key alias="memberrole">Роль участника</key>
+    <key alias="membertype">Тип участника</key>
+    <key alias="nestedContentDeleteItem">Вы уверены, что хотите удалить этот элемент?</key>
+    <key alias="nestedContentEditorNotSupported">Свойство '%0%' использует редактор '%1%', который не поддерживается для вложенного содержимого.</key>
+    <key alias="noChanges">Не было сделано никаких изменений</key>
+    <key alias="noDate">Дата не указана</key>
+    <key alias="nodeName">Заголовок страницы</key>
+    <key alias="noMediaLink">Этот медиа-элемент не содержит ссылки</key>
+    <key alias="notmemberof">Доступные группы</key>
+    <key alias="otherElements">Свойства</key>
+    <key alias="parentNotPublished">Этот документ опубликован, но скрыт, потому что его родительский документ '%0%' не опубликован</key>
+    <key alias="parentNotPublishedAnomaly">ВНИМАНИЕ: этот документ опубликован, но его нет в глобальном кэше (внутренняя ошибка - подробности в системном журнале)</key>
+    <key alias="publish">Опубликовать</key>
+    <key alias="published">Опубликовано</key>
+    <key alias="publishedPendingChanges">Опубликовано (есть измененения)</key>
+    <key alias="publishStatus">Состояние публикации</key>
+    <key alias="releaseDate">Опубликовать</key>
+    <key alias="removeDate">Очистить дату</key>
+    <key alias="routeError">ВНИМАНИЕ: этот документ опубликован, но его URL вступает в противоречие с документом %0%</key>
+    <key alias="scheduledPublishServerTime">Это время будет соответствовать следующему времени на сервере:</key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Что это означает?</a>]]></key>
+    <key alias="setDate">Задать дату</key>
+    <key alias="sortDone">Порядок сортировки обновлен</key>
+    <key alias="sortHelp">Для сортировки узлов просто перетаскивайте узлы или нажмите на заголовке столбца. Вы можете выбрать несколько узлов, удерживая клавиши "shift" или "ctrl" при пометке</key>
+    <key alias="statistics">Статистика</key>
+    <key alias="target" version="7.0">Цель</key>
+    <key alias="titleOptional">Заголовок (необязательно)</key>
+    <key alias="type">Тип</key>
+    <key alias="unpublish">Скрыть</key>
+    <key alias="unpublished">Распубликовано</key>
+    <key alias="unpublishDate">Распубликовать</key>
+    <key alias="updateDate">Последняя правка</key>
+    <key alias="updateDateDesc" version="7.0">Дата/время редактирования документа</key>
+    <key alias="updatedBy" version="7.0">Обновлено</key>
+    <key alias="uploadClear">Удалить файл</key>
+    <key alias="urls">Ссылка на документ</key>
+    <key alias="addTextBox">Добавить новое поле текста</key>
+    <key alias="removeTextBox">Удалить это поле текста</key>
+  </area>
+  <area alias="contentPicker">
+    <key alias="pickedTrashedItem">Выбран элемент содержимого, который в настоящее время удален или находится в корзине</key>
+    <key alias="pickedTrashedItems">Выбраны элементы содержимого, которые в настоящее время удалены или находятся в корзине</key>
+  </area>
+  <area alias="contentTypeEditor">
+    <key alias="compositions">Композиции</key>
+    <key alias="noGroups">Вы не добавили ни одной вкладки</key>
+    <key alias="inheritedFrom">Унаследовано от</key>
+    <key alias="addProperty">Добавить свойство</key>
+    <key alias="requiredLabel">Обязательная метка</key>
+    <key alias="enableListViewHeading">Представление в формате списка</key>
+    <key alias="enableListViewDescription">Устанавливает представление документа данного типа в виде сортируемого списка дочерних документов с функцией поиска, в отличие от обычного представления дочерних документов в виде дерева</key>
+    <key alias="allowedTemplatesHeading">Допустимые шаблоны</key>
+    <key alias="allowedTemplatesDescription">Выберите перечень допустимых шаблонов для сопоставления документам данного типа</key>
+    <key alias="allowAsRootHeading">Разрешить в качестве корневого</key>
+    <key alias="allowAsRootDescription">Позволяет создавать документы этого типа в самом корне дерева содержимого</key>
+    <key alias="childNodesHeading">Допустимые типы дочерних документов</key>
+    <key alias="childNodesDescription">Позволяет указать перечень типов документов, допустимых для создания документов, дочерних к данному типу</key>
+    <key alias="chooseChildNode">Выбрать дочерний узел</key>
+    <key alias="compositionsDescription">Унаследовать вкладки и свойства из уже существующего типа документов. Вкладки будут либо добавлены в создаваемый тип, либо в случае совпадения названий вкладок будут добавлены наследуемые свойства.</key>
+    <key alias="compositionInUse">Этот тип документов уже участвует в композиции другого типа, поэтому сам не может быть композицией.</key>
+    <key alias="compositionUsageHeading">Где используется эта композиция?</key>
+    <key alias="compositionUsageSpecification">Эта композиция сейчас используется при создании следующих типов документов:</key>
+    <key alias="noAvailableCompositions">В настоящее время нет типов документов, допустимых для построения композиции.</key>
+    <key alias="availableEditors">Доступные редакторы</key>
+    <key alias="reuse">Переиспользовать</key>
+    <key alias="editorSettings">Установки редактора</key>
+    <key alias="configuration">Конфигурирование</key>
+    <key alias="yesDelete">ДА, удалить</key>
+    <key alias="movedUnderneath">перемещены внутрь</key>
+    <key alias="copiedUnderneath">скопированы внутрь</key>
+    <key alias="folderToMove">Выбрать папку для перемещения</key>
+    <key alias="folderToCopy">Выбрать папку для копирования</key>
+    <key alias="structureBelow">в структуре дерева</key>
+    <key alias="allDocumentTypes">Все типы документов</key>
+    <key alias="allDocuments">Все документы</key>
+    <key alias="allMediaItems">Все медиа-элементы</key>
+    <key alias="usingThisDocument">, использующие этот тип документов, будут безвозвратно удалены, пожалуйста, подтвердите это действие.</key>
+    <key alias="usingThisMedia">, использующие этот тип медиа, будут безвозвратно удалены, пожалуйста, подтвердите это действие.</key>
+    <key alias="usingThisMember">, использующие этот тип участников, будут безвозвратно удалены, пожалуйста, подтвердите это действие.</key>
+    <key alias="andAllDocuments">и все документы, использующие данный тип</key>
+    <key alias="andAllMediaItems">и все медиа-элементы, использующие данный тип</key>
+    <key alias="andAllMembers">и все участники, использующие данный тип</key>
+    <key alias="memberCanEdit">Участник может изменить</key>
+    <key alias="memberCanEditDescription">Разрешает редактирование значение данного свойства участником в своем профиле</key>
+    <key alias="isSensitiveData">Конфеденциальные данные</key>
+    <key alias="isSensitiveDataDescription">Скрывает значение это свойства от редакторов содержимого, не имеющих доступа к конфеденциальной информации</key>
+    <key alias="showOnMemberProfile">Показать в профиле участника</key>
+    <key alias="showOnMemberProfileDescription">Разрешает показ данного свойства в профиле участника</key>
+    <key alias="tabHasNoSortOrder">для вкладки не указан порядок сортировки</key>
+  </area>
+  <area alias="create">
+    <key alias="chooseNode">Где вы хотите создать новый %0%</key>
+    <key alias="createContentBlueprint">Выберите тип документов, для которого нужно создать шаблон содержимого</key>
+    <key alias="createUnder">Создать в узле</key>
+    <key alias="newFolder">Новая папка</key>
+    <key alias="newDataType">Новый тип данных</key>
+    <key alias="noDocumentTypes" version="7.0"><![CDATA[Нет ни одного разрешенного типа документов для создания. Необходимо разрешить нужные Вам типы в секции "Установки" в дереве <strong>"Типы документов"</strong>.]]></key>
+    <key alias="noMediaTypes" version="7.0"><![CDATA[Нет ни одного разрешенного типа медиа-материалов для создания. Необходимо разрешить нужные Вам типы в секции "Установки" в дереве <strong>"Типы медиа-материалов"</strong>.]]></key>
+    <key alias="updateData">Выберите тип и заголовок</key>
+    <key alias="documentTypeWithoutTemplate">Тип документа без сопоставленного шаблона</key>
+    <key alias="newJavascriptFile">Новый файл javascript</key>
+    <key alias="newEmptyPartialView">Новое пустое частичное представление</key>
+    <key alias="newPartialViewMacro">Новый макрос-представление</key>
+    <key alias="newPartialViewFromSnippet">Новое частичное представление по образцу</key>
+    <key alias="newPartialViewMacroFromSnippet">Новый макрос-представление по образцу</key>
+    <key alias="newPartialViewMacroNoMacro">Новый макрос-представление (без регистрации макроса)</key>
+  </area>
+  <area alias="dashboard">
+    <key alias="browser">Обзор сайта</key>
+    <key alias="dontShowAgain">- Скрыть - </key>
+    <key alias="nothinghappens">Если административная панель не загружается, Вам, возможно, следует разрешить всплывающие окна для данного сайта</key>
+    <key alias="openinnew">было открыто в новом окне</key>
+    <key alias="restart">Перезапустить</key>
+    <key alias="visit">Посетить</key>
+    <key alias="welcome">Рады приветствовать</key>
+  </area>
+  <area alias="defaultdialogs">
+    <key alias="anchorInsert">Название</key>
+    <key alias="assignDomain">Управление доменами</key>
+    <key alias="closeThisWindow">Закрыть это окно</key>
+    <key alias="confirmdelete">Вы уверены, что хотите удалить</key>
+    <key alias="confirmdisable">Вы уверены, что хотите запретить</key>
+    <key alias="confirmlogout">Вы уверены?</key>
+    <key alias="confirmSure">Вы уверены?</key>
+    <key alias="cut">Вырезать</key>
+    <key alias="editdictionary">Править статью словаря</key>
+    <key alias="editlanguage">Изменить язык</key>
+    <key alias="insertAnchor">Вставить локальную ссылку (якорь)</key>
+    <key alias="insertCharacter">Вставить символ</key>
+    <key alias="insertgraphicheadline">Вставить графический заголовок</key>
+    <key alias="insertimage">Вставить изображение</key>
+    <key alias="insertlink">Вставить ссылку</key>
+    <key alias="insertMacro">Вставить макрос</key>
+    <key alias="inserttable">Вставить таблицу</key>
+    <key alias="lastEdited">Последняя правка</key>
+    <key alias="link">Ссылка</key>
+    <key alias="linkinternal">Внутренняя ссылка:</key>
+    <key alias="linklocaltip">Для того чтобы определить локальную ссылку, используйте "#" первым символом</key>
+    <key alias="linknewwindow">Открыть в новом окне?</key>
+    <key alias="macroDoesNotHaveProperties">Этот макрос не имеет редактируемых свойств</key>
+    <key alias="nodeNameLinkPicker">Заголовок ссылки</key>
+    <key alias="noIconsFound">Ни одной пиктограммы не найдено</key>
+    <key alias="paste">Вставить</key>
+    <key alias="permissionsEdit">Изменить разрешения для</key>
+    <key alias="permissionsSet">Установить разрешения для</key>
+    <key alias="permissionsSetForGroup">Установить права доступа к '%0%' для группы пользователей '%1%'</key>
+    <key alias="permissionsHelp">Выберите группу(ы) пользователей, для которых нужно установить разрешения</key>
+    <key alias="recycleBinDeleting">Все элементы в корзине сейчас удаляются. Пожалуйста, не закрывайте это окно до окончания процесса удаления</key>
+    <key alias="recycleBinIsEmpty">Корзина пуста</key>
+    <key alias="recycleBinWarning">Вы больше не сможете восстановить элементы, удаленные из корзины</key>
+    <key alias="regexSearchError"><![CDATA[Сервис <a target='_blank' href='http://regexlib.com'>regexlib.com</a> испытывает в настоящее время некоторые трудности, не зависящие от нас. Просим извинить за причиненные неудобства.]]></key>
+    <key alias="regexSearchHelp">Используйте поиск регулярных выражений для добавления сервиса проверки к полю Вашей формы. Например: 'email, 'zip-code', 'url'</key>
+    <key alias="removeMacro">Удалить макрос</key>
+    <key alias="requiredField">Обязательное поле</key>
+    <key alias="sitereindexed">Сайт переиндексирован</key>
+    <key alias="siterepublished">Кэш сайта был обновлен. Все опубликованное содержимое приведено в актуальное состояние, в то время как неопубликованное содержимое по-прежнему не опубликовано</key>
+    <key alias="siterepublishHelp">Кэш сайта будет полностью обновлен. Все опубликованное содержимое будет обновлено, в то время как неопубликованное содержимое по-прежнему останется неопубликованным</key>
+    <key alias="tableColumns">Количество столбцов</key>
+    <key alias="tableRows">Количество строк</key>
+    <key alias="thumbnailimageclickfororiginal">Кликните на изображении, чтобы увидеть полноразмерную версию</key>
+    <key alias="treepicker">Выберите элемент</key>
+    <key alias="urlLinkPicker">Ссылка</key>
+    <key alias="viewCacheItem">Просмотр элемента кэша</key>
+    <key alias="relateToOriginalLabel">Связать с оригиналом</key>
+    <key alias="includeDescendants">Включая все дочерние</key>
+    <key alias="theFriendliestCommunity">Самое дружелюбное сообщество</key>
+    <key alias="linkToPage">Ссылка на страницу</key>
+    <key alias="openInNewWindow">Открывать ссылку в новом окне или вкладке браузера</key>
+    <key alias="linkToMedia">Ссылка на медиа-элемент</key>
+    <key alias="selectMedia">Выбрать медиа</key>
+    <key alias="selectMediaStartNode">Выбрать начальный узел медиа-библиотеки</key>
+    <key alias="selectIcon">Выбрать значок</key>
+    <key alias="selectItem">Выбрать элемент</key>
+    <key alias="selectLink">Выбрать ссылку</key>
+    <key alias="selectMacro">Выбрать макрос</key>
+    <key alias="selectContent">Выбрать содержимое</key>
+    <key alias="selectContentStartNode">Выбрать начальный узел содержимого</key>
+    <key alias="selectMember">Выбрать участника</key>
+    <key alias="selectMemberGroup">Выбрать группу участников</key>
+    <key alias="selectNode">Выбрать узел</key>
+    <key alias="selectSections">Выбрать разделы</key>
+    <key alias="selectUsers">Выбрать пользователей</key>
+    <key alias="noMacroParams">Это макрос без параметров</key>
+    <key alias="noMacros">Нет макросов, доступных для вставки в редактор</key>
+    <key alias="externalLoginProviders">Провайдеры аутентификации</key>
+    <key alias="exceptionDetail">Подробное сообщение об ошибке</key>
+    <key alias="stacktrace">Трассировка стека</key>
+    <key alias="innerException">Внутренняя ошибка</key>
+    <key alias="linkYour">Связать</key>
+    <key alias="unLinkYour">Разорвать связь</key>
+    <key alias="account">учетную запись</key>
+    <key alias="selectEditor">Выбрать редактор</key>
+    <key alias="selectSnippet">Выбрать образец</key>
+  </area>
+  <area alias="dictionaryItem">
+    <key alias="description"><![CDATA[
+		Ниже Вы можете указать различные переводы данной статьи словаря '<em>%0%</em>'<br/>Добавить другие языки можно, воспользовавшись пунктом 'Языки' в меню слева
+		]]></key>
+    <key alias="displayName">Название языка (культуры)</key>
+    <key alias="changeKeyError"><![CDATA[
+      Ключ '%0%' уже существует в словаре.
+   ]]></key>
+    <key alias="overviewTitle">Обзор словаря</key>
+  </area>
+  <area alias="editcontenttype">
+    <key alias="createListView" version="7.2">Создать пользовательский список</key>
+    <key alias="removeListView" version="7.2">Удалить пользовательский список</key>
+  </area>
+  <area alias="editdatatype">
+    <key alias="addPrevalue">Добавить предустановленное значение</key>
+    <key alias="dataBaseDatatype">Тип данных в БД</key>
+    <key alias="guid">GUID типа данных</key>
+    <key alias="renderControl">Редактор свойства</key>
+    <key alias="rteButtons">Кнопки</key>
+    <key alias="rteEnableAdvancedSettings">Включить расширенные настройки для</key>
+    <key alias="rteEnableContextMenu">Включить контекстное меню</key>
+    <key alias="rteMaximumDefaultImgSize">Максимальный размер по-умолчанию для вставляемых изображений</key>
+    <key alias="rteRelatedStylesheets">Сопоставленные стили CSS</key>
+    <key alias="rteShowLabel">Показать метку</key>
+    <key alias="rteWidthAndHeight">Ширина и высота</key>
+    <key alias="allPropTypes">ВСЕ типы свойств и данные в свойствах документов,</key>
+    <key alias="willBeDeleted">использующие этот тип данных, будут удалены безвозвратно, подтвердите их удаление</key>
+    <key alias="yesDelete">Да, можно удалить</key>
+    <key alias="andAllRelated">и все типы свойств и данные свойств, использующие этот тип данных</key>
+    <key alias="selectFolder">Выберите папку, чтобы переместить в нее</key>
+    <key alias="inTheTree">в структуре дерева ниже</key>
+    <key alias="wasMoved">был перемещен в папку</key>
+  </area>
+  <area alias="emptyStates">
+    <key alias="emptyDictionaryTree">Нет доступных элементов словаря</key>
+  </area>
+  <area alias="errorHandling">
+    <key alias="errorButDataWasSaved">Ваши данные сохранены, но для того, чтобы опубликовать этот документ, Вы должны сначала исправить следующие ошибки:</key>
+    <key alias="errorChangingProviderPassword">Текущий провайдер ролей пользователей не поддерживает изменение пароля (необходимо свойству EnablePasswordRetrieval в файле web.config присвоить значение true)</key>
+    <key alias="errorExistsWithoutTab">%0% уже существует</key>
+    <key alias="errorHeader">Обнаружены следующие ошибки:</key>
+    <key alias="errorHeaderWithoutTab">Обнаружены следующие ошибки:</key>
+    <key alias="errorInPasswordFormat">Пароль должен состоять как минимум из %0% символов, хотя бы %1% из которых не являются буквами</key>
+    <key alias="errorIntegerWithoutTab">%0% должно быть целочисленным значением</key>
+    <key alias="errorMandatory">%0% в %1% является обязательным полем</key>
+    <key alias="errorMandatoryWithoutTab">%0% является обязательным полем</key>
+    <key alias="errorRegExp">%0% в %1%: данные в некорректном формате</key>
+    <key alias="errorRegExpWithoutTab">%0% - данные в некорректном формате</key>
+  </area>
+  <area alias="errors">
+    <key alias="receivedErrorFromServer">Получено сообщение об ошибке от сервера</key>
+    <key alias="codemirroriewarning">ПРЕДУПРЕЖДЕНИЕ! Несмотря на то, что CodeMirror по-умолчанию разрешен в данной конфигурации, он по-прежнему отключен для браузеров Internet Explorer ввиду нестабильной работы</key>
+    <key alias="contentTypeAliasAndNameNotNull">Укажите, пожалуйста, алиас и имя для этого свойства!</key>
+    <key alias="dissallowedMediaType">Использование данного типа файлов на сайте запрещено администратором</key>
+    <key alias="filePermissionsError">Ошибка доступа к указанному файлу или папке</key>
+    <key alias="macroErrorLoadingPartialView">Ошибка загрузки кода в частичном представлении (файл: %0%)</key>
+    <key alias="missingTitle">Укажите заголовок</key>
+    <key alias="missingType">Выберите тип</key>
+    <key alias="pictureResizeBiggerThanOrg">Вы пытаетесь увеличить изображение по сравнению с его исходным размером. Уверены, что хотите сделать это?</key>
+    <key alias="startNodeDoesNotExists">Начальный узел был удален, свяжитесь с Вашим администратором</key>
+    <key alias="stylesMustMarkBeforeSelect">Для смены стиля отметьте фрагмент текста</key>
+    <key alias="stylesNoStylesOnPage">Не определен ни один доступный стиль</key>
+    <key alias="tableColMergeLeft">Поместите курсор в левую из двух ячеек, которые хотите объединить</key>
+    <key alias="tableSplitNotSplittable">Нельзя разделить ячейку, которая не была до этого объединена</key>
+  </area>
+  <area alias="general">
+    <key alias="about">О системе</key>
+    <key alias="action">Действие</key>
+    <key alias="actions">Действия</key>
+    <key alias="add">Добавить</key>
+    <key alias="alias">Алиас</key>
+    <key alias="all">Все</key>
+    <key alias="areyousure">Вы уверены?</key>
+    <key alias="back">Назад</key>
+    <key alias="border">Границы</key>
+    <key alias="by">пользователем</key>
+    <key alias="cancel">Отмена</key>
+    <key alias="cellMargin">Отступ ячейки</key>
+    <key alias="choose">Выбрать</key>
+    <key alias="close">Закрыть</key>
+    <key alias="closewindow">Закрыть окно</key>
+    <key alias="comment">Примечание</key>
+    <key alias="confirm">Подтвердить</key>
+    <key alias="constrain">Сохранять пропорции</key>
+    <key alias="constrainProportions">Сохранять пропорции</key>
+    <key alias="continue">Далее</key>
+    <key alias="copy">Копировать</key>
+    <key alias="create">Создать</key>
+    <key alias="database">База данных</key>
+    <key alias="date">Дата</key>
+    <key alias="default">По-умолчанию</key>
+    <key alias="delete">Удалить</key>
+    <key alias="deleted">Удалено</key>
+    <key alias="deleting">Удаляется...</key>
+    <key alias="design">Дизайн</key>
+    <key alias="dictionary">Словарь</key>
+    <key alias="dimensions">Размеры</key>
+    <key alias="down">Вниз</key>
+    <key alias="download">Скачать</key>
+    <key alias="edit">Изменить</key>
+    <key alias="edited">Изменено</key>
+    <key alias="elements">Элементы</key>
+    <key alias="email">Email адрес</key>
+    <key alias="error">Ошибка</key>
+    <key alias="findDocument">Найти</key>
+    <key alias="first">Начало</key>
+    <key alias="general">Общее</key>
+    <key alias="groups">Группы</key>
+    <key alias="folder">Папка</key>
+    <key alias="height">Высота</key>
+    <key alias="help">Справка</key>
+    <key alias="hide">Скрыть</key>
+    <key alias="history">История</key>
+    <key alias="icon">Иконка</key>
+    <key alias="import">Импорт</key>
+    <key alias="info">Инфо</key>
+    <key alias="innerMargin">Внутренний отступ</key>
+    <key alias="insert">Вставить</key>
+    <key alias="install">Установить</key>
+    <key alias="invalid">Неверно</key>
+    <key alias="justify">Выравнивание</key>
+    <key alias="label">Название</key>
+    <key alias="language">Язык</key>
+    <key alias="last">Конец</key>
+    <key alias="layout">Макет</key>
+    <key alias="links">Ссылки</key>
+    <key alias="loading">Загрузка</key>
+    <key alias="locked">БЛОКИРОВКА</key>
+    <key alias="login">Войти</key>
+    <key alias="logoff">Выйти</key>
+    <key alias="logout">Выход</key>
+    <key alias="macro">Макрос</key>
+    <key alias="mandatory">Обязательно</key>
+    <key alias="message">Сообщение</key>
+    <key alias="move">Переместить</key>
+    <key alias="name">Название</key>
+    <key alias="new">Новый</key>
+    <key alias="next">След</key>
+    <key alias="no">Нет</key>
+    <key alias="noItemsInList">Здесь пока нет элементов</key>
+    <key alias="of">из</key>
+    <key alias="off">Выкл</key>
+    <key alias="ok">Ok</key>
+    <key alias="open">Открыть</key>
+    <key alias="on">Вкл</key>
+    <key alias="options">Варианты</key>
+    <key alias="or">или</key>
+    <key alias="orderBy">Сортировка по</key>
+    <key alias="password">Пароль</key>
+    <key alias="path">Путь</key>
+    <key alias="pleasewait">Минуточку...</key>
+    <key alias="previous">Пред</key>
+    <key alias="properties">Свойства</key>
+    <key alias="reciept">Email адрес для получения данных</key>
+    <key alias="recycleBin">Корзина</key>
+    <key alias="recycleBinEmpty">Ваша корзина пуста</key>
+    <key alias="remaining">Осталось</key>
+    <key alias="remove">Удалить</key>
+    <key alias="rename">Переименовать</key>
+    <key alias="renew">Обновить</key>
+    <key alias="required" version="7.0">Обязательное</key>
+    <key alias="retrieve">Получить</key>
+    <key alias="retry">Повторить</key>
+    <key alias="rights">Разрешения</key>
+    <key alias="scheduledPublishing">Публикация по расписанию</key>
+    <key alias="search">Поиск</key>
+    <key alias="searchNoResult">К сожалению, ничего подходящего не нашлось</key>
+    <key alias="searchResults">Результаты поиска</key>
+    <key alias="server">Сервер</key>
+    <key alias="show">Показать</key>
+    <key alias="showPageOnSend">Показать страницу при отправке</key>
+    <key alias="size">Размер</key>
+    <key alias="sort">Сортировать</key>
+    <key alias="status">Состояние</key>
+    <key alias="submit">Отправить</key>
+    <key alias="type">Тип</key>
+    <key alias="typeToSearch">Что искать?</key>
+    <key alias="up">Вверх</key>
+    <key alias="update">Обновить</key>
+    <key alias="upgrade">Обновление</key>
+    <key alias="upload">Загрузить</key>
+    <key alias="url">Интернет-ссылка</key>
+    <key alias="user">Пользователь</key>
+    <key alias="username">Имя пользователя</key>
+    <key alias="value">Значение</key>
+    <key alias="view">Просмотр</key>
+    <key alias="welcome">Добро пожаловать...</key>
+    <key alias="width">Ширина</key>
+    <key alias="yes">Да</key>
+    <key alias="reorder">Пересортировать</key>
+    <key alias="reorderDone">Пересортировка завершена</key>
+    <key alias="preview">Предпросмотр</key>
+    <key alias="changePassword">Сменить пароль</key>
+    <key alias="to">к</key>
+    <key alias="listView">Список</key>
+    <key alias="saving">Сохранение...</key>
+    <key alias="current">текущий</key>
+    <key alias="selected">выбрано</key>
+    <key alias="embed">Встроить</key>
+  </area>
+  <area alias="graphicheadline">
+    <key alias="backgroundcolor">Цвет фона</key>
+    <key alias="bold">Полужирный</key>
+    <key alias="color">Цвет текста</key>
+    <key alias="font">Шрифт</key>
+    <key alias="text">Текст</key>
+  </area>
+  <area alias="grid">
+    <key alias="media">Изображение</key>
+    <key alias="macro">Макрос</key>
+    <key alias="addElement">Добавить содержимое</key>
+    <key alias="dropElement">Сбросить содержимое</key>
+    <key alias="addGridLayout">Добавить шаблон сетки</key>
+    <key alias="addGridLayoutDetail">Настройте шаблон, задавая ширину колонок или добавляя дополнительные секции</key>
+    <key alias="addRowConfiguration">Добавить конфигурацию строки</key>
+    <key alias="addRowConfigurationDetail">Настройте строку, задавая ширину ячеек или добавляя дополнительные ячейки</key>
+    <key alias="addRows">Добавить новые строки</key>
+    <key alias="allowAllEditors">Доступны все редакторы</key>
+    <key alias="allowAllRowConfigurations">Доступны все конфигурации строк</key>
+    <key alias="chooseLayout">Выберите шаблон</key>
+    <key alias="clickToEmbed">Кликните для встраивания</key>
+    <key alias="clickToInsertImage">Кликните для вставки изображения</key>
+    <key alias="columns">Колонки</key>
+    <key alias="contentNotAllowed">Недопустимый тип содержимого</key>
+    <key alias="contentAllowed">Данный тип содержимого разрешен</key>
+    <key alias="columnsDetails">Суммарное число колонок в шаблоне сетки</key>
+    <key alias="gridLayouts">Шаблоны сетки</key>
+    <key alias="gridLayoutsDetail">Шаблоны являются рабочим пространством для редактора сетки, обычно Вам понадобится не более одного или двух шаблонов</key>
+    <key alias="insertControl">Вставить элемент</key>
+    <key alias="placeholderImageCaption">Заголовок для изображения...</key>
+    <key alias="placeholderWriteHere">Напишите...</key>
+    <key alias="rowConfigurations">Конфигурации строк</key>
+    <key alias="rowConfigurationsDetail">Строки - это последовательности ячеек с горизонтальным расположением</key>
+    <key alias="settings">Установки</key>
+    <key alias="settingsApplied">Установки применены</key>
+    <key alias="settingsDetails">Задайте установки, доступные редакторам для изменения</key>
+    <key alias="styles">Стили</key>
+    <key alias="stylesDetails">Задайте стили, доступные редакторам для изменения</key>
+    <key alias="setAsDefault">Установить по-умолчанию</key>
+    <key alias="chooseExtra">Выбрать дополнительно</key>
+    <key alias="chooseDefault">Выбрать по-умолчанию</key>
+    <key alias="areAdded">добавлены</key>
+    <key alias="maxItemsDescription">Оставьте пустым или задайте 0 для снятия лимита</key>
+    <key alias="maxItems">Максимальное количество</key>
+  </area>
+  <area alias="headers">
+    <key alias="page">Страница</key>
+  </area>
+  <area alias="healthcheck">
+    <!-- The following keys get these tokens passed in:
+	     0: Current value
+		   1: Recommended value
+		   2: XPath
+		   3: Configuration file path
+	  -->
+    <key alias="checkSuccessMessage">Для параметра установлено рекомендованное значение: '%0%'.</key>
+    <key alias="rectifySuccessMessage">Значение установлено в '%1%' для пути XPath '%2%' в файле конфигурации '%3%'.</key>
+    <key alias="checkErrorMessageDifferentExpectedValue">Ожидаемое значение '%1%' для параметра '%2%' в файле конфигурации '%3%', найденное значение: '%0%'.</key>
+    <key alias="checkErrorMessageUnexpectedValue">Найдено неожиданное значение '%0%' для параметра '%2%' в файле конфигурации '%3%'.</key>
+    <!-- The following keys get these tokens passed in:
+	     0: Current value
+		   1: Recommended value
+	  -->
+    <key alias="customErrorsCheckSuccessMessage">Параметр 'CustomErrors' установлен в '%0%'.</key>
+    <key alias="customErrorsCheckErrorMessage">Параметр 'CustomErrors' сейчас установлен в '%0%'. Рекомендуется установить в '%1%' перед размещением сайта в сети.</key>
+    <key alias="customErrorsCheckRectifySuccessMessage">Параметр 'CustomErrors' успешно установлен в '%0%'.</key>
+    <key alias="macroErrorModeCheckSuccessMessage">Параметр 'MacroErrors' установлен в '%0%'.</key>
+    <key alias="macroErrorModeCheckErrorMessage">Параметр 'MacroErrors' установлен в '%0%', что может привести к неполной обработке части страниц или всех страниц сайта при наличии ошибок в макросах. Устранить это можно путем установки значения в '%1%'.</key>
+    <key alias="macroErrorModeCheckRectifySuccessMessage">Параметр 'MacroErrors' теперь установлен в '%0%'.</key>
+    <!-- The following keys get these tokens passed in:
+	     0: Current value
+		   1: Recommended value
+		   2: Server version
+	  -->
+    <key alias="trySkipIisCustomErrorsCheckSuccessMessage">Параметр 'Try Skip IIS Custom Errors' установлен в '%0%' и Вы используете IIS версии '%1%'.</key>
+    <key alias="trySkipIisCustomErrorsCheckErrorMessage">Параметр 'Try Skip IIS Custom Errors' сейчас установлен в '%0%'. Рекомендуется установить в '%1%' для Вашего текущего IIS версии (%2%).</key>
+    <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">Параметр 'Try Skip IIS Custom Errors' успешно установлен в '%0%'.</key>
+    <!-- The following keys get predefined tokens passed in that are not all the same, like above -->
+    <key alias="configurationServiceFileNotFound">Файл не существует: '%0%'.</key>
+    <key alias="configurationServiceNodeNotFound"><![CDATA[Не найден параметр <strong>'%0%'</strong> в файле конфигурации <strong>'%1%'</strong>.]]></key>
+    <key alias="configurationServiceError">Обнаружена ошибка, для получения полной информации обратитесь к журналу: %0%.</key>
+    <key alias="healthCheckInvalidUrl">Ошибка проверки адреса URL %0% - '%1%'</key>
+    <key alias="httpsCheckValidCertificate">Сертификат Вашего веб-сайта отмечен как проверенный.</key>
+    <key alias="httpsCheckInvalidCertificate">Ошибка проверки сертификата: '%0%'</key>
+    <key alias="httpsCheckIsCurrentSchemeHttps">Сейчас Вы %0% просматриваете сайт, используя протокол HTTPS.</key>
+    <key alias="httpsCheckConfigurationRectifyNotPossible">Параметр 'Umbraco.Core.UseHttps' в секции 'appSetting' установлен в 'false' в файле web.config. Если Вам необходим доступ к сайту по протоколу HTTPS, нужно установить данный параметр в 'true'.</key>
+    <key alias="httpsCheckConfigurationCheckResult">Параметр 'Umbraco.Core.UseHttps' в секции 'appSetting' в файле установлен в '%0%', значения cookies %1% маркированы как безопасные.</key>
+    <key alias="httpsCheckEnableHttpsError">Невозможно обновить значение параметра 'Umbraco.Core.UseHttps' в файле web.config. Ошибка: %0%</key>
+    <!-- The following keys don't get tokens passed in -->
+    <key alias="httpsCheckEnableHttpsButton">Разрешить HTTPS</key>
+    <key alias="httpsCheckEnableHttpsDescription">Устанавливает значение параметра 'umbracoSSL' в 'true' в секции 'appSettings' файла web.config.</key>
+    <key alias="httpsCheckEnableHttpsSuccess">Параметр 'Umbraco.Core.UseHttps' в секции 'appSetting' файла web.config теперь установлен в 'true', значения cookies будут промаркированы как безопасные.</key>
+    <key alias="rectifyButton">Исправить</key>
+    <key alias="cannotRectifyShouldNotEqual">Невозможно исправление по результату проверки значения на 'ShouldNotEqual'.</key>
+    <key alias="cannotRectifyShouldEqualWithValue">Невозможно исправление по результату проверки значения на 'ShouldEqual' с предоставленным значением.</key>
+    <key alias="valueToRectifyNotProvided">Значение для исправления не предоставлено.</key>
+    <key alias="compilationDebugCheckSuccessMessage">Режим компиляции с отладкой выключен.</key>
+    <key alias="compilationDebugCheckErrorMessage">Режим компиляции с отладкой сейчас включен. Рекомендуется выключить перед размещением сайта в сети.</key>
+    <key alias="compilationDebugCheckRectifySuccessMessage">Режим компиляции с отладкой успешно выключен.</key>
+    <key alias="traceModeCheckSuccessMessage">Режим трассировки выключен.</key>
+    <key alias="traceModeCheckErrorMessage">Режим трассировки сейчас включен. Рекомендуется выключить перед размещением сайта в сети.</key>
+    <key alias="traceModeCheckRectifySuccessMessage">Режим трассировки успешно выключен.</key>
+    <key alias="folderPermissionsCheckMessage">Все папки имеют корректно установленные параметры безопасности.</key>
+    <!-- The following keys get these tokens passed in:
+	    0: Comma delimitted list of failed folder paths
+  	-->
+    <key alias="requiredFolderPermissionFailed"><![CDATA[Не получен доступ для установки корректных параметров безопасности к следующим папкам: <strong>%0%</strong>.]]></key>
+    <key alias="optionalFolderPermissionFailed"><![CDATA[Невозможно получить доступ для установки корректных параметров безопасности с целью корректного функционирования Umbraco к следующим папкам: <strong>%0%</strong>. Если в них не разрешена запись, не нужно предпринимать никаких действий.]]></key>
+    <key alias="filePermissionsCheckMessage">Все файлы имеют корректно установленные параметры безопасности.</key>
+    <!-- The following keys get these tokens passed in:
+	    0: Comma delimitted list of failed folder paths
+  	-->
+    <key alias="requiredFilePermissionFailed"><![CDATA[Не получен доступ для установки корректных параметров безопасности к следующим файлам: <strong>%0%</strong>.]]></key>
+    <key alias="optionalFilePermissionFailed"><![CDATA[Невозможно получить доступ для установки корректных параметров безопасности с целью корректного функционирования Umbraco к следующим файлам: <strong>%0%</strong>. Если в них не разрешена запись, не нужно предпринимать никаких действий.]]></key>
+    <key alias="clickJackingCheckHeaderFound"><![CDATA[Был обнаружен заголовок или мета-тэг <strong>X-Frame-Options</strong>, использующийся для управления возможностью помещать сайт в IFRAME на другом сайте.]]></key>
+    <key alias="clickJackingCheckHeaderNotFound"><![CDATA[Заголовок или мета-тэг <strong>X-Frame-Options</strong>, использующийся для управления возможностью помещать сайт в IFRAME на другом сайте, не обнаружен.]]></key>
+    <key alias="clickJackingSetHeaderInConfigDescription">Добавляет значение в секцию 'httpProtocol/customHeaders' файла web.config, препятствующее возможному использованию этого сайта внутри IFRAME на другом сайте.</key>
+    <key alias="clickJackingSetHeaderInConfigSuccess">Значение, добавляющее заголовок, препятствующий использованию этого сайта внутри IFRAME другого сайта, успешно добавлено в файл web.config.</key>
+    <key alias="setHeaderInConfig">Установить заголовок в файле конфигурации</key>
+    <key alias="setHeaderInConfigError">Невозможно обновить файл web.config. Ошибка: %0%</key>
+    <key alias="noSniffCheckHeaderFound"><![CDATA[Заголовок или мета-тэг <strong>X-Content-Type-Options</strong>, использующиеся для защиты от MIME-уязвимостей, обнаружены.]]></key>
+    <key alias="noSniffCheckHeaderNotFound"><![CDATA[Заголовок или мета-тэг <strong>X-Content-Type-Options</strong>, использующиеся для защиты от MIME-уязвимостей, не найдены.]]></key>
+    <key alias="noSniffSetHeaderInConfigDescription">Добавляет значение в секцию httpProtocol/customHeaders файла web.config, препятствующее использованию MIME-уязвимостей.</key>
+    <key alias="noSniffSetHeaderInConfigSuccess">Значение, добавляющее заголовок, препятствующий использованию MIME-уязвимостей, успешно добавлено в файл web.config.</key>
+    <key alias="hSTSCheckHeaderFound"><![CDATA[Заголовок <strong>Strict-Transport-Security</strong>, известный также как HSTS-header, обнаружен.]]></key>
+    <key alias="hSTSCheckHeaderNotFound"><![CDATA[Заголовок <strong>Strict-Transport-Security</strong> не найден.]]></key>
+    <key alias="hSTSSetHeaderInConfigDescription">Добавляет заголовок 'Strict-Transport-Security' и его значение 'max-age=10886400' в секцию httpProtocol/customHeaders файла web.config. Применяйте этот способ только в случае, если доступ к Вашим сайтам будет осуществляться по протоколу https как минимум ближайшие 18 недель.</key>
+    <key alias="hSTSSetHeaderInConfigSuccess">Заголовок HSTS-header успешно добавлен в файл web.config.</key>
+    <key alias="xssProtectionCheckHeaderFound"><![CDATA[Заголовок <strong>X-XSS-Protection</strong> обнаружен.]]></key>
+    <key alias="xssProtectionCheckHeaderNotFound"><![CDATA[Заголовок <strong>X-XSS-Protection</strong> не найден.]]></key>
+    <key alias="xssProtectionSetHeaderInConfigDescription">Добавляет заголовок 'X-XSS-Protection' и его значение '1; mode=block' в секцию httpProtocol/customHeaders файла web.config. </key>
+    <key alias="xssProtectionSetHeaderInConfigSuccess">Заголовок X-XSS-Protection успешно добавлен в файл web.config.</key>
+    <!-- The following key get these tokens passed in:
+	    0: Comma delimitted list of headers found
+  	-->
+    <key alias="excessiveHeadersFound"><![CDATA[Обнаружены следующие заголовки, позволяющие выяснить базовую технологию сайта: <strong>%0%</strong>.]]></key>
+    <key alias="excessiveHeadersNotFound">Заголовки, позволяющие выяснить базовую технологию сайта, не обнаружены.</key>
+    <key alias="smtpMailSettingsNotFound">В файле Web.config, не обнаружено параметров работы с отправкой электронной почты (секция 'system.net/mailsettings').</key>
+    <key alias="smtpMailSettingsHostNotConfigured">В файле Web.config в секции 'system.net/mailsettings' не обнаружены настройки почтового хоста.</key>
+    <key alias="smtpMailSettingsConnectionSuccess">Параметры отправки электронной почты (SMTP) настроены корректно, сервис работает как ожидается.</key>
+    <key alias="smtpMailSettingsConnectionFail">Сервер SMTP сконфигурирован на использование хоста '%0%' на порту '%1%', который в настоящее время недоступен. Пожалуйста, убедитесь, что настройки SMTP в файле Web.config в секции 'system.net/mailsettings' верны.</key>
+    <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Адрес для отправки уведомлений установлен в <strong>%0%</strong>.]]></key>
+    <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Адрес для отправки уведомлений все еще установлен в значение по-умолчанию <strong>%0%</strong>.]]></key>
+    <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Зафиксированы следующие результаты автоматической проверки состояния Umbraco по расписанию, запущенной на %0% в %1%:</p>%2%</body></html>]]></key>
+    <key alias="scheduledHealthCheckEmailSubject">Результат проверки состояния Umbraco: %0%</key>
+  </area>
+  <area alias="help">
+    <key alias="theBestUmbracoVideoTutorials">Лучшие обучающие видео-курсы по Umbraco</key>
+  </area>
+  <area alias="imagecropper">
+    <key alias="reset">Сбросить</key>
+    <key alias="saveCrop">Сохранить рамку</key>
+    <key alias="addCrop">Добавить новую рамку</key>
+  </area>
+  <area alias="installer">
+    <key alias="databaseErrorCannotConnect">Программа установки не может установить подключение к базе данных.</key>
+    <key alias="databaseErrorWebConfig">Невозможно сохранить изменения в файл web.config. Пожалуйста, вручную измените настройки строки подключения к базе данных.</key>
+    <key alias="databaseFound">База данных обнаружена и идентифицирована как</key>
+    <key alias="databaseHeader">Конфигурация базы данных</key>
+    <key alias="databaseInstall"><![CDATA[
+		Нажмите кнопку <strong>Установить</strong> чтобы установить базу данных Umbraco %0%
+		]]></key>
+    <key alias="databaseInstallDone"><![CDATA[Ваша База данных сконфигурирована для работы Umbraco %0%. Нажмите кнопку <strong>Далее</strong> для продолжения.]]></key>
+    <key alias="databaseNotFound"><![CDATA[<p>База данных не найдена! Пожалуйста, проверьте настройки строки подключения ("connection string") в файле конфигурации "web.config"</p>
+		<p>Для настройки откройте файл "web.config" с помощью любого текстового редактора и добавьте нужную информацию в строку подключения (параметр "UmbracoDbDSN"),
+		затем сохраните файл.</p>
+		<p>Нажмите кнопку "Повторить" когда все будет готово<br />
+		<a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7"
+		target="_blank">Более подробно о внесении изменений в файл "web.config" рассказано здесь.</a></p>]]></key>
+    <key alias="databaseText"><![CDATA[Для завершения данного шага Вам нужно располагать некоторой информацией о Вашем сервере базы данных
+		(строка подключения "connection string")<br />
+		Пожалуйста, свяжитесь с Вашим хостинг-провайдером, если есть необходимость, а если устанавливаете на локальную рабочую станцию или сервер, то получите информацию у Вашего системного администратора.]]></key>
+    <key alias="databaseUpgrade"><![CDATA[
+		<p>Нажмите кнопку <strong>Обновление</strong>
+		для того, чтобы привести Вашу базу данных
+		в соответствие с версией Umbraco %0%</p>
+		<p>Пожалуйста, не волнуйтесь, ни одной строки Вашей базы данных
+		не будет потеряно при данной операции, и после ее завершения все будет работать!</p>
+		]]></key>
+    <key alias="databaseUpgradeDone"><![CDATA[Ваша база данных успешно обновлена до последней версии %0%.<br/>Нажмите <strong>Далее</strong> для продолжения. ]]></key>
+    <key alias="databaseUpToDate"><![CDATA[Указанная Вами база данных находится в актуальном состоянии. Нажмите кнопку <strong>Далее</strong> для продолжения работы мастера настроек]]></key>
+    <key alias="defaultUserChangePass"><![CDATA[<strong>Пароль пользователя по-умолчанию необходимо сменить!</strong>]]></key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong>Пользователь по-умолчанию заблокирован или не имеет доступа к Umbraco!</strong></p><p>Не будет предпринято никаких дальнейших действий. Нажмите кнопку <strong>Далее</strong> для продолжения.]]></key>
+    <key alias="defaultUserPassChanged"><![CDATA[<strong>Пароль пользователя по-умолчанию успешно изменен в процессе установки!</strong></p><p>Нет надобности в каких-либо дальнейших действиях. Нажмите кнопку <strong>Далее</strong> для продолжения.]]></key>
+    <key alias="defaultUserPasswordChanged">Пароль изменен!</key>
+    <key alias="greatStart">Для начального обзора возможностей системы рекомендуем посмотреть ознакомительные видеоматериалы</key>
+    <key alias="licenseText"><![CDATA[Нажимая кнопку <strong>Далее</strong> (или модифицируя вручную ключ "UmbracoConfigurationStatus" в файле "web.config"), Вы принимаете лицензионное соглашение для данного программного обеспечения, расположенное ниже. Пожалуйста, обратите внимание, что установочный пакет Umbraco отвечает двум различным типам лицензий: лицензии MIT на программные продукты с открытым исходным кодом в части ядра системы и свободной лицензии Umbraco в части пользовательского интерфейса.]]></key>
+    <key alias="None">Система не установлена.</key>
+    <key alias="permissionsAffectedFolders">Затронутые файлы и папки</key>
+    <key alias="permissionsAffectedFoldersMoreInfo">Более подробно об установке разрешений для Umbraco рассказано здесь</key>
+    <key alias="permissionsAffectedFoldersText">Вам следует установить разрешения для учетной записи ASP.NET на модификацию следующих файлов и папок</key>
+    <key alias="permissionsAlmostPerfect"><![CDATA[<strong>Установки разрешений в Вашей системе почти полностью отвечают требованиям Umbraco!</strong>
+		<br /><br />Вы имеете возможность запускать Umbraco без проблем, однако не сможете воспользоваться такой сильной стороной системы Umbraco как установка дополнительных пакетов расширений и дополнений.]]></key>
+    <key alias="permissionsHowtoResolve">Как решить проблему</key>
+    <key alias="permissionsHowtoResolveLink">Нажмите здесь, чтобы прочесть текстовую версию документа</key>
+    <key alias="permissionsHowtoResolveText"><![CDATA[Пожалуйста, посмотрите наш <strong>видео-материал</strong>, посвященный установке разрешений для файлов и папок в Umbraco или прочтите текстовую версию документа.]]></key>
+    <key alias="permissionsMaybeAnIssue"><![CDATA[<strong>Установки разрешений в Вашей файловой системе могут быть неверными!</strong>
+		<br /><br />Вы имеете возможность запускать Umbraco без проблем,
+		однако не сможете воспользоваться такой сильной стороной системы Umbraco как установка дополнительных пакетов расширений и дополнений.]]></key>
+    <key alias="permissionsNotReady"><![CDATA[<strong>Установки разрешений в Вашей файловой системе не подходят для работы Umbraco!</strong>
+		<br /><br />Если Вы хотите продолжить работу с Umbraco,
+		Вам необходимо скорректировать установки разрешений.]]></key>
+    <key alias="permissionsPerfect"><![CDATA[<strong>Установки разрешений в Вашей системе идеальны!</strong>
+		<br /><br />Вы имеете возможность работать с Umbraco в полном объеме включая установку дополнительных пакетов расширений и дополнений!]]></key>
+    <key alias="permissionsResolveFolderIssues">Решение проблемы с папками</key>
+    <key alias="permissionsResolveFolderIssuesLink">Воспользуйтесь этой ссылкой для получения более подробной информации о проблемах создания папок от имени учетной записи ASP.NET</key>
+    <key alias="permissionsSettingUpPermissions">Установка разрешений на папки</key>
+    <key alias="permissionsText"><![CDATA[
+		Системе Umbraco необходимы права на чтение и запись файлов в некоторые папки, чтобы сохранять в них такие материалы как, например, изображения или документы PDF.
+		Также подобным образом система сохраняет кэшированные данные Вашего сайта с целью повышения его производительности.
+		]]></key>
+    <key alias="runwayFromScratch"><![CDATA[Я хочу начать с 'чистого листа']]></key>
+    <key alias="runwayFromScratchText"><![CDATA[
+		В настоящий момент Ваш сайт абсолютно пустой, что является наилучшим вариантом для старта
+		"с чистого листа", чтобы начать создавать свои собственные типы документов и шаблоны.
+		(<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">Здесь можно узнать об этом подробнее</a>) Вы также можете отложить установку "Runway" на более позднее время. Перейдите к разделу "Разработка" и выберите пункт "Пакеты".
+		]]></key>
+    <key alias="runwayHeader">Вы только что установили чистую платформу Umbraco. Какой шаг будет следующим?</key>
+    <key alias="runwayInstalled">"Runway" установлен</key>
+    <key alias="runwayInstalledText"><![CDATA[
+		Базовый пакет системы установлен. Выберите, какие модули Вы хотите установить сверх
+		базового пакета.<br />Ниже приведен список модулей, рекомендованных к установке, измените его при необходимости, или ознакомьтесь с <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">полным списком модулей</a>
+		]]></key>
+    <key alias="runwayOnlyProUsers">Рекомендовано только для опытных пользователей</key>
+    <key alias="runwaySimpleSite">Я хочу начать с установки простого демонстрационного сайта</key>
+    <key alias="runwaySimpleSiteText"><![CDATA[
+		<p>"Runway" - это простой демонстрационный веб-сайт, предоставляющий базовый перечень шаблонов и типов документов.
+		Программа установки может настроить "Runway" для Вас автоматически,
+		но Вы можете в дальнейшем свободно изменять, расширять или удалить его.
+		Этот демонстрационный сайт не является необходимой частью, и Вы можете свободно
+		использовать Umbraco без него. Однако, "Runway" предоставляет Вам возможность
+		максимально быстро познакомиться с базовыми принципами и техникой построения сайтов
+		на основе Umbraco. Если Вы выберете вариант с установкой "Runway",
+		Вам будет предложен выбор "базовых строительных блоков" (т.н. модулей Runway) для расширения возможностей страниц сайта "Runway".</p>
+		<small><em>В "Runway" входят:</em>"Домашняя" (главная) страница, страница "Начало работы",
+		страница установки модулей.<br /> <em>Дополнительные модули:</em>Базовая навигация, Карта сайта, Форма обратной связи, Галерея.</small>
+		]]></key>
+    <key alias="runwayWhatIsRunway">Что такое "Runway"</key>
+    <key alias="step1">Шаг 1 из 5: Лицензионное соглашение</key>
+    <key alias="step2">Шаг 2 из 5: конфигурация базы данных</key>
+    <key alias="step3">Шаг 3 из 5: проверка файловых разрешений</key>
+    <key alias="step4">Шаг 4 из 5: проверка безопасности</key>
+    <key alias="step5">Шаг 5 из 5: система готова для начала работы</key>
+    <key alias="thankYou">Спасибо, что выбрали Umbraco</key>
+    <key alias="theEndBrowseSite"><![CDATA[<h3>Обзор Вашего нового сайта</h3>Вы установили "Runway",
+		почему бы не посмотреть, как выглядит Ваш новый сайт?]]></key>
+    <key alias="theEndFurtherHelp"><![CDATA[<h3>Дальнейшее изучение и помощь</h3>
+		Получайте помощь от нашего замечательного сообщества пользователей, изучайте документацию или просматривайте наши свободно распространяемые видео-материалы о том, как создать собственный несложный сайт, как использовать расширения и пакеты, а также краткое руководство по терминологии Umbraco.]]></key>
+    <key alias="theEndHeader">Система Umbraco %0% установлена и готова к работе</key>
+    <key alias="theEndInstallFailed"><![CDATA[Для завершения процесса установки Вам необходимо
+		вручную модифицировать файл <strong>web.config</strong> и изменить значение ключа <strong>UmbracoConfigurationStatus</strong> в секции <strong>AppSetting</strong>, установив его равным <strong>'%0%'</strong>.]]></key>
+    <key alias="theEndInstallSuccess"><![CDATA[Вы можете начать работу <strong>прямо сейчас</strong>,
+		воспользовавшись ссылкой "Начать работу с Umbraco". <br />Если Вы <strong>новичок в мире Umbraco</strong>, Вы сможете найти много полезных ссылок на ресурсы на странице "Начало работы".]]></key>
+    <key alias="theEndOpenUmbraco"><![CDATA[<h3>Начните работу с Umbraco</h3>
+		Для того, чтобы начать администрировать свой сайт, просто откройте административную панель Umbraco и начните обновлять контент, изменять шаблоны страниц и стили CSS или добавлять новую функциональность]]></key>
+    <key alias="Unavailable">Попытка соединения с базой данных потерпела неудачу.</key>
+    <key alias="Version3">Версия Umbraco 3</key>
+    <key alias="Version4">Версия Umbraco 4</key>
+    <key alias="watch">Смотреть</key>
+    <key alias="welcomeIntro"><![CDATA[Этот мастер проведет Вас через процесс конфигурирования
+		<strong>Umbraco %0%</strong> в форме "чистой" установки или обновления предыдущей версии 3.x.
+		<br /><br />Нажмите кнопку <strong>"Далее"</strong> для начала работы мастера.]]></key>
+  </area>
+  <area alias="language">
+    <key alias="cultureCode">Код языка</key>
+    <key alias="displayName">Название языка</key>
+  </area>
+  <area alias="lockout">
+    <key alias="lockoutWillOccur">Вы отсутствовали некоторое время. Был осуществлен автоматический выход в</key>
+    <key alias="renewSession">Обновите сейчас, чтобы сохранить сделанные изменения</key>
+  </area>
+  <area alias="login">
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p>]]></key>
+    <key alias="greeting0">Сегодня же выходной!</key>
+    <key alias="greeting1">Понедельник — день тяжелый...</key>
+    <key alias="greeting2">Вот уже вторник...</key>
+    <key alias="greeting3">Берегите окружающую среду</key>
+    <key alias="greeting4">Рыбный день</key>
+    <key alias="greeting5">Слава Богу, сегодня пятница!</key>
+    <key alias="greeting6">Понедельник начинается в субботу</key>
+    <key alias="instruction">Укажите имя пользователя и пароль</key>
+    <key alias="timeout">Время сессии истекло</key>
+    <key alias="forgottenPassword">Забыли пароль?</key>
+    <key alias="forgottenPasswordInstruction">На email-адрес будет выслано письмо со ссылкой для сброса пароля</key>
+    <key alias="requestPasswordResetConfirmation">Будет выслано письмо с инструкциями по сбросу пароля на указанный email-адрес, если он совпадает с адресом пользователя</key>
+    <key alias="returnToLogin">Вернуться к форме входа</key>
+    <key alias="setPasswordInstruction">Пожалуйста укажите новый пароль</key>
+    <key alias="setPasswordConfirmation">Ваш пароль обновлен</key>
+    <key alias="signInWith">Войти с помощью</key>
+    <key alias="resetCodeExpired">Ссылка, по которой Вы попали сюда, неверна или устарела</key>
+    <key alias="resetPasswordEmailCopySubject">Umbraco: сброс пароля</key>
+    <key alias="resetPasswordEmailCopyFormat"><![CDATA[
+        <html>
+			<head>
+				<meta name='viewport' content='width=device-width'>
+				<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
+			</head>
+			<body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'>
+				<style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style>
+				<table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;" bgcolor="#1d1333">
+					<tr>
+						<td style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;" valign="top">
+							<table style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
+								<tr>
+									<td background="https://umbraco.com/umbraco/assets/img/application/logo.png" bgcolor="#1d1333" width="28" height="28" valign="top" style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
+										<!--[if gte mso 9]> <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:30px;height:30px;"> <v:fill type="tile" src="https://umbraco.com/umbraco/assets/img/application/logo.png" color="#1d1333" /> <v:textbox inset="0,0,0,0"> <![endif]-->
+										<div> </div>
+										<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->
+									</td>
+									<td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top"></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				</table>
+				<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>
+					<tr>
+						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
+						<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>
+							<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>
+								<br>
+								<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>
+									<tr>
+										<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>
+											<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>
+												<tr>
+													<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>
+														<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
+															Запрошен сброс пароля
+														</h1>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															Ваше имя пользователя для входа в административную панель Umbraco: <strong>%0%</strong>
+														</p>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>
+																<tbody>
+																	<tr>
+																		<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
+																			<a href='%1%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																				Нажмите на эту ссылку для того, чтобы сбросить пароль
+																			</a>
+																		</td>
+																	</tr>
+																</tbody>
+															</table>
+														</p>
+														<p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>Если Вы не имеете возможности нажать на сслыку, скопируйте следующий адрес (URL) и вставьте в адресную строку Вашего браузера:</p>
+															<table border='0' cellpadding='0' cellspacing='0'>
+																<tr>
+																	<td style='-ms-word-break: break-all; word-break: break-all; font-family: sans-serif; font-size: 11px; line-height:14px;'>
+																		<font style="-ms-word-break: break-all; word-break: break-all; font-size: 11px; line-height:14px;">
+																			<a style='-ms-word-break: break-all; word-break: break-all; color: #392F54; text-decoration: underline; font-size: 11px; line-height:15px;' href='%1%'>%1%</a>
+																		</font>
+																	</td>
+																</tr>
+															</table>
+														</p>
+													</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+								</table>
+								<br><br><br>
+							</div>
+						</td>
+						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
+					</tr>
+				</table>
+			</body>
+		</html>
+      ]]></key>
+  </area>
+  <area alias="main">
+    <key alias="dashboard">Панель управления</key>
+    <key alias="sections">Разделы</key>
+    <key alias="tree">Содержимое</key>
+  </area>
+  <area alias="media">
+    <key alias="clickToUpload">Нажмите, чтобы загрузить</key>
+    <key alias="disallowedFileType">Невозможна загрузка этого файла, этот тип файлов не разрешен для загрузки</key>
+    <key alias="orClickHereToUpload">или нажмите сюда, чтобы выбрать файлы</key>
+    <key alias="maxFileSize">Максимально допустимый размер файла: </key>
+    <key alias="mediaRoot">Начальный узел медиа</key>
+  </area>
+  <area alias="mediaPicker">
+    <key alias="pickedTrashedItem">Выбран медиа-элемент, который в настоящее время удален или находится в корзине</key>
+    <key alias="pickedTrashedItems">Выбраны медиа-элементы, которые в настоящее время удалены или находятся в корзине</key>
+  </area>
+  <area alias="member">
+    <key alias="createNewMember">Создать нового участника</key>
+    <key alias="allMembers">Все участники</key>
+  </area>
+  <area alias="modelsBuilder">
+    <key alias="buildingModels">Построение моделей</key>
+    <key alias="waitingMessage">это может занять некоторое время, пожалуйста, подождите</key>
+    <key alias="modelsGenerated">Модели построены</key>
+    <key alias="modelsGeneratedError">Модели не могут быть построены</key>
+    <key alias="modelsExceptionInUlog">Процесс построения моделей завершился ошибкой, подробности в системном журнале Umbraco</key>
+  </area>
+  <area alias="moveOrCopy">
+    <key alias="choose">Выберите страницу...</key>
+    <key alias="copyDone">Узел %0% был скопирован в %1%</key>
+    <key alias="copyTo">Выберите, куда должен быть скопирован узел %0%</key>
+    <key alias="moveDone">Узел %0% был перемещён в %1%</key>
+    <key alias="moveTo">Выберите, куда должен быть перемещён узел %0%</key>
+    <key alias="nodeSelected">был выбран как родительский узел для нового элемента, нажмите 'Ок'.</key>
+    <key alias="noNodeSelected">Не выбран узел! Пожалуйста выберите узел назначения, прежде чем нажать 'Ок'.</key>
+    <key alias="notAllowedAtRoot">Текущий узел не может быть размещен непосредственно в корне дерева</key>
+    <key alias="notAllowedByContentType">Текущий узел не может быть размещён в выбранном Вами из-за несоответствия типов.</key>
+    <key alias="notAllowedByPath">Текущий узел не может быть перемещен внутрь своих дочерних узлов</key>
+    <key alias="notValid">Данное действие не может быть осуществлено, так как Вы не имеете достаточных прав для совершения действий над одним или более дочерними документами.</key>
+    <key alias="relateToOriginal">Связать новые копии с оригиналами</key>
+  </area>
+  <area alias="notifications">
+    <key alias="editNotifications">Вы можете изменить уведомление для %0%</key>
+    <key alias="mailBody"><![CDATA[
+		Здравствуйте, %0%
+
+		Это автоматически сгенерированное уведомление.
+		Операция '%1%'
+		была произведена на странице '%2%' пользователем '%3%'.
+
+		Вы можете увидеть изменения и отредактировать, перейдя по ссылке http://%4%/#/content/content/edit/%5%.
+
+		Удачи!
+
+		Генератор уведомлений Umbraco.
+		]]></key>
+    <key alias="mailBodyHtml"><![CDATA[
+        <html>
+			<head>
+				<meta name='viewport' content='width=device-width'>
+				<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
+			</head>
+			<body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'>
+				<style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style>
+				<table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;" bgcolor="#1d1333">
+					<tr>
+						<td style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;" valign="top">
+							<table style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
+								<tr>
+									<td background="https://umbraco.com/umbraco/assets/img/application/logo.png" bgcolor="#1d1333" width="28" height="28" valign="top" style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
+										<!--[if gte mso 9]> <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:30px;height:30px;"> <v:fill type="tile" src="https://umbraco.com/umbraco/assets/img/application/logo.png" color="#1d1333" /> <v:textbox inset="0,0,0,0"> <![endif]-->
+										<div> </div>
+										<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->
+									</td>
+									<td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top"></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				</table>
+				<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>
+					<tr>
+						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
+						<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>
+							<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>
+								<br>
+								<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>
+									<tr>
+										<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>
+											<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>
+												<tr>
+													<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>
+														<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
+															Здравствуйте, %0%,
+														</h1>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															Это автоматически сгенерированное сообщение, отправленное, чтобы уведомить Вас о том, что операция <strong>'%1%'</strong> была выполнена на странице <a style="color: #392F54; text-decoration: none; -ms-word-break: break-all; word-break: break-all;" href="http://%4%/#/content/content/edit/%5%"><strong>'%2%'</strong></a> пользователем <strong>'%3%'</strong>
+														</p>
+														<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;'>
+															<tbody>
+																<tr>
+																	<td align='left' style='font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>
+																		<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'><tbody><tr>
+																			<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
+																				<a href='http://%4%/#/content/content/edit/%5%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>ВНЕСТИ ИЗМЕНЕНИЯ</a> </td> </tr></tbody></table>
+																	</td>
+																</tr>
+															</tbody>
+														</table>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															<h3>Обзор обновления:</h3>
+															<table style="width: 100%;">
+																 %6%
+															</table>
+														</p>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															Удачного дня!<br /><br />
+															К Вашим услугам, почтовый робот Umbraco
+														</p>
+													</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+								</table>
+								<br><br><br>
+							</div>
+						</td>
+						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
+					</tr>
+				</table>
+			</body>
+		</html>
+      ]]></key>
+    <key alias="mailSubject">[%0%] Уведомление об операции %1% над документом %2%</key>
+    <key alias="notifications">Уведомления</key>
+  </area>
+  <area alias="packager">
+    <key alias="chooseLocalPackageText"><![CDATA[
+		Выберите файл пакета на своем компьютере, нажав на кнопку 'Обзор'<br />
+		и указав на нужный файл. Пакеты Umbraco обычно являются архивами с расширением '.zip'.
+		]]></key>
+    <key alias="dropHere">Перетащите сюда</key>
+    <key alias="orClickHereToUpload">или нажмите здесь для выбора файла пакета</key>
+    <key alias="uploadPackage">Загрузить пакет</key>
+    <key alias="localPackageDescription">Установите локальный пакет из файла, расположенного на Вашем компьютере. Остерегайтесь устанавливать пакеты из непроверенных источников!</key>
+    <key alias="uploadAnother">Загрузить еще один пакет</key>
+    <key alias="cancelAndUploadAnother">Отменить и загрузить другой пакет</key>
+    <key alias="packageLicense">Лицензия</key>
+    <key alias="accept">Я принимаю</key>
+    <key alias="termsOfUse">условия использования</key>
+    <key alias="packageInstall">Установить пакет</key>
+    <key alias="installFinish">Завершить</key>
+    <key alias="installedPackages">Установленные пакеты</key>
+    <key alias="noPackages">Ни одного пакета еще не установлено</key>
+    <key alias="noPackagesDescription"><![CDATA[Вы пока еще не устанавливали ни одного пакета. Вы можете установить как локальный пакет, выбрав файл на Вашем компьютере, так и пакет из репозитория, нажав на значок <strong>'Packages'</strong> наверху справа]]></key>
+    <key alias="packageSearch">Поиск по пакетам</key>
+    <key alias="packageSearchResults">Результаты поиска по</key>
+    <key alias="packageNoResults">Ничего не найдено по запросу</key>
+    <key alias="packageNoResultsDescription">Пожалуйста, повторите поиск, уточнив запрос, или воспользуйтесь просмотром по категориям</key>
+    <key alias="packagesPopular">Популярные</key>
+    <key alias="packagesNew">Недавно созданные</key>
+    <key alias="packageHas">имеет на счету</key>
+    <key alias="packageKarmaPoints">очков кармы</key>
+    <key alias="packageInfo">Информация</key>
+    <key alias="packageOwner">Владелец</key>
+    <key alias="packageContrib">Соавторы</key>
+    <key alias="packageCreated">Создан</key>
+    <key alias="packageCurrentVersion">Текущая версия</key>
+    <key alias="packageNetVersion">Версия .NET</key>
+    <key alias="packageDownloads">Загрузок</key>
+    <key alias="packageLikes">Нравится</key>
+    <key alias="packageCompatibility">Совместимость</key>
+    <key alias="packageCompatibilityDescription">Этот пакет совместим со следующими версиями Umbraco, по сообщениям участников сообщества. Полная совместимость не гарантируется для версий со значением ниже 100%</key>
+    <key alias="packageExternalSources">Внешние источники</key>
+    <key alias="packageAuthor">Автор</key>
+    <key alias="packageDocumentation">Документация (описание)</key>
+    <key alias="packageMetaData">Мета-данные пакета</key>
+    <key alias="packageName">Название пакета</key>
+    <key alias="packageNoItemsHeader">Пакет ничего не содержит</key>
+    <key alias="packageNoItemsText"><![CDATA[Этот файл пакета не содержит ни одного элемента
+		для удаления.<br/><br/>Вы можете безопасно удалить данный пакет из системы, нажав на кнопку "Деинсталлировать пакет".]]></key>
+    <key alias="packageOptions">Опции пакета</key>
+    <key alias="packageReadme">Краткий обзор пакета</key>
+    <key alias="packageRepository">Репозиторий пакета</key>
+    <key alias="packageUninstallConfirm">Подтверждение деинсталляции пакета</key>
+    <key alias="packageUninstalledHeader">Пакет деинсталлирован</key>
+    <key alias="packageUninstalledText">Указанный пакет успешно удален из системы</key>
+    <key alias="packageUninstallHeader">Деинсталлировать пакет</key>
+    <key alias="packageUninstallText"><![CDATA[Сейчас Вы можете снять отметки с тех опций пакета, которые НЕ хотите удалять. После нажатия кнопки "Подтверждение деинсталляции" все отмеченные опции будут удалены.<br />
+		<span style="color: Red; font-weight: bold;">Обратите внимание:</span> все документы, медиа-файлы и другой контент, зависящий от этого пакета, перестанет нормально работать, что может привести к нестабильному поведению системы,
+		поэтому удаляйте пакеты очень осторожно. При наличии сомнений, свяжитесь с автором пакета.]]></key>
+    <key alias="packageVersion">Версия пакета</key>
+    <key alias="packageAlreadyInstalled">Этот пакет уже установлен в системе</key>
+    <key alias="targetVersionMismatch">Этот пакет не может быть установлен, он требует наличия Umbraco версии как минимум</key>
+    <key alias="installStateUninstalling">Удаление...</key>
+    <key alias="installStateDownloading">Загрузка...</key>
+    <key alias="installStateImporting">Импорт...</key>
+    <key alias="installStateInstalling">Установка...</key>
+    <key alias="installStateRestarting">Перезапуск, подождите, пожалуйста...</key>
+    <key alias="installStateComplete">Все готово, сейчас браузер перезагрузит страницу, подождите, пожалуйста...</key>
+    <key alias="installStateCompleted">Пожалуйста, нажмите кнопку 'Завершить' для завершения установки и перезагрузки страницы.</key>
+    <key alias="installStateUploading">Загрузка пакета...</key>
+  </area>
+  <area alias="paste">
+    <key alias="doNothing">Вставить, полностью сохранив форматирование (не рекомендуется)</key>
+    <key alias="errorMessage">Текст, который Вы пытаетесь вставить, содержит специальные символы и/или элементы форматирования. Это возможно при вставке текста, скопированного из Microsoft Word. Система может удалить эти элементы автоматически, чтобы сделать вставляемый текст более пригодным для веб-публикации.</key>
+    <key alias="removeAll">Вставить как простой текст без форматирования</key>
+    <key alias="removeSpecialFormattering">Вставить с очисткой форматирования (рекомендуется)</key>
+  </area>
+  <area alias="placeholders">
+    <key alias="confirmPassword">Подтвердите пароль</key>
+    <key alias="email">Укажите Ваш email...</key>
+    <key alias="enterDescription">Укажите описание...</key>
+    <key alias="enteremail">Укажите email...</key>
+    <key alias="enterMessage">Укажите сообщение...</key>
+    <key alias="entername">Укажите имя...</key>
+    <key alias="enterTags">Укажите теги (нажимайте Enter после каждого тега)...</key>
+    <key alias="enterusername">Укажите имя пользователя...</key>
+    <key alias="filter">Укажите фильтр...</key>
+    <key alias="label">Метка...</key>
+    <key alias="nameentity">Назовите %0%...</key>
+    <key alias="password">Укажите пароль</key>
+    <key alias="search">Что искать...</key>
+    <key alias="username">Укажите имя пользователя</key>
+    <key alias="usernameHint">Имя пользователя (часто это Ваш email-адрес)</key>
+  </area>
+  <area alias="prompt">
+    <key alias="stay">Остаться</key>
+    <key alias="discardChanges">Отменить изменения</key>
+    <key alias="unsavedChanges">Есть несохраненные изменения</key>
+    <key alias="unsavedChangesWarning">Вы уверены, что хотите уйти с этой страницы? - на ней имеются несохраненные изменения</key>
+  </area>
+  <area alias="publicAccess">
+    <key alias="paAdvanced">Расширенный: Защита на основе ролей (групп)</key>
+    <key alias="paAdvancedHelp"><![CDATA[Применяйте, если желаете контролировать доступ к документу на основе ролевой модели безопасности,<br /> с использованием групп участников Umbraco.]]></key>
+    <key alias="paAdvancedNoGroups">Вам необходимо создать хотя бы одну группу участников для применения ролевой модели безопасности.</key>
+    <key alias="paErrorPage">Страница сообщения об ошибке</key>
+    <key alias="paErrorPageHelp">Используется в случае, когда пользователь авторизован в системе, но не имеет доступа к документу.</key>
+    <key alias="paHowWould">Выберите способ ограничения доступа к документу</key>
+    <key alias="paIsProtected">Правила доступа к документу %0% установлены</key>
+    <key alias="paIsRemoved">Правила доступа для документа %0% удалены</key>
+    <key alias="paLoginPage">Страница авторизации (входа)</key>
+    <key alias="paLoginPageHelp">Используйте как страницу с формой для авторизации пользователей</key>
+    <key alias="paRemoveProtection">Снять защиту</key>
+    <key alias="paSelectPages">Выберите страницы авторизации и сообщений об ошибках</key>
+    <key alias="paSelectRoles">Выберите роли пользователей, имеющих доступ к документу</key>
+    <key alias="paSetLogin">Установите имя пользователя и пароль для доступа к этому документу</key>
+    <key alias="paSimple">Простой: Защита по имени пользователя и паролю</key>
+    <key alias="paSimpleHelp">Применяйте, если хотите установить самый простой способ доступа к документу - явно указанные имя пользователя и пароль</key>
+  </area>
+  <area alias="publish">
+    <key alias="contentPublishedFailedAwaitingRelease"><![CDATA[
+      Документ %0% не может быть опубликован сейчас, поскольку для него установлено расписание публикации.
+    ]]></key>
+    <key alias="contentPublishedFailedByEvent"><![CDATA[
+		Документ %0% не может быть опубликован. Операцию отменил установленный в системе пакет дополнений.
+		]]></key>
+    <key alias="contentPublishedFailedExpired"><![CDATA[
+      Документ %0% не может быть опубликован, так как текущая информация в нем устарела.
+    ]]></key>
+    <key alias="contentPublishedFailedByParent"><![CDATA[
+      Документ %0% не может быть опубликован, так как не опубликован его родительский документ.
+    ]]></key>
+    <key alias="contentPublishedFailedInvalid"><![CDATA[
+      Документ %0% не может быть опубликован, так как не все его свойства прошли проверку согласно установленным правилам валидации.
+    ]]></key>
+    <key alias="includeUnpublished">Включая неопубликованные дочерние документы</key>
+    <key alias="inProgress">Идет публикация. Пожалуйста, подождите...</key>
+    <key alias="inProgressCounter">%0% из %1% документов опубликованы...</key>
+    <key alias="nodePublish">Документ %0% опубликован.</key>
+    <key alias="nodePublishAll">Документ %0% и его дочерние документы были опубликованы</key>
+    <key alias="publishAll">Опубликовать документ %0% и все его дочерние документы</key>
+    <key alias="publishHelp"><![CDATA[Нажмите кнопку <em>Опубликовать</em> для публикации документа <strong>%0%</strong>.
+		Тем самым Вы сделаете содержимое документа доступным для просмотра.<br /><br />
+		Вы можете опубликовать этот документ и все его дочерние документы, отметив опцию <em>Опубликовать все дочерние документы</em>.
+		Чтобы опубликовать ранее неопубликованные документы среди дочерних, отметьте опцию <em>Включая неопубликованные дочерние документы</em>.
+		]]></key>
+  </area>
+  <area alias="redirectUrls">
+    <key alias="disableUrlTracker">Остановить отслеживание URL</key>
+    <key alias="enableUrlTracker">Запустить отслеживание URL</key>
+    <key alias="originalUrl">Первоначальный URL</key>
+    <key alias="redirectedTo">Перенаправлен в</key>
+    <key alias="noRedirects">На данный момент нет ни одного перенаправления</key>
+    <key alias="noRedirectsDescription">Если опубликованный документ переименовывается или меняет свое расположение в дереве, а следовательно, меняется адрес (URL), автоматически создается перенаправление на новое местоположение этого документа.</key>
+    <key alias="confirmRemove">Вы уверены, что хотите удалить перенаправление с '%0%' на '%1%'?</key>
+    <key alias="redirectRemoved">Перенаправление удалено.</key>
+    <key alias="redirectRemoveError">Ошибка удаления перенаправления.</key>
+    <key alias="confirmDisable">Вы уверены, что хотите остановить отслеживание URL?</key>
+    <key alias="disabledConfirm">Отслеживание URL в настоящий момент остановлено.</key>
+    <key alias="disableError">Ошибка остановки отслеживания URL, более подробные сведения находятся в системном журнале.</key>
+    <key alias="enabledConfirm">Отслеживание URL в настоящий момент запущено.</key>
+    <key alias="enableError">Ошибка запуска отслеживания URL, более подробные сведения находятся в системном журнале.</key>
+  </area>
+  <area alias="relatedlinks">
+    <key alias="caption">Заголовок</key>
+    <key alias="captionPlaceholder">Укажите заголовок ссылки</key>
+    <key alias="chooseInternal">выбрать страницу сайта</key>
+    <key alias="enterExternal">указать внешнюю ссылку</key>
+    <key alias="externalLinkPlaceholder">Укажите ссылку</key>
+    <key alias="link">Ссылка</key>
+    <key alias="newWindow">Открыть в новом окне</key>
+  </area>
+  <area alias="renamecontainer">
+    <key alias="renamed">Переименована</key>
+    <key alias="enterNewFolderName">Укажите здесь новое название для папки</key>
+    <key alias="folderWasRenamed">'%0%' была переименована в '%1%'</key>
+  </area>
+  <area alias="rollback">
+    <key alias="currentVersion">Текущая версия</key>
+    <key alias="diffHelp"><![CDATA[Здесь показаны различия между новейшей версией документа и выбранной Вами версией.<br /><del>Красным</del> отмечен текст, которого уже нет в последней версии, <ins>зеленым</ins> - текст, который добавлен]]></key>
+    <key alias="documentRolledBack">Произведен откат к ранней версии</key>
+    <key alias="htmlHelp">Текущая версия показана в виде HTML. Для просмотра различий в версиях выберите режим сравнения</key>
+    <key alias="rollbackTo">Откатить к версии</key>
+    <key alias="selectVersion">Выберите версию</key>
+    <key alias="view">Просмотр</key>
+  </area>
+  <area alias="scripts">
+    <key alias="editscript">Править файл скрипта</key>
+  </area>
+  <area alias="sections">
+    <key alias="concierge">Смотритель</key>
+    <key alias="content">Содержимое</key>
+    <key alias="courier">Курьер</key>
+    <key alias="developer">Разработка</key>
+    <key alias="forms">Формы</key>
+    <key alias="help" version="7.0">Помощь</key>
+    <key alias="installer">Мастер конфигурирования Umbraco</key>
+    <key alias="media">Медиа-материалы</key>
+    <key alias="member">Участники</key>
+    <key alias="newsletters">Рассылки</key>
+    <key alias="settings">Установки</key>
+    <key alias="statistics">Статистика</key>
+    <key alias="translation">Перевод</key>
+    <key alias="users">Пользователи</key>
+  </area>
+  <area alias="settings">
+    <key alias="addIcon">Добавить значок</key>
+    <key alias="asAContentMasterType">в качестве родительского типа. Вкладки родительского типа не показаны и могут быть изменены непосредственно в родительском типе</key>
+    <key alias="contentTypeEnabled">Родительский тип контента разрешен</key>
+    <key alias="contentTypeUses">Данный тип контента использует</key>
+    <key alias="defaulttemplate">Шаблон по-умолчанию</key>
+    <key alias="importDocumentTypeHelp">Чтобы импортировать тип документа, найдите файл ".udt" на своем компьютере, нажав на кнопку "Обзор", затем нажмите "Импортировать" (на следующем экране будет запрошено подтверждение для этой операции).</key>
+    <key alias="newtabname">Заголовок новой вкладки</key>
+    <key alias="nodetype">Тип узла (документа)</key>
+    <key alias="noPropertiesDefinedOnTab">Для данной вкладки не определены свойства. Кликните по ссылке "Click here to add a new property" сверху, чтобы создать новое свойство.</key>
+    <key alias="objecttype">Тип</key>
+    <key alias="script">Скрипт</key>
+    <key alias="stylesheet">Стили CSS</key>
+    <key alias="tab">Вкладка</key>
+    <key alias="tabname">Заголовок вкладки</key>
+    <key alias="tabs">Вкладки</key>
+  </area>
+  <area alias="shortcuts">
+    <key alias="addGroup">Добавить вкладку</key>
+    <key alias="addProperty">Добавить свойство</key>
+    <key alias="addEditor">Добавить редактор</key>
+    <key alias="addTemplate">Добавить шаблон</key>
+    <key alias="addChildNode">Добавить дочерний узел</key>
+    <key alias="addChild">Добавить дочерний</key>
+    <key alias="editDataType">Изменить тип данных</key>
+    <key alias="navigateSections">Навигация по разделам</key>
+    <key alias="shortcut">Ярлыки</key>
+    <key alias="showShortcuts">показать ярлыки</key>
+    <key alias="toggleListView">В формате списка</key>
+    <key alias="toggleAllowAsRoot">Разрешить в качестве корневого</key>
+    <key alias="commentLine">Закомментировать/раскомментировать строки</key>
+    <key alias="removeLine">Удалить строку</key>
+    <key alias="copyLineUp">Копировать строки вверх</key>
+    <key alias="copyLineDown">Копировать строки вниз</key>
+    <key alias="moveLineUp">Переместить строки вверх</key>
+    <key alias="moveLineDown">Переместить строки вниз</key>
+    <key alias="generalHeader">Общее</key>
+    <key alias="editorHeader">Редактор</key>
+  </area>
+  <area alias="sort">
+    <key alias="sortOrder">Порядок сортировки</key>
+    <key alias="sortCreationDate">Дата создания</key>
+    <key alias="sortDone">Сортировка завершена</key>
+    <key alias="sortHelp">Перетаскивайте элементы на нужное место вверх или вниз для определения необходимого Вам порядка сортировки. Также можно использовать заголовки столбцов, чтобы отсортировать все элементы сразу.</key>
+    <key alias="sortPleaseWait"><![CDATA[Пожалуйста, подождите... Страницы сортируются, это может занять некоторое время.]]></key>
+  </area>
+  <area alias="speechBubbles">
+    <key alias="contentPublishedFailedByEvent">Процесс публикации был отменен установленным пакетом дополнений.</key>
+    <key alias="contentTypeDublicatePropertyType">Такое свойство уже существует.</key>
+    <key alias="contentTypePropertyTypeCreated">Свойство создано</key>
+    <key alias="contentTypePropertyTypeCreatedText"><![CDATA[Имя: %0% <br /> Тип данных: %1%]]></key>
+    <key alias="contentTypePropertyTypeDeleted">Свойство удалено</key>
+    <key alias="contentTypeSavedHeader">Тип документа сохранен</key>
+    <key alias="contentTypeTabCreated">Вкладка создана</key>
+    <key alias="contentTypeTabDeleted">Вкладка удалена</key>
+    <key alias="contentTypeTabDeletedText">Вкладка с идентификатором (id): %0% удалена</key>
+    <key alias="contentUnpublished">Документ скрыт (публикация отменена)</key>
+    <key alias="cssErrorHeader">Стиль CSS не сохранен</key>
+    <key alias="cssSavedHeader">Стиль CSS сохранен</key>
+    <key alias="cssSavedText">Стиль CSS сохранен без ошибок</key>
+    <key alias="dataTypeSaved">Тип данных сохранен</key>
+    <key alias="dictionaryItemSaved">Статья в словаре сохранена</key>
+    <key alias="editContentPublishedFailedByParent">Публикация не завершена, так как родительский документ не опубликован</key>
+    <key alias="editContentPublishedHeader">Документ опубликован</key>
+    <key alias="editContentPublishedText">и является видимым</key>
+    <key alias="editContentSavedHeader">Документ сохранен</key>
+    <key alias="editContentSavedText">Не забудьте опубликовать, чтобы сделать видимым</key>
+    <key alias="editContentSendToPublish">Отослано на утверждение</key>
+    <key alias="editContentSendToPublishText">Изменения отосланы на утверждение</key>
+    <key alias="editMediaSaved">Медиа-элемент сохранен</key>
+    <key alias="editMediaSavedText"></key>
+    <key alias="editMemberSaved">Участник сохранен</key>
+    <key alias="editStylesheetPropertySaved">Правило стиля CSS сохранено</key>
+    <key alias="editStylesheetSaved">Стиль CSS сохранен</key>
+    <key alias="editTemplateSaved">Шаблон сохранен</key>
+    <key alias="editUserError">Произошла ошибка при сохранении пользователя (проверьте журналы ошибок)</key>
+    <key alias="editUserGroupSaved">Группа пользователей сохранена</key>
+    <key alias="editUserSaved">Пользователь сохранен</key>
+    <key alias="editUserTypeSaved">Тип пользователей сохранен</key>
+    <key alias="fileErrorHeader">Файл не сохранен</key>
+    <key alias="fileErrorText">Файл не может быть сохранен. Пожалуйста, проверьте установки файловых разрешений</key>
+    <key alias="fileSavedHeader">Файл сохранен</key>
+    <key alias="fileSavedText">Файл сохранен без ошибок</key>
+    <key alias="invalidUserPermissionsText">У текущего пользователя недостаточно прав, невозможно завершить операцию</key>
+    <key alias="languageSaved">Язык сохранен</key>
+    <key alias="mediaTypeSavedHeader">Тип медиа сохранен</key>
+    <key alias="memberTypeSavedHeader">Тип участника сохранен</key>
+    <key alias="operationCancelledHeader">Отменено</key>
+    <key alias="operationCancelledText">Операция отменена установленным сторонним расширением или блоком кода</key>
+    <key alias="operationFailedHeader">Ошибка</key>
+    <key alias="operationSavedHeader">Сохранено</key>
+    <key alias="partialViewErrorHeader">Представление не сохранено</key>
+    <key alias="partialViewErrorText">Произошла ошибка при сохранении файла</key>
+    <key alias="partialViewSavedHeader">Представление сохранено</key>
+    <key alias="partialViewSavedText">Представление сохранено без ошибок</key>
+    <key alias="permissionsSavedFor">Права доступа сохранены для</key>
+    <key alias="templateErrorHeader">Шаблон не сохранен</key>
+    <key alias="templateErrorText">Пожалуйста, проверьте, что нет двух шаблонов с одним и тем же алиасом (названием)</key>
+    <key alias="templateSavedHeader">Шаблон сохранен</key>
+    <key alias="templateSavedText">Шаблон сохранен без ошибок</key>
+    <key alias="validationFailedHeader">Проверка значений</key>
+    <key alias="validationFailedMessage">Ошибки, найденные при проверке значений, должны быть исправлены, чтобы было возможно сохранить документ</key>
+    <key alias="deleteUserGroupsSuccess">Удалено %0% групп пользователей</key>
+    <key alias="deleteUserGroupSuccess">'%0%' была удалена</key>
+    <key alias="enableUsersSuccess">Активировано %0% пользователей</key>
+    <key alias="disableUsersSuccess">Заблокировано %0% пользователей</key>
+    <key alias="enableUserSuccess">'%0%' сейчас активирован</key>
+    <key alias="disableUserSuccess">'%0%' сейчас заблокирован</key>
+    <key alias="setUserGroupOnUsersSuccess">Группы пользователей установлены</key>
+    <key alias="unlockUsersSuccess">Разблокировано %0% пользователей</key>
+    <key alias="unlockUserSuccess">'%0%' сейчас разблокирован</key>
+    <key alias="memberExportedSuccess">Данные участника успешно экспортированы в файл</key>
+    <key alias="memberExportedError">Во время экспортирования данных участника произошла ошибка</key>
+  </area>
+  <area alias="stylesheet">
+    <key alias="aliasHelp">Используется синтаксис селекторов CSS, например: h1, .redHeader, .blueTex</key>
+    <key alias="editstylesheet">Изменить стиль CSS</key>
+    <key alias="editstylesheetproperty">Изменить правило стиля CSS</key>
+    <key alias="nameHelp">Название правила для отображения в редакторе документа</key>
+    <key alias="preview">Предварительный просмотр</key>
+    <key alias="styles">Стили</key>
+  </area>
+  <area alias="template">
+    <key alias="edittemplate">Изменить шаблон</key>
+    <key alias="insertSections">Секции</key>
+    <key alias="insertContentArea">Вставить контент-область</key>
+    <key alias="insertContentAreaPlaceHolder">Вставить контейнер (placeholder)</key>
+    <key alias="insert">Вставить</key>
+    <key alias="insertDesc">Выберите, что хотите вставить в шаблон</key>
+    <key alias="insertDictionaryItem">Статью словаря</key>
+    <key alias="insertDictionaryItemDesc">Статья словаря - это контейнер для части текста, переводимой на разные языки, это позволяет упростить создание многоязычных сайтов.</key>
+    <key alias="insertMacro">Макрос</key>
+    <key alias="insertMacroDesc">
+      Макросы - это настраиваемые компоненты, которые хорошо подходят для
+      реализации переиспользуемых блоков, (особенно, если необходимо менять их внешний вид и/или поведение при помощи параметров)
+      таких как галереи, формы, списки и т.п.
+    </key>
+    <key alias="insertPageField">Значение поля</key>
+    <key alias="insertPageFieldDesc">Отображает значение указанного поля данных текущей страницы,
+      с возможностью указать альтернативные поля и/или подстановку константы.
+    </key>
+    <key alias="insertPartialView">Частичное представление</key>
+    <key alias="insertPartialViewDesc">
+      Частичное представление - это шаблон в отдельном файле, который может быть вызван для отображения внутри
+      другого шаблона, хорошо подходит для реализации переиспользуемых фрагментов разметки или для разбиения сложных шаблонов на составные части.
+    </key>
+    <key alias="mastertemplate">Мастер-шаблон</key>
+    <key alias="noMaster">Не выбран</key>
+    <key alias="renderBody">Вставить дочерний шаблон</key>
+    <key alias="renderBodyDesc"><![CDATA[
+     Отображает содержимое дочернего шаблона, при помощи вставки конструкции
+     <code>@RenderBody()</code> в выбранном месте.
+      ]]></key>
+    <key alias="defineSection">Определить именованную секцию</key>
+    <key alias="defineSectionDesc"><![CDATA[
+         Определяет специальную область шаблона как именованную секцию путем оборачивания ее в конструкцию
+          <code>@section { ... }</code>. Такая секци может быть отображена в нужном месте родительского шаблона
+          при помощи конструкции <code>@RenderSection</code>.
+      ]]></key>
+    <key alias="renderSection">Вставить именованную секцию</key>
+    <key alias="renderSectionDesc"><![CDATA[
+      Отображает содержимое именованной области дочернего шаблона, при помощи вставки конструкции <code>@RenderSection(name)</code>.
+      Таким образом из дочернего шаблона отображается содержимое внутри конструкции <code>@section [name]{ ... }</code>.
+      ]]></key>
+    <key alias="sectionName">Название секции</key>
+    <key alias="sectionMandatory">Секция обязательна</key>
+    <key alias="sectionMandatoryDesc">
+      Если секция помечена как обязательная, то дочерний шаблон должен обязательно содержать ее определение <code>@section</code>, в противном случае генерируется ошибка.
+    </key>
+    <key alias="queryBuilder">Генератор запросов</key>
+    <key alias="itemsReturned">элементов в результате, за</key>
+    <key alias="iWant">Мне нужны</key>
+    <key alias="allContent">все документы</key>
+    <key alias="contentOfType">документы типа "%0%"</key>
+    <key alias="from">из</key>
+    <key alias="websiteRoot">всего сайта</key>
+    <key alias="where">где</key>
+    <key alias="and">и</key>
+    <key alias="is">равна</key>
+    <key alias="isNot">не равна</key>
+    <key alias="before">до</key>
+    <key alias="beforeIncDate">до (включая выбранную дату)</key>
+    <key alias="after">после</key>
+    <key alias="afterIncDate">после (включая выбранную дату)</key>
+    <key alias="equals">равно</key>
+    <key alias="doesNotEqual">не равно</key>
+    <key alias="contains">содержит</key>
+    <key alias="doesNotContain">не содержит</key>
+    <key alias="greaterThan">больше, чем</key>
+    <key alias="greaterThanEqual">больше или равно</key>
+    <key alias="lessThan">меньше, чем</key>
+    <key alias="lessThanEqual">меньше или равно</key>
+    <key alias="id">Id</key>
+    <key alias="name">Название</key>
+    <key alias="createdDate">Создан</key>
+    <key alias="lastUpdatedDate">Обновлен</key>
+    <key alias="orderBy">сортировать</key>
+    <key alias="ascending">по возрастанию</key>
+    <key alias="descending">по убыванию</key>
+    <key alias="template">Шаблон</key>
+  </area>
+  <area alias="templateEditor">
+    <key alias="addFallbackField">Добавить поле замены</key>
+    <key alias="fallbackField">Поле замены</key>
+    <key alias="addDefaultValue">Добавить значение по-умолчанию</key>
+    <key alias="defaultValue">Значение по-умолчанию</key>
+    <key alias="alternativeField">Поле замены</key>
+    <key alias="alternativeText">Значение по-умолчанию</key>
+    <key alias="casing">Регистр</key>
+    <key alias="chooseField">Выбрать поле</key>
+    <key alias="convertLineBreaks">Преобразовать переводы строк</key>
+    <key alias="convertLineBreaksDescription">Да, преобразовывать</key>
+    <key alias="convertLineBreaksHelp">Заменяет переводы строк на тэг html 'br'</key>
+    <key alias="customFields">Пользовательские</key>
+    <key alias="dateOnly">Только дата</key>
+    <key alias="encoding">Кодировка</key>
+    <key alias="formatAndEncoding">Форматирование и кодировка</key>
+    <key alias="formatAsDate">Форматировать как дату</key>
+    <key alias="formatAsDateDescr">Форматировать значение как дату, или как дату и время, в соответствии с текущей культурой</key>
+    <key alias="htmlEncode">Кодировка HTML</key>
+    <key alias="htmlEncodeHelp">Заменяет спецсимволы эквивалентами в формате HTML</key>
+    <key alias="insertedAfter">Будет добавлено после поля</key>
+    <key alias="insertedBefore">Будет вставлено перед полем</key>
+    <key alias="lowercase">В нижнем регистре</key>
+    <key alias="modifyOutput">Модификации при выводе</key>
+    <key alias="none">-Не указано-</key>
+    <key alias="outputSample">Пример результата</key>
+    <key alias="postContent">Вставить после поля</key>
+    <key alias="preContent">Вставить перед полем</key>
+    <key alias="recursive">Рекурсивно</key>
+    <key alias="recursiveDescr">Да, использовать рекурсию</key>
+    <key alias="separator">Разделитель</key>
+    <key alias="standardFields">Стандартные</key>
+    <key alias="uppercase">В верхнем регистре</key>
+    <key alias="urlEncode">Кодирование URL</key>
+    <key alias="urlEncodeHelp">Форматирование специальных символов в URL</key>
+    <key alias="usedIfAllEmpty">Это значение будет использовано только если предыдущие поля пусты</key>
+    <key alias="usedIfEmpty">Это значение будет использовано только если первичное поле пусто</key>
+    <key alias="withTime">Дата и время</key>
+  </area>
+  <area alias="textbox">
+    <key alias="characters_left">символов осталось</key>
+  </area>
+  <area alias="translation">
+    <key alias="details">Подробности перевода</key>
+    <key alias="DownloadXmlDTD">Загрузить xml DTD</key>
+    <key alias="fields">Поля</key>
+    <key alias="includeSubpages">Включить дочерние документы</key>
+    <key alias="mailBody"><![CDATA[
+		Здравствуйте, %0%.
+
+		Это автоматически сгенерированное письмо было отправлено, чтобы проинформировать Вас о том,
+		что документ '%1%' был запрошен для перевода на '%5%' язык пользователем %2%.
+
+		Перейдите по ссылке http://%3%/translation/details.aspx?id=%4% для редактирования.
+
+		Или авторизуйтесь для общего обзора Ваших заданий по переводу
+		http://%3%.
+
+		Удачи!
+
+		Генератор уведомлений Umbraco.
+		]]></key>
+    <key alias="noTranslators">Пользователей-переводчиков не обнаружено. Пожалуйста, создайте пользователя с ролью переводчика, перед тем как отсылать содержимое на перевод</key>
+    <key alias="pageHasBeenSendToTranslation">Документ '%0%' был отправлен на перевод</key>
+    <key alias="sendToTranslate">Отправить документ '%0%' на перевод</key>
+    <key alias="totalWords">Всего слов</key>
+    <key alias="translateTo">Перевести на</key>
+    <key alias="translationDone">Перевод завершен.</key>
+    <key alias="translationDoneHelp">Вы можете просмотреть документы, переведенные Вами, кликнув на ссылке ниже. Если будет найден оригинал документа, Вы увидите его и переведенный вариант в режиме сравнения.</key>
+    <key alias="translationFailed">Перевод не сохранен, файл xml может быть поврежден</key>
+    <key alias="translationOptions">Опции перевода</key>
+    <key alias="translator">Переводчик</key>
+    <key alias="uploadTranslationXml">Загрузить переведенный xml</key>
+  </area>
+  <area alias="treeHeaders">
+    <key alias="cacheBrowser">Обзор кэша</key>
+    <key alias="content">Содержимое</key>
+    <key alias="contentBlueprints">Шаблоны содержимого</key>
+    <key alias="contentRecycleBin">Корзина</key>
+    <key alias="createdPackages">Созданные пакеты</key>
+    <key alias="dataTypes">Типы данных</key>
+    <key alias="dictionary">Словарь</key>
+    <key alias="installedPackages">Установленные пакеты</key>
+    <key alias="installSkin">Установить тему</key>
+    <key alias="installStarterKit">Установить стартовый набор</key>
+    <key alias="languages">Языки</key>
+    <key alias="localPackage">Установить локальный пакет</key>
+    <key alias="macros">Макросы</key>
+    <key alias="media">Медиа-материалы</key>
+    <key alias="mediaTypes">Типы медиа-материалов</key>
+    <key alias="member">Участники</key>
+    <key alias="memberGroups">Группы участников</key>
+    <key alias="memberRoles">Роли участников</key>
+    <key alias="memberTypes">Типы участников</key>
+    <key alias="documentTypes">Типы документов</key>
+    <key alias="packager">Пакеты дополнений</key>
+    <key alias="packages">Пакеты дополнений</key>
+    <key alias="partialViews">Частичные представления</key>
+    <key alias="partialViewMacros">Файлы макросов</key>
+    <key alias="relationTypes">Типы связей</key>
+    <key alias="repositories">Установить из репозитория</key>
+    <key alias="runway">Установить Runway</key>
+    <key alias="runwayModules">Модули Runway </key>
+    <key alias="scripting">Файлы скриптов</key>
+    <key alias="scripts">Скрипты</key>
+    <key alias="stylesheets">Стили CSS</key>
+    <key alias="templates">Шаблоны</key>
+    <key alias="users">Пользователи</key>
+  </area>
+  <area alias="update">
+    <key alias="updateAvailable">Доступны обновления</key>
+    <key alias="updateDownloadText">Обновление %0% готово, кликните для загрузки</key>
+    <key alias="updateNoServer">Нет связи с сервером</key>
+    <key alias="updateNoServerError">Во время проверки обновлений произошла ошибка. Пожалуйста, просмотрите журнал трассировки для получения дополнительной информации.</key>
+  </area>
+  <area alias="user">
+    <key alias="access">Доступ</key>
+    <key alias="accessHelp">На основании установленных групп и назначенных начальных узлов, пользователь имеет доступ к следующим узлам</key>
+    <key alias="administrators">Администратор</key>
+    <key alias="assignAccess">Назначение доступа</key>
+    <key alias="backToUsers">Вернуться к пользователям</key>
+    <key alias="categoryField">Поле категории</key>
+    <key alias="change">Изменить</key>
+    <key alias="changePassword">Изменить пароль</key>
+    <key alias="changePasswordDescription">Вы можете сменить свой пароль для доступа к административной панели Umbraco, заполнив нижеследующие поля и нажав на кнопку 'Изменить пароль'</key>
+    <key alias="changePhoto">Сменить аватар</key>
+    <key alias="confirmNewPassword">Подтверждение нового пароля</key>
+    <key alias="contentChannel">Канал содержимого</key>
+    <key alias="createAnotherUser">Создать еще одного пользователя</key>
+    <key alias="createDate">Создан</key>
+    <key alias="createUser">Создать пользователя</key>
+    <key alias="createUserHelp">Создавайте новых пользователей, которым нужен доступ к административной панели Umbraco. При создании пользователя для него генерируется новый первичный пароль, который нужно сообщить пользователю.</key>
+    <key alias="descriptionField">Поле описания</key>
+    <key alias="disabled">Отключить пользователя</key>
+    <key alias="documentType">Тип документа</key>
+    <key alias="editors">Редактор</key>
+    <key alias="excerptField">Исключить поле</key>
+    <key alias="failedPasswordAttempts">Неудачных попыток входа</key>
+    <key alias="goToProfile">К профилю пользователя</key>
+    <key alias="groupsHelp">Добавьте пользователя в группу(ы) для задания прав доступа</key>
+    <key alias="invite">Пригласить</key>
+    <key alias="inviteEmailCopySubject">Приглашение в панель администрирования Umbraco</key>
+    <key alias="inviteEmailCopyFormat"><![CDATA[<html><body><p>Здравствуйте, %0%,<br><br>Вы были приглашены пользователем %1%, и Вам предоставлен доступ в панель администрирования Umbraco.</p><p>Сообщение от %1%: <em>%2%</em></p><p>Перейдите по <a href="%3%" target="_blank">этой ссылке</a>, чтобы принять приглашение.</p><p><small>Если Вы не имеете возможности перейти по ссылке, скопируйте нижеследующий текст ссылки и вставьте в адресную строку Вашего браузера.<br/><br/>%3%</small></p></body></html>]]><![CDATA[
+        <html>
+			<head>
+				<meta name='viewport' content='width=device-width'>
+				<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
+			</head>
+			<body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'>
+				<style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style>
+				<table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;" bgcolor="#1d1333">
+					<tr>
+						<td style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;" valign="top">
+							<table style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
+								<tr>
+									<td background="https://umbraco.com/umbraco/assets/img/application/logo.png" bgcolor="#1d1333" width="28" height="28" valign="top" style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
+										<!--[if gte mso 9]> <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:30px;height:30px;"> <v:fill type="tile" src="https://umbraco.com/umbraco/assets/img/application/logo.png" color="#1d1333" /> <v:textbox inset="0,0,0,0"> <![endif]-->
+										<div> </div>
+										<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->
+									</td>
+									<td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top"></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				</table>
+				<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>
+					<tr>
+						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
+						<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>
+							<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>
+								<br>
+								<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>
+									<tr>
+										<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>
+											<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>
+												<tr>
+													<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>
+														<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
+															Здравствуйте, %0%,
+														</h1>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															Вы были приглашены пользователем <a href="mailto:%4%" style="text-decoration: underline; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a> в панель администрирования веб-сайта.
+														</p>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															Сообщение от пользователя <a href="mailto:%1%" style="text-decoration: none; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a>:
+															<br/>
+															<em>%2%</em>
+														</p>
+														<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;'>
+															<tbody>
+																<tr>
+																	<td align='left' style='font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>
+																		<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>
+																			<tbody>
+																				<tr>
+																					<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
+																						<a href='%3%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																							Нажмите на эту ссылку, чтобы принять приглашение
+																						</a>
+																					</td>
+																				</tr>
+																			</tbody>
+																		</table>
+																	</td>
+																</tr>
+															</tbody>
+														</table>
+														<p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>Если Вы не имеете возможности нажать на ссылку, скопируйте следующий адрес (URL) и вставьте в адресную строку Вашего браузера:</p>
+															<table border='0' cellpadding='0' cellspacing='0'>
+																<tr>
+																	<td style='-ms-word-break: break-all; word-break: break-all; font-family: sans-serif; font-size: 11px; line-height:14px;'>
+																		<font style="-ms-word-break: break-all; word-break: break-all; font-size: 11px; line-height:14px;">
+																			<a style='-ms-word-break: break-all; word-break: break-all; color: #392F54; text-decoration: underline; font-size: 11px; line-height:15px;' href='%3%'>%3%</a>
+																		</font>
+																	</td>
+																</tr>
+															</table>
+														</p>
+													</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+								</table>
+								<br><br><br>
+							</div>
+						</td>
+						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
+					</tr>
+				</table>
+			</body>
+      </html>
+    ]]></key>
+    <key alias="inviteAnotherUser">Пригласить еще одного пользователя</key>
+    <key alias="inviteUser">Пригласить пользователя</key>
+    <key alias="inviteUserHelp">Пригласите новых пользователей, которым нужен доступ к административной панели Umbraco. Приглашенному будет направлено электронное письмо с инструкциями по доступу к Umbraco.</key>
+    <key alias="language">Язык</key>
+    <key alias="languageHelp">Установите язык отображения интерфейса администрирования</key>
+    <key alias="lastLockoutDate">Время последней блокировки</key>
+    <key alias="lastLogin">Время последнего входа</key>
+    <key alias="lastPasswordChangeDate">Пароль в последний раз менялся</key>
+    <key alias="loginname">Имя входа (логин)</key>
+    <key alias="mediastartnode">Начальный узел медиа-библиотеки</key>
+    <key alias="mediastartnodehelp">Можно ограничить доступ к медиа-библиотеке (какой-либо ее части), задав начальный узел</key>
+    <key alias="mediastartnodes">Начальные узлы медиа-библиотеки</key>
+    <key alias="mediastartnodeshelp">Можно ограничить доступ к медиа-библиотеке (каким-либо ее частям), задав перечень начальных узлов</key>
+    <key alias="modules">Разделы</key>
+    <key alias="newPassword">Новый пароль</key>
+    <key alias="noConsole">Отключить доступ к административной панели Umbraco</key>
+    <key alias="noLogin">пока еще не входил</key>
+    <key alias="noLockouts">пока не блокировался</key>
+    <key alias="noPasswordChange">Пароль не менялся</key>
+    <key alias="oldPassword">Прежний пароль</key>
+    <key alias="password">Пароль</key>
+    <key alias="passwordChanged">Ваш пароль доступа изменен!</key>
+    <key alias="passwordConfirm">Подтвердите новый пароль</key>
+    <key alias="passwordCurrent">Текущий пароль</key>
+    <key alias="passwordEnterNew">Укажите новый пароль</key>
+    <key alias="passwordInvalid">Текущий пароль указан неверно</key>
+    <key alias="passwordIsBlank">Пароль не может быть пустым</key>
+    <key alias="passwordIsDifferent">Новый пароль и его подтверждение не совпадают. Попробуйте еще раз</key>
+    <key alias="passwordMismatch">Новый пароль и его подтверждение не совпадают</key>
+    <key alias="permissionReplaceChildren">Заменить разрешения для дочерних документов</key>
+    <key alias="permissionSelectedPages">Вы изменяете разрешения для следующих документов:</key>
+    <key alias="permissionSelectPages">Выберите документы для изменения их разрешений</key>
+    <key alias="removePhoto">Удалить аватар</key>
+    <key alias="permissionsDefault">Права доступа по-умолчанию</key>
+    <key alias="permissionsGranular">Атомарные права доступа</key>
+    <key alias="permissionsGranularHelp">Можно установить права доступа к конкретным узлам</key>
+    <key alias="profile">Профиль</key>
+    <key alias="resetPassword">Сбросить пароль</key>
+    <key alias="searchAllChildren">Поиск всех дочерних документов</key>
+    <key alias="selectUserGroups">Выбрать группы пользователей</key>
+    <key alias="sendInvite">Отправить приглашение</key>
+    <key alias="sessionExpires" version="7.0">Сессия истекает через</key>
+    <key alias="sectionsHelp">Разделы, доступные пользователю</key>
+    <key alias="noStartNode">Начальный узел не задан</key>
+    <key alias="noStartNodes">Начальные узлы не заданы</key>
+    <key alias="startnode">Начальный узел содержимого</key>
+    <key alias="startnodehelp">Можно ограничить доступ к дереву содержимого (какой-либо его части), задав начальный узел</key>
+    <key alias="startnodes">Начальные узлы содержимого</key>
+    <key alias="startnodeshelp">Можно ограничить доступ к дереву содержимого (каким-либо его частям), задав перечень начальных узлов</key>
+    <key alias="userCreated">Был создан</key>
+    <key alias="userCreatedSuccessHelp">Новый первичный пароль успешно сгенерирован. Для входа используйте пароль, приведенный ниже.</key>
+    <key alias="updateDate">Время последнего изменения</key>
+    <key alias="username">Имя пользователя</key>
+    <key alias="usergroup">Группа пользователей</key>
+    <key alias="userInvited"> был приглашен</key>
+    <key alias="userInvitedSuccessHelp">Новому пользователю было отправлено приглашение, в котором содержатся инструкции для входа в панель Umbraco.</key>
+    <key alias="userinviteWelcomeMessage">Здравствуйте и добро пожаловать в Umbraco! Все будет готово в течении пары минут, нам лишь нужно задать Ваш пароль для входа и добавить аватар.</key>
+    <key alias="userinviteAvatarMessage">Загрузите изображение, это поможет другим пользователям идентифицировать Вас.</key>
+    <key alias="userManagement">Управление пользователями</key>
+    <key alias="userPermissions">Разрешения для пользователя</key>
+    <key alias="writer">Автор</key>
+    <key alias="yourHistory" version="7.0">Ваша недавняя история</key>
+    <key alias="yourProfile" version="7.0">Ваш профиль</key>
+  </area>
+  <area alias="validation">
+    <key alias="validation">Валидация</key>
+    <key alias="validateAsEmail">Валидация по формату email</key>
+    <key alias="validateAsNumber">Валидация числового значения</key>
+    <key alias="validateAsUrl">Валидация по формату Url</key>
+    <key alias="enterCustomValidation">...или указать свои правила валидации</key>
+    <key alias="fieldIsMandatory">Обязательно к заполнению</key>
+    <key alias="validationRegExp">Задайте регулярное выражение</key>
+    <key alias="minCount">Необходимо выбрать как минимум</key>
+    <key alias="maxCount">Возможно выбрать максимум</key>
+    <key alias="items">элементов</key>
+    <key alias="itemsSelected">элементов</key>
+    <key alias="invalidDate">Неверный формат даты</key>
+    <key alias="invalidNumber">Не является числом</key>
+    <key alias="invalidEmail">неверный формат email-адреса</key>
+  </area>
+</language>

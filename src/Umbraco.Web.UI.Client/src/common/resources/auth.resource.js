@@ -71,7 +71,7 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
     performLogin: function (username, password) {
 
       if (!username || !password) {
-        return angularHelper.rejectedPromise({
+        return $q.reject({
           errorMsg: 'Username or password cannot be empty'
         });
       }
@@ -125,17 +125,17 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
     performRequestPasswordReset: function (email) {
 
       if (!email) {
-        return angularHelper.rejectedPromise({
+        return $q.reject({
           errorMsg: 'Email address cannot be empty'
         });
       }
 
-      //TODO: This validation shouldn't really be done here, the validation on the login dialog
+      // TODO: This validation shouldn't really be done here, the validation on the login dialog
       // is pretty hacky which is why this is here, ideally validation on the login dialog would
       // be done properly.
       var emailRegex = /\S+@\S+\.\S+/;
       if (!emailRegex.test(email)) {
-        return angularHelper.rejectedPromise({
+        return $q.reject({
           errorMsg: 'Email address is not valid'
         });
       }
@@ -173,13 +173,13 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
     performValidatePasswordResetCode: function (userId, resetCode) {
 
       if (!userId) {
-        return angularHelper.rejectedPromise({
+        return $q.reject({
           errorMsg: 'User Id cannot be empty'
         });
       }
 
       if (!resetCode) {
-        return angularHelper.rejectedPromise({
+        return $q.reject({
           errorMsg: 'Reset code cannot be empty'
         });
       }
@@ -238,25 +238,25 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
     performSetPassword: function (userId, password, confirmPassword, resetCode) {
 
       if (userId === undefined || userId === null) {
-        return angularHelper.rejectedPromise({
+        return $q.reject({
           errorMsg: 'User Id cannot be empty'
         });
       }
 
       if (!password) {
-        return angularHelper.rejectedPromise({
+        return $q.reject({
           errorMsg: 'Password cannot be empty'
         });
       }
 
       if (password !== confirmPassword) {
-        return angularHelper.rejectedPromise({
+        return $q.reject({
           errorMsg: 'Password and confirmation do not match'
         });
       }
 
       if (!resetCode) {
-        return angularHelper.rejectedPromise({
+        return $q.reject({
           errorMsg: 'Reset code cannot be empty'
         });
       }
@@ -276,7 +276,7 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
 
     unlinkLogin: function (loginProvider, providerKey) {
       if (!loginProvider || !providerKey) {
-        return angularHelper.rejectedPromise({
+        return $q.reject({
           errorMsg: 'loginProvider or providerKey cannot be empty'
         });
       }

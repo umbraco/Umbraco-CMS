@@ -1,22 +1,23 @@
 <div class="pull-right" style="position: relative;">
 
-    <!-- options button -->
-    <a class="btn btn-info" href="#" ng-click="getOptions()" prevent-default data-toggle="dropdown">
-        <localize key="general_actions">Actions</localize>
-        <span class="caret"></span>
-    </a>
+    <umb-button
+        type="button"
+        button-style="white"
+        action="dropdown.isOpen = !dropdown.isOpen"
+        label-key="general_actions"
+        show-caret="true"
+        has-popup="true"
+        is-expanded="dropdown.isOpen"
+        >
+    </umb-button>
 
-    <!-- actions -->
-    <ul class="dropdown-menu umb-actions" role="menu" aria-labelledby="dLabel">
-        <li class="action" ng-class="{sep:action.seperator}" ng-repeat="action in actions">
-
-            <!-- How does this reference executeMenuItem() i really don't think that this is very clear -->
-            <a prevent-default
-                ng-click="executeMenuItem(action)">
-                <i class="icon icon-{{action.cssclass}}"></i>
+    <umb-dropdown ng-if="dropdown.isOpen" class="umb-actions" on-close="dropdown.isOpen = false" deep-blur="dropdown.isOpen = false">
+        <umb-dropdown-item class="umb-action" ng-class="{'sep':action.separatorm, '-opens-dialog': action.opensDialog}" ng-repeat="action in actions">
+            <button type="button" ng-click="executeMenuItem(action)">
+                <i class="icon icon-{{action.cssclass}}" aria-hidden="true"></i>
                 <span class="menu-label">{{action.name}}</span>
-            </a>
+            </button>
+        </umb-dropdown-item>
+    </umb-dropdown>
 
-        </li>
-    </ul>
 </div>

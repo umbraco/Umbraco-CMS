@@ -1,4 +1,4 @@
-<div ng-controller="Umbraco.PrevalueEditors.ImageFilePickerController" class="umb-editor umb-mediapicker">
+<div ng-controller="Umbraco.PrevalueEditors.ImageFilePickerController" class="umb-property-editor umb-mediapicker">
 
     <ul class="umb-sortable-thumbnails" ng-if="model.value">
         <li class="umb-sortable-thumbnails__wrapper">
@@ -18,12 +18,5 @@
     <a href="#" class="add-link" ng-click="add()" ng-class="{'add-link-square': !model.value }" ng-hide="model.value" prevent-default>
         <i class="icon icon-add large"></i>
     </a>
-
-    <umb-overlay
-      ng-if="mediaPickerOverlay.show"
-      model="mediaPickerOverlay"
-      view="mediaPickerOverlay.view"
-      position="right">
-    </umb-overlay>
 
 </div>

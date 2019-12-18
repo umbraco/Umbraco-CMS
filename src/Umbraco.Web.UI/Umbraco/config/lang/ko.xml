@@ -1,0 +1,848 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<language alias="ko" intName="Korean" localName="한국어" lcid="18" culture="ko-KR">
+  <creator>
+    <name>The Umbraco community</name>
+    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+  </creator>
+  <area alias="actions">
+    <key alias="assignDomain">호스트명 관리</key>
+    <key alias="auditTrail">감사 추적</key>
+    <key alias="browse">노드 탐색</key>
+    <key alias="copy">복사</key>
+    <key alias="create">새로 만들기</key>
+    <key alias="createPackage">패키지 새로 만들기</key>
+    <key alias="delete">삭제</key>
+    <key alias="disable">비활성</key>
+    <key alias="emptyRecycleBin">휴지통 비우기</key>
+    <key alias="exportDocumentType">추출 문서 유형</key>
+    <key alias="importDocumentType">등록 문서 유형</key>
+    <key alias="importPackage">패키지 등록</key>
+    <key alias="liveEdit">캔버스 내용 편집</key>
+    <key alias="logout">종료</key>
+    <key alias="move">이동</key>
+    <key alias="notify">알림</key>
+    <key alias="protect">퍼블릭 접근</key>
+    <key alias="publish">발행</key>
+    <key alias="refreshNode">노드 새로 고침</key>
+    <key alias="republish">전체 사이트 재발행</key>
+    <key alias="rights">권한</key>
+    <key alias="rollback">롤백</key>
+    <key alias="sendtopublish">발행 항목으로 전달</key>
+    <key alias="sendToTranslate">번역 항목으로 전달</key>
+    <key alias="sort">정렬</key>
+    <key alias="toPublish">발행 항목으로 전달</key>
+    <key alias="translate">번역</key>
+    <key alias="update">업데이트</key>
+  </area>
+  <area alias="assignDomain">
+    <key alias="addNew">새로운 도메인 추가</key>
+    <key alias="domain">도메인</key>
+    <key alias="domainCreated">새로운 '%0%' 도메인이 생성되었습니다</key>
+    <key alias="domainDeleted">'%0%' 도메인이 삭제되었습니다</key>
+    <key alias="domainExists">'%0%' 도메인이 이미 존재합니다</key>
+    <key alias="domainUpdated">'%0%' 도메인이 업데이트 되었습니다</key>
+    <key alias="orEdit">현재 도메인 수정</key>
+  </area>
+  <area alias="auditTrails">
+    <key alias="atViewingFor">보기</key>
+  </area>
+  <area alias="buttons">
+    <key alias="bold">굵게</key>
+    <key alias="deindent">단락 들여쓰기 취소</key>
+    <key alias="formFieldInsert">폼 필드 삽입</key>
+    <key alias="graphicHeadline">그래픽 헤드라인 삽입</key>
+    <key alias="htmlEdit">Html 편집</key>
+    <key alias="indent">단락 들여쓰기</key>
+    <key alias="italic">기울임꼴</key>
+    <key alias="justifyCenter">가운데 맞춤</key>
+    <key alias="justifyLeft">왼쪽 맞춤</key>
+    <key alias="justifyRight">오른쪽 맞춤</key>
+    <key alias="linkInsert">하이퍼 링크</key>
+    <key alias="linkLocal">기호 삽입</key>
+    <key alias="listBullet">기호 목록</key>
+    <key alias="listNumeric">번호 목록</key>
+    <key alias="macroInsert">매크로 삽입</key>
+    <key alias="pictureInsert">이미지 삽입</key>
+    <key alias="relations">관계 편집</key>
+    <key alias="save">저장</key>
+    <key alias="saveAndPublish">저장 후 발행</key>
+    <key alias="saveToPublish">저장 후 승인을 위해 전송</key>
+    <key alias="showPage">미리보기</key>
+    <key alias="styleChoose">스타일 선택</key>
+    <key alias="styleShow">스타일 보기</key>
+    <key alias="tableInsert">테이블 삽입</key>
+  </area>
+  <area alias="content">
+    <key alias="about">이 페이지 정보</key>
+    <key alias="alias">대체 링크</key>
+    <key alias="alternativeTextHelp">(전화위에 그림을 어떻게 설명하시겠습니까)</key>
+    <key alias="alternativeUrls">대체 링크</key>
+    <key alias="clickToEdit">이 항목을 편집하시려면 클릭하세요.</key>
+    <key alias="createBy">작성자</key>
+    <key alias="createDate">생성일</key>
+    <key alias="documentType">문서 유형</key>
+    <key alias="editing">편집</key>
+    <key alias="expireDate">삭제됨</key>
+    <key alias="itemChanged">이 항목은 발행후 변경되었습니다.</key>
+    <key alias="itemNotPublished">이 항목은 발행되지 않았습니다.</key>
+    <key alias="lastPublished">마지막 발행일</key>
+    <key alias="mediatype">미디어 타입</key>
+    <key alias="membergroup">사용자 그룹</key>
+    <key alias="memberrole">역할</key>
+    <key alias="membertype">사용자 타입</key>
+    <key alias="noDate">날짜가 선택되지 않았습니다.</key>
+    <key alias="nodeName">페이지 제목</key>
+    <key alias="otherElements">속성</key>
+    <key alias="parentNotPublished">이문서는 발행되었지만 부모문서 '%0%'가 발행되지 않아 볼 수 없습니다.</key>
+    <key alias="publish">발행</key>
+    <key alias="publishStatus">발행 상태</key>
+    <key alias="releaseDate">발행됨</key>
+    <key alias="removeDate">날짜 삭제</key>
+    <key alias="sortDone">정렬이 업데이트되었습니다.</key>
+    <key alias="sortHelp">노드를 드래그하거나 컬럼헤더를 클릭하면 노드가 정렬됩니다. 쉬프트키나 컨트롤키를 이용하면 여러노드선택이 가능합니다.</key>
+    <key alias="statistics">통계</key>
+    <key alias="titleOptional">제목(옵션)</key>
+    <key alias="type">유형</key>
+    <key alias="unpublish">발행취소</key>
+    <key alias="updateDate">마지막 수정일</key>
+    <key alias="uploadClear">파일 삭제</key>
+    <key alias="urls">문서에 링크</key>
+  </area>
+  <area alias="create">
+    <key alias="chooseNode">새로운 %0% (을)를 생성할 위치를 지정하십시오</key>
+    <key alias="createUnder">생성자</key>
+    <key alias="updateData">타입과 제목을 선택하세요</key>
+  </area>
+  <area alias="dashboard">
+    <key alias="browser">브라우저에서 보기</key>
+    <key alias="dontShowAgain">TRANSLATE ME: '- Hide'</key>
+    <key alias="nothinghappens">Umbraco 가 열리지 않으면, 이 사이트의 팝업을 허용하여야 합니다</key>
+    <key alias="openinnew">새로운 창으로 열렸습니다</key>
+    <key alias="restart">재시작</key>
+    <key alias="visit">방문</key>
+    <key alias="welcome">환영합니다</key>
+  </area>
+  <area alias="prompt">
+    <key alias="stay">Stay</key>
+    <key alias="discardChanges">Discard changes</key>
+    <key alias="unsavedChanges">You have unsaved changes</key>
+    <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
+  </area>
+  <area alias="bulk">
+    <key alias="done">Done</key>
+    <key alias="deletedItem">Deleted %0% item</key>
+    <key alias="deletedItems">Deleted %0% items</key>
+    <key alias="deletedItemOfItem">Deleted %0% out of %1% item</key>
+    <key alias="deletedItemOfItems">Deleted %0% out of %1% items</key>
+    <key alias="publishedItem">Published %0% item</key>
+    <key alias="publishedItems">Published %0% items</key>
+    <key alias="publishedItemOfItem">Published %0% out of %1% item</key>
+    <key alias="publishedItemOfItems">Published %0% out of %1% items</key>
+    <key alias="unpublishedItem">Unpublished %0% item</key>
+    <key alias="unpublishedItems">Unpublished %0% items</key>
+    <key alias="unpublishedItemOfItem">Unpublished %0% out of %1% item</key>
+    <key alias="unpublishedItemOfItems">Unpublished %0% out of %1% items</key>
+    <key alias="movedItem">Moved %0% item</key>
+    <key alias="movedItems">Moved %0% items</key>
+    <key alias="movedItemOfItem">Moved %0% out of %1% item</key>
+    <key alias="movedItemOfItems">Moved %0% out of %1% items</key>
+    <key alias="copiedItem">Copied %0% item</key>
+    <key alias="copiedItems">Copied %0% items</key>
+    <key alias="copiedItemOfItem">Copied %0% out of %1% item</key>
+    <key alias="copiedItemOfItems">Copied %0% out of %1% items</key>
+  </area>
+  <area alias="defaultdialogs">
+    <key alias="anchorInsert">이름</key>
+    <key alias="assignDomain">호스트네임 관리</key>
+    <key alias="closeThisWindow">이창 닫기</key>
+    <key alias="confirmdelete">정말로 삭제하시겠습니까?</key>
+    <key alias="confirmdisable">정말로 비활성화하시겠습니까?</key>
+    <key alias="confirmlogout">로그아웃 하시겠습니까?</key>
+    <key alias="confirmSure">확실합니까?</key>
+    <key alias="cut">TRANSLATE ME: 'Cut'</key>
+    <key alias="editdictionary">사전 항목 편집</key>
+    <key alias="editlanguage">언어 편집</key>
+    <key alias="insertAnchor">내부 링크삽입</key>
+    <key alias="insertCharacter">문자열 삽입</key>
+    <key alias="insertgraphicheadline">그래픽 헤드라인 삽입</key>
+    <key alias="insertimage">그림삽입</key>
+    <key alias="insertlink">링크 삽입</key>
+    <key alias="insertMacro">매크로 추가 클릭</key>
+    <key alias="inserttable">테이블 삽입</key>
+    <key alias="lastEdited">마지막 수정</key>
+    <key alias="link">링크</key>
+    <key alias="linkinternal">내부링크:</key>
+    <key alias="linklocaltip">내부링크를 사용하실 때 링크앞에 "#"를 넣어주세요</key>
+    <key alias="linknewwindow">새 창으로 여시겠습니까?</key>
+    <key alias="macroDoesNotHaveProperties">이 매크로에는 편집할 수 있는 항목이 포함되어 있지 않습니다.</key>
+    <key alias="paste">붙여넣기</key>
+    <key alias="permissionsEdit">권한 편집</key>
+    <key alias="recycleBinDeleting">휴지통안에 이 항목들이 완전히 삭제중 입니다. 작업이 완료되기전까지 창을 닫지마세요.</key>
+    <key alias="recycleBinIsEmpty">휴지통이 비었습니다.</key>
+    <key alias="recycleBinWarning">휴지통에서 삭제하시면 완전히 삭제됩니다.</key>
+    <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>의 웹서비스는 현재 제어할 수 없는 몇가지 문제점이 보고되었습니다. 불편을 드려 대단히 죄송합니다.]]></key>
+    <key alias="regexSearchHelp">필드 유효성검사를 위해 정규표현식을 검색합니다. 예: 'email, 'zip-code' 'url'</key>
+    <key alias="removeMacro">매크로 삭제</key>
+    <key alias="requiredField">필수 필드</key>
+    <key alias="sitereindexed">사이트의 색인이 재생성되었습니다.</key>
+    <key alias="siterepublished">웹사이트 캐쉬가 재생되었습니다. 모든 발행컨텐츠가 업데이트되었습니다. 그러나 모든 미발행 컨텐츠는 여전히 미발행상태입니다.</key>
+    <key alias="siterepublishHelp">웹사이트 캐쉬가 재생되었습니다. 모든 발행컨텐츠가 업데이트되었습니다. 그러나 모든 미발행 컨텐츠는 미발행상태로 남아있습니다.</key>
+    <key alias="tableColumns">컬럼수</key>
+    <key alias="tableRows">줄수</key>
+    <key alias="thumbnailimageclickfororiginal">이미지를 전체크기로 보시려면 클릭하세요.</key>
+    <key alias="treepicker">아이템 선택</key>
+    <key alias="viewCacheItem">캐쉬 아이템 보기</key>
+  </area>
+  <area alias="dictionaryItem">
+    <key alias="description"><![CDATA[
+    '<em>%0%</em>'사전 항목 아래에 다른 언어버전들을 편집하세요<br/>왼쪽 '언어'메뉴를 사용하여 추가 언어들을 설정할 수 있습니다.
+ ]]></key>
+    <key alias="displayName">국가명</key>
+  </area>
+  <area alias="editcontenttype">
+  </area>
+  <area alias="editdatatype">
+    <key alias="addPrevalue">이전값 더하기</key>
+    <key alias="dataBaseDatatype">데이터베이스 데이터타입</key>
+    <key alias="guid">데이터타입 GUID</key>
+    <key alias="renderControl">Render 컨트롤</key>
+    <key alias="rteButtons">버튼</key>
+    <key alias="rteEnableAdvancedSettings">고급설정 사용</key>
+    <key alias="rteEnableContextMenu">context 메뉴 사용</key>
+    <key alias="rteMaximumDefaultImgSize">삽입이미지의 기본사이즈 최대값</key>
+    <key alias="rteRelatedStylesheets">관련 스타일시트</key>
+    <key alias="rteShowLabel">라벨 보기</key>
+    <key alias="rteWidthAndHeight">너비와 높이</key>
+  </area>
+  <area alias="errorHandling">
+    <key alias="errorButDataWasSaved">데이터가 저장되었지만, 이 페이지를 발행하기전에 에러들부터 수정하셔야 합니다</key>
+    <key alias="errorChangingProviderPassword">현재의 멤버쉽 프로바이더는 암호변경을 지원하지 않습니다(EnablePasswordRetrieval need to be true)</key>
+    <key alias="errorExistsWithoutTab">%0% 은 이미 존재합니다.</key>
+    <key alias="errorHeader">에러:</key>
+    <key alias="errorHeaderWithoutTab">에러:</key>
+    <key alias="errorInPasswordFormat">암호는 최소 %0% 자 이상이며 적어도 %1% 개의 알파벳이 아닌 문자를 포함해야 합니다.</key>
+    <key alias="errorIntegerWithoutTab">%0% must be an integer</key>
+    <key alias="errorMandatory">The %0% field in the %1% tab is mandatory</key>
+    <key alias="errorMandatoryWithoutTab">%0% 은 필수선택 항목입니다.</key>
+    <key alias="errorRegExp">%0% at %1% 올바른 형식이 아닙니다.</key>
+    <key alias="errorRegExpWithoutTab">%0% 올바른 형식이 아닙니다.</key>
+  </area>
+  <area alias="errors">
+    <key alias="codemirroriewarning">주의! CodeMirror가 설정에서 활성화 되었어도 충분히 안정적이지 않기 때문에 인터넷 익스플로러에선 비활성화 됩니다.</key>
+    <key alias="contentTypeAliasAndNameNotNull">새 속성타입에 이름과 별칭을 모두 채우세요!</key>
+    <key alias="filePermissionsError">특정 파일또는 폴더에 읽기/쓰기 접근제한 문제가 있습니다</key>
+    <key alias="missingTitle">제목을 넣어주세요</key>
+    <key alias="missingType">유형을 선택해주세요</key>
+    <key alias="pictureResizeBiggerThanOrg">원본크기보다 큰사이즈의 이미지를 만들려고 합니다. 계속하시겠습니까?</key>
+    <key alias="startNodeDoesNotExists">시작노드가 삭제되었습니다. 관리자에게 문의하세요</key>
+    <key alias="stylesMustMarkBeforeSelect">스타일을 변경하시기 전에 컨텐츠를 체크하세요</key>
+    <key alias="stylesNoStylesOnPage">사용할 수 있는 스타일이 없습니다.</key>
+    <key alias="tableColMergeLeft">합치기 원하시는 두셀의 왼쪽에 커서를 가져다놓으세요</key>
+    <key alias="tableSplitNotSplittable">병합되지 않은 셀을 분리할 수 없습니다.</key>
+  </area>
+  <area alias="general">
+    <key alias="about">정보</key>
+    <key alias="action">액션</key>
+    <key alias="add">추가</key>
+    <key alias="alias">별칭</key>
+    <key alias="areyousure">확실합니까?</key>
+    <key alias="border">경계선</key>
+    <key alias="by">또는</key>
+    <key alias="cancel">취소</key>
+    <key alias="cellMargin">셀 마진</key>
+    <key alias="choose">선택</key>
+    <key alias="close">닫기</key>
+    <key alias="closewindow">창 닫기</key>
+    <key alias="comment">코멘트</key>
+    <key alias="confirm">확인</key>
+    <key alias="constrainProportions">비율 맞추기</key>
+    <key alias="continue">계속</key>
+    <key alias="copy">복사</key>
+    <key alias="create">생성</key>
+    <key alias="database">데이타베이스</key>
+    <key alias="date">날짜</key>
+    <key alias="default">기본</key>
+    <key alias="delete">삭제</key>
+    <key alias="deleted">삭제됨</key>
+    <key alias="deleting">삭제중...</key>
+    <key alias="design">디자인</key>
+    <key alias="dimensions">범위</key>
+    <key alias="down">아래로</key>
+    <key alias="download">다운로드</key>
+    <key alias="edit">편집</key>
+    <key alias="edited">편집됨</key>
+    <key alias="elements">항목</key>
+    <key alias="email">이메일</key>
+    <key alias="error">에러</key>
+    <key alias="findDocument">찾기</key>
+    <key alias="height">높이</key>
+    <key alias="help">도움말</key>
+    <key alias="icon">아이콘</key>
+    <key alias="import">가져오기</key>
+    <key alias="innerMargin">내부 마진</key>
+    <key alias="insert">삽입</key>
+    <key alias="install">설치</key>
+    <key alias="justify">적용</key>
+    <key alias="language">언어</key>
+    <key alias="layout">레이아웃</key>
+    <key alias="loading">로딩</key>
+    <key alias="locked">TRANSLATE ME: 'Locked'</key>
+    <key alias="login">로그인</key>
+    <key alias="logoff">로그오프</key>
+    <key alias="logout">로그아웃</key>
+    <key alias="macro">매크로</key>
+    <key alias="move">이동</key>
+    <key alias="name">이름</key>
+    <key alias="new">새로</key>
+    <key alias="next">다음</key>
+    <key alias="no">아니요</key>
+    <key alias="of">의</key>
+    <key alias="ok">완료</key>
+    <key alias="open">열기</key>
+    <key alias="or">또는</key>
+    <key alias="password">비밀번호</key>
+    <key alias="path">경로</key>
+    <key alias="pleasewait">잠시만 기다려주세요...</key>
+    <key alias="previous">이전</key>
+    <key alias="properties">속성</key>
+    <key alias="reciept">수신된 폼데이터 이메일전송</key>
+    <key alias="recycleBin">휴지통</key>
+    <key alias="remaining">남아있는</key>
+    <key alias="rename">이름바꾸기</key>
+    <key alias="renew">TRANSLATE ME: 'Renew'</key>
+    <key alias="retry">재시도</key>
+    <key alias="rights">권한</key>
+    <key alias="search">검색</key>
+    <key alias="server">서버</key>
+    <key alias="show">보기</key>
+    <key alias="showPageOnSend">전송된 페이지보기</key>
+    <key alias="size">사이즈</key>
+    <key alias="sort">정렬</key>
+    <key alias="submit">Submit</key>
+    <!-- TODO: Translate this -->
+    <key alias="type">타입</key>
+    <key alias="typeToSearch">검색유형...</key>
+    <key alias="up">위로</key>
+    <key alias="update">업데이트</key>
+    <key alias="upgrade">업그레이드</key>
+    <key alias="upload">업로드</key>
+    <key alias="url">Url</key>
+    <key alias="user">사용자</key>
+    <key alias="username">사용자</key>
+    <key alias="value">값</key>
+    <key alias="view">보기</key>
+    <key alias="welcome">환영합니다...</key>
+    <key alias="width">너비</key>
+    <key alias="yes">예</key>
+    <key alias="reorder">Reorder</key>
+    <key alias="reorderDone">I am done reordering</key>
+  </area>
+  <area alias="graphicheadline">
+    <key alias="backgroundcolor">배경색</key>
+    <key alias="bold">굵게</key>
+    <key alias="color">글자색</key>
+    <key alias="font">폰트</key>
+    <key alias="text">글꼴</key>
+  </area>
+  <area alias="headers">
+    <key alias="page">페이지</key>
+  </area>
+  <area alias="installer">
+    <key alias="databaseErrorCannotConnect">인스톨러가 데이터베이스에 연결할 수 없습니다.</key>
+    <key alias="databaseErrorWebConfig">web.config를 저장할 수 없습니다.connection string을 수동으로 수정하세요.</key>
+    <key alias="databaseFound">데이터베이스가 확인되었으며 정보는 </key>
+    <key alias="databaseHeader">데이터베이스 설정</key>
+    <key alias="databaseInstall"><![CDATA[<strong>설치</strong> 버튼을 누르면 Umbraco %0% 데이터베이스가 설치됩니다.]]></key>
+    <key alias="databaseInstallDone"><![CDATA[Umbraco %0% 가 데이터베이스에 복사되었습니다. 계속하시려면 <strong>다음</strong>을 누르세요.]]></key>
+    <key alias="databaseNotFound"><![CDATA[<p>데이터베이스를 찾을 수 없습니다. “web.config”파일의 "connection string"이 바르게 설정되었는지 확인하세요.</p>
+            <p>"web.config" 파일에 맨아래에 ,키네임을 "UmbracoDbDSN"로 하여 사용하시는 데이터베이스의 connection string 정보를 입력하시고 파일을 저장하세요. </p>
+            <p>
+            완료 후<strong>재시도</strong>버튼을 누르세요.<br /><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
+		               web.config의 더많은 정보는 여기에 있습니다.</a></p>]]></key>
+    <key alias="databaseText"><![CDATA[이과정을 위해선, 당신의 DB서버 정보에 대해서 알고 계셔야합니다.("connection string").<br />
+      필요하시다면 사용하시는 ISP쪽에 문의하시기 바랍니다..
+      로컬 머신이나 서버에 설치되어 있다면 해당 시스템 관리자에게 문의하시기 바랍니다.]]></key>
+    <key alias="databaseUpgrade"><![CDATA[<p><strong>업그레이드</strong> 버튼을 누르면 여러분의 데이터베이스를 Umbraco %0% 로 업데이트합니다.</p><p>어떤 컨텐트도 삭제되지 않으니 걱정마세요!</p>]]></key>
+    <key alias="databaseUpgradeDone"><![CDATA[데이터베이스가 최신 버전 %0% 로 업그레이드 되었습니다.<br />계속 진행하시려면 <strong>다음</strong> 을 누르세요. ]]></key>
+    <key alias="databaseUpToDate"><![CDATA[데이터베이스가 업데이트 되었습니다. <strong>다음</strong>을 클릭하시면 설정마법사를 계속 진행합니다.]]></key>
+    <key alias="defaultUserChangePass"><![CDATA[<strong>기본 사용자의 암호가 변경되어야 합니다!</strong>]]></key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong>기본 사용자가 비활성화되었거나 Umbraco에 접근할 수 없습니다!</strong></p><p>더 이상 과정이 필요없으시면 <b>다음</b>을 눌러주세요.]]></key>
+    <key alias="defaultUserPassChanged"><![CDATA[<strong>설치후 기본사용자의 암호가 성공적으로 변경되었습니다!</strong></p><p>더 이상 과정이 필요없으시면 <strong>다음</strong>을 눌러주세요.]]></key>
+    <key alias="defaultUserPasswordChanged">비밀번호가 변경되었습니다!</key>
+    <key alias="greatStart">편리한 시작을 위해, 소개 Video를 시청하세요</key>
+    <key alias="licenseText">다음버튼을 누르시면 (또는Web.config에 UmbracoConfigurationStatus를 수정하시면), 여러분은 아래에 명시된 소프트웨어 라이센스를 수락합니다. Umbraco 배포는 2가지 다른 라이센스로 구성되어 있습니다. 프레임워크에는 오픈소스 MIT라이센스가 UI에는 Umbraco 프리웨어 라이센스가 적용됩니다.</key>
+    <key alias="None">아직 설치되지 않았습니다.</key>
+    <key alias="permissionsAffectedFolders">영향받는 파일과 폴더</key>
+    <key alias="permissionsAffectedFoldersMoreInfo">Umbraco권한관리을 위해 더정보가 필요하시면 여기를 누르세요</key>
+    <key alias="permissionsAffectedFoldersText">다음 파일/폴더에 ASP.NET 수정권한이 필요합니다.</key>
+    <key alias="permissionsAlmostPerfect"><![CDATA[<strong>권한 설정이 대부분 완벽합니다!</strong><br /><br />
+      여러분은 문제없이 Umbraco사용이 가능하지만 일부 추천 패키지가 설치되지 않을 수 있습니다.]]></key>
+    <key alias="permissionsHowtoResolve">문제해결방법</key>
+    <key alias="permissionsHowtoResolveLink">문서버전을 읽으시려면 클릭하세요</key>
+    <key alias="permissionsHowtoResolveText"><![CDATA[Umbraco를 위한 폴더권한세팅을 위해 텍스트 버전을 읽으시거나 저희 <strong>Video tutorial</strong>를 시청하세요.]]></key>
+    <key alias="permissionsMaybeAnIssue"><![CDATA[<strong>퍼미션 세팅에 문제가 있을 수 있습니다.</strong>
+    <br/><br />
+    Umbraco를 문제없이 실행할 수 있지만, 폴더를 만들거나 추천패키지를 설치하지 못할 수 있습니다.]]></key>
+    <key alias="permissionsNotReady"><![CDATA[<strong>권한 설정이 완료되지 않았습니다!</strong>
+        <br /><br />
+        Umbraco 실행을 위해, 권한설정을 업데이트하세요.]]></key>
+    <key alias="permissionsPerfect"><![CDATA[<strong>권한세팅이 완벽합니다!</strong><br /><br />
+            Umbraco 패키지 설치를 진행할 준비가 되었습니다. ]]></key>
+    <key alias="permissionsResolveFolderIssues">폴더 문제해결</key>
+    <key alias="permissionsResolveFolderIssuesLink">다음 링크는 ASP.NET이나 폴더생성문제에 대한 더 많은 정보를 제공합니다.</key>
+    <key alias="permissionsSettingUpPermissions">폴더 권한 세팅</key>
+    <key alias="permissionsText">Umbraco 는 특정 디렉토리에 쓰기/수정 권한이 필요합니다. 이것은 PDF나 그림과 같은 파일을 저장하고 cache같은 임시데이터을 위해 사용됩니다.</key>
+    <key alias="runwayFromScratch">scratch를 시작하기 원합니다.</key>
+    <key alias="runwayFromScratchText"><![CDATA[
+      사이트가 완전히 비어있는 상태입니다. 스크래치를 시작하시거나 문서유형, 템플릿을 만드시기에 완벽한 상태입니다.
+      (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
+      Runway설치를 나중에 실행하실 수 있습니다. 개발도구 부분에서 패키지를 선택하세요.
+    ]]></key>
+    <key alias="runwayHeader">여러분은 Umbraco 플랫폼 설치를 완료하였습니다. 다음엔 어떤 작업을 원하십니까?</key>
+    <key alias="runwayInstalled">Runway 가 설치됨</key>
+    <key alias="runwayInstalledText"><![CDATA[
+    이곳은 설치관리페이지입니다. 설치를 원하시는 모듈을 선택하세요.<br />
+    이것은 저희가 권장하는 모듈들입니다. 설치를 원하시는 모듈을 확인하세요 모듈이 없다면 <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">전체 모듈리스트</a>를 보세요
+    ]]></key>
+    <key alias="runwayOnlyProUsers">경험이 있는 사용자 분들만 추천합니다.</key>
+    <key alias="runwaySimpleSite">간단한 웹사이트 생성을 원합니다.</key>
+    <key alias="runwaySimpleSiteText"><![CDATA[
+    <p>
+    "Runway" 는 간단한 웹사이트 생성을 위한 기본 문서타입과 템플릿을 제공합니다. 인스톨러를 이용해 Runway를 자동으로 설치하신 후
+    여러분은 쉽게 수정, 확장, 삭제가 가능하십니다.
+    Umbraco에 익숙하시다면 Runway 가 필요없지만 그렇지 않으신경우 Runway는 가장 빨리 시작할 수 있는 최고의 예제를 제공합니다.
+    Runway 설치를 선택하시면, 여러분은 옵션으로 Runway 페이지에 쓰이는 Runway 모듈로 불리는 기본 빌딩 블록들을 선택하실 수 있습니다.
+    </p>
+      <small>
+      <em>Runway 포함사항:</em> 홈페이지, Getting Started 페이지, 모듈 설치페이지.<br />
+      <em>옵션 모듈들:</em> 네이게이션, 사이트맵, 연락처, 갤러리.
+      </small>
+    ]]></key>
+    <key alias="runwayWhatIsRunway">Runway 란?</key>
+    <key alias="step1">Step 1/5 라이센스 허가</key>
+    <key alias="step2">Step 2/5 데이터베이스 설정</key>
+    <key alias="step3">Step 3/5 파일권한 확인</key>
+    <key alias="step4">Step 4/5 Umbraco 보안설정 확인</key>
+    <key alias="step5">Step 5/5 Umbraco를 시작할 준비가 되었습니다.</key>
+    <key alias="thankYou">Umbraco를 선택해주셔서 감사합니다.</key>
+    <key alias="theEndBrowseSite"><![CDATA[<h3>새 사이트 보기</h3>
+      Runway가 설치되었습니다, 새 웹사이트를 볼 수 있습니다.]]></key>
+    <key alias="theEndFurtherHelp"><![CDATA[<h3>고급 도움말과 정보</h3>
+     우수 커뮤니티에서 도음을 받으세요. 간단한 사이트제작이나 패키지 사용법, Umbraco기술의 퀵가이드를 제공하는 문서를 보시거나 무료 비디오를 시청하세요.]]></key>
+    <key alias="theEndHeader">Umbraco %0% 가 설치되어 사용준비가 되었습니다.</key>
+    <key alias="theEndInstallFailed"><![CDATA[설치를 마치기 위해, <strong>/web.config file</strong>을 수동으로 편집해야 합니다. AppSetting 키의 <strong>UmbracoConfigurationStatus</strong> 를 <strong>'%0%'</strong>의 값으로 설정하세요.]]></key>
+    <key alias="theEndInstallSuccess"><![CDATA[<strong>Umbraco 와 첫만남</strong>이시면 <br />아래의 "Umbraco 접속하기" 버튼을 클릭하여 <strong>즉시 시작</strong>하실 수 있습니다.
+    시작페이지에서 풍부한 리소소를 제공받을 수 있습니다.]]></key>
+    <key alias="theEndOpenUmbraco"><![CDATA[<h3>Umbraco 실행</h3>
+사이트 관리를 위해서 Umbraco 관리자를 여시고 컨텐츠를 추가하시거나 템플릿과 스타일시트 업데이트 또는 새기능을 추가하세요]]></key>
+    <key alias="Unavailable">데이터베이스에 연결 실패</key>
+    <key alias="Version3">Umbraco 버전 3</key>
+    <key alias="Version4">Umbraco 버전 4</key>
+    <key alias="watch">보기</key>
+    <key alias="welcomeIntro"><![CDATA[이 마법사는 버전 3.0에서 <strong>Umbraco %0%</strong> 로 신규설치나 업그레이드가 가능하도록 도와줍니다.
+                              <br /><br />
+                              마법사를 시작하시려면 <strong>"다음"</strong> 을 누르세요.]]></key>
+  </area>
+  <area alias="language">
+    <key alias="cultureCode">국가 코드</key>
+    <key alias="displayName">국가명</key>
+  </area>
+  <area alias="lockout">
+    <key alias="lockoutWillOccur">TRANSLATE ME: 'You've been idle and logout will automatically occur in'</key>
+    <key alias="renewSession">TRANSLATE ME: 'Renew now to save your work'</key>
+  </area>
+  <area alias="login">
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
+  </area>
+  <area alias="main">
+    <key alias="dashboard">대시보드</key>
+    <key alias="sections">세부항목</key>
+    <key alias="tree">컨텐츠</key>
+  </area>
+  <area alias="moveOrCopy">
+    <key alias="choose">페이지 상단 선택...</key>
+    <key alias="copyDone">%0% 가 %1%로 복사되었습니다.</key>
+    <key alias="copyTo">%0%문서가 복사될 곳을 선택하세요</key>
+    <key alias="moveDone">%0% 가 %1%로 이동되었습니다.</key>
+    <key alias="moveTo">%0%문서가 이동할 곳을 선택하세요</key>
+    <key alias="nodeSelected">새 컨텐츠의 루트로 선택되었습니다. 확인을 클릭하세요</key>
+    <key alias="noNodeSelected">아직 노드가 선택되지 않았습니다, 확인 버튼을 누르기전에 리스트에 노드를 선택하세요.</key>
+    <key alias="notAllowedByContentType">현재노드는 타입때문에 선택된 노드아래로 갈 수 없습니다.</key>
+    <key alias="notAllowedByPath">현재 노드는 서브페이지로 이동할 수 없습니다.</key>
+    <key alias="notValid">TRANSLATE ME: 'The action isn't allowed since you have insufficient permissions on 1 or more child documents.'</key>
+  </area>
+  <area alias="notifications">
+    <key alias="editNotifications">%0% 에 대한 알림 편집</key>
+    <key alias="mailBody"><![CDATA[
+      안녕하세요 %0%
+
+      사용자 '%3%' 가  작업 '%1%' 를 페이지 '%2%' 에서
+      진행했음을 알리는 자동 발송 메일입니다.
+
+      편집하시려면 http://%4%/#/content/content/edit/%5% 로 이동하세요
+
+      좋은 하루 되세요!
+
+    ]]></key>
+    <key alias="mailBodyHtml"><![CDATA[<p>안녕하세요 %0%</p>
+
+	  <p>사용자 <strong>'%3%'</strong> 가  작업 <strong>'%1%'</strong> 를
+       페이지 <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>'%2%'</strong></a> 에서
+       진행했음을 알리는 자동 발송 메일입니다.
+  </p>
+	  <div style="margin: 8px 0; padding: 8px; display: block;">
+			<br />
+			<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;편집&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
+			<br />
+	  </div>
+	  <p>
+		  <h3>업데이트 요약:</h3>
+		  <table style="width: 100%;">
+					   %6%
+			</table>
+		 </p>
+
+	  <div style="margin: 8px 0; padding: 8px; display: block;">
+			<br />
+			<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;편집&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
+			<br />
+	  </div>
+
+	  <p>좋은 하루 되세요!<br /><br />
+	  </p>]]></key>
+    <key alias="mailSubject">%1%에 대한 [%0]알림이 %2%에 생성되었습니다</key>
+    <key alias="notifications">알림</key>
+  </area>
+  <area alias="packager">
+    <key alias="chooseLocalPackageText"><![CDATA[
+    사용하시는 PC에서 패키지를 선택하세요<br />
+       Umbraco 패키지는 보통 ".umb" 나 ".zip" 확장자를 가집니다.
+    ]]></key>
+    <key alias="packageAuthor">저자</key>
+    <key alias="packageDocumentation">문서화</key>
+    <key alias="packageMetaData">패키지 메타데이터</key>
+    <key alias="packageName">패키지 이름</key>
+    <key alias="packageNoItemsHeader">패키지가 포함한 아이템이 없습니다.</key>
+    <key alias="packageNoItemsText"><![CDATA[이 패키지엔 삭제할 아이템이 포함되어 있지 않습니다.<br/><br/>
+    아래 "패키지 삭제"를 클릭하시면 안전하게 시스템에서 삭제하실 수 있습니다.]]></key>
+    <key alias="packageOptions">패키지 옵션</key>
+    <key alias="packageReadme">패키지 정보</key>
+    <key alias="packageRepository">패키지 저장소</key>
+    <key alias="packageUninstallConfirm">삭제 확인</key>
+    <key alias="packageUninstalledHeader">패키지가 삭제되었습니다.</key>
+    <key alias="packageUninstalledText">패키지가 성공적으로 삭제되었습니다.</key>
+    <key alias="packageUninstallHeader">패키지 삭제</key>
+    <key alias="packageUninstallText"><![CDATA[삭제하시려는 항목은 선택하지 않을 수 있습니다. "삭제 확인" 버튼을 누를때 체크되어있지 항목은 모두 삭제됩니다.<br />
+    <span style="color: Red; font-weight: bold;">알림:</span> 문서, 미디어등 삭제항목에 관련된 모든 항목이 삭제됩니다, 작업을 중단하면 시스템이 불안정적으로 동작할 수 있습니다.
+    삭제는 매우 주의를 요하기 때문에 의심스러운항목은 패키지 제작자에게 문의하시기 바랍니다.]]></key>
+    <key alias="packageVersion">패키지 버전</key>
+  </area>
+  <area alias="paste">
+    <key alias="doNothing">포맷을 포함여하 붙여넣기(권장하지 않음)</key>
+    <key alias="errorMessage">붙여넣으려는 텍스트에 특수한 문자나 포맷이 포함되어있습니다. Microsoft Word문서에서 바로 복사해와서 문제가 발생된것일 수 있습니다. Umbraco는 붙여넣으려는 컨텐츠가 웹에 적합하도록 특수한 문자나 포맷을 자동으로 제거합니다</key>
+    <key alias="removeAll">포맷을 전혀 적용하지 않고 붙여넣기</key>
+    <key alias="removeSpecialFormattering">포맷을 제거하고 붙여넣기(권장)</key>
+  </area>
+  <area alias="publicAccess">
+    <key alias="paAdvanced">역할 기반 제한</key>
+    <key alias="paAdvancedHelp"><![CDATA[역할 기반인증을 사용하여 컨트롤 접근제한을 설정하시려면,<br /> Umbraco의 사용자그룹을 사용하세요.]]></key>
+    <key alias="paAdvancedNoGroups"><![CDATA[역할 기반인증을 사용하시기전에 <br />사용자 그룹부터 생성해야합니다.]]></key>
+    <key alias="paErrorPage">에러 페이지</key>
+    <key alias="paErrorPageHelp">로그인을 시도할 때 접근할 수 없습니다.</key>
+    <key alias="paHowWould">이페이지의 접근제한을 어떻게 제한할지 선택하세요</key>
+    <key alias="paIsProtected">%0% 제한되었습니다.</key>
+    <key alias="paIsRemoved">%0% 의 제한이 제거되었습니다</key>
+    <key alias="paLoginPage">로그인 페이지</key>
+    <key alias="paLoginPageHelp">로그인 폼 양식페이지를 선택하세요</key>
+    <key alias="paRemoveProtection">제한 제거</key>
+    <key alias="paSelectPages">로그인 폼과 에러메세지가 포함된 페이지를 선택하세요</key>
+    <key alias="paSelectRoles">이 페이지에 접근할 역할을 선택하세요</key>
+    <key alias="paSetLogin">이 페이지에 로그인과 암호 설정</key>
+    <key alias="paSimple">사용자 제한</key>
+    <key alias="paSimpleHelp">로그인과 암호를 이용해 사용자 제한</key>
+  </area>
+  <area alias="publish">
+    <key alias="contentPublishedFailedByEvent">제3공급자 익스텐션 취소때문에 %0% 가 발행할 수없습니다.</key>
+    <key alias="includeUnpublished">미발행된 자식 문서 포함</key>
+    <key alias="inProgress">발행 진행중 - 잠시만 기다리세요...</key>
+    <key alias="inProgressCounter">%1% 페이지를 제외한 %0% 가 발행됨...</key>
+    <key alias="nodePublish">%0% 발행됨</key>
+    <key alias="nodePublishAll">%0% 과 서브페이지가 발행되었습니다</key>
+    <key alias="publishAll">%0% 와 모든 서브페이지 발행</key>
+    <key alias="publishHelp"><![CDATA[<strong>%0%</strong>를 발행하기위해 <em>확인</em>를 클릭하세요 and thereby making it's content publicly available.<br/><br />
+    이 페이지와 모든 서브페이지를 아래 <em>모든 자식문서 발행</em>을 체크하여 발행할 수 있습니다.
+    ]]></key>
+  </area>
+  <area alias="relatedlinks">
+    <key alias="addExternal">외부링크 추가</key>
+    <key alias="addInternal">내부링크 추가</key>
+    <key alias="addlink">추가</key>
+    <key alias="caption">설명</key>
+    <key alias="internalPage">내부 페이지</key>
+    <key alias="linkurl">URL</key>
+    <key alias="modeDown">아래로 이동</key>
+    <key alias="modeUp">위로 이동</key>
+    <key alias="newWindow">새 창 열기</key>
+    <key alias="removeLink">링크 삭제</key>
+  </area>
+  <area alias="rollback">
+    <key alias="currentVersion">현재 버전</key>
+    <key alias="diffHelp"><![CDATA[현재 버전과 선택한 버전의 차이점을 보여줍니다<br /><del>빨간</del> 텍스트는 선택한 버전에선 보이지 않습니다. <ins>녹색은 추가되었음을 의미합니다</ins>]]></key>
+    <key alias="documentRolledBack">문서가 롤백되었습니다.</key>
+    <key alias="htmlHelp">선택한 버전을 html로 보여줍니다. 두 버전의 차이점을 동시에 보시려면, 차이점 보기를 사용하세요</key>
+    <key alias="rollbackTo">롤백</key>
+    <key alias="selectVersion">버전 선택</key>
+    <key alias="view">보기</key>
+  </area>
+  <area alias="scripts">
+    <key alias="editscript">스크립트 파일 편집</key>
+  </area>
+  <area alias="sections">
+    <key alias="concierge">안내</key>
+    <key alias="content">컨텐츠</key>
+    <key alias="courier">가이드</key>
+    <key alias="developer">개발도구</key>
+    <key alias="installer">Umbraco 설치마법사</key>
+    <key alias="media">미디어</key>
+    <key alias="member">구성원</key>
+    <key alias="newsletters">뉴스레터</key>
+    <key alias="settings">세팅</key>
+    <key alias="statistics">통계</key>
+    <key alias="translation">변환</key>
+    <key alias="users">사용자</key>
+  </area>
+  <area alias="settings">
+    <key alias="defaulttemplate">기본 템플릿</key>
+    <key alias="importDocumentTypeHelp">문서를 가져오시려면 사용하시는 컴퓨터에 ".udt"를 찾아 선택하시고 "가져오기"를 클릭하세요(다음 단계에서 확인여부를 문의합니다)</key>
+    <key alias="newtabname">새 색인 제목</key>
+    <key alias="nodetype">노드타입</key>
+    <key alias="objecttype">타입</key>
+    <key alias="stylesheet">스타일시트</key>
+    <key alias="tab">색인</key>
+    <key alias="tabname">색인 제목</key>
+    <key alias="tabs">색인</key>
+  </area>
+  <area alias="sort">
+    <key alias="sortOrder">Sort order</key>
+    <key alias="sortCreationDate">Creation date</key>
+    <key alias="sortDone">정렬 완료</key>
+    <key alias="sortHelp">다른 아이템을 마우스로 위,아래로 드래그 하여 이동하거나 열의 헤더를 클릭하여 아이템을 정렬할 수 있습니다</key>
+    <key alias="sortPleaseWait"><![CDATA[잠시 기다리십시오. 아이템을 정렬 하는데 잠시 시간이 소요될 수 있습니다]]></key>
+  </area>
+  <area alias="speechBubbles">
+    <key alias="contentPublishedFailedByEvent">3rd party add-in 때문에 발행이 취소되었습니다.</key>
+    <key alias="contentTypeDublicatePropertyType">속성타입이 이미존재합니다</key>
+    <key alias="contentTypePropertyTypeCreated">속성타입 생성되었습니다</key>
+    <key alias="contentTypePropertyTypeCreatedText"><![CDATA[이름: %0% <br /> 데이터타입: %1%]]></key>
+    <key alias="contentTypePropertyTypeDeleted">속성타입 삭제됨</key>
+    <key alias="contentTypeSavedHeader">컨텐츠타입 저장됨</key>
+    <key alias="contentTypeTabCreated">색인 생성</key>
+    <key alias="contentTypeTabDeleted">색인 삭제</key>
+    <key alias="contentTypeTabDeletedText">Tab with id: %0% 삭제됨</key>
+    <key alias="cssErrorHeader">스타일시트 저장되지 않음</key>
+    <key alias="cssSavedHeader">스타일시트 저장</key>
+    <key alias="cssSavedText">스타일시트 에러없이 저장</key>
+    <key alias="dataTypeSaved">데이터타입 저장됨</key>
+    <key alias="dictionaryItemSaved">사전 항목 저장됨</key>
+    <key alias="editContentPublishedFailedByParent">부모페이지가 발행되지 않았기때문에 발행에 실패했습니다.</key>
+    <key alias="editContentPublishedHeader">컨텐츠 발행됨</key>
+    <key alias="editContentPublishedText">and 웹사이트에서 보기</key>
+    <key alias="editContentSavedHeader">컨텐츠 저장됨</key>
+    <key alias="editContentSavedText">변경된 내용이 적용되어 발행됨을 기억하세요</key>
+    <key alias="editContentSendToPublish">승인을 위해 전송</key>
+    <key alias="editContentSendToPublishText">변경사항이 승인을 위해 전송되었습니다.</key>
+    <key alias="editMemberSaved">사용자 저장됨</key>
+    <key alias="editStylesheetPropertySaved">스타일시트 속성 저장됨</key>
+    <key alias="editStylesheetSaved">스타일시트 저장됨</key>
+    <key alias="editTemplateSaved">템플릿 저장됨</key>
+    <key alias="editUserError">사용자 저장에러(로그 확인)</key>
+    <key alias="editUserSaved">사용자 저장됨</key>
+    <key alias="fileErrorHeader">파일 저장되지 않음</key>
+    <key alias="fileErrorText">파일이 저장되지 않았습니다. 권한을 확인하세요</key>
+    <key alias="fileSavedHeader">파일 저장</key>
+    <key alias="fileSavedText">파일이 에러없이 저장</key>
+    <key alias="languageSaved">언어 저장됨</key>
+    <key alias="templateErrorHeader">템플릿이 저장되지 않음</key>
+    <key alias="templateErrorText">2 템플릿에 동일한 별칭이 적용되지 않았는지 확인하시기 바랍니다.</key>
+    <key alias="templateSavedHeader">템플릿 저장</key>
+    <key alias="templateSavedText">탬플릿이 에러없이 저장되었습니다!</key>
+  </area>
+  <area alias="stylesheet">
+    <key alias="aliasHelp">CSS 태그를 사용하세요 예: h1, .redHeader, .blueTex</key>
+    <key alias="editstylesheet">스타일시트 편집</key>
+    <key alias="editstylesheetproperty">스타일시트 속성편집</key>
+    <key alias="nameHelp">rich text editor 에 스타일속성을 확인할 수 있는 이름을 붙이세요</key>
+    <key alias="preview">미리보기</key>
+    <key alias="styles">스타일</key>
+  </area>
+  <area alias="template">
+    <key alias="edittemplate">템플릿 편집</key>
+    <key alias="insertContentArea">컨텐츠범위 삽입</key>
+    <key alias="insertContentAreaPlaceHolder">컨텐츠범위 Placeholder 삽입</key>
+    <key alias="insertDictionaryItem">사전 항목 삽입</key>
+    <key alias="insertMacro">매크로 삽입</key>
+    <key alias="insertPageField">Umbraco 페이지필드 삽입</key>
+    <key alias="mastertemplate">마스터 템플릿</key>
+    <key alias="quickGuide">Umbraco 템플릿태그 퀵가이드</key>
+    <key alias="template">템플릿</key>
+  </area>
+  <area alias="grid">
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="insertControl">Choose type of content</key>
+    <key alias="chooseLayout">Choose a layout</key>
+    <key alias="addRows">Add a row</key>
+    <key alias="addElement">Add content</key>
+    <key alias="dropElement">Drop content</key>
+    <key alias="settingsApplied">Settings applied</key>
+    <key alias="contentNotAllowed">This content is not allowed here</key>
+    <key alias="contentAllowed">This content is allowed here</key>
+    <key alias="clickToEmbed">Click to embed</key>
+    <key alias="clickToInsertImage">Click to insert image</key>
+    <key alias="placeholderImageCaption">Image caption...</key>
+    <key alias="placeholderWriteHere">Write here...</key>
+    <key alias="gridLayouts">Grid Layouts</key>
+    <key alias="gridLayoutsDetail">Layouts are the overall work area for the grid editor, usually you only need one or two different layouts</key>
+    <key alias="addGridLayout">Add Grid Layout</key>
+    <key alias="addGridLayoutDetail">Adjust the layout by setting column widths and adding additional sections</key>
+    <key alias="rowConfigurations">Row configurations</key>
+    <key alias="rowConfigurationsDetail">Rows are predefined cells arranged horizontally</key>
+    <key alias="addRowConfiguration">Add row configuration</key>
+    <key alias="addRowConfigurationDetail">Adjust the row by setting cell widths and adding additional cells</key>
+    <key alias="columns">Columns</key>
+    <key alias="columnsDetails">Total combined number of columns in the grid layout</key>
+    <key alias="settings">Settings</key>
+    <key alias="settingsDetails">Configure what settings editors can change</key>
+    <key alias="styles">Styles</key>
+    <key alias="stylesDetails">Configure what styling editors can change</key>
+    <key alias="allowAllEditors">Allow all editors</key>
+    <key alias="allowAllRowConfigurations">Allow all row configurations</key>
+  </area>
+  <area alias="templateEditor">
+    <key alias="alternativeField">대체 필드</key>
+    <key alias="alternativeText">대체 글꼴</key>
+    <key alias="casing">Casing</key>
+    <key alias="chooseField">필드 선택</key>
+    <key alias="convertLineBreaks">줄바꿈문자 변환</key>
+    <key alias="convertLineBreaksHelp">줄바꿈문자를 Html태그 &amp;amp;lt;br&amp;amp;gt; 로 변경</key>
+    <key alias="dateOnly">예, 날짜만</key>
+    <key alias="formatAsDate">날짜포맷으로</key>
+    <key alias="htmlEncode">HTML 인코딩</key>
+    <key alias="htmlEncodeHelp">HTML과 동일하게 특수문자를 변경하시겠습니까</key>
+    <key alias="insertedAfter">필드 값 후에 삽입하시겠습니까</key>
+    <key alias="insertedBefore">필드값 전에 삽입하시겠습니까</key>
+    <key alias="lowercase">소문자</key>
+    <key alias="none">없음</key>
+    <key alias="postContent">필드뒤에 삽입</key>
+    <key alias="preContent">필드앞에 삽입</key>
+    <key alias="recursive">Recursive</key>
+    <key alias="removeParagraph">단락 태그삭제</key>
+    <key alias="removeParagraphHelp">문서 시작과 끝의 &amp;amp;lt;P&amp;amp;gt; 를 삭제하시겠습니까</key>
+    <key alias="uppercase">대문자</key>
+    <key alias="urlEncode">URL 인코딩</key>
+    <key alias="urlEncodeHelp">URL의 특수문자를 포맷하겠습니까</key>
+    <key alias="usedIfAllEmpty">필드 위의 값들이 비었을때만 사용가능합니다.</key>
+    <key alias="usedIfEmpty">이 필드는 최초필드가 비었을때만 사용가능합니다.</key>
+    <key alias="withTime">예, 시간를 :로 구분하여</key>
+  </area>
+  <area alias="translation">
+    <key alias="details">번역 세부항목</key>
+    <key alias="DownloadXmlDTD">다운로드 xml DTD</key>
+    <key alias="fields">필드</key>
+    <key alias="includeSubpages">서브페이지 포함</key>
+    <key alias="mailBody"><![CDATA[
+      안녕하세요 %0%
+
+      %2% 에 의해 문서 '%1%' 가 '%5%' 로 번역요청되었음을
+      알리는 자동 발송 메일입니다.
+
+      편집하시려면 http://%3%/translation/details.aspx?id=%4% 로
+
+      번역작업을 전반적으로 보시려면 Umbraco에 로그인 하세요
+      http://%3%
+
+      좋은 하루 되세요!
+    ]]></key>
+    <key alias="noTranslators">번역자를 찾을 수 없습니다. 컨텐츠를 번역하기위해 발송하시기 전에 번역자를 생성하세요.</key>
+    <key alias="pageHasBeenSendToTranslation">'%0%' 페이지가 번역을 위해 전송되었습니다.</key>
+    <key alias="sendToTranslate">번역을 위해 '%0%' 페이지 전송하기Send the page '%0%' to translation</key>
+    <key alias="totalWords">총 단어 수</key>
+    <key alias="translateTo">번역</key>
+    <key alias="translationDone">번역 완료</key>
+    <key alias="translationDoneHelp">아래를 클릭하셔서 방금 번역한 페이지를 미리볼 수 있습니다. 원본 페이지가 있다면 두 페이지를 비교해보시기 바랍니다.</key>
+    <key alias="translationFailed">번역에 실패했습니다. Xml 파일에 문제가 있을수 있습니다.</key>
+    <key alias="translationOptions">번역 옵션</key>
+    <key alias="translator">번역자</key>
+    <key alias="uploadTranslationXml">번역 XML 업로드</key>
+  </area>
+  <area alias="treeHeaders">
+    <key alias="cacheBrowser">캐시 브라우저</key>
+    <key alias="contentRecycleBin">휴지통</key>
+    <key alias="createdPackages">생성된 패키지</key>
+    <key alias="dataTypes">데이터 타입</key>
+    <key alias="dictionary">사전</key>
+    <key alias="installedPackages">설치된 패키지</key>
+    <key alias="installSkin">TRANSLATE ME: 'Install skin'</key>
+    <key alias="installStarterKit">TRANSLATE ME: 'Install starter kit'</key>
+    <key alias="languages">언어</key>
+    <key alias="localPackage">로컬 패키지 설치</key>
+    <key alias="macros">매크로</key>
+    <key alias="mediaTypes">미디어 타입</key>
+    <key alias="member">구성원</key>
+    <key alias="memberGroups">구성원 그룹</key>
+    <key alias="memberRoles">역할</key>
+    <key alias="memberTypes">구성원 유형</key>
+    <key alias="packager">패키지</key>
+    <key alias="packages">패키지</key>
+    <key alias="repositories">저장소에 설치</key>
+    <key alias="runway">Runway 설치</key>
+    <key alias="runwayModules">Runway 모듈</key>
+    <key alias="scripting">스크립트 파일</key>
+    <key alias="scripts">스크립트</key>
+    <key alias="stylesheets">스타일시트</key>
+    <key alias="templates">템플릿</key>
+    <key alias="userPermissions">사용자권한</key>
+    <key alias="userTypes">사용자 유형</key>
+    <key alias="users">사용자</key>
+  </area>
+  <area alias="update">
+    <key alias="updateAvailable">새 업데이트가 준비되었습니다.</key>
+    <key alias="updateDownloadText">%0% 가 준비되었습니다. 다운로드를 위해 여기를 클릭하세요</key>
+    <key alias="updateNoServer">연결할 서버가 없습니다연결할 서버가 없습니다</key>
+    <key alias="updateNoServerError">업데이트을 위해 에러를 체크합니다 더많은 정보를 보시려면 stack 추적을 하세요</key>
+  </area>
+  <area alias="user">
+    <key alias="administrators">관리자</key>
+    <key alias="categoryField">카테고리 필드</key>
+    <key alias="changePassword">Change Your Password</key>
+    <key alias="changePasswordDescription">You can change your password for accessing the Umbraco Back Office by filling out the form below and click the 'Change Password' button</key>
+    <key alias="contentChannel">컨텐츠 채널</key>
+    <key alias="descriptionField">설명 필드</key>
+    <key alias="disabled">사용자 비활성화</key>
+    <key alias="documentType">문서 타입</key>
+    <key alias="editors">편집자</key>
+    <key alias="excerptField">필드 발췌</key>
+    <key alias="language">언어</key>
+    <key alias="loginname">로그인</key>
+    <key alias="mediastartnode">미디어 라이브러리에 시작노드</key>
+    <key alias="modules">세부항목</key>
+    <key alias="noConsole">Umbraco 접속 비활성화</key>
+    <key alias="password">비밀번호</key>
+    <key alias="passwordChanged">Your password has been changed!</key>
+    <key alias="passwordConfirm">Please confirm the new password</key>
+    <key alias="passwordEnterNew">Enter your new password</key>
+    <key alias="passwordIsBlank">Your new password cannot be blank!</key>
+    <key alias="passwordIsDifferent">There was a difference between the new password and the confirmed password. Please try again!</key>
+    <key alias="passwordMismatch">The confirmed password doesn't match the new password!</key>
+    <key alias="permissionReplaceChildren">자식노드 권한변경</key>
+    <key alias="permissionSelectedPages">현재 이페이지의 권한을 수정하는 중입니다:</key>
+    <key alias="permissionSelectPages">권한변경할 페이지를 선택해주세요</key>
+    <key alias="searchAllChildren">하위항목 모두찾기</key>
+    <key alias="startnode">컨텐츠의 시작노드</key>
+    <key alias="username">사용자명</key>
+    <key alias="userPermissions">사용자권한</key>
+    <key alias="usertype">사용자 타입</key>
+    <key alias="userTypes">사용자 타입</key>
+    <key alias="writer">작성자</key>
+  </area>
+</language>

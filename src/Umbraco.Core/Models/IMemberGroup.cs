@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
     /// <summary>
     /// Represents a member type
     /// </summary>
-    public interface IMemberGroup : IAggregateRoot, IRememberBeingDirty, ICanBeDirty
+    public interface IMemberGroup : IEntity, IRememberBeingDirty, IHaveAdditionalData
     {
         /// <summary>
         /// The name of the member group
@@ -17,10 +17,5 @@ namespace Umbraco.Core.Models
         /// Profile of the user who created this Entity
         /// </summary>
         int CreatorId { get; set; }
-
-        /// <summary>
-        /// Some entities may expose additional data that other's might not, this custom data will be available in this collection
-        /// </summary>
-        IDictionary<string, object> AdditionalData { get; }
     }
 }

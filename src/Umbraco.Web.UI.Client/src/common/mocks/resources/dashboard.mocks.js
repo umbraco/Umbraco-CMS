@@ -8,7 +8,7 @@ angular.module('umbraco.mocks').
               return [401, null, null];
           }
           else {
-              //TODO: return real mocked data
+              // TODO: return real mocked data
               return [200, [], null];
           }
       }

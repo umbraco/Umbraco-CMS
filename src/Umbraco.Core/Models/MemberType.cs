@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Core.Models
@@ -12,6 +11,8 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class MemberType : ContentTypeCompositionBase, IMemberType
     {
+        public const bool SupportsPublishingConst = false;
+
         //Dictionary is divided into string: PropertyTypeAlias, Tuple: MemberCanEdit, VisibleOnProfile, PropertyTypeId
         private string _alias;
 
@@ -30,11 +31,20 @@ namespace Umbraco.Core.Models
             MemberTypePropertyTypes = new Dictionary<string, MemberTypePropertyProfileAccess>();
         }
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+        /// <inheritdoc />
+        public override ISimpleContentType ToSimple() => new SimpleContentType(this);
 
-        private class PropertySelectors
+        /// <inheritdoc />
+        public override bool SupportsPublishing => SupportsPublishingConst;
+
+        public override ContentVariation Variations
         {
-            public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<MemberType, string>(x => x.Alias);
+            // note: although technically possible, variations on members don't make much sense
+            // and therefore are disabled - they are fully supported at service level, though,
+            // but not at published snapshot level.
+
+            get => base.Variations;
+            set => throw new NotSupportedException("Variations are not supported on members.");
         }
 
         /// <summary>
@@ -43,7 +53,7 @@ namespace Umbraco.Core.Models
         [DataMember]
         public override string Alias
         {
-            get { return _alias; }
+            get => _alias;
             set
             {
                 //NOTE: WE are overriding this because we don't want to do a ToSafeAlias when the alias is the special case of
@@ -51,7 +61,7 @@ namespace Umbraco.Core.Models
                 // leading underscores which we don't want in this case.
                 // see : http://issues.umbraco.org/issue/U4-3968
 
-                //TODO: BUT, I'm pretty sure we could do this with regards to underscores now:
+                // TODO: BUT, I'm pretty sure we could do this with regards to underscores now:
                 // .ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase)
                 // Need to ask Stephen
 
@@ -59,7 +69,7 @@ namespace Umbraco.Core.Models
                         ? value
                         : (value == null ? string.Empty : value.ToSafeAlias());
 
-                SetPropertyValueAndDetectChanges(newVal, ref _alias, Ps.Value.AliasSelector);
+                SetPropertyValueAndDetectChanges(newVal, ref _alias, nameof(Alias));
             }
         }
 
@@ -76,12 +86,7 @@ namespace Umbraco.Core.Models
         /// <returns></returns>
         public bool MemberCanEditProperty(string propertyTypeAlias)
         {
-            MemberTypePropertyProfileAccess propertyProfile;
-            if (MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out propertyProfile))
-            {
-                return propertyProfile.IsEditable;
-            }
-            return false;
+            return MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out var propertyProfile) && propertyProfile.IsEditable;
         }
 
         /// <summary>
@@ -91,14 +96,8 @@ namespace Umbraco.Core.Models
         /// <returns></returns>
         public bool MemberCanViewProperty(string propertyTypeAlias)
         {
-            MemberTypePropertyProfileAccess propertyProfile;
-            if (MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out propertyProfile))
-            {
-                return propertyProfile.IsVisible;
-            }
-            return false;
+            return MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out var propertyProfile) && propertyProfile.IsVisible;
         }
-
         /// <summary>
         /// Gets a boolean indicating whether a Property is marked as storing sensitive values on the Members profile.
         /// </summary>
@@ -106,12 +105,7 @@ namespace Umbraco.Core.Models
         /// <returns></returns>
         public bool IsSensitiveProperty(string propertyTypeAlias)
         {
-            MemberTypePropertyProfileAccess propertyProfile;
-            if (MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out propertyProfile))
-            {
-                return propertyProfile.IsSensitive;
-            }
-            return false;
+            return MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out var propertyProfile) && propertyProfile.IsSensitive;
         }
 
         /// <summary>
@@ -121,8 +115,7 @@ namespace Umbraco.Core.Models
         /// <param name="value">Boolean value, true or false</param>
         public void SetMemberCanEditProperty(string propertyTypeAlias, bool value)
         {
-            MemberTypePropertyProfileAccess propertyProfile;
-            if (MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out propertyProfile))
+            if (MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out var propertyProfile))
             {
                 propertyProfile.IsEditable = value;
             }
@@ -140,8 +133,7 @@ namespace Umbraco.Core.Models
         /// <param name="value">Boolean value, true or false</param>
         public void SetMemberCanViewProperty(string propertyTypeAlias, bool value)
         {
-            MemberTypePropertyProfileAccess propertyProfile;
-            if (MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out propertyProfile))
+            if (MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out var propertyProfile))
             {
                 propertyProfile.IsVisible = value;
             }
@@ -159,8 +151,7 @@ namespace Umbraco.Core.Models
         /// <param name="value">Boolean value, true or false</param>
         public void SetIsSensitiveProperty(string propertyTypeAlias, bool value)
         {
-            MemberTypePropertyProfileAccess propertyProfile;
-            if (MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out propertyProfile))
+            if (MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out var propertyProfile))
             {
                 propertyProfile.IsSensitive = value;
             }

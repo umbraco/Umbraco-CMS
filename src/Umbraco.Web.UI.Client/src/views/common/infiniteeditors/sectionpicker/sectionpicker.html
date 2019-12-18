@@ -1,0 +1,55 @@
+<div ng-controller="Umbraco.Editors.SectionPickerController as vm">
+
+    <umb-editor-view>
+
+        <umb-editor-header
+            name="model.title"
+            name-locked="true"
+            hide-alias="true"
+            hide-icon="true"
+            hide-description="true">
+        </umb-editor-header>
+
+        <umb-editor-container>
+
+            <umb-load-indicator
+                ng-if="vm.loading">
+            </umb-load-indicator>
+
+            <umb-box ng-if="!vm.loading">
+                <umb-box-content>
+                    <ul class="umb-tree">
+                        <li ng-repeat="section in vm.sections" class="umb-tree-item" ng-class="{'umb-tree-node-checked': section.selected }">
+                            <div class="umb-tree-item__inner cursor-pointer" ng-click="vm.selectSection(section)" style="padding: 5px 10px;">
+                                <i class="icon umb-tree-icon {{section.icon}}"></i>
+                                <a class="flex-auto" href="" prevent-default>
+                                    <span>{{ section.name }}</span>
+                                </a>
+                            </div>
+                        </li>
+                    </ul>
+                </umb-box-content>
+            </umb-box>
+        </umb-editor-container>
+
+        <umb-editor-footer>
+            <umb-editor-footer-content-right>
+                <umb-button
+                    type="button"
+                    button-style="link"
+                    label-key="general_close"
+                    shortcut="esc"
+                    action="vm.close()">
+                </umb-button>
+                <umb-button
+                    type="button"
+                    button-style="success"
+                    label-key="general_submit"
+                    action="vm.submit(model)">
+                </umb-button>
+            </umb-editor-footer-content-right>
+        </umb-editor-footer>
+
+    </umb-editor-view>
+
+</div>

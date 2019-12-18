@@ -1,9 +1,8 @@
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
-using umbraco.interfaces;
+using Umbraco.Core.Cache;
 
 namespace Umbraco.Core.Sync
 {
@@ -39,7 +38,7 @@ namespace Umbraco.Core.Sync
 
         private RefreshInstruction(ICacheRefresher refresher, RefreshMethodType refreshType)
         {
-            RefresherId = refresher.UniqueIdentifier;
+            RefresherId = refresher.RefresherUniqueId;
             RefreshType = refreshType;
             //set default - this value is not used for reading after it's been deserialized, it's only used for persisting the instruction to the db
             JsonIdCount = 1;
@@ -92,7 +91,7 @@ namespace Umbraco.Core.Sync
 
                 case MessageType.RefreshByJson:
                     return new[] { new RefreshInstruction(refresher, RefreshMethodType.RefreshByJson, json) };
-                
+
                 case MessageType.RefreshById:
                     if (idType == null)
                         throw new InvalidOperationException("Cannot refresh by id if idType is null.");
@@ -111,7 +110,7 @@ namespace Umbraco.Core.Sync
                     // must be ints, bulk-remove is not supported, iterate
                     return ids.Select(x => new RefreshInstruction(refresher, RefreshMethodType.RemoveById, (int) x));
                     //return new[] { new RefreshInstruction(refresher, RefreshMethodType.RemoveByIds, JsonConvert.SerializeObject(ids.Cast<int>().ToArray())) };
-                
+
                 default:
                     //case MessageType.RefreshByInstance:
                     //case MessageType.RemoveByInstance:
@@ -156,14 +155,14 @@ namespace Umbraco.Core.Sync
         /// Gets or sets the payload data value.
         /// </summary>
         public string JsonPayload { get; set; }
-        
+
         protected bool Equals(RefreshInstruction other)
         {
-            return RefreshType == other.RefreshType 
-                && RefresherId.Equals(other.RefresherId) 
-                && GuidId.Equals(other.GuidId) 
-                && IntId == other.IntId 
-                && string.Equals(JsonIds, other.JsonIds) 
+            return RefreshType == other.RefreshType
+                && RefresherId.Equals(other.RefresherId)
+                && GuidId.Equals(other.GuidId)
+                && IntId == other.IntId
+                && string.Equals(JsonIds, other.JsonIds)
                 && string.Equals(JsonPayload, other.JsonPayload);
         }
 

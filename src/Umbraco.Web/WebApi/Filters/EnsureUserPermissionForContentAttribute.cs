@@ -1,28 +1,23 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
+using System.Net;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services;
-using Umbraco.Web.Editors;
-using Umbraco.Web.Models.ContentEditing;
-using umbraco.BusinessLogic.Actions;
+using Umbraco.Core.Security;
+using Umbraco.Web.Actions;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.WebApi.Filters
 {
     /// <summary>
-    /// Auth filter to check if the current user has access to the content item (by id). 
+    /// Auth filter to check if the current user has access to the content item (by id).
     /// </summary>
     /// <remarks>
-    /// 
+    ///
     /// This first checks if the user can access this based on their start node, and then checks node permissions
-    /// 
+    ///
     /// By default the permission that is checked is browse but this can be specified in the ctor.
     /// NOTE: This cannot be an auth filter because that happens too soon and we don't have access to the action params.
     /// </remarks>
@@ -40,12 +35,19 @@ namespace Umbraco.Web.WebApi.Filters
             _nodeId = nodeId;
         }
 
+        public EnsureUserPermissionForContentAttribute(int nodeId, char permissionToCheck)
+            : this(nodeId)
+        {
+            _permissionToCheck = permissionToCheck;
+        }
+
         public EnsureUserPermissionForContentAttribute(string paramName)
         {
-            if (string.IsNullOrWhiteSpace(paramName)) throw new ArgumentException("Value cannot be null or whitespace.", "paramName");
+            if (paramName == null) throw new ArgumentNullException(nameof(paramName));
+            if (string.IsNullOrEmpty(paramName)) throw new ArgumentException("Value can't be empty.", nameof(paramName));
 
             _paramName = paramName;
-            _permissionToCheck = ActionBrowse.Instance.Letter;
+            _permissionToCheck = ActionBrowse.ActionLetter;
         }
 
         public EnsureUserPermissionForContentAttribute(string paramName, char permissionToCheck)
@@ -53,15 +55,12 @@ namespace Umbraco.Web.WebApi.Filters
         {
             _permissionToCheck = permissionToCheck;
         }
-        
-        public override bool AllowMultiple
-        {
-            get { return true; }
-        }
+
+        public override bool AllowMultiple => true;
 
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
-            if (UmbracoContext.Current.Security.CurrentUser == null)
+            if (Current.UmbracoContext.Security.CurrentUser == null)
             {
                 //not logged in
                 throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
@@ -70,7 +69,7 @@ namespace Umbraco.Web.WebApi.Filters
             int nodeId;
             if (_nodeId.HasValue == false)
             {
-                var parts = _paramName.Split(new char[] {'.'}, StringSplitOptions.RemoveEmptyEntries);
+                var parts = _paramName.Split(new[] {'.'}, StringSplitOptions.RemoveEmptyEntries);
 
                 if (actionContext.ActionArguments[parts[0]] == null)
                 {
@@ -88,13 +87,15 @@ namespace Umbraco.Web.WebApi.Filters
                         nodeId = parsedId;
                     }
                     else if (Udi.TryParse(argument, true, out Udi udi))
-                    { 
-                        nodeId = ApplicationContext.Current.Services.EntityService.GetIdForUdi(udi).Result;
+                    {
+                        // TODO: inject? we can't because this is an attribute but we could provide ctors and empty ctors that pass in the required services
+                        nodeId = Current.Services.EntityService.GetId(udi).Result;
                     }
                     else
                     {
                         Guid.TryParse(argument, out Guid key);
-                        nodeId = ApplicationContext.Current.Services.EntityService.GetIdForKey(key, UmbracoObjectTypes.Document).Result;
+                        // TODO: inject? we can't because this is an attribute but we could provide ctors and empty ctors that pass in the required services
+                        nodeId = Current.Services.EntityService.GetId(key, UmbracoObjectTypes.Document).Result;
                     }
                 }
                 else
@@ -106,7 +107,7 @@ namespace Umbraco.Web.WebApi.Filters
                     {
                         throw new InvalidOperationException("No argument found for the current action with the name: " + _paramName);
                     }
-                    nodeId = (int)prop.GetValue(actionContext.ActionArguments[parts[0]]);                    
+                    nodeId = (int)prop.GetValue(actionContext.ActionArguments[parts[0]]);
                 }
             }
             else
@@ -114,24 +115,27 @@ namespace Umbraco.Web.WebApi.Filters
                 nodeId = _nodeId.Value;
             }
 
-            if (ContentController.CheckPermissions(
-                actionContext.Request.Properties,
-                UmbracoContext.Current.Security.CurrentUser,
-                ApplicationContext.Current.Services.UserService,
-                ApplicationContext.Current.Services.ContentService, 
-                ApplicationContext.Current.Services.EntityService, 
-                nodeId, _permissionToCheck.HasValue ? new[]{_permissionToCheck.Value}: null))
-            {
-                base.OnActionExecuting(actionContext);
-            }
-            else
-            {
+            var permissionResult = ContentPermissionsHelper.CheckPermissions(nodeId,
+                Current.UmbracoContext.Security.CurrentUser,
+                Current.Services.UserService,
+                Current.Services.ContentService,
+                Current.Services.EntityService,
+                out var contentItem,
+                _permissionToCheck.HasValue ? new[] { _permissionToCheck.Value } : null);
+
+            if (permissionResult == ContentPermissionsHelper.ContentAccess.NotFound)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            if (permissionResult == ContentPermissionsHelper.ContentAccess.Denied)
                 throw new HttpResponseException(actionContext.Request.CreateUserNoAccessResponse());
+
+            if (contentItem != null)
+            {
+                //store the content item in request cache so it can be resolved in the controller without re-looking it up
+                actionContext.Request.Properties[typeof(IContent).ToString()] = contentItem;
             }
-            
+
+            base.OnActionExecuting(actionContext);
         }
-
-        
-
     }
 }

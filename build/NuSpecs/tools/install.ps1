@@ -11,46 +11,27 @@ if ($project) {
 	# Create paths and list them
 	$projectPath = (Get-Item $project.Properties.Item("FullPath").Value).FullName
 	Write-Host "projectPath:" "${projectPath}"
-	$backupPath = Join-Path $projectPath "App_Data\NuGetBackup\$dateTime"
-	Write-Host "backupPath:" "${backupPath}"
-	$copyLogsPath = Join-Path $backupPath "CopyLogs"
-	Write-Host "copyLogsPath:" "${copyLogsPath}"	
 	$webConfigSource = Join-Path $projectPath "Web.config"
 	Write-Host "webConfigSource:" "${webConfigSource}"
 	$configFolder = Join-Path $projectPath "Config"
 	Write-Host "configFolder:" "${configFolder}"
 
-	# Create backup folder and logs folder if it doesn't exist yet
-	New-Item -ItemType Directory -Force -Path $backupPath
-	New-Item -ItemType Directory -Force -Path $copyLogsPath
-	
-	# Create a backup of original web.config
-	Copy-Item $webConfigSource $backupPath -Force
-	
-	# Backup config files folder	
-	if(Test-Path $configFolder) {
-		$umbracoBackupPath = Join-Path $backupPath "Config"
-		New-Item -ItemType Directory -Force -Path $umbracoBackupPath
-		
-		robocopy $configFolder $umbracoBackupPath /e /LOG:$copyLogsPath\ConfigBackup.log
-	}
-	
 	# Copy umbraco and umbraco_files from package to project folder
 	$umbracoFolder = Join-Path $projectPath "Umbraco"
-	New-Item -ItemType Directory -Force -Path $umbracoFolder
+	New-Item -ItemType Directory -Force -Path $umbracoFolder	
 	$umbracoFolderSource = Join-Path $installPath "UmbracoFiles\Umbraco"		
-	$umbracoBackupPath = Join-Path $backupPath "Umbraco"
-	New-Item -ItemType Directory -Force -Path $umbracoBackupPath		
-	robocopy $umbracoFolder $umbracoBackupPath /e /LOG:$copyLogsPath\UmbracoBackup.log
-	robocopy $umbracoFolderSource $umbracoFolder /is /it /e /xf UI.xml /LOG:$copyLogsPath\UmbracoCopy.log
 
-	$umbracoClientFolder = Join-Path $projectPath "Umbraco_Client"	
-	New-Item -ItemType Directory -Force -Path $umbracoClientFolder
-	$umbracoClientFolderSource = Join-Path $installPath "UmbracoFiles\Umbraco_Client"		
-	$umbracoClientBackupPath = Join-Path $backupPath "Umbraco_Client"
-	New-Item -ItemType Directory -Force -Path $umbracoClientBackupPath		
-	robocopy $umbracoClientFolder $umbracoClientBackupPath /e /LOG:$copyLogsPath\UmbracoClientBackup.log
-	robocopy $umbracoClientFolderSource $umbracoClientFolder /is /it /e /LOG:$copyLogsPath\UmbracoClientCopy.log		
+    Write-Host "copying files to $umbracoFolder ..."
+    # see https://support.microsoft.com/en-us/help/954404/return-codes-that-are-used-by-the-robocopy-utility-in-windows-server-2
+    robocopy $umbracoFolderSource $umbracoFolder /is /it /e
+    if (($lastexitcode -eq 1) -or ($lastexitcode -eq 3) -or ($lastexitcode -eq 5) -or ($lastexitcode -eq 7))
+    {
+        write-host "Copy succeeded!"
+    }
+    else
+    {
+        write-host "Copy failed with exit code:" $lastexitcode
+    }
 
 	$copyWebconfig = $true
 	$destinationWebConfig = Join-Path $projectPath "Web.config"
@@ -62,7 +43,7 @@ if ($project) {
 			[xml]$config = Get-Content $destinationWebConfig
 			
 			$config.configuration.appSettings.ChildNodes | ForEach-Object { 
-				if($_.key -eq "umbracoConfigurationStatus") 
+				if($_.key -eq "Umbraco.Core.ConfigurationStatus") 
 				{
 					# The web.config has an umbraco-specific appSetting in it
 					# don't overwrite it and let config transforms do their thing
@@ -70,7 +51,11 @@ if ($project) {
 				}
 			}
 		} 
-		Catch { }
+		Catch 
+		{ 
+			Write-Host "An error occurred:"
+  			Write-Host $_
+		}
 	}
 	
 	if($copyWebconfig -eq $true) 
@@ -85,18 +70,6 @@ if ($project) {
 		$splashesDestination = Join-Path $projectPath "Config\splashes\"
 		New-Item $splashesDestination -Type directory
 		Copy-Item $splashesSource $splashesDestination -Force
-
-		$sqlCe64Source = Join-Path $installPath "UmbracoFiles\bin\amd64\*"
-		$sqlCe64Destination = Join-Path $projectPath "bin\amd64\"
-		Copy-Item $sqlCe64Source $sqlCe64Destination -Force
-		
-		$sqlCex86Source = Join-Path $installPath "UmbracoFiles\bin\x86\*"
-		$sqlCex86Destination = Join-Path $projectPath "bin\x86\"
-		Copy-Item $sqlCex86source $sqlCex86Destination -Force
-
-		$umbracoUIXMLSource = Join-Path $installPath "UmbracoFiles\Umbraco\Config\Create\UI.xml"
-		$umbracoUIXMLDestination = Join-Path $projectPath "Umbraco\Config\Create\UI.xml"
-		Copy-Item $umbracoUIXMLSource $umbracoUIXMLDestination -Force
 	} else {
 		# This part only runs for upgrades
 	
@@ -116,38 +89,10 @@ if ($project) {
 		} 
 		Catch 
 		{
-			# Not a big problem if this fails, let it go
+            # Not a big problem if this fails, let it go
+			# Write-Host "An error occurred:"
+  			# Write-Host $_			
 		}
-		
-		Try 
-		{
-			$uiXmlConfigPath = Join-Path $umbracoFolder -ChildPath "Config" | Join-Path -ChildPath "create" | Join-Path -ChildPath "UI.xml"
-			$uiXmlFile = Join-Path $umbracoFolder -ChildPath "Config" | Join-Path -ChildPath "create" | Join-Path -ChildPath "UI.xml"
-
-			$uiXml = New-Object System.Xml.XmlDocument
-			$uiXml.PreserveWhitespace = $true
-
-			$uiXml.Load($uiXmlFile)
-			$createExists = $uiXml.SelectNodes("//nodeType[@alias='macros']/tasks/create")
-
-			if($createExists.Count -eq 0) 
-			{    
-				$macrosTasksNode = $uiXml.SelectNodes("//nodeType[@alias='macros']/tasks")
-
-				#Creating: <create assembly="umbraco" type="macroTasks" />
-				$createNode = $uiXml.CreateElement("create")
-				$createNode.SetAttribute("assembly", "umbraco")
-				$createNode.SetAttribute("type", "macroTasks")
-				$macrosTasksNode.AppendChild($createNode)
-				$uiXml.Save($uiXmlFile)
-			}
-		} 
-		Catch { }
-	}
-	
-	$installFolder = Join-Path $projectPath "Install"
-	if(Test-Path $installFolder) {
-		Remove-Item $installFolder -Force -Recurse -Confirm:$false
 	}
 	
 	# Open appropriate readme

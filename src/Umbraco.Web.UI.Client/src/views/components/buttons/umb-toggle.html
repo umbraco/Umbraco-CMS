@@ -1,4 +1,4 @@
-<button ng-click="click()" type="button" class="umb-toggle" ng-disabled="disabled" ng-class="{'umb-toggle--checked': checked, 'umb-toggle--disabled': disabled}">
+<button role="checkbox" aria-checked="{{checked}}" ng-click="click()" type="button" class="umb-toggle" ng-disabled="disabled" ng-class="{'umb-toggle--checked': checked, 'umb-toggle--disabled': disabled}" id="{{inputId}}">
 
     <span ng-if="!labelPosition && showLabels === 'true' || labelPosition === 'left' && showLabels === 'true'">
         <span ng-if="!checked" class="umb-toggle__label umb-toggle__label--left">{{ displayLabelOff }}</span>
@@ -6,9 +6,9 @@
     </span>
 
     <div class="umb-toggle__toggle">
-        <i ng-show="checked && hideIcons !== 'true'" class="umb-toggle__icon umb-toggle__icon--left icon-check"></i>
-        <div class="umb-toggle__handler shadow-depth-1"></div>
-        <i ng-show="!checked && hideIcons !== 'true'" class="umb-toggle__icon umb-toggle__icon--right icon-wrong"></i>
+        <i ng-show="hideIcons !== 'true'" class="umb-toggle__icon umb-toggle__icon--left icon-check"></i>
+        <i ng-show="hideIcons !== 'true'" class="umb-toggle__icon umb-toggle__icon--right icon-wrong"></i>
+        <div class="umb-toggle__handler"></div>
     </div>
 
     <span ng-if="labelPosition === 'right' && showLabels === 'true'">

@@ -1,15 +1,14 @@
 angular.module("umbraco").controller("Umbraco.Editors.Content.RestoreController",
-    function ($scope, relationResource, contentResource, navigationService, appState, treeService, userService) {
-		var dialogOptions = $scope.dialogOptions;
+    function ($scope, relationResource, contentResource, entityResource, navigationService, appState, treeService, userService, localizationService) {
 
-		$scope.source = _.clone(dialogOptions.currentNode);
+        $scope.source = _.clone($scope.currentNode);
 
         $scope.error = null;
         $scope.loading = true;
         $scope.moving = false;
-	    $scope.success = false;
+        $scope.success = false;
 
-        $scope.dialogTreeEventHandler = $({});
+	    $scope.dialogTreeApi = {};
         $scope.searchInfo = {
             showSearch: false,
             results: [],
@@ -21,8 +20,12 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.RestoreController"
         userService.getCurrentUser().then(function (userData) {
             $scope.treeModel.hideHeader = userData.startContentIds.length > 0 && userData.startContentIds.indexOf(-1) == -1;
         });
+        $scope.labels = {};
+        localizationService.localizeMany(["treeHeaders_content"]).then(function (data) {
+            $scope.labels.treeRoot = data[0];
+        });
 
-        function nodeSelectHandler(ev, args) {
+        function nodeSelectHandler(args) {
 
             if (args && args.event) {
                 args.event.preventDefault();
@@ -39,7 +42,7 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.RestoreController"
 
         }
 
-        function nodeExpandedHandler(ev, args) {
+        function nodeExpandedHandler(args) {
             // open mini list view for list views
             if (args.node.metaData.isContainer) {
                 openMiniListView(args.node);
@@ -54,7 +57,7 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.RestoreController"
         // method to select a search result 
         $scope.selectResult = function (evt, result) {
             result.selected = result.selected === true ? false : true;
-            nodeSelectHandler(evt, { event: evt, node: result });
+            nodeSelectHandler({ event: evt, node: result });
         };
 
         //callback when there are search results 
@@ -63,18 +66,15 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.RestoreController"
             $scope.searchInfo.showSearch = true;
         };
 
-        $scope.dialogTreeEventHandler.bind("treeNodeSelect", nodeSelectHandler);
-        $scope.dialogTreeEventHandler.bind("treeNodeExpanded", nodeExpandedHandler);
-
-        $scope.$on('$destroy', function () {
-            $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
-            $scope.dialogTreeEventHandler.unbind("treeNodeExpanded", nodeExpandedHandler);
-        });
+        $scope.onTreeInit = function () {
+            $scope.dialogTreeApi.callbacks.treeNodeSelect(nodeSelectHandler);
+            $scope.dialogTreeApi.callbacks.treeNodeExpanded(nodeExpandedHandler);
+        }	    
 
         // Mini list view
         $scope.selectListViewNode = function (node) {
             node.selected = node.selected === true ? false : true;
-            nodeSelectHandler({}, { node: node });
+            nodeSelectHandler({ node: node });
         };
 
         $scope.closeMiniListView = function () {
@@ -95,36 +95,36 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.RestoreController"
 
 		    $scope.relation = data[0];
 
-			if ($scope.relation.parentId == -1) {
-				$scope.target = { id: -1, name: "Root" };
+			if ($scope.relation.parentId === -1) {
+                $scope.target = { id: -1, name: $scope.labels.treeRoot };
 
             } else {
                 $scope.loading = true;
 
-                contentResource.getById($scope.relation.parentId).then(function (data) {
+                entityResource.getById($scope.relation.parentId, "Document").then(function (data) {
                     $scope.loading = false;
                     $scope.target = data;
 
-					// make sure the target item isn't in the recycle bin
+                    // make sure the target item isn't in the recycle bin
                     if ($scope.target.path.indexOf("-20") !== -1) {
                         $scope.moving = true;
                         $scope.target = null;
                     }
 				}, function (err) {
                     $scope.loading = false;
-					$scope.error = err;
+                    $scope.error = err;
 				});
 			}
 
 		}, function (err) {
             $scope.loading = false;
-			$scope.error = err;
+            $scope.error = err;
 		});
 
 		$scope.restore = function () {
-            $scope.loading = true;
+		    $scope.loading = true;
 
-			// this code was copied from `content.move.controller.js`
+		    // this code was copied from `content.move.controller.js`
             contentResource.move({ parentId: $scope.target.id, id: $scope.source.id })
 				.then(function (path) {
 
@@ -150,7 +150,12 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.RestoreController"
 
 				}, function (err) {
                     $scope.loading = false;
-					$scope.error = err;
+                    $scope.error = err;
 				});
-		};
+        };
+
+        $scope.close = function () {
+            navigationService.hideDialog();
+        };
+
 	});

@@ -1,9 +1,9 @@
-function startUpVideosDashboardController($scope, xmlhelper, $log, $http) {
+function startUpVideosDashboardController($scope, dashboardResource) {
     $scope.videos = [];
     $scope.init = function(url){
-        var proxyUrl = "dashboard/feedproxy.aspx?url=" + url;
-        $http.get(proxyUrl).then(function(data){
-              var feed = $(data.data);
+
+        dashboardResource.getRemoteXmlData('COM', url).then(function (data) {
+            var feed = $(data.data);
               $('item', feed).each(function (i, item) {
                   var video = {};
                   video.thumbnail = $(item).find('thumbnail').attr('url');
@@ -11,6 +11,10 @@ function startUpVideosDashboardController($scope, xmlhelper, $log, $http) {
                   video.link = $("guid", item).text();
                   $scope.videos.push(video);
               });
+
+        },
+        function (exception) {
+            console.error('ex from remote data', exception);
         });
     };
 }
@@ -18,13 +22,13 @@ function startUpVideosDashboardController($scope, xmlhelper, $log, $http) {
 angular.module("umbraco").controller("Umbraco.Dashboard.StartupVideosController", startUpVideosDashboardController);
 
 
-function startUpDynamicContentController($timeout, $scope, dashboardResource, assetsService, tourService, eventsService) {
+function startUpDynamicContentController($q, $timeout, $scope, dashboardResource, assetsService, tourService, eventsService) {
     var vm = this;
     var evts = [];
 
     vm.loading = true;
     vm.showDefault = false;
-    
+
     vm.startTour = startTour;
 
     function onInit() {
@@ -93,7 +97,7 @@ function startUpDynamicContentController($timeout, $scope, dashboardResource, as
             });
         });
     }));
-    
+
     //proxy remote css through the local server
     assetsService.loadCss(dashboardResource.getRemoteDashboardCssUrl("content"), $scope);
     dashboardResource.getRemoteDashboardContent("content").then(
@@ -117,7 +121,7 @@ function startUpDynamicContentController($timeout, $scope, dashboardResource, as
             vm.showDefault = true;
         });
 
-    
+
     onInit();
 
 }
@@ -125,54 +129,68 @@ function startUpDynamicContentController($timeout, $scope, dashboardResource, as
 angular.module("umbraco").controller("Umbraco.Dashboard.StartUpDynamicContentController", startUpDynamicContentController);
 
 
-function FormsController($scope, $route, $cookieStore, packageResource, localizationService) {
-    $scope.installForms = function(){
-        $scope.state = localizationService.localize("packager_installStateDownloading");
+function FormsController($scope, $cookies, packageResource, localizationService) {
+
+    var vm = this;
+
+    var labels = {};
+    var labelKeys = [
+        "packager_installStateDownloading",
+        "packager_installStateImporting",
+        "packager_installStateInstalling",
+        "packager_installStateRestarting",
+        "packager_installStateComplete"
+    ];
+
+    localizationService.localizeMany(labelKeys).then(function(values) {
+        labels.installStateDownloading = values[0];
+        labels.installStateImporting = values[1];
+        labels.installStateInstalling = values[2];
+        labels.installStateRestarting = values[3];
+        labels.installStateComplete = values[4];
+    });
+
+    vm.installForms = function() {
+        vm.state = labels.installStateDownloading;
         packageResource
             .fetch("CD44CF39-3D71-4C19-B6EE-948E1FAF0525")
             .then(function(pack) {
-                $scope.state = localizationService.localize("packager_installStateImporting");
+                    vm.state = labels.installStateImporting;
                     return packageResource.import(pack);
-                },
-                $scope.error)
+                }, vm.error)
             .then(function(pack) {
-                $scope.state = localizationService.localize("packager_installStateInstalling");
+                vm.state = labels.installStateInstalling;
                     return packageResource.installFiles(pack);
-                },
-                $scope.error)
+                }, vm.error)
             .then(function(pack) {
-                $scope.state = localizationService.localize("packager_installStateRestarting");
+                vm.state = labels.installStateRestarting;
                     return packageResource.installData(pack);
-                },
-                $scope.error)
+                }, vm.error)
             .then(function(pack) {
-                $scope.state = localizationService.localize("packager_installStateComplete");
+                vm.state = labels.installStateComplete;
                     return packageResource.cleanUp(pack);
-                },
-                $scope.error)
-            .then($scope.complete, $scope.error);
+                }, vm.error)
+            .then(vm.complete, vm.error);
     };
 
-    $scope.complete = function(result){
-        var url = window.location.href + "?init=true";
-        $cookieStore.put("umbPackageInstallId", result.packageGuid);
+    vm.complete = function(result) {
+        window.location.href + "?init=true";
+        $cookies.putObject("umbPackageInstallId", result.packageGuid);
         window.location.reload(true);
     };
 
-    $scope.error = function(err){
-        $scope.state = undefined;
-        $scope.error = err;
-        //This will return a rejection meaning that the promise change above will stop
+    vm.error = function(err) {
+        vm.state = undefined;
+        vm.error = err;
+        // This will return a rejection meaning that the promise change above will stop
         return $q.reject();
     };
-
 
     function Video_player (videoId) {
       // Get dom elements
       this.container      = document.getElementById(videoId);
-      this.video          = this.container.getElementsByTagName('video')[0];
 
-      //Create controls
+      // Create controls
       this.controls = document.createElement('div');
       this.controls.className="video-controls";
 
@@ -193,104 +211,6 @@ function FormsController($scope, $route, $cookieStore, packageResource, localiza
       this.controls.appendChild(this.loader);
       this.loader.appendChild(this.progress_bar);
     }
-
-
-    Video_player.prototype
-      .seeking = function() {
-        // get the value of the seekbar (hidden input[type="range"])
-        var time = this.video.duration * (this.seek_bar.value / 100);
-
-        // Update video to seekbar value
-        this.video.currentTime = time;
-      };
-
-    // Stop video when user initiates seeking
-    Video_player.prototype
-      .start_seek = function() {
-        this.video.pause();
-      };
-
-    // Start video when user stops seeking
-    Video_player.prototype
-      .stop_seek = function() {
-        this.video.play();
-      };
-
-    // Update the progressbar (span.loader) according to video.currentTime
-    Video_player.prototype
-      .update_progress_bar = function() {
-        // Get video progress in %
-        var value = (100 / this.video.duration) * this.video.currentTime;
-
-        // Update progressbar
-        this.progress_bar.style.width = value + '%';
-      };
-
-    // Bind progressbar to mouse when seeking
-    Video_player.prototype
-      .handle_mouse_move = function(event) {
-        // Get position of progressbar relative to browser window
-        var pos = this.progress_bar.getBoundingClientRect().left;
-
-        // Make sure event is reckonized cross-browser
-        event = event || window.event;
-
-        // Update progressbar
-        this.progress_bar.style.width = (event.clientX - pos) + "px";
-      };
-
-    // Eventlisteners for seeking
-    Video_player.prototype
-      .video_event_handler = function(videoPlayer, interval) {
-        // Update the progress bar
-        var animate_progress_bar = setInterval(function () {
-              videoPlayer.update_progress_bar();
-            }, interval);
-
-        // Fire when input value changes (user seeking)
-        videoPlayer.seek_bar
-          .addEventListener("change", function() {
-              videoPlayer.seeking();
-          });
-
-        // Fire when user clicks on seekbar
-        videoPlayer.seek_bar
-          .addEventListener("mousedown", function (clickEvent) {
-              // Pause video playback
-              videoPlayer.start_seek();
-
-              // Stop updating progressbar according to video progress
-              clearInterval(animate_progress_bar);
-
-              // Update progressbar to where user clicks
-              videoPlayer.handle_mouse_move(clickEvent);
-
-              // Bind progressbar to cursor
-              window.onmousemove = function(moveEvent){
-                videoPlayer.handle_mouse_move(moveEvent);
-              };
-          });
-
-        // Fire when user releases seekbar
-        videoPlayer.seek_bar
-          .addEventListener("mouseup", function () {
-
-              // Unbind progressbar from cursor
-              window.onmousemove = null;
-
-              // Start video playback
-              videoPlayer.stop_seek();
-
-              // Animate the progressbar
-              animate_progress_bar = setInterval(function () {
-                  videoPlayer.update_progress_bar();
-              }, interval);
-          });
-      };
-
-
-    var videoPlayer = new Video_player('video_1');
-    videoPlayer.video_event_handler(videoPlayer, 17);
 }
 
 angular.module("umbraco").controller("Umbraco.Dashboard.FormsDashboardController", FormsController);

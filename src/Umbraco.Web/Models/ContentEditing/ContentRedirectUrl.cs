@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Models.ContentEditing
@@ -20,5 +20,8 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "contentId")]
         public int ContentId { get; set; }
+
+        [DataMember(Name = "culture")]
+        public string Culture { get; set; }
     }
 }

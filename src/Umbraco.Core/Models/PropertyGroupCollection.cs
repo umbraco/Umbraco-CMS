@@ -5,25 +5,22 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
-using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
+
     /// <summary>
     /// Represents a collection of <see cref="PropertyGroup"/> objects
     /// </summary>
     [Serializable]
     [DataContract]
+    // TODO: Change this to ObservableDictionary so we can reduce the INotifyCollectionChanged implementation details
     public class PropertyGroupCollection : KeyedCollection<string, PropertyGroup>, INotifyCollectionChanged, IDeepCloneable
     {
         private readonly ReaderWriterLockSlim _addLocker = new ReaderWriterLockSlim();
-        
-        internal Action OnAdd;
 
         internal PropertyGroupCollection()
-        {
-            
-        }
+        { }
 
         public PropertyGroupCollection(IEnumerable<PropertyGroup> groups)
         {
@@ -37,15 +34,19 @@ namespace Umbraco.Core.Models
         /// <remarks></remarks>
         internal void Reset(IEnumerable<PropertyGroup> groups)
         {
+            //collection events will be raised in each of these calls
             Clear();
-            groups.ForEach(Add);
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+
+            //collection events will be raised in each of these calls
+            foreach (var group in groups)
+                Add(group);
         }
 
         protected override void SetItem(int index, PropertyGroup item)
         {
+            var oldItem = index >= 0 ? this[index] : item;
             base.SetItem(index, item);
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index));
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, item, oldItem));
         }
 
         protected override void RemoveItem(int index)
@@ -69,18 +70,21 @@ namespace Umbraco.Core.Models
 
         internal new void Add(PropertyGroup item)
         {
-            using (new WriteLock(_addLocker))
+            try
             {
-                //Note this is done to ensure existig groups can be renamed
+                _addLocker.EnterWriteLock();
+
+                //Note this is done to ensure existing groups can be renamed
                 if (item.HasIdentity && item.Id > 0)
                 {
-                    var exists = this.Contains(item.Id);
+                    var exists = Contains(item.Id);
                     if (exists)
                     {
-                        var keyExists = this.Contains(item.Name);
-                        if(keyExists)
-                            throw new Exception(string.Format("Naming conflict: Changing the name of PropertyGroup '{0}' would result in duplicates", item.Name));
+                        var keyExists = Contains(item.Name);
+                        if (keyExists)
+                            throw new Exception($"Naming conflict: Changing the name of PropertyGroup '{item.Name}' would result in duplicates");
 
+                        //collection events will be raised in SetItem
                         SetItem(IndexOfKey(item.Id), item);
                         return;
                     }
@@ -90,19 +94,22 @@ namespace Umbraco.Core.Models
                     var key = GetKeyForItem(item);
                     if (key != null)
                     {
-                        var exists = this.Contains(key);
+                        var exists = Contains(key);
                         if (exists)
                         {
+                            //collection events will be raised in SetItem
                             SetItem(IndexOfKey(key), item);
                             return;
                         }
                     }
                 }
-                
+                //collection events will be raised in InsertItem
                 base.Add(item);
-                OnAdd.IfNotNull(x => x.Invoke());//Could this not be replaced by a Mandate/Contract for ensuring item is not null
-
-                OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
+            }
+            finally
+            {
+                if (_addLocker.IsWriteLockHeld)
+                    _addLocker.ExitWriteLock();
             }
         }
 
@@ -132,25 +139,17 @@ namespace Umbraco.Core.Models
 
         public int IndexOfKey(string key)
         {
-            for (var i = 0; i < this.Count; i++)
-            {
+            for (var i = 0; i < Count; i++)
                 if (this[i].Name == key)
-                {
                     return i;
-                }
-            }
             return -1;
         }
 
         public int IndexOfKey(int id)
         {
-            for (var i = 0; i < this.Count; i++)
-            {
+            for (var i = 0; i < Count; i++)
                 if (this[i].Id == id)
-                {
                     return i;
-                }
-            }
             return -1;
         }
 
@@ -163,20 +162,17 @@ namespace Umbraco.Core.Models
 
         protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
         {
-            if (CollectionChanged != null)
-            {
-                CollectionChanged(this, args);
-            }
+            CollectionChanged?.Invoke(this, args);
         }
 
         public object DeepClone()
         {
-            var newGroup = new PropertyGroupCollection();
-            foreach (var p in this)
+            var clone = new PropertyGroupCollection();
+            foreach (var group in this)
             {
-                newGroup.Add((PropertyGroup)p.DeepClone());
-            }            
-            return newGroup;
+                clone.Add((PropertyGroup)group.DeepClone());
+            }
+            return clone;
         }
     }
 }

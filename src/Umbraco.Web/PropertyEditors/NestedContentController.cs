@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Services;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Mvc;
 
@@ -11,7 +12,8 @@ namespace Umbraco.Web.PropertyEditors
         [System.Web.Http.HttpGet]
         public IEnumerable<object> GetContentTypes()
         {
-            return Services.ContentTypeService.GetAllContentTypes()
+            return Services.ContentTypeService
+                .GetAllElementTypes()
                 .OrderBy(x => x.SortOrder)
                 .Select(x => new
                 {

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Web.Mvc;
 
 namespace Umbraco.Web.Mvc
@@ -7,8 +7,8 @@ namespace Umbraco.Web.Mvc
     /// Redirects to the current URL rendering an Umbraco page including it's query strings
     /// </summary>
     /// <remarks>
-    /// This is useful if you need to redirect 
-    /// to the current page but the current page is actually a rewritten URL normally done with something like 
+    /// This is useful if you need to redirect
+    /// to the current page but the current page is actually a rewritten URL normally done with something like
     /// Server.Transfer. It is also handy if you want to persist the query strings.
     /// </remarks>
     public class RedirectToUmbracoUrlResult : ActionResult
@@ -17,7 +17,7 @@ namespace Umbraco.Web.Mvc
 
         /// <summary>
         /// Creates a new RedirectToUmbracoResult
-        /// </summary>		
+        /// </summary>
         /// <param name="umbracoContext"></param>
         public RedirectToUmbracoUrlResult(UmbracoContext umbracoContext)
         {

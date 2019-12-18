@@ -9,7 +9,7 @@
 (function() {
    "use strict";
 
-   function ListViewLayoutsPreValsController($scope) {
+   function ListViewLayoutsPreValsController($scope, editorService) {
 
       var vm = this;
       vm.focusLayoutName = false;
@@ -28,12 +28,6 @@
       vm.hidePrompt = hidePrompt;
       vm.removeLayout = removeLayout;
       vm.openIconPicker = openIconPicker;
-
-      function activate() {
-
-
-
-      }
 
       function addLayout() {
 
@@ -62,24 +56,27 @@
          $scope.model.value.splice($index, 1);
       }
 
-      function openIconPicker(layout) {
-          vm.iconPickerDialog = {
-              view: "iconpicker",
-              show: true,
-              submit: function(model) {
-                  if (model.color) {
-                     layout.icon = model.icon + " " + model.color;
-                  } else {
-                     layout.icon = model.icon;
-                  }
-                  vm.focusLayoutName = true;
-                  vm.iconPickerDialog.show = false;
-                  vm.iconPickerDialog = null;
-              }
-          };
-      }
-
-      activate();
+       function openIconPicker(layout) {
+            var iconPicker = {
+                icon: layout.icon.split(' ')[0],
+                color: layout.icon.split(' ')[1],
+                submit: function (model) {
+                    if (model.icon) {
+                        if (model.color) {
+                            layout.icon = model.icon + " " + model.color;
+                        } else {
+                            layout.icon = model.icon;
+                        }
+                    }
+                    vm.focusLayoutName = true;
+                    editorService.close();
+                },
+                close: function() {
+                    editorService.close();
+                }
+            };
+            editorService.iconPicker(iconPicker);
+        }
 
    }
 

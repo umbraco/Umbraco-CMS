@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,7 +6,7 @@ namespace Umbraco.Core.Models.Membership
 {
     public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGroup>
     {
-        public ReadOnlyUserGroup(int id, string name, string icon, int? startContentId, int? startMediaId, string @alias, 
+        public ReadOnlyUserGroup(int id, string name, string icon, int? startContentId, int? startMediaId, string @alias,
             IEnumerable<string> allowedSections, IEnumerable<string> permissions)
         {
             Name = name;

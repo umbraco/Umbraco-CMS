@@ -1,10 +1,8 @@
-using System;
-using System.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using System.Linq;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
-using Umbraco.Core.PropertyEditors.ValueConverters;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Models
 {
@@ -15,37 +13,18 @@ namespace Umbraco.Core.Models
         /// </summary>
         public static string GetUrl(this IMedia media, string propertyAlias, ILogger logger)
         {
-            var propertyType = media.PropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyAlias));
-            if (propertyType == null) return string.Empty;
+            if (!media.Properties.TryGetValue(propertyAlias, out var property))
+                return string.Empty;
 
-            var val = media.Properties[propertyType];
-            if (val == null) return string.Empty;
-
-            var jsonString = val.Value as string;
-            if (jsonString == null) return string.Empty;
-
-            if (propertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias)
-                return jsonString;
-
-            if (propertyType.PropertyEditorAlias == Constants.PropertyEditors.ImageCropperAlias)
+            if (Current.PropertyEditors.TryGet(property.PropertyType.PropertyEditorAlias, out var editor)
+                && editor is IDataEditorWithMediaPath dataEditor)
             {
-                if (jsonString.DetectIsJson() == false)
-                    return jsonString;
-
-                try
-                {
-                    var json = JsonConvert.DeserializeObject<JObject>(jsonString);
-                    if (json["src"] != null)
-                        return json["src"].Value<string>();
-                }
-                catch (Exception ex)
-                {
-                    logger.Error<ImageCropperValueConverter>("Could not parse the string " + jsonString + " to a json object", ex);
-                    return string.Empty;
-                }
+                // TODO: would need to be adjusted to variations, when media become variants
+                var value = property.GetValue();
+                return dataEditor.GetMediaPath(value);
             }
 
-            // hrm, without knowing what it is, just adding a string here might not be very nice
+            // Without knowing what it is, just adding a string here might not be very nice
             return string.Empty;
         }
 

@@ -1,55 +1,92 @@
-<div class="umb-dialog-body with-footer" ng-controller="Umbraco.Editors.Content.CreateController" ng-cloak>
+<div ng-controller="Umbraco.Editors.Content.CreateController">
 
-    <div class="umb-pane">
-        <h5 ng-show="selectContentType"><localize key="create_createUnder">Create a page under</localize> {{currentNode.name}}</h5>
-        <h5 ng-show="selectBlueprint"><localize key="blueprints_selectBlueprint">Select a blueprint</localize></h5>
+    <umb-load-indicator ng-if="loading"></umb-load-indicator>
 
-        <p class="abstract" ng-if="allowedTypes && allowedTypes.length === 0">
-            <localize key="create_noDocumentTypes" />
-        </p>
+    <div ng-if="!loading" class="umb-dialog-body with-footer" ng-cloak>
 
-        <ul class="umb-actions umb-actions-child" ng-show="selectContentType">
+        <div class="umb-pane">
+            <h5 ng-show="selectContentType"><localize key="create_createUnder">Create a page under</localize> {{currentNode.name}}</h5>
+            <h5 ng-show="selectBlueprint"><localize key="blueprints_selectBlueprint">Select a blueprint</localize></h5>
 
-            <li data-element="action-create-{{docType.alias}}" ng-repeat="docType in allowedTypes | orderBy:'name':false">
-                <a ng-click="createOrSelectBlueprintIfAny(docType)">
-                    <i class="large {{docType.icon}}"></i>
-                    <span class="menu-label">
-                        {{docType.name}}
-                        <small>
-                            {{docType.description}}
-                        </small>
-                    </span>
-                </a>
-            </li>
+            <div ng-if="allowedTypes && allowedTypes.length === 0">
+                <p class="abstract" ng-if="!hasSettingsAccess"><localize key="create_noDocumentTypesWithNoSettingsAccess" /></p>
+                <div ng-if="hasSettingsAccess && currentNode.id >= 0">
+                    <p class="abstract">
+                        <localize key="create_noDocumentTypes" />
+                    </p>
+                    <button class="btn umb-outline" ng-click="editContentType()">
+                        <localize key="create_noDocumentTypesEditPermissions" />
+                    </button>
+                </div>
+                <div ng-if="hasSettingsAccess && currentNode.id < 0">
+                    <!-- There are existing document types, but none are allowed at root -->
+                    <p class="abstract" ng-if="countTypes > 0">
+                        <localize key="create_noDocumentTypesAllowedAtRoot" />
+                    </p>
 
-        </ul>
-        <ul class="umb-actions umb-actions-child" ng-show="selectBlueprint">
+                    <!-- There's no document types, help people create one -->
+                    <p class="abstract" ng-if="countTypes === 0">
+                        <localize key="create_noDocumentTypesAtRoot" />
+                    </p>
+                    <button class="btn umb-outline" ng-click="createContentType()" ng-if="countTypes === 0">
+                        <localize key="create_noDocumentTypesCreateNew" />
+                    </button>
+                </div>
+            </div>
 
-            <li ng-repeat="(key, value) in docType.blueprints | orderBy:'name':false">
-                <a ng-click="createFromBlueprint(key)">
-                    <i class="large {{docType.icon}}"></i>
-                    <span class="menu-label">
-                        {{value}}
-                    </span>
-                </a>
-            </li>
-            
-            <li class="sep" ng-show="allowBlank">
-                <a ng-click="createBlank(docType)">
-                    <i class="large {{docType.icon}}"></i>
-                    <span class="menu-label">
-                        <localize key="blueprints_blankBlueprint">Blank</localize>
-                    </span>
-                </a>
-            </li>
+            <ul class="umb-actions umb-actions-child" ng-if="selectContentType && allowedTypes.length > 0">
 
-        </ul>
+                <li class="umb-action" data-element="action-create-{{docType.alias}}" ng-repeat="docType in allowedTypes | orderBy:'name':false">
+                    <button class="umb-action-link umb-outline btn-reset" ng-click="createOrSelectBlueprintIfAny(docType)" umb-auto-focus ng-if="$index === 0">
+                        <i class="large icon {{docType.icon}}"></i>
+                        <span class="menu-label">
+                            {{docType.name}}
+                            <small>
+                                {{docType.description}}
+                            </small>
+                        </span>
+                    </button>
+                    <button class="umb-action-link umb-outline btn-reset" ng-click="createOrSelectBlueprintIfAny(docType)" ng-if="$index !== 0">
+                        <i class="large icon {{docType.icon}}"></i>
+                        <span class="menu-label">
+                            {{docType.name}}
+                            <small>
+                                {{docType.description}}
+                            </small>
+                        </span>
+                    </button>
+                </li>
 
+            </ul>
+            <ul class="umb-actions umb-actions-child" ng-if="selectBlueprint">
+
+                <li class="umb-action" ng-repeat="blueprint in selectableBlueprints | orderBy:'name':false track by $index">
+                    <button class="umb-action-link umb-outline btn-reset" ng-click="createFromBlueprint(blueprint.id)">
+                        <i class="large icon {{docType.icon}}"></i>
+                        <span class="menu-label">
+                            {{blueprint.name}}
+                        </span>
+                    </button>
+                </li>
+
+                <li class="umb-action sep" ng-show="allowBlank">
+                    <button class="umb-action-link umb-outline btn-reset" ng-click="createBlank(docType)">
+                        <i class="large icon {{docType.icon}}"></i>
+                        <span class="menu-label">
+                            <localize key="blueprints_blankBlueprint">Blank</localize>
+                        </span>
+                    </button>
+                </li>
+
+            </ul>
+
+        </div>
     </div>
-</div>
 
-<div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
-    <button class="btn btn-info" ng-click="nav.hideDialog(true)">
-        <localize key="buttons_somethingElse">Do something else</localize>
-    </button>
+    <div ng-if="!loading" class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+        <button class="btn btn-info umb-outline" ng-click="closeDialog(true)">
+            <localize key="buttons_somethingElse">All Actions</localize>
+        </button>
+    </div>
+
 </div>

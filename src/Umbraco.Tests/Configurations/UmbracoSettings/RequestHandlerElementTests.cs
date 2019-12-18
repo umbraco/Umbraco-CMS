@@ -8,25 +8,14 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
     public class RequestHandlerElementTests : UmbracoSettingsTests
     {
         [Test]
-        public void UseDomainPrefixes()
-        {
-            Assert.IsTrue(SettingsSection.RequestHandler.UseDomainPrefixes == false);
-            
-        }
-        [Test]
         public void AddTrailingSlash()
         {
-            Assert.IsTrue(SettingsSection.RequestHandler.AddTrailingSlash == true);            
+            Assert.IsTrue(SettingsSection.RequestHandler.AddTrailingSlash == true);
         }
-        [Test]
-        public void RemoveDoubleDashes()
-        {
-            Assert.IsTrue(SettingsSection.RequestHandler.RemoveDoubleDashes == true);
-            
-        }
+
         [Test]
         public void CharCollection()
-        {            
+        {
             var chars = @" ,"",',%,.,;,/,\,:,#,+,*,&,?,æ,ø,å,ä,ö,ü,ß,Ä,Ö,|,<,>";
             var items = chars.Split(',');
             Assert.AreEqual(items.Length, SettingsSection.RequestHandler.CharCollection.Count());
@@ -39,6 +28,6 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
             Assert.IsTrue(SettingsSection.RequestHandler.CharCollection
                                  .All(x => string.IsNullOrEmpty(x.Replacement) || vals.Split(',').Contains(x.Replacement)));
         }
-        
+
     }
 }

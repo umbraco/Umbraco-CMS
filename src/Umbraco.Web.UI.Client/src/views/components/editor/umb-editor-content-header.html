@@ -1,0 +1,92 @@
+<div data-element="editor-header" class="umb-editor-header" ng-class="{'-split-view-active': splitViewOpen === true}">
+
+    <div class="flex items-center" style="height: 100%;">
+
+        <div ng-if="showBackButton === true && splitViewOpen !== true" style="margin-right: 15px;">
+            <button type="button" class="umb-editor-header__back" ng-click="goBack()" prevent-default>
+                <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                <span class="sr-only"><localize key="visuallyHiddenTexts_goBack">Go back</localize></span>
+            </button>
+        </div>
+
+        <div class="flex items-center" style="flex: 1;">
+
+            <div id="nameField" class="umb-editor-header__name-and-description" style="flex: 1 1 auto;">
+                <div>
+                    <p tabindex="0" class="sr-only">
+                        {{a11yMessage}}
+                    </p>
+                </div>
+                <div class="umb-editor-header__name-wrapper">
+                    <label for="headerName" class="sr-only">{{a11yName}}</label>
+                    <ng-form name="headerNameForm">
+                        <input data-element="editor-name-field"
+                               type="text"
+                               class="umb-editor-header__name-input"
+                               localize="placeholder"
+                               placeholder="@placeholders_entername"
+                               name="headerName"
+                               id="headerName"
+                               ng-model="name"
+                               ng-class="{'name-is-empty': $parent.name===null || $parent.name===''}"
+                               ng-disabled="nameDisabled"
+                               umb-auto-focus
+                               focus-on-filled="true"
+                               val-server-field="{{serverValidationNameField}}"
+                               required
+                               aria-required="true"
+                               aria-invalid="{{contentForm.headerNameForm.headerName.$invalid ? true : false}}"
+                               autocomplete="off" maxlength="255" />
+                    </ng-form>
+
+                    <a ng-if="content.variants.length > 0 && hideChangeVariant !== true" class="umb-variant-switcher__toggle" href="" ng-click="vm.dropdownOpen = !vm.dropdownOpen" ng-class="{'--error': vm.errorsOnOtherVariants}">
+                        <span>{{vm.currentVariant.language.name}}</span>
+                        <ins class="umb-variant-switcher__expand" ng-class="{'icon-navigation-down': !vm.dropdownOpen, 'icon-navigation-up': vm.dropdownOpen}">&nbsp;</ins>
+                    </a>
+
+                    <span ng-if="hideChangeVariant" class="umb-variant-switcher__toggle">
+                        <span>{{vm.currentVariant.language.name}}</span>
+                    </span>
+
+                    <umb-dropdown ng-if="vm.dropdownOpen" style="min-width: 100%; max-height: 250px; overflow-y: auto; margin-top: 5px;" on-close="vm.dropdownOpen = false" umb-keyboard-list>
+                        <umb-dropdown-item class="umb-variant-switcher__item" ng-class="{'--current': variant.active, '--not-allowed': variantIsOpen(variant.language.culture), '--error': variantHasError(variant.language.culture)}" ng-repeat="variant in content.variants">
+                            <a href="" class="umb-variant-switcher__name-wrapper" ng-click="selectVariant($event, variant)" prevent-default>
+                                <span class="umb-variant-switcher__name">{{variant.language.name}}</span>
+                                <umb-variant-state variant="variant" class="umb-variant-switcher__state"></umb-variant-state>
+                            </a>
+                            <div ng-if="splitViewOpen !== true && !variant.active" class="umb-variant-switcher__split-view" ng-click="openInSplitView($event, variant)">Open in split view</div>
+                        </umb-dropdown-item>
+                    </umb-dropdown>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div ng-if="splitViewOpen">
+            <a class="umb-editor-header__close-split-view" href="" ng-click="closeSplitView()">
+                <i class="icon-delete"></i>
+            </a>
+        </div>
+
+        <div ng-if="content.apps && splitViewOpen !== true">
+            <umb-editor-navigation
+                data-element="editor-sub-views"
+                navigation="content.apps"
+                on-select="selectNavigationItem(item)"
+                on-anchor-select="selectAnchorItem(item, anchor)">
+            </umb-editor-navigation>
+        </div>
+
+        <div ng-if="menu.currentNode && splitViewOpen !== true && hideActionsMenu !== true">
+            <umb-editor-menu
+                data-element="editor-actions"
+                current-node="menu.currentNode"
+                current-section="{{menu.currentSection}}">
+            </umb-editor-menu>
+        </div>
+
+    </div>
+
+</div>

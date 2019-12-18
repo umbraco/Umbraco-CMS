@@ -1,45 +1,30 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Linq.Expressions;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
     /// <summary>
-    /// Represents a <see cref="RelationType"/> to DTO mapper used to translate the properties of the public api 
+    /// Represents a <see cref="RelationType"/> to DTO mapper used to translate the properties of the public api
     /// implementation to that of the database's DTO as sql: [tableName].[columnName].
     /// </summary>
     [MapperFor(typeof(RelationType))]
     [MapperFor(typeof(IRelationType))]
     public sealed class RelationTypeMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
+        public RelationTypeMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+            : base(sqlContext, maps)
+        { }
 
-        //NOTE: its an internal class but the ctor must be public since we're using Activator.CreateInstance to create it
-        // otherwise that would fail because there is no public constructor.
-        public RelationTypeMapper()
+        protected override void DefineMaps()
         {
-            BuildMap();
+            DefineMap<RelationType, RelationTypeDto>(nameof(RelationType.Id), nameof(RelationTypeDto.Id));
+            DefineMap<RelationType, RelationTypeDto>(nameof(RelationType.Alias), nameof(RelationTypeDto.Alias));
+            DefineMap<RelationType, RelationTypeDto>(nameof(RelationType.ChildObjectType), nameof(RelationTypeDto.ChildObjectType));
+            DefineMap<RelationType, RelationTypeDto>(nameof(RelationType.IsBidirectional), nameof(RelationTypeDto.Dual));
+            DefineMap<RelationType, RelationTypeDto>(nameof(RelationType.Name), nameof(RelationTypeDto.Name));
+            DefineMap<RelationType, RelationTypeDto>(nameof(RelationType.ParentObjectType), nameof(RelationTypeDto.ParentObjectType));
         }
-
-        #region Overrides of BaseMapper
-
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache
-        {
-            get { return PropertyInfoCacheInstance; }
-        }
-
-        internal override void BuildMap()
-        {
-            CacheMap<RelationType, RelationTypeDto>(src => src.Id, dto => dto.Id);
-            CacheMap<RelationType, RelationTypeDto>(src => src.Alias, dto => dto.Alias);
-            CacheMap<RelationType, RelationTypeDto>(src => src.ChildObjectType, dto => dto.ChildObjectType);
-            CacheMap<RelationType, RelationTypeDto>(src => src.IsBidirectional, dto => dto.Dual);
-            CacheMap<RelationType, RelationTypeDto>(src => src.Name, dto => dto.Name);
-            CacheMap<RelationType, RelationTypeDto>(src => src.ParentObjectType, dto => dto.ParentObjectType);
-        }
-
-        #endregion
     }
 }

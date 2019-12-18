@@ -8,21 +8,18 @@
 
 .umb-group-builder__group {
   min-height: 86px;
-  margin: 50px 0 0 0;
-  border: 2px solid @gray-7;
-  border-radius: 0 10px 10px 10px;
-  padding: 10px 10px 5px 10px;
+  border: 1px solid transparent;
+  border-radius: @baseBorderRadius;
   box-sizing: border-box;
-  position:relative;
-}
-
-.umb-group-builder__group.-active {
-  border-color: @turquoise;
+  background-color: @white;
+  position: relative;
+  box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);
 }
 
 .umb-group-builder__group.-inherited {
   border-color: @gray-9;
   animation: fadeIn 0.5s;
+  box-shadow: none;
 }
 
 .umb-group-builder__group.-placeholder {
@@ -31,10 +28,17 @@
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  border: 1px dashed @gray-8;
-  color: @turquoise-d1;
+  border: 1px dashed @gray-7;
+  background-color: transparent;
+  color: @ui-action-type;
   font-weight: bold;
   position: relative;
+  box-shadow: none;
+  &:hover {
+      color:@ui-action-type-hover;
+      text-decoration: none;
+      border-color: @ui-active-type-hover;
+  }
 }
 
 .umb-group-builder__group.-sortable {
@@ -56,42 +60,29 @@
 }
 
 .umb-group-builder__group-remove {
-  position: absolute;
-  top: -30px;
-  right: 20px;
+  position: relative;
+  margin-left: auto;
   font-size: 18px;
+  color: @ui-icon;
 }
 
 .umb-group-builder__group-remove:hover {
   cursor: pointer;
-  color: @turquoise;
+  color: @ui-icon-hover;
 }
 
 .umb-group-builder__group-title-wrapper {
   display: flex;
   align-items: center;
-  margin-left: -12px;
-  margin-top: -55px;
-}
-
-.umb-group-builder__group-title-wrapper.-placeholder {
-  position: absolute;
-  left: -1px;
-  top: -44px;
-  margin-left: 0;
-  margin-top: 0;
+  border-bottom: 1px solid @gray-9;
+  padding: 10px 15px 10px 10px;
 }
 
 .umb-group-builder__group-title {
-  padding: 5px 9px 0 9px;
-  height: 38px;
-  background: @white;
-  border: 2px solid @gray-7;
-  border-bottom: none;
-  border-radius: 10px 10px 0 0;
   font-weight: bold;
   display: flex;
   align-items: center;
+  color: @black;
 }
 
 .umb-group-builder__group-title-icon {
@@ -99,7 +90,7 @@
 }
 
 .umb-group-builder__group-title.-active {
-  border-color: @turquoise;
+  border-color: @blueMid;
 }
 
 .umb-group-builder__group-title.-placeholder {
@@ -116,8 +107,12 @@ input.umb-group-builder__group-title-input {
   border-color: transparent;
   background: transparent;
   font-weight: bold;
-  color: @gray-3;
+  color: @black;
   margin-bottom: 0;
+}
+
+input.umb-group-builder__group-title-input:disabled:hover {
+    border-color: transparent;
 }
 
 .umb-group-builder__group-title-input:hover {
@@ -130,17 +125,36 @@ input.umb-group-builder__group-title-input {
 
 .umb-group-builder__group-inherited-label {
   font-size: 13px;
-  color: @gray-8;
   display: inline-block;
   position: relative;
   top: 2px;
-  margin-left: 10px;
 }
 
 .umb-group-builder__group-sort-order {
+    margin-right: 10px;
+    margin-left: auto;
+}
+
+.umb-group-builder__group-add-property {
+    min-height: 46px;
+    margin-right: 45px;
+    margin-left: 270px;
+    border-radius: 3px;
+    
     display: flex;
+    justify-content: center;
     align-items: center;
-    margin-left: 10px;
+    cursor: pointer;
+    border: 1px dashed @gray-7;
+    background-color: transparent;
+    color: @ui-action-type;
+    font-weight: bold;
+    position: relative;
+    &:hover {
+        color:@ui-action-type-hover;
+        text-decoration: none;
+        border-color: @ui-active-type-hover;
+    }
 }
 
 /* ---------- PROPERTIES ---------- */
@@ -148,7 +162,8 @@ input.umb-group-builder__group-title-input {
 .umb-group-builder__properties {
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 15px;
+  padding-right: 5px;
   min-height: 35px; // the height of a sortable property
 }
 
@@ -156,33 +171,21 @@ input.umb-group-builder__group-title-input {
   position: relative;
   display: flex;
   flex-flow: row;
-  margin-bottom: 5px;
-  border: 1px solid transparent;
-  border-radius: 5px;
-  padding: 5px;
   box-sizing: border-box;
+  border-bottom: 1px solid @gray-10; 
+  padding: 10px 0;
 }
 
-.umb-group-builder__property:hover {
-  border: 1px dashed @inputBorder;
+.umb-group-builder__property:first-of-type {
+  padding-top: 0;
 }
 
-.umb-group-builder__property.-placeholder {
-  background: @white;
-  border: 1px dashed @gray-8;
-  border-radius: 5px;
-  cursor: pointer;
-  align-items: center;
-  animation: fadeIn 0.5s;
+.umb-group-builder__property:last-of-type {
+  margin-bottom: 15px;
 }
 
 .umb-group-builder__property.-inherited {
-  border: transparent;
   animation: fadeIn 0.5s;
-}
-
-.umb-group-builder__property.-inherited:hover {
-  border: transparent;
 }
 
 .umb-group-builder__property.-locked {
@@ -197,14 +200,16 @@ input.umb-group-builder__group-title-input {
 .umb-group-builder__property.-sortable,
 .umb-group-builder__property.-sortable-locked {
     min-height: 35px;
-    border-radius: 5px;
+    border-radius: @baseBorderRadius;
     border: none;
     animation: none;
     align-items: center;
+    padding: 5px 10px;
+    margin-bottom: 5px;
 }
 
 .umb-group-builder__property.-sortable {
-  background: @gray-9;
+  background: @gray-10;
   color: @gray-1;
   cursor: move;
 }
@@ -216,16 +221,17 @@ input.umb-group-builder__group-title-input {
 
 
 .umb-group-builder__property-meta {
-  flex: 0 0 175px;
+  flex: 0 0 250px;
   margin-right: 20px;
 }
 
 .umb-group-builder__property-meta.-full-width {
   flex: 1;
+  margin-right: 0;
 }
 
 .umb-group-builder__property-meta-alias {
-  font-size: 10px;
+  font-size: 12px;
   color: @gray-3;
   word-break: break-word;
   line-height: 1.5;
@@ -245,6 +251,9 @@ input.umb-group-builder__group-title-input {
   overflow: hidden;
   border-color: transparent;
   background: transparent;
+    &:focus {
+        border-color: @inputBorderFocus;
+    }
 }
 
 .umb-group-builder__property-meta-label textarea.ng-invalid {
@@ -264,27 +273,40 @@ input.umb-group-builder__group-title-input {
   overflow: hidden;
   border-color: transparent;
   background: transparent;
+    &:focus {
+        border-color: @inputBorderFocus;
+    }
 }
 
 .umb-group-builder__property-preview {
-  flex: 1;
-  height: 30px;
-  overflow: hidden;
-  position: relative;
-  padding: 35px 10px 25px 10px;
-  background: url("../img/checkered-background-20.png");
+    flex: 1;
+    height: 30px;
+    overflow: hidden;
+    position: relative;
+    padding: 35px 10px 25px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+
+    &::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(225,225,225,.5);
+        transition: opacity 120ms;
+    }
 }
 
-.umb-group-builder__property-preview:hover {
-  cursor: pointer;
+.umb-group-builder__property-preview:not(.-not-clickable):hover {
+    &::after {
+        opacity: .66;
+    }
 }
 
-.umb-group-builder__property-preview:focus {
-  outline: none;
-}
-
-.umb-group-builder__property-preview.-not-clickable:hover {
-  cursor: auto;
+.umb-group-builder__property-preview.-not-clickable {
+    cursor: auto;
 }
 
 .umb-group-builder__property-preview .help-inline {
@@ -304,29 +326,60 @@ input.umb-group-builder__group-title-input {
   opacity: 0.8
 }
 
+
+.umb-group-builder__open-settings {
+    position: absolute;
+    z-index:1;
+    top: 0;
+    bottom:0;
+    left: 0;
+    width: 100%;
+    background-color: transparent;
+    border: none;
+    &:focus {
+        outline:0;
+        border: 1px solid @inputBorderFocus;
+    }
+}
+
 .umb-group-builder__property-actions {
-  flex: 0 0 40px;
-  text-align: center;
-  margin: 15px 0 0 15px;
+    flex: 0 0 44px;
+    text-align: right;
+    margin-top: 7px;
 }
 
 .umb-group-builder__property-action {
-  margin: 0 0 10px 0;
-  display: block;
-  font-size: 18px;
-  position: relative;
-  cursor: pointer;
-}
-
-.umb-group-builder__property-action:hover {
-    color: @turquoise;
+    
+    position: relative;
+    margin: 5px 0;
+    
+    > button {
+        border: none;
+        
+        font-size: 18px;
+        position: relative;
+        cursor: pointer;
+        color: @ui-icon;
+        
+        margin: 0;
+        padding: 5px 10px;
+        width: auto;
+        overflow: visible;
+        background: transparent;
+        line-height: normal;
+        -webkit-appearance: none;
+        
+        &:hover, &:focus  {
+            color: @ui-icon-hover;
+        }
+    }
 }
 
 .umb-group-builder__property-tags {
     position: absolute;
     z-index: 20;
-    top: 0;
-    left: 0;
+    top: 4px;
+    left: 4px;
     display: flex;
     flex-direction: row;
 }
@@ -339,9 +392,10 @@ input.umb-group-builder__group-title-input {
 .umb-group-builder__property-tag {
     font-size: 12px;
     background-color: @gray-8;
-    margin-left: 10px;
+    margin-left: 4px;
     padding: 0 4px;
     display: flex;
+    border-radius: 3px;
 }
 
 .umb-group-builder__property-tag:first-child {
@@ -354,42 +408,6 @@ input.umb-group-builder__group-title-input {
 
 .umb-group-builder__property-tag-icon {
     margin-right: 3px;
-}
-
-
-/* ---------- PLACEHOLDER BOX ---------- */
-
-.umb-group-builder__placeholder-box {
-  background: @gray-9;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  font-weight: bold;
-  color: @turquoise-d1;
-}
-
-.umb-group-builder__placeholder-box.-input {
-  height: 10px;
-  margin-bottom: 5px;
-}
-
-.umb-group-builder__placeholder-box.-input-small {
-  height: 5px;
-  margin-bottom: 5px;
-  width: 25%;
-}
-
-.umb-group-builder__placeholder-box.-text-full-width {
-  height: 3px;
-  margin-bottom: 3px;
-}
-
-.umb-group-builder__placeholder-box.-text-short {
-  height: 3px;
-  margin-bottom: 3px;
-  width: 75%;
 }
 
 /* ---------- SORTABLE ---------- */
@@ -417,10 +435,15 @@ input.umb-group-builder__group-title-input {
   text-align: center;
 }
 
+input.umb-group-builder__group-sort-value {
+  margin-bottom: 0;
+  margin-left: auto;
+}
+
 
 /* ---------- DIALOGS ---------- */
 
-.umb-overlay .show-validation .ng-invalid-val-required-component .editor-placeholder {
+.show-validation .edit-property-settings .ng-invalid-val-required-component .editor-placeholder {
    border-color: @red;
    color: @red;
 }
@@ -460,20 +483,21 @@ input.umb-group-builder__group-title-input {
     }
 
     .editor-placeholder {
-        border: 1px dashed @gray-8;
+        border: 1px dashed @ui-action-border;
         width: 100%;
         height: 80px;
         line-height: 80px;
         text-align: center;
         display: block;
         border-radius: 5px;
-        color: @gray-3;
         font-weight: bold;
         font-size: 14px;
-        color: @turquoise-d1;
+        color: @ui-action-type;
 
         &:hover {
             text-decoration: none;
+            color: @ui-action-type-hover;
+            border-color: @ui-action-border-hover;
         }
     }
 
@@ -530,7 +554,13 @@ input.umb-group-builder__group-title-input {
         overflow: hidden;
     }
 
-    .editor-validation-pattern{
+    .editor-validation-message {
+        min-width: 100%;
+        min-height: 25px;
+        margin-top: 4px;
+    }
+
+    .editor-validation-pattern {
         border: 1px solid @gray-7;
         margin: 10px 0 0;
         padding: 6px;

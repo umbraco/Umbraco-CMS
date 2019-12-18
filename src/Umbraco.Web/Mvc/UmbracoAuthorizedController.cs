@@ -1,44 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
-using umbraco.BusinessLogic;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Mvc
 {
     /// <summary>
-	/// A base MVC controller for use in the back office that ensures that every call to it authorizes the current user.
-	/// </summary>
-	/// <remarks>
-	/// This controller essentially just uses a global UmbracoAuthorizeAttribute, inheritors that require more granular control over the 
-	/// authorization of each method can use this attribute instead of inheriting from this controller.
-	/// </remarks>
-	[UmbracoAuthorize]
+    /// Provides a base class for authorized Umbraco controllers.
+    /// </summary>
+    /// <remarks>
+    /// This controller essentially just uses a global UmbracoAuthorizeAttribute, inheritors that require more granular control over the
+    /// authorization of each method can use this attribute instead of inheriting from this controller.
+    /// </remarks>
+    [UmbracoAuthorize]
     [DisableBrowserCache]
     public abstract class UmbracoAuthorizedController : UmbracoController
-	{
-
-        private bool _userisValidated = false;
-
-        /// <summary>
-        /// Returns the currently logged in Umbraco User
-        /// </summary>
-        [Obsolete("This should no longer be used since it returns the legacy user object, use The Security.CurrentUser instead to return the proper user object")]
-        protected User UmbracoUser
+    {
+        protected UmbracoAuthorizedController()
         {
-            get
-            {
-                if (!_userisValidated)
-                {
-                    Security.ValidateCurrentUser();
-                    _userisValidated = true;
-                }
-                return new User(Security.CurrentUser);
-            }
         }
 
-	}
+        protected UmbracoAuthorizedController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
+            : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger, umbracoHelper)
+        {
+        }
+    }
 }

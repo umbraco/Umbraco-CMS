@@ -1,0 +1,55 @@
+<div class="umbracoDialog umb-dialog-body with-footer" ng-controller="Umbraco.Editors.RelationTypes.CreateController as vm" ng-cloak>
+    <div class="umb-pane">
+        <form novalidate name="createRelationTypeForm"
+              val-form-manager
+              ng-submit="vm.createRelationType()">
+
+            <!-- Name -->
+            <umb-control-group label="@relationType_name">
+                <input type="text" name="relationTypeName" ng-model="vm.relationType.name" class="umb-textstring textstring input-block-level" umb-auto-focus required />
+            </umb-control-group>
+
+            <!-- Direction -->
+            <umb-control-group label="@relationType_direction">
+                <ul class="unstyled">
+                    <li>
+                        <label class="radio">
+                            <umb-radiobutton name="relationType-direction" value="false" model="vm.relationType.isBidirectional" />
+                            <localize key="relationType_parentToChild">Parent to child</localize>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="radio">
+                            <umb-radiobutton name="relationType-direction" value="true" model="vm.relationType.isBidirectional" />
+                            <localize key="relationType_bidirectional">Bidirectional</localize>
+                        </label>
+                    </li>
+                </ul>
+            </umb-control-group>
+
+            <!-- Parent -->
+            <umb-control-group label="@relationType_parent">
+                <select name="relationType-parent"
+                        ng-model="vm.relationType.parentObjectType"
+                        class="umb-property-editor umb-dropdown"
+                        required>
+                    <option ng-repeat="objectType in vm.objectTypes" value="{{objectType.id}}">{{objectType.name}}</option>
+                </select>
+            </umb-control-group>
+
+            <!-- Child -->
+            <umb-control-group label="@relationType_child">
+                <select name="relationType-child"
+                        ng-model="vm.relationType.childObjectType"
+                        class="umb-property-editor umb-dropdown"
+                        required>
+                    <option ng-repeat="objectType in vm.objectTypes" value="{{objectType.id}}">{{objectType.name}}</option>
+                </select>
+            </umb-control-group>
+
+            <button type="submit" class="btn btn-primary">
+                <localize key="general_create">Create</localize>
+            </button>
+        </form>
+    </div>
+</div>

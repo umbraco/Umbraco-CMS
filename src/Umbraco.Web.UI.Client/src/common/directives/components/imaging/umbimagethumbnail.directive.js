@@ -27,34 +27,34 @@ angular.module("umbraco.directives")
 					var $image = element.find("img");
 					scope.loaded = false;
 
-					$image.load(function(){
-						$timeout(function(){
-							$image.width("auto");
-							$image.height("auto");
+                    $image.on("load", function() {
+                        $timeout(function () {
+                            $image.width("auto");
+                            $image.height("auto");
 
-							scope.image = {};
-							scope.image.width = $image[0].width;
-							scope.image.height = $image[0].height;
+                            scope.image = {};
+                            scope.image.width = $image[0].width;
+                            scope.image.height = $image[0].height;
 
-							//we force a lower thumbnail size to fit the max size
-							//we do not compare to the image dimensions, but the thumbs
-							if(scope.maxSize){
-								var ratioCalculation = cropperHelper.calculateAspectRatioFit(
-										scope.width,
-										scope.height,
-										scope.maxSize,
-										scope.maxSize,
-										false);
+                            //we force a lower thumbnail size to fit the max size
+                            //we do not compare to the image dimensions, but the thumbs
+                            if (scope.maxSize) {
+                                var ratioCalculation = cropperHelper.calculateAspectRatioFit(
+                                    scope.width,
+                                    scope.height,
+                                    scope.maxSize,
+                                    scope.maxSize,
+                                    false);
 
-								//so if we have a max size, override the thumb sizes
-								scope.width = ratioCalculation.width;
-								scope.height = ratioCalculation.height;
-							}
+                                //so if we have a max size, override the thumb sizes
+                                scope.width = ratioCalculation.width;
+                                scope.height = ratioCalculation.height;
+                            }
 
-							setPreviewStyle();
-							scope.loaded = true;
-						});
-					});
+                            setPreviewStyle();
+                            scope.loaded = true;
+                        });
+                    })
 
 					/// WATCHERS ////
 					scope.$watchCollection('[crop, center]', function(newValues, oldValues){

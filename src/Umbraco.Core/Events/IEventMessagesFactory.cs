@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Umbraco.Core.Events
 {
@@ -8,5 +8,7 @@ namespace Umbraco.Core.Events
     public interface IEventMessagesFactory
     {
         EventMessages Get();
+
+        EventMessages GetOrDefault();
     }
 }

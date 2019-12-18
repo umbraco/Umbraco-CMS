@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Core.Models
@@ -9,7 +8,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     /// <typeparam name="T"></typeparam>
     [DataContract(Name = "pagedCollection", Namespace = "")]
-    public class PagedResult<T>
+    public abstract class PagedResult
     {
         public PagedResult(long totalItems, long pageNumber, long pageSize)
         {
@@ -19,7 +18,7 @@ namespace Umbraco.Core.Models
 
             if (pageSize > 0)
             {
-                TotalPages = (long)Math.Ceiling(totalItems / (Decimal)pageSize);
+                TotalPages = (long)Math.Ceiling(totalItems / (decimal)pageSize);
             }
             else
             {
@@ -38,9 +37,6 @@ namespace Umbraco.Core.Models
 
         [DataMember(Name = "totalItems")]
         public long TotalItems { get; private set; }
-
-        [DataMember(Name = "items")]
-        public IEnumerable<T> Items { get; set; }
 
         /// <summary>
         /// Calculates the skip size based on the paged parameters specified

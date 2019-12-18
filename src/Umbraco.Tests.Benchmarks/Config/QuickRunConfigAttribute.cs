@@ -1,13 +1,14 @@
-﻿using BenchmarkDotNet.Configs;
+﻿using System;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
-using System;
 
 namespace Umbraco.Tests.Benchmarks.Config
 {
     /// <summary>
     /// Configures the benchmark to run with less warmup and a shorter iteration time than the standard benchmark.
     /// </summary>
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public class QuickRunConfigAttribute : Attribute, IConfigSource
     {
         /// <summary>
@@ -15,11 +16,11 @@ namespace Umbraco.Tests.Benchmarks.Config
         /// </summary>
         public QuickRunConfigAttribute()
         {
-            Config = (ManualConfig) ManualConfig.CreateEmpty()
+            this.Config = (ManualConfig)ManualConfig.CreateEmpty()
                 .With(Job.Default.WithLaunchCount(1) // benchmark process will be launched only once
                 .WithIterationTime(new TimeInterval(100, TimeUnit.Millisecond)) // 100ms per iteration
                 .WithWarmupCount(3) // 3 warmup iteration
-                .WithTargetCount(3)); // 3 target iteration
+                .WithIterationCount(3)); // 3 target iteration
         }
 
         /// <summary>
@@ -28,6 +29,6 @@ namespace Umbraco.Tests.Benchmarks.Config
         protected ManualConfig Config { get; }
 
         /// <inheritdoc/>
-        IConfig IConfigSource.Config => Config;
+        IConfig IConfigSource.Config => this.Config;
     }
 }

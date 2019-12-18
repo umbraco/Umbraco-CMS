@@ -1,0 +1,150 @@
+.umb-dashboards-forms-install {
+    background: url('../img/forms/installer-background.png');
+    background-repeat: repeat-x;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding-top: 30px;
+    background-color: @white;
+    overflow: auto;
+    display: flex;
+
+    small {
+        font-size: 14px;
+        opacity: .5;
+    }
+
+    .umb-loader {
+        width: 640px;
+        height: 4px;
+    }
+
+    .video_player {
+        video {
+            width: 100%;
+            max-width: 640px;
+            border: 1px solid @gray-9;
+            border-left: none;
+            border-bottom: none;
+            box-sizing: border-box;
+        }
+
+        input[type="range"] {
+            position: relative;
+            z-index: 999;
+            max-width: 640px;
+            width: 100%;
+            margin: 0 auto;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-ms-fill-lower, input[type="range"]::-ms-fill-upper {
+            background: transparent;
+        }
+
+        input[type="range"]::-ms-tooltip {
+            display: none;
+        }
+
+        .video-controls {
+            position: relative;
+            max-width: 640px;
+            height: 20px;
+            margin: -13px auto 40px;
+            opacity: .8;
+        }
+
+        .loader {
+            display: block;
+            width: 100%;
+            height: 3px;
+            margin-top: -13px;
+            background-color: @gray-10;
+        }
+
+        .progress-bar {
+            display: block;
+            box-sizing: border-box;
+            max-width: 100%;
+            width: 200px;
+            height: 100%;
+            background: @gray-5;
+        }
+
+        .video-controls, .loader, .progress-bar {
+            transition: all 150ms ease-in-out;
+        }
+
+        .progress-bar {
+            transition-property: background;
+        }
+
+        .video_player video:hover + .video-controls, .video-controls:hover {
+            margin-top: -19px;
+            margin-bottom: 46px;
+            opacity: 1;
+        }
+
+        .video_player video:hover + .video-controls .loader, .video-controls:hover .loader {
+            height: 8px;
+        }
+
+        .video_player video:hover + .video-controls .progress-bar, .video-controls:hover .progress-bar {
+            background: @blueMid;
+        }
+    }
+
+    .forms-install-button {
+        .btn {
+            padding: 14px 40px;
+        }
+    }
+
+    .step-text {
+        font-size: 16px;
+        line-height: 1.5;
+        color: @gray;
+        margin-bottom: 20px;
+    }
+
+    .installing {
+        position: relative;
+    }
+
+    .installer-wrapper {
+        max-width: 800px;
+        text-align: center;
+        margin: auto;
+        padding: 20px;
+    }
+
+    .installer-intro {
+        overflow: hidden;
+        margin: 0 auto 30px;
+        height: 80px;
+        line-height: 80px;
+        text-align: center;
+        position: relative;
+        display: flex;
+        justify-content: center;
+
+        .icon, h3 {
+            display: inline-block;
+        }
+
+        .icon {
+            font-size: 80px;
+        }
+
+        h3 {
+            margin: 0 0 0 20px;
+            line-height: 80px;
+            font-weight: 700;
+            font-size: 36px;
+            letter-spacing: -1px;
+        }
+    }
+}

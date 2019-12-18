@@ -7,15 +7,15 @@
 **/
 
 //share property editor directive function
-var _umbPropertyEditor = function (umbPropEditorHelper) {
+function umbPropEditor(umbPropEditorHelper) {
         return {
             scope: {
                 model: "=",
                 isPreValue: "@",
-                preview: "@"
+                preview: "<"
             },
             
-            require: "^form",
+            require: "^^form",
             restrict: 'E',
             replace: true,      
             templateUrl: 'views/components/property/umb-property-editor.html',
@@ -30,13 +30,10 @@ var _umbPropertyEditor = function (umbPropEditorHelper) {
                    scope.model.alias = Math.random().toString(36).slice(2);
                 }
 
-                scope.$watch("model.view", function(val){
-                    scope.propertyEditorView = umbPropEditorHelper.getViewPath(scope.model.view, scope.isPreValue);
-                });
+                scope.propertyEditorView = umbPropEditorHelper.getViewPath(scope.model.view, scope.isPreValue);
+                
             }
         };
     };
 
-//Preffered is the umb-property-editor as its more explicit - but we keep umb-editor for backwards compat
-angular.module("umbraco.directives").directive('umbPropertyEditor', _umbPropertyEditor);
-angular.module("umbraco.directives").directive('umbEditor', _umbPropertyEditor);
+angular.module("umbraco.directives").directive('umbPropertyEditor', umbPropEditor);

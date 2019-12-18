@@ -4,7 +4,6 @@
     {
         Unknown = 0, // default
         PartialView = 1,
-        PartialViewMacro = 2,
-        MacroScript = 3
+        PartialViewMacro = 2
     }
 }

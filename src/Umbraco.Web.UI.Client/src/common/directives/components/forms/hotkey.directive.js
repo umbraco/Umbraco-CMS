@@ -4,7 +4,7 @@
 **/
 
 angular.module("umbraco.directives")
-    .directive('hotkey', function($window, keyboardService, $log) {
+    .directive('hotkey', function($window, keyboardService, $log, focusService) {
 
         return function(scope, el, attrs) {
 
@@ -28,7 +28,9 @@ angular.module("umbraco.directives")
                     }
 
                     keyboardService.bind(keyCombo, function() {
-
+                        
+                        focusService.rememberFocus();
+                        
                         var element = $(el);
                         var activeElementType = document.activeElement.tagName;
                         var clickableElements = ["A", "BUTTON"];
@@ -43,15 +45,15 @@ angular.module("umbraco.directives")
 
                                 // when keycombo is enter and a link or button has focus - click the link or button instead of using the hotkey
                                 if (keyCombo === "enter" && clickableElements.indexOf(activeElementType) === 0) {
-                                    document.activeElement.click();
+                                    document.activeElement.trigger( "click" );
                                 } else {
-                                    element.click();
+                                    element.trigger("click");
                                 }
 
                             }
 
                         } else {
-                            element.focus();
+                            element.trigger("focus");
                         }
 
                     }, options);

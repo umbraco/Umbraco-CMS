@@ -69,21 +69,13 @@ Use this directive to render a tooltip.
 (function() {
    'use strict';
 
-   function TooltipDirective($timeout) {
+   function TooltipDirective() {
 
       function link(scope, el, attr, ctrl) {
 
          scope.tooltipStyles = {};
          scope.tooltipStyles.left = 0;
          scope.tooltipStyles.top = 0;
-
-         function activate() {
-
-            $timeout(function() {
-               setTooltipPosition(scope.event);
-            });
-
-         }
 
          function setTooltipPosition(event) {
 
@@ -104,8 +96,8 @@ Use this directive to render a tooltip.
             };
 
             // element size
-            elementHeight = el.context.clientHeight;
-            elementWidth = el.context.clientWidth;
+            elementHeight = el[0].clientHeight;
+            elementWidth = el[0].clientWidth;
 
             position.left = event.pageX - (elementWidth / 2);
             position.top = event.pageY;
@@ -141,7 +133,7 @@ Use this directive to render a tooltip.
 
          }
 
-         activate();
+         setTooltipPosition(scope.event);
 
       }
 

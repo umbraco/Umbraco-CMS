@@ -91,14 +91,18 @@ Use this directive to generate a pagination.
       function link(scope, el, attr, ctrl) {
 
          function activate() {
+            // page number is sometimes a string - let's make sure it's an int before we do anything with it
+            if (scope.pageNumber) {
+                scope.pageNumber = parseInt(scope.pageNumber);
+            }
 
-            scope.pagination = [];
-
+            let tempPagination = [];
+             
             var i = 0;
 
             if (scope.totalPages <= 10) {
                 for (i = 0; i < scope.totalPages; i++) {
-                    scope.pagination.push({
+                    tempPagination.push({
                         val: (i + 1),
                         isActive: scope.pageNumber === (i + 1)
                     });
@@ -115,7 +119,7 @@ Use this directive to generate a pagination.
                 start = Math.min(maxIndex, start);
 
                 for (i = start; i < (10 + start) ; i++) {
-                    scope.pagination.push({
+                    tempPagination.push({
                         val: (i + 1),
                         isActive: scope.pageNumber === (i + 1)
                     });
@@ -123,15 +127,22 @@ Use this directive to generate a pagination.
 
                 //now, if the start is greater than 0 then '1' will not be displayed, so do the elipses thing
                 if (start > 0) {
-                    scope.pagination.unshift({ name: localizationService.localize("general_first"), val: 1, isActive: false }, {val: "...",isActive: false});
+                    localizationService.localize("general_first").then(function(value){
+                        var firstLabel = value;
+                        tempPagination.unshift({ name: firstLabel, val: 1, isActive: false }, {val: "...",isActive: false});
+                    });
                 }
 
                 //same for the end
                 if (start < maxIndex) {
-                    scope.pagination.push({ val: "...", isActive: false }, { name: localizationService.localize("general_last"), val: scope.totalPages, isActive: false });
+                    localizationService.localize("general_last").then(function(value){
+                        var lastLabel = value;
+                        tempPagination.push({ val: "...", isActive: false }, { name: lastLabel, val: scope.totalPages, isActive: false });
+                    });
                 }
             }
 
+            scope.pagination = tempPagination;
          }
 
          scope.next = function () {

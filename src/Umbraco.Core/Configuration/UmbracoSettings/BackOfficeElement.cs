@@ -5,14 +5,8 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
     internal class BackOfficeElement : UmbracoConfigurationElement, IBackOfficeSection
     {
         [ConfigurationProperty("tours")]
-        internal TourConfigElement Tours
-        {
-            get { return (TourConfigElement)this["tours"]; }
-        }
+        internal TourConfigElement Tours => (TourConfigElement)this["tours"];
 
-        ITourSection IBackOfficeSection.Tours
-        {
-            get { return Tours; }
-        }
+        ITourSection IBackOfficeSection.Tours => Tours;
     }
 }

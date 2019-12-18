@@ -1,15 +1,105 @@
-.umb-nav-tabs {
-  position: absolute;
-  z-index: 999;
+.umb-tabs-nav {
+    margin-left: 0;
+    margin-bottom: 0;
+    list-style: none;
+    border-bottom: 1px solid @gray-9;
+    display: block;
+    margin-bottom: 20px;
 }
 
-.umb-nav-tabs.-padding-left {
-  padding-left: 20px;
+.umb-tab {
+    display: inline-flex;
+    position: relative;
+    top: 1px;
 }
 
-.umb-tab-content {
-  padding-top: 20px;
-  position: relative;
-  top: 31px;
-  border-top: 1px solid @purple-l3;
+.umb-tab > a {
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    
+    cursor: pointer;
+    //border-bottom: 4px solid transparent;
+    color: @ui-light-type;
+    padding: 5px 20px 15px 20px;
+    transition: color 150ms ease-in-out;
+    &:focus {
+        color: @ui-light-type-hover;
+    }
+    &:hover {
+        color: @ui-light-type-hover;
+        text-decoration: none;
+    }
+    &::after {
+        content: "";
+        height: 0px;
+        left: 14px;
+        right: 14px;
+        background-color: @ui-light-active-border;
+        position: absolute;
+        bottom: 0;
+        border-radius: 3px 3px 0 0;
+        opacity: 0;
+        transition: all .2s linear;
+    }
+}
+
+
+.umb-tab--active > a {
+    color: @ui-light-active-type;
+    //border-bottom-color: @ui-active;
+    /*
+    &:focus {
+        border-bottom-color: @ui-active;
+    }
+    &:hover {
+        border-bottom-color: @ui-active-type-hover;
+    }
+    */
+    &::after {
+        opacity: 1;
+        height: 4px;
+    }
+}
+
+.show-validation .umb-tab--error > a,
+.show-validation .umb-tab--error > a:hover,
+.show-validation .umb-tab--error > a:focus {
+  color: @white !important;
+  background-color: @red !important;
+  border-color: @errorBorder;
+}
+
+.show-validation .umb-tab--error a:before {
+  content: "\e25d";
+  font-family: 'icomoon';
+  margin-right: 5px;
+  vertical-align: top;
+}
+
+// tabs tray
+
+.umb-tabs-tray {
+    right: 0;
+    left: auto;
+}
+
+.umb-tabs-tray > a {
+    cursor: pointer;
+}
+
+.umb-tabs-tray-item--active {
+    border-left: 2px solid @ui-active;
+}
+
+.umb-tab--expand > a > i {
+    height: 5px;
+    width: 5px;
+    border-radius: 50%;
+    background: @black;
+    display: inline-block;
+    margin: 0 5px 0 0;
+    opacity: .6;
 }

@@ -1,0 +1,105 @@
+<div ng-controller="Umbraco.Editors.RollbackController as vm">
+
+    <umb-editor-view>
+
+        <umb-editor-header
+            name="model.title"
+            name-locked="true"
+            hide-alias="true"
+            hide-icon="true"
+            hide-description="true">
+        </umb-editor-header>
+        
+        <umb-editor-container>
+            
+            <umb-load-indicator
+                ng-if="vm.loading">
+            </umb-load-indicator>
+
+            <umb-box>
+                <umb-box-content>
+
+                    <div ng-if="model.node.variants.length > 1">
+                        <h5><localize key="general_language"></localize></h5>
+                        <select 
+                            class="input-block-level"
+                            ng-model="vm.selectedLanguage"
+                            ng-options="variant as variant.language.name for variant in model.node.variants track by variant.language.culture"
+                            ng-change="vm.changeLanguage(vm.selectedLanguage)">
+                        </select>
+                    </div>
+                    
+                    <div>
+                                            
+                        <h5><localize key="rollback_currentVersion"></localize></h5>
+                        <p>{{vm.currentVersion.name}} (Created: {{vm.currentVersion.createDate}})</p>
+                        
+                        <h5><localize key="rollback_rollbackTo"></localize></h5>
+                        <select 
+                            class="input-block-level"
+                            ng-model="vm.selectedVersion"
+                            ng-options="version.displayValue for version in vm.previousVersions track by version.versionId"
+                            ng-change="vm.changeVersion(vm.selectedVersion)">
+                            <option value="">{{vm.labels.choose}}...</option>
+                        </select>
+                    </div>
+
+                    <div ng-if="vm.diff" class="diff" style="border-top: 1px solid #e9e9eb; margin-top: 30px;">
+
+                        <h5>Changes</h5>
+                        <small style="margin-bottom: 15px; display: block;"><localize key="rollback_diffHelp"></localize></small>
+        
+                        <table class="table table-condensed table-bordered">
+                            <tbody>
+                                <tr>
+                                    <td class="bold">Name</td>
+                                    <td>
+                                        <span ng-repeat="part in vm.diff.name">
+                                            <ins ng-if="part.added">{{part.value}}</ins>
+                                            <del ng-if="part.removed">{{part.value}}</del>
+                                            <span ng-if="!part.added && !part.removed">{{part.value}}</span>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr ng-repeat="property in vm.diff.properties track by property.alias">
+                                    <td class="bold">{{property.label}}</td>
+                                    <td ng-class="{'pre-line': property.isObject, 'word-wrap': !property.isObject}">
+                                        <span ng-repeat="part in property.diff">
+                                            <ins ng-if="part.added">{{part.value}}</ins>
+                                            <del ng-if="part.removed">{{part.value}}</del>
+                                            <span ng-if="!part.added && !part.removed">{{part.value}}</span>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+        
+                    </div>
+
+                </umb-box-content>
+            </umb-box>
+        </umb-editor-container>
+
+        <umb-editor-footer>
+            <umb-editor-footer-content-right>
+                <umb-button
+                    type="button"
+                    button-style="link"
+                    label-key="general_close"
+                    shortcut="esc"
+                    action="vm.close()">
+                </umb-button>
+                <umb-button
+                    type="button"
+                    button-style="success"
+                    state="vm.rollbackButtonState"
+                    label-key="actions_rollback"
+                    disabled="vm.rollbackButtonDisabled"
+                    action="vm.rollback()">
+                </umb-button>
+            </umb-editor-footer-content-right>
+        </umb-editor-footer>
+
+    </umb-editor-view>
+
+</div>

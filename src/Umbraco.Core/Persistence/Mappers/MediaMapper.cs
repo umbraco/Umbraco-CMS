@@ -1,55 +1,39 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Linq.Expressions;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
     /// <summary>
-    /// Represents a <see cref="Models.Media"/> to DTO mapper used to translate the properties of the public api 
+    /// Represents a <see cref="Models.Media"/> to DTO mapper used to translate the properties of the public api
     /// implementation to that of the database's DTO as sql: [tableName].[columnName].
     /// </summary>
     [MapperFor(typeof(IMedia))]
     [MapperFor(typeof(Umbraco.Core.Models.Media))]
     public sealed class MediaMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
+        public MediaMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+            : base(sqlContext, maps)
+        { }
 
-        //NOTE: its an internal class but the ctor must be public since we're using Activator.CreateInstance to create it
-        // otherwise that would fail because there is no public constructor.
-        public MediaMapper()
+        protected override void DefineMaps()
         {
-            BuildMap();
+            DefineMap<Models.Media, NodeDto>(nameof(Models.Media.Id), nameof(NodeDto.NodeId));
+            DefineMap<Models.Media, NodeDto>(nameof(Models.Media.Key), nameof(NodeDto.UniqueId));
+
+            DefineMap<Content, ContentVersionDto>(nameof(Content.VersionId), nameof(ContentVersionDto.Id));
+
+            DefineMap<Models.Media, NodeDto>(nameof(Models.Media.CreateDate), nameof(NodeDto.CreateDate));
+            DefineMap<Models.Media, NodeDto>(nameof(Models.Media.Level), nameof(NodeDto.Level));
+            DefineMap<Models.Media, NodeDto>(nameof(Models.Media.ParentId), nameof(NodeDto.ParentId));
+            DefineMap<Models.Media, NodeDto>(nameof(Models.Media.Path), nameof(NodeDto.Path));
+            DefineMap<Models.Media, NodeDto>(nameof(Models.Media.SortOrder), nameof(NodeDto.SortOrder));
+            DefineMap<Models.Media, NodeDto>(nameof(Models.Media.Name), nameof(NodeDto.Text));
+            DefineMap<Models.Media, NodeDto>(nameof(Models.Media.Trashed), nameof(NodeDto.Trashed));
+            DefineMap<Models.Media, NodeDto>(nameof(Models.Media.CreatorId), nameof(NodeDto.UserId));
+            DefineMap<Models.Media, ContentDto>(nameof(Models.Media.ContentTypeId), nameof(ContentDto.ContentTypeId));
+            DefineMap<Models.Media, ContentVersionDto>(nameof(Models.Media.UpdateDate), nameof(ContentVersionDto.VersionDate));
         }
-
-        #region Overrides of BaseMapper
-
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache
-        {
-            get { return PropertyInfoCacheInstance; }
-        }
-
-        internal override void BuildMap()
-        {
-            if (PropertyInfoCache.IsEmpty)
-            {
-                CacheMap<Models.Media, NodeDto>(src => src.Id, dto => dto.NodeId);
-                CacheMap<Models.Media, NodeDto>(src => src.CreateDate, dto => dto.CreateDate);
-                CacheMap<Models.Media, NodeDto>(src => src.Level, dto => dto.Level);
-                CacheMap<Models.Media, NodeDto>(src => src.ParentId, dto => dto.ParentId);
-                CacheMap<Models.Media, NodeDto>(src => src.Path, dto => dto.Path);
-                CacheMap<Models.Media, NodeDto>(src => src.SortOrder, dto => dto.SortOrder);
-                CacheMap<Models.Media, NodeDto>(src => src.Name, dto => dto.Text);
-                CacheMap<Models.Media, NodeDto>(src => src.Trashed, dto => dto.Trashed);
-                CacheMap<Models.Media, NodeDto>(src => src.Key, dto => dto.UniqueId);
-                CacheMap<Models.Media, NodeDto>(src => src.CreatorId, dto => dto.UserId);
-                CacheMap<Models.Media, ContentDto>(src => src.ContentTypeId, dto => dto.ContentTypeId);
-                CacheMap<Models.Media, ContentVersionDto>(src => src.UpdateDate, dto => dto.VersionDate);
-                CacheMap<Models.Media, ContentVersionDto>(src => src.Version, dto => dto.VersionId);
-            }
-        }
-
-        #endregion
     }
 }

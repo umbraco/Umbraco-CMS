@@ -1,14 +1,19 @@
 ﻿.umb-multiple-textbox{
     &__confirm{
         position: relative;
+        display: inline-block;
 
         &-action{
-            margin: 0;
+            margin: -2px 0 0 0;
             padding: 2px;
             background: transparent;
             border: 0 none;
         }
     }
+}
+
+.umb-multiple-textbox .icon-wrapper {
+    width: 50px;
 }
 
 .umb-multiple-textbox .textbox-wrapper {
@@ -26,6 +31,7 @@
 
 .umb-multiple-textbox .textbox-wrapper i.handle {
     margin-left: 5px;
+    cursor: move;
 }
 
 .umb-multiple-textbox .textbox-wrapper a.remove {
@@ -35,6 +41,10 @@
 
 .umb-multiple-textbox .add-link {
     &:extend(.umb-node-preview-add);
+}
+
+.umb-multiple-textbox .add-link:hover {
+    &:extend(.umb-node-preview-add:hover);
 }
 
 .umb-editor-wrapper .umb-multiple-textbox .add-link {

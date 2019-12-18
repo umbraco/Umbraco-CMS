@@ -17,19 +17,19 @@ namespace Umbraco.Web.Models.ContentEditing
         public string TreeAlias { get; set; }
 
         /// <summary>
-        /// This is optional but if specified should be the name of an angular service to format the search result. 
-        /// </summary>        
+        /// This is optional but if specified should be the name of an angular service to format the search result.
+        /// </summary>
         [DataMember(Name = "jsSvc")]
         public string JsFormatterService { get; set; }
 
         /// <summary>
         /// This is optional but if specified should be the name of a method on the jsSvc angular service to use, if not
-        /// specfied than it will expect the method to be called `format(searchResult, appAlias, treeAlias)`
+        /// specified than it will expect the method to be called `format(searchResult, appAlias, treeAlias)`
         /// </summary>
         [DataMember(Name = "jsMethod")]
         public string JsFormatterMethod { get; set; }
 
         [DataMember(Name = "results")]
-        public IEnumerable<SearchResultItem> Results { get; set; }
+        public IEnumerable<SearchResultEntity> Results { get; set; }
     }
 }

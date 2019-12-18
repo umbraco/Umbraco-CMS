@@ -9,14 +9,13 @@
         bool DisableAlternativeTemplates { get; }
 
         bool ValidateAlternativeTemplates { get; }
-        
+
         bool DisableFindContentByIdPath { get; }
-		
+
         bool DisableRedirectUrlTracking { get; }
 
         string UrlProviderMode { get; }
 
         string UmbracoApplicationUrl { get; }
     }
-
 }

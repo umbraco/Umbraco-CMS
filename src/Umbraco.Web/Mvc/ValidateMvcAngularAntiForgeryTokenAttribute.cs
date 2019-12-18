@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
@@ -12,7 +12,7 @@ namespace Umbraco.Web.Mvc
     /// </summary>
     /// <remarks>
     /// Code derived from http://ericpanorel.net/2013/07/28/spa-authentication-and-csrf-mvc4-antiforgery-implementation/
-    /// 
+    ///
     /// If the authentication type is cookie based, then this filter will execute, otherwise it will be disabled
     /// </remarks>
     public sealed class ValidateMvcAngularAntiForgeryTokenAttribute : ActionFilterAttribute

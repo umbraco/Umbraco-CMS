@@ -5,7 +5,7 @@
     beforeEach(module('umbraco'));
 
     beforeEach(inject(function ($injector) {
-        //TODO: I have no idea why this doesn't work!!?? it freakin should
+        // TODO: I have no idea why this doesn't work!!?? it freakin should
         //valEmailExpression = $injector.get('valEmailExpression');
 
         //in the meantime, i've had to hard code the regex statement here

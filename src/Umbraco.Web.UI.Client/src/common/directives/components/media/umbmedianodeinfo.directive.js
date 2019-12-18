@@ -1,25 +1,36 @@
 (function () {
     'use strict';
 
-    function MediaNodeInfoDirective($timeout, $location, eventsService, userService, dateHelper) {
+    function MediaNodeInfoDirective($timeout, $location, eventsService, userService, dateHelper, editorService, mediaHelper) {
 
         function link(scope, element, attrs, ctrl) {
 
             var evts = [];
 
+            scope.allowChangeMediaType = false;
+
             function onInit() {
-                // If logged in user has access to the settings section
-                // show the open anchors - if the user doesn't have 
-                // access, contentType is null, see MediaModelMapper
-                scope.allowOpen = scope.node.contentType !== null;
-                
+
+                userService.getCurrentUser().then(function(user){
+                    // only allow change of media type if user has access to the settings sections
+                    angular.forEach(user.sections, function(section){
+                        if(section.alias === "settings") {
+                            scope.allowChangeMediaType = true;
+                        }
+                    });
+                });
+
                 // get document type details
                 scope.mediaType = scope.node.contentType;
 
                 // set the media link initially
                 setMediaLink();
+
                 // make sure dates are formatted to the user's locale
                 formatDatesToLocal();
+
+                // set media file extension initially
+                setMediaExtension();
             }
 
             function formatDatesToLocal() {
@@ -32,13 +43,41 @@
 
             function setMediaLink(){
                 scope.nodeUrl = scope.node.mediaLink;
+                // grab the file name from the URL and use it as the display name in the file link
+                var match = /.*\/(.*)/.exec(scope.nodeUrl);
+                if (match) {
+                    scope.nodeFileName = match[1];
+                } else {
+                    scope.nodeFileName = scope.nodeUrl;
+                }
+            }
+
+            function setMediaExtension() {
+                scope.node.extension = mediaHelper.getFileExtension(scope.nodeUrl);
             }
 
             scope.openMediaType = function (mediaType) {
-                // remove first "#" from url if it is prefixed else the path won't work
-                var url = "/settings/mediaTypes/edit/" + mediaType.id;
-                $location.path(url);
+                var editor = {
+                    id: mediaType.id,
+                    submit: function(model) {
+                        editorService.close();
+                    },
+                    close: function() {
+                        editorService.close();
+                    }
+                };
+                editorService.mediaTypeEditor(editor);
             };
+
+            scope.openSVG = function () {
+                var popup = window.open('', '_blank');
+                var html = '<!DOCTYPE html><body><img src="' + scope.nodeUrl + '"/>' +
+                    '<script>history.pushState(null, null,"' + $location.$$absUrl + '");</script></body>';
+                
+                popup.document.open();
+                popup.document.write(html);
+                popup.document.close();
+            }
 
             // watch for content updates - reload content when node is saved, published etc.
             scope.$watch('node.updateDate', function(newValue, oldValue){
@@ -50,6 +89,9 @@
 
                 // Update the create and update dates
                 formatDatesToLocal();
+
+                //Update the media file format
+                setMediaExtension();
             });
 
             //ensure to unregister from all events!

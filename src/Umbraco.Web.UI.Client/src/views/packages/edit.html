@@ -1,0 +1,309 @@
+<div data-element="editor-packages" ng-controller="Umbraco.Editors.Packages.EditController as vm">
+
+    <form name="editPackageForm" no-validate val-form-manager>
+
+        <umb-editor-view>
+
+            <umb-editor-header
+                name="vm.package.name"
+                on-back="vm.back()"
+                show-back-button="vm.showBackButton"
+                hide-icon="true"
+                hide-description="true"
+                hide-alias="true">
+            </umb-editor-header>
+
+            <umb-editor-container class="form-horizontal">
+
+                <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+                <div class="umb-expansion-panel">
+
+                    <div class="umb-expansion-panel__header" ng-click="vm.propertiesOpen = !vm.propertiesOpen">
+                        <div><localize key="packager_packageProperties">Package Properties</localize></div>
+                        <ins class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !vm.propertiesOpen, 'icon-navigation-up': vm.propertiesOpen}">&nbsp;</ins>
+                    </div>
+
+                    <div class="umb-expansion-panel__content" ng-show="vm.propertiesOpen">
+
+                        <umb-control-group label="Url" required="true">
+                            <input class="umb-property-editor" name="url" type="text" ng-model="vm.package.url" val-server-field="model.Url" required />
+
+                            <span ng-messages="editPackageForm.url.$error" show-validation-on-submit >
+                                <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+                                <span class="help-inline" ng-message="valServerField">{{editPackageForm.url.errorMsg}}</span>
+                            </span>
+                        </umb-control-group>
+
+                        <umb-control-group label="Version" required="true">
+                            <input class="umb-property-editor" name="version" type="text" ng-model="vm.package.version" val-server-field="model.Version" required ng-pattern="vm.versionRegex" />
+
+                            <span ng-messages="editPackageForm.version.$error" show-validation-on-submit >
+                                <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+                                <span class="help-inline" ng-message="valServerField">{{editPackageForm.version.errorMsg}}</span>
+                            </span>
+                        </umb-control-group>
+
+                        <umb-control-group label="@packager_packageIconUrl">
+                            <input class="umb-property-editor" name="iconUrl" type="text" ng-model="vm.package.iconUrl" />
+                        </umb-control-group>
+
+                        <!-- we don't really need to show this
+                        <umb-control-group label="Package File">
+                            <input disabled="disabled" class="umb-property-editor" name="packagePath" type="text" ng-model="vm.package.packagePath" />
+                        </umb-control-group>-->
+
+                        <umb-control-group label="Umbraco version">
+                            <input class="umb-property-editor" name="umbracoVersion" type="text" ng-model="vm.package.umbracoVersion" val-server-field="model.umbracoVersion" ng-pattern="vm.versionRegex" />
+
+                            <span ng-messages="editPackageForm.umbracoVersion.$error" show-validation-on-submit >
+                                <span class="help-inline" ng-message="valServerField">{{editPackageForm.umbracoVersion.errorMsg}}</span>
+                            </span>
+                        </umb-control-group>
+
+                        <umb-control-group label="@packager_packageAuthor" required="true">
+                            <input class="umb-property-editor" name="author" type="text" ng-model="vm.package.author" val-server-field="model.Author" required />
+
+                            <span ng-messages="editPackageForm.author.$error" show-validation-on-submit >
+                                <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+                                <span class="help-inline" ng-message="valServerField">{{editPackageForm.author.errorMsg}}</span>
+                            </span>
+                        </umb-control-group>
+
+                        <umb-control-group label="@packager_packageAuthorUrl" required="true">
+                            <input class="umb-property-editor" name="authorUrl" type="text" ng-model="vm.package.authorUrl" val-server-field="model.AuthorUrl" required />
+
+                            <span ng-messages="editPackageForm.authorUrl.$error" show-validation-on-submit >
+                                <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+                                <span class="help-inline" ng-message="valServerField">{{editPackageForm.authorUrl.errorMsg}}</span>
+                            </span>
+                        </umb-control-group>
+
+                        <umb-control-group label="@packager_packageContrib" ng-if="vm.contributorsEditor">
+                            <umb-property property="vm.contributorsEditor">
+                                <umb-property-editor model="vm.contributorsEditor"></umb-property-editor>
+                            </umb-property>
+                        </umb-control-group>
+
+                        <umb-control-group label="@packager_packageLicense">
+                            <input class="umb-property-editor" name="license" type="text" ng-model="vm.package.license" />
+                        </umb-control-group>
+
+                        <umb-control-group label="@packager_packageLicenseUrl">
+                            <input class="umb-property-editor" name="licenseUrl" type="text" ng-model="vm.package.licenseUrl" />
+                        </umb-control-group>
+
+                        <umb-control-group label="@packager_packageReadme">
+                            <textarea class="umb-property-editor" name="readme" rows="10" ng-model="vm.package.readme"></textarea>
+                        </umb-control-group>
+
+                    </div>
+
+                </div>
+
+                <div class="umb-expansion-panel">
+
+                    <div class="umb-expansion-panel__header" ng-click="vm.contentOpen = !vm.contentOpen">
+                        <div><localize key="packager_packageContent">Package Content</localize></div>
+                        <ins class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !vm.contentOpen, 'icon-navigation-up': vm.contentOpen}">&nbsp;</ins>
+                    </div>
+
+                    <div class="umb-expansion-panel__content" ng-show="vm.contentOpen">
+
+                        <umb-control-group label="@general_content">
+
+                            <umb-node-preview
+                                ng-if="vm.package.contentNodeId"
+                                icon="vm.contentNodeDisplayModel.icon"
+                                name="vm.contentNodeDisplayModel.name"
+                                allow-edit="true"
+                                allow-remove="true"
+                                on-edit="vm.openContentPicker()"
+                                on-remove="vm.removeContentItem()">
+                            </umb-node-preview>
+
+                            <a href=""
+                                ng-if="!vm.package.contentNodeId"
+                                style="margin-bottom: 10px;"
+                                class="umb-node-preview-add"
+                                ng-click="vm.openContentPicker()"
+                                prevent-default>
+                                <localize key="general_add">Add</localize>
+                            </a>
+
+                                <umb-checkbox model="vm.package.contentLoadChildNodes"
+                                                disabled="!vm.package.contentNodeId"
+                                                text="{{vm.labels.includeAllChildNodes}}" />
+                        </umb-control-group>
+
+                        <umb-control-group label="@treeHeaders_documentTypes">
+                            <div ng-repeat="doctype in ::vm.documentTypes | orderBy:'name'">
+                                    <umb-checkbox model="doctype.selected"
+                                                  on-change="vm.selectDocumentType(doctype)"
+                                                  text="{{doctype.name}}" />
+                            </div>
+                        </umb-control-group>
+
+                        <umb-control-group label="@treeHeaders_templates">
+                            <div ng-repeat="template in ::vm.templates | orderBy:'name'">
+                                    <umb-checkbox model="template.selected"
+                                                  on-change="vm.selectTemplate(template)"
+                                                  text="{{template.name}}" />
+                            </div>
+                        </umb-control-group>
+
+                        <umb-control-group label="@treeHeaders_stylesheets">
+                            <div ng-repeat="stylesheet in ::vm.stylesheets | orderBy:'name'">
+                                    <umb-checkbox model="stylesheet.selected"
+                                                  on-change="vm.selectStyleSheet(stylesheet)"
+                                                  text="{{stylesheet.path}}" />
+                            </div>
+                        </umb-control-group>
+
+                        <umb-control-group label="@treeHeaders_macros">
+                            <div ng-repeat="macro in ::vm.macros | orderBy:'name'">
+                                    <umb-checkbox model="macro.selected"
+                                                  on-change="vm.selectMacro(macro)"
+                                                  text="{{macro.name}}" />
+                            </div>
+                        </umb-control-group>
+
+                        <umb-control-group label="@treeHeaders_languages">
+                            <div ng-repeat="language in ::vm.languages | orderBy:'name'">
+                                    <umb-checkbox model="language.selected"
+                                                  on-change="vm.selectLanguage(language)"
+                                                  text="{{language.name}}" />
+                            </div>
+                        </umb-control-group>
+
+                        <umb-control-group label="@treeHeaders_dictionary">
+                            <div ng-repeat="dictionaryItem in ::vm.dictionaryItems | orderBy:'name'">
+                                    <umb-checkbox model="dictionaryItem.selected"
+                                                  on-change="vm.selectDictionaryItem(dictionaryItem)"
+                                                  text="{{dictionaryItem.name}}" />
+                            </div>
+                        </umb-control-group>
+
+                        <umb-control-group label="@treeHeaders_dataTypes">
+                            <div ng-repeat="dataType in ::vm.dataTypes | orderBy:'name'">
+                                    <umb-checkbox model="dataType.selected"
+                                                  on-change="vm.selectDataType(dataType)"
+                                                  text="{{dataType.name}}" />
+                            </div>
+                        </umb-control-group>
+
+                    </div>
+
+                </div>
+
+                <div class="umb-expansion-panel">
+
+                    <div class="umb-expansion-panel__header" ng-click="vm.filesOpen = !vm.filesOpen">
+                        <div><localize key="packager_packageFiles">Package Files</localize></div>
+                        <ins class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !vm.filesOpen, 'icon-navigation-up': vm.filesOpen}">&nbsp;</ins>
+                    </div>
+
+                    <div class="umb-expansion-panel__content" ng-show="vm.filesOpen">
+                        <!--
+                        <p>Remember: .xslt and .ascx files for your macros will be added automaticly, but you will still need to add assemblies, images and script files manually to the list below.</p>
+                        -->
+                        <umb-control-group
+                            label="@packager_pathToFile"
+                            description="@packager_pathToFileDescription">
+
+                            <umb-node-preview
+                                ng-if="vm.package.files"
+                                ng-repeat="file in vm.package.files"
+                                icon="'icon-document'"
+                                name="file"
+                                allow-remove="true"
+                                on-remove="vm.removeFile($index)">
+                            </umb-node-preview>
+
+                            <a href=""
+                                class="umb-node-preview-add"
+                                ng-click="vm.openFilePicker()"
+                                prevent-default>
+                                <localize key="general_add">Add</localize>
+                            </a>
+
+                        </umb-control-group>
+
+                        <umb-control-group
+                            label="Package options view"
+                            description="Load this view after installation (ex: App_Plugins/MyApp/MyPackageOptions.html). It can be used to configure your package at any time by clicking Options on the installed package listing">
+
+                            <umb-node-preview
+                                ng-if="vm.package.packageView"
+                                icon="'icon-document'"
+                                name="vm.package.packageView"
+                                allow-edit="true"
+                                allow-remove="true"
+                                on-edit="vm.openViewPicker()"
+                                on-remove="vm.removePackageView()">
+                            </umb-node-preview>
+
+                            <a href=""
+                                ng-show="!vm.package.packageView"
+                                class="umb-node-preview-add"
+                                ng-click="vm.openViewPicker()"
+                                prevent-default>
+                                <localize key="general_add">Add</localize>
+                            </a>
+
+                        </umb-control-group>
+                    </div>
+
+                </div>
+
+                <div class="umb-expansion-panel">
+                    <div class="umb-expansion-panel__header" ng-click="vm.actionsOpen = !vm.actionsOpen">
+                        <div><localize key="packager_packageActions">Package Actions</localize></div>
+                        <ins class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !vm.actionsOpen, 'icon-navigation-up': vm.actionsOpen}">&nbsp;</ins>
+                    </div>
+                    <div class="umb-expansion-panel__content" ng-show="vm.actionsOpen">
+                        <umb-control-group
+                            label="@packager_actions"
+                            description="Here you can add custom installer / uninstaller events to perform certain tasks during installation and uninstallation.
+                            All actions are formed as a xml node, containing data for the action to be performed.">
+                            <div>
+                                <a target="_blank" ng-href="https://our.umbraco.com/documentation/Reference/Packaging/">Documentation</a>
+                                <div>
+                                    <textarea class="umb-property-editor" rows="10" ng-model="vm.package.actions"></textarea>
+                                </div>
+                            </div>
+                        </umb-control-group>
+                    </div>
+                </div>
+
+            </umb-editor-container>
+
+            <umb-editor-footer>
+
+                <umb-editor-footer-content-right>
+
+                    <umb-button ng-if="vm.package.packagePath"
+                                type="button"
+                                action="vm.downloadFile(vm.package.id)"
+                                disabled="vm.loading || vm.buttonState=='busy'"
+                                button-style="info"
+                                label-key="general_download">
+                    </umb-button>
+
+                    <umb-button type="button"
+                                action="vm.createOrUpdatePackage(editPackageForm)"
+                                state="vm.buttonState"
+                                button-style="success"
+                                label="{{vm.labels.button}}"
+                                disabled="vm.loading">
+                    </umb-button>
+
+                </umb-editor-footer-content-right>
+
+            </umb-editor-footer>
+
+        </umb-editor-view>
+
+    </form>
+
+</div>

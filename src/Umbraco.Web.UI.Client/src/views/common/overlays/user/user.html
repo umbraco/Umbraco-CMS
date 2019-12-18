@@ -1,21 +1,20 @@
 <div ng-controller="Umbraco.Overlays.UserController">
-
     <div class="umb-control-group" ng-if="!showPasswordFields">
 
        <h5><localize key="user_yourProfile" /></h5>
 
-       <p class="muted">
+       <!--<p class="muted">
            <small>
                <localize key="user_sessionExpires" />: {{remainingAuthSeconds | timespan}}
            </small>
-       </p>
+       </p>-->
 
         <umb-button
             alias="editUser"
             type="link"
             href="#/users/users/user/{{user.id}}"
             action="model.close()"
-            button-style="primary"
+            button-style="action"
             label="Edit"
             label-key="general_edit"
             ng-if="canEditProfile">
@@ -25,9 +24,9 @@
             alias="changePassword"
             type="button"
             action="togglePasswordFields()"
+            button-style="action"
             label="Change password"
-            label-key="general_changePassword"
-            button-style="success">
+            label-key="general_changePassword">
        </umb-button>
 
         <umb-button
@@ -50,17 +49,16 @@
 
         <div ng-repeat="login in externalLoginProviders">
 
-			<form ng-if="login.linkedProviderKey == undefined" method="POST" name="externalLoginForm"
-				  action="{{externalLinkLoginFormAction}}" id="oauthloginform" name="oauthloginform">
+			<form ng-if="login.linkedProviderKey == undefined" method="POST" action="{{externalLinkLoginFormAction}}" id="oauthloginform" name="oauthloginform">
 				<input type="hidden" name="provider" value="{{login.authType}}" />
-				<button class="btn btn-block btn-social"
-						ng-class="login.properties.SocialStyle"
-						id="{{login.authType}}"
-						onclick="document.forms.oauthloginform.submit();">
+                <button class="btn btn-block btn-social"
+                        ng-class="login.properties.SocialStyle"
+                        id="{{login.authType}}"
+                        onclick="document.forms.oauthloginform.submit();">
 
-					<i class="fa" ng-class="login.properties.SocialIcon"></i>
-					<localize key="defaultdialogs_linkYour">Link your</localize> {{login.caption}} <localize key="defaultdialogs_account">account</localize>
-				</button>
+                    <i class="fa" ng-class="login.properties.SocialIcon"></i>
+                    <localize key="defaultdialogs_linkYour">Link your</localize>&nbsp;{{login.caption}}&nbsp;<localize key="defaultdialogs_account">account</localize>
+                </button>
 			</form>
 
             <button ng-if="login.linkedProviderKey != undefined"
@@ -71,14 +69,14 @@
                     name="provider"
                     value="{{login.authType}}">
                 <i class="fa" ng-class="login.properties.SocialIcon"></i>
-                <localize key="defaultdialogs_unLinkYour">Un-link your</localize> {{login.caption}} <localize key="defaultdialogs_account">account</localize>
+                <localize key="defaultdialogs_unLinkYour">Un-link your</localize>&nbsp;{{login.caption}}&nbsp;<localize key="defaultdialogs_account">account</localize>
             </button>
         </div>
 
     </div>
 
 
-    <div class="umb-control-group" ng-if="!showPasswordFields">
+    <div class="umb-control-group" ng-if="!showPasswordFields && history.length">
         <h5><localize key="user_yourHistory" /></h5>
         <ul class="umb-tree">
             <li ng-repeat="item in history | orderBy:'time':true">
@@ -126,7 +124,7 @@
 
     </div>
 
-    <div class="umb-control-group">
+    <div class="umb-control-group" ng-if="tab.length">
         <div ng-repeat="tab in dashboard">
             <div ng-repeat="property in tab.properties">
                 <div>

@@ -1,68 +1,59 @@
-using System;
-using System.IO;
-using System.Linq;
+﻿using System.Collections.Generic;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Tests.TestHelpers;
+using Moq;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
+using Umbraco.Web.PropertyEditors;
+using Umbraco.Core.Services;
 using Umbraco.Web;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
 namespace Umbraco.Tests.PublishedContent
 {
     /// <summary>
     /// Abstract base class for tests for published content and published media
     /// </summary>
-    public abstract class PublishedContentTestBase : BaseRoutingTest
+    public abstract class PublishedContentTestBase : BaseWebTest
     {
-        public override void Initialize()
+        protected override void Compose()
+        {
+            base.Compose();
+
+            // FIXME: what about the if (PropertyValueConvertersResolver.HasCurrent == false) ??
+            // can we risk double - registering and then, what happens?
+
+            Composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>()
+                .Clear()
+                .Append<DatePickerValueConverter>()
+                .Append<TinyMceValueConverter>()
+                .Append<YesNoValueConverter>();
+        }
+
+        protected override void Initialize()
         {
             base.Initialize();
-            
-            // need to specify a custom callback for unit tests
-            var propertyTypes = new[]
-                {
-                    // AutoPublishedContentType will auto-generate other properties
-                    new PublishedPropertyType("content", 0, Constants.PropertyEditors.TinyMCEAlias), 
-                };
-            var type = new AutoPublishedContentType(0, "anything", propertyTypes);
-            PublishedContentType.GetPublishedContentTypeCallback = (alias) => type;
 
-            var rCtx = GetRoutingContext("/test", 1234);
-            UmbracoContext.Current = rCtx.UmbracoContext;
-            
-        }
+            var converters = Factory.GetInstance<PropertyValueConverterCollection>();
 
-        protected override void FreezeResolution()
-        {
-            if (PropertyValueConvertersResolver.HasCurrent == false)
-                PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(
-                    new ActivatorServiceProvider(), Logger,
-                    new[]
-                        {
-                            typeof(DatePickerValueConverter),
-                            typeof(TinyMceValueConverter),
-                            typeof(YesNoValueConverter)
-                        });    
+            var dataTypeService = new TestObjects.TestDataTypeService(
+                new DataType(new RichTextPropertyEditor(Mock.Of<ILogger>(), Mock.Of<IMediaService>(), Mock.Of<IContentTypeBaseServiceProvider>(), Mock.Of<IUmbracoContextAccessor>())) { Id = 1 });
 
-            PublishedCachesResolver.Current = new PublishedCachesResolver(new PublishedCaches(
-                new PublishedContentCache(), new PublishedMediaCache(ApplicationContext)));
+            var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeService);
 
-            if (PublishedContentModelFactoryResolver.HasCurrent == false)
-                PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();
+            IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
+            {
+                yield return publishedContentTypeFactory.CreatePropertyType(contentType, "content", 1);
+            }
 
-            base.FreezeResolution();
-        }
+            var type = new AutoPublishedContentType(0, "anything", CreatePropertyTypes);
+            ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;
 
-        public override void TearDown()
-        {
-            base.TearDown();
-            
-            UmbracoContext.Current = null;
+            var umbracoContext = GetUmbracoContext("/test");
+            Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;
         }
     }
 }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models;
@@ -7,6 +7,21 @@ namespace Umbraco.Core.Services
 {
     public static class ContentTypeServiceExtensions
     {
+        /// <summary>
+        /// Gets all of the element types (e.g. content types that have been marked as an element type).
+        /// </summary>
+        /// <param name="contentTypeService">The content type service.</param>
+        /// <returns>Returns all the element types.</returns>
+        public static IEnumerable<IContentType> GetAllElementTypes(this IContentTypeService contentTypeService)
+        {
+            if (contentTypeService == null)
+            {
+                return Enumerable.Empty<IContentType>();
+            }
+
+            return contentTypeService.GetAll().Where(x => x.IsElement);
+        }
+
         /// <summary>
         /// Returns the available composite content types for a given content type
         /// </summary>
@@ -22,20 +37,22 @@ namespace Umbraco.Core.Services
         /// This is required because in the case of creating/modifying a content type because new property types being added to it are not yet persisted so cannot
         /// be looked up via the db, they need to be passed in.
         /// </param>
+        /// <param name="isElement">Wether the composite content types should be applicable for an element type</param>
         /// <returns></returns>
         internal static ContentTypeAvailableCompositionsResults GetAvailableCompositeContentTypes(this IContentTypeService ctService,
             IContentTypeComposition source,
             IContentTypeComposition[] allContentTypes,
             string[] filterContentTypes = null,
-            string[] filterPropertyTypes = null)
-        {            
+            string[] filterPropertyTypes = null,
+            bool isElement = false)
+        {
             filterContentTypes = filterContentTypes == null
-                ? new string[] { }
-                : filterContentTypes.Where(x => x.IsNullOrWhiteSpace() == false).ToArray();
+                ? Array.Empty<string>()
+                : filterContentTypes.Where(x => !x.IsNullOrWhiteSpace()).ToArray();
 
             filterPropertyTypes = filterPropertyTypes == null
-                ? new string[] {}
-                : filterPropertyTypes.Where(x => x.IsNullOrWhiteSpace() == false).ToArray();
+                ? Array.Empty<string>()
+                : filterPropertyTypes.Where(x => !x.IsNullOrWhiteSpace()).ToArray();
 
             //create the full list of property types to use as the filter
             //this is the combination of all property type aliases found in the content types passed in for the filter
@@ -46,9 +63,9 @@ namespace Umbraco.Core.Services
                     .Select(c => c.Alias)
                     .Union(filterPropertyTypes)
                     .ToArray();
+            
+            var sourceId = source?.Id ?? 0;
 
-            var sourceId = source != null ? source.Id : 0;
-                        
             // find out if any content type uses this content type
             var isUsing = allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == sourceId)).ToArray();
             if (isUsing.Length > 0)
@@ -58,26 +75,27 @@ namespace Umbraco.Core.Services
             }
 
             // if it is not used then composition is possible
-            // hashset guarantees unicity on Id
+            // hashset guarantees uniqueness on Id
             var list = new HashSet<IContentTypeComposition>(new DelegateEqualityComparer<IContentTypeComposition>(
                 (x, y) => x.Id == y.Id,
                 x => x.Id));
 
             // usable types are those that are top-level
+            // do not allow element types to be composed by non-element types as this will break the model generation in ModelsBuilder
             var usableContentTypes = allContentTypes
-                .Where(x => x.ContentTypeComposition.Any() == false).ToArray();
+                .Where(x => x.ContentTypeComposition.Any() == false && (isElement == false || x.IsElement)).ToArray();
             foreach (var x in usableContentTypes)
                 list.Add(x);
-            
+
             // indirect types are those that we use, directly or indirectly
             var indirectContentTypes = GetDirectOrIndirect(source).ToArray();
             foreach (var x in indirectContentTypes)
                 list.Add(x);
 
             //At this point we have a list of content types that 'could' be compositions
-            
+
             //now we'll filter this list based on the filters requested
-            var filtered = list                
+            var filtered = list
                 .Where(x =>
                 {
                     //need to filter any content types that are included in this list
@@ -85,13 +103,13 @@ namespace Umbraco.Core.Services
                 })
                 .Where(x =>
                 {
-                    //need to filter any content types that have matching property aliases that are included in this list                    
+                    //need to filter any content types that have matching property aliases that are included in this list
                     //ensure that we don't return if there's any overlapping property aliases from the filtered ones specified
                     return filterPropertyTypes.Intersect(
-                        x.PropertyTypes.Select(p => p.Alias), 
+                        x.PropertyTypes.Select(p => p.Alias),
                         StringComparer.InvariantCultureIgnoreCase).Any() == false;
                 })
-                .OrderBy(x => x.Name)                
+                .OrderBy(x => x.Name)
                 .ToList();
 
             //get ancestor ids - we will filter all ancestors
@@ -109,23 +127,7 @@ namespace Umbraco.Core.Services
 
             return new ContentTypeAvailableCompositionsResults(ancestors, result);
         }
-        /// <summary>
-        /// Returns the list of content types the composition is used in
-        /// </summary>
-        /// <param name="allContentTypes"></param>
-        /// <param name="ctService"></param>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        internal static IEnumerable<IContentTypeComposition> GetWhereCompositionIsUsedInContentTypes(this IContentTypeService ctService,
-            IContentTypeComposition source,
-            IContentTypeComposition[] allContentTypes)
-        { 
-
-            var sourceId = source != null ? source.Id : 0;
-
-            // find which content types are using this composition
-            return allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == sourceId)).ToArray();
-        }
+        
 
         private static IContentTypeComposition[] GetAncestors(IContentTypeComposition ctype, IContentTypeComposition[] allContentTypes)
         {
@@ -157,13 +159,13 @@ namespace Umbraco.Core.Services
         {
             if (ctype == null) return Enumerable.Empty<IContentTypeComposition>();
 
-            // hashset guarantees unicity on Id
+            // hashset guarantees uniqueness on Id
             var all = new HashSet<IContentTypeComposition>(new DelegateEqualityComparer<IContentTypeComposition>(
                 (x, y) => x.Id == y.Id,
                 x => x.Id));
 
             var stack = new Stack<IContentTypeComposition>();
-            
+
             foreach (var x in ctype.ContentTypeComposition)
                 stack.Push(x);
 
@@ -177,6 +179,5 @@ namespace Umbraco.Core.Services
 
             return all;
         }
-
     }
 }

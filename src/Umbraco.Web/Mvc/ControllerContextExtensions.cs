@@ -1,49 +1,37 @@
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Mvc
 {
     public static class ControllerContextExtensions
     {
         /// <summary>
-        /// Tries to get the Umbraco context from the whole ControllerContext hierarchy based on data tokens and if that fails
-        /// it will attempt to fallback to retrieving it from the HttpContext.
+        /// Gets the Umbraco context from a controller context hierarchy, if any, else the 'current' Umbraco context.
         /// </summary>
-        /// <param name="controllerContext"></param>
-        /// <returns></returns>
+        /// <param name="controllerContext">The controller context.</param>
+        /// <returns>The Umbraco context.</returns>
         public static UmbracoContext GetUmbracoContext(this ControllerContext controllerContext)
         {
-            var umbCtx = controllerContext.RouteData.GetUmbracoContext();
-            if (umbCtx != null) return umbCtx;
-
-            if (controllerContext.ParentActionViewContext != null)
-            {
-                //recurse
-                return controllerContext.ParentActionViewContext.GetUmbracoContext();
-            }
-
-            //fallback to getting from HttpContext
-            return controllerContext.HttpContext.GetUmbracoContext();
+            var o = controllerContext.GetDataTokenInViewContextHierarchy(Core.Constants.Web.UmbracoContextDataToken);
+            return o != null ? o as UmbracoContext : Current.UmbracoContext;
         }
 
         /// <summary>
-        /// Find a data token in the whole ControllerContext hierarchy of execution
+        /// Recursively gets a data token from a controller context hierarchy.
         /// </summary>
-        /// <param name="controllerContext"></param>
-        /// <param name="dataTokenName"></param>
-        /// <returns></returns>
+        /// <param name="controllerContext">The controller context.</param>
+        /// <param name="dataTokenName">The name of the data token.</param>
+        /// <returns>The data token, or null.</returns>
         internal static object GetDataTokenInViewContextHierarchy(this ControllerContext controllerContext, string dataTokenName)
         {
-            if (controllerContext.RouteData.DataTokens.ContainsKey(dataTokenName))
+            var context = controllerContext;
+            while (context != null)
             {
-                return controllerContext.RouteData.DataTokens[dataTokenName];
+                object token;
+                if (context.RouteData.DataTokens.TryGetValue(dataTokenName, out token))
+                    return token;
+                context = context.ParentActionViewContext;
             }
-
-            if (controllerContext.ParentActionViewContext != null)
-            {
-                //recurse!
-                return controllerContext.ParentActionViewContext.GetDataTokenInViewContextHierarchy(dataTokenName);
-            }
-
             return null;
         }
     }

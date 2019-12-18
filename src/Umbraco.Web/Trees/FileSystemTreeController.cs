@@ -2,18 +2,19 @@
 using System.IO;
 using System.Linq;
 using System.Net.Http.Formatting;
-using umbraco.BusinessLogic.Actions;
+using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.IO;
-using Umbraco.Core.Services;
+using Umbraco.Web.Actions;
 using Umbraco.Web.Models.Trees;
-using System.Web;
+
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
 {
     public abstract class FileSystemTreeController : TreeController
     {
-        protected abstract IFileSystem2 FileSystem { get; }
+        protected abstract IFileSystem FileSystem { get; }
         protected abstract string[] Extensions { get; }
         protected abstract string FileIcon { get; }
 
@@ -27,11 +28,14 @@ namespace Umbraco.Web.Trees
         /// Inheritors can override this method to modify the folder node that is created.
         /// </summary>
         /// <param name="treeNode"></param>
-        protected virtual void OnRenderFolderNode(ref TreeNode treeNode) { }
+        protected virtual void OnRenderFolderNode(ref TreeNode treeNode) {
+            // TODO: This isn't the best way to ensure a noop process for clicking a node but it works for now.
+            treeNode.AdditionalData["jsClickCallback"] = "javascript:void(0);";
+        }
 
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
-            var path = string.IsNullOrEmpty(id) == false && id != Constants.System.Root.ToInvariantString()
+            var path = string.IsNullOrEmpty(id) == false && id != Constants.System.RootString
                 ? HttpUtility.UrlDecode(id).TrimStart("/")
                 : "";
 
@@ -45,7 +49,7 @@ namespace Umbraco.Web.Trees
                 var name = Path.GetFileName(directory);
                 var node = CreateTreeNode(HttpUtility.UrlEncode(directory), path, queryStrings, name, "icon-folder", hasChildren);
                 OnRenderFolderNode(ref node);
-                if(node != null)
+                if (node != null)
                     nodes.Add(node);
             }
 
@@ -54,6 +58,10 @@ namespace Umbraco.Web.Trees
             var files = FileSystem.GetFiles(path).Where(x =>
             {
                 var extension = Path.GetExtension(x);
+
+                if (Extensions.Contains("*"))
+                    return true;
+                
                 return extension != null && Extensions.Contains(extension.Trim('.'), StringComparer.InvariantCultureIgnoreCase);
             });
 
@@ -72,16 +80,24 @@ namespace Umbraco.Web.Trees
             return nodes;
         }
 
+        protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
+        {
+            var root = base.CreateRootNode(queryStrings);
+            //check if there are any children
+            root.HasChildren = GetTreeNodes(Constants.System.RootString, queryStrings).Any();
+            return root;
+        }
+
         protected virtual MenuItemCollection GetMenuForRootNode(FormDataCollection queryStrings)
         {
             var menu = new MenuItemCollection();
 
             //set the default to create
-            menu.DefaultMenuAlias = ActionNew.Instance.Alias;
+            menu.DefaultMenuAlias = ActionNew.ActionAlias;
             //create action
-            menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
+            menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
             //refresh action
-            menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
+            menu.Items.Add(new RefreshNode(Services.TextService, true));
 
             return menu;
         }
@@ -91,9 +107,9 @@ namespace Umbraco.Web.Trees
             var menu = new MenuItemCollection();
 
             //set the default to create
-            menu.DefaultMenuAlias = ActionNew.Instance.Alias;
+            menu.DefaultMenuAlias = ActionNew.ActionAlias;
             //create action
-            menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
+            menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
 
             var hasChildren = FileSystem.GetFiles(path).Any() || FileSystem.GetDirectories(path).Any();
 
@@ -101,11 +117,11 @@ namespace Umbraco.Web.Trees
             if (hasChildren == false)
             {
                 //delete action
-                menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)), true);
+                menu.Items.Add<ActionDelete>(Services.TextService, true, opensDialog: true);
             }
 
             //refresh action
-            menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
+            menu.Items.Add(new RefreshNode(Services.TextService, true));
 
             return menu;
         }
@@ -115,7 +131,7 @@ namespace Umbraco.Web.Trees
             var menu = new MenuItemCollection();
 
             //if it's not a directory then we only allow to delete the item
-            menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
+            menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
 
             return menu;
         }
@@ -123,14 +139,14 @@ namespace Umbraco.Web.Trees
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
             //if root node no need to visit the filesystem so lets just create the menu and return it
-            if (id == Constants.System.Root.ToInvariantString())
+            if (id == Constants.System.RootString)
             {
                 return GetMenuForRootNode(queryStrings);
             }
 
             var menu = new MenuItemCollection();
 
-            var path = string.IsNullOrEmpty(id) == false && id != Constants.System.Root.ToInvariantString()
+            var path = string.IsNullOrEmpty(id) == false && id != Constants.System.RootString
                 ? HttpUtility.UrlDecode(id).TrimStart("/")
                 : "";
 

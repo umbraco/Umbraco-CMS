@@ -12,9 +12,10 @@
 
                 <ul ng-if="nodeUrl" class="nav nav-stacked" style="margin-bottom: 0;">
                     <li>
-                        <a href="{{nodeUrl}}" target="_blank">
-                            <i class="icon icon-window-popin"></i>
-                            <span>{{nodeUrl}}</span>
+                        <a ng-attr-href="{{node.extension !== 'svg' ? nodeUrl : undefined}}" ng-click="node.extension === 'svg' && openSVG()" target="_blank">
+                                <i class="icon icon-out"></i>
+                                <span>{{nodeFileName}}</span>
+
                         </a>
                     </li>
                 </ul>
@@ -42,7 +43,7 @@
                         style="max-width: 100%; margin-bottom: 0px;"
                         icon="node.icon"
                         name="node.contentTypeName"
-                        allow-open="allowOpen"
+                        allow-open="allowChangeMediaType"
                         on-open="openMediaType(mediaType)">
                     </umb-node-preview>
                 </umb-control-group>

@@ -1,29 +1,37 @@
 /**
  * @ngdoc controller
- * @name Umbraco.Editors.ContentDeleteController
+ * @name Umbraco.Editors.Content.DeleteController
  * @function
  * 
  * @description
  * The controller for deleting content
  */
-function ContentDeleteController($scope, contentResource, treeService, navigationService, editorState, $location, dialogService, notificationsService) {
+function ContentDeleteController($scope, $timeout, contentResource, treeService, navigationService, editorState, $location, overlayService, languageResource) {
 
+    /**
+     * Used to toggle UI elements during delete operations
+     * @param {any} isDeleting
+     */
+    function toggleDeleting(isDeleting) {
+        $scope.currentNode.loading = isDeleting;
+        $scope.busy = isDeleting;
+    }
+    
     $scope.performDelete = function() {
 
         // stop from firing again on double-click
         if ($scope.busy) { return false; }
 
-        //mark it for deletion (used in the UI)
-        $scope.currentNode.loading = true;
-        $scope.busy = true;
+        toggleDeleting(true);
 
         contentResource.deleteById($scope.currentNode.id).then(function () {
-            $scope.currentNode.loading = false;
-
+            
             //get the root node before we remove it
             var rootNode = treeService.getTreeRoot($scope.currentNode);
 
             treeService.removeNode($scope.currentNode);
+
+            toggleDeleting(false);
 
             if (rootNode) {
                 //ensure the recycle bin has child nodes now            
@@ -50,27 +58,26 @@ function ContentDeleteController($scope, contentResource, treeService, navigatio
                 $location.path(location);
             }
 
-            navigationService.hideMenu();
+            $scope.success = true;
         }, function(err) {
 
-            $scope.currentNode.loading = false;
-            $scope.busy = false;
+            toggleDeleting(false);
 
             //check if response is ysod
             if (err.status && err.status >= 500) {
-                dialogService.ysodDialog(err);
-            }
-            
-            if (err.data && angular.isArray(err.data.notifications)) {
-                for (var i = 0; i < err.data.notifications.length; i++) {
-                    notificationsService.showNotification(err.data.notifications[i]);
-                }
+                // TODO: All YSOD handling should be done with an interceptor
+                overlayService.ysod(err);
             }
         });
 
     };
 
     $scope.cancel = function() {
+        toggleDeleting(false);
+        $scope.close();
+    };
+
+    $scope.close = function () {
         navigationService.hideDialog();
     };
 }

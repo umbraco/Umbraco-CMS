@@ -9,7 +9,7 @@ namespace Umbraco.Web.Models.ContentEditing
     public class DictionaryTranslationSave
     {
         /// <summary>
-        /// Gets or sets the iso code.
+        /// Gets or sets the ISO code.
         /// </summary>
         [DataMember(Name = "isoCode")]        
         public string IsoCode { get; set; }

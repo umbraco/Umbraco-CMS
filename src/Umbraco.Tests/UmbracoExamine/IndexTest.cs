@@ -1,57 +1,182 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
+using System.Threading;
 using Examine;
-using Examine.LuceneEngine;
 using Examine.LuceneEngine.Providers;
-using Examine.LuceneEngine.SearchCriteria;
-using Examine.SearchCriteria;
-using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
-using Lucene.Net.Store;
 using NUnit.Framework;
-using Umbraco.Tests.TestHelpers;
-using UmbracoExamine;
+using Umbraco.Tests.Testing;
+using Umbraco.Examine;
+using Umbraco.Core.Composing;
+using Umbraco.Core.PropertyEditors;
+using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Core.Models;
+using Newtonsoft.Json;
+using System.Collections.Generic;
+using System;
+using Umbraco.Core;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
     /// <summary>
     /// Tests the standard indexing capabilities
     /// </summary>
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
-    [TestFixture, RequiresSTA]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class IndexTest : ExamineBaseTest
     {
+        [Test]
+        public void Index_Property_Data_With_Value_Indexer()
+        {
+            var contentValueSetBuilder = IndexInitializer.GetContentValueSetBuilder(Factory.GetInstance<PropertyEditorCollection>(), false);
+
+            using (var luceneDir = new RandomIdRamDirectory())
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
+                validator: new ContentValueSetValidator(false)))
+            using (indexer.ProcessNonAsync())
+            {
+                indexer.CreateIndex();
+
+                var contentType = MockedContentTypes.CreateBasicContentType();
+                contentType.AddPropertyType(new PropertyType("test", ValueStorageType.Ntext)
+                {
+                    Alias = "grid",
+                    Name = "Grid",
+                    PropertyEditorAlias = Core.Constants.PropertyEditors.Aliases.Grid
+                });
+                var content = MockedContent.CreateBasicContent(contentType);
+                content.Id = 555;
+                content.Path = "-1,555";
+                var gridVal = new GridValue
+                {
+                    Name = "n1",
+                    Sections = new List<GridValue.GridSection>
+                    {
+                        new GridValue.GridSection
+                        {
+                            Grid = "g1",
+                            Rows = new List<GridValue.GridRow>
+                            {
+                                new GridValue.GridRow
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Name = "row1",
+                                    Areas = new List<GridValue.GridArea>
+                                    {
+                                        new GridValue.GridArea
+                                        {
+                                            Grid = "g2",
+                                            Controls = new List<GridValue.GridControl>
+                                            {
+                                                new GridValue.GridControl
+                                                {
+                                                    Editor = new GridValue.GridEditor
+                                                    {
+                                                        Alias = "editor1",
+                                                        View = "view1"
+                                                    },
+                                                    Value = "value1"
+                                                },
+                                                new GridValue.GridControl
+                                                {
+                                                    Editor = new GridValue.GridEditor
+                                                    {
+                                                        Alias = "editor1",
+                                                        View = "view1"
+                                                    },
+                                                    Value = "value2"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+
+                var json = JsonConvert.SerializeObject(gridVal);
+                content.Properties["grid"].SetValue(json);
+
+                var valueSet = contentValueSetBuilder.GetValueSets(content);
+                indexer.IndexItems(valueSet);
+
+                var searcher = indexer.GetSearcher();
+
+                var results = searcher.CreateQuery().Id(555).Execute();
+                Assert.AreEqual(1, results.TotalItemCount);
+
+                var result = results.First();
+                Assert.IsTrue(result.Values.ContainsKey("grid.row1"));
+                Assert.AreEqual("value1", result.AllValues["grid.row1"][0]);
+                Assert.AreEqual("value2", result.AllValues["grid.row1"][1]);
+                Assert.IsTrue(result.Values.ContainsKey("grid"));
+                Assert.AreEqual("value1 value2 ", result["grid"]);
+                Assert.IsTrue(result.Values.ContainsKey($"{UmbracoExamineIndex.RawFieldPrefix}grid"));
+                Assert.AreEqual(json, result[$"{UmbracoExamineIndex.RawFieldPrefix}grid"]);
+            }
+        }
+
+        [Test]
+        public void Rebuild_Index()
+        {
+            var contentRebuilder = IndexInitializer.GetContentIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockContentService(), ScopeProvider.SqlContext, false);
+            var mediaRebuilder = IndexInitializer.GetMediaIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockMediaService());
+
+            using (var luceneDir = new RandomIdRamDirectory())
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
+                validator: new ContentValueSetValidator(false)))
+            using (indexer.ProcessNonAsync())
+            {
+
+                var searcher = indexer.GetSearcher();
+
+                //create the whole thing
+                contentRebuilder.Populate(indexer);
+                mediaRebuilder.Populate(indexer);
+
+                var result = searcher.CreateQuery().All().Execute();
+
+                Assert.AreEqual(29, result.TotalItemCount);
+            }
+        }
+
+        ///// <summary>
         /// <summary>
         /// Check that the node signalled as protected in the content service is not present in the index.
         /// </summary>
         [Test]
         public void Index_Protected_Content_Not_Indexed()
         {
+            var rebuilder = IndexInitializer.GetContentIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockContentService(), ScopeProvider.SqlContext, false);
 
-            using (var luceneDir = new RandomIdRAMDirectory())
-            using (var writer = new IndexWriter(luceneDir, new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29), IndexWriter.MaxFieldLength.LIMITED))
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(writer))
-            using (var searcher = IndexInitializer.GetUmbracoSearcher(writer))
+
+            using (var luceneDir = new RandomIdRamDirectory())
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
+            using (indexer.ProcessNonAsync())
+            using (var searcher = ((LuceneSearcher)indexer.GetSearcher()).GetLuceneSearcher())
             {
-                indexer.RebuildIndex();
+                //create the whole thing
+                rebuilder.Populate(indexer);
+
 
                 var protectedQuery = new BooleanQuery();
                 protectedQuery.Add(
                     new BooleanClause(
-                        new TermQuery(new Term(LuceneIndexer.IndexTypeFieldName, IndexTypes.Content)),
-                        BooleanClause.Occur.MUST));
+                        new TermQuery(new Term(LuceneIndex.CategoryFieldName, IndexTypes.Content)),
+                        Occur.MUST));
 
                 protectedQuery.Add(
                     new BooleanClause(
-                        new TermQuery(new Term(LuceneIndexer.IndexNodeIdFieldName, TestContentService.ProtectedNode.ToString())),
-                        BooleanClause.Occur.MUST));
+                        new TermQuery(new Term(LuceneIndex.ItemIdFieldName, ExamineDemoDataContentService.ProtectedNode.ToString())),
+                        Occur.MUST));
 
-                var collector = new AllHitsCollector(false, true);
-                var s = searcher.GetSearcher();
-                s.Search(protectedQuery, collector);
+                var collector = TopScoreDocCollector.Create(100, true);
 
-                Assert.AreEqual(0, collector.Count, "Protected node should not be indexed");
+                searcher.Search(protectedQuery, collector);
+
+                Assert.AreEqual(0, collector.TotalHits, "Protected node should not be indexed");
             }
 
         }
@@ -59,35 +184,31 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Index_Move_Media_From_Non_Indexable_To_Indexable_ParentID()
         {
-            using (var luceneDir = new RandomIdRAMDirectory())
-            using (var writer = new IndexWriter(luceneDir, new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29), IndexWriter.MaxFieldLength.LIMITED))
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(writer))
-            using (var searcher = IndexInitializer.GetUmbracoSearcher(writer))
+            // create a validator with
+            // publishedValuesOnly false
+            // parentId 1116 (only content under that parent will be indexed)
+            var validator = new ContentValueSetValidator(false, 1116);
+
+            using (var luceneDir = new RandomIdRamDirectory())
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, validator: validator))
+            using (indexer.ProcessNonAsync())
             {
-                indexer.RebuildIndex();
-
-                var mediaService = new TestMediaService();
-
-                //change parent id to 1116
-                var existingCriteria = indexer.IndexerData;
-                indexer.IndexerData = new IndexCriteria(existingCriteria.StandardFields, existingCriteria.UserFields, existingCriteria.IncludeNodeTypes, existingCriteria.ExcludeNodeTypes,
-                    1116);
-
-                //rebuild so it excludes children unless they are under 1116
-                indexer.RebuildIndex();
-
-                //ensure that node 2112 doesn't exist
-                var results = searcher.Search(searcher.CreateSearchCriteria().Id(2112).Compile());
-                Assert.AreEqual(0, results.TotalItemCount);
+                var searcher = indexer.GetSearcher();
 
                 //get a node from the data repo (this one exists underneath 2222)
-                var node = mediaService.GetLatestMediaByXpath("//*[string-length(@id)>0 and number(@id)>0]")
-                                        .Root
-                                        .Elements()
-                                        .First(x => (int)x.Attribute("id") == 2112);
+                var node = _mediaService.GetLatestMediaByXpath("//*[string-length(@id)>0 and number(@id)>0]")
+                                        .Root.Elements()
+                                        .First(x => (int) x.Attribute("id") == 2112);
 
                 var currPath = (string)node.Attribute("path"); //should be : -1,1111,2222,2112
                 Assert.AreEqual("-1,1111,2222,2112", currPath);
+
+                //ensure it's indexed
+                indexer.IndexItem(node.ConvertToValueSet(IndexTypes.Media));
+
+                //it will not exist because it exists under 2222
+                var results = searcher.CreateQuery().Id(2112).Execute();
+                Assert.AreEqual(0, results.Count());
 
                 //now mimic moving 2112 to 1116
                 //node.SetAttributeValue("path", currPath.Replace("2222", "1116"));
@@ -95,65 +216,53 @@ namespace Umbraco.Tests.UmbracoExamine
                 node.SetAttributeValue("parentID", "1116");
 
                 //now reindex the node, this should first delete it and then WILL add it because of the parent id constraint
-                indexer.ReIndexNode(node, IndexTypes.Media);
+                indexer.IndexItems(new[] { node.ConvertToValueSet(IndexTypes.Media) });
 
-                //RESET the parent id
-                existingCriteria = ((IndexCriteria)indexer.IndexerData);
-                indexer.IndexerData = new IndexCriteria(existingCriteria.StandardFields, existingCriteria.UserFields, existingCriteria.IncludeNodeTypes, existingCriteria.ExcludeNodeTypes,
-                    null);
-
-                //now ensure it's deleted
-                var newResults = searcher.Search(searcher.CreateSearchCriteria().Id(2112).Compile());
-                Assert.AreEqual(1, newResults.TotalItemCount);
+                //now ensure it exists
+                results = searcher.CreateQuery().Id(2112).Execute();
+                Assert.AreEqual(1, results.Count());
             }
-
-            
         }
 
         [Test]
         public void Index_Move_Media_To_Non_Indexable_ParentID()
         {
-            using (var luceneDir = new RandomIdRAMDirectory())
-            using (var writer = new IndexWriter(luceneDir, new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29), IndexWriter.MaxFieldLength.LIMITED))
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(writer))
-            using (var searcher = IndexInitializer.GetUmbracoSearcher(writer))
-            {
-                indexer.RebuildIndex();
+            // create a validator with
+            // publishedValuesOnly false
+            // parentId 2222 (only content under that parent will be indexed)
+            var validator = new ContentValueSetValidator(false, 2222);
 
-                var mediaService = new TestMediaService();
+            using (var luceneDir = new RandomIdRamDirectory())
+            using (var indexer1 = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, validator: validator))
+            using (indexer1.ProcessNonAsync())
+            {
+                var searcher = indexer1.GetSearcher();
 
                 //get a node from the data repo (this one exists underneath 2222)
-                var node = mediaService.GetLatestMediaByXpath("//*[string-length(@id)>0 and number(@id)>0]")
-                                    .Root
-                                    .Elements()
-                                    .First(x => (int)x.Attribute("id") == 2112);
+                var node = _mediaService.GetLatestMediaByXpath("//*[string-length(@id)>0 and number(@id)>0]")
+                                    .Root.Elements()
+                                    .First(x => (int) x.Attribute("id") == 2112);
 
                 var currPath = (string)node.Attribute("path"); //should be : -1,1111,2222,2112
                 Assert.AreEqual("-1,1111,2222,2112", currPath);
 
                 //ensure it's indexed
-                indexer.ReIndexNode(node, IndexTypes.Media);
+                indexer1.IndexItem(node.ConvertToValueSet(IndexTypes.Media));
 
-                //change the parent node id to be the one it used to exist under
-                var existingCriteria = indexer.IndexerData;
-                indexer.IndexerData = new IndexCriteria(existingCriteria.StandardFields, existingCriteria.UserFields, existingCriteria.IncludeNodeTypes, existingCriteria.ExcludeNodeTypes,
-                    2222);
+                //it will exist because it exists under 2222
+                var results = searcher.CreateQuery().Id(2112).Execute();
+                Assert.AreEqual(1, results.Count());
 
                 //now mimic moving the node underneath 1116 instead of 2222
                 node.SetAttributeValue("path", currPath.Replace("2222", "1116"));
                 node.SetAttributeValue("parentID", "1116");
 
                 //now reindex the node, this should first delete it and then NOT add it because of the parent id constraint
-                indexer.ReIndexNode(node, IndexTypes.Media);
-
-                //RESET the parent id
-                existingCriteria = ((IndexCriteria)indexer.IndexerData);
-                indexer.IndexerData = new IndexCriteria(existingCriteria.StandardFields, existingCriteria.UserFields, existingCriteria.IncludeNodeTypes, existingCriteria.ExcludeNodeTypes,
-                    null);
+                indexer1.IndexItems(new[] { node.ConvertToValueSet(IndexTypes.Media) });
 
                 //now ensure it's deleted
-                var results = searcher.Search(searcher.CreateSearchCriteria().Id(2112).Compile());
-                Assert.AreEqual(0, results.TotalItemCount);
+                results = searcher.CreateQuery().Id(2112).Execute();
+                Assert.AreEqual(0, results.Count());
             }
         }
 
@@ -165,40 +274,37 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Index_Reindex_Content()
         {
-            using (var luceneDir = new RandomIdRAMDirectory())
-            using (var writer = new IndexWriter(luceneDir, new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29), IndexWriter.MaxFieldLength.LIMITED))
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(writer, supportUnpublishedContent: true))
-            using (var searcher = IndexInitializer.GetUmbracoSearcher(writer))
+            var rebuilder = IndexInitializer.GetContentIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockContentService(), ScopeProvider.SqlContext, false);
+            using (var luceneDir = new RandomIdRamDirectory())
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
+                validator: new ContentValueSetValidator(false)))
+            using (indexer.ProcessNonAsync())
             {
-                indexer.RebuildIndex();
 
-                var s = (IndexSearcher)searcher.GetSearcher();
+                var searcher = indexer.GetSearcher();
 
-                //first delete all 'Content' (not media). This is done by directly manipulating the index with the Lucene API, not examine!
+                //create the whole thing
+                rebuilder.Populate(indexer);
 
-                var contentTerm = new Term(LuceneIndexer.IndexTypeFieldName, IndexTypes.Content);
-                writer.DeleteDocuments(contentTerm);
-                writer.Commit();
+                var result = searcher.CreateQuery().Field(LuceneIndex.CategoryFieldName, IndexTypes.Content).Execute();
+                Assert.AreEqual(21, result.TotalItemCount);
 
-                //make sure the content is gone. This is done with lucene APIs, not examine!
-                var collector = new AllHitsCollector(false, true);
-                var query = new TermQuery(contentTerm);
-                s = (IndexSearcher)searcher.GetSearcher(); //make sure the searcher is up do date.
-                s.Search(query, collector);
-                Assert.AreEqual(0, collector.Count);
+                //delete all content
+                foreach (var r in result)
+                {
+                    indexer.DeleteFromIndex(r.Id);
+                }
+
+
+                //ensure it's all gone
+                result = searcher.CreateQuery().Field(LuceneIndex.CategoryFieldName, IndexTypes.Content).Execute();
+                Assert.AreEqual(0, result.TotalItemCount);
 
                 //call our indexing methods
-                indexer.IndexAll(IndexTypes.Content);
+                rebuilder.Populate(indexer);
 
-                collector = new AllHitsCollector(false, true);
-                s = (IndexSearcher)searcher.GetSearcher(); //make sure the searcher is up do date.
-                s.Search(query, collector);
-                //var ids = new List<string>();
-                //for (var i = 0; i < collector.Count;i++)
-                //{
-                //    ids.Add(s.Doc(collector.GetDocId(i)).GetValues("__NodeId")[0]);
-                //}
-                Assert.AreEqual(21, collector.Count);
+                result = searcher.CreateQuery().Field(LuceneIndex.CategoryFieldName, IndexTypes.Content).Execute();
+                Assert.AreEqual(21, result.TotalItemCount);
             }
         }
 
@@ -209,36 +315,31 @@ namespace Umbraco.Tests.UmbracoExamine
         public void Index_Delete_Index_Item_Ensure_Heirarchy_Removed()
         {
 
-            using (var luceneDir = new RandomIdRAMDirectory())
-            using (var writer = new IndexWriter(luceneDir, new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29), IndexWriter.MaxFieldLength.LIMITED))
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(writer))
-            using (var searcher = IndexInitializer.GetUmbracoSearcher(writer))
+            var rebuilder = IndexInitializer.GetContentIndexRebuilder(Factory.GetInstance<PropertyEditorCollection>(), IndexInitializer.GetMockContentService(), ScopeProvider.SqlContext, false);
+
+            using (var luceneDir = new RandomIdRamDirectory())
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
+            using (indexer.ProcessNonAsync())
             {
-                indexer.RebuildIndex();
+                var searcher = indexer.GetSearcher();
+
+                //create the whole thing
+                rebuilder.Populate(indexer);
 
                 //now delete a node that has children
 
                 indexer.DeleteFromIndex(1140.ToString());
                 //this node had children: 1141 & 1142, let's ensure they are also removed
 
-                var results = searcher.Search(searcher.CreateSearchCriteria().Id(1141).Compile());
-                Assert.AreEqual(0, results.TotalItemCount);
+                var results = searcher.CreateQuery().Id(1141).Execute();
+                Assert.AreEqual(0, results.Count());
 
-                results = searcher.Search(searcher.CreateSearchCriteria().Id(1142).Compile());
-                Assert.AreEqual(0, results.TotalItemCount);
+                results = searcher.CreateQuery().Id(1142).Execute();
+                Assert.AreEqual(0, results.Count());
+
             }
         }
-        
-        #region Initialize and Cleanup
-            
-        public override void TearDown()
-        {
-            base.TearDown();
-        
-            UmbracoExamineSearcher.DisableInitializationCheck = null;
-            BaseUmbracoIndexer.DisableInitializationCheck = null;
-        }
-        
-        #endregion
+
+        private readonly ExamineDemoDataMediaService _mediaService = new ExamineDemoDataMediaService();
     }
 }

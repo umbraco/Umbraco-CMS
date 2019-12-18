@@ -27,9 +27,9 @@ namespace Umbraco.Tests.Web.AngularIntegration
                 string cookieToken, headerToken;
                 AngularAntiForgeryHelper.GetTokens(out cookieToken, out headerToken);
 
-                Assert.AreEqual(true, AngularAntiForgeryHelper.ValidateTokens(cookieToken, headerToken));    
+                Assert.AreEqual(true, AngularAntiForgeryHelper.ValidateTokens(cookieToken, headerToken));
             }
-            
+
         }
 
         [Test]

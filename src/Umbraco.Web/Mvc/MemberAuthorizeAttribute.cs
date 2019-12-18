@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Web;
 using System.Web.Mvc;
-using System.Web.Security;
-using Umbraco.Web.Security;
-using umbraco.cms.businesslogic.member;
 using AuthorizeAttribute = System.Web.Mvc.AuthorizeAttribute;
 using Umbraco.Core;
+using Umbraco.Web.Security;
+using Umbraco.Core.Composing;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Mvc
 {
@@ -17,38 +15,6 @@ namespace Umbraco.Web.Mvc
     /// </summary>
     public sealed class MemberAuthorizeAttribute : AuthorizeAttribute
     {
-
-        private readonly UmbracoContext _umbracoContext;
-
-        private UmbracoContext GetUmbracoContext()
-        {
-            return _umbracoContext ?? UmbracoContext.Current;
-        }
-
-        /// <summary>
-        /// THIS SHOULD BE ONLY USED FOR UNIT TESTS
-        /// </summary>
-        /// <param name="umbracoContext"></param>
-        public MemberAuthorizeAttribute(UmbracoContext umbracoContext)
-        {
-            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
-            _umbracoContext = umbracoContext;
-        }
-
-        public MemberAuthorizeAttribute()
-        {
-
-        }
-
-        /// <summary>
-        /// Flag for whether to allow all site visitors or just authenticated members
-        /// </summary>
-        /// <remarks>
-        /// This is the same as applying the [AllowAnonymous] attribute
-        /// </remarks>
-        [Obsolete("Use [AllowAnonymous] instead")]
-        public bool AllowAll { get; set; }
-
         /// <summary>
         /// Comma delimited list of allowed member types
         /// </summary>
@@ -76,17 +42,15 @@ namespace Umbraco.Web.Mvc
             var members = new List<int>();
             foreach (var s in AllowMembers.Split(','))
             {
-                int id;
-                if (int.TryParse(s, out id))
+                if (int.TryParse(s, out var id))
                 {
                     members.Add(id);
                 }
             }
 
-            return GetUmbracoContext().Security.IsMemberAuthorized(AllowAll,
-                                                  AllowType.Split(','),
-                                                  AllowGroup.Split(','),
-                                                  members);
+            var helper = Current.Factory.GetInstance<MembershipHelper>();
+            return helper.IsMemberAuthorized(AllowType.Split(','), AllowGroup.Split(','), members);
+            
         }
 
         /// <summary>

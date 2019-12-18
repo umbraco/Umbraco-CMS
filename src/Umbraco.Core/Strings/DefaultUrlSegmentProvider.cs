@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using Umbraco.Core.Models;
+﻿using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Strings
 {
@@ -9,33 +8,23 @@ namespace Umbraco.Core.Strings
     public class DefaultUrlSegmentProvider : IUrlSegmentProvider
     {
         /// <summary>
-        /// Gets the default url segment for a specified content.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <returns>The url segment.</returns>
-        public string GetUrlSegment(IContentBase content)
-        {
-            return GetUrlSegmentSource(content).ToUrlSegment();
-        }
-
-        /// <summary>
         /// Gets the url segment for a specified content and culture.
         /// </summary>
         /// <param name="content">The content.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The url segment.</returns>
-        public string GetUrlSegment(IContentBase content, CultureInfo culture)
+        public string GetUrlSegment(IContentBase content, string culture = null)
         {
-            return GetUrlSegmentSource(content).ToUrlSegment(culture);
+            return GetUrlSegmentSource(content, culture).ToUrlSegment(culture);
         }
 
-        private static string GetUrlSegmentSource(IContentBase content)
+        private static string GetUrlSegmentSource(IContentBase content, string culture)
         {
             string source = null;
             if (content.HasProperty(Constants.Conventions.Content.UrlName))
-                source = (content.GetValue<string>(Constants.Conventions.Content.UrlName) ?? string.Empty).Trim();
+                source = (content.GetValue<string>(Constants.Conventions.Content.UrlName, culture) ?? string.Empty).Trim();
             if (string.IsNullOrWhiteSpace(source))
-                source = content.Name;
+                source = content.GetCultureName(culture);
             return source;
         }
     }

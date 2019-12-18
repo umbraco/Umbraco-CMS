@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
@@ -8,6 +8,9 @@ using Umbraco.Core.Security;
 
 namespace Umbraco.Tests.TestHelpers.ControllerTesting
 {
+    /// <summary>
+    /// Ensures there's an admin user assigned to the request
+    /// </summary>
     public class AuthenticateEverythingMiddleware : AuthenticationMiddleware<AuthenticationOptions>
     {
         public AuthenticateEverythingMiddleware(OwinMiddleware next, IAppBuilder app, AuthenticationOptions options)
@@ -26,16 +29,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             {
                 var sessionId = Guid.NewGuid().ToString();
                 var identity = new UmbracoBackOfficeIdentity(
-                    new UserData(sessionId)
-                    {
-                        SecurityStamp = sessionId,
-                        Id = 0,
-                        Roles = new[] { "admin" },
-                        AllowedApplications = new[] { "content", "media", "members" },
-                        Culture = "en-US",
-                        RealName = "Admin",                        
-                        Username = "admin"
-                    });
+                    -1, "admin", "Admin", new []{-1}, new[] { -1 }, "en-US", sessionId, sessionId, new[] { "content", "media", "members" }, new[] { "admin" });
 
                 return Task.FromResult(new AuthenticationTicket(identity,
                     new AuthenticationProperties()

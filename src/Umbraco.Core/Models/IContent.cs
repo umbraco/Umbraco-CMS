@@ -1,92 +1,134 @@
-using System;
-using System.ComponentModel;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Umbraco.Core.Models
 {
+
     /// <summary>
-    /// Defines a Content object
-    /// </summary>    
+    /// Represents a document.
+    /// </summary>
+    /// <remarks>
+    /// <para>A document can be published, rendered by a template.</para>
+    /// </remarks>
     public interface IContent : IContentBase
     {
         /// <summary>
-        /// Gets or sets the template used by the Content.
-        /// This is used to override the default one from the ContentType.
+        /// Gets or sets the content schedule
         /// </summary>
-        ITemplate Template { get; set; }
+        ContentScheduleCollection ContentSchedule { get; set; }
 
         /// <summary>
-        /// Boolean indicating whether the Content is Published or not
+        /// Gets or sets the template id used to render the content.
         /// </summary>
-        bool Published { get; }
-
-        [Obsolete("This will be removed in future versions")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        string Language { get; set; }
+        int? TemplateId { get; set; }
 
         /// <summary>
-        /// Gets or Sets the date the Content should be released and thus be published
+        /// Gets a value indicating whether the content is published.
         /// </summary>
-        DateTime? ReleaseDate { get; set; }
+        bool Published { get; set; }
+
+        PublishedState PublishedState { get; set; }
 
         /// <summary>
-        /// Gets or Sets the date the Content should expire and thus be unpublished
+        /// Gets a value indicating whether the content has been edited.
         /// </summary>
-        DateTime? ExpireDate { get; set; }
+        bool Edited { get; set; }
 
         /// <summary>
-        /// Id of the user who wrote/updated the Content
+        /// Gets the published version identifier.
         /// </summary>
-        int WriterId { get; set; }
+        int PublishedVersionId { get; set; }
 
         /// <summary>
-        /// Gets the ContentType used by this content object
+        /// Gets a value indicating whether the content item is a blueprint.
         /// </summary>
-        IContentType ContentType { get; }
+        bool Blueprint { get; set; }
 
         /// <summary>
-        /// Gets the current status of the Content
+        /// Gets the template id used to render the published version of the content.
         /// </summary>
-        ContentStatus Status { get; }
+        /// <remarks>When editing the content, the template can change, but this will not until the content is published.</remarks>
+        int? PublishTemplateId { get; set; }
 
         /// <summary>
-        /// Changes the <see cref="IContentType"/> for the current content object
+        /// Gets the name of the published version of the content.
         /// </summary>
-        /// <param name="contentType">New ContentType for this content</param>
-        /// <remarks>Leaves PropertyTypes intact after change</remarks>
-        void ChangeContentType(IContentType contentType);
+        /// <remarks>When editing the content, the name can change, but this will not until the content is published.</remarks>
+        string PublishName { get; set; }
 
         /// <summary>
-        /// Changes the <see cref="IContentType"/> for the current content object and removes PropertyTypes,
-        /// which are not part of the new ContentType.
+        /// Gets the identifier of the user who published the content.
         /// </summary>
-        /// <param name="contentType">New ContentType for this content</param>
-        /// <param name="clearProperties">Boolean indicating whether to clear PropertyTypes upon change</param>
-        void ChangeContentType(IContentType contentType, bool clearProperties);
+        int? PublisherId { get; set; }
 
         /// <summary>
-        /// Changes the Published state of the content object
+        /// Gets the date and time the content was published.
         /// </summary>
-        void ChangePublishedState(PublishedState state);
+        DateTime? PublishDate { get; set; }
+
+        /// <summary>
+        /// Gets a value indicating whether a culture is published.
+        /// </summary>
+        /// <remarks>
+        /// <para>A culture becomes published whenever values for this culture are published,
+        /// and the content published name for this culture is non-null. It becomes non-published
+        /// whenever values for this culture are unpublished.</para>
+        /// <para>A culture becomes published as soon as PublishCulture has been invoked,
+        /// even though the document might not have been saved yet (and can have no identity).</para>
+        /// <para>Does not support the '*' wildcard (returns false).</para>
+        /// </remarks>
+        bool IsCulturePublished(string culture);
+
+        /// <summary>
+        /// Gets the date a culture was published.
+        /// </summary>
+        DateTime? GetPublishDate(string culture);
+
+        /// <summary>
+        /// Gets a value indicated whether a given culture is edited.
+        /// </summary>
+        /// <remarks>
+        /// <para>A culture is edited when it is available, and not published or published but
+        /// with changes.</para>
+        /// <para>A culture can be edited even though the document might now have been saved yet (and can have no identity).</para>
+        /// <para>Does not support the '*' wildcard (returns false).</para>
+        /// </remarks>
+        bool IsCultureEdited(string culture);
+
+        /// <summary>
+        /// Gets the name of the published version of the content for a given culture.
+        /// </summary>
+        /// <remarks>
+        /// <para>When editing the content, the name can change, but this will not until the content is published.</para>
+        /// <para>When <paramref name="culture"/> is <c>null</c>, gets the invariant
+        /// language, which is the value of the <see cref="PublishName"/> property.</para>
+        /// </remarks>
+        string GetPublishName(string culture);
+
+        /// <summary>
+        /// Gets the published culture infos of the content.
+        /// </summary>
+        /// <remarks>
+        /// <para>Because a dictionary key cannot be <c>null</c> this cannot get the invariant
+        /// name, which must be get via the <see cref="PublishName"/> property.</para>
+        /// </remarks>
+        ContentCultureInfosCollection PublishCultureInfos { get; set; }
+
+        /// <summary>
+        /// Gets the published cultures.
+        /// </summary>
+        IEnumerable<string> PublishedCultures { get; }
+
+        /// <summary>
+        /// Gets the edited cultures.
+        /// </summary>
+        IEnumerable<string> EditedCultures { get; set; }
 
         /// <summary>
         /// Creates a deep clone of the current entity with its identity/alias and it's property identities reset
         /// </summary>
         /// <returns></returns>
         IContent DeepCloneWithResetIdentities();
-
-        /// <summary>
-        /// Gets a value indicating whether the content has a published version.
-        /// </summary>
-        bool HasPublishedVersion { get; }
-
-        /// <summary>
-        /// Gets the unique identifier of the published version, if any.
-        /// </summary>
-        Guid PublishedVersionGuid { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether the content item is a blueprint.
-        /// </summary>
-        bool IsBlueprint { get; }
+        
     }
 }

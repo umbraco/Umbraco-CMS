@@ -10,9 +10,6 @@ namespace Umbraco.Core
         /// <summary>
         /// Returns the machine name that is safe to use in file paths.
         /// </summary>
-        /// <remarks>
-        /// see: https://github.com/Shandem/ClientDependency/issues/4
-        /// </remarks>
         public static string FileSafeMachineName
         {
             get { return MachineName.ReplaceNonAlphanumericChars('-'); }
@@ -41,7 +38,7 @@ namespace Umbraco.Core
                     catch
                     {
                         //if we get here it means we cannot access the machine name
-                        throw new ApplicationException("Cannot resolve the current machine name eithe by Environment.MachineName or by Dns.GetHostname()");
+                        throw new ApplicationException("Cannot resolve the current machine name either by Environment.MachineName or by Dns.GetHostname()");
                     }
                 }
             }

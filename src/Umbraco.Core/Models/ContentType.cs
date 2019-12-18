@@ -13,6 +13,8 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class ContentType : ContentTypeCompositionBase, IContentType
     {
+        public const bool SupportsPublishingConst = true;
+
         private int _defaultTemplate;
         private IEnumerable<ITemplate> _allowedTemplates;
 
@@ -26,15 +28,6 @@ namespace Umbraco.Core.Models
             _allowedTemplates = new List<ITemplate>();
         }
 
-        /// <summary>
-        /// Constuctor for creating a ContentType with the parent as an inherited type.
-        /// </summary>
-        /// <remarks>Use this to ensure inheritance from parent.</remarks>
-        /// <param name="parent"></param>
-        [Obsolete("This method is obsolete, use ContentType(IContentType parent, string alias) instead.", false)]
-        public ContentType(IContentType parent) : this(parent, null)
-        {
-        }
 
         /// <summary>
         /// Constuctor for creating a ContentType with the parent as an inherited type.
@@ -48,23 +41,21 @@ namespace Umbraco.Core.Models
             _allowedTemplates = new List<ITemplate>();
         }
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+        /// <inheritdoc />
+        public override ISimpleContentType ToSimple() => new SimpleContentType(this);
 
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo DefaultTemplateSelector = ExpressionHelper.GetPropertyInfo<ContentType, int>(x => x.DefaultTemplateId);
-            public readonly PropertyInfo AllowedTemplatesSelector = ExpressionHelper.GetPropertyInfo<ContentType, IEnumerable<ITemplate>>(x => x.AllowedTemplates);
+        /// <inheritdoc />
+        public override bool SupportsPublishing => SupportsPublishingConst;
 
-            //Custom comparer for enumerable
-            public readonly DelegateEqualityComparer<IEnumerable<ITemplate>> TemplateComparer = new DelegateEqualityComparer<IEnumerable<ITemplate>>(
-                (templates, enumerable) => templates.UnsortedSequenceEqual(enumerable),
-                templates => templates.GetHashCode());
-        }
+        //Custom comparer for enumerable
+        private static readonly DelegateEqualityComparer<IEnumerable<ITemplate>> TemplateComparer = new DelegateEqualityComparer<IEnumerable<ITemplate>>(
+            (templates, enumerable) => templates.UnsortedSequenceEqual(enumerable),
+            templates => templates.GetHashCode());
 
         /// <summary>
         /// Gets or sets the alias of the default Template.
         /// TODO: This should be ignored from cloning!!!!!!!!!!!!!!
-        ///  - but to do that we have to implement callback hacks, this needs to be fixed in v8, 
+        ///  - but to do that we have to implement callback hacks, this needs to be fixed in v8,
         ///     we should not store direct entity
         /// </summary>
         [IgnoreDataMember]
@@ -79,23 +70,23 @@ namespace Umbraco.Core.Models
         [DataMember]
         internal int DefaultTemplateId
         {
-            get { return _defaultTemplate; }
-            set { SetPropertyValueAndDetectChanges(value, ref _defaultTemplate, Ps.Value.DefaultTemplateSelector); }
+            get => _defaultTemplate;
+            set => SetPropertyValueAndDetectChanges(value, ref _defaultTemplate, nameof(DefaultTemplateId));
         }
 
         /// <summary>
         /// Gets or Sets a list of Templates which are allowed for the ContentType
         /// TODO: This should be ignored from cloning!!!!!!!!!!!!!!
-        ///  - but to do that we have to implement callback hacks, this needs to be fixed in v8, 
+        ///  - but to do that we have to implement callback hacks, this needs to be fixed in v8,
         ///     we should not store direct entity
         /// </summary>
         [DataMember]
         public IEnumerable<ITemplate> AllowedTemplates
         {
-            get { return _allowedTemplates; }
+            get => _allowedTemplates;
             set
             {
-                SetPropertyValueAndDetectChanges(value, ref _allowedTemplates, Ps.Value.AllowedTemplatesSelector, Ps.Value.TemplateComparer);
+                SetPropertyValueAndDetectChanges(value, ref _allowedTemplates, nameof(AllowedTemplates), TemplateComparer);
 
                 if (_allowedTemplates.Any(x => x.Id == _defaultTemplate) == false)
                     DefaultTemplateId = 0;
@@ -109,8 +100,9 @@ namespace Umbraco.Core.Models
         /// <returns>True if AllowedTemplates contains the templateId else False</returns>
         public bool IsAllowedTemplate(int templateId)
         {
-            var allowedTemplates = AllowedTemplates ?? new ITemplate[0];
-            return allowedTemplates.Any(t => t.Id == templateId);
+            return AllowedTemplates == null
+                ? false
+                : AllowedTemplates.Any(t => t.Id == templateId);
         }
 
         /// <summary>
@@ -120,8 +112,9 @@ namespace Umbraco.Core.Models
         /// <returns>True if AllowedTemplates contains the templateAlias else False</returns>
         public bool IsAllowedTemplate(string templateAlias)
         {
-            var allowedTemplates = AllowedTemplates ?? new ITemplate[0];
-            return allowedTemplates.Any(t => t.Alias.Equals(templateAlias, StringComparison.InvariantCultureIgnoreCase));
+            return AllowedTemplates == null
+                ? false
+                : AllowedTemplates.Any(t => t.Alias.Equals(templateAlias, StringComparison.InvariantCultureIgnoreCase));
         }
 
         /// <summary>
@@ -163,40 +156,7 @@ namespace Umbraco.Core.Models
             return result;
         }
 
-        /// <summary>
-        /// Creates a deep clone of the current entity with its identity/alias and it's property identities reset
-        /// </summary>
-        /// <returns></returns>
-        [Obsolete("Use DeepCloneWithResetIdentities instead")]
-        public IContentType Clone(string alias)
-        {
-            return DeepCloneWithResetIdentities(alias);
-        }
-
-        /// <summary>
-        /// Creates a deep clone of the current entity with its identity/alias and it's property identities reset
-        /// </summary>
-        /// <returns></returns>
-        public IContentType DeepCloneWithResetIdentities(string alias)
-        {
-            var clone = (ContentType)DeepClone();
-            clone.Alias = alias;
-            clone.Key = Guid.Empty;
-            foreach (var propertyGroup in clone.PropertyGroups)
-            {
-                propertyGroup.ResetIdentity();
-                propertyGroup.ResetDirtyProperties(false);
-            }
-            foreach (var propertyType in clone.PropertyTypes)
-            {
-                propertyType.ResetIdentity();
-                propertyType.ResetDirtyProperties(false);
-            }
-
-            clone.ResetIdentity();
-            clone.ResetDirtyProperties(false);
-            return clone;
-        }
-
+        /// <inheritdoc />
+        IContentType IContentType.DeepCloneWithResetIdentities(string newAlias) => (IContentType)DeepCloneWithResetIdentities(newAlias);
     }
 }

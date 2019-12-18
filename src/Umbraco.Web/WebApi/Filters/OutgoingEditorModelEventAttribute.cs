@@ -1,7 +1,8 @@
-using System;
+﻿using System;
 using System.Net.Http;
 using System.Web.Http.Filters;
 using Umbraco.Core;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
 
@@ -16,23 +17,24 @@ namespace Umbraco.Web.WebApi.Filters
         {
             if (actionExecutedContext.Response == null) return;
 
-            var user = UmbracoContext.Current.Security.CurrentUser;
+            var user = Current.UmbracoContext.Security.CurrentUser;
             if (user == null) return;
 
-            var objectContent = actionExecutedContext.Response.Content as ObjectContent;
-            if (objectContent != null)
+            if (actionExecutedContext.Response.Content is ObjectContent objectContent)
             {
                 var model = objectContent.Value;
 
                 if (model != null)
                 {
-                    EditorModelEventManager.EmitEvent(actionExecutedContext, new EditorModelEventArgs(
-                        (dynamic)model,
-                        UmbracoContext.Current));
+                    var args = new EditorModelEventArgs(
+                        model,
+                        Current.UmbracoContext);
+                    EditorModelEventManager.EmitEvent(actionExecutedContext, args);
+                    objectContent.Value = args.Model;
                 }
             }
 
             base.OnActionExecuted(actionExecutedContext);
-        }        
+        }
     }
 }

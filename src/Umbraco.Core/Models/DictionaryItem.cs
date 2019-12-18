@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
@@ -12,7 +11,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class DictionaryItem : Entity, IDictionaryItem
+    public class DictionaryItem : EntityBase, IDictionaryItem
     {
         public Func<int, ILanguage> GetLanguage { get; set; }
         private Guid? _parentId;
@@ -30,20 +29,11 @@ namespace Umbraco.Core.Models
             _translations = new List<IDictionaryTranslation>();
         }
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<DictionaryItem, Guid?>(x => x.ParentId);
-            public readonly PropertyInfo ItemKeySelector = ExpressionHelper.GetPropertyInfo<DictionaryItem, string>(x => x.ItemKey);
-            public readonly PropertyInfo TranslationsSelector = ExpressionHelper.GetPropertyInfo<DictionaryItem, IEnumerable<IDictionaryTranslation>>(x => x.Translations);
-
-            //Custom comparer for enumerable
-            public readonly DelegateEqualityComparer<IEnumerable<IDictionaryTranslation>> DictionaryTranslationComparer =
-                new DelegateEqualityComparer<IEnumerable<IDictionaryTranslation>>(
-                    (enumerable, translations) => enumerable.UnsortedSequenceEqual(translations),
-                    enumerable => enumerable.GetHashCode());
-        }
+        //Custom comparer for enumerable
+        private static readonly DelegateEqualityComparer<IEnumerable<IDictionaryTranslation>> DictionaryTranslationComparer =
+            new DelegateEqualityComparer<IEnumerable<IDictionaryTranslation>>(
+                (enumerable, translations) => enumerable.UnsortedSequenceEqual(translations),
+                enumerable => enumerable.GetHashCode());
 
         /// <summary>
         /// Gets or Sets the Parent Id of the Dictionary Item
@@ -52,7 +42,7 @@ namespace Umbraco.Core.Models
         public Guid? ParentId
         {
             get { return _parentId; }
-            set { SetPropertyValueAndDetectChanges(value, ref _parentId, Ps.Value.ParentIdSelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _parentId, nameof(ParentId)); }
         }
 
         /// <summary>
@@ -62,7 +52,7 @@ namespace Umbraco.Core.Models
         public string ItemKey
         {
             get { return _itemKey; }
-            set { SetPropertyValueAndDetectChanges(value, ref _itemKey, Ps.Value.ItemKeySelector); }
+            set { SetPropertyValueAndDetectChanges(value, ref _itemKey, nameof(ItemKey)); }
         }
 
         /// <summary>
@@ -84,8 +74,8 @@ namespace Umbraco.Core.Models
                     }
                 }
 
-                SetPropertyValueAndDetectChanges(asArray, ref _translations, Ps.Value.TranslationsSelector,
-                    Ps.Value.DictionaryTranslationComparer);                
+                SetPropertyValueAndDetectChanges(asArray, ref _translations, nameof(Translations),
+                    DictionaryTranslationComparer);
             }
         }
     }

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -44,7 +44,7 @@ namespace Umbraco.Web.Models.ContentEditing
         public int[] StartContentIds { get; set; }
 
         [DataMember(Name = "startMediaIds")]
-        public int[] StartMediaIds { get; set; }        
+        public int[] StartMediaIds { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

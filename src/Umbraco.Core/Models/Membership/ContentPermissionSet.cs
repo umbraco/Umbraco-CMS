@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models.Membership
 {
@@ -10,7 +10,7 @@ namespace Umbraco.Core.Models.Membership
     /// <remarks>
     /// This implements <see cref="IAggregateRoot"/> purely so it can be used with the repository layer which is why it's explicitly implemented.
     /// </remarks>
-    public class ContentPermissionSet : EntityPermissionSet, IAggregateRoot
+    public class ContentPermissionSet : EntityPermissionSet, IEntity
     {
         private readonly IContent _content;
 
@@ -43,7 +43,7 @@ namespace Umbraco.Core.Models.Membership
 
         DateTime IEntity.UpdateDate { get; set; }
 
-        DateTime? IDeletableEntity.DeletedDate { get; set; }
+        DateTime? IEntity.DeleteDate { get; set; }
 
         object IDeepCloneable.DeepClone()
         {

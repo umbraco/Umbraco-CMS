@@ -1,17 +1,28 @@
-﻿using System.Linq;
-using System.Web.Mvc;
-using System.Web.Security;
-using umbraco.cms.businesslogic.member;
+﻿using System.Web.Mvc;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Controllers
 {
     public class UmbLoginController : SurfaceController
     {
+        public UmbLoginController()
+        {
+        }
+
+        public UmbLoginController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
+            : base(umbracoContextAccessor, databaseFactory, services, appCaches, logger, profilingLogger, umbracoHelper)
+        {
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ValidateUmbracoFormRouteString]
         public ActionResult HandleLogin([Bind(Prefix = "loginModel")]LoginModel model)
         {
             if (ModelState.IsValid == false)
@@ -32,15 +43,10 @@ namespace Umbraco.Web.Controllers
             if (model.RedirectUrl.IsNullOrWhiteSpace() == false)
             {
                 // validate the redirect url
-                if (Url.IsLocalUrl(model.RedirectUrl))
-                {
-                    return Redirect(model.RedirectUrl);
-                }
-                else
-                {
-                    // if it's not a local url we'll redirect to the root of the current site
-                    return Redirect(base.CurrentPage.Site().Url);
-                }
+                // if it's not a local url we'll redirect to the root of the current site
+                return Redirect(Url.IsLocalUrl(model.RedirectUrl)
+                    ? model.RedirectUrl
+                    : CurrentPage.AncestorOrSelf(1).Url);
             }
 
             //redirect to current page by default

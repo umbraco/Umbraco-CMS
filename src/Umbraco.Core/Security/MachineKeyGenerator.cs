@@ -34,9 +34,9 @@ namespace Umbraco.Core.Security
             //See: https://msdn.microsoft.com/en-us/library/vstudio/w8h3skw9%28v=vs.100%29.aspx?f=255&MSPPError=-2147217396
             //See: https://msdn.microsoft.com/en-us/library/ff649308.aspx?f=255&MSPPError=-2147217396
             /*
-                key value  Specifies a manually assigned key. 
-                The validationKey value must be manually set to a string of hexadecimal 
-                characters to ensure consistent configuration across all servers in a Web farm. 
+                key value  Specifies a manually assigned key.
+                The validationKey value must be manually set to a string of hexadecimal
+                characters to ensure consistent configuration across all servers in a Web farm.
                 The length of the key depends on the hash algorithm that is used:
 
                 AES requires a 256-bit key (64 hexadecimal characters).
@@ -56,12 +56,12 @@ namespace Umbraco.Core.Security
         {
             //See: //See: https://msdn.microsoft.com/en-us/library/vstudio/w8h3skw9%28v=vs.100%29.aspx?f=255&MSPPError=-2147217396
             /*
-            key value  Specifies a manually assigned key. 
-            The decryptionKey value must be manually set to a string of 
-            hexadecimal characters to ensure consistent configuration across all servers in a Web farm. 
-            The key should be 64 bits (16 hexadecimal characters) long for DES encryption, or 192 bits 
-            (48 hexadecimal characters) long for 3DES. For AES, the key can be 128 bits (32 characters), 
-            192 bits (48 characters), or 256 bits (64 characters) long. 
+            key value  Specifies a manually assigned key.
+            The decryptionKey value must be manually set to a string of
+            hexadecimal characters to ensure consistent configuration across all servers in a Web farm.
+            The key should be 64 bits (16 hexadecimal characters) long for DES encryption, or 192 bits
+            (48 hexadecimal characters) long for 3DES. For AES, the key can be 128 bits (32 characters),
+            192 bits (48 characters), or 256 bits (64 characters) long.
             */
 
             //64 in length = 256 bits

@@ -10,7 +10,6 @@
 // --------
 // For clearing floats like a boss h5bp.com/q
 .clearfix {
-  *zoom: 1;
   &:before,
   &:after {
     display: table;
@@ -40,31 +39,6 @@
   display: block;
   margin-left: auto;
   margin-right: auto;
-}
-
-// IE7 inline-block
-// ----------------
-.ie7-inline-block() {
-  *display: inline; /* IE7 inline-block hack */
-  *zoom: 1;
-}
-
-// IE7 likes to collapse whitespace on either side of the inline-block elements.
-// Ems because we're attempting to match the width of a space character. Left
-// version is for form buttons, which typically come after other elements, and
-// right version is for icons, which come before. Applying both is ok, but it will
-// mean that space between those elements will be .6em (~2 space characters) in IE7,
-// instead of the 1 space in other browsers.
-.ie7-restore-left-whitespace() {
-  *margin-left: .3em;
-
-  &:first-child {
-    *margin-left: 0;
-  }
-}
-
-.ie7-restore-right-whitespace() {
-  *margin-right: .3em;
 }
 
 // Sizing shortcuts
@@ -190,18 +164,6 @@
     background-color: @backgroundColor;
     border-color: @textColor;
   }
-  //SD: We could do this but need to get the colors right
-  /*input.ng-invalid {
-    &:-moz-placeholder {
-        color: lighten(@textColor, 50%) !important;
-    }
-    &:-ms-input-placeholder {
-        color: lighten(@textColor, 50%) !important;
-    }
-    &::-webkit-input-placeholder {
-        color: lighten(@textColor, 50%) !important;
-    }
-  }*/
 }
 
 // CSS3 PROPERTIES
@@ -209,31 +171,21 @@
 
 // Border Radius
 .border-radius(@radius) {
-  -webkit-border-radius: @radius;
-     -moz-border-radius: @radius;
-          border-radius: @radius;
+    border-radius: @radius;
 }
 
 // Single Corner Border Radius
 .border-top-left-radius(@radius) {
-  -webkit-border-top-left-radius: @radius;
-      -moz-border-radius-topleft: @radius;
-          border-top-left-radius: @radius;
+    border-top-left-radius: @radius;
 }
 .border-top-right-radius(@radius) {
-  -webkit-border-top-right-radius: @radius;
-      -moz-border-radius-topright: @radius;
-          border-top-right-radius: @radius;
+    border-top-right-radius: @radius;
 }
 .border-bottom-right-radius(@radius) {
-  -webkit-border-bottom-right-radius: @radius;
-      -moz-border-radius-bottomright: @radius;
-          border-bottom-right-radius: @radius;
+    border-bottom-right-radius: @radius;
 }
 .border-bottom-left-radius(@radius) {
-  -webkit-border-bottom-left-radius: @radius;
-      -moz-border-radius-bottomleft: @radius;
-          border-bottom-left-radius: @radius;
+    border-bottom-left-radius: @radius;
 }
 
 // Single Side Border Radius
@@ -256,66 +208,36 @@
 
 // Drop shadows
 .box-shadow(@shadow) {
-  -webkit-box-shadow: @shadow;
-     -moz-box-shadow: @shadow;
-          box-shadow: @shadow;
+    box-shadow: @shadow;
 }
 
 // Transitions
 .transition(@transition) {
-  -webkit-transition: @transition;
-     -moz-transition: @transition;
-       -o-transition: @transition;
-          transition: @transition;
+    transition: @transition;
 }
 .transition-delay(@transition-delay) {
-  -webkit-transition-delay: @transition-delay;
-     -moz-transition-delay: @transition-delay;
-       -o-transition-delay: @transition-delay;
-          transition-delay: @transition-delay;
+    transition-delay: @transition-delay;
 }
 .transition-duration(@transition-duration) {
-  -webkit-transition-duration: @transition-duration;
-     -moz-transition-duration: @transition-duration;
-       -o-transition-duration: @transition-duration;
-          transition-duration: @transition-duration;
+    transition-duration: @transition-duration;
 }
 
 // Transformations
 .rotate(@degrees) {
-  -webkit-transform: rotate(@degrees);
-     -moz-transform: rotate(@degrees);
-      -ms-transform: rotate(@degrees);
-       -o-transform: rotate(@degrees);
-          transform: rotate(@degrees);
+    transform: rotate(@degrees);
 }
 .scale(@ratio) {
-  -webkit-transform: scale(@ratio);
-     -moz-transform: scale(@ratio);
-      -ms-transform: scale(@ratio);
-       -o-transform: scale(@ratio);
-          transform: scale(@ratio);
+    transform: scale(@ratio);
 }
 .translate(@x, @y) {
-  -webkit-transform: translate(@x, @y);
-     -moz-transform: translate(@x, @y);
-      -ms-transform: translate(@x, @y);
-       -o-transform: translate(@x, @y);
-          transform: translate(@x, @y);
+    transform: translate(@x, @y);
 }
 .skew(@x, @y) {
-  -webkit-transform: skew(@x, @y);
-     -moz-transform: skew(@x, @y);
-      -ms-transform: skewX(@x) skewY(@y); // See https://github.com/twitter/bootstrap/issues/4885
-       -o-transform: skew(@x, @y);
-          transform: skew(@x, @y);
-  -webkit-backface-visibility: hidden; // See https://github.com/twitter/bootstrap/issues/5319
+    transform: skew(@x, @y);
+    -webkit-backface-visibility: hidden; // See https://github.com/twitter/bootstrap/issues/5319
 }
 .translate3d(@x, @y, @z) {
-  -webkit-transform: translate3d(@x, @y, @z);
-     -moz-transform: translate3d(@x, @y, @z);
-       -o-transform: translate3d(@x, @y, @z);
-          transform: translate3d(@x, @y, @z);
+    transform: translate3d(@x, @y, @z);
 }
 
 // Backface visibility
@@ -331,25 +253,18 @@
 // Background clipping
 // Heads up: FF 3.6 and under need "padding" instead of "padding-box"
 .background-clip(@clip) {
-  -webkit-background-clip: @clip;
-     -moz-background-clip: @clip;
-          background-clip: @clip;
+    background-clip: @clip;
 }
 
 // Background sizing
 .background-size(@size) {
-  -webkit-background-size: @size;
-     -moz-background-size: @size;
-       -o-background-size: @size;
-          background-size: @size;
+    background-size: @size;
 }
 
 
 // Box sizing
 .box-sizing(@boxmodel) {
-  -webkit-box-sizing: @boxmodel;
-     -moz-box-sizing: @boxmodel;
-          box-sizing: @boxmodel;
+    box-sizing: @boxmodel;
 }
 
 // User select
@@ -391,10 +306,16 @@
 // Opacity
 .opacity(@opacity) {
   opacity: @opacity / 100;
-  filter: ~"alpha(opacity=@{opacity})";
 }
 
-
+// Position
+.absolute() {
+    position:absolute;
+    top:0;
+    right:0;
+    bottom:0;
+    left:0;
+}
 
 // BACKGROUNDS
 // --------------------------------------------------
@@ -411,7 +332,7 @@
 }
 
 // Gradient Bar Colors for buttons and alerts
-.gradientBar(@primaryColor, @secondaryColor, @textColor: #fff) {
+.gradientBar(@primaryColor, @secondaryColor, @textColor: @white) {
   color: @textColor;
   #gradient > .vertical(@primaryColor, @secondaryColor);
   border-color: @secondaryColor @secondaryColor darken(@secondaryColor, 15%);
@@ -420,7 +341,7 @@
 
 // Gradients
 #gradient {
-  .horizontal(@startColor: #555, @endColor: #333) {
+  .horizontal(@startColor: @gray, @endColor: @grayDark) {
     background-color: @endColor;
     background-image: -moz-linear-gradient(left, @startColor, @endColor); // FF 3.6+
     background-image: -webkit-gradient(linear, 0 0, 100% 0, from(@startColor), to(@endColor)); // Safari 4+, Chrome 2+
@@ -428,9 +349,8 @@
     background-image: -o-linear-gradient(left, @startColor, @endColor); // Opera 11.10
     background-image: linear-gradient(to right, @startColor, @endColor); // Standard, IE10
     background-repeat: repeat-x;
-    filter: e(%("progid:DXImageTransform.Microsoft.gradient(startColorstr='%d', endColorstr='%d', GradientType=1)",argb(@startColor),argb(@endColor))); // IE9 and down
   }
-  .vertical(@startColor: #555, @endColor: #333) {
+  .vertical(@startColor: @gray, @endColor: @grayDark) {
     background-color: mix(@startColor, @endColor, 60%);
     background-image: -moz-linear-gradient(top, @startColor, @endColor); // FF 3.6+
     background-image: -webkit-gradient(linear, 0 0, 0 100%, from(@startColor), to(@endColor)); // Safari 4+, Chrome 2+
@@ -438,9 +358,8 @@
     background-image: -o-linear-gradient(top, @startColor, @endColor); // Opera 11.10
     background-image: linear-gradient(to bottom, @startColor, @endColor); // Standard, IE10
     background-repeat: repeat-x;
-    filter: e(%("progid:DXImageTransform.Microsoft.gradient(startColorstr='%d', endColorstr='%d', GradientType=0)",argb(@startColor),argb(@endColor))); // IE9 and down
   }
-  .directional(@startColor: #555, @endColor: #333, @deg: 45deg) {
+  .directional(@startColor: @gray, @endColor: @grayDark, @deg: 45deg) {
     background-color: @endColor;
     background-repeat: repeat-x;
     background-image: -moz-linear-gradient(@deg, @startColor, @endColor); // FF 3.6+
@@ -448,7 +367,7 @@
     background-image: -o-linear-gradient(@deg, @startColor, @endColor); // Opera 11.10
     background-image: linear-gradient(@deg, @startColor, @endColor); // Standard, IE10
   }
-  .horizontal-three-colors(@startColor: #00b3ee, @midColor: #7a43b6, @colorStop: 50%, @endColor: #c3325f) {
+  .horizontal-three-colors(@startColor: @lightBlueIcon, @midColor: @purple-l1, @colorStop: 50%, @endColor: @pink) {
     background-color: mix(@midColor, @endColor, 80%);
     background-image: -webkit-gradient(left, linear, 0 0, 0 100%, from(@startColor), color-stop(@colorStop, @midColor), to(@endColor));
     background-image: -webkit-linear-gradient(left, @startColor, @midColor @colorStop, @endColor);
@@ -456,10 +375,9 @@
     background-image: -o-linear-gradient(left, @startColor, @midColor @colorStop, @endColor);
     background-image: linear-gradient(to right, @startColor, @midColor @colorStop, @endColor);
     background-repeat: no-repeat;
-    filter: e(%("progid:DXImageTransform.Microsoft.gradient(startColorstr='%d', endColorstr='%d', GradientType=0)",argb(@startColor),argb(@endColor))); // IE9 and down, gets no color-stop at all for proper fallback
   }
 
-  .vertical-three-colors(@startColor: #00b3ee, @midColor: #7a43b6, @colorStop: 50%, @endColor: #c3325f) {
+  .vertical-three-colors(@startColor: @lightBlueIcon, @midColor: @deepPurpleIcon, @colorStop: 50%, @endColor: @pink) {
     background-color: mix(@midColor, @endColor, 80%);
     background-image: -webkit-gradient(linear, 0 0, 0 100%, from(@startColor), color-stop(@colorStop, @midColor), to(@endColor));
     background-image: -webkit-linear-gradient(@startColor, @midColor @colorStop, @endColor);
@@ -467,9 +385,8 @@
     background-image: -o-linear-gradient(@startColor, @midColor @colorStop, @endColor);
     background-image: linear-gradient(@startColor, @midColor @colorStop, @endColor);
     background-repeat: no-repeat;
-    filter: e(%("progid:DXImageTransform.Microsoft.gradient(startColorstr='%d', endColorstr='%d', GradientType=0)",argb(@startColor),argb(@endColor))); // IE9 and down, gets no color-stop at all for proper fallback
   }
-  .radial(@innerColor: #555, @outerColor: #333) {
+  .radial(@innerColor: @gray, @outerColor: @grayDark) {
     background-color: @outerColor;
     background-image: -webkit-gradient(radial, center center, 0, center center, 460, from(@innerColor), to(@outerColor));
     background-image: -webkit-radial-gradient(circle, @innerColor, @outerColor);
@@ -477,7 +394,7 @@
     background-image: -o-radial-gradient(circle, @innerColor, @outerColor);
     background-repeat: no-repeat;
   }
-  .striped(@color: #555, @angle: 45deg) {
+  .striped(@color: @gray, @angle: 45deg) {
     background-color: @color;
     background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.25, rgba(255,255,255,.15)), color-stop(.25, transparent), color-stop(.5, transparent), color-stop(.5, rgba(255,255,255,.15)), color-stop(.75, rgba(255,255,255,.15)), color-stop(.75, transparent), to(transparent));
     background-image: -webkit-linear-gradient(@angle, rgba(255,255,255,.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.15) 50%, rgba(255,255,255,.15) 75%, transparent 75%, transparent);
@@ -486,28 +403,31 @@
     background-image: linear-gradient(@angle, rgba(255,255,255,.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.15) 50%, rgba(255,255,255,.15) 75%, transparent 75%, transparent);
   }
 }
-// Reset filters for IE
-.reset-filter() {
-  filter: e(%("progid:DXImageTransform.Microsoft.gradient(enabled = false)"));
+
+.checkeredBackground(@backgroundColor: @gray-9, @fillColor: @black, @fillOpacity: 0.25) {
+    background-image: url('data:image/svg+xml;charset=utf-8,\
+                        <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" fill="@{fillColor}" fill-opacity="@{fillOpacity}" >\
+                            <rect x="50" width="50" height="50" />\
+                            <rect y="50" width="50" height="50" />\
+                        </svg>');
+    background-color: @backgroundColor;
+    background-size: 10px 10px;
+    background-repeat: repeat;
 }
-
-
 
 // COMPONENT MIXINS
 // --------------------------------------------------
+// Limit width of specific property editors
+.umb-property-editor--limit-width {
+    max-width: 800px;
+}
 
 // Horizontal dividers
 // -------------------------
 // Dividers (basically an hr) within dropdowns and nav lists
 .nav-divider(@top: @gray-8, @bottom: @white) {
-  // IE7 needs a set width since we gave a height. Restricting just
-  // to IE7 to keep the 1px left/right space in other browsers.
-  // It is unclear where IE is getting the extra space that we need
-  // to negative-margin away, but so it goes.
-  *width: 100%;
   height: 1px;
   margin: ((@baseLineHeight / 2) - 1) 1px; // 8px 1px
-  *margin: -5px 0 5px;
   overflow: hidden;
   background-color: @top;
   border-bottom: 1px solid @bottom;
@@ -515,27 +435,28 @@
 
 // Button backgrounds
 // ------------------
-.buttonBackground(@startColor, @endColor, @textColor: #fff) {
-  // gradientBar will set the background to a pleasing blend of these, to support IE<=9
-  .gradientBar(@startColor, @endColor, @textColor);
-  *background-color: @endColor; /* Darken IE7 buttons by default so they stand out more given they won't have borders */
-  .reset-filter();
+.buttonBackground(@startColor, @hoverColor: @startColor, @textColor: @white, @textColorHover: @textColor) {
 
-  // button states
-  &:hover, &:focus, &:active {
-      background-color: darken(@startColor, 2%);
+  color: @textColor;
+  border-color: @startColor @startColor darken(@startColor, 15%);
+  border-color: rgba(0,0,0,.1) rgba(0,0,0,.1) fadein(rgba(0,0,0,.1), 15%);
+
+  background-color: @startColor;
+
+  .caret {
+      border-top-color: @textColor;
+      border-bottom-color: @textColor;
   }
 
   // in these cases the gradient won't cover the background, so we override
-  &:hover, &:focus, &:active, &.active, &.disabled, &[disabled] {
-    color: @textColor;
-    *background-color: darken(@endColor, 5%);
+  &:hover, &:focus, &:active, &.active {
+    color: @textColorHover;
+    background-color: @hoverColor;
   }
 
-  // IE 7 + 8 can't handle box-shadow to show active, so we darken a bit ourselves
-  &:active,
-  &.active {
-    background-color: darken(@endColor, 10%) e("\9");
+  &.disabled, &[disabled] {
+    color: @white;
+    background-color: @sand-1;
   }
 }
 
@@ -643,17 +564,14 @@
 
     .offset (@columns) {
       margin-left: (@fluidGridColumnWidth * @columns) + (@fluidGridGutterWidth * (@columns - 1)) + (@fluidGridGutterWidth*2);
-  	  *margin-left: (@fluidGridColumnWidth * @columns) + (@fluidGridGutterWidth * (@columns - 1)) - (.5 / @gridRowWidth * 100 * 1%) + (@fluidGridGutterWidth*2) - (.5 / @gridRowWidth * 100 * 1%);
     }
 
     .offsetFirstChild (@columns) {
       margin-left: (@fluidGridColumnWidth * @columns) + (@fluidGridGutterWidth * (@columns - 1)) + (@fluidGridGutterWidth);
-      *margin-left: (@fluidGridColumnWidth * @columns) + (@fluidGridGutterWidth * (@columns - 1)) - (.5 / @gridRowWidth * 100 * 1%) + @fluidGridGutterWidth - (.5 / @gridRowWidth * 100 * 1%);
     }
 
     .span (@columns) {
       width: (@fluidGridColumnWidth * @columns) + (@fluidGridGutterWidth * (@columns - 1));
-      *width: (@fluidGridColumnWidth * @columns) + (@fluidGridGutterWidth * (@columns - 1)) - (.5 / @gridRowWidth * 100 * 1%);
     }
 
     .row-fluid {
@@ -663,7 +581,6 @@
         .input-block-level();
         float: left;
         margin-left: @fluidGridGutterWidth;
-        *margin-left: @fluidGridGutterWidth - (.5 / @gridRowWidth * 100 * 1%);
       }
       [class*="span"]:first-child {
         margin-left: 0;

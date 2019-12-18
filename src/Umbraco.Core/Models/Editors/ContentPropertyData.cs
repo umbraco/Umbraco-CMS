@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Umbraco.Core.Models.Editors
 {
@@ -16,32 +11,35 @@ namespace Umbraco.Core.Models.Editors
     /// </remarks>
     public class ContentPropertyData
     {
-        public ContentPropertyData(object value, PreValueCollection preValues) 
-            : this(value, preValues, new Dictionary<string, object>())
-        {
-        }
-
-        public ContentPropertyData(object value, PreValueCollection preValues, IDictionary<string, object> additionalData)
+        public ContentPropertyData(object value, object dataTypeConfiguration)
         {
             Value = value;
-            PreValues = preValues;
-            AdditionalData = new ReadOnlyDictionary<string, object>(additionalData);
+            DataTypeConfiguration = dataTypeConfiguration;
         }
 
         /// <summary>
         /// The value submitted for the property
         /// </summary>
-        public object Value { get; private set; }
+        public object Value { get; }
 
         /// <summary>
-        /// The pre-value collection for the content property
+        /// The data type configuration for the property.
         /// </summary>
-        public PreValueCollection PreValues { get; private set; }
+        public object DataTypeConfiguration { get; }
 
         /// <summary>
-        /// A dictionary containing any additional objects that are related to this property when saving
+        /// Gets or sets the unique identifier of the content owning the property.
         /// </summary>
-        public ReadOnlyDictionary<string, object> AdditionalData { get; private set; }
-        
+        public Guid ContentKey { get; set; }
+
+        /// <summary>
+        /// Gets or sets the unique identifier of the property type.
+        /// </summary>
+        public Guid PropertyTypeKey { get; set; }
+
+        /// <summary>
+        /// Gets or sets the uploaded files.
+        /// </summary>
+        public ContentPropertyFile[] Files { get; set; }
     }
 }

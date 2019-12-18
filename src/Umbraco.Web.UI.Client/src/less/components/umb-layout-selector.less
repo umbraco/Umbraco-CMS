@@ -4,8 +4,9 @@
 }
 
 .umb-layout-selector__active-layout {
+   background: transparent;
    box-sizing: border-box;
-   border: 1px solid transparent;
+   border: 1px solid @inputBorder;
    cursor: pointer;
    height: 30px;
    width: 30px;
@@ -16,16 +17,16 @@
 }
 
 .umb-layout-selector__active-layout:hover {
-   border-color: @gray-8;
+   border-color: @inputBorderFocus;
 }
 
 .umb-layout-selector__dropdown {
    position: absolute;
    padding: 5px;
-   background: #333;
+   background: @grayDark;
    z-index: 999;
    display: flex;
-   background: #fff;
+   background: @white;
    flex-wrap: wrap;
    flex-direction: column;
    transform: translate(-50%,0);
@@ -33,6 +34,7 @@
 }
 
 .umb-layout-selector__dropdown-item {
+   background: transparent;
    padding: 5px;
    margin: 3px 5px;
    display: flex;

@@ -1,18 +1,19 @@
-﻿using System.Globalization;
-using System.Linq;
-using System.Web;
+﻿using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
-using System.Web.Security;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
+using Umbraco.Core;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.Mvc
 {
     public abstract class UmbracoVirtualNodeRouteHandler : IRouteHandler
     {
+        // TODO: try lazy property injection?
+        private IPublishedRouter PublishedRouter => Current.Factory.GetInstance<IPublishedRouter>();
+
         /// <summary>
         /// Returns the UmbracoContext for this route handler
         /// </summary>
@@ -27,7 +28,7 @@ namespace Umbraco.Web.Mvc
         ///    //check if context is null, we know it will be null if we are dealing with a request that
         ///    //has an extension and by default no Umb ctx is created for the request
         ///    if (ctx == null) {
-        ///        //TODO: Here you can EnsureContext , please note that the requestContext is passed in 
+        ///        // TODO: Here you can EnsureContext , please note that the requestContext is passed in
         ///        //therefore your should refrain from using other singletons like HttpContext.Current since
         ///        //you will already have a reference to it. Also if you need an ApplicationContext you should
         ///        //pass this in via a ctor instead of using the ApplicationContext.Current singleton.
@@ -39,37 +40,35 @@ namespace Umbraco.Web.Mvc
         /// </remarks>
         protected virtual UmbracoContext GetUmbracoContext(RequestContext requestContext)
         {
-            return UmbracoContext.Current;
+            return Composing.Current.UmbracoContext;
         }
 
         public IHttpHandler GetHttpHandler(RequestContext requestContext)
         {
             var umbracoContext = GetUmbracoContext(requestContext);
-            
+
             var found = FindContent(requestContext, umbracoContext);
             if (found == null) return new NotFoundHandler();
-            
-            umbracoContext.PublishedContentRequest = new PublishedContentRequest(
-                umbracoContext.CleanedUmbracoUrl, umbracoContext.RoutingContext, 
-                UmbracoConfig.For.UmbracoSettings().WebRouting, s => Roles.Provider.GetRolesForUser(s))
-            {
-                PublishedContent = found
-            };
 
-            //allows inheritors to change the pcr
-            PreparePublishedContentRequest(umbracoContext.PublishedContentRequest);
+            var request = PublishedRouter.CreateRequest(umbracoContext);
+            request.PublishedContent = found;
+            umbracoContext.PublishedRequest = request;
 
-            //create the render model
-            var renderModel = new RenderModel(umbracoContext.PublishedContentRequest.PublishedContent, umbracoContext.PublishedContentRequest.Culture);
+            // allows inheritors to change the published content request
+            PreparePublishedContentRequest(umbracoContext.PublishedRequest);
 
-            //assigns the required tokens to the request
+            // create the render model
+            var renderModel = new ContentModel(umbracoContext.PublishedRequest.PublishedContent);
+
+            // assigns the required tokens to the request
             requestContext.RouteData.DataTokens.Add(Core.Constants.Web.UmbracoDataToken, renderModel);
-            requestContext.RouteData.DataTokens.Add(Core.Constants.Web.PublishedDocumentRequestDataToken, umbracoContext.PublishedContentRequest);
+            requestContext.RouteData.DataTokens.Add(Core.Constants.Web.PublishedDocumentRequestDataToken, umbracoContext.PublishedRequest);
             requestContext.RouteData.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbracoContext);
-            //this is used just for a flag that this is an umbraco custom route
+
+            // this is used just for a flag that this is an umbraco custom route
             requestContext.RouteData.DataTokens.Add(Core.Constants.Web.CustomRouteDataToken, true);
 
-            //Here we need to detect if a SurfaceController has posted
+            // Here we need to detect if a SurfaceController has posted
             var formInfo = RenderRouteHandler.GetFormInfo(requestContext);
             if (formInfo != null)
             {
@@ -77,11 +76,11 @@ namespace Umbraco.Web.Mvc
                 {
                     ActionName = requestContext.RouteData.GetRequiredString("action"),
                     ControllerName = requestContext.RouteData.GetRequiredString("controller"),
-                    PublishedContentRequest = umbracoContext.PublishedContentRequest
+                    PublishedRequest = umbracoContext.PublishedRequest
                 };
 
-                //set the special data token to the current route definition
-                requestContext.RouteData.DataTokens[Umbraco.Core.Constants.Web.UmbracoRouteDefinitionDataToken] = def;
+                // set the special data token to the current route definition
+                requestContext.RouteData.DataTokens[Core.Constants.Web.UmbracoRouteDefinitionDataToken] = def;
 
                 return RenderRouteHandler.HandlePostedValues(requestContext, formInfo);
             }
@@ -91,9 +90,9 @@ namespace Umbraco.Web.Mvc
 
         protected abstract IPublishedContent FindContent(RequestContext requestContext, UmbracoContext umbracoContext);
 
-        protected virtual void PreparePublishedContentRequest(PublishedContentRequest publishedContentRequest)
+        protected virtual void PreparePublishedContentRequest(PublishedRequest request)
         {
-            publishedContentRequest.Prepare();
+            PublishedRouter.PrepareRequest(request);
         }
     }
 }

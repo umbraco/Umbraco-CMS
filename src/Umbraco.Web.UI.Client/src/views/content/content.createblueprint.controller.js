@@ -3,7 +3,6 @@
   function CreateBlueprintController(
     $scope,
     contentResource,
-    notificationsService,
     navigationService,
     localizationService,
     formHelper,
@@ -13,12 +12,9 @@
       name: $scope.currentNode.name
     };
 
-    var successText = {};
     localizationService.localize("blueprints_createBlueprintFrom", ["<em>" + $scope.message.name + "</em>"]).then(function (localizedVal) {
       $scope.title = localizedVal;
     });
-
-   
 
     $scope.cancel = function () {
       navigationService.hideMenu();
@@ -27,21 +23,19 @@
     $scope.create = function () {
       if (formHelper.submitForm({
         scope: $scope,
-        formCtrl: this.blueprintForm,
-        statusMessage: "Creating blueprint..."
+        formCtrl: this.blueprintForm
       })) {
 
         contentResource.createBlueprintFromContent($scope.currentNode.id, $scope.message.name)
           .then(function(data) {
 
-              formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+              formHelper.resetForm({ scope: $scope });
 
               navigationService.hideMenu();
             },
             function(err) {
 
               contentEditingHelper.handleSaveError({
-                redirectOnFailure: false,
                 err: err
               });
 

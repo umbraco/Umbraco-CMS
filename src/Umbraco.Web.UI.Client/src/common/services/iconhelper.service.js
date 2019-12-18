@@ -56,7 +56,7 @@ function iconHelper($q, $timeout) {
         
         { oldIcon: ".sprTreeSettingDataType", newIcon: "icon-autofill" },
 
-        //TODO:
+        // TODO: Something needs to be done with the old tree icons that are commented out.
         /*
         { oldIcon: ".sprTreeSettingAgent", newIcon: "" },
         { oldIcon: ".sprTreeSettingCss", newIcon: "" },

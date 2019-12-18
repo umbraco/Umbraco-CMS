@@ -3,75 +3,69 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
-
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
-    public class MemberTypeRepositoryTest : BaseDatabaseFactoryTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    public class MemberTypeRepositoryTest : TestWithDatabaseBase
     {
-        [SetUp]
-        public override void Initialize()
+        private MemberTypeRepository CreateRepository(IScopeProvider provider)
         {
-            base.Initialize();
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
-        private MemberTypeRepository CreateRepository(IScopeUnitOfWork unitOfWork)
-        {
-            return new MemberTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);            
+            var templateRepository = Mock.Of<ITemplateRepository>();
+            var commonRepository = new ContentTypeCommonRepository((IScopeAccessor)provider, templateRepository, AppCaches);
+            var languageRepository = new LanguageRepository((IScopeAccessor)provider, AppCaches.Disabled, Mock.Of<ILogger>());
+            return new MemberTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Mock.Of<ILogger>(), commonRepository, languageRepository);
         }
 
         [Test]
         public void Can_Persist_Member_Type()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var memberType = (IMemberType)MockedContentTypes.CreateSimpleMemberType();
-                repository.AddOrUpdate(memberType);
-                unitOfWork.Commit();
+                var repository = CreateRepository(provider);
+
+                var memberType = (IMemberType) MockedContentTypes.CreateSimpleMemberType();
+                repository.Save(memberType);
 
                 var sut = repository.Get(memberType.Id);
 
                 var standardProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
 
                 Assert.That(sut, Is.Not.Null);
-                Assert.That(sut.PropertyGroups.Count(), Is.EqualTo(2));
+                Assert.That(sut.PropertyGroups.Count, Is.EqualTo(2));
                 Assert.That(sut.PropertyTypes.Count(), Is.EqualTo(3 + standardProps.Count));
 
                 Assert.That(sut.PropertyGroups.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
                 Assert.That(sut.PropertyTypes.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
 
-                TestHelper.AssertAllPropertyValuesAreEquals(sut, memberType, "yyyy-MM-dd HH:mm:ss");
+                TestHelper.AssertPropertyValuesAreEqual(sut, memberType, "yyyy-MM-dd HH:mm:ss");
             }
         }
 
         [Test]
         public void Can_Persist_Member_Type_Same_Property_Keys()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
+                var repository = CreateRepository(provider);
+
                 var memberType = (IMemberType)MockedContentTypes.CreateSimpleMemberType();
-                
-                repository.AddOrUpdate(memberType);
-                unitOfWork.Commit();
+
+                repository.Save(memberType);
+                scope.Complete();
 
                 var propertyKeys = memberType.PropertyTypes.Select(x => x.Key).OrderBy(x => x).ToArray();
                 var groupKeys = memberType.PropertyGroups.Select(x => x.Key).OrderBy(x => x).ToArray();
@@ -89,36 +83,38 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Cannot_Persist_Member_Type_Without_Alias()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
+                var repository = CreateRepository(provider);
+
                 var memberType = MockedContentTypes.CreateSimpleMemberType();
                 memberType.Alias = null;
-                repository.AddOrUpdate(memberType);
 
-                Assert.Throws<InvalidOperationException>(unitOfWork.Commit);
+
+                Assert.Throws<InvalidOperationException>(() => repository.Save(memberType));
             }
         }
 
         [Test]
         public void Can_Get_All_Member_Types()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
+                var repository = CreateRepository(provider);
+
                 var memberType1 = MockedContentTypes.CreateSimpleMemberType();
-                repository.AddOrUpdate(memberType1);
-                unitOfWork.Commit();
+                repository.Save(memberType1);
+
 
                 var memberType2 = MockedContentTypes.CreateSimpleMemberType();
                 memberType2.Name = "AnotherType";
                 memberType2.Alias = "anotherType";
-                repository.AddOrUpdate(memberType2);
-                unitOfWork.Commit();
+                repository.Save(memberType2);
 
-                var result = repository.GetAll();
+
+                var result = repository.GetMany();
 
                 //there are 3 because of the Member type created for init data
                 Assert.AreEqual(3, result.Count());
@@ -128,21 +124,22 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_All_Member_Types_By_Guid_Ids()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
+                var repository = CreateRepository(provider);
+
                 var memberType1 = MockedContentTypes.CreateSimpleMemberType();
-                repository.AddOrUpdate(memberType1);
-                unitOfWork.Commit();
+                repository.Save(memberType1);
+
 
                 var memberType2 = MockedContentTypes.CreateSimpleMemberType();
                 memberType2.Name = "AnotherType";
                 memberType2.Alias = "anotherType";
-                repository.AddOrUpdate(memberType2);
-                unitOfWork.Commit();
+                repository.Save(memberType2);
 
-                var result = ((IReadRepository<Guid, IMemberType>)repository).GetAll(memberType1.Key, memberType2.Key);
+
+                var result = ((IReadRepository<Guid, IMemberType>)repository).GetMany(memberType1.Key, memberType2.Key);
 
                 //there are 3 because of the Member type created for init data
                 Assert.AreEqual(2, result.Count());
@@ -152,19 +149,20 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Member_Types_By_Guid_Id()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
+                var repository = CreateRepository(provider);
+
                 var memberType1 = MockedContentTypes.CreateSimpleMemberType();
-                repository.AddOrUpdate(memberType1);
-                unitOfWork.Commit();
+                repository.Save(memberType1);
+
 
                 var memberType2 = MockedContentTypes.CreateSimpleMemberType();
                 memberType2.Name = "AnotherType";
                 memberType2.Alias = "anotherType";
-                repository.AddOrUpdate(memberType2);
-                unitOfWork.Commit();
+                repository.Save(memberType2);
+
 
                 var result = repository.Get(memberType1.Key);
 
@@ -174,45 +172,45 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-
         //NOTE: This tests for left join logic (rev 7b14e8eacc65f82d4f184ef46c23340c09569052)
         [Test]
         public void Can_Get_All_Members_When_No_Properties_Assigned()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
+                var repository = CreateRepository(provider);
+
                 var memberType1 = MockedContentTypes.CreateSimpleMemberType();
                 memberType1.PropertyTypeCollection.Clear();
-                repository.AddOrUpdate(memberType1);
-                unitOfWork.Commit();
+                repository.Save(memberType1);
+
 
                 var memberType2 = MockedContentTypes.CreateSimpleMemberType();
                 memberType2.PropertyTypeCollection.Clear();
                 memberType2.Name = "AnotherType";
                 memberType2.Alias = "anotherType";
-                repository.AddOrUpdate(memberType2);
-                unitOfWork.Commit();
+                repository.Save(memberType2);
 
-                var result = repository.GetAll();
+
+                var result = repository.GetMany();
 
                 //there are 3 because of the Member type created for init data
                 Assert.AreEqual(3, result.Count());
             }
         }
 
-
         [Test]
         public void Can_Get_Member_Type_By_Id()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
+                var repository = CreateRepository(provider);
+
                 IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-                repository.AddOrUpdate(memberType);
-                unitOfWork.Commit();
+                repository.Save(memberType);
+
                 memberType = repository.Get(memberType.Id);
                 Assert.That(memberType, Is.Not.Null);
             }
@@ -221,33 +219,127 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Member_Type_By_Guid_Id()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
+                var repository = CreateRepository(provider);
+
                 IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-                repository.AddOrUpdate(memberType);
-                unitOfWork.Commit();
+                repository.Save(memberType);
+
                 memberType = repository.Get(memberType.Key);
                 Assert.That(memberType, Is.Not.Null);
+            }
+        }
+
+        // See: https://github.com/umbraco/Umbraco-CMS/issues/4963#issuecomment-483516698
+        [Test]
+        public void Bug_Changing_Built_In_Member_Type_Property_Type_Aliases_Results_In_Exception()
+        {
+            var stubs = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
+
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (provider.CreateScope())
+            {
+                var repository = CreateRepository(provider);
+
+                IMemberType memberType = MockedContentTypes.CreateSimpleMemberType("mtype");
+
+                // created without the stub properties
+                Assert.AreEqual(1, memberType.PropertyGroups.Count);
+                Assert.AreEqual(3, memberType.PropertyTypes.Count());
+
+                // saving *new* member type adds the stub properties
+                repository.Save(memberType);
+
+                // saving has added (and saved) the stub properties
+                Assert.AreEqual(2, memberType.PropertyGroups.Count);
+                Assert.AreEqual(3 + stubs.Count, memberType.PropertyTypes.Count());
+
+                foreach (var stub in stubs)
+                {
+                    var prop = memberType.PropertyTypes.First(x => x.Alias == stub.Key);
+                    prop.Alias = prop.Alias + "__0000";
+                }
+
+                // saving *existing* member type does *not* ensure stub properties
+                repository.Save(memberType);
+
+                // therefore, nothing has changed
+                Assert.AreEqual(2, memberType.PropertyGroups.Count);
+                Assert.AreEqual(3 + stubs.Count, memberType.PropertyTypes.Count());
+
+                // fetching ensures that the stub properties are there
+                memberType = repository.Get("mtype");
+                Assert.IsNotNull(memberType);
+
+                Assert.AreEqual(2, memberType.PropertyGroups.Count);
+                Assert.AreEqual(3 + stubs.Count * 2, memberType.PropertyTypes.Count());
             }
         }
 
         [Test]
         public void Built_In_Member_Type_Properties_Are_Automatically_Added_When_Creating()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
-            {
-                IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-                repository.AddOrUpdate(memberType);
-                unitOfWork.Commit();
+            var stubs = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
 
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (provider.CreateScope())
+            {
+                var repository = CreateRepository(provider);
+
+                IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+
+                // created without the stub properties
+                Assert.AreEqual(1, memberType.PropertyGroups.Count);
+                Assert.AreEqual(3, memberType.PropertyTypes.Count());
+
+                // saving *new* member type adds the stub properties
+                repository.Save(memberType);
+
+                // saving has added (and saved) the stub properties
+                Assert.AreEqual(2, memberType.PropertyGroups.Count);
+                Assert.AreEqual(3 + stubs.Count, memberType.PropertyTypes.Count());
+
+                // getting with stub properties
                 memberType = repository.Get(memberType.Id);
 
-                Assert.That(memberType.PropertyTypes.Count(), Is.EqualTo(3 + Constants.Conventions.Member.GetStandardPropertyTypeStubs().Count));
-                Assert.That(memberType.PropertyGroups.Count(), Is.EqualTo(2));
+                Assert.AreEqual(2, memberType.PropertyGroups.Count);
+                Assert.AreEqual(3 + stubs.Count, memberType.PropertyTypes.Count());
+            }
+        }
+
+        [Test]
+        public void Built_In_Member_Type_Properties_Missing_Are_Automatically_Added_When_Creating()
+        {
+            var stubs = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
+
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (provider.CreateScope())
+            {
+                var repository = CreateRepository(provider);
+
+                IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+
+                // created without the stub properties
+                Assert.AreEqual(1, memberType.PropertyGroups.Count);
+                Assert.AreEqual(3, memberType.PropertyTypes.Count());
+
+                // add one stub property, others are still missing
+                memberType.AddPropertyType(stubs.First().Value, Constants.Conventions.Member.StandardPropertiesGroupName);
+
+                // saving *new* member type adds the (missing) stub properties
+                repository.Save(memberType);
+
+                // saving has added (and saved) the (missing) stub properties
+                Assert.AreEqual(2, memberType.PropertyGroups.Count);
+                Assert.AreEqual(3 + stubs.Count, memberType.PropertyTypes.Count());
+
+                // getting with stub properties
+                memberType = repository.Get(memberType.Id);
+
+                Assert.AreEqual(2, memberType.PropertyGroups.Count);
+                Assert.AreEqual(3 + stubs.Count, memberType.PropertyTypes.Count());
             }
         }
 
@@ -256,15 +348,16 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Built_In_Member_Type_Properties_Are_Not_Reused_For_Different_Member_Types()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
+                var repository = CreateRepository(provider);
+
                 IMemberType memberType1 = MockedContentTypes.CreateSimpleMemberType();
                 IMemberType memberType2 = MockedContentTypes.CreateSimpleMemberType("test2");
-                repository.AddOrUpdate(memberType1);
-                repository.AddOrUpdate(memberType2);
-                unitOfWork.Commit();
+                repository.Save(memberType1);
+                repository.Save(memberType2);
+
 
                 var m1Ids = memberType1.PropertyTypes.Select(x => x.Id).ToArray();
                 var m2Ids = memberType2.PropertyTypes.Select(x => x.Id).ToArray();
@@ -277,18 +370,19 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Delete_MemberType()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
+                var repository = CreateRepository(provider);
+
                 // Act
                 IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-                repository.AddOrUpdate(memberType);
-                unitOfWork.Commit();
+                repository.Save(memberType);
+
 
                 var contentType2 = repository.Get(memberType.Id);
                 repository.Delete(contentType2);
-                unitOfWork.Commit();
+
 
                 var exists = repository.Exists(memberType.Id);
 

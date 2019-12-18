@@ -1,16 +1,22 @@
+@boxUnit: 10px;
+
 .umb-box {
-    border: 1px solid @gray-8;
+    background: @white;
     border-radius: 3px;
-    margin-bottom: 30px;
+    margin-bottom: @boxUnit * 2;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,.16);
 }
 
 .umb-box-header {
-    padding: 10px 20px;
-    background-color: @gray-10;
+    padding: @boxUnit @boxUnit * 2;
+    border-bottom: 1px solid @gray-9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .umb-box-header-title {
-    font-size: 16px;
+    font-size: 15px;
     color: @black;
     font-weight: bold;
 }
@@ -23,5 +29,19 @@
 }
 
 .umb-box-content {
-    padding: 20px;
+    padding: @boxUnit * 2;
+}
+
+// allow side-by-side boxes
+.umb-box-row {
+    margin-left:-@boxUnit;
+    margin-right:-@boxUnit;
+    display:flex;
+    justify-content: space-around;
+    
+    .umb-box {
+        margin-left:@boxUnit;
+        margin-right:@boxUnit;
+        flex:1;
+    }
 }

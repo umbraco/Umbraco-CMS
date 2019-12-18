@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,16 +11,16 @@ using Umbraco.Core.Xml;
 
 namespace Umbraco.Core
 {
-	/// <summary>
-	/// Extension methods for xml objects
-	/// </summary>
-	internal static class XmlExtensions
-	{
+    /// <summary>
+    /// Extension methods for xml objects
+    /// </summary>
+    internal static class XmlExtensions
+    {
         public static bool HasAttribute(this XmlAttributeCollection attributes, string attributeName)
         {
             return attributes.Cast<XmlAttribute>().Any(x => x.Name == attributeName);
-        }	
-		
+        }
+
         /// <summary>
         /// Selects a list of XmlNode matching an XPath expression.
         /// </summary>
@@ -209,15 +209,15 @@ namespace Umbraco.Core
         ///// </summary>
         ///// <param name="xElement"></param>
         ///// <returns></returns>
-        //public static XmlNode ToXmlElement(this XContainer xElement)
-        //{
-        //    var xmlDocument = new XmlDocument();
-        //    using (var xmlReader = xElement.CreateReader())
-        //    {
-        //        xmlDocument.Load(xmlReader);
-        //    }
-        //    return xmlDocument.DocumentElement;
-        //}
+        public static XmlNode ToXmlElement(this XContainer xElement)
+        {
+            var xmlDocument = new XmlDocument();
+            using (var xmlReader = xElement.CreateReader())
+            {
+                xmlDocument.Load(xmlReader);
+            }
+            return xmlDocument.DocumentElement;
+        }
 
         /// <summary>
         /// Converts from an XmlElement to an XElement
@@ -248,21 +248,21 @@ namespace Umbraco.Core
 
             return default(T);
         }
-		public static T AttributeValue<T>(this XmlNode xml, string attributeName)
-		{
-			if (xml == null) throw new ArgumentNullException("xml");
-			if (xml.Attributes == null) return default(T);
+        public static T AttributeValue<T>(this XmlNode xml, string attributeName)
+        {
+            if (xml == null) throw new ArgumentNullException("xml");
+            if (xml.Attributes == null) return default(T);
 
-			if (xml.Attributes[attributeName] == null)
-				return default(T);
+            if (xml.Attributes[attributeName] == null)
+                return default(T);
 
-			var val = xml.Attributes[attributeName].Value;
-			var result = val.TryConvertTo<T>();
-			if (result.Success)
-				return result.Result;
+            var val = xml.Attributes[attributeName].Value;
+            var result = val.TryConvertTo<T>();
+            if (result.Success)
+                return result.Result;
 
-			return default(T);
-		}
+            return default(T);
+        }
 
         public static XElement GetXElement(this XmlNode node)
         {
@@ -292,20 +292,20 @@ namespace Umbraco.Core
         // .ToString(SaveOptions.*) is "a\r\nb" and cannot figure out how to get rid of "\r"
         // and when saving data we want nothing to change
         // this method will produce a string that respects the \r and \n in the data value
-	    public static string ToDataString(this XElement xml)
-	    {
-	        var settings = new XmlWriterSettings
-	        {
+        public static string ToDataString(this XElement xml)
+        {
+            var settings = new XmlWriterSettings
+            {
                 OmitXmlDeclaration = true,
-	            NewLineHandling = NewLineHandling.None,
+                NewLineHandling = NewLineHandling.None,
                 Indent = false
-	        };
-	        var output = new StringBuilder();
-	        using (var writer = XmlWriter.Create(output, settings))
-	        {
+            };
+            var output = new StringBuilder();
+            using (var writer = XmlWriter.Create(output, settings))
+            {
                 xml.WriteTo(writer);
             }
-	        return output.ToString();
-	    }
-	}
+            return output.ToString();
+        }
+    }
 }

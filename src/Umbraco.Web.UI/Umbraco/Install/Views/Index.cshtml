@@ -1,0 +1,78 @@
+﻿@using Umbraco.Core.Configuration
+@using Umbraco.Web
+@using Umbraco.Web.Install.Controllers
+@{
+    Layout = null;
+}
+<!doctype html>
+<html lang="en">
+<head>
+    <base href="@ViewData.GetUmbracoBaseFolder()/" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Install Umbraco</title>
+    <link rel="stylesheet" href="assets/css/installer.css" />
+</head>
+
+<body ng-class="{loading:installer.loading}" ng-controller="Umbraco.InstallerController" id="umbracoInstallPageBody">
+
+    <img src="assets/img/application/logo_white.png" id="logo" />
+
+    <umb-loader position="bottom"
+                class="umb-installer-loader"
+                ng-if="installer.loading"
+                ng-style="{'width': installer.progress}">
+    </umb-loader>
+
+    <div id="overlay" ng-cloak ng-animate="'fade'" ng-show="installer.done"></div>
+
+    <div id="installer" class="absolute-center clearfix"
+         ng-cloak
+         ng-animate="'fade'"
+         ng-show="installer.configuring">
+        
+        <div ng-if="installer.current" ng-switch on="installer.current.view">
+            <div ng-switch-when="ysod">
+                <h1>A server error occurred</h1>
+                <p>This is most likely due to an error during application startup</p>
+                <iframe id="ysod"></iframe>
+            </div>
+            <div ng-switch-default>
+                <div ng-include="installer.current.view"></div>
+            </div>    
+        </div>
+    </div>
+
+
+    <div ng-cloak ng-animate="'fade'" id="fact" class="absolute-center clearfix" ng-show="installer.fact">
+        <h2>Did you know</h2>
+        <p ng-bind-html="installer.fact"></p>
+    </div>
+    
+    <h3 ng-cloak ng-animate="'fade'" id="feedback" ng-show="installer.feedback">{{installer.feedback}}</h3> 
+   
+    <div id="missinglazyload" style="display: none;">
+        <h3>There has been a problem with the build.</h3> 
+        <p>This might be because you could be offline or on a slow connection. Please try the following steps</p>
+        <ol>
+            <li>Make sure you have <a href="https://nodejs.org" target="_blank">Node.js</a> installed.</li>
+            <li>Open command prompt and cd to \src\Umbraco.Web.UI.Client.</li>
+            <li>Check to see if \src\Umbraco.Web.UI.Client\node_modules folder exists (this could be hidden); if so delete it.</li>
+            <li>Run npm install; if successfull the node_modules folder should be created in the Umbraco.Web.UI.Client directory.</li>
+            <li>Run build\Build.bat.</li>
+        </ol>
+    </div>
+
+    <script type="text/javascript">
+        var Umbraco = {};
+        Umbraco.Sys = {};
+        Umbraco.Sys.ServerVariables = {
+            "installApiBaseUrl": "@ViewData.GetInstallApiBaseUrl()",
+            "umbracoBaseUrl": "@ViewData.GetUmbracoBaseFolder()"
+        };
+    </script>
+    <script src="lib/lazyload-js/lazyload.min.js"></script>
+    <script src="js/install.loader.js"></script>
+</body>
+</html>

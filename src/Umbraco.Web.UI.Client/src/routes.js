@@ -1,54 +1,60 @@
 app.config(function ($routeProvider) {
-
-    /** This checks if the user is authenticated for a route and what the isRequired is set to.
-        Depending on whether isRequired = true, it first check if the user is authenticated and will resolve successfully
+    
+    /**
+     * This determines if the route can continue depending on authentication and initialization requirements
+     * @param {boolean} authRequired If true, it checks if the user is authenticated and will resolve successfully
         otherwise the route will fail and the $routeChangeError event will execute, in that handler we will redirect to the rejected
-        path that is resolved from this method and prevent default (prevent the route from executing) */
-    var canRoute = function(isRequired) {
+        path that is resolved from this method and prevent default (prevent the route from executing)
+     * @returns {promise} 
+     */
+    var canRoute = function(authRequired) {
 
         return {
             /** Checks that the user is authenticated, then ensures that are requires assets are loaded */
             isAuthenticatedAndReady: function ($q, userService, $route, assetsService, appState) {
-                var deferred = $q.defer();
 
                 //don't need to check if we've redirected to login and we've already checked auth
                 if (!$route.current.params.section
                     && ($route.current.params.check === false || $route.current.params.check === "false")) {
-                    deferred.resolve(true);
-                    return deferred.promise;
+                    return $q.when(true);
                 }
 
-                userService.isAuthenticated()
+                return userService.isAuthenticated()
                     .then(function () {
 
-                        assetsService._loadInitAssets().then(function() {
+                        //before proceeding all initial assets must be loaded
+                        return assetsService._loadInitAssets().then(function () {
 
                             //This could be the first time has loaded after the user has logged in, in this case
                             // we need to broadcast the authenticated event - this will be handled by the startup (init)
                             // handler to set/broadcast the ready state
                             var broadcast = appState.getGlobalState("isReady") !== true;
 
-                            userService.getCurrentUser({ broadcastEvent: broadcast }).then(function (user) {
+                            return userService.getCurrentUser({ broadcastEvent: broadcast }).then(function (user) {
                                 //is auth, check if we allow or reject
-                                if (isRequired) {
+                                if (authRequired) {
 
                                     //This checks the current section and will force a redirect to 'content' as the default
                                     if ($route.current.params.section.toLowerCase() === "default" || $route.current.params.section.toLowerCase() === "umbraco" || $route.current.params.section === "") {
                                         $route.current.params.section = "content";
                                     }
 
+                                    var found = _.find(user.allowedSections, function (s) {
+                                        return s.localeCompare($route.current.params.section, undefined, { sensitivity: 'accent' }) === 0;
+                                    })
+
                                     // U4-5430, Benjamin Howarth
                                     // We need to change the current route params if the user only has access to a single section
                                     // To do this we need to grab the current user's allowed sections, then reject the promise with the correct path.
-                                    if (user.allowedSections.indexOf($route.current.params.section) > -1) {
+                                    if (found) {
                                         //this will resolve successfully so the route will continue
-                                        deferred.resolve(true);
+                                        return $q.when(true);
                                     } else {
-                                        deferred.reject({ path: "/" + user.allowedSections[0] });
+                                        return $q.reject({ path: "/" + user.allowedSections[0] });
                                     }
                                 }
                                 else {
-                                    deferred.reject({ path: "/" });
+                                    return $q.when(true);
                                 }
                             });
 
@@ -56,17 +62,17 @@ app.config(function ($routeProvider) {
 
                     }, function () {
                         //not auth, check if we allow or reject
-                        if (isRequired) {
+                        if (authRequired) {
                             //the check=false is checked above so that we don't have to make another http call to check
                             //if they are logged in since we already know they are not.
-                            deferred.reject({ path: "/login/false" });
+                            return $q.reject({ path: "/login/false" });
                         }
                         else {
                             //this will resolve successfully so the route will continue
-                            deferred.resolve(true);
+                            return $q.when(true);
                         }
                     });
-                return deferred.promise;
+
             }
         };
     };
@@ -74,21 +80,25 @@ app.config(function ($routeProvider) {
     /** When this is used to resolve it will attempt to log the current user out */
     var doLogout = function() {
         return {
-            isLoggedOut: function ($q, userService) {
-                var deferred = $q.defer();
-                userService.logout().then(function () {
+            isLoggedOut: function ($q, $location, userService) {
+                return userService.logout().then(function () {
+                    // we have to redirect here instead of the routes redirectTo
+                    // https://github.com/angular/angular.js/commit/7f4b356c2bebb87f0c26b57a20415b004b20bcd1
+                    $location.path("/login/false");
                     //success so continue
-                    deferred.resolve(true);
+                    return $q.when(true);
                 }, function() {
                     //logout failed somehow ? we'll reject with the login page i suppose
-                    deferred.reject({ path: "/login/false" });
+                    return $q.reject({ path: "/login/false" });
                 });
-                return deferred.promise;
             }
         }
     }
 
     $routeProvider
+        .when("/", {
+            redirectTo: '/content'
+        })
         .when('/login', {
             templateUrl: 'views/common/login.html',
             //ensure auth is *not* required so it will redirect to /
@@ -100,11 +110,9 @@ app.config(function ($routeProvider) {
             resolve: canRoute(false)
         })
         .when('/logout', {
-             redirectTo: '/login/false',
             resolve: doLogout()
         })
-        .when('/:section', {
-            
+        .when('/:section?', {
             //This allows us to dynamically change the template for this route since you cannot inject services into the templateUrl method.
             template: "<div ng-include='templateUrl'></div>",
             //This controller will execute for this route, then we can execute some code in order to set the template Url
@@ -115,7 +123,7 @@ app.config(function ($routeProvider) {
                 sectionService.getSectionsForUser().then(function(sections) {
                     //find the one we're requesting
                     var found = _.find(sections, function(s) {
-                        return s.alias === $routeParams.section;
+                        return s.alias.localeCompare($routeParams.section, undefined, { sensitivity: 'accent' }) === 0;
                     })
                     if (found && found.routePath) {
                         //there's a custom route path so redirect
@@ -124,10 +132,11 @@ app.config(function ($routeProvider) {
                     else {
                         //there's no custom route path so continue as normal
                         $routeParams.url = "dashboard.aspx?app=" + $routeParams.section;
-                        $scope.templateUrl = 'views/common/dashboard.html';            
+                        $scope.templateUrl = 'views/common/dashboard.html';
                     }
                 });
             },
+            reloadOnSearch: false,
             resolve: canRoute(true)
         })
         .when('/:section/framed/:url', {
@@ -138,19 +147,37 @@ app.config(function ($routeProvider) {
 
                 return 'views/common/legacy.html';
             },
+            reloadOnSearch: false,
             resolve: canRoute(true)
         })
-        .when('/:section/:tree/:method', {
+        .when('/:section/:tree/:method?', {
             //This allows us to dynamically change the template for this route since you cannot inject services into the templateUrl method.
             template: "<div ng-include='templateUrl'></div>",
-            //This controller will execute for this route, then we replace the template dynamnically based on the current tree.
-            controller: function ($scope, $route, $routeParams, treeService) {
+            //This controller will execute for this route, then we replace the template dynamically based on the current tree.
+            controller: function ($scope, $routeParams, treeService) {
 
                 if (!$routeParams.method) {
                     $scope.templateUrl = "views/common/dashboard.html";
+                    return;
                 }
 
-                // Here we need to figure out if this route is for a package tree and if so then we need
+                //TODO: Fix this special case by using components, the packager should be a component and then we just have a view for each route like normal rendering the component with the correct parameters
+                //special case for the package section
+                var packagePages = ["edit", "options"];
+                if ($routeParams.section.toLowerCase() === "packages" && $routeParams.tree.toLowerCase() === "packages" && packagePages.indexOf($routeParams.method.toLowerCase()) === -1) {
+                    $scope.templateUrl = "views/packages/overview.html";
+                    return;
+                }
+
+                //TODO: Fix this special case by using components, the users section should be a component and then we just have a view for each route like normal rendering the component with the correct parameters
+                //special case for the users section
+                var usersPages = ["user", "group"];
+                if ($routeParams.section.toLowerCase() === "users" && $routeParams.tree.toLowerCase() === "users" && usersPages.indexOf($routeParams.method.toLowerCase()) === -1) {
+                    $scope.templateUrl = "views/users/overview.html";
+                    return;
+                }
+
+                // Here we need to figure out if this route is for a user's package tree and if so then we need
                 // to change it's convention view path to:
                 // /App_Plugins/{mypackage}/backoffice/{treetype}/{method}.html
 
@@ -168,12 +195,13 @@ app.config(function ($routeProvider) {
                     $scope.templateUrl = ('views/' + $routeParams.tree + '/' + $routeParams.method + '.html');
                 }
             },
+            reloadOnSearch: false,
             resolve: canRoute(true)
         })
-        .when('/:section/:tree/:method/:id', {
+        .when('/:section/:tree/:method?/:id', {
             //This allows us to dynamically change the template for this route since you cannot inject services into the templateUrl method.
             template: "<div ng-include='templateUrl'></div>",
-            //This controller will execute for this route, then we replace the template dynamnically based on the current tree.
+            //This controller will execute for this route, then we replace the template dynamically based on the current tree.
             controller: function ($scope, $route, $routeParams, treeService) {
 
                 if (!$routeParams.tree || !$routeParams.method) {
@@ -199,11 +227,13 @@ app.config(function ($routeProvider) {
                 }
 
             },
+            reloadOnSearch: false,
+            reloadOnUrl: false,
             resolve: canRoute(true)
         })
         .otherwise({ redirectTo: '/login' });
     }).config(function ($locationProvider) {
-
-        //$locationProvider.html5Mode(false).hashPrefix('!'); //turn html5 mode off
-        // $locationProvider.html5Mode(true);         //turn html5 mode on
+        
+        $locationProvider.html5Mode(false); //turn html5 mode off
+        $locationProvider.hashPrefix('');
     });

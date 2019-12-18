@@ -10,46 +10,27 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         Group = "Live Environment")]
     public class CustomErrorsCheck : AbstractConfigCheck
     {
-        private readonly ILocalizedTextService _textService;
+        public CustomErrorsCheck(ILocalizedTextService textService)
+            : base(textService)
+        { }
 
-        public CustomErrorsCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
-        {
-            _textService = healthCheckContext.ApplicationContext.Services.TextService;
-        }
+        public override string FilePath => "~/Web.config";
 
-        public override string FilePath
-        {
-            get { return "~/Web.config"; }
-        }
+        public override string XPath => "/configuration/system.web/customErrors/@mode";
 
-        public override string XPath
-        {
-            get { return "/configuration/system.web/customErrors/@mode"; }
-        }
+        public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldEqual;
 
-        public override ValueComparisonType ValueComparisonType
+        public override IEnumerable<AcceptableConfiguration> Values => new List<AcceptableConfiguration>
         {
-            get { return ValueComparisonType.ShouldEqual; }
-        }
-
-        public override IEnumerable<AcceptableConfiguration> Values
-        {
-            get
-            {
-                return new List<AcceptableConfiguration>
-                {
-                    new AcceptableConfiguration { IsRecommended = true, Value = CustomErrorsMode.RemoteOnly.ToString() },
-                    new AcceptableConfiguration { IsRecommended = false, Value = "On" }
-                };
-            }
-        }
+            new AcceptableConfiguration { IsRecommended = true, Value = CustomErrorsMode.RemoteOnly.ToString() },
+            new AcceptableConfiguration { IsRecommended = false, Value = "On" }
+        };
 
         public override string CheckSuccessMessage
         {
             get
             {
-                return _textService.Localize("healthcheck/customErrorsCheckSuccessMessage",
-                    new[] { CurrentValue });
+                return TextService.Localize("healthcheck/customErrorsCheckSuccessMessage", new[] { CurrentValue });
             }
         }
 
@@ -57,7 +38,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         {
             get
             {
-                return _textService.Localize("healthcheck/customErrorsCheckErrorMessage",
+                return TextService.Localize("healthcheck/customErrorsCheckErrorMessage",
                     new[] { CurrentValue, Values.First(v => v.IsRecommended).Value });
             }
         }
@@ -66,7 +47,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         {
             get
             {
-                return _textService.Localize("healthcheck/customErrorsCheckRectifySuccessMessage",
+                return TextService.Localize("healthcheck/customErrorsCheckRectifySuccessMessage",
                     new[] { Values.First(v => v.IsRecommended).Value });
             }
         }

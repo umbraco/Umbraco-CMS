@@ -59,7 +59,6 @@ iframe, .content-column-body {
   right: 0;
   margin: 0;
   opacity: 0;
-  filter: alpha(opacity=0);
   transform: translate(-300px, 0) scale(4);
   font-size: 23px;
   direction: ltr;
@@ -106,18 +105,16 @@ iframe, .content-column-body {
     display: flex;
     flex-wrap: nowrap;
     flex-direction: row;
-    justify-content: center;
     align-items: flex-start;
 
     margin-top: 15px;
 }
 
 .pa-select-type label {
-    padding: 0 20px;
+    padding: 0 15px;
 }
 
 .pa-access-header {
-    font-weight: bold;
     margin: 0 0 3px 0;
     padding-bottom: 0;
 }
@@ -222,4 +219,13 @@ pre {
     background-color: transparent;
     border: 0;
   }
+}
+
+/* Styling for content/media sort order dialog */
+.sort-order {
+    td.tree-icon {
+        font-size:20px;
+        width:20px;
+        padding-right:0;
+    }
 }

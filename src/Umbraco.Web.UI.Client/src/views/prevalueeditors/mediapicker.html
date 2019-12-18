@@ -1,4 +1,4 @@
-<div ng-controller="Umbraco.PrevalueEditors.MediaPickerController" class="umb-editor umb-contentpicker">
+<div ng-controller="Umbraco.PrevalueEditors.MediaPickerController" class="umb-property-editor umb-contentpicker">
 
 	<div ng-model="renderModel">
 		<umb-node-preview
@@ -11,23 +11,16 @@
 			allow-remove="allowRemove"
 			allow-edit="allowEdit"
 			on-remove="remove($index)"
-			on-edit="openContentPicker()">
+			on-edit="openTreePicker()">
 		</umb-node-preview>
 	</div>
 
 	<a ng-show="model.config.multiPicker === true || renderModel.length === 0"
 		class="umb-node-preview-add"
 		href=""
-		ng-click="openContentPicker()"
+		ng-click="openTreePicker()"
 		prevent-default>
 		<localize key="general_add">Add</localize>
 	</a>
-
-	<umb-overlay
-		ng-if="contentPickerOverlay.show"
-		model="contentPickerOverlay"
-		position="right"
-		view="contentPickerOverlay.view">
-	</umb-overlay>
 
 </div>

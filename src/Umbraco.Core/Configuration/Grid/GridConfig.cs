@@ -1,16 +1,17 @@
-using System.IO;
+﻿using System.IO;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Manifest;
 
 namespace Umbraco.Core.Configuration.Grid
 {
     class GridConfig : IGridConfig
     {
-        public GridConfig(ILogger logger, IRuntimeCacheProvider runtimeCache, DirectoryInfo appPlugins, DirectoryInfo configFolder, bool isDebug)
+        public GridConfig(ILogger logger, AppCaches appCaches, DirectoryInfo configFolder, ManifestParser manifestParser, bool isDebug)
         {
-            EditorsConfig = new GridEditorsConfig(logger, runtimeCache, appPlugins, configFolder, isDebug);
+            EditorsConfig = new GridEditorsConfig(logger, appCaches, configFolder, manifestParser, isDebug);
         }
 
-        public IGridEditorsConfig EditorsConfig { get; private set; }
+        public IGridEditorsConfig EditorsConfig { get; }
     }
 }

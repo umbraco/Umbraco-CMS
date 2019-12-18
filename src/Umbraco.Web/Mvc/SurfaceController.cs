@@ -1,42 +1,28 @@
-using System;
-using System.Web.Mvc;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
+﻿using System;
 using Umbraco.Core;
-using Umbraco.Web.Security;
 using System.Collections.Specialized;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Mvc
 {
-
     /// <summary>
-    /// The base controller that all Presentation Add-in controllers should inherit from
+    /// Provides a base class for front-end add-in controllers.
     /// </summary>
     [MergeModelStateToChildAction]
     [MergeParentContextViewData]
     public abstract class SurfaceController : PluginController
     {
-        /// <summary>
-        /// Default constructor
-        /// </summary>
-        /// <param name="umbracoContext"></param>
-        protected SurfaceController(UmbracoContext umbracoContext)
-            : base(umbracoContext)
-        {
-        }
-
-        protected SurfaceController(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper)
-            : base(umbracoContext, umbracoHelper)
-        {
-        }
-
-        /// <summary>
-        /// Empty constructor, uses Singleton to resolve the UmbracoContext
-        /// </summary>
         protected SurfaceController()
-            : base(UmbracoContext.Current)
-        {
-        }
+        { }
+
+        protected SurfaceController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
+            : base(umbracoContextAccessor, databaseFactory, services, appCaches, logger, profilingLogger, umbracoHelper)
+        { }
 
         /// <summary>
         /// Redirects to the Umbraco page with the given id
@@ -45,7 +31,7 @@ namespace Umbraco.Web.Mvc
         /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToUmbracoPage(int pageId)
         {
-            return new RedirectToUmbracoPageResult(pageId, UmbracoContext);
+            return new RedirectToUmbracoPageResult(pageId,  Current.UmbracoContextAccessor);
         }
 
         /// <summary>
@@ -56,7 +42,7 @@ namespace Umbraco.Web.Mvc
         /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToUmbracoPage(int pageId, NameValueCollection queryStringValues)
         {
-            return new RedirectToUmbracoPageResult(pageId, queryStringValues, UmbracoContext);
+            return new RedirectToUmbracoPageResult(pageId, queryStringValues,  Current.UmbracoContextAccessor);
         }
 
         /// <summary>
@@ -67,7 +53,7 @@ namespace Umbraco.Web.Mvc
         /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToUmbracoPage(int pageId, string queryString)
         {
-            return new RedirectToUmbracoPageResult(pageId, queryString, UmbracoContext);
+            return new RedirectToUmbracoPageResult(pageId, queryString,  Current.UmbracoContextAccessor);
         }
 
         /// <summary>
@@ -77,7 +63,7 @@ namespace Umbraco.Web.Mvc
         /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToUmbracoPage(IPublishedContent publishedContent)
         {
-            return new RedirectToUmbracoPageResult(publishedContent, UmbracoContext);
+            return new RedirectToUmbracoPageResult(publishedContent,  Current.UmbracoContextAccessor);
         }
 
         /// <summary>
@@ -88,7 +74,7 @@ namespace Umbraco.Web.Mvc
         /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToUmbracoPage(IPublishedContent publishedContent, NameValueCollection queryStringValues)
         {
-            return new RedirectToUmbracoPageResult(publishedContent, queryStringValues, UmbracoContext);
+            return new RedirectToUmbracoPageResult(publishedContent, queryStringValues,  Current.UmbracoContextAccessor);
         }
 
         /// <summary>
@@ -99,7 +85,7 @@ namespace Umbraco.Web.Mvc
         /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToUmbracoPage(IPublishedContent publishedContent, string queryString)
         {
-            return new RedirectToUmbracoPageResult(publishedContent, queryString, UmbracoContext);
+            return new RedirectToUmbracoPageResult(publishedContent, queryString,  Current.UmbracoContextAccessor);
         }
 
         /// <summary>
@@ -108,7 +94,7 @@ namespace Umbraco.Web.Mvc
         /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToCurrentUmbracoPage()
         {
-            return new RedirectToUmbracoPageResult(CurrentPage, UmbracoContext);
+            return new RedirectToUmbracoPageResult(CurrentPage,  Current.UmbracoContextAccessor);
         }
 
         /// <summary>
@@ -118,25 +104,26 @@ namespace Umbraco.Web.Mvc
         /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToCurrentUmbracoPage(NameValueCollection queryStringValues)
         {
-            return new RedirectToUmbracoPageResult(CurrentPage, queryStringValues, UmbracoContext);
+            return new RedirectToUmbracoPageResult(CurrentPage, queryStringValues,  Current.UmbracoContextAccessor);
         }
 
         /// <summary>
         /// Redirects to the currently rendered Umbraco page and passes provided querystring
         /// </summary>
-        /// <param name="queryStringValues"></param>
+        /// <param name="queryString"></param>
         /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToCurrentUmbracoPage(string queryString)
         {
-            return new RedirectToUmbracoPageResult(CurrentPage, queryString, UmbracoContext);
+            return new RedirectToUmbracoPageResult(CurrentPage, queryString,  Current.UmbracoContextAccessor);
         }
+
         /// <summary>
         /// Redirects to the currently rendered Umbraco URL
         /// </summary>
         /// <returns></returns>
         /// <remarks>
-        /// this is useful if you need to redirect 
-        /// to the current page but the current page is actually a rewritten URL normally done with something like 
+        /// this is useful if you need to redirect
+        /// to the current page but the current page is actually a rewritten URL normally done with something like
         /// Server.Transfer.
         /// </remarks>
         protected RedirectToUmbracoUrlResult RedirectToCurrentUmbracoUrl()
@@ -150,7 +137,7 @@ namespace Umbraco.Web.Mvc
         /// <returns></returns>
         protected UmbracoPageResult CurrentUmbracoPage()
         {
-            return new UmbracoPageResult(ApplicationContext.ProfilingLogger);
+            return new UmbracoPageResult(ProfilingLogger);
         }
 
         /// <summary>
@@ -161,13 +148,11 @@ namespace Umbraco.Web.Mvc
             get
             {
                 var routeDefAttempt = TryGetRouteDefinitionFromAncestorViewContexts();
-                if (!routeDefAttempt.Success)
-                {
+                if (routeDefAttempt.Success == false)
                     throw routeDefAttempt.Exception;
-                }
 
                 var routeDef = routeDefAttempt.Result;
-                return routeDef.PublishedContentRequest.PublishedContent;
+                return routeDef.PublishedRequest.PublishedContent;
             }
         }
 
@@ -181,24 +166,16 @@ namespace Umbraco.Web.Mvc
         /// </remarks>
         private Attempt<RouteDefinition> TryGetRouteDefinitionFromAncestorViewContexts()
         {
-            ControllerContext currentContext = ControllerContext;
+            var currentContext = ControllerContext;
             while (currentContext != null)
             {
                 var currentRouteData = currentContext.RouteData;
                 if (currentRouteData.DataTokens.ContainsKey(Core.Constants.Web.UmbracoRouteDefinitionDataToken))
-                {
                     return Attempt.Succeed((RouteDefinition)currentRouteData.DataTokens[Core.Constants.Web.UmbracoRouteDefinitionDataToken]);
-                }
-                if (currentContext.IsChildAction)
-                {
-                    //assign current context to parent
-                    currentContext = currentContext.ParentActionViewContext;
-                }
-                else
-                {
-                    //exit the loop
-                    currentContext = null;
-                }
+
+                currentContext = currentContext.IsChildAction
+                    ? currentContext.ParentActionViewContext
+                    : null;
             }
             return Attempt<RouteDefinition>.Fail(
                 new InvalidOperationException("Cannot find the Umbraco route definition in the route values, the request must be made in the context of an Umbraco request"));

@@ -5,7 +5,7 @@ using Umbraco.Core.Models;
 namespace Umbraco.Core.Services
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public interface IRedirectUrlService : IService
     {
@@ -14,8 +14,9 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="url">The Umbraco url route.</param>
         /// <param name="contentKey">The content unique key.</param>
+        /// <param name="culture">The culture.</param>
         /// <remarks>Is a proper Umbraco route eg /path/to/foo or 123/path/tofoo.</remarks>
-        void Register(string url, Guid contentKey);
+        void Register(string url, Guid contentKey, string culture = null);
 
         /// <summary>
         /// Deletes all redirect urls for a given content.
@@ -72,7 +73,7 @@ namespace Umbraco.Core.Services
         /// <param name="total">The total count of redirect urls.</param>
         /// <returns>The redirect urls.</returns>
         IEnumerable<IRedirectUrl> GetAllRedirectUrls(int rootContentId, long pageIndex, int pageSize, out long total);
-        
+
         /// <summary>
         /// Searches for all redirect urls that contain a given search term in their URL property.
         /// </summary>

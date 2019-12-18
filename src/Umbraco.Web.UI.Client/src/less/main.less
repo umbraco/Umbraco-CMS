@@ -11,7 +11,7 @@
 	min-height: 100%;
 }
 .shadow {
-	box-shadow: 3px 0px 7px @gray-8;
+	box-shadow: 3px 0px 7px rgba(0,0,0,0.16);
 }
 
 .umb-scrollable, .umb-auto-overflow {
@@ -48,12 +48,13 @@ h5.-black {
     border: none
 }
 .bootstrap-datetimepicker-widget {
+  width: auto !important;
     td {
         &.active, span.active {
-            background: @turquoise !important;
+            background: @blueMid !important;
         }
         &.today:not(.active):before {
-            border-bottom-color: @purple-l1 !important;
+            border-bottom-color: @pinkLight !important;
         }
         a[data-action] {
             padding: 0 !important;
@@ -97,10 +98,6 @@ h5.-black {
   display: block;
   color: @gray-8;
   text-decoration: none;
-  -webkit-transition: all 0.3s ease-in-out;
-  -moz-transition: all 0.3s ease-in-out;
-  -ms-transition: all 0.3s ease-in-out;
-  -o-transition: all 0.3s ease-in-out;
   transition: all 0.3s ease-in-out;
 }
 
@@ -116,22 +113,45 @@ h5.-black {
 
 /* FORM GRID */
 .umb-pane {
-  margin: 30px 20px;
+  margin: 20px;
 }
 .umb-control-group {
-  border-bottom: 1px solid @gray-10;
-  padding-bottom: 20px;
-  margin-bottom: 15px !important;
+    position: relative;
+    &::after {
+        content: '';
+        display:block;
+        margin-top: 20px;
+        width: 100%;
+        height: 1px;
+        background-color: @gray-11;
+    }
 }
 
 .umb-control-group.-no-border {
-  border: none;
+    &::after {
+        margin-top: 0px;
+        height: 0;
+        background-color: transparent;
+    }
+}
+
+.umb-property:last-of-type .umb-control-group {
+    &::after {
+        margin-top: 0px;
+        height: 0;
+        background-color: transparent;
+    }
+    margin-bottom: 0 !important;
 }
 
 /* BLOCK MODE */
 .block-form .umb-control-group {
-  border-bottom: none;
-  padding-bottom: 0;
+    margin-top: 0px;
+    &::after {
+        margin-top: 0px;
+        height: 0;
+        background-color: transparent;
+    }
 }
 
 .block-form .umb-control-group label .help-block,
@@ -161,7 +181,36 @@ h5.-black {
 }
 
 .umb-control-group .umb-el-wrap {
-  padding: 0
+  padding: 0;
+}
+.form-horizontal .umb-control-group .control-header {
+    float: left;
+    width: 160px;
+    padding-top: 5px;
+    text-align: left;
+
+    .control-label {
+        float: left;
+        width: auto;
+        padding-top: 0;
+        text-align: left;
+    }
+
+    .control-description {
+        display: block;
+        clear: both;
+        max-width:480px;// avoiding description becoming too wide when its placed on top of property.
+        margin-bottom: 10px;
+    }
+}
+@media (max-width: 767px) {
+    
+    .form-horizontal .umb-control-group .control-header {
+        float: none;
+        width: 100%;
+    }
+    
+
 }
 
 /* LABELS*/
@@ -228,13 +277,15 @@ label:not([for]) {
   align-items: center;
 }
 
-.controls-row > .vertical-align-items > input.umb-editor-tiny {
-  margin-left: 5px;
-  margin-right: 5px;
+.controls-row > .vertical-align-items > input.umb-property-editor-tiny,
+.controls-row > .vertical-align-items > input.umb-property-editor-small {
+    margin-left: 5px;
+    margin-right: 5px;
 }
 
-.controls-row > .vertical-align-items > input.umb-editor-tiny:first-child {
-  margin-left: 0;
+.controls-row > .vertical-align-items > input.umb-property-editor-tiny:first-child
+.controls-row > .vertical-align-items > input.umb-property-editor-small:first-child {
+    margin-left: 0;
 }
 
 .thumbnails .selected {
@@ -372,8 +423,6 @@ table thead a {
   height: 100%;
   z-index: 5999;
   opacity: .6;
-  filter: alpha(opacity=6);
-  -webkit-box-shadow: inset 0 0 0 40px white,inset 0 0 0 41px rgba(0,0,0,0.2),inset 0 0 20px 41px rgba(0,0,0,0.2);
   box-shadow: inset 0 0 0 40px white,inset 0 0 0 41px rgba(0,0,0,0.2),inset 0 0 20px 41px rgba(0,0,0,0.2);
 }
 
@@ -449,15 +498,6 @@ table thead a {
     height: 100%;
 }
 
-#search-form .form-search div {
-    margin-top:3px;
-}
-#search-form .form-search div .btn {
-    position:relative;
-    top:0;
-    left:0;
-}
-
 /* DICTIONARY */
 #dictionaryItems tr {
     border-top:solid 1px @gray-8;
@@ -491,105 +531,6 @@ table thead a {
 
 #dictionaryItems .icon-check {
     color:@green;
-}
-
-// Loading Animation
-// ------------------------
-
-.umb-loader{
-background-color: @turquoise-d1;
-margin-top:0;
-margin-left:-100%;
--moz-animation-name:bounce_loadingProgressG;
--moz-animation-duration:1s;
--moz-animation-iteration-count:infinite;
--moz-animation-timing-function:linear;
--webkit-animation-name:bounce_loadingProgressG;
--webkit-animation-duration:1s;
--webkit-animation-iteration-count:infinite;
--webkit-animation-timing-function:linear;
--ms-animation-name:bounce_loadingProgressG;
--ms-animation-duration:1s;
--ms-animation-iteration-count:infinite;
--ms-animation-timing-function:linear;
--o-animation-name:bounce_loadingProgressG;
--o-animation-duration:1s;
--o-animation-iteration-count:infinite;
--o-animationtiming-function:linear;
-animation-name:bounce_loadingProgressG;
-animation-duration:1s;
-animation-iteration-count:infinite;
-animation-timing-function:linear;
-width:100%;
-height:1px;
-}
-
-
-    @-moz-keyframes bounce_loadingProgressG{
-    0%{
-    margin-left:-100%;
-    }
-
-    100%{
-    margin-left:100%;
-    }
-
-    }
-
-    @-webkit-keyframes bounce_loadingProgressG{
-    0%{
-    margin-left:-100%;
-    }
-
-    100%{
-    margin-left:100%;
-    }
-
-    }
-
-    @-ms-keyframes bounce_loadingProgressG{
-    0%{
-    margin-left:-100%;
-    }
-
-    100%{
-    margin-left:100%;
-    }
-
-    }
-
-    @-o-keyframes bounce_loadingProgressG{
-    0%{
-    margin-left:-100%;
-    }
-
-    100%{
-    margin-left:100%;
-    }
-
-    }
-
-    @keyframes bounce_loadingProgressG{
-    0%{
-    margin-left:-100%;
-    }
-    100%{
-    margin-left:100%;
-    }
-}
-
-.umb-loader-wrapper {
-
-    position: absolute;
-    right: 0;
-    left: 0;
-    margin: 10px 0;
-    overflow: hidden;
-
-}
-
-.umb-loader-wrapper.-bottom {
-	bottom: 0;
 }
 
 // Helpers
@@ -654,13 +595,11 @@ input[type=checkbox]:checked + .input-label--small {
 	border-radius: 0 !important;
 }
 
-.visuallyhidden{
-    position: absolute !important;
-	clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
-	clip: rect(1px, 1px, 1px, 1px);
-	padding:0 !important;
-	border:0 !important;
-	height: 1px !important;
-	width: 1px !important;
-	overflow: hidden;
+.diff del {
+  background-color: @red-l3;
+}
+
+.diff ins {
+  background-color: @green-l3;
+  text-decoration: none;
 }

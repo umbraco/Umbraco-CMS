@@ -6,21 +6,18 @@ using System.Text.RegularExpressions;
 
 namespace Umbraco.Core.IO
 {
-    internal class ShadowFileSystem : IFileSystem2
+    internal class ShadowFileSystem : IFileSystem
     {
         private readonly IFileSystem _fs;
-        private readonly IFileSystem2 _sfs;
+        private readonly IFileSystem _sfs;
 
-        public ShadowFileSystem(IFileSystem fs, IFileSystem2 sfs)
+        public ShadowFileSystem(IFileSystem fs, IFileSystem sfs)
         {
             _fs = fs;
             _sfs = sfs;
         }
 
-        public IFileSystem Inner
-        {
-            get { return _fs; }
-        }
+        public IFileSystem Inner => _fs;
 
         public void Complete()
         {
@@ -34,10 +31,9 @@ namespace Umbraco.Core.IO
                     {
                         try
                         {
-                            var fs2 = _fs as IFileSystem2;
-                            if (fs2 != null && fs2.CanAddPhysical)
+                            if (_fs.CanAddPhysical)
                             {
-                                fs2.AddFile(kvp.Key, _sfs.GetFullPath(kvp.Key)); // overwrite, move
+                                _fs.AddFile(kvp.Key, _sfs.GetFullPath(kvp.Key)); // overwrite, move
                             }
                             else
                             {
@@ -74,7 +70,7 @@ namespace Umbraco.Core.IO
 
         private Dictionary<string, ShadowNode> _nodes;
 
-        private Dictionary<string, ShadowNode> Nodes {  get { return _nodes ?? (_nodes = new Dictionary<string, ShadowNode>()); } }
+        private Dictionary<string, ShadowNode> Nodes => _nodes ?? (_nodes = new Dictionary<string, ShadowNode>());
 
         private class ShadowNode
         {
@@ -84,11 +80,11 @@ namespace Umbraco.Core.IO
                 IsDir = isdir;
             }
 
-            public bool IsDelete { get; private set; }
-            public bool IsDir { get; private set; }
+            public bool IsDelete { get; }
+            public bool IsDir { get; }
 
-            public bool IsExist { get { return IsDelete == false; } }
-            public bool IsFile { get { return IsDir == false; } }
+            public bool IsExist => IsDelete == false;
+            public bool IsFile => IsDir == false;
         }
 
         private static string NormPath(string path)
@@ -286,12 +282,8 @@ namespace Umbraco.Core.IO
         {
             ShadowNode sf;
             if (Nodes.TryGetValue(NormPath(path), out sf) == false)
-            {
-                // the inner filesystem (_fs) can be IFileSystem2... or just IFileSystem
-                // figure it out and use the most effective GetSize method
-                var fs2 = _fs as IFileSystem2;
-                return fs2 == null ? _fs.GetSize(path) : fs2.GetSize(path);
-            }
+                return _fs.GetSize(path);
+
             if (sf.IsDelete || sf.IsDir) throw new InvalidOperationException("Invalid path.");
             return _sfs.GetSize(path);
         }

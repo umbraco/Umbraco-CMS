@@ -2,112 +2,97 @@
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.Owin;
-using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Mvc
 {
     /// <summary>
-    /// A base controller class containing all of the Umbraco objects as properties that a developer requires
+    /// Provides a base class for Umbraco controllers.
     /// </summary>
     public abstract class UmbracoController : Controller
     {
-        protected UmbracoController(UmbracoContext umbracoContext)
-        {
-            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
-            UmbracoContext = umbracoContext;
-        }
+        // for debugging purposes
+        internal Guid InstanceId { get; } = Guid.NewGuid();
 
-        protected UmbracoController(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper)
-        {
-            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
-            if (umbracoHelper == null) throw new ArgumentNullException("umbracoHelper");
-            UmbracoContext = umbracoContext;
-            _umbraco = umbracoHelper;
-        }
+        /// <summary>
+        /// Gets or sets the Umbraco context.
+        /// </summary>
+        public IGlobalSettings GlobalSettings { get; }
+
+        /// <summary>
+        /// Gets the Umbraco context.
+        /// </summary>
+        public virtual UmbracoContext UmbracoContext => UmbracoContextAccessor.UmbracoContext;
+
+        /// <summary>
+        /// Gets or sets the Umbraco context accessor.
+        /// </summary>
+        public virtual IUmbracoContextAccessor UmbracoContextAccessor { get; set; }
+
+        /// <summary>
+        /// Gets or sets the services context.
+        /// </summary>
+        public ServiceContext Services { get; }
+
+        /// <summary>
+        /// Gets or sets the application cache.
+        /// </summary>
+        public AppCaches AppCaches { get; }
+
+        /// <summary>
+        /// Gets or sets the logger.
+        /// </summary>
+        public ILogger Logger { get; }
+
+        /// <summary>
+        /// Gets or sets the profiling logger.
+        /// </summary>
+        public IProfilingLogger ProfilingLogger { get; set; }
+
+        protected IOwinContext OwinContext => Request.GetOwinContext();
+
+        /// <summary>
+        /// Gets the membership helper.
+        /// </summary>
+        public MembershipHelper Members => Umbraco.MembershipHelper;
+
+        /// <summary>
+        /// Gets the Umbraco helper.
+        /// </summary>
+        public UmbracoHelper Umbraco { get; }
+
+        /// <summary>
+        /// Gets the web security helper.
+        /// </summary>
+        public virtual WebSecurity Security => UmbracoContext.Security;
 
         protected UmbracoController()
-            : this(UmbracoContext.Current)
+            : this(
+                  Current.Factory.GetInstance<IGlobalSettings>(),
+                  Current.Factory.GetInstance<IUmbracoContextAccessor>(),
+                  Current.Factory.GetInstance<ServiceContext>(),
+                  Current.Factory.GetInstance<AppCaches>(),
+                  Current.Factory.GetInstance<IProfilingLogger>(),
+                  Current.Factory.GetInstance<UmbracoHelper>()
+            )
         {
-            
         }
 
-        protected IOwinContext OwinContext
+        protected UmbracoController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
         {
-            get { return Request.GetOwinContext(); }
-        }
-
-        private UmbracoHelper _umbraco;
-
-        /// <summary>
-        /// Returns the MemberHelper instance
-        /// </summary>
-        public MembershipHelper Members
-        {
-            get { return Umbraco.MembershipHelper; }
-        }
-
-        /// <summary>
-        /// Returns an UmbracoHelper object
-        /// </summary>
-        public virtual UmbracoHelper Umbraco
-        {
-            get { return _umbraco ?? (_umbraco = new UmbracoHelper(UmbracoContext)); }
-        }
-
-        /// <summary>
-        /// Returns an ILogger
-        /// </summary>
-        public ILogger Logger
-        {
-            get { return ProfilingLogger.Logger; }
-        }
-
-        /// <summary>
-        /// Returns a ProfilingLogger
-        /// </summary>
-        public virtual ProfilingLogger ProfilingLogger
-        {
-            get { return UmbracoContext.Application.ProfilingLogger; }
-        }
-
-        /// <summary>
-        /// Returns the current UmbracoContext
-        /// </summary>
-        public virtual UmbracoContext UmbracoContext { get; private set; }
-
-        /// <summary>
-        /// Returns the current ApplicationContext
-        /// </summary>
-        public virtual ApplicationContext ApplicationContext
-        {
-            get { return UmbracoContext.Application; }
-        }
-
-        /// <summary>
-        /// Returns a ServiceContext
-        /// </summary>
-        public ServiceContext Services
-        {
-            get { return ApplicationContext.Services; }
-        }
-
-        /// <summary>
-        /// Returns a DatabaseContext
-        /// </summary>
-        public DatabaseContext DatabaseContext
-        {
-            get { return ApplicationContext.DatabaseContext; }
-        }
-
-        /// <summary>
-        /// Returns the WebSecurity instance
-        /// </summary>
-        public virtual WebSecurity Security
-        {
-            get { return UmbracoContext.Security; }
+            GlobalSettings = globalSettings;
+            UmbracoContextAccessor = umbracoContextAccessor;
+            Services = services;
+            AppCaches = appCaches;
+            Logger = profilingLogger;
+            ProfilingLogger = profilingLogger;
+            Umbraco = umbracoHelper;
         }
     }
 }

@@ -1,43 +1,28 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
     /// <summary>
-    /// Represents a <see cref="Tag"/> to DTO mapper used to translate the properties of the public api 
+    /// Represents a <see cref="Tag"/> to DTO mapper used to translate the properties of the public api
     /// implementation to that of the database's DTO as sql: [tableName].[columnName].
     /// </summary>
     [MapperFor(typeof(Tag))]
     [MapperFor(typeof(ITag))]
     public sealed class TagMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
+        public TagMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+            : base(sqlContext, maps)
+        { }
 
-        //NOTE: its an internal class but the ctor must be public since we're using Activator.CreateInstance to create it
-        // otherwise that would fail because there is no public constructor.
-        public TagMapper()
+        protected override void DefineMaps()
         {
-            BuildMap();
+            DefineMap<Tag, TagDto>(nameof(Tag.Id), nameof(TagDto.Id));
+            DefineMap<Tag, TagDto>(nameof(Tag.Text), nameof(TagDto.Text));
+            DefineMap<Tag, TagDto>(nameof(Tag.Group), nameof(TagDto.Group));
+            DefineMap<Tag, TagDto>(nameof(Tag.LanguageId), nameof(TagDto.LanguageId));
         }
-
-        #region Overrides of BaseMapper
-
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache
-        {
-            get { return PropertyInfoCacheInstance; }
-        }
-
-        internal override void BuildMap()
-        {
-            if (PropertyInfoCache.IsEmpty)
-            {
-                CacheMap<Tag, TagDto>(src => src.Id, dto => dto.Id);
-                CacheMap<Tag, TagDto>(src => src.Text, dto => dto.Tag);
-                CacheMap<Tag, TagDto>(src => src.Group, dto => dto.Group);
-            }
-        }
-
-        #endregion
     }
 }

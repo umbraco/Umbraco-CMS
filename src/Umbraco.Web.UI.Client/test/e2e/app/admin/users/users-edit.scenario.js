@@ -4,7 +4,7 @@ describe('admin edit user', function() {
     browser().navigateTo('/admin/users/new');
     input('user.email').enter('admin@abc.com');
     input('user.password').enter('changeme');
-    element('button.login').click();
+    element('button.login').trigger('click');
   });
 
   it('enables the save button when the user info is filled in correctly', function() {

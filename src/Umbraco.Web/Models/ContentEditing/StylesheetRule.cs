@@ -16,5 +16,7 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "selector")]
         public string Selector { get; set; }
 
+        [DataMember(Name = "styles")]
+        public string Styles { get; set; }
     }
 }

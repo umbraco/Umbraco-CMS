@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
@@ -13,7 +12,6 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -21,46 +19,45 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Security;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.Security.Identity;
-using Umbraco.Web.Trees;
-using Umbraco.Web.UI.JavaScript;
 using Umbraco.Core.Services;
-using Action = umbraco.BusinessLogic.Actions.Action;
+using Umbraco.Web.Composing;
+using Umbraco.Web.Features;
+using Umbraco.Web.JavaScript;
+using Umbraco.Web.Security;
 using Constants = Umbraco.Core.Constants;
+using JArray = Newtonsoft.Json.Linq.JArray;
 
 namespace Umbraco.Web.Editors
 {
+
     /// <summary>
-    /// A controller to render out the default back office view and JS results
+    /// Represents a controller user to render out the default back office view and JS results.
     /// </summary>
     [UmbracoRequireHttps]
-    [DisableClientCache]
+    [DisableBrowserCache]
     public class BackOfficeController : UmbracoController
     {
+        private readonly ManifestParser _manifestParser;
+        private readonly UmbracoFeatures _features;
+        private readonly IRuntimeState _runtimeState;
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
 
-        private const string TokenExternalSignInError = "ExternalSignInError";
-        private const string TokenPasswordResetCode = "PasswordResetCode";
-        private static readonly string[] TempDataTokenNames = { TokenExternalSignInError, TokenPasswordResetCode };
-
-        protected BackOfficeSignInManager SignInManager
+        public BackOfficeController(ManifestParser manifestParser, UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+            : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger, umbracoHelper)
         {
-            get { return _signInManager ?? (_signInManager = OwinContext.GetBackOfficeSignInManager()); }
-        }
-        protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager
-        {
-            get { return _userManager ?? (_userManager = OwinContext.GetBackOfficeUserManager()); }
+            _manifestParser = manifestParser;
+            _features = features;
+            _runtimeState = runtimeState;
         }
 
-        protected IAuthenticationManager AuthenticationManager
-        {
-            get { return OwinContext.Authentication; }
-        }
+        protected BackOfficeSignInManager SignInManager => _signInManager ?? (_signInManager = OwinContext.GetBackOfficeSignInManager());
+
+        protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager => _userManager ?? (_userManager = OwinContext.GetBackOfficeUserManager());
+
+        protected IAuthenticationManager AuthenticationManager => OwinContext.Authentication;
 
         /// <summary>
         /// Render the default view
@@ -69,8 +66,8 @@ namespace Umbraco.Web.Editors
         public async Task<ActionResult> Default()
         {
             return await RenderDefaultOrProcessExternalLoginAsync(
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml"),
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml"));
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings)),
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings)));
         }
 
         [HttpGet]
@@ -85,7 +82,7 @@ namespace Umbraco.Web.Editors
                     Core.Constants.Security.BackOfficeAuthenticationType,
                     Core.Constants.Security.BackOfficeExternalAuthenticationType);
             }
-            
+
             if (invite == null)
             {
                 Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: NULL");
@@ -96,7 +93,7 @@ namespace Umbraco.Web.Editors
 
             if (parts.Length != 2)
             {
-                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: " + invite);
+                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: {Invite}", invite);
                 return RedirectToAction("Default");
             }
 
@@ -105,7 +102,7 @@ namespace Umbraco.Web.Editors
             var decoded = token.FromUrlBase64();
             if (decoded.IsNullOrWhiteSpace())
             {
-                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: " + invite);
+                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: {Invite}", invite);
                 return RedirectToAction("Default");
             }
 
@@ -113,14 +110,14 @@ namespace Umbraco.Web.Editors
             int intId;
             if (int.TryParse(id, out intId) == false)
             {
-                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: " + invite);
+                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: {Invite}", invite);
                 return RedirectToAction("Default");
             }
 
             var identityUser = await UserManager.FindByIdAsync(intId);
             if (identityUser == null)
             {
-                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with non existing user: " + id);
+                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with non existing user: {UserId}", id);
                 return RedirectToAction("Default");
             }
 
@@ -128,7 +125,7 @@ namespace Umbraco.Web.Editors
 
             if (result.Succeeded == false)
             {
-                Logger.Warn<BackOfficeController>("Could not verify email, Error: " + string.Join(",", result.Errors) + ", Token: " + invite);
+                Logger.Warn<BackOfficeController>("Could not verify email, Error: {Errors}, Token: {Invite}", string.Join(",", result.Errors), invite);
                 return new RedirectResult(Url.Action("Default") + "#/login/false?invite=3");
             }
 
@@ -143,16 +140,17 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// This Action is used by the installer when an upgrade is detected but the admin user is not logged in. We need to 
+        /// This Action is used by the installer when an upgrade is detected but the admin user is not logged in. We need to
         /// ensure the user is authenticated before the install takes place so we redirect here to show the standard login screen.
         /// </summary>
-        /// <returns></returns>      
+        /// <returns></returns>
         [HttpGet]
+        [StatusCodeResult(System.Net.HttpStatusCode.ServiceUnavailable)]
         public async Task<ActionResult> AuthorizeUpgrade()
         {
             return await RenderDefaultOrProcessExternalLoginAsync(
                 //The default view to render when there is no external login info or errors
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml"),
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml", new BackOfficeModel(_features, GlobalSettings)),
                 //The ActionResult to perform if external login is successful
                 () => Redirect("/"));
         }
@@ -173,12 +171,26 @@ namespace Umbraco.Web.Editors
                     : CultureInfo.GetCultureInfo(GlobalSettings.DefaultUILanguage)
                 : CultureInfo.GetCultureInfo(culture);
 
-            var textForCulture = Services.TextService.GetAllStoredValues(cultureInfo)
-                //the dictionary returned is fine but the delimiter between an 'area' and a 'value' is a '/' but the javascript
-                // in the back office requres the delimiter to be a '_' so we'll just replace it
-                .ToDictionary(key => key.Key.Replace("/", "_"), val => val.Value);
+            var allValues = Services.TextService.GetAllStoredValues(cultureInfo);
+            var pathedValues = allValues.Select(kv =>
+            {
+                var slashIndex = kv.Key.IndexOf('/');
+                var areaAlias = kv.Key.Substring(0, slashIndex);
+                var valueAlias = kv.Key.Substring(slashIndex+1);
+                return new
+                {
+                    areaAlias,
+                    valueAlias,
+                    value = kv.Value
+                };
+            });
 
-            return new JsonNetResult { Data = textForCulture, Formatting = Formatting.Indented };
+            Dictionary<string, Dictionary<string, string>> nestedDictionary = pathedValues
+                .GroupBy(pv => pv.areaAlias)
+                .ToDictionary(pv => pv.Key, pv =>
+                    pv.ToDictionary(pve => pve.valueAlias, pve => pve.value));
+
+            return new JsonNetResult { Data = nestedDictionary, Formatting = Formatting.None };
         }
 
         /// <summary>
@@ -189,15 +201,11 @@ namespace Umbraco.Web.Editors
         [OutputCache(Order = 1, VaryByParam = "none", Location = OutputCacheLocation.Server, Duration = 5000)]
         public JavaScriptResult Application()
         {
-            var plugins = new DirectoryInfo(Server.MapPath("~/App_Plugins"));
-            var parser = new ManifestParser(plugins, ApplicationContext.ApplicationCache.RuntimeCache);
-            var initJs = new JsInitialization(parser);
-            var initCss = new CssInitialization(parser);
+            var initJs = new JsInitialization(_manifestParser);
+            var initCss = new CssInitialization(_manifestParser);
 
-            //get the legacy ActionJs file references to append as well
-            var legacyActionJsRef = new JArray(GetLegacyActionJs(LegacyJsActionType.JsUrl));
-
-            var result = initJs.GetJavascriptInitialization(HttpContext, JsInitialization.GetDefaultInitialization(), legacyActionJsRef);
+            var files = initJs.OptimizeBackOfficeScriptFiles(HttpContext, JsInitialization.GetDefaultInitialization());
+            var result = JsInitialization.GetJavascriptInitialization(HttpContext, files, "umbraco");
             result += initCss.GetStylesheetInitialization(HttpContext);
 
             return JavaScript(result);
@@ -211,44 +219,36 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public JsonNetResult GetManifestAssetList()
         {
-            Func<JArray> getResult = () =>
+            JArray GetAssetList()
             {
-                var plugins = new DirectoryInfo(Server.MapPath("~/App_Plugins"));
-                var parser = new ManifestParser(plugins, ApplicationContext.ApplicationCache.RuntimeCache);
-                var initJs = new JsInitialization(parser);
-                var initCss = new CssInitialization(parser);
-                var jsResult = initJs.GetJavascriptInitializationArray(HttpContext, new JArray());
-                var cssResult = initCss.GetStylesheetInitializationArray(HttpContext);
-                ManifestParser.MergeJArrays(jsResult, cssResult);
-                return jsResult;
-            };
+                var initJs = new JsInitialization(_manifestParser);
+                var initCss = new CssInitialization(_manifestParser);
+                var assets = new List<string>();
+                assets.AddRange(initJs.OptimizeBackOfficeScriptFiles(HttpContext, Enumerable.Empty<string>()));
+                assets.AddRange(initCss.GetStylesheetFiles(HttpContext));
+                return new JArray(assets);
+            }
 
             //cache the result if debugging is disabled
             var result = HttpContext.IsDebuggingEnabled
-                ? getResult()
-                : ApplicationContext.ApplicationCache.RuntimeCache.GetCacheItem<JArray>(
-                    typeof(BackOfficeController) + "GetManifestAssetList",
-                    () => getResult(),
-                    new TimeSpan(0, 10, 0));
+                ? GetAssetList()
+                : AppCaches.RuntimeCache.GetCacheItem<JArray>(
+                    "Umbraco.Web.Editors.BackOfficeController.GetManifestAssetList",
+                    GetAssetList,
+                    new TimeSpan(0, 2, 0));
 
-            return new JsonNetResult { Data = result, Formatting = Formatting.Indented };
+            return new JsonNetResult { Data = result, Formatting = Formatting.None };
         }
 
         [UmbracoAuthorize(Order = 0)]
         [HttpGet]
         public JsonNetResult GetGridConfig()
         {
-            var gridConfig = UmbracoConfig.For.GridConfig(
-                Logger,
-                ApplicationContext.ApplicationCache.RuntimeCache,
-                new DirectoryInfo(Server.MapPath(SystemDirectories.AppPlugins)),
-                new DirectoryInfo(Server.MapPath(SystemDirectories.Config)),
-                HttpContext.IsDebuggingEnabled);
-
-            return new JsonNetResult { Data = gridConfig.EditorsConfig.Editors, Formatting = Formatting.Indented };
+            var gridConfig = Current.Configs.Grids();
+            return new JsonNetResult { Data = gridConfig.EditorsConfig.Editors, Formatting = Formatting.None };
         }
 
-        
+
 
         /// <summary>
         /// Returns the JavaScript object representing the static server variables javascript object
@@ -258,12 +258,12 @@ namespace Umbraco.Web.Editors
         [MinifyJavaScriptResult(Order = 1)]
         public JavaScriptResult ServerVariables()
         {
-            var serverVars = new BackOfficeServerVariables(Url, ApplicationContext, UmbracoConfig.For.UmbracoSettings());
+            var serverVars = new BackOfficeServerVariables(Url, _runtimeState, _features, GlobalSettings);
 
             //cache the result if debugging is disabled
             var result = HttpContext.IsDebuggingEnabled
                 ? ServerVariablesParser.Parse(serverVars.GetServerVariables())
-                : ApplicationContext.ApplicationCache.RuntimeCache.GetCacheItem<string>(
+                : AppCaches.RuntimeCache.GetCacheItem<string>(
                     typeof(BackOfficeController) + "ServerVariables",
                     () => ServerVariablesParser.Parse(serverVars.GetServerVariables()),
                     new TimeSpan(0, 10, 0));
@@ -271,7 +271,7 @@ namespace Umbraco.Web.Editors
             return JavaScript(result);
         }
 
-        
+
 
         [HttpPost]
         public ActionResult ExternalLogin(string provider, string redirectUrl = null)
@@ -305,13 +305,13 @@ namespace Umbraco.Web.Editors
                 if (result)
                 {
                     //Add a flag and redirect for it to be displayed
-                    TempData[TokenPasswordResetCode] = new ValidatePasswordResetCodeModel { UserId = userId, ResetCode = resetCode };
+                    TempData[ViewDataExtensions.TokenPasswordResetCode] = new ValidatePasswordResetCodeModel { UserId = userId, ResetCode = resetCode };
                     return RedirectToLocal(Url.Action("Default", "BackOffice"));
                 }
             }
 
             //Add error and redirect for it to be displayed
-            TempData[TokenPasswordResetCode] = new[] { Services.TextService.Localize("login/resetCodeExpired") };
+            TempData[ViewDataExtensions.TokenPasswordResetCode] = new[] { Services.TextService.Localize("login/resetCodeExpired") };
             return RedirectToLocal(Url.Action("Default", "BackOffice"));
         }
 
@@ -325,7 +325,7 @@ namespace Umbraco.Web.Editors
             if (loginInfo == null)
             {
                 //Add error and redirect for it to be displayed
-                TempData[TokenExternalSignInError] = new[] { "An error occurred, could not get external login info" };
+                TempData[ViewDataExtensions.TokenExternalSignInError] = new[] { "An error occurred, could not get external login info" };
                 return RedirectToLocal(Url.Action("Default", "BackOffice"));
             }
 
@@ -336,15 +336,15 @@ namespace Umbraco.Web.Editors
             }
 
             //Add errors and redirect for it to be displayed
-            TempData[TokenExternalSignInError] = result.Errors;
+            TempData[ViewDataExtensions.TokenExternalSignInError] = result.Errors;
             return RedirectToLocal(Url.Action("Default", "BackOffice"));
         }
 
         /// <summary>
-        /// Used by Default and AuthorizeUpgrade to render as per normal if there's no external login info, 
+        /// Used by Default and AuthorizeUpgrade to render as per normal if there's no external login info,
         /// otherwise process the external login info.
         /// </summary>
-        /// <returns></returns>       
+        /// <returns></returns>
         private async Task<ActionResult> RenderDefaultOrProcessExternalLoginAsync(
             Func<ActionResult> defaultResponse,
             Func<ActionResult> externalSignInResponse)
@@ -352,17 +352,12 @@ namespace Umbraco.Web.Editors
             if (defaultResponse == null) throw new ArgumentNullException("defaultResponse");
             if (externalSignInResponse == null) throw new ArgumentNullException("externalSignInResponse");
 
-            ViewBag.UmbracoPath = GlobalSettings.UmbracoMvcArea;
+            ViewData.SetUmbracoPath(GlobalSettings.GetUmbracoMvcArea());
 
             //check if there is the TempData with the any token name specified, if so, assign to view bag and render the view
-            foreach (var tempDataTokenName in TempDataTokenNames)
-            {
-                if (TempData[tempDataTokenName] != null)
-                {
-                    ViewData[tempDataTokenName] = TempData[tempDataTokenName];
-                    return defaultResponse();
-                }
-            }
+            if (ViewData.FromTempData(TempData, ViewDataExtensions.TokenExternalSignInError) ||
+                ViewData.FromTempData(TempData, ViewDataExtensions.TokenPasswordResetCode))
+                return defaultResponse();
 
             //First check if there's external login info, if there's not proceed as normal
             var loginInfo = await OwinContext.Authentication.GetExternalLoginInfoAsync(
@@ -384,13 +379,13 @@ namespace Umbraco.Web.Editors
             ExternalSignInAutoLinkOptions autoLinkOptions = null;
 
             //Here we can check if the provider associated with the request has been configured to allow
-            // new users (auto-linked external accounts). This would never be used with public providers such as 
+            // new users (auto-linked external accounts). This would never be used with public providers such as
             // Google, unless you for some reason wanted anybody to be able to access the backend if they have a Google account
-            // .... not likely! 
+            // .... not likely!
             var authType = OwinContext.Authentication.GetExternalAuthenticationTypes().FirstOrDefault(x => x.AuthenticationType == loginInfo.Login.LoginProvider);
             if (authType == null)
             {
-                Logger.Warn<BackOfficeController>("Could not find external authentication provider registered: " + loginInfo.Login.LoginProvider);
+                Logger.Warn<BackOfficeController>("Could not find external authentication provider registered: {LoginProvider}", loginInfo.Login.LoginProvider);
             }
             else
             {
@@ -401,10 +396,10 @@ namespace Umbraco.Web.Editors
             var user = await UserManager.FindAsync(loginInfo.Login);
             if (user != null)
             {
-                //TODO: It might be worth keeping some of the claims associated with the ExternalLoginInfo, in which case we 
-                // wouldn't necessarily sign the user in here with the standard login, instead we'd update the 
+                // TODO: It might be worth keeping some of the claims associated with the ExternalLoginInfo, in which case we
+                // wouldn't necessarily sign the user in here with the standard login, instead we'd update the
                 // UseUmbracoBackOfficeExternalCookieAuthentication extension method to have the correct provider and claims factory,
-                // ticket format, etc.. to create our back office user including the claims assigned and in this method we'd just ensure 
+                // ticket format, etc.. to create our back office user including the claims assigned and in this method we'd just ensure
                 // that the ticket is created and stored and that the user is logged in.
 
                 var shouldSignIn = true;
@@ -413,7 +408,7 @@ namespace Umbraco.Web.Editors
                     shouldSignIn = autoLinkOptions.OnExternalLogin(user, loginInfo);
                     if (shouldSignIn == false)
                     {
-                        Logger.Warn<BackOfficeController>("The AutoLinkOptions of the external authentication provider '" + loginInfo.Login.LoginProvider + "' have refused the login based on the OnExternalLogin method. Affected user id: '" + user.Id + "'");
+                        Logger.Warn<BackOfficeController>("The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}'", loginInfo.Login.LoginProvider, user.Id);
                     }
                 }
 
@@ -427,7 +422,7 @@ namespace Umbraco.Web.Editors
             {
                 if (await AutoLinkAndSignInExternalAccount(loginInfo, autoLinkOptions) == false)
                 {
-                    ViewData[TokenExternalSignInError] = new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not been linked to to an account" };
+                    ViewData.SetExternalSignInError(new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not been linked to an account" });
                 }
 
                 //Remove the cookie otherwise this message will keep appearing
@@ -451,7 +446,7 @@ namespace Umbraco.Web.Editors
             //we are allowing auto-linking/creating of local accounts
             if (loginInfo.Email.IsNullOrWhiteSpace())
             {
-                ViewData[TokenExternalSignInError] = new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not provided an email address, the account cannot be linked." };
+                ViewData.SetExternalSignInError(new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not provided an email address, the account cannot be linked." });
             }
             else
             {
@@ -459,7 +454,7 @@ namespace Umbraco.Web.Editors
                 var foundByEmail = Services.UserService.GetByEmail(loginInfo.Email);
                 if (foundByEmail != null)
                 {
-                    ViewData[TokenExternalSignInError] = new[] { "A user with this email address already exists locally. You will need to login locally to Umbraco and link this external provider: " + loginInfo.Login.LoginProvider };
+                    ViewData.SetExternalSignInError(new[] { "A user with this email address already exists locally. You will need to login locally to Umbraco and link this external provider: " + loginInfo.Login.LoginProvider });
                 }
                 else
                 {
@@ -477,7 +472,7 @@ namespace Umbraco.Web.Editors
                     {
                         autoLinkUser.AddRole(userGroup.Alias);
                     }
-                            
+
                     //call the callback if one is assigned
                     if (autoLinkOptions.OnAutoLinking != null)
                     {
@@ -488,21 +483,21 @@ namespace Umbraco.Web.Editors
 
                     if (userCreationResult.Succeeded == false)
                     {
-                        ViewData[TokenExternalSignInError] = userCreationResult.Errors;
+                        ViewData.SetExternalSignInError(userCreationResult.Errors);
                     }
                     else
                     {
                         var linkResult = await UserManager.AddLoginAsync(autoLinkUser.Id, loginInfo.Login);
                         if (linkResult.Succeeded == false)
                         {
-                            ViewData[TokenExternalSignInError] = linkResult.Errors;
+                            ViewData.SetExternalSignInError(linkResult.Errors);
 
                             //If this fails, we should really delete the user since it will be in an inconsistent state!
                             var deleteResult = await UserManager.DeleteAsync(autoLinkUser);
                             if (deleteResult.Succeeded == false)
                             {
                                 //DOH! ... this isn't good, combine all errors to be shown
-                                ViewData[TokenExternalSignInError] = linkResult.Errors.Concat(deleteResult.Errors);
+                                ViewData.SetExternalSignInError(linkResult.Errors.Concat(deleteResult.Errors));
                             }
                         }
                         else
@@ -515,81 +510,6 @@ namespace Umbraco.Web.Editors
 
             }
             return true;
-        }
-
-        /// <summary>
-        /// Returns the JavaScript blocks for any legacy trees declared
-        /// </summary>
-        /// <returns></returns>
-        [UmbracoAuthorize(Order = 0)]
-        [MinifyJavaScriptResult(Order = 1)]
-        public JavaScriptResult LegacyTreeJs()
-        {
-            Func<string> getResult = () =>
-            {
-                var javascript = new StringBuilder();
-                javascript.AppendLine(LegacyTreeJavascript.GetLegacyTreeJavascript());
-                javascript.AppendLine(LegacyTreeJavascript.GetLegacyIActionJavascript());
-                //add all of the menu blocks
-                foreach (var file in GetLegacyActionJs(LegacyJsActionType.JsBlock))
-                {
-                    javascript.AppendLine(file);
-                }
-                return javascript.ToString();
-            };
-
-            //cache the result if debugging is disabled
-            var result = HttpContext.IsDebuggingEnabled
-                ? getResult()
-                : ApplicationContext.ApplicationCache.RuntimeCache.GetCacheItem<string>(
-                    typeof(BackOfficeController) + "LegacyTreeJs",
-                    () => getResult(),
-                    new TimeSpan(0, 10, 0));
-
-            return JavaScript(result);
-        }
-
-        internal static IEnumerable<string> GetLegacyActionJsForActions(LegacyJsActionType type, IEnumerable<string> values)
-        {
-            var blockList = new List<string>();
-            var urlList = new List<string>();
-            foreach (var jsFile in values)
-            {
-                var isJsPath = jsFile.DetectIsJavaScriptPath();
-                if (isJsPath.Success)
-
-                {
-                    urlList.Add(isJsPath.Result);
-                }
-                else
-                {
-                    blockList.Add(isJsPath.Result);
-                }
-            }
-
-            switch (type)
-            {
-                case LegacyJsActionType.JsBlock:
-                    return blockList;
-                case LegacyJsActionType.JsUrl:
-                    return urlList;
-            }
-
-            return blockList;
-        }
-
-        /// <summary>
-        /// Renders out all JavaScript references that have bee declared in IActions
-        /// </summary>
-        private static IEnumerable<string> GetLegacyActionJs(LegacyJsActionType type)
-        {
-            return GetLegacyActionJsForActions(type, Action.GetJavaScriptFileReferences());
-        }
-
-        internal enum LegacyJsActionType
-        {
-            JsBlock,
-            JsUrl
         }
 
         private ActionResult RedirectToLocal(string returnUrl)

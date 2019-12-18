@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Linq.Expressions;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
@@ -10,33 +9,19 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(IServerRegistration))]
     internal sealed class ServerRegistrationMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
+        public ServerRegistrationMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+            : base(sqlContext, maps)
+        { }
 
-        //NOTE: its an internal class but the ctor must be public since we're using Activator.CreateInstance to create it
-        // otherwise that would fail because there is no public constructor.
-        public ServerRegistrationMapper()
+        protected override void DefineMaps()
         {
-            BuildMap();
+            DefineMap<ServerRegistration, ServerRegistrationDto>(nameof(ServerRegistration.Id), nameof(ServerRegistrationDto.Id));
+            DefineMap<ServerRegistration, ServerRegistrationDto>(nameof(ServerRegistration.IsActive), nameof(ServerRegistrationDto.IsActive));
+            DefineMap<ServerRegistration, ServerRegistrationDto>(nameof(ServerRegistration.IsMaster), nameof(ServerRegistrationDto.IsMaster));
+            DefineMap<ServerRegistration, ServerRegistrationDto>(nameof(ServerRegistration.ServerAddress), nameof(ServerRegistrationDto.ServerAddress));
+            DefineMap<ServerRegistration, ServerRegistrationDto>(nameof(ServerRegistration.CreateDate), nameof(ServerRegistrationDto.DateRegistered));
+            DefineMap<ServerRegistration, ServerRegistrationDto>(nameof(ServerRegistration.UpdateDate), nameof(ServerRegistrationDto.DateAccessed));
+            DefineMap<ServerRegistration, ServerRegistrationDto>(nameof(ServerRegistration.ServerIdentity), nameof(ServerRegistrationDto.ServerIdentity));
         }
-
-        #region Overrides of BaseMapper
-
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache
-        {
-            get { return PropertyInfoCacheInstance; }
-        }
-
-        internal override void BuildMap()
-        {
-            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.Id, dto => dto.Id);
-            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.IsActive, dto => dto.IsActive);
-            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.IsMaster, dto => dto.IsMaster);
-            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.ServerAddress, dto => dto.ServerAddress);
-            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.CreateDate, dto => dto.DateRegistered);
-            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.UpdateDate, dto => dto.DateAccessed);
-            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.ServerIdentity, dto => dto.ServerIdentity);
-        }
-
-        #endregion
     }
 }

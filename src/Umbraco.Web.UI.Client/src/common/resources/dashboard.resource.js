@@ -14,7 +14,7 @@ function dashboardResource($q, $http, umbRequestHelper) {
          *
          * @description
          * Retrieves the dashboard configuration for a given section
-         * 
+         *
          * @param {string} section Alias of section to retrieve dashboard configuraton for
          * @returns {Promise} resourcePromise object containing the user array.
          *
@@ -36,7 +36,7 @@ function dashboardResource($q, $http, umbRequestHelper) {
         *
         * @description
         * Retrieves dashboard content from a remote source for a given section
-        * 
+        *
         * @param {string} section Alias of section to retrieve dashboard content for
         * @returns {Promise} resourcePromise object containing the user array.
         *
@@ -70,10 +70,18 @@ function dashboardResource($q, $http, umbRequestHelper) {
                         "dashboardApiBaseUrl",
                         "GetRemoteDashboardCss",
                         values);
+        },
+
+        getRemoteXmlData: function (site, url) {
+            //build request values with optional params
+            var values = { site: site, url: url };
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                umbRequestHelper.getApiUrl(
+                    "dashboardApiBaseUrl",
+                    "GetRemoteXml",
+                    values)), "Failed to get remote xml");
         }
-
-
-
     };
 }
 

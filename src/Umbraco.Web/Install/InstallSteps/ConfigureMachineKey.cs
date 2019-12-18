@@ -1,9 +1,7 @@
-﻿using System;
-using System.Configuration;
-using System.Linq;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Configuration;
 using System.Xml.Linq;
-using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Security;
 using Umbraco.Web.Install.Models;
@@ -16,26 +14,15 @@ namespace Umbraco.Web.Install.InstallSteps
         PerformsAppRestart = true)]
     internal class ConfigureMachineKey : InstallSetupStep<bool?>
     {
-        private readonly ApplicationContext _appContext;
-
-        public ConfigureMachineKey(ApplicationContext appContext)
-        {
-            if (appContext == null) throw new ArgumentNullException("appContext");
-            _appContext = appContext;
-        }
-
-        public override string View
-        {
-            get { return HasMachineKey() == false ? base.View : ""; }
-        }
+        public override string View => HasMachineKey() == false ? base.View : "";
 
         /// <summary>
         /// Don't display the view or execute if a machine key already exists
         /// </summary>
         /// <returns></returns>
-        private bool HasMachineKey()
+        private static bool HasMachineKey()
         {
-            var section = (MachineKeySection)WebConfigurationManager.GetSection("system.web/machineKey");
+            var section = (MachineKeySection) WebConfigurationManager.GetSection("system.web/machineKey");
             return section.ElementInformation.Source != null;
         }
 
@@ -44,19 +31,20 @@ namespace Umbraco.Web.Install.InstallSteps
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        public override InstallSetupResult Execute(bool? model)
+        public override Task<InstallSetupResult> ExecuteAsync(bool? model)
         {
-            if (model.HasValue && model.Value == false) return null;
+            if (model.HasValue && model.Value == false) return Task.FromResult<InstallSetupResult>(null);
 
             //install the machine key
-            var fileName = IOHelper.MapPath(string.Format("{0}/web.config", SystemDirectories.Root));
+            var fileName = IOHelper.MapPath($"{SystemDirectories.Root}/web.config");
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
 
-            var systemWeb = xml.Root.DescendantsAndSelf("system.web").Single();
+            // we only want to get the element that is under the root, (there may be more under <location> tags we don't want them)
+            var systemWeb = xml.Root.Element("system.web");
 
             // Update appSetting if it exists, or else create a new appSetting for the given key and value
             var machineKey = systemWeb.Descendants("machineKey").FirstOrDefault();
-            if (machineKey != null) return null;
+            if (machineKey != null) return Task.FromResult<InstallSetupResult>(null);
 
             var generator = new MachineKeyGenerator();
             var generatedSection = generator.GenerateConfigurationBlock();
@@ -64,7 +52,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             xml.Save(fileName, SaveOptions.DisableFormatting);
 
-            return null;
+            return Task.FromResult<InstallSetupResult>(null);
         }
 
         public override bool RequiresExecution(bool? model)

@@ -24,12 +24,12 @@ namespace Umbraco.Web.Models.ContentEditing
         /// An array of integer Ids representing the sort order
         /// </summary>
         /// <remarks>
-        /// Of course all of these Ids should be at the same level in the heirarchy!!
+        /// Of course all of these Ids should be at the same level in the hierarchy!!
         /// </remarks>
         [DataMember(Name = "idSortOrder", IsRequired = true)]
         [Required]
         public int[] IdSortOrder { get; set; }
 
     }
-    
+
 }

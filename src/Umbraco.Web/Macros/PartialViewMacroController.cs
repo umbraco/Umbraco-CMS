@@ -1,18 +1,17 @@
-using System.Collections.Generic;
-using System.Web.Mvc;
-using Umbraco.Core.Models;
+﻿using System.Web.Mvc;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
-using umbraco.cms.businesslogic.macro;
-using umbraco.interfaces;
 using System.Linq;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Macros
 {
     /// <summary>
-    /// Controller to render macro content for Parital View Macros
+    /// Controller to render macro content for Partial View Macros
     /// </summary>
     [MergeParentContextViewData]
+    [HideFromTypeFinder] // explicitly used: do *not* find and register it!
     internal class PartialViewMacroController : Controller
     {
         private readonly MacroModel _macro;
@@ -37,7 +36,7 @@ namespace Umbraco.Web.Macros
                 _macro.Alias,
                 _macro.Name,
                 _macro.Properties.ToDictionary(x => x.Key, x => (object)x.Value));
-            return PartialView(_macro.ScriptName, model);
+            return PartialView(_macro.MacroSource, model);
         }
     }
 }

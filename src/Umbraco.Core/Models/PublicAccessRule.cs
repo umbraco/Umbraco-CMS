@@ -1,13 +1,12 @@
-using System;
-using System.Reflection;
+﻿using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
     [Serializable]
     [DataContract(IsReference = true)]
-    public class PublicAccessRule : Entity
+    public class PublicAccessRule : EntityBase
     {
         private string _ruleValue;
         private string _ruleType;
@@ -23,28 +22,20 @@ namespace Umbraco.Core.Models
         {
         }
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo RuleValueSelector = ExpressionHelper.GetPropertyInfo<PublicAccessRule, string>(x => x.RuleValue);
-            public readonly PropertyInfo RuleTypeSelector = ExpressionHelper.GetPropertyInfo<PublicAccessRule, string>(x => x.RuleType);
-        }
-       
         public Guid AccessEntryId { get; internal set; }
 
         public string RuleValue
         {
-            get { return _ruleValue; }
-            set { SetPropertyValueAndDetectChanges(value, ref _ruleValue, Ps.Value.RuleValueSelector); }
+            get => _ruleValue;
+            set => SetPropertyValueAndDetectChanges(value, ref _ruleValue, nameof(RuleValue));
         }
 
         public string RuleType
         {
-            get { return _ruleType; }
-            set { SetPropertyValueAndDetectChanges(value, ref _ruleType, Ps.Value.RuleTypeSelector); }
+            get => _ruleType;
+            set => SetPropertyValueAndDetectChanges(value, ref _ruleType, nameof(RuleType));
         }
 
-        
+
     }
 }

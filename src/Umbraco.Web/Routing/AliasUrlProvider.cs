@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
-using Umbraco.Web.PublishedCache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Routing
 {
@@ -11,26 +13,25 @@ namespace Umbraco.Web.Routing
     /// </summary>
     public class AliasUrlProvider : IUrlProvider
     {
+        private readonly IGlobalSettings _globalSettings;
+        private readonly IRequestHandlerSection _requestConfig;
+        private readonly ISiteDomainHelper _siteDomainHelper;
+
+        public AliasUrlProvider(IGlobalSettings globalSettings, IRequestHandlerSection requestConfig, ISiteDomainHelper siteDomainHelper)
+        {
+            _globalSettings = globalSettings;
+            _requestConfig = requestConfig;
+            _siteDomainHelper = siteDomainHelper;
+        }
+
         // note - at the moment we seem to accept pretty much anything as an alias
         // without any form of validation ... could even prob. kill the XPath ...
         // ok, this is somewhat experimental and is NOT enabled by default
 
         #region GetUrl
 
-        /// <summary>
-        /// Gets the nice url of a published content.
-        /// </summary>
-        /// <param name="umbracoContext">The Umbraco context.</param>
-        /// <param name="id">The published content id.</param>
-        /// <param name="current">The current absolute url.</param>
-        /// <param name="mode">The url mode.</param>
-        /// <returns>The url for the published content.</returns>
-        /// <remarks>
-        /// <para>The url is absolute or relative depending on url indicated by <c>current</c> and settings, unless
-        /// <c>absolute</c> is true, in which case the url is always absolute.</para>
-        /// <para>If the provider is unable to provide a url, it should return <c>null</c>.</para>
-        /// </remarks>
-        public string GetUrl(UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode)
+        /// <inheritdoc />
+        public UrlInfo GetUrl(UmbracoContext umbracoContext, IPublishedContent content, UrlMode mode, string culture, Uri current)
         {
             return null; // we have nothing to say
         }
@@ -50,67 +51,84 @@ namespace Umbraco.Web.Routing
         /// <para>Other urls are those that <c>GetUrl</c> would not return in the current context, but would be valid
         /// urls for the node in other contexts (different domain for current request, umbracoUrlAlias...).</para>
         /// </remarks>
-        public IEnumerable<string> GetOtherUrls(UmbracoContext umbracoContext, int id, Uri current)
+        public IEnumerable<UrlInfo> GetOtherUrls(UmbracoContext umbracoContext, int id, Uri current)
         {
-            if (!FindByUrlAliasEnabled)
-                return Enumerable.Empty<string>(); // we have nothing to say
+            var node = umbracoContext.Content.GetById(id);
+            if (node == null)
+                yield break;
 
-            var node = umbracoContext.ContentCache.GetById(id);
-            string umbracoUrlName = null;
-            if (node.HasProperty(Constants.Conventions.Content.UrlAlias))
-                umbracoUrlName = node.GetPropertyValue<string>(Constants.Conventions.Content.UrlAlias);
-            if (string.IsNullOrWhiteSpace(umbracoUrlName))
-                return Enumerable.Empty<string>();
+            if (!node.HasProperty(Constants.Conventions.Content.UrlAlias))
+                yield break;
 
-            var domainHelper = new DomainHelper(umbracoContext.Application.Services.DomainService);
-
+            // look for domains, walking up the tree
             var n = node;
-            var domainUris = domainHelper.DomainsForNode(n.Id, current, false);
+            var domainUris = DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainHelper, n.Id, current, false);
             while (domainUris == null && n != null) // n is null at root
             {
                 // move to parent node
                 n = n.Parent;
-                domainUris = n == null ? null : domainHelper.DomainsForNode(n.Id, current, false);
+                domainUris = n == null ? null : DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainHelper, n.Id, current, excludeDefault: false);
             }
 
-            var path = "/" + umbracoUrlName;
+            // determine whether the alias property varies
+            var varies = node.GetProperty(Constants.Conventions.Content.UrlAlias).PropertyType.VariesByCulture();
 
             if (domainUris == null)
             {
-                var uri = new Uri(path, UriKind.Relative);
-                return new[] { UriUtility.UriFromUmbraco(uri).ToString() };
-            }
+                // no domain
+                // if the property is invariant, then url "/<alias>" is ok
+                // if the property varies, then what are we supposed to do?
+                //  the content finder may work, depending on the 'current' culture,
+                //  but there's no way we can return something meaningful here
+                if (varies)
+                    yield break;
 
-            return domainUris
-                .Select(domainUri => new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path)))
-                .Select(uri => UriUtility.UriFromUmbraco(uri).ToString());
+                var umbracoUrlName = node.Value<string>(Constants.Conventions.Content.UrlAlias);
+                var aliases = umbracoUrlName?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+                if (aliases == null || aliases.Any() == false)
+                    yield break;
+
+                foreach (var alias in aliases.Distinct())
+                {
+                    var path = "/" + alias;
+                    var uri = new Uri(path, UriKind.Relative);
+                    yield return UrlInfo.Url(UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString());
+                }
+            }
+            else
+            {
+                // some domains: one url per domain, which is "<domain>/<alias>"
+                foreach(var domainUri in domainUris)
+                {
+                    // if the property is invariant, get the invariant value, url is "<domain>/<invariant-alias>"
+                    // if the property varies, get the variant value, url is "<domain>/<variant-alias>"
+
+                    // but! only if the culture is published, else ignore
+                    if (varies && !node.HasCulture(domainUri.Culture.Name)) continue;
+
+                    var umbracoUrlName = varies
+                        ? node.Value<string>(Constants.Conventions.Content.UrlAlias, culture: domainUri.Culture.Name)
+                        : node.Value<string>(Constants.Conventions.Content.UrlAlias);
+
+                    var aliases = umbracoUrlName?.Split(new [] {','}, StringSplitOptions.RemoveEmptyEntries);
+
+                    if (aliases == null || aliases.Any() == false)
+                        continue;
+
+                    foreach(var alias in aliases.Distinct())
+                    {
+                        var path = "/" + alias;
+                        var uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path));
+                        yield return UrlInfo.Url(UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString(), domainUri.Culture.Name);
+                    }
+                }
+            }
         }
 
         #endregion
 
         #region Utilities
-
-        private static bool FindByUrlAliasEnabled
-        {
-            get
-            {
-                // finder
-                if (ContentFinderResolver.Current.ContainsType<ContentFinderByUrlAlias>())
-                    return true;
-
-                // handler wrapped into a finder
-                if (ContentFinderResolver.Current.ContainsType<ContentFinderByNotFoundHandler<global::umbraco.SearchForAlias>>())
-                    return true;
-
-                // handler wrapped into special finder
-                if (ContentFinderResolver.Current.ContainsType<ContentFinderByNotFoundHandlers>()
-                    && NotFoundHandlerHelper.IsNotFoundHandlerEnabled<global::umbraco.SearchForAlias>())
-                    return true;
-
-                // anything else, we can't detect
-                return false;
-            }
-        }
 
         string CombinePaths(string path1, string path2)
         {

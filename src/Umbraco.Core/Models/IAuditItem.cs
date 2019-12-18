@@ -1,12 +1,35 @@
-﻿using System;
-using Umbraco.Core.Models.EntityBase;
+﻿using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
-    public interface IAuditItem : IAggregateRoot
+    /// <summary>
+    /// Represents an audit item.
+    /// </summary>
+    public interface IAuditItem : IEntity
     {
-        string Comment { get; }
+        /// <summary>
+        /// Gets the audit type.
+        /// </summary>
         AuditType AuditType { get; }
+
+        /// <summary>
+        /// Gets the audited entity type.
+        /// </summary>
+        string EntityType { get; }
+
+        /// <summary>
+        /// Gets the audit user identifier.
+        /// </summary>
         int UserId { get; }
+
+        /// <summary>
+        /// Gets the audit comments.
+        /// </summary>
+        string Comment { get; }
+
+        /// <summary>
+        /// Gets optional additional data parameters.
+        /// </summary>
+        string Parameters { get; }
     }
 }

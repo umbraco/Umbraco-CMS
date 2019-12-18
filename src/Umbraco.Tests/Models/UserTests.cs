@@ -1,21 +1,31 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Serialization;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Models
 {
     [TestFixture]
     public class UserTests
     {
+        [SetUp]
+        public void Setup()
+        {
+            Current.Reset();
+            Current.UnlockConfigs();
+            Current.Configs.Add(SettingsForTests.GetDefaultGlobalSettings);
+        }
+
         [Test]
         public void Can_Deep_Clone()
         {
             var item = new User()
             {
-                Id = 3,                
+                Id = 3,
                 Key = Guid.NewGuid(),
                 UpdateDate = DateTime.Now,
                 CreateDate = DateTime.Now,
@@ -35,11 +45,11 @@ namespace Umbraco.Tests.Models
                 PasswordQuestion = "question",
                 //ProviderUserKey = "user key",
                 SessionTimeout = 5,
-                StartContentIds = new []{ 3 },
-                StartMediaIds = new[]{ 8 },
-                Username = "username"                            
+                StartContentIds = new[] { 3 },
+                StartMediaIds = new[] { 8 },
+                Username = "username"
             };
-          
+
             var clone = (User)item.DeepClone();
 
             Assert.AreNotSame(clone, item);
@@ -82,8 +92,8 @@ namespace Umbraco.Tests.Models
                 PasswordQuestion = "question",
                 //ProviderUserKey = "user key",
                 SessionTimeout = 5,
-                StartContentIds = new[]{ 3 },
-                StartMediaIds = new []{ 8 },
+                StartContentIds = new[] { 3 },
+                StartMediaIds = new[] { 8 },
                 Username = "username"
             };
 

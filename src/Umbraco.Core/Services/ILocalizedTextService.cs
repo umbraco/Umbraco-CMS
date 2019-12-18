@@ -5,10 +5,10 @@ using System.Globalization;
 namespace Umbraco.Core.Services
 {
     /// <summary>
-    /// The entry point to localize any key in the text storage source for a given culture 
+    /// The entry point to localize any key in the text storage source for a given culture
     /// </summary>
     /// <remarks>
-    /// This class is created to be as simple as possible so that it can be replaced very easily, 
+    /// This class is created to be as simple as possible so that it can be replaced very easily,
     /// all other methods are extension methods that simply call the one underlying method in this class
     /// </remarks>
     public interface ILocalizedTextService
@@ -42,18 +42,10 @@ namespace Umbraco.Core.Services
         /// </param>
         /// <returns></returns>
         /// <remarks>
-        /// TODO: This is just a hack due to the way we store the language files, they should be stored with 4 letters since that 
+        /// TODO: This is just a hack due to the way we store the language files, they should be stored with 4 letters since that
         /// is what they reference but they are stored with 2, further more our user's languages are stored with 2. So this attempts
         /// to resolve the full culture if possible.
         /// </remarks>
         CultureInfo ConvertToSupportedCultureWithRegionCode(CultureInfo currentCulture);
-
-        /// <summary>
-        /// HAAAAAAAAAAACK! Used for backwards compat to convert a user's real culture code to a region code - normally this would be two letters
-        /// TODO: REmove in v8
-        /// </summary>
-        /// <param name="currentCulture"></param>
-        /// <returns></returns>
-        string ConvertToRegionCodeFromSupportedCulture(CultureInfo currentCulture);
     }
 }

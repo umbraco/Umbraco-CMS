@@ -3,7 +3,7 @@
 angular.module('umbraco')
 .controller("Umbraco.PrevalueEditors.TreeSourceController",
 	
-	function($scope, dialogService, entityResource, $log, iconHelper){
+	function($scope, $timeout, entityResource, iconHelper, editorService, eventsService){
 
 	    if (!$scope.model) {
 	        $scope.model = {};
@@ -15,51 +15,65 @@ angular.module('umbraco')
         }
         if (!$scope.model.config) {
             $scope.model.config = {
-                idType: "int"
+                idType: "udi"
             };
         }
 
 		if($scope.model.value.id && $scope.model.value.type !== "member"){
-			var ent = "Document";
-			if($scope.model.value.type === "media"){
-				ent = "Media";
-			}
-			
-			entityResource.getById($scope.model.value.id, ent).then(function(item){
-				item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-				$scope.node = item;
+			entityResource.getById($scope.model.value.id, entityType()).then(function(item){
+                populate(item);
 			});
-		}
+        }
 
+	    $timeout(function () {
+	        treeSourceChanged();
+	    }, 100);
+
+        function entityType() {
+			var ent = "Document";
+            if($scope.model.value.type === "media"){
+                ent = "Media";
+            }
+            else if ($scope.model.value.type === "member") {
+                ent = "Member";
+            }
+            return ent;
+        }
 
 		$scope.openContentPicker =function(){
-			$scope.treePickerOverlay = {
-                view: "treepicker",
+			var treePicker = {
                 idType: $scope.model.config.idType,
 				section: $scope.model.value.type,
 				treeAlias: $scope.model.value.type,
 				multiPicker: false,
-				show: true,
 				submit: function(model) {
 					var item = model.selection[0];
 					populate(item);
-					$scope.treePickerOverlay.show = false;
-					$scope.treePickerOverlay = null;
+					editorService.close();
+				},
+				close: function() {
+					editorService.close();
 				}
 			};
+			editorService.treePicker(treePicker);
 		};
 
 		$scope.clear = function() {
-			$scope.model.value.id = undefined;
-			$scope.node = undefined;
-			$scope.model.value.query = undefined;
+			$scope.model.value.id = null;
+            $scope.node = null;
+            $scope.model.value.query = null;
+
+		    treeSourceChanged();
 		};
-		
+
+        function treeSourceChanged() {
+            eventsService.emit("treeSourceChanged", { value: $scope.model.value.type });
+        }
 
 		//we always need to ensure we dont submit anything broken
 	    var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
 	    	if($scope.model.value.type === "member"){
-	    		$scope.model.value.id = -1;
+	    		$scope.model.value.id = null;
 	    		$scope.model.value.query = "";
 	    	}
 	    });
@@ -70,9 +84,13 @@ angular.module('umbraco')
 	    });
 
 		function populate(item){
-				$scope.clear();
-				item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-				$scope.node = item;
-                $scope.model.value.id = $scope.model.config.idType === "udi" ? item.udi : item.id;
+			$scope.clear();
+			item.icon = iconHelper.convertFromLegacyIcon(item.icon);
+			$scope.node = item;
+            $scope.node.path = "";
+            $scope.model.value.id = $scope.model.config.idType === "udi" ? item.udi : item.id;
+            entityResource.getUrl(item.id, entityType()).then(function (data) {
+                $scope.node.path = data;
+            });
 		}
 });

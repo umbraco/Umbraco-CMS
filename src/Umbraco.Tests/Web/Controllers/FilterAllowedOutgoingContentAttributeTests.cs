@@ -7,7 +7,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
@@ -30,8 +30,8 @@ namespace Umbraco.Tests.Web.Controllers
             var val = new List<ContentItemBasic>() {new ContentItemBasic()};
             var result = att.GetValueFromResponse(
                 new ObjectContent(typeof (IEnumerable<ContentItemBasic>),
-                                  val, 
-                                  new JsonMediaTypeFormatter(), 
+                                  val,
+                                  new JsonMediaTypeFormatter(),
                                   new MediaTypeHeaderValue("html/text")));
 
             Assert.AreEqual(val, result);
@@ -93,7 +93,7 @@ namespace Umbraco.Tests.Web.Controllers
             var userService = userServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
             entityServiceMock.Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-                .Returns(new[] { Mock.Of<EntityPath>(entity => entity.Id == 5 && entity.Path == "-1,5") });
+                .Returns(new[] { Mock.Of<TreeEntityPath>(entity => entity.Id == 5 && entity.Path == "-1,5") });
             var entityService = entityServiceMock.Object;
 
             var att = new FilterAllowedOutgoingContentAttribute(typeof(IEnumerable<ContentItemBasic>), userService, entityService);
@@ -108,23 +108,23 @@ namespace Umbraco.Tests.Web.Controllers
                 path += i.ToInvariantString();
                 list.Add(new ContentItemBasic { Id = i, Name = "Test" + i, ParentId = i, Path = path });
             }
-            
+
             att.FilterBasedOnStartNode(list, user);
 
             Assert.AreEqual(5, list.Count);
-            
+
         }
 
         [Test]
         public void Filter_On_Permissions()
-        {            
+        {
             var list = new List<dynamic>();
             for (var i = 0; i < 10; i++)
             {
                 list.Add(new ContentItemBasic{Id = i, Name = "Test" + i, ParentId = -1});
             }
             var ids = list.Select(x => (int)x.Id).ToArray();
-            
+
             var userMock = new Mock<IUser>();
             userMock.Setup(u => u.Id).Returns(9);
             userMock.Setup(u => u.StartContentIds).Returns(new int[0]);
@@ -133,12 +133,12 @@ namespace Umbraco.Tests.Web.Controllers
             var userServiceMock = new Mock<IUserService>();
             //we're only assigning 3 nodes browse permissions so that is what we expect as a result
             var permissions = new EntityPermissionCollection
-                {
-                    new EntityPermission(9876, 1, new string[]{ "F" }),
-                    new EntityPermission(9876, 2, new string[]{ "F" }),
-                    new EntityPermission(9876, 3, new string[]{ "F" }),
-                    new EntityPermission(9876, 4, new string[]{ "A" })
-                };
+            {
+                new EntityPermission(9876, 1, new string[]{ "F" }),
+                new EntityPermission(9876, 2, new string[]{ "F" }),
+                new EntityPermission(9876, 3, new string[]{ "F" }),
+                new EntityPermission(9876, 4, new string[]{ "A" })
+            };
             userServiceMock.Setup(x => x.GetPermissions(user, ids)).Returns(permissions);
             var userService = userServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
@@ -152,10 +152,10 @@ namespace Umbraco.Tests.Web.Controllers
             Assert.AreEqual(2, list.ElementAt(1).Id);
             Assert.AreEqual(3, list.ElementAt(2).Id);
         }
-        
+
         private class MyTestClass
         {
-            public IEnumerable<ContentItemBasic> MyList { get; set; } 
+            public IEnumerable<ContentItemBasic> MyList { get; set; }
         }
     }
 }

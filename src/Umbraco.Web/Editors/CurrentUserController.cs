@@ -1,30 +1,19 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Net;
-using System.Text;
+using System.Globalization;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Security;
-using AutoMapper;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.UI;
 using Umbraco.Web.WebApi;
-using umbraco;
-using legacyUser = umbraco.BusinessLogic.User;
-using System.Net.Http;
-using System.Collections.Specialized;
 using System.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core;
-using Umbraco.Core.Security;
+using Umbraco.Web.Security;
 using Umbraco.Web.WebApi.Filters;
-using Constants = Umbraco.Core.Constants;
 
 
 namespace Umbraco.Web.Editors
@@ -36,18 +25,57 @@ namespace Umbraco.Web.Editors
     public class CurrentUserController : UmbracoAuthorizedJsonController
     {
         /// <summary>
+        /// Returns permissions for all nodes passed in for the current user
+        /// </summary>
+        /// <param name="nodeIds"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public Dictionary<int, string[]> GetPermissions(int[] nodeIds)
+        {
+            var permissions = Services.UserService
+                .GetPermissions(Security.CurrentUser, nodeIds);
+
+            var permissionsDictionary = new Dictionary<int, string[]>();
+            foreach (var nodeId in nodeIds)
+            {
+                var aggregatePerms = permissions.GetAllPermissions(nodeId).ToArray();
+                permissionsDictionary.Add(nodeId, aggregatePerms);
+            }
+
+            return permissionsDictionary;
+        }
+
+        /// <summary>
+        /// Checks a nodes permission for the current user
+        /// </summary>
+        /// <param name="permissionToCheck"></param>
+        /// <param name="nodeId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public bool HasPermission(string permissionToCheck, int nodeId)
+        {
+            var p = Services.UserService.GetPermissions(Security.CurrentUser, nodeId).GetAllPermissions();
+            if (p.Contains(permissionToCheck.ToString(CultureInfo.InvariantCulture)))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Saves a tour status for the current user
         /// </summary>
         /// <param name="status"></param>
         /// <returns></returns>
         public IEnumerable<UserTourStatus> PostSetUserTour(UserTourStatus status)
         {
-            if (status == null) throw new ArgumentNullException("status");
+            if (status == null) throw new ArgumentNullException(nameof(status));
 
             List<UserTourStatus> userTours;
             if (Security.CurrentUser.TourData.IsNullOrWhiteSpace())
             {
-                userTours = new List<UserTourStatus> {status};
+                userTours = new List<UserTourStatus> { status };
                 Security.CurrentUser.TourData = JsonConvert.SerializeObject(userTours);
                 Services.UserService.Save(Security.CurrentUser);
                 return userTours;
@@ -92,7 +120,7 @@ namespace Umbraco.Web.Editors
         [OverrideAuthorization]
         public async Task<UserDetail> PostSetInvitedUserPassword([FromBody]string newPassword)
         {
-            var result = await UserManager.AddPasswordAsync(Security.GetUserId(), newPassword);
+            var result = await UserManager.AddPasswordAsync(Security.GetUserId().ResultOr(0), newPassword);
 
             if (result.Succeeded == false)
             {
@@ -107,6 +135,8 @@ namespace Umbraco.Web.Editors
 
             //They've successfully set their password, we can now update their user account to be approved
             Security.CurrentUser.IsApproved = true;
+            //They've successfully set their password, and will now get fully logged into the back office, so the lastlogindate is set so the backoffice shows they have logged in
+            Security.CurrentUser.LastLoginDate = DateTime.UtcNow;
             Services.UserService.Save(Security.CurrentUser);
 
             //now we can return their full object since they are now really logged into the back office
@@ -125,7 +155,7 @@ namespace Umbraco.Web.Editors
         public async Task<HttpResponseMessage> PostSetAvatar()
         {
             //borrow the logic from the user controller
-            return await UsersController.PostSetAvatarInternal(Request, Services.UserService, ApplicationContext.ApplicationCache.StaticCache, Security.GetUserId());
+            return await UsersController.PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache, Security.GetUserId().ResultOr(0));
         }
 
         /// <summary>
@@ -145,7 +175,7 @@ namespace Umbraco.Web.Editors
                 var userMgr = this.TryGetOwinContext().Result.GetBackOfficeUserManager();
 
                 //raise the reset event
-                //TODO: I don't think this is required anymore since from 7.7 we no longer display the reset password checkbox since that didn't make sense.
+                // TODO: I don't think this is required anymore since from 7.7 we no longer display the reset password checkbox since that didn't make sense.
                 if (data.Reset.HasValue && data.Reset.Value)
                 {
                     userMgr.RaisePasswordResetEvent(Security.CurrentUser.Id);

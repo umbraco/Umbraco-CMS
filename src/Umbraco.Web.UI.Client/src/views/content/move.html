@@ -11,27 +11,25 @@
 
             <div ng-show="success">
                 <div class="alert alert-success">
-                    <strong>{{currentNode.name}}</strong>
+                    <strong>{{source.name}}</strong>
                     <localize key="actions_wasMovedTo">was moved to</localize>
                     <strong>{{target.name}}</strong>
                 </div>
-                <button class="btn btn-primary" ng-click="nav.hideDialog()">Ok</button>
+                <button class="btn btn-primary" ng-click="close()">Ok</button>
             </div>
 
             <p class="abstract" ng-hide="success">
                 <localize key="actions_chooseWhereToMove">Choose where to move</localize>
-                <strong>{{currentNode.name}}</strong>
-                <localize key="actions_toInTheTreeStructureBelow">to in the tree structure below</localize>                
+                <strong>{{source.name}}</strong>
+                <localize key="actions_toInTheTreeStructureBelow">to in the tree structure below</localize>
             </p>
 
-            <div class="umb-loader-wrapper" ng-show="busy">
-                <div class="umb-loader"></div>
-            </div>
+            <umb-loader ng-show="busy"></umb-loader>
 
             <div ng-hide="success">
 
                 <div ng-hide="miniListView">
-                    <umb-tree-search-box 
+                    <umb-tree-search-box
                         hide-search-callback="hideSearch"
                         search-callback="onSearchResults"
                         search-from-id="{{searchInfo.searchFromId}}"
@@ -54,7 +52,8 @@
                             hideheader="{{treeModel.hideHeader}}"
                             hideoptions="true"
                             isdialog="true"
-                            eventhandler="dialogTreeEventHandler"
+                            api="dialogTreeApi"
+                            on-init="onTreeInit()"
                             enablelistviewexpand="true"
                             enablecheckboxes="true">
                         </umb-tree>
@@ -75,9 +74,9 @@
 
 
     <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="success">
-        <a class="btn btn-link" ng-click="nav.hideDialog()" ng-show="!busy">
+        <button type="button" class="btn btn-link" ng-click="close()" ng-show="!busy">
             <localize key="general_cancel">Cancel</localize>
-        </a>
+        </button>
         <button class="btn btn-primary" ng-click="move()" ng-disabled="busy || !target">
             <localize key="actions_move">Move</localize>
         </button>

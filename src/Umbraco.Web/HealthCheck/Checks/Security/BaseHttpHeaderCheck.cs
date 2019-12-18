@@ -6,6 +6,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 
@@ -13,7 +14,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
 {
     public abstract class BaseHttpHeaderCheck : HealthCheck
     {
-        private readonly ILocalizedTextService _textService;
+        protected IRuntimeState Runtime { get; }
+        protected ILocalizedTextService TextService { get; }
 
         private const string SetHeaderInConfigAction = "setHeaderInConfig";
 
@@ -22,10 +24,13 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         private readonly string _localizedTextPrefix;
         private readonly bool _metaTagOptionAvailable;
 
-        public BaseHttpHeaderCheck(HealthCheckContext healthCheckContext, 
-            string header, string value, string localizedTextPrefix, bool metaTagOptionAvailable) : base(healthCheckContext)
+        protected BaseHttpHeaderCheck(
+            IRuntimeState runtime,
+            ILocalizedTextService textService,
+            string header, string value, string localizedTextPrefix, bool metaTagOptionAvailable)
         {
-            _textService = healthCheckContext.ApplicationContext.Services.TextService;
+            Runtime = runtime;
+            TextService = textService ?? throw new ArgumentNullException(nameof(textService));
 
             _header = header;
             _value = value;
@@ -65,7 +70,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             var success = false;
 
             // Access the site home page and check for the click-jack protection header or meta tag
-            var url = HealthCheckContext.SiteUrl;
+            var url = Runtime.ApplicationUrl;
             var request = WebRequest.Create(url);
             request.Method = "GET";
             try
@@ -73,7 +78,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 var response = request.GetResponse();
 
                 // Check first for header
-                success = DoHttpHeadersContainHeader(response);
+                success = HasMatchingHeader(response.Headers.AllKeys);
 
                 // If not found, and available, check for meta-tag
                 if (success == false && _metaTagOptionAvailable)
@@ -82,12 +87,12 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 }
 
                 message = success
-                    ? _textService.Localize(string.Format("healthcheck/{0}CheckHeaderFound", _localizedTextPrefix))
-                    : _textService.Localize(string.Format("healthcheck/{0}CheckHeaderNotFound", _localizedTextPrefix));
+                    ? TextService.Localize($"healthcheck/{_localizedTextPrefix}CheckHeaderFound")
+                    : TextService.Localize($"healthcheck/{_localizedTextPrefix}CheckHeaderNotFound");
             }
             catch (Exception ex)
             {
-                message = _textService.Localize("healthcheck/healthCheckInvalidUrl", new[] { url, ex.Message });
+                message = TextService.Localize("healthcheck/healthCheckInvalidUrl", new[] { url.ToString(), ex.Message });
             }
 
             var actions = new List<HealthCheckAction>();
@@ -95,8 +100,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             {
                 actions.Add(new HealthCheckAction(SetHeaderInConfigAction, Id)
                 {
-                    Name = _textService.Localize("healthcheck/setHeaderInConfig"),
-                    Description = _textService.Localize(string.Format("healthcheck/{0}SetHeaderInConfigDescription", _localizedTextPrefix))
+                    Name = TextService.Localize("healthcheck/setHeaderInConfig"),
+                    Description = TextService.Localize($"healthcheck/{_localizedTextPrefix}SetHeaderInConfigDescription")
                 });
             }
 
@@ -108,9 +113,9 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 };
         }
 
-        private bool DoHttpHeadersContainHeader(WebResponse response)
+        private bool HasMatchingHeader(IEnumerable<string> headerKeys)
         {
-            return response.Headers.AllKeys.Contains(_header);
+            return headerKeys.Contains(_header, StringComparer.InvariantCultureIgnoreCase);
         }
 
         private bool DoMetaTagsContainKeyForHeader(WebResponse response)
@@ -122,7 +127,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 {
                     var html = reader.ReadToEnd();
                     var metaTags = ParseMetaTags(html);
-                    return metaTags.ContainsKey(_header);
+                    return HasMatchingHeader(metaTags.Keys);
                 }
             }
         }
@@ -144,14 +149,14 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             if (success)
             {
                 return
-                    new HealthCheckStatus(_textService.Localize(string.Format("healthcheck/{0}SetHeaderInConfigSuccess", _localizedTextPrefix)))
+                    new HealthCheckStatus(TextService.Localize(string.Format("healthcheck/{0}SetHeaderInConfigSuccess", _localizedTextPrefix)))
                     {
                         ResultType = StatusResultType.Success
                     };
             }
 
             return
-                new HealthCheckStatus(_textService.Localize("healthcheck/setHeaderInConfigError", new [] { errorMessage }))
+                new HealthCheckStatus(TextService.Localize("healthcheck/setHeaderInConfigError", new [] { errorMessage }))
                 {
                     ResultType = StatusResultType.Error
                 };
@@ -181,24 +186,22 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 }
 
                 var removeHeaderElement = customHeadersElement.Elements("remove")
-                    .SingleOrDefault(x => x.Attribute("name") != null &&
-                                          x.Attribute("name")?.Value == _value);
+                    .SingleOrDefault(x => x.Attribute("name")?.Value.Equals(_value, StringComparison.InvariantCultureIgnoreCase) == true);
                 if (removeHeaderElement == null)
                 {
-                    removeHeaderElement = new XElement("remove");
-                    removeHeaderElement.Add(new XAttribute("name", _header));
-                    customHeadersElement.Add(removeHeaderElement);
+                    customHeadersElement.Add(
+                        new XElement("remove",
+                            new XAttribute("name", _header)));
                 }
 
                 var addHeaderElement = customHeadersElement.Elements("add")
-                    .SingleOrDefault(x => x.Attribute("name") != null &&
-                                          x.Attribute("name").Value == _header);
+                    .SingleOrDefault(x => x.Attribute("name")?.Value.Equals(_header, StringComparison.InvariantCultureIgnoreCase) == true);
                 if (addHeaderElement == null)
                 {
-                    addHeaderElement = new XElement("add");
-                    addHeaderElement.Add(new XAttribute("name", _header));
-                    addHeaderElement.Add(new XAttribute("value", _value));
-                    customHeadersElement.Add(addHeaderElement);
+                    customHeadersElement.Add(
+                        new XElement("add",
+                            new XAttribute("name", _header),
+                            new XAttribute("value", _value)));
                 }
 
                 doc.Save(configFile);

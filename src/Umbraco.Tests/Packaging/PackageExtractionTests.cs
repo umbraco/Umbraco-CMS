@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core.IO;
 using Umbraco.Core.Packaging;
 
 namespace Umbraco.Tests.Packaging
@@ -11,11 +12,11 @@ namespace Umbraco.Tests.Packaging
     {
         private const string PackageFileName = "Document_Type_Picker_1.1.umb";
 
-        private static string GetTestPackagePath(string packageName)
+        private static FileInfo GetTestPackagePath(string packageName)
         {
             const string testPackagesDirName = "Packaging\\Packages";
-            string path = Path.Combine(Core.Configuration.GlobalSettings.FullpathToRoot, testPackagesDirName, packageName);
-            return path;
+            string path = Path.Combine(IOHelper.GetRootDirectorySafe(), testPackagesDirName, packageName);
+            return new FileInfo(path);
         }
 
         [Test]

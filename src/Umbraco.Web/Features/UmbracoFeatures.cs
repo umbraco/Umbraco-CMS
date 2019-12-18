@@ -6,7 +6,7 @@ namespace Umbraco.Web.Features
     /// <summary>
     /// Represents the Umbraco features.
     /// </summary>
-    internal class UmbracoFeatures
+    public class UmbracoFeatures
     {
         /// <summary>
         ///  Initializes a new instance of the <see cref="UmbracoFeatures"/> class.
@@ -20,17 +20,17 @@ namespace Umbraco.Web.Features
         /// <summary>
         /// Gets the disabled features.
         /// </summary>
-        public DisabledFeatures Disabled { get; set; }
+        internal DisabledFeatures Disabled { get; }
 
         /// <summary>
         /// Gets the enabled features.
         /// </summary>
-        public EnabledFeatures Enabled { get; set; }
+        internal EnabledFeatures Enabled { get; }
 
         /// <summary>
         /// Determines whether a controller is enabled.
         /// </summary>
-        public bool IsControllerEnabled(Type feature)
+        internal bool IsControllerEnabled(Type feature)
         {
             if (typeof(UmbracoApiControllerBase).IsAssignableFrom(feature))
                 return Disabled.Controllers.Contains(feature) == false;

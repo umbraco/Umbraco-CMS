@@ -1,7 +1,9 @@
 ﻿using System;
-using System.ComponentModel;
-using System.Reflection;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Linq;
 using System.Runtime.Serialization;
+using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.Models
 {
@@ -12,14 +14,19 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class Content : ContentBase, IContent
     {
-        private IContentType _contentType;
-        private ITemplate _template;
+        private int? _templateId;
+        private ContentScheduleCollection _schedule;
         private bool _published;
-        private string _language;
-        private DateTime? _releaseDate;
-        private DateTime? _expireDate;
-        private int _writer;
-        private string _nodeName;//NOTE Once localization is introduced this will be the non-localized Node Name.
+        private PublishedState _publishedState;
+        private HashSet<string> _editedCultures;
+        private ContentCultureInfosCollection _publishInfos;
+
+        #region Used for change tracking
+
+        private (HashSet<string> addedCultures, HashSet<string> removedCultures, HashSet<string> updatedCultures) _currentPublishCultureChanges;
+        private (HashSet<string> addedCultures, HashSet<string> removedCultures, HashSet<string> updatedCultures) _previousPublishCultureChanges;
+
+        #endregion
 
         /// <summary>
         /// Constructor for creating a Content object
@@ -27,10 +34,10 @@ namespace Umbraco.Core.Models
         /// <param name="name">Name of the content</param>
         /// <param name="parent">Parent <see cref="IContent"/> object</param>
         /// <param name="contentType">ContentType for the current Content object</param>
-        public Content(string name, IContent parent, IContentType contentType)
-			: this(name, parent, contentType, new PropertyCollection())
-		{
-		}
+        /// <param name="culture">An optional culture.</param>
+        public Content(string name, IContent parent, IContentType contentType, string culture = null)
+            : this(name, parent, contentType, new PropertyCollection(), culture)
+        { }
 
         /// <summary>
         /// Constructor for creating a Content object
@@ -39,13 +46,14 @@ namespace Umbraco.Core.Models
         /// <param name="parent">Parent <see cref="IContent"/> object</param>
         /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="properties">Collection of properties</param>
-		public Content(string name, IContent parent, IContentType contentType, PropertyCollection properties)
-			: base(name, parent, contentType, properties)
-		{
-			Mandate.ParameterNotNull(contentType, "contentType");
-
-			_contentType = contentType;
-		}
+        /// <param name="culture">An optional culture.</param>
+        public Content(string name, IContent parent, IContentType contentType, PropertyCollection properties, string culture = null)
+            : base(name, parent, contentType, properties, culture)
+        {
+            if (contentType == null) throw new ArgumentNullException(nameof(contentType));
+            _publishedState = PublishedState.Unpublished;
+            PublishedVersionId = 0;
+        }
 
         /// <summary>
         /// Constructor for creating a Content object
@@ -53,10 +61,10 @@ namespace Umbraco.Core.Models
         /// <param name="name">Name of the content</param>
         /// <param name="parentId">Id of the Parent content</param>
         /// <param name="contentType">ContentType for the current Content object</param>
-        public Content(string name, int parentId, IContentType contentType)
-            : this(name, parentId, contentType, new PropertyCollection())
-        {
-        }
+        /// <param name="culture">An optional culture.</param>
+        public Content(string name, int parentId, IContentType contentType, string culture = null)
+            : this(name, parentId, contentType, new PropertyCollection(), culture)
+        { }
 
         /// <summary>
         /// Constructor for creating a Content object
@@ -65,25 +73,46 @@ namespace Umbraco.Core.Models
         /// <param name="parentId">Id of the Parent content</param>
         /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="properties">Collection of properties</param>
-        public Content(string name, int parentId, IContentType contentType, PropertyCollection properties)
-			: base(name, parentId, contentType, properties)
+        /// <param name="culture">An optional culture.</param>
+        public Content(string name, int parentId, IContentType contentType, PropertyCollection properties, string culture = null)
+            : base(name, parentId, contentType, properties, culture)
         {
-            Mandate.ParameterNotNull(contentType, "contentType");
-
-            _contentType = contentType;
+            if (contentType == null) throw new ArgumentNullException(nameof(contentType));
+            _publishedState = PublishedState.Unpublished;
+            PublishedVersionId = 0;
         }
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
-        private class PropertySelectors
+        /// <inheritdoc />
+        [DoNotClone]
+        public ContentScheduleCollection ContentSchedule
         {
-            public readonly PropertyInfo TemplateSelector = ExpressionHelper.GetPropertyInfo<Content, ITemplate>(x => x.Template);
-            public readonly PropertyInfo PublishedSelector = ExpressionHelper.GetPropertyInfo<Content, bool>(x => x.Published);
-            public readonly PropertyInfo LanguageSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.Language);
-            public readonly PropertyInfo ReleaseDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ReleaseDate);
-            public readonly PropertyInfo ExpireDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ExpireDate);
-            public readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<Content, int>(x => x.WriterId);
-            public readonly PropertyInfo NodeNameSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.NodeName);
+            get
+            {
+                if (_schedule == null)
+                {
+                    _schedule = new ContentScheduleCollection();
+                    _schedule.CollectionChanged += ScheduleCollectionChanged;
+                }
+                return _schedule;
+            }
+            set
+            {
+                if (_schedule != null)
+                    _schedule.CollectionChanged -= ScheduleCollectionChanged;
+                SetPropertyValueAndDetectChanges(value, ref _schedule, nameof(ContentSchedule));
+                if (_schedule != null)
+                    _schedule.CollectionChanged += ScheduleCollectionChanged;
+            }
+        }
+
+        /// <summary>
+        /// Collection changed event handler to ensure the schedule field is set to dirty when the schedule changes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ScheduleCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(ContentSchedule));
         }
 
         /// <summary>
@@ -95,126 +124,186 @@ namespace Umbraco.Core.Models
         /// the Default template from the ContentType will be returned.
         /// </remarks>
         [DataMember]
-        public virtual ITemplate Template
+        public int? TemplateId
         {
-            get { return _template; }
-            set { SetPropertyValueAndDetectChanges(value, ref _template, Ps.Value.TemplateSelector); }
+            get => _templateId;
+            set => SetPropertyValueAndDetectChanges(value, ref _templateId, nameof(TemplateId));
         }
 
         /// <summary>
-        /// Gets the current status of the Content
-        /// </summary>
-        [IgnoreDataMember]
-        public ContentStatus Status
-        {
-            get
-            {
-                if(Trashed)
-                    return ContentStatus.Trashed;
-
-                if(ExpireDate.HasValue && ExpireDate.Value > DateTime.MinValue && DateTime.Now > ExpireDate.Value)
-                    return ContentStatus.Expired;
-
-                if(ReleaseDate.HasValue && ReleaseDate.Value > DateTime.MinValue && ReleaseDate.Value > DateTime.Now)
-                    return ContentStatus.AwaitingRelease;
-
-                if(Published)
-                    return ContentStatus.Published;
-
-                return ContentStatus.Unpublished;
-            }
-        }
-
-        /// <summary>
-        /// Boolean indicating whether this Content is Published or not
+        /// Gets or sets a value indicating whether this content item is published or not.
         /// </summary>
         /// <remarks>
-        /// Setting Published to true/false should be private or internal and should ONLY be used for wiring up the value
-        /// from the db or modifying it based on changing the published state.
+        /// the setter is should only be invoked from
+        /// - the ContentFactory when creating a content entity from a dto
+        /// - the ContentRepository when updating a content entity
         /// </remarks>
         [DataMember]
         public bool Published
         {
-            get { return _published; }
-            internal set { SetPropertyValueAndDetectChanges(value, ref _published, Ps.Value.PublishedSelector); }
+            get => _published;
+            set
+            {
+                SetPropertyValueAndDetectChanges(value, ref _published, nameof(Published));
+                _publishedState = _published ? PublishedState.Published : PublishedState.Unpublished;
+            }
         }
 
         /// <summary>
-        /// Language of the data contained within this Content object.
+        /// Gets the published state of the content item.
         /// </summary>
-        [Obsolete("This is not used and will be removed from the codebase in future versions")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public string Language
-        {
-            get { return _language; }
-            set { SetPropertyValueAndDetectChanges(value, ref _language, Ps.Value.LanguageSelector); }
-        }
-
-        /// <summary>
-        /// The date this Content should be released and thus be published
-        /// </summary>
+        /// <remarks>The state should be Published or Unpublished, depending on whether Published
+        /// is true or false, but can also temporarily be Publishing or Unpublishing when the
+        /// content item is about to be saved.</remarks>
         [DataMember]
-        public DateTime? ReleaseDate
+        public PublishedState PublishedState
         {
-            get { return _releaseDate; }
-            set { SetPropertyValueAndDetectChanges(value, ref _releaseDate, Ps.Value.ReleaseDateSelector); }
+            get => _publishedState;
+            set
+            {
+                if (value != PublishedState.Publishing && value != PublishedState.Unpublishing)
+                    throw new ArgumentException("Invalid state, only Publishing and Unpublishing are accepted.");
+                _publishedState = value;
+            }
         }
 
-        /// <summary>
-        /// The date this Content should expire and thus be unpublished
-        /// </summary>
-        [DataMember]
-        public DateTime? ExpireDate
-        {
-            get { return _expireDate; }
-            set { SetPropertyValueAndDetectChanges(value, ref _expireDate, Ps.Value.ExpireDateSelector); }
-        }
-
-        /// <summary>
-        /// Id of the user who wrote/updated this Content
-        /// </summary>
-        [DataMember]
-        public virtual int WriterId
-        {
-            get { return _writer; }
-            set { SetPropertyValueAndDetectChanges(value, ref _writer, Ps.Value.WriterSelector); }
-        }
-
-        /// <summary>
-        /// Name of the Node (non-localized).
-        /// </summary>
-        /// <remarks>
-        /// This Property is kept internal until localization is introduced.
-        /// </remarks>
-        [DataMember]
-        internal string NodeName
-        {
-            get { return _nodeName; }
-            set { SetPropertyValueAndDetectChanges(value, ref _nodeName, Ps.Value.NodeNameSelector); }
-        }
-
-
-        /// <summary>
-        /// Gets the ContentType used by this content object
-        /// </summary>
         [IgnoreDataMember]
-        public IContentType ContentType
+        public bool Edited { get; set; }
+
+        /// <inheritdoc />
+        [IgnoreDataMember]
+        public DateTime? PublishDate { get; set; } // set by persistence
+
+        /// <inheritdoc />
+        [IgnoreDataMember]
+        public int? PublisherId { get; set; } // set by persistence
+
+        /// <inheritdoc />
+        [IgnoreDataMember]
+        public int? PublishTemplateId { get; set; } // set by persistence
+
+        /// <inheritdoc />
+        [IgnoreDataMember]
+        public string PublishName { get; set; } // set by persistence
+
+        /// <inheritdoc />
+        [IgnoreDataMember]
+        public IEnumerable<string> EditedCultures
         {
-            get { return _contentType; }
+            get => CultureInfos.Keys.Where(IsCultureEdited);
+            set => _editedCultures = value == null ? null : new HashSet<string>(value, StringComparer.OrdinalIgnoreCase);
         }
+
+        /// <inheritdoc />
+        [IgnoreDataMember]
+        public IEnumerable<string> PublishedCultures => _publishInfos?.Keys ?? Enumerable.Empty<string>();
+
+        /// <inheritdoc />
+        public bool IsCulturePublished(string culture)
+            // just check _publishInfos
+            // a non-available culture could not become published anyways
+            => _publishInfos != null && _publishInfos.ContainsKey(culture);
+
+        /// <inheritdoc />
+        public bool IsCultureEdited(string culture)
+            => IsCultureAvailable(culture) && // is available, and
+               (!IsCulturePublished(culture) || // is not published, or
+                (_editedCultures != null && _editedCultures.Contains(culture))); // is edited
+
+        /// <inheritdoc/>
+        [IgnoreDataMember]
+        public ContentCultureInfosCollection PublishCultureInfos
+        {
+            get
+            {
+                if (_publishInfos != null) return _publishInfos;
+                _publishInfos = new ContentCultureInfosCollection();
+                _publishInfos.CollectionChanged += PublishNamesCollectionChanged;
+                return _publishInfos;
+            }
+            set
+            {
+                if (_publishInfos != null) _publishInfos.CollectionChanged -= PublishNamesCollectionChanged;
+                _publishInfos = value;
+                if (_publishInfos != null)
+                    _publishInfos.CollectionChanged += PublishNamesCollectionChanged;
+            }
+        }
+
+        /// <inheritdoc/>
+        public string GetPublishName(string culture)
+        {
+            if (culture.IsNullOrWhiteSpace()) return PublishName;
+            if (!ContentType.VariesByCulture()) return null;
+            if (_publishInfos == null) return null;
+            return _publishInfos.TryGetValue(culture, out var infos) ? infos.Name : null;
+        }
+
+        /// <inheritdoc />
+        public DateTime? GetPublishDate(string culture)
+        {
+            if (culture.IsNullOrWhiteSpace()) return PublishDate;
+            if (!ContentType.VariesByCulture()) return null;
+            if (_publishInfos == null) return null;
+            return _publishInfos.TryGetValue(culture, out var infos) ? infos.Date : (DateTime?)null;
+        }
+
+        /// <summary>
+        /// Handles culture infos collection changes.
+        /// </summary>
+        private void PublishNamesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(PublishCultureInfos));
+
+            //we don't need to handle other actions, only add/remove, however we could implement Replace and track updated cultures in _updatedCultures too
+            //which would allows us to continue doing WasCulturePublished, but don't think we need it anymore
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    {
+                        var cultureInfo = e.NewItems.Cast<ContentCultureInfos>().First();
+                        if (_currentPublishCultureChanges.addedCultures == null) _currentPublishCultureChanges.addedCultures = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+                        if (_currentPublishCultureChanges.updatedCultures == null) _currentPublishCultureChanges.updatedCultures = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+                        _currentPublishCultureChanges.addedCultures.Add(cultureInfo.Culture);
+                        _currentPublishCultureChanges.updatedCultures.Add(cultureInfo.Culture);
+                        _currentPublishCultureChanges.removedCultures?.Remove(cultureInfo.Culture);
+                        break;
+                    }
+                case NotifyCollectionChangedAction.Remove:
+                    {
+                        //remove listening for changes
+                        var cultureInfo = e.OldItems.Cast<ContentCultureInfos>().First();
+                        if (_currentPublishCultureChanges.removedCultures == null) _currentPublishCultureChanges.removedCultures = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+                        _currentPublishCultureChanges.removedCultures.Add(cultureInfo.Culture);
+                        _currentPublishCultureChanges.updatedCultures?.Remove(cultureInfo.Culture);
+                        _currentPublishCultureChanges.addedCultures?.Remove(cultureInfo.Culture);
+                        break;
+                    }
+                case NotifyCollectionChangedAction.Replace:
+                    {
+                        //replace occurs when an Update occurs
+                        var cultureInfo = e.NewItems.Cast<ContentCultureInfos>().First();
+                        if (_currentPublishCultureChanges.updatedCultures == null) _currentPublishCultureChanges.updatedCultures = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+                        _currentPublishCultureChanges.updatedCultures.Add(cultureInfo.Culture);
+                        break;
+                    }
+            }
+        }
+
+        [IgnoreDataMember]
+        public int PublishedVersionId { get; set; }
+
+        [DataMember]
+        public bool Blueprint { get; set; }
 
         /// <summary>
         /// Changes the <see cref="ContentType"/> for the current content object
         /// </summary>
         /// <param name="contentType">New ContentType for this content</param>
         /// <remarks>Leaves PropertyTypes intact after change</remarks>
-        public void ChangeContentType(IContentType contentType)
+        internal void ChangeContentType(IContentType contentType)
         {
-            ContentTypeId = contentType.Id;
-            _contentType = contentType;
-            ContentTypeBase = contentType;
-            Properties.EnsurePropertyTypes(PropertyTypes);
-            Properties.CollectionChanged += PropertiesChanged;
+            ChangeContentType(contentType, false);
         }
 
         /// <summary>
@@ -223,85 +312,102 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="contentType">New ContentType for this content</param>
         /// <param name="clearProperties">Boolean indicating whether to clear PropertyTypes upon change</param>
-        public void ChangeContentType(IContentType contentType, bool clearProperties)
+        internal void ChangeContentType(IContentType contentType, bool clearProperties)
         {
-            if(clearProperties)
+            ChangeContentType(new SimpleContentType(contentType));
+
+            if (clearProperties)
+                Properties.EnsureCleanPropertyTypes(contentType.CompositionPropertyTypes);
+            else
+                Properties.EnsurePropertyTypes(contentType.CompositionPropertyTypes);
+
+            Properties.CollectionChanged -= PropertiesChanged; // be sure not to double add
+            Properties.CollectionChanged += PropertiesChanged;
+        }
+
+        public override void ResetWereDirtyProperties()
+        {
+            base.ResetWereDirtyProperties();
+            _previousPublishCultureChanges.updatedCultures = null;
+            _previousPublishCultureChanges.removedCultures = null;
+            _previousPublishCultureChanges.addedCultures = null;
+        }
+
+        public override void ResetDirtyProperties(bool rememberDirty)
+        {
+            base.ResetDirtyProperties(rememberDirty);
+
+            if (rememberDirty)
             {
-                ContentTypeId = contentType.Id;
-                _contentType = contentType;
-                ContentTypeBase = contentType;
-                Properties.EnsureCleanPropertyTypes(PropertyTypes);
-                Properties.CollectionChanged += PropertiesChanged;
-                return;
+                _previousPublishCultureChanges.addedCultures = _currentPublishCultureChanges.addedCultures == null || _currentPublishCultureChanges.addedCultures.Count == 0 ? null : new HashSet<string>(_currentPublishCultureChanges.addedCultures, StringComparer.InvariantCultureIgnoreCase);
+                _previousPublishCultureChanges.removedCultures = _currentPublishCultureChanges.removedCultures == null || _currentPublishCultureChanges.removedCultures.Count == 0 ? null : new HashSet<string>(_currentPublishCultureChanges.removedCultures, StringComparer.InvariantCultureIgnoreCase);
+                _previousPublishCultureChanges.updatedCultures = _currentPublishCultureChanges.updatedCultures == null || _currentPublishCultureChanges.updatedCultures.Count == 0 ? null : new HashSet<string>(_currentPublishCultureChanges.updatedCultures, StringComparer.InvariantCultureIgnoreCase);
+            }
+            else
+            {
+                _previousPublishCultureChanges.addedCultures = null;
+                _previousPublishCultureChanges.removedCultures = null;
+                _previousPublishCultureChanges.updatedCultures = null;
+            }
+            _currentPublishCultureChanges.addedCultures?.Clear();
+            _currentPublishCultureChanges.removedCultures?.Clear();
+            _currentPublishCultureChanges.updatedCultures?.Clear();
+
+            // take care of the published state
+            _publishedState = _published ? PublishedState.Published : PublishedState.Unpublished;
+
+            if (_publishInfos == null) return;
+
+            foreach (var infos in _publishInfos)
+                infos.ResetDirtyProperties(rememberDirty);
+        }
+
+        /// <inheritdoc />
+        /// <remarks>Overridden to check special keys.</remarks>
+        public override bool IsPropertyDirty(string propertyName)
+        {
+            //Special check here since we want to check if the request is for changed cultures
+            if (propertyName.StartsWith(ChangeTrackingPrefix.PublishedCulture))
+            {
+                var culture = propertyName.TrimStart(ChangeTrackingPrefix.PublishedCulture);
+                return _currentPublishCultureChanges.addedCultures?.Contains(culture) ?? false;
+            }
+            if (propertyName.StartsWith(ChangeTrackingPrefix.UnpublishedCulture))
+            {
+                var culture = propertyName.TrimStart(ChangeTrackingPrefix.UnpublishedCulture);
+                return _currentPublishCultureChanges.removedCultures?.Contains(culture) ?? false;
+            }
+            if (propertyName.StartsWith(ChangeTrackingPrefix.ChangedCulture))
+            {
+                var culture = propertyName.TrimStart(ChangeTrackingPrefix.ChangedCulture);
+                return _currentPublishCultureChanges.updatedCultures?.Contains(culture) ?? false;
             }
 
-            ChangeContentType(contentType);
+            return base.IsPropertyDirty(propertyName);
         }
 
-        /// <summary>
-        /// Changes the Published state of the content object
-        /// </summary>
-        public void ChangePublishedState(PublishedState state)
+        /// <inheritdoc />
+        /// <remarks>Overridden to check special keys.</remarks>
+        public override bool WasPropertyDirty(string propertyName)
         {
-            Published = state == PublishedState.Published;
-            PublishedState = state;
-        }
-
-        [DataMember]
-        internal PublishedState PublishedState { get; set; }
-
-        /// <summary>
-        /// Gets or sets the unique identifier of the published version, if any.
-        /// </summary>
-        [IgnoreDataMember]
-        public Guid PublishedVersionGuid { get; internal set; }
-
-        /// <summary>
-        /// Gets a value indicating whether the content has a published version.
-        /// </summary>
-        public bool HasPublishedVersion { get { return PublishedVersionGuid != default(Guid); } }
-
-        [IgnoreDataMember]
-        internal DateTime PublishedDate { get; set; }
-
-        [DataMember]
-        public bool IsBlueprint { get; internal set; }
-
-        /// <summary>
-        /// Changes the Trashed state of the content object
-        /// </summary>
-        /// <param name="isTrashed">Boolean indicating whether content is trashed (true) or not trashed (false)</param>
-        /// <param name="parentId"> </param>
-        public override void ChangeTrashedState(bool isTrashed, int parentId = -20)
-        {
-            Trashed = isTrashed;
-            ParentId = parentId;
-
-            //If the content is trashed and is published it should be marked as unpublished
-            if (isTrashed && Published)
+            //Special check here since we want to check if the request is for changed cultures
+            if (propertyName.StartsWith(ChangeTrackingPrefix.PublishedCulture))
             {
-                ChangePublishedState(PublishedState.Unpublished);
+                var culture = propertyName.TrimStart(ChangeTrackingPrefix.PublishedCulture);
+                return _previousPublishCultureChanges.addedCultures?.Contains(culture) ?? false;
             }
-        }
+            if (propertyName.StartsWith(ChangeTrackingPrefix.UnpublishedCulture))
+            {
+                var culture = propertyName.TrimStart(ChangeTrackingPrefix.UnpublishedCulture);
+                return _previousPublishCultureChanges.removedCultures?.Contains(culture) ?? false;
+            }
+            if (propertyName.StartsWith(ChangeTrackingPrefix.ChangedCulture))
+            {
+                var culture = propertyName.TrimStart(ChangeTrackingPrefix.ChangedCulture);
+                return _previousPublishCultureChanges.updatedCultures?.Contains(culture) ?? false;
+            }
 
-        /// <summary>
-        /// Method to call when Entity is being updated
-        /// </summary>
-        /// <remarks>Modified Date is set and a new Version guid is set</remarks>
-        internal override void UpdatingEntity()
-        {
-            base.UpdatingEntity();
-            Version = Guid.NewGuid();
-        }
-
-        /// <summary>
-        /// Creates a deep clone of the current entity with its identity and it's property identities reset
-        /// </summary>
-        /// <returns></returns>
-        [Obsolete("Use DeepCloneWithResetIdentities instead")]
-        public IContent Clone()
-        {
-            return DeepCloneWithResetIdentities();
+            return base.WasPropertyDirty(propertyName);
         }
 
         /// <summary>
@@ -312,32 +418,46 @@ namespace Umbraco.Core.Models
         {
             var clone = (Content)DeepClone();
             clone.Key = Guid.Empty;
-            clone.Version = Guid.NewGuid();
+            clone.VersionId = clone.PublishedVersionId = 0;
             clone.ResetIdentity();
 
             foreach (var property in clone.Properties)
-            {
                 property.ResetIdentity();
-                property.Version = clone.Version;
-            }
 
             return clone;
         }
 
-        public override object DeepClone()
+        protected override void PerformDeepClone(object clone)
         {
-            var clone = (Content)base.DeepClone();
-            //turn off change tracking
-            clone.DisableChangeTracking();
-            //need to manually clone this since it's not settable
-            clone._contentType = (IContentType)ContentType.DeepClone();
-            //this shouldn't really be needed since we're not tracking
-            clone.ResetDirtyProperties(false);
-            //re-enable tracking
-            clone.EnableChangeTracking();
+            base.PerformDeepClone(clone);
 
-            return clone;
+            var clonedContent = (Content)clone;
 
+            //fixme - need to reset change tracking bits
+
+            //if culture infos exist then deal with event bindings
+            if (clonedContent._publishInfos != null)
+            {
+                clonedContent._publishInfos.CollectionChanged -= PublishNamesCollectionChanged;          //clear this event handler if any
+                clonedContent._publishInfos = (ContentCultureInfosCollection)_publishInfos.DeepClone(); //manually deep clone
+                clonedContent._publishInfos.CollectionChanged += clonedContent.PublishNamesCollectionChanged;    //re-assign correct event handler
+            }
+
+            //if properties exist then deal with event bindings
+            if (clonedContent._schedule != null)
+            {
+                clonedContent._schedule.CollectionChanged -= ScheduleCollectionChanged;         //clear this event handler if any
+                clonedContent._schedule = (ContentScheduleCollection)_schedule.DeepClone();     //manually deep clone
+                clonedContent._schedule.CollectionChanged += clonedContent.ScheduleCollectionChanged;   //re-assign correct event handler
+            }
+
+            clonedContent._currentPublishCultureChanges.updatedCultures = null;
+            clonedContent._currentPublishCultureChanges.addedCultures = null;
+            clonedContent._currentPublishCultureChanges.removedCultures = null;
+
+            clonedContent._previousPublishCultureChanges.updatedCultures = null;
+            clonedContent._previousPublishCultureChanges.addedCultures = null;
+            clonedContent._previousPublishCultureChanges.removedCultures = null;
         }
     }
 }

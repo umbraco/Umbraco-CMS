@@ -1,19 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal static class UserFactory 
+    internal static class UserFactory
     {
         public static IUser BuildEntity(UserDto dto)
         {
             var guidId = dto.Id.ToGuid();
-            
-            var user = new User(dto.Id, dto.UserName, dto.Email, dto.Login,dto.Password, 
+
+            var user = new User(dto.Id, dto.UserName, dto.Email, dto.Login,dto.Password,
                 dto.UserGroupDtos.Select(x => x.ToReadOnlyGroup()).ToArray(),
                 dto.UserStartNodeDtos.Where(x => x.StartNodeType == (int)UserStartNodeDto.StartNodeTypeValue.Content).Select(x => x.StartNode).ToArray(),
                 dto.UserStartNodeDtos.Where(x => x.StartNodeType == (int)UserStartNodeDto.StartNodeTypeValue.Media).Select(x => x.StartNode).ToArray());
@@ -21,7 +19,7 @@ namespace Umbraco.Core.Persistence.Factories
             try
             {
                 user.DisableChangeTracking();
-                
+
                 user.Key = guidId;
                 user.IsLockedOut = dto.NoConsole;
                 user.IsApproved = dto.Disabled == false;
@@ -38,8 +36,14 @@ namespace Umbraco.Core.Persistence.Factories
                 user.InvitedDate = dto.InvitedDate;
                 user.TourData = dto.TourData;
 
-                //on initial construction we don't want to have dirty properties tracked
-                // http://issues.umbraco.org/issue/U4-1946
+                // we should never get user with ID zero from database, except
+                // when upgrading from v7 - mark that user so that we do not
+                // save it back to database (as that would create a *new* user)
+                // see also: UserRepository.PersistNewItem
+                if (dto.Id == 0)
+                    user.AdditionalData["IS_V7_ZERO"] = true;
+
+                // reset dirty initial properties (U4-1946)
                 user.ResetDirtyProperties(false);
 
                 return user;
@@ -53,7 +57,7 @@ namespace Umbraco.Core.Persistence.Factories
         public static UserDto BuildDto(IUser entity)
         {
             var dto = new UserDto
-            {                
+            {
                 Disabled = entity.IsApproved == false,
                 Email = entity.Email,
                 Login = entity.Username,
@@ -100,6 +104,6 @@ namespace Umbraco.Core.Persistence.Factories
             }
 
             return dto;
-        }        
+        }
     }
 }

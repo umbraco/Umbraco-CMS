@@ -1,9 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Web.Mvc;
-using umbraco.interfaces;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
@@ -11,139 +13,112 @@ using Umbraco.Web.WebApi;
 namespace Umbraco.Web.Mvc
 {
     /// <summary>
-    /// A base class for all plugin controllers to inherit from
+    /// Provides a base class for plugin controllers.
     /// </summary>
     public abstract class PluginController : Controller, IDiscoverable
     {
-        /// <summary>
-        /// stores the metadata about plugin controllers
-        /// </summary>
-        private static readonly ConcurrentDictionary<Type, PluginControllerMetadata> MetadataStorage = new ConcurrentDictionary<Type, PluginControllerMetadata>();
+        private static readonly ConcurrentDictionary<Type, PluginControllerMetadata> MetadataStorage
+            = new ConcurrentDictionary<Type, PluginControllerMetadata>();
 
-        private UmbracoHelper _umbracoHelper;        
+        // for debugging purposes
+        internal Guid InstanceId { get; } = Guid.NewGuid();
+        
+        /// <summary>
+        /// Gets the Umbraco context.
+        /// </summary>
+        public virtual UmbracoContext UmbracoContext => UmbracoContextAccessor.UmbracoContext;
 
         /// <summary>
-        /// Default constructor
+        /// Gets the database context accessor.
         /// </summary>
-        /// <param name="umbracoContext"></param>
-        protected PluginController(UmbracoContext umbracoContext)
+        public virtual IUmbracoContextAccessor UmbracoContextAccessor { get; }
+
+        /// <summary>
+        /// Gets the database context.
+        /// </summary>
+        public IUmbracoDatabaseFactory DatabaseFactory { get; }
+
+        /// <summary>
+        /// Gets or sets the services context.
+        /// </summary>
+        public ServiceContext Services { get; }
+
+        /// <summary>
+        /// Gets or sets the application cache.
+        /// </summary>
+        public AppCaches AppCaches { get;  }
+
+        /// <summary>
+        /// Gets or sets the logger.
+        /// </summary>
+        public ILogger Logger { get; }
+
+        /// <summary>
+        /// Gets or sets the profiling logger.
+        /// </summary>
+        public IProfilingLogger ProfilingLogger { get; }
+
+        /// <summary>
+        /// Gets the membership helper.
+        /// </summary>
+        public MembershipHelper Members => Umbraco.MembershipHelper;
+
+        /// <summary>
+        /// Gets the Umbraco helper.
+        /// </summary>
+        public UmbracoHelper Umbraco { get; }
+
+        /// <summary>
+        /// Gets metadata for this instance.
+        /// </summary>
+        internal PluginControllerMetadata Metadata => GetMetadata(GetType());
+
+        protected PluginController()
+            : this(
+                  Current.Factory.GetInstance<IUmbracoContextAccessor>(),
+                  Current.Factory.GetInstance<IUmbracoDatabaseFactory>(),
+                  Current.Factory.GetInstance<ServiceContext>(),
+                  Current.Factory.GetInstance<AppCaches>(),
+                  Current.Factory.GetInstance<ILogger>(),
+                  Current.Factory.GetInstance<IProfilingLogger>(),
+                  Current.Factory.GetInstance<UmbracoHelper>()
+            )
         {
-            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
-            UmbracoContext = umbracoContext;
-            InstanceId = Guid.NewGuid();
         }
 
-        protected PluginController(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper)
+        protected PluginController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, ILogger logger, IProfilingLogger profilingLogger, UmbracoHelper umbracoHelper)
         {
-            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
-            if (umbracoHelper == null) throw new ArgumentNullException("umbracoHelper");
-            UmbracoContext = umbracoContext;
-            InstanceId = Guid.NewGuid();
-            _umbracoHelper = umbracoHelper;
-        }
-
-        /// <summary>
-        /// Useful for debugging
-        /// </summary>
-        internal Guid InstanceId { get; private set; }
-
-        /// <summary>
-        /// Returns the MemberHelper instance
-        /// </summary>
-        public MembershipHelper Members
-        {
-            get { return Umbraco.MembershipHelper; }
-        }
-
-        /// <summary>
-        /// Returns an UmbracoHelper object
-        /// </summary>
-        public virtual UmbracoHelper Umbraco
-        {
-            get { return _umbracoHelper ?? (_umbracoHelper = new UmbracoHelper(UmbracoContext)); }
-        }
-
-        /// <summary>
-        /// Returns an ILogger
-        /// </summary>
-        public ILogger Logger
-        {
-            get { return ProfilingLogger.Logger; }
-        }
-
-        /// <summary>
-        /// Returns a ProfilingLogger
-        /// </summary>
-        public virtual ProfilingLogger ProfilingLogger
-        {
-            get { return UmbracoContext.Application.ProfilingLogger; }
-        }
-
-        /// <summary>
-        /// Returns the current UmbracoContext
-        /// </summary>
-        public virtual UmbracoContext UmbracoContext { get; private set; }
-
-        /// <summary>
-        /// Returns the current ApplicationContext
-        /// </summary>
-        public virtual ApplicationContext ApplicationContext
-        {
-            get { return UmbracoContext.Application; }
-        }
-
-        /// <summary>
-        /// Returns a ServiceContext
-        /// </summary>
-        public ServiceContext Services
-        {
-            get { return ApplicationContext.Services; }
+            UmbracoContextAccessor = umbracoContextAccessor;
+            DatabaseFactory = databaseFactory;
+            Services = services;
+            AppCaches = appCaches;
+            Logger = logger;
+            ProfilingLogger = profilingLogger;
+            Umbraco = umbracoHelper;
         }
 
         /// <summary>
-        /// Returns a DatabaseContext
+        /// Gets metadata for a controller type.
         /// </summary>
-        public DatabaseContext DatabaseContext
+        /// <param name="controllerType">The controller type.</param>
+        /// <returns>Metadata for the controller type.</returns>
+        internal static PluginControllerMetadata GetMetadata(Type controllerType)
         {
-            get { return ApplicationContext.DatabaseContext; }
-        }
+            return MetadataStorage.GetOrAdd(controllerType, type =>
+            {
+                // plugin controller? back-office controller?
+                var pluginAttribute = controllerType.GetCustomAttribute<PluginControllerAttribute>(false);
+                var backOfficeAttribute = controllerType.GetCustomAttribute<IsBackOfficeAttribute>(true);
 
-        /// <summary>
-        /// Returns the metadata for this instance
-        /// </summary>
-        internal PluginControllerMetadata Metadata
-        {
-            get { return GetMetadata(this.GetType()); }
-        }
-
-        /// <summary>
-        /// Returns the metadata for a PluginController
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        internal static PluginControllerMetadata GetMetadata(Type type)
-        {
-
-            return MetadataStorage.GetOrAdd(type, type1 =>
+                return new PluginControllerMetadata
                 {
-                    var pluginAttribute = type.GetCustomAttribute<PluginControllerAttribute>(false);
-                    //check if any inherited class of this type contains the IsBackOffice attribute
-                    var backOfficeAttribute = type.GetCustomAttribute<IsBackOfficeAttribute>(true);
-
-                    var meta = new PluginControllerMetadata()
-                    {
-                        AreaName = pluginAttribute == null ? null : pluginAttribute.AreaName,
-                        ControllerName = ControllerExtensions.GetControllerName(type),
-                        ControllerNamespace = type.Namespace,
-                        ControllerType = type,
-                        IsBackOffice = backOfficeAttribute != null
-                    };
-
-                    MetadataStorage.TryAdd(type, meta);
-
-                    return meta;
-                });
-
+                    AreaName = pluginAttribute?.AreaName,
+                    ControllerName = ControllerExtensions.GetControllerName(controllerType),
+                    ControllerNamespace = controllerType.Namespace,
+                    ControllerType = controllerType,
+                    IsBackOffice = backOfficeAttribute != null
+                };
+            });
         }
     }
 }

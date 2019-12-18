@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models.Membership
@@ -12,7 +11,7 @@ namespace Umbraco.Core.Models.Membership
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class UserGroup : Entity, IUserGroup, IReadOnlyUserGroup
+    public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     {
         private int? _startContentId;
         private int? _startMediaId;
@@ -22,23 +21,11 @@ namespace Umbraco.Core.Models.Membership
         private IEnumerable<string> _permissions;
         private readonly List<string> _sectionCollection;
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<UserGroup, string>(x => x.Name);
-            public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<UserGroup, string>(x => x.Alias);
-            public readonly PropertyInfo PermissionsSelector = ExpressionHelper.GetPropertyInfo<UserGroup, IEnumerable<string>>(x => x.Permissions);
-            public readonly PropertyInfo IconSelector = ExpressionHelper.GetPropertyInfo<UserGroup, string>(x => x.Icon);
-            public readonly PropertyInfo StartContentIdSelector = ExpressionHelper.GetPropertyInfo<UserGroup, int?>(x => x.StartContentId);
-            public readonly PropertyInfo StartMediaIdSelector = ExpressionHelper.GetPropertyInfo<UserGroup, int?>(x => x.StartMediaId);
-
-            //Custom comparer for enumerable
-            public readonly DelegateEqualityComparer<IEnumerable<string>> StringEnumerableComparer =
-                new DelegateEqualityComparer<IEnumerable<string>>(
-                    (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
-                    enum1 => enum1.GetHashCode());
-        }
+        //Custom comparer for enumerable
+        private static readonly DelegateEqualityComparer<IEnumerable<string>> StringEnumerableComparer =
+            new DelegateEqualityComparer<IEnumerable<string>>(
+                (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
+                enum1 => enum1.GetHashCode());
 
         /// <summary>
         /// Constructor to create a new user group
@@ -62,49 +49,43 @@ namespace Umbraco.Core.Models.Membership
             UserCount = userCount;
             _alias = alias;
             _name = name;
-            _permissions = permissions;            
+            _permissions = permissions;
             _icon = icon;
         }
 
         [DataMember]
         public int? StartMediaId
         {
-            get { return _startMediaId; }
-            set { SetPropertyValueAndDetectChanges(value, ref _startMediaId, Ps.Value.StartMediaIdSelector); }
+            get => _startMediaId;
+            set => SetPropertyValueAndDetectChanges(value, ref _startMediaId, nameof(StartMediaId));
         }
 
         [DataMember]
         public int? StartContentId
         {
-            get { return _startContentId; }
-            set { SetPropertyValueAndDetectChanges(value, ref _startContentId, Ps.Value.StartContentIdSelector); }
+            get => _startContentId;
+            set => SetPropertyValueAndDetectChanges(value, ref _startContentId, nameof(StartContentId));
         }
 
         [DataMember]
         public string Icon
         {
-            get { return _icon; }
-            set { SetPropertyValueAndDetectChanges(value, ref _icon, Ps.Value.IconSelector); }
+            get => _icon;
+            set => SetPropertyValueAndDetectChanges(value, ref _icon, nameof(Icon));
         }
 
         [DataMember]
         public string Alias
         {
-            get { return _alias; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(
-                    value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase),
-                    ref _alias,
-                    Ps.Value.AliasSelector);
-            }
+            get => _alias;
+            set => SetPropertyValueAndDetectChanges(value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase), ref _alias, nameof(Alias));
         }
 
         [DataMember]
         public string Name
         {
-            get { return _name; }
-            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
+            get => _name;
+            set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
         }
 
         /// <summary>
@@ -116,33 +97,22 @@ namespace Umbraco.Core.Models.Membership
         [DataMember]
         public IEnumerable<string> Permissions
         {
-            get { return _permissions; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(value, ref _permissions, Ps.Value.PermissionsSelector,
-                    Ps.Value.StringEnumerableComparer);
-            }
+            get => _permissions;
+            set => SetPropertyValueAndDetectChanges(value, ref _permissions, nameof(Permissions), StringEnumerableComparer);
         }
 
-        public IEnumerable<string> AllowedSections
-        {
-            get { return _sectionCollection; }
-        }
+        public IEnumerable<string> AllowedSections => _sectionCollection;
 
         public void RemoveAllowedSection(string sectionAlias)
         {
             if (_sectionCollection.Contains(sectionAlias))
-            {
                 _sectionCollection.Remove(sectionAlias);
-            }
         }
 
         public void AddAllowedSection(string sectionAlias)
         {
             if (_sectionCollection.Contains(sectionAlias) == false)
-            {
                 _sectionCollection.Add(sectionAlias);
-            }
         }
 
         public void ClearAllowedSections()
@@ -150,6 +120,6 @@ namespace Umbraco.Core.Models.Membership
             _sectionCollection.Clear();
         }
 
-        public int UserCount { get; private set; }
+        public int UserCount { get; }
     }
 }

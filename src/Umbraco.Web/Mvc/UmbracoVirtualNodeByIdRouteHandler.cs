@@ -1,5 +1,5 @@
 ﻿using System.Web.Routing;
-using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Mvc
 {
@@ -14,10 +14,8 @@ namespace Umbraco.Web.Mvc
 
         protected sealed override IPublishedContent FindContent(RequestContext requestContext, UmbracoContext umbracoContext)
         {
-            var byId = umbracoContext.ContentCache.GetById(_realNodeId);
-            if (byId == null) return null;
-
-            return FindContent(requestContext, umbracoContext, byId);
+            var byId = umbracoContext.Content.GetById(_realNodeId);
+            return byId == null ? null : FindContent(requestContext, umbracoContext, byId);
         }
 
         protected virtual IPublishedContent FindContent(RequestContext requestContext, UmbracoContext umbracoContext, IPublishedContent baseContent)

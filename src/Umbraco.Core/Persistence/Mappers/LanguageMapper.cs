@@ -1,40 +1,27 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Linq.Expressions;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
     /// <summary>
-    /// Represents a <see cref="Language"/> to DTO mapper used to translate the properties of the public api 
+    /// Represents a <see cref="Language"/> to DTO mapper used to translate the properties of the public api
     /// implementation to that of the database's DTO as sql: [tableName].[columnName].
     /// </summary>
     [MapperFor(typeof(ILanguage))]
     [MapperFor(typeof(Language))]
     public sealed class LanguageMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
+        public LanguageMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+            : base(sqlContext, maps)
+        { }
 
-        public LanguageMapper()
+        protected override void DefineMaps()
         {
-            BuildMap();
+            DefineMap<Language, LanguageDto>(nameof(Language.Id), nameof(LanguageDto.Id));
+            DefineMap<Language, LanguageDto>(nameof(Language.IsoCode), nameof(LanguageDto.IsoCode));
+            DefineMap<Language, LanguageDto>(nameof(Language.CultureName), nameof(LanguageDto.CultureName));
         }
-
-        #region Overrides of BaseMapper
-
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache
-        {
-            get { return PropertyInfoCacheInstance; }
-        }
-
-        internal override void BuildMap()
-        {
-            CacheMap<Language, LanguageDto>(src => src.Id, dto => dto.Id);
-            CacheMap<Language, LanguageDto>(src => src.IsoCode, dto => dto.IsoCode);
-            CacheMap<Language, LanguageDto>(src => src.CultureName, dto => dto.CultureName);
-        }
-
-        #endregion
     }
 }

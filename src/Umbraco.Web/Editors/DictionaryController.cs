@@ -4,11 +4,15 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using AutoMapper;
+using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.UI;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
@@ -22,15 +26,20 @@ namespace Umbraco.Web.Editors
     /// </summary>
     /// <remarks>
     /// The security for this controller is defined to allow full CRUD access to dictionary if the user has access to either:
-    /// Dictionar
+    /// Dictionary
     /// </remarks>
     [PluginController("UmbracoApi")]
     [UmbracoTreeAuthorize(Constants.Trees.Dictionary)]
     [EnableOverrideAuthorization]
     public class DictionaryController : BackOfficeNotificationsController
     {
+        public DictionaryController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        {
+        }
+
         /// <summary>
-        /// Deletes a data type wth a given ID
+        /// Deletes a data type with a given ID
         /// </summary>
         /// <param name="id"></param>
         /// <returns><see cref="HttpResponseMessage"/></returns>
@@ -42,14 +51,21 @@ namespace Umbraco.Web.Editors
 
             if (foundDictionary == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
-            
+
+            var foundDictionaryDescendants = Services.LocalizationService.GetDictionaryItemDescendants(foundDictionary.Key);
+
+            foreach (var dictionaryItem in foundDictionaryDescendants)
+            {
+                Services.LocalizationService.Delete(dictionaryItem, Security.CurrentUser.Id);
+            }
+
             Services.LocalizationService.Delete(foundDictionary, Security.CurrentUser.Id);
 
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         /// <summary>
-        /// Creates a new dictoinairy item
+        /// Creates a new dictionary item
         /// </summary>
         /// <param name="parentId">
         /// The parent id.
@@ -65,13 +81,13 @@ namespace Umbraco.Web.Editors
         {
             if (string.IsNullOrEmpty(key))
                 return Request
-                    .CreateNotificationValidationErrorResponse("Key can not be empty;"); // TODO translate
+                    .CreateNotificationValidationErrorResponse("Key can not be empty."); // TODO: translate
 
             if (Services.LocalizationService.DictionaryItemExists(key))
             {
                 var message = Services.TextService.Localize(
                      "dictionaryItem/changeKeyError",
-                     Security.CurrentUser.GetUserCulture(Services.TextService),
+                     Security.CurrentUser.GetUserCulture(Services.TextService, GlobalSettings),
                      new Dictionary<string, string> { { "0", key } });
                 return Request.CreateNotificationValidationErrorResponse(message);
             }
@@ -91,9 +107,9 @@ namespace Umbraco.Web.Editors
 
                 return Request.CreateResponse(HttpStatusCode.OK, item.Id);
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                Logger.Error(GetType(), "Error creating dictionary", exception);
+                Logger.Error(GetType(), ex, "Error creating dictionary with {Name} under {ParentId}", key, parentId);
                 return Request.CreateNotificationValidationErrorResponse("Error creating dictionary item");
             }
         }
@@ -108,7 +124,7 @@ namespace Umbraco.Web.Editors
         /// The <see cref="DictionaryDisplay"/>.
         /// </returns>
         /// <exception cref="HttpResponseException">
-        ///  Returrns a not found response when dictionary item does not exist
+        ///  Returns a not found response when dictionary item does not exist
         /// </exception>
         public DictionaryDisplay GetById(int id)
         {
@@ -128,7 +144,7 @@ namespace Umbraco.Web.Editors
         /// </param>
         /// <returns>
         /// The <see cref="DictionaryDisplay"/>.
-        /// </returns>      
+        /// </returns>
         public DictionaryDisplay PostSave(DictionarySave dictionary)
         {
             var dictionaryItem =
@@ -137,7 +153,7 @@ namespace Umbraco.Web.Editors
             if (dictionaryItem == null)
                 throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse("Dictionary item does not exist"));
 
-            var userCulture = Security.CurrentUser.GetUserCulture(Services.TextService);
+            var userCulture = Security.CurrentUser.GetUserCulture(Services.TextService, GlobalSettings);
 
             if (dictionary.NameIsDirty)
             {
@@ -172,13 +188,13 @@ namespace Umbraco.Web.Editors
 
                 model.Notifications.Add(new Notification(
                     Services.TextService.Localize("speechBubbles/dictionaryItemSaved", userCulture), string.Empty,
-                    SpeechBubbleIcon.Success));
+                    NotificationStyle.Success));
 
                 return model;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Logger.Error(GetType(), "Error saving dictionary", e);
+                Logger.Error(GetType(), ex, "Error saving dictionary with {Name} under {ParentId}", dictionary.Name, dictionary.ParentId);
                 throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse("Something went wrong saving dictionary"));
             }
         }
@@ -219,7 +235,7 @@ namespace Umbraco.Web.Editors
         /// <param name="list">
         /// The list.
         /// </param>
-        private void GetChildItemsForList(IDictionaryItem dictionaryItem, int level, List<DictionaryOverviewDisplay> list)
+        private void GetChildItemsForList(IDictionaryItem dictionaryItem, int level, ICollection<DictionaryOverviewDisplay> list)
         {
             foreach (var childItem in Services.LocalizationService.GetDictionaryItemChildren(dictionaryItem.Key).OrderBy(ItemSort()))
             {
@@ -231,6 +247,6 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        private Func<IDictionaryItem, string> ItemSort() => item => item.ItemKey;
+        private static Func<IDictionaryItem, string> ItemSort() => item => item.ItemKey;
     }
 }

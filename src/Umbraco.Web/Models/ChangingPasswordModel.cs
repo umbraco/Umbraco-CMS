@@ -14,7 +14,7 @@ namespace Umbraco.Web.Models
         public string NewPassword { get; set; }
 
         /// <summary>
-        /// The old password - used to change a password when: EnablePasswordRetrieval = false 
+        /// The old password - used to change a password when: EnablePasswordRetrieval = false
         /// </summary>
         [DataMember(Name = "oldPassword")]
         public string OldPassword { get; set; }
@@ -39,7 +39,7 @@ namespace Umbraco.Web.Models
         public bool? Reset { get; set; }
 
         /// <summary>
-        /// The password answer - required for reset when: RequiresQuestionAndAnswer = true 
+        /// The password answer - required for reset when: RequiresQuestionAndAnswer = true
         /// </summary>
         [DataMember(Name = "answer")]
         public string Answer { get; set; }

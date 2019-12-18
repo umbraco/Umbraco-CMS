@@ -1,7 +1,7 @@
 angular.module("umbraco.directives")
   .directive('selectOnFocus', function () {
     return function (scope, el, attrs) {
-        $(el).bind("click", function () {
+        $(el).on("click", function () {
             var editmode = $(el).data("editmode");
             //If editmode is true a click is handled like a normal click
             if (!editmode) {
@@ -11,7 +11,7 @@ angular.module("umbraco.directives")
                 $(el).data("editmode", true);
             }
         }).
-        bind("blur", function () {
+        on("blur", function () {
             //Reset on focus lost
             $(el).data("editmode", false);
         });

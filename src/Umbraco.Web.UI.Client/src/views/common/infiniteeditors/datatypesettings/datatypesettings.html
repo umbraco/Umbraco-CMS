@@ -1,0 +1,74 @@
+<div ng-controller="Umbraco.Editors.DataTypeSettingsController as vm">
+
+<form novalidate name="dataTypeSettingsForm" val-form-manager>
+
+    <umb-editor-view data-element="editor-data-type-settings">
+
+        <umb-editor-header
+            name="model.title"
+            name-locked="true"
+            hide-alias="true"
+            hide-icon="true"
+            hide-description="true">
+        </umb-editor-header>
+
+        <umb-editor-container class="form-horizontal">
+
+            <umb-load-indicator
+                ng-if="vm.loadingDataType">
+            </umb-load-indicator>
+
+            <umb-box ng-if="!vm.loadingDataType">
+                <umb-box-content>
+
+                    <div class="umb-control-group" ng-if="vm.dataType.id !== 0">
+                        <i class="icon-alert red"></i>
+                        <strong class="red"><localize key="contentTypeEditor_allDocumentTypes"></localize></strong> using this editor will get updated with the new settings.
+                    </div>
+                    
+                    <div class="control-group umb-control-group">
+                        <div class="umb-el-wrap">
+                            <label class="control-label" for="dataTypeName">
+                                <localize key="name"></localize>
+                            </label>
+                            <div class="controls">
+                                <input type="text" ng-model="vm.dataType.name" class="umb-property-editor" umb-auto-focus focus-on-filled="true" required />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h5><localize key="contentTypeEditor_configuration"></localize></h5>
+                    
+                    <umb-property property="preValue" ng-repeat="preValue in vm.dataType.preValues">
+                        <umb-property-editor model="preValue" is-pre-value="true"></umb-property-editor>
+                    </umb-property>
+                        
+                </umb-box-content>
+            </umb-box>
+        </umb-editor-container>
+
+        <umb-editor-footer>
+            <umb-editor-footer-content-right>
+                <umb-button
+                    type="button"
+                    button-style="link"
+                    label-key="general_close"
+                    shortcut="esc"
+                    action="vm.close()">
+                </umb-button>
+                <umb-button
+                    alias="submit"
+                    type="button"
+                    button-style="success"
+                    label-key="general_submit"
+                    state="vm.saveButtonState"
+                    action="vm.submit(model)">
+                </umb-button>
+            </umb-editor-footer-content-right>
+        </umb-editor-footer>
+
+    </umb-editor-view>
+
+</form>
+
+</div>

@@ -6,10 +6,9 @@
     app.ready
     app.authenticated
     app.notAuthenticated
-    app.closeDialogs
-    app.ysod
     app.reInitialize
     app.userRefresh
+    app.navigationReady
 */
 
 function eventsService($q, $rootScope) {

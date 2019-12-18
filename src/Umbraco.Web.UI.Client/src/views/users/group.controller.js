@@ -1,16 +1,16 @@
 (function () {
     "use strict";
 
-    function UserGroupEditController($scope, $location, $routeParams, userGroupsResource, localizationService, contentEditingHelper) {
+    function UserGroupEditController($scope, $location, $routeParams, userGroupsResource, localizationService, contentEditingHelper, editorService) {
 
         var vm = this;
-        var localizeSaving = localizationService.localize("general_saving");
-
+        var contentPickerOpen = false;
 
         vm.page = {};        
         vm.page.rootIcon = "icon-folder";
         vm.userGroup = {};
         vm.labels = {};
+        vm.showBackButton = true;
 
         vm.goToPage = goToPage;
         vm.openSectionPicker = openSectionPicker;
@@ -78,14 +78,9 @@
             vm.page.saveButtonState = "busy";
 
             contentEditingHelper.contentEditorPerformSave({
-                statusMessage: localizeSaving,
                 saveMethod: userGroupsResource.saveUserGroup,
                 scope: $scope,
                 content: vm.userGroup,
-                // We do not redirect on failure for users - this is because it is not possible to actually save a user
-                // when server side validation fails - as opposed to content where we are capable of saving the content
-                // item if server side validation fails
-                redirectOnFailure: false,
                 rebindCallback: function (orignal, saved) { }
             }).then(function (saved) {
 
@@ -101,36 +96,32 @@
         }
 
         function goToPage(ancestor) {
-            $location.path(ancestor.path).search("subview", ancestor.subView);
+            $location.path(ancestor.path);
         }
 
         function openSectionPicker() {
-            vm.sectionPicker = {
-                view: "sectionpicker",
-                selection: vm.userGroup.sections,
-                closeButtonLabel: vm.labels.cancel,
-                show: true,
+            var currentSelection = [];
+            angular.copy(vm.userGroup.sections, currentSelection);
+            var sectionPicker = {
+                selection: currentSelection,
                 submit: function (model) {
-                    vm.sectionPicker.show = false;
-                    vm.sectionPicker = null;
+                    vm.userGroup.sections = model.selection;
+                    editorService.close();
                 },
-                close: function (oldModel) {
-                    if (oldModel.selection) {
-                        vm.userGroup.sections = oldModel.selection;
-                    }
-                    vm.sectionPicker.show = false;
-                    vm.sectionPicker = null;
+                close: function () {
+                    editorService.close();
                 }
             };
+            editorService.sectionPicker(sectionPicker);
         }
 
         function openContentPicker() {
-            vm.contentPicker = {
+            var contentPicker = {
                 title: vm.labels.selectContentStartNode,
-                view: "contentpicker",
+                section: "content",
+                treeAlias: "content",
                 hideSubmitButton: true,
                 hideHeader: false,
-                show: true,
                 submit: function (model) {
                     if (model.selection) {
                         vm.userGroup.contentStartNode = model.selection[0];
@@ -139,26 +130,23 @@
                             vm.userGroup.contentStartNode.icon = "icon-folder";
                         }
                     }
-                    vm.contentPicker.show = false;
-                    vm.contentPicker = null;
+                    editorService.close();
                 },
-                close: function (oldModel) {
-                    vm.contentPicker.show = false;
-                    vm.contentPicker = null;
+                close: function () {
+                    editorService.close();
                 }
             };
+            editorService.treePicker(contentPicker);
         }
 
         function openMediaPicker() {
-            vm.contentPicker = {
+            var mediaPicker = {
                 title: vm.labels.selectMediaStartNode,
-                view: "treepicker",
                 section: "media",
                 treeAlias: "media",
                 entityType: "media",
                 hideSubmitButton: true,
                 hideHeader: false,
-                show: true,
                 submit: function (model) {
                     if (model.selection) {
                         vm.userGroup.mediaStartNode = model.selection[0];
@@ -167,30 +155,29 @@
                             vm.userGroup.mediaStartNode.icon = "icon-folder";
                         }
                     }
-                    vm.contentPicker.show = false;
-                    vm.contentPicker = null;
+                    editorService.close();
                 },
-                close: function (oldModel) {
-                    vm.contentPicker.show = false;
-                    vm.contentPicker = null;
+                close: function () {
+                    editorService.close();
                 }
             };
+            editorService.treePicker(mediaPicker);
         }
 
         function openUserPicker() {
-            vm.userPicker = {
-                view: "userpicker",
-                selection: vm.userGroup.users,
-                show: true,
+            var currentSelection = [];
+            angular.copy(vm.userGroup.users, currentSelection);
+            var userPicker = {
+                selection: currentSelection,
                 submit: function (model) {
-                    vm.userPicker.show = false;
-                    vm.userPicker = null;
+                    vm.userGroup.users = model.selection;
+                    editorService.close();
                 },
-                close: function (oldModel) {
-                    vm.userPicker.show = false;
-                    vm.userPicker = null;
+                close: function () {
+                    editorService.close();
                 }
             };
+            editorService.userPicker(userPicker);
         }
 
         /**
@@ -216,11 +203,11 @@
         }
 
         function openGranularPermissionsPicker() {
-            vm.contentPicker = {
+            var contentPicker = {
                 title: vm.labels.selectNode,
-                view: "contentpicker",
+                section: "content",
+                treeAlias: "content",
                 hideSubmitButton: true,
-                show: true,
                 submit: function (model) {
                     if (model.selection) {
                         var node = model.selection[0];
@@ -232,11 +219,12 @@
                         setPermissionsForNode(node);
                     }
                 },
-                close: function (oldModel) {
-                    vm.contentPicker.show = false;
-                    vm.contentPicker = null;
+                close: function () {
+                    editorService.close();
                 }
             };
+            editorService.treePicker(contentPicker);
+            contentPickerOpen = true;
         }
 
         function setPermissionsForNode(node) {
@@ -247,9 +235,7 @@
             }
 
             vm.nodePermissions = {
-                view: "nodepermissions",
                 node: node,
-                show: true,
                 submit: function (model) {
 
                     if (model && model.node && model.node.permissions) {
@@ -269,20 +255,21 @@
                         }
                     }
 
-                    // close node permisssions overlay
-                    vm.nodePermissions.show = false;
-                    vm.nodePermissions = null;
-                    // close content picker overlay
-                    if(vm.contentPicker) {
-                        vm.contentPicker.show = false;
-                        vm.contentPicker = null;
+                    editorService.close();
+
+                    if(contentPickerOpen) {
+                        editorService.close();
+                        contentPickerOpen = false;
                     }
+
                 },
-                close: function (oldModel) {
-                    vm.nodePermissions.show = false;
-                    vm.nodePermissions = null;
+                close: function () {
+                    editorService.close();
                 }
             };
+
+            editorService.nodePermissions(vm.nodePermissions);
+
         }
 
         function removeSelectedItem(index, selection) {
@@ -303,8 +290,7 @@
             vm.breadcrumbs = [
                 {
                     "name": vm.labels.groups,
-                    "path": "/users/users/overview",
-                    "subView": "groups"
+                    "path": "/users/users/groups"
                 },
                 {
                     "name": vm.userGroup.name
@@ -314,7 +300,7 @@
 
         function setSectionIcon(sections) {
             angular.forEach(sections, function (section) {
-                section.icon = "icon-section " + section.cssclass;
+                section.icon = "icon-section";
             });
         }
 

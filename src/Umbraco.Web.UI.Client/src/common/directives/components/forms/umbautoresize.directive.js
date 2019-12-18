@@ -142,8 +142,8 @@ angular.module("umbraco.directives")
             });
 
             scope.$on('$destroy', function() {
-               element.unbind('keyup keydown keypress change', update);
-               element.unbind('blur', update(true));
+               element.off('keyup keydown keypress change', update);
+               element.off('blur', update(true));
                unbindModelWatcher();
 
                // clean up IE dom element

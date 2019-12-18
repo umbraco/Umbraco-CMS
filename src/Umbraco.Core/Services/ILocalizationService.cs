@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
 
@@ -86,7 +86,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="dictionaryItem"><see cref="IDictionaryItem"/> to save</param>
         /// <param name="userId">Optional id of the user saving the dictionary item</param>
-        void Save(IDictionaryItem dictionaryItem, int userId = 0);
+        void Save(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Deletes a <see cref="IDictionaryItem"/> object and its related translations
@@ -94,7 +94,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="dictionaryItem"><see cref="IDictionaryItem"/> to delete</param>
         /// <param name="userId">Optional id of the user deleting the dictionary item</param>
-        void Delete(IDictionaryItem dictionaryItem, int userId = 0);
+        void Delete(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Gets a <see cref="ILanguage"/> by its id
@@ -102,20 +102,45 @@ namespace Umbraco.Core.Services
         /// <param name="id">Id of the <see cref="ILanguage"/></param>
         /// <returns><see cref="ILanguage"/></returns>
         ILanguage GetLanguageById(int id);
-
-        /// <summary>
-        /// Gets a <see cref="ILanguage"/> by its culture code
-        /// </summary>
-        /// <param name="cultureName">Culture Code - also refered to as the Friendly name</param>
-        /// <returns><see cref="ILanguage"/></returns>
-        ILanguage GetLanguageByCultureCode(string cultureName);
-
+        
         /// <summary>
         /// Gets a <see cref="Language"/> by its iso code
         /// </summary>
         /// <param name="isoCode">Iso Code of the language (ie. en-US)</param>
         /// <returns><see cref="Language"/></returns>
         ILanguage GetLanguageByIsoCode(string isoCode);
+
+        /// <summary>
+        /// Gets a language identifier from its ISO code.
+        /// </summary>
+        /// <remarks>
+        /// <para>This can be optimized and bypass all deep cloning.</para>
+        /// </remarks>
+        int? GetLanguageIdByIsoCode(string isoCode);
+
+        /// <summary>
+        /// Gets a language ISO code from its identifier.
+        /// </summary>
+        /// <remarks>
+        /// <para>This can be optimized and bypass all deep cloning.</para>
+        /// </remarks>
+        string GetLanguageIsoCodeById(int id);
+
+        /// <summary>
+        /// Gets the default language ISO code.
+        /// </summary>
+        /// <remarks>
+        /// <para>This can be optimized and bypass all deep cloning.</para>
+        /// </remarks>
+        string GetDefaultLanguageIsoCode();
+
+        /// <summary>
+        /// Gets the default language identifier.
+        /// </summary>
+        /// <remarks>
+        /// <para>This can be optimized and bypass all deep cloning.</para>
+        /// </remarks>
+        int? GetDefaultLanguageId();
 
         /// <summary>
         /// Gets all available languages
@@ -128,14 +153,14 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="language"><see cref="ILanguage"/> to save</param>
         /// <param name="userId">Optional id of the user saving the language</param>
-        void Save(ILanguage language, int userId = 0);
+        void Save(ILanguage language, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Deletes a <see cref="ILanguage"/> by removing it and its usages from the db
         /// </summary>
         /// <param name="language"><see cref="ILanguage"/> to delete</param>
         /// <param name="userId">Optional id of the user deleting the language</param>
-        void Delete(ILanguage language, int userId = 0);
+        void Delete(ILanguage language, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Gets the full dictionary key map.

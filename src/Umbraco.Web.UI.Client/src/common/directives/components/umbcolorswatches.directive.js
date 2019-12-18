@@ -18,6 +18,7 @@ Use this directive to generate color swatches to pick from.
 @param {string} size (<code>attribute</code>): The size (s, m).
 @param {string} useLabel (<code>attribute</code>): Specify if labels should be used.
 @param {string} useColorClass (<code>attribute</code>): Specify if color values are css classes.
+@param {string} colorClassNamePrefix (<code>attribute</code>): Specify the prefix used for the class for each color (defaults to "btn").
 @param {function} onSelect (<code>expression</code>): Callback function when the item is selected.
 **/
 
@@ -32,15 +33,32 @@ Use this directive to generate color swatches to pick from.
             if (angular.isUndefined(scope.useColorClass)) {
                 scope.useColorClass = false;
             }
-            
-            scope.setColor = function (color) {
-                //scope.selectedColor({color: color });
-                scope.selectedColor = color;
 
+            // Set default to "btn" if not defined
+            if (angular.isUndefined(scope.colorClassNamePrefix)) {
+                scope.colorClassNamePrefix = "btn";
+            }
+            
+            scope.setColor = function (color, $index, $event) {
                 if (scope.onSelect) {
-                    scope.onSelect(color);
+                    // did the value change?
+                    if (scope.selectedColor != null && scope.selectedColor.value === color.value) {
+                        // User clicked the currently selected color
+                        // to remove the selection, they don't want
+                        // to select any color after all.
+                        // Unselect the color
+                        color = null;
+                    }
+
+                    scope.selectedColor = color;
+                    scope.onSelect({color: color, $index: $index, $event: $event});
+                    $event.stopPropagation();
                 }
             };
+
+            scope.isSelectedColor = function (color) {
+                return scope.selectedColor && color.value === scope.selectedColor.value;
+            }
         }
 
         var directive = {
@@ -54,7 +72,8 @@ Use this directive to generate color swatches to pick from.
                 selectedColor: '=',
                 onSelect: '&',
                 useLabel: '=',
-                useColorClass: '=?'
+                useColorClass: '=?',
+                colorClassNamePrefix: '@?'
             },
             link: link
         };

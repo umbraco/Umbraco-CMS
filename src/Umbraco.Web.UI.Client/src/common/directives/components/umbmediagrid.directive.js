@@ -118,19 +118,20 @@ Use this directive to generate a thumbnail grid of media items.
                     var item = scope.items[i];
                     setItemData(item);
                     setOriginalSize(item, itemMaxHeight);
-
+                    
+                    item.selectable = getSelectableState(item);
+                    
                     // remove non images when onlyImages is set to true
-                    if(scope.onlyImages === "true" && !item.isFolder && !item.thumbnail){
+                    if (scope.onlyImages === "true" && !item.isFolder && !item.thumbnail){
                         scope.items.splice(i, 1);
                         i--;
                     }
-
 
                     // If subfolder search is not enabled remove the media items that's not needed
                     // Make sure that includeSubFolder is not undefined since the directive is used
                     // in contexts where it should not be used. Currently only used when we trigger
                     // a media picker
-                    if(scope.includeSubFolders !== undefined){
+                    if (scope.includeSubFolders !== undefined) {
                         if (scope.includeSubFolders !== 'true') {
                             if (item.parentId !== parseInt(scope.currentFolderId)) {
                                 scope.items.splice(i, 1);
@@ -140,27 +141,27 @@ Use this directive to generate a thumbnail grid of media items.
                     }
 
                 }
-
+                
                 if (scope.items.length > 0) {
                     setFlexValues(scope.items);
                 }
-
             }
 
             function setItemData(item) {
 
                 // check if item is a folder
-                if(item.image) {
+                if (item.image) {
                     // if is has an image path, it is not a folder
                     item.isFolder = false;
                 } else {
                     item.isFolder = !mediaHelper.hasFilePropertyType(item);
                 }
 
-                if (!item.isFolder) {
+                // if it's not a folder, get the thumbnail, extension etc. if we haven't already
+                if (!item.isFolder && !item.thumbnail) {
 
                     // handle entity
-                    if(item.image) {
+                    if (item.image) {
                         item.thumbnail = mediaHelper.resolveFileFromEntity(item, true);
                         item.extension = mediaHelper.getFileExtension(item.image);
                     // handle full media object
@@ -186,6 +187,25 @@ Use this directive to generate a thumbnail grid of media items.
 
                     }
                 }
+            }
+            
+            /**
+            * Returns wether a item should be selectable or not.
+            */
+            function getSelectableState(item) {
+                if (item.filtered) {
+                    return false;
+                }
+
+                // check if item is a folder or image
+                if (item.isFolder === true) {
+                    return scope.disableFolderSelect !== "true" && scope.onlyImages !== "true";
+                } else {
+                    return scope.onlyFolders !== "true";
+                }
+                
+                return false;
+                
             }
 
             function setOriginalSize(item, maxHeight) {
@@ -235,7 +255,7 @@ Use this directive to generate a thumbnail grid of media items.
                 }
 
             }
-
+            
             function setFlexValues(mediaItems) {
 
                 var flexSortArray = mediaItems;
@@ -270,11 +290,9 @@ Use this directive to generate a thumbnail grid of media items.
                     };
 
                     mediaItem.flexStyle = flexStyle;
-
                 }
-
             }
-
+            
             scope.clickItem = function(item, $event, $index) {
                 if (scope.onClick) {
                     scope.onClick(item, $event, $index);
@@ -292,6 +310,13 @@ Use this directive to generate a thumbnail grid of media items.
             scope.hoverItemDetails = function(item, $event, hover) {
                 if (scope.onDetailsHover) {
                     scope.onDetailsHover(item, $event, hover);
+                }
+            };
+
+            scope.clickEdit = function(item, $event) {
+                if (scope.onClickEdit) {
+                    scope.onClickEdit({"item": item})
+                    $event.stopPropagation();
                 }
             };
 
@@ -316,12 +341,16 @@ Use this directive to generate a thumbnail grid of media items.
                 onDetailsHover: "=",
                 onClick: '=',
                 onClickName: "=",
+                onClickEdit: "&?",
+                allowOnClickEdit: "@?",
                 filterBy: "=",
                 itemMaxWidth: "@",
                 itemMaxHeight: "@",
                 itemMinWidth: "@",
                 itemMinHeight: "@",
+                disableFolderSelect: "@",
                 onlyImages: "@",
+                onlyFolders: "@",
                 includeSubFolders: "@",
                 currentFolderId: "@"
             },

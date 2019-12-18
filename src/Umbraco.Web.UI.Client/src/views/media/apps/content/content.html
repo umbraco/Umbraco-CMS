@@ -1,0 +1,16 @@
+<div class="form-horizontal" ng-controller="Umbraco.Editors.Media.Apps.ContentController as vm">
+    <div class="umb-group-panel" data-element="group-{{group.alias}}" ng-repeat="group in content.tabs | filter: { hide : '!' + true } track by group.label">
+
+        <div class="umb-group-panel__header">
+            <div>{{ group.label }}</div>
+        </div>
+
+        <div class="umb-group-panel__content">
+            <umb-property data-element="property-{{property.alias}}" ng-repeat="property in group.properties" property="property">
+                <umb-property-editor model="property"></umb-property-editor>
+            </umb-property>
+        </div>
+
+    </div>
+
+</div>

@@ -11,22 +11,20 @@
 
             <div ng-show="success">
                 <div class="alert alert-success">
-                    <strong>{{currentNode.name}}</strong>
+                    <strong>{{source.name}}</strong> was copied to
                     <localize key="actions_wasCopiedTo">was copied to</localize>
                     <strong>{{target.name}}</strong>
                 </div>
-                <button class="btn btn-primary" ng-click="nav.hideDialog()">Ok</button>
+                <button class="btn btn-primary" ng-click="closeDialog()">Ok</button>
             </div>
 
             <p class="abstract" ng-hide="success">
                 <localize key="actions_chooseWhereToCopy">Choose where to copy</localize>
-                <strong>{{currentNode.name}}</strong>
+                <strong>{{source.name}}</strong>
                 <localize key="actions_toInTheTreeStructureBelow">to in the tree structure below</localize>
             </p>
 
-            <div class="umb-loader-wrapper" ng-show="busy">
-                <div class="umb-loader"></div>
-            </div>
+            <umb-loader ng-show="busy"></umb-loader>
 
             <div ng-hide="success">
 
@@ -54,7 +52,8 @@
                             hideheader="{{treeModel.hideHeader}}"
                             hideoptions="true"
                             isdialog="true"
-                            eventhandler="dialogTreeEventHandler"
+                            api="dialogTreeApi"
+                            on-init="onTreeInit()"
                             enablelistviewexpand="true"
                             enablecheckboxes="true">
                         </umb-tree>
@@ -86,7 +85,7 @@
     </div>
 
     <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="success">
-        <a class="btn btn-link" ng-click="nav.hideDialog()" ng-show="!busy">
+        <a class="btn btn-link" ng-click="closeDialog()" ng-show="!busy">
             <localize key="general_cancel">Cancel</localize>
         </a>
         <button class="btn btn-primary" ng-click="copy()" ng-disabled="busy || !target">

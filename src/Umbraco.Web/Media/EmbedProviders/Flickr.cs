@@ -1,25 +1,31 @@
-using System;
-using System.ComponentModel;
+﻿using System.Collections.Generic;
 using System.Web;
 
 namespace Umbraco.Web.Media.EmbedProviders
 {
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [Obsolete("This is no longer used and will be removed from the codebase in the future, for Flickr, use the Umbraco.Web.Media.EmbedProviders.OEmbedPhoto provider")]
-    public class Flickr : AbstractOEmbedProvider
+    public class Flickr : EmbedProviderBase
     {
-        public override string GetMarkup(string url, int maxWidth, int maxHeight)
+        public override string ApiEndpoint => "http://www.flickr.com/services/oembed/";
+
+        public override string[] UrlSchemeRegex => new string[]
         {
-            var flickrUrl = BuildFullUrl(url, maxWidth, maxHeight);
-            var doc = GetXmlResponse(flickrUrl);
+            @"flickr.com\/photos\/*",
+            @"flic.kr\/p\/*"
+        };
 
-            string imageUrl = doc.SelectSingleNode("/oembed/url").InnerText;
-            string imageWidth = doc.SelectSingleNode("/oembed/width").InnerText;
-            string imageHeight = doc.SelectSingleNode("/oembed/height").InnerText;
-            string imageTitle = doc.SelectSingleNode("/oembed/title").InnerText;
+        public override Dictionary<string, string> RequestParams => new Dictionary<string, string>();
+                
+        public override string GetMarkup(string url, int maxWidth = 0, int maxHeight = 0)
+        {
+            var requestUrl = base.GetEmbedProviderUrl(url, maxWidth, maxHeight);
+            var xmlDocument = base.GetXmlResponse(requestUrl);
 
-            return string.Format("<img src=\"{0}\" width\"{1}\" height=\"{2}\" alt=\"{3}\" />",
-                imageUrl, imageWidth, imageHeight, HttpUtility.HtmlEncode(imageTitle));
-        }
+            var imageUrl = GetXmlProperty(xmlDocument, "/oembed/url");
+            var imageWidth = GetXmlProperty(xmlDocument, "/oembed/width");
+            var imageHeight = GetXmlProperty(xmlDocument, "/oembed/height");
+            var imageTitle = GetXmlProperty(xmlDocument, "/oembed/title");
+
+            return string.Format("<img src=\"{0}\" width=\"{1}\" height=\"{2}\" alt=\"{3}\" />", imageUrl, imageWidth, imageHeight, HttpUtility.HtmlEncode(imageTitle));
+        }        
     }
 }

@@ -21,20 +21,6 @@
 @white:                 #FFF;
 @grayIcon:              #9E9E9E;
 
-// Accent colors
-// -------------------------
-
-
-
-@blue:                  #2E8AEA;
-@blueDark:              #0064CD;
-@blueLight:             #ADD8E6;
-@green:                 #46A546;
-@red:                   #9D261D;
-@yellow:                #FFC40D;
-@orange:                #DF7F48;
-@pink:                  #C3325F;
-
 
 // Colors
 // -------------------------
@@ -56,22 +42,22 @@
 
 // UI Colors
 @red-d1:                #F02E28;
-@red:                   #FE3E39;
-@red-l1:			    #FE6561;
+@red:                   #D42054;// updated 2019
+@red-l1:			    #e22c60;// updated 2019
 @red-l2:			    #FE8B88;
 @red-l3:			    #FFB2B0;
 @red-washed:		    #FFECEB;
 
 @yellow-d2:             #F0AC00;
 @yellow-d1:             #FFC011;
-@yellow:                #FFCE38;
+@yellow:                #fad634;// updated 2019
 @yellow-l1:			    #FFD861;
 @yellow-l2:			    #FFE28A;
 @yellow-l3:			    #FFECB0;
 @yellow-washed:		    #FFFAEB;
 
 @green-d1:              #1FB572;
-@green:                 #35C786;
+@green:                 #2bc37c;// updated 2019
 @green-l1:			    #4ECF95;
 @green-l2:			    #79E1B2;
 @green-l3:			    #A6F0CF;
@@ -88,6 +74,13 @@
 @gray-8:                #D8D7D9;
 @gray-9:                #E9E9EB;
 @gray-10:               #F3F3F5;
+@gray-11:               #F6F6F7;
+
+@sand-1:                #DED4CF;// added 2019
+@sand-2:                #EBDED6;// added 2019
+@sand-5:                #F3ECE8;// added 2019
+@sand-6:                #F6F1EF;// added 2019
+@sand-7:                #F9F7F5;// added 2019
 
 
 // Additional Icon Colours
@@ -109,90 +102,106 @@
 @indigoIcon:            #3F51B5;
 
 
+// Brand colors
+// -------------------------
+
+//@blueLight:               #4f89de;
+@blue:                  #2E8AEA;
+@blueMid:               #2152A3;// updated 2019
+@blueDark:              #3544b1;// updated 2019
+@blueExtraDark:         #1b264f;// added 2019
+@blueLight:             #ADD8E6;
+@blueNight:             #162335;// added 2019
+//@orange:              #f79c37;// updated 2019
+@pink:                  #D93F4C;// #C3325F;// update 2019
+@pinkLight:             #f5c1bc;// added 2019
+@pinkRedLight:          #ff8a89;// added 2019
+@brown:                 #9d8057;// added 2019
+@brownLight:            #e4e0dd;// added 2019
+@brownGrayLight:        #f6f4f4;// added 2019
+@brownGrayExtraLight:   #faf9f9;// added 2019
+@orange:                #ff9412;// added 2019
+
+//@u-greyLight:           #f2ebe6;// added 2019
+@u-white:               #f9f7f4;// added 2019
+@u-black:               @black;// added 2019
 
 
+// UI colors
+// -------------------------
 
-.red{color: @red;}
-.blue{color: @blue;}
-.black{color: @black;}
-.turquoise{color: @turquoise;}
-.turquoise-d1{color: @turquoise-d1;}
+@ui-option-type:        @blueExtraDark;
+@ui-option-type-hover:  @blueMid;
+@ui-option:             @white;
+@ui-option-hover:       @sand-7;
+
+@ui-option-disabled-type:        @gray-6;
+@ui-option-disabled-type-hover:  @gray-5;
+@ui-option-disabled-hover:       @sand-7;
+
+//@ui-active:           #346ab3;
+@ui-active:             @pinkLight;
+@ui-active-blur:        @brownLight;
+@ui-active-type:        @blueExtraDark;
+@ui-active-type-hover:  @blueMid;
+
+@ui-selected:           @sand-5;
+@ui-selected-hover:     ligthen(@sand-5, 10);
+@ui-selected-type:           @blueExtraDark;
+@ui-selected-type-hover:     @blueMid;
+@ui-selected-border:           @pinkLight;
+@ui-selected-border-hover:     darken(@pinkLight, 10);
+
+@ui-light-border:           @pinkLight;
+@ui-light-type:             @gray-4;
+@ui-light-type-hover:       @blueMid;
+
+@ui-light-active-border:      @pinkLight;
+@ui-light-active-type:        @blueExtraDark;
+@ui-light-active-type-hover:  @blueMid;
 
 
-//icon colors for tree icons
-.color-red, .color-red i{color: @red-d1 !important;}
-.color-blue, .color-blue i{color: @turquoise-d1 !important;}
-.color-orange, .color-orange i{color: @orange !important;}
-.color-green, .color-green i{color: @green-d1 !important;}
-.color-yellow, .color-yellow i{color: @yellowIcon !important;}
+@ui-action:             @white;
+@ui-action-hover:       @sand-7;
+@ui-action-type:             @blueExtraDark;
+@ui-action-type-hover:       @blueMid;
+@ui-action-border:             @blueExtraDark;
+@ui-action-border-hover:       @blueMid;
 
-/* Colors based on https://zavoloklom.github.io/material-design-color-palette/colors.html */
-.btn-color-black {background-color: @black;}
-.color-black i { color: @black;}
+@ui-action-discreet:              @white;
+@ui-action-discreet-hover:        @sand-7;
+@ui-action-discreet-type:         @blueExtraDark;
+@ui-action-discreet-type-hover:   @blueMid;
+@ui-action-discreet-border:         @gray-7;
+@ui-action-discreet-border-hover:   @blueMid;
 
+@type-white:                      @white;
+@type-black:                      @blueNight;
 
-.btn-color-blue-grey {background-color: @blueGrey;}
-.color-blue-grey, .color-blue-grey i { color: @blueGrey !important;}
+@ui-btn:                        @blueExtraDark;
+@ui-btn-hover:                  @blueMid;
+@ui-btn-type:                   @white;
 
+@ui-btn-positive:               @green;
+@ui-btn-positive-hover:         lighten(@green, 6%);
+@ui-btn-positive-type:          @white;
 
-.btn-color-grey{background-color: @grayIcon;}
-.color-grey, .color-grey i { color: @grayIcon !important; }
+@ui-btn-negative:               @red;
+@ui-btn-negative-hover:         @red;
 
-
-.btn-color-brown{background-color: @brownIcon;}
-.color-brown, .color-brown i { color: @brownIcon !important; }
-
-.btn-color-blue{background-color: @blueIcon;}
-.color-blue, .color-blue i { color: @blueIcon !important; }
-
-.btn-color-light-blue{background-color: @lightBlueIcon;}
-.color-light-blue, .color-light-blue i {color: @lightBlueIcon !important;}
-
-.btn-color-cyan{background-color: @cyanIcon;}
-.color-cyan, .color-cyan i { color: @cyanIcon !important; }
-
-.btn-color-green{background-color: @greenIcon;}
-.color-green, .color-green i { color: @greenIcon !important; }
-
-.btn-color-light-green{background-color: @lightGreenIcon;}
-.color-light-green, .color-light-green i {color: @lightGreenIcon !important; }
-
-.btn-color-lime{background-color: @limeIcon;}
-.color-lime, .color-lime i { color: @limeIcon !important; }
-
-.btn-color-yellow{background-color: @yellowIcon;}
-.color-yellow, .color-yellow i { color: @yellowIcon !important; }
-
-.btn-color-amber{background-color: @amberIcon;}
-.color-amber, .color-amber i { color: @amberIcon !important; }
-
-.btn-color-orange{background-color: @orangeIcon;}
-.color-orange, .color-orange i { color: @orangeIcon !important; }
-
-.btn-color-deep-orange{background-color: @deepOrangeIcon;}
-.color-deep-orange, .color-deep-orange i { color: @deepOrangeIcon !important; }
-
-.btn-color-red{background-color: @redIcon;}
-.color-red, .color-red i { color: @redIcon !important; }
-
-.btn-color-pink{background-color: @pinkIcon;}
-.color-pink, .color-pink i { color: @pinkIcon !important; }
-
-.btn-color-purple{background-color: @purpleIcon;}
-.color-purple, .color-purple i { color: @purpleIcon !important; }
-
-.btn-color-deep-purple{background-color: @deepPurpleIcon;}
-.color-deep-purple, .color-deep-purple i { color: @deepPurpleIcon !important; }
-
-.btn-color-indigo{background-color: @indigoIcon;}
-.color-indigo, .color-indigo i { color: @indigoIcon !important; }
+@ui-icon:             @blueNight;
+@ui-icon-hover:       @blueMid;
 
 
 
 // Scaffolding
 // -------------------------
-@bodyBackground:        @white;
-@textColor:             @gray-2;
+@appHeaderHeight:       55px;
+@bodyBackground:        @gray-10;
+@textColor:             @black;
+
+@editorHeaderHeight:    70px;
+@editorFooterHeight:    50px;
 
 
 // Links
@@ -238,10 +247,10 @@
 
 // Tables
 // -------------------------
-@tableBackground:                   transparent; // overall background-color
+@tableBackground:                   @white; // overall background-color
 @tableBackgroundAccent:             @gray-10; // for striping
 @tableBackgroundHover:              @gray-10; // for hover
-@tableBorder:                       @gray-8; // table and cell border
+@tableBorder:                       @gray-9; // table and cell border
 
 // Buttons
 // -------------------------
@@ -249,19 +258,27 @@
 @btnBackgroundHighlight:            @gray-9;
 @btnBorder:                         @gray-9;
 
-@btnPrimaryBackground:              @green;
-@btnPrimaryBackgroundHighlight:     @green;
+@btnPrimaryBackground:              @ui-btn-positive;
+@btnPrimaryBackgroundHighlight:     @ui-btn-positive-hover;
 
-@btnInfoBackground:                 @purple-l1;
-@btnInfoBackgroundHighlight:        @purple-l1;
+@btnInfoType:                       @ui-btn-type;// updated 2019
+@btnInfoTypeHover:                  @ui-btn-type;// updated 2019
+@btnInfoBackground:                 @ui-btn;// updated 2019
+@btnInfoBackgroundHighlight:        @ui-btn-hover;// updated 2019
 
-@btnSuccessBackground:              @green;
-@btnSuccessBackgroundHighlight:     @green;
+@btnWhiteType:                      @blueExtraDark;// updated 2019
+@btnWhiteTypeHover:                 @ui-action-type-hover;// updated 2019
+@btnWhiteBackground:                @white;// updated 2019
+@btnWhiteBackgroundHighlight:       @white;// updated 2019
 
-@btnWarningBackground:              @red-l1;
-@btnWarningBackgroundHighlight:     @red-l1;
+@btnSuccessType:                    @ui-btn-positive-type;// updated 2019
+@btnSuccessBackground:              @ui-btn-positive;// updated 2019
+@btnSuccessBackgroundHighlight:     @ui-btn-positive-hover;// updated 2019
 
-@btnDangerBackground:               @red-l1;
+@btnWarningBackground:              @orange;
+@btnWarningBackgroundHighlight:     lighten(@orange, 10%);
+
+@btnDangerBackground:               @red;
 @btnDangerBackgroundHighlight:      @red-l1;
 
 @btnInverseBackground:              @gray-2;
@@ -274,7 +291,9 @@
 // Forms
 // -------------------------
 @inputBackground:               @white;
-@inputBorder:                   @gray-7;
+@inputBorder:                   @gray-8;
+@inputBorderFocus:              @gray-7;
+@inputBorderTabFocus:           @blueExtraDark;
 @inputBorderRadius:             0;
 @inputDisabledBackground:       @gray-10;
 @formActionsBackground:         @gray-9;
@@ -290,7 +309,8 @@
 // Dropdowns
 // -------------------------
 @dropdownBackground:            @white;
-@dropdownBorder:                @gray-8;
+@dropdownBorder:                none;
+@dropdownBorderRadius:          @baseBorderRadius;
 @dropdownDividerTop:            @gray-8;
 @dropdownDividerBottom:         @white;
 
@@ -314,15 +334,21 @@
 // -------------------------
 // Used for a bird's eye view of components dependent on the z-axis
 // Try to avoid customizing these :)
+@zIndexEditor:             100;
+@zIndexTree:               100;
 @zindexDropdown:          1000;
 @zindexPopover:           1010;
 @zindexTooltip:           1030;
 @zindexFixedNavbar:       1030;
 @zindexModalBackdrop:     1040;
 @zindexModal:             1050;
-
+@zindexSearchBox:         8000;
 @zindexUmbOverlay:        7500;
 @zindexOverlayBackdrop:   2000;
+
+// these are used for the tour which should be on top of everything else
+@zindexTourBackdrop:      9999;
+@zindexTourModal:        10000;
 
 // Sticky bar has a z-index of "500", which is set from javascript in directive
 // so set z-index of cropper should be lower to be behind sticky bar.
@@ -407,14 +433,14 @@
 @heroUnitLeadColor:               inherit;
 
 
-// alerts
+// Alerts
 // -------------------------
 @warningText:             @white;
 @warningBackground:       @yellow-d2;
 @warningBorder:           transparent;
 
 @errorText:               @white;
-@errorBackground:         @red-d1;
+@errorBackground:         @red;
 @errorBorder:             transparent;
 
 @successText:             @white;

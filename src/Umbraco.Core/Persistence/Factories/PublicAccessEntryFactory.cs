@@ -1,15 +1,14 @@
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class PublicAccessEntryFactory
+    internal static class PublicAccessEntryFactory
     {
-        public PublicAccessEntry BuildEntity(AccessDto dto)
+        public static PublicAccessEntry BuildEntity(AccessDto dto)
         {
-            var entity = new PublicAccessEntry(dto.Id, dto.NodeId, dto.LoginNodeId, dto.NoAccessNodeId, 
+            var entity = new PublicAccessEntry(dto.Id, dto.NodeId, dto.LoginNodeId, dto.NoAccessNodeId,
                 dto.Rules.Select(x => new PublicAccessRule(x.Id, x.AccessId)
                 {
                     RuleValue = x.RuleValue,
@@ -22,13 +21,12 @@ namespace Umbraco.Core.Persistence.Factories
                 UpdateDate = dto.UpdateDate
             };
 
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
+            // reset dirty initial properties (U4-1946)
             entity.ResetDirtyProperties(false);
             return entity;
         }
 
-        public AccessDto BuildDto(PublicAccessEntry entity)
+        public static AccessDto BuildDto(PublicAccessEntry entity)
         {
             var dto = new AccessDto
             {

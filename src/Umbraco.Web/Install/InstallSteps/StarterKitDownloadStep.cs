@@ -1,12 +1,14 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
-using umbraco.cms.businesslogic.packager;
-using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Models.Packaging;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Install.Models;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
@@ -15,26 +17,27 @@ namespace Umbraco.Web.Install.InstallSteps
         PerformsAppRestart = true)]
     internal class StarterKitDownloadStep : InstallSetupStep<Guid?>
     {
-        private readonly ApplicationContext _applicationContext;
-        private readonly WebSecurity _security;
-        private readonly HttpContextBase _httpContext;
+        private readonly InstallHelper _installHelper;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IContentService _contentService;
+        private readonly IPackagingService _packageService;
 
-        public StarterKitDownloadStep(ApplicationContext applicationContext, WebSecurity security, HttpContextBase httpContext)
+        public StarterKitDownloadStep(IContentService contentService, IPackagingService packageService, InstallHelper installHelper, IUmbracoContextAccessor umbracoContextAccessor)
         {
-            _applicationContext = applicationContext;
-            _security = security;
-            _httpContext = httpContext;
+            _installHelper = installHelper;
+            _umbracoContextAccessor = umbracoContextAccessor;
+            _contentService = contentService;
+            _packageService = packageService;
         }
 
-        private const string RepoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
+        //private const string RepoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
 
-        public override InstallSetupResult Execute(Guid? starterKitId)
+        public override async Task<InstallSetupResult> ExecuteAsync(Guid? starterKitId)
         {
             //if there is no value assigned then use the default starter kit
             if (starterKitId.HasValue == false)
             {
-                var installHelper = new InstallHelper(UmbracoContext.Current);
-                var starterKits = installHelper.GetStarterKits().FirstOrDefault();
+                var starterKits = _installHelper.GetStarterKits().FirstOrDefault();
                 if (starterKits != null)
                     starterKitId = starterKits.Id;
                 else
@@ -47,46 +50,39 @@ namespace Umbraco.Web.Install.InstallSteps
                 return null;
             }
 
-            var result = DownloadPackageFiles(starterKitId.Value);
+            var (packageFile, packageId) = await DownloadPackageFilesAsync(starterKitId.Value);
 
-            _applicationContext.RestartApplicationPool(_httpContext);
+            UmbracoApplication.Restart();
 
             return new InstallSetupResult(new Dictionary<string, object>
             {
-                {"manifestId", result.Item2},
-                {"packageFile", result.Item1}
+                {"packageId", packageId},
+                {"packageFile", packageFile}
             });
         }
 
-        private Tuple<string, int> DownloadPackageFiles(Guid kitGuid)
-        {          
-            var installer = new Installer();
-
+        private async Task<(string packageFile, int packageId)> DownloadPackageFilesAsync(Guid kitGuid)
+        {
             //Go get the package file from the package repo
-            var packageFile = _applicationContext.Services.PackagingService.FetchPackageFile(kitGuid, UmbracoVersion.Current, _security.GetUserId());
+            var packageFile = await _packageService.FetchPackageFileAsync(kitGuid, UmbracoVersion.Current, _umbracoContextAccessor.UmbracoContext.Security.GetUserId().ResultOr(0));
+            if (packageFile == null) throw new InvalidOperationException("Could not fetch package file " + kitGuid);
 
-            var tempFile = installer.Import(packageFile);
-            installer.LoadConfig(tempFile);
-            var pId = installer.CreateManifest(tempFile, kitGuid.ToString(), RepoGuid);
+            //add an entry to the installedPackages.config
+            var compiledPackage = _packageService.GetCompiledPackageInfo(packageFile);
+            var packageDefinition = PackageDefinition.FromCompiledPackage(compiledPackage);
+            packageDefinition.PackagePath = packageFile.FullName;
 
-            InstallPackageFiles(pId, tempFile);
+            _packageService.SaveInstalledPackage(packageDefinition);
 
-            return new Tuple<string, int>(tempFile, pId);
+            _packageService.InstallCompiledPackageFiles(packageDefinition, packageFile, _umbracoContextAccessor.UmbracoContext.Security.GetUserId().ResultOr(-1));
+
+            return (compiledPackage.PackageFile.Name, packageDefinition.Id);
         }
 
-        private void InstallPackageFiles(int manifestId, string packageFile)
-        {
-            packageFile = HttpUtility.UrlDecode(packageFile);
-            var installer = new Installer();
-            installer.LoadConfig(packageFile);
-            installer.InstallFiles(manifestId, packageFile);
-
-        }
-
-        public override string View
-        {
-            get { return (InstalledPackage.GetAllInstalledPackages().Count > 0) ? string.Empty : base.View; }
-        }
+        /// <summary>
+        /// Don't show the view if there's already packages installed
+        /// </summary>
+        public override string View => _packageService.GetAllInstalledPackages().Any() ? string.Empty : base.View;
 
         public override bool RequiresExecution(Guid? model)
         {
@@ -96,10 +92,11 @@ namespace Umbraco.Web.Install.InstallSteps
                 return false;
             }
 
-            if (InstalledPackage.GetAllInstalledPackages().Count > 0)
+            //Don't continue if there's already packages installed
+            if (_packageService.GetAllInstalledPackages().Any())
                 return false;
 
-            if (_applicationContext.Services.ContentService.GetRootContent().Any())
+            if (_contentService.GetRootContent().Any())
                 return false;
 
             return true;

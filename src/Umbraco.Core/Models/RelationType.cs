@@ -1,8 +1,6 @@
-using System;
-using System.Reflection;
+﻿using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
@@ -11,7 +9,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class RelationType : Entity, IAggregateRoot, IRelationType
+    public class RelationType : EntityBase, IRelationType
     {
         private string _name;
         private string _alias;
@@ -19,31 +17,24 @@ namespace Umbraco.Core.Models
         private Guid _parentObjectType;
         private Guid _childObjectType;
 
-        public RelationType(Guid childObjectType, Guid parentObjectType, string @alias)
+        public RelationType(Guid childObjectType, Guid parentObjectType, string alias)
         {
-            Mandate.ParameterNotNullOrEmpty(@alias, "alias");
+            if (alias == null) throw new ArgumentNullException(nameof(alias));
+            if (string.IsNullOrWhiteSpace(alias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(alias));
+
             _childObjectType = childObjectType;
             _parentObjectType = parentObjectType;
             _alias = alias;
             Name = _alias;
         }
 
-        public RelationType(Guid childObjectType, Guid parentObjectType, string @alias, string name)
-            :this(childObjectType, parentObjectType, @alias)
+        public RelationType(Guid childObjectType, Guid parentObjectType, string alias, string name)
+            : this(childObjectType, parentObjectType, alias)
         {
-            Mandate.ParameterNotNullOrEmpty(name, "name");
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
+
             Name = name;
-        }
-
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<RelationType, string>(x => x.Name);
-            public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<RelationType, string>(x => x.Alias);
-            public readonly PropertyInfo IsBidirectionalSelector = ExpressionHelper.GetPropertyInfo<RelationType, bool>(x => x.IsBidirectional);
-            public readonly PropertyInfo ParentObjectTypeSelector = ExpressionHelper.GetPropertyInfo<RelationType, Guid>(x => x.ParentObjectType);
-            public readonly PropertyInfo ChildObjectTypeSelector = ExpressionHelper.GetPropertyInfo<RelationType, Guid>(x => x.ChildObjectType);
         }
 
         /// <summary>
@@ -52,8 +43,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public string Name
         {
-            get { return _name; }
-            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
+            get => _name;
+            set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
         }
 
         /// <summary>
@@ -62,8 +53,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public string Alias
         {
-            get { return _alias; }
-            set { SetPropertyValueAndDetectChanges(value, ref _alias, Ps.Value.AliasSelector); }
+            get => _alias;
+            set => SetPropertyValueAndDetectChanges(value, ref _alias, nameof(Alias));
         }
 
         /// <summary>
@@ -72,8 +63,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public bool IsBidirectional
         {
-            get { return _isBidrectional; }
-            set { SetPropertyValueAndDetectChanges(value, ref _isBidrectional, Ps.Value.IsBidirectionalSelector); }
+            get => _isBidrectional;
+            set => SetPropertyValueAndDetectChanges(value, ref _isBidrectional, nameof(IsBidirectional));
         }
 
         /// <summary>
@@ -83,8 +74,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public Guid ParentObjectType
         {
-            get { return _parentObjectType; }
-            set { SetPropertyValueAndDetectChanges(value, ref _parentObjectType, Ps.Value.ParentObjectTypeSelector); }
+            get => _parentObjectType;
+            set => SetPropertyValueAndDetectChanges(value, ref _parentObjectType, nameof(ParentObjectType));
         }
 
         /// <summary>
@@ -94,8 +85,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public Guid ChildObjectType
         {
-            get { return _childObjectType; }
-            set { SetPropertyValueAndDetectChanges(value, ref _childObjectType, Ps.Value.ChildObjectTypeSelector); }
+            get => _childObjectType;
+            set => SetPropertyValueAndDetectChanges(value, ref _childObjectType, nameof(ChildObjectType));
         }
 
     }

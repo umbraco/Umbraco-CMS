@@ -1,66 +1,78 @@
 ﻿using System;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Services.Changes;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
 namespace Umbraco.Web.Cache
 {
-    /// <summary>
-    /// A cache refresher to ensure language cache is refreshed when languages change
-    /// </summary>
-    public sealed class DomainCacheRefresher : CacheRefresherBase<DomainCacheRefresher>
+    public sealed class DomainCacheRefresher : PayloadCacheRefresherBase<DomainCacheRefresher, DomainCacheRefresher.JsonPayload>
     {
-        protected override DomainCacheRefresher Instance
+        private readonly IPublishedSnapshotService _publishedSnapshotService;
+
+        public DomainCacheRefresher(AppCaches appCaches, IPublishedSnapshotService publishedSnapshotService)
+            : base(appCaches)
         {
-            get { return this; }
+            _publishedSnapshotService = publishedSnapshotService;
         }
 
-        public override Guid UniqueIdentifier
-        {
-            get { return new Guid(DistributedCache.DomainCacheRefresherId); }
-        }
+        #region Define
 
-        public override string Name
-        {
-            get { return "Domain cache refresher"; }
-        }
+        protected override DomainCacheRefresher This => this;
 
-        public override void RefreshAll()
-        {
-            ClearCache();
-            base.RefreshAll();
-        }
+        public static readonly Guid UniqueId = Guid.Parse("11290A79-4B57-4C99-AD72-7748A3CF38AF");
 
-        public override void Refresh(int id)
-        {
-            ClearCache();
-            base.Refresh(id);
-        }
+        public override Guid RefresherUniqueId => UniqueId;
 
-        public override void Remove(int id)
-        {
-            ClearCache();
-            base.Remove(id);
-        }
+        public override string Name => "Domain Cache Refresher";
 
-        private void ClearCache()
-        {            
+        #endregion
+
+        #region Refresher
+
+        public override void Refresh(JsonPayload[] payloads)
+        {
             ClearAllIsolatedCacheByEntityType<IDomain>();
 
-            // SD: we need to clear the routes cache here!             
-            //
-            // zpqrtbnk: no, not here, in fact the caches should subsribe to refresh events else we
-            // are creating a nasty dependency - but keep it like that for the time being while
-            // SD is cleaning cache refreshers up.
-            if (UmbracoContext.Current != null)
-            {
-                var contentCache = UmbracoContext.Current.ContentCache.InnerCache as PublishedContentCache;
-                if (contentCache != null)
-                    contentCache.RoutesCache.Clear();    
-            }
+            // note: must do what's above FIRST else the repositories still have the old cached
+            // content and when the PublishedCachesService is notified of changes it does not see
+            // the new content...
+
+            // notify
+            _publishedSnapshotService.Notify(payloads);
+            // then trigger event
+            base.Refresh(payloads);
         }
+
+        // these events should never trigger
+        // everything should be PAYLOAD/JSON
+
+        public override void RefreshAll() => throw new NotSupportedException();
+
+        public override void Refresh(int id) => throw new NotSupportedException();
+
+        public override void Refresh(Guid id) => throw new NotSupportedException();
+
+        public override void Remove(int id) => throw new NotSupportedException();
+
+        #endregion
+
+        #region Json
+
+        public class JsonPayload
+        {
+            public JsonPayload(int id, DomainChangeTypes changeType)
+            {
+                Id = id;
+                ChangeType = changeType;
+            }
+
+            public int Id { get; }
+
+            public DomainChangeTypes ChangeType { get; }
+        }
+
+        #endregion
+
     }
 }

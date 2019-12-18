@@ -15,19 +15,14 @@ namespace Umbraco.Web.Models
         [DataMember(Name = "packageGuid")]
         public Guid PackageGuid { get; set; }
 
-        [DataMember(Name = "repositoryGuid")]
-        public Guid RepositoryGuid { get; set; }
-
-        [DataMember(Name = "temporaryDirectoryPath")]
-        public string TemporaryDirectoryPath { get; set; }
-
-        [DataMember(Name = "zipFilePath")]
-        public string ZipFilePath { get; set; }
+        [DataMember(Name = "zipFileName")]
+        public string ZipFileName { get; set; }
 
         /// <summary>
-        /// During installation this can be used to track any pending appdomain restarts
+        /// During installation this can be used to track any pending AppDomain restarts
         /// </summary>
         [DataMember(Name = "isRestarting")]
         public bool IsRestarting { get; set; }
+
     }
 }

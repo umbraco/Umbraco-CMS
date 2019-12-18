@@ -1,45 +1,30 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Linq.Expressions;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
     /// <summary>
-    /// Represents a <see cref="Relation"/> to DTO mapper used to translate the properties of the public api 
+    /// Represents a <see cref="Relation"/> to DTO mapper used to translate the properties of the public api
     /// implementation to that of the database's DTO as sql: [tableName].[columnName].
     /// </summary>
     [MapperFor(typeof(IRelation))]
     [MapperFor(typeof(Relation))]
     public sealed class RelationMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
+        public RelationMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+            : base(sqlContext, maps)
+        { }
 
-        //NOTE: its an internal class but the ctor must be public since we're using Activator.CreateInstance to create it
-        // otherwise that would fail because there is no public constructor.
-        public RelationMapper()
+        protected override void DefineMaps()
         {
-            BuildMap();
+            DefineMap<Relation, RelationDto>(nameof(Relation.Id), nameof(RelationDto.Id));
+            DefineMap<Relation, RelationDto>(nameof(Relation.ChildId), nameof(RelationDto.ChildId));
+            DefineMap<Relation, RelationDto>(nameof(Relation.Comment), nameof(RelationDto.Comment));
+            DefineMap<Relation, RelationDto>(nameof(Relation.CreateDate), nameof(RelationDto.Datetime));
+            DefineMap<Relation, RelationDto>(nameof(Relation.ParentId), nameof(RelationDto.ParentId));
+            DefineMap<Relation, RelationDto>(nameof(Relation.RelationTypeId), nameof(RelationDto.RelationType));
         }
-
-        #region Overrides of BaseMapper
-
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache
-        {
-            get { return PropertyInfoCacheInstance; }
-        }
-
-        internal override void BuildMap()
-        {
-            CacheMap<Relation, RelationDto>(src => src.Id, dto => dto.Id);
-            CacheMap<Relation, RelationDto>(src => src.ChildId, dto => dto.ChildId);
-            CacheMap<Relation, RelationDto>(src => src.Comment, dto => dto.Comment);
-            CacheMap<Relation, RelationDto>(src => src.CreateDate, dto => dto.Datetime);
-            CacheMap<Relation, RelationDto>(src => src.ParentId, dto => dto.ParentId);
-            CacheMap<Relation, RelationDto>(src => src.RelationTypeId, dto => dto.RelationType);
-        }
-
-        #endregion
     }
 }

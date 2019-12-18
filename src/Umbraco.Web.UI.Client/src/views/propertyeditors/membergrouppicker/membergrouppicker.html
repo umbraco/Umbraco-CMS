@@ -1,8 +1,8 @@
-<div ng-controller="Umbraco.PropertyEditors.MemberGroupPickerController" class="umb-editor umb-membergrouppicker">
+<div ng-controller="Umbraco.PropertyEditors.MemberGroupPickerController" class="umb-property-editor umb-membergrouppicker">
 
 	<div ng-model="renderModel">
 		<umb-node-preview
-			ng-repeat="node in renderModel"
+			ng-repeat="node in renderModel | orderBy:'name'"
 			icon="node.icon"
 			name="node.name"
 			allow-remove="allowRemove"
@@ -18,11 +18,6 @@
 		<localize key="general_add">Add</localize>
 	</a>
 
-   <umb-overlay
-      ng-if="memberGroupPicker.show"
-      model="memberGroupPicker"
-      position="right"
-      view="memberGroupPicker.view">
-   </umb-overlay>
+    <input type="hidden" name="mandatory" ng-model="model.mandatory" ng-required="model.validation.mandatory && !renderModel.length" />
 
 </div>

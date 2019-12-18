@@ -1,62 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
+using System.Security;
 using System.Web;
-using System.Web.Security;
-using AutoMapper;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
+using Umbraco.Core.Services;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
-using umbraco.businesslogic.Exceptions;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Composing;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
-using Umbraco.Web.Models.ContentEditing;
-using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
-using User = umbraco.BusinessLogic.User;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Security
 {
     /// <summary>
     /// A utility class used for dealing with USER security in Umbraco
     /// </summary>
-    public class WebSecurity : DisposableObjectSlim
+    public class WebSecurity
     {
-        private HttpContextBase _httpContext;
-        private ApplicationContext _applicationContext;
+        private readonly HttpContextBase _httpContext;
+        private readonly IUserService _userService;
+        private readonly IGlobalSettings _globalSettings;
 
-        public WebSecurity(HttpContextBase httpContext, ApplicationContext applicationContext)
+        public WebSecurity(HttpContextBase httpContext, IUserService userService, IGlobalSettings globalSettings)
         {
             _httpContext = httpContext;
-            _applicationContext = applicationContext;            
+            _userService = userService;
+            _globalSettings = globalSettings;
         }
         
-        /// <summary>
-        /// Returns true or false if the currently logged in member is authorized based on the parameters provided
-        /// </summary>
-        /// <param name="allowAll"></param>
-        /// <param name="allowTypes"></param>
-        /// <param name="allowGroups"></param>
-        /// <param name="allowMembers"></param>
-        /// <returns></returns>
-        [Obsolete("Use MembershipHelper.IsMemberAuthorized instead")]
-        public bool IsMemberAuthorized(
-            bool allowAll = false,
-            IEnumerable<string> allowTypes = null,
-            IEnumerable<string> allowGroups = null,
-            IEnumerable<int> allowMembers = null)
-        {
-            if (UmbracoContext.Current == null)
-            {
-                return false;
-            }
-            var helper = new MembershipHelper(UmbracoContext.Current);
-            return helper.IsMemberAuthorized(allowAll, allowTypes, allowGroups, allowMembers);
-        }
-
         private IUser _currentUser;
 
         /// <summary>
@@ -71,11 +48,7 @@ namespace Umbraco.Web.Security
                 if (_currentUser == null)
                 {
                     var id = GetUserId();
-                    if (id == -1)
-                    {
-                        return null;
-                    }
-                    _currentUser = _applicationContext.Services.UserService.GetUserById(id);
+                    _currentUser = id ? _userService.GetUserById(id.Result) : null;
                 }
 
                 return _currentUser;
@@ -102,9 +75,7 @@ namespace Umbraco.Web.Security
 
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager
-        {
-            get { return _userManager ?? (_userManager = _httpContext.GetOwinContext().GetBackOfficeUserManager()); }
-        }        
+            => _userManager ?? (_userManager = _httpContext.GetOwinContext().GetBackOfficeUserManager());
 
         /// <summary>
         /// Logs a user in.
@@ -116,14 +87,14 @@ namespace Umbraco.Web.Security
             var owinCtx = _httpContext.GetOwinContext();
             //ensure it's done for owin too
             owinCtx.Authentication.SignOut(Constants.Security.BackOfficeExternalAuthenticationType);
-            
+
             var user = UserManager.FindByIdAsync(userId).Result;
 
             SignInManager.SignInAsync(user, isPersistent: true, rememberBrowser: false).Wait();
             
             _httpContext.SetPrincipalForRequest(owinCtx.Request.User);
             
-            return TimeSpan.FromMinutes(GlobalSettings.TimeOutInMinutes).TotalSeconds;
+            return TimeSpan.FromMinutes(_globalSettings.TimeOutInMinutes).TotalSeconds;
         }
         
         /// <summary>
@@ -161,14 +132,6 @@ namespace Umbraco.Web.Security
             return user != null && UserManager.CheckPasswordAsync(user, password).Result;
         }
         
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Back office users shouldn't be resolved from the membership provider, they should be resolved usign the BackOfficeUserManager or the IUserService")]
-        public virtual MembershipUser GetBackOfficeMembershipUser(string username, bool setOnline)
-        {
-            var membershipProvider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
-            return membershipProvider != null ? membershipProvider.GetUser(username, setOnline) : null;
-        }
-
         /// <summary>
         /// Validates the current user to see if they have access to the specified app
         /// </summary>
@@ -183,28 +146,15 @@ namespace Umbraco.Web.Security
             }
             return CurrentUser.AllowedSections.Any(uApp => uApp.InvariantEquals(app));
         }
-        
-        /// <summary>
-        /// Gets the user id.
-        /// </summary>
-        /// <param name="umbracoUserContextId">This is not used</param>
-        /// <returns></returns>
-        [Obsolete("This method is no longer used, use the GetUserId() method without parameters instead")]
-        public int GetUserId(string umbracoUserContextId)
-        {           
-            return GetUserId();
-        }
 
         /// <summary>
-        /// Gets the currnet user's id.
+        /// Gets the current user's id.
         /// </summary>
         /// <returns></returns>
-        public virtual int GetUserId()
+        public virtual Attempt<int> GetUserId()
         {
             var identity = _httpContext.GetCurrentIdentity(false);
-            if (identity == null)
-                return -1;
-            return Convert.ToInt32(identity.Id);
+            return identity == null ? Attempt.Fail<int>() : Attempt.Succeed(Convert.ToInt32(identity.Id));
         }
 
         /// <summary>
@@ -214,22 +164,9 @@ namespace Umbraco.Web.Security
         public virtual string GetSessionId()
         {
             var identity = _httpContext.GetCurrentIdentity(false);
-            if (identity == null)
-                return null;
-            return identity.SessionId;
+            return identity?.SessionId;
         }
-
-        /// <summary>
-        /// Validates the user context ID.
-        /// </summary>
-        /// <param name="currentUmbracoUserContextId">This doesn't do anything</param>
-        /// <returns></returns>
-        [Obsolete("This method is no longer used, use the ValidateCurrentUser() method instead")]
-        public bool ValidateUserContextId(string currentUmbracoUserContextId)
-        {
-            return ValidateCurrentUser();
-        }
-
+        
         /// <summary>
         /// Validates the currently logged in user and ensures they are not timed out
         /// </summary>
@@ -237,7 +174,7 @@ namespace Umbraco.Web.Security
         public virtual bool ValidateCurrentUser()
         {
             return ValidateCurrentUser(false, true) == ValidateRequestAttempt.Success;
-        }        
+        }
 
         /// <summary>
         /// Validates the current user assigned to the request and ensures the stored user data is valid
@@ -248,10 +185,10 @@ namespace Umbraco.Web.Security
         public virtual ValidateRequestAttempt ValidateCurrentUser(bool throwExceptions, bool requiresApproval = true)
         {
             //This will first check if the current user is already authenticated - which should be the case in nearly all circumstances
-            // since the authentication happens in the Module, that authentication also checks the ticket expiry. We don't 
+            // since the authentication happens in the Module, that authentication also checks the ticket expiry. We don't
             // need to check it a second time because that requires another decryption phase and nothing can tamper with it during the request.
 
-            if (IsAuthenticated() == false) 
+            if (IsAuthenticated() == false)
             {
                 //There is no user
                 if (throwExceptions) throw new InvalidOperationException("The user has no umbraco contextid - try logging in");
@@ -261,13 +198,18 @@ namespace Umbraco.Web.Security
             var user = CurrentUser;
 
             // Check for console access
-            if (user == null || (requiresApproval && user.IsApproved == false) || (user.IsLockedOut && GlobalSettings.RequestIsInUmbracoApplication(_httpContext)))
+            if (user == null || (requiresApproval && user.IsApproved == false) || (user.IsLockedOut && RequestIsInUmbracoApplication(_httpContext)))
             {
-                if (throwExceptions) throw new ArgumentException("You have no priviledges to the umbraco console. Please contact your administrator");
+                if (throwExceptions) throw new ArgumentException("You have no privileges to the umbraco console. Please contact your administrator");
                 return ValidateRequestAttempt.FailedNoPrivileges;
             }
             return ValidateRequestAttempt.Success;
 
+        }
+
+        private static bool RequestIsInUmbracoApplication(HttpContextBase context)
+        {
+            return context.Request.Path.ToLower().IndexOf(IOHelper.ResolveUrl(SystemDirectories.Umbraco).ToLower(), StringComparison.Ordinal) > -1;
         }
 
         /// <summary>
@@ -278,9 +220,9 @@ namespace Umbraco.Web.Security
         internal ValidateRequestAttempt AuthorizeRequest(bool throwExceptions = false)
         {
             // check for secure connection
-            if (GlobalSettings.UseSSL && _httpContext.Request.IsSecureConnection == false)
+            if (_globalSettings.UseHttps && _httpContext.Request.IsSecureConnection == false)
             {
-                if (throwExceptions) throw new UserAuthorizationException("This installation requires a secure connection (via SSL). Please update the URL to include https://");
+                if (throwExceptions) throw new SecurityException("This installation requires a secure connection (via SSL). Please update the URL to include https://");
                 return ValidateRequestAttempt.FailedNoSsl;
             }
             return ValidateCurrentUser(throwExceptions);
@@ -297,12 +239,6 @@ namespace Umbraco.Web.Security
             return user.HasSectionAccess(section);
         }
 
-        [Obsolete("Do not use this method if you don't have to, use the overload with IUser instead")]
-        internal bool UserHasSectionAccess(string section, User user)
-        {
-            return user.Applications.Any(uApp => uApp.alias == section);
-        }
-
         /// <summary>
         /// Checks if the specified user by username as access to the app
         /// </summary>
@@ -311,24 +247,12 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         internal bool UserHasSectionAccess(string section, string username)
         {
-            var user = _applicationContext.Services.UserService.GetByUsername(username);
+            var user = _userService.GetByUsername(username);
             if (user == null)
             {
                 return false;
             }
             return user.HasSectionAccess(section);
-        }
-
-        [Obsolete("Returns the current user's unique umbraco sesion id - this cannot be set and isn't intended to be used in your code")]
-        public string UmbracoUserContextId
-        {
-            get
-            {
-                return _httpContext.GetUmbracoAuthTicket() == null ? "" : GetSessionId();                
-            }
-            set
-            {
-            }
         }
 
         /// <summary>
@@ -337,14 +261,8 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public bool IsAuthenticated()
         {
-            return _httpContext.User.Identity.IsAuthenticated && _httpContext.GetCurrentIdentity(false) != null;
+            return _httpContext.User != null && _httpContext.User.Identity.IsAuthenticated && _httpContext.GetCurrentIdentity(false) != null;
         }
-
-        protected override void DisposeResources()
-        {
-            _httpContext = null;
-        }
-
         
     }
 }

@@ -6,7 +6,6 @@ namespace Umbraco.Core.IO
 {
     public static class FileSystemExtensions
     {
-
         /// <summary>
         /// Attempts to open the file at <code>filePath</code> up to <code>maxRetries</code> times,
         /// with a thread sleep time of <code>sleepPerRetryInMilliseconds</code> between retries.
@@ -37,19 +36,6 @@ namespace Umbraco.Core.IO
             throw new ArgumentException("Retries must be greater than zero");
         }
 
-        // GetSize has been added to IFileSystem2 but not IFileSystem
-        public static long GetSize(this IFileSystem fs, string path)
-        {
-            var fs2 = fs as IFileSystem2;
-            if (fs2 != null) return fs2.GetSize(path);
-
-            // this is implementing GetSize for IFileSystem, the old way
-            using (var file = fs.OpenFile(path))
-            {
-                return file.Length;
-            }
-        }
-
         public static void CopyFile(this IFileSystem fs, string path, string newPath)
         {
             using (var stream = fs.OpenFile(path))
@@ -68,7 +54,7 @@ namespace Umbraco.Core.IO
             return Path.GetFileName(fs.GetFullPath(path));
         }
 
-        //TODO: Currently this is the only way to do this
+        // TODO: Currently this is the only way to do this
         internal static void CreateFolder(this IFileSystem fs, string folderPath)
         {
             var path = fs.GetRelativePath(folderPath);
@@ -78,6 +64,34 @@ namespace Umbraco.Core.IO
                 fs.AddFile(tempFile, s);
             }
             fs.DeleteFile(tempFile);
+        }
+
+        /// <summary>
+        /// Unwraps a filesystem.
+        /// </summary>
+        /// <remarks>
+        /// <para>A filesystem can be wrapped in a <see cref="FileSystemWrapper"/> (public) or a <see cref="ShadowWrapper"/> (internal),
+        /// and this method deals with the various wrappers and </para>
+        /// </remarks>
+        public static IFileSystem Unwrap(this IFileSystem filesystem)
+        {
+            var unwrapping = true;
+            while (unwrapping)
+            {
+                switch (filesystem)
+                {
+                    case FileSystemWrapper wrapper:
+                        filesystem = wrapper.InnerFileSystem;
+                        break;
+                    case ShadowWrapper shadow:
+                        filesystem = shadow.InnerFileSystem;
+                        break;
+                    default:
+                        unwrapping = false;
+                        break;
+                }
+            }
+            return filesystem;
         }
     }
 }

@@ -1,14 +1,13 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using System.Web.Http.Filters;
-using AutoMapper;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
+using Umbraco.Web.Editors.Filters;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -25,7 +24,7 @@ namespace Umbraco.Web.Editors
         [UserGroupValidate]
         public UserGroupDisplay PostSaveUserGroup(UserGroupSave userGroupSave)
         {
-            if (userGroupSave == null) throw new ArgumentNullException("userGroupSave");
+            if (userGroupSave == null) throw new ArgumentNullException(nameof(userGroupSave));
 
             //authorize that the user has access to save this user group
             var authHelper = new UserGroupEditorAuthorizationHelper(
@@ -51,17 +50,12 @@ namespace Umbraco.Web.Editors
             if (isAuthorized == false)
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Unauthorized, isAuthorized.Result));
 
-            //current user needs to be added to a new group if not an admin (possibly only if no other users are added?) to avoid a 401
-            if(!Security.CurrentUser.IsAdmin() && (userGroupSave.Id == null || Convert.ToInt32(userGroupSave.Id) >= 0)/* && !userGroupSave.Users.Any() */)
-            {
-                var userIds = userGroupSave.Users.ToList();
-                userIds.Add(Security.CurrentUser.Id);
-                userGroupSave.Users = userIds;
-            }
+            //need to ensure current user is in a group if not an admin to avoid a 401
+            EnsureNonAdminUserIsInSavedUserGroup(userGroupSave);
 
             //save the group
             Services.UserService.Save(userGroupSave.PersistedUserGroup, userGroupSave.Users.ToArray());
-            
+
             //deal with permissions
 
             //remove ones that have been removed
@@ -77,7 +71,7 @@ namespace Umbraco.Web.Editors
             foreach (var assignedPermission in userGroupSave.AssignedPermissions)
             {
                 Services.UserService.ReplaceUserGroupPermissions(
-                    userGroupSave.PersistedUserGroup.Id, 
+                    userGroupSave.PersistedUserGroup.Id,
                     assignedPermission.Value.Select(x => x[0]),
                     assignedPermission.Key);
             }
@@ -88,9 +82,26 @@ namespace Umbraco.Web.Editors
             return display;
         }
 
+        private void EnsureNonAdminUserIsInSavedUserGroup(UserGroupSave userGroupSave)
+        {
+            if (Security.CurrentUser.IsAdmin())
+            {
+                return;
+            }
+
+            var userIds = userGroupSave.Users.ToList();
+            if (userIds.Contains(Security.CurrentUser.Id))
+            {
+                return;
+            }
+
+            userIds.Add(Security.CurrentUser.Id);
+            userGroupSave.Users = userIds;
+        }
+
         /// <summary>
         /// Returns the scaffold for creating a new user group
-        /// </summary>        
+        /// </summary>
         /// <returns></returns>
         public UserGroupDisplay GetEmptyUserGroup()
         {
@@ -103,7 +114,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public IEnumerable<UserGroupBasic> GetUserGroups(bool onlyCurrentUserGroups = true)
         {
-            var allGroups = Mapper.Map<IEnumerable<IUserGroup>, IEnumerable<UserGroupBasic>>(Services.UserService.GetAllUserGroups())
+            var allGroups = Mapper.MapEnumerable<IUserGroup, UserGroupBasic>(Services.UserService.GetAllUserGroups())
                 .ToList();
 
             var isAdmin = Security.CurrentUser.IsAdmin();
@@ -111,7 +122,7 @@ namespace Umbraco.Web.Editors
 
             if (onlyCurrentUserGroups == false)
             {
-                //this user is not an admin so in that case we need to exlude all admin users
+                //this user is not an admin so in that case we need to exclude all admin users
                 allGroups.RemoveAt(allGroups.IndexOf(allGroups.Find(basic => basic.Alias == Constants.Security.AdminGroupAlias)));
                 return allGroups;
             }
@@ -131,7 +142,7 @@ namespace Umbraco.Web.Editors
             var found = Services.UserService.GetUserGroupById(id);
             if (found == null)
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
-            
+
             var display =  Mapper.Map<UserGroupDisplay>(found);
 
             return display;
@@ -143,8 +154,8 @@ namespace Umbraco.Web.Editors
         public HttpResponseMessage PostDeleteUserGroups([FromUri] int[] userGroupIds)
         {
             var userGroups = Services.UserService.GetAllUserGroups(userGroupIds)
-                //never delete the admin group or translators group
-                .Where(x => x.Alias != Constants.Security.AdminGroupAlias && x.Alias != Constants.Security.TranslatorGroupAlias)
+                //never delete the admin group, sensitive data or translators group
+                .Where(x => !x.IsSystemUserGroup())
                 .ToArray();
             foreach (var userGroup in userGroups)
             {

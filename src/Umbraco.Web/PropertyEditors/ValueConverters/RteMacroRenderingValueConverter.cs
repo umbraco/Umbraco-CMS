@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Web;
+﻿using System.Text;
 using Umbraco.Core;
 using Umbraco.Core.Macros;
 using Umbraco.Core.PropertyEditors;
@@ -10,59 +7,71 @@ using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Web.Templates;
 using System.Linq;
 using HtmlAgilityPack;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
+using Umbraco.Web.Macros;
+using System.Web;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
-
     /// <summary>
-    /// A value converter for TinyMCE that will ensure any macro content is rendered properly even when 
+    /// A value converter for TinyMCE that will ensure any macro content is rendered properly even when
     /// used dynamically.
     /// </summary>
-    // because that version of RTE converter parses {locallink} and executes macros, when going from
-    // data to source, its source value has to be cached at the request level, because we have no idea
-    // what the macros may depend on actually. An so, object and xpath need to follow... request, too.
-    // note: the TinyMceValueConverter is NOT inherited, so the PropertyValueCache attribute here is not
-    // actually required (since Request is default) but leave it here to be absolutely explicit.
     [DefaultPropertyValueConverter]
-    [PropertyValueType(typeof(IHtmlString))]
-    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Request)]
     public class RteMacroRenderingValueConverter : TinyMceValueConverter
-	{
+    {
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IMacroRenderer _macroRenderer;
+
+        public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
+        {
+            // because that version of RTE converter parses {locallink} and executes macros, its value has
+            // to be cached at the published snapshot level, because we have no idea what the macros may depend on actually.
+            return PropertyCacheLevel.Snapshot;
+        }
+
+        public RteMacroRenderingValueConverter(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer)
+        {
+            _umbracoContextAccessor = umbracoContextAccessor;
+            _macroRenderer = macroRenderer;
+        }
+
         // NOT thread-safe over a request because it modifies the
         // global UmbracoContext.Current.InPreviewMode status. So it
         // should never execute in // over the same UmbracoContext with
         // different preview modes.
-	    static string RenderRteMacros(string source, bool preview)
+        private string RenderRteMacros(string source, bool preview)
         {
-            // save and set for macro rendering
-            var inPreviewMode = UmbracoContext.Current.InPreviewMode;
-	        UmbracoContext.Current.InPreviewMode = preview;
+            var umbracoContext = _umbracoContextAccessor.UmbracoContext;
+            using (umbracoContext.ForcedPreview(preview)) // force for macro rendering
+            {
+                var sb = new StringBuilder();
 
-            var sb = new StringBuilder();
-            
-            try
-	        {
-	            var umbracoHelper = new UmbracoHelper(UmbracoContext.Current);
-	            MacroTagParser.ParseMacros(
-	                source,
-	                //callback for when text block is found
-	                textBlock => sb.Append(textBlock),
-	                //callback for when macro syntax is found
-	                (macroAlias, macroAttributes) => sb.Append(umbracoHelper.RenderMacro(
-	                    macroAlias,
-	                    //needs to be explicitly casted to Dictionary<string, object>
-	                    macroAttributes.ConvertTo(x => (string) x, x => x)).ToString()));
-	        }
-	        finally
-	        {
-                // restore
-                UmbracoContext.Current.InPreviewMode = inPreviewMode;	            
-	        }
+                MacroTagParser.ParseMacros(
+                    source,
+                    //callback for when text block is found
+                    textBlock => sb.Append(textBlock),
+                    //callback for when macro syntax is found
+                    (macroAlias, macroAttributes) => sb.Append(_macroRenderer.Render(
+                        macroAlias,
+                        umbracoContext.PublishedRequest?.PublishedContent,
+                        //needs to be explicitly casted to Dictionary<string, object>
+                        macroAttributes.ConvertTo(x => (string)x, x => x)).GetAsText()));
 
-            return sb.ToString();
+                return sb.ToString();
+            }
         }
 
-        public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        {
+            var converted = Convert(inter, preview);
+
+            return new HtmlString(converted == null ? string.Empty : converted);
+        }
+
+        private string Convert(object source, bool preview)
         {
             if (source == null)
             {
@@ -71,9 +80,10 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             var sourceString = source.ToString();
 
-            // ensures string is parsed for {localLink} and urls are resolved correctly
-            sourceString = TemplateUtilities.ParseInternalLinks(sourceString, preview);
+            // ensures string is parsed for {localLink} and urls and media are resolved correctly
+            sourceString = TemplateUtilities.ParseInternalLinks(sourceString, preview, Current.UmbracoContext);
             sourceString = TemplateUtilities.ResolveUrlsFromTextString(sourceString);
+            sourceString = TemplateUtilities.ResolveMediaFromTextString(sourceString);
 
             // ensure string is parsed for macros and macros are executed correctly
             sourceString = RenderRteMacros(sourceString, preview);
@@ -87,31 +97,34 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 // Find all images with rel attribute
                 var imgNodes = doc.DocumentNode.SelectNodes("//img[@rel]");
 
+                var modified = false;
                 if (imgNodes != null)
                 {
-                    var modified = false;
-
                     foreach (var img in imgNodes)
                     {
-                        var firstOrDefault = img.Attributes.FirstOrDefault(x => x.Name == "rel");
-                        if (firstOrDefault != null)
+                        var nodeId = img.GetAttributeValue("rel", string.Empty);
+                        if (int.TryParse(nodeId, out _))
                         {
-                            var rel = firstOrDefault.Value;
-
-                            // Check that the rel attribute is a integer before removing
-                            int nodeId;
-                            if (int.TryParse(rel, out nodeId))
-                            {
-                                img.Attributes.Remove("rel");
-                                modified = true;
-                            }
+                            img.Attributes.Remove("rel");
+                            modified = true;
                         }
                     }
+                }
 
-                    if (modified)
+                // Find all a and img tags with a data-udi attribute
+                var dataUdiNodes = doc.DocumentNode.SelectNodes("(//a|//img)[@data-udi]");
+                if (dataUdiNodes != null)
+                {
+                    foreach (var node in dataUdiNodes)
                     {
-                        return doc.DocumentNode.OuterHtml;
+                        node.Attributes.Remove("data-udi");
+                        modified = true;
                     }
+                }
+
+                if (modified)
+                {
+                    return doc.DocumentNode.OuterHtml;
                 }
             }
 

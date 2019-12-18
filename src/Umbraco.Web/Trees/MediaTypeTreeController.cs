@@ -2,27 +2,35 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Formatting;
-using AutoMapper;
-using umbraco;
-using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Services;
+using Umbraco.Web.Actions;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
 using Umbraco.Web.Search;
 
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.MediaTypes)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.MediaTypes, null, sortOrder:5)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.MediaTypes, SortOrder = 1, TreeGroup = Constants.Trees.Groups.Settings)]
     [Mvc.PluginController("UmbracoTrees")]
     [CoreTree]
-    [LegacyBaseTree(typeof(loadMediaTypes))]
     public class MediaTypeTreeController : TreeController, ISearchableTree
     {
+        private readonly UmbracoTreeSearcher _treeSearcher;
+
+        public MediaTypeTreeController(UmbracoTreeSearcher treeSearcher, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        {
+            _treeSearcher = treeSearcher;
+        }
+
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
             var intId = id.TryConvertTo<int>();
@@ -35,15 +43,15 @@ namespace Umbraco.Web.Trees
                     .OrderBy(entity => entity.Name)
                     .Select(dt =>
                     {
-                        var node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, "icon-folder", dt.HasChildren(), "");
+                        var node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, "icon-folder", dt.HasChildren, "");
                         node.Path = dt.Path;
                         node.NodeType = "container";
-                        //TODO: This isn't the best way to ensure a noop process for clicking a node but it works for now.
+                        // TODO: This isn't the best way to ensure a no operation process for clicking a node but it works for now.
                         node.AdditionalData["jsClickCallback"] = "javascript:void(0);";
                         return node;
                     }));
 
-            //if the request is for folders only then just return
+            // if the request is for folders only then just return
             if (queryStrings["foldersonly"].IsNullOrWhiteSpace() == false && queryStrings["foldersonly"] == "1") return nodes;
 
             nodes.AddRange(
@@ -51,10 +59,10 @@ namespace Umbraco.Web.Trees
                     .OrderBy(entity => entity.Name)
                     .Select(dt =>
                     {
-                        var node = CreateTreeNode(dt, Constants.ObjectTypes.MediaTypeGuid, id, queryStrings, "icon-thumbnails",
-                            //NOTE: Since 7.4+ child type creation is enabled by a config option. It defaults to on, but can be disabled if we decide to. 
-                            //We need this check to keep supporting sites where childs have already been created.
-                            dt.HasChildren());
+                        // since 7.4+ child type creation is enabled by a config option. It defaults to on, but can be disabled if we decide to.
+                        // need this check to keep supporting sites where children have already been created.
+                        var hasChildren = dt.HasChildren;
+                        var node = CreateTreeNode(dt, Constants.ObjectTypes.MediaType, id, queryStrings, Constants.Icons.MediaType, hasChildren);
 
                         node.Path = dt.Path;
                         return node;
@@ -67,79 +75,61 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
 
-            var enableInheritedMediaTypes = UmbracoConfig.For.UmbracoSettings().Content.EnableInheritedMediaTypes;
-
-            if (id == Constants.System.Root.ToInvariantString())
+            if (id == Constants.System.RootString)
             {
-                //set the default to create
-                menu.DefaultMenuAlias = ActionNew.Instance.Alias;
+                // set the default to create
+                menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
-                // root actions              
-                menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
-                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)));
+                // root actions
+                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
+                menu.Items.Add(new RefreshNode(Services.TextService));
                 return menu;
             }
 
             var container = Services.EntityService.Get(int.Parse(id), UmbracoObjectTypes.MediaTypeContainer);
             if (container != null)
             {
-                //set the default to create
-                menu.DefaultMenuAlias = ActionNew.Instance.Alias;
+                // set the default to create
+                menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
-                menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
+                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
 
-                menu.Items.Add(new MenuItem("rename", Services.TextService.Localize(String.Format("actions/{0}", "rename")))
+                menu.Items.Add(new MenuItem("rename", Services.TextService.Localize("actions/rename"))
                 {
                     Icon = "icon icon-edit"
                 });
 
-                if (container.HasChildren() == false)
+                if (container.HasChildren == false)
                 {
-                    //can delete doc type
-                    menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
-                }                
-                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), hasSeparator: true);
-
-                
+                    // can delete doc type
+                    menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
+                }
+                menu.Items.Add(new RefreshNode(Services.TextService, true));
             }
             else
             {
-                var ct = Services.ContentTypeService.GetMediaType(int.Parse(id));
-                var parent = ct == null ? null : Services.ContentTypeService.GetMediaType(ct.ParentId);
+                var ct = Services.MediaTypeService.Get(int.Parse(id));
+                var parent = ct == null ? null : Services.MediaTypeService.Get(ct.ParentId);
 
-                if (enableInheritedMediaTypes)
-                {
-                    menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
+                menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
 
-                    //no move action if this is a child doc type
-                    if (parent == null)
-                    {
-                        menu.Items.Add<ActionMove>(Services.TextService.Localize(string.Format("actions/{0}", ActionMove.Instance.Alias)), true);
-                    }
-                }
-                else
+                // no move action if this is a child doc type
+                if (parent == null)
                 {
-                    menu.Items.Add<ActionMove>(Services.TextService.Localize(string.Format("actions/{0}", ActionMove.Instance.Alias)));
-                    //no move action if this is a child doc type
-                    if (parent == null)
-                    {
-                        menu.Items.Add<ActionMove>(Services.TextService.Localize(string.Format("actions/{0}", ActionMove.Instance.Alias)), true);
-                    }
+                    menu.Items.Add<ActionMove>(Services.TextService, true, opensDialog: true);
                 }
 
-                menu.Items.Add<ActionCopy>(Services.TextService.Localize(string.Format("actions/{0}", ActionCopy.Instance.Alias)));
-                menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
-                if (enableInheritedMediaTypes)
-                    menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
+                menu.Items.Add<ActionCopy>(Services.TextService, opensDialog: true);
+                menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
+                menu.Items.Add(new RefreshNode(Services.TextService, true));
+
             }
 
             return menu;
         }
 
-        public IEnumerable<SearchResultItem> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
-        {
-            var results = Services.EntityService.GetPagedDescendantsFromRoot(UmbracoObjectTypes.MediaType, pageIndex, pageSize, out totalFound, filter: query);
-            return Mapper.Map<IEnumerable<SearchResultItem>>(results);
-        }
+        public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
+            => _treeSearcher.EntitySearch(UmbracoObjectTypes.MediaType, query, pageSize, pageIndex, out totalFound, searchFrom);
+
     }
 }

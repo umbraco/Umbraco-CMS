@@ -1,15 +1,15 @@
-function booleanEditorController($scope) {
+function booleanEditorController($scope, angularHelper) {
 
     function setupViewModel() {
         $scope.renderModel = {
             value: false
         };
 
-        if ($scope.model.config && $scope.model.config.default && $scope.model.config.default.toString() === "1" && $scope.model && !$scope.model.value) {
+        if ($scope.model.config && $scope.model.config.default && Object.toBoolean($scope.model.config.default) && $scope.model && !$scope.model.value) {
             $scope.renderModel.value = true;
         }
 
-        if ($scope.model && $scope.model.value && ($scope.model.value.toString() === "1" || angular.lowercase($scope.model.value) === "true")) {
+        if ($scope.model && $scope.model.value && Object.toBoolean($scope.model.value)) {
             $scope.renderModel.value = true;
         }
     }
@@ -29,6 +29,7 @@ function booleanEditorController($scope) {
 
     // Update the value when the toggle is clicked
     $scope.toggle = function(){
+        angularHelper.getCurrentForm($scope).$setDirty();
         if($scope.renderModel.value){
             $scope.model.value = "0";
             setupViewModel();

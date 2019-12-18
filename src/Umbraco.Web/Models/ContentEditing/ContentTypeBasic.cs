@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.Validation;
@@ -15,7 +16,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// </summary>
     /// <remarks>
     /// Generally used to return the minimal amount of data about a content type
-    /// </remarks> 
+    /// </remarks>
     [DataContract(Name = "contentType", Namespace = "")]
     public class ContentTypeBasic : EntityBasic
     {
@@ -26,7 +27,7 @@ namespace Umbraco.Web.Models.ContentEditing
 
         /// <summary>
         /// Overridden to apply our own validation attributes since this is not always required for other classes
-        /// </summary>        
+        /// </summary>
         [Required]
         [RegularExpression(@"^([a-zA-Z]\w.*)$", ErrorMessage = "Invalid alias")]
         [DataMember(Name = "alias")]
@@ -75,7 +76,7 @@ namespace Umbraco.Web.Models.ContentEditing
             {
                 return IconIsClass
                     ? string.Empty
-                    : string.Format("{0}images/umbraco/{1}", GlobalSettings.Path.EnsureEndsWith("/"), Icon);
+                    : string.Format("{0}images/umbraco/{1}", Current.Configs.Global().Path.EnsureEndsWith("/"), Icon);
             }
         }
 
@@ -115,5 +116,13 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "blueprints")]
         [ReadOnly(true)]
         public IDictionary<int, string> Blueprints { get; set; }
+
+        [DataMember(Name = "isContainer")]
+        [ReadOnly(true)]
+        public bool IsContainer { get; set; }
+
+        [DataMember(Name = "isElement")]
+        [ReadOnly(true)]
+        public bool IsElement { get; set; }
     }
 }

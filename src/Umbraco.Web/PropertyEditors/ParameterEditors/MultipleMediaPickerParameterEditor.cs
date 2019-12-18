@@ -1,14 +1,27 @@
 ﻿using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors.ParameterEditors
 {
-    [ParameterEditor(Constants.PropertyEditors.MultipleMediaPickerAlias, "Multiple Media Picker", "mediapicker")]
-    public class MultipleMediaPickerParameterEditor : ParameterEditor
+    /// <summary>
+    /// Represents a multiple media picker macro parameter editor.
+    /// </summary>
+    [DataEditor(
+        Constants.PropertyEditors.Aliases.MultipleMediaPicker,
+        EditorType.MacroParameter,
+        "Multiple Media Picker",
+        "mediapicker",
+        ValueType = ValueTypes.Text)]
+    public class MultipleMediaPickerParameterEditor : DataEditor
     {
-        public MultipleMediaPickerParameterEditor()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MultipleMediaPickerParameterEditor"/> class.
+        /// </summary>
+        public MultipleMediaPickerParameterEditor(ILogger logger)
+            : base(logger)
         {
-            Configuration.Add("multiPicker", "1");
+            DefaultConfiguration.Add("multiPicker", "1");
         }
     }
 }

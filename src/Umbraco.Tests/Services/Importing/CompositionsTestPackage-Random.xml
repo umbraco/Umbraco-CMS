@@ -71,7 +71,7 @@
         <GenericProperty>
           <Name>Content</Name>
           <Alias>content</Alias>
-          <Type>Umbraco.TinyMCEv3</Type>
+          <Type>Umbraco.TinyMCE</Type>
           <Definition>ca90c950-0aff-4e72-b976-a30b1ac57dad</Definition>
           <Tab>Content</Tab>
           <Mandatory>False</Mandatory>

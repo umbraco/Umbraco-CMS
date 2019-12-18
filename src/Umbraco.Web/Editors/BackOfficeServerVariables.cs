@@ -1,8 +1,9 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.Mvc;
@@ -10,16 +11,18 @@ using ClientDependency.Core.Config;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
+using Umbraco.Web.Controllers;
 using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Profiling;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Trees;
-using Umbraco.Web.WebServices;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
@@ -30,14 +33,18 @@ namespace Umbraco.Web.Editors
     internal class BackOfficeServerVariables
     {
         private readonly UrlHelper _urlHelper;
-        private readonly ApplicationContext _applicationContext;
+        private readonly IRuntimeState _runtimeState;
+        private readonly UmbracoFeatures _features;
+        private readonly IGlobalSettings _globalSettings;
         private readonly HttpContextBase _httpContext;
         private readonly IOwinContext _owinContext;
 
-        public BackOfficeServerVariables(UrlHelper urlHelper, ApplicationContext applicationContext, IUmbracoSettingsSection umbracoSettings)
+        internal BackOfficeServerVariables(UrlHelper urlHelper, IRuntimeState runtimeState, UmbracoFeatures features, IGlobalSettings globalSettings)
         {
             _urlHelper = urlHelper;
-            _applicationContext = applicationContext;
+            _runtimeState = runtimeState;
+            _features = features;
+            _globalSettings = globalSettings;
             _httpContext = _urlHelper.RequestContext.HttpContext;
             _owinContext = _httpContext.GetOwinContext();
         }
@@ -52,7 +59,7 @@ namespace Umbraco.Web.Editors
             var keepOnlyKeys = new Dictionary<string, string[]>
             {
                 {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl"}},
-                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "canSendRequiredEmail"}},
+                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "canSendRequiredEmail", "usernameIsEmail"}},
                 {"application", new[] {"applicationPath", "cacheBuster"}},
                 {"isDebuggingEnabled", new string[] { }},
                 {"features", new [] {"disabledFeatures"}}
@@ -82,7 +89,7 @@ namespace Umbraco.Web.Editors
                 }
             }
 
-            //TODO: This is ultra confusing! this same key is used for different things, when returning the full app when authenticated it is this URL but when not auth'd it's actually the ServerVariables address
+            // TODO: This is ultra confusing! this same key is used for different things, when returning the full app when authenticated it is this URL but when not auth'd it's actually the ServerVariables address
             // so based on compat and how things are currently working we need to replace the serverVarsJs one
             ((Dictionary<string, object>)defaults["umbracoUrls"])["serverVarsJs"] = _urlHelper.Action("ServerVariables", "BackOffice");
 
@@ -100,17 +107,16 @@ namespace Umbraco.Web.Editors
                 {
                     "umbracoUrls", new Dictionary<string, object>
                     {
-                        //TODO: Add 'umbracoApiControllerBaseUrl' which people can use in JS
+                        // TODO: Add 'umbracoApiControllerBaseUrl' which people can use in JS
                         // to prepend their URL. We could then also use this in our own resources instead of
                         // having each url defined here explicitly - we can do that in v8! for now
                         // for umbraco services we'll stick to explicitly defining the endpoints.
 
                         {"externalLoginsUrl", _urlHelper.Action("ExternalLogin", "BackOffice")},
                         {"externalLinkLoginsUrl", _urlHelper.Action("LinkLogin", "BackOffice")},
-                        {"legacyTreeJs", _urlHelper.Action("LegacyTreeJs", "BackOffice")},
                         {"manifestAssetList", _urlHelper.Action("GetManifestAssetList", "BackOffice")},
                         {"gridConfig", _urlHelper.Action("GetGridConfig", "BackOffice")},
-                        //TODO: This is ultra confusing! this same key is used for different things, when returning the full app when authenticated it is this URL but when not auth'd it's actually the ServerVariables address
+                        // TODO: This is ultra confusing! this same key is used for different things, when returning the full app when authenticated it is this URL but when not auth'd it's actually the ServerVariables address
                         {"serverVarsJs", _urlHelper.Action("Application", "BackOffice")},
                         //API URLs
                         {
@@ -146,7 +152,7 @@ namespace Umbraco.Web.Editors
                         },
                         {
                             "imagesApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ImagesController>(
-                                controller => controller.GetBigThumbnail(0))
+                                controller => controller.GetBigThumbnail(""))
                         },
                         {
                             "sectionApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<SectionController>(
@@ -154,7 +160,7 @@ namespace Umbraco.Web.Editors
                         },
                         {
                             "treeApplicationApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ApplicationTreeController>(
-                                controller => controller.GetApplicationTrees(null, null, null, true))
+                                controller => controller.GetApplicationTrees(null, null, null, TreeUse.None))
                         },
                         {
                             "contentTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ContentTypeController>(
@@ -165,8 +171,12 @@ namespace Umbraco.Web.Editors
                                 controller => controller.GetAllowedChildren(0))
                         },
                         {
-                            "macroApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MacroController>(
+                            "macroRenderingApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MacroRenderingController>(
                                 controller => controller.GetMacroParameters(0))
+                        },
+                        {
+                            "macroApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MacrosController>(
+                                controller => controller.Create(null))
                         },
                         {
                             "authenticationApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<AuthenticationController>(
@@ -175,10 +185,6 @@ namespace Umbraco.Web.Editors
                         {
                             "currentUserApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<CurrentUserController>(
                                 controller => controller.PostChangePassword(null))
-                        },
-                        {
-                            "legacyApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LegacyController>(
-                                controller => controller.DeleteLegacyItem(null, null, null))
                         },
                         {
                             "entityApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<EntityController>(
@@ -194,7 +200,7 @@ namespace Umbraco.Web.Editors
                         },
                         {
                             "logApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LogController>(
-                                controller => controller.GetEntityLog(0))
+                                controller => controller.GetPagedEntityLog(0, 0, 0, Core.Persistence.DatabaseModelDefinitions.Direction.Ascending, null))
                         },
                         {
                             "memberApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MemberController>(
@@ -203,6 +209,10 @@ namespace Umbraco.Web.Editors
                         {
                             "packageInstallApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PackageInstallController>(
                                 controller => controller.Fetch(string.Empty))
+                        },
+                        {
+                            "packageApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PackageController>(
+                                controller => controller.GetCreatedPackages())
                         },
                         {
                             "relationApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RelationController>(
@@ -221,12 +231,12 @@ namespace Umbraco.Web.Editors
                                 controller => controller.GetAllTypes())
                         },
                         {
-                            "updateCheckApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<UpdateCheckController>(
-                                controller => controller.GetCheck())
+                            "memberGroupApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MemberGroupController>(
+                                controller => controller.GetAllGroups())
                         },
                         {
-                            "tagApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TagsController>(
-                                controller => controller.GetAllTags(null))
+                            "updateCheckApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<UpdateCheckController>(
+                                controller => controller.GetCheck())
                         },
                         {
                             "templateApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TemplateController>(
@@ -246,15 +256,11 @@ namespace Umbraco.Web.Editors
                         },
                         {
                             "tagsDataBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TagsDataController>(
-                                controller => controller.GetTags(""))
+                                controller => controller.GetTags("", "", null))
                         },
                         {
-                            "examineMgmtBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ExamineManagementApiController>(
+                            "examineMgmtBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ExamineManagementController>(
                                 controller => controller.GetIndexerDetails())
-                        },
-                        {
-                            "xmlDataIntegrityBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<XmlDataIntegrityController>(
-                                controller => controller.CheckContentXmlTable())
                         },
                         {
                             "healthCheckBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<HealthCheckController>(
@@ -269,47 +275,74 @@ namespace Umbraco.Web.Editors
                                 controller => controller.GetByPath("", ""))
                         },
                         {
+                            "publishedStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PublishedStatusController>(
+                                controller => controller.GetPublishedStatusUrl())
+                        },
+                        {
                             "dictionaryApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<DictionaryController>(
                                 controller => controller.DeleteById(int.MaxValue))
 						},
+                        {
+                            "nuCacheStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<NuCacheStatusController>(
+                                controller => controller.GetStatus())
+                        },
                         {
                             "helpApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<HelpController>(
                                 controller => controller.GetContextHelpForPage("","",""))
                         },
                         {
                             "backOfficeAssetsApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<BackOfficeAssetsController>(
-                                controller => controller.GetSupportedMomentLocales())
-                        }
-
+                                controller => controller.GetSupportedLocales())
+                        },
+                        {
+                            "languageApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LanguageController>(
+                                controller => controller.GetAllLanguages())
+                        },
+                        {
+						    "relationTypeApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RelationTypeController>(
+                                controller => controller.GetById(1))
+                        },
+						{
+                            "logViewerApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LogViewerController>(
+                                controller => controller.GetNumberOfErrors(null, null))
+                        },
+                        {
+                            "webProfilingBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<WebProfilingController>(
+                                controller => controller.GetStatus())
+                        },
+                        {
+                            "tinyMceApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TinyMceController>(
+                                controller => controller.UploadImage())
+                        },
                     }
                 },
                 {
                     "umbracoSettings", new Dictionary<string, object>
                     {
-                        {"umbracoPath", GlobalSettings.Path},
+                        {"umbracoPath", _globalSettings.Path},
                         {"mediaPath", IOHelper.ResolveUrl(SystemDirectories.Media).TrimEnd('/')},
                         {"appPluginsPath", IOHelper.ResolveUrl(SystemDirectories.AppPlugins).TrimEnd('/')},
                         {
                             "imageFileTypes",
-                            string.Join(",", UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes)
+                            string.Join(",", Current.Configs.Settings().Content.ImageFileTypes)
                         },
                         {
                             "disallowedUploadFiles",
-                            string.Join(",", UmbracoConfig.For.UmbracoSettings().Content.DisallowedUploadFiles)
+                            string.Join(",", Current.Configs.Settings().Content.DisallowedUploadFiles)
                         },
                         {
                             "allowedUploadFiles",
-                            string.Join(",", UmbracoConfig.For.UmbracoSettings().Content.AllowedUploadFiles)
+                            string.Join(",", Current.Configs.Settings().Content.AllowedUploadFiles)
                         },
                         {
                             "maxFileSize",
                             GetMaxRequestLength()
                         },
-                        {"keepUserLoggedIn", UmbracoConfig.For.UmbracoSettings().Security.KeepUserLoggedIn},
-                        {"usernameIsEmail", UmbracoConfig.For.UmbracoSettings().Security.UsernameIsEmail},
+                        {"keepUserLoggedIn", Current.Configs.Settings().Security.KeepUserLoggedIn},
+                        {"usernameIsEmail", Current.Configs.Settings().Security.UsernameIsEmail},
                         {"cssPath", IOHelper.ResolveUrl(SystemDirectories.Css).TrimEnd('/')},
-                        {"allowPasswordReset", UmbracoConfig.For.UmbracoSettings().Security.AllowPasswordReset},
-                        {"loginBackgroundImage",  UmbracoConfig.For.UmbracoSettings().Content.LoginBackgroundImage},
+                        {"allowPasswordReset", Current.Configs.Settings().Security.AllowPasswordReset},
+                        {"loginBackgroundImage",  Current.Configs.Settings().Content.LoginBackgroundImage},
                         {"showUserInvite", EmailSender.CanSendRequiredEmail},
                         {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail},
                     }
@@ -317,7 +350,10 @@ namespace Umbraco.Web.Editors
                 {
                     "umbracoPlugins", new Dictionary<string, object>
                     {
-                        {"trees", GetTreePluginsMetaData()}
+                        // for each tree that is [PluginController], get
+                        // alias -> areaName
+                        // so that routing (route.js) can look for views
+                        { "trees", GetPluginTrees().ToArray() }
                     }
                 },
                 {
@@ -335,7 +371,7 @@ namespace Umbraco.Web.Editors
                                 .Select(p => new
                                 {
                                     authType = p.AuthenticationType, caption = p.Caption,
-                                    //TODO: Need to see if this exposes any sensitive data!
+                                    // TODO: Need to see if this exposes any sensitive data!
                                     properties = p.Properties
                                 })
                                 .ToArray()
@@ -348,7 +384,7 @@ namespace Umbraco.Web.Editors
                         {
                             "disabledFeatures", new Dictionary<string,object>
                             {
-                                { "disableTemplates", FeaturesResolver.Current.Features.Disabled.DisableTemplates}
+                                { "disableTemplates", _features.Disabled.DisableTemplates}
                             }
                         }
 
@@ -358,42 +394,42 @@ namespace Umbraco.Web.Editors
             return defaultVals;
         }
 
-        private IEnumerable<Dictionary<string, string>> GetTreePluginsMetaData()
+        [DataContract]
+        private class PluginTree
         {
-            var treeTypes = TreeControllerTypes.Value;
-            //get all plugin trees with their attributes
-            var treesWithAttributes = treeTypes.Select(x => new
-            {
-                tree = x,
-                attributes =
-                x.GetCustomAttributes(false)
-            }).ToArray();
+            [DataMember(Name = "alias")]
+            public string Alias { get; set; }
 
-            var pluginTreesWithAttributes = treesWithAttributes
-                //don't resolve any tree decorated with CoreTreeAttribute
-                .Where(x => x.attributes.All(a => (a is CoreTreeAttribute) == false))
-                //we only care about trees with the PluginControllerAttribute
-                .Where(x => x.attributes.Any(a => a is PluginControllerAttribute))
-                .ToArray();
-
-            return (from p in pluginTreesWithAttributes
-                    let treeAttr = p.attributes.OfType<TreeAttribute>().Single()
-                    let pluginAttr = p.attributes.OfType<PluginControllerAttribute>().Single()
-                    select new Dictionary<string, string>
-                {
-                    {"alias", treeAttr.Alias}, {"packageFolder", pluginAttr.AreaName}
-                }).ToArray();
-
+            [DataMember(Name = "packageFolder")]
+            public string PackageFolder { get; set; }
         }
 
-        /// <summary>
-        /// A lazy reference to all tree controller types
-        /// </summary>
-        /// <remarks>
-        /// We are doing this because if we constantly resolve the tree controller types from the PluginManager it will re-scan and also re-log that
-        /// it's resolving which is unecessary and annoying. 
-        /// </remarks>
-        private static readonly Lazy<IEnumerable<Type>> TreeControllerTypes = new Lazy<IEnumerable<Type>>(() => PluginManager.Current.ResolveAttributedTreeControllers().ToArray());
+        private IEnumerable<PluginTree> GetPluginTrees()
+        {
+            // used to be (cached)
+            //var treeTypes = Current.TypeLoader.GetAttributedTreeControllers();
+            //
+            // ie inheriting from TreeController and marked with TreeAttribute
+            //
+            // do this instead
+            // inheriting from TreeControllerBase and marked with TreeAttribute
+            var trees = Current.Factory.GetInstance<TreeCollection>();
+
+            foreach (var tree in trees)
+            {
+                var treeType = tree.TreeControllerType;
+
+                // exclude anything marked with CoreTreeAttribute
+                var coreTree = treeType.GetCustomAttribute<CoreTreeAttribute>(false);
+                if (coreTree != null) continue;
+
+                // exclude anything not marked with PluginControllerAttribute
+                var pluginController = treeType.GetCustomAttribute<PluginControllerAttribute>(false);
+                if (pluginController == null) continue;
+
+                yield return new PluginTree { Alias = tree.TreeAlias, PackageFolder = pluginController.AreaName };
+            }
+        }
 
         /// <summary>
         /// Returns the server variables regarding the application state
@@ -403,15 +439,19 @@ namespace Umbraco.Web.Editors
         {
             var app = new Dictionary<string, object>
             {
-                {"assemblyVersion", UmbracoVersion.AssemblyVersion}
+                // add versions - see UmbracoVersion for details & differences
+
+                // the complete application version (eg "8.1.2-alpha.25")
+                { "version", UmbracoVersion.SemanticVersion.ToSemanticString() },
+
+                // the assembly version (eg "8.0.0")
+                { "assemblyVersion", UmbracoVersion.AssemblyVersion.ToString() }
             };
 
-            var version = UmbracoVersion.GetSemanticVersion().ToSemanticString();
+            var version = _runtimeState.SemanticVersion.ToSemanticString();
 
             //the value is the hash of the version, cdf version and the configured state
-            app.Add("cacheBuster", $"{version}.{_applicationContext.IsConfigured}.{ClientDependencySettings.Instance.Version}".GenerateHash());
-
-            app.Add("version", version);
+            app.Add("cacheBuster", $"{version}.{_runtimeState.Level}.{ClientDependencySettings.Instance.Version}".GenerateHash());
 
             //useful for dealing with virtual paths on the client side when hosted in virtual directories especially
             app.Add("applicationPath", _httpContext.Request.ApplicationPath.EnsureEndsWith('/'));
@@ -422,11 +462,11 @@ namespace Umbraco.Web.Editors
             return app;
         }
 
-        private string GetMaxRequestLength()
+        private static string GetMaxRequestLength()
         {
-            var section = ConfigurationManager.GetSection("system.web/httpRuntime") as HttpRuntimeSection;
-            if (section == null) return string.Empty;
-            return section.MaxRequestLength.ToString();
+            return ConfigurationManager.GetSection("system.web/httpRuntime") is HttpRuntimeSection section
+                ? section.MaxRequestLength.ToString()
+                : string.Empty;
         }
     }
 }

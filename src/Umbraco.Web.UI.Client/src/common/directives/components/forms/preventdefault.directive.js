@@ -25,7 +25,7 @@ angular.module("umbraco.directives")
                 });
             }
 
-            $(element).click(function (event) {
+            $(element).on("click", function (event) {
                 if (event.metaKey || event.ctrlKey) {
                     return;
                 }

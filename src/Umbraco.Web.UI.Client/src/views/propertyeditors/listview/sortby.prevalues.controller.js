@@ -42,6 +42,7 @@ function sortByPreValsController($rootScope, $scope, localizationService, editor
         }
 
         // Localize the system fields, for some reason the directive doesn't work inside of the select group with an ng-model declared
+	// beware: ensure that GetDatabaseFieldNameForOrderBy knows about those fields!
         var systemFields = [
             { value: "SortOrder", key: "general_sort" },
             { value: "Name", key: "general_name" },

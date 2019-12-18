@@ -2,11 +2,8 @@
 
 namespace Umbraco.Tests.Benchmarks
 {
-    internal class Program
+    internal static class Program
     {
-        public static void Main(string[] args)
-        {
-            new BenchmarkSwitcher(typeof(Program).Assembly).Run(args);
-        }
+        private static void Main(string[] args) => new BenchmarkSwitcher(typeof(Program).Assembly).Run(args);
     }
 }

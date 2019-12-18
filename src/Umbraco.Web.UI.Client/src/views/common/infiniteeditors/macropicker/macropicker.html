@@ -1,0 +1,100 @@
+<div ng-controller="Umbraco.Overlays.MacroPickerController">
+
+    <umb-editor-view>
+
+        <umb-editor-header
+            name="model.title"
+            name-locked="true"
+            hide-alias="true"
+            hide-icon="true"
+            hide-description="true">
+        </umb-editor-header>
+
+        <umb-editor-container>
+            <umb-box>
+                <umb-box-content class="block-form">
+                    <div ng-switch="wizardStep">
+
+                        <div ng-switch-when="macroSelect">
+
+                            <div class="form-search">
+                                <i class="icon-search"></i>
+                                <input type="text"
+                                        style="width: 100%"
+                                        ng-model="searchTerm"
+                                        class="umb-search-field search-query input-block-level"
+                                        localize="placeholder"
+                                        placeholder="@placeholders_filter"
+                                        umb-auto-focus
+                                        no-dirty-check />
+                            </div>
+
+                            <ul class="umb-card-grid -three-in-row">
+                                <li ng-repeat="availableItem in macros | orderBy:'name' | filter:searchTerm"
+                                    ng-click="selectMacro(availableItem)">
+                                    <a class="umb-card-grid-item" href="" title="{{availableItem.name}}">
+                                        <span>
+                                            <i class="icon-settings-alt"></i>
+                                            {{availableItem.name}}
+                                        </span>
+                                    </a>
+                                </li>
+                            </ul>
+
+                            <umb-empty-state ng-if="nomacros"
+                                                position="center">
+                                <localize key="defaultdialogs_noMacros">
+                                    There are no macros available to insert
+                                </localize>
+                            </umb-empty-state>
+                        </div>
+
+                        <div ng-switch-when="paramSelect">
+
+                            <h5>{{model.selectedMacro.name}}</h5>
+
+                            <ul class="unstyled">
+                                <li ng-repeat="param in model.macroParams">
+
+                                    <ng-form name="parameterForm">
+                                        <umb-control-group label="{{param.name}}">
+                                            <umb-property-editor model="param"></umb-property-editor>
+                                        </umb-control-group>
+                                    </ng-form>
+
+                                </li>
+                            </ul>
+
+                            <umb-empty-state ng-if="noMacroParams"
+                                                position="center">
+                                <localize key="defaultdialogs_noMacroParams">There are no parameters for this macro</localize>
+                            </umb-empty-state>
+
+                        </div>
+                    </div>
+                </umb-box-content>
+            </umb-box>
+        </umb-editor-container>
+
+        <umb-editor-footer>
+            <umb-editor-footer-content-right>
+                <umb-button
+                    type="button"
+                    button-style="link"
+                    shortcut="esc"
+                    label-key="general_close"
+                    action="close()">
+                </umb-button>
+
+                <umb-button
+                    type="button"
+                    button-style="success"
+                    label-key="general_submit"
+                    action="selectMacro(model.selectedMacro)">
+                </umb-button>
+            </umb-editor-footer-content-right>
+        </umb-editor-footer>
+
+    </umb-editor-view>
+
+</div>

@@ -15,30 +15,76 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
     // a tab and have the trees where they used to be - supposed that is kind of nice but would mean we'd have to store the parent
     // as a nodeid reference instead of a variable with a getParent() method.
     var treeCache = {};
-    
+
     var standardCssClass = 'icon umb-tree-icon sprTree';
 
     function getCacheKey(args) {
         //if there is no cache key they return null - it won't be cached.
         if (!args || !args.cacheKey) {
             return null;
-        }        
+        }
 
         var cacheKey = args.cacheKey;
         cacheKey += "_" + args.section;
         return cacheKey;
     }
 
-    return {  
+    // Adapted from: https://stackoverflow.com/a/2140723
+    // Please note, we can NOT test this functionality correctly in Phantom because it implements
+    // the localeCompare method incorrectly: https://github.com/ariya/phantomjs/issues/11063
+    function invariantEquals(a, b) {
+        return typeof a === "string" && typeof b === "string"
+            ? a.localeCompare(b, undefined, { sensitivity: "base" }) === 0
+            : a === b;
+    }
+
+    return {
 
         /** Internal method to return the tree cache */
-        _getTreeCache: function() {
+        _getTreeCache: function () {
             return treeCache;
+        },
+
+        /** Internal method to track expanded paths on a tree */
+        _trackExpandedPaths: function (node, expandedPaths) {
+            if (!node.children || !angular.isArray(node.children) || node.children.length == 0) {
+                return;
+            }
+
+            //take the last child
+            var childPath = this.getPath(node.children[node.children.length - 1]).join(",");
+            //check if this already exists, if so exit
+            if (expandedPaths.indexOf(childPath) !== -1) {
+                return;
+            }
+
+            if (expandedPaths.length === 0) {
+                expandedPaths.push(childPath); //track it
+                return;
+            }
+
+            var clonedPaths = expandedPaths.slice(0); //make a copy to iterate over so we can modify the original in the iteration
+
+            _.each(clonedPaths, function (p) {
+                if (childPath.startsWith(p + ",")) {
+                    //this means that the node's path supercedes this path stored so we can remove the current 'p' and replace it with node.path
+                    expandedPaths.splice(expandedPaths.indexOf(p), 1); //remove it
+                    if (expandedPaths.indexOf(childPath) === -1) {
+                        expandedPaths.push(childPath); //replace it
+                    }
+                }
+                else if (p.startsWith(childPath + ",")) {
+                    //this means we've already tracked a deeper node so we shouldn't track this one
+                }
+                else if (expandedPaths.indexOf(childPath) === -1) {
+                    expandedPaths.push(childPath); //track it
+                }
+            });
         },
 
         /** Internal method that ensures there's a routePath, parent and level property on each tree node and adds some icon specific properties so that the nodes display properly */
         _formatNodeDataForUseInUI: function (parentNode, treeNodes, section, level) {
-            //if no level is set, then we make it 1   
+            //if no level is set, then we make it 1
             var childLevel = (level ? level : 1);
             //set the section if it's not already set
             if (!parentNode.section) {
@@ -53,16 +99,17 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             }
 
             //create a method outside of the loop to return the parent - otherwise jshint blows up
-            var funcParent = function() {
+            var funcParent = function () {
                 return parentNode;
             };
+
             for (var i = 0; i < treeNodes.length; i++) {
 
                 var treeNode = treeNodes[i];
 
                 treeNode.level = childLevel;
 
-                //create a function to get the parent node, we could assign the parent node but 
+                //create a function to get the parent node, we could assign the parent node but
                 // then we cannot serialize this entity because we have a cyclical reference.
                 // Instead we just make a function to return the parentNode.
                 treeNode.parent = funcParent;
@@ -73,17 +120,17 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                 //if there is not route path specified, then set it automatically,
                 //if this is a tree root node then we want to route to the section's dashboard
                 if (!treeNode.routePath) {
-                    
+
                     if (treeNode.metaData && treeNode.metaData["treeAlias"]) {
                         //this is a root node
-                        treeNode.routePath = section;                        
+                        treeNode.routePath = section;
                     }
                     else {
                         var treeAlias = this.getTreeAlias(treeNode);
                         treeNode.routePath = section + "/" + treeAlias + "/edit/" + treeNode.id;
                     }
                 }
-                
+
                 //now, format the icon data
                 if (treeNode.iconIsClass === undefined || treeNode.iconIsClass) {
                     var converted = iconHelper.convertFromLegacyTreeNodeIcon(treeNode);
@@ -120,19 +167,19 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          * @description
          * Determines if the current tree is a plugin tree and if so returns the package folder it has declared
          * so we know where to find it's views, otherwise it will just return undefined.
-         * 
+         *
          * @param {String} treeAlias The tree alias to check
          */
-        getTreePackageFolder: function(treeAlias) {            
+        getTreePackageFolder: function (treeAlias) {
             //we determine this based on the server variables
             if (Umbraco.Sys.ServerVariables.umbracoPlugins &&
                 Umbraco.Sys.ServerVariables.umbracoPlugins.trees &&
                 angular.isArray(Umbraco.Sys.ServerVariables.umbracoPlugins.trees)) {
 
-                var found = _.find(Umbraco.Sys.ServerVariables.umbracoPlugins.trees, function(item) {
-                    return item.alias === treeAlias;
+                var found = _.find(Umbraco.Sys.ServerVariables.umbracoPlugins.trees, function (item) {
+                    return invariantEquals(item.alias, treeAlias);
                 });
-                
+
                 return found ? found.packageFolder : undefined;
             }
             return undefined;
@@ -146,7 +193,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          *
          * @description
          * Clears the tree cache - with optional cacheKey, optional section or optional filter.
-         * 
+         *
          * @param {Object} args arguments
          * @param {String} args.cacheKey optional cachekey - this is used to clear specific trees in dialogs
          * @param {String} args.section optional section alias - clear tree for a given section
@@ -170,12 +217,12 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                     if (!args.cacheKey) {
                         throw "args.cacheKey is required if args.childrenOf is supplied";
                     }
-                    //this will clear out all children for the parentId passed in to this parameter, we'll 
+                    //this will clear out all children for the parentId passed in to this parameter, we'll
                     // do this by recursing and specifying a filter
                     var self = this;
                     this.clearCache({
                         cacheKey: args.cacheKey,
-                        filter: function(cc) {
+                        filter: function (cc) {
                             //get the new parent node from the tree cache
                             var parent = self.getDescendantNode(cc.root, args.childrenOf);
                             if (parent) {
@@ -203,7 +250,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                             //set the result to the filtered data
                             treeCache[args.cacheKey] = result;
                         }
-                        else {                            
+                        else {
                             //remove the cache
                             treeCache = _.omit(treeCache, args.cacheKey);
                         }
@@ -226,7 +273,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                         return k.endsWith("_" + args.section);
                     });
                     treeCache = _.omit(treeCache, toRemove2);
-                }               
+                }
             }
         },
 
@@ -243,19 +290,22 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          * @param {object} args.node The tree node
          * @param {object} args.section The current section
          */
-        loadNodeChildren: function(args) {
+        loadNodeChildren: function (args) {
             if (!args) {
                 throw "No args object defined for loadNodeChildren";
             }
             if (!args.node) {
                 throw "No node defined on args object for loadNodeChildren";
             }
-            
-            this.removeChildNodes(args.node);
+
+            // don't remove the children for container nodes in dialogs, as it'll remove the right arrow indicator
+            if (!args.isDialog || !args.node.metaData.isContainer) {
+                this.removeChildNodes(args.node);
+            }
             args.node.loading = true;
 
             return this.getChildren(args)
-                .then(function(data) {
+                .then(function (data) {
 
                     //set state to done and expand (only if there actually are children!)
                     args.node.loading = false;
@@ -264,25 +314,26 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                         args.node.expanded = true;
                         args.node.hasChildren = true;
 
+                        //Since we've removed the children &  reloaded them, we need to refresh the UI now because the tree node UI doesn't operate on normal angular $watch since that will be pretty slow
                         if (angular.isFunction(args.node.updateNodeData)) {
-                            args.node.updateNodeData();
+                            args.node.updateNodeData(args.node);
                         }
                     }
 
-                    return data;
+                    return $q.when(data);
 
-                }, function(reason) {
+                }, function (reason) {
 
                     //in case of error, emit event
-                    eventsService.emit("treeService.treeNodeLoadError", {error: reason } );
+                    eventsService.emit("treeService.treeNodeLoadError", { error: reason });
 
-                    //stop show the loading indicator  
+                    //stop show the loading indicator
                     args.node.loading = false;
 
                     //tell notications about the error
                     notificationsService.error(reason);
 
-                    return reason;
+                    return $q.reject(reason);
                 });
 
         },
@@ -297,7 +348,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          * Removes a given node from the tree
          * @param {object} treeNode the node to remove
          */
-        removeNode: function(treeNode) {
+        removeNode: function (treeNode) {
             if (!angular.isFunction(treeNode.parent)) {
                 return;
             }
@@ -306,9 +357,15 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                 throw "Cannot remove a node that doesn't have a parent";
             }
             //remove the current item from it's siblings
-            treeNode.parent().children.splice(treeNode.parent().children.indexOf(treeNode), 1);            
+            var parent = treeNode.parent();
+            parent.children.splice(parent.children.indexOf(treeNode), 1);
+
+            parent.hasChildren = parent.children.length !== 0;
+
+            //Notify that the node has been removed
+            eventsService.emit("treeService.removeNode", { node: treeNode });
         },
-        
+
         /**
          * @ngdoc method
          * @name umbraco.services.treeService#removeChildNodes
@@ -316,10 +373,10 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          * @function
          *
          * @description
-         * Removes all child nodes from a given tree node 
+         * Removes all child nodes from a given tree node
          * @param {object} treeNode the node to remove children from
          */
-        removeChildNodes : function(treeNode) {
+        removeChildNodes: function (treeNode) {
             treeNode.expanded = false;
             treeNode.children = [];
             treeNode.hasChildren = false;
@@ -358,27 +415,45 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          * @param {int} id id of descendant node
          * @param {string} treeAlias - optional tree alias, if fetching descendant node from a child of a listview document
          */
-        getDescendantNode: function(treeNode, id, treeAlias) {
+        getDescendantNode: function (treeNode, id, treeAlias) {
 
             //validate if it is a section container since we'll need a treeAlias if it is one
             if (treeNode.isContainer === true && !treeAlias) {
                 throw "Cannot get a descendant node from a section container node without a treeAlias specified";
             }
 
-            //if it is a section container, we need to find the tree to be searched
-            if (treeNode.isContainer) {
-                var foundRoot = null;
-                for (var c = 0; c < treeNode.children.length; c++) {
-                    if (this.getTreeAlias(treeNode.children[c]) === treeAlias) {
-                        foundRoot = treeNode.children[c];
-                        break;
+            //the treeNode passed in could be a section container, or it could be a section group
+            //in either case we need to go through the children until we can find the actual tree root with the treeAlias
+            var self = this;
+            function getTreeRoot(tn) {
+                //if it is a section container, we need to find the tree to be searched
+                if (tn.isContainer) {
+                    for (var c = 0; c < tn.children.length; c++) {
+                        if (tn.children[c].isContainer) {
+                            //recurse
+                            var root = getTreeRoot(tn.children[c]);
+
+                            //only return if we found the root in this child, otherwise continue.
+                            if (root) {
+                                return root;
+                            }
+                        }
+                        else if (self.getTreeAlias(tn.children[c]) === treeAlias) {
+                            return tn.children[c];
+                        }
                     }
+                    return null;
                 }
-                if (!foundRoot) {
-                    throw "Could not find a tree in the current section with alias " + treeAlias;
+                else {
+                    return tn;
                 }
-                treeNode = foundRoot;
             }
+
+            var foundRoot = getTreeRoot(treeNode);
+            if (!foundRoot) {
+                throw "Could not find a tree in the current section with alias " + treeAlias;
+            }
+            treeNode = foundRoot;
 
             //check this node
             if (treeNode.id === id) {
@@ -390,7 +465,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             if (found) {
                 return found;
             }
-           
+
             //check each child of this node
             if (!treeNode.children) {
                 return null;
@@ -406,7 +481,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                     }
                 }
             }
-            
+
             //not found
             return found === undefined ? null : found;
         },
@@ -428,9 +503,9 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
 
             //all root nodes have metadata key 'treeAlias'
             var root = null;
-            var current = treeNode;            
+            var current = treeNode;
             while (root === null && current) {
-                
+
                 if (current.metaData && current.metaData["treeAlias"]) {
                     root = current;
                 }
@@ -455,10 +530,10 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          * @function
          *
          * @description
-         * Gets the node's tree alias, this is done by looking up the meta-data of the current node's root node 
+         * Gets the node's tree alias, this is done by looking up the meta-data of the current node's root node
          * @param {object} treeNode to retrive tree alias from
          */
-        getTreeAlias : function(treeNode) {
+        getTreeAlias: function (treeNode) {
             var root = this.getTreeRoot(treeNode);
             if (root) {
                 return root.metaData["treeAlias"];
@@ -473,14 +548,12 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          * @function
          *
          * @description
-         * gets the tree, returns a promise 
+         * gets the tree, returns a promise
          * @param {object} args Arguments
          * @param {string} args.section Section alias
          * @param {string} args.cacheKey Optional cachekey
          */
         getTree: function (args) {
-
-            var deferred = $q.defer();
 
             //set defaults
             if (!args) {
@@ -491,37 +564,45 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             }
 
             var cacheKey = getCacheKey(args);
-            
+
             //return the cache if it exists
             if (cacheKey && treeCache[cacheKey] !== undefined) {
-                deferred.resolve(treeCache[cacheKey]);
-                return deferred.promise;
+                return $q.when(treeCache[cacheKey]);
             }
 
             var self = this;
-            treeResource.loadApplication(args)
-                .then(function(data) {
+            return treeResource.loadApplication(args)
+                .then(function (data) {
                     //this will be called once the tree app data has loaded
                     var result = {
                         name: data.name,
                         alias: args.section,
                         root: data
                     };
-                    //we need to format/modify some of the node data to be used in our app.
+
+                    //format the root
                     self._formatNodeDataForUseInUI(result.root, result.root.children, args.section);
+
+                    //if this is a root that contains group nodes, we need to format those manually too
+                    if (result.root.containsGroups) {
+                        for (var i = 0; i < result.root.children.length; i++) {
+                            var group = result.root.children[i];
+
+                            //we need to format/modify some of the node data to be used in our app.
+                            self._formatNodeDataForUseInUI(group, group.children, args.section);
+                        }
+                    }
 
                     //cache this result if a cache key is specified - generally a cache key should ONLY
                     // be specified for application trees, dialog trees should not be cached.
-                    if (cacheKey) {                        
+                    if (cacheKey) {
                         treeCache[cacheKey] = result;
-                        deferred.resolve(treeCache[cacheKey]);
+                        return $q.when(treeCache[cacheKey]);
                     }
 
                     //return un-cached
-                    deferred.resolve(result);
+                    return $q.when(result);
                 });
-            
-            return deferred.promise;
         },
 
         /**
@@ -545,7 +626,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             }
 
             return treeResource.loadMenu(args.treeNode)
-                .then(function(data) {
+                .then(function (data) {
                     //need to convert the icons to new ones
                     for (var i = 0; i < data.length; i++) {
                         data[i].cssclass = iconHelper.convertFromLegacyIcon(data[i].cssclass);
@@ -553,7 +634,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                     return data;
                 });
         },
-        
+
         /**
          * @ngdoc method
          * @name umbraco.services.treeService#getChildren
@@ -561,7 +642,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          * @function
          *
          * @description
-         * Gets the children from the server for a given node 
+         * Gets the children from the server for a given node
          * @param {object} args Arguments
          * @param {object} args.node tree node object to retrieve the children for
          * @param {string} args.section current section alias
@@ -584,10 +665,10 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                 .then(function (data) {
                     //now that we have the data, we need to add the level property to each item and the view
                     self._formatNodeDataForUseInUI(treeItem, data, section, treeItem.level + 1);
-                    return data;
+                    return $q.when(data);
                 });
         },
-        
+
         /**
          * @ngdoc method
          * @name umbraco.services.treeService#reloadNode
@@ -598,7 +679,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          * Re-loads the single node from the server
          * @param {object} node Tree node to reload
          */
-        reloadNode: function(node) {
+        reloadNode: function (node) {
             if (!node) {
                 throw "node cannot be null";
             }
@@ -608,16 +689,14 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             if (!node.section) {
                 throw "cannot reload a single node without an assigned node.section";
             }
-            
-            var deferred = $q.defer();
-            
+
             //set the node to loading
             node.loading = true;
 
-            this.getChildren({ node: node.parent(), section: node.section }).then(function(data) {
+            return this.getChildren({ node: node.parent(), section: node.section }).then(function (data) {
 
                 //ok, now that we have the children, find the node we're reloading
-                var found = _.find(data, function(item) {
+                var found = _.find(data, function (item) {
                     return item.id === node.id;
                 });
                 if (found) {
@@ -634,20 +713,18 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                         //just update as per normal - this means styles, etc.. won't be applied
                         _.extend(node.parent().children[index], found);
                     }
-                    
+
                     //set the node loading
                     node.parent().children[index].loading = false;
                     //return
-                    deferred.resolve(node.parent().children[index]);
+                    return $q.when(node.parent().children[index]);
                 }
                 else {
-                    deferred.reject();
+                    return $q.reject();
                 }
-            }, function() {
-                deferred.reject();
+            }, function () {
+                return $q.reject();
             });
-            
-            return deferred.promise;
         },
 
         /**
@@ -657,22 +734,25 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          * @function
          *
          * @description
-         * This will return the current node's path by walking up the tree 
+         * This will return the current node's path by walking up the tree
          * @param {object} node Tree node to retrieve path for
          */
-        getPath: function(node) {
+        getPath: function (node) {
             if (!node) {
-                throw "node cannot be null";                
+                throw "node cannot be null";
             }
             if (!angular.isFunction(node.parent)) {
                 throw "node.parent is not a function, the path cannot be resolved";
             }
-            //all root nodes have metadata key 'treeAlias'
+
             var reversePath = [];
             var current = node;
             while (current != null) {
-                reversePath.push(current.id);                
-                if (current.metaData && current.metaData["treeAlias"]) {
+                reversePath.push(current.id);
+
+                //all tree root nodes (non group, not section root) have a treeAlias so exit if that is the case
+                //or exit if we cannot traverse further up
+                if ((current.metaData && current.metaData["treeAlias"]) || !current.parent) {
                     current = null;
                 }
                 else {
@@ -682,8 +762,8 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             return reversePath.reverse();
         },
 
-        syncTree: function(args) {
-            
+        syncTree: function (args) {
+
             if (!args) {
                 throw "No args object defined for syncTree";
             }
@@ -701,14 +781,12 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                 args.path.push("-1");
             }
 
-            var deferred = $q.defer();
-
             //get the rootNode for the current node, we'll sync based on that
             var root = this.getTreeRoot(args.node);
             if (!root) {
                 throw "Could not get the root tree node based on the node passed in";
             }
-            
+
             //now we want to loop through the ids in the path, first we'll check if the first part
             //of the path is the root node, otherwise we'll search it's children.
             var currPathIndex = 0;
@@ -716,15 +794,16 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             if (String(args.path[currPathIndex]).toLowerCase() === String(args.node.id).toLowerCase()) {
                 if (args.path.length === 1) {
                     //return the root
-                    deferred.resolve(root);
-                    return deferred.promise;
+                    return $q.when(root);
                 }
                 else {
                     //move to the next path part and continue
                     currPathIndex = 1;
                 }
             }
-           
+
+            var deferred = $q.defer();
+
             //now that we have the first id to lookup, we can start the process
 
             var self = this;
@@ -737,16 +816,12 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                     if (args.path.length === (currPathIndex + 1)) {
                         //woot! synced the node
                         if (!args.forceReload) {
-                            deferred.resolve(child);
+                            return $q.when(child);
                         }
                         else {
                             //even though we've found the node if forceReload is specified
                             //we want to go update this single node from the server
-                            self.reloadNode(child).then(function (reloaded) {
-                                deferred.resolve(reloaded);
-                            }, function () {
-                                deferred.reject();
-                            });
+                            return self.reloadNode(child);
                         }
                     }
                     else {
@@ -754,45 +829,55 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                         currPathIndex++;
                         node = child;
                         //recurse
-                        doSync();
+                        return doSync();
                     }
                 }
                 else {
-                    //couldn't find it in the 
-                    self.loadNodeChildren({ node: node, section: node.section }).then(function () {
+                    //couldn't find it in the
+                    return self.loadNodeChildren({ node: node, section: node.section }).then(function (children) {
+
+                        //send back some progress to allow the caller to deal with expanded nodes
+                        deferred.notify({ type: "treeNodeExpanded", node: node, children: children })
+
                         //ok, got the children, let's find it
                         var found = self.getChildNode(node, args.path[currPathIndex]);
                         if (found) {
                             if (args.path.length === (currPathIndex + 1)) {
                                 //woot! synced the node
-                                deferred.resolve(found);
+                                return $q.when(found);
                             }
                             else {
                                 //now we need to recurse with the updated node/currPathIndex
                                 currPathIndex++;
                                 node = found;
                                 //recurse
-                                doSync();
+                                return doSync();
                             }
                         }
                         else {
                             //fail!
-                            deferred.reject();
+                            return $q.reject();
                         }
                     }, function () {
                         //fail!
-                        deferred.reject();
+                        return $q.reject();
                     });
                 }
             };
 
             //start
-            doSync();
-            
-            return deferred.promise;
+            var wrappedPromise = doSync();
 
+            //then wrap it 
+            wrappedPromise.then(function (args) {
+                deferred.resolve(args);
+            }, function (args) {
+                deferred.reject(args);
+            });
+
+            return deferred.promise;
         }
-        
+
     };
 }
 

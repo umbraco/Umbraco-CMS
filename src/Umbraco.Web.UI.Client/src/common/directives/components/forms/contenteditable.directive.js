@@ -14,7 +14,7 @@ angular.module("umbraco.directives")
       };
 
       
-      element.bind("focus", function(){
+      element.on("focus", function(){
           
           var range = document.createRange();
           range.selectNodeContents(element[0]);
@@ -25,7 +25,7 @@ angular.module("umbraco.directives")
 
       });
 
-      element.bind("blur keyup change", function() {
+      element.on("blur keyup change", function() {
         scope.$apply(read);
       });
     }

@@ -5,16 +5,13 @@ using Umbraco.Core.Persistence.SqlSyntax;
 namespace Umbraco.Tests.Persistence.Mappers
 {
     [TestFixture]
-    public class RelationMapperTest
+    public class RelationMapperTest : MapperTestBase
     {
         [Test]
         public void Can_Map_Id_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
-
             // Act
-            string column = new RelationMapper().Map("Id");
+            string column = new RelationMapper(MockSqlContext(), CreateMaps()).Map("Id");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelation].[id]"));
@@ -23,11 +20,8 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_ChildId_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
-
             // Act
-            string column = new RelationMapper().Map("ChildId");
+            string column = new RelationMapper(MockSqlContext(), CreateMaps()).Map("ChildId");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelation].[childId]"));
@@ -36,11 +30,8 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_Datetime_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
-
             // Act
-            string column = new RelationMapper().Map("CreateDate");
+            string column = new RelationMapper(MockSqlContext(), CreateMaps()).Map("CreateDate");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelation].[datetime]"));
@@ -49,11 +40,8 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_Comment_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
-
             // Act
-            string column = new RelationMapper().Map("Comment");
+            string column = new RelationMapper(MockSqlContext(), CreateMaps()).Map("Comment");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelation].[comment]"));
@@ -62,11 +50,8 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_RelationType_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
-
             // Act
-            string column = new RelationMapper().Map("RelationTypeId");
+            string column = new RelationMapper(MockSqlContext(), CreateMaps()).Map("RelationTypeId");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelation].[relType]"));

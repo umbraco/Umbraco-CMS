@@ -1,175 +1,160 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Web.Routing;
+using System.Linq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.ObjectResolution;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Web;
-using Umbraco.Tests.TestHelpers;
-using umbraco.BusinessLogic;
-using Umbraco.Web.PublishedCache.XmlPublishedCache;
-using Umbraco.Web.Security;
+using Umbraco.Core;
+using Umbraco.Tests.Testing;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Tests.PublishedContent
 {
     [TestFixture]
-    public class PublishedContentMoreTests : PublishedContentTestBase
+    [UmbracoTest(TypeLoader = UmbracoTestOptions.TypeLoader.PerFixture)]
+    public class PublishedContentMoreTests : PublishedContentSnapshotTestBase
     {
-
-        // read http://stackoverflow.com/questions/7713326/extension-method-that-works-on-ienumerablet-and-iqueryablet
-        // and http://msmvps.com/blogs/jon_skeet/archive/2010/10/28/overloading-and-generic-constraints.aspx
-        // and http://blogs.msdn.com/b/ericlippert/archive/2009/12/10/constraints-are-not-part-of-the-signature.aspx
-
-        private PluginManager _pluginManager;
-
-        public override void Initialize()
+        internal override void PopulateCache(PublishedContentTypeFactory factory, SolidPublishedContentCache cache)
         {
-            base.Initialize();
+            IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
+            {
+                yield return factory.CreatePropertyType(contentType, "prop1", 1);
+            }
 
-            // this is so the model factory looks into the test assembly
-            _pluginManager = PluginManager.Current;
-            PluginManager.Current = new PluginManager(new ActivatorServiceProvider(), new NullCacheProvider(), ProfilingLogger, false)
+            var contentType1 = factory.CreateContentType(1, "ContentType1", Enumerable.Empty<string>(), CreatePropertyTypes);
+            var contentType2 = factory.CreateContentType(2, "ContentType2", Enumerable.Empty<string>(), CreatePropertyTypes);
+            var contentType2Sub = factory.CreateContentType(3, "ContentType2Sub", Enumerable.Empty<string>(), CreatePropertyTypes);
+
+            var content = new SolidPublishedContent(contentType1)
+            {
+                Id = 1,
+                SortOrder = 0,
+                Name = "Content 1",
+                UrlSegment = "content-1",
+                Path = "/1",
+                Level = 1,
+                Url = "/content-1",
+                ParentId = -1,
+                ChildIds = new int[] { },
+                Properties = new Collection<IPublishedProperty>
                 {
-                    AssembliesToScan = _pluginManager.AssembliesToScan
-                        .Union(new[] { typeof (PublishedContentMoreTests).Assembly})
-                };
+                    new SolidPublishedProperty
+                    {
+                        Alias = "prop1",
+                        SolidHasValue = true,
+                        SolidValue = 1234,
+                        SolidSourceValue = "1234"
+                    }
+                }
+            };
+            cache.Add(content);
 
-            InitializeUmbracoContext();
-        }
+            content = new SolidPublishedContent(contentType2)
+            {
+                Id = 2,
+                SortOrder = 1,
+                Name = "Content 2",
+                UrlSegment = "content-2",
+                Path = "/2",
+                Level = 1,
+                Url = "/content-2",
+                ParentId = -1,
+                ChildIds = new int[] { },
+                Properties = new Collection<IPublishedProperty>
+                {
+                    new SolidPublishedProperty
+                    {
+                        Alias = "prop1",
+                        SolidHasValue = true,
+                        SolidValue = 1234,
+                        SolidSourceValue = "1234"
+                    }
+                }
+            };
+            cache.Add(content);
 
-        protected override void FreezeResolution()
-        {
-            PropertyValueConvertersResolver.Current =
-                new PropertyValueConvertersResolver(new ActivatorServiceProvider(), Logger);
-            var types = PluginManager.Current.ResolveTypes<PublishedContentModel>();
-            PublishedContentModelFactoryResolver.Current =
-                new PublishedContentModelFactoryResolver(new PublishedContentModelFactory(types));
-
-            base.FreezeResolution();
-        }
-
-        private void InitializeUmbracoContext()
-        {
-            RouteData routeData = null;
-
-            var caches = CreatePublishedContent();
-
-            var httpContext = GetHttpContextFactory("http://umbraco.local/", routeData).HttpContext;
-            var ctx = new UmbracoContext(
-                httpContext,
-                ApplicationContext,
-                caches,
-                new WebSecurity(httpContext, ApplicationContext));
-
-            UmbracoContext.Current = ctx;
-        }
-        
-        public override void TearDown()
-        {
-            PluginManager.Current = _pluginManager;
-            ApplicationContext.Current.DisposeIfDisposable();
-            ApplicationContext.Current = null;
+            content = new SolidPublishedContent(contentType2Sub)
+            {
+                Id = 3,
+                SortOrder = 2,
+                Name = "Content 2Sub",
+                UrlSegment = "content-2sub",
+                Path = "/3",
+                Level = 1,
+                Url = "/content-2sub",
+                ParentId = -1,
+                ChildIds = new int[] { },
+                Properties = new Collection<IPublishedProperty>
+                {
+                    new SolidPublishedProperty
+                    {
+                        Alias = "prop1",
+                        SolidHasValue = true,
+                        SolidValue = 1234,
+                        SolidSourceValue = "1234"
+                    }
+                }
+            };
+            cache.Add(content);
         }
 
         [Test]
         public void First()
         {
-            var content = UmbracoContext.Current.ContentCache.GetAtRoot().First();
-            Assert.AreEqual("Content 1", content.Name);
-        }
-
-        [Test]
-        public void DefaultContentSetIsSiblings()
-        {
-            var content = UmbracoContext.Current.ContentCache.GetAtRoot().First();
-            Assert.AreEqual(0, content.Index());
-            Assert.IsTrue(content.IsFirst());
-        }
-
-        [Test]
-        public void RunOnLatestContentSet()
-        {
-            // get first content
-            var content = UmbracoContext.Current.ContentCache.GetAtRoot().First();
-            var id = content.Id;
-            Assert.IsTrue(content.IsFirst());
-
-            // reverse => should be last, but set has not changed => still first
-            content = UmbracoContext.Current.ContentCache.GetAtRoot().Reverse().First(x => x.Id == id);
-            Assert.IsTrue(content.IsFirst());
-            Assert.IsFalse(content.IsLast());
-
-            // reverse + new set => now it's last
-            content = UmbracoContext.Current.ContentCache.GetAtRoot().Reverse().ToContentSet().First(x => x.Id == id);
-            Assert.IsFalse(content.IsFirst());
-            Assert.IsTrue(content.IsLast());
-
-            // reverse that set => should be first, but no new set => still last
-            content = UmbracoContext.Current.ContentCache.GetAtRoot().Reverse().ToContentSet().Reverse().First(x => x.Id == id);
-            Assert.IsFalse(content.IsFirst());
-            Assert.IsTrue(content.IsLast());
+            var content = Current.UmbracoContext.Content.GetAtRoot().First();
+            Assert.AreEqual("Content 1", content.Name());
         }
 
         [Test]
         public void Distinct()
         {
-            var content = UmbracoContext.Current.ContentCache.GetAtRoot()
+            var items = Current.UmbracoContext.Content.GetAtRoot()
                 .Distinct()
                 .Distinct()
-                .ToContentSet()
-                .First();
+                .ToIndexedArray();
 
-            Assert.AreEqual("Content 1", content.Name);
-            Assert.IsTrue(content.IsFirst());
-            Assert.IsFalse(content.IsLast());
+            var item = items[0];
+            Assert.AreEqual("Content 1", item.Content.Name);
+            Assert.IsTrue(item.IsFirst());
+            Assert.IsFalse(item.IsLast());
 
-            content = content.Next();
-            Assert.AreEqual("Content 2", content.Name);
-            Assert.IsFalse(content.IsFirst());
-            Assert.IsFalse(content.IsLast());
+            item = items[1];
+            Assert.AreEqual("Content 2", item.Content.Name);
+            Assert.IsFalse(item.IsFirst());
+            Assert.IsFalse(item.IsLast());
 
-            content = content.Next();
-            Assert.AreEqual("Content 2Sub", content.Name);
-            Assert.IsFalse(content.IsFirst());
-            Assert.IsTrue(content.IsLast());
+            item = items[2];
+            Assert.AreEqual("Content 2Sub", item.Content.Name);
+            Assert.IsFalse(item.IsFirst());
+            Assert.IsTrue(item.IsLast());
         }
 
         [Test]
         public void OfType1()
         {
-            var content = UmbracoContext.Current.ContentCache.GetAtRoot()
+            var items = Current.UmbracoContext.Content.GetAtRoot()
                 .OfType<ContentType2>()
                 .Distinct()
-                .ToArray();
-            Assert.AreEqual(2, content.Count());
-            Assert.IsInstanceOf<ContentType2>(content.First());
-            var set = content.ToContentSet();
-            Assert.IsInstanceOf<ContentType2>(set.First());
-            Assert.AreSame(set, set.First().ContentSet);
-            Assert.IsInstanceOf<ContentType2Sub>(set.First().Next());
+                .ToIndexedArray();
+            Assert.AreEqual(2, items.Length);
+            Assert.IsInstanceOf<ContentType2>(items.First().Content);
         }
 
         [Test]
         public void OfType2()
         {
-            var content = UmbracoContext.Current.ContentCache.GetAtRoot()
+            var content = Current.UmbracoContext.Content.GetAtRoot()
                 .OfType<ContentType2Sub>()
                 .Distinct()
-                .ToArray();
-            Assert.AreEqual(1, content.Count());
-            Assert.IsInstanceOf<ContentType2Sub>(content.First());
-            var set = content.ToContentSet();
-            Assert.IsInstanceOf<ContentType2Sub>(set.First());
+                .ToIndexedArray();
+            Assert.AreEqual(1, content.Length);
+            Assert.IsInstanceOf<ContentType2Sub>(content.First().Content);
         }
 
         [Test]
         public void OfType()
         {
-            var content = UmbracoContext.Current.ContentCache.GetAtRoot()
+            var content = Current.UmbracoContext.Content.GetAtRoot()
                 .OfType<ContentType2>()
                 .First(x => x.Prop1 == 1234);
             Assert.AreEqual("Content 2", content.Name);
@@ -179,23 +164,22 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Position()
         {
-            var content = UmbracoContext.Current.ContentCache.GetAtRoot()
-                .Where(x => x.GetPropertyValue<int>("prop1") == 1234)
-                .ToContentSet()
-                .ToArray();
+            var items = Current.UmbracoContext.Content.GetAtRoot()
+                .Where(x => x.Value<int>("prop1") == 1234)
+                .ToIndexedArray();
 
-            Assert.IsTrue(content.First().IsFirst());
-            Assert.IsFalse(content.First().IsLast());
-            Assert.IsFalse(content.First().Next().IsFirst());
-            Assert.IsFalse(content.First().Next().IsLast());
-            Assert.IsFalse(content.First().Next().Next().IsFirst());
-            Assert.IsTrue(content.First().Next().Next().IsLast());
+            Assert.IsTrue(items.First().IsFirst());
+            Assert.IsFalse(items.First().IsLast());
+            Assert.IsFalse(items.Skip(1).First().IsFirst());
+            Assert.IsFalse(items.Skip(1).First().IsLast());
+            Assert.IsFalse(items.Skip(2).First().IsFirst());
+            Assert.IsTrue(items.Skip(2).First().IsLast());
         }
 
         [Test]
         public void Issue()
         {
-            var content = UmbracoContext.Current.ContentCache.GetAtRoot()
+            var content = Current.UmbracoContext.Content.GetAtRoot()
                 .Distinct()
                 .OfType<ContentType2>();
 
@@ -203,12 +187,12 @@ namespace Umbraco.Tests.PublishedContent
             var first = where.First();
             Assert.AreEqual(1234, first.Prop1);
 
-            var content2 = UmbracoContext.Current.ContentCache.GetAtRoot()
+            var content2 = Current.UmbracoContext.Content.GetAtRoot()
                 .OfType<ContentType2>()
                 .First(x => x.Prop1 == 1234);
             Assert.AreEqual(1234, content2.Prop1);
 
-            var content3 = UmbracoContext.Current.ContentCache.GetAtRoot()
+            var content3 = Current.UmbracoContext.Content.GetAtRoot()
                 .OfType<ContentType2>()
                 .First();
             Assert.AreEqual(1234, content3.Prop1);
@@ -217,97 +201,11 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void PublishedContentQueryTypedContentList()
         {
-            var query = new PublishedContentQuery(UmbracoContext.Current.ContentCache, UmbracoContext.Current.MediaCache);
-            var result = query.TypedContent(new[] { 1, 2, 4 }).ToArray();
+            var query = new PublishedContentQuery(Current.UmbracoContext.PublishedSnapshot, Current.UmbracoContext.VariationContextAccessor);
+            var result = query.Content(new[] { 1, 2, 4 }).ToArray();
             Assert.AreEqual(2, result.Length);
             Assert.AreEqual(1, result[0].Id);
             Assert.AreEqual(2, result[1].Id);
-        }
-
-        static SolidPublishedCaches CreatePublishedContent()
-        {
-            var caches = new SolidPublishedCaches();
-            var cache = caches.ContentCache;
-
-            var props = new[]
-                    {
-                        new PublishedPropertyType("prop1", 1, "?"), 
-                    };
-
-            var contentType1 = new PublishedContentType(1, "ContentType1", Enumerable.Empty<string>(), props);
-            var contentType2 = new PublishedContentType(2, "ContentType2", Enumerable.Empty<string>(), props);
-            var contentType2s = new PublishedContentType(3, "ContentType2Sub", Enumerable.Empty<string>(), props);
-
-            cache.Add(new SolidPublishedContent(contentType1)
-                {
-                    Id = 1,
-                    SortOrder = 0,
-                    Name = "Content 1",
-                    UrlName = "content-1",
-                    Path = "/1",
-                    Level = 1,
-                    Url = "/content-1",
-                    ParentId = -1,
-                    ChildIds = new int[] {},
-                    Properties = new Collection<IPublishedProperty>
-                        {
-                            new SolidPublishedProperty
-                                {
-                                    PropertyTypeAlias = "prop1",
-                                    HasValue = true,
-                                    Value = 1234,
-                                    DataValue = "1234"
-                                }
-                        }
-                });
-
-            cache.Add(new SolidPublishedContent(contentType2)
-                {
-                    Id = 2,
-                    SortOrder = 1,
-                    Name = "Content 2",
-                    UrlName = "content-2",
-                    Path = "/2",
-                    Level = 1,
-                    Url = "/content-2",
-                    ParentId = -1,
-                    ChildIds = new int[] { },
-                    Properties = new Collection<IPublishedProperty>
-                            {
-                                new SolidPublishedProperty
-                                    {
-                                        PropertyTypeAlias = "prop1",
-                                        HasValue = true,
-                                        Value = 1234,
-                                        DataValue = "1234"
-                                    }
-                            }
-                });
-
-            cache.Add(new SolidPublishedContent(contentType2s)
-            {
-                Id = 3,
-                SortOrder = 2,
-                Name = "Content 2Sub",
-                UrlName = "content-2sub",
-                Path = "/3",
-                Level = 1,
-                Url = "/content-2sub",
-                ParentId = -1,
-                ChildIds = new int[] { },
-                Properties = new Collection<IPublishedProperty>
-                            {
-                                new SolidPublishedProperty
-                                    {
-                                        PropertyTypeAlias = "prop1",
-                                        HasValue = true,
-                                        Value = 1234,
-                                        DataValue = "1234"
-                                    }
-                            }
-            });
-
-            return caches;
         }
     }
 }
