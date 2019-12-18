@@ -27,6 +27,8 @@ namespace Umbraco.Web.Routing
             string propertyAlias, UrlMode mode, string culture, Uri current)
         {
             var prop = content.GetProperty(propertyAlias);
+
+            // get the raw source value since this is what is used by IDataEditorWithMediaPath for processing
             var value = prop?.GetSourceValue(culture);
             if (value == null)
             {
