@@ -11,7 +11,7 @@ namespace Umbraco.Core.Persistence.Factories
 {
     internal class ContentBaseFactory
     {
-        private static readonly Regex MediaPathPattern = new Regex("(" + SystemDirectories.Media.TrimStart("~").EnsureEndsWith("/") + ".+?)(?:['\"]|$)", RegexOptions.IgnoreCase);
+        private static readonly Regex MediaPathPattern = new Regex($"({SystemDirectories.Media.TrimStart("~").EnsureEndsWith(" / ")}.+?)(?:['\"]|$)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         /// <summary>
         /// Builds an IContent item from a dto and content type.
