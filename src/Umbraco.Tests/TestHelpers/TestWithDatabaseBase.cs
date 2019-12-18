@@ -269,6 +269,7 @@ namespace Umbraco.Tests.TestHelpers
                 Logger,
                 Factory.GetInstance<IGlobalSettings>(),
                 HostingEnvironment,
+                ShortStringHelper,
                 new SiteDomainHelper(),
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 ContentTypesCache,

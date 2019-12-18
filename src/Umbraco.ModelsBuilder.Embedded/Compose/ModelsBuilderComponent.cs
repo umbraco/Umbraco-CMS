@@ -8,6 +8,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Core.Strings;
 using Umbraco.ModelsBuilder.Embedded.BackOffice;
 using Umbraco.ModelsBuilder.Embedded.Configuration;
 using Umbraco.Web;
@@ -21,12 +22,14 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
     {
 
         private readonly IModelsBuilderConfig _config;
+        private readonly IShortStringHelper _shortStringHelper;
         private readonly LiveModelsProvider _liveModelsProvider;
         private readonly OutOfDateModelsStatus _outOfDateModels;
 
-        public ModelsBuilderComponent(IModelsBuilderConfig config, LiveModelsProvider liveModelsProvider, OutOfDateModelsStatus outOfDateModels)
+        public ModelsBuilderComponent(IModelsBuilderConfig config, IShortStringHelper shortStringHelper,  LiveModelsProvider liveModelsProvider, OutOfDateModelsStatus outOfDateModels)
         {
             _config = config;
+            _shortStringHelper = shortStringHelper;
             _liveModelsProvider = liveModelsProvider;
             _outOfDateModels = outOfDateModels;
         }
@@ -116,7 +119,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
                     // + this is how we get the default model name in Umbraco.ModelsBuilder.Umbraco.Application
                     var alias = e.AdditionalData["ContentTypeAlias"].ToString();
                     var name = template.Name; // will be the name of the content type since we are creating
-                    var className = UmbracoServices.GetClrName(name, alias);
+                    var className = UmbracoServices.GetClrName(_shortStringHelper, name, alias);
 
                     var modelNamespace = _config.ModelsNamespace;
 

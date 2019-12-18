@@ -17,6 +17,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi.Filters;
 
@@ -30,6 +31,7 @@ namespace Umbraco.Web.Editors
     public class CurrentUserController : UmbracoAuthorizedJsonController
     {
         private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly IShortStringHelper _shortStringHelper;
 
         public CurrentUserController(
             IGlobalSettings globalSettings,
@@ -40,10 +42,12 @@ namespace Umbraco.Web.Editors
             IProfilingLogger logger,
             IRuntimeState runtimeState,
             UmbracoHelper umbracoHelper,
-            IMediaFileSystem mediaFileSystem)
+            IMediaFileSystem mediaFileSystem,
+            IShortStringHelper shortStringHelper)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _mediaFileSystem = mediaFileSystem;
+            _shortStringHelper = shortStringHelper;
         }
 
         /// <summary>
@@ -177,7 +181,7 @@ namespace Umbraco.Web.Editors
         public async Task<HttpResponseMessage> PostSetAvatar()
         {
             //borrow the logic from the user controller
-            return await UsersController.PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache,  _mediaFileSystem, Security.GetUserId().ResultOr(0));
+            return await UsersController.PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache,  _mediaFileSystem, _shortStringHelper, Security.GetUserId().ResultOr(0));
         }
 
         /// <summary>

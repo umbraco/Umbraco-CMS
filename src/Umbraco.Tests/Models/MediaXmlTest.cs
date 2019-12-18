@@ -51,7 +51,7 @@ namespace Umbraco.Tests.Models
             media.SetValue(Constants.Conventions.Media.Bytes, "100");
             media.SetValue(Constants.Conventions.Media.Extension, "png");
 
-            var nodeName = media.ContentType.Alias.ToSafeAlias();
+            var nodeName = media.ContentType.Alias.ToSafeAlias(ShortStringHelper);
             var urlName = media.GetUrlSegment(ShortStringHelper, new[] { new DefaultUrlSegmentProvider(ShortStringHelper) });
 
             // Act

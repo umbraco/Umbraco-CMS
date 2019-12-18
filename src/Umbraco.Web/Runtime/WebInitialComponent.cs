@@ -16,6 +16,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Install;
 using Umbraco.Web.JavaScript;
 using Umbraco.Web.Mvc;
@@ -34,8 +35,17 @@ namespace Umbraco.Web.Runtime
         private readonly IGlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IIOHelper _ioHelper;
+        private readonly IShortStringHelper _shortStringHelper;
 
-        public WebInitialComponent(IUmbracoContextAccessor umbracoContextAccessor, SurfaceControllerTypeCollection surfaceControllerTypes, UmbracoApiControllerTypeCollection apiControllerTypes, IHostingSettings hostingSettings, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment, IIOHelper ioHelper)
+        public WebInitialComponent(
+            IUmbracoContextAccessor umbracoContextAccessor,
+            SurfaceControllerTypeCollection surfaceControllerTypes,
+            UmbracoApiControllerTypeCollection apiControllerTypes,
+            IHostingSettings hostingSettings,
+            IGlobalSettings globalSettings,
+            IHostingEnvironment hostingEnvironment,
+            IIOHelper ioHelper,
+            IShortStringHelper shortStringHelper)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _surfaceControllerTypes = surfaceControllerTypes;
@@ -44,6 +54,7 @@ namespace Umbraco.Web.Runtime
             _globalSettings = globalSettings;
             _hostingEnvironment = hostingEnvironment;
             _ioHelper = ioHelper;
+            _shortStringHelper = shortStringHelper;
         }
 
         public void Initialize()
@@ -68,7 +79,7 @@ namespace Umbraco.Web.Runtime
             ConfigureGlobalFilters();
 
             // set routes
-            CreateRoutes(_umbracoContextAccessor, _globalSettings, _surfaceControllerTypes, _apiControllerTypes);
+            CreateRoutes(_umbracoContextAccessor, _globalSettings, _shortStringHelper, _surfaceControllerTypes, _apiControllerTypes);
         }
 
         public void Terminate()
@@ -154,6 +165,7 @@ namespace Umbraco.Web.Runtime
         internal static void CreateRoutes(
             IUmbracoContextAccessor umbracoContextAccessor,
             IGlobalSettings globalSettings,
+            IShortStringHelper shortStringHelper,
             SurfaceControllerTypeCollection surfaceControllerTypes,
             UmbracoApiControllerTypeCollection apiControllerTypes)
         {
@@ -165,7 +177,7 @@ namespace Umbraco.Web.Runtime
                 umbracoPath + "/RenderMvc/{action}/{id}",
                 new { controller = "RenderMvc", action = "Index", id = UrlParameter.Optional }
             );
-            defaultRoute.RouteHandler = new RenderRouteHandler(umbracoContextAccessor, ControllerBuilder.Current.GetControllerFactory());
+            defaultRoute.RouteHandler = new RenderRouteHandler(umbracoContextAccessor, ControllerBuilder.Current.GetControllerFactory(),shortStringHelper);
 
             // register install routes
             RouteTable.Routes.RegisterArea<UmbracoInstallArea>();

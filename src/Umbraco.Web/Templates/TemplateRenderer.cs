@@ -12,6 +12,7 @@ using Umbraco.Web.Routing;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Macros;
 using Current = Umbraco.Web.Composing.Current;
 
@@ -30,14 +31,16 @@ namespace Umbraco.Web.Templates
         private readonly IFileService _fileService;
         private readonly ILocalizationService _languageService;
         private readonly IWebRoutingSection _webRoutingSection;
+        private readonly IShortStringHelper _shortStringHelper;
 
-        public TemplateRenderer(IUmbracoContextAccessor umbracoContextAccessor, IPublishedRouter publishedRouter, IFileService fileService, ILocalizationService textService, IWebRoutingSection webRoutingSection)
+        public TemplateRenderer(IUmbracoContextAccessor umbracoContextAccessor, IPublishedRouter publishedRouter, IFileService fileService, ILocalizationService textService, IWebRoutingSection webRoutingSection, IShortStringHelper shortStringHelper)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _publishedRouter = publishedRouter ?? throw new ArgumentNullException(nameof(publishedRouter));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _languageService = textService ?? throw new ArgumentNullException(nameof(textService));
             _webRoutingSection = webRoutingSection ?? throw new ArgumentNullException(nameof(webRoutingSection));
+            _shortStringHelper = shortStringHelper;
         }
 
         public void Render(int pageId, int? altTemplateId, StringWriter writer)
@@ -129,7 +132,7 @@ namespace Umbraco.Web.Templates
             {
                 Route = RouteTable.Routes["Umbraco_default"]
             });
-            var routeHandler = new RenderRouteHandler(_umbracoContextAccessor, ControllerBuilder.Current.GetControllerFactory());
+            var routeHandler = new RenderRouteHandler(_umbracoContextAccessor, ControllerBuilder.Current.GetControllerFactory(), _shortStringHelper);
             var routeDef = routeHandler.GetUmbracoRouteDefinition(requestContext, request);
             var renderModel = new ContentModel(request.PublishedContent);
             //manually add the action/controller, this is required by mvc

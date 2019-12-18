@@ -144,9 +144,7 @@
     <Compile Include="Security\ConfiguredPasswordValidator.cs" />
     <Compile Include="Security\PasswordSecurity.cs" />
     <Compile Include="Security\UmbracoBackOfficeIdentity.cs" />
-    <Compile Include="StringExtensions.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />
-    <Compile Include="RuntimeOptions.cs" />
     <Compile Include="FileResources\Files.Designer.cs" />
     <Compile Include="MainDom.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

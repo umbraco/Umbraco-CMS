@@ -86,7 +86,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
-                    Factory.GetInstance<IMediaFileSystem>()
+                    Factory.GetInstance<IMediaFileSystem>(),
+                    ShortStringHelper
                     );
                 return usersController;
             }
@@ -152,7 +153,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
-                    Factory.GetInstance<IMediaFileSystem>());
+                    Factory.GetInstance<IMediaFileSystem>(),
+                    ShortStringHelper);
                 return usersController;
             }
 
@@ -188,7 +190,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
-                    Factory.GetInstance<IMediaFileSystem>());
+                    Factory.GetInstance<IMediaFileSystem>(),
+                    ShortStringHelper);
                 return usersController;
             }
 
@@ -259,7 +262,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
-                    Factory.GetInstance<IMediaFileSystem>());
+                    Factory.GetInstance<IMediaFileSystem>(),
+                    ShortStringHelper);
                 return usersController;
             }
 

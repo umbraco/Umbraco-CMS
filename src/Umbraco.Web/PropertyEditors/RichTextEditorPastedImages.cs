@@ -68,7 +68,7 @@ namespace Umbraco.Web.PropertyEditors
 
                 var absoluteTempImagePath = _ioHelper.MapPath(tmpImgPath);
                 var fileName = Path.GetFileName(absoluteTempImagePath);
-                var safeFileName = fileName.ToSafeFileName();
+                var safeFileName = fileName.ToSafeFileName(_shortStringHelper);
 
                 var mediaItemName = safeFileName.ToFriendlyName();
                 IMedia mediaFile;

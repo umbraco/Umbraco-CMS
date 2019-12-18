@@ -64,11 +64,10 @@ namespace Umbraco.Web.Editors
             UmbracoHelper umbracoHelper,
             IMediaFileSystem mediaFileSystem,
             IShortStringHelper shortStringHelper)
-            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _mediaFileSystem = mediaFileSystem;
-            _shortStringHelper = shortStringHelper;
         }
 
         /// <summary>
@@ -253,7 +252,7 @@ namespace Umbraco.Web.Editors
         private int[] _userStartNodes;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IMediaFileSystem _mediaFileSystem;
-        private readonly IShortStringHelper _shortStringHelper;
+
 
         protected int[] UserStartNodes
         {
@@ -713,7 +712,7 @@ namespace Umbraco.Web.Editors
             foreach (var file in result.FileData)
             {
                 var fileName = file.Headers.ContentDisposition.FileName.Trim(new[] { '\"' }).TrimEnd();
-                var safeFileName = fileName.ToSafeFileName();
+                var safeFileName = fileName.ToSafeFileName(ShortStringHelper);
                 var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 
                 if (Current.Configs.Settings().Content.IsFileAllowedForUpload(ext))
@@ -741,7 +740,7 @@ namespace Umbraco.Web.Editors
                     if (fs == null) throw new InvalidOperationException("Could not acquire file stream");
                     using (fs)
                     {
-                        f.SetValue(_mediaFileSystem, _shortStringHelper, Services.ContentTypeBaseServices, Constants.Conventions.Media.File,fileName, fs);
+                        f.SetValue(_mediaFileSystem, ShortStringHelper, Services.ContentTypeBaseServices, Constants.Conventions.Media.File,fileName, fs);
                     }
 
                     var saveResult = mediaService.Save(f, Security.CurrentUser.Id);
