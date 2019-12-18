@@ -17,7 +17,7 @@ namespace Umbraco.Core
     /// <summary>
     /// Represents the state of the Umbraco runtime.
     /// </summary>
-    internal class RuntimeState : IRuntimeState
+    public class RuntimeState : IRuntimeState
     {
         private readonly ILogger _logger;
         private readonly IUmbracoSettingsSection _settings;
@@ -105,7 +105,7 @@ namespace Umbraco.Core
         /// <summary>
         /// Ensures that the <see cref="ApplicationUrl"/> property has a value.
         /// </summary>
-        internal void EnsureApplicationUrl()
+        public void EnsureApplicationUrl()
         {
             //Fixme: This causes problems with site swap on azure because azure pre-warms a site by calling into `localhost` and when it does that
             // it changes the URL to `localhost:80` which actually doesn't work for pinging itself, it only works internally in Azure. The ironic part

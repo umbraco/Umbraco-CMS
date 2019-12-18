@@ -11,7 +11,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Security
 {
-    internal class ContentPermissionsHelper
+    public class ContentPermissionsHelper
     {
         public enum ContentAccess
         {
@@ -216,7 +216,7 @@ namespace Umbraco.Core.Security
             return startNodeIds.Any(x => formattedPath.Contains(string.Concat(",", x, ",")));
         }
 
-        internal static bool IsInBranchOfStartNode(string path, int[] startNodeIds, string[] startNodePaths, out bool hasPathAccess)
+        public static bool IsInBranchOfStartNode(string path, int[] startNodeIds, string[] startNodePaths, out bool hasPathAccess)
         {
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(path));
 
