@@ -171,6 +171,15 @@ namespace Umbraco.TestData
             return CreateHierarchy(parent, count, depth, currParent =>
             {
                 var imageUrl = faker.Image.PicsumUrl();
+
+                // we are appending a &ext=.jpg to the end of this for a reason. The result of this url will be something like:
+                // https://picsum.photos/640/480/?image=106
+                // and due to the way that we detect images there must be an extension so we'll change it to
+                // https://picsum.photos/640/480/?image=106&ext=.jpg
+                // which will trick our app into parsing this and thinking it's an image ... which it is so that's good.
+                // if we don't do this we don't get thumbnails in the back office.
+                imageUrl += "&ext=.jpg";
+
                 var media = Services.MediaService.CreateMedia(faker.Commerce.ProductName(), currParent, Constants.Conventions.MediaTypes.Image);
                 media.SetValue(Constants.Conventions.Media.File, imageUrl);
                 Services.MediaService.Save(media);
