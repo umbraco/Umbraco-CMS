@@ -13,6 +13,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Diagnostics;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -87,6 +88,8 @@ namespace Umbraco.Tests.TestHelpers
         public static IShortStringHelper ShortStringHelper => new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
         public static IDbProviderFactoryCreator DbProviderFactoryCreator => new UmbracoDbProviderFactoryCreator(Constants.DbProviderNames.SqlCe);
         public static IBulkSqlInsertProvider BulkSqlInsertProvider => new SqlCeBulkSqlInsertProvider();
+        public static IMarchal Marchal => new FrameworkMarchal();
+        public static ICoreDebug CoreDebug => new CoreDebug();
 
         public static IIOHelper IOHelper = new IOHelper(GetHostingEnvironment());
 

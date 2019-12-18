@@ -241,7 +241,7 @@ namespace Umbraco.Tests.Testing
                     profiler = Mock.Of<IProfiler>();
                     break;
                 case UmbracoTestOptions.Logger.Serilog:
-                    logger = new SerilogLogger(new FileInfo(TestHelper.MapPathForTest("~/unit-test.config")));
+                    logger = new SerilogLogger(TestHelper.CoreDebug, IOHelper, TestHelper.Marchal, new FileInfo(TestHelper.MapPathForTest("~/unit-test.config")));
                     profiler = new LogProfiler(logger);
                     break;
                 case UmbracoTestOptions.Logger.Console:

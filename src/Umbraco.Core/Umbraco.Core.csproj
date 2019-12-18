@@ -129,19 +129,15 @@
     <Compile Include="Compose\AuditEventsComponent.cs" />
     <Compile Include="Compose\AuditEventsComposer.cs" />
     <Compile Include="Composing\RegisterFactory.cs" />
-    <Compile Include="CompositionExtensions.cs" />
     <Compile Include="Composing\CompositionExtensions\Configuration.cs" />
     <Compile Include="Composing\CompositionExtensions\CoreMappingProfiles.cs" />
     <Compile Include="Composing\CompositionExtensions\FileSystems.cs" />
     <Compile Include="Composing\CompositionExtensions\Repositories.cs" />
     <Compile Include="Composing\CompositionExtensions\Services.cs" />
-    <Compile Include="CompositionExtensions_Essentials.cs" />
-    <Compile Include="CompositionExtensions_FileSystems.cs" />
     <Compile Include="Deploy\IGridCellValueConnector.cs" />
     <Compile Include="Composing\Current.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="Composing\LightInject\MixedLightInjectScopeManagerProvider.cs" />
-    <Compile Include="Logging\Viewer\LogTimePeriod.cs" />
     <Compile Include="Models\Identity\BackOfficeIdentityUser.cs" />
     <Compile Include="Models\Identity\IdentityMapDefinition.cs" />
     <Compile Include="Models\Identity\IdentityUser.cs" />
@@ -155,35 +151,11 @@
     <Compile Include="Security\UmbracoBackOfficeIdentity.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />
-    <Compile Include="Logging\Viewer\CountingFilter.cs" />
-    <Compile Include="Logging\Viewer\ErrorCounterFilter.cs" />
-    <Compile Include="Logging\Viewer\ExpressionFilter.cs" />
-    <Compile Include="Logging\Viewer\ILogFilter.cs" />
-    <Compile Include="Logging\Viewer\LogTemplate.cs" />
-    <Compile Include="Logging\Viewer\ILogViewer.cs" />
-    <Compile Include="Logging\Viewer\LogLevelCounts.cs" />
-    <Compile Include="Logging\Viewer\JsonLogViewer.cs" />
-    <Compile Include="Logging\Viewer\LogMessage.cs" />
-    <Compile Include="Logging\Viewer\LogViewerComposer.cs" />
-    <Compile Include="Logging\Viewer\LogViewerSourceBase.cs" />
-    <Compile Include="Logging\LogHttpRequest.cs" />
-    <Compile Include="Logging\MessageTemplates.cs" />
-    <Compile Include="Logging\Serilog\Enrichers\HttpRequestIdEnricher.cs" />
-    <Compile Include="Logging\Serilog\Enrichers\HttpRequestNumberEnricher.cs" />
-    <Compile Include="Logging\Serilog\Enrichers\HttpSessionIdEnricher.cs" />
-    <Compile Include="Logging\Serilog\LoggerConfigExtensions.cs" />
-    <Compile Include="Logging\Serilog\Enrichers\Log4NetLevelMapperEnricher.cs" />
-    <Compile Include="Logging\Viewer\MessageTemplateFilter.cs" />
-    <Compile Include="Logging\Viewer\SavedLogSearch.cs" />
     <Compile Include="RuntimeOptions.cs" />
     <Compile Include="Runtime\CoreRuntime.cs" />
     <Compile Include="Runtime\CoreInitialComponent.cs" />
-    <Compile Include="Diagnostics\MiniDump.cs" />
     <Compile Include="Composing\LightInject\LightInjectException.cs" />
     <Compile Include="FileResources\Files.Designer.cs" />
-    <Compile Include="Logging\Serilog\SerilogLogger.cs" />
-    <Compile Include="Logging\OwinLogger.cs" />
-    <Compile Include="Logging\OwinLoggerFactory.cs" />
     <Compile Include="MainDom.cs" />
     <Compile Include="ContentExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -221,9 +193,6 @@
       <Project>{3ae7bf57-966b-45a5-910a-954d7c554441}</Project>
       <Name>Umbraco.Infrastructure</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Sync" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

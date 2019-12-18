@@ -170,6 +170,7 @@
     <Compile Include="Editors\MacrosController.cs" />
     <Compile Include="Editors\RelationTypeController.cs" />
     <Compile Include="Editors\TinyMceController.cs" />
+    <Compile Include="FrameworkMarchal.cs" />
     <Compile Include="Hosting\AspNetHostingEnvironment.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="IUmbracoContextFactory.cs" />

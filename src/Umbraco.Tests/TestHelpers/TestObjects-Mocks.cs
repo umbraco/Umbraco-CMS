@@ -158,7 +158,6 @@ namespace Umbraco.Tests.TestHelpers
         {
             return SettingsForTests.GetDefaultGlobalSettings();
         }
-
         public IFileSystems GetFileSystemsMock()
         {
             var fileSystems = Mock.Of<IFileSystems>();

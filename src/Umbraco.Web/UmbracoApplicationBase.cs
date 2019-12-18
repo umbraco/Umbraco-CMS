@@ -46,7 +46,7 @@ namespace Umbraco.Web
 
             _profiler = new LogProfiler(_logger);
 
-            _logger = SerilogLogger.CreateWithDefaultConfiguration(_hostingEnvironment, new AspNetSessionIdResolver(), () => _factory?.GetInstance<IRequestCache>());
+            _logger = SerilogLogger.CreateWithDefaultConfiguration(_hostingEnvironment,  new AspNetSessionIdResolver(), () => _factory?.GetInstance<IRequestCache>(), _configs.CoreDebug(), _ioHelper, new FrameworkMarchal());
             _backOfficeInfo = new AspNetBackOfficeInfo(_configs.Global(), _ioHelper, _configs.Settings(), _logger);
 
             Umbraco.Composing.Current.Logger = _logger;

@@ -9,6 +9,7 @@
       <PackageReference Include="LightInject" Version="6.2.0" />
       <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
       <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+      <PackageReference Include="Microsoft.Owin" Version="4.0.1" />
       <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-19554-01" />
       <PackageReference Include="MiniProfiler.Shared" Version="4.1.0" />
       <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
@@ -19,6 +20,7 @@
       <PackageReference Include="Serilog.Filters.Expressions" Version="2.0.0" />
       <PackageReference Include="Serilog.Formatting.Compact" Version="1.1.0" />
       <PackageReference Include="Serilog.Formatting.Compact.Reader" Version="1.0.3" />
+      <PackageReference Include="Serilog.Settings.AppSettings" Version="2.2.2" />
       <PackageReference Include="Serilog.Sinks.Async" Version="1.4.0" />
       <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
       <PackageReference Include="Serilog.Sinks.Map" Version="1.0.0" />

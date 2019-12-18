@@ -1,10 +1,10 @@
 ﻿using System;
 using Microsoft.Owin.Logging;
-using Umbraco.Core.Composing;
+using Umbraco.Composing;
 
 namespace Umbraco.Core.Logging
 {
-    internal class OwinLoggerFactory : ILoggerFactory
+    public class OwinLoggerFactory : ILoggerFactory
     {
         /// <summary>
         /// Creates a new ILogger instance of the given name.

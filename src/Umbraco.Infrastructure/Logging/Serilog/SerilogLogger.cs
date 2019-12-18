@@ -5,9 +5,10 @@ using System.Threading;
 using Serilog;
 using Serilog.Events;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Diagnostics;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.IO;
 using Umbraco.Net;
 
 namespace Umbraco.Core.Logging.Serilog
@@ -17,19 +18,31 @@ namespace Umbraco.Core.Logging.Serilog
     ///</summary>
     public class SerilogLogger : ILogger, IDisposable
     {
+        private readonly ICoreDebug _coreDebug;
+        private readonly IIOHelper _ioHelper;
+        private readonly IMarchal _marchal;
+
         /// <summary>
         /// Initialize a new instance of the <see cref="SerilogLogger"/> class with a configuration file.
         /// </summary>
         /// <param name="logConfigFile"></param>
-        public SerilogLogger(FileInfo logConfigFile)
+        public SerilogLogger(ICoreDebug coreDebug, IIOHelper ioHelper, IMarchal marchal, FileInfo logConfigFile)
         {
+            _coreDebug = coreDebug;
+            _ioHelper = ioHelper;
+            _marchal = marchal;
+
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.AppSettings(filePath: AppDomain.CurrentDomain.BaseDirectory + logConfigFile)
                 .CreateLogger();
         }
 
-        public SerilogLogger(LoggerConfiguration logConfig)
+        public SerilogLogger(ICoreDebug coreDebug, IIOHelper ioHelper, IMarchal marchal, LoggerConfiguration logConfig)
         {
+            _coreDebug = coreDebug;
+            _ioHelper = ioHelper;
+            _marchal = marchal;
+
             //Configure Serilog static global logger with config passed in
             Log.Logger = logConfig.CreateLogger();
         }
@@ -38,7 +51,7 @@ namespace Umbraco.Core.Logging.Serilog
         /// Creates a logger with some pre-defined configuration and remainder from config file
         /// </summary>
         /// <remarks>Used by UmbracoApplicationBase to get its logger.</remarks>
-        public static SerilogLogger CreateWithDefaultConfiguration(IHostingEnvironment hostingEnvironment, ISessionIdResolver sessionIdResolver, Func<IRequestCache> requestCacheGetter)
+        public static SerilogLogger CreateWithDefaultConfiguration(IHostingEnvironment hostingEnvironment, ISessionIdResolver sessionIdResolver, Func<IRequestCache> requestCacheGetter, ICoreDebug coreDebug, IIOHelper ioHelper, IMarchal marchal)
         {
             var loggerConfig = new LoggerConfiguration();
             loggerConfig
@@ -46,7 +59,7 @@ namespace Umbraco.Core.Logging.Serilog
                 .ReadFromConfigFile()
                 .ReadFromUserConfigFile();
 
-            return new SerilogLogger(loggerConfig);
+            return new SerilogLogger(coreDebug, ioHelper, marchal, loggerConfig);
         }
 
         /// <summary>
@@ -157,7 +170,7 @@ namespace Umbraco.Core.Logging.Serilog
             logger.Error(exception, messageTemplate, propertyValues);
         }
 
-        private static void DumpThreadAborts(global::Serilog.ILogger logger, LogEventLevel level, Exception exception, ref string messageTemplate)
+        private void DumpThreadAborts(global::Serilog.ILogger logger, LogEventLevel level, Exception exception, ref string messageTemplate)
         {
             var dump = false;
 
@@ -166,17 +179,17 @@ namespace Umbraco.Core.Logging.Serilog
                 messageTemplate += "\r\nThe thread has been aborted, because the request has timed out.";
 
                 // dump if configured, or if stacktrace contains Monitor.ReliableEnter
-                dump = Current.Configs.CoreDebug().DumpOnTimeoutThreadAbort || IsMonitorEnterThreadAbortException(exception);
+                dump = _coreDebug.DumpOnTimeoutThreadAbort || IsMonitorEnterThreadAbortException(exception);
 
                 // dump if it is ok to dump (might have a cap on number of dump...)
-                dump &= MiniDump.OkToDump();
+                dump &= MiniDump.OkToDump(_ioHelper);
             }
 
             if (dump)
             {
                 try
                 {
-                    var dumped = MiniDump.Dump(withException: true);
+                    var dumped = MiniDump.Dump(_marchal, _ioHelper, withException: true);
                     messageTemplate += dumped
                         ? "\r\nA minidump was created in App_Data/MiniDump"
                         : "\r\nFailed to create a minidump";
