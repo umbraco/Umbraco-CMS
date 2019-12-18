@@ -816,7 +816,7 @@ namespace Umbraco.Web.Editors
                     }
                     else
                     {
-                        throw new EntityNotFoundException(parentId, "The passed id doesn't exist");
+                        throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.NotFound, "The passed id doesn't exist"));
                     }
                 }
                 else
