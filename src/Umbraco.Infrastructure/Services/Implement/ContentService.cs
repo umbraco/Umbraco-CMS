@@ -28,7 +28,7 @@ namespace Umbraco.Core.Services.Implement
         private readonly ILanguageRepository _languageRepository;
         private readonly Lazy<IPropertyValidationService> _propertyValidationService;
         private IQuery<IContent> _queryNotTrashed;
-        
+
         #region Constructors
 
         public ContentService(IScopeProvider provider, ILogger logger,
@@ -2552,7 +2552,7 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Occurs after change.
         /// </summary>
-        internal static event TypedEventHandler<IContentService, TreeChange<IContent>.EventArgs> TreeChanged;
+        public static event TypedEventHandler<IContentService, TreeChange<IContent>.EventArgs> TreeChanged;
 
         /// <summary>
         /// Occurs after a blueprint has been saved.

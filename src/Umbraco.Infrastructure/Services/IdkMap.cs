@@ -47,7 +47,7 @@ namespace Umbraco.Core.Services
         private readonly ConcurrentDictionary<UmbracoObjectTypes, (Func<int, Guid> id2key, Func<Guid, int> key2id)> _dictionary
             = new ConcurrentDictionary<UmbracoObjectTypes, (Func<int, Guid> id2key, Func<Guid, int> key2id)>();
 
-        internal void SetMapper(UmbracoObjectTypes umbracoObjectType, Func<int, Guid> id2key, Func<Guid, int> key2id)
+        public void SetMapper(UmbracoObjectTypes umbracoObjectType, Func<int, Guid> id2key, Func<Guid, int> key2id)
         {
             _dictionary[umbracoObjectType] = (id2key, key2id);
         }

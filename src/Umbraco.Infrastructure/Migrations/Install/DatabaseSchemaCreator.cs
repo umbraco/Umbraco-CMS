@@ -20,12 +20,14 @@ namespace Umbraco.Core.Migrations.Install
         private readonly IUmbracoDatabase _database;
         private readonly ILogger _logger;
         private readonly IUmbracoVersion _umbracoVersion;
+        private readonly IGlobalSettings _globalSettings;
 
-        public DatabaseSchemaCreator(IUmbracoDatabase database, ILogger logger, IUmbracoVersion umbracoVersion)
+        public DatabaseSchemaCreator(IUmbracoDatabase database, ILogger logger, IUmbracoVersion umbracoVersion, IGlobalSettings globalSettings)
         {
             _database = database;
             _logger = logger;
             _umbracoVersion = umbracoVersion;
+            _globalSettings = globalSettings;
         }
 
         private ISqlSyntaxProvider SqlSyntax => _database.SqlContext.SqlSyntax;
@@ -128,7 +130,7 @@ namespace Umbraco.Core.Migrations.Install
 
             if (e.Cancel == false)
             {
-                var dataCreation = new DatabaseDataCreator(_database, _logger,_umbracoVersion);
+                var dataCreation = new DatabaseDataCreator(_database, _logger,_umbracoVersion, _globalSettings);
                 foreach (var table in OrderedTables)
                     CreateTable(false, table, dataCreation);
             }
@@ -398,7 +400,7 @@ namespace Umbraco.Core.Migrations.Install
             where T : new()
         {
             var tableType = typeof(T);
-            CreateTable(overwrite, tableType, new DatabaseDataCreator(_database, _logger, _umbracoVersion));
+            CreateTable(overwrite, tableType, new DatabaseDataCreator(_database, _logger, _umbracoVersion, _globalSettings));
         }
 
         /// <summary>

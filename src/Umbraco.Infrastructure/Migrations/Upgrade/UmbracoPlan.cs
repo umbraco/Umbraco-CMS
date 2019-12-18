@@ -16,15 +16,17 @@ namespace Umbraco.Core.Migrations.Upgrade
     public class UmbracoPlan : MigrationPlan
     {
         private readonly IUmbracoVersion _umbracoVersion;
+        private readonly IGlobalSettings _globalSettings;
         private const string InitPrefix = "{init-";
         private const string InitSuffix = "}";
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoPlan"/> class.
         /// </summary>
-        public UmbracoPlan(IUmbracoVersion umbracoVersion)
+        public UmbracoPlan(IUmbracoVersion umbracoVersion, IGlobalSettings globalSettings)
             : base(Constants.System.UmbracoUpgradePlanName)
         {
             _umbracoVersion = umbracoVersion;
+            _globalSettings = globalSettings;
             DefinePlan();
         }
 
@@ -63,7 +65,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             get
             {
                 // no state in database yet - assume we have something in web.config that makes some sense
-                if (!SemVersion.TryParse(Current.Configs.Global().ConfigurationStatus, out var currentVersion))
+                if (!SemVersion.TryParse(_globalSettings.ConfigurationStatus, out var currentVersion))
                     throw new InvalidOperationException($"Could not get current version from web.config {Constants.AppSettings.ConfigurationStatus} appSetting.");
 
                 // cannot go back in time

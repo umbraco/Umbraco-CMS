@@ -19,13 +19,15 @@ namespace Umbraco.Web.Install.InstallSteps
         private readonly IRuntimeState _runtime;
         private readonly ILogger _logger;
         private readonly IUmbracoVersion _umbracoVersion;
+        private readonly IGlobalSettings _globalSettings;
 
-        public DatabaseUpgradeStep(DatabaseBuilder databaseBuilder, IRuntimeState runtime, ILogger logger, IUmbracoVersion umbracoVersion)
+        public DatabaseUpgradeStep(DatabaseBuilder databaseBuilder, IRuntimeState runtime, ILogger logger, IUmbracoVersion umbracoVersion, IGlobalSettings globalSettings)
         {
             _databaseBuilder = databaseBuilder;
             _runtime = runtime;
             _logger = logger;
             _umbracoVersion = umbracoVersion;
+            _globalSettings = globalSettings;
         }
 
         public override Task<InstallSetupResult> ExecuteAsync(object model)
@@ -38,7 +40,7 @@ namespace Umbraco.Web.Install.InstallSteps
             {
                 _logger.Info<DatabaseUpgradeStep>("Running 'Upgrade' service");
 
-                var plan = new UmbracoPlan(_umbracoVersion);
+                var plan = new UmbracoPlan(_umbracoVersion, _globalSettings);
                 plan.AddPostMigration<ClearCsrfCookies>(); // needed when running installer (back-office)
 
                 var result = _databaseBuilder.UpgradeSchemaAndData(plan);

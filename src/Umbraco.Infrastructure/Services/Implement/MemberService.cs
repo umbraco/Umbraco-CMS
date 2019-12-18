@@ -22,12 +22,13 @@ namespace Umbraco.Core.Services.Implement
         private readonly IMemberTypeRepository _memberTypeRepository;
         private readonly IMemberGroupRepository _memberGroupRepository;
         private readonly IAuditRepository _auditRepository;
+        private readonly IMemberTypeService _memberTypeService;
 
         private readonly IMemberGroupService _memberGroupService;
 
         #region Constructor
 
-        public MemberService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IMemberGroupService memberGroupService, 
+        public MemberService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IMemberGroupService memberGroupService,
             IMemberRepository memberRepository, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, IAuditRepository auditRepository)
             : base(provider, logger, eventMessagesFactory)
         {
@@ -64,7 +65,7 @@ namespace Umbraco.Core.Services.Implement
                 {
                     case MemberCountType.All:
                         query = Query<IMember>();
-                        break;                    
+                        break;
                     case MemberCountType.LockedOut:
                         query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == Constants.Conventions.Member.IsLockedOut && ((Member) x).BoolPropertyValue);
                         break;
@@ -545,7 +546,7 @@ namespace Umbraco.Core.Services.Implement
                 return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, null, Ordering.By("Name"));
             }
         }
-
+        
         /// <summary>
         /// Finds a list of <see cref="IMember"/> objects by a partial email string
         /// </summary>
@@ -803,8 +804,8 @@ namespace Umbraco.Core.Services.Implement
         {
             //trimming username and email to make sure we have no trailing space
             member.Username = member.Username.Trim();
-            member.Email = member.Email.Trim();         
-            
+            member.Email = member.Email.Trim();
+
             using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<IMember>(member);
@@ -1127,7 +1128,7 @@ namespace Umbraco.Core.Services.Implement
         /// This is internal for now and is used to export a member in the member editor,
         /// it will raise an event so that auditing logs can be created.
         /// </remarks>
-        internal MemberExportModel ExportMember(Guid key)
+        public MemberExportModel ExportMember(Guid key)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -1244,10 +1245,6 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public string GetDefaultMemberType()
-        {
-            return Current.Services.MemberTypeService.GetDefault();
-        }
 
         #endregion
     }

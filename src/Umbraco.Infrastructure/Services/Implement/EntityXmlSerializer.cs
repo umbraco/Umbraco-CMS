@@ -5,8 +5,10 @@ using System.Linq;
 using System.Net;
 using System.Xml.Linq;
 using Newtonsoft.Json;
+using Umbraco.Composing;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Services.Implement
@@ -24,6 +26,7 @@ namespace Umbraco.Core.Services.Implement
         private readonly ILocalizationService _localizationService;
         private readonly UrlSegmentProviderCollection _urlSegmentProviders;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly PropertyEditorCollection _propertyEditors;
 
         public EntityXmlSerializer(
             IContentService contentService,
@@ -33,7 +36,8 @@ namespace Umbraco.Core.Services.Implement
             ILocalizationService localizationService,
             IContentTypeService contentTypeService,
             UrlSegmentProviderCollection urlSegmentProviders,
-            IShortStringHelper shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            PropertyEditorCollection propertyEditors)
         {
             _contentTypeService = contentTypeService;
             _mediaService = mediaService;
@@ -43,6 +47,7 @@ namespace Umbraco.Core.Services.Implement
             _localizationService = localizationService;
             _urlSegmentProviders = urlSegmentProviders;
             _shortStringHelper = shortStringHelper;
+            _propertyEditors = propertyEditors;
         }
 
         /// <summary>
@@ -54,7 +59,7 @@ namespace Umbraco.Core.Services.Implement
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
 
-            var nodeName = content.ContentType.Alias.ToSafeAlias();
+            var nodeName = content.ContentType.Alias.ToSafeAlias(_shortStringHelper);
 
             var xml = SerializeContentBase(content, content.GetUrlSegment(_shortStringHelper, _urlSegmentProviders), nodeName, published);
 
@@ -100,7 +105,7 @@ namespace Umbraco.Core.Services.Implement
             if (media == null) throw new ArgumentNullException(nameof(media));
             if (_urlSegmentProviders == null) throw new ArgumentNullException(nameof(_urlSegmentProviders));
 
-            var nodeName = media.ContentType.Alias.ToSafeAlias();
+            var nodeName = media.ContentType.Alias.ToSafeAlias(_shortStringHelper);
 
             const bool published = false; // always false for media
             var xml = SerializeContentBase(media, media.GetUrlSegment(_shortStringHelper, _urlSegmentProviders), nodeName, published);
@@ -135,7 +140,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         public XElement Serialize(IMember member)
         {
-            var nodeName = member.ContentType.Alias.ToSafeAlias();
+            var nodeName = member.ContentType.Alias.ToSafeAlias(_shortStringHelper);
 
             const bool published = false; // always false for member
             var xml = SerializeContentBase(member, "", nodeName, published);
@@ -564,7 +569,7 @@ namespace Umbraco.Core.Services.Implement
             var propertyType = property.PropertyType;
 
             // get the property editor for this property and let it convert it to the xml structure
-            var propertyEditor = Current.PropertyEditors[propertyType.PropertyEditorAlias];
+            var propertyEditor = _propertyEditors[propertyType.PropertyEditorAlias];
             return propertyEditor == null
                 ? Array.Empty<XElement>()
                 : propertyEditor.GetValueEditor().ConvertDbToXml(property, _dataTypeService, _localizationService, published);

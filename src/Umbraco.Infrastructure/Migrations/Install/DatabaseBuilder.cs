@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Data.SqlServerCe;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -106,7 +104,7 @@ namespace Umbraco.Core.Migrations.Install
             return DbConnectionExtensions.IsConnectionAvailable(connectionString, factory);
         }
 
-        internal bool HasSomeNonDefaultUser()
+        public bool HasSomeNonDefaultUser()
         {
             using (var scope = _scopeProvider.CreateScope())
             {
@@ -143,7 +141,7 @@ namespace Umbraco.Core.Migrations.Install
             ConfigureEmbeddedDatabaseConnection(_databaseFactory, _ioHelper, _logger);
         }
 
-        private static void ConfigureEmbeddedDatabaseConnection(IUmbracoDatabaseFactory factory, IIOHelper ioHelper, ILogger logger)
+        private void ConfigureEmbeddedDatabaseConnection(IUmbracoDatabaseFactory factory, IIOHelper ioHelper, ILogger logger)
         {
             SaveConnectionString(EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe, ioHelper, logger);
 
@@ -153,8 +151,7 @@ namespace Umbraco.Core.Migrations.Install
                 // this should probably be in a "using (new SqlCeEngine)" clause but not sure
                 // of the side effects and it's been like this for quite some time now
 
-                var engine = new SqlCeEngine(EmbeddedDatabaseConnectionString);
-                engine.CreateDatabase();
+                _dbProviderFactoryCreator.CreateDatabase();
             }
 
             factory.Configure(EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe);
@@ -366,7 +363,7 @@ namespace Umbraco.Core.Migrations.Install
         /// <para>This assumes that the database exists and the connection string is
         /// configured and it is possible to connect to the database.</para>
         /// </remarks>
-        internal DatabaseSchemaResult ValidateSchema()
+        public DatabaseSchemaResult ValidateSchema()
         {
             using (var scope = _scopeProvider.CreateScope())
             {
@@ -385,7 +382,7 @@ namespace Umbraco.Core.Migrations.Install
                 return _databaseSchemaValidationResult;
 
             var database = scope.Database;
-            var dbSchema = new DatabaseSchemaCreator(database, _logger, _umbracoVersion);
+            var dbSchema = new DatabaseSchemaCreator(database, _logger, _umbracoVersion, _globalSettings);
             _databaseSchemaValidationResult = dbSchema.ValidateSchema();
             scope.Complete();
             return _databaseSchemaValidationResult;
@@ -435,7 +432,7 @@ namespace Umbraco.Core.Migrations.Install
                     if (_runtime.Level == RuntimeLevel.Run)
                         throw new Exception("Umbraco is already configured!");
 
-                    var creator = new DatabaseSchemaCreator(database, _logger, _umbracoVersion);
+                    var creator = new DatabaseSchemaCreator(database, _logger, _umbracoVersion, _globalSettings);
                     creator.InitializeDatabaseSchema();
 
                     message = message + "<p>Installation completed!</p>";

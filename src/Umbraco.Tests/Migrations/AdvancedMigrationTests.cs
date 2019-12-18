@@ -42,7 +42,7 @@ namespace Umbraco.Tests.Migrations
 
                 upgrader.Execute(ScopeProvider, builder, Mock.Of<IKeyValueService>(), logger);
 
-                var helper = new DatabaseSchemaCreator(scope.Database, logger, UmbracoVersion);
+                var helper = new DatabaseSchemaCreator(scope.Database, logger, UmbracoVersion, TestObjects.GetGlobalSettings());
                 var exists = helper.TableExists("umbracoUser");
                 Assert.IsTrue(exists);
 

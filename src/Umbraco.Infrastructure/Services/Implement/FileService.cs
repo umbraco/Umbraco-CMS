@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -28,6 +29,7 @@ namespace Umbraco.Core.Services.Implement
         private readonly IPartialViewMacroRepository _partialViewMacroRepository;
         private readonly IAuditRepository _auditRepository;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IGlobalSettings _globalSettings;
 
         private const string PartialViewHeader = "@inherits Umbraco.Web.Mvc.UmbracoViewPage";
         private const string PartialViewMacroHeader = "@inherits Umbraco.Web.Macros.PartialViewMacroPage";
@@ -35,7 +37,7 @@ namespace Umbraco.Core.Services.Implement
         public FileService(IScopeProvider uowProvider, IIOHelper ioHelper,  ILogger logger, IEventMessagesFactory eventMessagesFactory,
             IStylesheetRepository stylesheetRepository, IScriptRepository scriptRepository, ITemplateRepository templateRepository,
             IPartialViewRepository partialViewRepository, IPartialViewMacroRepository partialViewMacroRepository,
-            IAuditRepository auditRepository, IShortStringHelper shortStringHelper)
+            IAuditRepository auditRepository, IShortStringHelper shortStringHelper, IGlobalSettings globalSettings)
             : base(uowProvider, logger, eventMessagesFactory)
         {
             _ioHelper = ioHelper;
@@ -46,6 +48,7 @@ namespace Umbraco.Core.Services.Implement
             _partialViewMacroRepository = partialViewMacroRepository;
             _auditRepository = auditRepository;
             _shortStringHelper = shortStringHelper;
+            _globalSettings = globalSettings;
         }
 
         #region Stylesheets
@@ -669,7 +672,7 @@ namespace Umbraco.Core.Services.Implement
 
         public IEnumerable<string> GetPartialViewSnippetNames(params string[] filterNames)
         {
-            var snippetPath = _ioHelper.MapPath($"{Current.Configs.Global().UmbracoPath}/PartialViewMacros/Templates/");
+            var snippetPath = _ioHelper.MapPath($"{_globalSettings.UmbracoPath}/PartialViewMacros/Templates/");
             var files = Directory.GetFiles(snippetPath, "*.cshtml")
                 .Select(Path.GetFileNameWithoutExtension)
                 .Except(filterNames, StringComparer.InvariantCultureIgnoreCase)
@@ -903,7 +906,7 @@ namespace Umbraco.Core.Services.Implement
                 fileName += ".cshtml";
             }
 
-            var snippetPath = _ioHelper.MapPath($"{Current.Configs.Global().UmbracoPath}/PartialViewMacros/Templates/{fileName}");
+            var snippetPath = _ioHelper.MapPath($"{_globalSettings.UmbracoPath}/PartialViewMacros/Templates/{fileName}");
             return System.IO.File.Exists(snippetPath)
                 ? Attempt<string>.Succeed(snippetPath)
                 : Attempt<string>.Fail();

@@ -92,7 +92,7 @@ namespace Umbraco.Core.Services.Implement
             do
             {
                 // users are returned ordered by id, notifications are returned ordered by user id
-                var users = ((UserService)_userService).GetNextUsers(id, pagesz).Where(x => x.IsApproved).ToList();
+                var users = _userService.GetNextUsers(id, pagesz).Where(x => x.IsApproved).ToList();
                 var notifications = GetUsersNotifications(users.Select(x => x.Id), action, Enumerable.Empty<int>(), Constants.ObjectTypes.Document).ToList();
                 if (notifications.Count == 0) break;
 
@@ -386,7 +386,7 @@ namespace Umbraco.Core.Services.Implement
             var protocol = _globalSettings.UseHttps ? "https" : "http";
 
             var subjectVars = new NotificationEmailSubjectParams(
-                string.Concat(siteUri.Authority, _ioHelper.ResolveUrl(Current.Configs.Global().UmbracoPath)),
+                string.Concat(siteUri.Authority, _ioHelper.ResolveUrl(_globalSettings.UmbracoPath)),
                 actionName,
                 content.Name);
 
@@ -402,7 +402,7 @@ namespace Umbraco.Core.Services.Implement
                     string.Concat(content.Id, ".aspx"),
                     protocol),
                 performingUser.Name,
-                string.Concat(siteUri.Authority, _ioHelper.ResolveUrl(Current.Configs.Global().UmbracoPath)),
+                string.Concat(siteUri.Authority, _ioHelper.ResolveUrl(_globalSettings.UmbracoPath)),
                 summary.ToString());
 
             // create the mail message

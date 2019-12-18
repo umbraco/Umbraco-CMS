@@ -10,7 +10,7 @@ namespace Umbraco.Core.Migrations.Install
     /// <summary>
     /// Represents ...
     /// </summary>
-    internal class DatabaseSchemaResult
+    public class DatabaseSchemaResult
     {
         public DatabaseSchemaResult(ISqlSyntaxProvider sqlSyntax)
         {

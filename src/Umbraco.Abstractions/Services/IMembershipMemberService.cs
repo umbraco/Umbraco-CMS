@@ -124,15 +124,7 @@ namespace Umbraco.Core.Services
         /// <param name="raiseEvents">Optional parameter to raise events.
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
         void Save(IEnumerable<T> entities, bool raiseEvents = true);
-
-        /// <summary>
-        /// Gets the default MemberType alias
-        /// </summary>
-        /// <remarks>By default we'll return the 'writer', but we need to check it exists. If it doesn't we'll
-        /// return the first type that is not an admin, otherwise if there's only one we will return that one.</remarks>
-        /// <returns>Alias of the default MemberType</returns>
-        string GetDefaultMemberType();
-
+        
         /// <summary>
         /// Finds a list of <see cref="IMembershipUser"/> objects by a partial email string
         /// </summary>

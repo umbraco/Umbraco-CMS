@@ -305,7 +305,7 @@ namespace Umbraco.Tests.TestHelpers
             {
                 using (var scope = ScopeProvider.CreateScope())
                 {
-                    var schemaHelper = new DatabaseSchemaCreator(scope.Database, Logger, UmbracoVersion);
+                    var schemaHelper = new DatabaseSchemaCreator(scope.Database, Logger, UmbracoVersion, TestObjects.GetGlobalSettings());
                     //Create the umbraco database and its base data
                     schemaHelper.InitializeDatabaseSchema();
 

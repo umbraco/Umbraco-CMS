@@ -257,7 +257,7 @@ namespace Umbraco.Core
 
         protected virtual bool EnsureUmbracoUpgradeState(IUmbracoDatabaseFactory databaseFactory, ILogger logger)
         {
-            var upgrader = new Upgrader(new UmbracoPlan(_umbracoVersion));
+            var upgrader = new Upgrader(new UmbracoPlan(_umbracoVersion, _globalSettings));
             var stateValueKey = upgrader.StateValueKey;
 
             // no scope, no service - just directly accessing the database

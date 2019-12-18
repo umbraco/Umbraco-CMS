@@ -107,7 +107,7 @@ namespace Umbraco.Tests.Benchmarks
                 //use the db  to create the initial schema so we can reuse in each bench
                 using (_dbSqlCe = GetSqlCeDatabase(sqlCeConnectionString, logger))
                 {
-                    var creation = new DatabaseSchemaCreator(_dbSqlCe, logger, umbracoVersion);
+                    var creation = new DatabaseSchemaCreator(_dbSqlCe, logger, umbracoVersion, SettingsForTests.GenerateMockGlobalSettings());
                     creation.InitializeDatabaseSchema();
                 }
                 _initDbBytes = File.ReadAllBytes(_dbFile);

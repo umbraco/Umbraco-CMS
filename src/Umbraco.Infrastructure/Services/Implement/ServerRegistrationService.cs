@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
@@ -18,9 +19,7 @@ namespace Umbraco.Core.Services.Implement
     public sealed class ServerRegistrationService : ScopeRepositoryService, IServerRegistrationService
     {
         private readonly IServerRegistrationRepository _serverRegistrationRepository;
-
-        private static readonly string CurrentServerIdentityValue = NetworkHelper.MachineName // eg DOMAIN\SERVER
-                                                            + "/" + Current.HostingEnvironment.ApplicationId; // eg /LM/S3SVC/11/ROOT
+        private readonly IHostingEnvironment _hostingEnvironment;
 
         private ServerRole _currentServerRole = ServerRole.Unknown;
 
@@ -31,10 +30,11 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="logger">A logger.</param>
         /// <param name="eventMessagesFactory"></param>
         public ServerRegistrationService(IScopeProvider scopeProvider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
-            IServerRegistrationRepository serverRegistrationRepository)
+            IServerRegistrationRepository serverRegistrationRepository, IHostingEnvironment hostingEnvironment)
             : base(scopeProvider, logger, eventMessagesFactory)
         {
             _serverRegistrationRepository = serverRegistrationRepository;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         /// <summary>
@@ -148,7 +148,8 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Gets the local server identity.
         /// </summary>
-        public string CurrentServerIdentity => CurrentServerIdentityValue;
+        public string CurrentServerIdentity => NetworkHelper.MachineName // eg DOMAIN\SERVER
+                                               + "/" + _hostingEnvironment.ApplicationId; // eg /LM/S3SVC/11/ROOT;
 
         /// <summary>
         /// Gets the role of the current server.

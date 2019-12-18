@@ -604,7 +604,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        internal IEnumerable<IUser> GetNextUsers(int id, int count)
+        public IEnumerable<IUser> GetNextUsers(int id, int count)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -1185,7 +1185,7 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Occurs after Save
         /// </summary>
-        internal static event TypedEventHandler<IUserService, SaveEventArgs<UserGroupWithUsers>> SavedUserGroup;
+        public static event TypedEventHandler<IUserService, SaveEventArgs<UserGroupWithUsers>> SavedUserGroup;
 
         /// <summary>
         /// Occurs before Delete
@@ -1199,6 +1199,6 @@ namespace Umbraco.Core.Services.Implement
 
         // TODO: still don't know if we need this yet unless we start caching permissions, but that also means we'll need another
         // event on the ContentService since there's a method there to modify node permissions too, or we can proxy events if needed.
-        internal static event TypedEventHandler<IUserService, SaveEventArgs<EntityPermission>> UserGroupPermissionsAssigned;
+        public static event TypedEventHandler<IUserService, SaveEventArgs<EntityPermission>> UserGroupPermissionsAssigned;
     }
 }
