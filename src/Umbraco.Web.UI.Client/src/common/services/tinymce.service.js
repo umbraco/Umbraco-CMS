@@ -543,11 +543,11 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     'contenteditable': false
                 },
                 embed.preview);
-
-            if (activeElement) {
+            
+            // Only replace if activeElement is an Embed element.
+            if (activeElement && activeElement.nodeName.toUpperCase() === "DIV" && activeElement.classList.contains("embeditem")){
                 activeElement.replaceWith(wrapper); // directly replaces the html node
-            }
-            else {
+            } else {
                 editor.selection.setNode(wrapper);
             }
         },

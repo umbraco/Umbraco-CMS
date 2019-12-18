@@ -20,7 +20,7 @@ function watchTask(cb) {
     //Setup a watcher for all groups of JS files
     _.forEach(config.sources.js, function (group) {
         if(group.watch !== false) {
-            watch(group.files, { ignoreInitial: true, interval: watchInterval }, function JS_Group_Compile() { return processJs(group.files, group.out); });
+            watch(group.files, { ignoreInitial: true, interval: watchInterval }, function JS_Group_Compile() { return processJs(group.files, group.out);});
         }
     });
 
