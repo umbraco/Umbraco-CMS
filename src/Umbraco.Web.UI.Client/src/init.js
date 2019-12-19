@@ -23,11 +23,20 @@ app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 
                 appReady(data);
 
                 tourService.registerAllTours().then(function () {
-                    // Auto start intro tour
-                    tourService.getTourByAlias("umbIntroIntroduction").then(function (introTour) {
+
+                    // Auto start - hidden tour - aka email marketing step
+                    tourService.getTourByAlias("umbEmailMarketing").then(function (emailMarketingTour) {
                         // start intro tour if it hasn't been completed or disabled
-                        if (introTour && introTour.disabled !== true && introTour.completed !== true) {
-                            tourService.startTour(introTour);
+                        if (emailMarketingTour && emailMarketingTour.disabled !== true && emailMarketingTour.completed !== true) {
+                            tourService.startTour(emailMarketingTour);
+                        } else {
+                            // The Email Marketing tour has been completed (Accepted) or Disabled (Declined)
+                            tourService.getTourByAlias("umbIntroIntroduction").then(function (introTour) {
+                                // start intro tour if it hasn't been completed or disabled
+                                if (introTour && introTour.disabled !== true && introTour.completed !== true) {
+                                    tourService.startTour(introTour);
+                                }
+                            });
                         }
                     });
                 });
