@@ -45,7 +45,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BulkInsertBenchmarks.cs" />
     <Compile Include="CombineGuidBenchmarks.cs" />
     <Compile Include="ConcurrentDictionaryBenchmarks.cs" />
     <Compile Include="Config\QuickRunConfigAttribute.cs" />

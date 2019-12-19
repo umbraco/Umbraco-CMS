@@ -18,72 +18,7 @@ namespace Umbraco.Tests.Persistence.NPocoTests
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class NPocoBulkInsertTests : TestWithDatabaseBase
     {
-        [Test]
-        public void Can_Bulk_Insert_One_By_One()
-        {
-            var servers = new List<ServerRegistrationDto>();
-            for (var i = 0; i < 1000; i++)
-            {
-                servers.Add(new ServerRegistrationDto
-                {
-                    ServerAddress = "address" + i,
-                    ServerIdentity = "computer" + i,
-                    DateRegistered = DateTime.Now,
-                    IsActive = true,
-                    DateAccessed = DateTime.Now
-                });
-            }
-
-            // Act
-            using (ProfilingLogger.TraceDuration<NPocoBulkInsertTests>("starting insert", "finished insert"))
-            {
-                using (var scope = ScopeProvider.CreateScope())
-                {
-                    scope.Database.BulkInsertRecords(servers, false);
-                    scope.Complete();
-                }
-            }
-
-            // Assert
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                Assert.That(scope.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoServer"), Is.EqualTo(1000));
-            }
-        }
-
-        [Test]
-        public void Can_Bulk_Insert_One_By_One_Transaction_Rollback()
-        {
-            var servers = new List<ServerRegistrationDto>();
-            for (var i = 0; i < 1000; i++)
-            {
-                servers.Add(new ServerRegistrationDto
-                {
-                    ServerAddress = "address" + i,
-                    ServerIdentity = "computer" + i,
-                    DateRegistered = DateTime.Now,
-                    IsActive = true,
-                    DateAccessed = DateTime.Now
-                });
-            }
-
-            // Act
-            using (ProfilingLogger.TraceDuration<NPocoBulkInsertTests>("starting insert", "finished insert"))
-            {
-                using (var scope = ScopeProvider.CreateScope())
-                {
-                    scope.Database.BulkInsertRecords(servers, false);
-                    //don't call complete here - the trans will be rolled back
-                }
-            }
-
-            // Assert
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                Assert.That(scope.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoServer"), Is.EqualTo(0));
-            }
-        }
-
+       
 
         [NUnit.Framework.Ignore("Ignored because you need to configure your own SQL Server to test thsi with")]
         [Test]
