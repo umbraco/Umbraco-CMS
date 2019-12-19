@@ -4,7 +4,7 @@ using System.Text;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;

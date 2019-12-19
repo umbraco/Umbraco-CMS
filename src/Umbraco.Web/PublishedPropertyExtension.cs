@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web

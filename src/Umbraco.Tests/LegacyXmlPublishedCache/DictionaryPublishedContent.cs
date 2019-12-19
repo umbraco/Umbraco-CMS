@@ -37,9 +37,10 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             Func<int, XPathNavigator, IEnumerable<IPublishedContent>> getChildren,
             Func<DictionaryPublishedContent, string, IPublishedProperty> getProperty,
             IAppCache appCache,
+            IVariationContextAccessor variationContextAccessor,
             PublishedContentTypeCache contentTypeCache,
             XPathNavigator nav,
-            bool fromExamine)
+            bool fromExamine):base(variationContextAccessor)
         {
             if (valueDictionary == null) throw new ArgumentNullException(nameof(valueDictionary));
             if (getParent == null) throw new ArgumentNullException(nameof(getParent));

@@ -38,6 +38,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
         private readonly ISiteDomainHelper _siteDomainHelper;
         private readonly IEntityXmlSerializer _entitySerializer;
+        private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IHostingEnvironment _hostingEnvironment;
 
@@ -58,6 +59,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             IShortStringHelper shortStringHelper,
             ISiteDomainHelper siteDomainHelper,
             IEntityXmlSerializer entitySerializer,
+
             MainDom mainDom,
             bool testing = false, bool enableRepositoryEvents = true)
             : this(serviceContext, publishedContentTypeFactory, scopeProvider, requestCache,
@@ -103,7 +105,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             _mediaService = serviceContext.MediaService;
             _userService = serviceContext.UserService;
             _defaultCultureAccessor = defaultCultureAccessor;
-
+            _variationContextAccessor = variationContextAccessor;
             _requestCache = requestCache;
             _umbracoContextAccessor = umbracoContextAccessor;
             _globalSettings = globalSettings;
@@ -153,9 +155,9 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             var domainCache = new DomainCache(_domainService, _defaultCultureAccessor);
 
             return new PublishedSnapshot(
-                new PublishedContentCache(_xmlStore, domainCache, _requestCache, _globalSettings, _contentTypeCache, _routesCache, previewToken),
-                new PublishedMediaCache(_xmlStore, _mediaService, _userService, _requestCache, _contentTypeCache, _entitySerializer, _umbracoContextAccessor),
-                new PublishedMemberCache(_xmlStore, _requestCache, _memberService, _contentTypeCache, _userService),
+                new PublishedContentCache(_xmlStore, domainCache, _requestCache, _globalSettings, _contentTypeCache, _routesCache,_variationContextAccessor, previewToken),
+                new PublishedMediaCache(_xmlStore, _mediaService, _userService, _requestCache, _contentTypeCache, _entitySerializer, _umbracoContextAccessor, _variationContextAccessor),
+                new PublishedMemberCache(_xmlStore, _requestCache, _memberService, _contentTypeCache, _userService, _variationContextAccessor),
                 domainCache);
         }
 

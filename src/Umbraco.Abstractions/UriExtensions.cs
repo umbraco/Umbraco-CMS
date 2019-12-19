@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using Umbraco.Core.Composing;
+using Umbraco.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 
@@ -240,7 +240,7 @@ namespace Umbraco.Core
         /// <remarks>Default uri.AbsolutePath does not support relative uris.</remarks>
         public static string GetSafeAbsolutePathDecoded(this Uri uri)
         {
-            return System.Web.HttpUtility.UrlDecode(uri.GetSafeAbsolutePath());
+            return System.Net.WebUtility.UrlDecode(uri.GetSafeAbsolutePath());
         }
 
         /// <summary>

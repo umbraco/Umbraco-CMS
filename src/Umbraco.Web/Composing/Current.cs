@@ -168,68 +168,70 @@ namespace Umbraco.Web.Composing
 
         // proxy Core for convenience
 
-        public static UmbracoMapper Mapper => CoreCurrent.Mapper;
+        public static IMediaFileSystem MediaFileSystem => Factory.GetInstance<IMediaFileSystem>();
 
-        public static IRuntimeState RuntimeState => CoreCurrent.RuntimeState;
+        public static UmbracoMapper Mapper =>  Factory.GetInstance<UmbracoMapper>();
 
-        public static TypeLoader TypeLoader => CoreCurrent.TypeLoader;
+        public static IRuntimeState RuntimeState => Factory.GetInstance<IRuntimeState>();
 
-        public static Configs Configs => CoreCurrent.Configs;
+        public static TypeLoader TypeLoader => Factory.GetInstance<TypeLoader>();
 
-        public static UrlSegmentProviderCollection UrlSegmentProviders => CoreCurrent.UrlSegmentProviders;
+        public static Configs Configs => Factory.GetInstance<Configs>();
 
-        public static CacheRefresherCollection CacheRefreshers => CoreCurrent.CacheRefreshers;
+        public static UrlSegmentProviderCollection UrlSegmentProviders => Factory.GetInstance<UrlSegmentProviderCollection>();
 
-        public static DataEditorCollection DataEditors => CoreCurrent.DataEditors;
+        public static CacheRefresherCollection CacheRefreshers => Factory.GetInstance<CacheRefresherCollection>();
 
-        public static DataValueReferenceFactoryCollection DataValueReferenceFactories => CoreCurrent.DataValueReferenceFactories;
+        public static DataEditorCollection DataEditors =>  Factory.GetInstance<DataEditorCollection>();
 
-        public static PropertyEditorCollection PropertyEditors => CoreCurrent.PropertyEditors;
+        public static DataValueReferenceFactoryCollection DataValueReferenceFactories => Factory.GetInstance<DataValueReferenceFactoryCollection>();
 
-        public static ParameterEditorCollection ParameterEditors => CoreCurrent.ParameterEditors;
+        public static PropertyEditorCollection PropertyEditors => Factory.GetInstance<PropertyEditorCollection>();
 
-        internal static ManifestValueValidatorCollection ManifestValidators => CoreCurrent.ManifestValidators;
+        public static ParameterEditorCollection ParameterEditors => Factory.GetInstance<ParameterEditorCollection>();
 
-        internal static IPackageActionRunner PackageActionRunner => CoreCurrent.PackageActionRunner;
+        internal static ManifestValueValidatorCollection ManifestValidators => Factory.GetInstance<ManifestValueValidatorCollection>();
 
-        internal static PackageActionCollection PackageActions => CoreCurrent.PackageActions;
+        internal static IPackageActionRunner PackageActionRunner => Factory.GetInstance<IPackageActionRunner>();
 
-        internal static PropertyValueConverterCollection PropertyValueConverters => CoreCurrent.PropertyValueConverters;
+        internal static PackageActionCollection PackageActions => Factory.GetInstance<PackageActionCollection>();
 
-        internal static IPublishedModelFactory PublishedModelFactory => CoreCurrent.PublishedModelFactory;
+        internal static PropertyValueConverterCollection PropertyValueConverters => Factory.GetInstance<PropertyValueConverterCollection>();
 
-        public static IServerMessenger ServerMessenger => CoreCurrent.ServerMessenger;
+        internal static IPublishedModelFactory PublishedModelFactory => Factory.GetInstance<IPublishedModelFactory>();
 
-        public static IServerRegistrar ServerRegistrar => CoreCurrent.ServerRegistrar;
+        public static IServerMessenger ServerMessenger => Factory.GetInstance<IServerMessenger>();
 
-        public static ICultureDictionaryFactory CultureDictionaryFactory => CoreCurrent.CultureDictionaryFactory;
+        public static IServerRegistrar ServerRegistrar => Factory.GetInstance<IServerRegistrar>();
 
-        public static IShortStringHelper ShortStringHelper => CoreCurrent.ShortStringHelper;
+        public static ICultureDictionaryFactory CultureDictionaryFactory => Factory.GetInstance<ICultureDictionaryFactory>();
 
-        public static ILogger Logger => CoreCurrent.Logger;
+        public static IShortStringHelper ShortStringHelper => Factory.GetInstance<IShortStringHelper>();
 
-        public static IProfiler Profiler => CoreCurrent.Profiler;
+        public static ILogger Logger => Umbraco.Composing.Current.Logger;
 
-        public static IProfilingLogger ProfilingLogger => CoreCurrent.ProfilingLogger;
+        public static IProfiler Profiler => Factory.GetInstance<IProfiler>();
 
-        public static AppCaches AppCaches => CoreCurrent.AppCaches;
+        public static IProfilingLogger ProfilingLogger => Factory.GetInstance<IProfilingLogger>();
 
-        public static ServiceContext Services => CoreCurrent.Services;
+        public static AppCaches AppCaches => Factory.GetInstance<AppCaches>();
 
-        public static IScopeProvider ScopeProvider => CoreCurrent.ScopeProvider;
+        public static ServiceContext Services => Factory.GetInstance<ServiceContext>();
 
-        public static IFileSystems FileSystems => CoreCurrent.FileSystems;
+        public static IScopeProvider ScopeProvider => Factory.GetInstance<IScopeProvider>();
 
-        public static ISqlContext SqlContext=> CoreCurrent.SqlContext;
+        public static IFileSystems FileSystems => Factory.GetInstance<IFileSystems>();
 
-        public static IPublishedContentTypeFactory PublishedContentTypeFactory => CoreCurrent.PublishedContentTypeFactory;
+        public static ISqlContext SqlContext=> Factory.GetInstance<ISqlContext>();
 
-        public static IPublishedValueFallback PublishedValueFallback => CoreCurrent.PublishedValueFallback;
+        public static IPublishedContentTypeFactory PublishedContentTypeFactory => Factory.GetInstance<IPublishedContentTypeFactory>();
 
-        public static IVariationContextAccessor VariationContextAccessor => CoreCurrent.VariationContextAccessor;
+        public static IPublishedValueFallback PublishedValueFallback => Factory.GetInstance<IPublishedValueFallback>();
 
-        public static IIOHelper IOHelper => CoreCurrent.IOHelper;
-        public static IHostingEnvironment HostingEnvironment => CoreCurrent.HostingEnvironment;
+        public static IVariationContextAccessor VariationContextAccessor => Factory.GetInstance<IVariationContextAccessor>();
+
+        public static IIOHelper IOHelper => Factory.GetInstance<IIOHelper>();
+        public static IHostingEnvironment HostingEnvironment => Factory.GetInstance<IHostingEnvironment>();
         public static IIpResolver IpResolver => Factory.GetInstance<IIpResolver>();
         public static IUmbracoVersion UmbracoVersion => Factory.GetInstance<IUmbracoVersion>();
 

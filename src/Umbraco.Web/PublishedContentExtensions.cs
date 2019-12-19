@@ -27,6 +27,7 @@ namespace Umbraco.Web
         private static IPublishedSnapshot PublishedSnapshot => Current.PublishedSnapshot;
         private static UmbracoContext UmbracoContext => Current.UmbracoContext;
         private static ISiteDomainHelper SiteDomainHelper => Current.Factory.GetInstance<ISiteDomainHelper>();
+        private static IVariationContextAccessor VariationContextAccessor => Current.VariationContextAccessor;
 
         #region IsComposedOf
 
@@ -771,7 +772,7 @@ namespace Umbraco.Web
 
         public static IPublishedContent Descendant(this IPublishedContent content, string culture = null)
         {
-            return content.Children(culture).FirstOrDefault();
+            return content.Children(VariationContextAccessor, culture).FirstOrDefault();
         }
 
         public static IPublishedContent Descendant(this IPublishedContent content, int level, string culture = null)
@@ -833,7 +834,7 @@ namespace Umbraco.Web
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (orSelf) yield return content;
 
-            foreach (var desc in content.Children(culture).SelectMany(x => x.EnumerateDescendants(culture)))
+            foreach (var desc in content.Children(VariationContextAccessor, culture).SelectMany(x => x.EnumerateDescendants(culture)))
                 yield return desc;
         }
 
@@ -841,7 +842,7 @@ namespace Umbraco.Web
         {
             yield return content;
 
-            foreach (var desc in content.Children(culture).SelectMany(x => x.EnumerateDescendants(culture)))
+            foreach (var desc in content.Children(VariationContextAccessor, culture).SelectMany(x => x.EnumerateDescendants(culture)))
                 yield return desc;
         }
 
@@ -880,7 +881,7 @@ namespace Umbraco.Web
         /// </remarks>
         public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, Func<IPublishedContent, bool> predicate, string culture = null)
         {
-            return content.Children(culture).Where(predicate);
+            return content.Children(VariationContextAccessor, culture).Where(predicate);
         }
 
         /// <summary>
@@ -908,12 +909,12 @@ namespace Umbraco.Web
         public static IEnumerable<T> Children<T>(this IPublishedContent content, string culture = null)
             where T : class, IPublishedContent
         {
-            return content.Children(culture).OfType<T>();
+            return content.Children(VariationContextAccessor, culture).OfType<T>();
         }
 
         public static IPublishedContent FirstChild(this IPublishedContent content, string culture = null)
         {
-            return content.Children(culture).FirstOrDefault();
+            return content.Children(VariationContextAccessor, culture).FirstOrDefault();
         }
 
         /// <summary>
@@ -970,10 +971,10 @@ namespace Umbraco.Web
         private static DataTable GenerateDataTable(IPublishedContent content, ServiceContext services, string contentTypeAliasFilter = "", string culture = null)
         {
             var firstNode = contentTypeAliasFilter.IsNullOrWhiteSpace()
-                                ? content.Children(culture).Any()
-                                    ? content.Children(culture).ElementAt(0)
+                                ? content.Children(VariationContextAccessor, culture).Any()
+                                    ? content.Children(VariationContextAccessor, culture).ElementAt(0)
                                     : null
-                                : content.Children(culture).FirstOrDefault(x => x.ContentType.Alias.InvariantEquals(contentTypeAliasFilter));
+                                : content.Children(VariationContextAccessor, culture).FirstOrDefault(x => x.ContentType.Alias.InvariantEquals(contentTypeAliasFilter));
             if (firstNode == null)
                 return new DataTable(); //no children found
 
@@ -989,7 +990,7 @@ namespace Umbraco.Web
                     //create all row data
                     var tableData = Core.DataTableExtensions.CreateTableData();
                     //loop through each child and create row data for it
-                    foreach (var n in content.Children().OrderBy(x => x.SortOrder))
+                    foreach (var n in content.Children(VariationContextAccessor).OrderBy(x => x.SortOrder))
                     {
                         if (contentTypeAliasFilter.IsNullOrWhiteSpace() == false)
                         {
@@ -1000,7 +1001,7 @@ namespace Umbraco.Web
                         var standardVals = new Dictionary<string, object>
                             {
                                     { "Id", n.Id },
-                                    { "NodeName", n.Name() },
+                                    { "NodeName", n.Name(VariationContextAccessor) },
                                     { "NodeTypeAlias", n.ContentType.Alias },
                                     { "CreateDate", n.CreateDate },
                                     { "UpdateDate", n.UpdateDate },
@@ -1082,8 +1083,8 @@ namespace Umbraco.Web
         public static IEnumerable<IPublishedContent> SiblingsAndSelf(this IPublishedContent content, string culture = null)
         {
             return content.Parent != null
-                ? content.Parent.Children(culture)
-                : PublishedSnapshot.Content.GetAtRoot().WhereIsInvariantOrHasCulture(culture);
+                ? content.Parent.Children(VariationContextAccessor, culture)
+                : PublishedSnapshot.Content.GetAtRoot().WhereIsInvariantOrHasCulture(VariationContextAccessor, culture);
         }
 
         /// <summary>
@@ -1097,7 +1098,7 @@ namespace Umbraco.Web
         {
             return content.Parent != null
                 ? content.Parent.ChildrenOfType(contentTypeAlias, culture)
-                : PublishedSnapshot.Content.GetAtRoot().OfTypes(contentTypeAlias).WhereIsInvariantOrHasCulture(culture);
+                : PublishedSnapshot.Content.GetAtRoot().OfTypes(contentTypeAlias).WhereIsInvariantOrHasCulture(VariationContextAccessor, culture);
         }
 
         /// <summary>
@@ -1112,7 +1113,7 @@ namespace Umbraco.Web
         {
             return content.Parent != null
                 ? content.Parent.Children<T>(culture)
-                : PublishedSnapshot.Content.GetAtRoot().OfType<T>().WhereIsInvariantOrHasCulture(culture);
+                : PublishedSnapshot.Content.GetAtRoot().OfType<T>().WhereIsInvariantOrHasCulture(VariationContextAccessor, culture);
         }
 
         #endregion

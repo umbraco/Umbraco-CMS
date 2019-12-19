@@ -4,7 +4,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Services;
@@ -68,9 +68,9 @@ namespace Umbraco.Tests.Cache.PublishedCache
             var appCache = new DictionaryAppCache();
             var domainCache = new DomainCache(ServiceContext.DomainService, DefaultCultureAccessor);
             var publishedShapshot = new PublishedSnapshot(
-                new PublishedContentCache(xmlStore, domainCache, appCache, globalSettings, ContentTypesCache, null, null),
-                new PublishedMediaCache(xmlStore, ServiceContext.MediaService, ServiceContext.UserService, appCache, ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>(), umbracoContextAccessor),
-                new PublishedMemberCache(null, appCache, Current.Services.MemberService, ContentTypesCache, Current.Services.UserService),
+                new PublishedContentCache(xmlStore, domainCache, appCache, globalSettings, ContentTypesCache, null, VariationContextAccessor, null),
+                new PublishedMediaCache(xmlStore, ServiceContext.MediaService, ServiceContext.UserService, appCache, ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>(), umbracoContextAccessor, VariationContextAccessor),
+                new PublishedMemberCache(null, appCache, Current.Services.MemberService, ContentTypesCache, Current.Services.UserService, VariationContextAccessor),
                 domainCache);
             var publishedSnapshotService = new Mock<IPublishedSnapshotService>();
             publishedSnapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(publishedShapshot);

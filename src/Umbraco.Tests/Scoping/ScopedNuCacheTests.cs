@@ -29,6 +29,7 @@ using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Scoping
 {
@@ -139,7 +140,7 @@ namespace Umbraco.Tests.Scoping
             var umbracoContext = GetUmbracoContextNu("http://example.com/", setSingleton: true);
 
             // wire cache refresher
-            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(), Mock.Of<IUmbracoContextFactory>(), Mock.Of<ILogger>());
+            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(Current.ServerMessenger, Current.CacheRefreshers), Mock.Of<IUmbracoContextFactory>(), Mock.Of<ILogger>());
             _distributedCacheBinder.BindEvents(true);
 
             // create document type, document
@@ -157,7 +158,7 @@ namespace Umbraco.Tests.Scoping
 
                 // during events, due to LiveSnapshot, we see the changes
                 Assert.IsNotNull(e);
-                Assert.AreEqual("changed", e.Name());
+                Assert.AreEqual("changed", e.Name(VariationContextAccessor));
             };
 
             using (var scope = ScopeProvider.CreateScope())
@@ -169,7 +170,7 @@ namespace Umbraco.Tests.Scoping
             // been created
             var x = umbracoContext.Content.GetById(item.Id);
             Assert.IsNotNull(x);
-            Assert.AreEqual("name", x.Name());
+            Assert.AreEqual("name", x.Name(VariationContextAccessor));
 
             ContentService.Published += OnPublishedAssert;
 
@@ -191,7 +192,7 @@ namespace Umbraco.Tests.Scoping
             // else changes have been rolled back
             x = umbracoContext.Content.GetById(item.Id);
             Assert.IsNotNull(x);
-            Assert.AreEqual(complete ? "changed" : "name", x.Name());
+            Assert.AreEqual(complete ? "changed" : "name", x.Name(VariationContextAccessor));
         }
     }
 }

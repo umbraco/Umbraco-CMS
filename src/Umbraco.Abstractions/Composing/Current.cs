@@ -5,6 +5,6 @@ namespace Umbraco.Composing
     public static class Current
     {
 
-        public static ILogger Logger { get; set; }
+        public static ILogger Logger { get; set; } = new NullLogger();
     }
 }

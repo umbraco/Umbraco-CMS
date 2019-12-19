@@ -4,8 +4,6 @@ using System;
 using System.IO;
 using System.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging.Viewer;
 using Umbraco.Tests.TestHelpers;
 

@@ -1,6 +1,5 @@
 ﻿using System.Web.Http.ExceptionHandling;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.WebApi
