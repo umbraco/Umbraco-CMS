@@ -24,6 +24,6 @@ namespace Umbraco.Core.Persistence
 
         bool EnableSqlCount { get; set; }
         int SqlCount { get; }
-        int BulkInsertRecords<T>(IEnumerable<T> records, bool useNativeBulkInsert = true);
+        int BulkInsertRecords<T>(IEnumerable<T> records);
     }
 }
