@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
@@ -20,7 +19,9 @@ namespace Umbraco.Core.Models
 
         public RelationType(Guid childObjectType, Guid parentObjectType, string alias)
         {
-            if (string.IsNullOrWhiteSpace(alias)) throw new ArgumentNullOrEmptyException(nameof(alias));
+            if (alias == null) throw new ArgumentNullException(nameof(alias));
+            if (string.IsNullOrWhiteSpace(alias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(alias));
+
             _childObjectType = childObjectType;
             _parentObjectType = parentObjectType;
             _alias = alias;
@@ -30,7 +31,9 @@ namespace Umbraco.Core.Models
         public RelationType(Guid childObjectType, Guid parentObjectType, string alias, string name)
             : this(childObjectType, parentObjectType, alias)
         {
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
+
             Name = name;
         }
 
