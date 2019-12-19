@@ -359,6 +359,7 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @param {Object} editor rendering options
          * @param {Boolean} editor.multiPicker Pick one or multiple items
+         * @param {Int} editor.startNodeId Set the startnode of the picker (optional)
          * @param {Function} editor.submit Callback function when the submit button is clicked. Returns the editor model object
          * @param {Function} editor.close Callback function when the close button is clicked.
          *
@@ -564,6 +565,7 @@ When building a custom infinite editor view you can use the same components as a
          * @description
          * Opens a media picker in infinite editing, the submit callback returns an array of selected media items
          * @param {Object} editor rendering options
+         * @param {Int} editor.startNodeId Set the startnode of the picker (optional)
          * @param {Boolean} editor.multiPicker Pick one or multiple items
          * @param {Boolean} editor.onlyImages Only display files that have an image file-extension
          * @param {Boolean} editor.disableFolderSelect Disable folder selection
@@ -633,6 +635,23 @@ When building a custom infinite editor view you can use the same components as a
          */
         function mediaTypeEditor(editor) {
             editor.view = "views/mediatypes/edit.html";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#memberTypeEditor
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens the member type editor in infinite editing, the submit callback returns the saved member type
+         * @param {Object} editor rendering options
+         * @param {Callback} editor.submit Submits the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+        function memberTypeEditor(editor) {
+            editor.view = "views/membertypes/edit.html";
             open(editor);
         }
 
