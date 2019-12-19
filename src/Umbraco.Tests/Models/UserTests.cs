@@ -14,15 +14,7 @@ namespace Umbraco.Tests.Models
     [TestFixture]
     public class UserTests
     {
-        private IGlobalSettings GlobalSettings { get; } = SettingsForTests.GenerateMockGlobalSettings();
-
-        [SetUp]
-        public void Setup()
-        {
-            Current.Reset();
-            Current.UnlockConfigs(TestHelper.GetConfigsFactory(), TestHelper.IOHelper);
-            Current.Configs.Add(SettingsForTests.GetDefaultGlobalSettings);
-        }
+        private IGlobalSettings GlobalSettings { get; } = SettingsForTests.GetDefaultGlobalSettings();
 
         [Test]
         public void Can_Deep_Clone()

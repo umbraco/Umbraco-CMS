@@ -464,6 +464,7 @@ namespace Umbraco.Web.Editors
                     var groups = Services.UserService.GetUserGroupsByAlias(autoLinkOptions.GetDefaultUserGroups(UmbracoContext, loginInfo));
 
                     var autoLinkUser = BackOfficeIdentityUser.CreateNew(
+                        GlobalSettings,
                         loginInfo.Email,
                         loginInfo.Email,
                         autoLinkOptions.GetDefaultCulture(UmbracoContext, loginInfo));

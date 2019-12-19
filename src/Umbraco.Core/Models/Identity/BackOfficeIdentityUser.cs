@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 
@@ -37,12 +38,12 @@ namespace Umbraco.Core.Models.Identity
         /// <param name="email">This is allowed to be null (but would need to be filled in if trying to persist this instance)</param>
         /// <param name="culture"></param>
         /// <returns></returns>
-        public static BackOfficeIdentityUser CreateNew(string username, string email, string culture)
+        public static BackOfficeIdentityUser CreateNew(IGlobalSettings globalSettings, string username, string email, string culture)
         {
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(username));
             if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(culture));
 
-            var user = new BackOfficeIdentityUser(Array.Empty<IReadOnlyUserGroup>());
+            var user = new BackOfficeIdentityUser(globalSettings, Array.Empty<IReadOnlyUserGroup>());
             user.DisableChangeTracking();
             user._userName = username;
             user._email = email;
@@ -55,12 +56,12 @@ namespace Umbraco.Core.Models.Identity
             return user;
         }
 
-        private BackOfficeIdentityUser(IReadOnlyUserGroup[] groups)
+        private BackOfficeIdentityUser(IGlobalSettings globalSettings, IReadOnlyUserGroup[] groups)
         {
             _startMediaIds = Array.Empty<int>();
             _startContentIds = Array.Empty<int>();
             _allowedSections = Array.Empty<string>();
-            _culture = Current.Configs.Global().DefaultUILanguage; // TODO: inject
+            _culture = globalSettings.DefaultUILanguage;
 
             // must initialize before setting groups
             _roles = new ObservableCollection<IdentityUserRole<string>>();
@@ -73,10 +74,11 @@ namespace Umbraco.Core.Models.Identity
         /// <summary>
         /// Creates an existing user with the specified groups
         /// </summary>
+        /// <param name="globalSettings"></param>
         /// <param name="userId"></param>
         /// <param name="groups"></param>
-        public BackOfficeIdentityUser(int userId, IEnumerable<IReadOnlyUserGroup> groups)
-            : this(groups.ToArray())
+        public BackOfficeIdentityUser(IGlobalSettings globalSettings, int userId, IEnumerable<IReadOnlyUserGroup> groups)
+            : this(globalSettings, groups.ToArray())
         {
             // use the property setters - they do more than just setting a field
             Id = userId;
@@ -426,6 +428,6 @@ namespace Umbraco.Core.Models.Identity
         private static readonly DelegateEqualityComparer<int[]> StartIdsComparer = new DelegateEqualityComparer<int[]>(
             (groups, enumerable) => groups.UnsortedSequenceEqual(enumerable),
             groups => groups.GetHashCode());
-        
+
     }
 }

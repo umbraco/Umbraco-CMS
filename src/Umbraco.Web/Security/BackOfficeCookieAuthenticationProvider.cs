@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Globalization;
-using System.Runtime.CompilerServices;
 using System.Security.Claims;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Security;

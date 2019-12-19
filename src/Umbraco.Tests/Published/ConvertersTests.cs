@@ -178,7 +178,7 @@ namespace Umbraco.Tests.Published
         [Test]
         public void SimpleConverter3Test()
         {
-            Current.Reset();
+           // Current.Reset();
             var register = TestHelper.GetRegister();
 
             var composition = new Composition(register, TestHelper.GetMockedTypeLoader(), Mock.Of<IProfilingLogger>(), ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
@@ -194,7 +194,7 @@ namespace Umbraco.Tests.Published
             });
             register.Register(f => factory);
 
-            Current.Factory = composition.CreateFactory();
+            var registerFactory = composition.CreateFactory();
 
             var cacheMock = new Mock<IPublishedContentCache>();
             var cacheContent = new Dictionary<int, IPublishedContent>();
@@ -205,7 +205,7 @@ namespace Umbraco.Tests.Published
             publishedSnapshotAccessorMock.Setup(x => x.PublishedSnapshot).Returns(publishedSnapshotMock.Object);
             register.Register(f => publishedSnapshotAccessorMock.Object);
 
-            var converters = Current.Factory.GetInstance<PropertyValueConverterCollection>();
+            var converters = registerFactory.GetInstance<PropertyValueConverterCollection>();
 
             var dataTypeService = new TestObjects.TestDataTypeService(
                 new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())) { Id = 1 },
@@ -236,8 +236,9 @@ namespace Umbraco.Tests.Published
                 Properties = new[] { new SolidPublishedProperty { Alias = "prop2", SolidHasValue = true, SolidValue = "1003" } }
             };
 
-            cacheContent[cnt1.Id] = cnt1.CreateModel(Current.PublishedModelFactory);
-            cacheContent[cnt2.Id] = cnt2.CreateModel(Current.PublishedModelFactory);
+            var publishedModelFactory = registerFactory.GetInstance<IPublishedModelFactory>();
+            cacheContent[cnt1.Id] = cnt1.CreateModel(publishedModelFactory);
+            cacheContent[cnt2.Id] = cnt2.CreateModel(publishedModelFactory);
 
             // can get the actual property Clr type
             // ie ModelType gets properly mapped by IPublishedContentModelFactory

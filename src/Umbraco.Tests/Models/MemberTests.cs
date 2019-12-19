@@ -13,15 +13,6 @@ namespace Umbraco.Tests.Models
     [TestFixture]
     public class MemberTests
     {
-        [SetUp]
-        public void Setup()
-        {
-            Current.Reset();
-            Current.UnlockConfigs(TestHelper.GetConfigsFactory(), TestHelper.IOHelper);
-            Current.Configs.Add(SettingsForTests.GetDefaultGlobalSettings);
-            Current.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
-        }
-
         [Test]
         public void Can_Deep_Clone()
         {

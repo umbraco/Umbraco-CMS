@@ -1,10 +1,9 @@
 ﻿using System;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
 
 namespace Umbraco.Web.PropertyEditors
 {

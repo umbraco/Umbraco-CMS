@@ -29,6 +29,7 @@ using Umbraco.Web.Install;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 using Umbraco.Web.Routing;
 using File = System.IO.File;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {

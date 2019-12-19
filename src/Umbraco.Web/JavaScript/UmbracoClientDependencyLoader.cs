@@ -2,8 +2,7 @@
 using ClientDependency.Core.Controls;
 using ClientDependency.Core.FileRegistration.Providers;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.IO;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.JavaScript
 {

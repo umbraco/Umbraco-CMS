@@ -1,14 +1,12 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.IO;
-using Umbraco.Core.Composing;
-using Umbraco.Core.IO;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {

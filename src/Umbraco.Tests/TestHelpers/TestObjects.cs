@@ -22,6 +22,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers.Stubs;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.TestHelpers
 {

@@ -6,12 +6,11 @@ using System.Net.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Editors.Filters
 {

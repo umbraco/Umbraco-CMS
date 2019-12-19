@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Web;
 using Newtonsoft.Json;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Models.Identity;

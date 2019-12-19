@@ -5,6 +5,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Tests.Testing;
 using Umbraco.Core;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Tests.Issues
 {
@@ -21,7 +22,7 @@ namespace Umbraco.Tests.Issues
             contentType.Name = "test";
             var propertyType = new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "prop") { Name = "Prop", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88 };
             contentType.PropertyTypeCollection.Add(propertyType);
-            Core.Composing.Current.Services.ContentTypeService.Save(contentType);
+            Current.Services.ContentTypeService.Save(contentType);
 
             var aliasName = string.Empty;
 

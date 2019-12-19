@@ -24,7 +24,7 @@ namespace Umbraco.Core.Models.Identity
             mapper.Define<IUser, BackOfficeIdentityUser>(
                 (source, context) =>
                 {
-                    var target = new BackOfficeIdentityUser(source.Id, source.Groups);
+                    var target = new BackOfficeIdentityUser(_globalSettings, source.Id, source.Groups);
                     target.DisableChangeTracking();
                     return target;
                 },

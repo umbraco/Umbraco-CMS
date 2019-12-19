@@ -101,7 +101,7 @@ namespace Umbraco.Web.Security
 
             //if the user is null, create an empty one which can be used for auto-linking
             if (user == null)
-                user = BackOfficeIdentityUser.CreateNew(userName, null, _globalSettings.DefaultUILanguage);
+                user = BackOfficeIdentityUser.CreateNew(_globalSettings, userName, null, _globalSettings.DefaultUILanguage);
 
             //check the password for the user, this will allow a developer to auto-link
             //an account if they have specified an IBackOfficeUserPasswordChecker
