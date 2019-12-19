@@ -30,26 +30,6 @@ namespace Umbraco.Core.Persistence
             SqlBulkCopyHelper.SqlTransactionResolver = dbTran => GetTypedTransaction<SqlTransaction>(dbTran);
         }
 
-        /// <summary>
-        /// Bulk-inserts records within a transaction.
-        /// </summary>
-        /// <typeparam name="T">The type of the records.</typeparam>
-        /// <param name="database">The database.</param>
-        /// <param name="records">The records.</param>
-        /// <param name="useNativeBulkInsert">Whether to use native bulk insert when available.</param>
-        public static void BulkInsertRecordsWithTransaction<T>(this IUmbracoDatabase database, IEnumerable<T> records, bool useNativeBulkInsert = true)
-        {
-            var recordsA = records.ToArray();
-            if (recordsA.Length == 0)
-                return;
-
-            // no need to "try...catch", if the transaction is not completed it will rollback!
-            using (var tr = database.GetTransaction())
-            {
-                database.BulkInsertRecords(recordsA, useNativeBulkInsert);
-                tr.Complete();
-            }
-        }
 
         /// <summary>
         /// Creates bulk-insert commands.

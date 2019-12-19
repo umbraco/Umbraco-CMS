@@ -9,7 +9,7 @@ namespace Umbraco.Core.Persistence
 {
     public class SqlCeBulkSqlInsertProvider : IBulkSqlInsertProvider
     {
-        public int BulkInsertRecords<T>(IUmbracoDatabase database, IEnumerable<T> records, bool useNativeBulkInsert)
+        public int BulkInsertRecords<T>(IUmbracoDatabase database, IEnumerable<T> records)
         {
             var recordsA = records.ToArray();
             if (recordsA.Length == 0) return 0;
@@ -17,11 +17,8 @@ namespace Umbraco.Core.Persistence
             var pocoData = database.PocoDataFactory.ForType(typeof(T));
             if (pocoData == null) throw new InvalidOperationException("Could not find PocoData for " + typeof(T));
 
-            if (useNativeBulkInsert) return BulkInsertRecordsSqlCe(database, pocoData, recordsA);
-            // else, no other choice
-            foreach (var record in recordsA)
-                database.Insert(record);
-            return recordsA.Length;
+            return BulkInsertRecordsSqlCe(database, pocoData, recordsA);
+
         }
 
          /// <summary>

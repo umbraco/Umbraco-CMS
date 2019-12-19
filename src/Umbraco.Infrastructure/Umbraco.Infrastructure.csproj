@@ -32,6 +32,11 @@
       <_UnmanagedRegistrationCache Remove="obj\Umbraco.Infrastructure.csproj.UnmanagedRegistration.cache" />
     </ItemGroup>
     
+
+    <ItemGroup>
+      <Compile Remove="obj\**" />
+    </ItemGroup>
+
     <ItemGroup>
       <EmbeddedResource Remove="obj\**" />
     </ItemGroup>
