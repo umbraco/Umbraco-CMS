@@ -1,0 +1,20 @@
+<div ng-controller="Umbraco.Tours.UmbEmailMarketing.EmailsController as vm">
+
+    <umb-tour-step on-close="model.disableTour()">
+
+        <umb-tour-step-header title="model.currentStep.title"></umb-tour-step-header>
+
+        <umb-tour-step-content content="model.currentStep.content"></umb-tour-step-content>
+
+        <umb-tour-step-footer class="flex justify-between items-center">
+
+            <div>
+                <umb-button size="xs" button-style="action" type="button" action="vm.optIn()" label="Yes"></umb-button>
+                <umb-button button-style="link" type="button" label="No" action="model.disableTour()"></umb-button>
+            </div>
+
+        </umb-tour-step-footer>
+
+    </umb-tour-step>
+
+</div>
