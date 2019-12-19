@@ -361,6 +361,7 @@
     <key alias="cancel">Avbryt</key>
     <key alias="cellMargin">Cellmarginal</key>
     <key alias="choose">Välj</key>
+    <key alias="clear">Rensa</key>
     <key alias="close">Stäng</key>
     <key alias="closewindow">Stäng fönstret</key>
     <key alias="comment">Kommentar</key>
