@@ -454,8 +454,8 @@ namespace Umbraco.Web.Trees
 
         internal IEnumerable<MenuItem> GetAllowedUserMenuItemsForNode(IUmbracoEntity dd)
         {
-            var permission = Services.UserService.GetPermissions(Security.CurrentUser, dd.Path);
-            return Current.Actions.FromEntityPermission(permission).Select(x => new MenuItem(x));
+            var assignedPermissions = Services.UserService.GetAssignedPermissions(Security.CurrentUser, dd.Id);
+            return Current.Actions.GetByLetters(assignedPermissions).Select(x => new MenuItem(x));
         }
 
         /// <summary>
