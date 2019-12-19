@@ -5,7 +5,7 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Composing.CompositionExtensions
 {
-    public static class FileSystems
+    internal static class FileSystems
     {
         /*
          * HOW TO REPLACE THE MEDIA UNDERLYING FILESYSTEM
