@@ -1,7 +1,14 @@
 ﻿@model dynamic
 @using Umbraco.Web.Templates
-
+@{
+    var embedValue = string.Empty;
+    try {
+        embedValue = Model.value.preview;
+    } catch(Exception ex) {
+        embedValue = Model.value;
+    }
+}
 
 <div class="video-wrapper">
-	@Html.Raw(Model.value)
+	@Html.Raw(embedValue)
 </div>
