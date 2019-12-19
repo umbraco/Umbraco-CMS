@@ -1,5 +1,22 @@
 [
     {
+        "name": "Email Marketing",
+        "alias": "umbEmailMarketing",
+        "group": "Email Marketing",
+        "groupOrder": 10,
+        "hidden": true,
+        "requiredSections": [
+            "content"
+        ],
+        "steps": [
+            {
+                "title": "Welcome to Umbraco - The Friendly CMS",
+                "content": "<p>Do you want emails?</p>",
+                "view": "emails"
+            }
+        ]
+    },
+    {
         "name": "Introduction",
         "alias": "umbIntroIntroduction",
         "group": "Getting Started",
