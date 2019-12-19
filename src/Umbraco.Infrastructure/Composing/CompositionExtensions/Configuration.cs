@@ -5,7 +5,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
     /// <summary>
     /// Compose configurations.
     /// </summary>
-    public static class Configuration
+    internal static class Configuration
     {
         public static Composition ComposeConfiguration(this Composition composition)
         {

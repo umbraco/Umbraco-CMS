@@ -87,14 +87,15 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-        public static IShortStringHelper ShortStringHelper => new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
-        public static IVariationContextAccessor VariationContextAccessor => new TestVariationContextAccessor();
-        public static IDbProviderFactoryCreator DbProviderFactoryCreator => new UmbracoDbProviderFactoryCreator(Constants.DbProviderNames.SqlCe);
-        public static IBulkSqlInsertProvider BulkSqlInsertProvider => new SqlCeBulkSqlInsertProvider();
-        public static IMarchal Marchal => new FrameworkMarchal();
-        public static ICoreDebug CoreDebug => new CoreDebug();
+        public static IShortStringHelper ShortStringHelper { get; } = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
+        public static IVariationContextAccessor VariationContextAccessor { get; } = new TestVariationContextAccessor();
+        public static IDbProviderFactoryCreator DbProviderFactoryCreator { get; } = new UmbracoDbProviderFactoryCreator(Constants.DbProviderNames.SqlCe);
+        public static IBulkSqlInsertProvider BulkSqlInsertProvider { get; } = new SqlCeBulkSqlInsertProvider();
+        public static IMarchal Marchal { get; } = new FrameworkMarchal();
+        public static ICoreDebug CoreDebug { get; } =  new CoreDebug();
 
-        public static IIOHelper IOHelper = new IOHelper(GetHostingEnvironment());
+
+        public static IIOHelper IOHelper { get; } = new IOHelper(GetHostingEnvironment());
 
         /// <summary>
         /// Maps the given <paramref name="relativePath"/> making it rooted on <see cref="CurrentAssemblyDirectory"/>. <paramref name="relativePath"/> must start with <code>~/</code>

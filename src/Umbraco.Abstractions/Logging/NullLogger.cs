@@ -1,5 +1,4 @@
 using System;
-using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Logging
 {

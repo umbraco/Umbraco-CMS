@@ -13,7 +13,7 @@ using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Core.Composing.CompositionExtensions
 {
-    public static class Services
+    internal static class Services
     {
         public static Composition ComposeServices(this Composition composition)
         {

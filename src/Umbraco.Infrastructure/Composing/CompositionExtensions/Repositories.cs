@@ -6,7 +6,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
     /// <summary>
     /// Composes repositories.
     /// </summary>
-    public static class Repositories
+    internal static class Repositories
     {
         public static Composition ComposeRepositories(this Composition composition)
         {
