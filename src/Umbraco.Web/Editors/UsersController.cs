@@ -40,12 +40,9 @@ namespace Umbraco.Web.Editors
     [IsCurrentUserModelFilter]
     public class UsersController : UmbracoAuthorizedJsonController
     {
-        private readonly IGlobalSettings _globalSettings;
-
         public UsersController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
-            _globalSettings = globalSettings;
         }
 
         /// <summary>
@@ -346,7 +343,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
 
-            if (EmailSender.CanSendRequiredEmail(_globalSettings) == false)
+            if (EmailSender.CanSendRequiredEmail(GlobalSettings) == false)
             {
                 throw new HttpResponseException(
                     Request.CreateNotificationValidationErrorResponse("No Email server is configured"));
@@ -476,7 +473,7 @@ namespace Umbraco.Web.Editors
             await UserManager.EmailService.SendAsync(
                 //send the special UmbracoEmailMessage which configures it's own sender
                 //to allow for events to handle sending the message if no smtp is configured
-                new UmbracoEmailMessage(new EmailSender(_globalSettings, true))
+                new UmbracoEmailMessage(new EmailSender(GlobalSettings, true))
                 {
                     Body = emailBody,
                     Destination = userDisplay.Email,
