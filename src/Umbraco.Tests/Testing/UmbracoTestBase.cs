@@ -67,7 +67,6 @@ namespace Umbraco.Tests.Testing
     /// provides all the necessary environment, through DI. Yes, DI is bad in tests - unit tests.
     /// But it is OK in integration tests.
     /// </remarks>
-    [Apartment(ApartmentState.STA)]
     public abstract class UmbracoTestBase
     {
         // this class
