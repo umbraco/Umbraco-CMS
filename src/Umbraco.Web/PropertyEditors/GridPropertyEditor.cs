@@ -55,7 +55,7 @@ namespace Umbraco.Web.PropertyEditors
             _umbracoContextAccessor = umbracoContextAccessor;
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
-            _ioHelper = Current.IOHelper;
+            _ioHelper = ioHelper;
             _logger = logger;
             _mediaService = mediaService;
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;

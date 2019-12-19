@@ -31,13 +31,6 @@
 
     <ItemGroup>
       <Compile Remove="obj\**" />
-      <Compile Remove="Scoping\ScopeReference.cs" />
-      <Compile Remove="Scoping\ScopeProvider.cs" />
-      <Compile Remove="Scoping\ScopeContext.cs" />
-      <Compile Remove="Persistence\FaultHandling\SqlAzureTransientErrorDetectionStrategy.cs" />
-      <Compile Remove="Persistence\FaultHandling\NetworkConnectivityErrorDetectionStrategy.cs" />
-      <Compile Remove="Persistence\FaultHandling\Incremental.cs" />
-      <Compile Remove="Persistence\FaultHandling\FixedInterval.cs" />
     </ItemGroup>
 
     <ItemGroup>
@@ -62,11 +55,6 @@
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
             <_Parameter1>Umbraco.Tests.Benchmarks</_Parameter1>
         </AssemblyAttribute>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Events" />
-      <Folder Include="Models\Identity" />
     </ItemGroup>
 
 </Project>
