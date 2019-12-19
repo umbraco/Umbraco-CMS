@@ -1,15 +1,23 @@
 ﻿using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
     internal class TemplateMapDefinition : IMapDefinition
     {
+        private readonly IShortStringHelper _shortStringHelper;
+
+        public TemplateMapDefinition(IShortStringHelper shortStringHelper)
+        {
+            _shortStringHelper = shortStringHelper;
+        }
+
         public void DefineMaps(UmbracoMapper mapper)
         {
             mapper.Define<ITemplate, TemplateDisplay>((source, context) => new TemplateDisplay(), Map);
-            mapper.Define<TemplateDisplay, ITemplate>((source, context) => new Template(source.Name, source.Alias), Map);
+            mapper.Define<TemplateDisplay, ITemplate>((source, context) => new Template(_shortStringHelper, source.Name, source.Alias), Map);
         }
 
         // Umbraco.Code.MapAll

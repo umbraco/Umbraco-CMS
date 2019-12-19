@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Xml.Linq;
 using Examine;
 using Moq;
 using NUnit.Framework;
@@ -47,6 +50,7 @@ using FileSystems = Umbraco.Core.IO.FileSystems;
 using Umbraco.Web.Templates;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.Services;
 using Umbraco.Net;
 
 namespace Umbraco.Tests.Testing
@@ -106,6 +110,10 @@ namespace Umbraco.Tests.Testing
         protected ILogger Logger => Factory.GetInstance<ILogger>();
 
         protected IIOHelper IOHelper { get; private set; }
+        protected IDataTypeService DataTypeService => Factory.GetInstance<IDataTypeService>();
+        protected Lazy<PropertyEditorCollection> PropertyEditorCollection => new Lazy<PropertyEditorCollection>(() => Factory.GetInstance<PropertyEditorCollection>());
+        protected ILocalizationService LocalizationService => Factory.GetInstance<ILocalizationService>();
+        protected ILocalizedTextService LocalizedTextService  { get; private set; }
         protected IShortStringHelper ShortStringHelper { get; private set; }
         protected IUmbracoVersion UmbracoVersion { get; private set; }
 
@@ -157,9 +165,14 @@ namespace Umbraco.Tests.Testing
             IBackOfficeInfo backOfficeInfo = new AspNetBackOfficeInfo(globalSettings, IOHelper, settings, logger);
             IIpResolver ipResolver = new AspNetIpResolver();
             UmbracoVersion = new UmbracoVersion(globalSettings);
+
+
+            LocalizedTextService = new LocalizedTextService(new Dictionary<CultureInfo, Lazy<XDocument>>(), logger);
             var typeLoader = GetTypeLoader(IOHelper, TypeFinder, appCaches.RuntimeCache, hostingEnvironment, proflogger, Options.TypeLoader);
 
             var register = TestHelper.GetRegister();
+
+
 
             Composition = new Composition(register, typeLoader, proflogger, ComponentTests.MockRuntimeState(RuntimeLevel.Run), TestHelper.GetConfigs(), TestHelper.IOHelper, AppCaches.NoCache);
 
@@ -168,6 +181,7 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique(IOHelper);
             Composition.RegisterUnique(UmbracoVersion);
             Composition.RegisterUnique(TypeFinder);
+            Composition.RegisterUnique(LocalizedTextService);
             Composition.RegisterUnique(typeLoader);
             Composition.RegisterUnique(logger);
             Composition.RegisterUnique(profiler);
@@ -286,6 +300,7 @@ namespace Umbraco.Tests.Testing
             // ah...
             Composition.WithCollectionBuilder<ActionCollectionBuilder>();
             Composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>();
+            Composition.RegisterUnique<PropertyEditorCollection>();
             Composition.RegisterUnique<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
 
             Composition.RegisterUnique<IMediaPathScheme, UniqueMediaPathScheme>();
@@ -335,7 +350,8 @@ namespace Umbraco.Tests.Testing
             {
                 Assembly.Load("Umbraco.Core"),
                 Assembly.Load("Umbraco.Web"),
-                Assembly.Load("Umbraco.Tests")
+                Assembly.Load("Umbraco.Tests"),
+                Assembly.Load("Umbraco.Infrastructure")
             });
         }
 
@@ -393,7 +409,9 @@ namespace Umbraco.Tests.Testing
                 Constants.System.UmbracoConnectionName,
                 Logger,
                 new Lazy<IMapperCollection>(f.GetInstance<IMapperCollection>),
-                TestHelper.GetConfigs()));
+                TestHelper.GetConfigs(),
+                TestHelper.DbProviderFactoryCreator,
+                TestHelper.BulkSqlInsertProvider));
             Composition.RegisterUnique(f => f.TryGetInstance<IUmbracoDatabaseFactory>().SqlContext);
 
             Composition.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty

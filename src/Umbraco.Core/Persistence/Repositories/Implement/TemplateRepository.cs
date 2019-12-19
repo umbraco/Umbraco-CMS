@@ -24,13 +24,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal class TemplateRepository : NPocoRepositoryBase<int, ITemplate>, ITemplateRepository
     {
         private readonly IIOHelper _ioHelper;
+        private readonly IShortStringHelper _shortStringHelper;
         private readonly IFileSystem _viewsFileSystem;
         private readonly ViewHelper _viewHelper;
 
-        public TemplateRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IFileSystems fileSystems,  IIOHelper ioHelper)
+        public TemplateRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IFileSystems fileSystems,  IIOHelper ioHelper, IShortStringHelper shortStringHelper)
             : base(scopeAccessor, cache, logger)
         {
             _ioHelper = ioHelper;
+            _shortStringHelper = shortStringHelper;
             _viewsFileSystem = fileSystems.MvcViewsFileSystem;
             _viewHelper = new ViewHelper(_viewsFileSystem);
         }
@@ -327,7 +329,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private ITemplate MapFromDto(TemplateDto dto, IUmbracoEntity[] axisDefinitions)
         {
 
-            var template = TemplateFactory.BuildEntity(dto, axisDefinitions, file => GetFileContent((Template) file, false));
+            var template = TemplateFactory.BuildEntity(_shortStringHelper, dto, axisDefinitions, file => GetFileContent((Template) file, false));
 
             if (dto.NodeDto.ParentId > 0)
             {

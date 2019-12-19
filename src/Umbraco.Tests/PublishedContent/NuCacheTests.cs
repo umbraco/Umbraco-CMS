@@ -120,15 +120,15 @@ namespace Umbraco.Tests.PublishedContent
             Mock.Get(runtime).Setup(x => x.Level).Returns(RuntimeLevel.Run);
 
             // create data types, property types and content types
-            var dataType = new DataType(new VoidEditor("Editor", Mock.Of<ILogger>())) { Id = 3 };
+            var dataType = new DataType(new VoidEditor("Editor", Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())) { Id = 3 };
 
             var dataTypes = new[]
             {
                 dataType
             };
 
-            _propertyType = new PropertyType("Umbraco.Void.Editor", ValueStorageType.Nvarchar) { Alias = "prop", DataTypeId = 3, Variations = ContentVariation.Culture };
-            _contentType = new ContentType(-1) { Id = 2, Alias = "alias-ct", Variations = ContentVariation.Culture };
+            _propertyType = new PropertyType(TestHelper.ShortStringHelper, "Umbraco.Void.Editor", ValueStorageType.Nvarchar) { Alias = "prop", DataTypeId = 3, Variations = ContentVariation.Culture };
+            _contentType = new ContentType(TestHelper.ShortStringHelper, -1) { Id = 2, Alias = "alias-ct", Variations = ContentVariation.Culture };
             _contentType.AddPropertyType(_propertyType);
 
             var contentTypes = new[]
@@ -204,7 +204,7 @@ namespace Umbraco.Tests.PublishedContent
                 globalSettings,
                 Mock.Of<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
-                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }),
+                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }),
                 typeFinder,
                 TestHelper.GetHostingEnvironment());
 

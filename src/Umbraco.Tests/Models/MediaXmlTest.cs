@@ -21,6 +21,8 @@ namespace Umbraco.Tests.Models
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
     public class MediaXmlTest : TestWithDatabaseBase
     {
+
+
         [Test]
         public void Can_Generate_Xml_Representation_Of_Media()
         {
@@ -31,13 +33,12 @@ namespace Umbraco.Tests.Models
             // reference, so static ctor runs, so event handlers register
             // and then, this will reset the width, height... because the file does not exist, of course ;-(
             var logger = Mock.Of<ILogger>();
-            var shortStringHelper = Mock.Of<IShortStringHelper>();
             var scheme = Mock.Of<IMediaPathScheme>();
             var config = Mock.Of<IContentSection>();
             var dataTypeService = Mock.Of<IDataTypeService>();
             var localizationService = Mock.Of<ILocalizationService>();
 
-            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), scheme, logger, shortStringHelper);
+            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), scheme, logger, ShortStringHelper);
             var ignored = new FileUploadPropertyEditor(Mock.Of<ILogger>(), mediaFileSystem, config, dataTypeService, localizationService);
 
             var media = MockedMedia.CreateMediaImage(mediaType, -1);
@@ -51,7 +52,7 @@ namespace Umbraco.Tests.Models
             media.SetValue(Constants.Conventions.Media.Extension, "png");
 
             var nodeName = media.ContentType.Alias.ToSafeAlias();
-            var urlName = media.GetUrlSegment(new[] { new DefaultUrlSegmentProvider() });
+            var urlName = media.GetUrlSegment(ShortStringHelper, new[] { new DefaultUrlSegmentProvider(ShortStringHelper) });
 
             // Act
             XElement element = media.ToXml(Factory.GetInstance<IEntityXmlSerializer>());

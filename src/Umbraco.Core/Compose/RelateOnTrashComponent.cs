@@ -9,22 +9,33 @@ namespace Umbraco.Core.Compose
 {
     public sealed class RelateOnTrashComponent : IComponent
     {
+        private readonly IRelationService _relationService;
+        private readonly IEntityService _entityService;
+        private readonly ILocalizedTextService _textService;
+
+        public RelateOnTrashComponent(IRelationService relationService, IEntityService entityService, ILocalizedTextService textService)
+        {
+            _relationService = relationService;
+            _entityService = entityService;
+            _textService = textService;
+        }
+
         public void Initialize()
         {
-            ContentService.Moved += ContentService_Moved;
-            ContentService.Trashed += ContentService_Trashed;
-            MediaService.Moved += MediaService_Moved;
-            MediaService.Trashed += MediaService_Trashed;
+            ContentService.Moved += (sender, args) =>  ContentService_Moved(sender, args, _relationService);
+            ContentService.Trashed += (sender, args) =>  ContentService_Trashed(sender, args, _relationService, _entityService, _textService);
+            MediaService.Moved += (sender, args) =>  MediaService_Moved(sender, args, _relationService);
+            MediaService.Trashed += (sender, args) =>   MediaService_Trashed(sender, args, _relationService, _entityService, _textService);
         }
 
         public void Terminate()
         { }
 
-        private static void ContentService_Moved(IContentService sender, MoveEventArgs<IContent> e)
+        private static void ContentService_Moved(IContentService sender, MoveEventArgs<IContent> e, IRelationService relationService)
         {
             foreach (var item in e.MoveInfoCollection.Where(x => x.OriginalPath.Contains(Constants.System.RecycleBinContentString)))
             {
-                var relationService = Current.Services.RelationService;
+
                 const string relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
                 var relations = relationService.GetByChildId(item.Entity.Id);
 
@@ -35,11 +46,10 @@ namespace Umbraco.Core.Compose
             }
         }
 
-        private static void MediaService_Moved(IMediaService sender, MoveEventArgs<IMedia> e)
+        private static void MediaService_Moved(IMediaService sender, MoveEventArgs<IMedia> e, IRelationService relationService)
         {
             foreach (var item in e.MoveInfoCollection.Where(x => x.OriginalPath.Contains(Constants.System.RecycleBinMediaString)))
             {
-                var relationService = Current.Services.RelationService;
                 const string relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias;
                 var relations = relationService.GetByChildId(item.Entity.Id);
                 foreach (var relation in relations.Where(x => x.RelationType.Alias.InvariantEquals(relationTypeAlias)))
@@ -49,11 +59,8 @@ namespace Umbraco.Core.Compose
             }
         }
 
-        private static void ContentService_Trashed(IContentService sender, MoveEventArgs<IContent> e)
+        private static void ContentService_Trashed(IContentService sender, MoveEventArgs<IContent> e, IRelationService relationService, IEntityService entityService, ILocalizedTextService textService)
         {
-            var relationService = Current.Services.RelationService;
-            var entityService = Current.Services.EntityService;
-            var textService = Current.Services.TextService;
             const string relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
             var relationType = relationService.GetRelationTypeByAlias(relationTypeAlias);
 
@@ -94,11 +101,8 @@ namespace Umbraco.Core.Compose
             }
         }
 
-        private static void MediaService_Trashed(IMediaService sender, MoveEventArgs<IMedia> e)
+        private static void MediaService_Trashed(IMediaService sender, MoveEventArgs<IMedia> e, IRelationService relationService, IEntityService entityService, ILocalizedTextService textService)
         {
-            var relationService = Current.Services.RelationService;
-            var entityService = Current.Services.EntityService;
-            var textService = Current.Services.TextService;
             const string relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias;
             var relationType = relationService.GetRelationTypeByAlias(relationTypeAlias);
             // check that the relation-type exists, if not, then recreate it

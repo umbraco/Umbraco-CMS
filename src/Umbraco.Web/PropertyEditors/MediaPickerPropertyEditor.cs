@@ -1,9 +1,13 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.IO;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
@@ -32,8 +36,10 @@ namespace Umbraco.Web.PropertyEditors
             ILogger logger,
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
-            IIOHelper ioHelper)
-            : base(logger)
+            IIOHelper ioHelper,
+            IShortStringHelper shortStringHelper,
+            ILocalizedTextService localizedTextService)
+            : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
@@ -47,7 +53,7 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class MediaPickerPropertyValueEditor : DataValueEditor, IDataValueReference
         {
-            public MediaPickerPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute) : base(dataTypeService,localizationService, attribute)
+            public MediaPickerPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute) : base(dataTypeService,localizationService, Current.Services.TextService,Current.ShortStringHelper,attribute)
             {
             }
 

@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
+using Current = Umbraco.Core.Composing.Current;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -150,7 +152,7 @@ namespace Umbraco.Web.Models.Mapping
             // handle locked properties
             var lockedPropertyAliases = new List<string>();
             // add built-in member property aliases to list of aliases to be locked
-            foreach (var propertyAlias in ConventionsHelper.GetStandardPropertyTypeStubs().Keys)
+            foreach (var propertyAlias in ConventionsHelper.GetStandardPropertyTypeStubs(Current.ShortStringHelper).Keys)
             {
                 lockedPropertyAliases.Add(propertyAlias);
             }

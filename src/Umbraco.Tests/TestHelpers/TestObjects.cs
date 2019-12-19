@@ -49,7 +49,7 @@ namespace Umbraco.Tests.TestHelpers
             var syntax = new SqlCeSyntaxProvider();
             var connection = GetDbConnection();
             var sqlContext = new SqlContext(syntax, DatabaseType.SQLCe, Mock.Of<IPocoDataFactory>());
-            return new UmbracoDatabase(connection, sqlContext, logger);
+            return new UmbracoDatabase(connection, sqlContext, logger, TestHelper.BulkSqlInsertProvider);
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace Umbraco.Tests.TestHelpers
             var syntax = new SqlServerSyntaxProvider(); // do NOT try to get the server's version!
             var connection = GetDbConnection();
             var sqlContext = new SqlContext(syntax, DatabaseType.SqlServer2008, Mock.Of<IPocoDataFactory>());
-            return new UmbracoDatabase(connection, sqlContext, logger);
+            return new UmbracoDatabase(connection, sqlContext, logger, TestHelper.BulkSqlInsertProvider);
         }
 
         public void RegisterServices(IRegister register)
@@ -167,7 +167,7 @@ namespace Umbraco.Tests.TestHelpers
             var mediaService = GetLazyService<IMediaService>(factory, c => new MediaService(scopeProvider, mediaFileSystem, logger, eventMessagesFactory, GetRepo<IMediaRepository>(c), GetRepo<IAuditRepository>(c), GetRepo<IMediaTypeRepository>(c), GetRepo<IEntityRepository>(c)));
             var contentTypeService = GetLazyService<IContentTypeService>(factory, c => new ContentTypeService(scopeProvider, logger, eventMessagesFactory, contentService.Value, GetRepo<IContentTypeRepository>(c), GetRepo<IAuditRepository>(c), GetRepo<IDocumentTypeContainerRepository>(c), GetRepo<IEntityRepository>(c)));
             var mediaTypeService = GetLazyService<IMediaTypeService>(factory, c => new MediaTypeService(scopeProvider, logger, eventMessagesFactory, mediaService.Value, GetRepo<IMediaTypeRepository>(c), GetRepo<IAuditRepository>(c), GetRepo<IMediaTypeContainerRepository>(c), GetRepo<IEntityRepository>(c)));
-            var fileService = GetLazyService<IFileService>(factory, c => new FileService(scopeProvider, ioHelper, logger, eventMessagesFactory, GetRepo<IStylesheetRepository>(c), GetRepo<IScriptRepository>(c), GetRepo<ITemplateRepository>(c), GetRepo<IPartialViewRepository>(c), GetRepo<IPartialViewMacroRepository>(c), GetRepo<IAuditRepository>(c)));
+            var fileService = GetLazyService<IFileService>(factory, c => new FileService(scopeProvider, ioHelper, logger, eventMessagesFactory, GetRepo<IStylesheetRepository>(c), GetRepo<IScriptRepository>(c), GetRepo<ITemplateRepository>(c), GetRepo<IPartialViewRepository>(c), GetRepo<IPartialViewMacroRepository>(c), GetRepo<IAuditRepository>(c), TestHelper.ShortStringHelper));
 
             var memberTypeService = GetLazyService<IMemberTypeService>(factory, c => new MemberTypeService(scopeProvider, logger, eventMessagesFactory, memberService.Value, GetRepo<IMemberTypeRepository>(c), GetRepo<IAuditRepository>(c), GetRepo<IEntityRepository>(c)));
             var entityService = GetLazyService<IEntityService>(factory, c => new EntityService(scopeProvider, logger, eventMessagesFactory, idkMap, GetRepo<IEntityRepository>(c)));
@@ -179,11 +179,11 @@ namespace Umbraco.Tests.TestHelpers
                 return new PackagingService(
                     auditService.Value,
                     new PackagesRepository(contentService.Value, contentTypeService.Value, dataTypeService.Value, fileService.Value, macroService.Value, localizationService.Value, ioHelper,
-                        new EntityXmlSerializer(contentService.Value, mediaService.Value, dataTypeService.Value, userService.Value, localizationService.Value, contentTypeService.Value, urlSegmentProviders), logger, umbracoVersion, "createdPackages.config"),
+                        new EntityXmlSerializer(contentService.Value, mediaService.Value, dataTypeService.Value, userService.Value, localizationService.Value, contentTypeService.Value, urlSegmentProviders, TestHelper.ShortStringHelper), logger, umbracoVersion, globalSettings, "createdPackages.config"),
                     new PackagesRepository(contentService.Value, contentTypeService.Value, dataTypeService.Value, fileService.Value, macroService.Value, localizationService.Value, ioHelper,
-                        new EntityXmlSerializer(contentService.Value, mediaService.Value, dataTypeService.Value, userService.Value, localizationService.Value, contentTypeService.Value, urlSegmentProviders), logger, umbracoVersion, "installedPackages.config"),
+                        new EntityXmlSerializer(contentService.Value, mediaService.Value, dataTypeService.Value, userService.Value, localizationService.Value, contentTypeService.Value, urlSegmentProviders, TestHelper.ShortStringHelper), logger, umbracoVersion,  globalSettings, "installedPackages.config"),
                     new PackageInstallation(
-                        new PackageDataInstallation(logger, fileService.Value, macroService.Value, localizationService.Value, dataTypeService.Value, entityService.Value, contentTypeService.Value, contentService.Value, propertyEditorCollection, scopeProvider),
+                        new PackageDataInstallation(logger, fileService.Value, macroService.Value, localizationService.Value, dataTypeService.Value, entityService.Value, contentTypeService.Value, contentService.Value, propertyEditorCollection, scopeProvider, shortStringHelper, GetGlobalSettings(), localizedTextService.Value),
                         new PackageFileInstallation(compiledPackageXmlParser, ioHelper, new ProfilingLogger(logger, new TestProfiler())),
                         compiledPackageXmlParser, Mock.Of<IPackageActionRunner>(),
                         new DirectoryInfo(ioHelper.GetRootDirectorySafe())), ioHelper);
@@ -243,7 +243,7 @@ namespace Umbraco.Tests.TestHelpers
                 // mappersBuilder.AddCore();
                 // var mappers = mappersBuilder.CreateCollection();
                 var mappers = Current.Factory.GetInstance<IMapperCollection>();
-                databaseFactory = new UmbracoDatabaseFactory(Constants.System.UmbracoConnectionName, logger, new Lazy<IMapperCollection>(() => mappers), TestHelper.GetConfigs());
+                databaseFactory = new UmbracoDatabaseFactory(Constants.System.UmbracoConnectionName, logger, new Lazy<IMapperCollection>(() => mappers), TestHelper.GetConfigs(), TestHelper.DbProviderFactoryCreator, TestHelper.BulkSqlInsertProvider);
             }
 
             typeFinder = typeFinder ?? new TypeFinder(logger);

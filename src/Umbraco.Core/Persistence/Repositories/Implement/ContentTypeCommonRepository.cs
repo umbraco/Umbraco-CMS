@@ -8,6 +8,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -19,17 +20,19 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private const string CacheKey = "Umbraco.Core.Persistence.Repositories.Implement.ContentTypeCommonRepository::AllTypes";
 
         private readonly AppCaches _appCaches;
+        private readonly IShortStringHelper _shortStringHelper;
         private readonly IScopeAccessor _scopeAccessor;
         private readonly ITemplateRepository _templateRepository;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="IContentTypeCommonRepository"/> class.
         /// </summary>
-        public ContentTypeCommonRepository(IScopeAccessor scopeAccessor, ITemplateRepository templateRepository, AppCaches appCaches)
+        public ContentTypeCommonRepository(IScopeAccessor scopeAccessor, ITemplateRepository templateRepository, AppCaches appCaches, IShortStringHelper shortStringHelper)
         {
             _scopeAccessor = scopeAccessor;
             _templateRepository = templateRepository;
             _appCaches = appCaches;
+            _shortStringHelper = shortStringHelper;
         }
 
         private IScope AmbientScope => _scopeAccessor.AmbientScope;
@@ -85,11 +88,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 // create content type
                 IContentTypeComposition contentType;
                 if (contentTypeDto.NodeDto.NodeObjectType == Constants.ObjectTypes.MediaType)
-                    contentType = ContentTypeFactory.BuildMediaTypeEntity(contentTypeDto);
+                    contentType = ContentTypeFactory.BuildMediaTypeEntity(_shortStringHelper, contentTypeDto);
                 else if (contentTypeDto.NodeDto.NodeObjectType == Constants.ObjectTypes.DocumentType)
-                    contentType = ContentTypeFactory.BuildContentTypeEntity(contentTypeDto);
+                    contentType = ContentTypeFactory.BuildContentTypeEntity(_shortStringHelper, contentTypeDto);
                 else if (contentTypeDto.NodeDto.NodeObjectType == Constants.ObjectTypes.MemberType)
-                    contentType = ContentTypeFactory.BuildMemberTypeEntity(contentTypeDto);
+                    contentType = ContentTypeFactory.BuildMemberTypeEntity(_shortStringHelper, contentTypeDto);
                 else throw new PanicException($"The node object type {contentTypeDto.NodeDto.NodeObjectType} is not supported");
                 contentTypes.Add(contentType.Id, contentType);
 
@@ -202,7 +205,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .AndBy<PropertyTypeDto>(x => x.SortOrder, x => x.Id);
 
             var propertyDtos = Database.Fetch<PropertyTypeCommonDto>(sql2);
-            var builtinProperties = ConventionsHelper.GetStandardPropertyTypeStubs();
+            var builtinProperties = ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper);
 
             var groupIx = 0;
             var propertyIx = 0;
@@ -288,7 +291,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 memberType.MemberTypePropertyTypes[dto.Alias] = access;
             }
 
-            return new PropertyType(dto.DataTypeDto.EditorAlias, storageType, readonlyStorageType, dto.Alias)
+            return new PropertyType(_shortStringHelper, dto.DataTypeDto.EditorAlias, storageType, readonlyStorageType, dto.Alias)
             {
                 Description = dto.Description,
                 DataTypeId = dto.DataTypeId,

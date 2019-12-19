@@ -57,12 +57,12 @@ namespace Umbraco.Tests.PublishedContent
             var localizationService = Mock.Of<ILocalizationService>();
 
             var dataTypeService = new TestObjects.TestDataTypeService(
-                new DataType(new VoidEditor(logger)) { Id = 1 },
-                new DataType(new TrueFalsePropertyEditor(logger, IOHelper)) { Id = 1001 },
-                new DataType(new RichTextPropertyEditor(logger, mediaService, contentTypeBaseServiceProvider, umbracoContextAccessor, Mock.Of<IDataTypeService>(), localizationService, imageSourceParser, linkParser, pastedImages, IOHelper)) { Id = 1002 },
-                new DataType(new IntegerPropertyEditor(logger)) { Id = 1003 },
-                new DataType(new TextboxPropertyEditor(logger, Mock.Of<IDataTypeService>(), localizationService, IOHelper)) { Id = 1004 },
-                new DataType(new MediaPickerPropertyEditor(logger, Mock.Of<IDataTypeService>(), localizationService, IOHelper)) { Id = 1005 });
+                new DataType(new VoidEditor(logger, Mock.Of<IDataTypeService>(), localizationService, LocalizedTextService, ShortStringHelper)) { Id = 1 },
+                new DataType(new TrueFalsePropertyEditor(logger, Mock.Of<IDataTypeService>(), localizationService, IOHelper, ShortStringHelper, LocalizedTextService)) { Id = 1001 },
+                new DataType(new RichTextPropertyEditor(logger, mediaService, contentTypeBaseServiceProvider, umbracoContextAccessor, Mock.Of<IDataTypeService>(),  localizationService, imageSourceParser, linkParser, pastedImages, ShortStringHelper, IOHelper, LocalizedTextService)) { Id = 1002 },
+                new DataType(new IntegerPropertyEditor(logger, Mock.Of<IDataTypeService>(), localizationService, ShortStringHelper, LocalizedTextService)) { Id = 1003 },
+                new DataType(new TextboxPropertyEditor(logger, Mock.Of<IDataTypeService>(), localizationService, IOHelper, ShortStringHelper, LocalizedTextService)) { Id = 1004 },
+                new DataType(new MediaPickerPropertyEditor(logger, Mock.Of<IDataTypeService>(), localizationService, IOHelper, ShortStringHelper, LocalizedTextService)) { Id = 1005 });
             Composition.RegisterUnique<IDataTypeService>(f => dataTypeService);
         }
 
@@ -260,7 +260,7 @@ namespace Umbraco.Tests.PublishedContent
             var ct = doc.ContentType;
 
             var items = doc.Children()
-                .Select(x => x.CreateModel()) // linq, returns IEnumerable<IPublishedContent>
+                .Select(x => x.CreateModel(Current.PublishedModelFactory)) // linq, returns IEnumerable<IPublishedContent>
 
                 // only way around this is to make sure every IEnumerable<T> extension
                 // explicitely returns a PublishedContentSet, not an IEnumerable<T>

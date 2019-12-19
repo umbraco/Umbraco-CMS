@@ -24,7 +24,7 @@ namespace Umbraco.Tests.Services
             var dataTypeService = ServiceContext.DataTypeService;
 
             // Act
-            IDataType dataType = new DataType(new LabelPropertyEditor(Logger, IOHelper)) { Name = "Testing Textfield", DatabaseType = ValueStorageType.Ntext };
+            IDataType dataType = new DataType(new LabelPropertyEditor(Logger, IOHelper, DataTypeService, LocalizedTextService,LocalizationService, ShortStringHelper)) { Name = "Testing Textfield", DatabaseType = ValueStorageType.Ntext };
             dataTypeService.Save(dataType);
 
             // Assert
@@ -66,7 +66,7 @@ namespace Umbraco.Tests.Services
             var dataTypeService = ServiceContext.DataTypeService;
 
             // Act
-            var dataTypeDefinition = new DataType(new LabelPropertyEditor(Logger, IOHelper)) { Name = string.Empty, DatabaseType = ValueStorageType.Ntext };
+            var dataTypeDefinition = new DataType(new LabelPropertyEditor(Logger, IOHelper, DataTypeService, LocalizedTextService,LocalizationService, ShortStringHelper)) { Name = string.Empty, DatabaseType = ValueStorageType.Ntext };
 
             // Act & Assert
             Assert.Throws<ArgumentException>(() => dataTypeService.Save(dataTypeDefinition));

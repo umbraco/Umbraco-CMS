@@ -96,7 +96,8 @@ namespace Umbraco.Web.Security
                     customUserStore,
                     contentSettings,
                     passwordConfiguration,
-                    ipResolver));
+                    ipResolver,
+                    globalSettings));
 
             app.SetBackOfficeUserManagerType<BackOfficeUserManager, BackOfficeIdentityUser>();
 

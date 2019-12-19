@@ -676,7 +676,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                 cacheValues.XPath, // though, outside of tests, that should be null
                 cacheValues.FromExamine
             );
-            return content.CreateModel();
+            return content.CreateModel(Current.PublishedModelFactory);
         }
 
         private static CacheValues GetCacheValues(int id, Func<int, CacheValues> func)

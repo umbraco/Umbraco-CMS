@@ -57,7 +57,7 @@ namespace Umbraco.Tests.Services
 
             var publishedSnapshotAccessor = new TestPublishedSnapshotAccessor();
             var variationContextAccessor = new TestVariationContextAccessor();
-            var pmember = PublishedMember.Create(member, pmemberType, false, publishedSnapshotAccessor, variationContextAccessor);
+            var pmember = PublishedMember.Create(member, pmemberType, false, publishedSnapshotAccessor, variationContextAccessor, Current.PublishedModelFactory);
 
             // contains the umbracoMember... properties created when installing, on the member type
             // contains the other properties, that PublishedContentType adds (BuiltinMemberProperties)
@@ -65,7 +65,7 @@ namespace Umbraco.Tests.Services
             // TODO: see TODO in PublishedContentType, this list contains duplicates
 
             var aliases = new[]
-            {                
+            {
                 Constants.Conventions.Member.Comments,
                 Constants.Conventions.Member.FailedPasswordAttempts,
                 Constants.Conventions.Member.IsApproved,
@@ -823,7 +823,7 @@ namespace Umbraco.Tests.Services
         public void Get_By_Property_Int_Value_Exact()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.Integer, ValueStorageType.Integer, "number")
+            memberType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.Integer, ValueStorageType.Integer, "number")
                 {
                     Name = "Number",
                     //NOTE: This is what really determines the db type - the above definition doesn't really do anything
@@ -847,7 +847,7 @@ namespace Umbraco.Tests.Services
         public void Get_By_Property_Int_Value_Greater_Than()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.Integer, ValueStorageType.Integer, "number")
+            memberType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.Integer, ValueStorageType.Integer, "number")
             {
                 Name = "Number",
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything
@@ -871,7 +871,7 @@ namespace Umbraco.Tests.Services
         public void Get_By_Property_Int_Value_Greater_Than_Equal_To()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.Integer, ValueStorageType.Integer, "number")
+            memberType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.Integer, ValueStorageType.Integer, "number")
             {
                 Name = "Number",
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything
@@ -895,7 +895,7 @@ namespace Umbraco.Tests.Services
         public void Get_By_Property_Int_Value_Less_Than()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.DateTime, ValueStorageType.Date, "number")
+            memberType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.DateTime, ValueStorageType.Date, "number")
             {
                 Name = "Number",
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything
@@ -919,7 +919,7 @@ namespace Umbraco.Tests.Services
         public void Get_By_Property_Int_Value_Less_Than_Or_Equal()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.Integer, ValueStorageType.Integer, "number")
+            memberType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.Integer, ValueStorageType.Integer, "number")
             {
                 Name = "Number",
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything
@@ -943,7 +943,7 @@ namespace Umbraco.Tests.Services
         public void Get_By_Property_Date_Value_Exact()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.Integer, ValueStorageType.Integer, "date")
+            memberType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.Integer, ValueStorageType.Integer, "date")
             {
                 Name = "Date",
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything
@@ -967,7 +967,7 @@ namespace Umbraco.Tests.Services
         public void Get_By_Property_Date_Value_Greater_Than()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.Integer, ValueStorageType.Integer, "date")
+            memberType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.Integer, ValueStorageType.Integer, "date")
             {
                 Name = "Date",
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything
@@ -991,7 +991,7 @@ namespace Umbraco.Tests.Services
         public void Get_By_Property_Date_Value_Greater_Than_Equal_To()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.Integer, ValueStorageType.Integer, "date")
+            memberType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.Integer, ValueStorageType.Integer, "date")
             {
                 Name = "Date",
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything
@@ -1015,7 +1015,7 @@ namespace Umbraco.Tests.Services
         public void Get_By_Property_Date_Value_Less_Than()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.Integer, ValueStorageType.Integer, "date")
+            memberType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.Integer, ValueStorageType.Integer, "date")
             {
                 Name = "Date",
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything
@@ -1039,7 +1039,7 @@ namespace Umbraco.Tests.Services
         public void Get_By_Property_Date_Value_Less_Than_Or_Equal()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.Integer, ValueStorageType.Integer, "date")
+            memberType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.Integer, ValueStorageType.Integer, "date")
             {
                 Name = "Date",
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything

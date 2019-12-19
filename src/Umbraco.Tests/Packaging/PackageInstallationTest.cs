@@ -13,6 +13,8 @@ using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using File = System.IO.File;
@@ -48,7 +50,11 @@ namespace Umbraco.Tests.Packaging
             ServiceContext.DataTypeService, ServiceContext.EntityService,
             ServiceContext.ContentTypeService, ServiceContext.ContentService,
             Factory.GetInstance<PropertyEditorCollection>(),
-            Factory.GetInstance<IScopeProvider>());
+            Factory.GetInstance<IScopeProvider>(),
+            Factory.GetInstance<IShortStringHelper>(),
+            Factory.GetInstance<IGlobalSettings>(),
+            Factory.GetInstance<ILocalizedTextService>()
+            );
 
         private IPackageInstallation PackageInstallation => new PackageInstallation(
             PackageDataInstallation,

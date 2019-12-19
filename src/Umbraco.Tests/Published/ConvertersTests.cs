@@ -10,6 +10,8 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Tests.Components;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
@@ -32,7 +34,7 @@ namespace Umbraco.Tests.Published
             });
 
             var dataTypeService = new TestObjects.TestDataTypeService(
-                new DataType(new VoidEditor(Mock.Of<ILogger>())) { Id = 1 });
+                new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())) { Id = 1 });
 
             var contentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeService);
 
@@ -112,7 +114,7 @@ namespace Umbraco.Tests.Published
             });
 
             var dataTypeService = new TestObjects.TestDataTypeService(
-                new DataType(new VoidEditor(Mock.Of<ILogger>())) { Id = 1 });
+                new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())) { Id = 1 });
 
             var contentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeService);
 
@@ -206,8 +208,8 @@ namespace Umbraco.Tests.Published
             var converters = Current.Factory.GetInstance<PropertyValueConverterCollection>();
 
             var dataTypeService = new TestObjects.TestDataTypeService(
-                new DataType(new VoidEditor(Mock.Of<ILogger>())) { Id = 1 },
-                new DataType(new VoidEditor("2", Mock.Of<ILogger>())) { Id = 2 });
+                new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())) { Id = 1 },
+                new DataType(new VoidEditor("2", Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(),Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())) { Id = 2 });
 
             var contentTypeFactory = new PublishedContentTypeFactory(factory, converters, dataTypeService);
 
@@ -234,8 +236,8 @@ namespace Umbraco.Tests.Published
                 Properties = new[] { new SolidPublishedProperty { Alias = "prop2", SolidHasValue = true, SolidValue = "1003" } }
             };
 
-            cacheContent[cnt1.Id] = cnt1.CreateModel();
-            cacheContent[cnt2.Id] = cnt2.CreateModel();
+            cacheContent[cnt1.Id] = cnt1.CreateModel(Current.PublishedModelFactory);
+            cacheContent[cnt2.Id] = cnt2.CreateModel(Current.PublishedModelFactory);
 
             // can get the actual property Clr type
             // ie ModelType gets properly mapped by IPublishedContentModelFactory

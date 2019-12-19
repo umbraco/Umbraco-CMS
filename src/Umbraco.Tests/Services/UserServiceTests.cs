@@ -721,7 +721,7 @@ namespace Umbraco.Tests.Services
             var hash = new HMACSHA1();
             hash.Key = Encoding.Unicode.GetBytes(password);
             var encodedPassword = Convert.ToBase64String(hash.ComputeHash(Encoding.Unicode.GetBytes(password)));
-            var membershipUser = new User("JohnDoe", "john@umbraco.io", encodedPassword, encodedPassword);
+            var membershipUser = new User(TestObjects.GetGlobalSettings(), "JohnDoe", "john@umbraco.io", encodedPassword, encodedPassword);
             userService.Save(membershipUser);
 
             // Assert
@@ -735,7 +735,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Add_And_Remove_Sections_From_UserGroup()
         {
-            var userGroup = new UserGroup
+            var userGroup = new UserGroup(ShortStringHelper)
             {
                 Alias = "Group1",
                 Name = "Group 1"
@@ -779,12 +779,12 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Remove_Section_From_All_Assigned_UserGroups()
         {
-            var userGroup1 = new UserGroup
+            var userGroup1 = new UserGroup(ShortStringHelper)
             {
                 Alias = "Group1",
                 Name = "Group 1"
             };
-            var userGroup2 = new UserGroup
+            var userGroup2 = new UserGroup(ShortStringHelper)
             {
                 Alias = "Group2",
                 Name = "Group 2"
@@ -811,21 +811,21 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Add_Section_To_All_UserGroups()
         {
-            var userGroup1 = new UserGroup
+            var userGroup1 = new UserGroup(ShortStringHelper)
             {
                 Alias = "Group1",
                 Name = "Group 1"
             };
             userGroup1.AddAllowedSection("test");
 
-            var userGroup2 = new UserGroup
+            var userGroup2 = new UserGroup(ShortStringHelper)
             {
                 Alias = "Group2",
                 Name = "Group 2"
             };
             userGroup2.AddAllowedSection("test");
 
-            var userGroup3 = new UserGroup
+            var userGroup3 = new UserGroup(ShortStringHelper)
             {
                 Alias = "Group3",
                 Name = "Group 3"
@@ -962,7 +962,7 @@ namespace Umbraco.Tests.Services
 
         private UserGroup CreateTestUserGroup(string alias = "testGroup", string name = "Test Group")
         {
-            var userGroup = new UserGroup
+            var userGroup = new UserGroup(ShortStringHelper)
             {
                 Alias = alias,
                 Name = name,

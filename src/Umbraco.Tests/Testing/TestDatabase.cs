@@ -105,6 +105,9 @@ namespace Umbraco.Tests.Testing
         public ISqlContext SqlContext { get; }
         public string InstanceId { get; }
         public bool InTransaction { get; }
+        public bool EnableSqlCount { get; set; }
+        public int SqlCount { get; }
+        public int BulkInsertRecords<T>(IEnumerable<T> records) => throw new NotImplementedException();
 
         public DbParameter CreateParameter()
         {
@@ -236,6 +239,8 @@ namespace Umbraco.Tests.Testing
             throw new NotImplementedException();
         }
 
+        public Task<int> InsertBatchAsync<T>(IEnumerable<T> pocos, BatchOptions options = null) => throw new NotImplementedException();
+
         public Task<int> UpdateAsync(object poco)
         {
             throw new NotImplementedException();
@@ -251,15 +256,23 @@ namespace Umbraco.Tests.Testing
             throw new NotImplementedException();
         }
 
+        public Task<int> UpdateBatchAsync<T>(IEnumerable<UpdateBatch<T>> pocos, BatchOptions options = null) => throw new NotImplementedException();
+
         public Task<int> DeleteAsync(object poco)
         {
             throw new NotImplementedException();
         }
 
+        public IAsyncUpdateQueryProvider<T> UpdateManyAsync<T>() => throw new NotImplementedException();
+
+        public IAsyncDeleteQueryProvider<T> DeleteManyAsync<T>() => throw new NotImplementedException();
+
         public void InsertBulk<T>(IEnumerable<T> pocos)
         {
             throw new NotImplementedException();
         }
+
+        int IDatabase.InsertBatch<T>(IEnumerable<T> pocos, BatchOptions options) => throw new NotImplementedException();
 
         public void InsertBatch<T>(IEnumerable<T> pocos, BatchOptions options = null)
         {
@@ -320,6 +333,8 @@ namespace Umbraco.Tests.Testing
         {
             throw new NotImplementedException();
         }
+
+        public int UpdateBatch<T>(IEnumerable<UpdateBatch<T>> pocos, BatchOptions options = null) => throw new NotImplementedException();
 
         public IUpdateQueryProvider<T> UpdateMany<T>()
         {
@@ -699,6 +714,8 @@ namespace Umbraco.Tests.Testing
         {
             throw new NotImplementedException();
         }
+
+        public IAsyncQueryProviderWithIncludes<T> QueryAsync<T>() => throw new NotImplementedException();
 
         public Task<List<T>> FetchAsync<T>(string sql, params object[] args)
         {

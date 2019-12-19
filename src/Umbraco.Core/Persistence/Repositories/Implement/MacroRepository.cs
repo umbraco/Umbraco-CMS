@@ -10,14 +10,19 @@ using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     internal class MacroRepository : NPocoRepositoryBase<int, IMacro>, IMacroRepository
     {
-        public MacroRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger)
+        private readonly IShortStringHelper _shortStringHelper;
+
+        public MacroRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IShortStringHelper shortStringHelper)
             : base(scopeAccessor, cache, logger)
-        { }
+        {
+            _shortStringHelper = shortStringHelper;
+        }
 
         protected override IMacro PerformGet(int id)
         {
@@ -40,8 +45,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             if (macroDto == null)
                 return null;
-            
-            var entity = MacroFactory.BuildEntity(macroDto);
+
+            var entity = MacroFactory.BuildEntity(_shortStringHelper, macroDto);
 
             // reset dirty initial properties (U4-1946)
             ((BeingDirtyBase)entity).ResetDirtyProperties(false);
@@ -79,7 +84,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private IEnumerable<IMacro> ConvertFromDtos(IEnumerable<MacroDto> dtos)
         {
 
-            foreach (var entity in dtos.Select(MacroFactory.BuildEntity))
+            foreach (var entity in dtos.Select(x => MacroFactory.BuildEntity(_shortStringHelper, x)))
             {
                 // reset dirty initial properties (U4-1946)
                 ((BeingDirtyBase)entity).ResetDirtyProperties(false);

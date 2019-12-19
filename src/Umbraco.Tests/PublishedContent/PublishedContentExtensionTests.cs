@@ -74,9 +74,9 @@ namespace Umbraco.Tests.PublishedContent
             if (_createContentTypes)
             {
                 var contentTypeService = Current.Services.ContentTypeService;
-                var baseType = new ContentType(-1) { Alias = "base", Name = "Base" };
+                var baseType = new ContentType(ShortStringHelper, -1) { Alias = "base", Name = "Base" };
                 const string contentTypeAlias = "inherited";
-                var inheritedType = new ContentType(baseType, contentTypeAlias) { Alias = contentTypeAlias, Name = "Inherited" };
+                var inheritedType = new ContentType(ShortStringHelper, baseType, contentTypeAlias) { Alias = contentTypeAlias, Name = "Inherited" };
                 contentTypeService.Save(baseType);
                 contentTypeService.Save(inheritedType);
                 _contentTypes = new Dictionary<string, PublishedContentType>

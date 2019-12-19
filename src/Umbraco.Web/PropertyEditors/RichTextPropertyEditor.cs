@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Examine;
 using Umbraco.Web.Macros;
 using Umbraco.Web.Templates;
@@ -51,7 +53,10 @@ namespace Umbraco.Web.PropertyEditors
             HtmlImageSourceParser imageSourceParser,
             HtmlLocalLinkParser localLinkParser,
             RichTextEditorPastedImages pastedImages,
-            IIOHelper ioHelper) : base(logger)
+            IShortStringHelper shortStringHelper,
+            IIOHelper ioHelper,
+            ILocalizedTextService localizedTextService)
+            : base(logger, dataTypeService, localizationService, localizedTextService,shortStringHelper)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _imageSourceParser = imageSourceParser;
@@ -86,7 +91,7 @@ namespace Umbraco.Web.PropertyEditors
             private readonly RichTextEditorPastedImages _pastedImages;
 
             public RichTextPropertyValueEditor(DataEditorAttribute attribute, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor, ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, HtmlImageSourceParser imageSourceParser, HtmlLocalLinkParser localLinkParser, RichTextEditorPastedImages pastedImages)
-                : base(dataTypeService, localizationService, attribute)
+                : base(dataTypeService, localizationService,Current.Services.TextService, Current.ShortStringHelper, attribute)
             {
                 _umbracoContextAccessor = umbracoContextAccessor;
                 _imageSourceParser = imageSourceParser;

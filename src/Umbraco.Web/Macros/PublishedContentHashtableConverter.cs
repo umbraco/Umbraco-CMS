@@ -242,7 +242,7 @@ namespace Umbraco.Web.Macros
 
                     var urlSegmentProviders = Current.UrlSegmentProviders; // TODO inject
                     return _cultureInfos = _inner.PublishCultureInfos.Values
-                        .ToDictionary(x => x.Culture, x => new PublishedCultureInfo(x.Culture, x.Name, _inner.GetUrlSegment(urlSegmentProviders, x.Culture), x.Date));
+                        .ToDictionary(x => x.Culture, x => new PublishedCultureInfo(x.Culture, x.Name, _inner.GetUrlSegment(Current.ShortStringHelper, urlSegmentProviders, x.Culture), x.Date));
                 }
             }
 

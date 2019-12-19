@@ -16,7 +16,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Deep_Clone()
         {
-            var item = new Template("Test", "test")
+            var item = new Template(ShortStringHelper, "Test", "test")
             {
                 Id = 3,
                 CreateDate = DateTime.Now,
@@ -62,7 +62,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Serialize_Without_Error()
         {
-            var item = new Template("Test", "test")
+            var item = new Template(ShortStringHelper, "Test", "test")
             {
                 Id = 3,
                 CreateDate = DateTime.Now,

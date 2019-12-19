@@ -4,6 +4,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -18,10 +19,20 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </remarks>
     internal class DocumentBlueprintRepository : DocumentRepository, IDocumentBlueprintRepository
     {
-        public DocumentBlueprintRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger,
-            IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, ILanguageRepository languageRepository, IRelationRepository relationRepository, IRelationTypeRepository relationTypeRepository,
-            Lazy<PropertyEditorCollection> propertyEditorCollection, DataValueReferenceFactoryCollection dataValueReferenceFactories)
-            : base(scopeAccessor, appCaches, logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditorCollection, dataValueReferenceFactories)
+        public DocumentBlueprintRepository(
+            IScopeAccessor scopeAccessor,
+            AppCaches appCaches,
+            ILogger logger,
+            IContentTypeRepository contentTypeRepository,
+            ITemplateRepository templateRepository,
+            ITagRepository tagRepository,
+            ILanguageRepository languageRepository,
+            IRelationRepository relationRepository,
+            IRelationTypeRepository relationTypeRepository,
+            Lazy<PropertyEditorCollection> propertyEditorCollection,
+            IDataTypeService dataTypeService,
+            DataValueReferenceFactoryCollection dataValueReferenceFactories)
+            : base(scopeAccessor, appCaches, logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditorCollection, dataValueReferenceFactories, dataTypeService)
         {
         }
 

@@ -11,6 +11,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Web.Models.ContentEditing;
@@ -37,7 +38,7 @@ namespace Umbraco.Tests.Models.Mapping
             Composition.Register(_ => Mock.Of<IContentSection>());
 
             // all this is required so we can validate properties...
-            var editor = new TextboxPropertyEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), IOHelper) { Alias = "test" };
+            var editor = new TextboxPropertyEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), IOHelper, ShortStringHelper, LocalizedTextService) { Alias = "test" };
             Composition.Register(_ => new DataEditorCollection(new[] { editor }));
             Composition.Register<PropertyEditorCollection>();
             var dataType = Mock.Of<IDataType>();
@@ -60,7 +61,7 @@ namespace Umbraco.Tests.Models.Mapping
             /// <summary>
             /// The constructor will setup the property editor based on the attribute if one is found
             /// </summary>
-            public TestPropertyEditor(ILogger logger) : base(logger)
+            public TestPropertyEditor(ILogger logger) : base(logger, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(),Mock.Of<IShortStringHelper>())
             { }
         }
 
@@ -207,8 +208,8 @@ namespace Umbraco.Tests.Models.Mapping
             var idSeed = 1;
             var contentType = MockedContentTypes.CreateSimpleContentType();
             //add non-grouped properties
-            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "nonGrouped1") { Name = "Non Grouped 1", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88 });
-            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "nonGrouped2") { Name = "Non Grouped 2", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88 });
+            contentType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "nonGrouped1") { Name = "Non Grouped 1", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88 });
+            contentType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "nonGrouped2") { Name = "Non Grouped 2", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88 });
             //set ids or it wont work
             contentType.Id = idSeed;
             foreach (var p in contentType.PropertyTypes)

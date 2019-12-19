@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
@@ -9,6 +10,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Core.Services;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -24,6 +26,8 @@ namespace Umbraco.Web.Models.Mapping
         private readonly IMediaTypeService _mediaTypeService;
         private readonly IMemberTypeService _memberTypeService;
         private readonly ILogger _logger;
+        private readonly IShortStringHelper _shortStringHelper;
+
 
         public ContentTypeMapDefinition(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IFileService fileService,
             IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService,
@@ -36,13 +40,15 @@ namespace Umbraco.Web.Models.Mapping
             _mediaTypeService = mediaTypeService;
             _memberTypeService = memberTypeService;
             _logger = logger;
+            _shortStringHelper = Current.ShortStringHelper;
+
         }
 
         public void DefineMaps(UmbracoMapper mapper)
         {
-            mapper.Define<DocumentTypeSave, IContentType>((source, context) => new ContentType(source.ParentId), Map);
-            mapper.Define<MediaTypeSave, IMediaType>((source, context) => new MediaType(source.ParentId), Map);
-            mapper.Define<MemberTypeSave, IMemberType>((source, context) => new MemberType(source.ParentId), Map);
+            mapper.Define<DocumentTypeSave, IContentType>((source, context) => new ContentType(_shortStringHelper, source.ParentId), Map);
+            mapper.Define<MediaTypeSave, IMediaType>((source, context) => new MediaType(_shortStringHelper, source.ParentId), Map);
+            mapper.Define<MemberTypeSave, IMemberType>((source, context) => new MemberType(_shortStringHelper, source.ParentId), Map);
 
             mapper.Define<IContentType, DocumentTypeDisplay>((source, context) => new DocumentTypeDisplay(), Map);
             mapper.Define<IMediaType, MediaTypeDisplay>((source, context) => new MediaTypeDisplay(), Map);
@@ -53,7 +59,7 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     var dataType = _dataTypeService.GetDataType(source.DataTypeId);
                     if (dataType == null) throw new NullReferenceException("No data type found with id " + source.DataTypeId);
-                    return new PropertyType(dataType, source.Alias);
+                    return new PropertyType(_shortStringHelper, dataType, source.Alias);
                 }, Map);
 
             // TODO: isPublishing in ctor?
@@ -228,7 +234,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Variations = source.AllowCultureVariant
                 ? target.Variations.SetFlag(ContentVariation.Culture)
                 : target.Variations.UnsetFlag(ContentVariation.Culture);
-            
+
             if (source.Id > 0)
                 target.Id = source.Id;
 
@@ -399,8 +405,8 @@ namespace Umbraco.Web.Models.Mapping
 
             if (!(target is IMemberType))
             {
-                target.Variations = source.AllowCultureVariant                    
-                    ? target.Variations.SetFlag(ContentVariation.Culture)                    
+                target.Variations = source.AllowCultureVariant
+                    ? target.Variations.SetFlag(ContentVariation.Culture)
                     : target.Variations.UnsetFlag(ContentVariation.Culture);
             }
 

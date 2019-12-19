@@ -5,10 +5,13 @@ using System.Linq;
 using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
@@ -54,7 +57,7 @@ namespace Umbraco.Tests.PublishedContent
 
         public void Add(SolidPublishedContent content)
         {
-            _content[content.Id] = content.CreateModel();
+            _content[content.Id] = content.CreateModel(Current.PublishedModelFactory);
         }
 
         public void Clear()
@@ -411,7 +414,7 @@ namespace Umbraco.Tests.PublishedContent
         static AutoPublishedContentType()
         {
             var dataTypeService = new TestObjects.TestDataTypeService(
-                new DataType(new VoidEditor(Mock.Of<ILogger>())) { Id = 666 });
+                new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),  Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())) { Id = 666 });
 
             var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
             Default = factory.CreatePropertyType("*", 666);

@@ -113,7 +113,7 @@ namespace Umbraco.Core.Services.Implement
                 if (loginExists)
                     throw new ArgumentException("Login already exists"); // causes rollback // causes rollback
 
-                user = new User
+                user = new User(_globalSettings)
                 {
                     DefaultToLiveEditing = false,
                     Email = email,
@@ -474,7 +474,7 @@ namespace Umbraco.Core.Services.Implement
                 {
                     case MemberCountType.All:
                         query = Query<IUser>();
-                        break;                    
+                        break;
                     case MemberCountType.LockedOut:
                         query = Query<IUser>().Where(x => x.IsLockedOut);
                         break;

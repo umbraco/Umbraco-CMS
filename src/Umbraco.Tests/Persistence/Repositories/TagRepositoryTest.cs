@@ -955,34 +955,34 @@ namespace Umbraco.Tests.Persistence.Repositories
         private DocumentRepository CreateDocumentRepository(IScopeProvider provider, out ContentTypeRepository contentTypeRepository)
         {
             var accessor = (IScopeAccessor) provider;
-            var templateRepository = new TemplateRepository(accessor, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock(), IOHelper);
+            var templateRepository = new TemplateRepository(accessor, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
             var tagRepository = new TagRepository(accessor, AppCaches.Disabled, Logger);
-            var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches.Disabled);
-            var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, Logger);
-            contentTypeRepository = new ContentTypeRepository(accessor, AppCaches.Disabled, Logger, commonRepository, languageRepository);
+            var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches.Disabled, ShortStringHelper);
+            var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, Logger, TestObjects.GetGlobalSettings());
+            contentTypeRepository = new ContentTypeRepository(accessor, AppCaches.Disabled, Logger, commonRepository, languageRepository, ShortStringHelper);
             var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, Logger);
             var entityRepository = new EntityRepository(accessor);
             var relationRepository = new RelationRepository(accessor, Logger, relationTypeRepository, entityRepository);
             var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
             var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-            var repository = new DocumentRepository(accessor, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences);
+            var repository = new DocumentRepository(accessor, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, DataTypeService);
             return repository;
         }
 
         private MediaRepository CreateMediaRepository(IScopeProvider provider, out MediaTypeRepository mediaTypeRepository)
         {
             var accessor = (IScopeAccessor) provider;
-            var templateRepository = new TemplateRepository(accessor, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock(), IOHelper);
+            var templateRepository = new TemplateRepository(accessor, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
             var tagRepository = new TagRepository(accessor, AppCaches.Disabled, Logger);
-            var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches.Disabled);
-            var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, Logger);
-            mediaTypeRepository = new MediaTypeRepository(accessor, AppCaches.Disabled, Logger, commonRepository, languageRepository);
+            var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches.Disabled, ShortStringHelper);
+            var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, Logger, TestObjects.GetGlobalSettings());
+            mediaTypeRepository = new MediaTypeRepository(accessor, AppCaches.Disabled, Logger, commonRepository, languageRepository, ShortStringHelper);
             var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, Logger);
             var entityRepository = new EntityRepository(accessor);
             var relationRepository = new RelationRepository(accessor, Logger, relationTypeRepository, entityRepository);
             var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
             var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-            var repository = new MediaRepository(accessor, AppCaches.Disabled, Logger, mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository, propertyEditors, dataValueReferences);
+            var repository = new MediaRepository(accessor, AppCaches.Disabled, Logger, mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, DataTypeService);
             return repository;
         }
     }

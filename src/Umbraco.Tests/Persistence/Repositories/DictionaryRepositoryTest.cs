@@ -288,7 +288,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository();
 
-                var languageNo = new Language("nb-NO") { CultureName = "nb-NO" };
+                var languageNo = new Language(TestObjects.GetGlobalSettings(), "nb-NO") { CultureName = "nb-NO" };
                 ServiceContext.LocalizationService.Save(languageNo);
 
                 // Act
@@ -373,7 +373,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var language = ServiceContext.LocalizationService.GetLanguageByIsoCode("en-US");
 
-            var languageDK = new Language("da-DK") { CultureName = "da-DK" };
+            var languageDK = new Language(TestObjects.GetGlobalSettings(), "da-DK") { CultureName = "da-DK" };
             ServiceContext.LocalizationService.Save(languageDK);//Id 2
 
             var readMore = new DictionaryItem("Read More");

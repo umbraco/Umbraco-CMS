@@ -11,6 +11,7 @@ using Umbraco.Core.Migrations;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.Migrations.Stubs;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Migrations
@@ -30,7 +31,7 @@ namespace Umbraco.Tests.Migrations
 
             var dbProviderFactory = DbProviderFactories.GetFactory(Constants.DbProviderNames.SqlServer);
             var sqlContext = new SqlContext(_sqlSyntax, DatabaseType.SqlServer2008, Mock.Of<IPocoDataFactory>());
-            _database = new UmbracoDatabase("cstr", sqlContext, dbProviderFactory, _logger);
+            _database = new UmbracoDatabase("cstr", sqlContext, dbProviderFactory, _logger, TestHelper.BulkSqlInsertProvider);
         }
 
         [Test]

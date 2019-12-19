@@ -133,7 +133,7 @@ namespace Umbraco.Web.Editors
                 }
 
                 // create it (creating a new language cannot create a fallback cycle)
-                var newLang = new Core.Models.Language(culture.Name)
+                var newLang = new Core.Models.Language(GlobalSettings, culture.Name)
                 {
                     CultureName = culture.DisplayName,
                     IsDefault = language.IsDefault,

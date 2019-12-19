@@ -87,7 +87,7 @@
     </PackageReference>
     <PackageReference Include="MiniProfiler" Version="4.0.138" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
-    <PackageReference Include="NPoco" Version="3.9.4" />
+    <PackageReference Include="NPoco" Version="4.0.2" />
     <PackageReference Include="SecurityCodeScan">
       <Version>3.3.0</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
@@ -114,6 +114,10 @@
     <ProjectReference Include="..\Umbraco.Examine\Umbraco.Examine.csproj">
       <Name>Umbraco.Examine</Name>
       <Project>{07FBC26B-2927-4A22-8D96-D644C667FECC}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj">
+      <Project>{3ae7bf57-966b-45a5-910a-954d7c554441}</Project>
+      <Name>Umbraco.Infrastructure</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -144,6 +148,10 @@
     <Compile Include="Composing\CompositionExtensions\Installer.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComponent.cs" />
+    <Compile Include="ContentApps\ContentAppFactoryCollection.cs" />
+    <Compile Include="ContentApps\ContentAppFactoryCollectionBuilder.cs" />
+    <Compile Include="ContentApps\ContentEditorContentAppFactory.cs" />
+    <Compile Include="ContentApps\ContentInfoContentAppFactory.cs" />
     <Compile Include="ContentApps\ListViewContentAppFactory.cs" />
     <Compile Include="Dashboards\ContentDashboard.cs" />
     <Compile Include="Dashboards\DashboardCollection.cs" />
@@ -280,6 +288,7 @@
     <Compile Include="UmbracoContextFactory.cs" />
     <Compile Include="UmbracoContextReference.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeByUdiRouteHandler.cs" />
+    <Compile Include="UmbracoDbProviderFactoryCreator.cs" />
     <Compile Include="ViewDataExtensions.cs" />
     <Compile Include="WebApi\Filters\AdminUsersAuthorizeAttribute.cs" />
     <Compile Include="WebApi\Filters\OnlyLocalRequestsAttribute.cs" />
@@ -310,10 +319,6 @@
     <Compile Include="Models\ContentEditing\SearchResult.cs" />
     <Compile Include="Models\ContentEditing\SearchResults.cs" />
     <Compile Include="Models\ContentEditing\UnpublishContent.cs" />
-    <Compile Include="ContentApps\ContentAppFactoryCollection.cs" />
-    <Compile Include="ContentApps\ContentAppFactoryCollectionBuilder.cs" />
-    <Compile Include="ContentApps\ContentEditorContentAppFactory.cs" />
-    <Compile Include="ContentApps\ContentInfoContentAppFactory.cs" />
     <Compile Include="Services\ITreeService.cs" />
     <Compile Include="Services\ISectionService.cs" />
     <Compile Include="Sections\SectionCollection.cs" />

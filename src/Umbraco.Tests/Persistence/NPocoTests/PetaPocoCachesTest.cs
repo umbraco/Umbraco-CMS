@@ -133,7 +133,7 @@ namespace Umbraco.Tests.Persistence.NPocoTests
 
             contentService.GetContentForRelease(DateTime.Now);
 
-            ((ContentService)contentService).GetPublishedDescendants(new Content("Test", -1, new ContentType(-1))
+            ((ContentService)contentService).GetPublishedDescendants(new Content("Test", -1, new ContentType(ShortStringHelper, -1))
             {
                 Id = id1,
                 Path = "-1," + id1
@@ -174,19 +174,19 @@ namespace Umbraco.Tests.Persistence.NPocoTests
             }
             contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory" + Guid.NewGuid().ToString("N"), "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType("test", ValueStorageType.Ntext, "tags")
+                new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
                 {
                     DataTypeId = 1041
                 });
             contentTypeService.Save(contentType);
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
-            content1.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
+            content1.AssignTags(PropertyEditorCollection.Value, DataTypeService, "tags", new[] { "hello", "world", "some", "tags" });
             content1.PublishCulture(CultureImpact.Invariant);
             contentService.SaveAndPublish(content1);
             id2 = content1.Id;
 
             var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
-            content2.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
+            content2.AssignTags(PropertyEditorCollection.Value, DataTypeService, "tags", new[] { "hello", "world", "some", "tags" });
             content2.PublishCulture(CultureImpact.Invariant);
             contentService.SaveAndPublish(content2);
             id3 = content2.Id;

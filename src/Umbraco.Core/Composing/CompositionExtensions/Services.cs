@@ -97,6 +97,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
                 factory.GetInstance<IEntityXmlSerializer>(),
                 factory.GetInstance<ILogger>(),
                 factory.GetInstance<IUmbracoVersion>(),
+                factory.GetInstance<IGlobalSettings>(),
                 packageRepoFileName);
 
         private static LocalizedTextServiceFileSources SourcesFactory(IFactory container)

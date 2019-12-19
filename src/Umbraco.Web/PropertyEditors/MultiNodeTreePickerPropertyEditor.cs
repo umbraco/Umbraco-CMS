@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Editors;
@@ -22,7 +23,7 @@ namespace Umbraco.Web.PropertyEditors
         private readonly IIOHelper _ioHelper;
 
         public MultiNodeTreePickerPropertyEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper)
-            : base(logger)
+            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService,Current.Services.TextService, Current.ShortStringHelper)
         {
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
@@ -35,7 +36,7 @@ namespace Umbraco.Web.PropertyEditors
 
         public class MultiNodeTreePickerPropertyValueEditor : DataValueEditor, IDataValueReference
         {
-            public MultiNodeTreePickerPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute): base(dataTypeService, localizationService, attribute)
+            public MultiNodeTreePickerPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute): base(dataTypeService, localizationService, Current.Services.TextService, Current.ShortStringHelper, attribute)
             {
 
             }

@@ -29,6 +29,7 @@ namespace Umbraco.Core.Migrations.Install
         private readonly ILogger _logger;
         private readonly IIOHelper _ioHelper;
         private readonly IUmbracoVersion _umbracoVersion;
+        private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
 
         private DatabaseSchemaResult _databaseSchemaValidationResult;
 
@@ -44,7 +45,8 @@ namespace Umbraco.Core.Migrations.Install
             IMigrationBuilder migrationBuilder,
             IKeyValueService keyValueService,
             IIOHelper ioHelper,
-            IUmbracoVersion umbracoVersion)
+            IUmbracoVersion umbracoVersion,
+            IDbProviderFactoryCreator dbProviderFactoryCreator)
         {
             _scopeProvider = scopeProvider;
             _globalSettings = globalSettings;
@@ -55,6 +57,7 @@ namespace Umbraco.Core.Migrations.Install
             _keyValueService = keyValueService;
             _ioHelper = ioHelper;
             _umbracoVersion = umbracoVersion;
+            _dbProviderFactoryCreator = dbProviderFactoryCreator;
         }
 
         #region Status
@@ -99,7 +102,8 @@ namespace Umbraco.Core.Migrations.Install
                     databaseType, out providerName);
             }
 
-            return DbConnectionExtensions.IsConnectionAvailable(connectionString, providerName);
+            var factory = _dbProviderFactoryCreator.CreateFactory(providerName);
+            return DbConnectionExtensions.IsConnectionAvailable(connectionString, factory);
         }
 
         internal bool HasSomeNonDefaultUser()

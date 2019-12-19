@@ -28,7 +28,17 @@ namespace Umbraco.Core.Runtime
         private readonly IUmbracoBootPermissionChecker _umbracoBootPermissionChecker;
 
 
-        public CoreRuntime(Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IUmbracoBootPermissionChecker umbracoBootPermissionChecker, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
+        public CoreRuntime(
+            Configs configs,
+            IUmbracoVersion umbracoVersion,
+            IIOHelper ioHelper,
+            ILogger logger,
+            IProfiler profiler,
+            IUmbracoBootPermissionChecker umbracoBootPermissionChecker,
+            IHostingEnvironment hostingEnvironment,
+            IBackOfficeInfo backOfficeInfo,
+            IDbProviderFactoryCreator dbProviderFactoryCreator,
+            IBulkSqlInsertProvider bulkSqlInsertProvider)
         {
             IOHelper = ioHelper;
             Configs = configs;
@@ -36,6 +46,8 @@ namespace Umbraco.Core.Runtime
             Profiler = profiler;
             HostingEnvironment = hostingEnvironment;
             BackOfficeInfo = backOfficeInfo;
+            DbProviderFactoryCreator = dbProviderFactoryCreator;
+            BulkSqlInsertProvider = bulkSqlInsertProvider;
 
             _umbracoBootPermissionChecker = umbracoBootPermissionChecker;
 
@@ -59,6 +71,8 @@ namespace Umbraco.Core.Runtime
         protected ILogger Logger { get; }
 
         protected IBackOfficeInfo BackOfficeInfo { get; }
+        public IDbProviderFactoryCreator DbProviderFactoryCreator { get; }
+        public IBulkSqlInsertProvider BulkSqlInsertProvider { get; }
 
         /// <summary>
         /// Gets the profiler.
@@ -155,7 +169,7 @@ namespace Umbraco.Core.Runtime
 
                 // create the composition
                 composition = new Composition(register, typeLoader, ProfilingLogger, _state, Configs, IOHelper, appCaches);
-                composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, mainDom, appCaches, databaseFactory, typeLoader, _state, TypeFinder, IOHelper, UmbracoVersion);
+                composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, mainDom, appCaches, databaseFactory, typeLoader, _state, TypeFinder, IOHelper, UmbracoVersion, DbProviderFactoryCreator, BulkSqlInsertProvider);
 
                 // run handlers
                 RuntimeOptions.DoRuntimeEssentials(composition, appCaches, typeLoader, databaseFactory);
@@ -363,7 +377,7 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         /// <remarks>This is strictly internal, for tests only.</remarks>
         protected internal virtual IUmbracoDatabaseFactory GetDatabaseFactory()
-            => new UmbracoDatabaseFactory(Logger, new Lazy<IMapperCollection>(() => _factory.GetInstance<IMapperCollection>()), Configs);
+            => new UmbracoDatabaseFactory(Logger, new Lazy<IMapperCollection>(() => _factory.GetInstance<IMapperCollection>()), Configs, DbProviderFactoryCreator, BulkSqlInsertProvider);
 
 
         #endregion

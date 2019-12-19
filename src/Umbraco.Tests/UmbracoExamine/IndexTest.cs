@@ -15,6 +15,7 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System;
 using Umbraco.Core;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
@@ -39,7 +40,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 indexer.CreateIndex();
 
                 var contentType = MockedContentTypes.CreateBasicContentType();
-                contentType.AddPropertyType(new PropertyType("test", ValueStorageType.Ntext)
+                contentType.AddPropertyType(new PropertyType(TestHelper.ShortStringHelper, "test", ValueStorageType.Ntext)
                 {
                     Alias = "grid",
                     Name = "Grid",

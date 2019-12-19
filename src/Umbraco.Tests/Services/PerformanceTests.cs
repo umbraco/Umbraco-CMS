@@ -29,11 +29,9 @@ namespace Umbraco.Tests.Services
     [TestFixture]
     [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    [NUnit.Framework.Ignore("These should not be run by the server, only directly as they are only benchmark tests")]
+    [NUnit.Framework.Explicit("These should not be run by the server, only directly as they are only benchmark tests")]
     public class PerformanceTests : TestWithDatabaseBase
     {
-        // FIXME: probably making little sense in places due to scope creating a transaction?!
-
         protected override string GetDbConnectionString()
         {
             return @"server=.\SQLEXPRESS;database=UmbTest;user id=sa;password=test";
@@ -161,24 +159,6 @@ namespace Umbraco.Tests.Services
             }
 
             //now, test truncating but then do bulk insertion of records
-            using (proflog.DebugDuration<PerformanceTests>("Starting truncate + bulk insert test"))
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                //do this 10x!
-                for (var i = 0; i < 10; i++)
-                {
-                    //clear all the xml entries
-                    scope.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
-                                            (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml
-                                                INNER JOIN cmsContent ON cmsContentXml.nodeId = cmsContent.nodeId)");
-
-                    //now we insert each record for the ones we've deleted like we do in the content service.
-                    var xmlItems = nodes.Select(node => new ContentXmlDto { NodeId = node.NodeId, Xml = UpdatedXmlStructure }).ToList();
-                    scope.Database.BulkInsertRecordsWithTransaction(xmlItems);
-                }
-            }
-
-            //now, test truncating but then do bulk insertion of records
             using (proflog.DebugDuration<PerformanceTests>("Starting truncate + bulk insert test in one transaction"))
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -188,19 +168,16 @@ namespace Umbraco.Tests.Services
                     //now we insert each record for the ones we've deleted like we do in the content service.
                     var xmlItems = nodes.Select(node => new ContentXmlDto { NodeId = node.NodeId, Xml = UpdatedXmlStructure }).ToList();
 
-                    using (var tr = scope.Database.GetTransaction())
-                    {
-                        //clear all the xml entries
-                        scope.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
+                    //clear all the xml entries
+                    scope.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
                                             (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml
                                                 INNER JOIN cmsContent ON cmsContentXml.nodeId = cmsContent.nodeId)");
 
 
-                        scope.Database.BulkInsertRecords(xmlItems);
-
-                        tr.Complete();
-                    }
+                    scope.Database.BulkInsertRecords(xmlItems);
                 }
+
+                scope.Complete();
             }
         }
 
@@ -267,7 +244,7 @@ namespace Umbraco.Tests.Services
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                scope.Database.BulkInsertRecordsWithTransaction(nodes);
+                scope.Database.BulkInsertRecords(nodes);
 
                 //re-get the nodes with ids
                 var sql = Current.SqlContext.Sql();
@@ -277,11 +254,11 @@ namespace Umbraco.Tests.Services
                 //create the cmsContent data, each with a new content type id (so we can query on it later if needed)
                 var contentTypeId = 0;
                 var cmsContentItems = nodes.Select(node => new ContentDto { NodeId = node.NodeId, ContentTypeId = contentTypeId++ }).ToList();
-                scope.Database.BulkInsertRecordsWithTransaction(cmsContentItems);
+                scope.Database.BulkInsertRecords(cmsContentItems);
 
                 //create the xml data
                 var xmlItems = nodes.Select(node => new ContentXmlDto { NodeId = node.NodeId, Xml = TestXmlStructure }).ToList();
-                scope.Database.BulkInsertRecordsWithTransaction(xmlItems);
+                scope.Database.BulkInsertRecords(xmlItems);
 
                 scope.Complete();
             }

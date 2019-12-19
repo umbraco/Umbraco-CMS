@@ -1,7 +1,10 @@
 ﻿using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -23,8 +26,8 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// Initializes a new instance of the <see cref="TrueFalsePropertyEditor"/> class.
         /// </summary>
-        public TrueFalsePropertyEditor(ILogger logger, IIOHelper ioHelper)
-            : base(logger)
+        public TrueFalsePropertyEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper, IShortStringHelper shortStringHelper, ILocalizedTextService localizedTextService)
+            : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             _ioHelper = ioHelper;
         }

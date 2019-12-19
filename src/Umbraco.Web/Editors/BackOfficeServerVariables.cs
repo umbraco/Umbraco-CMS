@@ -101,6 +101,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         internal Dictionary<string, object> GetServerVariables()
         {
+            var globalSettings = Current.Configs.Global();
             var defaultVals = new Dictionary<string, object>
             {
                 {
@@ -319,7 +320,7 @@ namespace Umbraco.Web.Editors
                     "umbracoSettings", new Dictionary<string, object>
                     {
                         {"umbracoPath", _globalSettings.Path},
-                        {"mediaPath", Current.IOHelper.ResolveUrl(Current.Configs.Global().UmbracoMediaPath).TrimEnd('/')},
+                        {"mediaPath", Current.IOHelper.ResolveUrl(globalSettings.UmbracoMediaPath).TrimEnd('/')},
                         {"appPluginsPath", Current.IOHelper.ResolveUrl(Constants.SystemDirectories.AppPlugins).TrimEnd('/')},
                         {
                             "imageFileTypes",
@@ -339,11 +340,11 @@ namespace Umbraco.Web.Editors
                         },
                         {"keepUserLoggedIn", Current.Configs.Settings().Security.KeepUserLoggedIn},
                         {"usernameIsEmail", Current.Configs.Settings().Security.UsernameIsEmail},
-                        {"cssPath", Current.IOHelper.ResolveUrl(Current.Configs.Global().UmbracoCssPath).TrimEnd('/')},
+                        {"cssPath", Current.IOHelper.ResolveUrl(globalSettings.UmbracoCssPath).TrimEnd('/')},
                         {"allowPasswordReset", Current.Configs.Settings().Security.AllowPasswordReset},
                         {"loginBackgroundImage",  Current.Configs.Settings().Content.LoginBackgroundImage},
-                        {"showUserInvite", EmailSender.CanSendRequiredEmail},
-                        {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail},
+                        {"showUserInvite", EmailSender.CanSendRequiredEmail(globalSettings)},
+                        {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail(globalSettings)},
                     }
                 },
                 {

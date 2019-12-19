@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Logging;
+﻿using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors.ParameterEditors
@@ -11,7 +12,7 @@ namespace Umbraco.Web.PropertyEditors.ParameterEditors
     public class PropertyTypeParameterEditor : DataEditor
     {
         public PropertyTypeParameterEditor(ILogger logger)
-            : base(logger)
+            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService,Current.Services.TextService, Current.ShortStringHelper)
         {
             // configure
             DefaultConfiguration.Add("multiple", "0");

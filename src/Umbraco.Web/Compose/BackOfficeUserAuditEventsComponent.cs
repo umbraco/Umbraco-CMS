@@ -2,6 +2,7 @@
 using Umbraco.Core;
 using Umbraco.Core.Compose;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
@@ -12,11 +13,13 @@ namespace Umbraco.Web.Compose
     {
         private readonly IAuditService _auditService;
         private readonly IUserService _userService;
+        private readonly IGlobalSettings _globalSettings;
 
-        public BackOfficeUserAuditEventsComponent(IAuditService auditService, IUserService userService)
+        public BackOfficeUserAuditEventsComponent(IAuditService auditService, IUserService userService, IGlobalSettings globalSettings)
         {
             _auditService = auditService;
             _userService = userService;
+            _globalSettings = globalSettings;
         }
 
         public void Initialize()
@@ -40,7 +43,7 @@ namespace Umbraco.Web.Compose
         private IUser GetPerformingUser(int userId)
         {
             var found = userId >= 0 ? _userService.GetUserById(userId) : null;
-            return found ?? AuditEventsComponent.UnknownUser;
+            return found ?? AuditEventsComponent.UnknownUser(_globalSettings);
         }
 
         private static string FormatEmail(IMembershipUser user)

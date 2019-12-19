@@ -42,7 +42,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 dtRepo.Save(dataType2);
 
                 var ctRepo = Factory.GetInstance<IContentTypeRepository>();
-                IContentType ct = new ContentType(-1)
+                IContentType ct = new ContentType(ShortStringHelper, -1)
                 {
                     Alias = "ct1",
                     Name = "CT1",
@@ -55,15 +55,15 @@ namespace Umbraco.Tests.Persistence.Repositories
                             Name = "PG1",
                             PropertyTypes = new PropertyTypeCollection(true)
                             {
-                                new PropertyType(dataType1, "pt1")
+                                new PropertyType(ShortStringHelper, dataType1, "pt1")
                                 {
                                     Name = "PT1"
                                 },
-                                new PropertyType(dataType1, "pt2")
+                                new PropertyType(ShortStringHelper, dataType1, "pt2")
                                 {
                                     Name = "PT2"
                                 },
-                                new PropertyType(dataType2, "pt3")
+                                new PropertyType(ShortStringHelper, dataType2, "pt3")
                                 {
                                     Name = "PT3"
                                 }
@@ -349,7 +349,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (provider.CreateScope())
             {
                 var repository = CreateRepository();
-                var dataTypeDefinition = new DataType(new LabelPropertyEditor(Logger, IOHelper))
+                var dataTypeDefinition = new DataType(new LabelPropertyEditor(Logger, IOHelper, DataTypeService, LocalizedTextService, LocalizationService, ShortStringHelper))
                 {
                     DatabaseType = ValueStorageType.Integer,
                     Name = "AgeDataType",
@@ -387,7 +387,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (provider.CreateScope())
             {
                 var repository = CreateRepository();
-                var dataTypeDefinition = new DataType(new IntegerPropertyEditor(Logger))
+                var dataTypeDefinition = new DataType(new IntegerPropertyEditor(Logger, DataTypeService, LocalizationService, ShortStringHelper, LocalizedTextService))
                 {
                     DatabaseType = ValueStorageType.Integer,
                     Name = "AgeDataType",
@@ -398,7 +398,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var definition = repository.Get(dataTypeDefinition.Id);
                 definition.Name = "AgeDataType Updated";
-                definition.Editor = new LabelPropertyEditor(Logger, IOHelper); //change
+                definition.Editor = new LabelPropertyEditor(Logger, IOHelper, DataTypeService, LocalizedTextService, LocalizationService, ShortStringHelper); //change
                 repository.Save(definition);
 
                 var definitionUpdated = repository.Get(dataTypeDefinition.Id);
@@ -418,7 +418,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (provider.CreateScope())
             {
                 var repository = CreateRepository();
-                var dataTypeDefinition = new DataType(new LabelPropertyEditor(Logger, IOHelper))
+                var dataTypeDefinition = new DataType(new LabelPropertyEditor(Logger, IOHelper, DataTypeService,LocalizedTextService, LocalizationService, ShortStringHelper))
                 {
                     DatabaseType = ValueStorageType.Integer,
                     Name = "AgeDataType",

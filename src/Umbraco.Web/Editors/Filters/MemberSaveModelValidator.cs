@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -89,7 +90,7 @@ namespace Umbraco.Web.Editors.Filters
         public override bool ValidateProperties(MemberSave model, IContentProperties<ContentPropertyBasic> modelWithProperties, HttpActionContext actionContext)
         {
             var propertiesToValidate = model.Properties.ToList();
-            var defaultProps = ConventionsHelper.GetStandardPropertyTypeStubs();
+            var defaultProps = ConventionsHelper.GetStandardPropertyTypeStubs(Current.ShortStringHelper);
             var exclude = defaultProps.Select(x => x.Value.Alias).ToArray();
             foreach (var remove in exclude)
             {

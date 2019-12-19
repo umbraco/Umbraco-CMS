@@ -10,6 +10,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web;
 using Umbraco.Web.Templates;
 
@@ -56,7 +57,9 @@ namespace Umbraco.Tests.PublishedContent
                     imageSourceParser,
                     localLinkParser,
                     pastedImages,
-                    IOHelper)) { Id = 1 });
+                    ShortStringHelper,
+                    IOHelper,
+                    LocalizedTextService)) { Id = 1 });
 
 
             var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeService);

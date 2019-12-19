@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Published
             var localizationService = Mock.Of<ILocalizationService>();
 
             PropertyEditorCollection editors = null;
-            var editor = new NestedContentPropertyEditor(logger, new Lazy<PropertyEditorCollection>(() => editors), Mock.Of<IDataTypeService>(), Mock.Of<IContentTypeService>(), localizationService, TestHelper.IOHelper);
+            var editor = new NestedContentPropertyEditor(logger, new Lazy<PropertyEditorCollection>(() => editors), Mock.Of<IDataTypeService>(),localizationService, Mock.Of<IContentTypeService>(), TestHelper.IOHelper, TestHelper.ShortStringHelper, Mock.Of<ILocalizedTextService>());
             editors = new PropertyEditorCollection(new DataEditorCollection(new DataEditor[] { editor }));
 
             var dataType1 = new DataType(editor)
@@ -66,7 +66,7 @@ namespace Umbraco.Tests.Published
                 }
             };
 
-            var dataType3 = new DataType(new TextboxPropertyEditor(logger, Mock.Of<IDataTypeService>(), localizationService, TestHelper.IOHelper))
+            var dataType3 = new DataType(new TextboxPropertyEditor(logger, Mock.Of<IDataTypeService>(), localizationService, TestHelper.IOHelper, TestHelper.ShortStringHelper, Mock.Of<ILocalizedTextService>()))
             {
                 Id = 3
             };

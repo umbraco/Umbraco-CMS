@@ -1,7 +1,10 @@
 ﻿using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
+using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -16,8 +19,8 @@ namespace Umbraco.Web.PropertyEditors
         ValueType = ValueTypes.Integer)]
     public class IntegerPropertyEditor : DataEditor
     {
-        public IntegerPropertyEditor(ILogger logger)
-            : base(logger)
+        public IntegerPropertyEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, IShortStringHelper shortStringHelper, ILocalizedTextService localizedTextService)
+            : base(logger, dataTypeService, localizationService,localizedTextService, shortStringHelper)
         { }
 
         /// <inheritdoc />

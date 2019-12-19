@@ -44,10 +44,20 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <param name="propertyEditors">
         ///     Lazy property value collection - must be lazy because we have a circular dependency since some property editors require services, yet these services require property editors
         /// </param>
-        public DocumentRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger,
-            IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, ILanguageRepository languageRepository, IRelationRepository relationRepository, IRelationTypeRepository relationTypeRepository,
-            Lazy<PropertyEditorCollection> propertyEditors, DataValueReferenceFactoryCollection dataValueReferenceFactories)
-            : base(scopeAccessor, appCaches, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferenceFactories)
+        public DocumentRepository(
+            IScopeAccessor scopeAccessor,
+            AppCaches appCaches,
+            ILogger logger,
+            IContentTypeRepository contentTypeRepository,
+            ITemplateRepository templateRepository,
+            ITagRepository tagRepository,
+            ILanguageRepository languageRepository,
+            IRelationRepository relationRepository,
+            IRelationTypeRepository relationTypeRepository,
+            Lazy<PropertyEditorCollection> propertyEditors,
+            DataValueReferenceFactoryCollection dataValueReferenceFactories,
+            IDataTypeService dataTypeService)
+            : base(scopeAccessor, appCaches, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferenceFactories, dataTypeService)
         {
             _contentTypeRepository = contentTypeRepository ?? throw new ArgumentNullException(nameof(contentTypeRepository));
             _templateRepository = templateRepository ?? throw new ArgumentNullException(nameof(templateRepository));

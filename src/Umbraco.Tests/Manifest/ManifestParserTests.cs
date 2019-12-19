@@ -15,6 +15,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Dashboards;
 using Umbraco.Core.IO;
 using Umbraco.Core.Serialization;
+using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Manifest
@@ -30,9 +31,46 @@ namespace Umbraco.Tests.Manifest
             var validators = new IManifestValueValidator[]
             {
                 new RequiredValidator(Mock.Of<ILocalizedTextService>()),
-                new RegexValidator(Mock.Of<ILocalizedTextService>(), null)
+                new RegexValidator(Mock.Of<ILocalizedTextService>(), null),
+                new DelimitedValueValidator(),
             };
-            _parser = new ManifestParser(AppCaches.Disabled, new ManifestValueValidatorCollection(validators), new ManifestFilterCollection(Array.Empty<IManifestFilter>()),  Mock.Of<ILogger>(), TestHelper.IOHelper, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), new JsonNetSerializer());
+            _parser = new ManifestParser(AppCaches.Disabled, new ManifestValueValidatorCollection(validators), new ManifestFilterCollection(Array.Empty<IManifestFilter>()),  Mock.Of<ILogger>(), TestHelper.IOHelper, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), new JsonNetSerializer(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>());
+        }
+
+        [Test]
+        public void DelimitedValueValidator()
+        {
+
+            const string json = @"{'propertyEditors': [
+    {
+        alias: 'Test.Test2',
+        name: 'Test 2',
+        isParameterEditor: true,
+        defaultConfig: { key1: 'some default val' },
+        editor: {
+            view: '~/App_Plugins/MyPackage/PropertyEditors/MyEditor.html',
+            valueType: 'int',
+            validation: {
+                delimited: {
+                    delimiter: ',',
+                    pattern: '^[a-zA-Z]*$'
+                }
+            }
+        }
+    }
+]}";
+
+            var manifest = _parser.ParseManifest(json);
+
+            Assert.AreEqual(1, manifest.ParameterEditors.Length);
+            Assert.AreEqual(1, manifest.ParameterEditors[0].GetValueEditor().Validators.Count);
+
+            Assert.IsTrue(manifest.ParameterEditors[0].GetValueEditor().Validators[0] is DelimitedValueValidator);
+            var validator = manifest.ParameterEditors[0].GetValueEditor().Validators[0] as DelimitedValueValidator;
+
+            Assert.IsNotNull(validator.Configuration);
+            Assert.AreEqual(",", validator.Configuration.Delimiter);
+            Assert.AreEqual("^[a-zA-Z]*$", validator.Configuration.Pattern);
         }
 
         [Test]

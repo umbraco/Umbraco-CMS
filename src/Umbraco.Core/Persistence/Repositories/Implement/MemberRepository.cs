@@ -28,8 +28,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         public MemberRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger,
             IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository, ILanguageRepository languageRepository, IRelationRepository relationRepository, IRelationTypeRepository relationTypeRepository,
-            Lazy<PropertyEditorCollection> propertyEditors, DataValueReferenceFactoryCollection dataValueReferenceFactories)
-            : base(scopeAccessor, cache, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferenceFactories)
+            Lazy<PropertyEditorCollection> propertyEditors,
+            DataValueReferenceFactoryCollection dataValueReferenceFactories,
+            IDataTypeService dataTypeService)
+            : base(scopeAccessor, cache, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferenceFactories, dataTypeService)
         {
             _memberTypeRepository = memberTypeRepository ?? throw new ArgumentNullException(nameof(memberTypeRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));

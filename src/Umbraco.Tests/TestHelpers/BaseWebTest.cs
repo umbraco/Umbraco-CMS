@@ -11,6 +11,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing.Objects.Accessors;
@@ -39,7 +40,7 @@ namespace Umbraco.Tests.TestHelpers
             // AutoPublishedContentTypes generates properties automatically
 
             var dataTypeService = new TestObjects.TestDataTypeService(
-                new DataType(new VoidEditor(Mock.Of<ILogger>())) { Id = 1 });
+                new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())) { Id = 1 });
 
             var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
             var type = new AutoPublishedContentType(0, "anything", new PublishedPropertyType[] { });

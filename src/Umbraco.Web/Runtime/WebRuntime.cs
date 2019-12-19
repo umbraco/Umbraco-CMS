@@ -6,6 +6,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Runtime;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing;
@@ -26,8 +27,18 @@ namespace Umbraco.Web.Runtime
         /// Initializes a new instance of the <see cref="WebRuntime"/> class.
         /// </summary>
         /// <param name="umbracoApplication"></param>
-        public WebRuntime(UmbracoApplicationBase umbracoApplication, Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo):
-            base(configs, umbracoVersion, ioHelper, logger, profiler ,new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo)
+        public WebRuntime(
+            UmbracoApplicationBase umbracoApplication,
+            Configs configs,
+            IUmbracoVersion umbracoVersion,
+            IIOHelper ioHelper,
+            ILogger logger,
+            IProfiler profiler,
+            IHostingEnvironment hostingEnvironment,
+            IBackOfficeInfo backOfficeInfo,
+            IDbProviderFactoryCreator dbProviderFactoryCreator,
+            IBulkSqlInsertProvider bulkSqlInsertProvider):
+            base(configs, umbracoVersion, ioHelper, logger, profiler ,new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, bulkSqlInsertProvider)
         {
             _umbracoApplication = umbracoApplication;
 

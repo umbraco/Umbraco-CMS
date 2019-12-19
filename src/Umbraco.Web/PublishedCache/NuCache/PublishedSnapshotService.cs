@@ -136,16 +136,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     // figure out whether it can read the databases or it should populate them from sql
 
                     _logger.Info<PublishedSnapshotService>("Creating the content store, localContentDbExists? {LocalContentDbExists}", _localDbExists);
-                    _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, _localContentDb);
+                    _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, Current.PublishedModelFactory, _localContentDb);
                     _logger.Info<PublishedSnapshotService>("Creating the media store, localMediaDbExists? {LocalMediaDbExists}", _localDbExists);
-                    _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, _localMediaDb);
+                    _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, Current.PublishedModelFactory, _localMediaDb);
                 }
                 else
                 {
                     _logger.Info<PublishedSnapshotService>("Creating the content store (local db ignored)");
-                    _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger);
+                    _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, Current.PublishedModelFactory);
                     _logger.Info<PublishedSnapshotService>("Creating the media store (local db ignored)");
-                    _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger);
+                    _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, Current.PublishedModelFactory);
                 }
 
                 _domainStore = new SnapDictionary<int, Domain>();
@@ -1185,7 +1185,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 ContentCache = new ContentCache(previewDefault, contentSnap, snapshotCache, elementsCache, domainCache, _globalSettings, VariationContextAccessor),
                 MediaCache = new MediaCache(previewDefault, mediaSnap, VariationContextAccessor),
-                MemberCache = new MemberCache(previewDefault, snapshotCache, _serviceContext.MemberService, memberTypeCache, PublishedSnapshotAccessor, VariationContextAccessor, _entitySerializer),
+                MemberCache = new MemberCache(previewDefault, snapshotCache, _serviceContext.MemberService, memberTypeCache, PublishedSnapshotAccessor, VariationContextAccessor, _entitySerializer, _publishedModelFactory),
                 DomainCache = domainCache,
                 SnapshotCache = snapshotCache,
                 ElementsCache = elementsCache
@@ -1400,7 +1400,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     cultureData[cultureInfo.Culture] = new CultureVariation
                     {
                         Name = cultureInfo.Name,
-                        UrlSegment = content.GetUrlSegment(_urlSegmentProviders, cultureInfo.Culture),
+                        UrlSegment = content.GetUrlSegment(Current.ShortStringHelper, _urlSegmentProviders, cultureInfo.Culture),
                         Date = content.GetUpdateDate(cultureInfo.Culture) ?? DateTime.MinValue,
                         IsDraft = cultureIsDraft
                     };
@@ -1412,7 +1412,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 PropertyData = propertyData,
                 CultureData = cultureData,
-                UrlSegment = content.GetUrlSegment(_urlSegmentProviders)
+                UrlSegment = content.GetUrlSegment(Current.ShortStringHelper, _urlSegmentProviders)
             };
 
             var dto = new ContentNuDto

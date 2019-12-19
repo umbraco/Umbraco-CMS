@@ -6,6 +6,7 @@ using System.Net;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Umbraco.Core.Collections;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
@@ -14,6 +15,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Packaging
 {
@@ -26,13 +28,17 @@ namespace Umbraco.Core.Packaging
         private readonly IDataTypeService _dataTypeService;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IScopeProvider _scopeProvider;
+        private readonly IShortStringHelper _shortStringHelper;
+        private readonly IGlobalSettings _globalSettings;
+        private readonly ILocalizedTextService _localizedTextService;
         private readonly IEntityService _entityService;
         private readonly IContentTypeService _contentTypeService;
         private readonly IContentService _contentService;
 
         public PackageDataInstallation(ILogger logger, IFileService fileService, IMacroService macroService, ILocalizationService localizationService,
             IDataTypeService dataTypeService, IEntityService entityService, IContentTypeService contentTypeService,
-            IContentService contentService, PropertyEditorCollection propertyEditors, IScopeProvider scopeProvider)
+            IContentService contentService, PropertyEditorCollection propertyEditors, IScopeProvider scopeProvider, IShortStringHelper shortStringHelper, IGlobalSettings globalSettings,
+            ILocalizedTextService localizedTextService)
         {
             _logger = logger;
             _fileService = fileService;
@@ -41,6 +47,9 @@ namespace Umbraco.Core.Packaging
             _dataTypeService = dataTypeService;
             _propertyEditors = propertyEditors;
             _scopeProvider = scopeProvider;
+            _shortStringHelper = shortStringHelper;
+            _globalSettings = globalSettings;
+            _localizedTextService = localizedTextService;
             _entityService = entityService;
             _contentTypeService = contentTypeService;
             _contentService = contentService;
@@ -587,8 +596,8 @@ namespace Umbraco.Core.Packaging
 
             var alias = infoElement.Element("Alias").Value;
             var contentType = parent == null
-                                  ? new ContentType(-1) { Alias = alias }
-                                  : new ContentType(parent, alias);
+                                  ? new ContentType(_shortStringHelper, -1) { Alias = alias }
+                                  : new ContentType(_shortStringHelper, parent, alias);
 
             if (parent != null)
                 contentType.AddContentType(parent);
@@ -778,7 +787,7 @@ namespace Umbraco.Core.Packaging
                 var sortOrderElement = property.Element("SortOrder");
                 if (sortOrderElement != null)
                     int.TryParse(sortOrderElement.Value, out sortOrder);
-                var propertyType = new PropertyType(dataTypeDefinition, property.Element("Alias").Value)
+                var propertyType = new PropertyType(_shortStringHelper, dataTypeDefinition, property.Element("Alias").Value)
                 {
                     Name = property.Element("Name").Value,
                     Description = (string)property.Element("Description"),
@@ -893,7 +902,7 @@ namespace Umbraco.Core.Packaging
 
                     var editorAlias = dataTypeElement.Attribute("Id")?.Value?.Trim();
                     if (!_propertyEditors.TryGet(editorAlias, out var editor))
-                        editor = new VoidEditor(_logger) { Alias = editorAlias };
+                        editor = new VoidEditor(_logger, _dataTypeService, _localizationService, _localizedTextService, _shortStringHelper) { Alias = editorAlias };
 
                     var dataType = new DataType(editor)
                     {
@@ -1083,7 +1092,7 @@ namespace Umbraco.Core.Packaging
                 var isoCode = languageElement.AttributeValue<string>("CultureAlias");
                 var existingLanguage = _localizationService.GetLanguageByIsoCode(isoCode);
                 if (existingLanguage != null) continue;
-                var langauge = new Language(isoCode)
+                var langauge = new Language(_globalSettings, isoCode)
                 {
                     CultureName = languageElement.AttributeValue<string>("FriendlyName")
                 };
@@ -1160,7 +1169,7 @@ namespace Umbraco.Core.Packaging
             }
 
             var existingMacro = _macroService.GetByAlias(macroAlias) as Macro;
-            var macro = existingMacro ?? new Macro(macroAlias, macroName, macroSource, macroType,
+            var macro = existingMacro ?? new Macro(_shortStringHelper, macroAlias, macroName, macroSource, macroType,
                 cacheByPage, cacheByMember, dontRender, useInEditor, cacheDuration);
 
             var properties = macroElement.Element("properties");
@@ -1302,7 +1311,7 @@ namespace Umbraco.Core.Packaging
                 var masterElement = templateElement.Element("Master");
 
                 var existingTemplate = _fileService.GetTemplate(alias) as Template;
-                var template = existingTemplate ?? new Template(templateName, alias);
+                var template = existingTemplate ?? new Template(_shortStringHelper, templateName, alias);
                 template.Content = design;
                 if (masterElement != null && string.IsNullOrEmpty((string)masterElement) == false)
                 {

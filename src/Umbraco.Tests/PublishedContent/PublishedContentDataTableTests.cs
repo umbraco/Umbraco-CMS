@@ -10,6 +10,8 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using PublishedContentExtensions = Umbraco.Web.PublishedContentExtensions;
@@ -125,7 +127,7 @@ namespace Umbraco.Tests.PublishedContent
         private IPublishedContent GetContent(bool createChildren, int indexVals)
         {
             var dataTypeService = new TestObjects.TestDataTypeService(
-                new DataType(new VoidEditor(Mock.Of<ILogger>())) { Id = 1 });
+                new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())) { Id = 1 });
 
             var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
             var contentTypeAlias = createChildren ? "Parent" : "Child";

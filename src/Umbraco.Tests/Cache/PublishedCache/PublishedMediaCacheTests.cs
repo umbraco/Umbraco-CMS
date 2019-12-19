@@ -56,7 +56,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 
         private IMediaType MakeNewMediaType(IUser user, string text, int parentId = -1)
         {
-            var mt = new MediaType(parentId) { Name = text, Alias = text, Thumbnail = "icon-folder", Icon = "icon-folder" };
+            var mt = new MediaType(ShortStringHelper, parentId) { Name = text, Alias = text, Thumbnail = "icon-folder", Icon = "icon-folder" };
             ServiceContext.MediaTypeService.Save(mt);
             return mt;
         }

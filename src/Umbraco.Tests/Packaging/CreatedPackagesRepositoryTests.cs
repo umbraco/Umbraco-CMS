@@ -7,6 +7,7 @@ using System.Xml.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Packaging;
@@ -43,6 +44,7 @@ namespace Umbraco.Tests.Packaging
             IOHelper,
             Factory.GetInstance<IEntityXmlSerializer>(), Logger,
             UmbracoVersion,
+            Factory.GetInstance<IGlobalSettings>(),
             "createdPackages.config",
             //temp paths
             tempFolderPath: "~/" + _testBaseFolder + "/temp",

@@ -4,17 +4,18 @@ using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Persistence.Factories
 {
     internal static class TemplateFactory
     {
-        
+
         #region Implementation of IEntityFactory<ITemplate,TemplateDto>
 
-        public static Template BuildEntity(TemplateDto dto, IEnumerable<IUmbracoEntity> childDefinitions, Func<File, string> getFileContent)
+        public static Template BuildEntity(IShortStringHelper shortStringHelper, TemplateDto dto, IEnumerable<IUmbracoEntity> childDefinitions, Func<File, string> getFileContent)
         {
-            var template = new Template(dto.NodeDto.Text, dto.Alias, getFileContent);
+            var template = new Template(shortStringHelper, dto.NodeDto.Text, dto.Alias, getFileContent);
 
             try
             {

@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Linq;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Persistence.Factories
 {
     internal static class UserFactory
     {
-        public static IUser BuildEntity(UserDto dto)
+        public static IUser BuildEntity(IGlobalSettings globalSettings, UserDto dto)
         {
             var guidId = dto.Id.ToGuid();
 
-            var user = new User(dto.Id, dto.UserName, dto.Email, dto.Login,dto.Password,
+            var user = new User(globalSettings, dto.Id, dto.UserName, dto.Email, dto.Login,dto.Password,
                 dto.UserGroupDtos.Select(x => x.ToReadOnlyGroup()).ToArray(),
                 dto.UserStartNodeDtos.Where(x => x.StartNodeType == (int)UserStartNodeDto.StartNodeTypeValue.Content).Select(x => x.StartNode).ToArray(),
                 dto.UserStartNodeDtos.Where(x => x.StartNodeType == (int)UserStartNodeDto.StartNodeTypeValue.Media).Select(x => x.StartNode).ToArray());

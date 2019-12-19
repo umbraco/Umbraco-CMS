@@ -12,6 +12,9 @@ namespace Umbraco.Tests.Testing.Objects
 
     internal class TestDataSource : IDataSource
     {
+
+        private IPublishedModelFactory PublishedModelFactory { get; } = new NoopPublishedModelFactory();
+
         public TestDataSource(params ContentNodeKit[] kits)
             : this((IEnumerable<ContentNodeKit>) kits)
         { }
@@ -27,14 +30,14 @@ namespace Umbraco.Tests.Testing.Objects
         // ContentNode is directly reused and modified by the snapshot service
 
         public ContentNodeKit GetContentSource(IScope scope, int id)
-            => Kits.TryGetValue(id, out var kit) ? kit.Clone() : default;
+            => Kits.TryGetValue(id, out var kit) ? kit.Clone(PublishedModelFactory) : default;
 
         public IEnumerable<ContentNodeKit> GetAllContentSources(IScope scope)
             => Kits.Values
                 .OrderBy(x => x.Node.Level)
                 .ThenBy(x => x.Node.ParentContentId)
                 .ThenBy(x => x.Node.SortOrder)
-                .Select(x => x.Clone());
+                .Select(x => x.Clone(PublishedModelFactory));
 
         public IEnumerable<ContentNodeKit> GetBranchContentSources(IScope scope, int id)
             => Kits.Values
@@ -42,7 +45,7 @@ namespace Umbraco.Tests.Testing.Objects
                 .OrderBy(x => x.Node.Level)
                 .ThenBy(x => x.Node.ParentContentId)
                 .ThenBy(x => x.Node.SortOrder)
-                .Select(x => x.Clone());
+                .Select(x => x.Clone(PublishedModelFactory));
 
         public IEnumerable<ContentNodeKit> GetTypeContentSources(IScope scope, IEnumerable<int> ids)
             => Kits.Values
@@ -50,7 +53,7 @@ namespace Umbraco.Tests.Testing.Objects
                 .OrderBy(x => x.Node.Level)
                 .ThenBy(x => x.Node.ParentContentId)
                 .ThenBy(x => x.Node.SortOrder)
-                .Select(x => x.Clone());
+                .Select(x => x.Clone(PublishedModelFactory));
 
         public ContentNodeKit GetMediaSource(IScope scope, int id)
         {

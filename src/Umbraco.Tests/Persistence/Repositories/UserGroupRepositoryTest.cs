@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Persistence.Repositories
     {
         private UserGroupRepository CreateRepository(IScopeProvider provider)
         {
-            return new UserGroupRepository((IScopeAccessor) provider, Core.Cache.AppCaches.Disabled, Mock.Of<ILogger>());
+            return new UserGroupRepository((IScopeAccessor) provider, Core.Cache.AppCaches.Disabled, Mock.Of<ILogger>(), ShortStringHelper);
         }
 
         [Test]
@@ -56,7 +56,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 repository.Save(userGroup1);
-                
+
                 repository.Save(userGroup2);
                 scope.Complete();
 
@@ -99,7 +99,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var userGroup = MockedUserGroup.CreateUserGroup();
                 repository.Save(userGroup);
-                
+
 
                 // Act
                 var resolved = repository.Get(userGroup.Id);
@@ -128,10 +128,10 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 repository.Save(userGroup);
-                
+
                 var id = userGroup.Id;
 
-                var repository2 = new UserGroupRepository((IScopeAccessor) provider, Core.Cache.AppCaches.Disabled, Logger);
+                var repository2 = new UserGroupRepository((IScopeAccessor) provider, Core.Cache.AppCaches.Disabled, Logger, ShortStringHelper);
                 repository2.Delete(userGroup);
                 scope.Complete();
 

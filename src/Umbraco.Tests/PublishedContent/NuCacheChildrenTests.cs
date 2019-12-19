@@ -36,6 +36,8 @@ namespace Umbraco.Tests.PublishedContent
     [TestFixture]
     public class NuCacheChildrenTests
     {
+        private IPublishedModelFactory PublishedModelFactory { get; } = new NoopPublishedModelFactory();
+
         private IPublishedSnapshotService _snapshotService;
         private IVariationContextAccessor _variationAccesor;
         private IPublishedSnapshotAccessor _snapshotAccessor;
@@ -63,26 +65,25 @@ namespace Umbraco.Tests.PublishedContent
             configs.Add(SettingsForTests.GenerateMockUmbracoSettings);
             configs.Add<IGlobalSettings>(() => globalSettings);
 
-            var publishedModelFactory = new NoopPublishedModelFactory();
-            Mock.Get(factory).Setup(x => x.GetInstance(typeof(IPublishedModelFactory))).Returns(publishedModelFactory);
+            Mock.Get(factory).Setup(x => x.GetInstance(typeof(IPublishedModelFactory))).Returns(PublishedModelFactory);
 
             var runtime = Mock.Of<IRuntimeState>();
             Mock.Get(runtime).Setup(x => x.Level).Returns(RuntimeLevel.Run);
 
             // create data types, property types and content types
-            var dataType = new DataType(new VoidEditor("Editor", Mock.Of<ILogger>())) { Id = 3 };
+            var dataType = new DataType(new VoidEditor("Editor", Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(),  Mock.Of<ILocalizationService>(),   Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())) { Id = 3 };
 
             var dataTypes = new[]
             {
                 dataType
             };
 
-            var propertyType = new PropertyType("Umbraco.Void.Editor", ValueStorageType.Nvarchar) { Alias = "prop", DataTypeId = 3, Variations = ContentVariation.Nothing };
-            _contentTypeInvariant = new ContentType(-1) { Id = 2, Alias = "itype", Variations = ContentVariation.Nothing };
+            var propertyType = new PropertyType(TestHelper.ShortStringHelper, "Umbraco.Void.Editor", ValueStorageType.Nvarchar) { Alias = "prop", DataTypeId = 3, Variations = ContentVariation.Nothing };
+            _contentTypeInvariant = new ContentType(TestHelper.ShortStringHelper, -1) { Id = 2, Alias = "itype", Variations = ContentVariation.Nothing };
             _contentTypeInvariant.AddPropertyType(propertyType);
 
-            propertyType = new PropertyType("Umbraco.Void.Editor", ValueStorageType.Nvarchar) { Alias = "prop", DataTypeId = 3, Variations = ContentVariation.Culture };
-            _contentTypeVariant = new ContentType(-1) { Id = 3, Alias = "vtype", Variations = ContentVariation.Culture };
+            propertyType = new PropertyType(TestHelper.ShortStringHelper, "Umbraco.Void.Editor", ValueStorageType.Nvarchar) { Alias = "prop", DataTypeId = 3, Variations = ContentVariation.Culture };
+            _contentTypeVariant = new ContentType(TestHelper.ShortStringHelper, -1) { Id = 3, Alias = "vtype", Variations = ContentVariation.Culture };
             _contentTypeVariant.AddPropertyType(propertyType);
 
             var contentTypes = new[]
@@ -163,7 +164,7 @@ namespace Umbraco.Tests.PublishedContent
                 globalSettings,
                 Mock.Of<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
-                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }),
+                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }),
                 typeFinder,
                 hostingEnvironment);
 
@@ -1179,7 +1180,7 @@ namespace Umbraco.Tests.PublishedContent
             var snapshotService = (PublishedSnapshotService)_snapshotService;
             var contentStore = snapshotService.GetContentStore();
 
-            var rootKit = _source.Kits[1].Clone();
+            var rootKit = _source.Kits[1].Clone(PublishedModelFactory);
 
             void ChangePublishFlagOfRoot(bool published, int assertGen, TreeChangeTypes changeType)
             {
@@ -1189,7 +1190,7 @@ namespace Umbraco.Tests.PublishedContent
                 Assert.IsFalse(contentStore.Test.NextGen);
 
                 //Change the root publish flag
-                var kit = rootKit.Clone();
+                var kit = rootKit.Clone(PublishedModelFactory);
                 kit.DraftData = published ? null : kit.PublishedData;
                 kit.PublishedData = published? kit.PublishedData : null;
                 _source.Kits[1] = kit;

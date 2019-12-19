@@ -306,17 +306,17 @@ namespace Umbraco.Tests.Persistence.Repositories
         private DocumentRepository CreateRepository(IScopeProvider provider, out ContentTypeRepository contentTypeRepository)
         {
             var accessor = (IScopeAccessor) provider;
-            var templateRepository = new TemplateRepository(accessor, AppCaches, Logger, TestObjects.GetFileSystemsMock(), IOHelper);
+            var templateRepository = new TemplateRepository(accessor, AppCaches, Logger, TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
             var tagRepository = new TagRepository(accessor, AppCaches, Logger);
-            var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches);
-            var languageRepository = new LanguageRepository(accessor, AppCaches, Logger);
-            contentTypeRepository = new ContentTypeRepository(accessor, AppCaches, Logger, commonRepository, languageRepository);
+            var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches, ShortStringHelper);
+            var languageRepository = new LanguageRepository(accessor, AppCaches, Logger, TestObjects.GetGlobalSettings());
+            contentTypeRepository = new ContentTypeRepository(accessor, AppCaches, Logger, commonRepository, languageRepository, ShortStringHelper);
             var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches, Logger);
             var entityRepository = new EntityRepository(accessor);
             var relationRepository = new RelationRepository(accessor, Logger, relationTypeRepository, entityRepository);
             var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
             var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-            var repository = new DocumentRepository(accessor, AppCaches, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences);
+            var repository = new DocumentRepository(accessor, AppCaches, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, DataTypeService);
             return repository;
         }
 

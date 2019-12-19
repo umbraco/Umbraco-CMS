@@ -8,7 +8,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
     {
         internal static User CreateUser(string suffix = "")
         {
-            var user = new User
+            var user = new User(SettingsForTests.GenerateMockGlobalSettings())
             {
                 Language = "en",
                 IsApproved = true,
@@ -29,7 +29,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
             for (int i = 0; i < amount; i++)
             {
                 var name = "Member No-" + i;
-                var user = new User(name, "test" + i + "@test.com", "test" + i, "test" + i);
+                var user = new User(SettingsForTests.GenerateMockGlobalSettings(), name, "test" + i + "@test.com", "test" + i, "test" + i);
 
                 onCreating?.Invoke(i, user);
 

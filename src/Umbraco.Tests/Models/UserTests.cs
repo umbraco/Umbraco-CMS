@@ -14,6 +14,8 @@ namespace Umbraco.Tests.Models
     [TestFixture]
     public class UserTests
     {
+        private IGlobalSettings GlobalSettings { get; } = SettingsForTests.GenerateMockGlobalSettings();
+
         [SetUp]
         public void Setup()
         {
@@ -25,7 +27,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Deep_Clone()
         {
-            var item = new User()
+            var item = new User(GlobalSettings)
             {
                 Id = 3,
                 Key = Guid.NewGuid(),
@@ -67,7 +69,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Serialize_Without_Error()
         {
-            var item = new User
+            var item = new User(GlobalSettings)
             {
                 Id = 3,
                 Key = Guid.NewGuid(),

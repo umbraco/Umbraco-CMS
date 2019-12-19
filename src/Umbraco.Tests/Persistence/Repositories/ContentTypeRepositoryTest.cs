@@ -30,36 +30,36 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private DocumentRepository CreateRepository(IScopeAccessor scopeAccessor, out ContentTypeRepository contentTypeRepository)
         {
-            var langRepository = new LanguageRepository(scopeAccessor, AppCaches.Disabled, Logger);
-            var templateRepository = new TemplateRepository(scopeAccessor, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock(), IOHelper);
+            var langRepository = new LanguageRepository(scopeAccessor, AppCaches.Disabled, Logger,TestObjects.GetGlobalSettings());
+            var templateRepository = new TemplateRepository(scopeAccessor, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
             var tagRepository = new TagRepository(scopeAccessor, AppCaches.Disabled, Logger);
-            var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository, AppCaches.Disabled);
-            contentTypeRepository = new ContentTypeRepository(scopeAccessor, AppCaches.Disabled, Logger, commonRepository, langRepository);
-            var languageRepository = new LanguageRepository(scopeAccessor, AppCaches.Disabled, Logger);
+            var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository, AppCaches.Disabled, ShortStringHelper);
+            contentTypeRepository = new ContentTypeRepository(scopeAccessor, AppCaches.Disabled, Logger, commonRepository, langRepository, ShortStringHelper);
+            var languageRepository = new LanguageRepository(scopeAccessor, AppCaches.Disabled, Logger, TestObjects.GetGlobalSettings());
             var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, Logger);
             var entityRepository = new EntityRepository(scopeAccessor);
             var relationRepository = new RelationRepository(scopeAccessor, Logger, relationTypeRepository, entityRepository);
             var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
             var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-            var repository = new DocumentRepository(scopeAccessor, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences);
+            var repository = new DocumentRepository(scopeAccessor, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, DataTypeService);
             return repository;
         }
 
         private ContentTypeRepository CreateRepository(IScopeAccessor scopeAccessor)
         {
-            var langRepository = new LanguageRepository(scopeAccessor, AppCaches.Disabled, Logger);
-            var templateRepository = new TemplateRepository(scopeAccessor, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock(), IOHelper);
-            var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository, AppCaches.Disabled);
-            var contentTypeRepository = new ContentTypeRepository(scopeAccessor, AppCaches.Disabled, Logger, commonRepository, langRepository);
+            var langRepository = new LanguageRepository(scopeAccessor, AppCaches.Disabled, Logger, TestObjects.GetGlobalSettings());
+            var templateRepository = new TemplateRepository(scopeAccessor, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
+            var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository, AppCaches.Disabled, ShortStringHelper);
+            var contentTypeRepository = new ContentTypeRepository(scopeAccessor, AppCaches.Disabled, Logger, commonRepository, langRepository, ShortStringHelper);
             return contentTypeRepository;
         }
 
         private MediaTypeRepository CreateMediaTypeRepository(IScopeAccessor scopeAccessor)
         {
-            var templateRepository = new TemplateRepository(scopeAccessor, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock(), IOHelper);
-            var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository, AppCaches.Disabled);
-            var langRepository = new LanguageRepository(scopeAccessor, AppCaches.Disabled, Logger);
-            var contentTypeRepository = new MediaTypeRepository(scopeAccessor, AppCaches.Disabled, Logger, commonRepository, langRepository);
+            var templateRepository = new TemplateRepository(scopeAccessor, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
+            var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository, AppCaches.Disabled, ShortStringHelper);
+            var langRepository = new LanguageRepository(scopeAccessor, AppCaches.Disabled, Logger, TestObjects.GetGlobalSettings());
+            var contentTypeRepository = new MediaTypeRepository(scopeAccessor, AppCaches.Disabled, Logger, commonRepository, langRepository, ShortStringHelper);
             return contentTypeRepository;
         }
 
@@ -77,13 +77,13 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var templateRepo = new TemplateRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock(), IOHelper);
+                var templateRepo = new TemplateRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
                 var repository = CreateRepository((IScopeAccessor) provider);
                 var templates = new[]
                 {
-                    new Template("test1", "test1"),
-                    new Template("test2", "test2"),
-                    new Template("test3", "test3")
+                    new Template(ShortStringHelper, "test1", "test1"),
+                    new Template(ShortStringHelper, "test2", "test2"),
+                    new Template(ShortStringHelper, "test3", "test3")
                 };
                 foreach (var template in templates)
                 {
@@ -128,7 +128,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
 
                 //create a
-                var contentType2 = (IContentType)new ContentType(contentType, "hello")
+                var contentType2 = (IContentType)new ContentType(ShortStringHelper, contentType, "hello")
                 {
                     Name = "Blahasdfsadf"
                 };
@@ -371,7 +371,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
 
                 contentType.Thumbnail = "Doc2.png";
-                contentType.PropertyGroups["Content"].PropertyTypes.Add(new PropertyType("test", ValueStorageType.Ntext, "subtitle")
+                contentType.PropertyGroups["Content"].PropertyTypes.Add(new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "subtitle")
                 {
                     Name = "Subtitle",
                     Description = "Optional Subtitle",
@@ -781,7 +781,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(4));
 
                 // Act
-                var urlAlias = new PropertyType("test", ValueStorageType.Nvarchar, "urlAlias")
+                var urlAlias = new PropertyType(ShortStringHelper, "test", ValueStorageType.Nvarchar, "urlAlias")
                     {
                         Name = "Url Alias",
                         Description = "",
@@ -886,7 +886,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 var propertyGroup = contentType.PropertyGroups.First(x => x.Name == "Meta");
-                propertyGroup.PropertyTypes.Add(new PropertyType("test", ValueStorageType.Ntext, "metaAuthor") { Name = "Meta Author", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88 });
+                propertyGroup.PropertyTypes.Add(new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "metaAuthor") { Name = "Meta Author", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88 });
                 repository.Save(contentType);
 
 
@@ -913,7 +913,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
 
                 var propertyGroup = contentType.PropertyGroups.First(x => x.Name == "Meta");
-                propertyGroup.PropertyTypes.Add(new PropertyType("test", ValueStorageType.Ntext, "metaAuthor") { Name = "Meta Author", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88 });
+                propertyGroup.PropertyTypes.Add(new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "metaAuthor") { Name = "Meta Author", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88 });
                 repository.Save(contentType);
 
 
@@ -950,7 +950,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 contentType.RemovePropertyType("keywords");
                 //Add PropertyType
                 var propertyGroup = contentType.PropertyGroups.First(x => x.Name == "Meta");
-                propertyGroup.PropertyTypes.Add(new PropertyType("test", ValueStorageType.Ntext, "metaAuthor") { Name = "Meta Author", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88 });
+                propertyGroup.PropertyTypes.Add(new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "metaAuthor") { Name = "Meta Author", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88 });
                 repository.Save(contentType);
 
 

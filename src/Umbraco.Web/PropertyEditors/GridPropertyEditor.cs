@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -49,7 +50,7 @@ namespace Umbraco.Web.PropertyEditors
             RichTextEditorPastedImages pastedImages,
             HtmlLocalLinkParser localLinkParser,
             IIOHelper ioHelper)
-            : base(logger)
+            : base(logger, dataTypeService, localizationService, Current.Services.TextService, Current.ShortStringHelper)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _dataTypeService = dataTypeService;
@@ -92,7 +93,7 @@ namespace Umbraco.Web.PropertyEditors
                 HtmlImageSourceParser imageSourceParser,
                 RichTextEditorPastedImages pastedImages,
                 HtmlLocalLinkParser localLinkParser)
-                : base(dataTypeService, localizationService, attribute)
+                : base(dataTypeService, localizationService, Current.Services.TextService, Current.ShortStringHelper, attribute)
             {
                 _umbracoContextAccessor = umbracoContextAccessor;
                 _imageSourceParser = imageSourceParser;

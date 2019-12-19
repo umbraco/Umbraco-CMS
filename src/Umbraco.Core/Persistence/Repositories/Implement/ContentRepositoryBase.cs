@@ -47,11 +47,19 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <param name="propertyEditors">
         ///     Lazy property value collection - must be lazy because we have a circular dependency since some property editors require services, yet these services require property editors
         /// </param>
-        protected ContentRepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger,
-            ILanguageRepository languageRepository, IRelationRepository relationRepository, IRelationTypeRepository relationTypeRepository,
-            Lazy<PropertyEditorCollection> propertyEditors, DataValueReferenceFactoryCollection dataValueReferenceFactories)
+        protected ContentRepositoryBase(
+            IScopeAccessor scopeAccessor,
+            AppCaches cache
+            , ILogger logger,
+            ILanguageRepository languageRepository,
+            IRelationRepository relationRepository,
+            IRelationTypeRepository relationTypeRepository,
+            Lazy<PropertyEditorCollection> propertyEditors,
+            DataValueReferenceFactoryCollection dataValueReferenceFactories,
+            IDataTypeService dataTypeService)
             : base(scopeAccessor, cache, logger)
         {
+            DataTypeService = dataTypeService;
             LanguageRepository = languageRepository;
             RelationRepository = relationRepository;
             RelationTypeRepository = relationTypeRepository;
@@ -62,6 +70,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected abstract TRepository This { get; }
 
         protected ILanguageRepository LanguageRepository { get; }
+        protected IDataTypeService DataTypeService { get; }
         protected IRelationRepository RelationRepository { get; }
         protected IRelationTypeRepository RelationTypeRepository { get; }
 
@@ -238,7 +247,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             foreach (var property in entity.Properties)
             {
-                var tagConfiguration = property.GetTagConfiguration();
+                var tagConfiguration = property.GetTagConfiguration(PropertyEditors, DataTypeService);
                 if (tagConfiguration == null) continue; // not a tags property
 
                 if (property.PropertyType.VariesByCulture())
@@ -246,7 +255,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     var tags = new List<ITag>();
                     foreach (var pvalue in property.Values)
                     {
-                        var tagsValue = property.GetTagsValue(pvalue.Culture);
+                        var tagsValue = property.GetTagsValue(PropertyEditors, DataTypeService, pvalue.Culture);
                         var languageId = LanguageRepository.GetIdByIsoCode(pvalue.Culture);
                         var cultureTags = tagsValue.Select(x => new Tag { Group = tagConfiguration.Group, Text = x, LanguageId = languageId });
                         tags.AddRange(cultureTags);
@@ -255,7 +264,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 }
                 else
                 {
-                    var tagsValue = property.GetTagsValue(); // strings
+                    var tagsValue = property.GetTagsValue(PropertyEditors, DataTypeService); // strings
                     var tags = tagsValue.Select(x => new Tag { Group = tagConfiguration.Group, Text = x });
                     tagRepo.Assign(entity.Id, property.PropertyTypeId, tags);
                 }

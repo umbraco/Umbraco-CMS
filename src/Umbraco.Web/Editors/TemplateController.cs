@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -81,7 +82,7 @@ namespace Umbraco.Web.Editors
         public TemplateDisplay GetScaffold(int id)
         {
             //empty default
-            var dt = new Template("", "");
+            var dt = new Template(Current.ShortStringHelper, "", "");
             dt.Path = "-1";
 
             if (id > 0)

@@ -35,17 +35,17 @@ namespace Umbraco.Tests.Persistence.Repositories
             appCaches = appCaches ?? AppCaches;
             var scopeAccessor = (IScopeAccessor) provider;
 
-            var templateRepository = new TemplateRepository(scopeAccessor, appCaches, Logger, TestObjects.GetFileSystemsMock(), IOHelper);
-            var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository, appCaches);
-            var languageRepository = new LanguageRepository(scopeAccessor, appCaches, Logger);
-            mediaTypeRepository = new MediaTypeRepository(scopeAccessor, appCaches, Logger, commonRepository, languageRepository);
+            var templateRepository = new TemplateRepository(scopeAccessor, appCaches, Logger, TestObjects.GetFileSystemsMock(), IOHelper, ShortStringHelper);
+            var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository, appCaches, ShortStringHelper);
+            var languageRepository = new LanguageRepository(scopeAccessor, appCaches, Logger, TestObjects.GetGlobalSettings());
+            mediaTypeRepository = new MediaTypeRepository(scopeAccessor, appCaches, Logger, commonRepository, languageRepository, ShortStringHelper);
             var tagRepository = new TagRepository(scopeAccessor, appCaches, Logger);
             var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, Logger);
             var entityRepository = new EntityRepository(scopeAccessor);
             var relationRepository = new RelationRepository(scopeAccessor, Logger, relationTypeRepository, entityRepository);
             var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
             var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-            var repository = new MediaRepository(scopeAccessor, appCaches, Logger, mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository, propertyEditors, dataValueReferences);
+            var repository = new MediaRepository(scopeAccessor, appCaches, Logger, mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, DataTypeService);
             return repository;
         }
 
@@ -64,7 +64,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository(provider, out mediaTypeRepository, appCaches: realCache);
 
-                var udb = (UmbracoDatabase)scope.Database;
+                var udb = scope.Database;
 
                 udb.EnableSqlCount = false;
 

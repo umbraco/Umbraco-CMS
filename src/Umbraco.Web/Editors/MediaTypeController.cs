@@ -17,6 +17,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Composing;
 using Constants = Umbraco.Core.Constants;
 using IMediaType = Umbraco.Core.Models.IMediaType;
@@ -36,9 +37,12 @@ namespace Umbraco.Web.Editors
     [MediaTypeControllerControllerConfiguration]
     public class MediaTypeController : ContentTypeControllerBase<IMediaType>
     {
-        public MediaTypeController(ICultureDictionary cultureDictionary, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+        private readonly IShortStringHelper _shortStringHelper;
+
+        public MediaTypeController(ICultureDictionary cultureDictionary, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IShortStringHelper shortStringHelper)
             : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
+            _shortStringHelper = shortStringHelper;
         }
 
         /// <summary>
@@ -140,10 +144,10 @@ namespace Umbraco.Web.Editors
             if (parentId != Constants.System.Root)
             {
                 var parent = Services.MediaTypeService.Get(parentId);
-                mt = parent != null ? new MediaType(parent, string.Empty) : new MediaType(parentId);
+                mt = parent != null ? new MediaType(_shortStringHelper, parent, string.Empty) : new MediaType(_shortStringHelper, parentId);
             }
             else
-                mt = new MediaType(parentId);
+                mt = new MediaType(_shortStringHelper, parentId);
 
             mt.Icon = Constants.Icons.MediaImage;
 

@@ -3,14 +3,15 @@ using System.Globalization;
 using System.Linq;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Persistence.Factories
 {
     internal static class UserGroupFactory
     {
-        public static IUserGroup BuildEntity(UserGroupDto dto)
+        public static IUserGroup BuildEntity(IShortStringHelper shortStringHelper, UserGroupDto dto)
         {
-            var userGroup = new UserGroup(dto.UserCount, dto.Alias, dto.Name,
+            var userGroup = new UserGroup(shortStringHelper, dto.UserCount, dto.Alias, dto.Name,
                 dto.DefaultPermissions.IsNullOrWhiteSpace()
                     ? Enumerable.Empty<string>()
                     : dto.DefaultPermissions.ToCharArray().Select(x => x.ToString(CultureInfo.InvariantCulture)).ToList(),

@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Services
             {
                 var contentCollection = new PropertyTypeCollection(true)
                 {
-                    new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext) {Alias = alias, Name = "Title", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88}
+                    new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext) {Alias = alias, Name = "Title", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88}
                 };
                 var pg = new PropertyGroup(contentCollection) { Name = "test", SortOrder = 1 };
                 ct.PropertyGroups.Add(pg);
@@ -61,7 +61,7 @@ namespace Umbraco.Tests.Services
             {
                 var contentCollection = new PropertyTypeCollection(true)
                 {
-                    new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext) {Alias = "title", Name = "Title", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88}
+                    new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext) {Alias = "title", Name = "Title", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88}
                 };
                 var pg = new PropertyGroup(contentCollection) { Name = "test", SortOrder = 1 };
                 ct.PropertyGroups.Add(pg);
@@ -98,7 +98,7 @@ namespace Umbraco.Tests.Services
             {
                 var contentCollection = new PropertyTypeCollection(true)
                 {
-                    new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext) {Alias = "title", Name = "Title", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88}
+                    new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext) {Alias = "title", Name = "Title", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88}
                 };
                 var pg = new PropertyGroup(contentCollection) { Name = "test", SortOrder = 1 };
                 ct.PropertyGroups.Add(pg);

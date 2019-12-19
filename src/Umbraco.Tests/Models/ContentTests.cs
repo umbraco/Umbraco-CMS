@@ -44,7 +44,7 @@ namespace Umbraco.Tests.Models
             Composition.Register(_ => Mock.Of<IContentSection>());
 
             // all this is required so we can validate properties...
-            var editor = new TextboxPropertyEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), TestHelper.IOHelper) { Alias = "test" };
+            var editor = new TextboxPropertyEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), IOHelper, ShortStringHelper, LocalizedTextService) { Alias = "test" };
             Composition.Register(_ => new DataEditorCollection(new [] { editor }));
             Composition.Register<PropertyEditorCollection>();
             var dataType = Mock.Of<IDataType>();
@@ -64,7 +64,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Variant_Culture_Names_Track_Dirty_Changes()
         {
-            var contentType = new ContentType(-1) { Alias = "contentType" };
+            var contentType = new ContentType(ShortStringHelper, -1) { Alias = "contentType" };
             contentType.Variations = ContentVariation.Culture;
             Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>())).Returns(contentType);
 
@@ -94,7 +94,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Variant_Published_Culture_Names_Track_Dirty_Changes()
         {
-            var contentType = new ContentType(-1) { Alias = "contentType" };
+            var contentType = new ContentType(ShortStringHelper, -1) { Alias = "contentType" };
             var content = new Content("content", -1, contentType) { Id = 1, VersionId = 1 };
 
             const string langFr = "fr-FR";
@@ -129,8 +129,8 @@ namespace Umbraco.Tests.Models
         {
             var contentType = MockedContentTypes.CreateSimpleContentType();
             //add non-grouped properties
-            contentType.AddPropertyType(new PropertyType("test", ValueStorageType.Ntext, "nonGrouped1") { Name = "Non Grouped 1", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88 });
-            contentType.AddPropertyType(new PropertyType("test", ValueStorageType.Ntext, "nonGrouped2") { Name = "Non Grouped 2", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88 });
+            contentType.AddPropertyType(new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "nonGrouped1") { Name = "Non Grouped 1", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88 });
+            contentType.AddPropertyType(new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "nonGrouped2") { Name = "Non Grouped 2", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88 });
 
             //ensure that nothing is marked as dirty
             contentType.ResetDirtyProperties(false);
@@ -396,7 +396,7 @@ namespace Umbraco.Tests.Models
             var asDirty = (ICanBeDirty)clone;
 
             Assert.IsFalse(asDirty.IsPropertyDirty("Properties"));
-            var propertyType = new PropertyType("test", ValueStorageType.Ntext, "blah");
+            var propertyType = new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "blah");
             var newProperty = new Property(1, propertyType);
             newProperty.SetValue("blah");
             clone.Properties.Add(newProperty);
@@ -602,7 +602,7 @@ namespace Umbraco.Tests.Models
             var contentType = MockedContentTypes.CreateTextPageContentType();
 
             // Act
-            contentType.PropertyGroups["Content"].PropertyTypes.Add(new PropertyType("test", ValueStorageType.Ntext, "subtitle")
+            contentType.PropertyGroups["Content"].PropertyTypes.Add(new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "subtitle")
                                                                         {
                                                                             Name = "Subtitle",
                                                                             Description = "Optional subtitle",
@@ -625,7 +625,7 @@ namespace Umbraco.Tests.Models
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act
-            var propertyType = new PropertyType("test", ValueStorageType.Ntext, "subtitle")
+            var propertyType = new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "subtitle")
                                    {
                                         Name = "Subtitle", Description = "Optional subtitle", Mandatory = false, SortOrder = 3, DataTypeId = -88
                                    };
@@ -649,7 +649,7 @@ namespace Umbraco.Tests.Models
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act
-            var propertyType = new PropertyType("test", ValueStorageType.Ntext, "subtitle")
+            var propertyType = new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "subtitle")
                                    {
                                        Name = "Subtitle",
                                        Description = "Optional subtitle",
@@ -680,7 +680,7 @@ namespace Umbraco.Tests.Models
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act - note that the PropertyType's properties like SortOrder is not updated through the Content object
-            var propertyType = new PropertyType("test", ValueStorageType.Ntext, "title")
+            var propertyType = new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "title")
                                    {
                                         Name = "Title", Description = "Title description added", Mandatory = false, SortOrder = 10, DataTypeId = -88
                                    };
@@ -910,7 +910,7 @@ namespace Umbraco.Tests.Models
             contentType.ResetDirtyProperties();
 
             // Act
-            var propertyType = new PropertyType("test", ValueStorageType.Ntext, "subtitle")
+            var propertyType = new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "subtitle")
                                    {
                                        Name = "Subtitle",
                                        Description = "Optional subtitle",
@@ -935,7 +935,7 @@ namespace Umbraco.Tests.Models
                                                                                 new PropertyTypeCollection(true,
                                                                                     new List<PropertyType>
                                                                                         {
-                                                                                            new PropertyType("test", ValueStorageType.Ntext, "coauthor")
+                                                                                            new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "coauthor")
                                                                                                 {
                                                                                                     Name = "Co-Author",
                                                                                                     Description = "Name of the Co-Author",
@@ -966,7 +966,7 @@ namespace Umbraco.Tests.Models
                                                                                 new PropertyTypeCollection(true,
                                                                                     new List<PropertyType>
                                                                                         {
-                                                                                            new PropertyType("test", ValueStorageType.Ntext, "coauthor")
+                                                                                            new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "coauthor")
                                                                                                 {
                                                                                                     Name = "Co-Author",
                                                                                                     Description = "Name of the Co-Author",
@@ -999,7 +999,7 @@ namespace Umbraco.Tests.Models
             var mixin1 = MockedContentTypes.CreateSimpleContentType("mixin1", "Mixin1", new PropertyTypeCollection(true,
                                                                                     new List<PropertyType>
                                                                                         {
-                                                                                            new PropertyType("test", ValueStorageType.Ntext, "coauthor")
+                                                                                            new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "coauthor")
                                                                                                 {
                                                                                                     Name = "Co-Author",
                                                                                                     Description = "Name of the Co-Author",
@@ -1011,7 +1011,7 @@ namespace Umbraco.Tests.Models
             var mixin2 = MockedContentTypes.CreateSimpleContentType("mixin2", "Mixin2", new PropertyTypeCollection(true,
                                                                                     new List<PropertyType>
                                                                                         {
-                                                                                            new PropertyType("test", ValueStorageType.Ntext, "author")
+                                                                                            new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "author")
                                                                                                 {
                                                                                                     Name = "Author",
                                                                                                     Description = "Name of the Author",

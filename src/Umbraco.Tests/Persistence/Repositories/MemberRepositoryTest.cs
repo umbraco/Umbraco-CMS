@@ -31,9 +31,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var accessor = (IScopeAccessor) provider;
             var templateRepository = Mock.Of<ITemplateRepository>();
-            var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches);
-            var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, Logger);
-            memberTypeRepository = new MemberTypeRepository(accessor, AppCaches.Disabled, Logger, commonRepository, languageRepository);
+            var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches, ShortStringHelper);
+            var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, Logger, TestObjects.GetGlobalSettings());
+            memberTypeRepository = new MemberTypeRepository(accessor, AppCaches.Disabled, Logger, commonRepository, languageRepository, ShortStringHelper);
             memberGroupRepository = new MemberGroupRepository(accessor, AppCaches.Disabled, Logger);
             var tagRepo = new TagRepository(accessor, AppCaches.Disabled, Logger);
             var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, Logger);
@@ -41,7 +41,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var relationRepository = new RelationRepository(accessor, Logger, relationTypeRepository, entityRepository);
             var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
             var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-            var repository = new MemberRepository(accessor, AppCaches.Disabled, Logger, memberTypeRepository, memberGroupRepository, tagRepo, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository, propertyEditors, dataValueReferences);
+            var repository = new MemberRepository(accessor, AppCaches.Disabled, Logger, memberTypeRepository, memberGroupRepository, tagRepo, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, DataTypeService);
             return repository;
         }
 
@@ -180,11 +180,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var sut = repository.Get(member.Id);
 
                 Assert.That(memberType.CompositionPropertyGroups.Count(), Is.EqualTo(2));
-                Assert.That(memberType.CompositionPropertyTypes.Count(), Is.EqualTo(3 + ConventionsHelper.GetStandardPropertyTypeStubs().Count));
-                Assert.That(sut.Properties.Count(), Is.EqualTo(3 + ConventionsHelper.GetStandardPropertyTypeStubs().Count));
+                Assert.That(memberType.CompositionPropertyTypes.Count(), Is.EqualTo(3 + ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper).Count));
+                Assert.That(sut.Properties.Count(), Is.EqualTo(3 + ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper).Count));
                 var grp = memberType.CompositionPropertyGroups.FirstOrDefault(x => x.Name == Constants.Conventions.Member.StandardPropertiesGroupName);
                 Assert.IsNotNull(grp);
-                var aliases = ConventionsHelper.GetStandardPropertyTypeStubs().Select(x => x.Key).ToArray();
+                var aliases = ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper).Select(x => x.Key).ToArray();
                 foreach (var p in memberType.CompositionPropertyTypes.Where(x => aliases.Contains(x.Alias)))
                 {
                     Assert.AreEqual(grp.Id, p.PropertyGroupId.Value);

@@ -9,6 +9,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using Umbraco.Core.IO;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core
 {
@@ -1274,5 +1275,126 @@ namespace Umbraco.Core
             return Attempt.Fail(input);
         }
 
+
+          // FORMAT STRINGS
+
+          /// <summary>
+          /// Cleans a string to produce a string that can safely be used in an alias.
+          /// </summary>
+          /// <param name="alias">The text to filter.</param>
+          /// <returns>The safe alias.</returns>
+          public static string ToSafeAlias(this string alias, IShortStringHelper shortStringHelper)
+          {
+              return shortStringHelper.CleanStringForSafeAlias(alias);
+          }
+
+          /// <summary>
+          /// Cleans a string to produce a string that can safely be used in an alias.
+          /// </summary>
+          /// <param name="alias">The text to filter.</param>
+          /// <param name="camel">A value indicating that we want to camel-case the alias.</param>
+          /// <returns>The safe alias.</returns>
+          public static string ToSafeAlias(this string alias, IShortStringHelper shortStringHelper, bool camel)
+          {
+              var a = shortStringHelper.CleanStringForSafeAlias(alias);
+              if (string.IsNullOrWhiteSpace(a) || camel == false) return a;
+              return char.ToLowerInvariant(a[0]) + a.Substring(1);
+          }
+
+          /// <summary>
+          /// Cleans a string, in the context of a specified culture, to produce a string that can safely be used in an alias.
+          /// </summary>
+          /// <param name="alias">The text to filter.</param>
+          /// <param name="culture">The culture.</param>
+          /// <returns>The safe alias.</returns>
+          public static string ToSafeAlias(this string alias, IShortStringHelper shortStringHelper, string culture)
+          {
+              return shortStringHelper.CleanStringForSafeAlias(alias, culture);
+          }
+
+
+          // the new methods to get a url segment
+
+          /// <summary>
+          /// Cleans a string to produce a string that can safely be used in an url segment.
+          /// </summary>
+          /// <param name="text">The text to filter.</param>
+          /// <returns>The safe url segment.</returns>
+          public static string ToUrlSegment(this string text, IShortStringHelper shortStringHelper)
+          {
+              if (text == null) throw new ArgumentNullException(nameof(text));
+              if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(text));
+
+              return shortStringHelper.CleanStringForUrlSegment(text);
+          }
+
+          /// <summary>
+          /// Cleans a string, in the context of a specified culture, to produce a string that can safely be used in an url segment.
+          /// </summary>
+          /// <param name="text">The text to filter.</param>
+          /// <param name="culture">The culture.</param>
+          /// <returns>The safe url segment.</returns>
+          public static string ToUrlSegment(this string text, IShortStringHelper shortStringHelper, string culture)
+          {
+              if (text == null) throw new ArgumentNullException(nameof(text));
+              if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(text));
+
+              return shortStringHelper.CleanStringForUrlSegment(text, culture);
+          }
+
+
+              /// <summary>
+        /// Cleans a string.
+        /// </summary>
+        /// <param name="text">The text to clean.</param>
+        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default,
+        /// strings are cleaned up to camelCase and Ascii.</param>
+        /// <returns>The clean string.</returns>
+        /// <remarks>The string is cleaned in the context of the ICurrent.ShortStringHelper default culture.</remarks>
+        public static string ToCleanString(this string text, IShortStringHelper shortStringHelper, CleanStringType stringType)
+        {
+            return shortStringHelper.CleanString(text, stringType);
+        }
+
+        /// <summary>
+        /// Cleans a string, using a specified separator.
+        /// </summary>
+        /// <param name="text">The text to clean.</param>
+        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default,
+        /// strings are cleaned up to camelCase and Ascii.</param>
+        /// <param name="separator">The separator.</param>
+        /// <returns>The clean string.</returns>
+        /// <remarks>The string is cleaned in the context of the ICurrent.ShortStringHelper default culture.</remarks>
+        public static string ToCleanString(this string text, IShortStringHelper shortStringHelper, CleanStringType stringType, char separator)
+        {
+            return shortStringHelper.CleanString(text, stringType, separator);
+        }
+
+        /// <summary>
+        /// Cleans a string in the context of a specified culture.
+        /// </summary>
+        /// <param name="text">The text to clean.</param>
+        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default,
+        /// strings are cleaned up to camelCase and Ascii.</param>
+        /// <param name="culture">The culture.</param>
+        /// <returns>The clean string.</returns>
+        public static string ToCleanString(this string text, IShortStringHelper shortStringHelper, CleanStringType stringType, string culture)
+        {
+            return shortStringHelper.CleanString(text, stringType, culture);
+        }
+
+        /// <summary>
+        /// Cleans a string in the context of a specified culture, using a specified separator.
+        /// </summary>
+        /// <param name="text">The text to clean.</param>
+        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default,
+        /// strings are cleaned up to camelCase and Ascii.</param>
+        /// <param name="separator">The separator.</param>
+        /// <param name="culture">The culture.</param>
+        /// <returns>The clean string.</returns>
+        public static string ToCleanString(this string text, IShortStringHelper shortStringHelper, CleanStringType stringType, char separator, string culture)
+        {
+            return shortStringHelper.CleanString(text, stringType, separator, culture);
+        }
     }
 }

@@ -16,7 +16,7 @@ namespace Umbraco.Tests.PropertyEditors
         public void Only_Tests_On_JArray()
         {
             var validator = new ColorPickerConfigurationEditor.ColorListValidator();
-            var result = validator.Validate("hello", null, new ColorPickerPropertyEditor(Mock.Of<ILogger>(), TestHelper.IOHelper));
+            var result = validator.Validate("hello", null, new ColorPickerPropertyEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), TestHelper.IOHelper, TestHelper.ShortStringHelper, Mock.Of<ILocalizedTextService>()));
             Assert.AreEqual(0, result.Count());
         }
 
@@ -24,7 +24,7 @@ namespace Umbraco.Tests.PropertyEditors
         public void Only_Tests_On_JArray_Of_Item_JObject()
         {
             var validator = new ColorPickerConfigurationEditor.ColorListValidator();
-            var result = validator.Validate(new JArray("hello", "world"), null, new ColorPickerPropertyEditor(Mock.Of<ILogger>(), TestHelper.IOHelper));
+            var result = validator.Validate(new JArray("hello", "world"), null, new ColorPickerPropertyEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), TestHelper.IOHelper, TestHelper.ShortStringHelper, Mock.Of<ILocalizedTextService>()));
             Assert.AreEqual(0, result.Count());
         }
 
@@ -37,7 +37,7 @@ namespace Umbraco.Tests.PropertyEditors
                                                 JObject.FromObject(new { value = "zxcvzxcvxzcv" }),
                                                 JObject.FromObject(new { value = "ABC" }),
                                                 JObject.FromObject(new { value = "1234567" })),
-                                            null, new ColorPickerPropertyEditor(Mock.Of<ILogger>(), TestHelper.IOHelper));
+                                            null, new ColorPickerPropertyEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), TestHelper.IOHelper, TestHelper.ShortStringHelper, Mock.Of<ILocalizedTextService>()));
             Assert.AreEqual(2, result.Count());
         }
     }

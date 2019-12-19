@@ -145,8 +145,8 @@ namespace Umbraco.Tests.Benchmarks
             //_expressionMethod3 = (Func<IFoo, IFoo>) Delegate.CreateDelegate(typeof (Func<IFoo, IFoo>), _expressionMethod.Method);
 
             // but, our utilities know how to do it!
-            _expressionMethod3 = ReflectionUtilities.CompileToDelegate(expr);
-            _expressionMethod4 = ReflectionUtilities.GetCtor<Foo, IFoo>();
+            _expressionMethod3 = ReflectionUtilitiesForTest.CompileToDelegate(expr);
+            _expressionMethod4 = ReflectionUtilitiesForTest.GetCtor<Foo, IFoo>();
 
             // however, unfortunately, the generated "compiled to delegate" code cannot access private stuff :(
 

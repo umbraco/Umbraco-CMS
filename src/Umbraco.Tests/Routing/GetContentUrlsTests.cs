@@ -29,7 +29,7 @@ namespace Umbraco.Tests.Routing
         {
             var allLangs = isoCodes
                 .Select(CultureInfo.GetCultureInfo)
-                .Select(culture => new Language(culture.Name)
+                .Select(culture => new Language(TestObjects.GetGlobalSettings(), culture.Name)
                 {
                     CultureName = culture.DisplayName,
                     IsDefault = true,

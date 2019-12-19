@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -12,6 +13,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Media;
 
 namespace Umbraco.Web.PropertyEditors
@@ -39,8 +41,8 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// Initializes a new instance of the <see cref="ImageCropperPropertyEditor"/> class.
         /// </summary>
-        public ImageCropperPropertyEditor(ILogger logger, IMediaFileSystem mediaFileSystem, IContentSection contentSettings, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper)
-            : base(logger)
+        public ImageCropperPropertyEditor(ILogger logger, IMediaFileSystem mediaFileSystem, IContentSection contentSettings, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper, IShortStringHelper shortStringHelper, ILocalizedTextService localizedTextService)
+            : base(logger, dataTypeService, localizationService, localizedTextService,shortStringHelper)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
             _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));

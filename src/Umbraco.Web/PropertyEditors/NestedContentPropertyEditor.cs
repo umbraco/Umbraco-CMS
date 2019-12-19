@@ -14,6 +14,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -41,10 +42,12 @@ namespace Umbraco.Web.PropertyEditors
             ILogger logger,
             Lazy<PropertyEditorCollection> propertyEditors,
             IDataTypeService dataTypeService,
-            IContentTypeService contentTypeService,
             ILocalizationService localizationService,
-            IIOHelper ioHelper)
-            : base (logger)
+            IContentTypeService contentTypeService,
+            IIOHelper ioHelper,
+            IShortStringHelper shortStringHelper,
+            ILocalizedTextService localizedTextService)
+            : base (logger, dataTypeService, localizationService, localizedTextService,  shortStringHelper)
         {
             _propertyEditors = propertyEditors;
             _dataTypeService = dataTypeService;
@@ -77,7 +80,7 @@ namespace Umbraco.Web.PropertyEditors
             );
 
             public NestedContentPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute, PropertyEditorCollection propertyEditors, IContentTypeService contentTypeService)
-                : base(dataTypeService, localizationService, attribute)
+                : base(dataTypeService, localizationService,  Current.Services.TextService, Current.ShortStringHelper, attribute)
             {
                 _propertyEditors = propertyEditors;
                 _dataTypeService = dataTypeService;

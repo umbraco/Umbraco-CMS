@@ -63,7 +63,7 @@ namespace Umbraco.Tests.Scoping
             var service = Current.Services.UserService;
             var globalCache = Current.AppCaches.IsolatedCaches.GetOrCreate(typeof(IUser));
 
-            var user = (IUser)new User("name", "email", "username", "rawPassword");
+            var user = (IUser)new User(TestObjects.GetGlobalSettings(), "name", "email", "username", "rawPassword");
             service.Save(user);
 
             // global cache contains the entity
@@ -140,7 +140,7 @@ namespace Umbraco.Tests.Scoping
             var service = Current.Services.LocalizationService;
             var globalCache = Current.AppCaches.IsolatedCaches.GetOrCreate(typeof (ILanguage));
 
-            var lang = (ILanguage) new Language("fr-FR");
+            var lang = (ILanguage) new Language(TestObjects.GetGlobalSettings(), "fr-FR");
             service.Save(lang);
 
             // global cache has been flushed, reload
@@ -232,7 +232,7 @@ namespace Umbraco.Tests.Scoping
             var service = Current.Services.LocalizationService;
             var globalCache = Current.AppCaches.IsolatedCaches.GetOrCreate(typeof (IDictionaryItem));
 
-            var lang = (ILanguage)new Language("fr-FR");
+            var lang = (ILanguage)new Language(TestObjects.GetGlobalSettings(), "fr-FR");
             service.Save(lang);
 
             var item = (IDictionaryItem) new DictionaryItem("item-key");

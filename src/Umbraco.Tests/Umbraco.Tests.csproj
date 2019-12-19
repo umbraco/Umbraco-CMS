@@ -100,7 +100,7 @@
     <PackageReference Include="Microsoft.Web.Infrastructure" Version="1.0.0.0" />
     <PackageReference Include="MiniProfiler" Version="4.0.138" />
     <PackageReference Include="Moq" Version="4.10.1" />
-    <PackageReference Include="NPoco" Version="3.9.4" />
+    <PackageReference Include="NPoco" Version="4.0.2" />
     <PackageReference Include="NUnit" Version="3.11.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.12.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
@@ -108,6 +108,7 @@
     <PackageReference Include="Selenium.WebDriver" Version="3.141.0" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.6.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.6.0" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.0" />
     <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.2" />
   </ItemGroup>
@@ -563,6 +564,10 @@
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
       <Project>{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}</Project>
       <Name>Umbraco.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj">
+      <Project>{3ae7bf57-966b-45a5-910a-954d7c554441}</Project>
+      <Name>Umbraco.Infrastructure</Name>
     </ProjectReference>
     <ProjectReference Include="..\Umbraco.ModelsBuilder.Embedded\Umbraco.ModelsBuilder.Embedded.csproj">
       <Project>{52ac0ba8-a60e-4e36-897b-e8b97a54ed1c}</Project>

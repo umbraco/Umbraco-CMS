@@ -30,7 +30,7 @@ namespace Umbraco.Tests.Services
             IContentType contentType = MockedContentTypes.CreateBasicContentType();
             contentType.Variations = ContentVariation.Nothing;
             var contentCollection = new PropertyTypeCollection(true);
-            contentCollection.Add(new PropertyType("test", ValueStorageType.Ntext)
+            contentCollection.Add(new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext)
             {
                 Alias = "title",
                 Name = "Title",
@@ -400,8 +400,8 @@ namespace Umbraco.Tests.Services
             var cs = ServiceContext.ContentService;
             var cts = ServiceContext.ContentTypeService;
             var dtdYesNo = ServiceContext.DataTypeService.GetDataType(-49);
-            var ctBase = new ContentType(-1) { Name = "Base", Alias = "Base", Icon = "folder.gif", Thumbnail = "folder.png" };
-            ctBase.AddPropertyType(new PropertyType(dtdYesNo, Constants.Conventions.Content.NaviHide)
+            var ctBase = new ContentType(ShortStringHelper, -1) { Name = "Base", Alias = "Base", Icon = "folder.gif", Thumbnail = "folder.png" };
+            ctBase.AddPropertyType(new PropertyType(ShortStringHelper, dtdYesNo, Constants.Conventions.Content.NaviHide)
             {
                 Name = "Hide From Navigation",
             }
@@ -409,7 +409,7 @@ namespace Umbraco.Tests.Services
             cts.Save(ctBase);
 
             const string contentTypeAlias = "HomePage";
-            var ctHomePage = new ContentType(ctBase, contentTypeAlias)
+            var ctHomePage = new ContentType(ShortStringHelper, ctBase, contentTypeAlias)
             {
                 Name = "Home Page",
                 Alias = contentTypeAlias,
@@ -417,7 +417,7 @@ namespace Umbraco.Tests.Services
                 Thumbnail = "folder.png",
                 AllowedAsRoot = true
             };
-            ctHomePage.AddPropertyType(new PropertyType(dtdYesNo, "someProperty") { Name = "Some property" }
+            ctHomePage.AddPropertyType(new PropertyType(ShortStringHelper, dtdYesNo, "someProperty") { Name = "Some property" }
                 /*,"Navigation"*/);
             cts.Save(ctHomePage);
 
@@ -437,7 +437,7 @@ namespace Umbraco.Tests.Services
         {
             var service = ServiceContext.ContentTypeService;
 
-            var contentType = new ContentType(-1)
+            var contentType = new ContentType(ShortStringHelper, -1)
             {
                 Alias = "test",
                 Name = "Test",
@@ -449,9 +449,9 @@ namespace Umbraco.Tests.Services
                 Trashed = false
             };
 
-            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "title") { Name = "Title", Description = "", Mandatory = false, DataTypeId = -88 });
-            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TinyMce, ValueStorageType.Ntext, "bodyText") { Name = "Body Text", Description = "", Mandatory = false, DataTypeId = -87 });
-            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "author") { Name = "Author", Description = "Name of the author", Mandatory = false, DataTypeId = -88 });
+            contentType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "title") { Name = "Title", Description = "", Mandatory = false, DataTypeId = -88 });
+            contentType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TinyMce, ValueStorageType.Ntext, "bodyText") { Name = "Body Text", Description = "", Mandatory = false, DataTypeId = -87 });
+            contentType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "author") { Name = "Author", Description = "Name of the author", Mandatory = false, DataTypeId = -88 });
 
             service.Save(contentType);
 
@@ -842,7 +842,7 @@ namespace Umbraco.Tests.Services
             service.Save(child);
 
             // Act
-            var duplicatePropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "title")
+            var duplicatePropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "title")
             {
                  Name = "Title", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
@@ -878,7 +878,7 @@ namespace Umbraco.Tests.Services
             service.Save(advancedPage);
 
             // Act
-            var duplicatePropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "title")
+            var duplicatePropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "title")
             {
                  Name = "Title", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
@@ -932,14 +932,14 @@ namespace Umbraco.Tests.Services
             service.Save(contentMetaComposition);
 
             // Act
-            var bodyTextPropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "bodyText")
+            var bodyTextPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "bodyText")
             {
                  Name = "Body Text", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
             var bodyTextAdded = basePage.AddPropertyType(bodyTextPropertyType, "Content");
             service.Save(basePage);
 
-            var authorPropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "author")
+            var authorPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "author")
             {
                  Name = "Author", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
@@ -950,7 +950,7 @@ namespace Umbraco.Tests.Services
             service.Save(advancedPage);
 
             //NOTE: It should not be possible to Save 'BasePage' with the Title PropertyType added
-            var titlePropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "title")
+            var titlePropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "title")
             {
                  Name = "Title", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
@@ -1007,28 +1007,28 @@ namespace Umbraco.Tests.Services
             service.Save(metaComposition);
 
             // Act
-            var bodyTextPropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "bodyText")
+            var bodyTextPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "bodyText")
             {
                  Name = "Body Text", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
             var bodyTextAdded = basePage.AddPropertyType(bodyTextPropertyType, "Content");
             service.Save(basePage);
 
-            var authorPropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "author")
+            var authorPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "author")
             {
                  Name = "Author", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
             var authorAdded = contentPage.AddPropertyType(authorPropertyType, "Content");
             service.Save(contentPage);
 
-            var subtitlePropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "subtitle")
+            var subtitlePropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "subtitle")
             {
                  Name = "Subtitle", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
             var subtitleAdded = advancedPage.AddPropertyType(subtitlePropertyType, "Content");
             service.Save(advancedPage);
 
-            var titlePropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "title")
+            var titlePropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "title")
             {
                  Name = "Title", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
@@ -1087,28 +1087,28 @@ namespace Umbraco.Tests.Services
             service.Save(metaComposition);
 
             // Act
-            var bodyTextPropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "bodyText")
+            var bodyTextPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "bodyText")
             {
                  Name = "Body Text", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
             var bodyTextAdded = basePage.AddPropertyType(bodyTextPropertyType, "Content");
             service.Save(basePage);
 
-            var authorPropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "author")
+            var authorPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "author")
             {
                  Name = "Author", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
             var authorAdded = contentPage.AddPropertyType(authorPropertyType, "Content");
             service.Save(contentPage);
 
-            var subtitlePropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "subtitle")
+            var subtitlePropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "subtitle")
             {
                  Name = "Subtitle", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
             var subtitleAdded = advancedPage.AddPropertyType(subtitlePropertyType, "Content");
             service.Save(advancedPage);
 
-            var titlePropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "title")
+            var titlePropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "title")
             {
                  Name = "Title", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
@@ -1128,7 +1128,7 @@ namespace Umbraco.Tests.Services
             Assert.That(seoCompositionAdded, Is.True);
             Assert.That(metaCompositionAdded, Is.True);
 
-            var testPropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "test")
+            var testPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "test")
             {
                  Name = "Test", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
@@ -1158,11 +1158,11 @@ namespace Umbraco.Tests.Services
             service.Save(contentMetaComposition);
 
             // Act
-            var subtitlePropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "subtitle")
+            var subtitlePropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "subtitle")
             {
                  Name = "Subtitle", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            var authorPropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "author")
+            var authorPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "author")
             {
                  Name = "Author", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
@@ -1204,22 +1204,22 @@ namespace Umbraco.Tests.Services
             service.Save(advancedPage);
 
             // Act
-            var titlePropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "title")
+            var titlePropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "title")
             {
                  Name = "Title", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
             var titleAdded = basePage.AddPropertyType(titlePropertyType, "Content");
-            var bodyTextPropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "bodyText")
+            var bodyTextPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "bodyText")
             {
                  Name = "Body Text", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
             var bodyTextAdded = contentPage.AddPropertyType(bodyTextPropertyType, "Content");
-            var subtitlePropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "subtitle")
+            var subtitlePropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "subtitle")
             {
                  Name = "Subtitle", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
             var subtitleAdded = contentPage.AddPropertyType(subtitlePropertyType, "Content");
-            var authorPropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "author")
+            var authorPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "author")
             {
                  Name = "Author", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
@@ -1277,7 +1277,7 @@ namespace Umbraco.Tests.Services
             service.Save(contentMetaComposition);
 
             // Act
-            var propertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "title")
+            var propertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "title")
             {
                  Name = "Title", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
@@ -1335,7 +1335,7 @@ namespace Umbraco.Tests.Services
             service.Save(contentPage);
 
             // add property 'prop1' to 'contentPage' group 'Content_'
-            var prop1 = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "testTextbox")
+            var prop1 = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "testTextbox")
             {
                  Name = "Test Textbox", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
@@ -1343,7 +1343,7 @@ namespace Umbraco.Tests.Services
             Assert.IsTrue(prop1Added);
 
             // add property 'prop2' to 'contentPage' group 'Content'
-            var prop2 = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "anotherTextbox")
+            var prop2 = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "anotherTextbox")
             {
                  Name = "Another Test Textbox", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
@@ -1393,11 +1393,11 @@ namespace Umbraco.Tests.Services
             service.Save(contentPage);
 
             // Act
-            var bodyTextPropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "bodyText")
+            var bodyTextPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "bodyText")
             {
                  Name = "Body Text", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            var subtitlePropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "subtitle")
+            var subtitlePropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "subtitle")
             {
                  Name = "Subtitle", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
@@ -1405,15 +1405,15 @@ namespace Umbraco.Tests.Services
             var subtitleAdded = contentPage.AddPropertyType(subtitlePropertyType, "Content");//Will be added to the "Content Meta" composition
             service.Save(contentPage);
 
-            var authorPropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "author")
+            var authorPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "author")
             {
                  Name = "Author", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            var descriptionPropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "description")
+            var descriptionPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "description")
             {
                  Name = "Description", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            var keywordsPropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "keywords")
+            var keywordsPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "keywords")
             {
                  Name = "Keywords", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
@@ -1462,15 +1462,15 @@ namespace Umbraco.Tests.Services
             service.Save(contentMetaComposition);
 
             // Act
-            var bodyTextPropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "bodyText")
+            var bodyTextPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "bodyText")
             {
                  Name = "Body Text", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            var subtitlePropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "subtitle")
+            var subtitlePropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "subtitle")
             {
                  Name = "Subtitle", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            var authorPropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "author")
+            var authorPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "author")
             {
                  Name = "Author", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
@@ -1515,14 +1515,14 @@ namespace Umbraco.Tests.Services
             service.Save(contentMetaComposition);
 
             // Act
-            var bodyTextPropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "bodyText")
+            var bodyTextPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "bodyText")
             {
                  Name = "Body Text", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
             var bodyTextAdded = basePage.AddPropertyType(bodyTextPropertyType, "Content");
             service.Save(basePage);
 
-            var authorPropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "author")
+            var authorPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "author")
             {
                  Name = "Author", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
@@ -1557,7 +1557,7 @@ namespace Umbraco.Tests.Services
             basePage.AddPropertyGroup("Meta");
             service.Save(basePage);
 
-            var authorPropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "author")
+            var authorPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "author")
             {
                 Name = "Author",
                 Description = "",
@@ -1567,7 +1567,7 @@ namespace Umbraco.Tests.Services
             };
             Assert.IsTrue(basePage.AddPropertyType(authorPropertyType, "Content"));
 
-            var titlePropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "title")
+            var titlePropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "title")
             {
                 Name = "Title",
                 Description = "",
@@ -1616,14 +1616,14 @@ namespace Umbraco.Tests.Services
             service.Save(contentMetaComposition);
 
             // Act
-            var authorPropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "author")
+            var authorPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "author")
             {
                  Name = "Author", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
             var authorAdded = contentPage.AddPropertyType(authorPropertyType, "Content");
             service.Save(contentPage);
 
-            var bodyTextPropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "bodyText")
+            var bodyTextPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "bodyText")
             {
                  Name = "Body Text", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
@@ -1649,7 +1649,7 @@ namespace Umbraco.Tests.Services
 
             //Ensure that adding a new PropertyType to the "Content"-tab also adds it to the right group
 
-            var descriptionPropertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
+            var descriptionPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
             {
                 Alias = "description", Name = "Description", Description = "",  Mandatory = false, SortOrder = 1,DataTypeId = -88
             };
@@ -1717,7 +1717,7 @@ namespace Umbraco.Tests.Services
 
         private ContentType CreateComponent()
         {
-            var component = new ContentType(-1)
+            var component = new ContentType(ShortStringHelper, -1)
             {
                 Alias = "component",
                 Name = "Component",
@@ -1730,7 +1730,7 @@ namespace Umbraco.Tests.Services
             };
 
             var contentCollection = new PropertyTypeCollection(true);
-            contentCollection.Add(new PropertyType("test", ValueStorageType.Ntext, "componentGroup") { Name = "Component Group", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88 });
+            contentCollection.Add(new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "componentGroup") { Name = "Component Group", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88 });
             component.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Component", SortOrder = 1 });
 
             return component;
@@ -1739,7 +1739,7 @@ namespace Umbraco.Tests.Services
         private ContentType CreateBannerComponent(ContentType parent)
         {
             const string contentTypeAlias = "banner";
-            var banner = new ContentType(parent, contentTypeAlias)
+            var banner = new ContentType(ShortStringHelper, parent, contentTypeAlias)
             {
                 Alias = contentTypeAlias,
                 Name = "Banner Component",
@@ -1751,7 +1751,7 @@ namespace Umbraco.Tests.Services
                 Trashed = false
             };
 
-            var propertyType = new PropertyType("test", ValueStorageType.Ntext, "bannerName")
+            var propertyType = new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "bannerName")
             {
                 Name = "Banner Name",
                 Description = "",
@@ -1765,7 +1765,7 @@ namespace Umbraco.Tests.Services
 
         private ContentType CreateSite()
         {
-            var site = new ContentType(-1)
+            var site = new ContentType(ShortStringHelper, -1)
             {
                 Alias = "site",
                 Name = "Site",
@@ -1778,7 +1778,7 @@ namespace Umbraco.Tests.Services
             };
 
             var contentCollection = new PropertyTypeCollection(true);
-            contentCollection.Add(new PropertyType("test", ValueStorageType.Ntext, "hostname") { Name = "Hostname", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88 });
+            contentCollection.Add(new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "hostname") { Name = "Hostname", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88 });
             site.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Site Settings", SortOrder = 1 });
 
             return site;
@@ -1787,7 +1787,7 @@ namespace Umbraco.Tests.Services
         private ContentType CreateHomepage(ContentType parent)
         {
             const string contentTypeAlias = "homepage";
-            var contentType = new ContentType(parent, contentTypeAlias)
+            var contentType = new ContentType(ShortStringHelper, parent, contentTypeAlias)
             {
                 Alias = contentTypeAlias,
                 Name = "Homepage",
@@ -1800,9 +1800,9 @@ namespace Umbraco.Tests.Services
             };
 
             var contentCollection = new PropertyTypeCollection(true);
-            contentCollection.Add(new PropertyType("test", ValueStorageType.Ntext, "title") { Name = "Title", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88 });
-            contentCollection.Add(new PropertyType("test", ValueStorageType.Ntext, "bodyText") { Name = "Body Text", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = -87 });
-            contentCollection.Add(new PropertyType("test", ValueStorageType.Ntext, "author") { Name = "Author", Description = "Name of the author",  Mandatory = false, SortOrder = 3, DataTypeId = -88 });
+            contentCollection.Add(new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "title") { Name = "Title", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88 });
+            contentCollection.Add(new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "bodyText") { Name = "Body Text", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = -87 });
+            contentCollection.Add(new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "author") { Name = "Author", Description = "Name of the author",  Mandatory = false, SortOrder = 3, DataTypeId = -88 });
 
             contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
 

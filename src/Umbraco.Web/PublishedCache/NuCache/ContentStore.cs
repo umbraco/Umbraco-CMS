@@ -30,6 +30,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly ConcurrentDictionary<Guid, int> _xmap;
 
         private readonly ILogger _logger;
+        private readonly IPublishedModelFactory _publishedModelFactory;
         private BPlusTree<int, ContentNodeKit> _localDb;
         private readonly ConcurrentQueue<GenObj> _genObjs;
         private GenObj _genObj;
@@ -51,11 +52,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
             IVariationContextAccessor variationContextAccessor,
             ILogger logger,
+            IPublishedModelFactory publishedModelFactory,
             BPlusTree<int, ContentNodeKit> localDb = null)
         {
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
             _variationContextAccessor = variationContextAccessor;
             _logger = logger;
+            _publishedModelFactory = publishedModelFactory;
             _localDb = localDb;
 
             _contentNodes = new ConcurrentDictionary<int, LinkedNode<ContentNode>>();
@@ -300,7 +303,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     if (node == null) continue;
                     var contentTypeId = node.ContentType.Id;
                     if (index.TryGetValue(contentTypeId, out var contentType) == false) continue;
-                    SetValueLocked(_contentNodes, node.Id, new ContentNode(node, contentType));
+                    SetValueLocked(_contentNodes, node.Id, new ContentNode(node, _publishedModelFactory, contentType));
                 }
             }
             finally
@@ -455,7 +458,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                         _contentNodes.TryGetValue(id, out var link);
                         if (link?.Value == null)
                             continue;
-                        var node = new ContentNode(link.Value, contentType);
+                        var node = new ContentNode(link.Value, _publishedModelFactory, contentType);
                         SetValueLocked(_contentNodes, id, node);
                         if (_localDb != null) RegisterChange(id, node.ToKit());
                     }
@@ -495,7 +498,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var canBePublished = ParentPublishedLocked(kit);
 
             // and use
-            kit.Build(link.Value, _publishedSnapshotAccessor, _variationContextAccessor, canBePublished);
+            kit.Build(link.Value, _publishedSnapshotAccessor, _variationContextAccessor, _publishedModelFactory, canBePublished);
 
             return true;
         }
@@ -552,7 +555,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 {
                     kit.Node.FirstChildContentId = existing.FirstChildContentId;
                     kit.Node.LastChildContentId = existing.LastChildContentId;
-                }   
+                }
 
                 // set
                 SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
@@ -604,7 +607,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// <param name="fromDb">True if the data is coming from the database (not the local cache db)</param>
         /// <returns></returns>
         /// <remarks>
-        /// This requires that the collection is sorted by Level + ParentId + Sort Order. 
+        /// This requires that the collection is sorted by Level + ParentId + Sort Order.
         /// This should be used only on a site startup as the first generations.
         /// This CANNOT be used after startup since it bypasses all checks for Generations.
         /// </remarks>
@@ -830,10 +833,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             if (_contentNodes.TryGetValue(id, out var link))
             {
-                link = GetLinkedNodeGen(link, gen);                
+                link = GetLinkedNodeGen(link, gen);
                 if (link != null && link.Value != null)
                     return link;
-            }   
+            }
 
             throw new PanicException($"failed to get {description} with id={id}");
         }
@@ -846,13 +849,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             if (content.ParentContentId < 0)
             {
-                var root = GetLinkedNodeGen(_root, gen);                
+                var root = GetLinkedNodeGen(_root, gen);
                 return root;
             }
 
             if (_contentNodes.TryGetValue(content.ParentContentId, out var link))
                 link = GetLinkedNodeGen(link, gen);
-                
+
             return link;
         }
 
@@ -944,7 +947,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             if (node != null && link.Gen < _liveGen)
             {
-                node = new ContentNode(link.Value);
+                node = new ContentNode(link.Value, _publishedModelFactory);
                 if (link == _root)
                     SetRootLocked(node);
                 else
@@ -1122,7 +1125,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public IEnumerable<ContentNode> GetAtRoot(long gen)
         {
-            var root = GetLinkedNodeGen(_root, gen);            
+            var root = GetLinkedNodeGen(_root, gen);
             if (root == null)
                 yield break;
 

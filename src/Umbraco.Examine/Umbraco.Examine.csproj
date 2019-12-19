@@ -56,7 +56,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
-    <PackageReference Include="NPoco" Version="3.9.4" />
+    <PackageReference Include="NPoco" Version="4.0.2" />
     <PackageReference Include="SecurityCodeScan">
       <Version>3.3.0</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
@@ -113,6 +113,10 @@
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
       <Project>{31785bc3-256c-4613-b2f5-a1b0bdded8c1}</Project>
       <Name>Umbraco.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj">
+      <Project>{3ae7bf57-966b-45a5-910a-954d7c554441}</Project>
+      <Name>Umbraco.Infrastructure</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

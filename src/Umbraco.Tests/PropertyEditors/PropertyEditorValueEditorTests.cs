@@ -45,7 +45,7 @@ namespace Umbraco.Tests.PropertyEditors
         [TestCase("hello world", false)]
         public void Value_Editor_Can_Convert_To_Json_Object_For_Editor(string value, bool isOk)
         {
-            var prop = new Property(1, new PropertyType("test", ValueStorageType.Nvarchar));
+            var prop = new Property(1, new PropertyType(TestHelper.ShortStringHelper, "test", ValueStorageType.Nvarchar));
             prop.SetValue(value);
 
             var valueEditor = TestHelper.CreateDataValueEditor(ValueTypes.String);
@@ -117,7 +117,7 @@ namespace Umbraco.Tests.PropertyEditors
         [TestCase(ValueTypes.DateTime, "", "")] //test empty string for date
         public void Value_Editor_Can_Serialize_Value(string valueType, object val, string expected)
         {
-            var prop = new Property(1, new PropertyType("test", ValueStorageType.Nvarchar));
+            var prop = new Property(1, new PropertyType(TestHelper.ShortStringHelper, "test", ValueStorageType.Nvarchar));
             prop.SetValue(val);
 
             var valueEditor = TestHelper.CreateDataValueEditor(valueType);
@@ -132,7 +132,7 @@ namespace Umbraco.Tests.PropertyEditors
             var value = 12.34M;
             var valueEditor = TestHelper.CreateDataValueEditor(ValueTypes.Decimal);
 
-            var prop = new Property(1, new PropertyType("test", ValueStorageType.Decimal));
+            var prop = new Property(1, new PropertyType(TestHelper.ShortStringHelper, "test", ValueStorageType.Decimal));
             prop.SetValue(value);
 
             var result = valueEditor.ToEditor(prop);
@@ -144,7 +144,7 @@ namespace Umbraco.Tests.PropertyEditors
         {
             var valueEditor = TestHelper.CreateDataValueEditor(ValueTypes.Decimal);
 
-            var prop = new Property(1, new PropertyType("test", ValueStorageType.Decimal));
+            var prop = new Property(1, new PropertyType(TestHelper.ShortStringHelper, "test", ValueStorageType.Decimal));
             prop.SetValue(string.Empty);
 
             var result = valueEditor.ToEditor(prop);
@@ -157,7 +157,7 @@ namespace Umbraco.Tests.PropertyEditors
             var now = DateTime.Now;
             var valueEditor = TestHelper.CreateDataValueEditor(ValueTypes.Date);
 
-            var prop = new Property(1, new PropertyType("test", ValueStorageType.Date));
+            var prop = new Property(1, new PropertyType(TestHelper.ShortStringHelper, "test", ValueStorageType.Date));
             prop.SetValue(now);
 
             var result = valueEditor.ToEditor(prop);

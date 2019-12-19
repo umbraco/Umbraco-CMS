@@ -8,6 +8,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Serialization;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.PropertyEditors.ValueConverters;
 
@@ -95,7 +96,7 @@ namespace Umbraco.Tests.PropertyEditors
 
             var publishedPropType = new PublishedPropertyType(
                 new PublishedContentType(1234, "test", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing),
-                new PropertyType("test", ValueStorageType.Nvarchar) { DataTypeId = 123 },
+                new PropertyType(TestHelper.ShortStringHelper,  "test", ValueStorageType.Nvarchar) { DataTypeId = 123 },
                 new PropertyValueConverterCollection(Enumerable.Empty<IPropertyValueConverter>()),
                 Mock.Of<IPublishedModelFactory>(), mockPublishedContentTypeFactory.Object);
 

@@ -43,10 +43,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
             DateTime createDate, int creatorId,
             ContentData draftData, ContentData publishedData,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
-            IVariationContextAccessor variationContextAccessor)
+            IVariationContextAccessor variationContextAccessor,
+            IPublishedModelFactory publishedModelFactory)
             : this(id, uid, level, path, sortOrder, parentContentId, createDate, creatorId)
         {
-            SetContentTypeAndData(contentType, draftData, publishedData, publishedSnapshotAccessor, variationContextAccessor);
+            SetContentTypeAndData(contentType, draftData, publishedData, publishedSnapshotAccessor, variationContextAccessor, publishedModelFactory);
         }
 
         // 2-phases ctor, phase 1
@@ -70,7 +71,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         // two-phase ctor, phase 2
-        public void SetContentTypeAndData(IPublishedContentType contentType, ContentData draftData, ContentData publishedData, IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor)
+        public void SetContentTypeAndData(IPublishedContentType contentType, ContentData draftData, ContentData publishedData, IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor, IPublishedModelFactory publishedModelFactory)
         {
             ContentType = contentType;
 
@@ -79,14 +80,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
             _variationContextAccessor = variationContextAccessor;
+            _publishedModelFactory = publishedModelFactory;
 
             _draftData = draftData;
             _publishedData = publishedData;
         }
 
         // clone
-        public ContentNode(ContentNode origin, IPublishedContentType contentType = null)
+        public ContentNode(ContentNode origin, IPublishedModelFactory publishedModelFactory, IPublishedContentType contentType = null)
         {
+            _publishedModelFactory = publishedModelFactory;
             Id = origin.Id;
             Uid = origin.Uid;
             ContentType = contentType ?? origin.ContentType;
@@ -135,6 +138,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // are models not direct PublishedContent instances
         private IPublishedContent _draftModel;
         private IPublishedContent _publishedModel;
+        private IPublishedModelFactory _publishedModelFactory;
 
         private IPublishedContent GetModel(ref IPublishedContent model, ContentData contentData)
         {
@@ -145,7 +149,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // more than 1 instance, but the lock below ensures we only ever return
             // 1 unique instance - and locking is a nice explicit way to ensure this
 
-            var m = new PublishedContent(this, contentData, _publishedSnapshotAccessor, _variationContextAccessor).CreateModel();
+            var m = new PublishedContent(this, contentData, _publishedSnapshotAccessor, _variationContextAccessor, _publishedModelFactory).CreateModel(_publishedModelFactory);
 
             // locking 'this' is not a best-practice but ContentNode is internal and
             // we know what we do, so it is fine here and avoids allocating an object

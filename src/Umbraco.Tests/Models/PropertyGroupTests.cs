@@ -17,7 +17,7 @@ namespace Umbraco.Tests.Models
             var pg = new PropertyGroup(
                 new PropertyTypeCollection(false, new[]
                 {
-                    new PropertyType("TestPropertyEditor", ValueStorageType.Nvarchar, "test")
+                    new PropertyType(ShortStringHelper, "TestPropertyEditor", ValueStorageType.Nvarchar, "test")
                     {
                         Id = 3,
                         CreateDate = DateTime.Now,
@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Models
                         ValidationRegExp = "xxxx",
                         ValueStorageType = ValueStorageType.Nvarchar
                     },
-                    new PropertyType("TestPropertyEditor", ValueStorageType.Nvarchar, "test2")
+                    new PropertyType(ShortStringHelper, "TestPropertyEditor", ValueStorageType.Nvarchar, "test2")
                     {
                         Id = 4,
                         CreateDate = DateTime.Now,
@@ -92,7 +92,7 @@ namespace Umbraco.Tests.Models
             var pg = new PropertyGroup(
                 new PropertyTypeCollection(false, new[]
                 {
-                    new PropertyType("TestPropertyEditor", ValueStorageType.Nvarchar, "test")
+                    new PropertyType(ShortStringHelper, "TestPropertyEditor", ValueStorageType.Nvarchar, "test")
                     {
                         Id = 3,
                         CreateDate = DateTime.Now,
@@ -108,7 +108,7 @@ namespace Umbraco.Tests.Models
                         ValidationRegExp = "xxxx",
                         ValueStorageType = ValueStorageType.Nvarchar
                     },
-                    new PropertyType("TestPropertyEditor2", ValueStorageType.Nvarchar, "test2")
+                    new PropertyType(ShortStringHelper, "TestPropertyEditor2", ValueStorageType.Nvarchar, "test2")
                     {
                         Id = 4,
                         CreateDate = DateTime.Now,

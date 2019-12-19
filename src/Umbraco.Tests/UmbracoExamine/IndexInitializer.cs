@@ -20,6 +20,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Examine;
+using Umbraco.Tests.TestHelpers;
 using IContentService = Umbraco.Core.Services.IContentService;
 using IMediaService = Umbraco.Core.Services.IMediaService;
 using Version = Lucene.Net.Util.Version;
@@ -33,7 +34,7 @@ namespace Umbraco.Tests.UmbracoExamine
     {
         public static ContentValueSetBuilder GetContentValueSetBuilder(PropertyEditorCollection propertyEditors, bool publishedValuesOnly)
         {
-            var contentValueSetBuilder = new ContentValueSetBuilder(propertyEditors, new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }), GetMockUserService(), publishedValuesOnly);
+            var contentValueSetBuilder = new ContentValueSetBuilder(propertyEditors, new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }), GetMockUserService(), TestHelper.ShortStringHelper, publishedValuesOnly);
             return contentValueSetBuilder;
         }
 
@@ -46,7 +47,7 @@ namespace Umbraco.Tests.UmbracoExamine
 
         public static MediaIndexPopulator GetMediaIndexRebuilder(PropertyEditorCollection propertyEditors, IMediaService mediaService)
         {
-            var mediaValueSetBuilder = new MediaValueSetBuilder(propertyEditors, new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }), GetMockUserService(), GetMockLogger());
+            var mediaValueSetBuilder = new MediaValueSetBuilder(propertyEditors, new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }), GetMockUserService(), GetMockLogger(), TestHelper.ShortStringHelper);
             var mediaIndexDataSource = new MediaIndexPopulator(null, mediaService, mediaValueSetBuilder);
             return mediaIndexDataSource;
         }
@@ -141,8 +142,8 @@ namespace Umbraco.Tests.UmbracoExamine
             mediaTypeServiceMock.Setup(x => x.GetAll())
                 .Returns(new List<IMediaType>
                 {
-                    new MediaType(-1) {Alias = "Folder", Name = "Folder", Id = 1031, Icon = "icon-folder"},
-                    new MediaType(-1) {Alias = "Image", Name = "Image", Id = 1032, Icon = "icon-picture"}
+                    new MediaType(TestHelper.ShortStringHelper, -1) {Alias = "Folder", Name = "Folder", Id = 1031, Icon = "icon-folder"},
+                    new MediaType(TestHelper.ShortStringHelper, -1) {Alias = "Image", Name = "Image", Id = 1032, Icon = "icon-picture"}
                 });
             return mediaTypeServiceMock.Object;
         }

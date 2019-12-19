@@ -2,18 +2,23 @@
 using System.Diagnostics;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Serialization;
+using Umbraco.Core.Strings;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Models
 {
     [TestFixture]
     public class LanguageTests
     {
+        private IGlobalSettings GlobalSettings { get; } = SettingsForTests.GenerateMockGlobalSettings();
+
         [Test]
         public void Can_Deep_Clone()
         {
-            var item = new Language("en-AU")
+            var item = new Language(GlobalSettings, "en-AU")
             {
                 CreateDate = DateTime.Now,
                 CultureName = "AU",
@@ -44,7 +49,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Serialize_Without_Error()
         {
-            var item = new Language("en-AU")
+            var item = new Language(GlobalSettings, "en-AU")
             {
                 CreateDate = DateTime.Now,
                 CultureName = "AU",

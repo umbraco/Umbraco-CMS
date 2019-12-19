@@ -14,6 +14,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Web.Editors
 {
@@ -30,15 +31,17 @@ namespace Umbraco.Web.Editors
     {
         private readonly IMacroService _macroService;
         private readonly IContentService _contentService;
+        private readonly IShortStringHelper _shortStringHelper;
         private readonly IUmbracoComponentRenderer _componentRenderer;
         private readonly IVariationContextAccessor _variationContextAccessor;
 
-        public MacroRenderingController(IUmbracoComponentRenderer componentRenderer, IVariationContextAccessor variationContextAccessor, IMacroService macroService, IContentService contentService)
+        public MacroRenderingController(IUmbracoComponentRenderer componentRenderer, IVariationContextAccessor variationContextAccessor, IMacroService macroService, IContentService contentService, IShortStringHelper shortStringHelper)
         {
             _componentRenderer = componentRenderer;
             _variationContextAccessor = variationContextAccessor;
             _macroService = macroService;
             _contentService = contentService;
+            _shortStringHelper = shortStringHelper;
         }
 
         /// <summary>
@@ -159,7 +162,7 @@ namespace Umbraco.Web.Editors
 
             var macroName = model.Filename.TrimEnd(".cshtml");
 
-            var macro = new Macro
+            var macro = new Macro(_shortStringHelper)
             {
                 Alias = macroName.ToSafeAlias(),
                 Name = macroName,

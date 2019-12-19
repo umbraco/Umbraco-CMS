@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Serialization;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Models
 {
@@ -24,7 +25,7 @@ namespace Umbraco.Tests.Models
                 UpdateDate = DateTime.Now,
                 Translations = new[]
                 {
-                    new DictionaryTranslation(new Language("en-AU")
+                    new DictionaryTranslation(new Language(SettingsForTests.GenerateMockGlobalSettings(),"en-AU")
                     {
                         CreateDate = DateTime.Now,
                         CultureName = "en",
@@ -39,7 +40,7 @@ namespace Umbraco.Tests.Models
                         Key = Guid.NewGuid(),
                         UpdateDate = DateTime.Now
                     },
-                    new DictionaryTranslation(new Language("en-US")
+                    new DictionaryTranslation(new Language(SettingsForTests.GenerateMockGlobalSettings(),"en-US")
                     {
                         CreateDate = DateTime.Now,
                         CultureName = "en",
@@ -95,7 +96,7 @@ namespace Umbraco.Tests.Models
                 UpdateDate = DateTime.Now,
                 Translations = new[]
                 {
-                    new DictionaryTranslation(new Language("en-AU")
+                    new DictionaryTranslation(new Language(SettingsForTests.GenerateMockGlobalSettings(),"en-AU")
                     {
                         CreateDate = DateTime.Now,
                         CultureName = "en",
@@ -110,7 +111,7 @@ namespace Umbraco.Tests.Models
                         Key = Guid.NewGuid(),
                         UpdateDate = DateTime.Now
                     },
-                    new DictionaryTranslation(new Language("en-US")
+                    new DictionaryTranslation(new Language(SettingsForTests.GenerateMockGlobalSettings(),"en-US")
                     {
                         CreateDate = DateTime.Now,
                         CultureName = "en",
@@ -128,7 +129,7 @@ namespace Umbraco.Tests.Models
                 }
             };
 
-            
+
             var json = JsonConvert.SerializeObject(item);
             Debug.Print(json);
         }

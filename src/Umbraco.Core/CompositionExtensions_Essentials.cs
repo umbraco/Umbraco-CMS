@@ -24,7 +24,9 @@ namespace Umbraco.Core
             IRuntimeState state,
             ITypeFinder typeFinder,
             IIOHelper ioHelper,
-            IUmbracoVersion umbracoVersion)
+            IUmbracoVersion umbracoVersion,
+            IDbProviderFactoryCreator dbProviderFactoryCreator,
+            IBulkSqlInsertProvider bulkSqlInsertProvider)
         {
             composition.RegisterUnique(logger);
             composition.RegisterUnique(profiler);
@@ -39,6 +41,8 @@ namespace Umbraco.Core
             composition.RegisterUnique(typeFinder);
             composition.RegisterUnique(ioHelper);
             composition.RegisterUnique(umbracoVersion);
+            composition.RegisterUnique(dbProviderFactoryCreator);
+            composition.RegisterUnique(bulkSqlInsertProvider);
         }
     }
 }

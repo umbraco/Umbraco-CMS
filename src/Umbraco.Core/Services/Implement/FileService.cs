@@ -11,6 +11,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Services.Implement
 {
@@ -26,6 +27,7 @@ namespace Umbraco.Core.Services.Implement
         private readonly IPartialViewRepository _partialViewRepository;
         private readonly IPartialViewMacroRepository _partialViewMacroRepository;
         private readonly IAuditRepository _auditRepository;
+        private readonly IShortStringHelper _shortStringHelper;
 
         private const string PartialViewHeader = "@inherits Umbraco.Web.Mvc.UmbracoViewPage";
         private const string PartialViewMacroHeader = "@inherits Umbraco.Web.Macros.PartialViewMacroPage";
@@ -33,7 +35,7 @@ namespace Umbraco.Core.Services.Implement
         public FileService(IScopeProvider uowProvider, IIOHelper ioHelper,  ILogger logger, IEventMessagesFactory eventMessagesFactory,
             IStylesheetRepository stylesheetRepository, IScriptRepository scriptRepository, ITemplateRepository templateRepository,
             IPartialViewRepository partialViewRepository, IPartialViewMacroRepository partialViewMacroRepository,
-            IAuditRepository auditRepository)
+            IAuditRepository auditRepository, IShortStringHelper shortStringHelper)
             : base(uowProvider, logger, eventMessagesFactory)
         {
             _ioHelper = ioHelper;
@@ -43,6 +45,7 @@ namespace Umbraco.Core.Services.Implement
             _partialViewRepository = partialViewRepository;
             _partialViewMacroRepository = partialViewMacroRepository;
             _auditRepository = auditRepository;
+            _shortStringHelper = shortStringHelper;
         }
 
         #region Stylesheets
@@ -305,7 +308,7 @@ namespace Umbraco.Core.Services.Implement
         /// </returns>
         public Attempt<OperationResult<OperationResultType, ITemplate>> CreateTemplateForContentType(string contentTypeAlias, string contentTypeName, int userId = Constants.Security.SuperUserId)
         {
-            var template = new Template(contentTypeName,
+            var template = new Template(_shortStringHelper, contentTypeName,
                 //NOTE: We are NOT passing in the content type alias here, we want to use it's name since we don't
                 // want to save template file names as camelCase, the Template ctor will clean the alias as
                 // `alias.ToCleanString(CleanStringType.UnderscoreAlias)` which has been the default.
@@ -386,7 +389,7 @@ namespace Umbraco.Core.Services.Implement
             }
 
             // file might already be on disk, if so grab the content to avoid overwriting
-            var template = new Template(name, alias)
+            var template = new Template(_shortStringHelper, name, alias)
             {
                 Content = GetViewContent(alias) ?? content
             };

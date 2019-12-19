@@ -36,12 +36,14 @@ namespace Umbraco.Web.Search
                     factory.GetInstance<PropertyEditorCollection>(),
                     factory.GetInstance<UrlSegmentProviderCollection>(),
                     factory.GetInstance<IUserService>(),
+                    factory.GetInstance<IShortStringHelper>(),
                     true));
             composition.RegisterUnique<IContentValueSetBuilder>(factory =>
                 new ContentValueSetBuilder(
                     factory.GetInstance<PropertyEditorCollection>(),
                     factory.GetInstance<UrlSegmentProviderCollection>(),
                     factory.GetInstance<IUserService>(),
+                    factory.GetInstance<IShortStringHelper>(),
                     false));
             composition.RegisterUnique<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
             composition.RegisterUnique<IValueSetBuilder<IMember>, MemberValueSetBuilder>();

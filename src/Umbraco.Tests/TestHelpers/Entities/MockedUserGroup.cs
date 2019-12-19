@@ -6,7 +6,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
     {
         internal static UserGroup CreateUserGroup(string suffix = "", string[] permissions = null, string[] allowedSections = null)
         {
-            var group = new UserGroup
+            var group = new UserGroup(TestHelper.ShortStringHelper)
             {
                 Alias = "testUserGroup" + suffix,
                 Name = "TestUserGroup" + suffix,

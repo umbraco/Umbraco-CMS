@@ -1,21 +1,25 @@
 ﻿using System;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
+using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Tests.Models
 {
     [TestFixture]
     public class VariationTests
     {
+        private IShortStringHelper ShortStringHelper { get; } = TestHelper.ShortStringHelper;
+
         [SetUp]
         public void SetUp()
         {
@@ -41,7 +45,7 @@ namespace Umbraco.Tests.Models
 
             var dataEditors = new DataEditorCollection(new IDataEditor[]
             {
-                new DataEditor(Mock.Of<ILogger>()) { Alias = "editor", ExplicitValueEditor = TestHelper.CreateDataValueEditor("view") }
+                new DataEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>()) { Alias = "editor", ExplicitValueEditor = TestHelper.CreateDataValueEditor("view") }
             });
             var propertyEditors = new PropertyEditorCollection(dataEditors);
 
@@ -200,7 +204,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void PropertyTests()
         {
-            var propertyType = new PropertyType("editor", ValueStorageType.Nvarchar) { Alias = "prop" };
+            var propertyType = new PropertyType(TestHelper.ShortStringHelper, "editor", ValueStorageType.Nvarchar) { Alias = "prop" };
             var prop = new Property(propertyType);
 
             const string langFr = "fr-FR";
@@ -296,7 +300,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void ContentNames()
         {
-            var contentType = new ContentType(-1) { Alias = "contentType" };
+            var contentType = new ContentType(ShortStringHelper, -1) { Alias = "contentType" };
             var content = new Content("content", -1, contentType) { Id = 1, VersionId = 1 };
 
             const string langFr = "fr-FR";
@@ -337,8 +341,8 @@ namespace Umbraco.Tests.Models
         {
             const string langFr = "fr-FR";
 
-            var propertyType = new PropertyType("editor", ValueStorageType.Nvarchar) { Alias = "prop" };
-            var contentType = new ContentType(-1) { Alias = "contentType" };
+            var propertyType = new PropertyType(ShortStringHelper, "editor", ValueStorageType.Nvarchar) { Alias = "prop" };
+            var contentType = new ContentType(ShortStringHelper, -1) { Alias = "contentType" };
             contentType.AddPropertyType(propertyType);
 
             var content = new Content("content", -1, contentType) { Id = 1, VersionId = 1 };
@@ -452,11 +456,11 @@ namespace Umbraco.Tests.Models
             // prop1 varies by Culture
             // prop2 is invariant
 
-            var contentType = new ContentType(-1) { Alias = "contentType" };
+            var contentType = new ContentType(ShortStringHelper, -1) { Alias = "contentType" };
             contentType.Variations |= ContentVariation.Culture;
 
-            var variantPropType = new PropertyType("editor", ValueStorageType.Nvarchar) { Alias = "prop1", Variations = ContentVariation.Culture, Mandatory = true };
-            var invariantPropType = new PropertyType("editor", ValueStorageType.Nvarchar) { Alias = "prop2", Variations = ContentVariation.Nothing, Mandatory = true};
+            var variantPropType = new PropertyType(ShortStringHelper, "editor", ValueStorageType.Nvarchar) { Alias = "prop1", Variations = ContentVariation.Culture, Mandatory = true };
+            var invariantPropType = new PropertyType(ShortStringHelper, "editor", ValueStorageType.Nvarchar) { Alias = "prop2", Variations = ContentVariation.Nothing, Mandatory = true};
 
             contentType.AddPropertyType(variantPropType);
             contentType.AddPropertyType(invariantPropType);
@@ -491,8 +495,8 @@ namespace Umbraco.Tests.Models
             const string langUk = "en-UK";
             const string langEs = "es-ES";
 
-            var propertyType = new PropertyType("editor", ValueStorageType.Nvarchar) { Alias = "prop" };
-            var contentType = new ContentType(-1) { Alias = "contentType" };
+            var propertyType = new PropertyType(ShortStringHelper, "editor", ValueStorageType.Nvarchar) { Alias = "prop" };
+            var contentType = new ContentType(ShortStringHelper, -1) { Alias = "contentType" };
             contentType.AddPropertyType(propertyType);
 
             var content = new Content("content", -1, contentType) { Id = 1, VersionId = 1 };
@@ -546,9 +550,9 @@ namespace Umbraco.Tests.Models
         [Test]
         public void IsDirtyTests()
         {
-            var propertyType = new PropertyType("editor", ValueStorageType.Nvarchar) { Alias = "prop" };
+            var propertyType = new PropertyType(ShortStringHelper, "editor", ValueStorageType.Nvarchar) { Alias = "prop" };
             var prop = new Property(propertyType);
-            var contentType = new ContentType(-1) { Alias = "contentType" };
+            var contentType = new ContentType(ShortStringHelper, -1) { Alias = "contentType" };
             contentType.AddPropertyType(propertyType);
 
             var content = new Content("content", -1, contentType) { Id = 1, VersionId = 1 };
@@ -571,7 +575,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void ValidationTests()
         {
-            var propertyType = new PropertyType("editor", ValueStorageType.Nvarchar) { Alias = "prop", SupportsPublishing = true };
+            var propertyType = new PropertyType(ShortStringHelper, "editor", ValueStorageType.Nvarchar) { Alias = "prop", SupportsPublishing = true };
             var prop = new Property(propertyType);
 
             prop.SetValue("a");

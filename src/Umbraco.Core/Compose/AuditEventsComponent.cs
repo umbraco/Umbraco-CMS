@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -19,13 +20,15 @@ namespace Umbraco.Core.Compose
         private readonly IUserService _userService;
         private readonly IEntityService _entityService;
         private readonly IIpResolver _ipResolver;
+        private readonly IGlobalSettings _globalSettings;
 
-        public AuditEventsComponent(IAuditService auditService, IUserService userService, IEntityService entityService, IIpResolver ipResolver)
+        public AuditEventsComponent(IAuditService auditService, IUserService userService, IEntityService entityService, IIpResolver ipResolver, IGlobalSettings globalSettings)
         {
             _auditService = auditService;
             _userService = userService;
             _entityService = entityService;
             _ipResolver = ipResolver;
+            _globalSettings = globalSettings;
         }
 
         public void Initialize()
@@ -46,7 +49,7 @@ namespace Umbraco.Core.Compose
         public void Terminate()
         { }
 
-        internal static IUser UnknownUser => new User { Id = Constants.Security.UnknownUserId, Name = Constants.Security.UnknownUserName, Email = "" };
+        public static IUser UnknownUser(IGlobalSettings globalSettings) => new User(globalSettings) { Id = Constants.Security.UnknownUserId, Name = Constants.Security.UnknownUserName, Email = "" };
 
         private IUser CurrentPerformingUser
         {
@@ -54,14 +57,14 @@ namespace Umbraco.Core.Compose
             {
                 var identity = Thread.CurrentPrincipal?.GetUmbracoIdentity();
                 var user = identity == null ? null : _userService.GetUserById(Convert.ToInt32(identity.Id));
-                return user ?? UnknownUser;
+                return user ?? UnknownUser(_globalSettings);
             }
         }
 
         private IUser GetPerformingUser(int userId)
         {
             var found = userId >= 0 ? _userService.GetUserById(userId) : null;
-            return found ?? UnknownUser;
+            return found ?? UnknownUser(_globalSettings);
         }
 
         private string PerformingIp => _ipResolver.GetCurrentRequestIpAddress();

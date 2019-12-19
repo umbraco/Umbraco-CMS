@@ -45,7 +45,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             _mapperCollection = mapperCollection ?? throw new ArgumentNullException(nameof(mapperCollection));
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
             _passwordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
-        }     
+        }
 
         /// <summary>
         /// Returns a serialized dictionary of the password configuration that is stored against the user in the database
@@ -77,7 +77,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (dtos.Count == 0) return null;
 
             PerformGetReferencedDtos(dtos);
-            return UserFactory.BuildEntity(dtos[0]);
+            return UserFactory.BuildEntity(_globalSettings, dtos[0]);
         }
 
         /// <summary>
@@ -237,7 +237,7 @@ ORDER BY colName";
             var users = new IUser[dtos.Count];
             var i = 0;
             foreach (var dto in dtos)
-                users[i++] = UserFactory.BuildEntity(dto);
+                users[i++] = UserFactory.BuildEntity(_globalSettings, dto);
             return users;
         }
 
@@ -250,14 +250,14 @@ ORDER BY colName";
             var users = new IUser[dtos.Count];
             var i = 0;
             foreach (var dto in dtos)
-                users[i++] = UserFactory.BuildEntity(dto);
+                users[i++] = UserFactory.BuildEntity(_globalSettings, dto);
             return users;
         }
 
         private IUser GetWith(Action<Sql<ISqlContext>> with, bool includeReferences)
         {
             var dto = GetDtoWith(with, includeReferences);
-            return dto == null ? null : UserFactory.BuildEntity(dto);
+            return dto == null ? null : UserFactory.BuildEntity(_globalSettings, dto);
         }
 
         private UserDto GetDtoWith(Action<Sql<ISqlContext>> with, bool includeReferences)
@@ -795,7 +795,7 @@ ORDER BY colName";
 
             // map references
             PerformGetReferencedDtos(pagedResult.Items);
-            return pagedResult.Items.Select(UserFactory.BuildEntity);
+            return pagedResult.Items.Select(x => UserFactory.BuildEntity(_globalSettings, x));
         }
 
         private Sql<ISqlContext> ApplyFilter(Sql<ISqlContext> sql, Sql<ISqlContext> filterSql, bool hasWhereClause)
@@ -866,7 +866,7 @@ ORDER BY colName";
 
         private IEnumerable<IUser> ConvertFromDtos(IEnumerable<UserDto> dtos)
         {
-            return dtos.Select(UserFactory.BuildEntity);
+            return dtos.Select(x => UserFactory.BuildEntity(_globalSettings, x));
         }
     }
 }

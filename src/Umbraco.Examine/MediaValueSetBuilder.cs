@@ -18,15 +18,17 @@ namespace Umbraco.Examine
         private readonly UrlSegmentProviderCollection _urlSegmentProviders;
         private readonly IUserService _userService;
         private readonly ILogger _logger;
+        private readonly IShortStringHelper _shortStringHelper;
 
         public MediaValueSetBuilder(PropertyEditorCollection propertyEditors,
             UrlSegmentProviderCollection urlSegmentProviders,
-            IUserService userService, ILogger logger)
+            IUserService userService, ILogger logger, IShortStringHelper shortStringHelper)
             : base(propertyEditors, false)
         {
             _urlSegmentProviders = urlSegmentProviders;
             _userService = userService;
             _logger = logger;
+            _shortStringHelper = shortStringHelper;
         }
 
         /// <inheritdoc />
@@ -34,7 +36,7 @@ namespace Umbraco.Examine
         {
             foreach (var m in media)
             {
-                var urlValue = m.GetUrlSegment(_urlSegmentProviders);
+                var urlValue = m.GetUrlSegment(_shortStringHelper, _urlSegmentProviders);
 
                 var umbracoFilePath = string.Empty;
                 var umbracoFile = string.Empty;

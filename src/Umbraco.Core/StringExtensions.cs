@@ -95,47 +95,6 @@ namespace Umbraco.Core
             return Current.ShortStringHelper.CleanString(text, stringType);
         }
 
-        /// <summary>
-        /// Cleans a string, using a specified separator.
-        /// </summary>
-        /// <param name="text">The text to clean.</param>
-        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default,
-        /// strings are cleaned up to camelCase and Ascii.</param>
-        /// <param name="separator">The separator.</param>
-        /// <returns>The clean string.</returns>
-        /// <remarks>The string is cleaned in the context of the ICurrent.ShortStringHelper default culture.</remarks>
-        public static string ToCleanString(this string text, CleanStringType stringType, char separator)
-        {
-            return Current.ShortStringHelper.CleanString(text, stringType, separator);
-        }
-
-        /// <summary>
-        /// Cleans a string in the context of a specified culture.
-        /// </summary>
-        /// <param name="text">The text to clean.</param>
-        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default,
-        /// strings are cleaned up to camelCase and Ascii.</param>
-        /// <param name="culture">The culture.</param>
-        /// <returns>The clean string.</returns>
-        public static string ToCleanString(this string text, CleanStringType stringType, string culture)
-        {
-            return Current.ShortStringHelper.CleanString(text, stringType, culture);
-        }
-
-        /// <summary>
-        /// Cleans a string in the context of a specified culture, using a specified separator.
-        /// </summary>
-        /// <param name="text">The text to clean.</param>
-        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default,
-        /// strings are cleaned up to camelCase and Ascii.</param>
-        /// <param name="separator">The separator.</param>
-        /// <param name="culture">The culture.</param>
-        /// <returns>The clean string.</returns>
-        public static string ToCleanString(this string text, CleanStringType stringType, char separator, string culture)
-        {
-            return Current.ShortStringHelper.CleanString(text, stringType, separator, culture);
-        }
-
         // note: LegacyCurrent.ShortStringHelper will produce 100% backward-compatible output for SplitPascalCasing.
         // other helpers may not. DefaultCurrent.ShortStringHelper produces better, but non-compatible, results.
 

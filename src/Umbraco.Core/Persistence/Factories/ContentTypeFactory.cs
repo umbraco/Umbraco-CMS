@@ -5,6 +5,7 @@ using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Persistence.Factories
 {
@@ -17,9 +18,9 @@ namespace Umbraco.Core.Persistence.Factories
     {
         #region IContentType
 
-        public static IContentType BuildContentTypeEntity(ContentTypeDto dto)
+        public static IContentType BuildContentTypeEntity(IShortStringHelper shortStringHelper, ContentTypeDto dto)
         {
-            var contentType = new ContentType(dto.NodeDto.ParentId);
+            var contentType = new ContentType(shortStringHelper, dto.NodeDto.ParentId);
 
             try
             {
@@ -41,9 +42,9 @@ namespace Umbraco.Core.Persistence.Factories
 
         #region IMediaType
 
-        public static IMediaType BuildMediaTypeEntity(ContentTypeDto dto)
+        public static IMediaType BuildMediaTypeEntity(IShortStringHelper shortStringHelper, ContentTypeDto dto)
         {
-            var contentType = new MediaType(dto.NodeDto.ParentId);
+            var contentType = new MediaType(shortStringHelper, dto.NodeDto.ParentId);
             try
             {
                 contentType.DisableChangeTracking();
@@ -65,9 +66,9 @@ namespace Umbraco.Core.Persistence.Factories
 
         #region IMemberType
 
-        public static IMemberType BuildMemberTypeEntity(ContentTypeDto dto)
+        public static IMemberType BuildMemberTypeEntity(IShortStringHelper shortStringHelper, ContentTypeDto dto)
         {
-            var contentType = new MemberType(dto.NodeDto.ParentId);
+            var contentType = new MemberType(shortStringHelper, dto.NodeDto.ParentId);
             try
             {
                 contentType.DisableChangeTracking();

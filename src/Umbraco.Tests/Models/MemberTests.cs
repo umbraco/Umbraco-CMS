@@ -4,9 +4,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
-using Umbraco.Core.Serialization;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 

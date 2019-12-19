@@ -457,7 +457,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             var id = attrs?.GetNamedItem("id").Value;
             if (id.IsNullOrWhiteSpace()) throw new InvalidOperationException("Node has no ID attribute.");
             var key = CacheKeyPrefix + id; // dont bother with preview, wont change during request in Xml cache
-            return (IPublishedContent) appCache.Get(key, () => (new XmlPublishedContent(node, isPreviewing, appCache, contentTypeCache)).CreateModel());
+            return (IPublishedContent) appCache.Get(key, () => (new XmlPublishedContent(node, isPreviewing, appCache, contentTypeCache)).CreateModel(Current.PublishedModelFactory));
         }
 
         public static void ClearRequest()

@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
@@ -106,7 +107,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public UserGroupDisplay GetEmptyUserGroup()
         {
-            return Mapper.Map<UserGroupDisplay>(new UserGroup());
+            return Mapper.Map<UserGroupDisplay>(new UserGroup(Current.ShortStringHelper));
         }
 
         /// <summary>
