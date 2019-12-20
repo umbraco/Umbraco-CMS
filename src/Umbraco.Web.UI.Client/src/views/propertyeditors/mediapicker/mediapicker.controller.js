@@ -260,7 +260,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             labelTokens: [],
             icon: 'trash',
             method: removeAllEntries,
-            isDisabled: false
+            isDisabled: true
         };
         
         if (multiPicker === true) {
