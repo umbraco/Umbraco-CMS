@@ -427,6 +427,7 @@ namespace Umbraco.Tests.Web.Mvc
                 new TestDefaultCultureAccessor(),
                 Current.Logger, TestObjects.GetGlobalSettings(),
                 TestHelper.GetHostingEnvironment(),
+                ShortStringHelper,
                 new SiteDomainHelper(),
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 null, true, false

@@ -13,11 +13,11 @@ using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
-
 
 namespace Umbraco.Web.Editors
 {
@@ -29,8 +29,8 @@ namespace Umbraco.Web.Editors
     {
         protected ICultureDictionary CultureDictionary { get; }
 
-        protected ContentControllerBase(ICultureDictionary cultureDictionary, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        protected ContentControllerBase(ICultureDictionary cultureDictionary, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IShortStringHelper shortStringHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
         {
             CultureDictionary = cultureDictionary;
         }
@@ -84,7 +84,7 @@ namespace Umbraco.Web.Editors
                     .ToArray();
 
                 foreach (var file in files)
-                    file.FileName = file.FileName.ToSafeFileName();
+                    file.FileName = file.FileName.ToSafeFileName(ShortStringHelper);
 
                 // create the property data for the property editor
                 var data = new ContentPropertyData(propertyDto.Value, propertyDto.DataType.Configuration)

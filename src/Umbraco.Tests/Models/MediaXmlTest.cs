@@ -3,13 +3,12 @@ using System.Xml.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Tests.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
@@ -21,8 +20,6 @@ namespace Umbraco.Tests.Models
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
     public class MediaXmlTest : TestWithDatabaseBase
     {
-
-
         [Test]
         public void Can_Generate_Xml_Representation_Of_Media()
         {
@@ -39,7 +36,7 @@ namespace Umbraco.Tests.Models
             var localizationService = Mock.Of<ILocalizationService>();
 
             var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), scheme, logger, ShortStringHelper);
-            var ignored = new FileUploadPropertyEditor(Mock.Of<ILogger>(), mediaFileSystem, config, dataTypeService, localizationService);
+            var ignored = new FileUploadPropertyEditor(Mock.Of<ILogger>(), mediaFileSystem, config, dataTypeService, localizationService, ShortStringHelper);
 
             var media = MockedMedia.CreateMediaImage(mediaType, -1);
             media.WriterId = -1; // else it's zero and that's not a user and it breaks the tests
@@ -51,7 +48,7 @@ namespace Umbraco.Tests.Models
             media.SetValue(Constants.Conventions.Media.Bytes, "100");
             media.SetValue(Constants.Conventions.Media.Extension, "png");
 
-            var nodeName = media.ContentType.Alias.ToSafeAlias();
+            var nodeName = media.ContentType.Alias.ToSafeAlias(ShortStringHelper);
             var urlName = media.GetUrlSegment(ShortStringHelper, new[] { new DefaultUrlSegmentProvider(ShortStringHelper) });
 
             // Act

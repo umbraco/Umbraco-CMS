@@ -164,7 +164,7 @@ namespace Umbraco.Web.Editors
 
             var macro = new Macro(_shortStringHelper)
             {
-                Alias = macroName.ToSafeAlias(),
+                Alias = macroName.ToSafeAlias(ShortStringHelper),
                 Name = macroName,
                 MacroSource = model.VirtualPath.EnsureStartsWith("~"),
                 MacroType = MacroTypes.PartialView

@@ -17,13 +17,15 @@ namespace Umbraco.ModelsBuilder.Embedded
         private readonly IMediaTypeService _mediaTypeService;
         private readonly IMemberTypeService _memberTypeService;
         private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
+        private readonly IShortStringHelper _shortStringHelper;
 
-        public UmbracoServices(IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService, IPublishedContentTypeFactory publishedContentTypeFactory)
+        public UmbracoServices(IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService, IPublishedContentTypeFactory publishedContentTypeFactory, IShortStringHelper shortStringHelper)
         {
             _contentTypeService = contentTypeService;
             _mediaTypeService = mediaTypeService;
             _memberTypeService = memberTypeService;
             _publishedContentTypeFactory = publishedContentTypeFactory;
+            _shortStringHelper = shortStringHelper;
         }
 
         #region Services
@@ -61,10 +63,10 @@ namespace Umbraco.ModelsBuilder.Embedded
             return GetTypes(PublishedItemType.Member, memberTypes); // aliases have to be unique here
         }
 
-        public static string GetClrName(string name, string alias)
+        public static string GetClrName(IShortStringHelper shortStringHelper, string name, string alias)
         {
             // ModelsBuilder's legacy - but not ideal
-            return alias.ToCleanString(CleanStringType.ConvertCase | CleanStringType.PascalCase);
+            return alias.ToCleanString(shortStringHelper, CleanStringType.ConvertCase | CleanStringType.PascalCase);
         }
 
         private IList<TypeModel> GetTypes(PublishedItemType itemType, IContentTypeComposition[] contentTypes)
@@ -79,7 +81,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                 {
                     Id = contentType.Id,
                     Alias = contentType.Alias,
-                    ClrName = GetClrName(contentType.Name, contentType.Alias),
+                    ClrName = GetClrName(_shortStringHelper, contentType.Name, contentType.Alias),
                     ParentId = contentType.ParentId,
 
                     Name = contentType.Name,
@@ -121,7 +123,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                     var propertyModel = new PropertyModel
                     {
                         Alias = propertyType.Alias,
-                        ClrName = GetClrName(propertyType.Name, propertyType.Alias),
+                        ClrName = GetClrName(_shortStringHelper, propertyType.Name, propertyType.Alias),
 
                         Name = propertyType.Name,
                         Description = propertyType.Description

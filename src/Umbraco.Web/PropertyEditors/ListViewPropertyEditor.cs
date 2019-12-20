@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using Umbraco.Core;
+﻿using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -25,8 +25,8 @@ namespace Umbraco.Web.PropertyEditors
         /// Initializes a new instance of the <see cref="ListViewPropertyEditor"/> class.
         /// </summary>
         /// <param name="logger"></param>
-        public ListViewPropertyEditor(ILogger logger, IIOHelper iioHelper)
-            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService, Current.Services.TextService,Current.ShortStringHelper)
+        public ListViewPropertyEditor(ILogger logger, IIOHelper iioHelper, IShortStringHelper shortStringHelper)
+            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService, Current.Services.TextService, shortStringHelper)
         {
             _iioHelper = iioHelper;
         }

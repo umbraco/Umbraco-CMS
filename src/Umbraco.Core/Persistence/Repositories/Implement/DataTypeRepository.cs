@@ -17,6 +17,7 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using static Umbraco.Core.Persistence.SqlExtensionsStatics;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
@@ -28,13 +29,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     {
         private readonly Lazy<PropertyEditorCollection> _editors;
         private readonly IIOHelper _ioHelper;
+        private readonly IShortStringHelper _shortStringHelper;
 
         // TODO: https://github.com/umbraco/Umbraco-CMS/issues/4237 - get rid of Lazy injection and fix circular dependencies
-        public DataTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, Lazy<PropertyEditorCollection> editors, ILogger logger, IIOHelper ioHelper)
+        public DataTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, Lazy<PropertyEditorCollection> editors, ILogger logger, IIOHelper ioHelper, IShortStringHelper shortStringHelper)
             : base(scopeAccessor, cache, logger)
         {
             _editors = editors;
             _ioHelper = ioHelper;
+            _shortStringHelper = shortStringHelper;
         }
 
         #region Overrides of RepositoryBase<int,DataTypeDefinition>
@@ -58,7 +61,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             var dtos = Database.Fetch<DataTypeDto>(dataTypeSql);
-            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors.Value, Logger,_ioHelper)).ToArray();
+            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors.Value, Logger,_ioHelper, _shortStringHelper)).ToArray();
         }
 
         protected override IEnumerable<IDataType> PerformGetByQuery(IQuery<IDataType> query)
@@ -69,7 +72,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             var dtos = Database.Fetch<DataTypeDto>(sql);
 
-            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors.Value, Logger, _ioHelper)).ToArray();
+            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors.Value, Logger, _ioHelper, _shortStringHelper)).ToArray();
         }
 
         #endregion

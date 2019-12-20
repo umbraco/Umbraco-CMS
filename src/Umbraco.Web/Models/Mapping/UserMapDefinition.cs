@@ -13,6 +13,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Sections;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Services;
 
@@ -27,9 +28,10 @@ namespace Umbraco.Web.Models.Mapping
         private readonly ActionCollection _actions;
         private readonly AppCaches _appCaches;
         private readonly IGlobalSettings _globalSettings;
+        private readonly IShortStringHelper _shortStringHelper;
 
         public UserMapDefinition(ILocalizedTextService textService, IUserService userService, IEntityService entityService, ISectionService sectionService,
-            AppCaches appCaches, ActionCollection actions, IGlobalSettings globalSettings)
+            AppCaches appCaches, ActionCollection actions, IGlobalSettings globalSettings, IShortStringHelper shortStringHelper)
         {
             _sectionService = sectionService;
             _entityService = entityService;
@@ -38,11 +40,12 @@ namespace Umbraco.Web.Models.Mapping
             _actions = actions;
             _appCaches = appCaches;
             _globalSettings = globalSettings;
+            _shortStringHelper = shortStringHelper;
         }
 
         public void DefineMaps(UmbracoMapper mapper)
         {
-            mapper.Define<UserGroupSave, IUserGroup>((source, context) => new UserGroup(Current.ShortStringHelper) { CreateDate = DateTime.UtcNow }, Map);
+            mapper.Define<UserGroupSave, IUserGroup>((source, context) => new UserGroup(_shortStringHelper) { CreateDate = DateTime.UtcNow }, Map);
             mapper.Define<UserInvite, IUser>(Map);
             mapper.Define<IProfile, ContentEditing.UserProfile>((source, context) => new ContentEditing.UserProfile(), Map);
             mapper.Define<IReadOnlyUserGroup, UserGroupBasic>((source, context) => new UserGroupBasic(), Map);

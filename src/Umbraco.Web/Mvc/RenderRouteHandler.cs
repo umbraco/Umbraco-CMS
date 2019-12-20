@@ -1,18 +1,17 @@
 using System;
 using System.Linq;
 using System.Web;
-using System.Web.Compilation;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.SessionState;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Strings;
+using Umbraco.Web.Features;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
-using System.Collections.Generic;
 using Current = Umbraco.Web.Composing.Current;
-using Umbraco.Web.Features;
 
 namespace Umbraco.Web.Mvc
 {
@@ -29,17 +28,20 @@ namespace Umbraco.Web.Mvc
         private readonly IControllerFactory _controllerFactory;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly UmbracoContext _umbracoContext;
+        private readonly IShortStringHelper _shortStringHelper;
 
-        public RenderRouteHandler(IUmbracoContextAccessor umbracoContextAccessor, IControllerFactory controllerFactory)
+        public RenderRouteHandler(IUmbracoContextAccessor umbracoContextAccessor, IControllerFactory controllerFactory, IShortStringHelper shortStringHelper)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _controllerFactory = controllerFactory ?? throw new ArgumentNullException(nameof(controllerFactory));
+            _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
         }
 
-        public RenderRouteHandler(UmbracoContext umbracoContext, IControllerFactory controllerFactory)
+        public RenderRouteHandler(UmbracoContext umbracoContext, IControllerFactory controllerFactory, IShortStringHelper shortStringHelper)
         {
             _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
             _controllerFactory = controllerFactory ?? throw new ArgumentNullException(nameof(controllerFactory));
+            _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
         }
 
         private UmbracoContext UmbracoContext => _umbracoContext ?? _umbracoContextAccessor.UmbracoContext;
@@ -262,7 +264,7 @@ namespace Umbraco.Web.Mvc
                 //the template Alias should always be already saved with a safe name.
                 //if there are hyphens in the name and there is a hijacked route, then the Action will need to be attributed
                 // with the action name attribute.
-                var templateName = request.TemplateAlias.Split('.')[0].ToSafeAlias();
+                var templateName = request.TemplateAlias.Split('.')[0].ToSafeAlias(_shortStringHelper);
                 def.ActionName = templateName;
             }
 

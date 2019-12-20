@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -32,7 +31,6 @@ using File = System.IO.File;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
-
     internal class PublishedSnapshotService : PublishedSnapshotServiceBase
     {
         private readonly ServiceContext _serviceContext;
@@ -50,6 +48,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly UrlSegmentProviderCollection _urlSegmentProviders;
         private readonly ITypeFinder _typeFinder;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IShortStringHelper _shortStringHelper;
 
         // volatile because we read it with no lock
         private volatile bool _isReady;
@@ -83,7 +82,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IPublishedModelFactory publishedModelFactory,
             UrlSegmentProviderCollection urlSegmentProviders,
             ITypeFinder typeFinder,
-            IHostingEnvironment hostingEnvironment)
+            IHostingEnvironment hostingEnvironment,
+            IShortStringHelper shortStringHelper)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
@@ -102,6 +102,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _urlSegmentProviders = urlSegmentProviders;
             _typeFinder = typeFinder;
             _hostingEnvironment = hostingEnvironment;
+            _shortStringHelper = shortStringHelper;
 
             // we need an Xml serializer here so that the member cache can support XPath,
             // for members this is done by navigating the serialized-to-xml member
@@ -1400,7 +1401,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     cultureData[cultureInfo.Culture] = new CultureVariation
                     {
                         Name = cultureInfo.Name,
-                        UrlSegment = content.GetUrlSegment(Current.ShortStringHelper, _urlSegmentProviders, cultureInfo.Culture),
+                        UrlSegment = content.GetUrlSegment(_shortStringHelper, _urlSegmentProviders, cultureInfo.Culture),
                         Date = content.GetUpdateDate(cultureInfo.Culture) ?? DateTime.MinValue,
                         IsDraft = cultureIsDraft
                     };
@@ -1412,7 +1413,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 PropertyData = propertyData,
                 CultureData = cultureData,
-                UrlSegment = content.GetUrlSegment(Current.ShortStringHelper, _urlSegmentProviders)
+                UrlSegment = content.GetUrlSegment(_shortStringHelper, _urlSegmentProviders)
             };
 
             var dto = new ContentNuDto

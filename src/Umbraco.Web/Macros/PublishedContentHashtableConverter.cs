@@ -76,8 +76,8 @@ namespace Umbraco.Web.Macros
         /// <param name="content">The content.</param>
         /// <param name="variationContextAccessor"></param>
         /// <remarks>This is for <see cref="MacroRenderingController"/> usage only.</remarks>
-        internal PublishedContentHashtableConverter(IContent content, IVariationContextAccessor variationContextAccessor)
-            : this(new PagePublishedContent(content, variationContextAccessor))
+        internal PublishedContentHashtableConverter(IContent content, IVariationContextAccessor variationContextAccessor, IShortStringHelper shortStringHelper)
+            : this(new PagePublishedContent(content, variationContextAccessor, shortStringHelper))
         { }
 
         #endregion
@@ -184,6 +184,7 @@ namespace Umbraco.Web.Macros
             private readonly IPublishedProperty[] _properties;
             private IReadOnlyDictionary<string, PublishedCultureInfo> _cultureInfos;
             private readonly IVariationContextAccessor _variationContextAccessor;
+            private readonly IShortStringHelper _shortStringHelper;
 
             private static readonly IReadOnlyDictionary<string, PublishedCultureInfo> NoCultureInfos = new Dictionary<string, PublishedCultureInfo>();
 
@@ -192,10 +193,11 @@ namespace Umbraco.Web.Macros
                 Id = id;
             }
 
-            public PagePublishedContent(IContent inner, IVariationContextAccessor variationContextAccessor)
+            public PagePublishedContent(IContent inner, IVariationContextAccessor variationContextAccessor, IShortStringHelper shortStringHelper)
             {
-                _inner = inner ?? throw new NullReferenceException("content");
+                _inner = inner ?? throw new ArgumentNullException(nameof(inner));
                 _variationContextAccessor = variationContextAccessor;
+                _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
                 Id = _inner.Id;
                 Key = _inner.Key;
 
@@ -242,7 +244,7 @@ namespace Umbraco.Web.Macros
 
                     var urlSegmentProviders = Current.UrlSegmentProviders; // TODO inject
                     return _cultureInfos = _inner.PublishCultureInfos.Values
-                        .ToDictionary(x => x.Culture, x => new PublishedCultureInfo(x.Culture, x.Name, _inner.GetUrlSegment(Current.ShortStringHelper, urlSegmentProviders, x.Culture), x.Date));
+                        .ToDictionary(x => x.Culture, x => new PublishedCultureInfo(x.Culture, x.Name, _inner.GetUrlSegment(_shortStringHelper, urlSegmentProviders, x.Culture), x.Date));
                 }
             }
 

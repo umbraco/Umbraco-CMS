@@ -678,7 +678,7 @@ namespace Umbraco.Core.Packaging
                 foreach (var templateElement in allowedTemplatesElement.Elements("Template"))
                 {
                     var alias = templateElement.Value;
-                    var template = _fileService.GetTemplate(alias.ToSafeAlias());
+                    var template = _fileService.GetTemplate(alias.ToSafeAlias(_shortStringHelper));
                     if (template != null)
                     {
                         if (allowedTemplates.Any(x => x.Id == template.Id)) continue;
@@ -695,7 +695,7 @@ namespace Umbraco.Core.Packaging
 
             if (string.IsNullOrEmpty((string)defaultTemplateElement) == false)
             {
-                var defaultTemplate = _fileService.GetTemplate(defaultTemplateElement.Value.ToSafeAlias());
+                var defaultTemplate = _fileService.GetTemplate(defaultTemplateElement.Value.ToSafeAlias(_shortStringHelper));
                 if (defaultTemplate != null)
                 {
                     contentType.SetDefaultTemplate(defaultTemplate);
@@ -1231,7 +1231,7 @@ namespace Umbraco.Core.Packaging
                     var name = prop.Element("Name")?.Value;
                     if (sp == null)
                     {
-                        sp = new StylesheetProperty(name, "#" + name.ToSafeAlias(), "");
+                        sp = new StylesheetProperty(name, "#" + name.ToSafeAlias(_shortStringHelper), string.Empty);
                         s.AddProperty(sp);
                     }
                     else

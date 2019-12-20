@@ -1,27 +1,24 @@
 ﻿using System;
-using System.Reflection;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using Umbraco.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Strings;
 using Current = Umbraco.Core.Composing.Current;
 
 namespace Umbraco.Core.Persistence.Factories
 {
     internal static class DataTypeFactory
     {
-        public static IDataType BuildEntity(DataTypeDto dto, PropertyEditorCollection editors, ILogger logger, IIOHelper ioHelper)
+        public static IDataType BuildEntity(DataTypeDto dto, PropertyEditorCollection editors, ILogger logger, IIOHelper ioHelper, IShortStringHelper shortStringHelper)
         {
             if (!editors.TryGet(dto.EditorAlias, out var editor))
             {
                 logger.Warn(typeof(DataType), "Could not find an editor with alias {EditorAlias}, treating as Label."
                                                      +" The site may fail to boot and / or load data types and run.", dto.EditorAlias);
                 //convert to label
-                editor = new LabelPropertyEditor(logger, ioHelper, Current.Services.DataTypeService, Current.Services.TextService, Current.Services.LocalizationService,  Current.ShortStringHelper);
+                editor = new LabelPropertyEditor(logger, ioHelper, Current.Services.DataTypeService, Current.Services.TextService, Current.Services.LocalizationService, shortStringHelper);
             }
 
             var dataType = new DataType(editor);

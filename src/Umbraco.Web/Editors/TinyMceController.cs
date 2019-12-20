@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -25,20 +25,20 @@ namespace Umbraco.Web.Editors
         Constants.Applications.Members)]
     public class TinyMceController : UmbracoAuthorizedApiController
     {
-        private IMediaService _mediaService;
-        private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+        private readonly IMediaService _mediaService;
+        private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+        private readonly IShortStringHelper _shortStringHelper;
 
-
-        public TinyMceController(IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
+        public TinyMceController(IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IShortStringHelper shortStringHelper)
         {
             _mediaService = mediaService;
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
+            _shortStringHelper = shortStringHelper;
         }
 
         [HttpPost]
         public async Task<HttpResponseMessage> UploadImage()
         {
-
             if (Request.Content.IsMimeMultipartContent() == false)
             {
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
@@ -75,7 +75,7 @@ namespace Umbraco.Web.Editors
             // Really we should only have one file per request to this endpoint
             var file = result.FileData[0];
             var fileName = file.Headers.ContentDisposition.FileName.Trim(new[] { '\"' }).TrimEnd();
-            var safeFileName = fileName.ToSafeFileName();
+            var safeFileName = fileName.ToSafeFileName(_shortStringHelper);
             var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 
             if (Current.Configs.Settings().Content.IsFileAllowedForUpload(ext) == false || Current.Configs.Settings().Content.ImageFileTypes.Contains(ext) == false)

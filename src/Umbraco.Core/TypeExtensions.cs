@@ -21,7 +21,7 @@ namespace Umbraco.Core
         /// <remarks>
         /// Currently this will only work for ProperCase and camelCase properties, see the TODO below to enable complete case insensitivity
         /// </remarks>
-        internal static Attempt<object> GetMemberIgnoreCase(this Type type, object target, string memberName)
+        internal static Attempt<object> GetMemberIgnoreCase(this Type type, object target, string memberName, IShortStringHelper shortStringHelper)
         {
             Func<string, Attempt<object>> getMember =
                 memberAlias =>
@@ -49,8 +49,8 @@ namespace Umbraco.Core
             {
                 //if we cannot get with the current alias, try changing it's case
                 attempt = memberName[0].IsUpperCase()
-                    ? getMember(memberName.ToCleanString(CleanStringType.Ascii | CleanStringType.ConvertCase | CleanStringType.CamelCase))
-                    : getMember(memberName.ToCleanString(CleanStringType.Ascii | CleanStringType.ConvertCase | CleanStringType.PascalCase));
+                    ? getMember(memberName.ToCleanString(shortStringHelper, CleanStringType.Ascii | CleanStringType.ConvertCase | CleanStringType.CamelCase))
+                    : getMember(memberName.ToCleanString(shortStringHelper, CleanStringType.Ascii | CleanStringType.ConvertCase | CleanStringType.PascalCase));
 
                 // TODO: If this still fails then we should get a list of properties from the object and then compare - doing the above without listing
                 // all properties will surely be faster than using reflection to get ALL properties first and then query against them.

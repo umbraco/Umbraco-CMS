@@ -52,7 +52,7 @@ namespace Umbraco.Tests.PublishedContent
             var contentTypeBaseServiceProvider = Mock.Of<IContentTypeBaseServiceProvider>();
             var umbracoContextAccessor = Mock.Of<IUmbracoContextAccessor>();
             var imageSourceParser = new HtmlImageSourceParser(umbracoContextAccessor);
-            var pastedImages = new RichTextEditorPastedImages(umbracoContextAccessor, logger, IOHelper, mediaService, contentTypeBaseServiceProvider);
+            var pastedImages = new RichTextEditorPastedImages(umbracoContextAccessor, logger, IOHelper, mediaService, contentTypeBaseServiceProvider, ShortStringHelper);
             var linkParser = new HtmlLocalLinkParser(umbracoContextAccessor);
             var localizationService = Mock.Of<ILocalizationService>();
 

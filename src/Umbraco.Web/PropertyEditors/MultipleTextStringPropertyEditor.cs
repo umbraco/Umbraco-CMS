@@ -13,6 +13,7 @@ using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -36,8 +37,8 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// Initializes a new instance of the <see cref="MultipleTextStringPropertyEditor"/> class.
         /// </summary>
-        public MultipleTextStringPropertyEditor(ILogger logger, IIOHelper ioHelper, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService)
-            : base(logger, dataTypeService, localizationService, Current.Services.TextService,Current.ShortStringHelper)
+        public MultipleTextStringPropertyEditor(ILogger logger, IIOHelper ioHelper, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper)
+            : base(logger, dataTypeService, localizationService, Current.Services.TextService, shortStringHelper)
         {
             _ioHelper = ioHelper;
             _dataTypeService = dataTypeService;
@@ -46,7 +47,7 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         /// <inheritdoc />
-        protected override IDataValueEditor CreateValueEditor() => new MultipleTextStringPropertyValueEditor(_dataTypeService, _localizationService,Attribute, _localizedTextService);
+        protected override IDataValueEditor CreateValueEditor() => new MultipleTextStringPropertyValueEditor(_dataTypeService, _localizationService, _localizedTextService, ShortStringHelper, Attribute);
 
         /// <inheritdoc />
         protected override IConfigurationEditor CreateConfigurationEditor() => new MultipleTextStringConfigurationEditor(_ioHelper);
@@ -58,8 +59,8 @@ namespace Umbraco.Web.PropertyEditors
         {
             private readonly ILocalizedTextService _localizedTextService;
 
-            public MultipleTextStringPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute, ILocalizedTextService localizedTextService)
-                : base(dataTypeService, localizationService, Current.Services.TextService,Current.ShortStringHelper, attribute)
+            public MultipleTextStringPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute)
+                : base(dataTypeService, localizationService, Current.Services.TextService, shortStringHelper, attribute)
             {
                 _localizedTextService = localizedTextService;
             }
