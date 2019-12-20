@@ -75,7 +75,7 @@
             scope.displayLabelOff = "";
 
             function onInit() {
-                scope.inputId = scope.inputId || String.CreateGuid();
+                scope.inputId = scope.inputId || "umb-toggle_" + String.CreateGuid();
 
                 setLabelText();
                 // must wait until the current digest cycle is finished before we emit this event on init, 

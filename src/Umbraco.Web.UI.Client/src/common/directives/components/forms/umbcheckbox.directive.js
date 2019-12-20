@@ -46,7 +46,7 @@
         vm.change = change;
 
         function onInit() {
-            vm.inputId = vm.inputId || String.CreateGuid();
+            vm.inputId = vm.inputId || "umb-check_" + String.CreateGuid();
 
             // If a labelKey is passed let's update the returned text if it's does not contain an opening square bracket [
             if (vm.labelKey) {
