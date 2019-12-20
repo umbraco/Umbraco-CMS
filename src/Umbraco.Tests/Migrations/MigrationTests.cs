@@ -56,7 +56,6 @@ namespace Umbraco.Tests.Migrations
             {
                 throw new NotImplementedException();
             }
-            public Dictionary<Guid, object> CallContextObjects => throw new NotImplementedException();
             public IEnumerable<ScopeInfo> ScopeInfos => throw new NotImplementedException();
 #endif
         }
