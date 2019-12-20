@@ -20,16 +20,6 @@
             public const string ContentType = "icon-item-arrangement";
 
             /// <summary>
-            /// System data type icon
-            /// </summary>
-            public const string DataType = "icon-autofill";
-
-            /// <summary>
-            /// System list view icon
-            /// </summary>
-            public const string ListView = "icon-thumbnail-list";
-
-            /// <summary>
             /// System macro icon
             /// </summary>
             public const string Macro = "icon-settings-alt";
