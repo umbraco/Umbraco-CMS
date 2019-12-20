@@ -7,6 +7,7 @@
         var oldModel = null;
 
         vm.showConfirmSubmit = false;
+        vm.loading = false;
 
         vm.isSelected = isSelected;
         vm.openContentType = openContentType;
@@ -57,9 +58,31 @@
 
         function selectCompositeContentType(compositeContentType) {  
 
+            vm.loading = true;
+            
             var contentType = compositeContentType.contentType;
 
-            $scope.model.selectCompositeContentType(contentType);
+            $scope.model.selectCompositeContentType(contentType).then(function (response) {
+                console.log("selectCompositeContentType", response);
+
+                angular.forEach(vm.availableGroups, function (group) {
+
+                    angular.forEach(group.compositeContentTypes, function (obj) {
+                        if (obj.allowed === false) {
+                            obj.selected = false;
+                        }
+                    });
+                });
+
+                $timeout(function () {
+                    vm.loading = false;
+                }, 500);
+                
+            }, function () {
+                $timeout(function () {
+                    vm.loading = false;
+                }, 500);
+            });
 
             // Check if the template is already selected.
             var index = $scope.model.contentType.compositeContentTypes.indexOf(contentType.alias);
@@ -69,20 +92,6 @@
             } else {
                 $scope.model.contentType.compositeContentTypes.splice(index, 1);
             }
-
-            // Not ideal, but set short timeout to wait for selectCompositeContentType to run and update "allowed" property.
-            $timeout(function () {
-                angular.forEach(vm.availableGroups, function (group) {
-
-                    var notAllowed = _.filter(group.compositeContentTypes, function (obj) {
-                        return obj.allowed === false;
-                    });
-
-                    angular.forEach(notAllowed, function (obj) {
-                        obj.selected = false;
-                    });
-                });
-            }, 1000);
         }
 
         function submit() {
