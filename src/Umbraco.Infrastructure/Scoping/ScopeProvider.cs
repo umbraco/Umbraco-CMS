@@ -75,6 +75,9 @@ namespace Umbraco.Core.Scoping
 
         #region Context
 
+        // TODO: I don't think this whole thing is necessary anymore since we are using AsyncLocal which
+        // I don't believe has the same odd requirements as the old CallContext! Also see SafeCallContext
+
         // objects that go into the logical call context better be serializable else they'll eventually
         // cause issues whenever some cross-AppDomain code executes - could be due to ReSharper running
         // tests, any other things (see https://msdn.microsoft.com/en-us/library/dn458353(v=vs.110).aspx),
@@ -88,6 +91,7 @@ namespace Umbraco.Core.Scoping
         // and we can retrieve the actual objects from the table.
         // only issue: how are we supposed to clear the table? we can't, really. objects should take
         // care of de-registering themselves from context.
+        // see https://www.zpqrtbnk.net/posts/putting-things-in-contexts/
 
         private static readonly object StaticCallContextObjectsLock = new object();
         private static readonly Dictionary<Guid, object> StaticCallContextObjects
@@ -110,12 +114,12 @@ namespace Umbraco.Core.Scoping
         private static T GetCallContextObject<T>(string key)
             where T : class
         {
-            var objectKey = CallContext.GetData(key);
-            if (objectKey is null) return null;
+            var objectKey = CallContext<Guid>.GetData(key);
+            if (objectKey == Guid.Empty) return null;
 
             lock (StaticCallContextObjectsLock)
             {
-                if (StaticCallContextObjects.TryGetValue(objectKey.Value, out object callContextObject))
+                if (StaticCallContextObjects.TryGetValue(objectKey, out object callContextObject))
                 {
 #if DEBUG_SCOPES
                     Current.Logger.Debug<ScopeProvider>("Got " + typeof(T).Name + " Object " + objectKey.ToString("N").Substring(0, 8));
@@ -125,7 +129,7 @@ namespace Umbraco.Core.Scoping
                 }
 
                 // hard to inject into a static method :(
-                Current.Logger.Warn<ScopeProvider>("Missed {TypeName} Object {ObjectKey}", typeof(T).Name, objectKey.Value.ToString("N").Substring(0, 8));
+                Current.Logger.Warn<ScopeProvider>("Missed {TypeName} Object {ObjectKey}", typeof(T).Name, objectKey.ToString("N").Substring(0, 8));
 #if DEBUG_SCOPES
                 //Current.Logger.Debug<ScopeProvider>("At:\r\n" + Head(Environment.StackTrace, 24));
 #endif
@@ -157,16 +161,16 @@ namespace Umbraco.Core.Scoping
 #endif
             if (value == null)
             {
-                var objectKey = CallContext.GetData(key);
-                CallContext.RemoveData(key);
-                if (objectKey is null) return;
+                var objectKey = CallContext<Guid>.GetData(key);
+                CallContext<Guid>.RemoveData(key);
+                if (objectKey == Guid.Empty) return;
                 lock (StaticCallContextObjectsLock)
                 {
 #if DEBUG_SCOPES
                     Current.Logger.Debug<ScopeProvider>("Remove Object " + objectKey.ToString("N").Substring(0, 8));
                     //Current.Logger.Debug<ScopeProvider>("At:\r\n" + Head(Environment.StackTrace, 24));
 #endif
-                    StaticCallContextObjects.Remove(objectKey.Value);
+                    StaticCallContextObjects.Remove(objectKey);
                 }
             }
             else
@@ -183,7 +187,7 @@ namespace Umbraco.Core.Scoping
 #endif
                     StaticCallContextObjects.Add(objectKey, value);
                 }
-                CallContext.SetData(key, objectKey);
+                CallContext<Guid>.SetData(key, objectKey);
             }
         }
 
