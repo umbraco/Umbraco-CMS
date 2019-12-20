@@ -1,12 +1,8 @@
 ﻿@model dynamic
 @using Umbraco.Web.Templates
 @{
-    var embedValue = string.Empty;
-    try {
-        embedValue = Model.value.preview;
-    } catch(Exception ex) {
-        embedValue = Model.value;
-    }
+    string embedValue = Convert.ToString(Model.value);
+    embedValue = embedValue.DetectIsJson() ? Model.value.preview : Model.value;
 }
 
 <div class="video-wrapper">
