@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using Moq;
 using NUnit.Framework;
@@ -45,8 +46,19 @@ namespace Umbraco.Tests.Migrations
                 throw new NotImplementedException();
             }
 
+            
+
             public IScopeContext Context { get; set; }
             public ISqlContext SqlContext { get; set;  }
+
+#if DEBUG_SCOPES
+            public ScopeInfo GetScopeInfo(IScope scope)
+            {
+                throw new NotImplementedException();
+            }
+            public Dictionary<Guid, object> CallContextObjects => throw new NotImplementedException();
+            public IEnumerable<ScopeInfo> ScopeInfos => throw new NotImplementedException();
+#endif
         }
 
         [Test]

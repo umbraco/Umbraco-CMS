@@ -145,11 +145,11 @@ namespace Umbraco.Core.Scoping
             if (key == ScopeItemKey)
             {
                 // first, null-register the existing value
-                var ambientKey = CallContext.GetData(ScopeItemKey).AsGuid();
+                var ambientKey = CallContext<Guid>.GetData(ScopeItemKey);
                 object o = null;
                 lock (StaticCallContextObjectsLock)
                 {
-                    if (ambientKey != default(Guid))
+                    if (ambientKey != default)
                         StaticCallContextObjects.TryGetValue(ambientKey, out o);
                 }
                 var ambientScope = o as IScope;
@@ -162,7 +162,7 @@ namespace Umbraco.Core.Scoping
             if (value == null)
             {
                 var objectKey = CallContext<Guid>.GetData(key);
-                CallContext<Guid>.RemoveData(key);
+                CallContext<Guid>.SetData(key, default); // aka remove
                 if (objectKey == Guid.Empty) return;
                 lock (StaticCallContextObjectsLock)
                 {

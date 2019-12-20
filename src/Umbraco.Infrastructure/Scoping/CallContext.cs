@@ -5,12 +5,14 @@ using System.Threading;
 namespace Umbraco.Core.Scoping
 {
     /// <summary>
-    /// Provides a way to set contextual data that flows with the call and
-    /// async context of a test or invocation.
+    /// Represents ambient data that is local to a given asynchronous control flow, such as an asynchronous method.
     /// </summary>
+    /// <remarks>
+    /// This is just a simple wrapper around <seealso cref="AsyncLocal{T}"/>
+    /// </remarks>
     public static class CallContext<T>
     {
-        static ConcurrentDictionary<string, AsyncLocal<T>> _state = new ConcurrentDictionary<string, AsyncLocal<T>>();
+        private static ConcurrentDictionary<string, AsyncLocal<T>> _state = new ConcurrentDictionary<string, AsyncLocal<T>>();
 
         /// <summary>
         /// Stores a given object and associates it with the specified name.
@@ -27,11 +29,11 @@ namespace Umbraco.Core.Scoping
         /// <returns>The object in the call context associated with the specified name, or a default value for <typeparamref name="T"/> if none is found.</returns>
         public static T GetData(string name) => _state.TryGetValue(name, out var data) ? data.Value : default;
 
-        /// <summary>
-        /// Clears the state from <see cref="CallContext{T}"/> for the given name.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public static bool RemoveData(string name) => _state.TryRemove(name, out _);
+        // NOTE: If you have used the old CallContext in the past you might be thinking you need to clean this up but that is not the case.
+        // With CallContext you had to call FreeNamedDataSlot to prevent leaks but with AsyncLocal this is not the case, there is no way to clean this up.
+        // The above dictionary is sort of a trick because sure, there is always going to be a string key that will exist in the collection but the values
+        // themselves are managed per ExecutionContext so they don't build up. 
+        // There's an SO article relating to this here https://stackoverflow.com/questions/36511243/safety-of-asynclocal-in-asp-net-core
+
     }
 }
