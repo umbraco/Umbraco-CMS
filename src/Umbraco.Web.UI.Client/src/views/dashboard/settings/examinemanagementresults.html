@@ -1,18 +1,41 @@
 <div>
-
-    <table class="table table-bordered table-condensed">
-        <thead>
-            <tr>
-                <th class="score"><localize key="general_field">Field</localize></th>
-                <th class="id"><localize key="general_value">Value</localize></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="(key, val) in model.searchResultValues track by key">
-                <td>{{key}}</td>
-                <td>{{val}}</td>
-            </tr>
-        </tbody>
-    </table>
-
+    <umb-editor-view>
+        <umb-editor-header
+            name="model.title"
+            hide-icon="true"
+            hide-alias="true"
+            name-locked="true"
+            hide-description="true">
+        </umb-editor-header>
+        <umb-editor-container>
+            <umb-box>
+                <umb-box-content>
+                    <table class="table table-bordered table-condensed">
+                        <thead>
+                            <tr>
+                                <th class="score"><localize key="general_field">Field</localize></th>
+                                <th class="id"><localize key="general_value">Value</localize></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="(key, val) in model.searchResultValues track by key">
+                                <td>{{key}}</td>
+                                <td style="word-break: break-word;">{{val}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </umb-box-content>
+            </umb-box>
+        </umb-editor-container>
+        <umb-editor-footer>
+            <umb-editor-footer-content-right>
+                <umb-button
+                    type="button"
+                    button-style="link"
+                    label-key="general_close"
+                    action="model.close()">
+                </umb-button>
+            </umb-editor-footer-content-right>
+        </umb-editor-footer>
+    </umb-editor-view>
 </div>
