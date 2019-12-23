@@ -49,10 +49,11 @@ namespace Umbraco.Tests.PublishedContent
 
             var logger = Mock.Of<ILogger>();
             var mediaService = Mock.Of<IMediaService>();
+            var mediaFileService = Mock.Of<IMediaFileSystem>();
             var contentTypeBaseServiceProvider = Mock.Of<IContentTypeBaseServiceProvider>();
             var umbracoContextAccessor = Mock.Of<IUmbracoContextAccessor>();
             var imageSourceParser = new HtmlImageSourceParser(umbracoContextAccessor);
-            var pastedImages = new RichTextEditorPastedImages(umbracoContextAccessor, logger, IOHelper, mediaService, contentTypeBaseServiceProvider);
+            var pastedImages = new RichTextEditorPastedImages(umbracoContextAccessor, logger, IOHelper, mediaService, contentTypeBaseServiceProvider, mediaFileService, ShortStringHelper);
             var linkParser = new HtmlLocalLinkParser(umbracoContextAccessor);
             var localizationService = Mock.Of<ILocalizationService>();
 

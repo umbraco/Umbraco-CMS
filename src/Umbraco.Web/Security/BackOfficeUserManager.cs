@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using System.Web;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security.DataProtection;
@@ -13,6 +12,7 @@ using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Net;
+using IPasswordHasher = Microsoft.AspNet.Identity.IPasswordHasher;
 
 namespace Umbraco.Web.Security
 {

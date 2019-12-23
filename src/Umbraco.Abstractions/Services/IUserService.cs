@@ -203,6 +203,8 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IEnumerable{IUser}"/></returns>
         IEnumerable<IUser> GetAllNotInGroup(int groupId);
 
+        IEnumerable<IUser> GetNextUsers(int id, int count);
+
         #region User groups
 
         /// <summary>

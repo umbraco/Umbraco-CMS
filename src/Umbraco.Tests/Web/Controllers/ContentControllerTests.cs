@@ -267,7 +267,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper);
+                    helper,
+                    ShortStringHelper);
 
                 return controller;
             }
@@ -301,7 +302,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper);
+                    helper,
+                    ShortStringHelper);
 
                 return controller;
             }
@@ -343,7 +345,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper);
+                    helper,
+                    ShortStringHelper);
 
                 return controller;
             }
@@ -390,7 +393,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper);
+                    helper,
+                    ShortStringHelper);
 
                 return controller;
             }
@@ -429,7 +433,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper);
+                    helper,
+                    ShortStringHelper);
 
                 return controller;
             }
@@ -474,7 +479,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper);
+                    helper,
+                    ShortStringHelper);
 
                 return controller;
             }

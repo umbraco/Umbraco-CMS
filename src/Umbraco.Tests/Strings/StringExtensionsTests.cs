@@ -228,77 +228,77 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void ToUrlAlias()
         {
-            var output = "JUST-ANYTHING".ToUrlSegment();
+            var output = "JUST-ANYTHING".ToUrlSegment(ShortStringHelper);
             Assert.AreEqual("URL-SEGMENT::JUST-ANYTHING", output);
         }
 
         [Test]
         public void FormatUrl()
         {
-            var output = "JUST-ANYTHING".ToUrlSegment();
+            var output = "JUST-ANYTHING".ToUrlSegment(ShortStringHelper);
             Assert.AreEqual("URL-SEGMENT::JUST-ANYTHING", output);
         }
 
         [Test]
         public void ToUmbracoAlias()
         {
-            var output = "JUST-ANYTHING".ToSafeAlias();
+            var output = "JUST-ANYTHING".ToSafeAlias(ShortStringHelper);
             Assert.AreEqual("SAFE-ALIAS::JUST-ANYTHING", output);
         }
 
         [Test]
         public void ToSafeAlias()
         {
-            var output = "JUST-ANYTHING".ToSafeAlias();
+            var output = "JUST-ANYTHING".ToSafeAlias(ShortStringHelper);
             Assert.AreEqual("SAFE-ALIAS::JUST-ANYTHING", output);
         }
 
         [Test]
         public void ToSafeAliasWithCulture()
         {
-            var output = "JUST-ANYTHING".ToSafeAlias((string)null);
+            var output = "JUST-ANYTHING".ToSafeAlias(ShortStringHelper, (string)null);
             Assert.AreEqual("SAFE-ALIAS-CULTURE::JUST-ANYTHING", output);
         }
 
         [Test]
         public void ToUrlSegment()
         {
-            var output = "JUST-ANYTHING".ToUrlSegment();
+            var output = "JUST-ANYTHING".ToUrlSegment(ShortStringHelper);
             Assert.AreEqual("URL-SEGMENT::JUST-ANYTHING", output);
         }
 
         [Test]
         public void ToUrlSegmentWithCulture()
         {
-            var output = "JUST-ANYTHING".ToUrlSegment((string)null);
+            var output = "JUST-ANYTHING".ToUrlSegment(ShortStringHelper, (string)null);
             Assert.AreEqual("URL-SEGMENT-CULTURE::JUST-ANYTHING", output);
         }
 
         [Test]
         public void ToSafeFileName()
         {
-            var output = "JUST-ANYTHING".ToSafeFileName();
+            var output = "JUST-ANYTHING".ToSafeFileName(ShortStringHelper);
             Assert.AreEqual("SAFE-FILE-NAME::JUST-ANYTHING", output);
         }
 
         [Test]
         public void ToSafeFileNameWithCulture()
         {
-            var output = "JUST-ANYTHING".ToSafeFileName(null);
+            var output = "JUST-ANYTHING".ToSafeFileName(ShortStringHelper, null);
             Assert.AreEqual("SAFE-FILE-NAME-CULTURE::JUST-ANYTHING", output);
         }
 
         [Test]
         public void ConvertCase()
         {
-            var output = "JUST-ANYTHING".ToCleanString(CleanStringType.Unchanged);
+            var output = "JUST-ANYTHING".ToCleanString(ShortStringHelper, CleanStringType.Unchanged);
             Assert.AreEqual("CLEAN-STRING-A::JUST-ANYTHING", output);
         }
 
         [Test]
         public void SplitPascalCasing()
         {
-            var output = "JUST-ANYTHING".SplitPascalCasing();
+            var output = "JUST-ANYTHING".SplitPascalCasing(ShortStringHelper);
             Assert.AreEqual("SPLIT-PASCAL-CASING::JUST-ANYTHING", output);
         }
 

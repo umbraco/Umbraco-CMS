@@ -12,6 +12,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -28,9 +29,21 @@ namespace Umbraco.Web.Editors
     [EnableOverrideAuthorization]
     public class RelationTypeController : BackOfficeNotificationsController
     {
-        public RelationTypeController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+        private readonly IShortStringHelper _shortStringHelper;
+
+        public RelationTypeController(
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoHelper umbracoHelper,
+            IShortStringHelper shortStringHelper)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
+            _shortStringHelper = shortStringHelper;
         }
 
         /// <summary>
@@ -48,7 +61,7 @@ namespace Umbraco.Web.Editors
             }
 
             var display = Mapper.Map<IRelationType, RelationTypeDisplay>(relationType);
-            
+
             return display;
         }
 
@@ -100,7 +113,7 @@ namespace Umbraco.Web.Editors
         /// <returns>A <see cref="HttpResponseMessage"/> containing the persisted relation type's ID.</returns>
         public HttpResponseMessage PostCreate(RelationTypeSave relationType)
         {
-            var relationTypePersisted = new RelationType(relationType.Name, relationType.Name.ToSafeAlias(true), relationType.IsBidirectional, relationType.ChildObjectType, relationType.ParentObjectType);
+            var relationTypePersisted = new RelationType(relationType.Name, relationType.Name.ToSafeAlias(_shortStringHelper, true), relationType.IsBidirectional, relationType.ChildObjectType, relationType.ParentObjectType);
 
             try
             {

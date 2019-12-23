@@ -13,6 +13,7 @@ using Umbraco.Core.Migrations.PostMigrations;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Runtime;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Net;
 using Umbraco.Web.Actions;
@@ -57,6 +58,7 @@ namespace Umbraco.Web.Runtime
             composition.Register<ISessionIdResolver, AspNetSessionIdResolver>();
             composition.Register<IHostingEnvironment, AspNetHostingEnvironment>();
             composition.Register<IBackOfficeInfo, AspNetBackOfficeInfo>();
+            composition.Register<IPasswordHasher, AspNetPasswordHasher>();
 
             composition.RegisterUnique<IHttpContextAccessor, AspNetHttpContextAccessor>(); // required for hybrid accessors
 

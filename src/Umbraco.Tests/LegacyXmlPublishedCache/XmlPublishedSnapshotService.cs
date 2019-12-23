@@ -12,6 +12,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
 using Umbraco.Web.PublishedCache;
@@ -54,6 +55,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             ILogger logger,
             IGlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment,
+            IShortStringHelper shortStringHelper,
             ISiteDomainHelper siteDomainHelper,
             IEntityXmlSerializer entitySerializer,
             MainDom mainDom,
@@ -62,7 +64,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                 publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor,
                 documentRepository, mediaRepository, memberRepository,
                 defaultCultureAccessor,
-                logger, globalSettings, hostingEnvironment, siteDomainHelper, entitySerializer, null, mainDom, testing, enableRepositoryEvents)
+                logger, globalSettings, hostingEnvironment, shortStringHelper, siteDomainHelper, entitySerializer, null, mainDom, testing, enableRepositoryEvents)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
         }
@@ -79,6 +81,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             ILogger logger,
             IGlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment,
+            IShortStringHelper shortStringHelper,
             ISiteDomainHelper siteDomainHelper,
             IEntityXmlSerializer entitySerializer,
             PublishedContentTypeCache contentTypeCache,
@@ -93,7 +96,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
             _xmlStore = new XmlStore(serviceContext.ContentTypeService, serviceContext.ContentService, scopeProvider, _routesCache,
                 _contentTypeCache, publishedSnapshotAccessor, mainDom, testing, enableRepositoryEvents,
-                documentRepository, mediaRepository, memberRepository, globalSettings, entitySerializer, hostingEnvironment);
+                documentRepository, mediaRepository, memberRepository, globalSettings, entitySerializer, hostingEnvironment, shortStringHelper);
 
             _domainService = serviceContext.DomainService;
             _memberService = serviceContext.MemberService;
@@ -152,7 +155,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             return new PublishedSnapshot(
                 new PublishedContentCache(_xmlStore, domainCache, _requestCache, _globalSettings, _contentTypeCache, _routesCache, previewToken),
                 new PublishedMediaCache(_xmlStore, _mediaService, _userService, _requestCache, _contentTypeCache, _entitySerializer, _umbracoContextAccessor),
-                new PublishedMemberCache(_xmlStore, _requestCache, _memberService, _contentTypeCache),
+                new PublishedMemberCache(_xmlStore, _requestCache, _memberService, _contentTypeCache, _userService),
                 domainCache);
         }
 

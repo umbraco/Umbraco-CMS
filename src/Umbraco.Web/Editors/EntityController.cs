@@ -20,6 +20,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.Mapping;
@@ -50,15 +51,28 @@ namespace Umbraco.Web.Editors
     {
         private readonly ITreeService _treeService;
         private readonly UmbracoTreeSearcher _treeSearcher;
+        private readonly IShortStringHelper _shortStringHelper;
         private readonly SearchableTreeCollection _searchableTreeCollection;
 
-        public EntityController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState,
-            ITreeService treeService, UmbracoHelper umbracoHelper, SearchableTreeCollection searchableTreeCollection, UmbracoTreeSearcher treeSearcher)
+        public EntityController(
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            ITreeService treeService,
+            UmbracoHelper umbracoHelper,
+            SearchableTreeCollection searchableTreeCollection,
+            UmbracoTreeSearcher treeSearcher,
+            IShortStringHelper shortStringHelper)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _treeService = treeService;
             _searchableTreeCollection = searchableTreeCollection;
             _treeSearcher = treeSearcher;
+            _shortStringHelper = shortStringHelper;
         }
 
         /// <summary>
@@ -88,7 +102,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public dynamic GetSafeAlias(string value, bool camelCase = true)
         {
-            var returnValue = string.IsNullOrWhiteSpace(value) ? string.Empty : value.ToSafeAlias(camelCase);
+            var returnValue = string.IsNullOrWhiteSpace(value) ? string.Empty : value.ToSafeAlias(_shortStringHelper, camelCase);
             dynamic returnObj = new System.Dynamic.ExpandoObject();
             returnObj.alias = returnValue;
             returnObj.original = value;

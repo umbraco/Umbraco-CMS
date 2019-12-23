@@ -13,6 +13,8 @@ namespace Umbraco.Core.Configuration
         }
 
         public IHostingSettings HostingSettings { get; } = new HostingSettings();
+        public ICoreDebug CoreDebug { get; } = new CoreDebug();
+
         public IUmbracoSettingsSection UmbracoSettings { get; }
 
         public Configs Create(IIOHelper ioHelper)
@@ -26,7 +28,7 @@ namespace Umbraco.Core.Configuration
 
             configs.Add<IUserPasswordConfiguration>(() => new DefaultPasswordConfig());
             configs.Add<IMemberPasswordConfiguration>(() => new DefaultPasswordConfig());
-            configs.Add<ICoreDebug>(() => new CoreDebug());
+            configs.Add<ICoreDebug>(() => CoreDebug);
             configs.Add<IConnectionStrings>(() => new ConnectionStrings());
             configs.AddCoreConfigs(ioHelper);
             return configs;

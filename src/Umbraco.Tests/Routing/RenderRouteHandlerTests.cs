@@ -46,6 +46,7 @@ namespace Umbraco.Tests.Routing
             WebInitialComponent.CreateRoutes(
                 new TestUmbracoContextAccessor(),
                 TestObjects.GetGlobalSettings(),
+                ShortStringHelper,
                 new SurfaceControllerTypeCollection(Enumerable.Empty<Type>()),
                 new UmbracoApiControllerTypeCollection(Enumerable.Empty<Type>()));
         }
@@ -106,7 +107,7 @@ namespace Umbraco.Tests.Routing
             frequest.TemplateModel = template;
 
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
-            var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContextAccessor, Mock.Of<ILogger>()));
+            var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContextAccessor, Mock.Of<ILogger>()), ShortStringHelper);
 
             handler.GetHandlerForRoute(umbracoContext.HttpContext.Request.RequestContext, frequest);
             Assert.AreEqual("RenderMvc", routeData.Values["controller"].ToString());
@@ -155,13 +156,13 @@ namespace Umbraco.Tests.Routing
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     new UmbracoHelper(Mock.Of<IPublishedContent>(), Mock.Of<ITagQuery>(), Mock.Of<ICultureDictionaryFactory>(), Mock.Of<IUmbracoComponentRenderer>(), Mock.Of<IPublishedContentQuery>(), membershipHelper));
-            }));
+            }), ShortStringHelper);
 
             handler.GetHandlerForRoute(umbracoContext.HttpContext.Request.RequestContext, frequest);
             Assert.AreEqual("CustomDocument", routeData.Values["controller"].ToString());
             Assert.AreEqual(
                 //global::umbraco.cms.helpers.Casing.SafeAlias(template.Alias),
-                template.Alias.ToSafeAlias(),
+                template.Alias.ToSafeAlias(ShortStringHelper),
                 routeData.Values["action"].ToString());
         }
 

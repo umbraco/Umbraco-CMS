@@ -76,5 +76,7 @@ namespace Umbraco.Core
         /// Gets the exception that caused the boot to fail.
         /// </summary>
         BootFailedException BootFailedException { get; }
+
+        IMainDom MainDom { get; }
     }
 }

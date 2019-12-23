@@ -58,7 +58,7 @@ namespace Umbraco.Web.Editors
                 return this.ReturnErrorResponse("Name can not be empty");
             }
 
-            var alias = name.ToSafeAlias();
+            var alias = name.ToSafeAlias(_shortStringHelper);
 
             if (_macroService.GetByAlias(alias) != null)
             {

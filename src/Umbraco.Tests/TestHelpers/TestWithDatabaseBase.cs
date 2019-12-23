@@ -269,6 +269,7 @@ namespace Umbraco.Tests.TestHelpers
                 Logger,
                 Factory.GetInstance<IGlobalSettings>(),
                 HostingEnvironment,
+                ShortStringHelper,
                 new SiteDomainHelper(),
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 ContentTypesCache,
@@ -305,7 +306,7 @@ namespace Umbraco.Tests.TestHelpers
             {
                 using (var scope = ScopeProvider.CreateScope())
                 {
-                    var schemaHelper = new DatabaseSchemaCreator(scope.Database, Logger, UmbracoVersion);
+                    var schemaHelper = new DatabaseSchemaCreator(scope.Database, Logger, UmbracoVersion, TestObjects.GetGlobalSettings());
                     //Create the umbraco database and its base data
                     schemaHelper.InitializeDatabaseSchema();
 

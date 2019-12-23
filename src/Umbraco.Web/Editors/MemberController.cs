@@ -31,6 +31,7 @@ using Umbraco.Core.Dictionary;
 using Umbraco.Web.Security;
 using Umbraco.Core.Security;
 using System.Threading.Tasks;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Web.Editors
 {
@@ -43,8 +44,20 @@ namespace Umbraco.Web.Editors
     [OutgoingNoHyphenGuidFormat]
     public class MemberController : ContentControllerBase
     {
-        public MemberController(IMemberPasswordConfiguration passwordConfig, ICultureDictionary cultureDictionary, PropertyEditorCollection propertyEditors, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
-            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        public MemberController(
+            IMemberPasswordConfiguration passwordConfig,
+            ICultureDictionary cultureDictionary,
+            PropertyEditorCollection propertyEditors,
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoHelper umbracoHelper,
+            IShortStringHelper shortStringHelper)
+            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
         {
             _passwordConfig = passwordConfig ?? throw new ArgumentNullException(nameof(passwordConfig));
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
@@ -285,7 +298,7 @@ namespace Umbraco.Web.Editors
                 IsApproved = contentItem.IsApproved
             };
 
-            return member;            
+            return member;
         }
 
         /// <summary>

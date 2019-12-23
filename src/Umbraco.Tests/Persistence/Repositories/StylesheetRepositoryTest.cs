@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private IStylesheetRepository CreateRepository()
         {
-            return new StylesheetRepository(_fileSystems, IOHelper);
+            return new StylesheetRepository(_fileSystems, IOHelper, TestObjects.GetGlobalSettings());
         }
 
         [Test]

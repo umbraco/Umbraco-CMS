@@ -91,7 +91,7 @@ namespace Umbraco.Tests.Persistence
             using (var database = _databaseFactory.CreateDatabase())
             using (var transaction = database.GetTransaction())
             {
-                schemaHelper = new DatabaseSchemaCreator(database, _logger, _umbracoVersion);
+                schemaHelper = new DatabaseSchemaCreator(database, _logger, _umbracoVersion, SettingsForTests.GenerateMockGlobalSettings());
                 schemaHelper.InitializeDatabaseSchema();
                 transaction.Complete();
             }
