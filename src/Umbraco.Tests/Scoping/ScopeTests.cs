@@ -119,8 +119,8 @@ namespace Umbraco.Tests.Scoping
                     Assert.AreSame(scope, ((Scope) nested).ParentScope);
 
                     // it's moved over to call context
-                    var callContextKey = CallContext<Guid>.GetData(ScopeProvider.ScopeItemKey);
-                    Assert.AreNotEqual(Guid.Empty, callContextKey);
+                    var callContextScope = CallContext<IScope>.GetData(ScopeProvider.ScopeItemKey);
+                    Assert.IsNotNull(callContextScope);
 
                     // only if Core.DEBUG_SCOPES are defined
                     //var ccnested = scopeProvider.CallContextObjects[callContextKey];

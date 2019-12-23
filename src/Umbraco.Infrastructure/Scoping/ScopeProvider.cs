@@ -75,24 +75,6 @@ namespace Umbraco.Core.Scoping
 
         #region Context
 
-        // TODO: I don't think this whole thing is necessary anymore since we are using AsyncLocal which
-        // I don't believe has the same odd requirements as the old CallContext! Also see SafeCallContext
-
-        // objects that go into the logical call context better be serializable else they'll eventually
-        // cause issues whenever some cross-AppDomain code executes - could be due to ReSharper running
-        // tests, any other things (see https://msdn.microsoft.com/en-us/library/dn458353(v=vs.110).aspx),
-        // but we don't want to make all of our objects serializable since they are *not* meant to be
-        // used in cross-AppDomain scenario anyways.
-        // in addition, whatever goes into the logical call context is serialized back and forth any
-        // time cross-AppDomain code executes, so if we put an "object" there, we'll can *another*
-        // "object" instance - and so we cannot use a random object as a key.
-        // so what we do is: we register a guid in the call context, and we keep a table mapping those
-        // guids to the actual objects. the guid serializes back and forth without causing any issue,
-        // and we can retrieve the actual objects from the table.
-        // only issue: how are we supposed to clear the table? we can't, really. objects should take
-        // care of de-registering themselves from context.
-        // see https://www.zpqrtbnk.net/posts/putting-things-in-contexts/
-
         private static T GetCallContextObject<T>(string key)
             where T : class, IInstanceIdentifiable
         {
