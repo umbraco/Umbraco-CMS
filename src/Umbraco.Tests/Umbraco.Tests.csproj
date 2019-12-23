@@ -168,6 +168,7 @@
     <Compile Include="Services\PropertyValidationServiceTests.cs" />
     <Compile Include="Templates\HtmlLocalLinkParserTests.cs" />
     <Compile Include="TestHelpers\RandomIdRamDirectory.cs" />
+    <Compile Include="TestHelpers\Stubs\TestUserPasswordConfig.cs" />
     <Compile Include="Testing\Objects\TestDataSource.cs" />
     <Compile Include="Published\PublishedSnapshotTestObjects.cs" />
     <Compile Include="Published\ModelTypeTests.cs" />

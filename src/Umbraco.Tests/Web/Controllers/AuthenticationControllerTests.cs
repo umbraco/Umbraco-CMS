@@ -16,7 +16,6 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Persistence;
@@ -26,6 +25,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.ControllerTesting;
+using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.Editors;
@@ -76,7 +76,7 @@ namespace Umbraco.Tests.Web.Controllers
                 }
                 IOHelper.ForceNotHosted = true;
                 var usersController = new AuthenticationController(
-                    new DefaultPasswordConfig(),
+                    new TestUserPasswordConfig(),
                     Factory.GetInstance<IGlobalSettings>(),
                     umbracoContextAccessor,
                     Factory.GetInstance<ISqlContext>(),
