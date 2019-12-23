@@ -26,7 +26,7 @@ function umbPropEditor(umbPropEditorHelper) {
                 //we'll also maintain the current form name.
                 scope[ctrl[0].$name] = ctrl[0];
 
-                // We will capture a reference to umbProperty in this Directive and parse it on to the Scope, so Property-Editor controllers can use it.
+                // We will capture a reference to umbProperty in this Directive and pass it on to the Scope, so Property-Editor controllers can use it.
                 scope["umbProperty"] = ctrl[1];
 
                 if(!scope.model.alias){
