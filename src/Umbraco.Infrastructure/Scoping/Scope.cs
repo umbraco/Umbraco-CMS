@@ -2,6 +2,7 @@
 using System.Data;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -16,6 +17,8 @@ namespace Umbraco.Core.Scoping
     internal class Scope : IScope
     {
         private readonly ScopeProvider _scopeProvider;
+        private readonly ICoreDebug _coreDebug;
+        private readonly IMediaFileSystem _mediaFileSystem;
         private readonly ILogger _logger;
         private readonly ITypeFinder _typeFinder;
 
@@ -36,7 +39,9 @@ namespace Umbraco.Core.Scoping
 
         // initializes a new scope
         private Scope(ScopeProvider scopeProvider,
-            ILogger logger, ITypeFinder typeFinder, FileSystems fileSystems, Scope parent, ScopeContext scopeContext, bool detachable,
+            ICoreDebug coreDebug,
+            IMediaFileSystem mediaFileSystem,
+            ILogger logger, ITypeFinder typeFinder, FileSystems fileSystems, Scope parent, IScopeContext scopeContext, bool detachable,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             IEventDispatcher eventDispatcher = null,
@@ -45,6 +50,8 @@ namespace Umbraco.Core.Scoping
             bool autoComplete = false)
         {
             _scopeProvider = scopeProvider;
+            _coreDebug = coreDebug;
+            _mediaFileSystem = mediaFileSystem;
             _logger = logger;
             _typeFinder = typeFinder;
 
@@ -111,18 +118,22 @@ namespace Umbraco.Core.Scoping
 
         // initializes a new scope
         public Scope(ScopeProvider scopeProvider,
-            ILogger logger, ITypeFinder typeFinder, FileSystems fileSystems, bool detachable, ScopeContext scopeContext,
+            ICoreDebug coreDebug,
+            IMediaFileSystem mediaFileSystem,
+            ILogger logger, ITypeFinder typeFinder, FileSystems fileSystems, bool detachable, IScopeContext scopeContext,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             IEventDispatcher eventDispatcher = null,
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false)
-            : this(scopeProvider, logger, typeFinder, fileSystems, null, scopeContext, detachable, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete)
+            : this(scopeProvider, coreDebug, mediaFileSystem, logger, typeFinder, fileSystems, null, scopeContext, detachable, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete)
         { }
 
         // initializes a new scope in a nested scopes chain, with its parent
         public Scope(ScopeProvider scopeProvider,
+            ICoreDebug coreDebug,
+            IMediaFileSystem mediaFileSystem,
             ILogger logger, ITypeFinder typeFinder, FileSystems fileSystems, Scope parent,
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
@@ -130,7 +141,7 @@ namespace Umbraco.Core.Scoping
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false)
-            : this(scopeProvider, logger, typeFinder, fileSystems, parent, null, false, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete)
+            : this(scopeProvider, coreDebug, mediaFileSystem, logger, typeFinder, fileSystems, parent, null, false, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete)
         { }
 
         public Guid InstanceId { get; } = Guid.NewGuid();
@@ -194,10 +205,10 @@ namespace Umbraco.Core.Scoping
         public Scope OrigScope { get; set; }
 
         // the original context (when attaching a detachable scope)
-        public ScopeContext OrigContext { get; set; }
+        public IScopeContext OrigContext { get; set; }
 
         // the context (for attaching & detaching only)
-        public ScopeContext Context { get; }
+        public IScopeContext Context { get; }
 
         public IsolationLevel IsolationLevel
         {
@@ -289,7 +300,7 @@ namespace Umbraco.Core.Scoping
             {
                 EnsureNotDisposed();
                 if (ParentScope != null) return ParentScope.Events;
-                return _eventDispatcher ?? (_eventDispatcher = new QueuingEventDispatcher());
+                return _eventDispatcher ?? (_eventDispatcher = new QueuingEventDispatcher(_mediaFileSystem));
             }
         }
 
@@ -484,8 +495,8 @@ namespace Umbraco.Core.Scoping
 
         // caching config
         // true if Umbraco.CoreDebug.LogUncompletedScope appSetting is set to "true"
-        private static bool LogUncompletedScopes => (_logUncompletedScopes
-            ?? (_logUncompletedScopes = Current.Configs.CoreDebug().LogUncompletedScopes)).Value;
+        private bool LogUncompletedScopes => (_logUncompletedScopes
+            ?? (_logUncompletedScopes = _coreDebug.LogUncompletedScopes)).Value;
 
         /// <inheritdoc />
         public void ReadLock(params int[] lockIds) => Database.SqlContext.SqlSyntax.ReadLock(Database, lockIds);

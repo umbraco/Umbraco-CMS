@@ -23,7 +23,6 @@ using Umbraco.Web.Security;
 using Umbraco.Web.Routing;
 using File = System.IO.File;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Hosting;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.Testing;
