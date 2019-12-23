@@ -13,7 +13,7 @@ namespace Umbraco.Tests.Persistence
 {
     [TestFixture]
     [Timeout(60000)]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Serilog)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
     public class LocksTests : TestWithDatabaseBase
     {
         protected override void Initialize()
