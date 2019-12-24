@@ -38,7 +38,9 @@ namespace Umbraco.Tests.Components
             var typeFinder = new TypeFinder(logger);
             var f = new UmbracoDatabaseFactory(logger, new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())), TestHelper.GetConfigs(), TestHelper.DbProviderFactoryCreator, TestHelper.BulkSqlInsertProvider);
             var fs = new FileSystems(mock.Object, logger, TestHelper.IOHelper, SettingsForTests.GenerateMockGlobalSettings());
-            var p = new ScopeProvider(f, fs, logger, typeFinder, NoAppCache.Instance);
+            var coreDebug = Mock.Of<ICoreDebug>();
+            var mediaFileSystem = Mock.Of<IMediaFileSystem>();
+            var p = new ScopeProvider(f, fs, coreDebug, mediaFileSystem, logger, typeFinder, NoAppCache.Instance);
 
             mock.Setup(x => x.GetInstance(typeof (ILogger))).Returns(logger);
             mock.Setup(x => x.GetInstance(typeof (IProfilingLogger))).Returns(new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));

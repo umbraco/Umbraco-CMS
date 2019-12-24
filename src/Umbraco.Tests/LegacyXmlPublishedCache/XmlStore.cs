@@ -46,13 +46,13 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private readonly IGlobalSettings _globalSettings;
         private readonly IEntityXmlSerializer _entitySerializer;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IShortStringHelper _shortStringHelper;
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly PublishedContentTypeCache _contentTypeCache;
         private readonly RoutesCache _routesCache;
         private readonly IContentTypeService _contentTypeService;
         private readonly IContentService _contentService;
         private readonly IScopeProvider _scopeProvider;
-        private readonly IShortStringHelper _shortStringHelper;
 
         private XmlStoreFilePersister _persisterTask;
         private volatile bool _released;

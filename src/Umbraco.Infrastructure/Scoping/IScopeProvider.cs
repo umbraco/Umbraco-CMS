@@ -88,7 +88,7 @@ namespace Umbraco.Core.Scoping
         ISqlContext SqlContext { get; }
 
 #if DEBUG_SCOPES
-        Dictionary<Guid, object> CallContextObjects { get; }
+
         IEnumerable<ScopeInfo> ScopeInfos { get; }
         ScopeInfo GetScopeInfo(IScope scope);
 #endif

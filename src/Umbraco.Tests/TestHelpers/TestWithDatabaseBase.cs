@@ -23,7 +23,6 @@ using Umbraco.Web.Security;
 using Umbraco.Web.Routing;
 using File = System.IO.File;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Hosting;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.Testing;
@@ -307,7 +306,7 @@ namespace Umbraco.Tests.TestHelpers
             {
                 using (var scope = ScopeProvider.CreateScope())
                 {
-                    var schemaHelper = new DatabaseSchemaCreator(scope.Database, Logger, UmbracoVersion);
+                    var schemaHelper = new DatabaseSchemaCreator(scope.Database, Logger, UmbracoVersion, TestObjects.GetGlobalSettings());
                     //Create the umbraco database and its base data
                     schemaHelper.InitializeDatabaseSchema();
 

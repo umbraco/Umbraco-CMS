@@ -39,6 +39,7 @@ namespace Umbraco.Web
             var configFactory = new ConfigsFactory();
 
             var hostingSettings = configFactory.HostingSettings;
+            var coreDebug = configFactory.CoreDebug;
 
             _hostingEnvironment = new AspNetHostingEnvironment(hostingSettings);
             _ioHelper = new IOHelper(_hostingEnvironment);
@@ -46,7 +47,7 @@ namespace Umbraco.Web
 
             _profiler = new LogProfiler(_logger);
 
-            _logger = SerilogLogger.CreateWithDefaultConfiguration(_hostingEnvironment, new AspNetSessionIdResolver(), () => _factory?.GetInstance<IRequestCache>());
+            _logger = SerilogLogger.CreateWithDefaultConfiguration(_hostingEnvironment,  new AspNetSessionIdResolver(), () => _factory?.GetInstance<IRequestCache>(), coreDebug, _ioHelper, new FrameworkMarchal());
             _backOfficeInfo = new AspNetBackOfficeInfo(_configs.Global(), _ioHelper, _configs.Settings(), _logger);
 
             Umbraco.Composing.Current.Logger = _logger;

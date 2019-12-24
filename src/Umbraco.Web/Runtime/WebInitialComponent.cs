@@ -17,6 +17,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Strings;
 using Umbraco.Core.IO;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Install;
 using Umbraco.Web.JavaScript;
 using Umbraco.Web.Mvc;
@@ -37,7 +38,15 @@ namespace Umbraco.Web.Runtime
         private readonly IIOHelper _ioHelper;
         private readonly IShortStringHelper _shortStringHelper;
 
-        public WebInitialComponent(IUmbracoContextAccessor umbracoContextAccessor, SurfaceControllerTypeCollection surfaceControllerTypes, UmbracoApiControllerTypeCollection apiControllerTypes, IHostingSettings hostingSettings, IGlobalSettings globalSettings, IHostingEnvironment hostingEnvironment, IIOHelper ioHelper, IShortStringHelper shortStringHelper)
+        public WebInitialComponent(
+            IUmbracoContextAccessor umbracoContextAccessor,
+            SurfaceControllerTypeCollection surfaceControllerTypes,
+            UmbracoApiControllerTypeCollection apiControllerTypes,
+            IHostingSettings hostingSettings,
+            IGlobalSettings globalSettings,
+            IHostingEnvironment hostingEnvironment,
+            IIOHelper ioHelper,
+            IShortStringHelper shortStringHelper)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _surfaceControllerTypes = surfaceControllerTypes;

@@ -1,6 +1,8 @@
 using System;
 using System.Data.Common;
+using System.Data.SqlServerCe;
 using Umbraco.Core;
+using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -39,6 +41,12 @@ namespace Umbraco.Web
                 default:
                     throw new InvalidOperationException($"Unknown provider name \"{providerName}\"");
             }
+        }
+
+        public void CreateDatabase()
+        {
+            var engine = new SqlCeEngine(DatabaseBuilder.EmbeddedDatabaseConnectionString);
+            engine.CreateDatabase();
         }
     }
 }

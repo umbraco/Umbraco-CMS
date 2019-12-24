@@ -19,7 +19,12 @@ namespace Umbraco.ModelsBuilder.Embedded
         private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
         private readonly IShortStringHelper _shortStringHelper;
 
-        public UmbracoServices(IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService, IPublishedContentTypeFactory publishedContentTypeFactory, IShortStringHelper shortStringHelper)
+        public UmbracoServices(
+            IContentTypeService contentTypeService,
+            IMediaTypeService mediaTypeService,
+            IMemberTypeService memberTypeService,
+            IPublishedContentTypeFactory publishedContentTypeFactory,
+            IShortStringHelper shortStringHelper)
         {
             _contentTypeService = contentTypeService;
             _mediaTypeService = mediaTypeService;

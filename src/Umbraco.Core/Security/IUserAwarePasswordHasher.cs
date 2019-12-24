@@ -8,7 +8,7 @@ namespace Umbraco.Core.Security
     /// </summary>
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TUser"></typeparam>
-    public interface IUserAwarePasswordHasher<in TUser, TKey> : IPasswordHasher
+    public interface IUserAwarePasswordHasher<in TUser, TKey> : Microsoft.AspNet.Identity.IPasswordHasher
         where TUser : class, IUser<TKey>
         where TKey : IEquatable<TKey>
     {

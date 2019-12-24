@@ -15,13 +15,14 @@ namespace Umbraco.Core
         /// Tries to return a value based on a property name for an object but ignores case sensitivity
         /// </summary>
         /// <param name="type"></param>
+        /// <param name="shortStringHelper"></param>
         /// <param name="target"></param>
         /// <param name="memberName"></param>
         /// <returns></returns>
         /// <remarks>
         /// Currently this will only work for ProperCase and camelCase properties, see the TODO below to enable complete case insensitivity
         /// </remarks>
-        internal static Attempt<object> GetMemberIgnoreCase(this Type type, object target, string memberName, IShortStringHelper shortStringHelper)
+        internal static Attempt<object> GetMemberIgnoreCase(this Type type, IShortStringHelper shortStringHelper, object target, string memberName)
         {
             Func<string, Attempt<object>> getMember =
                 memberAlias =>
@@ -58,6 +59,6 @@ namespace Umbraco.Core
 
             return attempt;
         }
-        
+
     }
 }

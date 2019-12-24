@@ -2,7 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
@@ -15,6 +22,24 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class LogController : UmbracoAuthorizedJsonController
     {
+        private readonly IMediaFileSystem _mediaFileSystem;
+
+        public LogController(
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoHelper umbracoHelper,
+            IMediaFileSystem mediaFileSystem,
+            IShortStringHelper shortStringHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
+        {
+            _mediaFileSystem = mediaFileSystem;
+        }
+
         [UmbracoApplicationAuthorize(Core.Constants.Applications.Content, Core.Constants.Applications.Media)]
         public PagedResult<AuditLog> GetPagedEntityLog(int id,
             int pageNumber = 1,
@@ -67,7 +92,7 @@ namespace Umbraco.Web.Editors
             var mappedItems = items.ToList();
             var userIds = mappedItems.Select(x => x.UserId).ToArray();
             var userAvatars = Services.UserService.GetUsersById(userIds)
-                .ToDictionary(x => x.Id, x => x.GetUserAvatarUrls(AppCaches.RuntimeCache));
+                .ToDictionary(x => x.Id, x => x.GetUserAvatarUrls(AppCaches.RuntimeCache, _mediaFileSystem));
             var userNames = Services.UserService.GetUsersById(userIds).ToDictionary(x => x.Id, x => x.Name);
             foreach (var item in mappedItems)
             {

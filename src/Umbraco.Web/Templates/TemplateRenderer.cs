@@ -10,6 +10,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Web.Templates
 {

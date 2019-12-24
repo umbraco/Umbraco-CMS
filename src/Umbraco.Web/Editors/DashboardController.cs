@@ -18,6 +18,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Dashboards;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Services;
 
 namespace Umbraco.Web.Editors
@@ -38,7 +39,18 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Initializes a new instance of the <see cref="DashboardController"/> with all its dependencies.
         /// </summary>
-        public DashboardController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, IDashboardService dashboardService, UmbracoHelper umbracoHelper, IUmbracoVersion umbracoVersion, IShortStringHelper shortStringHelper)
+        public DashboardController(
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            IDashboardService dashboardService,
+            UmbracoHelper umbracoHelper,
+            IUmbracoVersion umbracoVersion,
+            IShortStringHelper shortStringHelper)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _dashboardService = dashboardService;
@@ -158,7 +170,7 @@ namespace Umbraco.Web.Editors
 
 
             //Make remote call to fetch videos or remote dashboard feed data
-            var key = $"umbraco-XML-feed-{site}-{url.ToCleanString(_shortStringHelper, Core.Strings.CleanStringType.UrlSegment)}";
+            var key = $"umbraco-XML-feed-{site}-{url.ToCleanString(_shortStringHelper, CleanStringType.UrlSegment)}";
 
             var content = AppCaches.RuntimeCache.GetCacheItem<string>(key);
             var result = string.Empty;

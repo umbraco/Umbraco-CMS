@@ -337,7 +337,7 @@ namespace Umbraco.Tests.Scoping
         {
             var counter = 0;
             IScope ambientScope = null;
-            ScopeContext ambientContext = null;
+            IScopeContext ambientContext = null;
             Guid value = Guid.Empty;
 
             var scopeProvider = _testObjects.GetScopeProvider(Mock.Of<ILogger>()) as ScopeProvider;

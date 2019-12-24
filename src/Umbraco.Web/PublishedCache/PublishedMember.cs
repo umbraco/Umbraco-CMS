@@ -5,6 +5,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 
 namespace Umbraco.Web.PublishedCache
@@ -18,14 +19,17 @@ namespace Umbraco.Web.PublishedCache
         private readonly IMembershipUser _membershipUser;
         private readonly IPublishedProperty[] _properties;
         private readonly IPublishedContentType _publishedMemberType;
+        private readonly IUserService _userService;
 
         public PublishedMember(
             IMember member,
-            IPublishedContentType publishedMemberType)
+            IPublishedContentType publishedMemberType,
+            IUserService userService)
         {
             _member = member ?? throw new ArgumentNullException(nameof(member));
             _membershipUser = member;
             _publishedMemberType = publishedMemberType ?? throw new ArgumentNullException(nameof(publishedMemberType));
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
 
             // RawValueProperty is used for two things here
             // - for the 'map properties' thing that we should really get rid of
@@ -136,11 +140,9 @@ namespace Umbraco.Web.PublishedCache
 
         public override string UrlSegment => throw new NotSupportedException();
 
-        // TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
-        public override string WriterName => _member.GetCreatorProfile().Name;
+        public override string WriterName => _member.GetCreatorProfile(_userService).Name;
 
-        // TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
-        public override string CreatorName => _member.GetCreatorProfile().Name;
+        public override string CreatorName => _member.GetCreatorProfile(_userService).Name;
 
         public override int WriterId => _member.CreatorId;
 

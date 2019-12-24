@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Models.ContentEditing;
@@ -28,10 +29,11 @@ namespace Umbraco.Web.Models.Mapping
         private readonly ActionCollection _actions;
         private readonly AppCaches _appCaches;
         private readonly IGlobalSettings _globalSettings;
+        private readonly IMediaFileSystem _mediaFileSystem;
         private readonly IShortStringHelper _shortStringHelper;
 
         public UserMapDefinition(ILocalizedTextService textService, IUserService userService, IEntityService entityService, ISectionService sectionService,
-            AppCaches appCaches, ActionCollection actions, IGlobalSettings globalSettings, IShortStringHelper shortStringHelper)
+            AppCaches appCaches, ActionCollection actions, IGlobalSettings globalSettings, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper)
         {
             _sectionService = sectionService;
             _entityService = entityService;
@@ -40,6 +42,7 @@ namespace Umbraco.Web.Models.Mapping
             _actions = actions;
             _appCaches = appCaches;
             _globalSettings = globalSettings;
+            _mediaFileSystem = mediaFileSystem;
             _shortStringHelper = shortStringHelper;
         }
 
@@ -276,7 +279,7 @@ namespace Umbraco.Web.Models.Mapping
         private void Map(IUser source, UserDisplay target, MapperContext context)
         {
             target.AvailableCultures = _textService.GetSupportedCultures().ToDictionary(x => x.Name, x => x.DisplayName);
-            target.Avatars = source.GetUserAvatarUrls(_appCaches.RuntimeCache);
+            target.Avatars = source.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileSystem);
             target.CalculatedStartContentIds = GetStartNodes(source.CalculateContentStartNodeIds(_entityService), UmbracoObjectTypes.Document, "content/contentRoot", context);
             target.CalculatedStartMediaIds = GetStartNodes(source.CalculateMediaStartNodeIds(_entityService), UmbracoObjectTypes.Media, "media/mediaRoot", context);
             target.CreateDate = source.CreateDate;
@@ -307,7 +310,7 @@ namespace Umbraco.Web.Models.Mapping
             //Loading in the user avatar's requires an external request if they don't have a local file avatar, this means that initial load of paging may incur a cost
             //Alternatively, if this is annoying the back office UI would need to be updated to request the avatars for the list of users separately so it doesn't look
             //like the load time is waiting.
-            target.Avatars = source.GetUserAvatarUrls(_appCaches.RuntimeCache);
+            target.Avatars = source.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileSystem);
             target.Culture = source.GetUserCulture(_textService, _globalSettings).ToString();
             target.Email = source.Email;
             target.EmailHash = source.Email.ToLowerInvariant().Trim().GenerateHash();
@@ -326,7 +329,7 @@ namespace Umbraco.Web.Models.Mapping
         private void Map(IUser source, UserDetail target, MapperContext context)
         {
             target.AllowedSections = source.AllowedSections;
-            target.Avatars = source.GetUserAvatarUrls(_appCaches.RuntimeCache);
+            target.Avatars = source.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileSystem);
             target.Culture = source.GetUserCulture(_textService, _globalSettings).ToString();
             target.Email = source.Email;
             target.EmailHash = source.Email.ToLowerInvariant().Trim().GenerateHash();

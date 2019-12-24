@@ -11,6 +11,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Web.Features;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
+using Umbraco.Core.Strings;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Mvc
@@ -26,9 +27,9 @@ namespace Umbraco.Web.Mvc
         }
 
         private readonly IControllerFactory _controllerFactory;
+        private readonly IShortStringHelper _shortStringHelper;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly UmbracoContext _umbracoContext;
-        private readonly IShortStringHelper _shortStringHelper;
 
         public RenderRouteHandler(IUmbracoContextAccessor umbracoContextAccessor, IControllerFactory controllerFactory, IShortStringHelper shortStringHelper)
         {

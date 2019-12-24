@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Editors;
@@ -76,8 +77,8 @@ namespace Umbraco.Web.Macros
         /// <param name="content">The content.</param>
         /// <param name="variationContextAccessor"></param>
         /// <remarks>This is for <see cref="MacroRenderingController"/> usage only.</remarks>
-        internal PublishedContentHashtableConverter(IContent content, IVariationContextAccessor variationContextAccessor, IShortStringHelper shortStringHelper)
-            : this(new PagePublishedContent(content, variationContextAccessor, shortStringHelper))
+        internal PublishedContentHashtableConverter(IContent content, IVariationContextAccessor variationContextAccessor, IUserService userService, IShortStringHelper shortStringHelper)
+            : this(new PagePublishedContent(content, variationContextAccessor, userService, shortStringHelper))
         { }
 
         #endregion
@@ -193,16 +194,17 @@ namespace Umbraco.Web.Macros
                 Id = id;
             }
 
-            public PagePublishedContent(IContent inner, IVariationContextAccessor variationContextAccessor, IShortStringHelper shortStringHelper)
+            public PagePublishedContent(IContent inner, IVariationContextAccessor variationContextAccessor, IUserService userService, IShortStringHelper shortStringHelper)
             {
                 _inner = inner ?? throw new ArgumentNullException(nameof(inner));
                 _variationContextAccessor = variationContextAccessor;
                 _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
+
                 Id = _inner.Id;
                 Key = _inner.Key;
 
-                CreatorName = _inner.GetCreatorProfile()?.Name;
-                WriterName = _inner.GetWriterProfile()?.Name;
+                CreatorName = _inner.GetCreatorProfile(userService)?.Name;
+                WriterName = _inner.GetWriterProfile(userService)?.Name;
 
                 // TODO: inject
                 var contentType = Current.Services.ContentTypeBaseServices.GetContentTypeOf(_inner);

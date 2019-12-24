@@ -9,5 +9,6 @@ namespace Umbraco.Core.Persistence
         DbProviderFactory CreateFactory();
         DbProviderFactory CreateFactory(string providerName);
         ISqlSyntaxProvider GetSqlSyntaxProvider(string providerName);
+        void CreateDatabase();
     }
 }

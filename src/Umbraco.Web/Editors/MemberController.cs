@@ -31,6 +31,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Web.Editors
 {
@@ -43,7 +44,19 @@ namespace Umbraco.Web.Editors
     [OutgoingNoHyphenGuidFormat]
     public class MemberController : ContentControllerBase
     {
-        public MemberController(IMemberPasswordConfiguration passwordConfig, ICultureDictionary cultureDictionary, PropertyEditorCollection propertyEditors, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IShortStringHelper shortStringHelper)
+        public MemberController(
+            IMemberPasswordConfiguration passwordConfig,
+            ICultureDictionary cultureDictionary,
+            PropertyEditorCollection propertyEditors,
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoHelper umbracoHelper,
+            IShortStringHelper shortStringHelper)
             : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
         {
             _passwordConfig = passwordConfig ?? throw new ArgumentNullException(nameof(passwordConfig));
@@ -285,7 +298,7 @@ namespace Umbraco.Web.Editors
                 IsApproved = contentItem.IsApproved
             };
 
-            return member;            
+            return member;
         }
 
         /// <summary>

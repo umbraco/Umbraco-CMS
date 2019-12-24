@@ -20,13 +20,14 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
     internal class ModelsBuilderComponent : IComponent
     {
         private readonly IModelsBuilderConfig _config;
+        private readonly IShortStringHelper _shortStringHelper;
         private readonly LiveModelsProvider _liveModelsProvider;
         private readonly OutOfDateModelsStatus _outOfDateModels;
-        private readonly IShortStringHelper _shortStringHelper;
 
-        public ModelsBuilderComponent(IModelsBuilderConfig config, LiveModelsProvider liveModelsProvider, OutOfDateModelsStatus outOfDateModels, IShortStringHelper shortStringHelper)
+        public ModelsBuilderComponent(IModelsBuilderConfig config, IShortStringHelper shortStringHelper, LiveModelsProvider liveModelsProvider, OutOfDateModelsStatus outOfDateModels)
         {
             _config = config;
+            _shortStringHelper = shortStringHelper;
             _liveModelsProvider = liveModelsProvider;
             _outOfDateModels = outOfDateModels;
             _shortStringHelper = shortStringHelper;

@@ -138,7 +138,7 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void ValidateUmbracoPlan()
         {
-            var plan = new UmbracoPlan(TestHelper.GetUmbracoVersion());
+            var plan = new UmbracoPlan(TestHelper.GetUmbracoVersion(), SettingsForTests.GenerateMockGlobalSettings());
             plan.Validate();
             Console.WriteLine(plan.FinalState);
             Assert.IsFalse(plan.FinalState.IsNullOrWhiteSpace());
