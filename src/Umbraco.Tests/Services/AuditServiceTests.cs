@@ -16,7 +16,7 @@ namespace Umbraco.Tests.Services
         public void CanCrudAuditEntry()
         {
             var yesterday = DateTime.UtcNow.AddDays(-1);
-            var entry = ServiceContext.AuditService.Write(123, "user 123, bob@example.com", null, yesterday, 456, "user 456, alice@example.com", "umbraco/user", "change property whatever value");
+            var entry = AuditService.Write(123, "user 123, bob@example.com", null, yesterday, 456, "user 456, alice@example.com", "umbraco/user", "change property whatever value");
             Assert.AreEqual(123, entry.PerformingUserId);
             Assert.AreEqual("user 123, bob@example.com", entry.PerformingDetails);
             Assert.AreEqual(yesterday, entry.EventDateUtc);
@@ -25,7 +25,7 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("umbraco/user", entry.EventType);
             Assert.AreEqual("change property whatever value", entry.EventDetails);
 
-            var entries = ((AuditService)ServiceContext.AuditService).GetAll().ToArray();
+            var entries = ((AuditService)AuditService).GetAll().ToArray();
             Assert.IsNotNull(entries);
             Assert.AreEqual(1, entries.Length);
             Assert.AreEqual(123, entries[0].PerformingUserId);
@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Services
             for (var i = 0; i < 10; i++)
             {
                 yesterday = yesterday.AddMinutes(1);
-                entry = ServiceContext.AuditService.Write(123 + i, "user 123, bob@example.com", null, yesterday, 456 + i, "user 456, alice@example.com", "umbraco/user", "change property whatever value");
+                entry = AuditService.Write(123 + i, "user 123, bob@example.com", null, yesterday, 456 + i, "user 456, alice@example.com", "umbraco/user", "change property whatever value");
             }
 
             //
@@ -42,7 +42,7 @@ namespace Umbraco.Tests.Services
             // page 2 contains 123+5, 123+4
             // ...
 
-            entries = ((AuditService)ServiceContext.AuditService).GetPage(2, 2, out var count).ToArray();
+            entries = ((AuditService)AuditService).GetPage(2, 2, out var count).ToArray();
 
             Assert.AreEqual(2, entries.Length);
 
@@ -58,10 +58,10 @@ namespace Umbraco.Tests.Services
             for (var i = 0; i < 10; i++)
             {
                 yesterday = yesterday.AddMinutes(1);
-                ServiceContext.AuditService.Add(AuditType.Unpublish, -1, 33, "", "blah");
+                AuditService.Add(AuditType.Unpublish, -1, 33, "", "blah");
             }
 
-            var logs = ServiceContext.AuditService.GetUserLogs(-1, AuditType.Unpublish);
+            var logs = AuditService.GetUserLogs(-1, AuditType.Unpublish);
         }
     }
 }

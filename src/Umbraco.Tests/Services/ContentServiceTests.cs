@@ -1024,7 +1024,7 @@ namespace Umbraco.Tests.Services
             content.SetCultureName("content-fr", langFr.IsoCode);
             var published = ServiceContext.ContentService.SaveAndPublish(content, langFr.IsoCode);
             //audit log will only show that french was published
-            var lastLog = ServiceContext.AuditService.GetLogs(content.Id).Last();
+            var lastLog = AuditService.GetLogs(content.Id).Last();
             Assert.AreEqual($"Published languages: French (France)", lastLog.Comment);
 
             //re-get
@@ -1032,7 +1032,7 @@ namespace Umbraco.Tests.Services
             content.SetCultureName("content-en", langUk.IsoCode);
             published = ServiceContext.ContentService.SaveAndPublish(content, langUk.IsoCode);
             //audit log will only show that english was published
-            lastLog = ServiceContext.AuditService.GetLogs(content.Id).Last();
+            lastLog = AuditService.GetLogs(content.Id).Last();
             Assert.AreEqual($"Published languages: English (United Kingdom)", lastLog.Comment);
         }
 
@@ -1061,7 +1061,7 @@ namespace Umbraco.Tests.Services
             content = ServiceContext.ContentService.GetById(content.Id);
             var unpublished = ServiceContext.ContentService.Unpublish(content, langFr.IsoCode);
             //audit log will only show that french was unpublished
-            var lastLog = ServiceContext.AuditService.GetLogs(content.Id).Last();
+            var lastLog = AuditService.GetLogs(content.Id).Last();
             Assert.AreEqual($"Unpublished languages: French (France)", lastLog.Comment);
 
             //re-get
@@ -1069,7 +1069,7 @@ namespace Umbraco.Tests.Services
             content.SetCultureName("content-en", langGB.IsoCode);
             unpublished = ServiceContext.ContentService.Unpublish(content, langGB.IsoCode);
             //audit log will only show that english was published
-            var logs = ServiceContext.AuditService.GetLogs(content.Id).ToList();
+            var logs = AuditService.GetLogs(content.Id).ToList();
             Assert.AreEqual($"Unpublished languages: English (United Kingdom)", logs[logs.Count - 2].Comment);
             Assert.AreEqual($"Unpublished (mandatory language unpublished)", logs[logs.Count - 1].Comment);
         }
