@@ -30,6 +30,7 @@ namespace Umbraco.Web.Editors
     public class RelationTypeController : BackOfficeNotificationsController
     {
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IRelationService _relationService;
 
         public RelationTypeController(
             IGlobalSettings globalSettings,
@@ -40,10 +41,12 @@ namespace Umbraco.Web.Editors
             IProfilingLogger logger,
             IRuntimeState runtimeState,
             UmbracoHelper umbracoHelper,
-            IShortStringHelper shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IRelationService relationService)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _shortStringHelper = shortStringHelper;
+            _relationService = relationService;
         }
 
         /// <summary>
@@ -53,7 +56,7 @@ namespace Umbraco.Web.Editors
         /// <returns>Returns the <see cref="RelationTypeDisplay"/>.</returns>
         public RelationTypeDisplay GetById(int id)
         {
-            var relationType = Services.RelationService.GetRelationTypeById(id);
+            var relationType = _relationService.GetRelationTypeById(id);
 
             if (relationType == null)
             {
@@ -74,7 +77,7 @@ namespace Umbraco.Web.Editors
             }
 
             // Ordering do we need to pass through?
-            var relations = Services.RelationService.GetPagedByRelationTypeId(id, pageNumber -1, pageSize, out long totalRecords);
+            var relations = _relationService.GetPagedByRelationTypeId(id, pageNumber -1, pageSize, out long totalRecords);
 
             return new PagedResult<RelationDisplay>(totalRecords, pageNumber, pageSize)
             {
@@ -117,7 +120,7 @@ namespace Umbraco.Web.Editors
 
             try
             {
-                Services.RelationService.Save(relationTypePersisted);
+                _relationService.Save(relationTypePersisted);
 
                 return Request.CreateResponse(HttpStatusCode.OK, relationTypePersisted.Id);
             }
@@ -135,7 +138,7 @@ namespace Umbraco.Web.Editors
         /// <returns>A display object containing the updated relation type.</returns>
         public RelationTypeDisplay PostSave(RelationTypeSave relationType)
         {
-            var relationTypePersisted = Services.RelationService.GetRelationTypeById(relationType.Key);
+            var relationTypePersisted = _relationService.GetRelationTypeById(relationType.Key);
 
             if (relationTypePersisted == null)
             {
@@ -146,7 +149,7 @@ namespace Umbraco.Web.Editors
 
             try
             {
-                Services.RelationService.Save(relationTypePersisted);
+                _relationService.Save(relationTypePersisted);
                 var display = Mapper.Map<RelationTypeDisplay>(relationTypePersisted);
                 display.AddSuccessNotification("Relation type saved", "");
 
@@ -168,12 +171,12 @@ namespace Umbraco.Web.Editors
         [HttpDelete]
         public HttpResponseMessage DeleteById(int id)
         {
-            var relationType = Services.RelationService.GetRelationTypeById(id);
+            var relationType = _relationService.GetRelationTypeById(id);
 
             if(relationType == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            Services.RelationService.Delete(relationType);
+            _relationService.Delete(relationType);
 
             return Request.CreateResponse(HttpStatusCode.OK);
         }

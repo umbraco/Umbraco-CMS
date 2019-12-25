@@ -117,6 +117,9 @@ namespace Umbraco.Tests.Testing
         protected IPasswordHasher PasswordHasher => Factory.GetInstance<IPasswordHasher>();
         protected Lazy<PropertyEditorCollection> PropertyEditorCollection => new Lazy<PropertyEditorCollection>(() => Factory.GetInstance<PropertyEditorCollection>());
         protected ILocalizationService LocalizationService => Factory.GetInstance<ILocalizationService>();
+
+        protected IRelationService RelationService => Factory.GetInstance<IRelationService>();
+
         protected ILocalizedTextService LocalizedTextService  { get; private set; }
         protected IShortStringHelper ShortStringHelper => Factory?.GetInstance<IShortStringHelper>() ?? TestHelper.ShortStringHelper;
         protected IUmbracoVersion UmbracoVersion { get; private set; }

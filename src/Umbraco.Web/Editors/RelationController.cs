@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
@@ -16,15 +17,22 @@ namespace Umbraco.Web.Editors
     [UmbracoApplicationAuthorize(Constants.Applications.Content)]
     public class RelationController : UmbracoAuthorizedJsonController
     {
+        private readonly IRelationService _relationService;
+
+        public RelationController(IRelationService relationService)
+        {
+            _relationService = relationService;
+        }
+
         public RelationDisplay GetById(int id)
         {
-            return Mapper.Map<IRelation, RelationDisplay>(Services.RelationService.GetById(id));
+            return Mapper.Map<IRelation, RelationDisplay>(_relationService.GetById(id));
         }
 
         //[EnsureUserPermissionForContent("childId")]
         public IEnumerable<RelationDisplay> GetByChildId(int childId, string relationTypeAlias = "")
         {
-            var relations = Services.RelationService.GetByChildId(childId).ToArray();
+            var relations = _relationService.GetByChildId(childId).ToArray();
 
             if (relations.Any() == false)
             {
@@ -45,14 +53,14 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public HttpResponseMessage DeleteById(int id)
         {
-            var foundRelation = Services.RelationService.GetById(id);
+            var foundRelation = _relationService.GetById(id);
 
             if (foundRelation == null)
             {
                 return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No relation found with the specified id");
             }
 
-            Services.RelationService.Delete(foundRelation);
+            _relationService.Delete(foundRelation);
 
             return Request.CreateResponse(HttpStatusCode.OK);
         }

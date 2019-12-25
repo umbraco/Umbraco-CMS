@@ -219,8 +219,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             ServiceContext.MediaTypeService.Save(imageType);
             var media = MockedMedia.CreateMediaImage(imageType, -1);
             ServiceContext.MediaService.Save(media);
-            var relType = ServiceContext.RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMediaAlias);
-            ServiceContext.RelationService.Relate(media.Id, media.Id, relType);
+            var relType = RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMediaAlias);
+            RelationService.Relate(media.Id, media.Id, relType);
 
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
@@ -309,16 +309,16 @@ namespace Umbraco.Tests.Persistence.Repositories
             createdMembers = MockedMember.CreateSimpleMember(memberType, 10).ToList();
             ServiceContext.MemberService.Save(createdMembers);
 
-            var relType = ServiceContext.RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMediaAlias);
+            var relType = RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMediaAlias);
 
             // Relate content to media
             foreach (var content in createdContent)
                 foreach (var media in createdMedia)
-                    ServiceContext.RelationService.Relate(content.Id, media.Id, relType);
+                    RelationService.Relate(content.Id, media.Id, relType);
             // Relate members to media
             foreach (var member in createdMembers)
                 foreach (var media in createdMedia)
-                    ServiceContext.RelationService.Relate(member.Id, media.Id, relType);
+                    RelationService.Relate(member.Id, media.Id, relType);
         }
 
         [Test]

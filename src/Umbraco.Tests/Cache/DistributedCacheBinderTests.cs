@@ -111,11 +111,11 @@ namespace Umbraco.Tests.Cache
                 new EventDefinition<IPublicAccessService, SaveEventArgs<PublicAccessEntry>>(null, serviceContext.PublicAccessService, new SaveEventArgs<PublicAccessEntry>(Enumerable.Empty<PublicAccessEntry>())),
                 new EventDefinition<IPublicAccessService, DeleteEventArgs<PublicAccessEntry>>(null, serviceContext.PublicAccessService, new DeleteEventArgs<PublicAccessEntry>(Enumerable.Empty<PublicAccessEntry>())),
 
-                new EventDefinition<IRelationService, SaveEventArgs<IRelationType>>(null, serviceContext.RelationService, new SaveEventArgs<IRelationType>(Enumerable.Empty<IRelationType>())),
-                new EventDefinition<IRelationService, DeleteEventArgs<IRelationType>>(null, serviceContext.RelationService, new DeleteEventArgs<IRelationType>(Enumerable.Empty<IRelationType>())),
+                new EventDefinition<IRelationService, SaveEventArgs<IRelationType>>(null, RelationService, new SaveEventArgs<IRelationType>(Enumerable.Empty<IRelationType>())),
+                new EventDefinition<IRelationService, DeleteEventArgs<IRelationType>>(null, RelationService, new DeleteEventArgs<IRelationType>(Enumerable.Empty<IRelationType>())),
 
-                new EventDefinition<IRelationService, SaveEventArgs<IRelationType>>(null, serviceContext.RelationService, new SaveEventArgs<IRelationType>(Enumerable.Empty<IRelationType>())),
-                new EventDefinition<IRelationService, DeleteEventArgs<IRelationType>>(null, serviceContext.RelationService, new DeleteEventArgs<IRelationType>(Enumerable.Empty<IRelationType>())),
+                new EventDefinition<IRelationService, SaveEventArgs<IRelationType>>(null, RelationService, new SaveEventArgs<IRelationType>(Enumerable.Empty<IRelationType>())),
+                new EventDefinition<IRelationService, DeleteEventArgs<IRelationType>>(null, RelationService, new DeleteEventArgs<IRelationType>(Enumerable.Empty<IRelationType>())),
             };
 
             var ok = true;

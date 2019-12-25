@@ -51,6 +51,8 @@ namespace Umbraco.Web.Editors
     [MediaControllerControllerConfiguration]
     public class MediaController : ContentControllerBase
     {
+        private readonly IRelationService _relationService;
+
         public MediaController(
             ICultureDictionary cultureDictionary,
             PropertyEditorCollection propertyEditors,
@@ -63,11 +65,13 @@ namespace Umbraco.Web.Editors
             IRuntimeState runtimeState,
             UmbracoHelper umbracoHelper,
             IMediaFileSystem mediaFileSystem,
-            IShortStringHelper shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IRelationService relationService)
             : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _mediaFileSystem = mediaFileSystem;
+            _relationService = relationService;
         }
 
         /// <summary>
@@ -971,7 +975,7 @@ namespace Umbraco.Web.Editors
             var objectType = ObjectTypes.GetUmbracoObjectType(entityType);
             var udiType = ObjectTypes.GetUdiType(objectType);
 
-            var relations = Services.RelationService.GetPagedParentEntitiesByChildId(id, pageNumber - 1, pageSize, out var totalRecords, objectType);
+            var relations = _relationService.GetPagedParentEntitiesByChildId(id, pageNumber - 1, pageSize, out var totalRecords, objectType);
 
             return new PagedResult<EntityBasic>(totalRecords, pageNumber, pageSize)
             {

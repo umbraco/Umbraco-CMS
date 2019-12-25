@@ -479,7 +479,7 @@ namespace Umbraco.Tests.Services
 
             ServiceContext.ContentService.Save(c2);
 
-            var relations = ServiceContext.RelationService.GetByParentId(c2.Id).ToList();
+            var relations = RelationService.GetByParentId(c2.Id).ToList();
             Assert.AreEqual(3, relations.Count);
             Assert.AreEqual(Constants.Conventions.RelationTypes.RelatedMediaAlias, relations[0].RelationType.Alias);
             Assert.AreEqual(m1.Id, relations[0].ChildId);
@@ -1819,8 +1819,8 @@ namespace Umbraco.Tests.Services
             admin.StartContentIds = new[] {content1.Id};
             ServiceContext.UserService.Save(admin);
 
-            ServiceContext.RelationService.Save(new RelationType("test", "test", false, Constants.ObjectTypes.Document, Constants.ObjectTypes.Document));
-            Assert.IsNotNull(ServiceContext.RelationService.Relate(content1, content2, "test"));
+            RelationService.Save(new RelationType("test", "test", false, Constants.ObjectTypes.Document, Constants.ObjectTypes.Document));
+            Assert.IsNotNull(RelationService.Relate(content1, content2, "test"));
 
             ServiceContext.PublicAccessService.Save(new PublicAccessEntry(content1, content2, content2, new List<PublicAccessRule>
             {

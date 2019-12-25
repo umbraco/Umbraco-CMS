@@ -42,20 +42,20 @@ namespace Umbraco.Tests.Services
                 createdMedia.Add(c1);
             }
 
-            var relType = ServiceContext.RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMediaAlias);
+            var relType = RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMediaAlias);
 
             // Relate content to media
             foreach (var content in createdContent)
                 foreach (var media in createdMedia)
-                    ServiceContext.RelationService.Relate(content.Id, media.Id, relType);
+                    RelationService.Relate(content.Id, media.Id, relType);
 
-            var paged = ServiceContext.RelationService.GetPagedByRelationTypeId(relType.Id, 0, 51, out var totalRecs).ToList();
+            var paged = RelationService.GetPagedByRelationTypeId(relType.Id, 0, 51, out var totalRecs).ToList();
 
             Assert.AreEqual(100, totalRecs);
             Assert.AreEqual(51, paged.Count);
 
             //next page
-            paged.AddRange(ServiceContext.RelationService.GetPagedByRelationTypeId(relType.Id, 1, 51, out totalRecs));
+            paged.AddRange(RelationService.GetPagedByRelationTypeId(relType.Id, 1, 51, out totalRecs));
 
             Assert.AreEqual(100, totalRecs);
             Assert.AreEqual(100, paged.Count);
@@ -89,23 +89,23 @@ namespace Umbraco.Tests.Services
             for (var i = 0; i < 6; i++)
                 createContentWithMediaRefs(); //create 6 content items referencing the same media
 
-            var relations = ServiceContext.RelationService.GetByChildId(m1.Id, Constants.Conventions.RelationTypes.RelatedMediaAlias).ToList();
+            var relations = RelationService.GetByChildId(m1.Id, Constants.Conventions.RelationTypes.RelatedMediaAlias).ToList();
             Assert.AreEqual(6, relations.Count);
 
-            var entities = ServiceContext.RelationService.GetParentEntitiesFromRelations(relations).ToList();
+            var entities = RelationService.GetParentEntitiesFromRelations(relations).ToList();
             Assert.AreEqual(6, entities.Count);
         }
 
         [Test]
         public void Can_Create_RelationType_Without_Name()
         {
-            var rs = ServiceContext.RelationService;
+            var rs = RelationService;
             IRelationType rt = new RelationType("Test", "repeatedEventOccurence", false, Constants.ObjectTypes.Document, Constants.ObjectTypes.Media);
 
             Assert.DoesNotThrow(() => rs.Save(rt));
 
             //re-get
-            rt = ServiceContext.RelationService.GetRelationTypeById(rt.Id);
+            rt = RelationService.GetRelationTypeById(rt.Id);
 
             Assert.AreEqual("Test", rt.Name);
             Assert.AreEqual("repeatedEventOccurence", rt.Alias);
@@ -117,13 +117,13 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Create_Relation_Type_Without_Object_Types()
         {
-            var rs = ServiceContext.RelationService;
+            var rs = RelationService;
             IRelationType rt = new RelationType("repeatedEventOccurence", "repeatedEventOccurence", false, null, null);
 
             Assert.DoesNotThrow(() => rs.Save(rt));
 
             //re-get
-            rt = ServiceContext.RelationService.GetRelationTypeById(rt.Id);
+            rt = RelationService.GetRelationTypeById(rt.Id);
 
             Assert.IsNull(rt.ChildObjectType);
             Assert.IsNull(rt.ParentObjectType);
@@ -144,7 +144,7 @@ namespace Umbraco.Tests.Services
             var r = CreateAndSaveRelation("Test", "test");
 
             // re-get
-            r = ServiceContext.RelationService.GetById(r.Id);
+            r = RelationService.GetById(r.Id);
 
             Assert.AreEqual(Constants.ObjectTypes.Document, r.ParentObjectType);
             Assert.AreEqual(Constants.ObjectTypes.Media, r.ChildObjectType);
@@ -153,13 +153,13 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Insert_Bulk_Relations()
         {
-            var rs = ServiceContext.RelationService;
+            var rs = RelationService;
 
             var newRelations = CreateRelations(10);
 
             Assert.IsTrue(newRelations.All(x => !x.HasIdentity));
 
-            ServiceContext.RelationService.Save(newRelations);
+            RelationService.Save(newRelations);
 
             Assert.IsTrue(newRelations.All(x => x.HasIdentity));
         }
@@ -167,7 +167,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Update_Bulk_Relations()
         {
-            var rs = ServiceContext.RelationService;
+            var rs = RelationService;
 
             var date = DateTime.Now.AddDays(-10);
             var newRelations = CreateRelations(10);
@@ -178,7 +178,7 @@ namespace Umbraco.Tests.Services
             }   
 
             //insert
-            ServiceContext.RelationService.Save(newRelations);
+            RelationService.Save(newRelations);
             Assert.IsTrue(newRelations.All(x => x.UpdateDate == date));
 
             var newDate = DateTime.Now.AddDays(-5);
@@ -186,13 +186,13 @@ namespace Umbraco.Tests.Services
                 r.UpdateDate = newDate;
 
             //update
-            ServiceContext.RelationService.Save(newRelations);
+            RelationService.Save(newRelations);
             Assert.IsTrue(newRelations.All(x => x.UpdateDate == newDate));
         }
 
         private IRelation CreateAndSaveRelation(string name, string alias)
         {
-            var rs = ServiceContext.RelationService;
+            var rs = RelationService;
             var rt = new RelationType(name, alias, false, null, null);
             rs.Save(rt);
 
@@ -208,7 +208,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.MediaService.Save(c2);
 
             var r = new Relation(c1.Id, c2.Id, rt);
-            ServiceContext.RelationService.Save(r);
+            RelationService.Save(r);
 
             return r;
         }
@@ -220,7 +220,7 @@ namespace Umbraco.Tests.Services
         /// <returns></returns>
         private IEnumerable<IRelation> CreateRelations(int count)
         {
-            var rs = ServiceContext.RelationService;
+            var rs = RelationService;
             var rtName = Guid.NewGuid().ToString();
             var rt = new RelationType(rtName, rtName, false, null, null);
             rs.Save(rt);
