@@ -160,7 +160,7 @@ namespace Umbraco.Tests.Web.Mvc
             var content = Mock.Of<IPublishedContent>(publishedContent => publishedContent.Id == 12345);
 
             var contextBase = umbracoContext.HttpContext;
-            var publishedRouter = BaseWebTest.CreatePublishedRouter(TestObjects.GetUmbracoSettings().WebRouting);
+            var publishedRouter = BaseWebTest.CreatePublishedRouter(TestObjects.GetUmbracoSettings().WebRouting, ContentService);
             var frequest = publishedRouter.CreateRequest(umbracoContext, new Uri("http://localhost/test"));
             frequest.PublishedContent = content;
 

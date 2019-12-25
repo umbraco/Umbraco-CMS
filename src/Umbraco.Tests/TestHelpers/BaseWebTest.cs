@@ -35,7 +35,6 @@ namespace Umbraco.Tests.TestHelpers
         protected override void Initialize()
         {
             base.Initialize();
-
             // need to specify a custom callback for unit tests
             // AutoPublishedContentTypes generates properties automatically
 
@@ -88,10 +87,10 @@ namespace Umbraco.Tests.TestHelpers
 
         internal PublishedRouter CreatePublishedRouter(IFactory container = null, ContentFinderCollection contentFinders = null)
         {
-            return CreatePublishedRouter(TestObjects.GetUmbracoSettings().WebRouting, container, contentFinders);
+            return CreatePublishedRouter(TestObjects.GetUmbracoSettings().WebRouting, ContentService, container, contentFinders);
         }
 
-        internal static PublishedRouter CreatePublishedRouter(IWebRoutingSection webRoutingSection, IFactory container = null, ContentFinderCollection contentFinders = null)
+        internal static PublishedRouter CreatePublishedRouter(IWebRoutingSection webRoutingSection, IContentService contentService, IFactory container = null, ContentFinderCollection contentFinders = null)
         {
             return new PublishedRouter(
                 webRoutingSection,
@@ -99,7 +98,8 @@ namespace Umbraco.Tests.TestHelpers
                 new TestLastChanceFinder(),
                 new TestVariationContextAccessor(),
                 container?.TryGetInstance<ServiceContext>() ?? ServiceContext.CreatePartial(),
-                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()),
+                contentService);
         }
     }
 }

@@ -272,6 +272,7 @@ namespace Umbraco.Tests.TestHelpers
                 ShortStringHelper,
                 new SiteDomainHelper(),
                 Factory.GetInstance<IEntityXmlSerializer>(),
+                ContentService,
                 ContentTypesCache,
                 null, true, Options.PublishedRepositoryEvents);
 

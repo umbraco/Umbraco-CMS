@@ -47,7 +47,7 @@ namespace Umbraco.Tests.Services
 
         private const int MaxThreadCount = 20;
 
-        private void Save(ContentService service, IContent content)
+        private void Save(IContentService service, IContent content)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
