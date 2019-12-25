@@ -87,8 +87,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
                     Factory.GetInstance<IMediaFileSystem>(),
-                    ShortStringHelper
-                    );
+                    ShortStringHelper,
+                    ContentService);
                 return usersController;
             }
 
@@ -154,7 +154,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
                     Factory.GetInstance<IMediaFileSystem>(),
-                    ShortStringHelper);
+                    ShortStringHelper,
+                    ContentService);
                 return usersController;
             }
 
@@ -191,7 +192,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
                     Factory.GetInstance<IMediaFileSystem>(),
-                    ShortStringHelper);
+                    ShortStringHelper,
+                    ContentService);
                 return usersController;
             }
 
@@ -263,7 +265,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
                     Factory.GetInstance<IMediaFileSystem>(),
-                    ShortStringHelper);
+                    ShortStringHelper,
+                    ContentService);
                 return usersController;
             }
 

@@ -430,6 +430,7 @@ namespace Umbraco.Tests.Web.Mvc
                 ShortStringHelper,
                 new SiteDomainHelper(),
                 Factory.GetInstance<IEntityXmlSerializer>(),
+                ContentService,
                 null, true, false
                 ); // no events
 
