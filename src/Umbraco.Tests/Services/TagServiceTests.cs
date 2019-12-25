@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void TagApiConsistencyTest()
         {
-            var contentService = ServiceContext.ContentService;
+            var contentService = ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
@@ -76,7 +76,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void TagList_Contains_NodeCount()
         {
-            var contentService = ServiceContext.ContentService;
+            var contentService = ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);

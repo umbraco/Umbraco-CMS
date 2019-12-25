@@ -67,7 +67,7 @@ namespace Umbraco.Tests.Services
         public void Get_All_Published_Content()
         {
             var result = PrimeDbWithLotsOfContent();
-            var contentSvc = (ContentService) ServiceContext.ContentService;
+            var contentSvc = (ContentService) ContentService;
 
             var countOfPublished = result.Count(x => x.Published);
             var contentTypeId = result.First().ContentTypeId;
@@ -194,7 +194,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentTypeService.Save(contentType1);
             IContent lastParent = MockedContent.CreateSimpleContent(contentType1);
             lastParent.PublishCulture(CultureImpact.Invariant);
-            ServiceContext.ContentService.SaveAndPublish(lastParent);
+            ContentService.SaveAndPublish(lastParent);
             result.Add(lastParent);
             //create 20 deep
             for (var i = 0; i < 20; i++)
@@ -208,11 +208,11 @@ namespace Umbraco.Tests.Services
                     if (j % 2 == 0)
                     {
                         content.PublishCulture(CultureImpact.Invariant);
-                        ServiceContext.ContentService.SaveAndPublish(content);
+                        ContentService.SaveAndPublish(content);
                     }
                     else
                     {
-                        ServiceContext.ContentService.Save(content);
+                        ContentService.Save(content);
                     }
                     result.Add(content);
                 }

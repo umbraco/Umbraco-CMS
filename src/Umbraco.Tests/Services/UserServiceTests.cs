@@ -41,7 +41,7 @@ namespace Umbraco.Tests.Services
                     MockedContent.CreateSimpleContent(contentType),
                     MockedContent.CreateSimpleContent(contentType)
                 };
-            ServiceContext.ContentService.Save(content);
+            ContentService.Save(content);
 
             // Act
             var permissions = userService.GetPermissions(user, content[0].Id, content[1].Id, content[2].Id)
@@ -70,13 +70,13 @@ namespace Umbraco.Tests.Services
                     MockedContent.CreateSimpleContent(contentType),
                     MockedContent.CreateSimpleContent(contentType)
                 };
-            ServiceContext.ContentService.Save(content);
-            ServiceContext.ContentService.SetPermission(content[0], ActionBrowse.ActionLetter, new int[] { userGroup.Id });
-            ServiceContext.ContentService.SetPermission(content[0], ActionDelete.ActionLetter, new int[] { userGroup.Id });
-            ServiceContext.ContentService.SetPermission(content[0], ActionMove.ActionLetter, new int[] { userGroup.Id });
-            ServiceContext.ContentService.SetPermission(content[1], ActionBrowse.ActionLetter, new int[] { userGroup.Id });
-            ServiceContext.ContentService.SetPermission(content[1], ActionDelete.ActionLetter, new int[] { userGroup.Id });
-            ServiceContext.ContentService.SetPermission(content[2], ActionBrowse.ActionLetter, new int[] { userGroup.Id });
+            ContentService.Save(content);
+            ContentService.SetPermission(content[0], ActionBrowse.ActionLetter, new int[] { userGroup.Id });
+            ContentService.SetPermission(content[0], ActionDelete.ActionLetter, new int[] { userGroup.Id });
+            ContentService.SetPermission(content[0], ActionMove.ActionLetter, new int[] { userGroup.Id });
+            ContentService.SetPermission(content[1], ActionBrowse.ActionLetter, new int[] { userGroup.Id });
+            ContentService.SetPermission(content[1], ActionDelete.ActionLetter, new int[] { userGroup.Id });
+            ContentService.SetPermission(content[2], ActionBrowse.ActionLetter, new int[] { userGroup.Id });
 
             // Act
             var permissions = userService.GetPermissions(user, content[0].Id, content[1].Id, content[2].Id).ToArray();
@@ -103,13 +103,13 @@ namespace Umbraco.Tests.Services
                     MockedContent.CreateSimpleContent(contentType),
                     MockedContent.CreateSimpleContent(contentType)
                 };
-            ServiceContext.ContentService.Save(content);
-            ServiceContext.ContentService.SetPermission(content.ElementAt(0), ActionBrowse.ActionLetter, new int[] { userGroup.Id });
-            ServiceContext.ContentService.SetPermission(content.ElementAt(0), ActionDelete.ActionLetter, new int[] { userGroup.Id });
-            ServiceContext.ContentService.SetPermission(content.ElementAt(0), ActionMove.ActionLetter, new int[] { userGroup.Id });
-            ServiceContext.ContentService.SetPermission(content.ElementAt(1), ActionBrowse.ActionLetter, new int[] { userGroup.Id });
-            ServiceContext.ContentService.SetPermission(content.ElementAt(1), ActionDelete.ActionLetter, new int[] { userGroup.Id });
-            ServiceContext.ContentService.SetPermission(content.ElementAt(2), ActionBrowse.ActionLetter, new int[] { userGroup.Id });
+            ContentService.Save(content);
+            ContentService.SetPermission(content.ElementAt(0), ActionBrowse.ActionLetter, new int[] { userGroup.Id });
+            ContentService.SetPermission(content.ElementAt(0), ActionDelete.ActionLetter, new int[] { userGroup.Id });
+            ContentService.SetPermission(content.ElementAt(0), ActionMove.ActionLetter, new int[] { userGroup.Id });
+            ContentService.SetPermission(content.ElementAt(1), ActionBrowse.ActionLetter, new int[] { userGroup.Id });
+            ContentService.SetPermission(content.ElementAt(1), ActionDelete.ActionLetter, new int[] { userGroup.Id });
+            ContentService.SetPermission(content.ElementAt(2), ActionBrowse.ActionLetter, new int[] { userGroup.Id });
 
             // Act
             var permissions = userService.GetPermissions(userGroup, false, content[0].Id, content[1].Id, content[2].Id).ToArray();
@@ -136,12 +136,12 @@ namespace Umbraco.Tests.Services
                     MockedContent.CreateSimpleContent(contentType),
                     MockedContent.CreateSimpleContent(contentType)
                 };
-            ServiceContext.ContentService.Save(content);
-            ServiceContext.ContentService.SetPermission(content[0], ActionBrowse.ActionLetter, new int[] { userGroup.Id });
-            ServiceContext.ContentService.SetPermission(content[0], ActionDelete.ActionLetter, new int[] { userGroup.Id });
-            ServiceContext.ContentService.SetPermission(content[0], ActionMove.ActionLetter, new int[] { userGroup.Id });
-            ServiceContext.ContentService.SetPermission(content[1], ActionBrowse.ActionLetter, new int[] { userGroup.Id });
-            ServiceContext.ContentService.SetPermission(content[1], ActionDelete.ActionLetter, new int[] { userGroup.Id });
+            ContentService.Save(content);
+            ContentService.SetPermission(content[0], ActionBrowse.ActionLetter, new int[] { userGroup.Id });
+            ContentService.SetPermission(content[0], ActionDelete.ActionLetter, new int[] { userGroup.Id });
+            ContentService.SetPermission(content[0], ActionMove.ActionLetter, new int[] { userGroup.Id });
+            ContentService.SetPermission(content[1], ActionBrowse.ActionLetter, new int[] { userGroup.Id });
+            ContentService.SetPermission(content[1], ActionDelete.ActionLetter, new int[] { userGroup.Id });
 
             // Act
             var permissions = userService.GetPermissions(userGroup, true, content[0].Id, content[1].Id, content[2].Id)
@@ -179,14 +179,14 @@ namespace Umbraco.Tests.Services
                 MockedContent.CreateSimpleContent(contentType),
                 MockedContent.CreateSimpleContent(contentType)
             };
-            ServiceContext.ContentService.Save(content);
+            ContentService.Save(content);
             //assign permissions - we aren't assigning anything explicit for group3 and nothing explicit for content[2] /w group2
-            ServiceContext.ContentService.SetPermission(content[0], ActionBrowse.ActionLetter, new int[] { userGroup1.Id });
-            ServiceContext.ContentService.SetPermission(content[0], ActionDelete.ActionLetter, new int[] { userGroup1.Id });
-            ServiceContext.ContentService.SetPermission(content[0], ActionMove.ActionLetter, new int[] { userGroup2.Id });
-            ServiceContext.ContentService.SetPermission(content[1], ActionBrowse.ActionLetter, new int[] { userGroup1.Id });
-            ServiceContext.ContentService.SetPermission(content[1], ActionDelete.ActionLetter, new int[] { userGroup2.Id });
-            ServiceContext.ContentService.SetPermission(content[2], ActionDelete.ActionLetter, new int[] { userGroup1.Id });
+            ContentService.SetPermission(content[0], ActionBrowse.ActionLetter, new int[] { userGroup1.Id });
+            ContentService.SetPermission(content[0], ActionDelete.ActionLetter, new int[] { userGroup1.Id });
+            ContentService.SetPermission(content[0], ActionMove.ActionLetter, new int[] { userGroup2.Id });
+            ContentService.SetPermission(content[1], ActionBrowse.ActionLetter, new int[] { userGroup1.Id });
+            ContentService.SetPermission(content[1], ActionDelete.ActionLetter, new int[] { userGroup2.Id });
+            ContentService.SetPermission(content[2], ActionDelete.ActionLetter, new int[] { userGroup1.Id });
 
             // Act
             //we don't pass in any nodes so it will return all of them
@@ -249,13 +249,13 @@ namespace Umbraco.Tests.Services
                 MockedContent.CreateSimpleContent(contentType),
                 MockedContent.CreateSimpleContent(contentType)
             };
-            ServiceContext.ContentService.Save(content);
-            ServiceContext.ContentService.SetPermission(content[0], ActionBrowse.ActionLetter, new int[] { userGroup.Id });
-            ServiceContext.ContentService.SetPermission(content[0], ActionDelete.ActionLetter, new int[] { userGroup.Id });
-            ServiceContext.ContentService.SetPermission(content[0], ActionMove.ActionLetter, new int[] { userGroup.Id });
-            ServiceContext.ContentService.SetPermission(content[1], ActionBrowse.ActionLetter, new int[] { userGroup.Id });
-            ServiceContext.ContentService.SetPermission(content[1], ActionDelete.ActionLetter, new int[] { userGroup.Id });
-            ServiceContext.ContentService.SetPermission(content[2], ActionDelete.ActionLetter, new int[] { userGroup.Id });
+            ContentService.Save(content);
+            ContentService.SetPermission(content[0], ActionBrowse.ActionLetter, new int[] { userGroup.Id });
+            ContentService.SetPermission(content[0], ActionDelete.ActionLetter, new int[] { userGroup.Id });
+            ContentService.SetPermission(content[0], ActionMove.ActionLetter, new int[] { userGroup.Id });
+            ContentService.SetPermission(content[1], ActionBrowse.ActionLetter, new int[] { userGroup.Id });
+            ContentService.SetPermission(content[1], ActionDelete.ActionLetter, new int[] { userGroup.Id });
+            ContentService.SetPermission(content[2], ActionDelete.ActionLetter, new int[] { userGroup.Id });
 
             // Act
             //we don't pass in any nodes so it will return all of them
@@ -407,17 +407,17 @@ namespace Umbraco.Tests.Services
             var contentType = MockedContentTypes.CreateSimpleContentType();
             ServiceContext.ContentTypeService.Save(contentType);
             var parent = MockedContent.CreateSimpleContent(contentType);
-            ServiceContext.ContentService.Save(parent);
+            ContentService.Save(parent);
             var child1 = MockedContent.CreateSimpleContent(contentType, "child1", parent);
-            ServiceContext.ContentService.Save(child1);
+            ContentService.Save(child1);
             var child2 = MockedContent.CreateSimpleContent(contentType, "child2", child1);
-            ServiceContext.ContentService.Save(child2);
+            ContentService.Save(child2);
 
-            ServiceContext.ContentService.SetPermission(parent, ActionBrowse.ActionLetter, new int[] { userGroup.Id });
-            ServiceContext.ContentService.SetPermission(parent, ActionDelete.ActionLetter, new int[] { userGroup.Id });
-            ServiceContext.ContentService.SetPermission(parent, ActionMove.ActionLetter, new int[] { userGroup.Id });
-            ServiceContext.ContentService.SetPermission(parent, ActionBrowse.ActionLetter, new int[] { userGroup.Id });
-            ServiceContext.ContentService.SetPermission(parent, ActionDelete.ActionLetter, new int[] { userGroup.Id });
+            ContentService.SetPermission(parent, ActionBrowse.ActionLetter, new int[] { userGroup.Id });
+            ContentService.SetPermission(parent, ActionDelete.ActionLetter, new int[] { userGroup.Id });
+            ContentService.SetPermission(parent, ActionMove.ActionLetter, new int[] { userGroup.Id });
+            ContentService.SetPermission(parent, ActionBrowse.ActionLetter, new int[] { userGroup.Id });
+            ContentService.SetPermission(parent, ActionDelete.ActionLetter, new int[] { userGroup.Id });
 
             // Act
             var permissions = userService.GetPermissionsForPath(userGroup, child2.Path);

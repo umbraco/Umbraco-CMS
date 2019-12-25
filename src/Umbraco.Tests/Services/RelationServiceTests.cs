@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Services
             for (int i = 0; i < 10; i++)
             {
                 var c1 = MockedContent.CreateBasicContent(contentType);
-                ServiceContext.ContentService.Save(c1);
+                ContentService.Save(c1);
                 createdContent.Add(c1);
             }
 
@@ -83,7 +83,7 @@ namespace Umbraco.Tests.Services
                 content.Properties["bodyText"].SetValue(@"<p>
         <img src='/media/12312.jpg' data-udi='umb://media/" + m1.Key.ToString("N") + @"' />
 </p>");
-                ServiceContext.ContentService.Save(content);
+                ContentService.Save(content);
             }
 
             for (var i = 0; i < 6; i++)
@@ -204,7 +204,7 @@ namespace Umbraco.Tests.Services
 
             var c1 = MockedContent.CreateBasicContent(ct);
             var c2 = MockedMedia.CreateMediaImage(mt, -1);
-            ServiceContext.ContentService.Save(c1);
+            ContentService.Save(c1);
             ServiceContext.MediaService.Save(c2);
 
             var r = new Relation(c1.Id, c2.Id, rt);
@@ -235,7 +235,7 @@ namespace Umbraco.Tests.Services
             {
                 var c1 = MockedContent.CreateBasicContent(ct);
                 var c2 = MockedMedia.CreateMediaImage(mt, -1);
-                ServiceContext.ContentService.Save(c1);
+                ContentService.Save(c1);
                 ServiceContext.MediaService.Save(c2);
 
                 return new Relation(c1.Id, c2.Id, rt);

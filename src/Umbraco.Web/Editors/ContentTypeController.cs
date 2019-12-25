@@ -53,6 +53,7 @@ namespace Umbraco.Web.Editors
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IScopeProvider _scopeProvider;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IContentService _contentService;
 
         public ContentTypeController(IEntityXmlSerializer serializer,
             ICultureDictionary cultureDictionary,
@@ -62,7 +63,8 @@ namespace Umbraco.Web.Editors
             ServiceContext services, AppCaches appCaches,
             IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper,
             IScopeProvider scopeProvider,
-            IShortStringHelper shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IContentService contentService)
             : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _serializer = serializer;
@@ -70,6 +72,7 @@ namespace Umbraco.Web.Editors
             _propertyEditors = propertyEditors;
             _scopeProvider = scopeProvider;
             _shortStringHelper = shortStringHelper;
+            _contentService = contentService;
         }
 
         public int GetCount()
@@ -425,7 +428,7 @@ namespace Umbraco.Web.Editors
             }
             else
             {
-                var contentItem = Services.ContentService.GetById(contentId);
+                var contentItem = _contentService.GetById(contentId);
                 if (contentItem == null)
                 {
                     return Enumerable.Empty<ContentTypeBasic>();
@@ -449,7 +452,7 @@ namespace Umbraco.Web.Editors
             }
 
             //map the blueprints
-            var blueprints = Services.ContentService.GetBlueprintsForContentTypes(types.Select(x => x.Id).ToArray()).ToArray();
+            var blueprints = _contentService.GetBlueprintsForContentTypes(types.Select(x => x.Id).ToArray()).ToArray();
             foreach (var basic in basics)
             {
                 var docTypeBluePrints = blueprints.Where(x => x.ContentTypeId == (int) basic.Id).ToArray();
@@ -528,7 +531,7 @@ namespace Umbraco.Web.Editors
             }
 
             var dataInstaller = new PackageDataInstallation(Logger, Services.FileService, Services.MacroService, Services.LocalizationService,
-                Services.DataTypeService, Services.EntityService, Services.ContentTypeService, Services.ContentService, _propertyEditors, _scopeProvider, _shortStringHelper, _globalSettings, Services.TextService);
+                Services.DataTypeService, Services.EntityService, Services.ContentTypeService, _contentService, _propertyEditors, _scopeProvider, _shortStringHelper, _globalSettings, Services.TextService);
 
             var xd = new XmlDocument {XmlResolver = null};
             xd.Load(filePath);

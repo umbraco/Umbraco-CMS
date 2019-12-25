@@ -34,7 +34,8 @@ namespace Umbraco.Web.Search
         private readonly IMainDom _mainDom;
         private readonly IProfilingLogger _logger;
         private readonly IUmbracoIndexesCreator _indexCreator;
-        
+        private readonly IContentService _contentService;
+
 
         // the default enlist priority is 100
         // enlist with a lower priority to ensure that anything "default" runs after us
@@ -49,7 +50,8 @@ namespace Umbraco.Web.Search
             IPublishedContentValueSetBuilder publishedContentValueSetBuilder,
             IValueSetBuilder<IMedia> mediaValueSetBuilder,
             IValueSetBuilder<IMember> memberValueSetBuilder,
-            BackgroundIndexRebuilder backgroundIndexRebuilder)
+            BackgroundIndexRebuilder backgroundIndexRebuilder,
+            IContentService contentService)
         {
             _services = services;
             _scopeProvider = scopeProvider;
@@ -62,6 +64,7 @@ namespace Umbraco.Web.Search
             _mainDom = mainDom;
             _logger = profilingLogger;
             _indexCreator = indexCreator;
+            _contentService = contentService;
         }
 
         public void Initialize()
@@ -138,7 +141,7 @@ namespace Umbraco.Web.Search
             if (args.MessageType != MessageType.RefreshByPayload)
                 throw new NotSupportedException();
 
-            var contentService = _services.ContentService;
+            var contentService = _contentService;
 
             foreach (var payload in (ContentCacheRefresher.JsonPayload[])args.MessageObject)
             {
@@ -469,7 +472,7 @@ namespace Umbraco.Web.Search
             var total = long.MaxValue;
             while (page * pageSize < total)
             {
-                var contentToRefresh = _services.ContentService.GetPagedOfTypes(
+                var contentToRefresh = _contentService.GetPagedOfTypes(
                     //Re-index all content of these types
                     contentTypeIds,
                     page++, pageSize, out total, null,
@@ -487,7 +490,7 @@ namespace Umbraco.Web.Search
                         if (!publishChecked.TryGetValue(c.ParentId, out isPublished))
                         {
                             //nothing by parent id, so query the service and cache the result for the next child to check against
-                            isPublished = _services.ContentService.IsPathPublished(c);
+                            isPublished = _contentService.IsPathPublished(c);
                             publishChecked[c.Id] = isPublished;
                         }
                     }

@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Packaging
         }
 
         public ICreatedPackagesRepository PackageBuilder => new PackagesRepository(
-            ServiceContext.ContentService, ServiceContext.ContentTypeService, ServiceContext.DataTypeService,
+            ContentService, ServiceContext.ContentTypeService, ServiceContext.DataTypeService,
             ServiceContext.FileService, ServiceContext.MacroService, ServiceContext.LocalizationService,
             IOHelper,
             Factory.GetInstance<IEntityXmlSerializer>(), Logger,

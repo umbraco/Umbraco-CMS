@@ -145,10 +145,10 @@ namespace Umbraco.Tests.Services
                 doc.SetCultureName(doc.Name, "en-US");
             }
 
-            ServiceContext.ContentService.Save(doc);
+            ContentService.Save(doc);
 
             IContent doc2 = MockedContent.CreateBasicContent(contentType2);
-            ServiceContext.ContentService.Save(doc2);
+            ContentService.Save(doc2);
 
             ServiceContext.RedirectUrlService.Register("hello/world", doc.Key);
             ServiceContext.RedirectUrlService.Register("hello2/world2", doc2.Key);
@@ -181,9 +181,9 @@ namespace Umbraco.Tests.Services
             IContent doc = MockedContent.CreateBasicContent(contentType);
             doc.Name = "Hello1";
             doc.SetValue("title", "hello world");
-            ServiceContext.ContentService.Save(doc);
+            ContentService.Save(doc);
 
-            doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
+            doc = ContentService.GetById(doc.Id); //re-get
 
             Assert.AreEqual("Hello1", doc.Name);
             Assert.AreEqual("hello world", doc.GetValue("title"));
@@ -192,10 +192,10 @@ namespace Umbraco.Tests.Services
 
             //change the content type to be variant, we will also update the name here to detect the copy changes
             doc.Name = "Hello2";
-            ServiceContext.ContentService.Save(doc);
+            ContentService.Save(doc);
             contentType.Variations = to;
             ServiceContext.ContentTypeService.Save(contentType);
-            doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
+            doc = ContentService.GetById(doc.Id); //re-get
 
             Assert.AreEqual("Hello2", doc.GetCultureName("en-US"));
             Assert.AreEqual("hello world", doc.GetValue("title")); //We are not checking against en-US here because properties will remain invariant
@@ -204,10 +204,10 @@ namespace Umbraco.Tests.Services
 
             //change back property type to be invariant, we will also update the name here to detect the copy changes
             doc.SetCultureName("Hello3", "en-US");
-            ServiceContext.ContentService.Save(doc);
+            ContentService.Save(doc);
             contentType.Variations = from;
             ServiceContext.ContentTypeService.Save(contentType);
-            doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
+            doc = ContentService.GetById(doc.Id); //re-get
 
             Assert.AreEqual("Hello3", doc.Name);
             Assert.AreEqual("hello world", doc.GetValue("title"));
@@ -231,9 +231,9 @@ namespace Umbraco.Tests.Services
             IContent doc = MockedContent.CreateBasicContent(contentType);
             doc.SetCultureName("Hello1", "en-US");
             doc.SetValue("title", "hello world", "en-US");
-            ServiceContext.ContentService.Save(doc);
+            ContentService.Save(doc);
 
-            doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
+            doc = ContentService.GetById(doc.Id); //re-get
             Assert.AreEqual("Hello1", doc.GetCultureName("en-US"));
             Assert.AreEqual("hello world", doc.GetValue("title", "en-US"));
             Assert.IsTrue(doc.Edited);
@@ -241,10 +241,10 @@ namespace Umbraco.Tests.Services
 
             //change the content type to be invariant, we will also update the name here to detect the copy changes
             doc.SetCultureName("Hello2", "en-US");
-            ServiceContext.ContentService.Save(doc);
+            ContentService.Save(doc);
             contentType.Variations = changeContentTypeVariationTo;
             ServiceContext.ContentTypeService.Save(contentType);
-            doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
+            doc = ContentService.GetById(doc.Id); //re-get
 
             Assert.AreEqual("Hello2", doc.Name);
             Assert.AreEqual("hello world", doc.GetValue("title"));
@@ -253,10 +253,10 @@ namespace Umbraco.Tests.Services
 
             //change back property type to be variant, we will also update the name here to detect the copy changes
             doc.Name = "Hello3";
-            ServiceContext.ContentService.Save(doc);
+            ContentService.Save(doc);
             contentType.Variations = startingContentTypeVariation;
             ServiceContext.ContentTypeService.Save(contentType);
-            doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
+            doc = ContentService.GetById(doc.Id); //re-get
 
             //at this stage all property types were switched to invariant so even though the variant value
             //exists it will not be returned because the property type is invariant,
@@ -269,7 +269,7 @@ namespace Umbraco.Tests.Services
             //we can now switch the property type to be variant and the value can be returned again
             contentType.PropertyTypes.First().Variations = startingContentTypeVariation;
             ServiceContext.ContentTypeService.Save(contentType);
-            doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
+            doc = ContentService.GetById(doc.Id); //re-get
 
             Assert.AreEqual("Hello3", doc.GetCultureName("en-US"));
             Assert.AreEqual("hello world", doc.GetValue("title", "en-US"));
@@ -325,15 +325,15 @@ namespace Umbraco.Tests.Services
                 Assert.Throws<NotSupportedException>(() => doc.SetCultureName(nlContentName, nlCulture));
             }
 
-            ServiceContext.ContentService.Save(doc);
-            doc = ServiceContext.ContentService.GetById(doc.Id);
+            ContentService.Save(doc);
+            doc = ContentService.GetById(doc.Id);
 
             AssertAll();
 
             // Change variation
             contentType.Variations = contentTypeVariationTo;
-            ServiceContext.ContentService.Save(doc);
-            doc = ServiceContext.ContentService.GetById(doc.Id);
+            ContentService.Save(doc);
+            doc = ContentService.GetById(doc.Id);
 
             AssertAll();
 
@@ -405,9 +405,9 @@ namespace Umbraco.Tests.Services
             IContent doc = MockedContent.CreateBasicContent(contentType);
             doc.SetCultureName("Home", "en-US");
             doc.SetValue("title", "hello world");
-            ServiceContext.ContentService.Save(doc);
+            ContentService.Save(doc);
 
-            doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
+            doc = ContentService.GetById(doc.Id); //re-get
             Assert.AreEqual("hello world", doc.GetValue("title"));
             Assert.IsTrue(doc.IsCultureEdited("en-US")); //invariant prop changes show up on default lang
             Assert.IsTrue(doc.Edited);
@@ -415,7 +415,7 @@ namespace Umbraco.Tests.Services
             //change the property type to be variant
             contentType.PropertyTypes.First().Variations = variant;
             ServiceContext.ContentTypeService.Save(contentType);
-            doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
+            doc = ContentService.GetById(doc.Id); //re-get
 
             Assert.AreEqual("hello world", doc.GetValue("title", "en-US"));
             Assert.IsTrue(doc.IsCultureEdited("en-US"));
@@ -424,7 +424,7 @@ namespace Umbraco.Tests.Services
             //change back property type to be invariant
             contentType.PropertyTypes.First().Variations = invariant;
             ServiceContext.ContentTypeService.Save(contentType);
-            doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
+            doc = ContentService.GetById(doc.Id); //re-get
 
             Assert.AreEqual("hello world", doc.GetValue("title"));
             Assert.IsTrue(doc.IsCultureEdited("en-US"));  //invariant prop changes show up on default lang
@@ -449,21 +449,21 @@ namespace Umbraco.Tests.Services
             IContent doc = MockedContent.CreateBasicContent(contentType);
             doc.SetCultureName("Home", "en-US");
             doc.SetValue("title", "hello world", "en-US");
-            ServiceContext.ContentService.Save(doc);
+            ContentService.Save(doc);
 
             Assert.AreEqual("hello world", doc.GetValue("title", "en-US"));
 
             //change the property type to be invariant
             contentType.PropertyTypes.First().Variations = invariant;
             ServiceContext.ContentTypeService.Save(contentType);
-            doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
+            doc = ContentService.GetById(doc.Id); //re-get
 
             Assert.AreEqual("hello world", doc.GetValue("title"));
 
             //change back property type to be variant
             contentType.PropertyTypes.First().Variations = variant;
             ServiceContext.ContentTypeService.Save(contentType);
-            doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
+            doc = ContentService.GetById(doc.Id); //re-get
 
             Assert.AreEqual("hello world", doc.GetValue("title", "en-US"));
         }
@@ -492,18 +492,18 @@ namespace Umbraco.Tests.Services
             IContent doc = MockedContent.CreateBasicContent(contentType);
             doc.SetCultureName("Home", "en-US");
             doc.SetValue("title", "hello world", "en-US");
-            ServiceContext.ContentService.Save(doc);
+            ContentService.Save(doc);
 
             IContent doc2 = MockedContent.CreateBasicContent(contentType2);
             doc2.SetCultureName("Home", "en-US");
             doc2.SetValue("title", "hello world", "en-US");
-            ServiceContext.ContentService.Save(doc2);
+            ContentService.Save(doc2);
 
             //change the property type to be invariant
             contentType.PropertyTypes.First().Variations = invariant;
             ServiceContext.ContentTypeService.Save(contentType);
-            doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
-            doc2 = ServiceContext.ContentService.GetById(doc2.Id); //re-get
+            doc = ContentService.GetById(doc.Id); //re-get
+            doc2 = ContentService.GetById(doc2.Id); //re-get
 
             Assert.AreEqual("hello world", doc.GetValue("title"));
             Assert.AreEqual("hello world", doc2.GetValue("title"));
@@ -511,8 +511,8 @@ namespace Umbraco.Tests.Services
             //change back property type to be variant
             contentType.PropertyTypes.First().Variations = variant;
             ServiceContext.ContentTypeService.Save(contentType);
-            doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
-            doc2 = ServiceContext.ContentService.GetById(doc2.Id); //re-get
+            doc = ContentService.GetById(doc.Id); //re-get
+            doc2 = ContentService.GetById(doc2.Id); //re-get
 
             Assert.AreEqual("hello world", doc.GetValue("title", "en-US"));
             Assert.AreEqual("hello world", doc2.GetValue("title", "en-US"));
@@ -541,18 +541,18 @@ namespace Umbraco.Tests.Services
             IContent doc = MockedContent.CreateBasicContent(contentType);
             doc.SetCultureName("Home", "en-US");
             doc.SetValue("title", "hello world", "en-US");
-            ServiceContext.ContentService.Save(doc);
+            ContentService.Save(doc);
 
             IContent doc2 = MockedContent.CreateBasicContent(contentType2);
             doc2.SetCultureName("Home", "en-US");
             doc2.SetValue("title", "hello world", "en-US");
-            ServiceContext.ContentService.Save(doc2);
+            ContentService.Save(doc2);
 
             //change the content type to be invariant
             contentType.Variations = invariant;
             ServiceContext.ContentTypeService.Save(contentType);
-            doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
-            doc2 = ServiceContext.ContentService.GetById(doc2.Id); //re-get
+            doc = ContentService.GetById(doc.Id); //re-get
+            doc2 = ContentService.GetById(doc2.Id); //re-get
 
             Assert.AreEqual("hello world", doc.GetValue("title"));
             Assert.AreEqual("hello world", doc2.GetValue("title"));
@@ -560,8 +560,8 @@ namespace Umbraco.Tests.Services
             //change back content type to be variant
             contentType.Variations = variant;
             ServiceContext.ContentTypeService.Save(contentType);
-            doc = ServiceContext.ContentService.GetById(doc.Id); //re-get
-            doc2 = ServiceContext.ContentService.GetById(doc2.Id); //re-get
+            doc = ContentService.GetById(doc.Id); //re-get
+            doc2 = ContentService.GetById(doc2.Id); //re-get
 
             //this will be null because the doc type was changed back to variant but it's property types don't get changed back
             Assert.IsNull(doc.GetValue("title", "en-US"));
@@ -591,9 +591,9 @@ namespace Umbraco.Tests.Services
             document.SetValue("value1", "v1en", "en");
             document.SetValue("value1", "v1fr", "fr");
             document.SetValue("value2", "v2");
-            ServiceContext.ContentService.Save(document);
+            ContentService.Save(document);
 
-            document = ServiceContext.ContentService.GetById(document.Id);
+            document = ContentService.GetById(document.Id);
             Assert.AreEqual("doc1en", document.Name);
             Assert.AreEqual("doc1en", document.GetCultureName("en"));
             Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
@@ -609,7 +609,7 @@ namespace Umbraco.Tests.Services
             contentType.Variations = ContentVariation.Nothing;
             ServiceContext.ContentTypeService.Save(contentType);
 
-            document = ServiceContext.ContentService.GetById(document.Id);
+            document = ContentService.GetById(document.Id);
             Assert.AreEqual("doc1en", document.Name);
             Assert.IsNull(document.GetCultureName("en"));
             Assert.IsNull(document.GetCultureName("fr"));
@@ -626,7 +626,7 @@ namespace Umbraco.Tests.Services
             contentType.Variations = ContentVariation.Culture;
             ServiceContext.ContentTypeService.Save(contentType);
 
-            document = ServiceContext.ContentService.GetById(document.Id);
+            document = ContentService.GetById(document.Id);
             Assert.AreEqual("doc1en", document.Name);
             Assert.AreEqual("doc1en", document.GetCultureName("en"));
             Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
@@ -643,7 +643,7 @@ namespace Umbraco.Tests.Services
             contentType.PropertyTypes.First(x => x.Alias == "value1").Variations = ContentVariation.Culture;
             ServiceContext.ContentTypeService.Save(contentType);
 
-            document = ServiceContext.ContentService.GetById(document.Id);
+            document = ContentService.GetById(document.Id);
             Assert.AreEqual("doc1en", document.Name);
             Assert.AreEqual("doc1en", document.GetCultureName("en"));
             Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
@@ -681,9 +681,9 @@ namespace Umbraco.Tests.Services
             document.Name = "doc1";
             document.SetValue("value1", "v1");
             document.SetValue("value2", "v2");
-            ServiceContext.ContentService.Save(document);
+            ContentService.Save(document);
 
-            document = ServiceContext.ContentService.GetById(document.Id);
+            document = ContentService.GetById(document.Id);
             Assert.AreEqual("doc1", document.Name);
             Assert.IsNull(document.GetCultureName("en"));
             Assert.IsNull(document.GetCultureName("fr"));
@@ -700,7 +700,7 @@ namespace Umbraco.Tests.Services
             contentType.Variations = ContentVariation.Culture;
             ServiceContext.ContentTypeService.Save(contentType);
 
-            document = ServiceContext.ContentService.GetById(document.Id);
+            document = ContentService.GetById(document.Id);
             Assert.AreEqual("doc1", document.GetCultureName("en"));
             Assert.IsNull(document.GetCultureName("fr"));
             Assert.IsNull(document.GetValue("value1", "en"));
@@ -716,7 +716,7 @@ namespace Umbraco.Tests.Services
             contentType.PropertyTypes.First(x => x.Alias == "value1").Variations = ContentVariation.Culture;
             ServiceContext.ContentTypeService.Save(contentType);
 
-            document = ServiceContext.ContentService.GetById(document.Id);
+            document = ContentService.GetById(document.Id);
             Assert.AreEqual("doc1", document.GetCultureName("en"));
             Assert.IsNull(document.GetCultureName("fr"));
             Assert.AreEqual("v1", document.GetValue("value1", "en"));
@@ -731,7 +731,7 @@ namespace Umbraco.Tests.Services
             contentType.Variations = ContentVariation.Nothing;
             ServiceContext.ContentTypeService.Save(contentType);
 
-            document = ServiceContext.ContentService.GetById(document.Id);
+            document = ContentService.GetById(document.Id);
             Assert.AreEqual("doc1", document.Name);
             Assert.IsNull(document.GetCultureName("en"));
             Assert.IsNull(document.GetCultureName("fr"));
@@ -768,9 +768,9 @@ namespace Umbraco.Tests.Services
             document.SetValue("value1", "v1en", "en");
             document.SetValue("value1", "v1fr", "fr");
             document.SetValue("value2", "v2");
-            ServiceContext.ContentService.Save(document);
+            ContentService.Save(document);
 
-            document = ServiceContext.ContentService.GetById(document.Id);
+            document = ContentService.GetById(document.Id);
             Assert.AreEqual("doc1en", document.Name);
             Assert.AreEqual("doc1en", document.GetCultureName("en"));
             Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
@@ -786,7 +786,7 @@ namespace Umbraco.Tests.Services
             contentType.PropertyTypes.First(x => x.Alias == "value1").Variations = ContentVariation.Nothing;
             ServiceContext.ContentTypeService.Save(contentType);
 
-            document = ServiceContext.ContentService.GetById(document.Id);
+            document = ContentService.GetById(document.Id);
             Assert.AreEqual("doc1en", document.Name);
             Assert.AreEqual("doc1en", document.GetCultureName("en"));
             Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
@@ -803,7 +803,7 @@ namespace Umbraco.Tests.Services
             contentType.PropertyTypes.First(x => x.Alias == "value1").Variations = ContentVariation.Culture;
             ServiceContext.ContentTypeService.Save(contentType);
 
-            document = ServiceContext.ContentService.GetById(document.Id);
+            document = ContentService.GetById(document.Id);
             Assert.AreEqual("doc1en", document.Name);
             Assert.AreEqual("doc1en", document.GetCultureName("en"));
             Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
@@ -819,7 +819,7 @@ namespace Umbraco.Tests.Services
             contentType.PropertyTypes.First(x => x.Alias == "value2").Variations = ContentVariation.Culture;
             ServiceContext.ContentTypeService.Save(contentType);
 
-            document = ServiceContext.ContentService.GetById(document.Id);
+            document = ContentService.GetById(document.Id);
             Assert.AreEqual("doc1en", document.Name);
             Assert.AreEqual("doc1en", document.GetCultureName("en"));
             Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
@@ -857,18 +857,18 @@ namespace Umbraco.Tests.Services
             document.SetCultureName("doc1fr", "fr");
             document.SetValue("value1", "v1en-init", "en");
             document.SetValue("value1", "v1fr-init", "fr");
-            ServiceContext.ContentService.SaveAndPublish(document); //all values are published which means the document is not 'edited'
+            ContentService.SaveAndPublish(document); //all values are published which means the document is not 'edited'
 
-            document = ServiceContext.ContentService.GetById(document.Id);
+            document = ContentService.GetById(document.Id);
             Assert.IsFalse(document.IsCultureEdited("en"));
             Assert.IsFalse(document.IsCultureEdited("fr"));
             Assert.IsFalse(document.Edited);
 
             document.SetValue("value1", "v1en", "en"); //change the property culture value, so now this culture will be edited
             document.SetValue("value1", "v1fr", "fr"); //change the property culture value, so now this culture will be edited
-            ServiceContext.ContentService.Save(document);
+            ContentService.Save(document);
 
-            document = ServiceContext.ContentService.GetById(document.Id);
+            document = ContentService.GetById(document.Id);
             Assert.AreEqual("doc1en", document.Name);
             Assert.AreEqual("doc1en", document.GetCultureName("en"));
             Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
@@ -884,16 +884,16 @@ namespace Umbraco.Tests.Services
             contentType.PropertyTypes.First(x => x.Alias == "value1").Variations = invariant;
             ServiceContext.ContentTypeService.Save(contentType); //This is going to have to re-normalize the "Edited" flag
 
-            document = ServiceContext.ContentService.GetById(document.Id);
+            document = ContentService.GetById(document.Id);
             Assert.IsTrue(document.IsCultureEdited("en")); //This will remain true because there is now a pending change for the invariant property data which is flagged under the default lang
             Assert.IsFalse(document.IsCultureEdited("fr")); //This will be false because nothing has changed for this culture and the property no longer reflects variant changes
             Assert.IsTrue(document.Edited);
 
             //update the invariant value and publish
             document.SetValue("value1", "v1inv");
-            ServiceContext.ContentService.SaveAndPublish(document);
+            ContentService.SaveAndPublish(document);
 
-            document = ServiceContext.ContentService.GetById(document.Id);
+            document = ContentService.GetById(document.Id);
             Assert.AreEqual("doc1en", document.Name);
             Assert.AreEqual("doc1en", document.GetCultureName("en"));
             Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
@@ -911,7 +911,7 @@ namespace Umbraco.Tests.Services
             contentType.PropertyTypes.First(x => x.Alias == "value1").Variations = variant;
             ServiceContext.ContentTypeService.Save(contentType);
 
-            document = ServiceContext.ContentService.GetById(document.Id);
+            document = ContentService.GetById(document.Id);
             Assert.AreEqual("v1inv", document.GetValue("value1", "en")); //The invariant property value gets copied over to the default language
             Assert.AreEqual("v1inv", document.GetValue("value1", "en", published: true));
             Assert.AreEqual("v1fr", document.GetValue("value1", "fr")); //values are still retained
@@ -923,9 +923,9 @@ namespace Umbraco.Tests.Services
             // publish again
             document.SetValue("value1", "v1en2", "en"); //update the value now that it's variant again
             document.SetValue("value1", "v1fr2", "fr"); //update the value now that it's variant again
-            ServiceContext.ContentService.SaveAndPublish(document);
+            ContentService.SaveAndPublish(document);
 
-            document = ServiceContext.ContentService.GetById(document.Id);
+            document = ContentService.GetById(document.Id);
             Assert.AreEqual("doc1en", document.Name);
             Assert.AreEqual("doc1en", document.GetCultureName("en"));
             Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
@@ -959,17 +959,17 @@ namespace Umbraco.Tests.Services
             document.SetCultureName("doc1en", "en");
             document.SetCultureName("doc1fr", "fr");
             document.SetValue("value1", "v1en-init");
-            ServiceContext.ContentService.SaveAndPublish(document); //all values are published which means the document is not 'edited'
+            ContentService.SaveAndPublish(document); //all values are published which means the document is not 'edited'
 
-            document = ServiceContext.ContentService.GetById(document.Id);
+            document = ContentService.GetById(document.Id);
             Assert.IsFalse(document.IsCultureEdited("en"));
             Assert.IsFalse(document.IsCultureEdited("fr"));
             Assert.IsFalse(document.Edited);
 
             document.SetValue("value1", "v1en"); //change the property value, so now the invariant (default) culture will be edited
-            ServiceContext.ContentService.Save(document);
+            ContentService.Save(document);
 
-            document = ServiceContext.ContentService.GetById(document.Id);
+            document = ContentService.GetById(document.Id);
             Assert.AreEqual("doc1en", document.Name);
             Assert.AreEqual("doc1en", document.GetCultureName("en"));
             Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
@@ -983,16 +983,16 @@ namespace Umbraco.Tests.Services
             contentType.PropertyTypes.First(x => x.Alias == "value1").Variations = variant;
             ServiceContext.ContentTypeService.Save(contentType); //This is going to have to re-normalize the "Edited" flag
 
-            document = ServiceContext.ContentService.GetById(document.Id);
+            document = ContentService.GetById(document.Id);
             Assert.IsTrue(document.IsCultureEdited("en")); //Remains true
             Assert.IsFalse(document.IsCultureEdited("fr")); //False because no french property has ever been edited
             Assert.IsTrue(document.Edited);
 
             //update the culture value and publish
             document.SetValue("value1", "v1en2", "en");
-            ServiceContext.ContentService.SaveAndPublish(document);
+            ContentService.SaveAndPublish(document);
 
-            document = ServiceContext.ContentService.GetById(document.Id);
+            document = ContentService.GetById(document.Id);
             Assert.AreEqual("doc1en", document.Name);
             Assert.AreEqual("doc1en", document.GetCultureName("en"));
             Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
@@ -1008,7 +1008,7 @@ namespace Umbraco.Tests.Services
             contentType.PropertyTypes.First(x => x.Alias == "value1").Variations = invariant;
             ServiceContext.ContentTypeService.Save(contentType);
 
-            document = ServiceContext.ContentService.GetById(document.Id);
+            document = ContentService.GetById(document.Id);
             Assert.AreEqual("v1en2", document.GetValue("value1")); //The variant property value gets copied over to the invariant
             Assert.AreEqual("v1en2", document.GetValue("value1", published: true));
             Assert.IsNull(document.GetValue("value1", "fr"));  //The values are there but the business logic returns null
@@ -1057,7 +1057,7 @@ namespace Umbraco.Tests.Services
             document.SetValue("value21", "v21en", "en");
             document.SetValue("value21", "v21fr", "fr");
             document.SetValue("value22", "v22");
-            ServiceContext.ContentService.Save(document);
+            ContentService.Save(document);
 
             // both value11 and value21 are variant
             Console.WriteLine(GetJson(document.Id));
@@ -1162,7 +1162,7 @@ namespace Umbraco.Tests.Services
             document1.SetValue("value21", "v21en", "en");
             document1.SetValue("value21", "v21fr", "fr");
             document1.SetValue("value22", "v22");
-            ServiceContext.ContentService.Save(document1);
+            ContentService.Save(document1);
 
             var document2 = (IContent)new Content("document2", -1, composed2);
             document2.Name = "doc2";
@@ -1170,7 +1170,7 @@ namespace Umbraco.Tests.Services
             document2.SetValue("value12", "v12");
             document2.SetValue("value31", "v31");
             document2.SetValue("value32", "v32");
-            ServiceContext.ContentService.Save(document2);
+            ContentService.Save(document2);
 
             // both value11 and value21 are variant
             Console.WriteLine(GetJson(document1.Id));

@@ -724,7 +724,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             //create content
 
             var root = MockedContent.CreateSimpleContent(invariantCt);
-            ServiceContext.ContentService.Save(root);
+            ContentService.Save(root);
 
             var children = new List<IContent>();
 
@@ -748,7 +748,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     child.SetValue("author", "John Doe", culture: culture);
                 }
 
-                ServiceContext.ContentService.Save(child);
+                ContentService.Save(child);
                 children.Add(child);
             }
 
@@ -1050,21 +1050,21 @@ namespace Umbraco.Tests.Persistence.Repositories
             //Create and Save Content "Homepage" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 1)
             Content textpage = MockedContent.CreateSimpleContent(contentType);
             textpage.Key = new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0");
-            ServiceContext.ContentService.Save(textpage, 0);
+            ContentService.Save(textpage, 0);
 
             //Create and Save Content "Text Page 1" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 2)
             Content subpage = MockedContent.CreateSimpleContent(contentType, "Text Page 1", textpage.Id);
             subpage.Key = new Guid("FF11402B-7E53-4654-81A7-462AC2108059");
-            ServiceContext.ContentService.Save(subpage, 0);
+            ContentService.Save(subpage, 0);
 
             //Create and Save Content "Text Page 1" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 3)
             Content subpage2 = MockedContent.CreateSimpleContent(contentType, "Text Page 2", textpage.Id);
-            ServiceContext.ContentService.Save(subpage2, 0);
+            ContentService.Save(subpage2, 0);
 
             //Create and Save Content "Text Page Deleted" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 4)
             Content trashed = MockedContent.CreateSimpleContent(contentType, "Text Page Deleted", -20);
             trashed.Trashed = true;
-            ServiceContext.ContentService.Save(trashed, 0);
+            ContentService.Save(trashed, 0);
         }
     }
 }

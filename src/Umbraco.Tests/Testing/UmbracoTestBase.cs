@@ -109,6 +109,7 @@ namespace Umbraco.Tests.Testing
         private TypeLoader _featureTypeLoader;
 
         #region Accessors
+        protected IContentService ContentService => Factory.GetInstance<IContentService>();
 
         protected ILogger Logger => Factory.GetInstance<ILogger>();
 

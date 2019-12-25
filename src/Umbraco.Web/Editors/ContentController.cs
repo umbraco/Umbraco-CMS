@@ -54,6 +54,7 @@ namespace Umbraco.Web.Editors
     {
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly Lazy<IDictionary<string, ILanguage>> _allLangs;
+        private readonly IContentService _contentService;
 
         public object Domains { get; private set; }
 
@@ -68,11 +69,13 @@ namespace Umbraco.Web.Editors
             IProfilingLogger logger,
             IRuntimeState runtimeState,
             UmbracoHelper umbracoHelper,
-            IShortStringHelper shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IContentService contentService)
             : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _allLangs = new Lazy<IDictionary<string, ILanguage>>(() => Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
+            _contentService = contentService;
         }
 
         /// <summary>
@@ -109,7 +112,7 @@ namespace Umbraco.Web.Editors
         [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemDisplay>))]
         public IEnumerable<ContentItemDisplay> GetByIds([FromUri]int[] ids)
         {
-            var foundContent = Services.ContentService.GetByIds(ids);
+            var foundContent = _contentService.GetByIds(ids);
             return foundContent.Select(MapToDisplay);
         }
 
@@ -128,11 +131,11 @@ namespace Umbraco.Web.Editors
 
             // TODO: Should non-admins be allowed to set granular permissions?
 
-            var content = Services.ContentService.GetById(saveModel.ContentId);
+            var content = _contentService.GetById(saveModel.ContentId);
             if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
             //current permissions explicitly assigned to this content item
-            var contentPermissions = Services.ContentService.GetPermissions(content)
+            var contentPermissions = _contentService.GetPermissions(content)
                 .ToDictionary(x => x.UserGroupId, x => x);
 
             var allUserGroups = Services.UserService.GetAllUserGroups().ToArray();
@@ -187,7 +190,7 @@ namespace Umbraco.Web.Editors
         public IEnumerable<AssignedUserGroupPermissions> GetDetailedPermissions(int contentId)
         {
             if (contentId <= 0) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
-            var content = Services.ContentService.GetById(contentId);
+            var content = _contentService.GetById(contentId);
             if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
             // TODO: Should non-admins be able to see detailed permissions?
@@ -208,7 +211,7 @@ namespace Umbraco.Web.Editors
                 .ToDictionary(x => Convert.ToInt32(x.Id), x => x);
 
             //get the actual assigned permissions
-            var assignedPermissionsByGroup = Services.ContentService.GetPermissions(content).ToArray();
+            var assignedPermissionsByGroup = _contentService.GetPermissions(content).ToArray();
 
             //iterate over assigned and update the defaults with the real values
             foreach (var assignedGroupPermission in assignedPermissionsByGroup)
@@ -263,7 +266,7 @@ namespace Umbraco.Web.Editors
 
         public ContentItemDisplay GetBlueprintById(int id)
         {
-            var foundContent = Services.ContentService.GetBlueprintById(id);
+            var foundContent = _contentService.GetBlueprintById(id);
             if (foundContent == null)
             {
                 HandleContentNotFound(id);
@@ -303,7 +306,7 @@ namespace Umbraco.Web.Editors
         [EnsureUserPermissionForContent("id")]
         public ContentItemDisplay GetById(int id)
         {
-            var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
+            var foundContent = GetObjectFromRequest(() => _contentService.GetById(id));
             if (foundContent == null)
             {
                 HandleContentNotFound(id);
@@ -322,7 +325,7 @@ namespace Umbraco.Web.Editors
         [EnsureUserPermissionForContent("id")]
         public ContentItemDisplay GetById(Guid id)
         {
-            var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
+            var foundContent = GetObjectFromRequest(() => _contentService.GetById(id));
             if (foundContent == null)
             {
                 HandleContentNotFound(id);
@@ -365,7 +368,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var emptyContent = Services.ContentService.Create("", parentId, contentType.Alias, Security.GetUserId().ResultOr(0));
+            var emptyContent = _contentService.Create("", parentId, contentType.Alias, Security.GetUserId().ResultOr(0));
             var mapped = MapToDisplay(emptyContent);
             // translate the content type name if applicable
             mapped.ContentTypeName = Services.TextService.UmbracoDictionaryTranslate(CultureDictionary, mapped.ContentTypeName);
@@ -382,7 +385,7 @@ namespace Umbraco.Web.Editors
         [OutgoingEditorModelEvent]
         public ContentItemDisplay GetEmpty(int blueprintId, int parentId)
         {
-            var blueprint = Services.ContentService.GetBlueprintById(blueprintId);
+            var blueprint = _contentService.GetBlueprintById(blueprintId);
             if (blueprint == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -496,7 +499,7 @@ namespace Umbraco.Web.Editors
                         .Where(x => x.Name.Contains(filter));
                 }
 
-                children = Services.ContentService
+                children = _contentService
                     .GetPagedChildren(id, pageNumber - 1, pageSize, out totalChildren,
                         queryFilter,
                         Ordering.By(orderBy, orderDirection, cultureName, !orderBySystemField)).ToList();
@@ -504,7 +507,7 @@ namespace Umbraco.Web.Editors
             else
             {
                 //better to not use this without paging where possible, currently only the sort dialog does
-                children = Services.ContentService.GetPagedChildren(id, 0, int.MaxValue, out var total).ToList();
+                children = _contentService.GetPagedChildren(id, 0, int.MaxValue, out var total).ToList();
                 totalChildren = children.Count;
             }
 
@@ -542,15 +545,15 @@ namespace Umbraco.Web.Editors
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(name));
 
-            var content = Services.ContentService.GetById(contentId);
+            var content = _contentService.GetById(contentId);
             if (content == null)
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
             EnsureUniqueName(name, content, nameof(name));
 
-            var blueprint = Services.ContentService.CreateContentFromBlueprint(content, name, Security.GetUserId().ResultOr(0));
+            var blueprint = _contentService.CreateContentFromBlueprint(content, name, Security.GetUserId().ResultOr(0));
 
-            Services.ContentService.SaveBlueprint(blueprint, Security.GetUserId().ResultOr(0));
+            _contentService.SaveBlueprint(blueprint, Security.GetUserId().ResultOr(0));
 
             var notificationModel = new SimpleNotificationModel();
             notificationModel.AddSuccessNotification(
@@ -563,7 +566,7 @@ namespace Umbraco.Web.Editors
 
         private void EnsureUniqueName(string name, IContent content, string modelName)
         {
-            var existing = Services.ContentService.GetBlueprintsForContentTypes(content.ContentTypeId);
+            var existing = _contentService.GetBlueprintsForContentTypes(content.ContentTypeId);
             if (existing.Any(x => x.Name == name && x.Id != content.Id))
             {
                 ModelState.AddModelError(modelName, Services.TextService.Localize("blueprints/duplicateBlueprintMessage"));
@@ -584,7 +587,7 @@ namespace Umbraco.Web.Editors
                 {
                     EnsureUniqueName(content.Name, content, "Name");
 
-                    Services.ContentService.SaveBlueprint(contentItem.PersistedContent, Security.CurrentUser.Id);
+                    _contentService.SaveBlueprint(contentItem.PersistedContent, Security.CurrentUser.Id);
                     //we need to reuse the underlying logic so return the result that it wants
                     return OperationResult.Succeed(new EventMessages());
                 },
@@ -609,7 +612,7 @@ namespace Umbraco.Web.Editors
         {
             var contentItemDisplay = PostSaveInternal(
                 contentItem,
-                content => Services.ContentService.Save(contentItem.PersistedContent, Security.CurrentUser.Id),
+                content => _contentService.Save(contentItem.PersistedContent, Security.CurrentUser.Id),
                 MapToDisplay);
 
             return contentItemDisplay;
@@ -711,7 +714,7 @@ namespace Umbraco.Web.Editors
 
                 case ContentSaveAction.SendPublish:
                 case ContentSaveAction.SendPublishNew:
-                    var sendResult = Services.ContentService.SendToPublication(contentItem.PersistedContent, Security.CurrentUser.Id);
+                    var sendResult = _contentService.SendToPublication(contentItem.PersistedContent, Security.CurrentUser.Id);
                     wasCancelled = sendResult == false;
                     if (sendResult)
                     {
@@ -1155,7 +1158,7 @@ namespace Umbraco.Web.Editors
             if (!contentItem.PersistedContent.ContentType.VariesByCulture())
             {
                 //its invariant, proceed normally
-                var publishStatus = Services.ContentService.SaveAndPublishBranch(contentItem.PersistedContent, force, userId: Security.CurrentUser.Id);
+                var publishStatus = _contentService.SaveAndPublishBranch(contentItem.PersistedContent, force, userId: Security.CurrentUser.Id);
                 // TODO: Deal with multiple cancellations
                 wasCancelled = publishStatus.Any(x => x.Result == PublishResultType.FailedPublishCancelledByEvent);
                 successfulCultures = null; //must be null! this implies invariant
@@ -1191,7 +1194,7 @@ namespace Umbraco.Web.Editors
             if (canPublish)
             {
                 //proceed to publish if all validation still succeeds
-                var publishStatus = Services.ContentService.SaveAndPublishBranch(contentItem.PersistedContent, force, culturesToPublish, Security.CurrentUser.Id);
+                var publishStatus = _contentService.SaveAndPublishBranch(contentItem.PersistedContent, force, culturesToPublish, Security.CurrentUser.Id);
                 // TODO: Deal with multiple cancellations
                 wasCancelled = publishStatus.Any(x => x.Result == PublishResultType.FailedPublishCancelledByEvent);
                 successfulCultures = contentItem.Variants.Where(x => x.Publish).Select(x => x.Culture).ToArray();
@@ -1200,7 +1203,7 @@ namespace Umbraco.Web.Editors
             else
             {
                 //can only save
-                var saveResult = Services.ContentService.Save(contentItem.PersistedContent, Security.CurrentUser.Id);
+                var saveResult = _contentService.Save(contentItem.PersistedContent, Security.CurrentUser.Id);
                 var publishStatus = new[]
                 {
                     new PublishResult(PublishResultType.FailedPublishMandatoryCultureMissing, null, contentItem.PersistedContent)
@@ -1228,7 +1231,7 @@ namespace Umbraco.Web.Editors
             if (!contentItem.PersistedContent.ContentType.VariesByCulture())
             {
                 //its invariant, proceed normally
-                var publishStatus = Services.ContentService.SaveAndPublish(contentItem.PersistedContent, userId: Security.CurrentUser.Id);
+                var publishStatus = _contentService.SaveAndPublish(contentItem.PersistedContent, userId: Security.CurrentUser.Id);
                 wasCancelled = publishStatus.Result == PublishResultType.FailedPublishCancelledByEvent;
                 successfulCultures = null; //must be null! this implies invariant
                 return publishStatus;
@@ -1274,7 +1277,7 @@ namespace Umbraco.Web.Editors
             if (canPublish)
             {
                 //proceed to publish if all validation still succeeds
-                var publishStatus = Services.ContentService.SaveAndPublish(contentItem.PersistedContent, culturesToPublish, Security.CurrentUser.Id);
+                var publishStatus = _contentService.SaveAndPublish(contentItem.PersistedContent, culturesToPublish, Security.CurrentUser.Id);
                 wasCancelled = publishStatus.Result == PublishResultType.FailedPublishCancelledByEvent;
                 successfulCultures = culturesToPublish;
                 return publishStatus;
@@ -1282,7 +1285,7 @@ namespace Umbraco.Web.Editors
             else
             {
                 //can only save
-                var saveResult = Services.ContentService.Save(contentItem.PersistedContent, Security.CurrentUser.Id);
+                var saveResult = _contentService.Save(contentItem.PersistedContent, Security.CurrentUser.Id);
                 var publishStatus = new PublishResult(PublishResultType.FailedPublishMandatoryCultureMissing, null, contentItem.PersistedContent);
                 wasCancelled = saveResult.Result == OperationResultType.FailedCancelledByEvent;
                 successfulCultures = Array.Empty<string>();
@@ -1404,14 +1407,14 @@ namespace Umbraco.Web.Editors
         [EnsureUserPermissionForContent("id", 'U')]
         public HttpResponseMessage PostPublishById(int id)
         {
-            var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
+            var foundContent = GetObjectFromRequest(() => _contentService.GetById(id));
 
             if (foundContent == null)
             {
                 return HandleContentNotFound(id, false);
             }
 
-            var publishResult = Services.ContentService.SaveAndPublish(foundContent, userId: Security.GetUserId().ResultOr(0));
+            var publishResult = _contentService.SaveAndPublish(foundContent, userId: Security.GetUserId().ResultOr(0));
             if (publishResult.Success == false)
             {
                 var notificationModel = new SimpleNotificationModel();
@@ -1428,14 +1431,14 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public HttpResponseMessage DeleteBlueprint(int id)
         {
-            var found = Services.ContentService.GetBlueprintById(id);
+            var found = _contentService.GetBlueprintById(id);
 
             if (found == null)
             {
                 return HandleContentNotFound(id, false);
             }
 
-            Services.ContentService.DeleteBlueprint(found);
+            _contentService.DeleteBlueprint(found);
 
             return Request.CreateResponse(HttpStatusCode.OK);
         }
@@ -1454,7 +1457,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public HttpResponseMessage DeleteById(int id)
         {
-            var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
+            var foundContent = GetObjectFromRequest(() => _contentService.GetById(id));
 
             if (foundContent == null)
             {
@@ -1464,7 +1467,7 @@ namespace Umbraco.Web.Editors
             //if the current item is in the recycle bin
             if (foundContent.Trashed == false)
             {
-                var moveResult = Services.ContentService.MoveToRecycleBin(foundContent, Security.GetUserId().ResultOr(0));
+                var moveResult = _contentService.MoveToRecycleBin(foundContent, Security.GetUserId().ResultOr(0));
                 if (moveResult.Success == false)
                 {
                     //returning an object of INotificationModel will ensure that any pending
@@ -1474,7 +1477,7 @@ namespace Umbraco.Web.Editors
             }
             else
             {
-                var deleteResult = Services.ContentService.Delete(foundContent, Security.GetUserId().ResultOr(0));
+                var deleteResult = _contentService.Delete(foundContent, Security.GetUserId().ResultOr(0));
                 if (deleteResult.Success == false)
                 {
                     //returning an object of INotificationModel will ensure that any pending
@@ -1498,7 +1501,7 @@ namespace Umbraco.Web.Editors
         [EnsureUserPermissionForContent(Constants.System.RecycleBinContent, ActionDelete.ActionLetter)]
         public HttpResponseMessage EmptyRecycleBin()
         {
-            Services.ContentService.EmptyRecycleBin(Security.GetUserId().ResultOr(Constants.Security.SuperUserId));
+            _contentService.EmptyRecycleBin(Security.GetUserId().ResultOr(Constants.Security.SuperUserId));
 
             return Request.CreateNotificationSuccessResponse(Services.TextService.Localize("defaultdialogs/recycleBinIsEmpty"));
         }
@@ -1524,7 +1527,7 @@ namespace Umbraco.Web.Editors
 
             try
             {
-                var contentService = Services.ContentService;
+                var contentService = _contentService;
 
                 // Save content with new sort order and update content xml in db accordingly
                 var sortResult = contentService.Sort(sorted.IdSortOrder, Security.CurrentUser.Id);
@@ -1554,7 +1557,7 @@ namespace Umbraco.Web.Editors
         {
             var toMove = ValidateMoveOrCopy(move);
 
-            Services.ContentService.Move(toMove, move.ParentId, Security.GetUserId().ResultOr(0));
+            _contentService.Move(toMove, move.ParentId, Security.GetUserId().ResultOr(0));
 
             var response = Request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(toMove.Path, Encoding.UTF8, "text/plain");
@@ -1571,7 +1574,7 @@ namespace Umbraco.Web.Editors
         {
             var toCopy = ValidateMoveOrCopy(copy);
 
-            var c = Services.ContentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal, copy.Recursive, Security.GetUserId().ResultOr(0));
+            var c = _contentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal, copy.Recursive, Security.GetUserId().ResultOr(0));
 
             var response = Request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(c.Path, Encoding.UTF8, "text/plain");
@@ -1587,7 +1590,7 @@ namespace Umbraco.Web.Editors
         [OutgoingEditorModelEvent]
         public ContentItemDisplay PostUnpublish(UnpublishContent model)
         {
-            var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(model.Id));
+            var foundContent = GetObjectFromRequest(() => _contentService.GetById(model.Id));
 
             if (foundContent == null)
                 HandleContentNotFound(model.Id);
@@ -1596,7 +1599,7 @@ namespace Umbraco.Web.Editors
             if (model.Cultures.Length == 0 || model.Cultures.Length == languageCount)
             {
                 //this means that the entire content item will be unpublished
-                var unpublishResult = Services.ContentService.Unpublish(foundContent, userId: Security.GetUserId().ResultOr(0));
+                var unpublishResult = _contentService.Unpublish(foundContent, userId: Security.GetUserId().ResultOr(0));
 
                 var content = MapToDisplay(foundContent);
 
@@ -1619,7 +1622,7 @@ namespace Umbraco.Web.Editors
                 var results = new Dictionary<string, PublishResult>();
                 foreach (var c in model.Cultures)
                 {
-                    var result = Services.ContentService.Unpublish(foundContent, culture: c, userId: Security.GetUserId().ResultOr(0));
+                    var result = _contentService.Unpublish(foundContent, culture: c, userId: Security.GetUserId().ResultOr(0));
                     results[c] = result;
                     if (result.Result == PublishResultType.SuccessUnpublishMandatoryCulture)
                     {
@@ -1680,7 +1683,7 @@ namespace Umbraco.Web.Editors
                 }
             }
 
-            var node = Services.ContentService.GetById(model.NodeId);
+            var node = _contentService.GetById(model.NodeId);
 
             if (node == null)
             {
@@ -1779,14 +1782,14 @@ namespace Umbraco.Web.Editors
                     var xrcid = xdomain.RootContentId;
                     if (xrcid.HasValue)
                     {
-                        var xcontent = Services.ContentService.GetById(xrcid.Value);
+                        var xcontent = _contentService.GetById(xrcid.Value);
                         var xnames = new List<string>();
                         while (xcontent != null)
                         {
                             xnames.Add(xcontent.Name);
                             if (xcontent.ParentId < -1)
                                 xnames.Add("Recycle Bin");
-                            xcontent = Services.ContentService.GetParent(xcontent);
+                            xcontent = _contentService.GetParent(xcontent);
                         }
                         xnames.Reverse();
                         domainModel.Other = "/" + string.Join("/", xnames);
@@ -1929,7 +1932,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var contentService = Services.ContentService;
+            var contentService = _contentService;
             var toMove = contentService.GetById(model.Id);
             if (toMove == null)
             {
@@ -2179,7 +2182,7 @@ namespace Umbraco.Web.Editors
             var notifications = new List<NotifySetting>();
             if (contentId <= 0) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
-            var content = Services.ContentService.GetById(contentId);
+            var content = _contentService.GetById(contentId);
             if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
             var userNotifications = Services.NotificationService.GetUserNotifications(Security.CurrentUser, content.Path).ToList();
@@ -2201,7 +2204,7 @@ namespace Umbraco.Web.Editors
         public void PostNotificationOptions(int contentId, [FromUri] string[] notifyOptions)
         {
             if (contentId <= 0) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
-            var content = Services.ContentService.GetById(contentId);
+            var content = _contentService.GetById(contentId);
             if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
             Services.NotificationService.SetNotifications(Security.CurrentUser, content, notifyOptions);
@@ -2213,7 +2216,7 @@ namespace Umbraco.Web.Editors
             var rollbackVersions = new List<RollbackVersion>();
             var writerIds = new HashSet<int>();
 
-            var versions = Services.ContentService.GetVersionsSlim(contentId, 0, 50);
+            var versions = _contentService.GetVersionsSlim(contentId, 0, 50);
 
             //Not all nodes are variants & thus culture can be null
             if (culture != null)
@@ -2255,7 +2258,7 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public ContentVariantDisplay GetRollbackVersion(int versionId, string culture = null)
         {
-            var version = Services.ContentService.GetVersion(versionId);
+            var version = _contentService.GetVersion(versionId);
             var content = MapToDisplay(version);
 
             return culture == null
@@ -2267,7 +2270,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public HttpResponseMessage PostRollbackContent(int contentId, int versionId, string culture = "*")
         {
-            var rollbackResult = Services.ContentService.Rollback(contentId, versionId, culture, Security.GetUserId().ResultOr(0));
+            var rollbackResult = _contentService.Rollback(contentId, versionId, culture, Security.GetUserId().ResultOr(0));
 
             if (rollbackResult.Success)
                 return Request.CreateResponse(HttpStatusCode.OK);
@@ -2299,7 +2302,7 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public HttpResponseMessage GetPublicAccess(int contentId)
         {
-            var content = Services.ContentService.GetById(contentId);
+            var content = _contentService.GetById(contentId);
             if (content == null)
             {
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
@@ -2353,9 +2356,9 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.BadRequest));
             }
 
-            var content = Services.ContentService.GetById(contentId);
-            var loginPage = Services.ContentService.GetById(loginPageId);
-            var errorPage = Services.ContentService.GetById(errorPageId);
+            var content = _contentService.GetById(contentId);
+            var loginPage = _contentService.GetById(loginPageId);
+            var errorPage = _contentService.GetById(errorPageId);
             if (content == null || loginPage == null || errorPage == null)
             {
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.BadRequest));
@@ -2415,7 +2418,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public HttpResponseMessage RemovePublicAccess(int contentId)
         {
-            var content = Services.ContentService.GetById(contentId);
+            var content = _contentService.GetById(contentId);
             if (content == null)
             {
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));

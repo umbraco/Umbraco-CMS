@@ -204,23 +204,23 @@ namespace Umbraco.Tests.Persistence.Repositories
             //Create and Save Content "Homepage" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 1)
             _textpage = MockedContent.CreateSimpleContent(contentType);
             _textpage.Key = Guid.NewGuid();
-            ServiceContext.ContentService.Save(_textpage);
+            ContentService.Save(_textpage);
 
             //Create and Save Content "Text Page 1" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 2)
             _subpage = MockedContent.CreateSimpleContent(contentType, "Text Page 1", _textpage.Id);
             _subpage.Key = Guid.NewGuid();
-            ServiceContext.ContentService.Save(_subpage);
+            ContentService.Save(_subpage);
 
             //Create and Save Content "Text Page 1" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 3)
             _otherpage = MockedContent.CreateSimpleContent(contentType, "Text Page 2", _textpage.Id);
             _otherpage.Key = Guid.NewGuid();
-            ServiceContext.ContentService.Save(_otherpage);
+            ContentService.Save(_otherpage);
 
             //Create and Save Content "Text Page Deleted" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 4)
             _trashed = MockedContent.CreateSimpleContent(contentType, "Text Page Deleted", -20);
             _trashed.Key = Guid.NewGuid();
             ((Content) _trashed).Trashed = true;
-            ServiceContext.ContentService.Save(_trashed);
+            ContentService.Save(_trashed);
         }
     }
 }

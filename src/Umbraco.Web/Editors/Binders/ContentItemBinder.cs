@@ -18,15 +18,17 @@ namespace Umbraco.Web.Editors.Binders
     internal class ContentItemBinder : IModelBinder
     {
         private readonly ContentModelBinderHelper _modelBinderHelper;
+        private readonly IContentService _contentService;
 
-        public ContentItemBinder() : this(Current.Logger, Current.Services, Current.UmbracoContextAccessor)
+        public ContentItemBinder(IContentService contentService) : this(Current.Logger, Current.Services, Current.UmbracoContextAccessor, contentService)
         {
         }
 
-        public ContentItemBinder(ILogger logger, ServiceContext services, IUmbracoContextAccessor umbracoContextAccessor)
+        public ContentItemBinder(ILogger logger, ServiceContext services, IUmbracoContextAccessor umbracoContextAccessor, IContentService contentService)
         {
             Services = services;
             _modelBinderHelper = new ContentModelBinderHelper();
+            _contentService = contentService;
         }
 
         protected ServiceContext Services { get; }
@@ -72,7 +74,7 @@ namespace Umbraco.Web.Editors.Binders
 
         protected virtual IContent GetExisting(ContentItemSave model)
         {
-            return Services.ContentService.GetById(model.Id);
+            return _contentService.GetById(model.Id);
         }
 
         private IContent CreateNew(ContentItemSave model)

@@ -12,6 +12,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
+using ContentServiceImplementation = Umbraco.Core.Services.Implement.ContentService;
 using Umbraco.Core.Sync;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers;
@@ -55,7 +56,7 @@ namespace Umbraco.Tests.Scoping
             _distributedCacheBinder = null;
 
             _onPublishedAssertAction = null;
-            ContentService.Published -= OnPublishedAssert;
+            ContentServiceImplementation.Published -= OnPublishedAssert;
             SafeXmlReaderWriter.Cloning = null;
         }
 
@@ -122,13 +123,13 @@ namespace Umbraco.Tests.Scoping
                 Assert.AreEqual(beforeOuterXml, xml.OuterXml);
             };
 
-            ContentService.Published += OnPublishedAssert;
+            ContentServiceImplementation.Published += OnPublishedAssert;
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                Current.Services.ContentService.SaveAndPublish(item); // should create an xml clone
+                ContentService.SaveAndPublish(item); // should create an xml clone
                 item.Name = "changed";
-                Current.Services.ContentService.SaveAndPublish(item); // should re-use the xml clone
+                ContentService.SaveAndPublish(item); // should re-use the xml clone
 
                 // this should never change
                 Assert.AreEqual(beforeOuterXml, beforeXml.OuterXml);
@@ -225,12 +226,12 @@ namespace Umbraco.Tests.Scoping
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                Current.Services.ContentService.SaveAndPublish(item);
+                ContentService.SaveAndPublish(item);
 
                 for (var i = 0; i < count; i++)
                 {
                     var temp = new Content("content_" + i, -1, contentType);
-                    Current.Services.ContentService.SaveAndPublish(temp);
+                    ContentService.SaveAndPublish(temp);
                     ids[i] = temp.Id;
                 }
 

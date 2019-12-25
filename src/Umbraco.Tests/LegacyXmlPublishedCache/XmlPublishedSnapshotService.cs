@@ -58,13 +58,14 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             IShortStringHelper shortStringHelper,
             ISiteDomainHelper siteDomainHelper,
             IEntityXmlSerializer entitySerializer,
+            IContentService contentService,
             MainDom mainDom,
             bool testing = false, bool enableRepositoryEvents = true)
             : this(serviceContext, publishedContentTypeFactory, scopeProvider, requestCache,
                 publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor,
                 documentRepository, mediaRepository, memberRepository,
                 defaultCultureAccessor,
-                logger, globalSettings, hostingEnvironment, shortStringHelper, siteDomainHelper, entitySerializer, null, mainDom, testing, enableRepositoryEvents)
+                logger, globalSettings, hostingEnvironment, shortStringHelper, siteDomainHelper, entitySerializer, contentService, null, mainDom, testing, enableRepositoryEvents)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
         }
@@ -84,6 +85,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             IShortStringHelper shortStringHelper,
             ISiteDomainHelper siteDomainHelper,
             IEntityXmlSerializer entitySerializer,
+            IContentService contentService,
             PublishedContentTypeCache contentTypeCache,
             MainDom mainDom,
             bool testing, bool enableRepositoryEvents)
@@ -94,7 +96,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             _contentTypeCache = contentTypeCache
                 ?? new PublishedContentTypeCache(serviceContext.ContentTypeService, serviceContext.MediaTypeService, serviceContext.MemberTypeService, publishedContentTypeFactory, logger);
 
-            _xmlStore = new XmlStore(serviceContext.ContentTypeService, serviceContext.ContentService, scopeProvider, _routesCache,
+            _xmlStore = new XmlStore(serviceContext.ContentTypeService, contentService, scopeProvider, _routesCache,
                 _contentTypeCache, publishedSnapshotAccessor, mainDom, testing, enableRepositoryEvents,
                 documentRepository, mediaRepository, memberRepository, globalSettings, entitySerializer, hostingEnvironment, shortStringHelper);
 

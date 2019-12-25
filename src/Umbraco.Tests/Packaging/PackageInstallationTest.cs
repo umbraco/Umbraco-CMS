@@ -48,7 +48,7 @@ namespace Umbraco.Tests.Packaging
         private PackageDataInstallation PackageDataInstallation => new PackageDataInstallation(
             Logger, ServiceContext.FileService, ServiceContext.MacroService, ServiceContext.LocalizationService,
             ServiceContext.DataTypeService, ServiceContext.EntityService,
-            ServiceContext.ContentTypeService, ServiceContext.ContentService,
+            ServiceContext.ContentTypeService, ContentService,
             Factory.GetInstance<PropertyEditorCollection>(),
             Factory.GetInstance<IScopeProvider>(),
             Factory.GetInstance<IShortStringHelper>(),

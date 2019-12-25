@@ -45,19 +45,19 @@ namespace Umbraco.Tests.Publishing
 
             //Create and Save Content "Homepage" based on "umbTextpage" -> 1046
             _homePage = MockedContent.CreateSimpleContent(contentType);
-            ServiceContext.ContentService.Save(_homePage, 0);
+            ContentService.Save(_homePage, 0);
 
             //Create and Save Content "Text Page 1" based on "umbTextpage" -> 1047
             Content subpage = MockedContent.CreateSimpleContent(contentType, "Text Page 1", _homePage.Id);
-            ServiceContext.ContentService.Save(subpage, 0);
+            ContentService.Save(subpage, 0);
 
             //Create and Save Content "Text Page 2" based on "umbTextpage" -> 1048
             Content subpage2 = MockedContent.CreateSimpleContent(contentType, "Text Page 2", _homePage.Id);
-            ServiceContext.ContentService.Save(subpage2, 0);
+            ContentService.Save(subpage2, 0);
 
             //Create and Save Content "Text Page 3" based on "umbTextpage" -> 1048
             Content subpage3 = MockedContent.CreateSimpleContent(contentType, "Text Page 3", subpage2.Id);
-            ServiceContext.ContentService.Save(subpage3, 0);
+            ContentService.Save(subpage3, 0);
 
             return new[] {_homePage, subpage, subpage2, subpage3};
         }

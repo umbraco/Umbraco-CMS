@@ -53,6 +53,7 @@ namespace Umbraco.Web.Editors
         private readonly UmbracoTreeSearcher _treeSearcher;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly SearchableTreeCollection _searchableTreeCollection;
+        private readonly IContentService _contentService;
 
         public EntityController(
             IGlobalSettings globalSettings,
@@ -66,13 +67,15 @@ namespace Umbraco.Web.Editors
             UmbracoHelper umbracoHelper,
             SearchableTreeCollection searchableTreeCollection,
             UmbracoTreeSearcher treeSearcher,
-            IShortStringHelper shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IContentService contentService)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _treeService = treeService;
             _searchableTreeCollection = searchableTreeCollection;
             _treeSearcher = treeSearcher;
             _shortStringHelper = shortStringHelper;
+            _contentService = contentService;
         }
 
         /// <summary>
@@ -318,7 +321,7 @@ namespace Umbraco.Web.Editors
         public UrlAndAnchors GetUrlAndAnchors(int id, string culture = "*")
         {
             var url = UmbracoContext.UrlProvider.GetUrl(id);
-            var anchorValues = Services.ContentService.GetAnchorValuesFromRTEs(id, culture);
+            var anchorValues = _contentService.GetAnchorValuesFromRTEs(id, culture);
             return new UrlAndAnchors(url, anchorValues);
         }
 
@@ -326,7 +329,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public IEnumerable<string> GetAnchors(AnchorsModel model)
         {
-            var anchorValues = Services.ContentService.GetAnchorValuesFromRTEContent(model.RteContent);
+            var anchorValues = _contentService.GetAnchorValuesFromRTEContent(model.RteContent);
             return anchorValues;
         }
 

@@ -23,6 +23,13 @@ namespace Umbraco.Web.Editors
     [PrefixlessBodyModelValidator]
     public class UserGroupsController : UmbracoAuthorizedJsonController
     {
+        private readonly IContentService _contentService;
+
+        public UserGroupsController(IContentService contentService)
+        {
+            _contentService = contentService;
+        }
+
         [UserGroupValidate]
         public UserGroupDisplay PostSaveUserGroup(UserGroupSave userGroupSave)
         {
@@ -30,7 +37,7 @@ namespace Umbraco.Web.Editors
 
             //authorize that the user has access to save this user group
             var authHelper = new UserGroupEditorAuthorizationHelper(
-                Services.UserService, Services.ContentService, Services.MediaService, Services.EntityService);
+                Services.UserService, _contentService, Services.MediaService, Services.EntityService);
 
             var isAuthorized = authHelper.AuthorizeGroupAccess(Security.CurrentUser, userGroupSave.Alias);
             if (isAuthorized == false)

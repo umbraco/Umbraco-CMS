@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             for (int i = 0; i < 10; i++)
             {
                 var c1 = MockedContent.CreateBasicContent(contentType);
-                ServiceContext.ContentService.Save(c1);
+                ContentService.Save(c1);
                 createdContent.Add(c1);
             }
 

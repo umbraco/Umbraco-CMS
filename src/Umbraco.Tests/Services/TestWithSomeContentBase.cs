@@ -30,21 +30,21 @@ namespace Umbraco.Tests.Services
             //Create and Save Content "Homepage" based on "umbTextpage" -> 1061
             Content textpage = MockedContent.CreateSimpleContent(contentType);
             textpage.Key = new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0");
-            ServiceContext.ContentService.Save(textpage, 0);
+            ContentService.Save(textpage, 0);
 
             //Create and Save Content "Text Page 1" based on "umbTextpage" -> 1062
             Content subpage = MockedContent.CreateSimpleContent(contentType, "Text Page 1", textpage.Id);
             subpage.ContentSchedule.Add(DateTime.Now.AddMinutes(-5), null);
-            ServiceContext.ContentService.Save(subpage, 0);
+            ContentService.Save(subpage, 0);
 
             //Create and Save Content "Text Page 1" based on "umbTextpage" -> 1063
             Content subpage2 = MockedContent.CreateSimpleContent(contentType, "Text Page 2", textpage.Id);
-            ServiceContext.ContentService.Save(subpage2, 0);
+            ContentService.Save(subpage2, 0);
 
             //Create and Save Content "Text Page Deleted" based on "umbTextpage" -> 1064
             Content trashed = MockedContent.CreateSimpleContent(contentType, "Text Page Deleted", -20);
             trashed.Trashed = true;
-            ServiceContext.ContentService.Save(trashed, 0);
+            ContentService.Save(trashed, 0);
         }
     }
 }

@@ -107,14 +107,14 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentTypeService.Save(new[] { contentType1, contentType2, contentType3 });
 
             var roots = MockedContent.CreateTextpageContent(contentType1, -1, 10);
-            ServiceContext.ContentService.Save(roots);
+            ContentService.Save(roots);
             foreach (var root in roots)
             {
                 var item1 = MockedContent.CreateTextpageContent(contentType1, root.Id, 10);
                 var item2 = MockedContent.CreateTextpageContent(contentType2, root.Id, 10);
                 var item3 = MockedContent.CreateTextpageContent(contentType3, root.Id, 10);
 
-                ServiceContext.ContentService.Save(item1.Concat(item2).Concat(item3));
+                ContentService.Save(item1.Concat(item2).Concat(item3));
             }
 
             var total = new List<IContent>();
@@ -122,10 +122,10 @@ namespace Umbraco.Tests.Services
             using (GetTestProfilingLogger().TraceDuration<ContentServicePerformanceTest>("Getting all content in site"))
             {
                 TestProfiler.Enable();
-                total.AddRange(ServiceContext.ContentService.GetRootContent());
+                total.AddRange(ContentService.GetRootContent());
                 foreach (var content in total.ToArray())
                 {
-                    total.AddRange(ServiceContext.ContentService.GetPagedDescendants(content.Id, 0, int.MaxValue, out var _));
+                    total.AddRange(ContentService.GetPagedDescendants(content.Id, 0, int.MaxValue, out var _));
                 }
                 TestProfiler.Disable();
                 Current.Logger.Info<ContentServicePerformanceTest>("Returned {Total} items", total.Count);
@@ -141,7 +141,7 @@ namespace Umbraco.Tests.Services
 
             // Act
             Stopwatch watch = Stopwatch.StartNew();
-            ServiceContext.ContentService.Save(pages, 0);
+            ContentService.Save(pages, 0);
             watch.Stop();
             var elapsed = watch.ElapsedMilliseconds;
 
@@ -160,7 +160,7 @@ namespace Umbraco.Tests.Services
 
             // Act
             Stopwatch watch = Stopwatch.StartNew();
-            ServiceContext.ContentService.Save(pages, 0);
+            ContentService.Save(pages, 0);
             watch.Stop();
             var elapsed = watch.ElapsedMilliseconds;
 
@@ -176,7 +176,7 @@ namespace Umbraco.Tests.Services
             // Arrange
             var contentType = ServiceContext.ContentTypeService.Get(NodeDto.NodeIdSeed);
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 100);
-            ServiceContext.ContentService.Save(pages, 0);
+            ContentService.Save(pages, 0);
 
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
@@ -205,7 +205,7 @@ namespace Umbraco.Tests.Services
             // Arrange
             var contentType = ServiceContext.ContentTypeService.Get(NodeDto.NodeIdSeed);
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 1000);
-            ServiceContext.ContentService.Save(pages, 0);
+            ContentService.Save(pages, 0);
 
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
@@ -232,7 +232,7 @@ namespace Umbraco.Tests.Services
             // Arrange
             var contentType = ServiceContext.ContentTypeService.Get(NodeDto.NodeIdSeed);
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 100);
-            ServiceContext.ContentService.Save(pages, 0);
+            ContentService.Save(pages, 0);
 
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
@@ -262,7 +262,7 @@ namespace Umbraco.Tests.Services
             // Arrange
             var contentType = ServiceContext.ContentTypeService.Get(NodeDto.NodeIdSeed);
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 1000);
-            ServiceContext.ContentService.Save(pages, 0);
+            ContentService.Save(pages, 0);
 
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())

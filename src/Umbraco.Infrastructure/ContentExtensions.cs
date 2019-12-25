@@ -118,11 +118,11 @@ namespace Umbraco.Core
         /// <remarks>
         /// This is a bit of a hack because we need to type check!
         /// </remarks>
-        internal static bool HasChildren(IContentBase content, ServiceContext services)
+        internal static bool HasChildren(IContentBase content, IContentService contentService, ServiceContext services)
         {
             if (content is IContent)
             {
-                return services.ContentService.HasChildren(content.Id);
+                return contentService.HasChildren(content.Id);
             }
             if (content is IMedia)
             {

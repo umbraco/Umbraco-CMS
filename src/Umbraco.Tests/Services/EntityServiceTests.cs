@@ -45,13 +45,13 @@ namespace Umbraco.Tests.Services
             var contentType = ServiceContext.ContentTypeService.Get("umbTextpage");
 
             var root = MockedContent.CreateSimpleContent(contentType);
-            ServiceContext.ContentService.Save(root);
+            ContentService.Save(root);
             var rootId = root.Id;
             var ids = new List<int>();
             for (int i = 0; i < 10; i++)
             {
                 var c1 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
-                ServiceContext.ContentService.Save(c1);
+                ContentService.Save(c1);
                 ids.Add(c1.Id);
                 root = c1; // make a hierarchy
             }
@@ -92,12 +92,12 @@ namespace Umbraco.Tests.Services
             var contentType = ServiceContext.ContentTypeService.Get("umbTextpage");
 
             var root = MockedContent.CreateSimpleContent(contentType);
-            ServiceContext.ContentService.Save(root);
+            ContentService.Save(root);
             var ids = new List<int>();
             for (int i = 0; i < 10; i++)
             {
                 var c1 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
-                ServiceContext.ContentService.Save(c1);
+                ContentService.Save(c1);
                 ids.Add(c1.Id);
             }
 
@@ -136,18 +136,18 @@ namespace Umbraco.Tests.Services
             var contentType = ServiceContext.ContentTypeService.Get("umbTextpage");
 
             var root = MockedContent.CreateSimpleContent(contentType);
-            ServiceContext.ContentService.Save(root);
+            ContentService.Save(root);
             var count = 0;
             for (int i = 0; i < 10; i++)
             {
                 var c1 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
-                ServiceContext.ContentService.Save(c1);
+                ContentService.Save(c1);
                 count++;
 
                 for (int j = 0; j < 5; j++)
                 {
                     var c2 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), c1);
-                    ServiceContext.ContentService.Save(c2);
+                    ContentService.Save(c2);
                     count++;
                 }
             }
@@ -169,12 +169,12 @@ namespace Umbraco.Tests.Services
             var contentType = ServiceContext.ContentTypeService.Get("umbTextpage");
 
             var root = MockedContent.CreateSimpleContent(contentType);
-            ServiceContext.ContentService.Save(root);
+            ContentService.Save(root);
             var toDelete = new List<IContent>();
             for (int i = 0; i < 10; i++)
             {
                 var c1 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
-                ServiceContext.ContentService.Save(c1);
+                ContentService.Save(c1);
 
                 if (i % 2 == 0)
                 {
@@ -184,13 +184,13 @@ namespace Umbraco.Tests.Services
                 for (int j = 0; j < 5; j++)
                 {
                     var c2 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), c1);
-                    ServiceContext.ContentService.Save(c2);
+                    ContentService.Save(c2);
                 }
             }
 
             foreach (var content in toDelete)
             {
-                ServiceContext.ContentService.MoveToRecycleBin(content);
+                ContentService.MoveToRecycleBin(content);
             }
 
             var service = ServiceContext.EntityService;
@@ -213,12 +213,12 @@ namespace Umbraco.Tests.Services
             var contentType = ServiceContext.ContentTypeService.Get("umbTextpage");
 
             var root = MockedContent.CreateSimpleContent(contentType);
-            ServiceContext.ContentService.Save(root);
+            ContentService.Save(root);
             var toDelete = new List<IContent>();
             for (int i = 0; i < 10; i++)
             {
                 var c1 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
-                ServiceContext.ContentService.Save(c1);
+                ContentService.Save(c1);
 
                 if (i % 2 == 0)
                 {
@@ -228,13 +228,13 @@ namespace Umbraco.Tests.Services
                 for (int j = 0; j < 5; j++)
                 {
                     var c2 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), c1);
-                    ServiceContext.ContentService.Save(c2);
+                    ContentService.Save(c2);
                 }
             }
 
             foreach (var content in toDelete)
             {
-                ServiceContext.ContentService.MoveToRecycleBin(content);
+                ContentService.MoveToRecycleBin(content);
             }
 
             var service = ServiceContext.EntityService;
@@ -257,17 +257,17 @@ namespace Umbraco.Tests.Services
             var contentType = ServiceContext.ContentTypeService.Get("umbTextpage");
 
             var root = MockedContent.CreateSimpleContent(contentType);
-            ServiceContext.ContentService.Save(root);
+            ContentService.Save(root);
 
             for (int i = 0; i < 10; i++)
             {
                 var c1 = MockedContent.CreateSimpleContent(contentType, "ssss" + Guid.NewGuid(), root);
-                ServiceContext.ContentService.Save(c1);
+                ContentService.Save(c1);
 
                 for (int j = 0; j < 5; j++)
                 {
                     var c2 = MockedContent.CreateSimpleContent(contentType, "tttt" + Guid.NewGuid(), c1);
-                    ServiceContext.ContentService.Save(c2);
+                    ContentService.Save(c2);
                 }
             }
 
@@ -531,7 +531,7 @@ namespace Umbraco.Tests.Services
             var c1 = MockedContent.CreateSimpleContent(contentType, "Test", -1);
             c1.SetCultureName("Test - FR", _langFr.IsoCode);
             c1.SetCultureName("Test - ES", _langEs.IsoCode);
-            ServiceContext.ContentService.Save(c1);
+            ContentService.Save(c1);
 
             var result = service.Get(c1.Id, UmbracoObjectTypes.Document);
             Assert.AreEqual("Test - FR", result.Name); // got name from default culture
@@ -553,7 +553,7 @@ namespace Umbraco.Tests.Services
 
             var root = MockedContent.CreateSimpleContent(contentType);
             root.SetCultureName("Root", _langFr.IsoCode); // else cannot save
-            ServiceContext.ContentService.Save(root);
+            ContentService.Save(root);
 
             for (int i = 0; i < 10; i++)
             {
@@ -567,7 +567,7 @@ namespace Umbraco.Tests.Services
                 {
                     c1.SetCultureName("Test", _langFr.IsoCode); // else cannot save
                 }
-                ServiceContext.ContentService.Save(c1);
+                ContentService.Save(c1);
             }
 
             var entities = service.GetChildren(root.Id, UmbracoObjectTypes.Document).ToArray();

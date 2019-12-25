@@ -252,7 +252,7 @@ namespace Umbraco.Tests.Web.Controllers
         {
             ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
             {
-                var contentServiceMock = Mock.Get(Current.Services.ContentService);
+                var contentServiceMock = Mock.Get(ContentService);
                 contentServiceMock.Setup(x => x.GetById(123)).Returns(() => null); //do not find it
 
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
@@ -331,7 +331,7 @@ namespace Umbraco.Tests.Web.Controllers
         {
             ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
             {
-                var contentServiceMock = Mock.Get(Current.Services.ContentService);
+                var contentServiceMock = Mock.Get(ContentService);
                 contentServiceMock.Setup(x => x.GetById(123)).Returns(() => GetMockedContent());
 
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
@@ -377,7 +377,7 @@ namespace Umbraco.Tests.Web.Controllers
 
             ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
             {
-                var contentServiceMock = Mock.Get(Current.Services.ContentService);
+                var contentServiceMock = Mock.Get(ContentService);
                 contentServiceMock.Setup(x => x.GetById(123)).Returns(() => content);
                 contentServiceMock.Setup(x => x.Save(It.IsAny<IContent>(), It.IsAny<int>(), It.IsAny<bool>()))
                     .Returns(new OperationResult(OperationResultType.Success, new Core.Events.EventMessages())); //success
@@ -417,7 +417,7 @@ namespace Umbraco.Tests.Web.Controllers
 
             ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
             {
-                var contentServiceMock = Mock.Get(Current.Services.ContentService);
+                var contentServiceMock = Mock.Get(ContentService);
                 contentServiceMock.Setup(x => x.GetById(123)).Returns(() => content);
                 contentServiceMock.Setup(x => x.Save(It.IsAny<IContent>(), It.IsAny<int>(), It.IsAny<bool>()))
                     .Returns(new OperationResult(OperationResultType.Success, new Core.Events.EventMessages())); //success
@@ -463,7 +463,7 @@ namespace Umbraco.Tests.Web.Controllers
 
             ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
             {
-                var contentServiceMock = Mock.Get(Current.Services.ContentService);
+                var contentServiceMock = Mock.Get(ContentService);
                 contentServiceMock.Setup(x => x.GetById(123)).Returns(() => content);
                 contentServiceMock.Setup(x => x.Save(It.IsAny<IContent>(), It.IsAny<int>(), It.IsAny<bool>()))
                     .Returns(new OperationResult(OperationResultType.Success, new Core.Events.EventMessages())); //success

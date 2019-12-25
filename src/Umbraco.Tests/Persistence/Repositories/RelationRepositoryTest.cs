@@ -288,7 +288,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             for (int i = 0; i < 10; i++)
             {
                 var c1 = MockedContent.CreateBasicContent(contentType);
-                ServiceContext.ContentService.Save(c1);
+                ContentService.Save(c1);
                 createdContent.Add(c1);
             }
 
@@ -392,8 +392,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 RelationTypeRepository repositoryType;
                 var repository = CreateRepository(provider, out repositoryType);
 
-                var content = ServiceContext.ContentService.GetById(NodeDto.NodeIdSeed + 3);
-                ServiceContext.ContentService.Delete(content, 0);
+                var content = ContentService.GetById(NodeDto.NodeIdSeed + 3);
+                ContentService.Delete(content, 0);
 
                 // Act
                 var shouldntExist = repository.Exists(1);
@@ -442,15 +442,15 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //Create and Save Content "Homepage" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 1)
                 Content textpage = MockedContent.CreateSimpleContent(contentType);
-                ServiceContext.ContentService.Save(textpage, 0);
+                ContentService.Save(textpage, 0);
 
                 //Create and Save Content "Text Page 1" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 2)
                 Content subpage = MockedContent.CreateSimpleContent(contentType, "Text Page 1", textpage.Id);
-                ServiceContext.ContentService.Save(subpage, 0);
+                ContentService.Save(subpage, 0);
 
                 //Create and Save Content "Text Page 1" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 3)
                 Content subpage2 = MockedContent.CreateSimpleContent(contentType, "Text Page 2", textpage.Id);
-                ServiceContext.ContentService.Save(subpage2, 0);
+                ContentService.Save(subpage2, 0);
 
                 var relation = new Relation(textpage.Id, subpage.Id, relateContent) { Comment = string.Empty };
                 var relation2 = new Relation(textpage.Id, subpage2.Id, relateContent) { Comment = string.Empty };

@@ -16,7 +16,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
+using ContentServiceImplementation = Umbraco.Core.Services.Implement.ContentService;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Tests.TestHelpers;
@@ -60,7 +60,7 @@ namespace Umbraco.Tests.Scoping
             _distributedCacheBinder = null;
 
             _onPublishedAssertAction = null;
-            ContentService.Published -= OnPublishedAssert;
+            ContentServiceImplementation.Published -= OnPublishedAssert;
         }
 
         private void OnPublishedAssert(IContentService sender, PublishEventArgs<IContent> args)
@@ -162,7 +162,7 @@ namespace Umbraco.Tests.Scoping
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                Current.Services.ContentService.SaveAndPublish(item);
+                ContentService.SaveAndPublish(item);
                 scope.Complete();
             }
 
@@ -171,12 +171,12 @@ namespace Umbraco.Tests.Scoping
             Assert.IsNotNull(x);
             Assert.AreEqual("name", x.Name());
 
-            ContentService.Published += OnPublishedAssert;
+            ContentServiceImplementation.Published += OnPublishedAssert;
 
             using (var scope = ScopeProvider.CreateScope())
             {
                 item.Name = "changed";
-                Current.Services.ContentService.SaveAndPublish(item);
+                ContentService.SaveAndPublish(item);
 
                 if (complete)
                     scope.Complete();

@@ -99,7 +99,7 @@ namespace Umbraco.Tests.Services
                 Assert.Ignore("Do not run on VSTS.");
 
             // the ServiceContext in that each repository in a service (i.e. ContentService) is a singleton
-            var contentService = (ContentService)ServiceContext.ContentService;
+            var contentService = ContentService;
 
             var threads = new List<Thread>();
             var exceptions = new List<Exception>();

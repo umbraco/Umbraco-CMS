@@ -6,6 +6,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
+using ContentServiceImplementation = Umbraco.Core.Services.Implement.ContentService;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 
@@ -46,7 +47,7 @@ namespace Umbraco.Tests.Services
                 propertyType.Variations = ContentVariation.Culture;
             contentTypeService.Save(contentType);
 
-            var contentService = ServiceContext.ContentService;
+            var contentService = ContentService;
 
             IContent document = new Content("content", -1, contentType);
             document.SetCultureName("hello", "en-US");
@@ -79,16 +80,16 @@ namespace Umbraco.Tests.Services
                 Assert.IsFalse(e.HasSavedCulture(saved, "fr-FR"));
             }
 
-            ContentService.Saving += OnSaving;
-            ContentService.Saved += OnSaved;
+            ContentServiceImplementation.Saving += OnSaving;
+            ContentServiceImplementation.Saved += OnSaved;
             try
             {
                 contentService.Save(document);
             }
             finally
             {
-                ContentService.Saving -= OnSaving;
-                ContentService.Saved -= OnSaved;
+                ContentServiceImplementation.Saving -= OnSaving;
+                ContentServiceImplementation.Saved -= OnSaved;
             }
         }
 
@@ -101,7 +102,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate);
             contentTypeService.Save(contentType);
 
-            var contentService = ServiceContext.ContentService;
+            var contentService = ContentService;
 
             IContent document = new Content("content", -1, contentType);
 
@@ -127,16 +128,16 @@ namespace Umbraco.Tests.Services
                 Assert.IsNull(propValue.PublishedValue);
             }
 
-            ContentService.Saving += OnSaving;
-            ContentService.Saved += OnSaved;
+            ContentServiceImplementation.Saving += OnSaving;
+            ContentServiceImplementation.Saved += OnSaved;
             try
             {
                 contentService.Save(document);
             }
             finally
             {
-                ContentService.Saving -= OnSaving;
-                ContentService.Saved -= OnSaved;
+                ContentServiceImplementation.Saving -= OnSaving;
+                ContentServiceImplementation.Saved -= OnSaved;
             }
 
         }
@@ -157,7 +158,7 @@ namespace Umbraco.Tests.Services
                 propertyType.Variations = ContentVariation.Culture;
             contentTypeService.Save(contentType);
 
-            var contentService = ServiceContext.ContentService;
+            var contentService = ContentService;
 
             IContent document = new Content("content", -1, contentType);
             document.SetCultureName("hello", "en-US");
@@ -190,16 +191,16 @@ namespace Umbraco.Tests.Services
                 Assert.IsTrue(e.HasPublishedCulture(published, "fr-FR"));
             }
 
-            ContentService.Publishing += OnPublishing;
-            ContentService.Published += OnPublished;
+            ContentServiceImplementation.Publishing += OnPublishing;
+            ContentServiceImplementation.Published += OnPublished;
             try
             {
                 contentService.SaveAndPublish(document, "fr-FR");
             }
             finally
             {
-                ContentService.Publishing -= OnPublishing;
-                ContentService.Published -= OnPublished;
+                ContentServiceImplementation.Publishing -= OnPublishing;
+                ContentServiceImplementation.Published -= OnPublished;
             }
 
             document = contentService.GetById(document.Id);
@@ -218,7 +219,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate);
             contentTypeService.Save(contentType);
 
-            var contentService = ServiceContext.ContentService;
+            var contentService = ContentService;
 
             IContent document = new Content("content", -1, contentType);
 
@@ -247,16 +248,16 @@ namespace Umbraco.Tests.Services
             //We are binding to Saving (not Publishing), because the Publishing event is really just used for cancelling, it should not be
             //used for setting values and it won't actually work! This is because the Publishing event is raised AFTER the values on the model
             //are published, but Saving is raised BEFORE.
-            ContentService.Saving += OnSaving;
-            ContentService.Saved += OnSaved;
+            ContentServiceImplementation.Saving += OnSaving;
+            ContentServiceImplementation.Saved += OnSaved;
             try
             {
                 contentService.SaveAndPublish(document);
             }
             finally
             {
-                ContentService.Saving -= OnSaving;
-                ContentService.Saved -= OnSaved;
+                ContentServiceImplementation.Saving -= OnSaving;
+                ContentServiceImplementation.Saved -= OnSaved;
             }
         }
 
@@ -271,7 +272,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate);
             contentTypeService.Save(contentType);
 
-            var contentService = ServiceContext.ContentService;
+            var contentService = ContentService;
 
             IContent document = new Content("content", -1, contentType);
 
@@ -295,7 +296,7 @@ namespace Umbraco.Tests.Services
             //We are binding to Saving (not Publishing), because the Publishing event is really just used for cancelling, it should not be
             //used for setting values and it won't actually work! This is because the Publishing event is raised AFTER the values on the model
             //are published, but Saving is raised BEFORE.
-            ContentService.Saving += OnSaving;
+            ContentServiceImplementation.Saving += OnSaving;
             try
             {
                 result = contentService.SaveAndPublish(document);
@@ -303,7 +304,7 @@ namespace Umbraco.Tests.Services
             }
             finally
             {
-                ContentService.Saving -= OnSaving;
+                ContentServiceImplementation.Saving -= OnSaving;
             }
         }
 
@@ -323,7 +324,7 @@ namespace Umbraco.Tests.Services
                 propertyType.Variations = ContentVariation.Culture;
             contentTypeService.Save(contentType);
 
-            var contentService = (ContentService)ServiceContext.ContentService;
+            var contentService = (ContentService)ContentService;
 
             IContent document = new Content("content", -1, contentType);
             document.SetCultureName("hello", "en-US");
@@ -364,16 +365,16 @@ namespace Umbraco.Tests.Services
 
             document.UnpublishCulture("fr-FR");
 
-            ContentService.Publishing += OnPublishing;
-            ContentService.Published += OnPublished;
+            ContentServiceImplementation.Publishing += OnPublishing;
+            ContentServiceImplementation.Published += OnPublished;
             try
             {
                 contentService.CommitDocumentChanges(document);
             }
             finally
             {
-                ContentService.Publishing -= OnPublishing;
-                ContentService.Published -= OnPublished;
+                ContentServiceImplementation.Publishing -= OnPublishing;
+                ContentServiceImplementation.Published -= OnPublished;
             }
 
             document = contentService.GetById(document.Id);

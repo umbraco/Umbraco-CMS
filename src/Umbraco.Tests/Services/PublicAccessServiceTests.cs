@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Services
         public void Can_Add_New_Entry()
         {
             // Arrange
-            var contentService = ServiceContext.ContentService;
+            var contentService = ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var ct = MockedContentTypes.CreateSimpleContentType("blah", "Blah");
             ServiceContext.FileService.SaveTemplate(ct.DefaultTemplate);
@@ -54,7 +54,7 @@ namespace Umbraco.Tests.Services
         public void Can_Add_Rule()
         {
             // Arrange
-            var contentService = ServiceContext.ContentService;
+            var contentService = ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var ct = MockedContentTypes.CreateSimpleContentType("blah", "Blah");
             ServiceContext.FileService.SaveTemplate(ct.DefaultTemplate);
@@ -87,7 +87,7 @@ namespace Umbraco.Tests.Services
         public void Can_Add_Multiple_Value_For_Same_Rule_Type()
         {
             // Arrange
-            var contentService = ServiceContext.ContentService;
+            var contentService = ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var ct = MockedContentTypes.CreateSimpleContentType("blah", "Blah");
             ServiceContext.FileService.SaveTemplate(ct.DefaultTemplate);
@@ -124,7 +124,7 @@ namespace Umbraco.Tests.Services
         public void Can_Remove_Rule()
         {
             // Arrange
-            var contentService = ServiceContext.ContentService;
+            var contentService = ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var ct = MockedContentTypes.CreateSimpleContentType("blah", "Blah");
             ServiceContext.FileService.SaveTemplate(ct.DefaultTemplate);

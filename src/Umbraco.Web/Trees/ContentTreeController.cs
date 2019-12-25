@@ -40,21 +40,23 @@ namespace Umbraco.Web.Trees
         private readonly UmbracoTreeSearcher _treeSearcher;
         private readonly ActionCollection _actions;
         private readonly IGlobalSettings _globalSettings;
+        private readonly IContentService _contentService;
 
         protected override int RecycleBinId => Constants.System.RecycleBinContent;
 
-        protected override bool RecycleBinSmells => Services.ContentService.RecycleBinSmells();
+        protected override bool RecycleBinSmells => _contentService.RecycleBinSmells();
 
         private int[] _userStartNodes;
 
         protected override int[] UserStartNodes
             => _userStartNodes ?? (_userStartNodes = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService));
 
-        public ContentTreeController(UmbracoTreeSearcher treeSearcher, ActionCollection actions, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        public ContentTreeController(UmbracoTreeSearcher treeSearcher, ActionCollection actions, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IContentService contentService) : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _treeSearcher = treeSearcher;
             _actions = actions;
             _globalSettings = globalSettings;
+            _contentService = contentService;
         }
 
         /// <inheritdoc />

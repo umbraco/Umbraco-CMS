@@ -24,13 +24,13 @@ namespace Umbraco.Tests.Services
 
             IContent iRoot = new Content("iroot", -1, iContentType);
             iRoot.SetValue("ip", "iroot");
-            ServiceContext.ContentService.Save(iRoot);
+            ContentService.Save(iRoot);
             IContent ii1 = new Content("ii1", iRoot, iContentType);
             ii1.SetValue("ip", "vii1");
-            ServiceContext.ContentService.Save(ii1);
+            ContentService.Save(ii1);
             IContent ii2 = new Content("ii2", iRoot, iContentType);
             ii2.SetValue("ip", "vii2");
-            ServiceContext.ContentService.Save(ii2);
+            ContentService.Save(ii2);
 
             // iroot    !published   !edited
             //  ii1     !published   !edited
@@ -49,24 +49,24 @@ namespace Umbraco.Tests.Services
 
             // prepare
 
-            ServiceContext.ContentService.SaveAndPublish(iRoot);
-            ServiceContext.ContentService.SaveAndPublish(ii1);
+            ContentService.SaveAndPublish(iRoot);
+            ContentService.SaveAndPublish(ii1);
 
             IContent ii11 = new Content("ii11", ii1, iContentType);
             ii11.SetValue("ip", "vii11");
-            ServiceContext.ContentService.SaveAndPublish(ii11);
+            ContentService.SaveAndPublish(ii11);
             IContent ii12 = new Content("ii12", ii1, iContentType);
             ii11.SetValue("ip", "vii12");
-            ServiceContext.ContentService.Save(ii12);
+            ContentService.Save(ii12);
 
-            ServiceContext.ContentService.SaveAndPublish(ii2);
+            ContentService.SaveAndPublish(ii2);
             IContent ii21 = new Content("ii21", ii2, iContentType);
             ii21.SetValue("ip", "vii21");
-            ServiceContext.ContentService.SaveAndPublish(ii21);
+            ContentService.SaveAndPublish(ii21);
             IContent ii22 = new Content("ii22", ii2, iContentType);
             ii22.SetValue("ip", "vii22");
-            ServiceContext.ContentService.Save(ii22);
-            ServiceContext.ContentService.Unpublish(ii2);
+            ContentService.Save(ii22);
+            ContentService.Unpublish(ii2);
 
             // iroot    published    !edited
             //  ii1     published    !edited
@@ -92,9 +92,9 @@ namespace Umbraco.Tests.Services
             // prepare
 
             iRoot.SetValue("ip", "changed");
-            ServiceContext.ContentService.Save(iRoot);
+            ContentService.Save(iRoot);
             ii11.SetValue("ip", "changed");
-            ServiceContext.ContentService.Save(ii11);
+            ContentService.Save(ii11);
 
             // iroot    published    edited     ***
             //  ii1     published    !edited
@@ -131,7 +131,7 @@ namespace Umbraco.Tests.Services
                 PublishResultType.SuccessPublishAlready, // was masked
                 PublishResultType.SuccessPublish);
 
-            ii21 = ServiceContext.ContentService.GetById(ii21.Id);
+            ii21 = ContentService.GetById(ii21.Id);
             Assert.IsTrue(ii21.Published);
         }
 
@@ -149,7 +149,7 @@ namespace Umbraco.Tests.Services
             vRoot.SetValue("vp", "vroot.de", "de");
             vRoot.SetValue("vp", "vroot.ru", "ru");
             vRoot.SetValue("vp", "vroot.es", "es");
-            ServiceContext.ContentService.SaveAndPublish(vRoot);
+            ContentService.SaveAndPublish(vRoot);
 
             //create/publish child
             IContent iv1 = new Content("iv1", vRoot, vContentType, "de");
@@ -160,13 +160,13 @@ namespace Umbraco.Tests.Services
             iv1.SetValue("vp", "iv1.de", "de");
             iv1.SetValue("vp", "iv1.ru", "ru");
             iv1.SetValue("vp", "iv1.es", "es");
-            ServiceContext.ContentService.SaveAndPublish(iv1);
+            ContentService.SaveAndPublish(iv1);
 
             //update the child
             iv1.SetValue("vp", "UPDATED-iv1.de", "de");
-            ServiceContext.ContentService.Save(iv1);
+            ContentService.Save(iv1);
 
-            var r = ServiceContext.ContentService.SaveAndPublishBranch(vRoot, false).ToArray(); //no culture specified so "*" is used, so all cultures
+            var r = ContentService.SaveAndPublishBranch(vRoot, false).ToArray(); //no culture specified so "*" is used, so all cultures
             Assert.AreEqual(PublishResultType.SuccessPublishAlready, r[0].Result);
             Assert.AreEqual(PublishResultType.SuccessPublishCulture, r[1].Result);
         }
@@ -185,7 +185,7 @@ namespace Umbraco.Tests.Services
             vRoot.SetValue("vp", "vroot.de", "de");
             vRoot.SetValue("vp", "vroot.ru", "ru");
             vRoot.SetValue("vp", "vroot.es", "es");
-            ServiceContext.ContentService.SaveAndPublish(vRoot);
+            ContentService.SaveAndPublish(vRoot);
 
             //create/publish child
             IContent iv1 = new Content("iv1", vRoot, vContentType, "de");
@@ -196,13 +196,13 @@ namespace Umbraco.Tests.Services
             iv1.SetValue("vp", "iv1.de", "de");
             iv1.SetValue("vp", "iv1.ru", "ru");
             iv1.SetValue("vp", "iv1.es", "es");
-            ServiceContext.ContentService.SaveAndPublish(iv1);
+            ContentService.SaveAndPublish(iv1);
 
             //update the child
             iv1.SetValue("vp", "UPDATED-iv1.de", "de");
-            ServiceContext.ContentService.Save(iv1);
+            ContentService.Save(iv1);
 
-            var r = ServiceContext.ContentService.SaveAndPublishBranch(vRoot, false, "de").ToArray();
+            var r = ContentService.SaveAndPublishBranch(vRoot, false, "de").ToArray();
             Assert.AreEqual(PublishResultType.SuccessPublishAlready, r[0].Result);
             Assert.AreEqual(PublishResultType.SuccessPublishCulture, r[1].Result);
         }
@@ -220,7 +220,7 @@ namespace Umbraco.Tests.Services
             vRoot.SetValue("vp", "vroot.de", "de");
             vRoot.SetValue("vp", "vroot.ru", "ru");
             vRoot.SetValue("vp", "vroot.es", "es");
-            ServiceContext.ContentService.Save(vRoot);
+            ContentService.Save(vRoot);
 
             IContent iv1 = new Content("iv1", vRoot, vContentType, "de");
             iv1.SetCultureName("iv1.de", "de");
@@ -230,7 +230,7 @@ namespace Umbraco.Tests.Services
             iv1.SetValue("vp", "iv1.de", "de");
             iv1.SetValue("vp", "iv1.ru", "ru");
             iv1.SetValue("vp", "iv1.es", "es");
-            ServiceContext.ContentService.Save(iv1);
+            ContentService.Save(iv1);
 
             IContent iv2 = new Content("iv2", vRoot, vContentType, "de");
             iv2.SetCultureName("iv2.de", "de");
@@ -240,7 +240,7 @@ namespace Umbraco.Tests.Services
             iv2.SetValue("vp", "iv2.de", "de");
             iv2.SetValue("vp", "iv2.ru", "ru");
             iv2.SetValue("vp", "iv2.es", "es");
-            ServiceContext.ContentService.Save(iv2);
+            ContentService.Save(iv2);
 
             // vroot    !published   !edited
             //  iv1     !published   !edited
@@ -249,7 +249,7 @@ namespace Umbraco.Tests.Services
             // !force = publishes those that are actually published, and have changes
             // here: nothing
 
-            var r = ServiceContext.ContentService.SaveAndPublishBranch(vRoot, false).ToArray(); // no culture specified = all cultures
+            var r = ContentService.SaveAndPublishBranch(vRoot, false).ToArray(); // no culture specified = all cultures
 
             // not forcing, iv1 and iv2 not published yet: only root got published
             AssertPublishResults(r, x => x.Content.Name,
@@ -262,15 +262,15 @@ namespace Umbraco.Tests.Services
             vRoot.SetValue("vp", "changed.de", "de");
             vRoot.SetValue("vp", "changed.ru", "ru");
             vRoot.SetValue("vp", "changed.es", "es");
-            ServiceContext.ContentService.Save(vRoot); // now root has drafts in all cultures
+            ContentService.Save(vRoot); // now root has drafts in all cultures
 
-            ServiceContext.ContentService.SaveAndPublish(iv1, new []{"de", "ru"}); // now iv1 de and ru are published
+            ContentService.SaveAndPublish(iv1, new []{"de", "ru"}); // now iv1 de and ru are published
 
             iv1.SetValue("ip", "changed");
             iv1.SetValue("vp", "changed.de", "de");
             iv1.SetValue("vp", "changed.ru", "ru");
             iv1.SetValue("vp", "changed.es", "es");
-            ServiceContext.ContentService.Save(iv1); // now iv1 has drafts in all cultures
+            ContentService.Save(iv1); // now iv1 has drafts in all cultures
 
             // validate - everything published for root, because no culture was specified = all
             Assert.IsTrue(vRoot.Published);
@@ -284,7 +284,7 @@ namespace Umbraco.Tests.Services
             Assert.IsTrue(iv1.IsCulturePublished("ru"));
             Assert.IsFalse(iv1.IsCulturePublished("es"));
 
-            r = ServiceContext.ContentService.SaveAndPublishBranch(vRoot, false, "de").ToArray();
+            r = ContentService.SaveAndPublishBranch(vRoot, false, "de").ToArray();
 
             // not forcing, iv2 not published yet: only root and iv1 got published
             AssertPublishResults(r, x => x.Content.Name,
@@ -330,21 +330,21 @@ namespace Umbraco.Tests.Services
             // invariant root -> invariant -> variant
             iRoot = new Content("iroot", -1, iContentType);
             iRoot.SetValue("ip", "iroot");
-            ServiceContext.ContentService.SaveAndPublish(iRoot);
+            ContentService.SaveAndPublish(iRoot);
             ii1 = new Content("ii1", iRoot, iContentType);
             ii1.SetValue("ip", "vii1");
-            ServiceContext.ContentService.SaveAndPublish(ii1);
+            ContentService.SaveAndPublish(ii1);
             ii1.SetValue("ip", "changed");
-            ServiceContext.ContentService.Save(ii1);
+            ContentService.Save(ii1);
             iv11 = new Content("iv11.de", ii1, vContentType, "de");
             iv11.SetValue("ip", "iv11");
             iv11.SetValue("vp", "iv11.de", "de");
             iv11.SetValue("vp", "iv11.ru", "ru");
             iv11.SetValue("vp", "iv11.es", "es");
-            ServiceContext.ContentService.Save(iv11);
+            ContentService.Save(iv11);
 
             iv11.SetCultureName("iv11.ru", "ru");
-            ServiceContext.ContentService.SaveAndPublish(iv11, new []{"de", "ru"});
+            ContentService.SaveAndPublish(iv11, new []{"de", "ru"});
 
             Assert.AreEqual("iv11.de", iv11.GetValue("vp", "de", published: true));
             Assert.AreEqual("iv11.ru", iv11.GetValue("vp", "ru", published: true));
@@ -352,7 +352,7 @@ namespace Umbraco.Tests.Services
             iv11.SetValue("ip", "changed");
             iv11.SetValue("vp", "changed.de", "de");
             iv11.SetValue("vp", "changed.ru", "ru");
-            ServiceContext.ContentService.Save(iv11);
+            ContentService.Save(iv11);
         }
 
         [Test]
@@ -360,7 +360,7 @@ namespace Umbraco.Tests.Services
         {
             Can_Publish_Mixed_Branch(out var iRoot, out var ii1, out var iv11);
 
-            var r = ServiceContext.ContentService.SaveAndPublishBranch(iRoot, false, "de").ToArray();
+            var r = ContentService.SaveAndPublishBranch(iRoot, false, "de").ToArray();
             AssertPublishResults(r, x => x.Content.Name,
                 "iroot", "ii1", "iv11.de");
             AssertPublishResults(r, x => x.Result,
@@ -386,7 +386,7 @@ namespace Umbraco.Tests.Services
         {
             Can_Publish_Mixed_Branch(out var iRoot, out var ii1, out var iv11);
 
-            var r = ServiceContext.ContentService.SaveAndPublishBranch(iRoot, false, new[] { "de", "ru" }).ToArray();
+            var r = ContentService.SaveAndPublishBranch(iRoot, false, new[] { "de", "ru" }).ToArray();
             AssertPublishResults(r, x => x.Content.Name,
                 "iroot", "ii1", "iv11.de");
             AssertPublishResults(r, x => x.Result,
@@ -421,7 +421,7 @@ namespace Umbraco.Tests.Services
         }
 
         private void Reload(ref IContent document)
-            => document = ServiceContext.ContentService.GetById(document.Id);
+            => document = ContentService.GetById(document.Id);
 
         private void CreateTypes(out IContentType iContentType, out IContentType vContentType)
         {
@@ -459,9 +459,9 @@ namespace Umbraco.Tests.Services
             switch (method)
             {
                 case 1:
-                    return ServiceContext.ContentService.SaveAndPublishBranch(content, force, culture: "*");
+                    return ContentService.SaveAndPublishBranch(content, force, culture: "*");
                 case 2:
-                    return ServiceContext.ContentService.SaveAndPublishBranch(content, force, cultures: new [] { "*" });
+                    return ContentService.SaveAndPublishBranch(content, force, cultures: new [] { "*" });
                 default:
                     throw new ArgumentOutOfRangeException(nameof(method));
             }

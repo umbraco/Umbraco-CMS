@@ -3,6 +3,7 @@ using System.Net.Http.Formatting;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
@@ -23,6 +24,12 @@ namespace Umbraco.Web.Trees
     [CoreTree]
     public class ContentBlueprintTreeController : TreeController
     {
+        private readonly IContentService _contentService;
+
+        public ContentBlueprintTreeController(IContentService contentService)
+        {
+            _contentService = contentService;
+        }
 
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
         {

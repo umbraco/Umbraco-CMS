@@ -103,7 +103,7 @@ namespace Umbraco.Tests.Persistence.NPocoTests
 
         private void QueryStuff(int id1, int id2, int id3, string alias1)
         {
-            var contentService = ServiceContext.ContentService;
+            var contentService = ContentService;
 
             ServiceContext.TagService.GetTagsForEntity(id1);
 
@@ -144,7 +144,7 @@ namespace Umbraco.Tests.Persistence.NPocoTests
 
         private void CreateStuff(out int id1, out int id2, out int id3, out string alias)
         {
-            var contentService = ServiceContext.ContentService;
+            var contentService = ContentService;
 
             var ctAlias = "umbTextpage" + Guid.NewGuid().ToString("N");
             alias = ctAlias;

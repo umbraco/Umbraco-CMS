@@ -44,7 +44,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void TagsCanBeInvariant()
         {
-            var contentService = ServiceContext.ContentService;
+            var contentService = ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
@@ -83,7 +83,7 @@ namespace Umbraco.Tests.Services
             var languageService = ServiceContext.LocalizationService;
             languageService.Save(new Language(TestObjects.GetGlobalSettings(), "fr-FR")); // en-US is already there
 
-            var contentService = ServiceContext.ContentService;
+            var contentService = ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
@@ -136,7 +136,7 @@ namespace Umbraco.Tests.Services
         {
             var enId = ServiceContext.LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
 
-            var contentService = ServiceContext.ContentService;
+            var contentService = ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
@@ -209,7 +209,7 @@ namespace Umbraco.Tests.Services
 
             var enId = ServiceContext.LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
 
-            var contentService = ServiceContext.ContentService;
+            var contentService = ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
@@ -266,7 +266,7 @@ namespace Umbraco.Tests.Services
 
             var enId = ServiceContext.LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
 
-            var contentService = ServiceContext.ContentService;
+            var contentService = ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
@@ -313,7 +313,7 @@ namespace Umbraco.Tests.Services
 
             var enId = ServiceContext.LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
 
-            var contentService = ServiceContext.ContentService;
+            var contentService = ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
@@ -370,7 +370,7 @@ namespace Umbraco.Tests.Services
 
             var enId = ServiceContext.LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
 
-            var contentService = ServiceContext.ContentService;
+            var contentService = ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
@@ -404,7 +404,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void TagsAreUpdatedWhenContentIsTrashedAndUnTrashed_One()
         {
-            var contentService = ServiceContext.ContentService;
+            var contentService = ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
@@ -435,7 +435,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void TagsAreUpdatedWhenContentIsTrashedAndUnTrashed_All()
         {
-            var contentService = ServiceContext.ContentService;
+            var contentService = ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
@@ -468,7 +468,7 @@ namespace Umbraco.Tests.Services
         [Ignore("https://github.com/umbraco/Umbraco-CMS/issues/3821 (U4-8442), will need to be fixed.")]
         public void TagsAreUpdatedWhenContentIsTrashedAndUnTrashed_Tree()
         {
-            var contentService = ServiceContext.ContentService;
+            var contentService = ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
@@ -544,7 +544,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void TagsAreUpdatedWhenContentIsUnpublishedAndRePublished()
         {
-            var contentService = ServiceContext.ContentService;
+            var contentService = ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
@@ -571,7 +571,7 @@ namespace Umbraco.Tests.Services
         [Ignore("https://github.com/umbraco/Umbraco-CMS/issues/3821 (U4-8442), will need to be fixed.")]
         public void TagsAreUpdatedWhenContentIsUnpublishedAndRePublished_Tree()
         {
-            var contentService = ServiceContext.ContentService;
+            var contentService = ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
@@ -616,7 +616,7 @@ namespace Umbraco.Tests.Services
         public void Create_Tag_Data_Bulk_Publish_Operation()
         {
             //Arrange
-            var contentService = ServiceContext.ContentService;
+            var contentService = ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var dataTypeService = ServiceContext.DataTypeService;
 
@@ -676,7 +676,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Does_Not_Create_Tag_Data_For_Non_Published_Version()
         {
-            var contentService = ServiceContext.ContentService;
+            var contentService = ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
 
             // create content type with a tag property
@@ -711,7 +711,7 @@ namespace Umbraco.Tests.Services
         public void Can_Replace_Tag_Data_To_Published_Content()
         {
             //Arrange
-            var contentService = ServiceContext.ContentService;
+            var contentService = ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
@@ -745,7 +745,7 @@ namespace Umbraco.Tests.Services
         public void Can_Append_Tag_Data_To_Published_Content()
         {
             //Arrange
-            var contentService = ServiceContext.ContentService;
+            var contentService = ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
@@ -779,7 +779,7 @@ namespace Umbraco.Tests.Services
         public void Can_Remove_Tag_Data_To_Published_Content()
         {
             //Arrange
-            var contentService = ServiceContext.ContentService;
+            var contentService = ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(

@@ -53,7 +53,7 @@ namespace Umbraco.Tests.Routing
                 contentFinders: new ContentFinderCollection(new[] { new ContentFinderByUrl(Logger) }));
             var urls = content.GetContentUrls(publishedRouter,
                 umbContext,
-                GetLangService("en-US", "fr-FR"), GetTextService(), ServiceContext.ContentService,
+                GetLangService("en-US", "fr-FR"), GetTextService(), ContentService,
                 Logger).ToList();
 
             Assert.AreEqual(1, urls.Count);
@@ -78,7 +78,7 @@ namespace Umbraco.Tests.Routing
                 contentFinders:new ContentFinderCollection(new[]{new ContentFinderByUrl(Logger) }));
             var urls = content.GetContentUrls(publishedRouter,
                 umbContext,
-                GetLangService("en-US", "fr-FR"), GetTextService(), ServiceContext.ContentService,
+                GetLangService("en-US", "fr-FR"), GetTextService(), ContentService,
                 Logger).ToList();
 
             Assert.AreEqual(1, urls.Count);
@@ -110,7 +110,7 @@ namespace Umbraco.Tests.Routing
                 contentFinders: new ContentFinderCollection(new[] { new ContentFinderByUrl(Logger) }));
             var urls = child.GetContentUrls(publishedRouter,
                 umbContext,
-                GetLangService("en-US", "fr-FR"), GetTextService(), ServiceContext.ContentService,
+                GetLangService("en-US", "fr-FR"), GetTextService(), ContentService,
                 Logger).ToList();
 
             Assert.AreEqual(1, urls.Count);
