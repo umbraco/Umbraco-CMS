@@ -20,8 +20,6 @@ namespace Umbraco.Tests.Services
         Logger = UmbracoTestOptions.Logger.Console)]
     public class ContentServiceTagsTests : TestWithSomeContentBase
     {
-        private readonly ILocalizationService _localizationService = new Mock<ILocalizationService>().Object;
-
         public PropertyEditorCollection PropertyEditorCollection => Factory.GetInstance<PropertyEditorCollection>();
 
         public override void SetUp()
@@ -83,7 +81,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void TagsCanBeVariant()
         {
-            _localizationService.Save(new Language(TestObjects.GetGlobalSettings(), "fr-FR")); // en-US is already there
+            LocalizationService.Save(new Language(TestObjects.GetGlobalSettings(), "fr-FR")); // en-US is already there
 
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
@@ -136,7 +134,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void TagsCanBecomeVariant()
         {
-            var enId = _localizationService.GetLanguageIdByIsoCode("en-US").Value;
+            var enId = LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
 
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
@@ -206,10 +204,10 @@ namespace Umbraco.Tests.Services
         [Test]
         public void TagsCanBecomeInvariant()
         {
-            var languageService = _localizationService;
+            var languageService = LocalizationService;
             languageService.Save(new Language(TestObjects.GetGlobalSettings(), "fr-FR")); // en-US is already there
 
-            var enId = _localizationService.GetLanguageIdByIsoCode("en-US").Value;
+            var enId = LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
 
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
@@ -263,10 +261,10 @@ namespace Umbraco.Tests.Services
         [Test]
         public void TagsCanBecomeInvariant2()
         {
-            var languageService = _localizationService;
+            var languageService = LocalizationService;
             languageService.Save(new Language(TestObjects.GetGlobalSettings(), "fr-FR")); // en-US is already there
 
-            var enId = _localizationService.GetLanguageIdByIsoCode("en-US").Value;
+            var enId = LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
 
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
@@ -310,10 +308,10 @@ namespace Umbraco.Tests.Services
         [Test]
         public void TagsCanBecomeInvariantByPropertyType()
         {
-            var languageService = _localizationService;
+            var languageService = LocalizationService;
             languageService.Save(new Language(TestObjects.GetGlobalSettings(), "fr-FR")); // en-US is already there
 
-            var enId = _localizationService.GetLanguageIdByIsoCode("en-US").Value;
+            var enId = LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
 
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
@@ -367,10 +365,10 @@ namespace Umbraco.Tests.Services
         [Test]
         public void TagsCanBecomeInvariantByPropertyTypeAndBackToVariant()
         {
-            var languageService = _localizationService;
+            var languageService = LocalizationService;
             languageService.Save(new Language(TestObjects.GetGlobalSettings(), "fr-FR")); // en-US is already there
 
-            var enId = _localizationService.GetLanguageIdByIsoCode("en-US").Value;
+            var enId = LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
 
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;

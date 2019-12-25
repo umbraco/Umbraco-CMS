@@ -32,8 +32,6 @@ namespace Umbraco.Tests.Services
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true, WithApplication = true)]
     public class ContentTypeServiceVariantsTests : TestWithSomeContentBase
     {
-        private readonly ILocalizationService _localizationService = new Mock<ILocalizationService>().Object;
-
         protected override void Compose()
         {
             base.Compose();
@@ -309,7 +307,7 @@ namespace Umbraco.Tests.Services
             var nlContentName = "Content nl-NL";
             var nlCulture = "nl-NL";
 
-            _localizationService.Save(new Language(TestObjects.GetGlobalSettings(), nlCulture));
+            LocalizationService.Save(new Language(TestObjects.GetGlobalSettings(), nlCulture));
 
             var includeCultureNames = contentType.Variations.HasFlag(ContentVariation.Culture);
 
@@ -666,9 +664,9 @@ namespace Umbraco.Tests.Services
             // can then switch one property to variant
 
             var languageEn = new Language(TestObjects.GetGlobalSettings(), "en") { IsDefault = true };
-            _localizationService.Save(languageEn);
+            LocalizationService.Save(languageEn);
             var languageFr = new Language(TestObjects.GetGlobalSettings(), "fr");
-            _localizationService.Save(languageFr);
+            LocalizationService.Save(languageFr);
 
             var contentType = CreateContentType(ContentVariation.Nothing);
 
@@ -1259,9 +1257,9 @@ namespace Umbraco.Tests.Services
         private void CreateFrenchAndEnglishLangs()
         {
             var languageEn = new Language(TestObjects.GetGlobalSettings(), "en") { IsDefault = true };
-            _localizationService.Save(languageEn);
+            LocalizationService.Save(languageEn);
             var languageFr = new Language(TestObjects.GetGlobalSettings(), "fr");
-            _localizationService.Save(languageFr);
+            LocalizationService.Save(languageFr);
         }
 
         private IContentType CreateContentType(ContentVariation variance, string alias = "contentType") => new ContentType(ShortStringHelper, -1)

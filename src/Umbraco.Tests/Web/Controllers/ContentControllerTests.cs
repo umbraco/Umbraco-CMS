@@ -42,7 +42,6 @@ namespace Umbraco.Tests.Web.Controllers
     public class ContentControllerTests : TestWithDatabaseBase
     {
         private IContentType _contentTypeForMockedContent;
-        private readonly ILocalizationService _localizationService = new Mock<ILocalizationService>().Object;
 
         public override void SetUp()
         {
@@ -270,7 +269,7 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
                     ShortStringHelper,
-                    _localizationService);
+                    LocalizationService);
 
                 return controller;
             }
@@ -306,7 +305,7 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
                     ShortStringHelper,
-                    _localizationService);
+                    LocalizationService);
 
                 return controller;
             }
@@ -350,7 +349,7 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
                     ShortStringHelper,
-                    _localizationService);
+                    LocalizationService);
 
                 return controller;
             }
@@ -399,7 +398,7 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
                     ShortStringHelper,
-                    _localizationService);
+                    LocalizationService);
 
                 return controller;
             }
@@ -440,7 +439,7 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
                     ShortStringHelper,
-                    _localizationService);
+                    LocalizationService);
 
                 return controller;
             }
@@ -487,7 +486,7 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
                     ShortStringHelper,
-                    _localizationService);
+                    LocalizationService);
 
                 return controller;
             }

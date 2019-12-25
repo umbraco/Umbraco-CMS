@@ -17,8 +17,6 @@ namespace Umbraco.Tests.Persistence.Repositories
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class DictionaryRepositoryTest : TestWithDatabaseBase
     {
-        private readonly ILocalizationService _localizationService = new Mock<ILocalizationService>().Object;
-
         public override void SetUp()
         {
             base.SetUp();
@@ -43,7 +41,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     Translations = new List<IDictionaryTranslation>
                     {
-                        new DictionaryTranslation(_localizationService.GetLanguageByIsoCode("en-US"), "Hello world")
+                        new DictionaryTranslation(LocalizationService.GetLanguageByIsoCode("en-US"), "Hello world")
                     }
                 };
 
@@ -74,7 +72,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     Translations = new List<IDictionaryTranslation>
                     {
-                        new DictionaryTranslation(_localizationService.GetLanguageByIsoCode("en-US"), "Hello world")
+                        new DictionaryTranslation(LocalizationService.GetLanguageByIsoCode("en-US"), "Hello world")
                     }
                 };
 
@@ -104,7 +102,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     Translations = new List<IDictionaryTranslation>
                     {
-                        new DictionaryTranslation(_localizationService.GetLanguageByIsoCode("en-US"), "Hello world")
+                        new DictionaryTranslation(LocalizationService.GetLanguageByIsoCode("en-US"), "Hello world")
                     }
                 };
 
@@ -293,7 +291,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository();
 
                 var languageNo = new Language(TestObjects.GetGlobalSettings(), "nb-NO") { CultureName = "nb-NO" };
-                _localizationService.Save(languageNo);
+                LocalizationService.Save(languageNo);
 
                 // Act
                 var item = repository.Get(1);
@@ -375,10 +373,10 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         public void CreateTestData()
         {
-            var language = _localizationService.GetLanguageByIsoCode("en-US");
+            var language = LocalizationService.GetLanguageByIsoCode("en-US");
 
             var languageDK = new Language(TestObjects.GetGlobalSettings(), "da-DK") { CultureName = "da-DK" };
-            _localizationService.Save(languageDK);//Id 2
+            LocalizationService.Save(languageDK);//Id 2
 
             var readMore = new DictionaryItem("Read More");
             var translations = new List<IDictionaryTranslation>
@@ -387,7 +385,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                                        new DictionaryTranslation(languageDK, "Læs mere")
                                    };
             readMore.Translations = translations;
-            _localizationService.Save(readMore);//Id 1
+            LocalizationService.Save(readMore);//Id 1
 
             var article = new DictionaryItem("Article");
             var translations2 = new List<IDictionaryTranslation>
@@ -396,7 +394,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                                        new DictionaryTranslation(languageDK, "Artikel")
                                    };
             article.Translations = translations2;
-            _localizationService.Save(article);//Id 2
+            LocalizationService.Save(article);//Id 2
         }
     }
 }

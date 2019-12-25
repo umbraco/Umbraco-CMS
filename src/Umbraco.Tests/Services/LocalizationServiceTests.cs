@@ -9,8 +9,6 @@ using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Services;
-using Moq;
 
 namespace Umbraco.Tests.Services
 {
@@ -31,12 +29,10 @@ namespace Umbraco.Tests.Services
         private int _danishLangId;
         private int _englishLangId;
 
-        private readonly ILocalizationService _localizationService = new Mock<ILocalizationService>().Object;
-
         [Test]
         public void Can_Get_Root_Dictionary_Items()
         {
-            var rootItems = _localizationService.GetRootDictionaryItems();
+            var rootItems = LocalizationService.GetRootDictionaryItems();
 
             Assert.NotNull(rootItems);
             Assert.IsTrue(rootItems.Any());
@@ -45,14 +41,14 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Determint_If_DictionaryItem_Exists()
         {
-            var exists = _localizationService.DictionaryItemExists("Parent");
+            var exists = LocalizationService.DictionaryItemExists("Parent");
             Assert.IsTrue(exists);
         }
 
         [Test]
         public void Can_Get_All_Languages()
         {
-            var languages = _localizationService.GetAllLanguages();
+            var languages = LocalizationService.GetAllLanguages();
             Assert.NotNull(languages);
             Assert.IsTrue(languages.Any());
             Assert.That(languages.Count(), Is.EqualTo(3));
@@ -61,37 +57,37 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Get_Dictionary_Item_By_Int_Id()
         {
-            var parentItem = _localizationService.GetDictionaryItemById(_parentItemIntId);
+            var parentItem = LocalizationService.GetDictionaryItemById(_parentItemIntId);
             Assert.NotNull(parentItem);
 
-            var childItem = _localizationService.GetDictionaryItemById(_childItemIntId);
+            var childItem = LocalizationService.GetDictionaryItemById(_childItemIntId);
             Assert.NotNull(childItem);
         }
 
         [Test]
         public void Can_Get_Dictionary_Item_By_Guid_Id()
         {
-            var parentItem = _localizationService.GetDictionaryItemById(_parentItemGuidId);
+            var parentItem = LocalizationService.GetDictionaryItemById(_parentItemGuidId);
             Assert.NotNull(parentItem);
 
-            var childItem = _localizationService.GetDictionaryItemById(_childItemGuidId);
+            var childItem = LocalizationService.GetDictionaryItemById(_childItemGuidId);
             Assert.NotNull(childItem);
         }
 
         [Test]
         public void Can_Get_Dictionary_Item_By_Key()
         {
-            var parentItem = _localizationService.GetDictionaryItemByKey("Parent");
+            var parentItem = LocalizationService.GetDictionaryItemByKey("Parent");
             Assert.NotNull(parentItem);
 
-            var childItem = _localizationService.GetDictionaryItemByKey("Child");
+            var childItem = LocalizationService.GetDictionaryItemByKey("Child");
             Assert.NotNull(childItem);
         }
 
         [Test]
         public void Can_Get_Dictionary_Item_Children()
         {
-            var item = _localizationService.GetDictionaryItemChildren(_parentItemGuidId);
+            var item = LocalizationService.GetDictionaryItemChildren(_parentItemGuidId);
             Assert.NotNull(item);
             Assert.That(item.Count(), Is.EqualTo(1));
 
@@ -107,8 +103,8 @@ namespace Umbraco.Tests.Services
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var en = _localizationService.GetLanguageById(_englishLangId);
-                var dk = _localizationService.GetLanguageById(_danishLangId);
+                var en = LocalizationService.GetLanguageById(_englishLangId);
+                var dk = LocalizationService.GetLanguageById(_danishLangId);
 
                 var currParentId = _childItemGuidId;
                 for (int i = 0; i < 25; i++)
@@ -130,8 +126,8 @@ namespace Umbraco.Tests.Services
                             new DictionaryTranslation(dk, "BørnVærdi2 " + i)
                         }
                     };
-                    _localizationService.Save(desc1);
-                    _localizationService.Save(desc2);
+                    LocalizationService.Save(desc1);
+                    LocalizationService.Save(desc2);
 
                     currParentId = desc1.Key;
                 }
@@ -139,7 +135,7 @@ namespace Umbraco.Tests.Services
                 scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
                 scope.Database.AsUmbracoDatabase().EnableSqlCount = true;
 
-                var items = _localizationService.GetDictionaryItemDescendants(_parentItemGuidId)
+                var items = LocalizationService.GetDictionaryItemDescendants(_parentItemGuidId)
                     .ToArray();
 
                 Debug.WriteLine("SQL CALLS: " + scope.Database.AsUmbracoDatabase().SqlCount);
@@ -153,8 +149,8 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_GetLanguageById()
         {
-            var danish = _localizationService.GetLanguageById(_danishLangId);
-            var english = _localizationService.GetLanguageById(_englishLangId);
+            var danish = LocalizationService.GetLanguageById(_danishLangId);
+            var english = LocalizationService.GetLanguageById(_englishLangId);
             Assert.NotNull(danish);
             Assert.NotNull(english);
         }
@@ -162,8 +158,8 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_GetLanguageByIsoCode()
         {
-            var danish = _localizationService.GetLanguageByIsoCode("da-DK");
-            var english = _localizationService.GetLanguageByIsoCode("en-GB");
+            var danish = LocalizationService.GetLanguageByIsoCode("da-DK");
+            var english = LocalizationService.GetLanguageByIsoCode("en-GB");
             Assert.NotNull(danish);
             Assert.NotNull(english);
         }
@@ -171,14 +167,14 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Does_Not_Fail_When_Language_Doesnt_Exist()
         {
-            var language = _localizationService.GetLanguageByIsoCode("sv-SE");
+            var language = LocalizationService.GetLanguageByIsoCode("sv-SE");
             Assert.Null(language);
         }
 
         [Test]
         public void Does_Not_Fail_When_DictionaryItem_Doesnt_Exist()
         {
-            var item = _localizationService.GetDictionaryItemByKey("RandomKey");
+            var item = LocalizationService.GetDictionaryItemByKey("RandomKey");
             Assert.Null(item);
         }
 
@@ -186,34 +182,34 @@ namespace Umbraco.Tests.Services
         public void Can_Delete_Language()
         {
             var norwegian = new Language(TestObjects.GetGlobalSettings(), "nb-NO") { CultureName = "Norwegian" };
-            _localizationService.Save(norwegian, 0);
+            LocalizationService.Save(norwegian, 0);
             Assert.That(norwegian.HasIdentity, Is.True);
             var languageId = norwegian.Id;
 
-            _localizationService.Delete(norwegian);
+            LocalizationService.Delete(norwegian);
 
-            var language = _localizationService.GetLanguageById(languageId);
+            var language = LocalizationService.GetLanguageById(languageId);
             Assert.Null(language);
         }
 
         [Test]
         public void Can_Delete_Language_Used_As_Fallback()
         {
-            var danish = _localizationService.GetLanguageByIsoCode("da-DK");
+            var danish = LocalizationService.GetLanguageByIsoCode("da-DK");
             var norwegian = new Language(TestObjects.GetGlobalSettings(), "nb-NO") { CultureName = "Norwegian", FallbackLanguageId = danish.Id };
-            _localizationService.Save(norwegian, 0);
+            LocalizationService.Save(norwegian, 0);
             var languageId = danish.Id;
 
-            _localizationService.Delete(danish);
+            LocalizationService.Delete(danish);
 
-            var language = _localizationService.GetLanguageById(languageId);
+            var language = LocalizationService.GetLanguageById(languageId);
             Assert.Null(language);
         }
 
         [Test]
         public void Can_Create_DictionaryItem_At_Root()
         {
-            var english = _localizationService.GetLanguageByIsoCode("en-US");
+            var english = LocalizationService.GetLanguageByIsoCode("en-US");
 
             var item = (IDictionaryItem)new DictionaryItem("Testing123")
             {
@@ -222,10 +218,10 @@ namespace Umbraco.Tests.Services
                                    new DictionaryTranslation(english, "Hello world")
                                }
             };
-            _localizationService.Save(item);
+            LocalizationService.Save(item);
 
             //re-get
-            item = _localizationService.GetDictionaryItemById(item.Id);
+            item = LocalizationService.GetDictionaryItemById(item.Id);
 
             Assert.Greater(item.Id, 0);
             Assert.IsTrue(item.HasIdentity);
@@ -238,18 +234,18 @@ namespace Umbraco.Tests.Services
         public void Can_Create_DictionaryItem_At_Root_With_Identity()
         {
 
-            var item = _localizationService.CreateDictionaryItemWithIdentity(
+            var item = LocalizationService.CreateDictionaryItemWithIdentity(
                 "Testing12345", null, "Hellooooo");
 
             //re-get
-            item = _localizationService.GetDictionaryItemById(item.Id);
+            item = LocalizationService.GetDictionaryItemById(item.Id);
 
             Assert.IsNotNull(item);
             Assert.Greater(item.Id, 0);
             Assert.IsTrue(item.HasIdentity);
             Assert.IsFalse(item.ParentId.HasValue);
             Assert.AreEqual("Testing12345", item.ItemKey);
-            var allLangs = _localizationService.GetAllLanguages();
+            var allLangs = LocalizationService.GetAllLanguages();
             Assert.Greater(allLangs.Count(), 0);
             foreach (var language in allLangs)
             {
@@ -261,20 +257,20 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Add_Translation_To_Existing_Dictionary_Item()
         {
-            var english = _localizationService.GetLanguageByIsoCode("en-US");
+            var english = LocalizationService.GetLanguageByIsoCode("en-US");
 
             var item = (IDictionaryItem) new DictionaryItem("Testing123");
-            _localizationService.Save(item);
+            LocalizationService.Save(item);
 
             //re-get
-            item = _localizationService.GetDictionaryItemById(item.Id);
+            item = LocalizationService.GetDictionaryItemById(item.Id);
 
             item.Translations = new List<IDictionaryTranslation>
             {
                 new DictionaryTranslation(english, "Hello world")
             };
 
-            _localizationService.Save(item);
+            LocalizationService.Save(item);
 
             Assert.AreEqual(1, item.Translations.Count());
             foreach (var translation in item.Translations)
@@ -285,14 +281,14 @@ namespace Umbraco.Tests.Services
             item.Translations = new List<IDictionaryTranslation>(item.Translations)
             {
                 new DictionaryTranslation(
-                    _localizationService.GetLanguageByIsoCode("en-GB"),
+                    LocalizationService.GetLanguageByIsoCode("en-GB"),
                     "My new value")
             };
 
-            _localizationService.Save(item);
+            LocalizationService.Save(item);
 
             //re-get
-            item = _localizationService.GetDictionaryItemById(item.Id);
+            item = LocalizationService.GetDictionaryItemById(item.Id);
 
             Assert.AreEqual(2, item.Translations.Count());
             Assert.AreEqual("Hello world", item.Translations.First().Value);
@@ -302,27 +298,27 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Delete_DictionaryItem()
         {
-            var item = _localizationService.GetDictionaryItemByKey("Child");
+            var item = LocalizationService.GetDictionaryItemByKey("Child");
             Assert.NotNull(item);
 
-            _localizationService.Delete(item);
+            LocalizationService.Delete(item);
 
-            var deletedItem = _localizationService.GetDictionaryItemByKey("Child");
+            var deletedItem = LocalizationService.GetDictionaryItemByKey("Child");
             Assert.Null(deletedItem);
         }
 
         [Test]
         public void Can_Update_Existing_DictionaryItem()
         {
-            var item = _localizationService.GetDictionaryItemByKey("Child");
+            var item = LocalizationService.GetDictionaryItemByKey("Child");
             foreach (var translation in item.Translations)
             {
                 translation.Value = translation.Value + "UPDATED";
             }
 
-            _localizationService.Save(item);
+            LocalizationService.Save(item);
 
-            var updatedItem = _localizationService.GetDictionaryItemByKey("Child");
+            var updatedItem = LocalizationService.GetDictionaryItemByKey("Child");
             Assert.NotNull(updatedItem);
 
             foreach (var translation in updatedItem.Translations)
@@ -335,7 +331,7 @@ namespace Umbraco.Tests.Services
         public void Find_BaseData_Language()
         {
             // Arrange
-            var localizationService = _localizationService;
+            var localizationService = LocalizationService;
 
             // Act
             var languages = localizationService.GetAllLanguages();
@@ -348,7 +344,7 @@ namespace Umbraco.Tests.Services
         public void Save_Language_And_GetLanguageByIsoCode()
         {
             // Arrange
-            var localizationService = _localizationService;
+            var localizationService = LocalizationService;
             var isoCode = "en-AU";
             var language = new Core.Models.Language(TestObjects.GetGlobalSettings(), isoCode);
 
@@ -363,7 +359,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Save_Language_And_GetLanguageById()
         {
-            var localizationService = _localizationService;
+            var localizationService = LocalizationService;
             var isoCode = "en-AU";
             var language = new Core.Models.Language(TestObjects.GetGlobalSettings(), isoCode);
 
@@ -378,7 +374,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Set_Default_Language()
         {
-            var localizationService = _localizationService;
+            var localizationService = LocalizationService;
             var language = new Core.Models.Language(TestObjects.GetGlobalSettings(), "en-AU");
             language.IsDefault = true;
             localizationService.Save(language);
@@ -400,7 +396,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Deleted_Language_Should_Not_Exist()
         {
-            var localizationService = _localizationService;
+            var localizationService = LocalizationService;
             var isoCode = "en-AU";
             var language = new Core.Models.Language(TestObjects.GetGlobalSettings(), isoCode);
             localizationService.Save(language);
@@ -417,8 +413,8 @@ namespace Umbraco.Tests.Services
         {
             var danish = new Language(TestObjects.GetGlobalSettings(), "da-DK") { CultureName = "Danish" };
             var english = new Language(TestObjects.GetGlobalSettings(), "en-GB") { CultureName = "English" };
-            _localizationService.Save(danish, 0);
-            _localizationService.Save(english, 0);
+            LocalizationService.Save(danish, 0);
+            LocalizationService.Save(english, 0);
             _danishLangId = danish.Id;
             _englishLangId = english.Id;
 
@@ -430,7 +426,7 @@ namespace Umbraco.Tests.Services
                                    new DictionaryTranslation(danish, "ForældreVærdi")
                                }
             };
-            _localizationService.Save(parentItem);
+            LocalizationService.Save(parentItem);
             _parentItemGuidId = parentItem.Key;
             _parentItemIntId = parentItem.Id;
 
@@ -442,7 +438,7 @@ namespace Umbraco.Tests.Services
                                                    new DictionaryTranslation(danish, "BørnVærdi")
                                                }
             };
-            _localizationService.Save(childItem);
+            LocalizationService.Save(childItem);
             _childItemGuidId = childItem.Key;
             _childItemIntId = childItem.Id;
         }

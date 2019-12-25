@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
@@ -32,7 +33,7 @@ namespace Umbraco.Tests.PublishedContent
             return serviceContext;
         }
 
-        private static void MockLocalizationService(ServiceContext serviceContext)
+        private void MockLocalizationService(ServiceContext serviceContext)
         {
             var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
             // Set up languages.
@@ -52,7 +53,7 @@ namespace Umbraco.Tests.PublishedContent
                     new Language(globalSettings, "nl") { Id = 9, CultureName = "Dutch", FallbackLanguageId = 1 }
                 };
 
-            var localizationService = new Mock<ILocalizationService>();
+            var localizationService = Mock.Get((ILocalizationService)Factory.GetInstance(typeof(ILocalizationService)));
             localizationService.Setup(x => x.GetAllLanguages()).Returns(languages);
             localizationService.Setup(x => x.GetLanguageById(It.IsAny<int>()))
                 .Returns((int id) => languages.SingleOrDefault(y => y.Id == id));

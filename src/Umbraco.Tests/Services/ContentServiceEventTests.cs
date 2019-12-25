@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Events;
@@ -19,8 +18,6 @@ namespace Umbraco.Tests.Services
         Logger = UmbracoTestOptions.Logger.Console)]
     public class ContentServiceEventTests : TestWithSomeContentBase
     {
-        private readonly ILocalizationService _localizationService = new Mock<ILocalizationService>().Object;
-
         public override void SetUp()
         {
             base.SetUp();
@@ -36,7 +33,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Saving_Culture()
         {
-            _localizationService.Save(new Language(TestObjects.GetGlobalSettings(), "fr-FR"));
+            LocalizationService.Save(new Language(TestObjects.GetGlobalSettings(), "fr-FR"));
 
             var contentTypeService = ServiceContext.ContentTypeService;
 
@@ -145,7 +142,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Publishing_Culture()
         {
-            _localizationService.Save(new Language(TestObjects.GetGlobalSettings(), "fr-FR"));
+            LocalizationService.Save(new Language(TestObjects.GetGlobalSettings(), "fr-FR"));
 
             var contentTypeService = ServiceContext.ContentTypeService;
 
@@ -309,7 +306,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Unpublishing_Culture()
         {
-            _localizationService.Save(new Language(TestObjects.GetGlobalSettings(), "fr-FR"));
+            LocalizationService.Save(new Language(TestObjects.GetGlobalSettings(), "fr-FR"));
 
             var contentTypeService = ServiceContext.ContentTypeService;
 

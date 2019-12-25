@@ -188,7 +188,7 @@ namespace Umbraco.Web.Editors
             foreach (var translation in dictionary.Translations)
             {
                 _localizationService.AddOrUpdateDictionaryValue(dictionaryItem,
-                    _localizationService.GetLanguageById(translation.LanguageId), translation.Translation);
+                _localizationService.GetLanguageById(translation.LanguageId), translation.Translation);
             }
 
             try

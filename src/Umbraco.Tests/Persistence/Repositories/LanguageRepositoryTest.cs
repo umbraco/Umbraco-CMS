@@ -390,18 +390,17 @@ namespace Umbraco.Tests.Persistence.Repositories
         private void CreateTestData()
         {
             //Id 1 is en-US - when Umbraco is installed
-            var localizationService = new Mock<ILocalizationService>().Object;
             var languageDK = new Language(TestObjects.GetGlobalSettings(), "da-DK") { CultureName = "da-DK" };
-            localizationService.Save(languageDK);//Id 2
+            LocalizationService.Save(languageDK);//Id 2
 
             var languageSE = new Language(TestObjects.GetGlobalSettings(), "sv-SE") { CultureName = "sv-SE" };
-            localizationService.Save(languageSE);//Id 3
+            LocalizationService.Save(languageSE);//Id 3
 
             var languageDE = new Language(TestObjects.GetGlobalSettings(), "de-DE") { CultureName = "de-DE" };
-            localizationService.Save(languageDE);//Id 4
+            LocalizationService.Save(languageDE);//Id 4
 
             var languagePT = new Language(TestObjects.GetGlobalSettings(), "pt-PT") { CultureName = "pt-PT" };
-            localizationService.Save(languagePT);//Id 5
+            LocalizationService.Save(languagePT);//Id 5
         }
     }
 }

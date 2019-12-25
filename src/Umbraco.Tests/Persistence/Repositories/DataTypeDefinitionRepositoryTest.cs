@@ -11,8 +11,6 @@ using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Web.PropertyEditors;
-using Umbraco.Core.Services;
-using Moq;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -20,8 +18,6 @@ namespace Umbraco.Tests.Persistence.Repositories
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class DataTypeDefinitionRepositoryTest : TestWithDatabaseBase
     {
-        private readonly ILocalizationService _localizationService = new Mock<ILocalizationService>().Object;
-
         private IDataTypeRepository CreateRepository()
         {
             return Factory.GetInstance<IDataTypeRepository>();
@@ -40,9 +36,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (provider.CreateScope())
             {
                 var dtRepo = CreateRepository();
-                IDataType dataType1 = new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService, IOHelper, _localizationService)) { Name = "dt1" };
+                IDataType dataType1 = new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService, IOHelper, LocalizationService)) { Name = "dt1" };
                 dtRepo.Save(dataType1);
-                IDataType dataType2 = new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService, IOHelper, _localizationService)) { Name = "dt2" };
+                IDataType dataType2 = new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService, IOHelper, LocalizationService)) { Name = "dt2" };
                 dtRepo.Save(dataType2);
 
                 var ctRepo = Factory.GetInstance<IContentTypeRepository>();
@@ -110,14 +106,14 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var container2 = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah2", ParentId = container1.Id };
                 containerRepository.Save(container2);
 
-                var dataType = (IDataType) new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService, IOHelper, _localizationService), container2.Id)
+                var dataType = (IDataType) new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService, IOHelper, LocalizationService), container2.Id)
                 {
                     Name = "dt1"
                 };
                 repository.Save(dataType);
 
                 //create a
-                var dataType2 = (IDataType)new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService, IOHelper, _localizationService), dataType.Id)
+                var dataType2 = (IDataType)new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService, IOHelper, LocalizationService), dataType.Id)
                 {
                     Name = "dt2"
                 };
@@ -189,7 +185,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
                 containerRepository.Save(container);
 
-                var dataTypeDefinition = new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService, IOHelper, _localizationService), container.Id) { Name = "test" };
+                var dataTypeDefinition = new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService, IOHelper, LocalizationService), container.Id) { Name = "test" };
                 repository.Save(dataTypeDefinition);
 
                 Assert.AreEqual(container.Id, dataTypeDefinition.ParentId);
@@ -209,7 +205,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
                 containerRepository.Save(container);
 
-                IDataType dataType = new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService, IOHelper, _localizationService), container.Id) { Name = "test" };
+                IDataType dataType = new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService, IOHelper, LocalizationService), container.Id) { Name = "test" };
                 repository.Save(dataType);
 
                 // Act
@@ -232,7 +228,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (provider.CreateScope())
             {
                 var repository = CreateRepository();
-                IDataType dataType = new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService, IOHelper, _localizationService)) {Name = "test"};
+                IDataType dataType = new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService, IOHelper, LocalizationService)) {Name = "test"};
 
                 repository.Save(dataType);
 

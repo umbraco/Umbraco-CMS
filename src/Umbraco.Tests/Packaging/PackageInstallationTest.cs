@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Packaging
         private CompiledPackageXmlParser Parser => new CompiledPackageXmlParser(new ConflictingPackageData(ServiceContext.MacroService, ServiceContext.FileService),Factory.GetInstance<IGlobalSettings>());
 
         private PackageDataInstallation PackageDataInstallation => new PackageDataInstallation(
-            Logger, ServiceContext.FileService, ServiceContext.MacroService, new Mock<ILocalizationService>().Object,
+            Logger, ServiceContext.FileService, ServiceContext.MacroService, LocalizationService,
             ServiceContext.DataTypeService, ServiceContext.EntityService,
             ServiceContext.ContentTypeService, ServiceContext.ContentService,
             Factory.GetInstance<PropertyEditorCollection>(),

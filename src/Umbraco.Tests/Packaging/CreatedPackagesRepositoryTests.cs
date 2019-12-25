@@ -41,7 +41,7 @@ namespace Umbraco.Tests.Packaging
 
         public ICreatedPackagesRepository PackageBuilder => new PackagesRepository(
             ServiceContext.ContentService, ServiceContext.ContentTypeService, ServiceContext.DataTypeService,
-            ServiceContext.FileService, ServiceContext.MacroService, new Mock<ILocalizationService>().Object,
+            ServiceContext.FileService, ServiceContext.MacroService, LocalizationService,
             IOHelper,
             Factory.GetInstance<IEntityXmlSerializer>(), Logger,
             UmbracoVersion,
