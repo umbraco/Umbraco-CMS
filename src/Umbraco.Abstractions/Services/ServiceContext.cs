@@ -144,11 +144,6 @@ namespace Umbraco.Core.Services
         public IDomainService DomainService => _domainService.Value;
 
         /// <summary>
-        /// Gets the <see cref="IAuditService"/>
-        /// </summary>
-        public IAuditService AuditService => _auditService.Value;
-
-        /// <summary>
         /// Gets the <see cref="ILocalizedTextService"/>
         /// </summary>
         public ILocalizedTextService TextService => _localizedTextService.Value;
