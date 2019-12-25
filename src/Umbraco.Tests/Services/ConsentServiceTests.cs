@@ -14,7 +14,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void CanCrudConsent()
         {
-            var consentService = ServiceContext.ConsentService;
+            var consentService = ConsentService;
 
             // can register
 
@@ -109,7 +109,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void CanRegisterConsentWithoutComment()
         {
-            var consentService = ServiceContext.ConsentService;
+            var consentService = ConsentService;
 
             // Attept to add consent without a comment
             consentService.RegisterConsent("user/1234", "app1", "consentWithoutComment", ConsentState.Granted);
