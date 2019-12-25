@@ -53,6 +53,7 @@ namespace Umbraco.Web.Editors
         private readonly UmbracoTreeSearcher _treeSearcher;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly SearchableTreeCollection _searchableTreeCollection;
+        private readonly ILocalizationService _localizationService;
 
         public EntityController(
             IGlobalSettings globalSettings,
@@ -66,13 +67,15 @@ namespace Umbraco.Web.Editors
             UmbracoHelper umbracoHelper,
             SearchableTreeCollection searchableTreeCollection,
             UmbracoTreeSearcher treeSearcher,
-            IShortStringHelper shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            ILocalizationService localizationService)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _treeService = treeService;
             _searchableTreeCollection = searchableTreeCollection;
             _treeSearcher = treeSearcher;
             _shortStringHelper = shortStringHelper;
+            _localizationService = localizationService;
         }
 
         /// <summary>
@@ -1079,7 +1082,7 @@ namespace Umbraco.Web.Editors
                     if (!postFilter.IsNullOrWhiteSpace() )
                         throw new NotSupportedException("Filtering on languages is not currently supported");
 
-                    return Services.LocalizationService.GetAllLanguages().Select(MapEntities());
+                    return _localizationService.GetAllLanguages().Select(MapEntities());
                 case UmbracoEntityTypes.DictionaryItem:
 
                     if (!postFilter.IsNullOrWhiteSpace())
@@ -1194,7 +1197,7 @@ namespace Umbraco.Web.Editors
         {
             var list = new List<EntityBasic>();
 
-            foreach (var dictionaryItem in Services.LocalizationService.GetRootDictionaryItems().OrderBy(DictionaryItemSort()))
+            foreach (var dictionaryItem in _localizationService.GetRootDictionaryItems().OrderBy(DictionaryItemSort()))
             {
                 var item = Mapper.Map<IDictionaryItem, EntityBasic>(dictionaryItem);
                 list.Add(item);
@@ -1208,7 +1211,7 @@ namespace Umbraco.Web.Editors
 
         private void GetChildItemsForList(IDictionaryItem dictionaryItem, ICollection<EntityBasic> list)
         {
-            foreach (var childItem in Services.LocalizationService.GetDictionaryItemChildren(dictionaryItem.Key).OrderBy(DictionaryItemSort()))
+            foreach (var childItem in _localizationService.GetDictionaryItemChildren(dictionaryItem.Key).OrderBy(DictionaryItemSort()))
             {
                 var item = Mapper.Map<IDictionaryItem, EntityBasic>(childItem);
                 list.Add(item);

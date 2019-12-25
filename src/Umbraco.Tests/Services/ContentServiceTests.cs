@@ -39,6 +39,8 @@ namespace Umbraco.Tests.Services
         // TODO: Add test to verify there is only ONE newest document/content in {Constants.DatabaseSchema.Tables.Document} table after updating.
         // TODO: Add test to delete specific version (with and without deleting prior versions) and versions by date.
 
+        private readonly ILocalizationService _localizationService = new Mock<ILocalizationService>().Object;
+
         public override void SetUp()
         {
             base.SetUp();
@@ -175,8 +177,8 @@ namespace Umbraco.Tests.Services
             var langUk = new Language(TestObjects.GetGlobalSettings(), "en-GB") { IsDefault = true };
             var langFr = new Language(TestObjects.GetGlobalSettings(), "fr-FR");
 
-            ServiceContext.LocalizationService.Save(langFr);
-            ServiceContext.LocalizationService.Save(langUk);
+            _localizationService.Save(langFr);
+            _localizationService.Save(langUk);
 
             var ctInvariant = MockedContentTypes.CreateBasicContentType("invariantPage");
             ServiceContext.ContentTypeService.Save(ctInvariant);
@@ -879,8 +881,8 @@ namespace Umbraco.Tests.Services
             var langUk = new Language(TestObjects.GetGlobalSettings(), "en-GB") { IsDefault = true, IsMandatory = true };
             var langFr = new Language(TestObjects.GetGlobalSettings(), "fr-FR");
 
-            ServiceContext.LocalizationService.Save(langFr);
-            ServiceContext.LocalizationService.Save(langUk);
+            _localizationService.Save(langFr);
+            _localizationService.Save(langUk);
 
             var contentType = MockedContentTypes.CreateBasicContentType();
             contentType.Variations = ContentVariation.Culture;
@@ -976,8 +978,8 @@ namespace Umbraco.Tests.Services
             var langGB = new Language(TestObjects.GetGlobalSettings(), "en-GB") { IsDefault = true };
             var langFr = new Language(TestObjects.GetGlobalSettings(), "fr-FR");
 
-            ServiceContext.LocalizationService.Save(langFr);
-            ServiceContext.LocalizationService.Save(langGB);
+            _localizationService.Save(langFr);
+            _localizationService.Save(langGB);
 
             var contentType = MockedContentTypes.CreateMetaContentType();
             contentType.Variations = ContentVariation.Culture;
@@ -1044,8 +1046,8 @@ namespace Umbraco.Tests.Services
             var langGB = new Language(TestObjects.GetGlobalSettings(), "en-GB") { IsDefault = true, IsMandatory = true };
             var langFr = new Language(TestObjects.GetGlobalSettings(), "fr-FR");
 
-            ServiceContext.LocalizationService.Save(langFr);
-            ServiceContext.LocalizationService.Save(langGB);
+            _localizationService.Save(langFr);
+            _localizationService.Save(langGB);
 
             var contentType = MockedContentTypes.CreateBasicContentType();
             contentType.Variations = ContentVariation.Culture;
@@ -1222,8 +1224,8 @@ namespace Umbraco.Tests.Services
 
             var langFr = new Language(TestObjects.GetGlobalSettings(), "fr");
             var langDa = new Language(TestObjects.GetGlobalSettings(), "da");
-            ServiceContext.LocalizationService.Save(langFr);
-            ServiceContext.LocalizationService.Save(langDa);
+            _localizationService.Save(langFr);
+            _localizationService.Save(langDa);
 
             var ct = MockedContentTypes.CreateBasicContentType();
             ct.Variations = ContentVariation.Culture;
@@ -2115,8 +2117,8 @@ namespace Umbraco.Tests.Services
         {
             var langFr = new Language(TestObjects.GetGlobalSettings(), "fr");
             var langDa = new Language(TestObjects.GetGlobalSettings(), "da");
-            ServiceContext.LocalizationService.Save(langFr);
-            ServiceContext.LocalizationService.Save(langDa);
+            _localizationService.Save(langFr);
+            _localizationService.Save(langDa);
 
             var contentType = MockedContentTypes.CreateSimpleContentType("multi", "Multi");
             contentType.Key = new Guid("45FF9A70-9C5F-448D-A476-DCD23566BBF8");
@@ -2640,7 +2642,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Ensure_Invariant_Name()
         {
-            var languageService = ServiceContext.LocalizationService;
+            var languageService = _localizationService;
 
             var langUk = new Language(TestObjects.GetGlobalSettings(), "en-GB") { IsDefault = true };
             var langFr = new Language(TestObjects.GetGlobalSettings(), "fr-FR");
@@ -2675,7 +2677,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Ensure_Unique_Culture_Names()
         {
-            var languageService = ServiceContext.LocalizationService;
+            var languageService = _localizationService;
 
             var langUk = new Language(TestObjects.GetGlobalSettings(), "en-GB") { IsDefault = true };
             var langFr = new Language(TestObjects.GetGlobalSettings(), "fr-FR");
@@ -2712,7 +2714,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Get_Paged_Children_WithFilterAndOrder()
         {
-            var languageService = ServiceContext.LocalizationService;
+            var languageService = _localizationService;
 
             var langUk = new Language(TestObjects.GetGlobalSettings(), "en-GB") { IsDefault = true };
             var langFr = new Language(TestObjects.GetGlobalSettings(), "fr-FR");
@@ -2813,7 +2815,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_SaveRead_Variations()
         {
-            var languageService = ServiceContext.LocalizationService;
+            var languageService = _localizationService;
 
             //var langFr = new Language("fr-FR") { IsDefaultVariantLanguage = true };
             var langXx = new Language(TestObjects.GetGlobalSettings(), "pt-PT") { IsDefault = true };
@@ -3220,8 +3222,8 @@ namespace Umbraco.Tests.Services
         {
             langUk = new Language(TestObjects.GetGlobalSettings(), "en-GB") { IsDefault = true };
             langFr = new Language(TestObjects.GetGlobalSettings(), "fr-FR");
-            ServiceContext.LocalizationService.Save(langFr);
-            ServiceContext.LocalizationService.Save(langUk);
+            _localizationService.Save(langFr);
+            _localizationService.Save(langUk);
 
             contentType = MockedContentTypes.CreateBasicContentType();
             contentType.Variations = ContentVariation.Culture;

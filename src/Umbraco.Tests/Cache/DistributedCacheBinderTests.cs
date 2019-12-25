@@ -40,6 +40,7 @@ namespace Umbraco.Tests.Cache
             //var testObjects = new TestObjects(null);
             //var serviceContext = testObjects.GetServiceContextMock();
             var serviceContext = Current.Services;
+            var localizationService = new Mock<ILocalizationService>().Object;
 
             var definitions = new IEventDefinition[]
             {
@@ -54,8 +55,8 @@ namespace Umbraco.Tests.Cache
                 new EventDefinition<IUserService, SaveEventArgs<UserGroupWithUsers>>(null, serviceContext.UserService, new SaveEventArgs<UserGroupWithUsers>(Enumerable.Empty<UserGroupWithUsers>())),
                 new EventDefinition<IUserService, DeleteEventArgs<IUserGroup>>(null, serviceContext.UserService, new DeleteEventArgs<IUserGroup>(Enumerable.Empty<IUserGroup>())),
 
-                new EventDefinition<ILocalizationService, SaveEventArgs<IDictionaryItem>>(null, serviceContext.LocalizationService, new SaveEventArgs<IDictionaryItem>(Enumerable.Empty<IDictionaryItem>())),
-                new EventDefinition<ILocalizationService, DeleteEventArgs<IDictionaryItem>>(null, serviceContext.LocalizationService, new DeleteEventArgs<IDictionaryItem>(Enumerable.Empty<IDictionaryItem>())),
+                new EventDefinition<ILocalizationService, SaveEventArgs<IDictionaryItem>>(null, localizationService, new SaveEventArgs<IDictionaryItem>(Enumerable.Empty<IDictionaryItem>())),
+                new EventDefinition<ILocalizationService, DeleteEventArgs<IDictionaryItem>>(null, localizationService, new DeleteEventArgs<IDictionaryItem>(Enumerable.Empty<IDictionaryItem>())),
 
                 new EventDefinition<IDataTypeService, SaveEventArgs<IDataType>>(null, serviceContext.DataTypeService, new SaveEventArgs<IDataType>(Enumerable.Empty<IDataType>())),
                 new EventDefinition<IDataTypeService, DeleteEventArgs<IDataType>>(null, serviceContext.DataTypeService, new DeleteEventArgs<IDataType>(Enumerable.Empty<IDataType>())),
@@ -66,8 +67,8 @@ namespace Umbraco.Tests.Cache
                 new EventDefinition<IDomainService, SaveEventArgs<IDomain>>(null, serviceContext.DomainService, new SaveEventArgs<IDomain>(Enumerable.Empty<IDomain>())),
                 new EventDefinition<IDomainService, DeleteEventArgs<IDomain>>(null, serviceContext.DomainService, new DeleteEventArgs<IDomain>(Enumerable.Empty<IDomain>())),
 
-                new EventDefinition<ILocalizationService, SaveEventArgs<ILanguage>>(null, serviceContext.LocalizationService, new SaveEventArgs<ILanguage>(Enumerable.Empty<ILanguage>())),
-                new EventDefinition<ILocalizationService, DeleteEventArgs<ILanguage>>(null, serviceContext.LocalizationService, new DeleteEventArgs<ILanguage>(Enumerable.Empty<ILanguage>())),
+                new EventDefinition<ILocalizationService, SaveEventArgs<ILanguage>>(null, localizationService, new SaveEventArgs<ILanguage>(Enumerable.Empty<ILanguage>())),
+                new EventDefinition<ILocalizationService, DeleteEventArgs<ILanguage>>(null, localizationService, new DeleteEventArgs<ILanguage>(Enumerable.Empty<ILanguage>())),
 
                 new EventDefinition<IContentTypeService, SaveEventArgs<IContentType>>(null, serviceContext.ContentTypeService, new SaveEventArgs<IContentType>(Enumerable.Empty<IContentType>())),
                 new EventDefinition<IContentTypeService, DeleteEventArgs<IContentType>>(null, serviceContext.ContentTypeService, new DeleteEventArgs<IContentType>(Enumerable.Empty<IContentType>())),

@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
@@ -20,6 +21,13 @@ namespace Umbraco.Web.Editors
     [PrefixlessBodyModelValidator]
     public class LanguageController : UmbracoAuthorizedJsonController
     {
+        private readonly ILocalizationService _localizationService;
+
+        public LanguageController(ILocalizationService localizationService)
+        {
+            _localizationService = localizationService;
+        }
+
         /// <summary>
         /// Returns all cultures available for creating languages.
         /// </summary>
@@ -44,7 +52,7 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public IEnumerable<Language> GetAllLanguages()
         {
-            var allLanguages = Services.LocalizationService.GetAllLanguages();
+            var allLanguages = _localizationService.GetAllLanguages();
 
             return Mapper.Map<IEnumerable<ILanguage>, IEnumerable<Language>>(allLanguages);
         }
@@ -52,7 +60,7 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public Language GetLanguage(int id)
         {
-            var lang = Services.LocalizationService.GetLanguageById(id);
+            var lang = _localizationService.GetLanguageById(id);
             if (lang == null)
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
@@ -67,7 +75,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public IHttpActionResult DeleteLanguage(int id)
         {
-            var language = Services.LocalizationService.GetLanguageById(id);
+            var language = _localizationService.GetLanguageById(id);
             if (language == null)
             {
                 return NotFound();
@@ -83,7 +91,7 @@ namespace Umbraco.Web.Editors
             // service is happy deleting a language that's fallback for another language,
             // will just remove it - so no need to check here
 
-            Services.LocalizationService.Delete(language);
+            _localizationService.Delete(language);
 
             return Ok();
         }
@@ -99,7 +107,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
 
             // this is prone to race conditions but the service will not let us proceed anyways
-            var existingByCulture = Services.LocalizationService.GetLanguageByIsoCode(language.IsoCode);
+            var existingByCulture = _localizationService.GetLanguageByIsoCode(language.IsoCode);
 
             // the localization service might return the generic language even when queried for specific ones (e.g. "da" when queried for "da-DK")
             // - we need to handle that explicitly
@@ -115,7 +123,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
             }
 
-            var existingById = language.Id != default ? Services.LocalizationService.GetLanguageById(language.Id) : null;
+            var existingById = language.Id != default ? _localizationService.GetLanguageById(language.Id) : null;
 
             if (existingById == null)
             {
@@ -141,7 +149,7 @@ namespace Umbraco.Web.Editors
                     FallbackLanguageId = language.FallbackLanguageId
                 };
 
-                Services.LocalizationService.Save(newLang);
+                _localizationService.Save(newLang);
                 return Mapper.Map<Language>(newLang);
             }
 
@@ -163,7 +171,7 @@ namespace Umbraco.Web.Editors
             // note that the service will check again, dealing with race conditions
             if (existingById.FallbackLanguageId.HasValue)
             {
-                var languages = Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.Id, x => x);
+                var languages = _localizationService.GetAllLanguages().ToDictionary(x => x.Id, x => x);
                 if (!languages.ContainsKey(existingById.FallbackLanguageId.Value))
                 {
                     ModelState.AddModelError("FallbackLanguage", "The selected fall back language does not exist.");
@@ -176,7 +184,7 @@ namespace Umbraco.Web.Editors
                 }
             }
 
-            Services.LocalizationService.Save(existingById);
+            _localizationService.Save(existingById);
             return Mapper.Map<Language>(existingById);
         }
 

@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Xml.Linq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
@@ -16,6 +17,8 @@ namespace Umbraco.Tests.Services
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class EntityXmlSerializerTests : TestWithSomeContentBase
     {
+        private readonly ILocalizationService _localizationService = new Mock<ILocalizationService>().Object;
+
         private IEntityXmlSerializer Serializer => Factory.GetInstance<IEntityXmlSerializer>();
 
         [Test]
@@ -40,7 +43,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             CreateDictionaryData();
-            var dictionaryItem = ServiceContext.LocalizationService.GetDictionaryItemByKey("Parent");
+            var dictionaryItem =_localizationService.GetDictionaryItemByKey("Parent");
 
             var newPackageXml = XElement.Parse(ImportResources.Dictionary_Package);
             var dictionaryItemsElement = newPackageXml.Elements("DictionaryItems").First();
@@ -57,10 +60,10 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var languageNbNo = new Language(TestObjects.GetGlobalSettings(), "nb-NO") { CultureName = "Norwegian" };
-            ServiceContext.LocalizationService.Save(languageNbNo);
+           _localizationService.Save(languageNbNo);
 
             var languageEnGb = new Language(TestObjects.GetGlobalSettings(), "en-GB") { CultureName = "English (United Kingdom)" };
-            ServiceContext.LocalizationService.Save(languageEnGb);
+           _localizationService.Save(languageEnGb);
 
             var newPackageXml = XElement.Parse(ImportResources.Dictionary_Package);
             var languageItemsElement = newPackageXml.Elements("Languages").First();
@@ -75,10 +78,10 @@ namespace Umbraco.Tests.Services
         private void CreateDictionaryData()
         {
             var languageNbNo = new Language(TestObjects.GetGlobalSettings(), "nb-NO") { CultureName = "nb-NO" };
-            ServiceContext.LocalizationService.Save(languageNbNo);
+           _localizationService.Save(languageNbNo);
 
             var languageEnGb = new Language(TestObjects.GetGlobalSettings(), "en-GB") { CultureName = "en-GB" };
-            ServiceContext.LocalizationService.Save(languageEnGb);
+           _localizationService.Save(languageEnGb);
 
             var parentItem = new DictionaryItem("Parent");
             var parentTranslations = new List<IDictionaryTranslation>
@@ -87,7 +90,7 @@ namespace Umbraco.Tests.Services
                 new DictionaryTranslation(languageEnGb, "ParentValue")
             };
             parentItem.Translations = parentTranslations;
-            ServiceContext.LocalizationService.Save(parentItem);
+           _localizationService.Save(parentItem);
 
             var childItem = new DictionaryItem(parentItem.Key, "Child");
             var childTranslations = new List<IDictionaryTranslation>
@@ -96,7 +99,7 @@ namespace Umbraco.Tests.Services
                 new DictionaryTranslation(languageEnGb, "ChildValue")
             };
             childItem.Translations = childTranslations;
-            ServiceContext.LocalizationService.Save(childItem);
+           _localizationService.Save(childItem);
         }
     }
 }

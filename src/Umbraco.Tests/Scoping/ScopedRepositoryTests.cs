@@ -16,6 +16,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
 using Umbraco.Web;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Tests.Scoping
 {
@@ -24,6 +25,8 @@ namespace Umbraco.Tests.Scoping
     public class ScopedRepositoryTests : TestWithDatabaseBase
     {
         private DistributedCacheBinder _distributedCacheBinder;
+
+        private readonly ILocalizationService _localizationService = new Mock<ILocalizationService>().Object;
 
         protected override void Compose()
         {
@@ -137,16 +140,15 @@ namespace Umbraco.Tests.Scoping
         public void FullDataSetRepositoryCachePolicy(bool complete)
         {
             var scopeProvider = ScopeProvider;
-            var service = Current.Services.LocalizationService;
             var globalCache = Current.AppCaches.IsolatedCaches.GetOrCreate(typeof (ILanguage));
 
             var lang = (ILanguage) new Language(TestObjects.GetGlobalSettings(), "fr-FR");
-            service.Save(lang);
+            _localizationService.Save(lang);
 
             // global cache has been flushed, reload
             var globalFullCached = (IEnumerable<ILanguage>) globalCache.Get(GetCacheTypeKey<ILanguage>(), () => null);
             Assert.IsNull(globalFullCached);
-            var reload = service.GetLanguageById(lang.Id);
+            var reload = _localizationService.GetLanguageById(lang.Id);
 
             // global cache contains the entity
             globalFullCached = (IEnumerable<ILanguage>) globalCache.Get(GetCacheTypeKey<ILanguage>(), () => null);
@@ -171,12 +173,12 @@ namespace Umbraco.Tests.Scoping
                 Assert.AreNotSame(globalCache, scopedCache);
 
                 lang.IsoCode = "de-DE";
-                service.Save(lang);
+                _localizationService.Save(lang);
 
                 // scoped cache has been flushed, reload
                 var scopeFullCached = (IEnumerable<ILanguage>) scopedCache.Get(GetCacheTypeKey<ILanguage>(), () => null);
                 Assert.IsNull(scopeFullCached);
-                reload = service.GetLanguageById(lang.Id);
+                reload = _localizationService.GetLanguageById(lang.Id);
 
                 // scoped cache contains the "new" entity
                 scopeFullCached = (IEnumerable<ILanguage>) scopedCache.Get(GetCacheTypeKey<ILanguage>(), () => null);
@@ -212,7 +214,7 @@ namespace Umbraco.Tests.Scoping
             }
 
             // get again, updated if completed
-            lang = service.GetLanguageById(lang.Id);
+            lang = _localizationService.GetLanguageById(lang.Id);
             Assert.AreEqual(complete ? "de-DE" : "fr-FR", lang.IsoCode);
 
             // global cache contains the entity again
@@ -229,18 +231,17 @@ namespace Umbraco.Tests.Scoping
         public void SingleItemsOnlyRepositoryCachePolicy(bool complete)
         {
             var scopeProvider = ScopeProvider;
-            var service = Current.Services.LocalizationService;
             var globalCache = Current.AppCaches.IsolatedCaches.GetOrCreate(typeof (IDictionaryItem));
 
             var lang = (ILanguage)new Language(TestObjects.GetGlobalSettings(), "fr-FR");
-            service.Save(lang);
+            _localizationService.Save(lang);
 
             var item = (IDictionaryItem) new DictionaryItem("item-key");
             item.Translations = new IDictionaryTranslation[]
             {
                 new DictionaryTranslation(lang.Id, "item-value"),
             };
-            service.Save(item);
+            _localizationService.Save(item);
 
             // global cache contains the entity
             var globalCached = (IDictionaryItem) globalCache.Get(GetCacheIdKey<IDictionaryItem>(item.Id), () => null);
@@ -263,7 +264,7 @@ namespace Umbraco.Tests.Scoping
                 Assert.AreNotSame(globalCache, scopedCache);
 
                 item.ItemKey = "item-changed";
-                service.Save(item);
+                _localizationService.Save(item);
 
                 // scoped cache contains the "new" entity
                 var scopeCached = (IDictionaryItem) scopedCache.Get(GetCacheIdKey<IDictionaryItem>(item.Id), () => null);
@@ -295,7 +296,7 @@ namespace Umbraco.Tests.Scoping
             }
 
             // get again, updated if completed
-            item = service.GetDictionaryItemById(item.Id);
+            item = _localizationService.GetDictionaryItemById(item.Id);
             Assert.AreEqual(complete ? "item-changed" : "item-key", item.ItemKey);
 
             // global cache contains the entity again

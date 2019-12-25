@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net.Http.Formatting;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
@@ -21,6 +22,12 @@ namespace Umbraco.Web.Trees
     [Tree(Constants.Applications.Translation, Constants.Trees.Dictionary, TreeGroup = Constants.Trees.Groups.Settings)]
     public class DictionaryTreeController : TreeController
     {
+        private readonly ILocalizationService _localizationService;
+        public DictionaryTreeController(ILocalizationService localizationService)
+        {
+            _localizationService = localizationService;
+        }
+
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
         {
             var root = base.CreateRootNode(queryStrings);
@@ -61,30 +68,30 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.RootString)
             {
                 nodes.AddRange(
-                    Services.LocalizationService.GetRootDictionaryItems().OrderBy(ItemSort()).Select(
+                    _localizationService.GetRootDictionaryItems().OrderBy(ItemSort()).Select(
                         x => CreateTreeNode(
                             x.Id.ToInvariantString(),
                             id,
                             queryStrings,
                             x.ItemKey,
                             "icon-book-alt",
-                            Services.LocalizationService.GetDictionaryItemChildren(x.Key).Any())));
+                            _localizationService.GetDictionaryItemChildren(x.Key).Any())));
             }
             else
             {
                 // maybe we should use the guid as url param to avoid the extra call for getting dictionary item
-                var parentDictionary = Services.LocalizationService.GetDictionaryItemById(intId.Result);
+                var parentDictionary = _localizationService.GetDictionaryItemById(intId.Result);
                 if (parentDictionary == null)
                     return nodes;
 
-                nodes.AddRange(Services.LocalizationService.GetDictionaryItemChildren(parentDictionary.Key).ToList().OrderBy(ItemSort()).Select(
+                nodes.AddRange(_localizationService.GetDictionaryItemChildren(parentDictionary.Key).ToList().OrderBy(ItemSort()).Select(
                     x => CreateTreeNode(
                         x.Id.ToInvariantString(),
                         id,
                         queryStrings,
                         x.ItemKey,
                         "icon-book-alt",
-                        Services.LocalizationService.GetDictionaryItemChildren(x.Key).Any())));
+                        _localizationService.GetDictionaryItemChildren(x.Key).Any())));
             }
 
             return nodes;

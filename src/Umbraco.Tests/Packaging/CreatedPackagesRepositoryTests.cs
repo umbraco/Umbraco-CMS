@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Xml.Linq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
@@ -40,7 +41,7 @@ namespace Umbraco.Tests.Packaging
 
         public ICreatedPackagesRepository PackageBuilder => new PackagesRepository(
             ServiceContext.ContentService, ServiceContext.ContentTypeService, ServiceContext.DataTypeService,
-            ServiceContext.FileService, ServiceContext.MacroService, ServiceContext.LocalizationService,
+            ServiceContext.FileService, ServiceContext.MacroService, new Mock<ILocalizationService>().Object,
             IOHelper,
             Factory.GetInstance<IEntityXmlSerializer>(), Logger,
             UmbracoVersion,

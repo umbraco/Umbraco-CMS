@@ -25,8 +25,8 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public RadioButtonsPropertyEditor(ILogger logger, ILocalizedTextService textService, IIOHelper ioHelper)
-            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService,Current.Services.TextService, Current.ShortStringHelper)
+        public RadioButtonsPropertyEditor(ILogger logger, ILocalizedTextService textService, IIOHelper ioHelper, ILocalizationService localizationService)
+            : base(logger, Current.Services.DataTypeService, localizationService,Current.Services.TextService, Current.ShortStringHelper)
         {
             _textService = textService;
             _ioHelper = ioHelper;

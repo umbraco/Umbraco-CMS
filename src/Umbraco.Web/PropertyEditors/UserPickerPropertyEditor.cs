@@ -4,6 +4,7 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -16,8 +17,8 @@ namespace Umbraco.Web.PropertyEditors
         Icon = Constants.Icons.User)]
     public class UserPickerPropertyEditor : DataEditor
     {
-        public UserPickerPropertyEditor(ILogger logger)
-            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService, Current.Services.TextService,Current.ShortStringHelper)
+        public UserPickerPropertyEditor(ILogger logger, ILocalizationService localizationService)
+            : base(logger, Current.Services.DataTypeService, localizationService, Current.Services.TextService,Current.ShortStringHelper)
         { }
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new UserPickerConfiguration();

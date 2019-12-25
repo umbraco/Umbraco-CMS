@@ -20,7 +20,6 @@ namespace Umbraco.Core.Services
         private readonly Lazy<IMediaTypeService> _mediaTypeService;
         private readonly Lazy<IDataTypeService> _dataTypeService;
         private readonly Lazy<IFileService> _fileService;
-        private readonly Lazy<ILocalizationService> _localizationService;
         private readonly Lazy<IPackagingService> _packagingService;
         private readonly Lazy<IServerRegistrationService> _serverRegistrationService;
         private readonly Lazy<IEntityService> _entityService;
@@ -52,7 +51,6 @@ namespace Umbraco.Core.Services
             _mediaTypeService = mediaTypeService;
             _dataTypeService = dataTypeService;
             _fileService = fileService;
-            _localizationService = localizationService;
             _packagingService = packagingService;
             _serverRegistrationService = serverRegistrationService;
             _entityService = entityService;
@@ -207,11 +205,6 @@ namespace Umbraco.Core.Services
         /// Gets the <see cref="IFileService"/>
         /// </summary>
         public IFileService FileService => _fileService.Value;
-
-        /// <summary>
-        /// Gets the <see cref="ILocalizationService"/>
-        /// </summary>
-        public ILocalizationService LocalizationService => _localizationService.Value;
 
         /// <summary>
         /// Gets the <see cref="IMediaService"/>

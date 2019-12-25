@@ -3,6 +3,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -23,8 +24,8 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// Initializes a new instance of the <see cref="MarkdownPropertyEditor"/> class.
         /// </summary>
-        public MarkdownPropertyEditor(ILogger logger, IIOHelper ioHelper)
-            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService, Current.Services.TextService,Current.ShortStringHelper)
+        public MarkdownPropertyEditor(ILogger logger, IIOHelper ioHelper, ILocalizationService localizationService)
+            : base(logger, Current.Services.DataTypeService, localizationService, Current.Services.TextService,Current.ShortStringHelper)
         {
             _ioHelper = ioHelper;
         }

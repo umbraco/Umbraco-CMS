@@ -42,6 +42,7 @@ namespace Umbraco.Tests.Web.Controllers
     public class ContentControllerTests : TestWithDatabaseBase
     {
         private IContentType _contentTypeForMockedContent;
+        private readonly ILocalizationService _localizationService = new Mock<ILocalizationService>().Object;
 
         public override void SetUp()
         {
@@ -268,7 +269,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
-                    ShortStringHelper);
+                    ShortStringHelper,
+                    _localizationService);
 
                 return controller;
             }
@@ -303,7 +305,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
-                    ShortStringHelper);
+                    ShortStringHelper,
+                    _localizationService);
 
                 return controller;
             }
@@ -346,7 +349,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
-                    ShortStringHelper);
+                    ShortStringHelper,
+                    _localizationService);
 
                 return controller;
             }
@@ -394,7 +398,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
-                    ShortStringHelper);
+                    ShortStringHelper,
+                    _localizationService);
 
                 return controller;
             }
@@ -434,7 +439,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
-                    ShortStringHelper);
+                    ShortStringHelper,
+                    _localizationService);
 
                 return controller;
             }
@@ -480,7 +486,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
-                    ShortStringHelper);
+                    ShortStringHelper,
+                    _localizationService);
 
                 return controller;
             }

@@ -69,7 +69,7 @@ namespace Umbraco.Tests.Models
                     if (x == typeof(Configs)) return configs;
                     if (x == typeof(PropertyEditorCollection)) return propertyEditors;
                     if (x == typeof(ServiceContext)) return serviceContext;
-                    if (x == typeof(ILocalizedTextService)) return serviceContext.LocalizationService;
+                    if (x == typeof(ILocalizedTextService)) return new Mock<ILocalizationService>().Object;
                     throw new NotSupportedException(x.FullName);
                 });
         }

@@ -10,6 +10,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
@@ -389,18 +390,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         private void CreateTestData()
         {
             //Id 1 is en-US - when Umbraco is installed
-
+            var localizationService = new Mock<ILocalizationService>().Object;
             var languageDK = new Language(TestObjects.GetGlobalSettings(), "da-DK") { CultureName = "da-DK" };
-            ServiceContext.LocalizationService.Save(languageDK);//Id 2
+            localizationService.Save(languageDK);//Id 2
 
             var languageSE = new Language(TestObjects.GetGlobalSettings(), "sv-SE") { CultureName = "sv-SE" };
-            ServiceContext.LocalizationService.Save(languageSE);//Id 3
+            localizationService.Save(languageSE);//Id 3
 
             var languageDE = new Language(TestObjects.GetGlobalSettings(), "de-DE") { CultureName = "de-DE" };
-            ServiceContext.LocalizationService.Save(languageDE);//Id 4
+            localizationService.Save(languageDE);//Id 4
 
             var languagePT = new Language(TestObjects.GetGlobalSettings(), "pt-PT") { CultureName = "pt-PT" };
-            ServiceContext.LocalizationService.Save(languagePT);//Id 5
+            localizationService.Save(languagePT);//Id 5
         }
     }
 }

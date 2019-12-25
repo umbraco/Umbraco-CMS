@@ -30,7 +30,7 @@ namespace Umbraco.Web.PropertyEditors
             ILocalizationService localizationService,
             ILogger logger,
             IIOHelper ioHelper)
-            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService,Current.Services.TextService, Current.ShortStringHelper)
+            : base(logger, Current.Services.DataTypeService, localizationService,Current.Services.TextService, Current.ShortStringHelper)
         {
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;

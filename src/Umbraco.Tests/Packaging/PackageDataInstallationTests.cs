@@ -28,6 +28,8 @@ namespace Umbraco.Tests.Packaging
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class PackageDataInstallationTests : TestWithSomeContentBase
     {
+        private readonly ILocalizationService _localizationService = new Mock<ILocalizationService>().Object;
+
         [HideFromTypeFinder]
         [DataEditor("7e062c13-7c41-4ad9-b389-41d88aeef87c", "Editor1", "editor1")]
         public class Editor1 : DataEditor
@@ -533,11 +535,11 @@ namespace Umbraco.Tests.Packaging
             var dictionaryItems = PackageDataInstallation.ImportDictionaryItems(dictionaryItemsElement.Elements("DictionaryItem"), 0);
 
             // Assert
-            Assert.That(ServiceContext.LocalizationService.DictionaryItemExists(parentKey), "DictionaryItem parentKey does not exist");
-            Assert.That(ServiceContext.LocalizationService.DictionaryItemExists(childKey), "DictionaryItem childKey does not exist");
+            Assert.That(_localizationService.DictionaryItemExists(parentKey), "DictionaryItem parentKey does not exist");
+            Assert.That(_localizationService.DictionaryItemExists(childKey), "DictionaryItem childKey does not exist");
 
-            var parentDictionaryItem = ServiceContext.LocalizationService.GetDictionaryItemByKey(parentKey);
-            var childDictionaryItem = ServiceContext.LocalizationService.GetDictionaryItemByKey(childKey);
+            var parentDictionaryItem = _localizationService.GetDictionaryItemByKey(parentKey);
+            var childDictionaryItem = _localizationService.GetDictionaryItemByKey(childKey);
 
             Assert.That(parentDictionaryItem.ParentId, Is.Not.EqualTo(childDictionaryItem.ParentId));
             Assert.That(childDictionaryItem.ParentId, Is.EqualTo(parentDictionaryItem.Key));
@@ -602,7 +604,7 @@ namespace Umbraco.Tests.Packaging
 
             // Act
             var languages = PackageDataInstallation.ImportLanguages(LanguageItemsElement.Elements("Language"), 0);
-            var allLanguages = ServiceContext.LocalizationService.GetAllLanguages();
+            var allLanguages = _localizationService.GetAllLanguages();
 
             // Assert
             Assert.That(languages.Any(x => x.HasIdentity == false), Is.False);
@@ -715,14 +717,14 @@ namespace Umbraco.Tests.Packaging
         {
             var norwegian = new Core.Models.Language(TestObjects.GetGlobalSettings(), "nb-NO");
             var english = new Core.Models.Language(TestObjects.GetGlobalSettings(), "en-GB");
-            ServiceContext.LocalizationService.Save(norwegian, 0);
-            ServiceContext.LocalizationService.Save(english, 0);
+            _localizationService.Save(norwegian, 0);
+            _localizationService.Save(english, 0);
         }
 
         private void AssertDictionaryItem(string key, string expectedValue, string cultureCode)
         {
-            Assert.That(ServiceContext.LocalizationService.DictionaryItemExists(key), "DictionaryItem key does not exist");
-            var dictionaryItem = ServiceContext.LocalizationService.GetDictionaryItemByKey(key);
+            Assert.That(_localizationService.DictionaryItemExists(key), "DictionaryItem key does not exist");
+            var dictionaryItem = _localizationService.GetDictionaryItemByKey(key);
             var translation = dictionaryItem.Translations.SingleOrDefault(i => i.Language.IsoCode == cultureCode);
             Assert.IsNotNull(translation, "Translation to {0} was not added", cultureCode);
             var value = translation.Value;
@@ -731,9 +733,9 @@ namespace Umbraco.Tests.Packaging
 
         private void AddExistingEnglishParentDictionaryItem(string expectedEnglishParentValue)
         {
-            var languages = ServiceContext.LocalizationService.GetAllLanguages().ToList();
+            var languages = _localizationService.GetAllLanguages().ToList();
             var englishLanguage = languages.Single(l => l.IsoCode == "en-GB");
-            ServiceContext.LocalizationService.Save(
+            _localizationService.Save(
                 new DictionaryItem("Parent")
                 {
                     Translations = new List<IDictionaryTranslation>
@@ -746,10 +748,10 @@ namespace Umbraco.Tests.Packaging
 
         private void AddExistingEnglishAndNorwegianParentDictionaryItem(string expectedEnglishParentValue, string expectedNorwegianParentValue)
         {
-            var languages = ServiceContext.LocalizationService.GetAllLanguages().ToList();
+            var languages = _localizationService.GetAllLanguages().ToList();
             var englishLanguage = languages.Single(l => l.IsoCode == "en-GB");
             var norwegianLanguage = languages.Single(l => l.IsoCode == "nb-NO");
-            ServiceContext.LocalizationService.Save(
+            _localizationService.Save(
                 new DictionaryItem("Parent")
                 {
                     Translations = new List<IDictionaryTranslation>

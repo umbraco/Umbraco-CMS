@@ -32,6 +32,8 @@ namespace Umbraco.Tests.Services
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true, WithApplication = true)]
     public class ContentTypeServiceVariantsTests : TestWithSomeContentBase
     {
+        private readonly ILocalizationService _localizationService = new Mock<ILocalizationService>().Object;
+
         protected override void Compose()
         {
             base.Compose();
@@ -307,7 +309,7 @@ namespace Umbraco.Tests.Services
             var nlContentName = "Content nl-NL";
             var nlCulture = "nl-NL";
 
-            ServiceContext.LocalizationService.Save(new Language(TestObjects.GetGlobalSettings(), nlCulture));
+            _localizationService.Save(new Language(TestObjects.GetGlobalSettings(), nlCulture));
 
             var includeCultureNames = contentType.Variations.HasFlag(ContentVariation.Culture);
 
@@ -664,9 +666,9 @@ namespace Umbraco.Tests.Services
             // can then switch one property to variant
 
             var languageEn = new Language(TestObjects.GetGlobalSettings(), "en") { IsDefault = true };
-            ServiceContext.LocalizationService.Save(languageEn);
+            _localizationService.Save(languageEn);
             var languageFr = new Language(TestObjects.GetGlobalSettings(), "fr");
-            ServiceContext.LocalizationService.Save(languageFr);
+            _localizationService.Save(languageFr);
 
             var contentType = CreateContentType(ContentVariation.Nothing);
 
@@ -1257,9 +1259,9 @@ namespace Umbraco.Tests.Services
         private void CreateFrenchAndEnglishLangs()
         {
             var languageEn = new Language(TestObjects.GetGlobalSettings(), "en") { IsDefault = true };
-            ServiceContext.LocalizationService.Save(languageEn);
+            _localizationService.Save(languageEn);
             var languageFr = new Language(TestObjects.GetGlobalSettings(), "fr");
-            ServiceContext.LocalizationService.Save(languageFr);
+            _localizationService.Save(languageFr);
         }
 
         private IContentType CreateContentType(ContentVariation variance, string alias = "contentType") => new ContentType(ShortStringHelper, -1)

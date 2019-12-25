@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -25,6 +26,8 @@ namespace Umbraco.Tests.Services
         private Language _langFr;
         private Language _langEs;
 
+        private readonly ILocalizationService _localizationService = new Mock<ILocalizationService>().Object;
+
         public override void SetUp()
         {
             base.SetUp();
@@ -33,8 +36,8 @@ namespace Umbraco.Tests.Services
             {
                 _langFr = new Language(SettingsForTests.GenerateMockGlobalSettings(), "fr-FR");
                 _langEs = new Language(SettingsForTests.GenerateMockGlobalSettings(), "es-ES");
-                ServiceContext.LocalizationService.Save(_langFr);
-                ServiceContext.LocalizationService.Save(_langEs);
+                _localizationService.Save(_langFr);
+                _localizationService.Save(_langEs);
             }
         }
 

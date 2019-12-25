@@ -52,7 +52,7 @@ namespace Umbraco.Tests.PublishedContent
                     new Language(globalSettings, "nl") { Id = 9, CultureName = "Dutch", FallbackLanguageId = 1 }
                 };
 
-            var localizationService = Mock.Get(serviceContext.LocalizationService);
+            var localizationService = new Mock<ILocalizationService>();
             localizationService.Setup(x => x.GetAllLanguages()).Returns(languages);
             localizationService.Setup(x => x.GetLanguageById(It.IsAny<int>()))
                 .Returns((int id) => languages.SingleOrDefault(y => y.Id == id));

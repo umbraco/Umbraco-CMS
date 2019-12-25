@@ -28,16 +28,18 @@ namespace Umbraco.Web.PropertyEditors
         private readonly ManifestValueValidatorCollection _validators;
         private readonly IIOHelper _ioHelper;
         private readonly ILocalizedTextService _localizedTextService;
+        private readonly ILocalizationService _localizationService;
 
-        public TagsPropertyEditor(ManifestValueValidatorCollection validators, ILogger logger, IIOHelper ioHelper, ILocalizedTextService localizedTextService)
-            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService, Current.Services.TextService,Current.ShortStringHelper)
+        public TagsPropertyEditor(ManifestValueValidatorCollection validators, ILogger logger, IIOHelper ioHelper, ILocalizedTextService localizedTextService, ILocalizationService localizationService)
+            : base(logger, Current.Services.DataTypeService, localizationService, Current.Services.TextService,Current.ShortStringHelper)
         {
             _validators = validators;
             _ioHelper = ioHelper;
             _localizedTextService = localizedTextService;
+            _localizationService = localizationService;
         }
 
-        protected override IDataValueEditor CreateValueEditor() => new TagPropertyValueEditor(Current.Services.DataTypeService, Current.Services.LocalizationService, Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new TagPropertyValueEditor(Current.Services.DataTypeService, _localizationService, Attribute);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new TagConfigurationEditor(_validators, _ioHelper, _localizedTextService);
 

@@ -54,6 +54,7 @@ namespace Umbraco.Web.Editors
     {
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly Lazy<IDictionary<string, ILanguage>> _allLangs;
+        private readonly ILocalizationService _localizationService;
 
         public object Domains { get; private set; }
 
@@ -68,11 +69,13 @@ namespace Umbraco.Web.Editors
             IProfilingLogger logger,
             IRuntimeState runtimeState,
             UmbracoHelper umbracoHelper,
-            IShortStringHelper shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            ILocalizationService localizationService)
             : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
-            _allLangs = new Lazy<IDictionary<string, ILanguage>>(() => Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
+            _localizationService = localizationService;
+            _allLangs = new Lazy<IDictionary<string, ILanguage>>(() => _localizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
         }
 
         /// <summary>
@@ -717,7 +720,7 @@ namespace Umbraco.Web.Editors
                     {
                         if (variantCount > 1)
                         {
-                            var cultureErrors = ModelState.GetCulturesWithErrors(Services.LocalizationService, cultureForInvariantErrors);
+                            var cultureErrors = ModelState.GetCulturesWithErrors(_localizationService, cultureForInvariantErrors);
                             foreach (var c in contentItem.Variants.Where(x => x.Save && !cultureErrors.Contains(x.Culture)).Select(x => x.Culture).ToArray())
                             {
                                 AddSuccessNotification(notifications, c,
@@ -907,7 +910,7 @@ namespace Umbraco.Web.Editors
             {
                 if (variantCount > 1)
                 {
-                    var cultureErrors = ModelState.GetCulturesWithErrors(Services.LocalizationService, cultureForInvariantErrors);
+                    var cultureErrors = ModelState.GetCulturesWithErrors(_localizationService, cultureForInvariantErrors);
                     foreach (var c in contentItem.Variants.Where(x => x.Save && !cultureErrors.Contains(x.Culture)).Select(x => x.Culture).ToArray())
                     {
                         AddSuccessNotification(notifications, c,
@@ -1167,7 +1170,7 @@ namespace Umbraco.Web.Editors
 
             var mandatoryCultures = _allLangs.Value.Values.Where(x => x.IsMandatory).Select(x => x.IsoCode).ToList();
 
-            var cultureErrors = ModelState.GetCulturesWithErrors(Services.LocalizationService, cultureForInvariantErrors);
+            var cultureErrors = ModelState.GetCulturesWithErrors(_localizationService, cultureForInvariantErrors);
 
             //validate if we can publish based on the mandatory language requirements
             var canPublish = ValidatePublishingMandatoryLanguages(
@@ -1239,7 +1242,7 @@ namespace Umbraco.Web.Editors
 
             var mandatoryCultures = _allLangs.Value.Values.Where(x => x.IsMandatory).Select(x => x.IsoCode).ToList();
 
-            var cultureErrors = ModelState.GetCulturesWithErrors(Services.LocalizationService, cultureForInvariantErrors);
+            var cultureErrors = ModelState.GetCulturesWithErrors(_localizationService, cultureForInvariantErrors);
 
             //validate if we can publish based on the mandatory languages selected
             var canPublish = ValidatePublishingMandatoryLanguages(
@@ -1702,7 +1705,7 @@ namespace Umbraco.Web.Editors
 
             model.Valid = true;
             var domains = Services.DomainService.GetAssignedDomains(model.NodeId, true).ToArray();
-            var languages = Services.LocalizationService.GetAllLanguages().ToArray();
+            var languages = _localizationService.GetAllLanguages().ToArray();
             var language = model.Language > 0 ? languages.FirstOrDefault(l => l.Id == model.Language) : null;
 
             // process wildcard
@@ -1829,7 +1832,7 @@ namespace Umbraco.Web.Editors
             if (!ModelState.IsValid && display.Variants.Count() > 1)
             {
                 //Add any culture specific errors here
-                var cultureErrors = ModelState.GetCulturesWithErrors(Services.LocalizationService, cultureForInvariantErrors);
+                var cultureErrors = ModelState.GetCulturesWithErrors(_localizationService, cultureForInvariantErrors);
 
                 foreach (var cultureError in cultureErrors)
                 {

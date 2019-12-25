@@ -40,6 +40,7 @@ namespace Umbraco.Web.Trees
         private readonly UmbracoTreeSearcher _treeSearcher;
         private readonly ActionCollection _actions;
         private readonly IGlobalSettings _globalSettings;
+        private readonly ILocalizationService _localizationService;
 
         protected override int RecycleBinId => Constants.System.RecycleBinContent;
 
@@ -50,11 +51,22 @@ namespace Umbraco.Web.Trees
         protected override int[] UserStartNodes
             => _userStartNodes ?? (_userStartNodes = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService));
 
-        public ContentTreeController(UmbracoTreeSearcher treeSearcher, ActionCollection actions, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        public ContentTreeController(
+            UmbracoTreeSearcher treeSearcher,
+            ActionCollection actions, IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoHelper umbracoHelper,
+            ILocalizationService localizationService) : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _treeSearcher = treeSearcher;
             _actions = actions;
             _globalSettings = globalSettings;
+            _localizationService = localizationService;
         }
 
         /// <inheritdoc />
@@ -214,7 +226,7 @@ namespace Umbraco.Web.Trees
             var culture = queryStrings["culture"].TryConvertTo<string>();
 
             //if this is null we'll set it to the default.
-            var cultureVal = (culture.Success ? culture.Result : null) ?? Services.LocalizationService.GetDefaultLanguageIsoCode();
+            var cultureVal = (culture.Success ? culture.Result : null) ?? _localizationService.GetDefaultLanguageIsoCode();
 
             // set names according to variations
             foreach (var entity in result)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -425,12 +426,13 @@ namespace Umbraco.Tests.Services
 
         private void CreateTypes(out IContentType iContentType, out IContentType vContentType)
         {
+            var localizationService = new Mock<ILocalizationService>().Object;
             var langDe = new Language(TestObjects.GetGlobalSettings(), "de") { IsDefault = true };
-            ServiceContext.LocalizationService.Save(langDe);
+            localizationService.Save(langDe);
             var langRu = new Language(TestObjects.GetGlobalSettings(), "ru");
-            ServiceContext.LocalizationService.Save(langRu);
+            localizationService.Save(langRu);
             var langEs = new Language(TestObjects.GetGlobalSettings(), "es");
-            ServiceContext.LocalizationService.Save(langEs);
+            localizationService.Save(langEs);
 
             iContentType = new ContentType(ShortStringHelper, -1)
             {
