@@ -264,7 +264,7 @@ namespace Umbraco.Tests.Published
             public override bool HasValue(string culture = null, string segment = null) => _hasValue;
             public override object GetSourceValue(string culture = null, string segment = null) => _sourceValue;
             public override object GetValue(string culture = null, string segment = null) => PropertyType.ConvertInterToObject(_owner, ReferenceCacheLevel, InterValue, _preview);
-            public override object GetXPathValue(string culture = null, string segment = null) => throw new WontImplementException();
+            public override object GetXPathValue(string culture = null, string segment = null) => throw new InvalidOperationException("This method won't be implemented.");
         }
     }
 }

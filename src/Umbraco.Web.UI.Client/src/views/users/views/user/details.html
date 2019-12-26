@@ -205,6 +205,7 @@
                                 <localize key="user_changePhoto">Change photo</localize>
                             </button>
 
+
                             <button ng-if="model.user.avatars"
                                     class="btn-link umb-user-group-preview__action umb-user-group-preview__action--red"
                                     ng-click="model.clearAvatar()"
@@ -247,7 +248,7 @@
                     <div>
                         <umb-button ng-if="model.user.userDisplayState.key !== 'Disabled' && model.user.userDisplayState.key !== 'Invited' && !model.user.isCurrentUser"
                                     type="button"
-                                    button-style="[info,block]"
+                                    button-style="[warning,block]"
                                     action="model.disableUser()"
                                     state="model.disableUserButtonState"
                                     label="Disable"
@@ -320,7 +321,7 @@
                               rows="4">
                 </textarea>
                     <umb-button type="button"
-                                button-style="[info,block]"
+                                button-style="[action,block]"
                                 action="model.resendInvite()"
                                 state="model.resendInviteButtonState"
                                 label="Resend Invite"

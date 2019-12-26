@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Moq;
@@ -301,7 +302,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual("/scripts/path-2/test-path-3.js", script.VirtualPath);
 
                 script = new Script("\\test-path-4.js") { Content = "// script" };
-                Assert.Throws<FileSecurityException>(() => // fixed in 7.3 - 7.2.8 used to strip the \
+                Assert.Throws<UnauthorizedAccessException>(() => // fixed in 7.3 - 7.2.8 used to strip the \
                 {
                     repository.Save(script);
                 });
@@ -310,11 +311,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.IsNull(script);
 
                 // fixed in 7.3 - 7.2.8 used to...
-                Assert.Throws<FileSecurityException>(() =>
+                Assert.Throws<UnauthorizedAccessException>(() =>
                 {
                     script = repository.Get("\\test-path-4.js"); // outside the filesystem, does not exist
                 });
-                Assert.Throws<FileSecurityException>(() =>
+                Assert.Throws<UnauthorizedAccessException>(() =>
                 {
                     script = repository.Get("../packages.config"); // outside the filesystem, exists
                 });

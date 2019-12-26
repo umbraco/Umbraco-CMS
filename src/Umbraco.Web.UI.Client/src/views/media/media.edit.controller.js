@@ -35,7 +35,8 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource,
     //setup scope vars
     $scope.currentSection = appState.getSectionState("currentSection");
     $scope.currentNode = null; //the editors affiliated node
-
+    $scope.header = {};
+    $scope.header.setPageTitle = $scope.currentSection ==="media";
     $scope.page = {};
     $scope.page.loading = false;
     $scope.page.menu = {};

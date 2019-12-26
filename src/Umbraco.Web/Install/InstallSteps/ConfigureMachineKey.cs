@@ -39,7 +39,8 @@ namespace Umbraco.Web.Install.InstallSteps
             var fileName = IOHelper.MapPath($"{SystemDirectories.Root}/web.config");
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
 
-            var systemWeb = xml.Root.DescendantsAndSelf("system.web").Single();
+            // we only want to get the element that is under the root, (there may be more under <location> tags we don't want them)
+            var systemWeb = xml.Root.Element("system.web");
 
             // Update appSetting if it exists, or else create a new appSetting for the given key and value
             var machineKey = systemWeb.Descendants("machineKey").FirstOrDefault();
