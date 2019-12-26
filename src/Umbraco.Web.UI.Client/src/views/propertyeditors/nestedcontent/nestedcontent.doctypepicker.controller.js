@@ -53,10 +53,6 @@
             });
         }
 
-        $scope.canAdd = function () {
-            return !$scope.model.docTypes || !$scope.model.value || $scope.model.value.length < $scope.model.docTypes.length;
-        }
-
         $scope.remove = function (index) {
             $scope.model.value.splice(index, 1);
         }
@@ -112,6 +108,7 @@
                 });
             });
         }
+
         $scope.canAdd = function () {
             return !$scope.model.value || _.some($scope.model.elemTypes, function (elType) {
                 return !_.find($scope.model.value, function (c) {
@@ -119,7 +116,6 @@
                 });
             });
         }
-
 
         $scope.openElemTypeModal = function ($event, config) {
 
