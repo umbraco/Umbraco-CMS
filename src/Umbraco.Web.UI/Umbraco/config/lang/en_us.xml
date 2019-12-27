@@ -99,11 +99,14 @@
         <key alias="orEdit">Edit Current Domains</key>
         <key alias="domainHelpWithVariants">
             <![CDATA[Valid domain names are: "example.com", "www.example.com", "example.com:8080", or "https://www.example.com/".
-     Furthermore also one-level paths in domains are supported, eg. "example.com/en" or "/en".]]></key>
+     Furthermore also one-level paths in domains are supported, eg. "example.com/en" or "/en".]]>
+        </key>
         <key alias="inherit">Inherit</key>
         <key alias="setLanguage">Culture</key>
-    <key alias="setLanguageHelp"><![CDATA[Set the culture for nodes below the current node,<br /> or inherit culture from parent nodes. Will also apply<br />
-      to the current node, unless a domain below applies too.]]></key>
+        <key alias="setLanguageHelp">
+            <![CDATA[Set the culture for nodes below the current node,<br /> or inherit culture from parent nodes. Will also apply<br />
+      to the current node, unless a domain below applies too.]]>
+        </key>
         <key alias="setDomains">Domains</key>
     </area>
     <area alias="buttons">
@@ -305,6 +308,7 @@
         <key alias="schedulePublishHelp">Select the date and time to publish and/or unpublish the content item.</key>
         <key alias="createEmpty">Create new</key>
         <key alias="createFromClipboard">Paste from clipboard</key>
+        <key alias="nodeIsInTrash">This item is in the Recycle Bin</key>
     </area>
     <area alias="blueprints">
         <key alias="createBlueprintFrom">Create a new Content Template from '%0%'</key>
@@ -348,7 +352,8 @@
         <key alias="noDocumentTypesAllowedAtRoot"><![CDATA[There are no allowed document types available for creating content here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by changing the <strong>Allow as root</strong> option under <strong>Permissions</strong>.]]></key>
         <key alias="noMediaTypes" version="7.0"><![CDATA[There are no allowed media types available for creating media here. You must enable these in <strong>Media Types Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Permissions</strong>.]]></key>
         <key alias="noMediaTypesWithNoSettingsAccess">The selected media in the tree doesn't allow for any other media to be created below it.</key>
-    <key alias="noMediaTypesEditPermissions">Edit permissions for this media type</key>    <key alias="documentTypeWithoutTemplate">Document Type without a template</key>
+        <key alias="noMediaTypesEditPermissions">Edit permissions for this media type</key>
+        <key alias="documentTypeWithoutTemplate">Document Type without a template</key>
         <key alias="newFolder">New folder</key>
         <key alias="newDataType">New data type</key>
         <key alias="newJavascriptFile">New JavaScript file</key>
@@ -492,13 +497,17 @@
         <key alias="noItems">There are no dictionary items.</key>
     </area>
     <area alias="dictionaryItem">
-    <key alias="description"><![CDATA[
+        <key alias="description">
+            <![CDATA[
       Edit the different language versions for the dictionary item '<em>%0%</em>' below
-   ]]></key>
+   ]]>
+        </key>
         <key alias="displayName">Culture Name</key>
-    <key alias="changeKeyError"><![CDATA[
+        <key alias="changeKeyError">
+            <![CDATA[
       The key '%0%' already exists.
-   ]]></key>
+   ]]>
+        </key>
         <key alias="overviewTitle">Dictionary overview</key>
     </area>
     <area alias="examineManagement">
@@ -513,7 +522,8 @@
         <key alias="manageIndexes">Manage Examine's indexes</key>
         <key alias="manageIndexesDescription">Allows you to view the details of each index and provides some tools for managing the indexes</key>
         <key alias="rebuildIndex">Rebuild index</key>
-    <key alias="rebuildIndexWarning"><![CDATA[
+        <key alias="rebuildIndexWarning">
+            <![CDATA[
       This will cause the index to be rebuilt.<br />
       Depending on how much content there is in your site this could take a while.<br />
       It is not recommended to rebuild an index during times of high website traffic or when editors are editing content.
@@ -631,6 +641,7 @@
         <key alias="cancel">Cancel</key>
         <key alias="cellMargin">Cell margin</key>
         <key alias="choose">Choose</key>
+        <key alias="clear">Clear</key>
         <key alias="close">Close</key>
         <key alias="closewindow">Close Window</key>
         <key alias="comment">Comment</key>
@@ -802,28 +813,38 @@
         <key alias="databaseErrorWebConfig">Could not save the web.config file. Please modify the connection string manually.</key>
         <key alias="databaseFound">Your database has been found and is identified as</key>
         <key alias="databaseHeader">Database configuration</key>
-    <key alias="databaseInstall"><![CDATA[
+        <key alias="databaseInstall">
+            <![CDATA[
       Press the <strong>install</strong> button to install the Umbraco %0% database
-    ]]></key>
+    ]]>
+        </key>
         <key alias="databaseInstallDone"><![CDATA[Umbraco %0% has now been copied to your database. Press <strong>Next</strong> to proceed.]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>Database not found! Please check that the information in the "connection string" of the "web.config" file is correct.</p>
+        <key alias="databaseNotFound">
+            <![CDATA[<p>Database not found! Please check that the information in the "connection string" of the "web.config" file is correct.</p>
               <p>To proceed, please edit the "web.config" file (using Visual Studio or your favourite text editor), scroll to the bottom, add the connection string for your database in the key named "UmbracoDbDSN" and save the file. </p>
               <p>
               Click the <strong>retry</strong> button when
               done.<br /><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
-			              More information on editing web.config here.</a></p>]]></key>
-    <key alias="databaseText"><![CDATA[To complete this step, you must know some information regarding your database server ("connection string").<br />
+			              More information on editing web.config here.</a></p>]]>
+        </key>
+        <key alias="databaseText">
+            <![CDATA[To complete this step, you must know some information regarding your database server ("connection string").<br />
         Please contact your ISP if necessary.
-        If you're installing on a local machine or server you might need information from your system administrator.]]></key>
-    <key alias="databaseUpgrade"><![CDATA[
+        If you're installing on a local machine or server you might need information from your system administrator.]]>
+        </key>
+        <key alias="databaseUpgrade">
+            <![CDATA[
       <p>
       Press the <strong>upgrade</strong> button to upgrade your database to Umbraco %0%</p>
       <p>
       Don't worry - no content will be deleted and everything will continue working afterwards!
       </p>
-      ]]></key>
-    <key alias="databaseUpgradeDone"><![CDATA[Your database has been upgraded to the final version %0%.<br/>Press <strong>Next</strong> to
-      proceed. ]]></key>
+      ]]>
+        </key>
+        <key alias="databaseUpgradeDone">
+            <![CDATA[Your database has been upgraded to the final version %0%.<br/>Press <strong>Next</strong> to
+      proceed. ]]>
+        </key>
         <key alias="databaseUpToDate"><![CDATA[Your current database is up-to-date!. Click <strong>next</strong> to continue the configuration wizard]]></key>
         <key alias="defaultUserChangePass"><![CDATA[<strong>The Default users' password needs to be changed!</strong>]]></key>
         <key alias="defaultUserDisabled"><![CDATA[<strong>The Default user has been disabled or has no access to Umbraco!</strong></p><p>No further actions needs to be taken. Click <b>Next</b> to proceed.]]></key>
@@ -835,41 +856,56 @@
         <key alias="permissionsAffectedFolders">Affected files and folders</key>
         <key alias="permissionsAffectedFoldersMoreInfo">More information on setting up permissions for Umbraco here</key>
         <key alias="permissionsAffectedFoldersText">You need to grant ASP.NET modify permissions to the following files/folders</key>
-    <key alias="permissionsAlmostPerfect"><![CDATA[<strong>Your permission settings are almost perfect!</strong><br /><br />
-        You can run Umbraco without problems, but you will not be able to install packages which are recommended to take full advantage of Umbraco.]]></key>
+        <key alias="permissionsAlmostPerfect">
+            <![CDATA[<strong>Your permission settings are almost perfect!</strong><br /><br />
+        You can run Umbraco without problems, but you will not be able to install packages which are recommended to take full advantage of Umbraco.]]>
+        </key>
         <key alias="permissionsHowtoResolve">How to Resolve</key>
         <key alias="permissionsHowtoResolveLink">Click here to read the text version</key>
         <key alias="permissionsHowtoResolveText"><![CDATA[Watch our <strong>video tutorial</strong> on setting up folder permissions for Umbraco or read the text version.]]></key>
-    <key alias="permissionsMaybeAnIssue"><![CDATA[<strong>Your permission settings might be an issue!</strong>
+        <key alias="permissionsMaybeAnIssue">
+            <![CDATA[<strong>Your permission settings might be an issue!</strong>
       <br/><br />
-      You can run Umbraco without problems, but you will not be able to create folders or install packages which are recommended to take full advantage of Umbraco.]]></key>
-    <key alias="permissionsNotReady"><![CDATA[<strong>Your permission settings are not ready for Umbraco!</strong>
+      You can run Umbraco without problems, but you will not be able to create folders or install packages which are recommended to take full advantage of Umbraco.]]>
+        </key>
+        <key alias="permissionsNotReady">
+            <![CDATA[<strong>Your permission settings are not ready for Umbraco!</strong>
           <br /><br />
-          In order to run Umbraco, you'll need to update your permission settings.]]></key>
-    <key alias="permissionsPerfect"><![CDATA[<strong>Your permission settings are perfect!</strong><br /><br />
-              You are ready to run Umbraco and install packages!]]></key>
+          In order to run Umbraco, you'll need to update your permission settings.]]>
+        </key>
+        <key alias="permissionsPerfect">
+            <![CDATA[<strong>Your permission settings are perfect!</strong><br /><br />
+              You are ready to run Umbraco and install packages!]]>
+        </key>
         <key alias="permissionsResolveFolderIssues">Resolving folder issue</key>
         <key alias="permissionsResolveFolderIssuesLink">Follow this link for more information on problems with ASP.NET and creating folders</key>
         <key alias="permissionsSettingUpPermissions">Setting up folder permissions</key>
-    <key alias="permissionsText"><![CDATA[
+        <key alias="permissionsText">
+            <![CDATA[
       Umbraco needs write/modify access to certain directories in order to store files like pictures and PDF's.
       It also stores temporary data (aka: cache) for enhancing the performance of your website.
-    ]]></key>
+    ]]>
+        </key>
         <key alias="runwayFromScratch">I want to start from scratch</key>
-    <key alias="runwayFromScratchText"><![CDATA[
+        <key alias="runwayFromScratchText">
+            <![CDATA[
         Your website is completely empty at the moment, so that's perfect if you want to start from scratch and create your own document types and templates.
         (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
         You can still choose to install Runway later on. Please go to the Developer section and choose Packages.
-      ]]></key>
+      ]]>
+        </key>
         <key alias="runwayHeader">You've just set up a clean Umbraco platform. What do you want to do next?</key>
         <key alias="runwayInstalled">Runway is installed</key>
-    <key alias="runwayInstalledText"><![CDATA[
+        <key alias="runwayInstalledText">
+            <![CDATA[
       You have the foundation in place. Select what modules you wish to install on top of it.<br />
       This is our list of recommended modules, check off the ones you would like to install, or view the <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">full list of modules</a>
-      ]]></key>
+      ]]>
+        </key>
         <key alias="runwayOnlyProUsers">Only recommended for experienced users</key>
         <key alias="runwaySimpleSite">I want to start with a simple website</key>
-    <key alias="runwaySimpleSiteText"><![CDATA[
+        <key alias="runwaySimpleSiteText">
+            <![CDATA[
       <p>
       "Runway" is a simple website providing some basic document types and templates. The installer can set up Runway for you automatically,
         but you can easily edit, extend or remove it. It's not necessary and you can perfectly use Umbraco without it. However,
@@ -880,7 +916,8 @@
         <em>Included with Runway:</em> Home page, Getting Started page, Installing Modules page.<br />
         <em>Optional Modules:</em> Top Navigation, Sitemap, Contact, Gallery.
         </small>
-      ]]></key>
+      ]]>
+        </key>
         <key alias="runwayWhatIsRunway">What is Runway</key>
         <key alias="step1">Step 1/5 Accept license</key>
         <key alias="step2">Step 2/5: Database configuration</key>
@@ -888,24 +925,36 @@
         <key alias="step4">Step 4/5: Check Umbraco security</key>
         <key alias="step5">Step 5/5: Umbraco is ready to get you started</key>
         <key alias="thankYou">Thank you for choosing Umbraco</key>
-    <key alias="theEndBrowseSite"><![CDATA[<h3>Browse your new site</h3>
-You installed Runway, so why not see how your new website looks.]]></key>
-    <key alias="theEndFurtherHelp"><![CDATA[<h3>Further help and information</h3>
-Get help from our award winning community, browse the documentation or watch some free videos on how to build a simple site, how to use packages and a quick guide to the Umbraco terminology]]></key>
+        <key alias="theEndBrowseSite">
+            <![CDATA[<h3>Browse your new site</h3>
+You installed Runway, so why not see how your new website looks.]]>
+        </key>
+        <key alias="theEndFurtherHelp">
+            <![CDATA[<h3>Further help and information</h3>
+Get help from our award winning community, browse the documentation or watch some free videos on how to build a simple site, how to use packages and a quick guide to the Umbraco terminology]]>
+        </key>
         <key alias="theEndHeader">Umbraco %0% is installed and ready for use</key>
-    <key alias="theEndInstallFailed"><![CDATA[To finish the installation, you'll need to
-        manually edit the <strong>/web.config file</strong> and update the AppSetting key <strong>UmbracoConfigurationStatus</strong> in the bottom to the value of <strong>'%0%'</strong>.]]></key>
-    <key alias="theEndInstallSuccess"><![CDATA[You can get <strong>started instantly</strong> by clicking the "Launch Umbraco" button below. <br />If you are <strong>new to Umbraco</strong>,
-you can find plenty of resources on our getting started pages.]]></key>
-    <key alias="theEndOpenUmbraco"><![CDATA[<h3>Launch Umbraco</h3>
-To manage your website, simply open the Umbraco back office and start adding content, updating the templates and stylesheets or add new functionality]]></key>
+        <key alias="theEndInstallFailed">
+            <![CDATA[To finish the installation, you'll need to
+        manually edit the <strong>/web.config file</strong> and update the AppSetting key <strong>UmbracoConfigurationStatus</strong> in the bottom to the value of <strong>'%0%'</strong>.]]>
+        </key>
+        <key alias="theEndInstallSuccess">
+            <![CDATA[You can get <strong>started instantly</strong> by clicking the "Launch Umbraco" button below. <br />If you are <strong>new to Umbraco</strong>,
+you can find plenty of resources on our getting started pages.]]>
+        </key>
+        <key alias="theEndOpenUmbraco">
+            <![CDATA[<h3>Launch Umbraco</h3>
+To manage your website, simply open the Umbraco back office and start adding content, updating the templates and stylesheets or add new functionality]]>
+        </key>
         <key alias="Unavailable">Connection to database failed.</key>
         <key alias="Version3">Umbraco Version 3</key>
         <key alias="Version4">Umbraco Version 4</key>
         <key alias="watch">Watch</key>
-    <key alias="welcomeIntro"><![CDATA[This wizard will guide you through the process of configuring <strong>Umbraco %0%</strong> for a fresh install or upgrading from version 3.0.
+        <key alias="welcomeIntro">
+            <![CDATA[This wizard will guide you through the process of configuring <strong>Umbraco %0%</strong> for a fresh install or upgrading from version 3.0.
                                 <br /><br />
-                                Press <strong>"next"</strong> to start the wizard.]]></key>
+                                Press <strong>"next"</strong> to start the wizard.]]>
+        </key>
     </area>
     <area alias="language">
         <key alias="cultureCode">Culture Code</key>
@@ -937,7 +986,8 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="setPasswordConfirmation">Your Password has been updated</key>
         <key alias="resetCodeExpired">The link you have clicked on is invalid or has expired</key>
         <key alias="resetPasswordEmailCopySubject">Umbraco: Reset Password</key>
-    <key alias="resetPasswordEmailCopyFormat"><![CDATA[
+        <key alias="resetPasswordEmailCopyFormat">
+            <![CDATA[
         <html>
 			<head>
 				<meta name='viewport' content='width=device-width'>
@@ -1017,7 +1067,8 @@ To manage your website, simply open the Umbraco back office and start adding con
 				</table>
 			</body>
 		</html>
-	]]></key>
+	]]>
+        </key>
     </area>
     <area alias="main">
         <key alias="dashboard">Dashboard</key>
@@ -1041,7 +1092,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <area alias="notifications">
         <key alias="editNotifications"><![CDATA[Select your notification for <strong>%0%</strong>]]></key>
         <key alias="notificationsSavedFor">Notification settings saved for</key>
-    <key alias="mailBody"><![CDATA[
+        <key alias="mailBody">
+            <![CDATA[
       Hi %0%
 
       This is an automated mail to inform you that the task '%1%'
@@ -1055,9 +1107,11 @@ To manage your website, simply open the Umbraco back office and start adding con
       Have a nice day!
 
       Cheers from the Umbraco robot
-    ]]></key>
+    ]]>
+        </key>
         <key alias="mailBodyVariantSummary">The following languages have been modified %0%</key>
-    <key alias="mailBodyHtml"><![CDATA[
+        <key alias="mailBodyHtml">
+            <![CDATA[
         <html>
 			<head>
 				<meta name='viewport' content='width=device-width'>
@@ -1132,10 +1186,13 @@ To manage your website, simply open the Umbraco back office and start adding con
 				</table>
 			</body>
 		</html>
-	]]></key>
-    <key alias="mailBodyVariantHtmlSummary"><![CDATA[<p>The following languages have been modified:</p>
+	]]>
+        </key>
+        <key alias="mailBodyVariantHtmlSummary">
+            <![CDATA[<p>The following languages have been modified:</p>
         %0%
-    ]]></key>
+    ]]>
+        </key>
         <key alias="mailSubject">[%0%] Notification about %1% performed on %2%</key>
         <key alias="notifications">Notifications</key>
     </area>
@@ -1143,10 +1200,12 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="actions">Actions</key>
         <key alias="created">Created</key>
         <key alias="createPackage">Create package</key>
-    <key alias="chooseLocalPackageText"><![CDATA[
+        <key alias="chooseLocalPackageText">
+            <![CDATA[
       Choose Package from your machine, by clicking the Browse<br />
          button and locating the package. Umbraco packages usually have a ".umb" or ".zip" extension.
-      ]]></key>
+      ]]>
+        </key>
         <key alias="deletewarning">This will delete the package</key>
         <key alias="dropHere">Drop to upload</key>
         <key alias="includeAllChildNodes">Include all child nodes</key>
@@ -1200,8 +1259,10 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="packageMetaData">Package meta data</key>
         <key alias="packageName">Package name</key>
         <key alias="packageNoItemsHeader">Package doesn't contain any items</key>
-    <key alias="packageNoItemsText"><![CDATA[This package file doesn't contain any items to uninstall.<br/><br/>
-      You can safely remove this from the system by clicking "uninstall package" below.]]></key>
+        <key alias="packageNoItemsText">
+            <![CDATA[This package file doesn't contain any items to uninstall.<br/><br/>
+      You can safely remove this from the system by clicking "uninstall package" below.]]>
+        </key>
         <key alias="packageOptions">Package options</key>
         <key alias="packageReadme">Package readme</key>
         <key alias="packageRepository">Package repository</key>
@@ -1209,9 +1270,11 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="packageUninstalledHeader">Package was uninstalled</key>
         <key alias="packageUninstalledText">The package was successfully uninstalled</key>
         <key alias="packageUninstallHeader">Uninstall package</key>
-    <key alias="packageUninstallText"><![CDATA[You can unselect items you do not wish to remove, at this time, below. When you click "confirm uninstall" all checked-off items will be removed.<br />
+        <key alias="packageUninstallText">
+            <![CDATA[You can unselect items you do not wish to remove, at this time, below. When you click "confirm uninstall" all checked-off items will be removed.<br />
       <span style="color: Red; font-weight: bold;">Notice:</span> any documents, media etc depending on the items you remove, will stop working, and could lead to system instability,
-      so uninstall with caution. If in doubt, contact the package author.]]></key>
+      so uninstall with caution. If in doubt, contact the package author.]]>
+        </key>
         <key alias="packageVersion">Package version</key>
         <key alias="packageVersionUpgrade">Upgrading from version</key>
         <key alias="packageAlreadyInstalled">Package already installed</key>
@@ -1252,24 +1315,36 @@ To manage your website, simply open the Umbraco back office and start adding con
     </area>
     <area alias="publish">
         <key alias="invalidPublishBranchPermissions">Insufficient user permissions to publish all descendant documents</key>
-    <key alias="contentPublishedFailedIsTrashed"><![CDATA[
+        <key alias="contentPublishedFailedIsTrashed">
+            <![CDATA[
       %0% could not be published because the item is in the recycle bin.
-    ]]></key>
-    <key alias="contentPublishedFailedAwaitingRelease"><![CDATA[
+    ]]>
+        </key>
+        <key alias="contentPublishedFailedAwaitingRelease">
+            <![CDATA[
       %0% could not be published because the item is scheduled for release.
-    ]]></key>
-    <key alias="contentPublishedFailedExpired"><![CDATA[
+    ]]>
+        </key>
+        <key alias="contentPublishedFailedExpired">
+            <![CDATA[
       %0% could not be published because the item has expired.
-    ]]></key>
-    <key alias="contentPublishedFailedInvalid"><![CDATA[
+    ]]>
+        </key>
+        <key alias="contentPublishedFailedInvalid">
+            <![CDATA[
       %0% could not be published because some properties did not pass validation rules.
-    ]]></key>
-    <key alias="contentPublishedFailedByEvent"><![CDATA[
+    ]]>
+        </key>
+        <key alias="contentPublishedFailedByEvent">
+            <![CDATA[
       %0% could not be published, a 3rd party add-in cancelled the action.
-    ]]></key>
-    <key alias="contentPublishedFailedByParent"><![CDATA[
+    ]]>
+        </key>
+        <key alias="contentPublishedFailedByParent">
+            <![CDATA[
       %0% can not be published, because a parent page is not published.
-    ]]></key>
+    ]]>
+        </key>
         <key alias="contentPublishedFailedByMissingName"><![CDATA[%0% can not be published, because its missing a name.]]></key>
         <key alias="contentPublishedFailedReqCultureValidationError">Validation failed for required language '%0%'. This language was saved but not published.</key>
         <key alias="inProgress">Publishing in progress - please wait...</key>
@@ -1277,9 +1352,11 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="nodePublish">%0% has been published</key>
         <key alias="nodePublishAll">%0% and subpages have been published</key>
         <key alias="publishAll">Publish %0% and all its subpages</key>
-    <key alias="publishHelp"><![CDATA[Click <em>Publish</em> to publish <strong>%0%</strong> and thereby making its content publicly available.<br/><br />
+        <key alias="publishHelp">
+            <![CDATA[Click <em>Publish</em> to publish <strong>%0%</strong> and thereby making its content publicly available.<br/><br />
       You can publish this page and all its subpages by checking <em>Include unpublished subpages</em> below.
-      ]]></key>
+      ]]>
+        </key>
     </area>
     <area alias="colorpicker">
         <key alias="noColors">You have not configured any approved colors</key>
@@ -1494,21 +1571,27 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="mastertemplate">Master template</key>
         <key alias="noMaster">No master</key>
         <key alias="renderBody">Render child template</key>
-    <key alias="renderBodyDesc"><![CDATA[
+        <key alias="renderBodyDesc">
+            <![CDATA[
      Renders the contents of a child template, by inserting a
      <code>@RenderBody()</code> placeholder.
-      ]]></key>
+      ]]>
+        </key>
         <key alias="defineSection">Define a named section</key>
-    <key alias="defineSectionDesc"><![CDATA[
+        <key alias="defineSectionDesc">
+            <![CDATA[
          Defines a part of your template as a named section by wrapping it in
           <code>@section { ... }</code>. This can be rendered in a
           specific area of the parent of this template, by using <code>@RenderSection</code>.
-      ]]></key>
+      ]]>
+        </key>
         <key alias="renderSection">Render a named section</key>
-    <key alias="renderSectionDesc"><![CDATA[
+        <key alias="renderSectionDesc">
+            <![CDATA[
       Renders a named area of a child template, by inserting a <code>@RenderSection(name)</code> placeholder.
       This renders an area of a child template which is wrapped in a corresponding <code>@section [name]{ ... }</code> definition.
-      ]]></key>
+      ]]>
+        </key>
         <key alias="sectionName">Section Name</key>
         <key alias="sectionMandatory">Section is mandatory</key>
         <key alias="sectionMandatoryDesc">
@@ -1587,7 +1670,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="warning">Warning</key>
         <key alias="youAreDeleting">You are deleting the row configuration</key>
         <key alias="deletingARow">
-           Deleting a row configuration will result in loss of data for any existing content that is based on this configuration.
+            Deleting a row configuration will result in loss of data for any existing content that is based on this configuration.
         </key>
     </area>
     <area alias="contentTypeEditor">
@@ -1720,7 +1803,8 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="DownloadXmlDTD">Download XML DTD</key>
         <key alias="fields">Fields</key>
         <key alias="includeSubpages">Include subpages</key>
-    <key alias="mailBody"><![CDATA[
+        <key alias="mailBody">
+            <![CDATA[
       Hi %0%
 
       This is an automated mail to inform you that the document '%1%'
@@ -1734,7 +1818,8 @@ To manage your website, simply open the Umbraco back office and start adding con
       Have a nice day!
 
       Cheers from the Umbraco robot
-    ]]></key>
+    ]]>
+        </key>
         <key alias="noTranslators">No translator users found. Please create a translator user before you start sending content to translation</key>
         <key alias="pageHasBeenSendToTranslation">The page '%0%' has been send to translation</key>
         <key alias="sendToTranslate">Send the page '%0%' to translation</key>
@@ -1882,7 +1967,8 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="sendInvite">Send invite</key>
         <key alias="backToUsers">Back to users</key>
         <key alias="inviteEmailCopySubject">Umbraco: Invitation</key>
-    <key alias="inviteEmailCopyFormat"><![CDATA[
+        <key alias="inviteEmailCopyFormat">
+            <![CDATA[
         <html>
 			<head>
 				<meta name='viewport' content='width=device-width'>
@@ -1972,7 +2058,8 @@ To manage your website, simply open the Umbraco back office and start adding con
 					</tr>
 				</table>
 			</body>
-    </html>]]></key>
+    </html>]]>
+        </key>
         <key alias="invite">Invite</key>
         <key alias="defaultInvitationMessage">Resending invitation...</key>
         <key alias="deleteUser">Delete User</key>
@@ -2199,6 +2286,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="newPartialView">Partial View</key>
         <key alias="newPartialViewMacro">Partial View Macro</key>
         <key alias="newMember">Member</key>
+        <key alias="newDataType">Data type</key>
     </area>
     <area alias="references">
         <key alias="tabName">References</key>
