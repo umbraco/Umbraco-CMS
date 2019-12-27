@@ -206,7 +206,7 @@
                             </button>
 
 
-                            <button ng-if="model.user.avatars"
+                            <button ng-if="model.user.avatars.length > 0"
                                     class="btn-link umb-user-group-preview__action umb-user-group-preview__action--red"
                                     ng-click="model.clearAvatar()"
                                     prevent-default>
