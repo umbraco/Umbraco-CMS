@@ -112,6 +112,10 @@ namespace Umbraco.Core.Runtime
             {
                 while(true)
                 {
+                    // If cancellation has been requested we will just exit. Depending on timing of the shutdown,
+                    // we will have already flagged _mainDomChanging = true, or we're shutting down faster than
+                    // the other MainDom is taking to startup. In this case the db row will just be deleted and the
+                    // new MainDom will just take over.
                     if (_cancellationTokenSource.IsCancellationRequested)
                         break;
 
@@ -135,6 +139,7 @@ namespace Umbraco.Core.Runtime
                         {
                             // we are no longer main dom, another one has come online, exit
                             _mainDomChanging = true;
+                            _logger.Info<SqlMainDomLock>("Detected new booting application, releasing MainDom.");
                             return;
                         }
                     }
@@ -359,10 +364,12 @@ namespace Umbraco.Core.Runtime
                         // Otherwise, if we are just shutting down, we want to just delete the row.
                         if (mainDomChanging)
                         {
+                            _logger.Info<SqlMainDomLock>("Releasing MainDom, updating row, new application is booting.");
                             db.Execute("UPDATE umbracoKeyValue SET [value] = [value] + '_updated' WHERE [key] = @key", new { key = MainDomKey });
                         }
                         else
                         {
+                            _logger.Info<SqlMainDomLock>("Releasing MainDom, deleting row, application is shutting down.");
                             db.Execute("DELETE FROM umbracoKeyValue WHERE [key] = @key", new { key = MainDomKey });
                         }
                     }
