@@ -24,17 +24,20 @@ app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 
 
                 tourService.registerAllTours().then(function () {
 
-                    // Auto start - hidden tour - aka email marketing step
-                    tourService.getTourByAlias("umbEmailMarketing").then(function (emailMarketingTour) {
+                    // Start intro tour
+                    tourService.getTourByAlias("umbIntroIntroduction").then(function (introTour) {
                         // start intro tour if it hasn't been completed or disabled
-                        if (emailMarketingTour && emailMarketingTour.disabled !== true && emailMarketingTour.completed !== true) {
-                            tourService.startTour(emailMarketingTour);
-                        } else {
-                            // The Email Marketing tour has been completed (Accepted) or Disabled (Declined)
-                            tourService.getTourByAlias("umbIntroIntroduction").then(function (introTour) {
-                                // start intro tour if it hasn't been completed or disabled
-                                if (introTour && introTour.disabled !== true && introTour.completed !== true) {
-                                    tourService.startTour(introTour);
+                        if (introTour && introTour.disabled !== true && introTour.completed !== true) {
+                            tourService.startTour(introTour);
+                        }
+                        else {
+                            // Go & show email marketing tour (ONLY when intro tour is completed or been dismissed)
+                            tourService.getTourByAlias("umbEmailMarketing").then(function (emailMarketingTour) {
+                                // Only show the email marketing tour one time - dismissing it or saying no will make sure it never appears again
+                                // Unless invoked from tourService JS Client code explicitly.
+                                // Accepted mails = Completed and Declicned mails = Disabled
+                                if (emailMarketingTour && emailMarketingTour.disabled !== true && emailMarketingTour.completed !== true) {
+                                    tourService.startTour(emailMarketingTour);
                                 }
                             });
                         }

@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function EmailsController($scope, eventsService, tourService, userService) {
+    function EmailsController($scope, userService) {
 
         var vm = this;
 
@@ -18,23 +18,6 @@
             // Where disabled is set if user closes modal or chooses NO
             $scope.model.completeTour();
         }
-
-        // Listen for when all tours are closed
-        eventsService.on("appState.tour.end", function (evt, data) {
-
-            // Only do something if it is this hidden email marketing tour
-            // The email tour was 'disabled' or 'completed' which both emit 'appstate.tour.end'
-            if(data.alias === "umbEmailMarketing"){
-
-                // Get the intro tour
-                tourService.getTourByAlias("umbIntroIntroduction").then(function (introTour) {
-                    // start intro tour if it hasn't been completed or disabled
-                    if (introTour && introTour.disabled !== true && introTour.completed !== true) {
-                        tourService.startTour(introTour);
-                    }
-                });
-            }
-        });
     }
 
     angular.module("umbraco").controller("Umbraco.Tours.UmbEmailMarketing.EmailsController", EmailsController);
