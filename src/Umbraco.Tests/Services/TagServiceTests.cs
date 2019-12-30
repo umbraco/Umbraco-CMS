@@ -30,7 +30,6 @@ namespace Umbraco.Tests.Services
         {
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
-            var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
                 new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
@@ -63,7 +62,7 @@ namespace Umbraco.Tests.Services
             Assert.Contains("goat", tagsValues);
             Assert.Contains("elephant", tagsValues);
 
-            var tags = tagService.GetTagsForProperty(content1.Id, "tags").ToArray();
+            var tags = TagService.GetTagsForProperty(content1.Id, "tags").ToArray();
             Assert.IsTrue(tags.All(x => x.Group == "default"));
             tagsValues = tags.Select(x => x.Text).ToArray();
 
@@ -78,7 +77,6 @@ namespace Umbraco.Tests.Services
         {
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
-            var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
                 new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.Tags, ValueStorageType.Ntext, "tags")
@@ -100,7 +98,7 @@ namespace Umbraco.Tests.Services
             contentService.SaveAndPublish(content3);
 
             // Act
-            var tags = tagService.GetAllContentTags()
+            var tags = TagService.GetAllContentTags()
                 .OrderByDescending(x => x.NodeCount)
                 .ToList();
 

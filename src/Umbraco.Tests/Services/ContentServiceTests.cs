@@ -1956,13 +1956,13 @@ namespace Umbraco.Tests.Services
 
             // value has been set but no tags have been created (not published)
             Assert.AreEqual("[\"hello\",\"world\"]", content.GetValue(propAlias));
-            var contentTags = ServiceContext.TagService.GetTagsForEntity(content.Id).ToArray();
+            var contentTags = TagService.GetTagsForEntity(content.Id).ToArray();
             Assert.AreEqual(0, contentTags.Length);
 
             // reloading the content yields the same result
             content = (Content) contentService.GetById(content.Id);
             Assert.AreEqual("[\"hello\",\"world\"]", content.GetValue(propAlias));
-            contentTags = ServiceContext.TagService.GetTagsForEntity(content.Id).ToArray();
+            contentTags = TagService.GetTagsForEntity(content.Id).ToArray();
             Assert.AreEqual(0, contentTags.Length);
 
             // publish
@@ -1970,7 +1970,7 @@ namespace Umbraco.Tests.Services
 
             // now tags have been set (published)
             Assert.AreEqual("[\"hello\",\"world\"]", content.GetValue(propAlias));
-            contentTags = ServiceContext.TagService.GetTagsForEntity(content.Id).ToArray();
+            contentTags = TagService.GetTagsForEntity(content.Id).ToArray();
             Assert.AreEqual(2, contentTags.Length);
 
             // copy
@@ -1978,14 +1978,14 @@ namespace Umbraco.Tests.Services
 
             // copy is not published, so property has value, but no tags have been created
             Assert.AreEqual("[\"hello\",\"world\"]", copy.GetValue(propAlias));
-            var copiedTags = ServiceContext.TagService.GetTagsForEntity(copy.Id).ToArray();
+            var copiedTags = TagService.GetTagsForEntity(copy.Id).ToArray();
             Assert.AreEqual(0, copiedTags.Length);
 
             // publish
             contentService.SaveAndPublish(copy);
 
             // now tags have been set (published)
-            copiedTags = ServiceContext.TagService.GetTagsForEntity(copy.Id).ToArray();
+            copiedTags = TagService.GetTagsForEntity(copy.Id).ToArray();
 
             Assert.AreEqual(2, copiedTags.Length);
             Assert.AreEqual("hello", copiedTags[0].Text);

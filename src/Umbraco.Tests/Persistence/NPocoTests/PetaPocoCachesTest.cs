@@ -105,13 +105,13 @@ namespace Umbraco.Tests.Persistence.NPocoTests
         {
             var contentService = ServiceContext.ContentService;
 
-            ServiceContext.TagService.GetTagsForEntity(id1);
+            TagService.GetTagsForEntity(id1);
 
-            ServiceContext.TagService.GetAllContentTags();
+            TagService.GetAllContentTags();
 
-            ServiceContext.TagService.GetTagsForEntity(id2);
+            TagService.GetTagsForEntity(id2);
 
-            ServiceContext.TagService.GetTagsForEntity(id3);
+            TagService.GetTagsForEntity(id3);
 
             contentService.CountDescendants(id3);
 

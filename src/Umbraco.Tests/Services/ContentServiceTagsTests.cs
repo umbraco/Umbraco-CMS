@@ -46,7 +46,6 @@ namespace Umbraco.Tests.Services
         {
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
-            var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
                 new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
@@ -66,8 +65,8 @@ namespace Umbraco.Tests.Services
             Assert.Contains("one", enTags);
             Assert.AreEqual(-1, enTags.IndexOf("plus"));
 
-            var tagGroups = tagService.GetAllTags().GroupBy(x => x.LanguageId);
-            foreach (var tag in tagService.GetAllTags())
+            var tagGroups = TagService.GetAllTags().GroupBy(x => x.LanguageId);
+            foreach (var tag in TagService.GetAllTags())
                 Console.WriteLine($"{tag.Group}:{tag.Text} {tag.LanguageId}");
             Assert.AreEqual(1, tagGroups.Count());
             var enTagGroup = tagGroups.FirstOrDefault(x => x.Key == null);
@@ -85,7 +84,6 @@ namespace Umbraco.Tests.Services
 
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
-            var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
                 new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
@@ -115,8 +113,8 @@ namespace Umbraco.Tests.Services
             Assert.Contains("one", enTags);
             Assert.AreEqual(-1, enTags.IndexOf("plus"));
 
-            var tagGroups = tagService.GetAllTags(culture:"*").GroupBy(x => x.LanguageId);
-            foreach (var tag in tagService.GetAllTags())
+            var tagGroups = TagService.GetAllTags(culture:"*").GroupBy(x => x.LanguageId);
+            foreach (var tag in TagService.GetAllTags())
                 Console.WriteLine($"{tag.Group}:{tag.Text} {tag.LanguageId}");
             Assert.AreEqual(2, tagGroups.Count());
             var frTagGroup = tagGroups.FirstOrDefault(x => x.Key == 2);
@@ -138,7 +136,6 @@ namespace Umbraco.Tests.Services
 
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
-            var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             PropertyType propertyType;
             contentType.PropertyGroups.First().PropertyTypes.Add(
@@ -163,8 +160,8 @@ namespace Umbraco.Tests.Services
             Assert.Contains("one", tags);
             Assert.AreEqual(-1, tags.IndexOf("plus"));
 
-            var tagGroups = tagService.GetAllTags().GroupBy(x => x.LanguageId);
-            foreach (var tag in tagService.GetAllTags())
+            var tagGroups = TagService.GetAllTags().GroupBy(x => x.LanguageId);
+            foreach (var tag in TagService.GetAllTags())
                 Console.WriteLine($"{tag.Group}:{tag.Text} {tag.LanguageId}");
             Assert.AreEqual(1, tagGroups.Count());
             var enTagGroup = tagGroups.FirstOrDefault(x => x.Key == null);
@@ -189,8 +186,8 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(-1, tags.IndexOf("plus"));
 
             // tags have been copied from invariant to en-US
-            tagGroups = tagService.GetAllTags(culture: "*").GroupBy(x => x.LanguageId);
-            foreach (var tag in tagService.GetAllTags("*"))
+            tagGroups = TagService.GetAllTags(culture: "*").GroupBy(x => x.LanguageId);
+            foreach (var tag in TagService.GetAllTags("*"))
                 Console.WriteLine($"{tag.Group}:{tag.Text} {tag.LanguageId}");
             Assert.AreEqual(1, tagGroups.Count());
 
@@ -211,7 +208,6 @@ namespace Umbraco.Tests.Services
 
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
-            var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             PropertyType propertyType;
             contentType.PropertyGroups.First().PropertyTypes.Add(
@@ -246,8 +242,8 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(-1, tags.IndexOf("plus"));
 
             // tags have been copied from en-US to invariant, fr-FR tags are gone
-            var tagGroups = tagService.GetAllTags(culture: "*").GroupBy(x => x.LanguageId);
-            foreach (var tag in tagService.GetAllTags("*"))
+            var tagGroups = TagService.GetAllTags(culture: "*").GroupBy(x => x.LanguageId);
+            foreach (var tag in TagService.GetAllTags("*"))
                 Console.WriteLine($"{tag.Group}:{tag.Text} {tag.LanguageId}");
             Assert.AreEqual(1, tagGroups.Count());
 
@@ -268,7 +264,6 @@ namespace Umbraco.Tests.Services
 
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
-            var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             PropertyType propertyType;
             contentType.PropertyGroups.First().PropertyTypes.Add(
@@ -315,7 +310,6 @@ namespace Umbraco.Tests.Services
 
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
-            var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             PropertyType propertyType;
             contentType.PropertyGroups.First().PropertyTypes.Add(
@@ -350,8 +344,8 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(-1, tags.IndexOf("plus"));
 
             // tags have been copied from en-US to invariant, fr-FR tags are gone
-            var tagGroups = tagService.GetAllTags(culture: "*").GroupBy(x => x.LanguageId);
-            foreach (var tag in tagService.GetAllTags("*"))
+            var tagGroups = TagService.GetAllTags(culture: "*").GroupBy(x => x.LanguageId);
+            foreach (var tag in TagService.GetAllTags("*"))
                 Console.WriteLine($"{tag.Group}:{tag.Text} {tag.LanguageId}");
             Assert.AreEqual(1, tagGroups.Count());
 
@@ -372,7 +366,6 @@ namespace Umbraco.Tests.Services
 
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
-            var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             PropertyType propertyType;
             contentType.PropertyGroups.First().PropertyTypes.Add(
@@ -406,7 +399,6 @@ namespace Umbraco.Tests.Services
         {
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
-            var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
                 new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
@@ -424,9 +416,9 @@ namespace Umbraco.Tests.Services
             contentService.SaveAndPublish(content2);
 
             // verify
-            var tags = tagService.GetTagsForEntity(content1.Id);
+            var tags = TagService.GetTagsForEntity(content1.Id);
             Assert.AreEqual(5, tags.Count());
-            var allTags = tagService.GetAllContentTags();
+            var allTags = TagService.GetAllContentTags();
             Assert.AreEqual(5, allTags.Count());
 
             contentService.MoveToRecycleBin(content1);
@@ -437,7 +429,6 @@ namespace Umbraco.Tests.Services
         {
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
-            var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
                 new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
@@ -455,9 +446,9 @@ namespace Umbraco.Tests.Services
             contentService.SaveAndPublish(content2);
 
             // verify
-            var tags = tagService.GetTagsForEntity(content1.Id);
+            var tags = TagService.GetTagsForEntity(content1.Id);
             Assert.AreEqual(5, tags.Count());
-            var allTags = tagService.GetAllContentTags();
+            var allTags = TagService.GetAllContentTags();
             Assert.AreEqual(5, allTags.Count());
 
             contentService.Unpublish(content1);
@@ -470,7 +461,6 @@ namespace Umbraco.Tests.Services
         {
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
-            var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
                 new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
@@ -488,21 +478,21 @@ namespace Umbraco.Tests.Services
             contentService.SaveAndPublish(content2);
 
             // verify
-            var tags = tagService.GetTagsForEntity(content1.Id);
+            var tags = TagService.GetTagsForEntity(content1.Id);
             Assert.AreEqual(5, tags.Count());
-            var allTags = tagService.GetAllContentTags();
+            var allTags = TagService.GetAllContentTags();
             Assert.AreEqual(5, allTags.Count());
 
             contentService.MoveToRecycleBin(content1);
 
             // no more tags
-            tags = tagService.GetTagsForEntity(content1.Id);
+            tags = TagService.GetTagsForEntity(content1.Id);
             Assert.AreEqual(0, tags.Count());
-            tags = tagService.GetTagsForEntity(content2.Id);
+            tags = TagService.GetTagsForEntity(content2.Id);
             Assert.AreEqual(0, tags.Count());
 
             // no more tags
-            allTags = tagService.GetAllContentTags();
+            allTags = TagService.GetAllContentTags();
             Assert.AreEqual(0, allTags.Count());
 
             contentService.Move(content1, -1);
@@ -510,13 +500,13 @@ namespace Umbraco.Tests.Services
             Assert.IsFalse(content1.Published);
 
             // no more tags
-            tags = tagService.GetTagsForEntity(content1.Id);
+            tags = TagService.GetTagsForEntity(content1.Id);
             Assert.AreEqual(0, tags.Count());
-            tags = tagService.GetTagsForEntity(content2.Id);
+            tags = TagService.GetTagsForEntity(content2.Id);
             Assert.AreEqual(0, tags.Count());
 
             // no more tags
-            allTags = tagService.GetAllContentTags();
+            allTags = TagService.GetAllContentTags();
             Assert.AreEqual(0, allTags.Count());
 
             content1.PublishCulture(CultureImpact.Invariant);
@@ -525,7 +515,7 @@ namespace Umbraco.Tests.Services
             Assert.IsTrue(content1.Published);
 
             // tags are back
-            tags = tagService.GetTagsForEntity(content1.Id);
+            tags = TagService.GetTagsForEntity(content1.Id);
             Assert.AreEqual(5, tags.Count());
 
             // FIXME: tag & tree issue
@@ -533,11 +523,11 @@ namespace Umbraco.Tests.Services
             // what we should do is... NOT clear tags when unpublishing or trashing or...
             // and just update the tag service to NOT return anything related to trashed or
             // unpublished entities (since trashed is set on ALL entities in the trashed branch)
-            tags = tagService.GetTagsForEntity(content2.Id); // including that one!
+            tags = TagService.GetTagsForEntity(content2.Id); // including that one!
             Assert.AreEqual(4, tags.Count());
 
             // tags are back
-            allTags = tagService.GetAllContentTags();
+            allTags = TagService.GetAllContentTags();
             Assert.AreEqual(5, allTags.Count());
         }
 
@@ -546,7 +536,6 @@ namespace Umbraco.Tests.Services
         {
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
-            var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
                 new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
@@ -573,7 +562,6 @@ namespace Umbraco.Tests.Services
         {
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
-            var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
                 new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
@@ -592,23 +580,23 @@ namespace Umbraco.Tests.Services
 
             contentService.Unpublish(content1);
 
-            var tags = tagService.GetTagsForEntity(content1.Id);
+            var tags = TagService.GetTagsForEntity(content1.Id);
             Assert.AreEqual(0, tags.Count());
 
             // FIXME: tag & tree issue
             // when we (un)publish, we 'just' publish the top one and not the ones below = fails
             // see similar note above
-            tags = tagService.GetTagsForEntity(content2.Id);
+            tags = TagService.GetTagsForEntity(content2.Id);
             Assert.AreEqual(0, tags.Count());
-            var allTags = tagService.GetAllContentTags();
+            var allTags = TagService.GetAllContentTags();
             Assert.AreEqual(0, allTags.Count());
 
             content1.PublishCulture(CultureImpact.Invariant);
             contentService.SaveAndPublish(content1);
 
-            tags = tagService.GetTagsForEntity(content2.Id);
+            tags = TagService.GetTagsForEntity(content2.Id);
             Assert.AreEqual(4, tags.Count());
-            allTags = tagService.GetAllContentTags();
+            allTags = TagService.GetAllContentTags();
             Assert.AreEqual(5, allTags.Count());
         }
 

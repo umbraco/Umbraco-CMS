@@ -121,6 +121,8 @@ namespace Umbraco.Tests.Testing
         protected IShortStringHelper ShortStringHelper => Factory?.GetInstance<IShortStringHelper>() ?? TestHelper.ShortStringHelper;
         protected IUmbracoVersion UmbracoVersion { get; private set; }
 
+        protected ITagService TagService => Factory.GetInstance<ITagService>();
+
         protected ITypeFinder TypeFinder { get; private set; }
 
         protected IProfiler Profiler => Factory.GetInstance<IProfiler>();
