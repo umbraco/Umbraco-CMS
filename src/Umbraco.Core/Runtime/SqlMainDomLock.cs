@@ -24,6 +24,7 @@ namespace Umbraco.Core.Runtime
         private bool _mainDomChanging = false;
         private readonly UmbracoDatabaseFactory _dbFactory;
         private bool _hasError;
+        private object _locker = new object();
 
         public SqlMainDomLock(ILogger logger)
         {
@@ -112,49 +113,53 @@ namespace Umbraco.Core.Runtime
             {
                 while(true)
                 {
-                    // If cancellation has been requested we will just exit. Depending on timing of the shutdown,
-                    // we will have already flagged _mainDomChanging = true, or we're shutting down faster than
-                    // the other MainDom is taking to startup. In this case the db row will just be deleted and the
-                    // new MainDom will just take over.
-                    if (_cancellationTokenSource.IsCancellationRequested)
-                        break;
-
                     // poll every 1 second
                     Thread.Sleep(1000);
 
-                    var db = GetDatabase();
-
-                    try
+                    lock(_locker)
                     {
-                        db.BeginTransaction(IsolationLevel.ReadCommitted);
+                        // If cancellation has been requested we will just exit. Depending on timing of the shutdown,
+                        // we will have already flagged _mainDomChanging = true, or we're shutting down faster than
+                        // the other MainDom is taking to startup. In this case the db row will just be deleted and the
+                        // new MainDom will just take over.
+                        if (_cancellationTokenSource.IsCancellationRequested)
+                            break;
 
-                        // get a read lock
-                        _sqlServerSyntax.ReadLock(db, Constants.Locks.MainDom);
+                        var db = GetDatabase();
 
-                        // TODO: We could in theory just check if the main dom row doesn't exist, that could indicate that
-                        // we are still the maindom. An empty value might be better because then we won't have any orphan rows
-                        // if the app is terminated. Could that work?
-
-                        if (!IsMainDomValue(_lockId))
+                        try
                         {
-                            // we are no longer main dom, another one has come online, exit
-                            _mainDomChanging = true;
-                            _logger.Info<SqlMainDomLock>("Detected new booting application, releasing MainDom.");
+                            db.BeginTransaction(IsolationLevel.ReadCommitted);
+
+                            // get a read lock
+                            _sqlServerSyntax.ReadLock(db, Constants.Locks.MainDom);
+
+                            // TODO: We could in theory just check if the main dom row doesn't exist, that could indicate that
+                            // we are still the maindom. An empty value might be better because then we won't have any orphan rows
+                            // if the app is terminated. Could that work?
+
+                            if (!IsMainDomValue(_lockId))
+                            {
+                                // we are no longer main dom, another one has come online, exit
+                                _mainDomChanging = true;
+                                _logger.Info<SqlMainDomLock>("Detected new booting application, releasing MainDom.");
+                                return;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            ResetDatabase();
+                            // unexpected
+                            _logger.Error<SqlMainDomLock>(ex, "Unexpected error, listening is canceled.");
+                            _hasError = true;
                             return;
                         }
+                        finally
+                        {
+                            db?.CompleteTransaction();
+                        }
                     }
-                    catch (Exception ex)
-                    {
-                        ResetDatabase();
-                        // unexpected
-                        _logger.Error<SqlMainDomLock>(ex, "Unexpected error, listening is canceled.");
-                        _hasError = true;
-                        return;
-                    }
-                    finally
-                    {
-                        db?.CompleteTransaction();
-                    }
+                    
                 }
                 
 
@@ -341,48 +346,48 @@ namespace Umbraco.Core.Runtime
             {
                 if (disposing)
                 {
-                    // capture locally just in case in some strange way a sub task somehow updates this
-                    var mainDomChanging = _mainDomChanging;
-
-                    // immediately cancel all sub-tasks, we don't want them to keep querying
-                    _cancellationTokenSource.Cancel();
-                    _cancellationTokenSource.Dispose();
-
-                    var db = GetDatabase();
-                    try
+                    lock (_locker)
                     {
-                        db.BeginTransaction(IsolationLevel.ReadCommitted);
+                        // immediately cancel all sub-tasks, we don't want them to keep querying
+                        _cancellationTokenSource.Cancel();
+                        _cancellationTokenSource.Dispose();
 
-                        // get a write lock
-                        _sqlServerSyntax.WriteLock(db, Constants.Locks.MainDom);
-
-                        // When we are disposed, it means we have released the MainDom lock
-                        // and called all MainDom release callbacks, in this case
-                        // if another maindom is actually coming online we need
-                        // to signal to the MainDom coming online that we have shutdown.
-                        // To do that, we update the existing main dom DB record with a suffixed "_updated" string.
-                        // Otherwise, if we are just shutting down, we want to just delete the row.
-                        if (mainDomChanging)
+                        var db = GetDatabase();
+                        try
                         {
-                            _logger.Info<SqlMainDomLock>("Releasing MainDom, updating row, new application is booting.");
-                            db.Execute("UPDATE umbracoKeyValue SET [value] = [value] + '_updated' WHERE [key] = @key", new { key = MainDomKey });
+                            db.BeginTransaction(IsolationLevel.ReadCommitted);
+
+                            // get a write lock
+                            _sqlServerSyntax.WriteLock(db, Constants.Locks.MainDom);
+
+                            // When we are disposed, it means we have released the MainDom lock
+                            // and called all MainDom release callbacks, in this case
+                            // if another maindom is actually coming online we need
+                            // to signal to the MainDom coming online that we have shutdown.
+                            // To do that, we update the existing main dom DB record with a suffixed "_updated" string.
+                            // Otherwise, if we are just shutting down, we want to just delete the row.
+                            if (_mainDomChanging)
+                            {
+                                _logger.Info<SqlMainDomLock>("Releasing MainDom, updating row, new application is booting.");
+                                db.Execute("UPDATE umbracoKeyValue SET [value] = [value] + '_updated' WHERE [key] = @key", new { key = MainDomKey });
+                            }
+                            else
+                            {
+                                _logger.Info<SqlMainDomLock>("Releasing MainDom, deleting row, application is shutting down.");
+                                db.Execute("DELETE FROM umbracoKeyValue WHERE [key] = @key", new { key = MainDomKey });
+                            }
                         }
-                        else
+                        catch (Exception ex)
                         {
-                            _logger.Info<SqlMainDomLock>("Releasing MainDom, deleting row, application is shutting down.");
-                            db.Execute("DELETE FROM umbracoKeyValue WHERE [key] = @key", new { key = MainDomKey });
+                            ResetDatabase();
+                            _logger.Error<SqlMainDomLock>(ex, "Unexpected error during dipsose.");
+                            _hasError = true;
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        ResetDatabase();
-                        _logger.Error<SqlMainDomLock>(ex, "Unexpected error during dipsose.");
-                        _hasError = true;
-                    }
-                    finally
-                    {
-                        db?.CompleteTransaction();
-                        ResetDatabase();
+                        finally
+                        {
+                            db?.CompleteTransaction();
+                            ResetDatabase();
+                        }
                     }
                 }
 
