@@ -38,6 +38,8 @@ namespace Umbraco.Core.Runtime
 
         public async Task<bool> AcquireLockAsync(int millisecondsTimeout)
         {
+            _logger.Info<SqlMainDomLock>("Acquiring lock...");
+
             var db = GetDatabase();
 
             var tempId = Guid.NewGuid().ToString();
@@ -73,6 +75,7 @@ namespace Umbraco.Core.Runtime
                     // are MainDom? then we don't leave any orphan rows behind.
 
                     InsertLockRecord(_lockId); // so update with our appdomain id
+                    _logger.Info<SqlMainDomLock>("Acquired with ID {LockId}", _lockId);
                     return true;
                 }
 
@@ -212,7 +215,7 @@ namespace Umbraco.Core.Runtime
 
                             // so now we update the row with our appdomain id
                             InsertLockRecord(_lockId);
-
+                            _logger.Info<SqlMainDomLock>("Acquired with ID {LockId}", _lockId);
                             return true; 
                         }
                         else if (mainDomRows.Count == 1 && !mainDomRows[0].Value.StartsWith(tempId))
@@ -220,6 +223,8 @@ namespace Umbraco.Core.Runtime
                             // in this case, the prefixed ID is different which  means
                             // another new AppDomain has come online and is wanting to take over. In that case, we will not
                             // acquire.
+
+                            _logger.Info<SqlMainDomLock>("Cannot acquire, another booting application detected.");
 
                             return false;
                         }
@@ -253,6 +258,7 @@ namespace Umbraco.Core.Runtime
                         // which isn't ideal.
                         // So... we're going to 'just' take over, if the writelock works then we'll assume we're ok
 
+                        _logger.Info<SqlMainDomLock>("Timeout elapsed, assuming orphan row, acquiring MainDom.");
 
                         try
                         {
@@ -262,6 +268,7 @@ namespace Umbraco.Core.Runtime
 
                             // so now we update the row with our appdomain id
                             InsertLockRecord(_lockId);
+                            _logger.Info<SqlMainDomLock>("Acquired with ID {LockId}", _lockId);
                             return true;
                         }
                         catch (Exception ex)
