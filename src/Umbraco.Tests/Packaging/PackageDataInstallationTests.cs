@@ -627,7 +627,7 @@ namespace Umbraco.Tests.Packaging
             // Assert
             Assert.That(macros.Any(), Is.True);
 
-            var allMacros = ServiceContext.MacroService.GetAll().ToList();
+            var allMacros = MacroService.GetAll().ToList();
             foreach (var macro in macros)
             {
                 Assert.That(allMacros.Any(x => x.Alias == macro.Alias), Is.True);
@@ -650,7 +650,7 @@ namespace Umbraco.Tests.Packaging
             Assert.That(macros.Any(), Is.True);
             Assert.That(macros.First().Properties.Values.Any(), Is.True);
 
-            var allMacros = ServiceContext.MacroService.GetAll().ToList();
+            var allMacros = MacroService.GetAll().ToList();
             foreach (var macro in macros)
             {
                 Assert.That(allMacros.Any(x => x.Alias == macro.Alias), Is.True);

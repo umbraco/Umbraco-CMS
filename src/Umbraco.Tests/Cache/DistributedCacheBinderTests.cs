@@ -80,8 +80,8 @@ namespace Umbraco.Tests.Cache
                 new EventDefinition<IFileService, SaveEventArgs<ITemplate>>(null, serviceContext.FileService, new SaveEventArgs<ITemplate>(Enumerable.Empty<ITemplate>())),
                 new EventDefinition<IFileService, DeleteEventArgs<ITemplate>>(null, serviceContext.FileService, new DeleteEventArgs<ITemplate>(Enumerable.Empty<ITemplate>())),
 
-                new EventDefinition<IMacroService, SaveEventArgs<IMacro>>(null, serviceContext.MacroService, new SaveEventArgs<IMacro>(Enumerable.Empty<IMacro>())),
-                new EventDefinition<IMacroService, DeleteEventArgs<IMacro>>(null, serviceContext.MacroService, new DeleteEventArgs<IMacro>(Enumerable.Empty<IMacro>())),
+                new EventDefinition<IMacroService, SaveEventArgs<IMacro>>(null, MacroService, new SaveEventArgs<IMacro>(Enumerable.Empty<IMacro>())),
+                new EventDefinition<IMacroService, DeleteEventArgs<IMacro>>(null, MacroService, new DeleteEventArgs<IMacro>(Enumerable.Empty<IMacro>())),
 
                 new EventDefinition<IMemberService, SaveEventArgs<IMember>>(null, serviceContext.MemberService, new SaveEventArgs<IMember>(Enumerable.Empty<IMember>())),
                 new EventDefinition<IMemberService, DeleteEventArgs<IMember>>(null, serviceContext.MemberService, new DeleteEventArgs<IMember>(Enumerable.Empty<IMember>())),

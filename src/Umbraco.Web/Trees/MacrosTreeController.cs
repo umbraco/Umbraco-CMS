@@ -6,6 +6,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Web.Actions;
 using Constants = Umbraco.Core.Constants;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Trees
 {
@@ -15,11 +16,18 @@ namespace Umbraco.Web.Trees
     [CoreTree]
     public class MacrosTreeController : TreeController
     {
+        private readonly IMacroService _macroService;
+
+        public MacrosTreeController(IMacroService macroService)
+        {
+            _macroService = macroService;
+        }
+
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
         {
             var root = base.CreateRootNode(queryStrings);
             //check if there are any macros
-            root.HasChildren = Services.MacroService.GetAll().Any();
+            root.HasChildren = _macroService.GetAll().Any();
             return root;
         }
 
@@ -29,7 +37,7 @@ namespace Umbraco.Web.Trees
 
             if (id == Constants.System.RootString)
             {
-                foreach (var macro in Services.MacroService.GetAll().OrderBy(m => m.Name))
+                foreach (var macro in _macroService.GetAll().OrderBy(m => m.Name))
                 {
                     nodes.Add(CreateTreeNode(
                         macro.Id.ToString(),
@@ -59,7 +67,7 @@ namespace Umbraco.Web.Trees
                 return menu;
             }
 
-            var macro = Services.MacroService.GetById(int.Parse(id));
+            var macro = _macroService.GetById(int.Parse(id));
             if (macro == null) return new MenuItemCollection();
 
             //add delete option for all macros

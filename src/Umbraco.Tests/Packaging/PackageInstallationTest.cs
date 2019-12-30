@@ -43,10 +43,10 @@ namespace Umbraco.Tests.Packaging
                 Directory.Delete(path, true);
         }
 
-        private CompiledPackageXmlParser Parser => new CompiledPackageXmlParser(new ConflictingPackageData(ServiceContext.MacroService, ServiceContext.FileService),Factory.GetInstance<IGlobalSettings>());
+        private CompiledPackageXmlParser Parser => new CompiledPackageXmlParser(new ConflictingPackageData(MacroService, ServiceContext.FileService),Factory.GetInstance<IGlobalSettings>());
 
         private PackageDataInstallation PackageDataInstallation => new PackageDataInstallation(
-            Logger, ServiceContext.FileService, ServiceContext.MacroService, ServiceContext.LocalizationService,
+            Logger, ServiceContext.FileService, MacroService, ServiceContext.LocalizationService,
             ServiceContext.DataTypeService, ServiceContext.EntityService,
             ServiceContext.ContentTypeService, ServiceContext.ContentService,
             Factory.GetInstance<PropertyEditorCollection>(),

@@ -134,6 +134,8 @@ namespace Umbraco.Tests.Testing
 
         protected virtual ISqlSyntaxProvider SqlSyntax => Factory.GetInstance<ISqlSyntaxProvider>();
 
+        protected IMacroService MacroService => Factory.GetInstance<IMacroService>();
+
         protected IMapperCollection Mappers => Factory.GetInstance<IMapperCollection>();
 
         protected UmbracoMapper Mapper => Factory.GetInstance<UmbracoMapper>();

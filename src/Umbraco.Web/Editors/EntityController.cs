@@ -53,6 +53,7 @@ namespace Umbraco.Web.Editors
         private readonly UmbracoTreeSearcher _treeSearcher;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly SearchableTreeCollection _searchableTreeCollection;
+        private readonly IMacroService _macroService;
 
         public EntityController(
             IGlobalSettings globalSettings,
@@ -66,13 +67,15 @@ namespace Umbraco.Web.Editors
             UmbracoHelper umbracoHelper,
             SearchableTreeCollection searchableTreeCollection,
             UmbracoTreeSearcher treeSearcher,
-            IShortStringHelper shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IMacroService macroService)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _treeService = treeService;
             _searchableTreeCollection = searchableTreeCollection;
             _treeSearcher = treeSearcher;
             _shortStringHelper = shortStringHelper;
+            _macroService = macroService;
         }
 
         /// <summary>
@@ -1035,7 +1038,7 @@ namespace Umbraco.Web.Editors
 
                 case UmbracoEntityTypes.Macro:
                     //Get all macros from the macro service
-                    var macros = Services.MacroService.GetAll().WhereNotNull().OrderBy(x => x.Name);
+                    var macros = _macroService.GetAll().WhereNotNull().OrderBy(x => x.Name);
                     var filteredMacros = ExecutePostFilter(macros, postFilter);
                     return filteredMacros.Select(MapEntities());
 

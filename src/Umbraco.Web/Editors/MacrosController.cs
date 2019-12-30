@@ -34,11 +34,11 @@ namespace Umbraco.Web.Editors
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IMacroService _macroService;
 
-        public MacrosController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IShortStringHelper shortStringHelper)
+        public MacrosController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IShortStringHelper shortStringHelper, IMacroService macroService)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _shortStringHelper = shortStringHelper;
-            _macroService = Services.MacroService;
+            _macroService = macroService;
         }
 
         /// <summary>

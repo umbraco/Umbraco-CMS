@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var macro = new Macro(ShortStringHelper, "test1", "Test", "~/views/macropartials/test.cshtml", MacroTypes.PartialView);
-            ServiceContext.MacroService.Save(macro);
+            MacroService.Save(macro);
 
             // Act
             var element = Serializer.Serialize(macro);
