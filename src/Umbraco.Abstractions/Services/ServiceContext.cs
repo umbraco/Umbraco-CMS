@@ -254,6 +254,11 @@ namespace Umbraco.Core.Services
         public IRedirectUrlService RedirectUrlService => _redirectUrlService.Value;
 
         /// <summary>
+        /// Gets the ConsentService.
+        /// </summary>
+        public IConsentService ConsentService => _consentService.Value;
+
+        /// <summary>
         /// Gets the ContentTypeServiceBaseFactory.
         /// </summary>
         public IContentTypeBaseServiceProvider ContentTypeBaseServices => _contentTypeBaseServiceProvider.Value;
