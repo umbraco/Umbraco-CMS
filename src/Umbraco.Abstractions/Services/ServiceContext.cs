@@ -179,6 +179,11 @@ namespace Umbraco.Core.Services
         public IEntityService EntityService => _entityService.Value;
 
         /// <summary>
+        /// Gets the <see cref="IRelationService"/>
+        /// </summary>
+        public IRelationService RelationService => _relationService.Value;
+
+        /// <summary>
         /// Gets the <see cref="IContentService"/>
         /// </summary>
         public IContentService ContentService => _contentService.Value;
