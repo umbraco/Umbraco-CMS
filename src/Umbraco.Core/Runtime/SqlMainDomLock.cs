@@ -39,7 +39,7 @@ namespace Umbraco.Core.Runtime
 
         public async Task<bool> AcquireLockAsync(int millisecondsTimeout)
         {
-            _logger.Info<SqlMainDomLock>("Acquiring lock...");
+            _logger.Debug<SqlMainDomLock>("Acquiring lock...");
 
             var db = GetDatabase();
 
@@ -76,7 +76,7 @@ namespace Umbraco.Core.Runtime
                     // are MainDom? then we don't leave any orphan rows behind.
 
                     InsertLockRecord(_lockId); // so update with our appdomain id
-                    _logger.Info<SqlMainDomLock>("Acquired with ID {LockId}", _lockId);
+                    _logger.Debug<SqlMainDomLock>("Acquired with ID {LockId}", _lockId);
                     return true;
                 }
 
@@ -142,7 +142,7 @@ namespace Umbraco.Core.Runtime
                             {
                                 // we are no longer main dom, another one has come online, exit
                                 _mainDomChanging = true;
-                                _logger.Info<SqlMainDomLock>("Detected new booting application, releasing MainDom.");
+                                _logger.Debug<SqlMainDomLock>("Detected new booting application, releasing MainDom.");
                                 return;
                             }
                         }
@@ -225,7 +225,7 @@ namespace Umbraco.Core.Runtime
 
                             // so now we update the row with our appdomain id
                             InsertLockRecord(_lockId);
-                            _logger.Info<SqlMainDomLock>("Acquired with ID {LockId}", _lockId);
+                            _logger.Debug<SqlMainDomLock>("Acquired with ID {LockId}", _lockId);
                             return true; 
                         }
                         else if (mainDomRows.Count == 1 && !mainDomRows[0].Value.StartsWith(tempId))
@@ -234,7 +234,7 @@ namespace Umbraco.Core.Runtime
                             // another new AppDomain has come online and is wanting to take over. In that case, we will not
                             // acquire.
 
-                            _logger.Info<SqlMainDomLock>("Cannot acquire, another booting application detected.");
+                            _logger.Debug<SqlMainDomLock>("Cannot acquire, another booting application detected.");
 
                             return false;
                         }
@@ -268,7 +268,7 @@ namespace Umbraco.Core.Runtime
                         // which isn't ideal.
                         // So... we're going to 'just' take over, if the writelock works then we'll assume we're ok
 
-                        _logger.Info<SqlMainDomLock>("Timeout elapsed, assuming orphan row, acquiring MainDom.");
+                        _logger.Debug<SqlMainDomLock>("Timeout elapsed, assuming orphan row, acquiring MainDom.");
 
                         try
                         {
@@ -278,7 +278,7 @@ namespace Umbraco.Core.Runtime
 
                             // so now we update the row with our appdomain id
                             InsertLockRecord(_lockId);
-                            _logger.Info<SqlMainDomLock>("Acquired with ID {LockId}", _lockId);
+                            _logger.Debug<SqlMainDomLock>("Acquired with ID {LockId}", _lockId);
                             return true;
                         }
                         catch (Exception ex)
@@ -368,12 +368,12 @@ namespace Umbraco.Core.Runtime
                             // Otherwise, if we are just shutting down, we want to just delete the row.
                             if (_mainDomChanging)
                             {
-                                _logger.Info<SqlMainDomLock>("Releasing MainDom, updating row, new application is booting.");
+                                _logger.Debug<SqlMainDomLock>("Releasing MainDom, updating row, new application is booting.");
                                 db.Execute("UPDATE umbracoKeyValue SET [value] = [value] + '_updated' WHERE [key] = @key", new { key = MainDomKey });
                             }
                             else
                             {
-                                _logger.Info<SqlMainDomLock>("Releasing MainDom, deleting row, application is shutting down.");
+                                _logger.Debug<SqlMainDomLock>("Releasing MainDom, deleting row, application is shutting down.");
                                 db.Execute("DELETE FROM umbracoKeyValue WHERE [key] = @key", new { key = MainDomKey });
                             }
                         }
