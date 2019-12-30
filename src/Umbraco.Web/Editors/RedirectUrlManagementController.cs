@@ -12,6 +12,7 @@ using Umbraco.Web.WebApi;
 using File = System.IO.File;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Editors
 {
@@ -19,10 +20,12 @@ namespace Umbraco.Web.Editors
     public class RedirectUrlManagementController : UmbracoAuthorizedApiController
     {
         private readonly ILogger _logger;
+        private readonly IRedirectUrlService _redirectUrlService;
 
-        public RedirectUrlManagementController(ILogger logger)
+        public RedirectUrlManagementController(ILogger logger, IRedirectUrlService redirectUrlService)
         {
             _logger = logger;
+            _redirectUrlService = redirectUrlService;
         }
 
         /// <summary>
@@ -42,12 +45,11 @@ namespace Umbraco.Web.Editors
         public RedirectUrlSearchResult SearchRedirectUrls(string searchTerm, int page = 0, int pageSize = 10)
         {
             var searchResult = new RedirectUrlSearchResult();
-            var redirectUrlService = Services.RedirectUrlService;
             long resultCount;
 
             var redirects = string.IsNullOrWhiteSpace(searchTerm)
-                ? redirectUrlService.GetAllRedirectUrls(page, pageSize, out resultCount)
-                : redirectUrlService.SearchRedirectUrls(searchTerm, page, pageSize, out resultCount);
+                ? _redirectUrlService.GetAllRedirectUrls(page, pageSize, out resultCount)
+                : _redirectUrlService.SearchRedirectUrls(searchTerm, page, pageSize, out resultCount);
 
             searchResult.SearchResults = Mapper.MapEnumerable<IRedirectUrl, ContentRedirectUrl>(redirects);
             searchResult.TotalCount = resultCount;
@@ -69,8 +71,7 @@ namespace Umbraco.Web.Editors
             var redirectsResult = new RedirectUrlSearchResult();
             if (UdiParser.TryParse(contentUdi, out GuidUdi guidIdi))
             {
-                var redirectUrlService = Services.RedirectUrlService;
-                var redirects = redirectUrlService.GetContentRedirectUrls(guidIdi.Guid);
+                var redirects = _redirectUrlService.GetContentRedirectUrls(guidIdi.Guid);
                 var mapped = Mapper.MapEnumerable<IRedirectUrl, ContentRedirectUrl>(redirects);
                 redirectsResult.SearchResults = mapped;
                 //not doing paging 'yet'
@@ -83,8 +84,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public IHttpActionResult DeleteRedirectUrl(Guid id)
         {
-            var redirectUrlService = Services.RedirectUrlService;
-            redirectUrlService.Delete(id);
+            _redirectUrlService.Delete(id);
             return Ok();
         }
 

@@ -150,19 +150,19 @@ namespace Umbraco.Tests.Services
             IContent doc2 = MockedContent.CreateBasicContent(contentType2);
             ServiceContext.ContentService.Save(doc2);
 
-            ServiceContext.RedirectUrlService.Register("hello/world", doc.Key);
-            ServiceContext.RedirectUrlService.Register("hello2/world2", doc2.Key);
+            RedirectUrlService.Register("hello/world", doc.Key);
+            RedirectUrlService.Register("hello2/world2", doc2.Key);
 
             // These 2 assertions should probably be moved to a test for the Register() method?
-            Assert.AreEqual(1, ServiceContext.RedirectUrlService.GetContentRedirectUrls(doc.Key).Count());
-            Assert.AreEqual(1, ServiceContext.RedirectUrlService.GetContentRedirectUrls(doc2.Key).Count());
+            Assert.AreEqual(1, RedirectUrlService.GetContentRedirectUrls(doc.Key).Count());
+            Assert.AreEqual(1, RedirectUrlService.GetContentRedirectUrls(doc2.Key).Count());
 
             //change variation
             contentType.Variations = changedContentTypeVariation;
             ServiceContext.ContentTypeService.Save(contentType);
             var expectedRedirectUrlCount = shouldUrlRedirectsBeCleared ? 0 : 1;
-            Assert.AreEqual(expectedRedirectUrlCount, ServiceContext.RedirectUrlService.GetContentRedirectUrls(doc.Key).Count());
-            Assert.AreEqual(1, ServiceContext.RedirectUrlService.GetContentRedirectUrls(doc2.Key).Count());
+            Assert.AreEqual(expectedRedirectUrlCount, RedirectUrlService.GetContentRedirectUrls(doc.Key).Count());
+            Assert.AreEqual(1, RedirectUrlService.GetContentRedirectUrls(doc2.Key).Count());
         }
 
         [TestCase(ContentVariation.Nothing, ContentVariation.Culture)]
