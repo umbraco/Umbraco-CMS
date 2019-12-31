@@ -505,28 +505,22 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
     };
 
     // Hides navigation tree, with a short delay, is cancelled if the user moves the mouse over the tree again
-    $scope.leaveTree = function (event) {
+    $scope.leaveTree = function(event) {
         //this is a hack to handle IE touch events which freaks out due to no mouse events so the tree instantly shuts down
         if (!event) {
             return;
         }
-        closeTree();
-    };
 
-    $scope.onOutsideClick = function() {
-        closeTree();
-    };
-
-    function closeTree() {
         if (!appState.getGlobalState("touchDevice")) {
             treeActive = false;
-            $timeout(function () {
-                if (!treeActive) {
-                    navigationService.hideTree();
-                }
-            }, 300);
+            $timeout(function() {
+                    if (!treeActive) {
+                        navigationService.hideTree();
+                    }
+                },
+                300);
         }
-    }
+    };
 
     $scope.toggleLanguageSelector = function () {
         $scope.page.languageSelectorIsOpen = !$scope.page.languageSelectorIsOpen;
