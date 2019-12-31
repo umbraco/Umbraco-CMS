@@ -1,6 +1,6 @@
 ﻿<div id="umb-nested-content--{{model.id}}" class="umb-nested-content" ng-class="{'umb-nested-content--narrow':!vm.wideMode, 'umb-nested-content--wide':vm.wideMode}">
 
-    <umb-load-indicator ng-if="!vm.inited"></umb-load-indicator>
+    <umb-load-indicator class="mt2" ng-if="!vm.inited"></umb-load-indicator>
 
     <ng-form name="nestedContentForm">
 
@@ -40,7 +40,7 @@
             </div>
         </div>
 
-        <div class="umb-nested-content__footer-bar" ng-hide="vm.hasContentTypes === false">
+        <div class="umb-nested-content__footer-bar" ng-hide="!vm.inited || vm.hasContentTypes === false">
             <button class="btn-reset umb-nested-content__add-content umb-focus" ng-class="{ '--disabled': (!vm.scaffolds.length || vm.nodes.length >= maxItems) }" ng-click="vm.openNodeTypePicker($event)" prevent-default>
                 <localize key="grid_addElement"></localize>
             </button>
