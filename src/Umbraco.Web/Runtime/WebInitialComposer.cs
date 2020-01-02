@@ -73,7 +73,7 @@ namespace Umbraco.Web.Runtime
             // register accessors for cultures
             composition.RegisterUnique<IDefaultCultureAccessor, DefaultCultureAccessor>();
             composition.RegisterUnique<IVariationContextAccessor, HybridVariationContextAccessor>();
-            
+
             // register the http context and umbraco context accessors
             // we *should* use the HttpContextUmbracoContextAccessor, however there are cases when
             // we have no http context, eg when booting Umbraco or in background threads, so instead
@@ -95,7 +95,7 @@ namespace Umbraco.Web.Runtime
             // a way to inject the UmbracoContext - DO NOT register this as Lifetime.Request since LI will dispose the context
             // in it's own way but we don't want that to happen, we manage its lifetime ourselves.
             composition.Register(factory => factory.GetInstance<IUmbracoContextAccessor>().UmbracoContext);
-            composition.RegisterUnique<IInternalSearchConstants, InternalSearchConstants>();
+            composition.RegisterUnique<IUmbracoTreeSearcherFields, UmbracoTreeSearcherFields>();
             composition.Register<IPublishedContentQuery>(factory =>
             {
                 var umbCtx = factory.GetInstance<IUmbracoContextAccessor>();
@@ -268,7 +268,7 @@ namespace Umbraco.Web.Runtime
                 .Append<Issuu>()
                 .Append<Hulu>()
                 .Append<Giphy>();
-            
+
 
             // replace with web implementation
             composition.RegisterUnique<IPublishedSnapshotRebuilder, Migrations.PostMigrations.PublishedSnapshotRebuilder>();

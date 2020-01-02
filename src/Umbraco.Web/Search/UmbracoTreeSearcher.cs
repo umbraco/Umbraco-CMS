@@ -28,7 +28,7 @@ namespace Umbraco.Web.Search
         private readonly IEntityService _entityService;
         private readonly UmbracoMapper _mapper;
         private readonly ISqlContext _sqlContext;
-        private readonly IInternalSearchConstants _internalSearchConstants;
+        private readonly IUmbracoTreeSearcherFields _umbracoTreeSearcherFields;
 
 
         public UmbracoTreeSearcher(IExamineManager examineManager,
@@ -36,7 +36,7 @@ namespace Umbraco.Web.Search
             ILocalizationService languageService,
             IEntityService entityService,
             UmbracoMapper mapper,
-            ISqlContext sqlContext,IInternalSearchConstants internalSearchConstants)
+            ISqlContext sqlContext,IUmbracoTreeSearcherFields umbracoTreeSearcherFields)
         {
             _examineManager = examineManager ?? throw new ArgumentNullException(nameof(examineManager));
             _umbracoContext = umbracoContext;
@@ -44,7 +44,7 @@ namespace Umbraco.Web.Search
             _entityService = entityService;
             _mapper = mapper;
             _sqlContext = sqlContext;
-            _internalSearchConstants = internalSearchConstants;
+            _umbracoTreeSearcherFields = umbracoTreeSearcherFields;
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace Umbraco.Web.Search
 
             string type;
             var indexName = Constants.UmbracoIndexes.InternalIndexName;
-            var fields = _internalSearchConstants.GetBackOfficeFields();
+            var fields = _umbracoTreeSearcherFields.GetBackOfficeFields();
 
             // TODO: WE should try to allow passing in a lucene raw query, however we will still need to do some manual string
             // manipulation for things like start paths, member types, etc...
@@ -90,7 +90,7 @@ namespace Umbraco.Web.Search
                 case UmbracoEntityTypes.Member:
                     indexName = Constants.UmbracoIndexes.MembersIndexName;
                     type = "member";
-                    fields.AddRange(_internalSearchConstants.GetBackOfficeMembersFields());
+                    fields.AddRange(_umbracoTreeSearcherFields.GetBackOfficeMembersFields());
                     if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId && searchFrom.Trim() != "-1")
                     {
                         sb.Append("+__NodeTypeAlias:");
@@ -100,13 +100,13 @@ namespace Umbraco.Web.Search
                     break;
                 case UmbracoEntityTypes.Media:
                     type = "media";
-                    fields.AddRange(_internalSearchConstants.GetBackOfficeMediaFields());
+                    fields.AddRange(_umbracoTreeSearcherFields.GetBackOfficeMediaFields());
                     var allMediaStartNodes = _umbracoContext.Security.CurrentUser.CalculateMediaStartNodeIds(_entityService);
                     AppendPath(sb, UmbracoObjectTypes.Media, allMediaStartNodes, searchFrom, ignoreUserStartNodes, _entityService);
                     break;
                 case UmbracoEntityTypes.Document:
                     type = "content";
-                    fields.AddRange(_internalSearchConstants.GetBackOfficeDocumentFields());
+                    fields.AddRange(_umbracoTreeSearcherFields.GetBackOfficeDocumentFields());
                     var allContentStartNodes = _umbracoContext.Security.CurrentUser.CalculateContentStartNodeIds(_entityService);
                     AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, searchFrom, ignoreUserStartNodes, _entityService);
                     break;

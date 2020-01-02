@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Umbraco.Web.Search
 {
-    public interface IInternalSearchConstants
+    public interface IUmbracoTreeSearcherFields
     {
         IEnumerable<string> GetBackOfficeFields();
         IEnumerable<string> GetBackOfficeMembersFields();

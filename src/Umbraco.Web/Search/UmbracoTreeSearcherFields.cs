@@ -4,7 +4,7 @@ using Umbraco.Web.Search;
 
 namespace Umbraco.Web
 {
-    public class InternalSearchConstants : IInternalSearchConstants
+    public class UmbracoTreeSearcherFields : IUmbracoTreeSearcherFields
     {
         private IReadOnlyList<string> _backOfficeFields = new List<string> {"id", "__NodeId", "__Key"};
         public IEnumerable<string> GetBackOfficeFields()
