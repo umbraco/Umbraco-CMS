@@ -80,7 +80,8 @@
             disabled: "<",
             required: "<",
             onChange: "&?",
-            cssClass: "@?"
+            cssClass: "@?",
+            iconClass: "@?"
         }
     };
 
