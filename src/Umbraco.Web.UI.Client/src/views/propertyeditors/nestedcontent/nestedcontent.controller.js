@@ -47,9 +47,11 @@
         vm.hasContentTypes = model.config.contentTypes.length > 0;
 
         var labels = {};
-        localizationService.localizeMany(["grid_addElement", "content_createEmpty"]).then(function (data) {
+        vm.labels = labels;
+        localizationService.localizeMany(["grid_addElement", "content_createEmpty", "actions_copy"]).then(function (data) {
             labels.grid_addElement = data[0];
             labels.content_createEmpty = data[1];
+            labels.copy_icon_title = data[2]
         });
 
         function setCurrentNode(node) {
@@ -503,6 +505,7 @@
                     // Force validation to occur server side as this is the
                     // only way we can have consistency between mandatory and
                     // regex validation messages. Not ideal, but it works.
+                    prop.ncMandatory = prop.validation.mandatory;
                     prop.validation = {
                         mandatory: false,
                         pattern: ""

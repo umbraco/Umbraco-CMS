@@ -620,6 +620,7 @@
     <key alias="cancel">Fortryd</key>
     <key alias="cellMargin">Celle margen</key>
     <key alias="choose">Vælg</key>
+    <key alias="clear">Ryd</key>
     <key alias="close">Luk</key>
     <key alias="closewindow">Luk vindue</key>
     <key alias="comment">Kommentar</key>
