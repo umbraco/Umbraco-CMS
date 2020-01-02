@@ -22,7 +22,7 @@ namespace Umbraco.Web.Mvc
             var userIdentity = filterContext.HttpContext.User.Identity as ClaimsIdentity;
             if (userIdentity != null)
             {
-                //if there is not CookiePath claim, then exist
+                //if there is not CookiePath claim, then exit
                 if (userIdentity.HasClaim(x => x.Type == ClaimTypes.CookiePath) == false)
                 {
                     base.OnActionExecuting(filterContext);

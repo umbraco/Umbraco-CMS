@@ -2885,7 +2885,8 @@ namespace Umbraco.Core.Services.Implement
 
         private IContentType GetContentType(IScope scope, string contentTypeAlias)
         {
-            if (string.IsNullOrWhiteSpace(contentTypeAlias)) throw new ArgumentNullOrEmptyException(nameof(contentTypeAlias));
+            if (contentTypeAlias == null) throw new ArgumentNullException(nameof(contentTypeAlias));
+            if (string.IsNullOrWhiteSpace(contentTypeAlias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(contentTypeAlias));
 
             scope.ReadLock(Constants.Locks.ContentTypes);
 
@@ -2900,7 +2901,8 @@ namespace Umbraco.Core.Services.Implement
 
         private IContentType GetContentType(string contentTypeAlias)
         {
-            if (string.IsNullOrWhiteSpace(contentTypeAlias)) throw new ArgumentNullOrEmptyException(nameof(contentTypeAlias));
+            if (contentTypeAlias == null) throw new ArgumentNullException(nameof(contentTypeAlias));
+            if (string.IsNullOrWhiteSpace(contentTypeAlias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(contentTypeAlias));
 
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
