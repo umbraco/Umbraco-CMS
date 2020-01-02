@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Editors.MediaPickerController",
-        function ($scope, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService) {
+        function ($scope, $timeout, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService) {
 
             var vm = this;
             
@@ -292,13 +292,20 @@ angular.module("umbraco")
 
             function onUploadComplete(files) {
                 gotoFolder($scope.currentFolder).then(function () {
-                    if (files.length === 1 && $scope.model.selection.length === 0) {
-                        var image = $scope.images[$scope.images.length - 1];
-                        $scope.target = image;
-                        $scope.target.url = mediaHelper.resolveFile(image);
-                        selectMedia(image);
-                    }
-                })
+                    $timeout(function () {
+                        if ($scope.multiPicker) {
+                            var images = _.rest($scope.images, $scope.images.length - files.length);
+                            _.each(images, function(image) {
+                                selectMedia(image);
+                            });
+                        } else {
+                            var image = $scope.images[$scope.images.length - 1];
+                            $scope.target = image;
+                            $scope.target.url = mediaHelper.resolveFile(image);
+                            selectMedia(image);
+                        }
+                    });
+                });
             }
 
             function onFilesQueue() {
