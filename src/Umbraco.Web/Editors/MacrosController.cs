@@ -112,19 +112,7 @@ namespace Umbraco.Web.Editors
                 return this.ReturnErrorResponse($"Macro with id {id} does not exist");
             }
 
-            var macroDisplay = Mapper.Map<IMacro, MacroDisplay>(macro);
-
-            var parameters = macro.Properties.Values
-                                .OrderBy(x => x.SortOrder)
-                                .Select(x => new MacroParameterDisplay()
-                                {
-                                    Editor = x.EditorAlias,
-                                    Key = x.Alias,
-                                    Label = x.Name,
-                                    Id = x.Id
-                                });
-
-            macroDisplay.Parameters = parameters;
+            var macroDisplay = MapToDisplay(macro);
 
             return this.Request.CreateResponse(HttpStatusCode.OK, macroDisplay);
         }
@@ -139,19 +127,7 @@ namespace Umbraco.Web.Editors
                 return this.ReturnErrorResponse($"Macro with id {id} does not exist");
             }
 
-            var macroDisplay = Mapper.Map<IMacro, MacroDisplay>(macro);
-
-            var parameters = macro.Properties.Values
-                                .OrderBy(x => x.SortOrder)
-                                .Select(x => new MacroParameterDisplay()
-                                {
-                                    Editor = x.EditorAlias,
-                                    Key = x.Alias,
-                                    Label = x.Name,
-                                    Id = x.Id
-                                });
-
-            macroDisplay.Parameters = parameters;
+            var macroDisplay = MapToDisplay(macro);
 
             return this.Request.CreateResponse(HttpStatusCode.OK, macroDisplay);
         }
@@ -169,19 +145,7 @@ namespace Umbraco.Web.Editors
                 return this.ReturnErrorResponse($"Macro with id {id} does not exist");
             }
 
-            var macroDisplay = Mapper.Map<IMacro, MacroDisplay>(macro);
-
-            var parameters = macro.Properties.Values
-                                .OrderBy(x => x.SortOrder)
-                                .Select(x => new MacroParameterDisplay()
-                                {
-                                    Editor = x.EditorAlias,
-                                    Key = x.Alias,
-                                    Label = x.Name,
-                                    Id = x.Id
-                                });
-
-            macroDisplay.Parameters = parameters;
+            var macroDisplay = MapToDisplay(macro);
 
             return this.Request.CreateResponse(HttpStatusCode.OK, macroDisplay);
         }
@@ -439,6 +403,30 @@ namespace Umbraco.Web.Editors
                     prefixVirtualPath.TrimEnd('/') + "/" + (path.Replace(orgPath, string.Empty).Trim('/') + "/" + file.Name).Trim('/')));
 
             return files;
+        }
+
+        /// <summary>
+        /// Used to map an <see cref="IMacro"/> instance to a <see cref="MacroDisplay"/>
+        /// </summary>
+        /// <param name="macro"></param>
+        /// <returns></returns>
+        private MacroDisplay MapToDisplay(IMacro macro)
+        {
+            var display = Mapper.Map<MacroDisplay>(macro);
+
+            var parameters = macro.Properties.Values
+                                .OrderBy(x => x.SortOrder)
+                                .Select(x => new MacroParameterDisplay()
+                                {
+                                    Editor = x.EditorAlias,
+                                    Key = x.Alias,
+                                    Label = x.Name,
+                                    Id = x.Id
+                                });
+
+            display.Parameters = parameters;
+
+            return display;
         }
     }
 }
