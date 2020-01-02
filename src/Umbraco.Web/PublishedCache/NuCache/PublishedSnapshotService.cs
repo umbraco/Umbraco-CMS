@@ -190,10 +190,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// </remarks>
         private void MainDomRelease()
         {
+            _logger.Debug<PublishedSnapshotService>("Releasing from MainDom...");
+
             lock (_storesLock)
             {
+                _logger.Debug<PublishedSnapshotService>("Releasing content store...");
                 _contentStore?.ReleaseLocalDb(); //null check because we could shut down before being assigned
                 _localContentDb = null;
+
+                _logger.Debug<PublishedSnapshotService>("Releasing media store...");
                 _mediaStore?.ReleaseLocalDb(); //null check because we could shut down before being assigned
                 _localMediaDb = null;
 
@@ -663,10 +668,20 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 publishedChanged = publishedChanged2;
             }
 
+            // TODO: These resync's are a problem, they cause deadlocks because when this is called, it's generally called within a writelock
+            // and then we clear out the snapshot and then if there's some event handler that needs the content cache, it tries to re-get it
+            // which first tries locking on the _storesLock which may have already been acquired and in this case we deadlock because
+            // we're still holding the write lock.
+            // We resync at the end of a ScopedWriteLock
+            // BUT if we don't resync here then the current snapshot is out of date for any event handlers that wish to use the most up to date
+            // data...
+            // so we need to figure out how to deal with the _storesLock
+
             if (draftChanged || publishedChanged)
                 ((PublishedSnapshot)CurrentPublishedSnapshot)?.Resync();
         }
 
+        // Calling this method means we have a lock on the contentStore (i.e. GetScopedWriteLock)
         private void NotifyLocked(IEnumerable<ContentCacheRefresher.JsonPayload> payloads, out bool draftChanged, out bool publishedChanged)
         {
             publishedChanged = false;
@@ -676,7 +691,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // content (and content types) are read-locked while reading content
             // contentStore is wlocked (so readable, only no new views)
             // and it can be wlocked by 1 thread only at a time
-            // contentStore is write-locked during changes
+            // contentStore is write-locked during changes - see note above, calls to this method are wrapped in contentStore.GetScopedWriteLock
 
             foreach (var payload in payloads)
             {
@@ -1131,6 +1146,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
             ContentStore.Snapshot contentSnap, mediaSnap;
             SnapDictionary<int, Domain>.Snapshot domainSnap;
             IAppCache elementsCache;
+
+            // TODO: Idea... TryGetElements? Might check if we are shutting down and return false and callers to this could handle it?
+            // Else does a readerwriterlockslim work here? (i don't think so)
+            // Else we have 2x locks, one for startup/shutdown, the other for getting elements and then we can maybe do a Monitor.Try?
+            // That is sort of the same as a TryGetElements
+
             lock (_storesLock)
             {
                 var scopeContext = _scopeProvider.Context;
@@ -1156,6 +1177,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     // elements
                     // just need to make sure nothing gets elements in another enlisted action... so using
                     // a MaxValue to make sure this one runs last, and it should be ok
+                    // ... else there is potential to deadlock since this would recursively go back into trying
+                    // lock on _storesLock but another thread may have already tried that
                     scopeContext.Enlist("Umbraco.Web.PublishedCache.NuCache.PublishedSnapshotService.Resync", () => this, (completed, svc) =>
                     {
                         ((PublishedSnapshot)svc.CurrentPublishedSnapshot)?.Resync();

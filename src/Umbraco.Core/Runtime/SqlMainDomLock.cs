@@ -109,62 +109,62 @@ namespace Umbraco.Core.Runtime
 
             // Create a long running task (dedicated thread)
             // to poll to check if we are still the MainDom registered in the DB
-            return Task.Factory.StartNew(() =>
+            return Task.Factory.StartNew(ListeningLoop, _cancellationTokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+
+        }
+
+        private void ListeningLoop()
+        {
+            while (true)
             {
-                while(true)
+                // poll every 1 second
+                Thread.Sleep(1000);
+
+                lock (_locker)
                 {
-                    // poll every 1 second
-                    Thread.Sleep(1000);
+                    // If cancellation has been requested we will just exit. Depending on timing of the shutdown,
+                    // we will have already flagged _mainDomChanging = true, or we're shutting down faster than
+                    // the other MainDom is taking to startup. In this case the db row will just be deleted and the
+                    // new MainDom will just take over.
+                    if (_cancellationTokenSource.IsCancellationRequested)
+                        return;
 
-                    lock(_locker)
+                    var db = GetDatabase();
+
+                    try
                     {
-                        // If cancellation has been requested we will just exit. Depending on timing of the shutdown,
-                        // we will have already flagged _mainDomChanging = true, or we're shutting down faster than
-                        // the other MainDom is taking to startup. In this case the db row will just be deleted and the
-                        // new MainDom will just take over.
-                        if (_cancellationTokenSource.IsCancellationRequested)
-                            break;
+                        db.BeginTransaction(IsolationLevel.ReadCommitted);
 
-                        var db = GetDatabase();
+                        // get a read lock
+                        _sqlServerSyntax.ReadLock(db, Constants.Locks.MainDom);
 
-                        try
+                        // TODO: We could in theory just check if the main dom row doesn't exist, that could indicate that
+                        // we are still the maindom. An empty value might be better because then we won't have any orphan rows
+                        // if the app is terminated. Could that work?
+
+                        if (!IsMainDomValue(_lockId))
                         {
-                            db.BeginTransaction(IsolationLevel.ReadCommitted);
-
-                            // get a read lock
-                            _sqlServerSyntax.ReadLock(db, Constants.Locks.MainDom);
-
-                            // TODO: We could in theory just check if the main dom row doesn't exist, that could indicate that
-                            // we are still the maindom. An empty value might be better because then we won't have any orphan rows
-                            // if the app is terminated. Could that work?
-
-                            if (!IsMainDomValue(_lockId))
-                            {
-                                // we are no longer main dom, another one has come online, exit
-                                _mainDomChanging = true;
-                                _logger.Debug<SqlMainDomLock>("Detected new booting application, releasing MainDom.");
-                                return;
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            ResetDatabase();
-                            // unexpected
-                            _logger.Error<SqlMainDomLock>(ex, "Unexpected error, listening is canceled.");
-                            _hasError = true;
+                            // we are no longer main dom, another one has come online, exit
+                            _mainDomChanging = true;
+                            _logger.Debug<SqlMainDomLock>("Detected new booting application, releasing MainDom lock.");
                             return;
                         }
-                        finally
-                        {
-                            db?.CompleteTransaction();
-                        }
                     }
-                    
+                    catch (Exception ex)
+                    {
+                        ResetDatabase();
+                        // unexpected
+                        _logger.Error<SqlMainDomLock>(ex, "Unexpected error, listening is canceled.");
+                        _hasError = true;
+                        return;
+                    }
+                    finally
+                    {
+                        db?.CompleteTransaction();
+                    }
                 }
-                
 
-            }, _cancellationTokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
-
+            }
         }
 
         private void ResetDatabase()

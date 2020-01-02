@@ -22,7 +22,7 @@ namespace Umbraco.Web
 
             var mainDomLock = appSettingMainDomLock == "SqlMainDomLock"
                 ? (IMainDomLock)new SqlMainDomLock(logger)
-                : new MainDomSemaphoreLock();
+                : new MainDomSemaphoreLock(logger);
             
             var runtime = new WebRuntime(this, logger, new MainDom(logger, mainDomLock));
 

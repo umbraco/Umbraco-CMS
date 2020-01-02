@@ -115,11 +115,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // TODO: GetScopedWriter? should the dict have a ref onto the scope provider?
         public IDisposable GetScopedWriteLock(IScopeProvider scopeProvider)
         {
+            _logger.Debug<ContentStore>("GetScopedWriteLock");
             return ScopeContextualBase.Get(scopeProvider, _instanceId, scoped => new ScopedWriteLock(this, scoped));
         }
 
         private void Lock(WriteLockInfo lockInfo, bool forceGen = false)
         {
+            // TODO: We are in a deadlock here somehow??
+
             Monitor.Enter(_wlocko, ref lockInfo.Taken);
 
             var rtaken = false;
@@ -193,8 +196,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 _localDb.Commit();
             }
 
-            if (lockInfo.Count) _wlocked--;
-            if (lockInfo.Taken) Monitor.Exit(_wlocko);
+            // TODO: Shouldn't this be in a finally block?
+            // TODO: Shouldn't this be decremented after we exit??
+            // TODO: Shouldn't the locked flag never exceed 1?
+            if (lockInfo.Count)
+                _wlocked--;
+
+            // TODO: Shouldn't this be in a finally block?
+            if (lockInfo.Taken)
+                Monitor.Exit(_wlocko);
         }
 
         private void Release(ReadLockInfo lockInfo)
@@ -232,21 +242,29 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public void ReleaseLocalDb()
         {
+            _logger.Info<ContentStore>("Releasing DB...");
             var lockInfo = new WriteLockInfo();
             try
             {
                 try
                 {
                     // Trying to lock could throw exceptions so always make sure to clean up.
+                    _logger.Info<ContentStore>("Trying to lock before releasing DB (lock count = {LockCount}) ...", _wlocked);
+
                     Lock(lockInfo);
                 }
                 finally
                 {
                     try
                     {
+                        _logger.Info<ContentStore>("Disposing local DB...");
                         _localDb?.Dispose();
                     }
-                    catch { /* TBD: May already be throwing so don't throw again */}
+                    catch (Exception ex)
+                    {
+                        /* TBD: May already be throwing so don't throw again */
+                        _logger.Error<ContentStore>(ex, "Error trying to release DB");
+                    }
                     finally
                     {
                         _localDb = null;
@@ -254,8 +272,17 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 }
 
             }
+            catch (Exception ex)
+            {
+                _logger.Error<ContentStore>(ex, "Error trying to lock");
+                throw;
+            }
             finally
             {
+                _logger.Info<ContentStore>("Releasing ContentStore...");
+
+                // TODO: I don't understand this, we would have already closed the BPlusTree store above??
+                // I guess it's 'safe' and will just decrement the write lock counter?
                 Release(lockInfo);
             }
         }
@@ -275,6 +302,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var lockInfo = new WriteLockInfo();
             try
             {
+                _logger.Debug<ContentStore>("NewContentTypes");
                 Lock(lockInfo);
 
                 foreach (var type in types)
@@ -297,6 +325,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var lockInfo = new WriteLockInfo();
             try
             {
+                _logger.Debug<ContentStore>("UpdateContentTypes");
                 Lock(lockInfo);
 
                 var index = types.ToDictionary(x => x.Id, x => x);
@@ -324,10 +353,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public void SetAllContentTypes(IEnumerable<IPublishedContentType> types)
         {
-            var lockInfo = new WriteLockInfo();
+            // TODO: There should be NO lock here! All calls made to this are wrapped in GetScopedWriteLock
+
+            //var lockInfo = new WriteLockInfo();
             try
             {
-                Lock(lockInfo);
+                _logger.Debug<ContentStore>("SetAllContentTypes");
+                //Lock(lockInfo);
 
                 // clear all existing content types
                 ClearLocked(_contentTypesById);
@@ -345,7 +377,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
             finally
             {
-                Release(lockInfo);
+                //Release(lockInfo);
             }
         }
 
@@ -362,6 +394,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var lockInfo = new WriteLockInfo();
             try
             {
+                _logger.Debug<ContentStore>("UpdateContentTypes");
                 Lock(lockInfo);
 
                 var removedContentTypeNodes = new List<int>();
@@ -435,6 +468,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var lockInfo = new WriteLockInfo();
             try
             {
+                _logger.Debug<ContentStore>("UpdateDataTypes");
                 Lock(lockInfo);
 
                 var contentTypes = _contentTypesById
@@ -545,10 +579,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             _logger.Debug<ContentStore>("Set content ID: {KitNodeId}", kit.Node.Id);
 
-            var lockInfo = new WriteLockInfo();
+            // TODO: There should be NO locks here, all calls made to this are done within GetScopedWriteLock
+            //var lockInfo = new WriteLockInfo();
             try
             {
-                Lock(lockInfo);
+                //Lock(lockInfo);
 
                 // get existing
                 _contentNodes.TryGetValue(kit.Node.Id, out var link);
@@ -594,7 +629,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
             finally
             {
-                Release(lockInfo);
+                //Release(lockInfo);
             }
 
             return true;
@@ -623,11 +658,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// </remarks>
         internal bool SetAllFastSorted(IEnumerable<ContentNodeKit> kits, bool fromDb)
         {
-            var lockInfo = new WriteLockInfo();
+
+            //TODO: There should be NO locks here all calls made to this are done within GetScopedWriteLock
+
+            //var lockInfo = new WriteLockInfo();
             var ok = true;
             try
             {
-                Lock(lockInfo);
+                _logger.Debug<ContentStore>("SetAllFastSorted");
+
+                //Lock(lockInfo);
 
                 ClearLocked(_contentNodes);
                 ClearRootLocked();
@@ -665,7 +705,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                         previousNode = null; // there is no previous sibling
                     }
 
-                    _logger.Debug<ContentStore>($"Set {thisNode.Id} with parent {thisNode.ParentContentId}");
+                    _logger.Verbose<ContentStore>($"Set {thisNode.Id} with parent {thisNode.ParentContentId}");
                     SetValueLocked(_contentNodes, thisNode.Id, thisNode);
 
                     // if we are initializing from the database source ensure the local db is updated
@@ -689,7 +729,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
             finally
             {
-                Release(lockInfo);
+                //Release(lockInfo);
             }
 
             return ok;
@@ -697,11 +737,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public bool SetAll(IEnumerable<ContentNodeKit> kits)
         {
-            var lockInfo = new WriteLockInfo();
+            //TODO: There should be NO locks here all calls made to this are done within GetScopedWriteLock
+
+            //var lockInfo = new WriteLockInfo();
             var ok = true;
             try
             {
-                Lock(lockInfo);
+                _logger.Debug<ContentStore>("SetAll");
+
+                //Lock(lockInfo);
 
                 ClearLocked(_contentNodes);
                 ClearRootLocked();
@@ -717,7 +761,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                         ok = false;
                         continue; // skip that one
                     }
-                    _logger.Debug<ContentStore>($"Set {kit.Node.Id} with parent {kit.Node.ParentContentId}");
+                    _logger.Verbose<ContentStore>($"Set {kit.Node.Id} with parent {kit.Node.ParentContentId}");
                     SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
 
                     if (_localDb != null) RegisterChange(kit.Node.Id, kit);
@@ -728,7 +772,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
             finally
             {
-                Release(lockInfo);
+                //Release(lockInfo);
             }
 
             return ok;
@@ -737,11 +781,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // IMPORTANT kits must be sorted out by LEVEL and by SORT ORDER
         public bool SetBranch(int rootContentId, IEnumerable<ContentNodeKit> kits)
         {
-            var lockInfo = new WriteLockInfo();
+            //TODO: There should be NO locks here all calls made to this are done within GetScopedWriteLock
+
+            //var lockInfo = new WriteLockInfo();
             var ok = true;
             try
             {
-                Lock(lockInfo);
+                _logger.Debug<ContentStore>("SetBranch");
+
+                //Lock(lockInfo);
 
                 // get existing
                 _contentNodes.TryGetValue(rootContentId, out var link);
@@ -773,7 +821,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
             finally
             {
-                Release(lockInfo);
+                //Release(lockInfo);
             }
 
             return ok;
@@ -781,10 +829,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public bool Clear(int id)
         {
-            var lockInfo = new WriteLockInfo();
+            // TODO: There should be NO locks here! All calls to this are made within GetScopedWriteLock
+            //var lockInfo = new WriteLockInfo();
             try
             {
-                Lock(lockInfo);
+                _logger.Debug<ContentStore>("Clear");
+
+                //Lock(lockInfo);
 
                 // try to find the content
                 // if it is not there, nothing to do
@@ -804,7 +855,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
             finally
             {
-                Release(lockInfo);
+                //Release(lockInfo);
             }
         }
 
@@ -1200,6 +1251,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var lockInfo = new ReadLockInfo();
             try
             {
+                // TODO: This would be much simpler with just a lock(_rlocko) { }
+                // in this case I see no reason why we are using this syntax?!
                 Lock(lockInfo);
 
                 // if no next generation is required, and we already have one,
@@ -1373,6 +1426,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 link.Next = null;
             }
         }
+
+        // TODO: This is never used? Should it be?
 
         public async Task WaitForPendingCollect()
         {
