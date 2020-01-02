@@ -6,7 +6,7 @@
     flex-wrap: wrap;
     align-items: center;
     position: relative;
-    padding: 0 !important;
+    padding: 0 0 0 26px !important;
     margin: 0;
     min-height: 22px;
     line-height: 22px;
@@ -21,7 +21,6 @@
     }
 
     &__text {
-        margin: 0 0 0 26px;
         position: relative;
         top: 1px;
         user-select: none;
@@ -80,7 +79,7 @@
         outline: 2px solid @inputBorderTabFocus;
     }
     .tabbing-active &.umb-form-check--checkbox &__input:checked:focus ~ .umb-form-check__state .umb-form-check__check {
-        border-color: white;
+        border-color: @white;
     }
 
     // add spacing between when flexed/inline, equal to the width of the input
