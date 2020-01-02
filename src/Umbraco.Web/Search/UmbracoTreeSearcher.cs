@@ -70,7 +70,7 @@ namespace Umbraco.Web.Search
 
             string type;
             var indexName = Constants.UmbracoIndexes.InternalIndexName;
-            var fields = _umbracoTreeSearcherFields.GetBackOfficeFields();
+            var fields = _umbracoTreeSearcherFields.GetBackOfficeFields().ToList();
 
             // TODO: WE should try to allow passing in a lucene raw query, however we will still need to do some manual string
             // manipulation for things like start paths, member types, etc...
