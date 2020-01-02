@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
 using System.Web;
@@ -505,6 +506,49 @@ namespace Umbraco.Core.Composing
 
         #endregion
 
+        #region Get Assembly Attributes
+
+        /// <summary>
+        /// Gets the assembly attributes of the specified type <typeparamref name="T" />.
+        /// </summary>
+        /// <typeparam name="T">The attribute type.</typeparam>
+        /// <returns>
+        /// The assembly attributes of the specified type <typeparamref name="T" />.
+        /// </returns>
+        public IEnumerable<T> GetAssemblyAttributes<T>()
+            where T : Attribute
+        {
+            return AssembliesToScan.SelectMany(a => a.GetCustomAttributes<T>()).ToList();
+        }
+
+        /// <summary>
+        /// Gets all the assembly attributes.
+        /// </summary>
+        /// <returns>
+        /// All assembly attributes.
+        /// </returns>
+        public IEnumerable<Attribute> GetAssemblyAttributes()
+        {
+            return AssembliesToScan.SelectMany(a => a.GetCustomAttributes()).ToList();
+        }
+
+        /// <summary>
+        /// Gets the assembly attributes of the specified <paramref name="attributeTypes" />.
+        /// </summary>
+        /// <param name="attributeTypes">The attribute types.</param>
+        /// <returns>
+        /// The assembly attributes of the specified types.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">attributeTypes</exception>
+        public IEnumerable<Attribute> GetAssemblyAttributes(params Type[] attributeTypes)
+        {
+            if (attributeTypes == null) throw new ArgumentNullException(nameof(attributeTypes));
+
+            return AssembliesToScan.SelectMany(a => attributeTypes.SelectMany(at => a.GetCustomAttributes(at))).ToList();
+        }
+
+        #endregion
+
         #region Get Types
 
         /// <summary>
@@ -813,11 +857,44 @@ namespace Umbraco.Core.Composing
         }
 
         /// <summary>
-        /// Represents the error that occurs when a type was not found in the cache type
-        /// list with the specified TypeResolutionKind.
+        /// Represents the error that occurs when a type was not found in the cache type list with the specified TypeResolutionKind.
         /// </summary>
+        /// <seealso cref="System.Exception" />
+        [Serializable]
         internal class CachedTypeNotFoundInFileException : Exception
-        { }
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="CachedTypeNotFoundInFileException" /> class.
+            /// </summary>
+            public CachedTypeNotFoundInFileException()
+            { }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="CachedTypeNotFoundInFileException" /> class.
+            /// </summary>
+            /// <param name="message">The message that describes the error.</param>
+            public CachedTypeNotFoundInFileException(string message)
+                : base(message)
+            { }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="CachedTypeNotFoundInFileException" /> class.
+            /// </summary>
+            /// <param name="message">The error message that explains the reason for the exception.</param>
+            /// <param name="innerException">The exception that is the cause of the current exception, or a null reference (<see langword="Nothing" /> in Visual Basic) if no inner exception is specified.</param>
+            public CachedTypeNotFoundInFileException(string message, Exception innerException)
+                : base(message, innerException)
+            { }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="CachedTypeNotFoundInFileException" /> class.
+            /// </summary>
+            /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object data about the exception being thrown.</param>
+            /// <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual information about the source or destination.</param>
+            protected CachedTypeNotFoundInFileException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            { }
+        }
 
         #endregion
     }

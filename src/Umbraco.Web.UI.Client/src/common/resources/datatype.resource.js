@@ -389,7 +389,7 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     (umbRequestHelper.getApiUrl(
                         "dataTypeApiBaseUrl",
                         "PostRenameContainer",
-                        { id: id, name: name })),
+                        { id: id, name: encodeURIComponent(name) })),
                 "Failed to rename the folder with id " + id);
         }
     };
