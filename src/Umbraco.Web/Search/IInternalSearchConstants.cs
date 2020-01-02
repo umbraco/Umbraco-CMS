@@ -4,10 +4,10 @@ namespace Umbraco.Web.Search
 {
     public interface IInternalSearchConstants
     {
-        List<string> GetBackOfficeFields();
-        List<string> GetBackOfficeMembersFields();
-        
-        List<string> GetBackOfficeMediaFields();
-        List<string> GetBackOfficeDocumentFields();
+        IEnumerable<string> GetBackOfficeFields();
+        IEnumerable<string> GetBackOfficeMembersFields();
+
+        IEnumerable<string> GetBackOfficeMediaFields();
+        IEnumerable<string> GetBackOfficeDocumentFields();
     }
 }

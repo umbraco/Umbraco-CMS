@@ -6,25 +6,25 @@ namespace Umbraco.Web
 {
     public class InternalSearchConstants : IInternalSearchConstants
     {
-        private List<string> _backOfficeFields = new List<string> {"id", "__NodeId", "__Key"};
-        public List<string> GetBackOfficeFields()
+        private IReadOnlyList<string> _backOfficeFields = new List<string> {"id", "__NodeId", "__Key"};
+        public IEnumerable<string> GetBackOfficeFields()
         {
             return _backOfficeFields;
         }
 
 
-        private List<string> _backOfficeMembersFields = new List<string> {"email", "loginName"};
-        public List<string> GetBackOfficeMembersFields()
+        private IReadOnlyList<string> _backOfficeMembersFields = new List<string> {"email", "loginName"};
+        public IEnumerable<string> GetBackOfficeMembersFields()
         {
             return _backOfficeMembersFields;
         }
-        private List<string> _backOfficeMediaFields = new List<string> {UmbracoExamineIndex.UmbracoFileFieldName };
-        public List<string> GetBackOfficeMediaFields()
+        private IReadOnlyList<string> _backOfficeMediaFields = new List<string> {UmbracoExamineIndex.UmbracoFileFieldName };
+        public IEnumerable<string> GetBackOfficeMediaFields()
         {
             return _backOfficeMediaFields;
         }
-        private List<string> _backOfficeDocumentFields = new List<string> ();
-        public List<string> GetBackOfficeDocumentFields()
+        private IReadOnlyList<string> _backOfficeDocumentFields = new List<string> ();
+        public IEnumerable<string> GetBackOfficeDocumentFields()
         {
             return _backOfficeDocumentFields;
         }
