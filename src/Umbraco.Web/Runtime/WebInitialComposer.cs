@@ -95,7 +95,7 @@ namespace Umbraco.Web.Runtime
             // a way to inject the UmbracoContext - DO NOT register this as Lifetime.Request since LI will dispose the context
             // in it's own way but we don't want that to happen, we manage its lifetime ourselves.
             composition.Register(factory => factory.GetInstance<IUmbracoContextAccessor>().UmbracoContext);
-
+            composition.RegisterUnique<IInternalSearchConstants, InternalSearchConstants>();
             composition.Register<IPublishedContentQuery>(factory =>
             {
                 var umbCtx = factory.GetInstance<IUmbracoContextAccessor>();
