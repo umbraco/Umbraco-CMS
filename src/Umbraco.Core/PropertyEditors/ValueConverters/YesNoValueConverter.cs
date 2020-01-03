@@ -22,6 +22,12 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             // typically the converter does not need to handle anything else ("true"...)
             // however there are cases where the value passed to the converter could be a non-string object, e.g. int, bool
 
+            if (source == null)
+            {
+                // if source is null fall back to default-value of data type
+                source = propertyType?.DataType?.ConfigurationAs<dynamic>()?.Default;
+            }
+            
             if (source is string s)
             {
                 if (s.Length == 0 || s == "0")
