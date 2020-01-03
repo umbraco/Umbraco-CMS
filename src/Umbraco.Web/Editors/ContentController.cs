@@ -54,6 +54,7 @@ namespace Umbraco.Web.Editors
     {
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly Lazy<IDictionary<string, ILanguage>> _allLangs;
+        private readonly INotificationService _notificationService;
 
         public object Domains { get; private set; }
 
@@ -68,11 +69,13 @@ namespace Umbraco.Web.Editors
             IProfilingLogger logger,
             IRuntimeState runtimeState,
             UmbracoHelper umbracoHelper,
-            IShortStringHelper shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            INotificationService notificationService)
             : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _allLangs = new Lazy<IDictionary<string, ILanguage>>(() => Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
+            _notificationService = notificationService;
         }
 
         /// <summary>
@@ -2182,7 +2185,7 @@ namespace Umbraco.Web.Editors
             var content = Services.ContentService.GetById(contentId);
             if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
-            var userNotifications = Services.NotificationService.GetUserNotifications(Security.CurrentUser, content.Path).ToList();
+            var userNotifications = _notificationService.GetUserNotifications(Security.CurrentUser, content.Path).ToList();
 
             foreach (var a in Current.Actions.Where(x => x.ShowInNotifier))
             {
@@ -2204,7 +2207,7 @@ namespace Umbraco.Web.Editors
             var content = Services.ContentService.GetById(contentId);
             if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
-            Services.NotificationService.SetNotifications(Security.CurrentUser, content, notifyOptions);
+            _notificationService.SetNotifications(Security.CurrentUser, content, notifyOptions);
         }
 
         [HttpGet]

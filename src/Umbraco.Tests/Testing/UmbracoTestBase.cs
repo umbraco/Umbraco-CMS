@@ -112,6 +112,8 @@ namespace Umbraco.Tests.Testing
 
         protected ILogger Logger => Factory.GetInstance<ILogger>();
 
+        protected INotificationService NotificationService => Factory.GetInstance<INotificationService>();
+
         protected IIOHelper IOHelper { get; private set; }
         protected IDataTypeService DataTypeService => Factory.GetInstance<IDataTypeService>();
         protected IPasswordHasher PasswordHasher => Factory.GetInstance<IPasswordHasher>();
