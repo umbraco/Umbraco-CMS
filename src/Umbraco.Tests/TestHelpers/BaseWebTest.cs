@@ -24,6 +24,8 @@ namespace Umbraco.Tests.TestHelpers
     [Apartment(ApartmentState.STA)]
     public abstract class BaseWebTest : TestWithDatabaseBase
     {
+        private static IPublicAccessService _publicAccessService;
+
         protected override void Compose()
         {
             base.Compose();
@@ -45,6 +47,8 @@ namespace Umbraco.Tests.TestHelpers
             var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
             var type = new AutoPublishedContentType(0, "anything", new PublishedPropertyType[] { });
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => GetPublishedContentTypeByAlias(alias) ?? type;
+
+            _publicAccessService = PublicAccessService;
         }
 
         protected virtual PublishedContentType GetPublishedContentTypeByAlias(string alias) => null;
@@ -99,7 +103,8 @@ namespace Umbraco.Tests.TestHelpers
                 new TestLastChanceFinder(),
                 new TestVariationContextAccessor(),
                 container?.TryGetInstance<ServiceContext>() ?? ServiceContext.CreatePartial(),
-                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()),
+                _publicAccessService);
         }
     }
 }
