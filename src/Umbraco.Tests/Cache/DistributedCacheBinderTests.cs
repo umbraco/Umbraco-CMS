@@ -49,10 +49,10 @@ namespace Umbraco.Tests.Cache
                 //Permission.Deleted += PermissionDeleted;
                 //PermissionRepository<IContent>.AssignedPermissions += CacheRefresherEventHandler_AssignedPermissions;
 
-                new EventDefinition<IUserService, SaveEventArgs<IUser>>(null, serviceContext.UserService, new SaveEventArgs<IUser>(Enumerable.Empty<IUser>())),
-                new EventDefinition<IUserService, DeleteEventArgs<IUser>>(null, serviceContext.UserService, new DeleteEventArgs<IUser>(Enumerable.Empty<IUser>())),
-                new EventDefinition<IUserService, SaveEventArgs<UserGroupWithUsers>>(null, serviceContext.UserService, new SaveEventArgs<UserGroupWithUsers>(Enumerable.Empty<UserGroupWithUsers>())),
-                new EventDefinition<IUserService, DeleteEventArgs<IUserGroup>>(null, serviceContext.UserService, new DeleteEventArgs<IUserGroup>(Enumerable.Empty<IUserGroup>())),
+                new EventDefinition<IUserService, SaveEventArgs<IUser>>(null, UserService, new SaveEventArgs<IUser>(Enumerable.Empty<IUser>())),
+                new EventDefinition<IUserService, DeleteEventArgs<IUser>>(null, UserService, new DeleteEventArgs<IUser>(Enumerable.Empty<IUser>())),
+                new EventDefinition<IUserService, SaveEventArgs<UserGroupWithUsers>>(null, UserService, new SaveEventArgs<UserGroupWithUsers>(Enumerable.Empty<UserGroupWithUsers>())),
+                new EventDefinition<IUserService, DeleteEventArgs<IUserGroup>>(null, UserService, new DeleteEventArgs<IUserGroup>(Enumerable.Empty<IUserGroup>())),
 
                 new EventDefinition<ILocalizationService, SaveEventArgs<IDictionaryItem>>(null, serviceContext.LocalizationService, new SaveEventArgs<IDictionaryItem>(Enumerable.Empty<IDictionaryItem>())),
                 new EventDefinition<ILocalizationService, DeleteEventArgs<IDictionaryItem>>(null, serviceContext.LocalizationService, new DeleteEventArgs<IDictionaryItem>(Enumerable.Empty<IDictionaryItem>())),

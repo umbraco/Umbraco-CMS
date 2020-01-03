@@ -101,7 +101,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             _domainService = serviceContext.DomainService;
             _memberService = serviceContext.MemberService;
             _mediaService = serviceContext.MediaService;
-            _userService = serviceContext.UserService;
             _defaultCultureAccessor = defaultCultureAccessor;
 
             _requestCache = requestCache;

@@ -43,14 +43,16 @@ namespace Umbraco.Web.Editors
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
         private readonly IUmbracoVersion _umbracoVersion;
+        private readonly IUserService _userService;
 
-        public BackOfficeController(IManifestParser manifestParser, UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IUmbracoVersion umbracoVersion)
+        public BackOfficeController(IManifestParser manifestParser, UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IUmbracoVersion umbracoVersion, IUserService userService)
             : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger, umbracoHelper)
         {
             _manifestParser = manifestParser;
             _features = features;
             _runtimeState = runtimeState;
             _umbracoVersion = umbracoVersion;
+            _userService = userService;
         }
 
         protected BackOfficeSignInManager SignInManager => _signInManager ?? (_signInManager = OwinContext.GetBackOfficeSignInManager());
@@ -451,7 +453,7 @@ namespace Umbraco.Web.Editors
             else
             {
                 //Now we need to perform the auto-link, so first we need to lookup/create a user with the email address
-                var foundByEmail = Services.UserService.GetByEmail(loginInfo.Email);
+                var foundByEmail = _userService.GetByEmail(loginInfo.Email);
                 if (foundByEmail != null)
                 {
                     ViewData.SetExternalSignInError(new[] { "A user with this email address already exists locally. You will need to login locally to Umbraco and link this external provider: " + loginInfo.Login.LoginProvider });
@@ -461,7 +463,7 @@ namespace Umbraco.Web.Editors
                     if (loginInfo.Email.IsNullOrWhiteSpace()) throw new InvalidOperationException("The Email value cannot be null");
                     if (loginInfo.ExternalIdentity.Name.IsNullOrWhiteSpace()) throw new InvalidOperationException("The Name value cannot be null");
 
-                    var groups = Services.UserService.GetUserGroupsByAlias(autoLinkOptions.GetDefaultUserGroups(UmbracoContext, loginInfo));
+                    var groups = _userService.GetUserGroupsByAlias(autoLinkOptions.GetDefaultUserGroups(UmbracoContext, loginInfo));
 
                     var autoLinkUser = BackOfficeIdentityUser.CreateNew(
                         loginInfo.Email,

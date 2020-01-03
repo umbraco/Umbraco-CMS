@@ -63,7 +63,7 @@ namespace Umbraco.Tests.Web.Controllers
                 //setup some mocks
                 Umbraco.Core.Configuration.GlobalSettings.HasSmtpServer = true;
 
-                var userServiceMock = Mock.Get(Current.Services.UserService);
+                var userServiceMock = Mock.Get(UserService);
 
                 userServiceMock.Setup(service => service.Save(It.IsAny<IUser>(), It.IsAny<bool>()))
                     .Callback((IUser u, bool raiseEvents) =>
@@ -87,8 +87,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
                     Factory.GetInstance<IMediaFileSystem>(),
-                    ShortStringHelper
-                    );
+                    ShortStringHelper,
+                    UserService);
                 return usersController;
             }
 
@@ -154,7 +154,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
                     Factory.GetInstance<IMediaFileSystem>(),
-                    ShortStringHelper);
+                    ShortStringHelper,
+                    UserService);
                 return usersController;
             }
 
@@ -173,7 +174,7 @@ namespace Umbraco.Tests.Web.Controllers
             ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
             {
                 //setup some mocks
-                var userServiceMock = Mock.Get(Current.Services.UserService);
+                var userServiceMock = Mock.Get(UserService);
                 var users = MockedUser.CreateMulipleUsers(10);
                 long outVal = 10;
                 userServiceMock.Setup(service => service.GetAll(
@@ -191,7 +192,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
                     Factory.GetInstance<IMediaFileSystem>(),
-                    ShortStringHelper);
+                    ShortStringHelper,
+                    UserService);
                 return usersController;
             }
 
@@ -250,7 +252,7 @@ namespace Umbraco.Tests.Web.Controllers
             ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
             {
                 //setup some mocks
-                var userServiceMock = Mock.Get(Current.Services.UserService);
+                var userServiceMock = Mock.Get(UserService);
                 userServiceSetup(userServiceMock);
 
                 var usersController = new UsersController(
@@ -263,7 +265,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
                     Factory.GetInstance<IMediaFileSystem>(),
-                    ShortStringHelper);
+                    ShortStringHelper,
+                    UserService);
                 return usersController;
             }
 

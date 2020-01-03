@@ -61,7 +61,7 @@ namespace Umbraco.Tests.Web.Controllers
             ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
             {
                 //setup some mocks
-                var userServiceMock = Mock.Get(Current.Services.UserService);
+                var userServiceMock = Mock.Get(UserService);
                 userServiceMock.Setup(service => service.GetUserById(It.IsAny<int>()))
                     .Returns(() => null);
 
@@ -85,7 +85,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
-                    Factory.GetInstance<UmbracoMapper>());
+                    Factory.GetInstance<UmbracoMapper>(),
+                    UserService);
                 return usersController;
             }
 

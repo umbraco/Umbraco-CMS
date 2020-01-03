@@ -40,6 +40,7 @@ namespace Umbraco.Web.Trees
         private readonly UmbracoTreeSearcher _treeSearcher;
         private readonly ActionCollection _actions;
         private readonly IGlobalSettings _globalSettings;
+        private readonly IUserService _userService;
 
         protected override int RecycleBinId => Constants.System.RecycleBinContent;
 
@@ -50,11 +51,12 @@ namespace Umbraco.Web.Trees
         protected override int[] UserStartNodes
             => _userStartNodes ?? (_userStartNodes = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService));
 
-        public ContentTreeController(UmbracoTreeSearcher treeSearcher, ActionCollection actions, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        public ContentTreeController(UmbracoTreeSearcher treeSearcher, ActionCollection actions, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IUserService userService) : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, userService)
         {
             _treeSearcher = treeSearcher;
             _actions = actions;
             _globalSettings = globalSettings;
+            _userService = userService;
         }
 
         /// <inheritdoc />
@@ -131,7 +133,7 @@ namespace Umbraco.Web.Trees
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
                 // we need to get the default permissions as you can't set permissions on the very root node
-                var permission = Services.UserService.GetPermissions(Security.CurrentUser, Constants.System.Root).First();
+                var permission = _userService.GetPermissions(Security.CurrentUser, Constants.System.Root).First();
                 var nodeActions = _actions.FromEntityPermission(permission)
                     .Select(x => new MenuItem(x));
 

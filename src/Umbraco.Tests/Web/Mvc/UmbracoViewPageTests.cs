@@ -440,7 +440,7 @@ namespace Umbraco.Tests.Web.Mvc
             var ctx = new UmbracoContext(
                 http,
                 _service,
-                new WebSecurity(http, Current.Services.UserService, globalSettings),
+                new WebSecurity(http, UserService, globalSettings),
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
                 Enumerable.Empty<IMediaUrlProvider>(),

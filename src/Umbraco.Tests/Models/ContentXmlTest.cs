@@ -48,8 +48,8 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(content.Path, (string)element.Attribute("path"));
             Assert.AreEqual("", (string)element.Attribute("isDoc"));
             Assert.AreEqual(content.ContentType.Id.ToString(), (string)element.Attribute("nodeType"));
-            Assert.AreEqual(content.GetCreatorProfile(ServiceContext.UserService).Name, (string)element.Attribute("creatorName"));
-            Assert.AreEqual(content.GetWriterProfile(ServiceContext.UserService).Name, (string)element.Attribute("writerName"));
+            Assert.AreEqual(content.GetCreatorProfile(UserService).Name, (string)element.Attribute("creatorName"));
+            Assert.AreEqual(content.GetWriterProfile(UserService).Name, (string)element.Attribute("writerName"));
             Assert.AreEqual(content.WriterId.ToString(), (string)element.Attribute("writerID"));
             Assert.AreEqual(content.TemplateId.ToString(), (string)element.Attribute("template"));
 

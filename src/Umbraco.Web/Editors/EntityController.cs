@@ -53,6 +53,7 @@ namespace Umbraco.Web.Editors
         private readonly UmbracoTreeSearcher _treeSearcher;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly SearchableTreeCollection _searchableTreeCollection;
+        private readonly IUserService _userService;
 
         public EntityController(
             IGlobalSettings globalSettings,
@@ -66,13 +67,15 @@ namespace Umbraco.Web.Editors
             UmbracoHelper umbracoHelper,
             SearchableTreeCollection searchableTreeCollection,
             UmbracoTreeSearcher treeSearcher,
-            IShortStringHelper shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IUserService userService)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _treeService = treeService;
             _searchableTreeCollection = searchableTreeCollection;
             _treeSearcher = treeSearcher;
             _shortStringHelper = shortStringHelper;
+            _userService = userService;
         }
 
         /// <summary>
@@ -1063,7 +1066,7 @@ namespace Umbraco.Web.Editors
 
                 case UmbracoEntityTypes.User:
 
-                    var users = Services.UserService.GetAll(0, int.MaxValue, out _);
+                    var users = _userService.GetAll(0, int.MaxValue, out _);
                     var filteredUsers = ExecutePostFilter(users, postFilter);
                     return Mapper.MapEnumerable<IUser, EntityBasic>(filteredUsers);
 

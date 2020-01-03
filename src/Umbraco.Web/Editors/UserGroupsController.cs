@@ -23,6 +23,13 @@ namespace Umbraco.Web.Editors
     [PrefixlessBodyModelValidator]
     public class UserGroupsController : UmbracoAuthorizedJsonController
     {
+        private readonly IUserService _userService;
+
+        public UserGroupsController(IUserService userService)
+        {
+            _userService = userService;
+        }
+
         [UserGroupValidate]
         public UserGroupDisplay PostSaveUserGroup(UserGroupSave userGroupSave)
         {
@@ -30,7 +37,7 @@ namespace Umbraco.Web.Editors
 
             //authorize that the user has access to save this user group
             var authHelper = new UserGroupEditorAuthorizationHelper(
-                Services.UserService, Services.ContentService, Services.MediaService, Services.EntityService);
+                _userService, Services.ContentService, Services.MediaService, Services.EntityService);
 
             var isAuthorized = authHelper.AuthorizeGroupAccess(Security.CurrentUser, userGroupSave.Alias);
             if (isAuthorized == false)
@@ -56,23 +63,23 @@ namespace Umbraco.Web.Editors
             EnsureNonAdminUserIsInSavedUserGroup(userGroupSave);
 
             //save the group
-            Services.UserService.Save(userGroupSave.PersistedUserGroup, userGroupSave.Users.ToArray());
+            _userService.Save(userGroupSave.PersistedUserGroup, userGroupSave.Users.ToArray());
 
             //deal with permissions
 
             //remove ones that have been removed
-            var existing = Services.UserService.GetPermissions(userGroupSave.PersistedUserGroup, true)
+            var existing = _userService.GetPermissions(userGroupSave.PersistedUserGroup, true)
                 .ToDictionary(x => x.EntityId, x => x);
             var toRemove = existing.Keys.Except(userGroupSave.AssignedPermissions.Select(x => x.Key));
             foreach (var contentId in toRemove)
             {
-                Services.UserService.RemoveUserGroupPermissions(userGroupSave.PersistedUserGroup.Id, contentId);
+                _userService.RemoveUserGroupPermissions(userGroupSave.PersistedUserGroup.Id, contentId);
             }
 
             //update existing
             foreach (var assignedPermission in userGroupSave.AssignedPermissions)
             {
-                Services.UserService.ReplaceUserGroupPermissions(
+                _userService.ReplaceUserGroupPermissions(
                     userGroupSave.PersistedUserGroup.Id,
                     assignedPermission.Value.Select(x => x[0]),
                     assignedPermission.Key);
@@ -116,7 +123,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public IEnumerable<UserGroupBasic> GetUserGroups(bool onlyCurrentUserGroups = true)
         {
-            var allGroups = Mapper.MapEnumerable<IUserGroup, UserGroupBasic>(Services.UserService.GetAllUserGroups())
+            var allGroups = Mapper.MapEnumerable<IUserGroup, UserGroupBasic>(_userService.GetAllUserGroups())
                 .ToList();
 
             var isAdmin = Security.CurrentUser.IsAdmin();
@@ -141,7 +148,7 @@ namespace Umbraco.Web.Editors
         [UserGroupAuthorization("id")]
         public UserGroupDisplay GetUserGroup(int id)
         {
-            var found = Services.UserService.GetUserGroupById(id);
+            var found = _userService.GetUserGroupById(id);
             if (found == null)
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
@@ -155,13 +162,13 @@ namespace Umbraco.Web.Editors
         [UserGroupAuthorization("userGroupIds")]
         public HttpResponseMessage PostDeleteUserGroups([FromUri] int[] userGroupIds)
         {
-            var userGroups = Services.UserService.GetAllUserGroups(userGroupIds)
+            var userGroups = _userService.GetAllUserGroups(userGroupIds)
                 //never delete the admin group, sensitive data or translators group
                 .Where(x => !x.IsSystemUserGroup())
                 .ToArray();
             foreach (var userGroup in userGroups)
             {
-                Services.UserService.DeleteUserGroup(userGroup);
+                _userService.DeleteUserGroup(userGroup);
             }
             if (userGroups.Length > 1)
                 return Request.CreateNotificationSuccessResponse(

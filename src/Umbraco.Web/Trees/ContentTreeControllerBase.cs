@@ -26,9 +26,11 @@ namespace Umbraco.Web.Trees
 {
     public abstract class ContentTreeControllerBase : TreeController
     {
+        private readonly IUserService _userService;
 
-        protected ContentTreeControllerBase(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        protected ContentTreeControllerBase(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IUserService userService) : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
+            _userService = userService;
         }
 
         protected ContentTreeControllerBase()
@@ -403,7 +405,7 @@ namespace Umbraco.Web.Trees
                 var deleteAction = Current.Actions.FirstOrDefault(y => y.Letter == ActionDelete.ActionLetter);
                 if (deleteAction != null)
                 {
-                    var perms = Security.CurrentUser.GetPermissions(Constants.System.RecycleBinContentString, Services.UserService);
+                    var perms = Security.CurrentUser.GetPermissions(Constants.System.RecycleBinContentString, _userService);
                     deleteAllowed = perms.FirstOrDefault(x => x.Contains(deleteAction.Letter)) != null;
                 }
 
@@ -454,7 +456,7 @@ namespace Umbraco.Web.Trees
 
         internal IEnumerable<MenuItem> GetAllowedUserMenuItemsForNode(IUmbracoEntity dd)
         {
-            var permission = Services.UserService.GetPermissions(Security.CurrentUser, dd.Path);
+            var permission = _userService.GetPermissions(Security.CurrentUser, dd.Path);
             return Current.Actions.FromEntityPermission(permission).Select(x => new MenuItem(x));
         }
 
@@ -538,7 +540,6 @@ namespace Umbraco.Web.Trees
         }
 
         private readonly ConcurrentDictionary<string, IEntitySlim> _entityCache = new ConcurrentDictionary<string, IEntitySlim>();
-
         private bool? _ignoreUserStartNodes;
 
 

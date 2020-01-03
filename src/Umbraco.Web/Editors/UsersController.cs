@@ -44,6 +44,7 @@ namespace Umbraco.Web.Editors
     {
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IUserService _userService;
 
         public UsersController(
             IGlobalSettings globalSettings,
@@ -55,11 +56,13 @@ namespace Umbraco.Web.Editors
             IRuntimeState runtimeState,
             UmbracoHelper umbracoHelper,
             IMediaFileSystem mediaFileSystem,
-            IShortStringHelper shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IUserService userService)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _mediaFileSystem = mediaFileSystem;
             _shortStringHelper = shortStringHelper;
+            _userService = userService;
         }
 
         /// <summary>
@@ -80,7 +83,7 @@ namespace Umbraco.Web.Editors
         [AdminUsersAuthorize]
         public async Task<HttpResponseMessage> PostSetAvatar(int id)
         {
-            return await PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache, _mediaFileSystem, _shortStringHelper, id);
+            return await PostSetAvatarInternal(Request, _userService, AppCaches.RuntimeCache, _mediaFileSystem, _shortStringHelper, id);
         }
 
         internal static async Task<HttpResponseMessage> PostSetAvatarInternal(HttpRequestMessage request, IUserService userService, IAppCache cache, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, int id)
@@ -144,7 +147,7 @@ namespace Umbraco.Web.Editors
         [AdminUsersAuthorize]
         public HttpResponseMessage PostClearAvatar(int id)
         {
-            var found = Services.UserService.GetUserById(id);
+            var found = _userService.GetUserById(id);
             if (found == null)
                 return Request.CreateResponse(HttpStatusCode.NotFound);
 
@@ -163,7 +166,7 @@ namespace Umbraco.Web.Editors
                 found.Avatar = "none";
             }
 
-            Services.UserService.Save(found);
+            _userService.Save(found);
 
             if (filePath.IsNullOrWhiteSpace() == false)
             {
@@ -183,7 +186,7 @@ namespace Umbraco.Web.Editors
         [AdminUsersAuthorize]
         public UserDisplay GetById(int id)
         {
-            var user = Services.UserService.GetUserById(id);
+            var user = _userService.GetUserById(id);
             if (user == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -250,12 +253,12 @@ namespace Umbraco.Web.Editors
 
             long pageIndex = pageNumber - 1;
             long total;
-            var result = Services.UserService.GetAll(pageIndex, pageSize, out total, orderBy, orderDirection, userStates, userGroups, excludeUserGroups, filterQuery);
+            var result = _userService.GetAll(pageIndex, pageSize, out total, orderBy, orderDirection, userStates, userGroups, excludeUserGroups, filterQuery);
 
             var paged = new PagedUserResult(total, pageNumber, pageSize)
             {
                 Items = Mapper.MapEnumerable<IUser, UserBasic>(result),
-                UserStates = Services.UserService.GetUserStates()
+                UserStates = _userService.GetUserStates()
             };
 
             return paged;
@@ -288,7 +291,7 @@ namespace Umbraco.Web.Editors
             CheckUniqueEmail(userSave.Email, null);
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
-            var authHelper = new UserEditorAuthorizationHelper(Services.ContentService, Services.MediaService, Services.UserService, Services.EntityService);
+            var authHelper = new UserEditorAuthorizationHelper(Services.ContentService, Services.MediaService, _userService, Services.EntityService);
             var canSaveUser = authHelper.IsAuthorized(Security.CurrentUser, null, null, null, userSave.UserGroups);
             if (canSaveUser == false)
             {
@@ -325,7 +328,7 @@ namespace Umbraco.Web.Editors
             }
 
             //now re-look the user back up which will now exist
-            var user = Services.UserService.GetByEmail(userSave.Email);
+            var user = _userService.GetByEmail(userSave.Email);
 
             //map the save info over onto the user
             user = Mapper.Map(userSave, user);
@@ -333,7 +336,7 @@ namespace Umbraco.Web.Editors
             //since the back office user is creating this user, they will be set to approved
             user.IsApproved = true;
 
-            Services.UserService.Save(user);
+            _userService.Save(user);
 
             var display = Mapper.Map<UserDisplay>(user);
             display.ResetPasswordValue = resetPassword;
@@ -380,7 +383,7 @@ namespace Umbraco.Web.Editors
             user = CheckUniqueEmail(userSave.Email, u => u.LastLoginDate != default(DateTime) || u.EmailConfirmedDate.HasValue);
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
-            var authHelper = new UserEditorAuthorizationHelper(Services.ContentService, Services.MediaService, Services.UserService, Services.EntityService);
+            var authHelper = new UserEditorAuthorizationHelper(Services.ContentService, Services.MediaService, _userService, Services.EntityService);
             var canSaveUser = authHelper.IsAuthorized(Security.CurrentUser, user, null, null, userSave.UserGroups);
             if (canSaveUser == false)
             {
@@ -402,7 +405,7 @@ namespace Umbraco.Web.Editors
                 }
 
                 //now re-look the user back up
-                user = Services.UserService.GetByEmail(userSave.Email);
+                user = _userService.GetByEmail(userSave.Email);
             }
 
             //map the save info over onto the user
@@ -412,7 +415,7 @@ namespace Umbraco.Web.Editors
             user.InvitedDate = DateTime.Now;
 
             //Save the updated user
-            Services.UserService.Save(user);
+            _userService.Save(user);
             var display = Mapper.Map<UserDisplay>(user);
 
             //send the email
@@ -426,7 +429,7 @@ namespace Umbraco.Web.Editors
 
         private IUser CheckUniqueEmail(string email, Func<IUser, bool> extraCheck)
         {
-            var user = Services.UserService.GetByEmail(email);
+            var user = _userService.GetByEmail(email);
             if (user != null && (extraCheck == null || extraCheck(user)))
             {
                 ModelState.AddModelError("Email", "A user with the email already exists");
@@ -437,7 +440,7 @@ namespace Umbraco.Web.Editors
 
         private IUser CheckUniqueUsername(string username, Func<IUser, bool> extraCheck)
         {
-            var user = Services.UserService.GetByUsername(username);
+            var user = _userService.GetByUsername(username);
             if (user != null && (extraCheck == null || extraCheck(user)))
             {
                 ModelState.AddModelError(
@@ -518,12 +521,12 @@ namespace Umbraco.Web.Editors
             if (intId.Success == false)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            var found = Services.UserService.GetUserById(intId.Result);
+            var found = _userService.GetUserById(intId.Result);
             if (found == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
-            var authHelper = new UserEditorAuthorizationHelper(Services.ContentService, Services.MediaService, Services.UserService, Services.EntityService);
+            var authHelper = new UserEditorAuthorizationHelper(Services.ContentService, Services.MediaService, _userService, Services.EntityService);
             var canSaveUser = authHelper.IsAuthorized(Security.CurrentUser, found, userSave.StartContentIds, userSave.StartMediaIds, userSave.UserGroups);
             if (canSaveUser == false)
             {
@@ -532,13 +535,13 @@ namespace Umbraco.Web.Editors
 
             var hasErrors = false;
 
-            var existing = Services.UserService.GetByEmail(userSave.Email);
+            var existing = _userService.GetByEmail(userSave.Email);
             if (existing != null && existing.Id != userSave.Id)
             {
                 ModelState.AddModelError("Email", "A user with the email already exists");
                 hasErrors = true;
             }
-            existing = Services.UserService.GetByUsername(userSave.Username);
+            existing = _userService.GetByUsername(userSave.Username);
             if (existing != null && existing.Id != userSave.Id)
             {
                 ModelState.AddModelError("Username", "A user with the username already exists");
@@ -546,13 +549,13 @@ namespace Umbraco.Web.Editors
             }
             // going forward we prefer to align usernames with email, so we should cross-check to make sure
             // the email or username isn't somehow being used by anyone.
-            existing = Services.UserService.GetByEmail(userSave.Username);
+            existing = _userService.GetByEmail(userSave.Username);
             if (existing != null && existing.Id != userSave.Id)
             {
                 ModelState.AddModelError("Username", "A user using this as their email already exists");
                 hasErrors = true;
             }
-            existing = Services.UserService.GetByUsername(userSave.Email);
+            existing = _userService.GetByUsername(userSave.Email);
             if (existing != null && existing.Id != userSave.Id)
             {
                 ModelState.AddModelError("Email", "A user using this as their username already exists");
@@ -575,7 +578,7 @@ namespace Umbraco.Web.Editors
                 if (passwordChangeResult.Success)
                 {
                     //need to re-get the user
-                    found = Services.UserService.GetUserById(intId.Result);
+                    found = _userService.GetUserById(intId.Result);
                 }
                 else
                 {
@@ -594,7 +597,7 @@ namespace Umbraco.Web.Editors
             //merge the save data onto the user
             var user = Mapper.Map(userSave, found);
 
-            Services.UserService.Save(user);
+            _userService.Save(user);
 
             var display = Mapper.Map<UserDisplay>(user);
 
@@ -616,13 +619,13 @@ namespace Umbraco.Web.Editors
                     Request.CreateNotificationValidationErrorResponse("The current user cannot disable itself"));
             }
 
-            var users = Services.UserService.GetUsersById(userIds).ToArray();
+            var users = _userService.GetUsersById(userIds).ToArray();
             foreach (var u in users)
             {
                 u.IsApproved = false;
                 u.InvitedDate = null;
             }
-            Services.UserService.Save(users);
+            _userService.Save(users);
 
             if (users.Length > 1)
             {
@@ -641,12 +644,12 @@ namespace Umbraco.Web.Editors
         [AdminUsersAuthorize("userIds")]
         public HttpResponseMessage PostEnableUsers([FromUri]int[] userIds)
         {
-            var users = Services.UserService.GetUsersById(userIds).ToArray();
+            var users = _userService.GetUsersById(userIds).ToArray();
             foreach (var u in users)
             {
                 u.IsApproved = true;
             }
-            Services.UserService.Save(users);
+            _userService.Save(users);
 
             if (users.Length > 1)
             {
@@ -698,8 +701,8 @@ namespace Umbraco.Web.Editors
         [AdminUsersAuthorize("userIds")]
         public HttpResponseMessage PostSetUserGroupsOnUsers([FromUri]string[] userGroupAliases, [FromUri]int[] userIds)
         {
-            var users = Services.UserService.GetUsersById(userIds).ToArray();
-            var userGroups = Services.UserService.GetUserGroupsByAlias(userGroupAliases).Select(x => x.ToReadOnlyGroup()).ToArray();
+            var users = _userService.GetUsersById(userIds).ToArray();
+            var userGroups = _userService.GetUserGroupsByAlias(userGroupAliases).Select(x => x.ToReadOnlyGroup()).ToArray();
             foreach (var u in users)
             {
                 u.ClearGroups();
@@ -708,7 +711,7 @@ namespace Umbraco.Web.Editors
                     u.AddGroup(userGroup);
                 }
             }
-            Services.UserService.Save(users);
+            _userService.Save(users);
             return Request.CreateNotificationSuccessResponse(
                 Services.TextService.Localize("speechBubbles/setUserGroupOnUsersSuccess"));
         }
@@ -724,7 +727,7 @@ namespace Umbraco.Web.Editors
         [AdminUsersAuthorize]
         public HttpResponseMessage PostDeleteNonLoggedInUser(int id)
         {
-            var user = Services.UserService.GetUserById(id);
+            var user = _userService.GetUserById(id);
             if (user == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -738,7 +741,7 @@ namespace Umbraco.Web.Editors
             }
 
             var userName = user.Name;
-            Services.UserService.Delete(user, true);
+            _userService.Delete(user, true);
 
             return Request.CreateNotificationSuccessResponse(
                 Services.TextService.Localize("speechBubbles/deleteUserSuccess", new[] { userName }));

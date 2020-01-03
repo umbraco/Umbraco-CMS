@@ -42,11 +42,13 @@ namespace Umbraco.Web.Editors
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
         private readonly IUserPasswordConfiguration _passwordConfiguration;
+        private readonly IUserService _userService;
 
-        public AuthenticationController(IUserPasswordConfiguration passwordConfiguration, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, UmbracoMapper umbracoMapper)
+        public AuthenticationController(IUserPasswordConfiguration passwordConfiguration, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, UmbracoMapper umbracoMapper, IUserService userService)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper)
         {
             _passwordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
+            _userService = userService;
         }
 
         protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager => _userManager
@@ -101,7 +103,7 @@ namespace Umbraco.Web.Editors
 
             await SignInManager.SignInAsync(identityUser, false, false);
 
-            var user = Services.UserService.GetUserById(id);
+            var user = _userService.GetUserById(id);
 
             return Mapper.Map<UserDisplay>(user);
         }
@@ -228,7 +230,7 @@ namespace Umbraco.Web.Editors
                 case SignInStatus.Success:
 
                     // get the user
-                    var user = Services.UserService.GetByUsername(loginModel.Username);
+                    var user = _userService.GetByUsername(loginModel.Username);
                     UserManager.RaiseLoginSuccessEvent(user.Id);
 
                     return SetPrincipalAndReturnUserDetail(user, owinContext.Request.User);
@@ -256,7 +258,7 @@ namespace Umbraco.Web.Editors
                                 typeof(IUmbracoBackOfficeTwoFactorOptions) + ".GetTwoFactorView returned an empty string"));
                     }
 
-                    var attemptedUser = Services.UserService.GetByUsername(loginModel.Username);
+                    var attemptedUser = _userService.GetByUsername(loginModel.Username);
 
                     // create a with information to display a custom two factor send code view
                     var verifyResponse = Request.CreateResponse(HttpStatusCode.PaymentRequired, new
@@ -297,7 +299,7 @@ namespace Umbraco.Web.Editors
             var identityUser = await SignInManager.UserManager.FindByEmailAsync(model.Email);
             if (identityUser != null)
             {
-                var user = Services.UserService.GetByEmail(model.Email);
+                var user = _userService.GetByEmail(model.Email);
                 if (user != null)
                 {
                     var code = await UserManager.GeneratePasswordResetTokenAsync(identityUser.Id);
@@ -377,7 +379,7 @@ namespace Umbraco.Web.Editors
             var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent: true, rememberBrowser: false);
             var owinContext = TryGetOwinContext().Result;
 
-            var user = Services.UserService.GetByUsername(userName);
+            var user = _userService.GetByUsername(userName);
             switch (result)
             {
                 case SignInStatus.Success:
@@ -439,13 +441,13 @@ namespace Umbraco.Web.Editors
                 */
                 if (identityUser != null && !identityUser.IsApproved)
                 {
-                    var user = Services.UserService.GetByUsername(identityUser.UserName);
+                    var user = _userService.GetByUsername(identityUser.UserName);
                     // also check InvitedDate and never logged in, otherwise this would allow a disabled user to reactivate their account with a forgot password
                     if (user.LastLoginDate == default && user.InvitedDate != null)
                     {
                         user.IsApproved = true;
                         user.InvitedDate = null;
-                        Services.UserService.Save(user);
+                        _userService.Save(user);
                     }
                 }
 

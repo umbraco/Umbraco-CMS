@@ -32,6 +32,7 @@ namespace Umbraco.Web.Editors
     {
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IUserService _userService;
 
         public CurrentUserController(
             IGlobalSettings globalSettings,
@@ -43,11 +44,13 @@ namespace Umbraco.Web.Editors
             IRuntimeState runtimeState,
             UmbracoHelper umbracoHelper,
             IMediaFileSystem mediaFileSystem,
-            IShortStringHelper shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IUserService userService)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _mediaFileSystem = mediaFileSystem;
             _shortStringHelper = shortStringHelper;
+            _userService = userService;
         }
 
         /// <summary>
@@ -58,7 +61,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public Dictionary<int, string[]> GetPermissions(int[] nodeIds)
         {
-            var permissions = Services.UserService
+            var permissions = _userService
                 .GetPermissions(Security.CurrentUser, nodeIds);
 
             var permissionsDictionary = new Dictionary<int, string[]>();
@@ -80,7 +83,7 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public bool HasPermission(string permissionToCheck, int nodeId)
         {
-            var p = Services.UserService.GetPermissions(Security.CurrentUser, nodeId).GetAllPermissions();
+            var p = _userService.GetPermissions(Security.CurrentUser, nodeId).GetAllPermissions();
             if (p.Contains(permissionToCheck.ToString(CultureInfo.InvariantCulture)))
             {
                 return true;
@@ -103,7 +106,7 @@ namespace Umbraco.Web.Editors
             {
                 userTours = new List<UserTourStatus> { status };
                 Security.CurrentUser.TourData = JsonConvert.SerializeObject(userTours);
-                Services.UserService.Save(Security.CurrentUser);
+                _userService.Save(Security.CurrentUser);
                 return userTours;
             }
 
@@ -116,7 +119,7 @@ namespace Umbraco.Web.Editors
             }
             userTours.Add(status);
             Security.CurrentUser.TourData = JsonConvert.SerializeObject(userTours);
-            Services.UserService.Save(Security.CurrentUser);
+            _userService.Save(Security.CurrentUser);
             return userTours;
         }
 
@@ -163,7 +166,7 @@ namespace Umbraco.Web.Editors
             Security.CurrentUser.IsApproved = true;
             //They've successfully set their password, and will now get fully logged into the back office, so the lastlogindate is set so the backoffice shows they have logged in
             Security.CurrentUser.LastLoginDate = DateTime.UtcNow;
-            Services.UserService.Save(Security.CurrentUser);
+            _userService.Save(Security.CurrentUser);
 
             //now we can return their full object since they are now really logged into the back office
             var userDisplay = Mapper.Map<UserDetail>(Security.CurrentUser);
@@ -181,7 +184,7 @@ namespace Umbraco.Web.Editors
         public async Task<HttpResponseMessage> PostSetAvatar()
         {
             //borrow the logic from the user controller
-            return await UsersController.PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache,  _mediaFileSystem, _shortStringHelper, Security.GetUserId().ResultOr(0));
+            return await UsersController.PostSetAvatarInternal(Request, _userService, AppCaches.RuntimeCache,  _mediaFileSystem, _shortStringHelper, Security.GetUserId().ResultOr(0));
         }
 
         /// <summary>

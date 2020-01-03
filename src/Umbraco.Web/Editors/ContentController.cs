@@ -54,6 +54,7 @@ namespace Umbraco.Web.Editors
     {
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly Lazy<IDictionary<string, ILanguage>> _allLangs;
+        private readonly IUserService _userService;
 
         public object Domains { get; private set; }
 
@@ -68,11 +69,13 @@ namespace Umbraco.Web.Editors
             IProfilingLogger logger,
             IRuntimeState runtimeState,
             UmbracoHelper umbracoHelper,
-            IShortStringHelper shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IUserService userService)
             : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _allLangs = new Lazy<IDictionary<string, ILanguage>>(() => Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
+            _userService = userService;
         }
 
         /// <summary>
@@ -135,7 +138,7 @@ namespace Umbraco.Web.Editors
             var contentPermissions = Services.ContentService.GetPermissions(content)
                 .ToDictionary(x => x.UserGroupId, x => x);
 
-            var allUserGroups = Services.UserService.GetAllUserGroups().ToArray();
+            var allUserGroups = _userService.GetAllUserGroups().ToArray();
 
             //loop through each user group
             foreach (var userGroup in allUserGroups)
@@ -151,7 +154,7 @@ namespace Umbraco.Web.Editors
                     //for this group/node which will go back to the defaults
                     if (groupPermissionCodes.Length == 0)
                     {
-                        Services.UserService.RemoveUserGroupPermissions(userGroup.Id, content.Id);
+                        _userService.RemoveUserGroupPermissions(userGroup.Id, content.Id);
                     }
                     //check if they are the defaults, if so we should just remove them if they exist since it's more overhead having them stored
                     else if (userGroup.Permissions.UnsortedSequenceEqual(groupPermissionCodes))
@@ -160,14 +163,14 @@ namespace Umbraco.Web.Editors
                         if (contentPermissions.ContainsKey(userGroup.Id))
                         {
                             //remove these permissions from this node for this group since the ones being assigned are the same as the defaults
-                            Services.UserService.RemoveUserGroupPermissions(userGroup.Id, content.Id);
+                            _userService.RemoveUserGroupPermissions(userGroup.Id, content.Id);
                         }
                     }
                     //if they are different we need to update, otherwise there's nothing to update
                     else if (contentPermissions.ContainsKey(userGroup.Id) == false || contentPermissions[userGroup.Id].AssignedPermissions.UnsortedSequenceEqual(groupPermissionCodes) == false)
                     {
 
-                        Services.UserService.ReplaceUserGroupPermissions(userGroup.Id, groupPermissionCodes.Select(x => x[0]), content.Id);
+                        _userService.ReplaceUserGroupPermissions(userGroup.Id, groupPermissionCodes.Select(x => x[0]), content.Id);
                     }
                 }
             }
@@ -192,7 +195,7 @@ namespace Umbraco.Web.Editors
 
             // TODO: Should non-admins be able to see detailed permissions?
 
-            var allUserGroups = Services.UserService.GetAllUserGroups();
+            var allUserGroups = _userService.GetAllUserGroups();
 
             return GetDetailedPermissions(content, allUserGroups);
         }
@@ -1138,7 +1141,7 @@ namespace Umbraco.Web.Editors
                     //if this item's path has already been denied or if the user doesn't have access to it, add to the deny list
                     if (denied.Any(x => c.Path.StartsWith($"{x.Path},"))
                         || (ContentPermissionsHelper.CheckPermissions(c,
-                            Security.CurrentUser, Services.UserService, Services.EntityService,
+                            Security.CurrentUser, _userService, Services.EntityService,
                             ActionPublish.ActionLetter) == ContentPermissionsHelper.ContentAccess.Denied))
                     {
                         denied.Add(c);
@@ -1690,7 +1693,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(response);
             }
 
-            var permission = Services.UserService.GetPermissions(Security.CurrentUser, node.Path);
+            var permission = _userService.GetPermissions(Security.CurrentUser, node.Path);
 
             if (permission.AssignedPermissions.Contains(ActionAssignDomain.ActionLetter.ToString(), StringComparer.Ordinal) == false)
             {
@@ -2239,7 +2242,7 @@ namespace Umbraco.Web.Editors
                 writerIds.Add(version.WriterId);
             }
 
-            var users = Services.UserService
+            var users = _userService
                 .GetUsersById(writerIds.ToArray())
                 .ToDictionary(x => x.Id, x => x.Name);
 

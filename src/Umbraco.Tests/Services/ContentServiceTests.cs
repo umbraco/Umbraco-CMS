@@ -514,7 +514,7 @@ namespace Umbraco.Tests.Services
                     Username = "test",
                 RawPasswordValue = "test"
                 };
-            ServiceContext.UserService.Save(user);
+            UserService.Save(user);
             var content = new Content("Test", Constants.System.Root, ServiceContext.ContentTypeService.Get("umbTextpage"));
 
             // Act
@@ -1681,7 +1681,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var userGroup = MockedUserGroup.CreateUserGroup("1");
-            ServiceContext.UserService.Save(userGroup);
+            UserService.Save(userGroup);
 
             var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
             contentType.AllowedContentTypes = new List<ContentTypeSort>
@@ -1706,7 +1706,7 @@ namespace Umbraco.Tests.Services
             var copy = ServiceContext.ContentService.Copy(childPage, parentPage2.Id, false, true);
 
             //get the permissions and verify
-            var permissions = ServiceContext.UserService.GetPermissionsForPath(userGroup, copy.Path, fallbackToDefaultPermissions: true);
+            var permissions = UserService.GetPermissionsForPath(userGroup, copy.Path, fallbackToDefaultPermissions: true);
             var allPermissions = permissions.GetAllPermissions().ToArray();
             Assert.AreEqual(1, allPermissions.Length);
             Assert.AreEqual("A", allPermissions[0]);
@@ -1717,7 +1717,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var userGroup = MockedUserGroup.CreateUserGroup("1");
-            ServiceContext.UserService.Save(userGroup);
+            UserService.Save(userGroup);
 
             var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
             contentType.AllowedContentTypes = new List<ContentTypeSort>
@@ -1749,7 +1749,7 @@ namespace Umbraco.Tests.Services
 
             foreach (var descendant in descendants)
             {
-                var permissions = ServiceContext.UserService.GetPermissionsForPath(userGroup, descendant.Path, fallbackToDefaultPermissions: true);
+                var permissions = UserService.GetPermissionsForPath(userGroup, descendant.Path, fallbackToDefaultPermissions: true);
                 var allPermissions = permissions.GetAllPermissions().ToArray();
                 Assert.AreEqual(1, allPermissions.Length);
                 Assert.AreEqual("A", allPermissions[0]);
@@ -1771,7 +1771,7 @@ namespace Umbraco.Tests.Services
 
             foreach (var descendant in descendants)
             {
-                var permissions = ServiceContext.UserService.GetPermissionsForPath(userGroup, descendant.Path, fallbackToDefaultPermissions: true);
+                var permissions = UserService.GetPermissionsForPath(userGroup, descendant.Path, fallbackToDefaultPermissions: true);
                 var allPermissions = permissions.GetAllPermissions().ToArray();
                 Assert.AreEqual(1, allPermissions.Length);
                 Assert.AreEqual("B", allPermissions[0]);
@@ -1811,13 +1811,13 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentService.Save(content2, Constants.Security.SuperUserId);
             Assert.IsTrue(ServiceContext.ContentService.SaveAndPublish(content2, userId: 0).Success);
 
-            var editorGroup = ServiceContext.UserService.GetUserGroupByAlias("editor");
+            var editorGroup = UserService.GetUserGroupByAlias("editor");
             editorGroup.StartContentId = content1.Id;
-            ServiceContext.UserService.Save(editorGroup);
+            UserService.Save(editorGroup);
 
-            var admin = ServiceContext.UserService.GetUserById(Constants.Security.SuperUserId);
+            var admin = UserService.GetUserById(Constants.Security.SuperUserId);
             admin.StartContentIds = new[] {content1.Id};
-            ServiceContext.UserService.Save(admin);
+            UserService.Save(admin);
 
             ServiceContext.RelationService.Save(new RelationType("test", "test", false, Constants.ObjectTypes.Document, Constants.ObjectTypes.Document));
             Assert.IsNotNull(ServiceContext.RelationService.Relate(content1, content2, "test"));
@@ -1832,8 +1832,8 @@ namespace Umbraco.Tests.Services
             }));
             Assert.IsTrue(ServiceContext.PublicAccessService.AddRule(content1, "test2", "test2").Success);
 
-            var user = ServiceContext.UserService.GetUserById(Constants.Security.SuperUserId);
-            var userGroup = ServiceContext.UserService.GetUserGroupByAlias(user.Groups.First().Alias);
+            var user = UserService.GetUserById(Constants.Security.SuperUserId);
+            var userGroup = UserService.GetUserGroupByAlias(user.Groups.First().Alias);
             Assert.IsNotNull(ServiceContext.NotificationService.CreateNotification(user, content1, "X"));
 
             ServiceContext.ContentService.SetPermission(content1, 'A', new[] { userGroup.Id });

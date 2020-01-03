@@ -60,11 +60,10 @@ namespace Umbraco.Tests.Scoping
         public void DefaultRepositoryCachePolicy(bool complete)
         {
             var scopeProvider = ScopeProvider;
-            var service = Current.Services.UserService;
             var globalCache = Current.AppCaches.IsolatedCaches.GetOrCreate(typeof(IUser));
 
             var user = (IUser)new User(TestObjects.GetGlobalSettings(), "name", "email", "username", "rawPassword");
-            service.Save(user);
+            UserService.Save(user);
 
             // global cache contains the entity
             var globalCached = (IUser) globalCache.Get(GetCacheIdKey<IUser>(user.Id), () => null);
@@ -73,7 +72,7 @@ namespace Umbraco.Tests.Scoping
             Assert.AreEqual("name", globalCached.Name);
 
             // get user again - else we'd modify the one that's in the cache
-            user = service.GetUserById(user.Id);
+            user = UserService.GetUserById(user.Id);
 
             _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(), Mock.Of<IUmbracoContextFactory>(), Mock.Of<ILogger>());
             _distributedCacheBinder.BindEvents(true);
@@ -90,7 +89,7 @@ namespace Umbraco.Tests.Scoping
                 Assert.AreNotSame(globalCache, scopedCache);
 
                 user.Name = "changed";
-                service.Save(user);
+                UserService.Save(user);
 
                 // scoped cache contains the "new" entity
                 var scopeCached = (IUser) scopedCache.Get(GetCacheIdKey<IUser>(user.Id), () => null);
@@ -122,7 +121,7 @@ namespace Umbraco.Tests.Scoping
             }
 
             // get again, updated if completed
-            user = service.GetUserById(user.Id);
+            user = UserService.GetUserById(user.Id);
             Assert.AreEqual(complete ? "changed" : "name", user.Name);
 
             // global cache contains the entity again

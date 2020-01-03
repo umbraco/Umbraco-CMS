@@ -65,7 +65,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         /// </summary>
         /// <remarks>The default constructor will boot the cache, load data from file or database, /// wire events in order to manage changes, etc.</remarks>
         public XmlStore(IContentTypeService contentTypeService, IContentService contentService, IScopeProvider scopeProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache,
-            IPublishedSnapshotAccessor publishedSnapshotAccessor, MainDom mainDom, IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository, IGlobalSettings globalSettings, IEntityXmlSerializer entitySerializer, IHostingEnvironment hostingEnvironment, IShortStringHelper  shortStringHelper)
+            IPublishedSnapshotAccessor publishedSnapshotAccessor, MainDom mainDom, IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository, IGlobalSettings globalSettings, IEntityXmlSerializer entitySerializer, IHostingEnvironment hostingEnvironment, IShortStringHelper  shortStringHelper, IUserService userService)
             : this(contentTypeService, contentService, scopeProvider, routesCache, contentTypeCache, publishedSnapshotAccessor, mainDom, false, false, documentRepository, mediaRepository, memberRepository, globalSettings, entitySerializer, hostingEnvironment, shortStringHelper)
         { }
 

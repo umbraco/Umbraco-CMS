@@ -6,6 +6,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
@@ -18,6 +19,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly ContentNode _contentNode;
         private readonly string _urlSegment;
+        private static IUserService _userService;
 
         #region Constructors
 
@@ -26,14 +28,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
             ContentData contentData,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
             IVariationContextAccessor variationContextAccessor,
-            IPublishedModelFactory publishedModelFactory)
+            IPublishedModelFactory publishedModelFactory,
+            IUserService userService)
         {
             _contentNode = contentNode ?? throw new ArgumentNullException(nameof(contentNode));
             ContentData = contentData ?? throw new ArgumentNullException(nameof(contentData));
             _publishedSnapshotAccessor = publishedSnapshotAccessor ?? throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
             _publishedModelFactory = publishedModelFactory;
             VariationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
-
+            _userService = userService;
             _urlSegment = ContentData.UrlSegment;
             IsPreviewing = ContentData.Published == false;
 
@@ -59,14 +62,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private static string GetProfileNameByIdNoCache(int id)
         {
 #if DEBUG
-            var userService = Current.Services?.UserService;
-            if (userService == null) return "[null]"; // for tests
+            if (_userService == null) return "[null]"; // for tests
 #else
             // we don't want each published content to hold a reference to the service
             // so where should they get the service from really? from the locator...
             var userService = Current.Services.UserService;
 #endif
-            var user = userService.GetProfileById(id);
+            var user = _userService.GetProfileById(id);
             return user?.Name;
         }
 

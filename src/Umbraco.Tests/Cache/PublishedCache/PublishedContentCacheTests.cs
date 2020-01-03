@@ -69,8 +69,8 @@ namespace Umbraco.Tests.Cache.PublishedCache
             var domainCache = new DomainCache(ServiceContext.DomainService, DefaultCultureAccessor);
             var publishedShapshot = new PublishedSnapshot(
                 new PublishedContentCache(xmlStore, domainCache, appCache, globalSettings, ContentTypesCache, null, null),
-                new PublishedMediaCache(xmlStore, ServiceContext.MediaService, ServiceContext.UserService, appCache, ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>(), umbracoContextAccessor),
-                new PublishedMemberCache(null, appCache, Current.Services.MemberService, ContentTypesCache, Current.Services.UserService),
+                new PublishedMediaCache(xmlStore, ServiceContext.MediaService, UserService, appCache, ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>(), umbracoContextAccessor),
+                new PublishedMemberCache(null, appCache, Current.Services.MemberService, ContentTypesCache, UserService),
                 domainCache);
             var publishedSnapshotService = new Mock<IPublishedSnapshotService>();
             publishedSnapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(publishedShapshot);
@@ -78,7 +78,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
             _umbracoContext = new UmbracoContext(
                 _httpContextFactory.HttpContext,
                 publishedSnapshotService.Object,
-                new WebSecurity(_httpContextFactory.HttpContext, Current.Services.UserService, globalSettings),
+                new WebSecurity(_httpContextFactory.HttpContext, UserService, globalSettings),
                 umbracoSettings,
                 Enumerable.Empty<IUrlProvider>(),
                 Enumerable.Empty<IMediaUrlProvider>(),
