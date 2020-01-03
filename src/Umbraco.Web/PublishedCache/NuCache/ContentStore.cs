@@ -115,6 +115,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return ScopeContextualBase.Get(scopeProvider, _instanceId, scoped => new ScopedWriteLock(this, scoped));
         }
 
+        private void EnsureLocked()
+        {
+            if (!Monitor.IsEntered(_wlocko))
+                throw new InvalidOperationException("Write lock must be acquried.");
+        }
+
         private void Lock(WriteLockInfo lockInfo, bool forceGen = false)
         {
             Monitor.Enter(_wlocko, ref lockInfo.Taken);
@@ -323,34 +329,36 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        public void SetAllContentTypes(IEnumerable<IPublishedContentType> types)
+        /// <summary>
+        /// Updates/sets data for all content types
+        /// </summary>
+        /// <param name="types"></param>
+        /// <remarks>
+        /// This methods MUST be called from within a write lock, normally wrapped within GetScopedWriteLock
+        /// otherwise an exception will occur.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if this method is not called within a write lock
+        /// </exception>
+        public void SetAllContentTypesLocked(IEnumerable<IPublishedContentType> types)
         {
-            // TODO: There should be NO lock here! All calls made to this are wrapped in GetScopedWriteLock
+            EnsureLocked();
 
-            //var lockInfo = new WriteLockInfo();
-            try
+            _logger.Debug<ContentStore>("SetAllContentTypes");
+
+            // clear all existing content types
+            ClearLocked(_contentTypesById);
+            ClearLocked(_contentTypesByAlias);
+
+            // set all new content types
+            foreach (var type in types)
             {
-                _logger.Debug<ContentStore>("SetAllContentTypes");
-                //Lock(lockInfo);
-
-                // clear all existing content types
-                ClearLocked(_contentTypesById);
-                ClearLocked(_contentTypesByAlias);
-
-                // set all new content types
-                foreach (var type in types)
-                {
-                    SetValueLocked(_contentTypesById, type.Id, type);
-                    SetValueLocked(_contentTypesByAlias, type.Alias, type);
-                }
-
-                // beware! at that point the cache is inconsistent,
-                // assuming we are going to SetAll content items!
+                SetValueLocked(_contentTypesById, type.Id, type);
+                SetValueLocked(_contentTypesByAlias, type.Alias, type);
             }
-            finally
-            {
-                //Release(lockInfo);
-            }
+
+            // beware! at that point the cache is inconsistent,
+            // assuming we are going to SetAll content items!
         }
 
         public void UpdateContentTypes(IReadOnlyCollection<int> removedIds, IReadOnlyCollection<IPublishedContentType> refreshedTypes, IReadOnlyCollection<ContentNodeKit> kits)
@@ -540,8 +548,22 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return link;
         }
 
-        public bool Set(ContentNodeKit kit)
+        /// <summary>
+        /// Sets the data for a <see cref="ContentNodeKit"/>
+        /// </summary>
+        /// <param name="kit"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This methods MUST be called from within a write lock, normally wrapped within GetScopedWriteLock
+        /// otherwise an exception will occur.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if this method is not called within a write lock
+        /// </exception>
+        public bool SetLocked(ContentNodeKit kit)
         {
+            EnsureLocked();
+
             // ReSharper disable LocalizableElement
             if (kit.IsEmpty)
                 throw new ArgumentException("Kit is empty.", nameof(kit));
@@ -551,58 +573,47 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             _logger.Debug<ContentStore>("Set content ID: {KitNodeId}", kit.Node.Id);
 
-            // TODO: There should be NO locks here, all calls made to this are done within GetScopedWriteLock
-            //var lockInfo = new WriteLockInfo();
-            try
+            // get existing
+            _contentNodes.TryGetValue(kit.Node.Id, out var link);
+            var existing = link?.Value;
+
+            if (!BuildKit(kit, out var parent))
+                return false;
+
+            // moving?
+            var moving = existing != null && existing.ParentContentId != kit.Node.ParentContentId;
+
+            // manage children
+            if (existing != null)
             {
-                //Lock(lockInfo);
-
-                // get existing
-                _contentNodes.TryGetValue(kit.Node.Id, out var link);
-                var existing = link?.Value;
-
-                if (!BuildKit(kit, out var parent))
-                    return false;
-
-                // moving?
-                var moving = existing != null && existing.ParentContentId != kit.Node.ParentContentId;
-
-                // manage children
-                if (existing != null)
-                {
-                    kit.Node.FirstChildContentId = existing.FirstChildContentId;
-                    kit.Node.LastChildContentId = existing.LastChildContentId;
-                }   
-
-                // set
-                SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
-                if (_localDb != null) RegisterChange(kit.Node.Id, kit);
-
-                // manage the tree
-                if (existing == null)
-                {
-                    // new, add to parent
-                    AddTreeNodeLocked(kit.Node, parent);
-                }
-                else if (moving || existing.SortOrder != kit.Node.SortOrder)
-                {
-                    // moved, remove existing from its parent, add content to its parent
-                    RemoveTreeNodeLocked(existing);
-                    AddTreeNodeLocked(kit.Node);
-                }
-                else
-                {
-                    // replacing existing, handle siblings
-                    kit.Node.NextSiblingContentId = existing.NextSiblingContentId;
-                    kit.Node.PreviousSiblingContentId = existing.PreviousSiblingContentId;
-                }
-
-                _xmap[kit.Node.Uid] = kit.Node.Id;
+                kit.Node.FirstChildContentId = existing.FirstChildContentId;
+                kit.Node.LastChildContentId = existing.LastChildContentId;
             }
-            finally
+
+            // set
+            SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
+            if (_localDb != null) RegisterChange(kit.Node.Id, kit);
+
+            // manage the tree
+            if (existing == null)
             {
-                //Release(lockInfo);
+                // new, add to parent
+                AddTreeNodeLocked(kit.Node, parent);
             }
+            else if (moving || existing.SortOrder != kit.Node.SortOrder)
+            {
+                // moved, remove existing from its parent, add content to its parent
+                RemoveTreeNodeLocked(existing);
+                AddTreeNodeLocked(kit.Node);
+            }
+            else
+            {
+                // replacing existing, handle siblings
+                kit.Node.NextSiblingContentId = existing.NextSiblingContentId;
+                kit.Node.PreviousSiblingContentId = existing.PreviousSiblingContentId;
+            }
+
+            _xmap[kit.Node.Uid] = kit.Node.Id;
 
             return true;
         }
@@ -624,211 +635,222 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// <param name="fromDb">True if the data is coming from the database (not the local cache db)</param>
         /// <returns></returns>
         /// <remarks>
+        /// <para>
         /// This requires that the collection is sorted by Level + ParentId + Sort Order. 
         /// This should be used only on a site startup as the first generations.
         /// This CANNOT be used after startup since it bypasses all checks for Generations.
+        /// </para>
+        /// <para>
+        /// This methods MUST be called from within a write lock, normally wrapped within GetScopedWriteLock
+        /// otherwise an exception will occur.
+        /// </para>        
         /// </remarks>
-        internal bool SetAllFastSorted(IEnumerable<ContentNodeKit> kits, bool fromDb)
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if this method is not called within a write lock
+        /// </exception>
+        public bool SetAllFastSortedLocked(IEnumerable<ContentNodeKit> kits, bool fromDb)
         {
+            EnsureLocked();
 
-            //TODO: There should be NO locks here all calls made to this are done within GetScopedWriteLock
+            _logger.Debug<ContentStore>("SetAllFastSorted");
 
-            //var lockInfo = new WriteLockInfo();
             var ok = true;
-            try
+
+            ClearLocked(_contentNodes);
+            ClearRootLocked();
+
+            // The name of the game here is to populate each kit's
+            //  FirstChildContentId
+            //  LastChildContentId
+            //  NextSiblingContentId
+            //  PreviousSiblingContentId
+
+            ContentNode previousNode = null;
+            ContentNode parent = null;
+
+            foreach (var kit in kits)
             {
-                _logger.Debug<ContentStore>("SetAllFastSorted");
-
-                //Lock(lockInfo);
-
-                ClearLocked(_contentNodes);
-                ClearRootLocked();
-
-                // The name of the game here is to populate each kit's
-                //  FirstChildContentId
-                //  LastChildContentId
-                //  NextSiblingContentId
-                //  PreviousSiblingContentId
-
-                ContentNode previousNode = null;
-                ContentNode parent = null;
-
-                foreach (var kit in kits)
+                if (!BuildKit(kit, out var parentLink))
                 {
-                    if (!BuildKit(kit, out var parentLink))
-                    {
-                        ok = false;
-                        continue; // skip that one
-                    }
-
-                    var thisNode = kit.Node;
-
-                    if (parent == null)
-                    {
-                        // first parent
-                        parent = parentLink.Value;
-                        parent.FirstChildContentId = thisNode.Id; // this node is the first node
-                    }
-                    else if (parent.Id != parentLink.Value.Id)
-                    {
-                        // new parent
-                        parent = parentLink.Value;
-                        parent.FirstChildContentId = thisNode.Id; // this node is the first node
-                        previousNode = null; // there is no previous sibling
-                    }
-
-                    _logger.Verbose<ContentStore>($"Set {thisNode.Id} with parent {thisNode.ParentContentId}");
-                    SetValueLocked(_contentNodes, thisNode.Id, thisNode);
-
-                    // if we are initializing from the database source ensure the local db is updated
-                    if (fromDb && _localDb != null) RegisterChange(thisNode.Id, kit);
-
-                    // this node is always the last child
-                    parent.LastChildContentId = thisNode.Id;
-
-                    // wire previous node as previous sibling
-                    if (previousNode != null)
-                    {
-                        previousNode.NextSiblingContentId = thisNode.Id;
-                        thisNode.PreviousSiblingContentId = previousNode.Id;
-                    }
-
-                    // this node becomes the previous node
-                    previousNode = thisNode;
-
-                    _xmap[kit.Node.Uid] = kit.Node.Id;
+                    ok = false;
+                    continue; // skip that one
                 }
-            }
-            finally
-            {
-                //Release(lockInfo);
+
+                var thisNode = kit.Node;
+
+                if (parent == null)
+                {
+                    // first parent
+                    parent = parentLink.Value;
+                    parent.FirstChildContentId = thisNode.Id; // this node is the first node
+                }
+                else if (parent.Id != parentLink.Value.Id)
+                {
+                    // new parent
+                    parent = parentLink.Value;
+                    parent.FirstChildContentId = thisNode.Id; // this node is the first node
+                    previousNode = null; // there is no previous sibling
+                }
+
+                _logger.Verbose<ContentStore>($"Set {thisNode.Id} with parent {thisNode.ParentContentId}");
+                SetValueLocked(_contentNodes, thisNode.Id, thisNode);
+
+                // if we are initializing from the database source ensure the local db is updated
+                if (fromDb && _localDb != null) RegisterChange(thisNode.Id, kit);
+
+                // this node is always the last child
+                parent.LastChildContentId = thisNode.Id;
+
+                // wire previous node as previous sibling
+                if (previousNode != null)
+                {
+                    previousNode.NextSiblingContentId = thisNode.Id;
+                    thisNode.PreviousSiblingContentId = previousNode.Id;
+                }
+
+                // this node becomes the previous node
+                previousNode = thisNode;
+
+                _xmap[kit.Node.Uid] = kit.Node.Id;
             }
 
             return ok;
         }
 
-        public bool SetAll(IEnumerable<ContentNodeKit> kits)
+        /// <summary>
+        /// Set all data for a collection of <see cref="ContentNodeKit"/>
+        /// </summary>
+        /// <param name="kits"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This methods MUST be called from within a write lock, normally wrapped within GetScopedWriteLock
+        /// otherwise an exception will occur.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if this method is not called within a write lock
+        /// </exception>
+        public bool SetAllLocked(IEnumerable<ContentNodeKit> kits)
         {
-            //TODO: There should be NO locks here all calls made to this are done within GetScopedWriteLock
+            EnsureLocked();
 
-            //var lockInfo = new WriteLockInfo();
             var ok = true;
-            try
+            _logger.Debug<ContentStore>("SetAll");
+
+            ClearLocked(_contentNodes);
+            ClearRootLocked();
+
+            // do NOT clear types else they are gone!
+            //ClearLocked(_contentTypesById);
+            //ClearLocked(_contentTypesByAlias);
+
+            foreach (var kit in kits)
             {
-                _logger.Debug<ContentStore>("SetAll");
-
-                //Lock(lockInfo);
-
-                ClearLocked(_contentNodes);
-                ClearRootLocked();
-
-                // do NOT clear types else they are gone!
-                //ClearLocked(_contentTypesById);
-                //ClearLocked(_contentTypesByAlias);
-
-                foreach (var kit in kits)
+                if (!BuildKit(kit, out var parent))
                 {
-                    if (!BuildKit(kit, out var parent))
-                    {
-                        ok = false;
-                        continue; // skip that one
-                    }
-                    _logger.Verbose<ContentStore>($"Set {kit.Node.Id} with parent {kit.Node.ParentContentId}");
-                    SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
-
-                    if (_localDb != null) RegisterChange(kit.Node.Id, kit);
-                    AddTreeNodeLocked(kit.Node, parent);
-
-                    _xmap[kit.Node.Uid] = kit.Node.Id;
+                    ok = false;
+                    continue; // skip that one
                 }
-            }
-            finally
-            {
-                //Release(lockInfo);
+                _logger.Verbose<ContentStore>($"Set {kit.Node.Id} with parent {kit.Node.ParentContentId}");
+                SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
+
+                if (_localDb != null) RegisterChange(kit.Node.Id, kit);
+                AddTreeNodeLocked(kit.Node, parent);
+
+                _xmap[kit.Node.Uid] = kit.Node.Id;
             }
 
             return ok;
         }
 
-        // IMPORTANT kits must be sorted out by LEVEL and by SORT ORDER
-        public bool SetBranch(int rootContentId, IEnumerable<ContentNodeKit> kits)
+        /// <summary>
+        /// Sets data for a branch of <see cref="ContentNodeKit"/>
+        /// </summary>
+        /// <param name="rootContentId"></param>
+        /// <param name="kits"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// <para>
+        /// IMPORTANT kits must be sorted out by LEVEL and by SORT ORDER
+        /// </para>
+        /// <para>
+        /// This methods MUST be called from within a write lock, normally wrapped within GetScopedWriteLock
+        /// otherwise an exception will occur.
+        /// </para>        
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if this method is not called within a write lock
+        /// </exception>
+        public bool SetBranchLocked(int rootContentId, IEnumerable<ContentNodeKit> kits)
         {
-            //TODO: There should be NO locks here all calls made to this are done within GetScopedWriteLock
+            EnsureLocked();
 
-            //var lockInfo = new WriteLockInfo();
             var ok = true;
-            try
+            _logger.Debug<ContentStore>("SetBranch");
+
+            // get existing
+            _contentNodes.TryGetValue(rootContentId, out var link);
+            var existing = link?.Value;
+
+            // clear
+            if (existing != null)
             {
-                _logger.Debug<ContentStore>("SetBranch");
-
-                //Lock(lockInfo);
-
-                // get existing
-                _contentNodes.TryGetValue(rootContentId, out var link);
-                var existing = link?.Value;
-
-                // clear
-                if (existing != null)
-                {
-                    //this zero's out the branch (recursively), if we're in a new gen this will add a NULL placeholder for the gen
-                    ClearBranchLocked(existing);
-                    //TODO: This removes the current GEN from the tree - do we really want to do that?
-                    RemoveTreeNodeLocked(existing);
-                }
-
-                // now add them all back
-                foreach (var kit in kits)
-                {
-                    if (!BuildKit(kit, out var parent))
-                    {
-                        ok = false;
-                        continue; // skip that one
-                    }
-                    SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
-                    if (_localDb != null) RegisterChange(kit.Node.Id, kit);
-                    AddTreeNodeLocked(kit.Node, parent);
-
-                    _xmap[kit.Node.Uid] = kit.Node.Id;
-                }
+                //this zero's out the branch (recursively), if we're in a new gen this will add a NULL placeholder for the gen
+                ClearBranchLocked(existing);
+                //TODO: This removes the current GEN from the tree - do we really want to do that?
+                RemoveTreeNodeLocked(existing);
             }
-            finally
+
+            // now add them all back
+            foreach (var kit in kits)
             {
-                //Release(lockInfo);
+                if (!BuildKit(kit, out var parent))
+                {
+                    ok = false;
+                    continue; // skip that one
+                }
+                SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
+                if (_localDb != null) RegisterChange(kit.Node.Id, kit);
+                AddTreeNodeLocked(kit.Node, parent);
+
+                _xmap[kit.Node.Uid] = kit.Node.Id;
             }
 
             return ok;
         }
 
-        public bool Clear(int id)
+        /// <summary>
+        /// Clears data for a given node id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This methods MUST be called from within a write lock, normally wrapped within GetScopedWriteLock
+        /// otherwise an exception will occur.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if this method is not called within a write lock
+        /// </exception>
+        public bool ClearLocked(int id)
         {
-            // TODO: There should be NO locks here! All calls to this are made within GetScopedWriteLock
-            //var lockInfo = new WriteLockInfo();
-            try
-            {
-                _logger.Debug<ContentStore>("Clear");
+            EnsureLocked();
 
-                //Lock(lockInfo);
+            _logger.Debug<ContentStore>("Clear");
 
-                // try to find the content
-                // if it is not there, nothing to do
-                _contentNodes.TryGetValue(id, out var link); // else null
-                if (link?.Value == null) return false;
+            // try to find the content
+            // if it is not there, nothing to do
+            _contentNodes.TryGetValue(id, out var link); // else null
+            if (link?.Value == null) return false;
 
-                var content = link.Value;
-                _logger.Debug<ContentStore>("Clear content ID: {ContentId}", content.Id);
+            var content = link.Value;
+            _logger.Debug<ContentStore>("Clear content ID: {ContentId}", content.Id);
 
-                // clear the entire branch
-                ClearBranchLocked(content);
+            // clear the entire branch
+            ClearBranchLocked(content);
 
-                // manage the tree
-                RemoveTreeNodeLocked(content);
+            // manage the tree
+            RemoveTreeNodeLocked(content);
 
-                return true;
-            }
-            finally
-            {
-                //Release(lockInfo);
-            }
+            return true;
         }
 
         private void ClearBranchLocked(int id)

@@ -384,7 +384,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var contentTypes = _serviceContext.ContentTypeService.GetAll()
                 .Select(x => _publishedContentTypeFactory.CreateContentType(x));
 
-            _contentStore.SetAllContentTypes(contentTypes);
+            _contentStore.SetAllContentTypesLocked(contentTypes);
 
             using (_logger.TraceDuration<PublishedSnapshotService>("Loading content from database"))
             {
@@ -395,7 +395,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 // IMPORTANT GetAllContentSources sorts kits by level + parentId + sortOrder
                 var kits = _dataSource.GetAllContentSources(scope);
-                return onStartup ? _contentStore.SetAllFastSorted(kits, true) : _contentStore.SetAll(kits);
+                return onStartup ? _contentStore.SetAllFastSortedLocked(kits, true) : _contentStore.SetAllLocked(kits);
             }
         }
 
@@ -403,7 +403,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             var contentTypes = _serviceContext.ContentTypeService.GetAll()
                     .Select(x => _publishedContentTypeFactory.CreateContentType(x));
-            _contentStore.SetAllContentTypes(contentTypes);
+            _contentStore.SetAllContentTypesLocked(contentTypes);
 
             using (_logger.TraceDuration<PublishedSnapshotService>("Loading content from local cache file"))
             {
@@ -455,7 +455,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             var mediaTypes = _serviceContext.MediaTypeService.GetAll()
                 .Select(x => _publishedContentTypeFactory.CreateContentType(x));
-            _mediaStore.SetAllContentTypes(mediaTypes);
+            _mediaStore.SetAllContentTypesLocked(mediaTypes);
 
             using (_logger.TraceDuration<PublishedSnapshotService>("Loading media from database"))
             {
@@ -467,7 +467,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 _logger.Debug<PublishedSnapshotService>("Loading media from database...");
                 // IMPORTANT GetAllMediaSources sorts kits by level + parentId + sortOrder
                 var kits = _dataSource.GetAllMediaSources(scope);
-                return onStartup ? _mediaStore.SetAllFastSorted(kits, true) : _mediaStore.SetAll(kits);
+                return onStartup ? _mediaStore.SetAllFastSortedLocked(kits, true) : _mediaStore.SetAllLocked(kits);
             }
         }
 
@@ -475,7 +475,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             var mediaTypes = _serviceContext.MediaTypeService.GetAll()
                     .Select(x => _publishedContentTypeFactory.CreateContentType(x));
-            _mediaStore.SetAllContentTypes(mediaTypes);
+            _mediaStore.SetAllContentTypesLocked(mediaTypes);
 
             using (_logger.TraceDuration<PublishedSnapshotService>("Loading media from local cache file"))
             {
@@ -516,7 +516,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return false;
             }
 
-            return onStartup ? store.SetAllFastSorted(kits, false) : store.SetAll(kits);
+            return onStartup ? store.SetAllFastSortedLocked(kits, false) : store.SetAllLocked(kits);
         }
 
         // keep these around - might be useful
@@ -713,7 +713,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
                 {
-                    if (_contentStore.Clear(payload.Id))
+                    if (_contentStore.ClearLocked(payload.Id))
                         draftChanged = publishedChanged = true;
                     continue;
                 }
@@ -736,7 +736,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                         // ?? should we do some RV check here?
                         // IMPORTANT GetbranchContentSources sorts kits by level and by sort order
                         var kits = _dataSource.GetBranchContentSources(scope, capture.Id);
-                        _contentStore.SetBranch(capture.Id, kits);
+                        _contentStore.SetBranchLocked(capture.Id, kits);
                     }
                     else
                     {
@@ -744,11 +744,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
                         var kit = _dataSource.GetContentSource(scope, capture.Id);
                         if (kit.IsEmpty)
                         {
-                            _contentStore.Clear(capture.Id);
+                            _contentStore.ClearLocked(capture.Id);
                         }
                         else
                         {
-                            _contentStore.Set(kit);
+                            _contentStore.SetLocked(kit);
                         }
                     }
 
@@ -806,7 +806,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
                 {
-                    if (_mediaStore.Clear(payload.Id))
+                    if (_mediaStore.ClearLocked(payload.Id))
                         anythingChanged = true;
                     continue;
                 }
@@ -829,7 +829,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                         // ?? should we do some RV check here?
                         // IMPORTANT GetbranchContentSources sorts kits by level and by sort order
                         var kits = _dataSource.GetBranchMediaSources(scope, capture.Id);
-                        _mediaStore.SetBranch(capture.Id, kits);
+                        _mediaStore.SetBranchLocked(capture.Id, kits);
                     }
                     else
                     {
@@ -837,11 +837,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
                         var kit = _dataSource.GetMediaSource(scope, capture.Id);
                         if (kit.IsEmpty)
                         {
-                            _mediaStore.Clear(capture.Id);
+                            _mediaStore.ClearLocked(capture.Id);
                         }
                         else
                         {
-                            _mediaStore.Set(kit);
+                            _mediaStore.SetLocked(kit);
                         }
                     }
 
