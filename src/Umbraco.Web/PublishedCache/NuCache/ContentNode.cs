@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 
 namespace Umbraco.Web.PublishedCache.NuCache
@@ -149,7 +150,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // more than 1 instance, but the lock below ensures we only ever return
             // 1 unique instance - and locking is a nice explicit way to ensure this
 
-            var m = new PublishedContent(this, contentData, _publishedSnapshotAccessor, _variationContextAccessor, _publishedModelFactory).CreateModel(_publishedModelFactory);
+            var m = new PublishedContent(this, contentData, _publishedSnapshotAccessor, _variationContextAccessor, _publishedModelFactory, null).CreateModel(_publishedModelFactory);
 
             // locking 'this' is not a best-practice but ContentNode is internal and
             // we know what we do, so it is fine here and avoids allocating an object

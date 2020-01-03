@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 
 namespace Umbraco.Web.PublishedCache.NuCache
@@ -14,6 +15,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
     internal class PublishedMember : PublishedContent //, IPublishedMember
     {
         private readonly IMember _member;
+        private static IUserService _userService;
 
         private PublishedMember(
             IMember member,
@@ -21,10 +23,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
             ContentData contentData,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
             IVariationContextAccessor variationContextAccessor,
-            IPublishedModelFactory publishedModelFactory)
-            : base(contentNode, contentData, publishedSnapshotAccessor, variationContextAccessor, publishedModelFactory)
+            IPublishedModelFactory publishedModelFactory,
+            IUserService userService)
+            : base(contentNode, contentData, publishedSnapshotAccessor, variationContextAccessor, publishedModelFactory, userService)
         {
             _member = member;
+            _userService = userService;
         }
 
         public static IPublishedContent Create(
@@ -49,7 +53,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 member.Level, member.Path, member.SortOrder,
                 member.ParentId,
                 member.CreateDate, member.CreatorId);
-            return new PublishedMember(member, n, d, publishedSnapshotAccessor, variationContextAccessor, publishedModelFactory).CreateModel(publishedModelFactory);
+            return new PublishedMember(member, n, d, publishedSnapshotAccessor, variationContextAccessor, publishedModelFactory, _userService).CreateModel(publishedModelFactory);
         }
 
         private static Dictionary<string, PropertyData[]> GetPropertyValues(IPublishedContentType contentType, IMember member)
