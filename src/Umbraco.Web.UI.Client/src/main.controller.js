@@ -57,12 +57,14 @@ function MainController($scope, $location, appState, treeService, notificationsS
         appState.setSearchState("show", false);
     };
 
-    $scope.showLoginScreen = function(isTimedOut) {
+    $scope.showLoginScreen = function (isTimedOut) {
+        $scope.login.pageTitle = $scope.$root.locationTitle;
         $scope.login.isTimedOut = isTimedOut;
         $scope.login.show = true;
     };
 
-    $scope.hideLoginScreen = function() {
+    $scope.hideLoginScreen = function () {
+        $scope.$root.locationTitle = $scope.login.pageTitle;
         $scope.login.show = false;
     };
 
