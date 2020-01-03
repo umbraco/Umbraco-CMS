@@ -110,6 +110,8 @@ namespace Umbraco.Tests.Testing
 
         #region Accessors
 
+        protected IDomainService DomainService => Factory.GetInstance<IDomainService>();
+
         protected ILogger Logger => Factory.GetInstance<ILogger>();
 
         protected IIOHelper IOHelper { get; private set; }

@@ -98,7 +98,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                 _contentTypeCache, publishedSnapshotAccessor, mainDom, testing, enableRepositoryEvents,
                 documentRepository, mediaRepository, memberRepository, globalSettings, entitySerializer, hostingEnvironment, shortStringHelper);
 
-            _domainService = serviceContext.DomainService;
             _memberService = serviceContext.MemberService;
             _mediaService = serviceContext.MediaService;
             _userService = serviceContext.UserService;

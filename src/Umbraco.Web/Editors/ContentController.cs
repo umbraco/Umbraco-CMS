@@ -54,6 +54,7 @@ namespace Umbraco.Web.Editors
     {
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly Lazy<IDictionary<string, ILanguage>> _allLangs;
+        private readonly IDomainService _domainService;
 
         public object Domains { get; private set; }
 
@@ -68,11 +69,13 @@ namespace Umbraco.Web.Editors
             IProfilingLogger logger,
             IRuntimeState runtimeState,
             UmbracoHelper umbracoHelper,
-            IShortStringHelper shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IDomainService domainService)
             : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _allLangs = new Lazy<IDictionary<string, ILanguage>>(() => Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
+            _domainService = domainService;
         }
 
         /// <summary>
@@ -1654,7 +1657,7 @@ namespace Umbraco.Web.Editors
 
         public ContentDomainsAndCulture GetCultureAndDomains(int id)
         {
-            var nodeDomains = Services.DomainService.GetAssignedDomains(id, true).ToArray();
+            var nodeDomains = _domainService.GetAssignedDomains(id, true).ToArray();
             var wildcard = nodeDomains.FirstOrDefault(d => d.IsWildcard);
             var domains = nodeDomains.Where(d => !d.IsWildcard).Select(d => new DomainDisplay(d.DomainName, d.LanguageId.GetValueOrDefault(0)));
             return new ContentDomainsAndCulture
@@ -1701,7 +1704,7 @@ namespace Umbraco.Web.Editors
             }
 
             model.Valid = true;
-            var domains = Services.DomainService.GetAssignedDomains(model.NodeId, true).ToArray();
+            var domains = _domainService.GetAssignedDomains(model.NodeId, true).ToArray();
             var languages = Services.LocalizationService.GetAllLanguages().ToArray();
             var language = model.Language > 0 ? languages.FirstOrDefault(l => l.Id == model.Language) : null;
 
@@ -1723,7 +1726,7 @@ namespace Umbraco.Web.Editors
                     };
                 }
 
-                var saveAttempt = Services.DomainService.Save(wildcard);
+                var saveAttempt = _domainService.Save(wildcard);
                 if (saveAttempt == false)
                 {
                     var response = Request.CreateResponse(HttpStatusCode.BadRequest);
@@ -1737,7 +1740,7 @@ namespace Umbraco.Web.Editors
                 var wildcard = domains.FirstOrDefault(d => d.IsWildcard);
                 if (wildcard != null)
                 {
-                    Services.DomainService.Delete(wildcard);
+                    _domainService.Delete(wildcard);
                 }
             }
 
@@ -1745,7 +1748,7 @@ namespace Umbraco.Web.Editors
             // delete every (non-wildcard) domain, that exists in the DB yet is not in the model
             foreach (var domain in domains.Where(d => d.IsWildcard == false && model.Domains.All(m => m.Name.InvariantEquals(d.DomainName) == false)))
             {
-                Services.DomainService.Delete(domain);
+                _domainService.Delete(domain);
             }
 
             var names = new List<string>();
@@ -1770,12 +1773,12 @@ namespace Umbraco.Web.Editors
                 if (domain != null)
                 {
                     domain.LanguageId = language.Id;
-                    Services.DomainService.Save(domain);
+                    _domainService.Save(domain);
                 }
-                else if (Services.DomainService.Exists(domainModel.Name))
+                else if (_domainService.Exists(domainModel.Name))
                 {
                     domainModel.Duplicate = true;
-                    var xdomain = Services.DomainService.GetByName(domainModel.Name);
+                    var xdomain = _domainService.GetByName(domainModel.Name);
                     var xrcid = xdomain.RootContentId;
                     if (xrcid.HasValue)
                     {
@@ -1800,7 +1803,7 @@ namespace Umbraco.Web.Editors
                         LanguageId = domainModel.Lang,
                         RootContentId = model.NodeId
                     };
-                    var saveAttempt = Services.DomainService.Save(newDomain);
+                    var saveAttempt = _domainService.Save(newDomain);
                     if (saveAttempt == false)
                     {
                         var response = Request.CreateResponse(HttpStatusCode.BadRequest);

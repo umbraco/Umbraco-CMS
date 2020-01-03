@@ -50,6 +50,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly UrlSegmentProviderCollection _urlSegmentProviders;
         private readonly ITypeFinder _typeFinder;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IDomainService _domainService;
 
         // volatile because we read it with no lock
         private volatile bool _isReady;
@@ -83,7 +84,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IPublishedModelFactory publishedModelFactory,
             UrlSegmentProviderCollection urlSegmentProviders,
             ITypeFinder typeFinder,
-            IHostingEnvironment hostingEnvironment)
+            IHostingEnvironment hostingEnvironment,
+            IDomainService domainService)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
@@ -102,6 +104,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _urlSegmentProviders = urlSegmentProviders;
             _typeFinder = typeFinder;
             _hostingEnvironment = hostingEnvironment;
+            _domainService = domainService;
 
             // we need an Xml serializer here so that the member cache can support XPath,
             // for members this is done by navigating the serialized-to-xml member
@@ -612,7 +615,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void LoadDomainsLocked()
         {
-            var domains = _serviceContext.DomainService.GetAll(true);
+            var domains = _domainService.GetAll(true);
             foreach (var domain in domains
                 .Where(x => x.RootContentId.HasValue && x.LanguageIsoCode.IsNullOrWhiteSpace() == false)
                 .Select(x => new Domain(x.Id, x.DomainName, x.RootContentId.Value, CultureInfo.GetCultureInfo(x.LanguageIsoCode), x.IsWildcard)))
@@ -968,7 +971,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                             _domainStore.Clear(payload.Id);
                             break;
                         case DomainChangeTypes.Refresh:
-                            var domain = _serviceContext.DomainService.GetById(payload.Id);
+                            var domain = _domainService.GetById(payload.Id);
                             if (domain == null) continue;
                             if (domain.RootContentId.HasValue == false) continue; // anomaly
                             if (domain.LanguageIsoCode.IsNullOrWhiteSpace()) continue; // anomaly

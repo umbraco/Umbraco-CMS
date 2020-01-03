@@ -1838,7 +1838,7 @@ namespace Umbraco.Tests.Services
 
             ServiceContext.ContentService.SetPermission(content1, 'A', new[] { userGroup.Id });
 
-            Assert.IsTrue(ServiceContext.DomainService.Save(new UmbracoDomain("www.test.com", "en-AU")
+            Assert.IsTrue(DomainService.Save(new UmbracoDomain("www.test.com", "en-AU")
             {
                 RootContentId = content1.Id
             }).Success);
