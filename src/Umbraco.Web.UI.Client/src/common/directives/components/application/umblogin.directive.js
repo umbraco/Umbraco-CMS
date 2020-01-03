@@ -456,7 +456,7 @@
                     break;
             } 
 
-            $scope.$emit("$changeTitle", title);
+            $scope.$emit("$setRootTitle", title);
         }
 
     }
