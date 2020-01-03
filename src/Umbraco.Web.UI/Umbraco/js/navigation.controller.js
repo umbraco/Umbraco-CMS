@@ -510,7 +510,6 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
         if (!event) {
             return;
         }
-
         if (!appState.getGlobalState("touchDevice")) {
             treeActive = false;
             $timeout(function () {
