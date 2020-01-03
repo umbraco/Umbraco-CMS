@@ -43,14 +43,22 @@ app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 
         }
 
         var currentRouteParams = null;
-
-        var originalTitle = "";
-
+        var pageTitle = "";
+        var rootTitle = "";
+        
         $rootScope.$on('$changeTitle', function (event, titlePrefix) {
             if (titlePrefix) {
-                $rootScope.locationTitle = titlePrefix + " - " + originalTitle;
+                $rootScope.locationTitle = titlePrefix + " - " + pageTitle;
             } else {
-                $rootScope.locationTitle = originalTitle;
+                $rootScope.locationTitle = pageTitle;
+            }
+        });
+
+        $rootScope.$on('$setRootTitle', function (event, titlePrefix) {
+            if (titlePrefix) {
+                $rootScope.locationTitle = titlePrefix + " - " + rootTitle;
+            } else {
+                $rootScope.locationTitle = rootTitle;
             }
         });
 
@@ -68,39 +76,10 @@ app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 
                 currentRouteParams = angular.copy(current.params); 
             }
 
-
-            var deployConfig = Umbraco.Sys.ServerVariables.deploy;
-            var deployEnv, deployEnvTitle;
-            if (deployConfig) {
-                deployEnv = Umbraco.Sys.ServerVariables.deploy.CurrentWorkspace;
-                deployEnvTitle = "(" + deployEnv + ") ";
-            }
-
-            if (current.params.section) {
-
-                //Uppercase the current section, content, media, settings, developer, forms
-                var currentSection = current.params.section.charAt(0).toUpperCase() + current.params.section.slice(1);
-
-                var baseTitle = currentSection + " - " + $location.$$host;
-
-                //Check deploy for Global Umbraco.Sys obj workspace
-                if (deployEnv) {
-                    $rootScope.locationTitle = deployEnvTitle + baseTitle;
-                }
-                else {
-                    $rootScope.locationTitle = baseTitle;
-                }
-
-            }
-            else {
-
-                if (deployEnv) {
-                    $rootScope.locationTitle = deployEnvTitle + "Umbraco - " + $location.$$host;
-                }
-
-                $rootScope.locationTitle = "Umbraco - " + $location.$$host;
-            }
-            originalTitle = $rootScope.locationTitle;
+            pageTitle = getPageTitle(current);
+            rootTitle = getRootTitle(null); // need to capture the root tile of the page when there is no section, this is used when the section name shouldn't be set in the page title
+                        // eg on login
+            $rootScope.locationTitle = pageTitle;
         });
 
         /** When the route change is rejected - based on checkAuth - we'll prevent the rejected route from executing including
@@ -116,7 +95,7 @@ app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 
                     returnPath = encodeURIComponent($location.url());
                 }
 
-                $location.path(rejection.path)
+                $location.path(rejection.path);
                 if (returnPath) {
                     $location.search("returnPath", returnPath);
                 }
@@ -171,6 +150,45 @@ app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 
                 }
             }
         });
+
+        function getDeployEnvTitle() {
+            var deployConfig = Umbraco.Sys.ServerVariables.deploy;
+            var deployEnv, deployEnvTitle;
+            if (deployConfig) {
+                deployEnv = Umbraco.Sys.ServerVariables.deploy.CurrentWorkspace;
+                deployEnvTitle = "(" + deployEnv + ") ";
+                if (deployEnv) {
+                    return deployEnvTitle;
+                }
+            }
+            return null;
+        }
+        // also sets the param "pageTitle", used in "$changeTitle"
+        function getPageTitle(current) {
+            if (current.params.section) {
+
+                //Uppercase the current section, content, media, settings, developer, forms
+                var currentSection = current.params.section.charAt(0).toUpperCase() + current.params.section.slice(1);
+                return getRootTitle(currentSection);
+            }
+            return getRootTitle(null);
+
+        }
+        
+        function getRootTitle(section) {
+                var deployEnvTitle = getDeployEnvTitle();
+                var title = " - " + $location.$$host;
+                if (section) {
+                    title = section + title;
+                } else {
+                    title = "Umbraco" + title;
+                }
+
+                if (deployEnvTitle) {
+                    return deployEnvTitle + title;
+                }
+                return title;
+        }
 
         //check for touch device, add to global appState
         //var touchDevice = ("ontouchstart" in window || window.touch || window.navigator.msMaxTouchPoints === 5 || window.DocumentTouch && document instanceof DocumentTouch);
