@@ -117,6 +117,12 @@ h5.-black {
 }
 .umb-control-group {
     position: relative;
+
+    &.umb-control-group__listview {
+        // position: relative messes up the listview status messages (e.g. "no search results")
+        position: unset;
+    }
+
     &::after {
         content: '';
         display:block;
