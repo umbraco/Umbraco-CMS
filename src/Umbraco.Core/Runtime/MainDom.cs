@@ -36,7 +36,7 @@ namespace Umbraco.Core.Runtime
         // actions to run before releasing the main domain
         private readonly List<KeyValuePair<int, Action>> _callbacks = new List<KeyValuePair<int, Action>>();
 
-        private const int LockTimeoutMilliseconds = 10000; // 10 seconds
+        private const int LockTimeoutMilliseconds = 40000; // 40 seconds
 
         #endregion
 
@@ -151,22 +151,20 @@ namespace Umbraco.Core.Runtime
             {
                 _logger.Info<MainDom>("Cannot acquire (timeout).");
 
-                // TODO: Previously we'd throw an exception and the appdomain would not start, what do we want to do?
-
-                // return false;
+                // TODO: In previous versions we'd let a TimeoutException be thrown
+                // and the appdomain would not start. We have the opportunity to allow it to
+                // start without having MainDom? This would mean that it couldn't write
+                // to nucache/examine and would only be ok if this was a super short lived appdomain.
+                // maybe safer to just keep throwing in this case.
 
                 throw new TimeoutException("Cannot acquire MainDom");
+                // return false;
             }
 
             try
             {
                 // Listen for the signal from another AppDomain coming online to release the lock
-                _mainDomLock.ListenAsync()
-                    .ContinueWith(_ =>
-                    {
-                        _logger.Debug<MainDom>("Signal heard from other appdomain.");
-                        OnSignal("signal");
-                    });
+                _mainDomLock.ListenAsync().ContinueWith(_ => OnSignal("signal"));
             }
             catch (OperationCanceledException ex)
             {
