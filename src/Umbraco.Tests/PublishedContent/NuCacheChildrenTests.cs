@@ -104,6 +104,7 @@ namespace Umbraco.Tests.PublishedContent
             contentTypeServiceBaseFactory.Setup(x => x.For(It.IsAny<IContentBase>())).Returns(contentTypeService.Object);
 
             var dataTypeService = Mock.Of<IDataTypeService>();
+            var domainService = Mock.Of<IDomainService>();
             Mock.Get(dataTypeService).Setup(x => x.GetAll()).Returns(dataTypes);
 
             // create a service context
@@ -166,7 +167,8 @@ namespace Umbraco.Tests.PublishedContent
                 Mock.Of<IPublishedModelFactory>(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }),
                 typeFinder,
-                hostingEnvironment);
+                hostingEnvironment,
+                domainService);
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();
