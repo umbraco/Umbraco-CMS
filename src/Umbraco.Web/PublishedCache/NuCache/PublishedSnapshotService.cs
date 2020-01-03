@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using CSharpTest.Net.Collections;
 using Newtonsoft.Json;
 using Umbraco.Core;
@@ -54,6 +55,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly ContentStore _mediaStore;
         private readonly SnapDictionary<int, Domain> _domainStore;
         private readonly object _storesLock = new object();
+        private readonly object _elementsLock = new object();
 
         private BPlusTree<int, ContentNodeKit> _localContentDb;
         private BPlusTree<int, ContentNodeKit> _localMediaDb;
@@ -143,7 +145,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 _domainStore = new SnapDictionary<int, Domain>();
 
-                LoadCachesOnStartup(); 
+                LoadCachesOnStartup();
             }
 
             Guid GetUid(ContentStore store, int id) => store.LiveSnapshot.Get(id)?.Uid ?? default;
@@ -171,7 +173,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var path = GetLocalFilesPath();
             var localContentDbPath = Path.Combine(path, "NuCache.Content.db");
             var localMediaDbPath = Path.Combine(path, "NuCache.Media.db");
-            
+
             _localContentDbExists = File.Exists(localContentDbPath);
             _localMediaDbExists = File.Exists(localMediaDbPath);
 
@@ -221,7 +223,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 {
                     okContent = LockAndLoadContent(scope => LoadContentFromLocalDbLocked(true));
                     if (!okContent)
-                        _logger.Warn<PublishedSnapshotService>("Loading content from local db raised warnings, will reload from database.");                    
+                        _logger.Warn<PublishedSnapshotService>("Loading content from local db raised warnings, will reload from database.");
                 }
 
                 if (_localMediaDbExists)
@@ -1147,12 +1149,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
             SnapDictionary<int, Domain>.Snapshot domainSnap;
             IAppCache elementsCache;
 
-            // TODO: Idea... TryGetElements? Might check if we are shutting down and return false and callers to this could handle it?
-            // Else does a readerwriterlockslim work here? (i don't think so)
-            // Else we have 2x locks, one for startup/shutdown, the other for getting elements and then we can maybe do a Monitor.Try?
-            // That is sort of the same as a TryGetElements
+            // Here we are reading/writing to shared objects so we need to lock (can't be _storesLock which manages the actual nucache files
+            // and would result in a deadlock). Even though we are locking around underlying readlocks (within CreateSnapshot) it's because
+            // we need to ensure that the result of contentSnap.Gen (etc) and the re-assignment of these values and _elements cache
+            // are done atomically. 
 
-            lock (_storesLock)
+            lock (_elementsLock)
             {
                 var scopeContext = _scopeProvider.Context;
 
@@ -1177,13 +1179,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     // elements
                     // just need to make sure nothing gets elements in another enlisted action... so using
                     // a MaxValue to make sure this one runs last, and it should be ok
-                    // ... else there is potential to deadlock since this would recursively go back into trying
-                    // lock on _storesLock but another thread may have already tried that
+
                     scopeContext.Enlist("Umbraco.Web.PublishedCache.NuCache.PublishedSnapshotService.Resync", () => this, (completed, svc) =>
                     {
                         ((PublishedSnapshot)svc.CurrentPublishedSnapshot)?.Resync();
                     }, int.MaxValue);
                 }
+
 
                 // create a new snapshot cache if snapshots are different gens
                 if (contentSnap.Gen != _contentGen || mediaSnap.Gen != _mediaGen || domainSnap.Gen != _domainGen || _elementsCache == null)
@@ -1351,7 +1353,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             //culture changed on an existing language
             var cultureChanged = e.SavedEntities.Any(x => !x.WasPropertyDirty(nameof(ILanguage.Id)) && x.WasPropertyDirty(nameof(ILanguage.IsoCode)));
-            if(cultureChanged)
+            if (cultureChanged)
             {
                 RebuildContentDbCache();
             }
