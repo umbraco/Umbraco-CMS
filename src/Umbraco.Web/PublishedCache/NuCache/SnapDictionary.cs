@@ -22,6 +22,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // This class is optimized for many readers, few writers
         // Readers are lock-free
 
+        // NOTE - we used to lock _rlocko the long hand way with Monitor.Enter(_rlocko, ref lockTaken) but this has
+        // been replaced with a normal c# lock because that's exactly how the normal c# lock works,
+        // see https://blogs.msdn.microsoft.com/ericlippert/2009/03/06/locks-and-exceptions-do-not-mix/
+        // for the readlock, there's no reason here to use the long hand way.
+
         private readonly ConcurrentDictionary<TKey, LinkedNode<TValue>> _items;
         private readonly ConcurrentQueue<GenObj> _genObjs;
         private GenObj _genObj;
@@ -71,15 +76,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
         //  are all ignored - Release is private and meant to be invoked with 'commit' being false only
         //  only on the outermost lock (by SnapDictionaryWriter)
 
-        // using (...) {} for locking is prone to nasty leaks in case of weird exceptions
-        // such as thread-abort or out-of-memory, but let's not worry about it now
+        // side note - using (...) {} for locking is prone to nasty leaks in case of weird exceptions
+        // such as thread-abort or out-of-memory, which is why we've moved away from the old using wrapper we had on locking.
 
         private readonly string _instanceId = Guid.NewGuid().ToString("N");
-
-        private class ReadLockInfo
-        {
-            public bool Taken;
-        }
 
         private class WriteLockInfo
         {
@@ -121,18 +121,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             Monitor.Enter(_wlocko, ref lockInfo.Taken);
 
-            var rtaken = false;
-            try
+            lock(_rlocko)
             {
-                Monitor.Enter(_rlocko, ref rtaken);
-
                 // assume everything in finally runs atomically
                 // http://stackoverflow.com/questions/18501678/can-this-unexpected-behavior-of-prepareconstrainedregions-and-thread-abort-be-ex
                 // http://joeduffyblog.com/2005/03/18/atomicity-and-asynchronous-exception-failures/
                 // http://joeduffyblog.com/2007/02/07/introducing-the-new-readerwriterlockslim-in-orcas/
                 // http://chabster.blogspot.fr/2013/12/readerwriterlockslim-fails-on-dual.html
                 //RuntimeHelpers.PrepareConstrainedRegions();
-                try { } finally
+                try { }
+                finally
                 {
                     // increment the lock count, and register that this lock is counting
                     _wlocked++;
@@ -149,15 +147,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     }
                 }
             }
-            finally
-            {
-                if (rtaken) Monitor.Exit(_rlocko);
-            }
-        }
-
-        private void Lock(ReadLockInfo lockInfo)
-        {
-            Monitor.Enter(_rlocko, ref lockInfo.Taken);
         }
 
         private void Release(WriteLockInfo lockInfo, bool commit = true)
@@ -168,22 +157,17 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             if (commit == false)
             {
-                var rtaken = false;
-                try
+                lock(_rlocko)
                 {
-                    Monitor.Enter(_rlocko, ref rtaken);
-                    try { } finally
+                    try { }
+                    finally
                     {
                         // forget about the temp. liveGen
                         _nextGen = false;
                         _liveGen -= 1;
                     }
                 }
-                finally
-                {
-                    if (rtaken) Monitor.Exit(_rlocko);
-                }
-
+                
                 foreach (var item in _items)
                 {
                     var link = item.Value;
@@ -200,11 +184,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // decrement the lock count, if counting, then exit the lock
             if (lockInfo.Count) _wlocked--;
             Monitor.Exit(_wlocko);
-        }
-
-        private void Release(ReadLockInfo lockInfo)
-        {
-            if (lockInfo.Taken) Monitor.Exit(_rlocko);
         }
 
         #endregion
@@ -347,11 +326,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public Snapshot CreateSnapshot()
         {
-            var lockInfo = new ReadLockInfo();
-            try
+            lock(_rlocko)
             {
-                Lock(lockInfo);
-
                 // if no next generation is required, and we already have a gen object,
                 // use it to create a new snapshot
                 if (_nextGen == false && _genObj != null)
@@ -397,10 +373,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     CollectAsyncLocked();
 
                 return snapshot;
-            }
-            finally
-            {
-                Release(lockInfo);
             }
         }
 

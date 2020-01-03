@@ -20,6 +20,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // this class is an extended version of SnapDictionary
         // most of the snapshots management code, etc is an exact copy
         // SnapDictionary has unit tests to ensure it all works correctly
+        // For locking information, see SnapDictionary
 
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly IVariationContextAccessor _variationContextAccessor;
@@ -79,11 +80,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private readonly string _instanceId = Guid.NewGuid().ToString("N");
 
-        private class ReadLockInfo
-        {
-            public bool Taken;
-        }
-
         private class WriteLockInfo
         {
             public bool Taken;
@@ -121,15 +117,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void Lock(WriteLockInfo lockInfo, bool forceGen = false)
         {
-            // TODO: We are in a deadlock here somehow??
-
             Monitor.Enter(_wlocko, ref lockInfo.Taken);
 
-            var rtaken = false;
-            try
+            lock(_rlocko)
             {
-                Monitor.Enter(_rlocko, ref rtaken);
-
                 // see SnapDictionary
                 try { }
                 finally
@@ -146,36 +137,22 @@ namespace Umbraco.Web.PublishedCache.NuCache
                         _nextGen = true;
                     }
                 }
-            }
-            finally
-            {
-                if (rtaken) Monitor.Exit(_rlocko);
-            }
-        }
-
-        private void Lock(ReadLockInfo lockInfo)
-        {
-            Monitor.Enter(_rlocko, ref lockInfo.Taken);
+            }           
         }
 
         private void Release(WriteLockInfo lockInfo, bool commit = true)
         {
             if (commit == false)
             {
-                var rtaken = false;
-                try
+                lock(_rlocko)
                 {
-                    Monitor.Enter(_rlocko, ref rtaken);
+                    // see SnapDictionary
                     try { }
                     finally
                     {
                         _nextGen = false;
                         _liveGen -= 1;
                     }
-                }
-                finally
-                {
-                    if (rtaken) Monitor.Exit(_rlocko);
                 }
 
                 Rollback(_contentNodes);
@@ -205,11 +182,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // TODO: Shouldn't this be in a finally block?
             if (lockInfo.Taken)
                 Monitor.Exit(_wlocko);
-        }
-
-        private void Release(ReadLockInfo lockInfo)
-        {
-            if (lockInfo.Taken) Monitor.Exit(_rlocko);
         }
 
         private void RollbackRoot()
@@ -1248,13 +1220,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public Snapshot CreateSnapshot()
         {
-            var lockInfo = new ReadLockInfo();
-            try
+            lock(_rlocko)
             {
-                // TODO: This would be much simpler with just a lock(_rlocko) { }
-                // in this case I see no reason why we are using this syntax?!
-                Lock(lockInfo);
-
                 // if no next generation is required, and we already have one,
                 // use it and create a new snapshot
                 if (_nextGen == false && _genObj != null)
@@ -1305,10 +1272,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     CollectAsyncLocked();
 
                 return snapshot;
-            }
-            finally
-            {
-                Release(lockInfo);
             }
         }
 
@@ -1427,18 +1390,17 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        // TODO: This is never used? Should it be?
-
-        public async Task WaitForPendingCollect()
-        {
-            Task task;
-            lock (_rlocko)
-            {
-                task = _collectTask;
-            }
-            if (task != null)
-                await task;
-        }
+        // TODO: This is never used? Should it be? Maybe move to TestHelper below?
+        //public async Task WaitForPendingCollect()
+        //{
+        //    Task task;
+        //    lock (_rlocko)
+        //    {
+        //        task = _collectTask;
+        //    }
+        //    if (task != null)
+        //        await task;
+        //}
 
         public long GenCount => _genObjs.Count;
 
