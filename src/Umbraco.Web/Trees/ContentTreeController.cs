@@ -40,6 +40,7 @@ namespace Umbraco.Web.Trees
         private readonly UmbracoTreeSearcher _treeSearcher;
         private readonly ActionCollection _actions;
         private readonly IGlobalSettings _globalSettings;
+        private readonly IPublicAccessService _publicAccessService;
 
         protected override int RecycleBinId => Constants.System.RecycleBinContent;
 
@@ -50,11 +51,12 @@ namespace Umbraco.Web.Trees
         protected override int[] UserStartNodes
             => _userStartNodes ?? (_userStartNodes = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService));
 
-        public ContentTreeController(UmbracoTreeSearcher treeSearcher, ActionCollection actions, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        public ContentTreeController(UmbracoTreeSearcher treeSearcher, ActionCollection actions, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IPublicAccessService publicAccessService) : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _treeSearcher = treeSearcher;
             _actions = actions;
             _globalSettings = globalSettings;
+            _publicAccessService = publicAccessService;
         }
 
         /// <inheritdoc />
@@ -105,7 +107,7 @@ namespace Umbraco.Web.Trees
                 node.AdditionalData.Add("variesByCulture", documentEntity.Variations.VariesByCulture());
                 node.AdditionalData.Add("contentType", documentEntity.ContentTypeAlias);
 
-                if (Services.PublicAccessService.IsProtected(entity.Path))
+                if (_publicAccessService.IsProtected(entity.Path))
                     node.SetProtectedStyle();
 
                 return node;

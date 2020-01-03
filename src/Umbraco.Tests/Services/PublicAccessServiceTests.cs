@@ -26,8 +26,6 @@ namespace Umbraco.Tests.Services
             contentTypeService.Save(ct);
             var c = MockedContent.CreateSimpleContent(ct, "Test", -1);
             contentService.Save(c);
-            var publicAccessService = ServiceContext.PublicAccessService;
-
 
             // Act
             var entry = new PublicAccessEntry(c, c, c, new[]
@@ -38,7 +36,7 @@ namespace Umbraco.Tests.Services
                     RuleValue = "TestVal"
                 },
             });
-            var result = publicAccessService.Save(entry);
+            var result = PublicAccessService.Save(entry);
 
             // Assert
             Assert.IsTrue(result.Success);
@@ -61,7 +59,6 @@ namespace Umbraco.Tests.Services
             contentTypeService.Save(ct);
             var c = MockedContent.CreateSimpleContent(ct, "Test", -1);
             contentService.Save(c);
-            var publicAccessService = ServiceContext.PublicAccessService;
             var entry = new PublicAccessEntry(c, c, c, new[]
            {
                 new PublicAccessRule()
@@ -70,12 +67,12 @@ namespace Umbraco.Tests.Services
                     RuleValue = "TestVal"
                 },
             });
-            publicAccessService.Save(entry);
+            PublicAccessService.Save(entry);
 
             // Act
-            var updated = publicAccessService.AddRule(c, "TestType2", "AnotherVal");
+            var updated = PublicAccessService.AddRule(c, "TestType2", "AnotherVal");
             //re-get
-            entry = publicAccessService.GetEntryForContent(c);
+            entry = PublicAccessService.GetEntryForContent(c);
 
             // Assert
             Assert.IsTrue(updated.Success);
@@ -94,7 +91,6 @@ namespace Umbraco.Tests.Services
             contentTypeService.Save(ct);
             var c = MockedContent.CreateSimpleContent(ct, "Test", -1);
             contentService.Save(c);
-            var publicAccessService = ServiceContext.PublicAccessService;
             var entry = new PublicAccessEntry(c, c, c, new[]
            {
                 new PublicAccessRule()
@@ -103,14 +99,14 @@ namespace Umbraco.Tests.Services
                     RuleValue = "TestVal"
                 },
             });
-            publicAccessService.Save(entry);
+            PublicAccessService.Save(entry);
 
             // Act
-            var updated1 = publicAccessService.AddRule(c, "TestType", "AnotherVal1");
-            var updated2 = publicAccessService.AddRule(c, "TestType", "AnotherVal2");
+            var updated1 = PublicAccessService.AddRule(c, "TestType", "AnotherVal1");
+            var updated2 = PublicAccessService.AddRule(c, "TestType", "AnotherVal2");
 
             //re-get
-            entry = publicAccessService.GetEntryForContent(c);
+            entry = PublicAccessService.GetEntryForContent(c);
 
             // Assert
             Assert.IsTrue(updated1.Success);
@@ -131,7 +127,6 @@ namespace Umbraco.Tests.Services
             contentTypeService.Save(ct);
             var c = MockedContent.CreateSimpleContent(ct, "Test", -1);
             contentService.Save(c);
-            var publicAccessService = ServiceContext.PublicAccessService;
             var entry = new PublicAccessEntry(c, c, c, new[]
            {
                 new PublicAccessRule()
@@ -145,12 +140,12 @@ namespace Umbraco.Tests.Services
                     RuleValue = "TestValue2"
                 },
             });
-            publicAccessService.Save(entry);
+            PublicAccessService.Save(entry);
 
             // Act
-            var removed = publicAccessService.RemoveRule(c, "TestType", "TestValue1");
+            var removed = PublicAccessService.RemoveRule(c, "TestType", "TestValue1");
             //re-get
-            entry = publicAccessService.GetEntryForContent(c);
+            entry = PublicAccessService.GetEntryForContent(c);
 
             // Assert
             Assert.IsTrue(removed.Success);

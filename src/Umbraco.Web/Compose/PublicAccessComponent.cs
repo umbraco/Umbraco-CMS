@@ -8,6 +8,13 @@ namespace Umbraco.Web.Compose
 {
     public sealed class PublicAccessComponent : IComponent
     {
+        private static IPublicAccessService _publicAccessService;
+
+        public PublicAccessComponent(IPublicAccessService publicAccessService)
+        {
+            _publicAccessService = publicAccessService;
+        }
+
         public void Initialize()
         {
             MemberGroupService.Saved += MemberGroupService_Saved;
@@ -26,7 +33,7 @@ namespace Umbraco.Web.Compose
                     && grp.AdditionalData["previousName"].ToString().IsNullOrWhiteSpace() == false
                     && grp.AdditionalData["previousName"].ToString() != grp.Name)
                 {
-                    Current.Services.PublicAccessService.RenameMemberGroupRoleRules(grp.AdditionalData["previousName"].ToString(), grp.Name);
+                    _publicAccessService.RenameMemberGroupRoleRules(grp.AdditionalData["previousName"].ToString(), grp.Name);
                 }
             }
         }

@@ -114,6 +114,9 @@ namespace Umbraco.Tests.Testing
 
         protected IIOHelper IOHelper { get; private set; }
         protected IDataTypeService DataTypeService => Factory.GetInstance<IDataTypeService>();
+
+        protected IPublicAccessService PublicAccessService => Factory.GetInstance<IPublicAccessService>();
+
         protected IPasswordHasher PasswordHasher => Factory.GetInstance<IPasswordHasher>();
         protected Lazy<PropertyEditorCollection> PropertyEditorCollection => new Lazy<PropertyEditorCollection>(() => Factory.GetInstance<PropertyEditorCollection>());
         protected ILocalizationService LocalizationService => Factory.GetInstance<ILocalizationService>();

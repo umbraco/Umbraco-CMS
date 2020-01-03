@@ -268,7 +268,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
-                    ShortStringHelper);
+                    ShortStringHelper,
+                    PublicAccessService);
 
                 return controller;
             }
@@ -303,7 +304,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
-                    ShortStringHelper);
+                    ShortStringHelper,
+                    PublicAccessService);
 
                 return controller;
             }
@@ -346,7 +348,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
-                    ShortStringHelper);
+                    ShortStringHelper,
+                    PublicAccessService);
 
                 return controller;
             }
@@ -394,7 +397,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
-                    ShortStringHelper);
+                    ShortStringHelper,
+                    PublicAccessService);
 
                 return controller;
             }
@@ -434,7 +438,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
-                    ShortStringHelper);
+                    ShortStringHelper,
+                    PublicAccessService);
 
                 return controller;
             }
@@ -480,7 +485,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
-                    ShortStringHelper);
+                    ShortStringHelper,
+                    PublicAccessService);
 
                 return controller;
             }

@@ -1822,7 +1822,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.RelationService.Save(new RelationType("test", "test", false, Constants.ObjectTypes.Document, Constants.ObjectTypes.Document));
             Assert.IsNotNull(ServiceContext.RelationService.Relate(content1, content2, "test"));
 
-            ServiceContext.PublicAccessService.Save(new PublicAccessEntry(content1, content2, content2, new List<PublicAccessRule>
+            PublicAccessService.Save(new PublicAccessEntry(content1, content2, content2, new List<PublicAccessRule>
             {
                 new PublicAccessRule
                 {
@@ -1830,7 +1830,7 @@ namespace Umbraco.Tests.Services
                     RuleValue = "test"
                 }
             }));
-            Assert.IsTrue(ServiceContext.PublicAccessService.AddRule(content1, "test2", "test2").Success);
+            Assert.IsTrue(PublicAccessService.AddRule(content1, "test2", "test2").Success);
 
             var user = ServiceContext.UserService.GetUserById(Constants.Security.SuperUserId);
             var userGroup = ServiceContext.UserService.GetUserGroupByAlias(user.Groups.First().Alias);

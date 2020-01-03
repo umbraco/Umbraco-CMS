@@ -27,6 +27,7 @@ namespace Umbraco.Web.Routing
         private readonly IProfilingLogger _profilingLogger;
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly ILogger _logger;
+        private readonly IPublicAccessService _publicAccessService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedRouter"/> class.
@@ -37,7 +38,8 @@ namespace Umbraco.Web.Routing
             IContentLastChanceFinder contentLastChanceFinder,
             IVariationContextAccessor variationContextAccessor,
             ServiceContext services,
-            IProfilingLogger proflog)
+            IProfilingLogger proflog,
+            IPublicAccessService publicAccessService)
         {
             _webRoutingSection = webRoutingSection ?? throw new ArgumentNullException(nameof(webRoutingSection));
             _contentFinders = contentFinders ?? throw new ArgumentNullException(nameof(contentFinders));
@@ -46,6 +48,7 @@ namespace Umbraco.Web.Routing
             _profilingLogger = proflog ?? throw new ArgumentNullException(nameof(proflog));
             _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
             _logger = proflog;
+            _publicAccessService = publicAccessService;
         }
 
         /// <inheritdoc />
@@ -564,7 +567,7 @@ namespace Umbraco.Web.Routing
 
             var path = request.PublishedContent.Path;
 
-            var publicAccessAttempt = _services.PublicAccessService.IsProtected(path);
+            var publicAccessAttempt = _publicAccessService.IsProtected(path);
 
             if (publicAccessAttempt)
             {
@@ -581,7 +584,7 @@ namespace Umbraco.Web.Routing
                     if (loginPageId != request.PublishedContent.Id)
                         request.PublishedContent = request.UmbracoContext.PublishedSnapshot.Content.GetById(loginPageId);
                 }
-                else if (_services.PublicAccessService.HasAccess(request.PublishedContent.Id, _services.ContentService, membershipHelper.CurrentUserName, membershipHelper.GetCurrentUserRoles()) == false)
+                else if (_publicAccessService.HasAccess(request.PublishedContent.Id, _services.ContentService, membershipHelper.CurrentUserName, membershipHelper.GetCurrentUserRoles()) == false)
                 {
                     _logger.Debug<PublishedRouter>("EnsurePublishedContentAccess: Current member has not access, redirect to error page");
                     var errorPageId = publicAccessAttempt.Result.NoAccessNodeId;

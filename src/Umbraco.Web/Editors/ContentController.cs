@@ -54,6 +54,7 @@ namespace Umbraco.Web.Editors
     {
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly Lazy<IDictionary<string, ILanguage>> _allLangs;
+        private readonly IPublicAccessService _publicAccessService;
 
         public object Domains { get; private set; }
 
@@ -68,11 +69,13 @@ namespace Umbraco.Web.Editors
             IProfilingLogger logger,
             IRuntimeState runtimeState,
             UmbracoHelper umbracoHelper,
-            IShortStringHelper shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IPublicAccessService publicAccessService)
             : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _allLangs = new Lazy<IDictionary<string, ILanguage>>(() => Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
+            _publicAccessService = publicAccessService;
         }
 
         /// <summary>
@@ -2305,7 +2308,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
             }
 
-            var entry = Services.PublicAccessService.GetEntryForContent(content);
+            var entry = _publicAccessService.GetEntryForContent(content);
             if (entry == null || entry.ProtectedNodeId != content.Id)
             {
                 return Request.CreateResponse(HttpStatusCode.OK);
@@ -2369,7 +2372,7 @@ namespace Umbraco.Web.Editors
                 ? Constants.Conventions.PublicAccess.MemberRoleRuleType
                 : Constants.Conventions.PublicAccess.MemberUsernameRuleType;
 
-            var entry = Services.PublicAccessService.GetEntryForContent(content);
+            var entry = _publicAccessService.GetEntryForContent(content);
 
             if (entry == null || entry.ProtectedNodeId != content.Id)
             {
@@ -2406,7 +2409,7 @@ namespace Umbraco.Web.Editors
                 }
             }
 
-            return Services.PublicAccessService.Save(entry).Success
+            return _publicAccessService.Save(entry).Success
                 ? Request.CreateResponse(HttpStatusCode.OK)
                 : Request.CreateResponse(HttpStatusCode.InternalServerError);
         }
@@ -2421,13 +2424,13 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
             }
 
-            var entry = Services.PublicAccessService.GetEntryForContent(content);
+            var entry = _publicAccessService.GetEntryForContent(content);
             if (entry == null)
             {
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
 
-            return Services.PublicAccessService.Delete(entry).Success
+            return _publicAccessService.Delete(entry).Success
                 ? Request.CreateResponse(HttpStatusCode.OK)
                 : Request.CreateResponse(HttpStatusCode.InternalServerError);
         }

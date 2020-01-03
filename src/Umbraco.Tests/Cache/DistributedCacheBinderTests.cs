@@ -108,8 +108,8 @@ namespace Umbraco.Tests.Cache
                 new EventDefinition<IContentService, PublishEventArgs<IContent>>(null, serviceContext.ContentService, new PublishEventArgs<IContent>(Enumerable.Empty<IContent>()), "Published"),
                 new EventDefinition<IContentService, PublishEventArgs<IContent>>(null, serviceContext.ContentService, new PublishEventArgs<IContent>(Enumerable.Empty<IContent>()), "Unpublished"),
 
-                new EventDefinition<IPublicAccessService, SaveEventArgs<PublicAccessEntry>>(null, serviceContext.PublicAccessService, new SaveEventArgs<PublicAccessEntry>(Enumerable.Empty<PublicAccessEntry>())),
-                new EventDefinition<IPublicAccessService, DeleteEventArgs<PublicAccessEntry>>(null, serviceContext.PublicAccessService, new DeleteEventArgs<PublicAccessEntry>(Enumerable.Empty<PublicAccessEntry>())),
+                new EventDefinition<IPublicAccessService, SaveEventArgs<PublicAccessEntry>>(null, PublicAccessService, new SaveEventArgs<PublicAccessEntry>(Enumerable.Empty<PublicAccessEntry>())),
+                new EventDefinition<IPublicAccessService, DeleteEventArgs<PublicAccessEntry>>(null, PublicAccessService, new DeleteEventArgs<PublicAccessEntry>(Enumerable.Empty<PublicAccessEntry>())),
 
                 new EventDefinition<IRelationService, SaveEventArgs<IRelationType>>(null, serviceContext.RelationService, new SaveEventArgs<IRelationType>(Enumerable.Empty<IRelationType>())),
                 new EventDefinition<IRelationService, DeleteEventArgs<IRelationType>>(null, serviceContext.RelationService, new DeleteEventArgs<IRelationType>(Enumerable.Empty<IRelationType>())),
