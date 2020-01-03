@@ -104,7 +104,8 @@ namespace Umbraco.Tests.Scoping
                 Mock.Of<IPublishedModelFactory>(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(ShortStringHelper) }),
                 typeFinder,
-                hostingEnvironment);
+                hostingEnvironment,
+                DomainService);
         }
 
         protected UmbracoContext GetUmbracoContextNu(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null)

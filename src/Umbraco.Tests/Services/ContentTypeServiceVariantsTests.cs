@@ -78,7 +78,8 @@ namespace Umbraco.Tests.Services
                 Mock.Of<IPublishedModelFactory>(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(ShortStringHelper) }),
                 typeFinder,
-                hostingEnvironment);
+                hostingEnvironment,
+                DomainService);
         }
 
         public class LocalServerMessenger : ServerMessengerBase

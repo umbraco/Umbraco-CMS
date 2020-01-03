@@ -206,7 +206,8 @@ namespace Umbraco.Tests.PublishedContent
                 Mock.Of<IPublishedModelFactory>(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }),
                 typeFinder,
-                TestHelper.GetHostingEnvironment());
+                TestHelper.GetHostingEnvironment(),
+                Mock.Of<IDomainService>());
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();
