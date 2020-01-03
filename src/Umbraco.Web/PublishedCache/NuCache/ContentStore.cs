@@ -39,7 +39,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private long _liveGen, _floorGen;
         private bool _nextGen, _collectAuto;
         private Task _collectTask;
-        private volatile int _wlocked;
         private List<KeyValuePair<int, ContentNodeKit>> _wchanges;
 
         // TODO: collection trigger (ok for now)
@@ -83,7 +82,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private class WriteLockInfo
         {
             public bool Taken;
-            public bool Count;
         }
 
         // a scope contextual that represents a locked writer to the dictionary
@@ -111,7 +109,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // TODO: GetScopedWriter? should the dict have a ref onto the scope provider?
         public IDisposable GetScopedWriteLock(IScopeProvider scopeProvider)
         {
-            _logger.Debug<ContentStore>("GetScopedWriteLock");
             return ScopeContextualBase.Get(scopeProvider, _instanceId, scoped => new ScopedWriteLock(this, scoped));
         }
 
@@ -123,6 +120,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void Lock(WriteLockInfo lockInfo, bool forceGen = false)
         {
+            if (Monitor.IsEntered(_wlocko))
+                throw new InvalidOperationException("Recursive locks not allowed");
+
             Monitor.Enter(_wlocko, ref lockInfo.Taken);
 
             lock(_rlocko)
@@ -131,9 +131,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 try { }
                 finally
                 {
-                    _wlocked++;
-                    lockInfo.Count = true;
-                    if (_nextGen == false || (forceGen && _wlocked == 1))
+                    if (_nextGen == false || (forceGen))
                     {
                         // because we are changing things, a new generation
                         // is created, which will trigger a new snapshot
@@ -180,12 +178,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
 
             // TODO: Shouldn't this be in a finally block?
-            // TODO: Shouldn't this be decremented after we exit??
-            // TODO: Shouldn't the locked flag never exceed 1?
-            if (lockInfo.Count)
-                _wlocked--;
-
-            // TODO: Shouldn't this be in a finally block?
             if (lockInfo.Taken)
                 Monitor.Exit(_wlocko);
         }
@@ -220,22 +212,18 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public void ReleaseLocalDb()
         {
-            _logger.Info<ContentStore>("Releasing DB...");
             var lockInfo = new WriteLockInfo();
             try
             {
                 try
                 {
-                    // Trying to lock could throw exceptions so always make sure to clean up.
-                    _logger.Info<ContentStore>("Trying to lock before releasing DB (lock count = {LockCount}) ...", _wlocked);
-
+                    // Trying to lock could throw exceptions so always make sure to clean up.                    
                     Lock(lockInfo);
                 }
                 finally
                 {
                     try
                     {
-                        _logger.Info<ContentStore>("Disposing local DB...");
                         _localDb?.Dispose();
                     }
                     catch (Exception ex)
@@ -275,57 +263,61 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Content types
 
-        public void NewContentTypes(IEnumerable<IPublishedContentType> types)
+        /// <summary>
+        /// Sets data for new content types
+        /// </summary>
+        /// <param name="types"></param>
+        /// <remarks>
+        /// This methods MUST be called from within a write lock, normally wrapped within GetScopedWriteLock
+        /// otherwise an exception will occur.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if this method is not called within a write lock
+        /// </exception>
+        public void NewContentTypesLocked(IEnumerable<IPublishedContentType> types)
         {
-            var lockInfo = new WriteLockInfo();
-            try
-            {
-                _logger.Debug<ContentStore>("NewContentTypes");
-                Lock(lockInfo);
+            EnsureLocked();
 
-                foreach (var type in types)
-                {
-                    SetValueLocked(_contentTypesById, type.Id, type);
-                    SetValueLocked(_contentTypesByAlias, type.Alias, type);
-                }
-            }
-            finally
+            foreach (var type in types)
             {
-                Release(lockInfo);
+                SetValueLocked(_contentTypesById, type.Id, type);
+                SetValueLocked(_contentTypesByAlias, type.Alias, type);
             }
         }
 
-        public void UpdateContentTypes(IEnumerable<IPublishedContentType> types)
+        /// <summary>
+        /// Sets data for updated content types
+        /// </summary>
+        /// <param name="types"></param>
+        /// <remarks>
+        /// This methods MUST be called from within a write lock, normally wrapped within GetScopedWriteLock
+        /// otherwise an exception will occur.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if this method is not called within a write lock
+        /// </exception>
+        public void UpdateContentTypesLocked(IEnumerable<IPublishedContentType> types)
         {
             //nothing to do if this is empty, no need to lock/allocate/iterate/etc...
             if (!types.Any()) return;
 
-            var lockInfo = new WriteLockInfo();
-            try
+            EnsureLocked();
+
+            var index = types.ToDictionary(x => x.Id, x => x);
+
+            foreach (var type in index.Values)
             {
-                _logger.Debug<ContentStore>("UpdateContentTypes");
-                Lock(lockInfo);
-
-                var index = types.ToDictionary(x => x.Id, x => x);
-
-                foreach (var type in index.Values)
-                {
-                    SetValueLocked(_contentTypesById, type.Id, type);
-                    SetValueLocked(_contentTypesByAlias, type.Alias, type);
-                }
-
-                foreach (var link in _contentNodes.Values)
-                {
-                    var node = link.Value;
-                    if (node == null) continue;
-                    var contentTypeId = node.ContentType.Id;
-                    if (index.TryGetValue(contentTypeId, out var contentType) == false) continue;
-                    SetValueLocked(_contentNodes, node.Id, new ContentNode(node, contentType));
-                }
+                SetValueLocked(_contentTypesById, type.Id, type);
+                SetValueLocked(_contentTypesByAlias, type.Alias, type);
             }
-            finally
+
+            foreach (var link in _contentNodes.Values)
             {
-                Release(lockInfo);
+                var node = link.Value;
+                if (node == null) continue;
+                var contentTypeId = node.ContentType.Id;
+                if (index.TryGetValue(contentTypeId, out var contentType) == false) continue;
+                SetValueLocked(_contentNodes, node.Id, new ContentNode(node, contentType));
             }
         }
 
@@ -1256,7 +1248,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // else we need to try to create a new gen ref
                 // whether we are wlocked or not, noone can rlock while we do,
                 // so _liveGen and _nextGen are safe
-                if (_wlocked > 0) // volatile, cannot ++ but could --
+                if (Monitor.IsEntered(_wlocko))
                 {
                     // write-locked, cannot use latest gen (at least 1) so use previous
                     var snapGen = _nextGen ? _liveGen - 1 : _liveGen;

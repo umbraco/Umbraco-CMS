@@ -622,7 +622,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 .Where(x => x.RootContentId.HasValue && x.LanguageIsoCode.IsNullOrWhiteSpace() == false)
                 .Select(x => new Domain(x.Id, x.DomainName, x.RootContentId.Value, CultureInfo.GetCultureInfo(x.LanguageIsoCode), x.IsWildcard)))
             {
-                _domainStore.Set(domain.Id, domain);
+                _domainStore.SetLocked(domain.Id, domain);
             }
         }
 
@@ -980,7 +980,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                             }
                             break;
                         case DomainChangeTypes.Remove:
-                            _domainStore.Clear(payload.Id);
+                            _domainStore.ClearLocked(payload.Id);
                             break;
                         case DomainChangeTypes.Refresh:
                             var domain = _serviceContext.DomainService.GetById(payload.Id);
@@ -988,7 +988,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                             if (domain.RootContentId.HasValue == false) continue; // anomaly
                             if (domain.LanguageIsoCode.IsNullOrWhiteSpace()) continue; // anomaly
                             var culture = CultureInfo.GetCultureInfo(domain.LanguageIsoCode);
-                            _domainStore.Set(domain.Id, new Domain(domain.Id, domain.DomainName, domain.RootContentId.Value, culture, domain.IsWildcard));
+                            _domainStore.SetLocked(domain.Id, new Domain(domain.Id, domain.DomainName, domain.RootContentId.Value, culture, domain.IsWildcard));
                             break;
                     }
                 }
@@ -1075,9 +1075,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 _contentStore.UpdateContentTypes(removedIds, typesA, kits);
                 if (!otherIds.IsCollectionEmpty())
-                    _contentStore.UpdateContentTypes(CreateContentTypes(PublishedItemType.Content, otherIds.ToArray()));
+                    _contentStore.UpdateContentTypesLocked(CreateContentTypes(PublishedItemType.Content, otherIds.ToArray()));
                 if (!newIds.IsCollectionEmpty())
-                    _contentStore.NewContentTypes(CreateContentTypes(PublishedItemType.Content, newIds.ToArray()));
+                    _contentStore.NewContentTypesLocked(CreateContentTypes(PublishedItemType.Content, newIds.ToArray()));
                 scope.Complete();
             }
         }
@@ -1106,9 +1106,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 _mediaStore.UpdateContentTypes(removedIds, typesA, kits);
                 if (!otherIds.IsCollectionEmpty())
-                    _mediaStore.UpdateContentTypes(CreateContentTypes(PublishedItemType.Media, otherIds.ToArray()).ToArray());
+                    _mediaStore.UpdateContentTypesLocked(CreateContentTypes(PublishedItemType.Media, otherIds.ToArray()).ToArray());
                 if (!newIds.IsCollectionEmpty())
-                    _mediaStore.NewContentTypes(CreateContentTypes(PublishedItemType.Media, newIds.ToArray()).ToArray());
+                    _mediaStore.NewContentTypesLocked(CreateContentTypes(PublishedItemType.Media, newIds.ToArray()).ToArray());
                 scope.Complete();
             }
         }
