@@ -32,7 +32,7 @@ namespace Umbraco.Web
 
             var publishedSearchResults = new List<PublishedSearchResult>();
 
-            foreach (var result in results.OrderByDescending(x => x.Score))
+            foreach (var result in results)
             {
                 if (int.TryParse(result.Id, out var contentId) &&
                     cache.GetById(contentId) is IPublishedContent content)
@@ -62,7 +62,7 @@ namespace Umbraco.Web
 
             var publishedSearchResults = new List<PublishedSearchResult>();
 
-            foreach (var result in results.OrderByDescending(x => x.Score))
+            foreach (var result in results)
             {
                 if (int.TryParse(result.Id, out var contentId) &&
                     result.Values.TryGetValue(LuceneIndex.CategoryFieldName, out var indexType))
