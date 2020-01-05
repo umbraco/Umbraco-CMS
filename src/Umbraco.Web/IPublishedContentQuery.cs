@@ -49,7 +49,7 @@ namespace Umbraco.Web
         /// </para>
         /// <para>While enumerating results, the ambient culture is changed to be the searched culture.</para>
         /// </remarks>
-        IEnumerable<PublishedSearchResult> Search(string term, string culture = "*", string indexName = null);
+        IEnumerable<PublishedSearchResult> Search(string term, string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName);
 
         /// <summary>
         /// Searches content.
@@ -71,7 +71,7 @@ namespace Umbraco.Web
         /// </para>
         /// <para>While enumerating results, the ambient culture is changed to be the searched culture.</para>
         /// </remarks>
-        IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = null);
+        IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName);
 
         /// <summary>
         /// Executes the query and converts the results to <see cref="PublishedSearchResult" />.

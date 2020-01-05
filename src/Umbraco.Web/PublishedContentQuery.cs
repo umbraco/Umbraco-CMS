@@ -183,13 +183,13 @@ namespace Umbraco.Web
         #region Search
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(string term, string culture = "*", string indexName = null)
+        public IEnumerable<PublishedSearchResult> Search(string term, string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName)
         {
             return Search(term, 0, 0, out _, culture, indexName);
         }
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = null)
+        public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName)
         {
             if (string.IsNullOrEmpty(indexName))
             {
@@ -318,9 +318,6 @@ namespace Umbraco.Web
                 object IEnumerator.Current => Current;
             }
         }
-
-
-
 
         #endregion
     }
