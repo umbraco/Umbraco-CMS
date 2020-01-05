@@ -191,6 +191,16 @@ namespace Umbraco.Web
         /// <inheritdoc />
         public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName)
         {
+            if (skip < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(skip), skip, "The value must be greater than or equal to zero.");
+            }
+
+            if (take < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(take), take, "The value must be greater than or equal to zero.");
+            }
+
             if (string.IsNullOrEmpty(indexName))
             {
                 indexName = Constants.UmbracoIndexes.ExternalIndexName;
@@ -240,6 +250,16 @@ namespace Umbraco.Web
         /// <inheritdoc />
         public IEnumerable<PublishedSearchResult> Search(IQueryExecutor query, int skip, int take, out long totalRecords)
         {
+            if (skip < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(skip), skip, "The value must be greater than or equal to zero.");
+            }
+
+            if (take < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(take), take, "The value must be greater than or equal to zero.");
+            }
+
             var results = skip == 0 && take == 0
                 ? query.Execute()
                 : query.Execute(skip + take);
