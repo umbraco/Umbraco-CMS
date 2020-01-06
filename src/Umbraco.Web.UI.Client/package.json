@@ -78,6 +78,6 @@
     "marked": "^0.5.2",
     "merge-stream": "1.0.1",
     "run-sequence": "2.2.1",
-    "caniuse-lite": "^1.0.30000966"
+    "caniuse-lite": "^1.0.30001019"
   }
 }
