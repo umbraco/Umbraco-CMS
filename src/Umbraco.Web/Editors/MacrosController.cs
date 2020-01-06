@@ -323,7 +323,6 @@ namespace Umbraco.Web.Editors
         /// Finds partial view files in app plugin folders.
         /// </summary>
         /// <returns>
-        /// The <see cref="IEnumerable"/>.
         /// </returns>
         private IEnumerable<string> FindPartialViewFilesInPluginFolders()
         {
