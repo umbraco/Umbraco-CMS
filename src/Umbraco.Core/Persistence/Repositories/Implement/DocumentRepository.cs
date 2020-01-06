@@ -839,7 +839,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return GetPage<DocumentDto>(query, pageIndex, pageSize, out totalRecords,
                 x => MapDtosToContent(x, false,
                     // load properties but nothing else
-                    true, false, false, false),
+                    true, false, false, true),
                 filterSql,
                 ordering);
         }
