@@ -1,4 +1,4 @@
-<label class="checkbox umb-form-check umb-form-check--checkbox" ng-class="{ 'umb-form-check--disabled': disabled }">
+<label class="checkbox umb-form-check umb-form-check--checkbox {{vm.cssClass}}" ng-class="{ 'umb-form-check--disabled': vm.disabled }">
     <input type="checkbox"
            id="{{vm.inputId}}"
            name="{{vm.name}}"
@@ -8,12 +8,15 @@
            ng-model="vm.model"
            ng-disabled="vm.disabled"
            ng-required="vm.required"
-           ng-change="vm.callOnChange()"/>
+           ng-change="vm.change()"/>
 
     <span class="umb-form-check__state" aria-hidden="true">
         <span class="umb-form-check__check">
             <i class="umb-form-check__icon icon-check"></i>
         </span>
     </span>
-    <span class="umb-form-check__text">{{vm.text}}</span>
+
+    <i ng-if="vm.iconClass.length" class="{{vm.iconClass}}" aria-hidden="true"></i>
+
+    <span ng-if="vm.text.length" class="umb-form-check__text">{{vm.text}}</span>
 </label>

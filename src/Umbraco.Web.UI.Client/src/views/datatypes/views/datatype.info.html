@@ -1,0 +1,140 @@
+<div ng-controller="Umbraco.Editors.DataType.InfoController as vm">
+
+    <div class="umb-package-details">
+        <div class="umb-package-details__main-content">
+
+
+            <umb-load-indicator ng-if="vm.view.loading === true"></umb-load-indicator>
+
+
+            <umb-box ng-if="vm.view.loading === false && vm.hasReferences === false">
+                <umb-box-header title-key="references_tabName"></umb-box-header>
+                <umb-box-content>
+                    <umb-empty-state size="small">
+                        <localize key="references_DataTypeNoReferences">This Data Type has no references.</localize>
+                    </umb-empty-state>
+                </umb-box-content>
+            </umb-box>
+
+
+            <div ng-if="vm.view.loading === false && vm.hasReferences === true">
+
+                <!-- Document Types -->
+
+                <div ng-if="vm.references.documentTypes.length > 0" class="mb4">
+
+                    <h5 class="mt0" style="margin-bottom: 20px;">
+                        <localize key="references_labelUsedByDocumentTypes"></localize>
+                    </h5>
+
+                    <div class="umb-table">
+                        <div class="umb-table-head">
+                            <div class="umb-table-row">
+                                <div class="umb-table-cell"></div>
+                                <div class="umb-table-cell umb-table__name not-fixed"><localize key="general_name">Name</localize></div>
+                                <div class="umb-table-cell"><localize key="content_alias">Alias</localize></div>
+                                <div class="umb-table-cell"><localize key="references_usedByProperties">Used in</localize></div>
+                                <div class="umb-table-cell umb-table-cell--nano"><localize key="general_open" style="visibility:hidden;">Open</localize></div>
+                            </div>
+                        </div>
+                        <div class="umb-table-body">
+                            <div class="umb-table-row" ng-repeat="reference in vm.references.documentTypes">
+                                <div class="umb-table-cell"><i class="umb-table-body__icon {{reference.icon}}"></i></div>
+                                <div class="umb-table-cell umb-table__name"><span>{{::reference.name}}</span></div>
+                                <div class="umb-table-cell"><span title="{{::reference.alias}}">{{::reference.alias}}</span></div>
+                                <div class="umb-table-cell --noOverflow"><span>{{::reference.properties | umbCmsJoinArray:', ':'name'}}</span></div>
+                                <div class="umb-table-cell umb-table-cell--nano"><a href="#/settings/documentTypes/edit/{{::reference.id}}"><localize key="general_open">Open</localize></a></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Media Types -->
+                <div ng-if="vm.references.mediaTypes.length > 0" class="mb4">
+
+                    <h5 class="mt0" style="margin-bottom: 20px;">
+                        <localize key="references_labelUsedByMediaTypes"></localize>
+                    </h5>
+
+                    <div class="umb-table">
+                        <div class="umb-table-head">
+                            <div class="umb-table-row">
+                                <div class="umb-table-cell"></div>
+                                <div class="umb-table-cell umb-table__name not-fixed"><localize key="general_name">Name</localize></div>
+                                <div class="umb-table-cell"><localize key="content_alias">Alias</localize></div>
+                                <div class="umb-table-cell"><localize key="references_usedByProperties">Used in</localize></div>
+                                <div class="umb-table-cell umb-table-cell--nano"><localize key="general_open" style="visibility:hidden;">Open</localize></div>
+                            </div>
+                        </div>
+                        <div class="umb-table-body">
+                            <div class="umb-table-row" ng-repeat="reference in vm.references.mediaTypes">
+                                <div class="umb-table-cell"><i class="umb-table-body__icon {{reference.icon}}"></i></div>
+                                <div class="umb-table-cell umb-table__name"><span>{{::reference.name}}</span></div>
+                                <div class="umb-table-cell"><span title="{{::reference.alias}}">{{::reference.alias}}</span></div>
+                                <div class="umb-table-cell --noOverflow"><span>{{::reference.properties | umbCmsJoinArray:', ':'name'}}</span></div>
+                                <div class="umb-table-cell umb-table-cell--nano"><a href="#/settings/mediaTypes/edit/{{::reference.id}}"><localize key="general_open">Open</localize></a></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <!-- Member Types -->
+                <div ng-if="vm.references.memberTypes.length > 0" class="mb4">
+
+                    <h5 class="mt0" style="margin-bottom: 20px;">
+                        <localize key="references_labelUsedByMemberTypes"></localize>
+                    </h5>
+
+                    <div class="umb-table">
+                        <div class="umb-table-head">
+                            <div class="umb-table-row">
+                                <div class="umb-table-cell"></div>
+                                <div class="umb-table-cell umb-table__name not-fixed"><localize key="general_name">Name</localize></div>
+                                <div class="umb-table-cell"><localize key="content_alias">Alias</localize></div>
+                                <div class="umb-table-cell"><localize key="references_usedByProperties">Used in</localize></div>
+                                <div class="umb-table-cell umb-table-cell--nano"><localize key="general_open" style="visibility:hidden;">Open</localize></div>
+                            </div>
+                        </div>
+                        <div class="umb-table-body">
+                            <div class="umb-table-row" ng-repeat="reference in vm.references.memberTypes">
+                                <div class="umb-table-cell"><i class="umb-table-body__icon {{reference.icon}}"></i></div>
+                                <div class="umb-table-cell umb-table__name"><span>{{::reference.name}}</span></div>
+                                <div class="umb-table-cell"><span title="{{::reference.alias}}">{{::reference.alias}}</span></div>
+                                <div class="umb-table-cell --noOverflow"><span>{{::reference.properties | umbCmsJoinArray:', ':'name'}}</span></div>
+                                <div class="umb-table-cell umb-table-cell--nano"><a href="#/settings/memberTypes/edit/{{::reference.id}}"><localize key="general_open">Open</localize></a></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+        <div class="umb-package-details__sidebar">
+            <umb-box data-element="node-info-general">
+                <umb-box-header title-key="general_general"></umb-box-header>
+                <umb-box-content class="block-form">
+
+                    <umb-control-group label="Id" ng-if="model.showIdentifier">
+                        <div>{{model.content.id}}</div>
+                        <small>{{model.content.key}}</small>
+                    </umb-control-group>
+
+                    <umb-control-group label="Property Editor Alias" ng-if="model.content.selectedEditor">
+                        <div>{{model.content.selectedEditor}}</div>
+                    </umb-control-group>
+
+                </umb-box-content>
+            </umb-box>
+        </div>
+
+    </div>
+
+
+</div>

@@ -1679,9 +1679,9 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(response);
             }
 
-            var permission = Services.UserService.GetPermissions(Security.CurrentUser, node.Path);
+            var assignedPermissions = Services.UserService.GetAssignedPermissions(Security.CurrentUser, node.Id);
 
-            if (permission.AssignedPermissions.Contains(ActionAssignDomain.ActionLetter.ToString(), StringComparer.Ordinal) == false)
+            if (assignedPermissions.Contains(ActionAssignDomain.ActionLetter.ToString(), StringComparer.Ordinal) == false)
             {
                 var response = Request.CreateResponse(HttpStatusCode.BadRequest);
                 response.Content = new StringContent("You do not have permission to assign domains on that node.");
@@ -1926,10 +1926,8 @@ namespace Umbraco.Web.Editors
             }
             if (model.ParentId < 0)
             {
-                //cannot move if the content item is not allowed at the root unless there are
-                //none allowed at root (in which case all should be allowed at root)
-                var contentTypeService = Services.ContentTypeService;
-                if (toMove.ContentType.AllowedAsRoot == false && contentTypeService.GetAll().Any(ct => ct.AllowedAsRoot))
+                //cannot move if the content item is not allowed at the root
+                if (toMove.ContentType.AllowedAsRoot == false)
                 {
                     throw new HttpResponseException(
                             Request.CreateNotificationValidationErrorResponse(
@@ -2297,7 +2295,7 @@ namespace Umbraco.Web.Editors
             }
 
             var entry = Services.PublicAccessService.GetEntryForContent(content);
-            if (entry == null)
+            if (entry == null || entry.ProtectedNodeId != content.Id)
             {
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
@@ -2379,7 +2377,7 @@ namespace Umbraco.Web.Editors
 
             var entry = Services.PublicAccessService.GetEntryForContent(content);
 
-            if (entry == null)
+            if (entry == null || entry.ProtectedNodeId != content.Id)
             {
                 entry = new PublicAccessEntry(content, loginPage, errorPage, new List<PublicAccessRule>());
 

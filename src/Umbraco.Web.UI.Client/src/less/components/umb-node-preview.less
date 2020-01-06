@@ -3,6 +3,7 @@
     display: flex;
     box-sizing: border-box;
     border-bottom: 1px solid @gray-9;
+    flex-wrap: wrap;
 }
 
 .umb-editor-wrapper .umb-node-preview {
@@ -64,9 +65,13 @@
     flex: 0 0 auto;
     display: flex;
     align-items: center;
+    margin-left: auto;
 }
 
 .umb-node-preview__action {
+    background: transparent;
+    padding: 0;
+    border: 0 none;
     margin-left: 5px;
     margin-right: 5px;
     font-size: 13px;
@@ -89,11 +94,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    background: transparent;
     border: 1px dashed @ui-action-discreet-border;
     color: @ui-action-discreet-type;
     font-weight: bold;
     padding: 5px 15px;
     box-sizing: border-box;
+    width: 100%;
 }
 
 .umb-node-preview-add:hover {

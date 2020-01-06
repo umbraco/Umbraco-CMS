@@ -1,5 +1,4 @@
 ﻿.umb-nested-content {
-    text-align: center;
     position: relative;
 }
 
@@ -13,6 +12,17 @@
 .umb-nested-content--not-supported {
     opacity: 0.3;
     pointer-events: none;
+}
+
+.umb-nested-content--mandatory {
+    /*
+        yeah so this is a pain, but we must be super specific in targeting the mandatory property labels,
+        otherwise all properties within a reqired, nested, nested content property will all appear mandatory
+    */
+    > ng-form > .control-group > .umb-el-wrap > .control-header label:after {
+        content: '*';
+        color: @red;
+    }
 }
 
 .umb-nested-content-overlay {
@@ -72,7 +82,7 @@
     padding: 15px 5px;
     color:@ui-option-type;
     border-radius: 3px 3px 0 0;
-    
+
     &:hover {
         color:@ui-option-type-hover;
     }
@@ -94,7 +104,7 @@
             padding-left: 30px;
         }
     }
-    
+
 }
 
 .umb-nested-content__icons {
@@ -135,6 +145,8 @@
 
 
 .umb-nested-content__icon {
+    background: transparent;
+    border: 0 none;
     display: inline-block;
     padding: 4px;
     margin: 2px;
@@ -154,6 +166,11 @@
 
 .umb-nested-content__icon--disabled {
     opacity: 0.3;
+    cursor: default !important;
+
+    &:hover {
+        color: @ui-option-type;
+    }
 }
 
 
@@ -165,6 +182,7 @@
 
 .umb-nested-content__add-content {
     display: flex;
+    width: 100%;
     align-items: center;
     justify-content: center;
     border: 1px dashed @ui-action-discreet-border;
@@ -208,19 +226,19 @@
     display: none !important;
 }
 
-.umb-nested-content__doctypepicker table input, 
+.umb-nested-content__doctypepicker table input,
 .umb-nested-content__doctypepicker table select {
     width: 100%;
     padding-right: 0;
 }
 
-.umb-nested-content__doctypepicker table td.icon-navigation, 
+.umb-nested-content__doctypepicker table td.icon-navigation,
 .umb-nested-content__doctypepicker i.umb-nested-content__help-icon {
     vertical-align: middle;
     color: @gray-7;
 }
 
-.umb-nested-content__doctypepicker table td.icon-navigation:hover, 
+.umb-nested-content__doctypepicker table td.icon-navigation:hover,
 .umb-nested-content__doctypepicker i.umb-nested-content__help-icon:hover {
     color: @gray-2;
 }
@@ -229,8 +247,30 @@
     margin-left: 10px;
 }
 
-.form-horizontal .umb-nested-content--narrow .controls-row
-{
+.umb-nested-content__placeholder {
+    padding: 4px 6px;
+    border: 1px dashed @gray-8;
+    background: 0 0;
+    cursor: pointer;
+    color: @blueExtraDark;
+    -webkit-animation: fadeIn .5s;
+    animation: fadeIn .5s;
+    text-align: center;
+
+    &--selected {
+        border: none;
+        text-align: left;
+        padding: 0;
+    }
+}
+
+.umb-nested-content__placeholder:hover {
+    color: @blueMid;
+    border-color: @blueMid;
+    text-decoration: none;
+}
+
+.form-horizontal .umb-nested-content--narrow .controls-row {
     margin-left: 40% !important;
 }
 
@@ -248,7 +288,7 @@
 // the attribute selector ensures the change only applies to the linkpicker overlay
 .form-horizontal .umb-nested-content--narrow [ng-controller*="Umbraco.Overlays.LinkPickerController"] .controls-row {
     margin-left:0!important;
-    
+
     .umb-textarea, .umb-textstring {
         width:100%;
     }

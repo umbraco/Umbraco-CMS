@@ -14,6 +14,7 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("Umbraco.Web")]
 [assembly: InternalsVisibleTo("Umbraco.Web.UI")]
 [assembly: InternalsVisibleTo("Umbraco.Examine")]
+[assembly: InternalsVisibleTo("Umbraco.ModelsBuilder.Embedded")]
 
 [assembly: InternalsVisibleTo("Umbraco.Tests")]
 [assembly: InternalsVisibleTo("Umbraco.Tests.Benchmarks")]
@@ -32,7 +33,7 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("Umbraco.Forms.Web")]
 
 // Umbraco Headless
-[assembly: InternalsVisibleTo("Umbraco.Headless")]
+[assembly: InternalsVisibleTo("Umbraco.Cloud.Headless")]
 
 // code analysis
 // IDE1006 is broken, wants _value syntax for consts, etc - and it's even confusing ppl at MS, kill it

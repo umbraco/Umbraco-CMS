@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
@@ -75,7 +74,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (ids.Any())
                 sql.WhereIn<NodeDto>(x => x.NodeId, ids);
 
-            return MapDtosToContent(Database.Fetch<DocumentDto>(sql));
+            return MapDtosToContent(Database.Fetch<DocumentDto>(sql), false,
+                // load everything
+                true, true, true, true);
         }
 
         protected override IEnumerable<IContent> PerformGetByQuery(IQuery<IContent> query)
@@ -87,7 +88,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             AddGetByQueryOrderBy(sql);
 
-            return MapDtosToContent(Database.Fetch<DocumentDto>(sql));
+            return MapDtosToContent(Database.Fetch<DocumentDto>(sql), false,
+                // load everything
+                true, true, true, true);
         }
 
         private void AddGetByQueryOrderBy(Sql<ISqlContext> sql)
@@ -226,7 +229,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .OrderByDescending<ContentVersionDto>(x => x.Current)
                 .AndByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            return MapDtosToContent(Database.Fetch<DocumentDto>(sql), true);
+            return MapDtosToContent(Database.Fetch<DocumentDto>(sql), true, true, true, true, true);
         }
 
         public override IEnumerable<IContent> GetAllVersionsSlim(int nodeId, int skip, int take)
@@ -236,7 +239,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .OrderByDescending<ContentVersionDto>(x => x.Current)
                 .AndByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            return MapDtosToContent(Database.Fetch<DocumentDto>(sql), true, true).Skip(skip).Take(take);
+            return MapDtosToContent(Database.Fetch<DocumentDto>(sql), true,
+                // load bare minimum
+                false, false, false, false).Skip(skip).Take(take);
         }
 
         public override IContent GetVersion(int versionId)
@@ -248,14 +253,63 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return dto == null ? null : MapDtoToContent(dto);
         }
 
+        // deletes a specific version
+        public override void DeleteVersion(int versionId)
+        {
+            // TODO: test object node type?
+
+            // get the version we want to delete
+            var template = SqlContext.Templates.Get("Umbraco.Core.DocumentRepository.GetVersion", tsql =>
+                tsql.Select<ContentVersionDto>()
+                    .AndSelect<DocumentVersionDto>()
+                    .From<ContentVersionDto>()
+                    .InnerJoin<DocumentVersionDto>()
+                    .On<ContentVersionDto, DocumentVersionDto>((c, d) => c.Id == d.Id)
+                    .Where<ContentVersionDto>(x => x.Id == SqlTemplate.Arg<int>("versionId"))
+            );
+            var versionDto = Database.Fetch<DocumentVersionDto>(template.Sql(new { versionId })).FirstOrDefault();
+
+            // nothing to delete
+            if (versionDto == null)
+                return;
+
+            // don't delete the current or published version
+            if (versionDto.ContentVersionDto.Current)
+                throw new InvalidOperationException("Cannot delete the current version.");
+            else if (versionDto.Published)
+                throw new InvalidOperationException("Cannot delete the published version.");
+
+            PerformDeleteVersion(versionDto.ContentVersionDto.NodeId, versionId);
+        }
+
+        //  deletes all versions of an entity, older than a date.
+        public override void DeleteVersions(int nodeId, DateTime versionDate)
+        {
+            // TODO: test object node type?
+
+            // get the versions we want to delete, excluding the current one
+            var template = SqlContext.Templates.Get("Umbraco.Core.DocumentRepository.GetVersions", tsql =>
+               tsql.Select<ContentVersionDto>()
+                    .From<ContentVersionDto>()
+                    .InnerJoin<DocumentVersionDto>()
+                    .On<ContentVersionDto, DocumentVersionDto>((c, d) => c.Id == d.Id)
+                    .Where<ContentVersionDto>(x => x.NodeId == SqlTemplate.Arg<int>("nodeId") && !x.Current && x.VersionDate < SqlTemplate.Arg<DateTime>("versionDate"))
+                    .Where<DocumentVersionDto>( x => !x.Published)                    
+            );
+            var versionDtos = Database.Fetch<ContentVersionDto>(template.Sql(new { nodeId, versionDate }));
+            foreach (var versionDto in versionDtos)
+                PerformDeleteVersion(versionDto.NodeId, versionDto.Id);
+        }
+
         protected override void PerformDeleteVersion(int id, int versionId)
         {
             // raise event first else potential FK issues
             OnUowRemovingVersion(new ScopedVersionEventArgs(AmbientScope, id, versionId));
 
             Database.Delete<PropertyDataDto>("WHERE versionId = @versionId", new { versionId });
-            Database.Delete<ContentVersionDto>("WHERE id = @versionId", new { versionId });
+            Database.Delete<ContentVersionCultureVariationDto>("WHERE versionId = @versionId", new { versionId });
             Database.Delete<DocumentVersionDto>("WHERE id = @versionId", new { versionId });
+            Database.Delete<ContentVersionDto>("WHERE id = @versionId", new { versionId });
         }
 
         #endregion
@@ -386,7 +440,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 Database.BulkInsertRecords(GetContentVariationDtos(entity, publishing));
 
                 // insert document variations
-                Database.BulkInsertRecords(GetDocumentVariationDtos(entity, publishing, editedCultures));
+                Database.BulkInsertRecords(GetDocumentVariationDtos(entity, editedCultures));
             }
 
             // refresh content
@@ -511,7 +565,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 entity.VersionId = documentVersionDto.Id = contentVersionDto.Id; // get the new id
 
                 documentVersionDto.Published = false; // non-published version
-                Database.Insert(documentVersionDto);
+                Database.Insert(documentVersionDto); 
             }
 
             // replace the property data (rather than updating)
@@ -571,7 +625,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 Database.BulkInsertRecords(GetContentVariationDtos(entity, publishing));
 
                 // insert document variations
-                Database.BulkInsertRecords(GetDocumentVariationDtos(entity, publishing, editedCultures));
+                Database.BulkInsertRecords(GetDocumentVariationDtos(entity, editedCultures));
             }
 
             // refresh content
@@ -783,7 +837,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             return GetPage<DocumentDto>(query, pageIndex, pageSize, out totalRecords,
-                x => MapDtosToContent(x),
+                x => MapDtosToContent(x, false,
+                    // load properties but nothing else
+                    true, false, false, true),
                 filterSql,
                 ordering);
         }
@@ -870,37 +926,39 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (ids.Length > 0)
                     sql.WhereIn<NodeDto>(x => x.UniqueId, ids);
 
-                return _outerRepo.MapDtosToContent(Database.Fetch<DocumentDto>(sql));
+                return _outerRepo.MapDtosToContent(Database.Fetch<DocumentDto>(sql), false,
+                    // load everything
+                    true, true, true, true);
             }
 
             protected override IEnumerable<IContent> PerformGetByQuery(IQuery<IContent> query)
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
             protected override IEnumerable<string> GetDeleteClauses()
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
             protected override void PersistNewItem(IContent entity)
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
             protected override void PersistUpdatedItem(IContent entity)
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
             protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
             protected override string GetBaseWhereClause()
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
         }
 
@@ -928,7 +986,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             AddGetByQueryOrderBy(sql);
 
-            return MapDtosToContent(Database.Fetch<DocumentDto>(sql));
+            return MapDtosToContent(Database.Fetch<DocumentDto>(sql),
+                // load the bare minimum
+                false, false, false, false, false);
         }
 
         /// <inheritdoc />
@@ -944,7 +1004,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             AddGetByQueryOrderBy(sql);
 
-            return MapDtosToContent(Database.Fetch<DocumentDto>(sql));
+            return MapDtosToContent(Database.Fetch<DocumentDto>(sql),
+                // load the bare minimum
+                false, false, false, false, false);
         }
 
         #endregion
@@ -1007,7 +1069,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return base.ApplySystemOrdering(ref sql, ordering);
         }
 
-        private IEnumerable<IContent> MapDtosToContent(List<DocumentDto> dtos, bool withCache = false, bool slim = false)
+        private IEnumerable<IContent> MapDtosToContent(List<DocumentDto> dtos,
+            bool withCache,
+            bool loadProperties,
+            bool loadTemplates,
+            bool loadSchedule,
+            bool loadVariants)
         {
             var temps = new List<TempContent<Content>>();
             var contentTypes = new Dictionary<int, IContentType>();
@@ -1040,7 +1107,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 var c = content[i] = ContentBaseFactory.BuildEntity(dto, contentType);
 
-                if (!slim)
+                if (loadTemplates)
                 {
                     // need templates
                     var templateId = dto.DocumentVersionDto.TemplateId;
@@ -1065,49 +1132,71 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 temps.Add(temp);
             }
 
-            if (!slim)
+            Dictionary<int, ITemplate> templates = null;
+            if (loadTemplates)
             {
                 // load all required templates in 1 query, and index
-                var templates = _templateRepository.GetMany(templateIds.ToArray())
+                templates = _templateRepository.GetMany(templateIds.ToArray())
                     .ToDictionary(x => x.Id, x => x);
+            }
 
+            IDictionary<int, PropertyCollection> properties = null;
+            if (loadProperties)
+            {
                 // load all properties for all documents from database in 1 query - indexed by version id
-                var properties = GetPropertyCollections(temps);
-                var schedule = GetContentSchedule(temps.Select(x => x.Content.Id).ToArray());
+                properties = GetPropertyCollections(temps);
+            }
 
-                // assign templates and properties
-                foreach (var temp in temps)
+            var schedule = GetContentSchedule(temps.Select(x => x.Content.Id).ToArray());
+
+            // assign templates and properties
+            foreach (var temp in temps)
+            {
+                if (loadTemplates)
                 {
                     // set the template ID if it matches an existing template
                     if (temp.Template1Id.HasValue && templates.ContainsKey(temp.Template1Id.Value))
                         temp.Content.TemplateId = temp.Template1Id;
                     if (temp.Template2Id.HasValue && templates.ContainsKey(temp.Template2Id.Value))
                         temp.Content.PublishTemplateId = temp.Template2Id;
+                }
+                
 
-                    // set properties
+                // set properties
+                if (loadProperties)
+                {
                     if (properties.ContainsKey(temp.VersionId))
                         temp.Content.Properties = properties[temp.VersionId];
                     else
                         throw new InvalidOperationException($"No property data found for version: '{temp.VersionId}'.");
+                }
 
+                if (loadSchedule)
+                {
                     // load in the schedule
                     if (schedule.TryGetValue(temp.Content.Id, out var s))
                         temp.Content.ContentSchedule = s;
                 }
+
             }
 
-            // set variations, if varying
-            temps = temps.Where(x => x.ContentType.VariesByCulture()).ToList();
-            if (temps.Count > 0)
+            if (loadVariants)
             {
-                // load all variations for all documents from database, in one query
-                var contentVariations = GetContentVariations(temps);
-                var documentVariations = GetDocumentVariations(temps);
-                foreach (var temp in temps)
-                    SetVariations(temp.Content, contentVariations, documentVariations);
+                // set variations, if varying
+                temps = temps.Where(x => x.ContentType.VariesByCulture()).ToList();
+                if (temps.Count > 0)
+                {
+                    // load all variations for all documents from database, in one query
+                    var contentVariations = GetContentVariations(temps);
+                    var documentVariations = GetDocumentVariations(temps);
+                    foreach (var temp in temps)
+                        SetVariations(temp.Content, contentVariations, documentVariations);
+                }
             }
+            
 
-            foreach(var c in content)
+
+            foreach (var c in content)
                 c.ResetDirtyProperties(false); // reset dirty initial properties (U4-1946)
 
             return content;
@@ -1297,25 +1386,28 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 };
         }
 
-        private IEnumerable<DocumentCultureVariationDto> GetDocumentVariationDtos(IContent content, bool publishing, HashSet<string> editedCultures)
+        private IEnumerable<DocumentCultureVariationDto> GetDocumentVariationDtos(IContent content, HashSet<string> editedCultures)
         {
             var allCultures = content.AvailableCultures.Union(content.PublishedCultures); // union = distinct
             foreach (var culture in allCultures)
-                yield return new DocumentCultureVariationDto
+            {
+                var dto = new DocumentCultureVariationDto
                 {
                     NodeId = content.Id,
                     LanguageId = LanguageRepository.GetIdByIsoCode(culture) ?? throw new InvalidOperationException("Not a valid culture."),
                     Culture = culture,
 
                     Name = content.GetCultureName(culture) ?? content.GetPublishName(culture),
-
-                    // note: can't use IsCultureEdited at that point - hasn't been updated yet - see PersistUpdatedItem
-
                     Available = content.IsCultureAvailable(culture),
                     Published = content.IsCulturePublished(culture),
+                    // note: can't use IsCultureEdited at that point - hasn't been updated yet - see PersistUpdatedItem
                     Edited = content.IsCultureAvailable(culture) &&
                              (!content.IsCulturePublished(culture) || (editedCultures != null && editedCultures.Contains(culture)))
                 };
+
+                yield return dto;
+            }
+                
         }
 
         private class ContentVariation

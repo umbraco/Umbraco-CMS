@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Web.Hosting;
 using Umbraco.Core.Logging;
@@ -15,25 +15,26 @@ namespace Umbraco.Core
     /// <para>When an AppDomain starts, it tries to acquire the main domain status.</para>
     /// <para>When an AppDomain stops (eg the application is restarting) it should release the main domain status.</para>
     /// </remarks>
-    internal class MainDom : IMainDom, IRegisteredObject
+    internal class MainDom : IMainDom, IRegisteredObject, IDisposable
     {
         #region Vars
 
         private readonly ILogger _logger;
 
         // our own lock for local consistency
-        private readonly object _locko = new object();
+        private object _locko = new object();
 
         // async lock representing the main domain lock
-        private readonly AsyncLock _asyncLock;
-        private IDisposable _asyncLocker;
+        private readonly SystemLock _systemLock;
+        private IDisposable _systemLocker;
 
         // event wait handle used to notify current main domain that it should
         // release the lock because a new domain wants to be the main domain
         private readonly EventWaitHandle _signal;
 
+        private bool _isInitialized;
         // indicates whether...
-        private volatile bool _isMainDom; // we are the main domain
+        private bool _isMainDom; // we are the main domain
         private volatile bool _signaled; // we have been signaled
 
         // actions to run before releasing the main domain
@@ -48,13 +49,13 @@ namespace Umbraco.Core
         // initializes a new instance of MainDom
         public MainDom(ILogger logger)
         {
+            HostingEnvironment.RegisterObject(this);
+
             _logger = logger;
 
-            var appId = string.Empty;
             // HostingEnvironment.ApplicationID is null in unit tests, making ReplaceNonAlphanumericChars fail
-            if (HostingEnvironment.ApplicationID != null)
-                appId = HostingEnvironment.ApplicationID.ReplaceNonAlphanumericChars(string.Empty);
-
+            var appId = HostingEnvironment.ApplicationID?.ReplaceNonAlphanumericChars(string.Empty) ?? string.Empty;
+            
             // combining with the physical path because if running on eg IIS Express,
             // two sites could have the same appId even though they are different.
             //
@@ -64,11 +65,11 @@ namespace Umbraco.Core
             // we *cannot* use the process ID here because when an AppPool restarts it is
             // a new process for the same application path
 
-            var appPath = HostingEnvironment.ApplicationPhysicalPath;
-            var hash = (appId + ":::" + appPath).ToSHA1();
+            var appPath = HostingEnvironment.ApplicationPhysicalPath?.ToLowerInvariant() ?? string.Empty;
+            var hash = (appId + ":::" + appPath).GenerateHash<SHA1>();
 
             var lockName = "UMBRACO-" + hash + "-MAINDOM-LCK";
-            _asyncLock = new AsyncLock(lockName);
+            _systemLock = new SystemLock(lockName);
 
             var eventName = "UMBRACO-" + hash + "-MAINDOM-EVT";
             _signal = new EventWaitHandle(false, EventResetMode.AutoReset, eventName);
@@ -99,6 +100,12 @@ namespace Umbraco.Core
             lock (_locko)
             {
                 if (_signaled) return false;
+                if (_isMainDom == false)
+                {
+                    _logger.Warn<MainDom>("Register called when MainDom has not been acquired");
+                    return false;
+                }
+
                 install?.Invoke();
                 if (release != null)
                     _callbacks.Add(new KeyValuePair<int, Action>(weight, release));
@@ -118,64 +125,65 @@ namespace Umbraco.Core
                 if (_signaled) return;
                 if (_isMainDom == false) return; // probably not needed
                 _signaled = true;
-            }
 
-            try
-            {
-                _logger.Info<MainDom>("Stopping ({SignalSource})", source);
-                foreach (var callback in _callbacks.OrderBy(x => x.Key).Select(x => x.Value))
+                try
                 {
-                    try
+                    _logger.Info<MainDom>("Stopping ({SignalSource})", source);
+                    foreach (var callback in _callbacks.OrderBy(x => x.Key).Select(x => x.Value))
                     {
-                        callback(); // no timeout on callbacks
+                        try
+                        {
+                            callback(); // no timeout on callbacks
+                        }
+                        catch (Exception e)
+                        {
+                            _logger.Error<MainDom>(e, "Error while running callback");
+                            continue;
+                        }
                     }
-                    catch (Exception e)
-                    {
-                        _logger.Error<MainDom>(e, "Error while running callback, remaining callbacks will not run.");
-                        throw;
-                    }
-
+                    _logger.Debug<MainDom>("Stopped ({SignalSource})", source);
                 }
-                _logger.Debug<MainDom>("Stopped ({SignalSource})", source);
-            }
-            finally
-            {
-                // in any case...
-                _isMainDom = false;
-                _asyncLocker.Dispose();
-                _logger.Info<MainDom>("Released ({SignalSource})", source);
+                finally
+                {
+                    // in any case...
+                    _isMainDom = false;
+                    _systemLocker?.Dispose();
+                    _logger.Info<MainDom>("Released ({SignalSource})", source);
+                }
+
             }
         }
 
         // acquires the main domain
-        internal bool Acquire()
+        private bool Acquire()
         {
-            lock (_locko) // we don't want the hosting environment to interfere by signaling
+            // if signaled, too late to acquire, give up
+            // the handler is not installed so that would be the hosting environment
+            if (_signaled)
             {
-                // if signaled, too late to acquire, give up
-                // the handler is not installed so that would be the hosting environment
-                if (_signaled)
-                {
-                    _logger.Info<MainDom>("Cannot acquire (signaled).");
-                    return false;
-                }
+                _logger.Info<MainDom>("Cannot acquire (signaled).");
+                return false;
+            }
 
-                _logger.Info<MainDom>("Acquiring.");
+            _logger.Info<MainDom>("Acquiring.");
 
-                // signal other instances that we want the lock, then wait one the lock,
-                // which may timeout, and this is accepted - see comments below
+            // signal other instances that we want the lock, then wait one the lock,
+            // which may timeout, and this is accepted - see comments below
 
-                // signal, then wait for the lock, then make sure the event is
-                // reset (maybe there was noone listening..)
-                _signal.Set();
+            // signal, then wait for the lock, then make sure the event is
+            // reset (maybe there was noone listening..)
+            _signal.Set();
 
-                // if more than 1 instance reach that point, one will get the lock
-                // and the other one will timeout, which is accepted
+            // if more than 1 instance reach that point, one will get the lock
+            // and the other one will timeout, which is accepted
 
-                //TODO: This can throw a TimeoutException - in which case should this be in a try/finally to ensure the signal is always reset?
-                _asyncLocker = _asyncLock.Lock(LockTimeoutMilliseconds);
-                _isMainDom = true;
-
+            //This can throw a TimeoutException - in which case should this be in a try/finally to ensure the signal is always reset.
+            try
+            {
+                _systemLocker = _systemLock.Lock(LockTimeoutMilliseconds);
+            }
+            finally
+            {
                 // we need to reset the event, because otherwise we would end up
                 // signaling ourselves and committing suicide immediately.
                 // only 1 instance can reach that point, but other instances may
@@ -183,35 +191,58 @@ namespace Umbraco.Core
                 // which is accepted
 
                 _signal.Reset();
-
-                //WaitOneAsync (ext method) will wait for a signal without blocking the main thread, the waiting is done on a background thread
-
-                _signal.WaitOneAsync()
-                    .ContinueWith(_ => OnSignal("signal"));
-
-                HostingEnvironment.RegisterObject(this);
-
-                _logger.Info<MainDom>("Acquired.");
-                return true;
             }
+            
+            //WaitOneAsync (ext method) will wait for a signal without blocking the main thread, the waiting is done on a background thread
+
+            _signal.WaitOneAsync()
+                .ContinueWith(_ => OnSignal("signal"));
+
+            _logger.Info<MainDom>("Acquired.");
+            return true;
         }
 
         /// <summary>
         /// Gets a value indicating whether the current domain is the main domain.
         /// </summary>
-        public bool IsMainDom => _isMainDom;
+        public bool IsMainDom => LazyInitializer.EnsureInitialized(ref _isMainDom, ref _isInitialized, ref _locko, () => Acquire());
 
         // IRegisteredObject
         void IRegisteredObject.Stop(bool immediate)
         {
-            try
+            OnSignal("environment"); // will run once
+
+            // The web app is stopping, need to wind down
+            Dispose(true);
+
+            HostingEnvironment.UnregisterObject(this);
+        }
+
+        #region IDisposable Support
+
+        // This code added to correctly implement the disposable pattern.
+
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
             {
-                OnSignal("environment"); // will run once
-            }
-            finally
-            {
-                HostingEnvironment.UnregisterObject(this);
+                if (disposing)
+                {
+                    _signal?.Close();
+                    _signal?.Dispose();
+                }
+
+                disposedValue = true;
             }
         }
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        #endregion
     }
 }

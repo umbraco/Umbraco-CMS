@@ -45,6 +45,30 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
         /**
          * @ngdoc method
+         * @name umbraco.resources.dataTypeResource#getReferences
+         * @methodOf umbraco.resources.dataTypeResource
+         *
+         * @description
+         * Retrieves references of a given data type.
+         *
+         * @param {Int} id id of datatype to retrieve references for
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        getReferences: function (id) {
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "dataTypeApiBaseUrl",
+                        "GetReferences",
+                        { id: id })),
+                "Failed to retrieve usages for data type of id " + id);
+            
+        },
+
+        /**
+         * @ngdoc method
          * @name umbraco.resources.dataTypeResource#getById
          * @methodOf umbraco.resources.dataTypeResource
          *
@@ -365,7 +389,7 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     (umbRequestHelper.getApiUrl(
                         "dataTypeApiBaseUrl",
                         "PostRenameContainer",
-                        { id: id, name: name })),
+                        { id: id, name: encodeURIComponent(name) })),
                 "Failed to rename the folder with id " + id);
         }
     };

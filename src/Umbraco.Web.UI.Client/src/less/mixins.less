@@ -308,7 +308,14 @@
   opacity: @opacity / 100;
 }
 
-
+// Position
+.absolute() {
+    position:absolute;
+    top:0;
+    right:0;
+    bottom:0;
+    left:0;
+}
 
 // BACKGROUNDS
 // --------------------------------------------------
@@ -325,7 +332,7 @@
 }
 
 // Gradient Bar Colors for buttons and alerts
-.gradientBar(@primaryColor, @secondaryColor, @textColor: #fff) {
+.gradientBar(@primaryColor, @secondaryColor, @textColor: @white) {
   color: @textColor;
   #gradient > .vertical(@primaryColor, @secondaryColor);
   border-color: @secondaryColor @secondaryColor darken(@secondaryColor, 15%);
@@ -334,7 +341,7 @@
 
 // Gradients
 #gradient {
-  .horizontal(@startColor: #555, @endColor: #333) {
+  .horizontal(@startColor: @gray, @endColor: @grayDark) {
     background-color: @endColor;
     background-image: -moz-linear-gradient(left, @startColor, @endColor); // FF 3.6+
     background-image: -webkit-gradient(linear, 0 0, 100% 0, from(@startColor), to(@endColor)); // Safari 4+, Chrome 2+
@@ -343,7 +350,7 @@
     background-image: linear-gradient(to right, @startColor, @endColor); // Standard, IE10
     background-repeat: repeat-x;
   }
-  .vertical(@startColor: #555, @endColor: #333) {
+  .vertical(@startColor: @gray, @endColor: @grayDark) {
     background-color: mix(@startColor, @endColor, 60%);
     background-image: -moz-linear-gradient(top, @startColor, @endColor); // FF 3.6+
     background-image: -webkit-gradient(linear, 0 0, 0 100%, from(@startColor), to(@endColor)); // Safari 4+, Chrome 2+
@@ -352,7 +359,7 @@
     background-image: linear-gradient(to bottom, @startColor, @endColor); // Standard, IE10
     background-repeat: repeat-x;
   }
-  .directional(@startColor: #555, @endColor: #333, @deg: 45deg) {
+  .directional(@startColor: @gray, @endColor: @grayDark, @deg: 45deg) {
     background-color: @endColor;
     background-repeat: repeat-x;
     background-image: -moz-linear-gradient(@deg, @startColor, @endColor); // FF 3.6+
@@ -360,7 +367,7 @@
     background-image: -o-linear-gradient(@deg, @startColor, @endColor); // Opera 11.10
     background-image: linear-gradient(@deg, @startColor, @endColor); // Standard, IE10
   }
-  .horizontal-three-colors(@startColor: #00b3ee, @midColor: #7a43b6, @colorStop: 50%, @endColor: #c3325f) {
+  .horizontal-three-colors(@startColor: @lightBlueIcon, @midColor: @purple-l1, @colorStop: 50%, @endColor: @pink) {
     background-color: mix(@midColor, @endColor, 80%);
     background-image: -webkit-gradient(left, linear, 0 0, 0 100%, from(@startColor), color-stop(@colorStop, @midColor), to(@endColor));
     background-image: -webkit-linear-gradient(left, @startColor, @midColor @colorStop, @endColor);
@@ -370,7 +377,7 @@
     background-repeat: no-repeat;
   }
 
-  .vertical-three-colors(@startColor: #00b3ee, @midColor: #7a43b6, @colorStop: 50%, @endColor: #c3325f) {
+  .vertical-three-colors(@startColor: @lightBlueIcon, @midColor: @deepPurpleIcon, @colorStop: 50%, @endColor: @pink) {
     background-color: mix(@midColor, @endColor, 80%);
     background-image: -webkit-gradient(linear, 0 0, 0 100%, from(@startColor), color-stop(@colorStop, @midColor), to(@endColor));
     background-image: -webkit-linear-gradient(@startColor, @midColor @colorStop, @endColor);
@@ -379,7 +386,7 @@
     background-image: linear-gradient(@startColor, @midColor @colorStop, @endColor);
     background-repeat: no-repeat;
   }
-  .radial(@innerColor: #555, @outerColor: #333) {
+  .radial(@innerColor: @gray, @outerColor: @grayDark) {
     background-color: @outerColor;
     background-image: -webkit-gradient(radial, center center, 0, center center, 460, from(@innerColor), to(@outerColor));
     background-image: -webkit-radial-gradient(circle, @innerColor, @outerColor);
@@ -387,7 +394,7 @@
     background-image: -o-radial-gradient(circle, @innerColor, @outerColor);
     background-repeat: no-repeat;
   }
-  .striped(@color: #555, @angle: 45deg) {
+  .striped(@color: @gray, @angle: 45deg) {
     background-color: @color;
     background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.25, rgba(255,255,255,.15)), color-stop(.25, transparent), color-stop(.5, transparent), color-stop(.5, rgba(255,255,255,.15)), color-stop(.75, rgba(255,255,255,.15)), color-stop(.75, transparent), to(transparent));
     background-image: -webkit-linear-gradient(@angle, rgba(255,255,255,.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.15) 50%, rgba(255,255,255,.15) 75%, transparent 75%, transparent);
@@ -397,11 +404,19 @@
   }
 }
 
-
+.checkeredBackground(@backgroundColor: @gray-9, @fillColor: @black, @fillOpacity: 0.25) {
+    background-image: url('data:image/svg+xml;charset=utf-8,\
+                        <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" fill="@{fillColor}" fill-opacity="@{fillOpacity}" >\
+                            <rect x="50" width="50" height="50" />\
+                            <rect y="50" width="50" height="50" />\
+                        </svg>');
+    background-color: @backgroundColor;
+    background-size: 10px 10px;
+    background-repeat: repeat;
+}
 
 // COMPONENT MIXINS
 // --------------------------------------------------
-
 // Limit width of specific property editors
 .umb-property-editor--limit-width {
     max-width: 800px;
@@ -420,14 +435,14 @@
 
 // Button backgrounds
 // ------------------
-.buttonBackground(@startColor, @hoverColor: @startColor, @textColor: #fff, @textColorHover: @textColor) {
-  
+.buttonBackground(@startColor, @hoverColor: @startColor, @textColor: @white, @textColorHover: @textColor) {
+
   color: @textColor;
   border-color: @startColor @startColor darken(@startColor, 15%);
   border-color: rgba(0,0,0,.1) rgba(0,0,0,.1) fadein(rgba(0,0,0,.1), 15%);
-  
+
   background-color: @startColor;
-  
+
   .caret {
       border-top-color: @textColor;
       border-bottom-color: @textColor;
@@ -438,7 +453,7 @@
     color: @textColorHover;
     background-color: @hoverColor;
   }
-  
+
   &.disabled, &[disabled] {
     color: @white;
     background-color: @sand-1;
