@@ -54,6 +54,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly ContentStore _mediaStore;
         private readonly SnapDictionary<int, Domain> _domainStore;
         private readonly object _storesLock = new object();
+        private readonly object _elementsLock = new object();
 
         private BPlusTree<int, ContentNodeKit> _localContentDb;
         private BPlusTree<int, ContentNodeKit> _localMediaDb;
@@ -1125,7 +1126,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
             ContentStore.Snapshot contentSnap, mediaSnap;
             SnapDictionary<int, Domain>.Snapshot domainSnap;
             IAppCache elementsCache;
-            lock (_storesLock)
+
+            // Here we are reading/writing to shared objects so we need to lock (can't be _storesLock which manages the actual nucache files
+            // and would result in a deadlock). Even though we are locking around underlying readlocks (within CreateSnapshot) it's because
+            // we need to ensure that the result of contentSnap.Gen (etc) and the re-assignment of these values and _elements cache
+            // are done atomically.
+
+            lock (_elementsLock)
             {
                 var scopeContext = _scopeProvider.Context;
 
