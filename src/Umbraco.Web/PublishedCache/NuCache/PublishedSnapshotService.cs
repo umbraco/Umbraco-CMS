@@ -943,14 +943,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 using (var scope = _scopeProvider.CreateScope())
                 {
                     scope.ReadLock(Constants.Locks.ContentTree);
-                    _contentStore.UpdateDataTypes(idsA, id => CreateContentType(PublishedItemType.Content, id));
+                    _contentStore.UpdateDataTypesLocked(idsA, id => CreateContentType(PublishedItemType.Content, id));
                     scope.Complete();
                 }
 
                 using (var scope = _scopeProvider.CreateScope())
                 {
                     scope.ReadLock(Constants.Locks.MediaTree);
-                    _mediaStore.UpdateDataTypes(idsA, id => CreateContentType(PublishedItemType.Media, id));
+                    _mediaStore.UpdateDataTypesLocked(idsA, id => CreateContentType(PublishedItemType.Media, id));
                     scope.Complete();
                 }
             }
@@ -1073,7 +1073,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     ? Array.Empty<ContentNodeKit>()
                     : _dataSource.GetTypeContentSources(scope, refreshedIds).ToArray();
 
-                _contentStore.UpdateContentTypes(removedIds, typesA, kits);
+                _contentStore.UpdateContentTypesLocked(removedIds, typesA, kits);
                 if (!otherIds.IsCollectionEmpty())
                     _contentStore.UpdateContentTypesLocked(CreateContentTypes(PublishedItemType.Content, otherIds.ToArray()));
                 if (!newIds.IsCollectionEmpty())
@@ -1104,7 +1104,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     ? Array.Empty<ContentNodeKit>()
                     : _dataSource.GetTypeMediaSources(scope, refreshedIds).ToArray();
 
-                _mediaStore.UpdateContentTypes(removedIds, typesA, kits);
+                _mediaStore.UpdateContentTypesLocked(removedIds, typesA, kits);
                 if (!otherIds.IsCollectionEmpty())
                     _mediaStore.UpdateContentTypesLocked(CreateContentTypes(PublishedItemType.Media, otherIds.ToArray()).ToArray());
                 if (!newIds.IsCollectionEmpty())
