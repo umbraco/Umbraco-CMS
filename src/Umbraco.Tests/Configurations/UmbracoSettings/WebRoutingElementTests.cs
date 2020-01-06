@@ -14,7 +14,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public void InternalRedirectPreservesTemplate()
         {
-            Assert.IsTrue(SettingsSection.WebRouting.TrySkipIisCustomErrors == false);
+            Assert.IsTrue(SettingsSection.WebRouting.InternalRedirectPreservesTemplate == false);
         }
 
         [Test]
