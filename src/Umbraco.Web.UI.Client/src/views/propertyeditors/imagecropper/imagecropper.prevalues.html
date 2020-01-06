@@ -53,7 +53,7 @@
         <div class="umb-cropsizes__controls">
             <button class="btn btn-info add" ng-hide="editMode" ng-click="add($event)"><localize key="general_add">Add</localize></button>
             <button class="btn btn-info add" ng-show="editMode" ng-click="add($event)"><localize key="general_update">Update</localize></button>
-            <a href class="btn btn-link" ng-show="editMode" ng-click="cancel($event)"><localize key="general_cancel">Cancel</localize></a>
+            <button type="button" class="btn btn-link" ng-show="editMode" ng-click="cancel($event)"><localize key="general_cancel">Cancel</localize></button>
         </div>
 
     </div>
@@ -65,8 +65,8 @@
                 <p><span>{{item.alias}}</span> <small>({{item.width}}px &times; {{item.height}}px)</small></p>
             </div>
             <div class="umb-prevalues-multivalues__right">
-                <a href="#" prevent-default class="umb-node-preview__action" ng-click="edit(item, $event)"><localize key="general_edit">Edit</localize></a>
-                <a href="#" prevent-default class="umb-node-preview__action umb-node-preview__action--red" ng-click="remove(item, $event)"><localize key="general_remove">Remove</localize></a>
+                <button type="button" class="umb-node-preview__action" ng-click="edit(item, $event)"><localize key="general_edit">Edit</localize></button>
+                <button type="button" class="umb-node-preview__action umb-node-preview__action--red" ng-click="remove(item, $event)"><localize key="general_remove">Remove</localize></button>
             </div>
         </div>
     </div>
