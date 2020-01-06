@@ -6,6 +6,7 @@ using Umbraco.Core.Migrations.Upgrade.Common;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_1;
 using Umbraco.Core.Migrations.Upgrade.V_8_1_0;
+using Umbraco.Core.Migrations.Upgrade.V_8_6_0;
 
 namespace Umbraco.Core.Migrations.Upgrade
 {
@@ -181,6 +182,10 @@ namespace Umbraco.Core.Migrations.Upgrade
             To<ConvertTinyMceAndGridMediaUrlsToLocalLink>("{B69B6E8C-A769-4044-A27E-4A4E18D1645A}");
             To<RenameUserLoginDtoDateIndex>("{0372A42B-DECF-498D-B4D1-6379E907EB94}");
             To<FixContentNuCascade>("{5B1E0D93-F5A3-449B-84BA-65366B84E2D4}");
+
+            // to 8.6.0
+            To<AddPropertyTypeValidationMessageColumns>("{3D67D2C8-5E65-47D0-A9E1-DC2EE0779D6B}");
+            To<MissingContentVersionsIndexes>("{EE288A91-531B-4995-8179-1D62D9AA3E2E}");
 
             //FINAL
         }

@@ -488,7 +488,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
          * @methodOf umbraco.services.tinyMceService
          *
          * @description
-         * Creates the umbrco insert embedded media tinymce plugin
+         * Creates the umbraco insert embedded media tinymce plugin
          *
          * @param {Object} editor the TinyMCE editor instance
          */
@@ -543,11 +543,11 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     'contenteditable': false
                 },
                 embed.preview);
-
-            if (activeElement) {
+            
+            // Only replace if activeElement is an Embed element.
+            if (activeElement && activeElement.nodeName.toUpperCase() === "DIV" && activeElement.classList.contains("embeditem")){
                 activeElement.replaceWith(wrapper); // directly replaces the html node
-            }
-            else {
+            } else {
                 editor.selection.setNode(wrapper);
             }
         },
@@ -575,7 +575,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
          * @methodOf umbraco.services.tinyMceService
          *
          * @description
-         * Creates the umbrco insert media tinymce plugin
+         * Creates the umbraco insert media tinymce plugin
          *
          * @param {Object} editor the TinyMCE editor instance
          */
@@ -705,7 +705,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
          * @methodOf umbraco.services.tinyMceService
          *
          * @description
-         * Creates the insert umbrco macro tinymce plugin
+         * Creates the insert umbraco macro tinymce plugin
          *
          * @param {Object} editor the TinyMCE editor instance
          */
