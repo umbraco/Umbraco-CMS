@@ -267,7 +267,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             return MapDtosToContent(Database.Fetch<DocumentDto>(sql), true,
                 // load bare minimum
-                false, false, false, false).Skip(skip).Take(take);
+                false, false, false, true).Skip(skip).Take(take);
         }
 
         public override IContent GetVersion(int versionId)
@@ -1018,7 +1018,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             return MapDtosToContent(Database.Fetch<DocumentDto>(sql),
                 // load the bare minimum
-                false, false, false, false, false);
+                false, false, false, true, true);
         }
 
         /// <inheritdoc />
@@ -1036,7 +1036,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             return MapDtosToContent(Database.Fetch<DocumentDto>(sql),
                 // load the bare minimum
-                false, false, false, false, false);
+                false, false, false, true, true);
         }
 
         #endregion
