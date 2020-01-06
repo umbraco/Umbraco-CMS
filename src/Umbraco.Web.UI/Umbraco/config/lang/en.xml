@@ -1406,6 +1406,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="editUserSaved">User Saved</key>
     <key alias="editUserTypeSaved">User type saved</key>
     <key alias="editUserGroupSaved">User group saved</key>
+    <key alias="editCulturesAndHostnamesSaved">Cultures and hostnames saved</key>
+    <key alias="editCulturesAndHostnamesError">Error saving cultures and hostnames</key>
     <key alias="fileErrorHeader">File not saved</key>
     <key alias="fileErrorText">file could not be saved. Please check file permissions</key>
     <key alias="fileSavedHeader">File saved</key>
