@@ -91,7 +91,7 @@ angular.module("umbraco.directives")
                 }
 
                 // checking the nodeType to ensure that this node and actionNode is from the same treeAlias
-                if (actionNode && actionNode.nodeType === node.nodeType) {
+                if (actionNode && actionNode.metaData.treeAlias === node.metaData.treeAlias) {
 
                     if (actionNode.id === node.id && String(node.id) !== "-1") {
                         css.push("active");
