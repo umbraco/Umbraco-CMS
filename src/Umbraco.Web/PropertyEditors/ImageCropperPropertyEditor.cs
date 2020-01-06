@@ -29,7 +29,7 @@ namespace Umbraco.Web.PropertyEditors
         HideLabel = false,
         Group = Constants.PropertyEditors.Groups.Media,
         Icon = "icon-crop")]
-    public class ImageCropperPropertyEditor : DataEditor
+    public class ImageCropperPropertyEditor : DataEditor, IDataEditorWithMediaPath
     {
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly IContentSection _contentSettings;
@@ -53,6 +53,8 @@ namespace Umbraco.Web.PropertyEditors
             // TODO: inject?
             _autoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, logger, _contentSettings);
         }
+
+        public string GetMediaPath(object value) => GetFileSrcFromPropertyValue(value, out _, false);
 
         /// <summary>
         /// Creates the corresponding property value editor.
@@ -138,8 +140,9 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         /// <param name="propVal"></param>
         /// <param name="deserializedValue">The deserialized <see cref="JObject"/> value</param>
+        /// <param name="relative">Should the path returned be the application relative path</param>
         /// <returns></returns>
-        private string GetFileSrcFromPropertyValue(object propVal, out JObject deserializedValue)
+        private string GetFileSrcFromPropertyValue(object propVal, out JObject deserializedValue, bool relative = true)
         {
             deserializedValue = null;
             if (propVal == null || !(propVal is string str)) return null;
@@ -147,7 +150,7 @@ namespace Umbraco.Web.PropertyEditors
             deserializedValue = GetJObject(str, true);
             if (deserializedValue?["src"] == null) return null;
             var src = deserializedValue["src"].Value<string>();
-            return _mediaFileSystem.GetRelativePath(src);
+            return relative ? _mediaFileSystem.GetRelativePath(src) : src;
         }
 
         /// <summary>

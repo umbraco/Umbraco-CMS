@@ -126,6 +126,7 @@
       <DependentUpon>Constants.cs</DependentUpon>
     </Compile>
     -->
+    <Compile Include="SystemLock.cs" />
     <Compile Include="Compose\AuditEventsComponent.cs" />
     <Compile Include="Compose\AuditEventsComposer.cs" />
     <Compile Include="Composing\CompositionExtensions\CoreMappingProfiles.cs" />

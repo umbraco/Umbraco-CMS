@@ -45,7 +45,7 @@
                         <tbody>
                             <tr ng-repeat="domain in vm.domains">
                                 <td>
-                                    <input style="width: 100%; margin-bottom: 0;" type="text" ng-model="domain.name" name="domain_name_{{$index}}" required />
+                                    <input style="width: 100%; margin-bottom: 0;" type="text" ng-model="domain.name" name="domain_name_{{$index}}" required umb-auto-focus />
                                     <span ng-if="vm.domainForm.$submitted" ng-messages="vm.domainForm['domain_name_' + $index].$error">
                                         <span class="help-inline" ng-message="required"><localize key="validation_invalidEmpty"></localize></span>
                                     </span>

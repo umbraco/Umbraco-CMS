@@ -1692,6 +1692,7 @@ namespace Umbraco.Web.Editors
 
             var permission = Services.UserService.GetPermissions(Security.CurrentUser, node.Path);
 
+
             if (permission.AssignedPermissions.Contains(ActionAssignDomain.ActionLetter.ToString(), StringComparer.Ordinal) == false)
             {
                 var response = Request.CreateResponse(HttpStatusCode.BadRequest);

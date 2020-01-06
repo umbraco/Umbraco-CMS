@@ -67,6 +67,8 @@ namespace Umbraco.Tests.TestHelpers.Entities
             media.SetValue(Constants.Conventions.Media.Bytes, "100");
             media.SetValue(Constants.Conventions.Media.Extension, "png");
 
+
+
             return media;
         }
 

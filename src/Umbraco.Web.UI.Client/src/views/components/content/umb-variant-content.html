@@ -27,6 +27,12 @@
         </ng-form>
 
         <umb-editor-container ng-if="vm.editor.content.apps.length > 0">
+
+            <!-- Deleted Context Message Bar (Displayed when viewing node in recycle bin) -->
+            <div ng-show="vm.content.trashed" class="umb-editor--trashed-message">
+                <i class="icon icon-trash"></i> <localize key="content_nodeIsInTrash">This item is in the Recycle Bin</localize>
+            </div>
+
             <div class="umb-editor-sub-views">
                 <div ng-repeat="app in vm.editor.content.apps track by app.alias">
                     <umb-editor-sub-view model="app" content="vm.content" />

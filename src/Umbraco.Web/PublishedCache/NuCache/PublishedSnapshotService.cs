@@ -61,7 +61,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private BPlusTree<int, ContentNodeKit> _localContentDb;
         private BPlusTree<int, ContentNodeKit> _localMediaDb;
-        private bool _localDbExists;
+        private bool _localContentDbExists;
+        private bool _localMediaDbExists;
 
         // define constant - determines whether to use cache when previewing
         // to store eg routes, property converted values, anything - caching
@@ -135,9 +136,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     // stores need to be populated, happens in OnResolutionFrozen which uses _localDbExists to
                     // figure out whether it can read the databases or it should populate them from sql
 
-                    _logger.Info<PublishedSnapshotService>("Creating the content store, localContentDbExists? {LocalContentDbExists}", _localDbExists);
-                    _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, Current.PublishedModelFactory, _localContentDb);
-                    _logger.Info<PublishedSnapshotService>("Creating the media store, localMediaDbExists? {LocalMediaDbExists}", _localDbExists);
+                    _logger.Info<PublishedSnapshotService>("Creating the content store, localContentDbExists? {LocalContentDbExists}", _localContentDbExists);
+                    _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger,  Current.PublishedModelFactory, _localContentDb);
+                    _logger.Info<PublishedSnapshotService>("Creating the media store, localMediaDbExists? {LocalMediaDbExists}", _localMediaDbExists);
                     _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, Current.PublishedModelFactory, _localMediaDb);
                 }
                 else
@@ -178,14 +179,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var path = GetLocalFilesPath();
             var localContentDbPath = Path.Combine(path, "NuCache.Content.db");
             var localMediaDbPath = Path.Combine(path, "NuCache.Media.db");
-            var localContentDbExists = File.Exists(localContentDbPath);
-            var localMediaDbExists = File.Exists(localMediaDbPath);
-            _localDbExists = localContentDbExists && localMediaDbExists;
-            // if both local databases exist then GetTree will open them, else new databases will be created
-            _localContentDb = BTree.GetTree(localContentDbPath, _localDbExists);
-            _localMediaDb = BTree.GetTree(localMediaDbPath, _localDbExists);
 
-            _logger.Info<PublishedSnapshotService>("Registered with MainDom, localContentDbExists? {LocalContentDbExists}, localMediaDbExists? {LocalMediaDbExists}", localContentDbExists, localMediaDbExists);
+            _localContentDbExists = File.Exists(localContentDbPath);
+            _localMediaDbExists = File.Exists(localMediaDbPath);
+
+            // if both local databases exist then GetTree will open them, else new databases will be created
+            _localContentDb = BTree.GetTree(localContentDbPath, _localContentDbExists);
+            _localMediaDb = BTree.GetTree(localMediaDbPath, _localMediaDbExists);
+
+            _logger.Info<PublishedSnapshotService>("Registered with MainDom, localContentDbExists? {LocalContentDbExists}, localMediaDbExists? {LocalMediaDbExists}", _localContentDbExists, _localMediaDbExists);
         }
 
         /// <summary>
@@ -218,11 +220,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             try
             {
-                if (_localDbExists)
+                if (_localContentDbExists)
                 {
                     okContent = LockAndLoadContent(scope => LoadContentFromLocalDbLocked(true));
                     if (!okContent)
                         _logger.Warn<PublishedSnapshotService>("Loading content from local db raised warnings, will reload from database.");
+                }
+
+                if (_localMediaDbExists)
+                {
                     okMedia = LockAndLoadMedia(scope => LoadMediaFromLocalDbLocked(true));
                     if (!okMedia)
                         _logger.Warn<PublishedSnapshotService>("Loading media from local db raised warnings, will reload from database.");

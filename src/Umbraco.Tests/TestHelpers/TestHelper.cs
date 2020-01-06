@@ -92,7 +92,7 @@ namespace Umbraco.Tests.TestHelpers
         public static ICoreDebug CoreDebug { get; } =  new CoreDebug();
 
         public static IIOHelper IOHelper { get; } = new IOHelper(GetHostingEnvironment());
-
+        public static IMainDom MainDom { get; } = new MainDom(Mock.Of<ILogger>(), GetHostingEnvironment());
         /// <summary>
         /// Maps the given <paramref name="relativePath"/> making it rooted on <see cref="CurrentAssemblyDirectory"/>. <paramref name="relativePath"/> must start with <code>~/</code>
         /// </summary>

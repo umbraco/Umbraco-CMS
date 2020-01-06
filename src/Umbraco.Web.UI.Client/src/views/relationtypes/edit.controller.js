@@ -10,6 +10,10 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
 
     var vm = this;
 
+    vm.header = {};
+    vm.header.editorfor = "relationType_tabRelationType";
+    vm.header.setPageTitle = true;
+
     vm.page = {};
     vm.page.loading = false;
     vm.page.saveButtonState = "init";

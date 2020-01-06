@@ -1,0 +1,98 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@{
+    Layout = null;
+    var homepage = Model.Content.AncestorOrSelf(1);
+}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+      <title>@Model.Content.GetPropertyValue("title")</title>
+        <meta name="keywords" content="@Model.Content.GetPropertyValue("keywords")" />
+        <meta name="description" content="@Model.Content.GetPropertyValue("description")" />
+        
+  
+       <meta http-equiv="Content-Language" content="en" />
+      <meta name="language" content="en" />
+      <meta name="robots" content="all, follow" />
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta name="MSSmartTagsPreventParsing" content="TRUE" />
+  
+      <link rel="stylesheet" href="/css/base-min.css" type="text/css" media="screen, projection" />
+      <link rel="stylesheet" href="/css/default.css" type="text/css" media="screen, projection" />
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400" rel="stylesheet" type="text/css">
+      <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        
+
+    </head>
+    <body>
+        <div id="header">
+            <div class="page-width fc">
+                
+                <a href="/" id="logo"><img src="/images/logo.png" alt="Koiak Basic Site" /></a>
+				
+                @if (homepage.HasProperty("headerNavigation"))
+                {
+                    <ul  class="navigation fc">
+                    @foreach (var item in Umbraco.TypedContent(homepage.GetPropertyValue("headerNavigation").ToString().Split(',')))
+                    {
+                        if (item != null)
+                        {
+                        <li><a href="@item.NiceUrl()">@item.Name</a></li>
+                        }
+                    }
+                    </ul>
+                }
+                
+                
+                @if(Umbraco.MemberIsLoggedOn())
+                {
+                <p class="fr" id="loggedIn">
+      Welcome @Context.User.Identity.Name, <a href="/login.aspx?signout=true">logout</a>
+                    
+    </p>
+                }
+                
+                <form action="/search" id="searchForm" method="get">
+                <fieldset>
+                  <label for="search" class="remove">Search Site</label>
+                  <input type="text" value="@Request.QueryString["search"]" class="input" name="search" id="search"/>
+                  <input type="submit" value="Search" class="submit"/>
+                </fieldset>
+              </form>
+            </div>
+
+            <div class="navigation">
+                @if (homepage.HasProperty("primaryNavigation"))
+                {
+                <ul  class="navigation fc">
+                    @foreach (var item in Umbraco.TypedContent(homepage.GetPropertyValue<string>("primaryNavigation").Split(',')))
+                    {
+                        if (item != null)
+                        {
+                            var selected = Array.IndexOf(Model.Content.Path.Split(','), item.Id.ToString()) >= 0 && item.Level > 1 ? " class=\"selected\"" : "";
+                        <li @Html.Raw(selected)><a href="@item.NiceUrl()">@item.Name</a></li>
+                        }
+                    }
+                    </ul>
+                }
+            </div>
+        </div>
+            <div id="body" class="page-width">
+                @RenderBody()
+            </div>
+            
+            <div id="footer" class="fc">
+                <div class="page-width">
+                    @Html.Partial("Affiliations",homepage)
+                    <p>@homepage.GetPropertyValue("address")</p>
+                    <p>@Html.Raw(homepage.GetPropertyValue<string>("copyright"))</p>
+                </div>
+            </div>
+
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+        <script type="text/javascript" src="/scripts/jquery.timers.js"></script>
+        <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>  
+        <script type="text/javascript" src="/scripts/default.js"></script>
+    </body>
+</html>
