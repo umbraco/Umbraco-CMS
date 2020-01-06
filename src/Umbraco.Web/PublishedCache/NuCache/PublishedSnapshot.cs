@@ -39,15 +39,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public void Resync()
         {
-            // This is annoying since this can cause deadlocks. Since this will be cleared if something happens in the same
-            // thread after that calls Elements, it will re-lock the _storesLock but that might already be locked again
-            // and since we're most likely in a ContentStore write lock, the other thread is probably wanting that one too.
-
             // no lock - published snapshots are single-thread
-
-            // TODO: Instead of clearing, we could hold this value in another var in case the above call to GetElements() Or potentially
-            // a new TryGetElements() fails (since we might be shutting down). In that case we can use the old value.
-
             _elements?.Dispose();
             _elements = null;
         }

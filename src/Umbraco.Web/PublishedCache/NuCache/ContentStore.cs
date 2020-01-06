@@ -157,40 +157,44 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void Release(WriteLockInfo lockInfo, bool commit = true)
         {
-            if (commit == false)
+            try
             {
-                lock(_rlocko)
+                if (commit == false)
                 {
-                    // see SnapDictionary
-                    try { }
-                    finally
+                    lock (_rlocko)
                     {
-                        _nextGen = false;
-                        _liveGen -= 1;
+                        // see SnapDictionary
+                        try { }
+                        finally
+                        {
+                            _nextGen = false;
+                            _liveGen -= 1;
+                        }
                     }
-                }
 
-                Rollback(_contentNodes);
-                RollbackRoot();
-                Rollback(_contentTypesById);
-                Rollback(_contentTypesByAlias);
-            }
-            else if (_localDb != null && _wchanges != null)
-            {
-                foreach (var change in _wchanges)
+                    Rollback(_contentNodes);
+                    RollbackRoot();
+                    Rollback(_contentTypesById);
+                    Rollback(_contentTypesByAlias);
+                }
+                else if (_localDb != null && _wchanges != null)
                 {
-                    if (change.Value.IsNull)
-                        _localDb.TryRemove(change.Key, out ContentNodeKit unused);
-                    else
-                        _localDb[change.Key] = change.Value;
+                    foreach (var change in _wchanges)
+                    {
+                        if (change.Value.IsNull)
+                            _localDb.TryRemove(change.Key, out ContentNodeKit unused);
+                        else
+                            _localDb[change.Key] = change.Value;
+                    }
+                    _wchanges = null;
+                    _localDb.Commit();
                 }
-                _wchanges = null;
-                _localDb.Commit();
             }
-
-            // TODO: Shouldn't this be in a finally block?
-            if (lockInfo.Taken)
-                Monitor.Exit(_wlocko);
+            finally
+            {
+                if (lockInfo.Taken)
+                    Monitor.Exit(_wlocko);
+            }
         }
 
         private void RollbackRoot()
@@ -256,10 +260,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
             finally
             {
-                _logger.Info<ContentStore>("Releasing ContentStore...");
-
-                // TODO: I don't understand this, we would have already closed the BPlusTree store above??
-                // I guess it's 'safe' and will just decrement the write lock counter?
                 Release(lockInfo);
             }
         }

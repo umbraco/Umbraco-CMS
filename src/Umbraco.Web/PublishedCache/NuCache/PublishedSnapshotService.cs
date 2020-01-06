@@ -670,15 +670,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 publishedChanged = publishedChanged2;
             }
 
-            // TODO: These resync's are a problem, they cause deadlocks because when this is called, it's generally called within a writelock
-            // and then we clear out the snapshot and then if there's some event handler that needs the content cache, it tries to re-get it
-            // which first tries locking on the _storesLock which may have already been acquired and in this case we deadlock because
-            // we're still holding the write lock.
-            // We resync at the end of a ScopedWriteLock
-            // BUT if we don't resync here then the current snapshot is out of date for any event handlers that wish to use the most up to date
-            // data...
-            // so we need to figure out how to deal with the _storesLock
-
+            
             if (draftChanged || publishedChanged)
                 ((PublishedSnapshot)CurrentPublishedSnapshot)?.Resync();
         }

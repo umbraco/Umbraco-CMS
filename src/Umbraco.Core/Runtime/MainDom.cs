@@ -151,7 +151,7 @@ namespace Umbraco.Core.Runtime
             {
                 _logger.Info<MainDom>("Cannot acquire (timeout).");
 
-                // TODO: In previous versions we'd let a TimeoutException be thrown
+                // In previous versions we'd let a TimeoutException be thrown
                 // and the appdomain would not start. We have the opportunity to allow it to
                 // start without having MainDom? This would mean that it couldn't write
                 // to nucache/examine and would only be ok if this was a super short lived appdomain.
