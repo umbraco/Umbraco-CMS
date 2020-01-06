@@ -2,15 +2,15 @@
 
 👍🎉 First off, thanks for taking the time to contribute! 🎉👍
 
-The following is a set of guidelines for contributing to Umbraco CMS.
+The following is a set of guidelines, for contributing to Umbraco CMS.
 
-These are mostly guidelines, not rules. Use your best judgment, and feel free to propose changes to this document in a pull request.
+These are mostly guidelines, not rules. Use your best judgement, and feel free to propose changes to this document in a pull request.
 
 Remember, we're a friendly bunch and are happy with whatever contribution you might provide. Below are guidelines for success that we've gathered over the years. If you choose to ignore them then we still love you 💖.
 
 **Code of conduct**
 
-This project and everyone participating in it is governed by the [our Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to [Sebastiaan Janssen - sj@umbraco.dk](mailto:sj@umbraco.dk).
+This project and everyone participating in it, is governed by the [our Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to [Sebastiaan Janssen - sj@umbraco.dk](mailto:sj@umbraco.dk).
 
 **Table of contents**
 
@@ -59,7 +59,8 @@ Great question! The short version goes like this:
   * **Clone** - when GitHub has created your fork, you can clone it in your favorite Git tool
 
   ![Clone the fork](img/clonefork.png)
-
+  
+  * **Switch to the correct branch** - switch to the v8-dev branch
   * **Build** - build your fork of Umbraco locally as described in [building Umbraco from source code](BUILD.md)
   * **Change** - make your changes, experiment, have fun, explore and learn, and don't be afraid. We welcome all contributions and will [happily give feedback](#questions)
   * **Commit** - done? Yay! 🎉 **Important:** create a new branch now and name it after the issue you're fixing, we usually follow the format: `temp-12345`. This means it's a temporary branch for the particular issue you're working on, in this case `12345`. When you have a branch, commit your changes. Don't commit to `v8/dev`, create a new branch first.
@@ -169,9 +170,9 @@ If you make the corrections we ask for in the same branch and push them to your 
 
 ### Keeping your Umbraco fork in sync with the main repository
 
-We recommend you sync with our repository before you submit your pull request. That way, you can fix any potential merge conflicts and make our lives a little bit easier.
+We recommend you to sync with our repository before you submit your pull request. That way, you can fix any potential merge conflicts and make our lives a little bit easier.
 
-Also, if you submitted a pull request three weeks ago and want to work on something new, you'll want to get the latest code to build against of course.
+Also, if you have submitted a pull request three weeks ago and want to work on something new, you'll want to get the latest code to build against of course.
 
 To sync your fork with this original one, you'll have to add the upstream url. You only have to do this once:
 

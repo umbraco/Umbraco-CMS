@@ -31,6 +31,7 @@
 @param {boolean} disabled Set the checkbox to be disabled.
 @param {boolean} required Set the checkbox to be required.
 @param {callback} onChange Callback when the value of the checkbox change by interaction.
+@param {string} cssClass Set a css class modifier
 
 **/
 
@@ -45,6 +46,8 @@
         vm.change = change;
 
         function onInit() {
+            vm.inputId = vm.inputId || "umb-check_" + String.CreateGuid();
+
             // If a labelKey is passed let's update the returned text if it's does not contain an opening square bracket [
             if (vm.labelKey) {
                  localizationService.localize(vm.labelKey).then(function (data) {
@@ -78,7 +81,9 @@
             serverValidationField: "@",
             disabled: "<",
             required: "<",
-            onChange: "&?"
+            onChange: "&?",
+            cssClass: "@?",
+            iconClass: "@?"
         }
     };
 

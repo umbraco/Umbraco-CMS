@@ -1,4 +1,4 @@
-<div id="leftcolumn" ng-controller="Umbraco.NavigationController" ng-mouseleave="leaveTree($event)" ng-mouseenter="enterTree($event)">
+<div id="leftcolumn" ng-controller="Umbraco.NavigationController" ng-mouseleave="leaveTree($event)" ng-mouseenter="enterTree($event)" on-outside-click="onOutsideClick()">
 
     <!-- navigation container -->
     <div id="navigation" ng-show="showNavigation" class="fill umb-modalcolumn" ng-animate="'slide'" nav-resize
@@ -10,12 +10,8 @@
                 <button type="button" class="umb-language-picker__toggle" ng-click="toggleLanguageSelector()" aria-haspopup="true" aria-expanded="{{page.languageSelectorIsOpen}}">
                     <span>
                         <span class="sr-only">
-<<<<<<< HEAD
                             <localize key="visuallyHiddenTexts_currentLanguage">Current language</localize>
                             <span>: </span>
-=======
-                            <localize key="visuallyHiddenTexts_currentLanguage">Current language</localize>:
->>>>>>> v8/dev
                         </span>
                         <span>{{selectedLanguage.name}}</span>
                     </span>
@@ -30,12 +26,8 @@
                         ng-repeat="language in languages"
                     >
                     <span class="sr-only">
-<<<<<<< HEAD
                         <localize key="visuallyHiddenTexts_switchLanguage">Switch language to</localize>
                         <span>: </span>
-=======
-                        <localize key="visuallyHiddenTexts_switchLanguage">Switch language to</localize>:
->>>>>>> v8/dev
                     </span>
                     <span>{{language.name}}</span>
                     </button>
