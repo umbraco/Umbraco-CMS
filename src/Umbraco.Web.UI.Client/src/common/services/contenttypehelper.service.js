@@ -27,7 +27,7 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
 
         generateModels: function () {
             var deferred = $q.defer();
-            var modelsResource = $injector.has("modelsBuilderResource") ? $injector.get("modelsBuilderResource") : null;
+            var modelsResource = $injector.has("modelsBuilderManagementResource") ? $injector.get("modelsBuilderManagementResource") : null;
             var modelsBuilderEnabled = Umbraco.Sys.ServerVariables.umbracoPlugins.modelsBuilder.enabled;
             if (modelsBuilderEnabled && modelsResource) {
                 modelsResource.buildModels().then(function(result) {
@@ -48,7 +48,7 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
 
         checkModelsBuilderStatus: function () {
             var deferred = $q.defer();
-            var modelsResource = $injector.has("modelsBuilderResource") ? $injector.get("modelsBuilderResource") : null;
+            var modelsResource = $injector.has("modelsBuilderManagementResource") ? $injector.get("modelsBuilderManagementResource") : null;
             var modelsBuilderEnabled = (Umbraco && Umbraco.Sys && Umbraco.Sys.ServerVariables && Umbraco.Sys.ServerVariables.umbracoPlugins && Umbraco.Sys.ServerVariables.umbracoPlugins.modelsBuilder && Umbraco.Sys.ServerVariables.umbracoPlugins.modelsBuilder.enabled === true);            
             
             if (modelsBuilderEnabled && modelsResource) {
