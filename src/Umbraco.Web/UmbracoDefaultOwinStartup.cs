@@ -29,7 +29,7 @@ namespace Umbraco.Web
         protected IUmbracoContextAccessor UmbracoContextAccessor => Current.UmbracoContextAccessor;
         protected IGlobalSettings GlobalSettings => Current.Configs.Global();
         protected IUmbracoSettingsSection UmbracoSettings => Current.Configs.Settings();
-        protected IUserPasswordConfiguration UserPasswordConfig => Current.Configs.UserPasswordConfig();
+        protected IUserPasswordConfiguration UserPasswordConfig => Current.Configs.UserPasswordConfiguration();
         protected IRuntimeState RuntimeState => Core.Composing.Current.RuntimeState;
         protected ServiceContext Services => Current.Services;
         protected UmbracoMapper Mapper => Current.Mapper;

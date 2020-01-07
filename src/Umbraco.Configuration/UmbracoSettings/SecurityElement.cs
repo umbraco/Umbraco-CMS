@@ -32,6 +32,12 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("authCookieDomain")]
         internal InnerTextConfigurationElement<string> AuthCookieDomain => GetOptionalTextElement<string>("authCookieDomain", null);
 
+        [ConfigurationProperty("userPasswordConfiguration")]
+        public UserPasswordConfigurationElement UserPasswordConfiguration => (UserPasswordConfigurationElement)this["userPasswordConfiguration"];
+
+        [ConfigurationProperty("memberPasswordConfiguration")]
+        public MemberPasswordConfigurationElement MemberPasswordConfiguration => (MemberPasswordConfigurationElement)this["memberPasswordConfiguration"];
+
         bool ISecuritySection.KeepUserLoggedIn => KeepUserLoggedIn;
 
         bool ISecuritySection.HideDisabledUsersInBackoffice => HideDisabledUsersInBackoffice;
@@ -53,5 +59,9 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         string ISecuritySection.AuthCookieName => AuthCookieName;
 
         string ISecuritySection.AuthCookieDomain => AuthCookieDomain;
+
+        IUserPasswordConfigurationSection ISecuritySection.UserPasswordConfiguration => UserPasswordConfiguration;
+
+        IMemberPasswordConfigurationSection ISecuritySection.MemberPasswordConfiguration => MemberPasswordConfiguration;
     }
 }
