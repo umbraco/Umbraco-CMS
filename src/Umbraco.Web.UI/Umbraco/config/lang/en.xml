@@ -2107,6 +2107,14 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Notification email is still set to the default value of <strong>%0%</strong>.]]></key>
     <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Results of the scheduled Umbraco Health Checks run on %0% at %1% are as follows:</p>%2%</body></html>]]></key>
     <key alias="scheduledHealthCheckEmailSubject">Umbraco Health Check Status: %0%</key>
+    <key alias="checkAllGroups">Check All Groups</key>
+    <key alias="checkGroup">Check group</key>
+    <key alias="helpText">
+        <![CDATA[
+        <p>The health checker evaluates various areas of your site for best practice settings, configuration, potential problems, etc. You can easily fix problems by pressing a button.
+        You can add your own health checks, have a look at <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" class="btn-link -underline">the documentation for more information</a> about custom health checks.</p>
+        ]]>
+    </key>
   </area>
   <area alias="redirectUrls">
     <key alias="disableUrlTracker">Disable URL tracker</key>
@@ -2358,4 +2366,3 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="fallbackDescription">Thank you for choosing Umbraco - we think this could be the beginning of something beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast as possible.</key>
   </area>  
 </language>
-
