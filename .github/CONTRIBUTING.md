@@ -59,7 +59,8 @@ Great question! The short version goes like this:
   * **Clone** - when GitHub has created your fork, you can clone it in your favorite Git tool
 
   ![Clone the fork](img/clonefork.png)
-
+  
+  * **Switch to the correct branch** - switch to the v8-dev branch
   * **Build** - build your fork of Umbraco locally as described in [building Umbraco from source code](BUILD.md)
   * **Change** - make your changes, experiment, have fun, explore and learn, and don't be afraid. We welcome all contributions and will [happily give feedback](#questions)
   * **Commit** - done? Yay! 🎉 **Important:** create a new branch now and name it after the issue you're fixing, we usually follow the format: `temp-12345`. This means it's a temporary branch for the particular issue you're working on, in this case `12345`. When you have a branch, commit your changes. Don't commit to `v8/dev`, create a new branch first.
