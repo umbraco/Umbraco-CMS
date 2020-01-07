@@ -8,10 +8,10 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.PropertyEditors
 {

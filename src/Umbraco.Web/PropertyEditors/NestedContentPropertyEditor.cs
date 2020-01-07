@@ -30,9 +30,7 @@ namespace Umbraco.Web.PropertyEditors
     public class NestedContentPropertyEditor : DataEditor
     {
         private readonly Lazy<PropertyEditorCollection> _propertyEditors;
-        private readonly IDataTypeService _dataTypeService;
         private readonly IContentTypeService _contentTypeService;
-        private readonly ILocalizationService _localizationService;
         private readonly IIOHelper _ioHelper;
 
         internal const string ContentTypeAliasPropertyKey = "ncContentTypeAlias";
@@ -49,9 +47,7 @@ namespace Umbraco.Web.PropertyEditors
             : base (logger, dataTypeService, localizationService, localizedTextService,  shortStringHelper)
         {
             _propertyEditors = propertyEditors;
-            _dataTypeService = dataTypeService;
             _contentTypeService = contentTypeService;
-            _localizationService = localizationService;
             _ioHelper = ioHelper;
         }
 
@@ -66,25 +62,29 @@ namespace Umbraco.Web.PropertyEditors
 
         #region Value Editor
 
-        protected override IDataValueEditor CreateValueEditor() => new NestedContentPropertyValueEditor(_dataTypeService, _localizationService, _contentTypeService, ShortStringHelper, Attribute, PropertyEditors);
+        protected override IDataValueEditor CreateValueEditor() => new NestedContentPropertyValueEditor(DataTypeService, LocalizationService, LocalizedTextService, _contentTypeService, ShortStringHelper, Attribute, PropertyEditors);
 
         internal class NestedContentPropertyValueEditor : DataValueEditor, IDataValueReference
         {
             private readonly PropertyEditorCollection _propertyEditors;
+            private readonly IContentTypeService _contentTypeService;
             private readonly IDataTypeService _dataTypeService;
             private readonly NestedContentValues _nestedContentValues;
 
-            private readonly Lazy<Dictionary<string, IContentType>> _contentTypes = new Lazy<Dictionary<string, IContentType>>(() =>
-                    Current.Services.ContentTypeService.GetAll().ToDictionary(c => c.Alias)
-            );
+            private readonly Lazy<Dictionary<string, IContentType>> _contentTypes;
 
-            public NestedContentPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, IContentTypeService contentTypeService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute, PropertyEditorCollection propertyEditors)
-                : base(dataTypeService, localizationService,  Current.Services.TextService,  shortStringHelper, attribute)
+            public NestedContentPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IContentTypeService contentTypeService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute, PropertyEditorCollection propertyEditors)
+                : base(dataTypeService, localizationService,  localizedTextService, shortStringHelper, attribute)
             {
                 _propertyEditors = propertyEditors;
+                _contentTypeService = contentTypeService;
                 _dataTypeService = dataTypeService;
                 _nestedContentValues = new NestedContentValues(contentTypeService);
                 Validators.Add(new NestedContentValidator(propertyEditors, dataTypeService, _nestedContentValues));
+
+                _contentTypes = new Lazy<Dictionary<string, IContentType>>(() =>
+                    _contentTypeService.GetAll().ToDictionary(c => c.Alias)
+                );
             }
 
             /// <inheritdoc />

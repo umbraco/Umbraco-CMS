@@ -1,23 +1,23 @@
 ﻿using System;
 using Moq;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using ILogger = Umbraco.Core.Logging.ILogger;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Models
 {
     [TestFixture]
     public class VariationTests
     {
+        private IFactory _factory;
         private IShortStringHelper ShortStringHelper { get; } = TestHelper.ShortStringHelper;
 
         [SetUp]
@@ -37,8 +37,7 @@ namespace Umbraco.Tests.Models
             configs.Add(SettingsForTests.GetDefaultGlobalSettings);
             configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
 
-            var factory = Mock.Of<IFactory>();
-            Current.Factory = factory;
+            _factory = Mock.Of<IFactory>();
 
             var dataTypeService = Mock.Of<IDataTypeService>();
             var localizationService = Mock.Of<ILocalizationService>();
@@ -62,7 +61,7 @@ namespace Umbraco.Tests.Models
                 dataTypeService: dataTypeService,
                 localizedTextService: Mock.Of<ILocalizedTextService>());
 
-            Mock.Get(factory)
+            Mock.Get(_factory)
                 .Setup(x => x.GetInstance(It.IsAny<Type>()))
                 .Returns<Type>(x =>
                 {
@@ -449,7 +448,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void ContentPublishValuesWithMixedPropertyTypeVariations()
         {
-            var propertyValidationService = new PropertyValidationService(Current.Factory.GetInstance<PropertyEditorCollection>(), Current.Factory.GetInstance<ServiceContext>().DataTypeService);
+            var propertyValidationService = new PropertyValidationService(_factory.GetInstance<PropertyEditorCollection>(), _factory.GetInstance<ServiceContext>().DataTypeService);
             const string langFr = "fr-FR";
 
             // content type varies by Culture
@@ -581,7 +580,7 @@ namespace Umbraco.Tests.Models
             prop.SetValue("a");
             Assert.AreEqual("a", prop.GetValue());
             Assert.IsNull(prop.GetValue(published: true));
-            var propertyValidationService = new PropertyValidationService(Current.Factory.GetInstance<PropertyEditorCollection>(), Current.Factory.GetInstance<ServiceContext>().DataTypeService);
+            var propertyValidationService = new PropertyValidationService(_factory.GetInstance<PropertyEditorCollection>(), _factory.GetInstance<ServiceContext>().DataTypeService);
 
             Assert.IsTrue(propertyValidationService.IsPropertyValid(prop));
 

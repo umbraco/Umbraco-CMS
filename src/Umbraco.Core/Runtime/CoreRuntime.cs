@@ -202,7 +202,7 @@ namespace Umbraco.Core.Runtime
                 composers.Compose();
 
                 // create the factory
-                _factory = Current.Factory = composition.CreateFactory();
+                _factory = composition.CreateFactory();
 
                 // create & initialize the components
                 _components = _factory.GetInstance<ComponentCollection>();
@@ -229,7 +229,7 @@ namespace Umbraco.Core.Runtime
                 {
                     try
                     {
-                        _factory = Current.Factory = composition?.CreateFactory();
+                        _factory = composition?.CreateFactory();
                     }
                     catch { /* yea */ }
                 }

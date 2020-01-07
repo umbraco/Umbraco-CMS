@@ -2,10 +2,10 @@
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.ContentEditing;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.ContentApps
 {

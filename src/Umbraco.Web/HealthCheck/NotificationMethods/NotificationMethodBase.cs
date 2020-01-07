@@ -10,7 +10,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
 {
     public abstract class NotificationMethodBase : IHealthCheckNotificationMethod
     {
-        protected NotificationMethodBase()
+        protected NotificationMethodBase(IHealthChecks healthCheckConfig)
         {
             var type = GetType();
             var attribute = type.GetCustomAttribute<HealthCheckNotificationMethodAttribute>();
@@ -20,7 +20,6 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
                 return;
             }
 
-            var healthCheckConfig = Current.Configs.HealthChecks();
             var notificationMethods = healthCheckConfig.NotificationSettings.NotificationMethods;
             var notificationMethod = notificationMethods[attribute.Alias];
             if (notificationMethod == null)

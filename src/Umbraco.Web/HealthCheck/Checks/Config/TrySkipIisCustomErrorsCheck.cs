@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.Checks.Config
@@ -13,8 +14,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
     {
         private readonly Version _serverVersion = HttpRuntime.IISVersion;
 
-        public TrySkipIisCustomErrorsCheck(ILocalizedTextService textService)
-            : base(textService)
+        public TrySkipIisCustomErrorsCheck(ILocalizedTextService textService, IIOHelper ioHelper)
+            : base(textService, ioHelper)
         { }
 
         public override string FilePath => "~/Config/umbracoSettings.config";

@@ -10,6 +10,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Models.TemplateQuery;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -34,8 +35,9 @@ namespace Umbraco.Web.Editors
             IProfilingLogger logger,
             IRuntimeState runtimeState,
             UmbracoHelper umbracoHelper,
-            IVariationContextAccessor variationContextAccessor)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+            IVariationContextAccessor variationContextAccessor,
+            IShortStringHelper shortStringHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
         {
             _variationContextAccessor = variationContextAccessor;
         }

@@ -20,16 +20,20 @@ namespace Umbraco.Web.PropertyEditors
         Icon = "icon-target")]
     public class RadioButtonsPropertyEditor : DataEditor
     {
-        private readonly ILocalizedTextService _textService;
         private readonly IIOHelper _ioHelper;
 
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public RadioButtonsPropertyEditor(ILogger logger, ILocalizedTextService textService, IIOHelper ioHelper, IShortStringHelper shortStringHelper)
-            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService,Current.Services.TextService, shortStringHelper)
+        public RadioButtonsPropertyEditor(
+            ILogger logger,
+            IIOHelper ioHelper,
+            IDataTypeService dataTypeService,
+            ILocalizationService localizationService,
+            ILocalizedTextService localizedTextService,
+            IShortStringHelper shortStringHelper)
+            : base(logger, dataTypeService, localizationService,localizedTextService, shortStringHelper)
         {
-            _textService = textService;
             _ioHelper = ioHelper;
         }
 
@@ -37,6 +41,6 @@ namespace Umbraco.Web.PropertyEditors
         /// Return a custom pre-value editor
         /// </summary>
         /// <returns></returns>
-        protected override IConfigurationEditor CreateConfigurationEditor() => new ValueListConfigurationEditor(_textService, _ioHelper);
+        protected override IConfigurationEditor CreateConfigurationEditor() => new ValueListConfigurationEditor(LocalizedTextService, _ioHelper);
     }
 }

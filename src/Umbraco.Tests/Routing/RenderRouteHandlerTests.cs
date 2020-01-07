@@ -50,7 +50,8 @@ namespace Umbraco.Tests.Routing
                 TestObjects.GetGlobalSettings(),
                 ShortStringHelper,
                 new SurfaceControllerTypeCollection(Enumerable.Empty<Type>()),
-                new UmbracoApiControllerTypeCollection(Enumerable.Empty<Type>()));
+                new UmbracoApiControllerTypeCollection(Enumerable.Empty<Type>()),
+                IOHelper);
         }
 
         public class TestRuntime : WebRuntime

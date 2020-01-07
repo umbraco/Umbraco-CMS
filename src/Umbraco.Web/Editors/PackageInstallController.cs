@@ -8,7 +8,7 @@ using System.Web.Http;
 using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Editors;
@@ -43,7 +43,7 @@ namespace Umbraco.Web.Editors
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
         {
             _umbracoVersion = umbracoVersion;
-                
+
         }
 
         /// <summary>

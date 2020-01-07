@@ -27,14 +27,16 @@ namespace Umbraco.Web.PropertyEditors
         private readonly UploadAutoFillProperties _uploadAutoFillProperties;
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizationService _localizationService;
+        private readonly ILocalizedTextService _localizedTextService;
 
-        public FileUploadPropertyEditor(ILogger logger, IMediaFileSystem mediaFileSystem, IContentSection contentSection, IDataTypeService dataTypeService, ILocalizationService localizationService, IShortStringHelper shortStringHelper)
-            : base(logger, dataTypeService, localizationService, Current.Services.TextService, shortStringHelper)
+        public FileUploadPropertyEditor(ILogger logger, IMediaFileSystem mediaFileSystem, IContentSection contentSection, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper)
+            : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
             _contentSection = contentSection;
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
+            _localizedTextService = localizedTextService;
             _uploadAutoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, logger, contentSection);
         }
 
@@ -44,8 +46,8 @@ namespace Umbraco.Web.PropertyEditors
         /// <returns>The corresponding property value editor.</returns>
         protected override IDataValueEditor CreateValueEditor()
         {
-            var editor = new FileUploadPropertyValueEditor(Attribute, _mediaFileSystem, _dataTypeService, _localizationService, ShortStringHelper);
-            editor.Validators.Add(new UploadFileTypeValidator());
+            var editor = new FileUploadPropertyValueEditor(Attribute, _mediaFileSystem, _dataTypeService, _localizationService, _localizedTextService, ShortStringHelper);
+            editor.Validators.Add(new UploadFileTypeValidator(_localizedTextService));
             return editor;
         }
 

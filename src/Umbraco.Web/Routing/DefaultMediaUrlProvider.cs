@@ -17,11 +17,6 @@ namespace Umbraco.Web.Routing
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
         }
 
-        [Obsolete("Use the constructor with all parameters instead")]
-        public DefaultMediaUrlProvider() : this(Current.PropertyEditors)
-        {
-        }
-
         /// <inheritdoc />
         public virtual UrlInfo GetMediaUrl(UmbracoContext umbracoContext, IPublishedContent content,
             string propertyAlias, UrlMode mode, string culture, Uri current)

@@ -27,6 +27,7 @@ using Umbraco.Web.Cache;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -129,7 +130,7 @@ namespace Umbraco.Tests.PublishedContent
 
             // create a published content type factory
             var contentTypeFactory = new PublishedContentTypeFactory(
-                Mock.Of<IPublishedModelFactory>(),
+                PublishedModelFactory,
                 new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()),
                 dataTypeService);
 
@@ -161,7 +162,7 @@ namespace Umbraco.Tests.PublishedContent
                 _source,
                 globalSettings,
                 Mock.Of<IEntityXmlSerializer>(),
-                Mock.Of<IPublishedModelFactory>(),
+                PublishedModelFactory,
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }),
                 typeFinder,
                 hostingEnvironment,

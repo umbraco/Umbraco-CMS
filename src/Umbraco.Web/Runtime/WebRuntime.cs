@@ -12,6 +12,7 @@ using Umbraco.Core.Runtime;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Logging;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Runtime
 {
@@ -81,7 +82,7 @@ namespace Umbraco.Web.Runtime
                     NetworkHelper.MachineName);
                 Logger.Debug<CoreRuntime>("Runtime: {Runtime}", GetType().FullName);
 
-                var factory = base.Boot(register);
+                var factory = Current.Factory = base.Boot(register);
 
                 // now (and only now) is the time to switch over to perWebRequest scopes.
                 // up until that point we may not have a request, and scoped services would

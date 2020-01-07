@@ -12,18 +12,15 @@ using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Logging;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.ControllerTesting;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -35,6 +32,7 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
+using Umbraco.Web.Composing;
 using Task = System.Threading.Tasks.Task;
 
 namespace Umbraco.Tests.Web.Controllers

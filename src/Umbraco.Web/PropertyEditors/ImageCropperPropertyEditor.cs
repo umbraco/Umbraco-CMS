@@ -60,7 +60,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Creates the corresponding property value editor.
         /// </summary>
         /// <returns>The corresponding property value editor.</returns>
-        protected override IDataValueEditor CreateValueEditor() => new ImageCropperPropertyValueEditor(Attribute, Logger, _mediaFileSystem, _dataTypeService, _localizationService, ShortStringHelper);
+        protected override IDataValueEditor CreateValueEditor() => new ImageCropperPropertyValueEditor(Attribute, Logger, _mediaFileSystem, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper);
 
         /// <summary>
         /// Creates the corresponding preValue editor.

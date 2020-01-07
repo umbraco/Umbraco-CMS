@@ -102,7 +102,7 @@ namespace Umbraco.Tests.Scoping
                 new DatabaseDataSource(),
                 Factory.GetInstance<IGlobalSettings>(),
                 Factory.GetInstance<IEntityXmlSerializer>(),
-                Mock.Of<IPublishedModelFactory>(),
+                new NoopPublishedModelFactory(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(ShortStringHelper) }),
                 typeFinder,
                 hostingEnvironment,

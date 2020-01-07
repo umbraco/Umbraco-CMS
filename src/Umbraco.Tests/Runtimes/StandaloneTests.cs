@@ -35,6 +35,7 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Runtime;
 using File = System.IO.File;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Runtimes
 {
@@ -48,7 +49,7 @@ namespace Umbraco.Tests.Runtimes
             IFactory factory = null;
 
             // clear
-            foreach (var file in Directory.GetFiles(Path.Combine(Current.IOHelper.MapPath("~/App_Data")), "NuCache.*"))
+            foreach (var file in Directory.GetFiles(Path.Combine(TestHelper.IOHelper.MapPath("~/App_Data")), "NuCache.*"))
                 File.Delete(file);
 
             // settings

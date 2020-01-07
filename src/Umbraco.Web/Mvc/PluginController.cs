@@ -3,12 +3,13 @@ using System.Collections.Concurrent;
 using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Mvc
 {
@@ -22,7 +23,7 @@ namespace Umbraco.Web.Mvc
 
         // for debugging purposes
         internal Guid InstanceId { get; } = Guid.NewGuid();
-        
+
         /// <summary>
         /// Gets the Umbraco context.
         /// </summary>

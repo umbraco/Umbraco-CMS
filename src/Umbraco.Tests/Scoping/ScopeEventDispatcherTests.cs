@@ -4,6 +4,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.IO;
@@ -11,10 +12,10 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Components;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Scoping
 {

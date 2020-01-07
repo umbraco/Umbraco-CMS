@@ -18,10 +18,7 @@ namespace Umbraco.Core.PropertyEditors
     public class LabelPropertyEditor : DataEditor
     {
         private readonly IIOHelper _ioHelper;
-        private readonly IDataTypeService _dataTypeService;
-        private readonly ILocalizedTextService _localizedTextService;
-        private readonly ILocalizationService _localizationService;
-        private readonly IShortStringHelper _shortStringHelper;
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LabelPropertyEditor"/> class.
@@ -30,14 +27,10 @@ namespace Umbraco.Core.PropertyEditors
             : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             _ioHelper = ioHelper;
-            _dataTypeService = dataTypeService;
-            _localizedTextService = localizedTextService;
-            _localizationService = localizationService;
-            _shortStringHelper = shortStringHelper;
         }
 
         /// <inheritdoc />
-        protected override IDataValueEditor CreateValueEditor() => new LabelPropertyValueEditor(_dataTypeService, _localizationService,_localizedTextService, _shortStringHelper, Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new LabelPropertyValueEditor(DataTypeService, LocalizationService,LocalizedTextService, ShortStringHelper, Attribute);
 
         /// <inheritdoc />
         protected override IConfigurationEditor CreateConfigurationEditor() => new LabelConfigurationEditor(_ioHelper);

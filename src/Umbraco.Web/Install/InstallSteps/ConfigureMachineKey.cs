@@ -2,8 +2,7 @@
 using System.Threading.Tasks;
 using System.Web.Configuration;
 using System.Xml.Linq;
-using Umbraco.Core.Composing;
-using Umbraco.Core.IO;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Security;
 using Umbraco.Web.Install.Models;
 

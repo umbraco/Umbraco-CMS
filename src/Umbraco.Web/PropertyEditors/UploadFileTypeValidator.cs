@@ -14,6 +14,13 @@ namespace Umbraco.Web.PropertyEditors
 {
     internal class UploadFileTypeValidator : IValueValidator
     {
+        private readonly ILocalizedTextService _localizedTextService;
+
+        public UploadFileTypeValidator(ILocalizedTextService localizedTextService)
+        {
+            _localizedTextService = localizedTextService;
+        }
+
         public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)
         {
             string selectedFiles = null;
@@ -40,11 +47,11 @@ namespace Umbraco.Web.PropertyEditors
                 {
                     //we only store a single value for this editor so the 'member' or 'field'
                     // we'll associate this error with will simply be called 'value'
-                    yield return new ValidationResult(Current.Services.TextService.Localize("errors/dissallowedMediaType"), new[] { "value" });
+                    yield return new ValidationResult(_localizedTextService.Localize("errors/dissallowedMediaType"), new[] { "value" });
                 }
             }
         }
-        
+
         internal static bool IsValidFileExtension(string fileName)
         {
             if (fileName.IndexOf('.') <= 0) return false;

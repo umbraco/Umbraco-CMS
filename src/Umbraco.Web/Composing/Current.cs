@@ -29,8 +29,6 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.Services;
 using Umbraco.Web.WebApi;
 
-using CoreCurrent = Umbraco.Core.Composing.Current;
-
 namespace Umbraco.Web.Composing
 {
     // see notes in Umbraco.Core.Composing.Current.
@@ -38,11 +36,30 @@ namespace Umbraco.Web.Composing
     {
         private static readonly object Locker = new object();
 
+        private static IFactory _factory;
+
+        /// <summary>
+        /// Gets or sets the factory.
+        /// </summary>
+        public static IFactory Factory
+        {
+            get
+            {
+                if (_factory == null) throw new InvalidOperationException("No factory has been set.");
+                return _factory;
+            }
+            set
+            {
+                if (_factory != null) throw new InvalidOperationException("A factory has already been set.");
+                _factory = value;
+            }
+        }
+
         private static IUmbracoContextAccessor _umbracoContextAccessor;
 
         static Current()
         {
-            CoreCurrent.Resetted += (sender, args) =>
+            Resetted += (sender, args) =>
             {
                 if (_umbracoContextAccessor != null)
                 {
@@ -53,17 +70,23 @@ namespace Umbraco.Web.Composing
             };
         }
 
-        // for UNIT TESTS exclusively!
-        internal static void Reset()
+        /// <summary>
+        /// for UNIT TESTS exclusively! Resets <see cref="Current"/>. Indented for testing only, and not supported in production code.
+        /// </summary>
+        /// <remarks>
+        /// <para>For UNIT TESTS exclusively.</para>
+        /// <para>Resets everything that is 'current'.</para>
+        /// </remarks>
+        public static void Reset()
         {
-            CoreCurrent.Reset();
+            _factory.DisposeIfDisposable();
+            _factory = null;
+
+            Resetted?.Invoke(null, EventArgs.Empty);
         }
 
-        /// <summary>
-        /// Gets the factory.
-        /// </summary>
-        public static IFactory Factory
-            => CoreCurrent.Factory;
+        internal static event EventHandler Resetted;
+
 
         #region Temp & Special
 

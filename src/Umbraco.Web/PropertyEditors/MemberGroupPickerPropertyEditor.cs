@@ -2,6 +2,7 @@
 using Umbraco.Web.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Web.PropertyEditors
@@ -15,8 +16,13 @@ namespace Umbraco.Web.PropertyEditors
         Icon = Constants.Icons.MemberGroup)]
     public class MemberGroupPickerPropertyEditor : DataEditor
     {
-         public MemberGroupPickerPropertyEditor(ILogger logger, IShortStringHelper shortStringHelper)
-             : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService, Current.Services.TextService, shortStringHelper)
+         public MemberGroupPickerPropertyEditor(
+             ILogger logger,
+             IDataTypeService dataTypeService,
+             ILocalizationService localizationService,
+             ILocalizedTextService localizedTextService,
+             IShortStringHelper shortStringHelper)
+             : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
          { }
     }
 }

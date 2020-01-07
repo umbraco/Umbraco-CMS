@@ -23,8 +23,6 @@ namespace Umbraco.Web.PropertyEditors
         Icon = Constants.Icons.MediaImage)]
     public class MediaPickerPropertyEditor : DataEditor
     {
-        private readonly IDataTypeService _dataTypeService;
-        private readonly ILocalizationService _localizationService;
         private readonly IIOHelper _ioHelper;
 
         /// <summary>
@@ -39,20 +37,18 @@ namespace Umbraco.Web.PropertyEditors
             ILocalizedTextService localizedTextService)
             : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
-            _dataTypeService = dataTypeService;
-            _localizationService = localizationService;
             _ioHelper = ioHelper;
         }
 
         /// <inheritdoc />
         protected override IConfigurationEditor CreateConfigurationEditor() => new MediaPickerConfigurationEditor(_ioHelper);
 
-        protected override IDataValueEditor CreateValueEditor() => new MediaPickerPropertyValueEditor(_dataTypeService, _localizationService, ShortStringHelper, Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new MediaPickerPropertyValueEditor(DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, Attribute);
 
         internal class MediaPickerPropertyValueEditor : DataValueEditor, IDataValueReference
         {
-            public MediaPickerPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute)
-                : base(dataTypeService,localizationService, Current.Services.TextService, shortStringHelper,attribute)
+            public MediaPickerPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute)
+                : base(dataTypeService,localizationService, localizedTextService, shortStringHelper,attribute)
             {
             }
 
