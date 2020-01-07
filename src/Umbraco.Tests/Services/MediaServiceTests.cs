@@ -184,7 +184,7 @@ namespace Umbraco.Tests.Services
         public void Can_Get_Media_With_Crop_By_Path()
         {
             var mediaService = ServiceContext.MediaService;
-            var mediaType = MockedContentTypes.CreateImageMediaType("Image2");
+            var mediaType = MockedContentTypes.CreateImageMediaTypeWithCrop("Image2");
             ServiceContext.MediaTypeService.Save(mediaType);
 
             var media = MockedMedia.CreateMediaImageWithCrop(mediaType, -1);

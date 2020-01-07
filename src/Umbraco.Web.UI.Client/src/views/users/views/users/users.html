@@ -29,12 +29,18 @@
                 <umb-editor-sub-header-section>
                     <div class="form-search -no-margin-bottom pull-right">
                         <div class="inner-addon left-addon">
-                            <i class="icon icon-search"></i>
+                            <label for="users-search" class="form-search__label-icon">
+                                <i class="icon icon-search" aria-hidden="true"></i>
+                                <span class="sr-only">
+                                    <localize key="visuallyHiddenTexts_userSearchLabel">Search the users section</localize>
+                                </span>
+                            </label>
                             <input class="form-control search-input"
                                    type="text" localize="placeholder"
                                    placeholder="@general_typeToSearch"
                                    ng-model="vm.usersOptions.filter"
                                    ng-change="vm.searchUsers()"
+                                   id="users-search"
                                    prevent-enter-submit
                                    no-dirty-check>
                         </div>
@@ -505,6 +511,7 @@
                 <div class="flex items-center" style="margin-bottom: 15px;">
                     <umb-checkmark
                         checked="vm.usersViewState === 'inviteUserSuccess'"
+                        readonly="true"
                         size="m">
                     </umb-checkmark>
                     <h3 class="bold" style="margin: 0 0 0 10px;">

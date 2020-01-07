@@ -20,12 +20,18 @@
             <umb-editor-sub-header-section>
             <div class="form-search -no-margin-bottom pull-right">
                 <div class="inner-addon left-addon">
-                    <i class="icon icon-search"></i>
+                    <label for="user-group-search" class="form-search__label-icon">
+                        <i class="icon icon-search" aria-hidden="true"></i>
+                        <span class="sr-only">
+                            <localize key="visuallyHiddenTexts_userGroupSearchLabel">Search the user group section</localize>
+                        </span>
+                    </label>
                     <input class="form-control search-input"
                         type="text"
                         localize="placeholder"
                         placeholder="@placeholders_filter"
                         ng-model="vm.filter"
+                        id="user-group-search"
                         prevent-enter-submit
                         no-dirty-check>
                 </div>

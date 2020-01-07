@@ -3,7 +3,6 @@ using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using Umbraco.Core;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Editors;
@@ -38,14 +37,18 @@ namespace Umbraco.Web.WebApi.Filters
 
         public EnsureUserPermissionForMediaAttribute(string paramName)
         {
-            if (string.IsNullOrEmpty(paramName)) throw new ArgumentNullOrEmptyException(nameof(paramName));
+            if (paramName == null) throw new ArgumentNullException(nameof(paramName));
+            if (string.IsNullOrEmpty(paramName)) throw new ArgumentException("Value can't be empty.", nameof(paramName));
+
             _paramName = paramName;
         }
 
         // TODO: v8 guess this is not used anymore, source is ignored?!
         public EnsureUserPermissionForMediaAttribute(string paramName, DictionarySource source)
         {
-            if (string.IsNullOrEmpty(paramName)) throw new ArgumentNullOrEmptyException(nameof(paramName));
+            if (paramName == null) throw new ArgumentNullException(nameof(paramName));
+            if (string.IsNullOrEmpty(paramName)) throw new ArgumentException("Value can't be empty.", nameof(paramName));
+
             _paramName = paramName;
         }
 
