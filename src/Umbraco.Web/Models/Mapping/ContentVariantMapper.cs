@@ -56,7 +56,7 @@ namespace Umbraco.Web.Models.Mapping
                 if (languages.Count == 0 || segments.Count == 0)
                 {
                     // This should not happen
-                    throw new ArgumentException("No languages or segments available");
+                    throw new InvalidOperationException("No languages or segments available");
                 }
 
                 variants = languages
