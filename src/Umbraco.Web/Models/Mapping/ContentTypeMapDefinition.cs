@@ -226,8 +226,8 @@ namespace Umbraco.Web.Models.Mapping
             target.ValidationRegExp = source.Validation.Pattern;
             target.ValidationRegExpMessage = source.Validation.PatternMessage;
             target.Variations = source.AllowCultureVariant
-                ? target.Variations.SetFlag(ContentVariation.Culture)
-                : target.Variations.UnsetFlag(ContentVariation.Culture);
+                ? target.Variations | ContentVariation.Culture // Set flag using bitwise logical OR
+                : target.Variations & ~ContentVariation.Culture; // Remove flag using bitwise logical AND with bitwise complement (reversing the bit)
             
             if (source.Id > 0)
                 target.Id = source.Id;
@@ -399,9 +399,9 @@ namespace Umbraco.Web.Models.Mapping
 
             if (!(target is IMemberType))
             {
-                target.Variations = source.AllowCultureVariant                    
-                    ? target.Variations.SetFlag(ContentVariation.Culture)                    
-                    : target.Variations.UnsetFlag(ContentVariation.Culture);
+                target.Variations = source.AllowCultureVariant
+                    ? target.Variations | ContentVariation.Culture // Set flag using bitwise logical OR
+                    : target.Variations & ~ContentVariation.Culture; // Remove flag using bitwise logical AND with bitwise complement (reversing the bit)
             }
 
             // handle property groups and property types
