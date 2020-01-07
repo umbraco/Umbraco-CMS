@@ -117,8 +117,8 @@ namespace Umbraco.Web.PropertyEditors
             /// <returns></returns>
             public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
             {
-                var val = property.GetValue(culture, segment) as string;
-                if (string.IsNullOrEmpty(val)) return string.Empty;
+                var val = property.GetValue(culture, segment)?.ToString();
+                if (val.IsNullOrWhiteSpace()) return string.Empty;
 
                 var grid = DeserializeGridValue(val, out var rtes);
 
