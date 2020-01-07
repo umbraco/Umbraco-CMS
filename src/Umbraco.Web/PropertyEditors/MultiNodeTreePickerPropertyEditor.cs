@@ -6,6 +6,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -22,8 +23,8 @@ namespace Umbraco.Web.PropertyEditors
         private readonly ILocalizationService _localizationService;
         private readonly IIOHelper _ioHelper;
 
-        public MultiNodeTreePickerPropertyEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper)
-            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService,Current.Services.TextService, Current.ShortStringHelper)
+        public MultiNodeTreePickerPropertyEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper, IShortStringHelper shortStringHelper)
+            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService,Current.Services.TextService, shortStringHelper)
         {
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
@@ -32,11 +33,12 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new MultiNodePickerConfigurationEditor(_ioHelper);
 
-        protected override IDataValueEditor CreateValueEditor() => new MultiNodeTreePickerPropertyValueEditor(_dataTypeService, _localizationService, Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new MultiNodeTreePickerPropertyValueEditor(_dataTypeService, _localizationService, ShortStringHelper, Attribute);
 
         public class MultiNodeTreePickerPropertyValueEditor : DataValueEditor, IDataValueReference
         {
-            public MultiNodeTreePickerPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute): base(dataTypeService, localizationService, Current.Services.TextService, Current.ShortStringHelper, attribute)
+            public MultiNodeTreePickerPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute)
+                : base(dataTypeService, localizationService, Current.Services.TextService, shortStringHelper, attribute)
             {
 
             }

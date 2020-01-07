@@ -19,7 +19,6 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 
-
 namespace Umbraco.Web.Editors
 {
     /// <summary>
@@ -29,7 +28,6 @@ namespace Umbraco.Web.Editors
     public abstract class ContentControllerBase : BackOfficeNotificationsController
     {
         protected ICultureDictionary CultureDictionary { get; }
-        public IShortStringHelper ShortStringHelper { get; }
 
         protected ContentControllerBase(
             ICultureDictionary cultureDictionary,
@@ -42,10 +40,9 @@ namespace Umbraco.Web.Editors
             IRuntimeState runtimeState,
             UmbracoHelper umbracoHelper,
             IShortStringHelper shortStringHelper)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+            :base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
         {
             CultureDictionary = cultureDictionary;
-            ShortStringHelper = shortStringHelper;
         }
 
         protected HttpResponseMessage HandleContentNotFound(object id, bool throwException = true)

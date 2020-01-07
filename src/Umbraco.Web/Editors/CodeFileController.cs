@@ -34,8 +34,6 @@ namespace Umbraco.Web.Editors
     [UmbracoApplicationAuthorize(Core.Constants.Applications.Settings)]
     public class CodeFileController : BackOfficeNotificationsController
     {
-        private readonly IShortStringHelper _shortStringHelper;
-
         public CodeFileController(
             IGlobalSettings globalSettings,
             IUmbracoContextAccessor umbracoContextAccessor,
@@ -46,9 +44,9 @@ namespace Umbraco.Web.Editors
             IRuntimeState runtimeState,
             UmbracoHelper umbracoHelper,
             IShortStringHelper shortStringHelper)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
+
         {
-            _shortStringHelper = shortStringHelper;
         }
 
         /// <summary>
@@ -242,7 +240,7 @@ namespace Umbraco.Web.Editors
                     throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            return snippets.Select(snippet => new SnippetDisplay() {Name = snippet.SplitPascalCasing(_shortStringHelper).ToFirstUpperInvariant(), FileName = snippet});
+            return snippets.Select(snippet => new SnippetDisplay() {Name = snippet.SplitPascalCasing(ShortStringHelper).ToFirstUpperInvariant(), FileName = snippet});
         }
 
         /// <summary>

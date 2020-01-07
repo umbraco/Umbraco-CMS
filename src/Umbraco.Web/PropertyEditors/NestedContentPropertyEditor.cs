@@ -67,7 +67,7 @@ namespace Umbraco.Web.PropertyEditors
 
         #region Value Editor
 
-        protected override IDataValueEditor CreateValueEditor() => new NestedContentPropertyValueEditor(_dataTypeService, _localizationService, Attribute, PropertyEditors, _contentTypeService);
+        protected override IDataValueEditor CreateValueEditor() => new NestedContentPropertyValueEditor(_dataTypeService, _localizationService, _contentTypeService, ShortStringHelper, Attribute, PropertyEditors);
 
         internal class NestedContentPropertyValueEditor : DataValueEditor, IDataValueReference
         {
@@ -79,8 +79,8 @@ namespace Umbraco.Web.PropertyEditors
                     Current.Services.ContentTypeService.GetAll().ToDictionary(c => c.Alias)
             );
 
-            public NestedContentPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute, PropertyEditorCollection propertyEditors, IContentTypeService contentTypeService)
-                : base(dataTypeService, localizationService,  Current.Services.TextService, Current.ShortStringHelper, attribute)
+            public NestedContentPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, IContentTypeService contentTypeService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute, PropertyEditorCollection propertyEditors)
+                : base(dataTypeService, localizationService,  Current.Services.TextService,  shortStringHelper, attribute)
             {
                 _propertyEditors = propertyEditors;
                 _dataTypeService = dataTypeService;

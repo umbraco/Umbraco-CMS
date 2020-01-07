@@ -8,7 +8,6 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -18,6 +17,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Strings;
+using Umbraco.Tests.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing.Objects;
 using Umbraco.Tests.Testing.Objects.Accessors;
@@ -206,7 +206,8 @@ namespace Umbraco.Tests.PublishedContent
                 Mock.Of<IPublishedModelFactory>(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }),
                 typeFinder,
-                TestHelper.GetHostingEnvironment());
+                TestHelper.GetHostingEnvironment(),
+                new MockShortStringHelper());
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();

@@ -25,7 +25,6 @@ namespace Umbraco.Core.PropertyEditors
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizationService _localizationService;
         private readonly ILocalizedTextService _localizedTextService;
-        private readonly IShortStringHelper _shortStringHelper;
         private IDictionary<string, object> _defaultConfiguration;
         private IDataValueEditor _dataValueEditor;
 
@@ -37,7 +36,7 @@ namespace Umbraco.Core.PropertyEditors
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
             _localizedTextService = localizedTextService;
-            _shortStringHelper = shortStringHelper;
+            ShortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             // defaults
@@ -61,6 +60,8 @@ namespace Umbraco.Core.PropertyEditors
         /// Gets the editor attribute.
         /// </summary>
         protected DataEditorAttribute Attribute { get; }
+
+        protected IShortStringHelper ShortStringHelper { get; }
 
         /// <summary>
         /// Gets a logger.
@@ -178,7 +179,7 @@ namespace Umbraco.Core.PropertyEditors
             if (Attribute == null)
                 throw new InvalidOperationException($"The editor is not attributed with {nameof(DataEditorAttribute)}");
 
-            return new DataValueEditor(_dataTypeService, _localizationService, _localizedTextService, _shortStringHelper, Attribute);
+            return new DataValueEditor(_dataTypeService, _localizationService, _localizedTextService, ShortStringHelper, Attribute);
         }
 
         /// <summary>

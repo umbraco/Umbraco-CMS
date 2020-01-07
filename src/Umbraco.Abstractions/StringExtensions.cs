@@ -14,13 +14,11 @@ using Umbraco.Core.Strings;
 
 namespace Umbraco.Core
 {
-
     ///<summary>
     /// String extension methods
     ///</summary>
     public static class StringExtensions
     {
-
         private static readonly char[] ToCSharpHexDigitLower = "0123456789abcdef".ToCharArray();
         private static readonly char[] ToCSharpEscapeChars;
 
@@ -72,12 +70,9 @@ namespace Umbraco.Core
 
                 return string.Format("{0}", fileName.Substring(0, fileName.IndexOf(ext, StringComparison.Ordinal)));
             }
+
             return fileName;
-
-
         }
-
-
 
         /// <summary>
         /// This tries to detect a json string, this is not a fail safe way but it is quicker than doing
@@ -99,8 +94,6 @@ namespace Umbraco.Core
         {
             return JsonEmpties.Contains(Whitespace.Value.Replace(input, string.Empty));
         }
-
-
 
         public static string ReplaceNonAlphanumericChars(this string input, string replacement)
         {
@@ -188,9 +181,6 @@ namespace Umbraco.Core
             }
             return url + string.Join("&", nonEmpty).EnsureStartsWith('?');
         }
-
-
-
 
 
         //this is from SqlMetal and just makes it a bit of fun to allow pluralization
@@ -1232,7 +1222,7 @@ namespace Umbraco.Core
                    && Path.GetPathRoot(path).Equals(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal) == false;
         }
 
-          /// <summary>
+        /// <summary>
         /// Based on the input string, this will detect if the string is a JS path or a JS snippet.
         /// If a path cannot be determined, then it is assumed to be a snippet the original text is returned
         /// with an invalid attempt, otherwise a valid attempt is returned with the resolved path
@@ -1277,77 +1267,83 @@ namespace Umbraco.Core
         }
 
 
-          // FORMAT STRINGS
+        // FORMAT STRINGS
 
-          /// <summary>
-          /// Cleans a string to produce a string that can safely be used in an alias.
-          /// </summary>
-          /// <param name="alias">The text to filter.</param>
-          /// <returns>The safe alias.</returns>
-          public static string ToSafeAlias(this string alias, IShortStringHelper shortStringHelper)
-          {
-              return shortStringHelper.CleanStringForSafeAlias(alias);
-          }
+        /// <summary>
+        /// Cleans a string to produce a string that can safely be used in an alias.
+        /// </summary>
+        /// <param name="alias">The text to filter.</param>
+        /// <param name="shortStringHelper">The short string helper.</param>
+        /// <returns>The safe alias.</returns>
+        public static string ToSafeAlias(this string alias, IShortStringHelper shortStringHelper)
+        {
+            return shortStringHelper.CleanStringForSafeAlias(alias);
+        }
 
-          /// <summary>
-          /// Cleans a string to produce a string that can safely be used in an alias.
-          /// </summary>
-          /// <param name="alias">The text to filter.</param>
-          /// <param name="camel">A value indicating that we want to camel-case the alias.</param>
-          /// <returns>The safe alias.</returns>
-          public static string ToSafeAlias(this string alias, IShortStringHelper shortStringHelper, bool camel)
-          {
-              var a = shortStringHelper.CleanStringForSafeAlias(alias);
-              if (string.IsNullOrWhiteSpace(a) || camel == false) return a;
-              return char.ToLowerInvariant(a[0]) + a.Substring(1);
-          }
+        /// <summary>
+        /// Cleans a string to produce a string that can safely be used in an alias.
+        /// </summary>
+        /// <param name="alias">The text to filter.</param>
+        /// <param name="camel">A value indicating that we want to camel-case the alias.</param>
+        /// <param name="shortStringHelper">The short string helper.</param>
+        /// <returns>The safe alias.</returns>
+        public static string ToSafeAlias(this string alias, IShortStringHelper shortStringHelper, bool camel)
+        {
+            var a = shortStringHelper.CleanStringForSafeAlias(alias);
+            if (string.IsNullOrWhiteSpace(a) || camel == false) return a;
+            return char.ToLowerInvariant(a[0]) + a.Substring(1);
+        }
 
-          /// <summary>
-          /// Cleans a string, in the context of a specified culture, to produce a string that can safely be used in an alias.
-          /// </summary>
-          /// <param name="alias">The text to filter.</param>
-          /// <param name="culture">The culture.</param>
-          /// <returns>The safe alias.</returns>
-          public static string ToSafeAlias(this string alias, IShortStringHelper shortStringHelper, string culture)
-          {
-              return shortStringHelper.CleanStringForSafeAlias(alias, culture);
-          }
-
-
-          // the new methods to get a url segment
-
-          /// <summary>
-          /// Cleans a string to produce a string that can safely be used in an url segment.
-          /// </summary>
-          /// <param name="text">The text to filter.</param>
-          /// <returns>The safe url segment.</returns>
-          public static string ToUrlSegment(this string text, IShortStringHelper shortStringHelper)
-          {
-              if (text == null) throw new ArgumentNullException(nameof(text));
-              if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(text));
-
-              return shortStringHelper.CleanStringForUrlSegment(text);
-          }
-
-          /// <summary>
-          /// Cleans a string, in the context of a specified culture, to produce a string that can safely be used in an url segment.
-          /// </summary>
-          /// <param name="text">The text to filter.</param>
-          /// <param name="culture">The culture.</param>
-          /// <returns>The safe url segment.</returns>
-          public static string ToUrlSegment(this string text, IShortStringHelper shortStringHelper, string culture)
-          {
-              if (text == null) throw new ArgumentNullException(nameof(text));
-              if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(text));
-
-              return shortStringHelper.CleanStringForUrlSegment(text, culture);
-          }
+        /// <summary>
+        /// Cleans a string, in the context of a specified culture, to produce a string that can safely be used in an alias.
+        /// </summary>
+        /// <param name="alias">The text to filter.</param>
+        /// <param name="culture">The culture.</param>
+        /// <param name="shortStringHelper">The short string helper.</param>
+        /// <returns>The safe alias.</returns>
+        public static string ToSafeAlias(this string alias, IShortStringHelper shortStringHelper, string culture)
+        {
+            return shortStringHelper.CleanStringForSafeAlias(alias, culture);
+        }
 
 
-              /// <summary>
+        // the new methods to get a url segment
+
+        /// <summary>
+        /// Cleans a string to produce a string that can safely be used in an url segment.
+        /// </summary>
+        /// <param name="text">The text to filter.</param>
+        /// <param name="shortStringHelper">The short string helper.</param>
+        /// <returns>The safe url segment.</returns>
+        public static string ToUrlSegment(this string text, IShortStringHelper shortStringHelper)
+        {
+            if (text == null) throw new ArgumentNullException(nameof(text));
+            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(text));
+
+            return shortStringHelper.CleanStringForUrlSegment(text);
+        }
+
+        /// <summary>
+        /// Cleans a string, in the context of a specified culture, to produce a string that can safely be used in an url segment.
+        /// </summary>
+        /// <param name="text">The text to filter.</param>
+        /// <param name="shortStringHelper">The short string helper.</param>
+        /// <param name="culture">The culture.</param>
+        /// <returns>The safe url segment.</returns>
+        public static string ToUrlSegment(this string text, IShortStringHelper shortStringHelper, string culture)
+        {
+            if (text == null) throw new ArgumentNullException(nameof(text));
+            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(text));
+
+            return shortStringHelper.CleanStringForUrlSegment(text, culture);
+        }
+
+
+        /// <summary>
         /// Cleans a string.
         /// </summary>
         /// <param name="text">The text to clean.</param>
+        /// <param name="shortStringHelper">The short string helper.</param>
         /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default,
         /// strings are cleaned up to camelCase and Ascii.</param>
         /// <returns>The clean string.</returns>
@@ -1361,6 +1357,7 @@ namespace Umbraco.Core
         /// Cleans a string, using a specified separator.
         /// </summary>
         /// <param name="text">The text to clean.</param>
+        /// <param name="shortStringHelper">The short string helper.</param>
         /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default,
         /// strings are cleaned up to camelCase and Ascii.</param>
         /// <param name="separator">The separator.</param>
@@ -1375,6 +1372,7 @@ namespace Umbraco.Core
         /// Cleans a string in the context of a specified culture.
         /// </summary>
         /// <param name="text">The text to clean.</param>
+        /// <param name="shortStringHelper">The short string helper.</param>
         /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default,
         /// strings are cleaned up to camelCase and Ascii.</param>
         /// <param name="culture">The culture.</param>
@@ -1388,6 +1386,7 @@ namespace Umbraco.Core
         /// Cleans a string in the context of a specified culture, using a specified separator.
         /// </summary>
         /// <param name="text">The text to clean.</param>
+        /// <param name="shortStringHelper">The short string helper.</param>
         /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default,
         /// strings are cleaned up to camelCase and Ascii.</param>
         /// <param name="separator">The separator.</param>

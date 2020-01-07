@@ -4,6 +4,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -20,8 +21,8 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public EmailAddressPropertyEditor(ILogger logger, IIOHelper ioHelper)
-            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService, Current.Services.TextService,Current.ShortStringHelper)
+        public EmailAddressPropertyEditor(ILogger logger, IIOHelper ioHelper, IShortStringHelper shortStringHelper)
+            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService, Current.Services.TextService, shortStringHelper)
         {
             _ioHelper = ioHelper;
         }

@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
@@ -26,10 +25,9 @@ namespace Umbraco.Web.Editors
         Constants.Applications.Members)]
     public class TinyMceController : UmbracoAuthorizedApiController
     {
-        private IMediaService _mediaService;
-        private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+        private readonly IMediaService _mediaService;
+        private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
         private readonly IShortStringHelper _shortStringHelper;
-
 
         public TinyMceController(IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IShortStringHelper shortStringHelper)
         {
@@ -41,7 +39,6 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public async Task<HttpResponseMessage> UploadImage()
         {
-
             if (Request.Content.IsMimeMultipartContent() == false)
             {
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);

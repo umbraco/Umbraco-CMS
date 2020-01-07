@@ -14,11 +14,9 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
-using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
@@ -52,7 +50,6 @@ namespace Umbraco.Web.Editors
         private readonly IGlobalSettings _globalSettings;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IScopeProvider _scopeProvider;
-        private readonly IShortStringHelper _shortStringHelper;
 
         public ContentTypeController(IEntityXmlSerializer serializer,
             ICultureDictionary cultureDictionary,
@@ -63,13 +60,12 @@ namespace Umbraco.Web.Editors
             IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper,
             IScopeProvider scopeProvider,
             IShortStringHelper shortStringHelper)
-            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
         {
             _serializer = serializer;
             _globalSettings = globalSettings;
             _propertyEditors = propertyEditors;
             _scopeProvider = scopeProvider;
-            _shortStringHelper = shortStringHelper;
         }
 
         public int GetCount()
@@ -229,9 +225,9 @@ namespace Umbraco.Web.Editors
         public CreatedContentTypeCollectionResult PostCreateCollection(int parentId, string collectionName, bool collectionCreateTemplate, string collectionItemName, bool collectionItemCreateTemplate, string collectionIcon, string collectionItemIcon)
         {
             // create item doctype
-            var itemDocType = new ContentType(_shortStringHelper, parentId);
+            var itemDocType = new ContentType(ShortStringHelper, parentId);
             itemDocType.Name = collectionItemName;
-            itemDocType.Alias = collectionItemName.ToSafeAlias(_shortStringHelper, true);
+            itemDocType.Alias = collectionItemName.ToSafeAlias(ShortStringHelper, true);
             itemDocType.Icon = collectionItemIcon;
 
             // create item doctype template
@@ -245,9 +241,9 @@ namespace Umbraco.Web.Editors
             Services.ContentTypeService.Save(itemDocType);
 
             // create collection doctype
-            var collectionDocType = new ContentType(_shortStringHelper, parentId);
+            var collectionDocType = new ContentType(ShortStringHelper, parentId);
             collectionDocType.Name = collectionName;
-            collectionDocType.Alias = collectionName.ToSafeAlias(_shortStringHelper, true);
+            collectionDocType.Alias = collectionName.ToSafeAlias(ShortStringHelper, true);
             collectionDocType.Icon = collectionIcon;
             collectionDocType.IsContainer = true;
             collectionDocType.AllowedContentTypes = new List<ContentTypeSort>()
@@ -380,10 +376,10 @@ namespace Umbraco.Web.Editors
             if (parentId != Constants.System.Root)
             {
                 var parent = Services.ContentTypeService.Get(parentId);
-                ct = parent != null ? new ContentType(_shortStringHelper, parent, string.Empty) : new ContentType(_shortStringHelper, parentId);
+                ct = parent != null ? new ContentType(ShortStringHelper, parent, string.Empty) : new ContentType(ShortStringHelper, parentId);
             }
             else
-                ct = new ContentType(_shortStringHelper, parentId);
+                ct = new ContentType(ShortStringHelper, parentId);
 
             ct.Icon = Constants.Icons.Content;
 
@@ -528,7 +524,7 @@ namespace Umbraco.Web.Editors
             }
 
             var dataInstaller = new PackageDataInstallation(Logger, Services.FileService, Services.MacroService, Services.LocalizationService,
-                Services.DataTypeService, Services.EntityService, Services.ContentTypeService, Services.ContentService, _propertyEditors, _scopeProvider, _shortStringHelper, _globalSettings, Services.TextService);
+                Services.DataTypeService, Services.EntityService, Services.ContentTypeService, Services.ContentService, _propertyEditors, _scopeProvider, ShortStringHelper, _globalSettings, Services.TextService);
 
             var xd = new XmlDocument {XmlResolver = null};
             xd.Load(filePath);

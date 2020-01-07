@@ -11,6 +11,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -33,8 +34,8 @@ namespace Umbraco.Web.Editors
     [EnableOverrideAuthorization]
     public class DictionaryController : BackOfficeNotificationsController
     {
-        public DictionaryController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        public DictionaryController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IShortStringHelper shortStringHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
         {
         }
 

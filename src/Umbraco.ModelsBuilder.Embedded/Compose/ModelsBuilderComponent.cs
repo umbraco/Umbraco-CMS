@@ -17,21 +17,20 @@ using Umbraco.Web.Mvc;
 
 namespace Umbraco.ModelsBuilder.Embedded.Compose
 {
-
     internal class ModelsBuilderComponent : IComponent
     {
-
         private readonly IModelsBuilderConfig _config;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly LiveModelsProvider _liveModelsProvider;
         private readonly OutOfDateModelsStatus _outOfDateModels;
 
-        public ModelsBuilderComponent(IModelsBuilderConfig config, IShortStringHelper shortStringHelper,  LiveModelsProvider liveModelsProvider, OutOfDateModelsStatus outOfDateModels)
+        public ModelsBuilderComponent(IModelsBuilderConfig config, IShortStringHelper shortStringHelper, LiveModelsProvider liveModelsProvider, OutOfDateModelsStatus outOfDateModels)
         {
             _config = config;
             _shortStringHelper = shortStringHelper;
             _liveModelsProvider = liveModelsProvider;
             _outOfDateModels = outOfDateModels;
+            _shortStringHelper = shortStringHelper;
         }
 
         public void Initialize()

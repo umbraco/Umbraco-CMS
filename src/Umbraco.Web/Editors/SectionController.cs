@@ -8,6 +8,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Trees;
 using Section = Umbraco.Web.Models.ContentEditing.Section;
 using Umbraco.Web.Models.Trees;
@@ -26,8 +27,8 @@ namespace Umbraco.Web.Editors
         private readonly ITreeService _treeService;
 
         public SectionController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState,
-            IDashboardService dashboardService, ISectionService sectionService, ITreeService treeService, UmbracoHelper umbracoHelper)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+            IDashboardService dashboardService, ISectionService sectionService, ITreeService treeService, UmbracoHelper umbracoHelper, IShortStringHelper shortStringHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
         {
             _dashboardService = dashboardService;
             _sectionService = sectionService;

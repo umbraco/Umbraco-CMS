@@ -149,16 +149,16 @@ namespace Umbraco.Tests.Routing
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;
 
             var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContextAccessor, Mock.Of<ILogger>(), context =>
-            {
-                var membershipHelper = new MembershipHelper(
-                    umbracoContext.HttpContext, Mock.Of<IPublishedMemberCache>(), Mock.Of<MembersMembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IPublicAccessService>(), AppCaches.Disabled, Mock.Of<ILogger>());
-               return new CustomDocumentController(Factory.GetInstance<IGlobalSettings>(),
-                    umbracoContextAccessor,
-                    Factory.GetInstance<ServiceContext>(),
-                    Factory.GetInstance<AppCaches>(),
-                    Factory.GetInstance<IProfilingLogger>(),
-                    new UmbracoHelper(Mock.Of<IPublishedContent>(), Mock.Of<ITagQuery>(), Mock.Of<ICultureDictionaryFactory>(), Mock.Of<IUmbracoComponentRenderer>(), Mock.Of<IPublishedContentQuery>(), membershipHelper));
-            }), ShortStringHelper);
+                {
+                    var membershipHelper = new MembershipHelper(
+                        umbracoContext.HttpContext, Mock.Of<IPublishedMemberCache>(), Mock.Of<MembersMembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IPublicAccessService>(), AppCaches.Disabled, Mock.Of<ILogger>(), ShortStringHelper);
+                   return new CustomDocumentController(Factory.GetInstance<IGlobalSettings>(),
+                        umbracoContextAccessor,
+                        Factory.GetInstance<ServiceContext>(),
+                        Factory.GetInstance<AppCaches>(),
+                        Factory.GetInstance<IProfilingLogger>(),
+                        new UmbracoHelper(Mock.Of<IPublishedContent>(), Mock.Of<ITagQuery>(), Mock.Of<ICultureDictionaryFactory>(), Mock.Of<IUmbracoComponentRenderer>(), Mock.Of<IPublishedContentQuery>(), membershipHelper));
+                }), ShortStringHelper);
 
             handler.GetHandlerForRoute(umbracoContext.HttpContext.Request.RequestContext, frequest);
             Assert.AreEqual("CustomDocument", routeData.Values["controller"].ToString());

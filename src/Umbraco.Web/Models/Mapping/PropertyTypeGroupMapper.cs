@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Composing;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Models.ContentEditing;
 using Current = Umbraco.Core.Composing.Current;
 
@@ -17,12 +17,14 @@ namespace Umbraco.Web.Models.Mapping
     {
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IDataTypeService _dataTypeService;
+        private readonly IShortStringHelper _shortStringHelper;
         private readonly ILogger _logger;
 
-        public PropertyTypeGroupMapper(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, ILogger logger)
+        public PropertyTypeGroupMapper(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IShortStringHelper shortStringHelper, ILogger logger)
         {
             _propertyEditors = propertyEditors;
             _dataTypeService = dataTypeService;
+            _shortStringHelper = shortStringHelper;
             _logger = logger;
         }
 
@@ -152,7 +154,7 @@ namespace Umbraco.Web.Models.Mapping
             // handle locked properties
             var lockedPropertyAliases = new List<string>();
             // add built-in member property aliases to list of aliases to be locked
-            foreach (var propertyAlias in ConventionsHelper.GetStandardPropertyTypeStubs(Current.ShortStringHelper).Keys)
+            foreach (var propertyAlias in ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper).Keys)
             {
                 lockedPropertyAliases.Add(propertyAlias);
             }

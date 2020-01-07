@@ -1,9 +1,11 @@
-﻿using Umbraco.Core;
+﻿using System;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 
@@ -24,9 +26,12 @@ namespace Umbraco.Web.Editors
         {
         }
 
-        protected UmbracoAuthorizedJsonController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+        protected UmbracoAuthorizedJsonController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IShortStringHelper shortStringHelper)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
+            ShortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
         }
+
+        public IShortStringHelper ShortStringHelper { get; }
     }
 }

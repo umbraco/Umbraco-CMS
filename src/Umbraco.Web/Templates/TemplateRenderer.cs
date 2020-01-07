@@ -1,20 +1,16 @@
 using System;
-using System.Collections;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
-using Umbraco.Core;
-using Umbraco.Web.Models;
-using Umbraco.Web.Mvc;
-using Umbraco.Web.Routing;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Web.Macros;
-using Current = Umbraco.Web.Composing.Current;
+using Umbraco.Web.Models;
+using Umbraco.Web.Mvc;
+using Umbraco.Web.Routing;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Web.Templates
 {
@@ -40,7 +36,7 @@ namespace Umbraco.Web.Templates
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _languageService = textService ?? throw new ArgumentNullException(nameof(textService));
             _webRoutingSection = webRoutingSection ?? throw new ArgumentNullException(nameof(webRoutingSection));
-            _shortStringHelper = shortStringHelper;
+            _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
         }
 
         public void Render(int pageId, int? altTemplateId, StringWriter writer)
