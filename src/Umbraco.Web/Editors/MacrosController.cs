@@ -30,13 +30,11 @@ namespace Umbraco.Web.Editors
     [UmbracoTreeAuthorize(Constants.Trees.Macros)]
     public class MacrosController : BackOfficeNotificationsController
     {
-        private readonly IShortStringHelper _shortStringHelper;
         private readonly IMacroService _macroService;
 
         public MacrosController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IShortStringHelper shortStringHelper)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
         {
-            _shortStringHelper = shortStringHelper;
             _macroService = Services.MacroService;
         }
 
@@ -71,7 +69,7 @@ namespace Umbraco.Web.Editors
 
             try
             {
-                var macro = new Macro(_shortStringHelper)
+                var macro = new Macro(ShortStringHelper)
                 {
                     Alias = alias,
                     Name = name,

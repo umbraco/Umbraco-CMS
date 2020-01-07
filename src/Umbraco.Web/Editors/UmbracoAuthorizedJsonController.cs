@@ -32,6 +32,6 @@ namespace Umbraco.Web.Editors
             ShortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
         }
 
-        public IShortStringHelper ShortStringHelper { get; }
+        protected IShortStringHelper ShortStringHelper { get; }
     }
 }

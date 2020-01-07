@@ -144,7 +144,6 @@
     <Compile Include="Security\ConfiguredPasswordValidator.cs" />
     <Compile Include="Security\PasswordSecurity.cs" />
     <Compile Include="Security\UmbracoBackOfficeIdentity.cs" />
-    <Compile Include="TypeLoaderExtensions.cs" />
     <Compile Include="FileResources\Files.Designer.cs" />
     <Compile Include="MainDom.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -155,8 +154,6 @@
     <Compile Include="Security\UmbracoEmailMessage.cs" />
     <Compile Include="Security\UserAwarePasswordHasher.cs" />
     <Compile Include="ServiceContextExtensions.cs" />
-    <Compile Include="TypeExtensions.cs" />
-    <Compile Include="UriExtensions.cs" />
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
