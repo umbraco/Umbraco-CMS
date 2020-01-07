@@ -251,8 +251,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .AndByDescending<ContentVersionDto>(x => x.VersionDate);
 
             return MapDtosToContent(Database.Fetch<DocumentDto>(sql), true,
-                // load bare minimum
-                false, false, false, false).Skip(skip).Take(take);
+                // load bare minimum, need variants though since this is used to rollback with variants
+                false, false, false, true).Skip(skip).Take(take);
         }
 
         public override IContent GetVersion(int versionId)
