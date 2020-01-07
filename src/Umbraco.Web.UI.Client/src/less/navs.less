@@ -233,11 +233,13 @@
 }
 
 .dropdown-menu > li > a {
+    position: relative;
     padding: 8px 20px;
     color: @ui-option-type;
 }
 
 .dropdown-menu > li > button {
+    position: relative;
   background: transparent;
   border: 0;
   padding: 8px 20px;
@@ -253,11 +255,9 @@
 }
 
 .dropdown-menu > li > a:hover, 
-.dropdown-menu > li > a:focus, 
 .dropdown-menu > li > button:hover, 
-.dropdown-menu > li > button:focus, 
 .dropdown-submenu:hover > a, 
-.dropdown-submenu:focus > a {
+.dropdown-submenu:hover > button {
     color: @ui-option-type-hover;
     background: @ui-option-hover;
 }

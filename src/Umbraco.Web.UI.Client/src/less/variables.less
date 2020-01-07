@@ -108,6 +108,7 @@
 //@blueLight:               #4f89de;
 @blue:                  #2E8AEA;
 @blueMid:               #2152A3;// updated 2019
+@blueMidLight:          rgb(99, 174, 236);
 @blueDark:              #3544b1;// updated 2019
 @blueExtraDark:         #1b264f;// added 2019
 @blueLight:             #ADD8E6;
@@ -149,8 +150,8 @@
 @ui-selected-hover:     ligthen(@sand-5, 10);
 @ui-selected-type:           @blueExtraDark;
 @ui-selected-type-hover:     @blueMid;
-@ui-selected-border:           @pinkLight;
-@ui-selected-border-hover:     darken(@pinkLight, 10);
+@ui-selected-border:           @blueDark;
+@ui-selected-border-hover:     darken(@blueDark, 10);
 
 @ui-light-border:           @pinkLight;
 @ui-light-type:             @gray-4;
@@ -174,6 +175,8 @@
 @ui-action-discreet-type-hover:   @blueMid;
 @ui-action-discreet-border:         @gray-7;
 @ui-action-discreet-border-hover:   @blueMid;
+
+@ui-outline:                      @blueMidLight;
 
 @type-white:                      @white;
 @type-black:                      @blueNight;
@@ -293,7 +296,7 @@
 @inputBackground:               @white;
 @inputBorder:                   @gray-8;
 @inputBorderFocus:              @gray-7;
-@inputBorderTabFocus:           @blueExtraDark;
+@inputBorderTabFocus:           @ui-outline;
 @inputBorderRadius:             0;
 @inputDisabledBackground:       @gray-10;
 @formActionsBackground:         @gray-9;

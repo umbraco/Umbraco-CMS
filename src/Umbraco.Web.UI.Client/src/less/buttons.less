@@ -23,8 +23,7 @@
   border-radius: 3px;
 
     // Hover/focus state
-    &:hover,
-    &:focus {
+    &:hover {
         background: @btnBackgroundHighlight;
         color: @gray-4;
         background-position: 0 -15px;
@@ -33,11 +32,6 @@
         // transition is only when going to hover/focus, otherwise the background
         // behind the gradient (there for IE<=9 fallback) gets mismatched
         .transition(background-position .1s linear);
-    }
-
-    // Focus state for keyboard and accessibility
-    &:focus {
-        .tab-focus();
     }
 
     // Active state
@@ -230,8 +224,7 @@ input[type="button"] {
   .buttonBackground(@btnNeutralBackground, @btnNeutralBackgroundHighlight);
   color: @gray-5;
   // Hover/focus state
-  &:hover,
-  &:focus {
+  &:hover {
     color: @gray-5;
   }
 
@@ -267,9 +260,7 @@ input[type="button"] {
   transition: all .2s linear;
 }
 
-.btn-outline:hover,
-.btn-outline:focus,
-.btn-outline:active {
+.btn-outline:hover {
   border-color: @ui-light-type-hover;
   color: @ui-light-type-hover;
   background: @white;
@@ -309,14 +300,12 @@ input[type="submit"].btn {
   color: @linkColor;
   .border-radius(0);
 }
-.btn-link:hover,
-.btn-link:focus {
+.btn-link:hover {
   color: @linkColorHover;
   text-decoration: underline;
   background-color: transparent;
 }
-.btn-link[disabled]:hover,
-.btn-link[disabled]:focus {
+.btn-link[disabled]:hover {
   color: @gray-4;
   text-decoration: none;
 }
@@ -324,8 +313,7 @@ input[type="submit"].btn {
 // Make a reverse type of a button link
 .btn-link-reverse{
     text-decoration:underline;
-  &:hover,
-  &:focus{
+  &:hover {
     text-decoration:none;
   }
 }
@@ -362,7 +350,7 @@ input[type="submit"].btn {
     outline: 0;
     -webkit-appearance: none;
 
-    &:hover, &:focus  {
+    &:hover {
         color: @ui-icon-hover;
     }
 }
