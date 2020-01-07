@@ -8,7 +8,7 @@ using Umbraco.Web.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
-using Umbraco.Core.Composing.CompositionExtensions;
+using Umbraco.Web.Composing.CompositionExtensions;
 using Umbraco.Core.Logging;
 using FileSystems = Umbraco.Core.IO.FileSystems;
 

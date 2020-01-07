@@ -38,7 +38,7 @@ using Umbraco.Web.Actions;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
-using Umbraco.Core.Composing.CompositionExtensions;
+using Umbraco.Web.Composing.CompositionExtensions;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Serialization;

@@ -6,6 +6,7 @@ using Microsoft.Owin.Security;
 using Umbraco.Core;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
+using Umbraco.Web.Models.Identity;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web

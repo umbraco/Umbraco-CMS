@@ -1,7 +1,8 @@
-﻿using Umbraco.Core.Mapping;
-using Umbraco.Core.Models.Identity;
+﻿using Umbraco.Core;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Mapping;
 
-namespace Umbraco.Core.Composing.CompositionExtensions
+namespace Umbraco.Web.Composing.CompositionExtensions
 
 {
     public static class CoreMappingProfiles
@@ -9,8 +10,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
         public static Composition ComposeCoreMappingProfiles(this Composition composition)
         {
             composition.RegisterUnique<UmbracoMapper>();
-            composition.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
-                .Add<IdentityMapDefinition>();
+
             return composition;
         }
     }

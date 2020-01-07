@@ -62,10 +62,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Models\Identity" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Compile Remove="obj\**" />
     </ItemGroup>
 

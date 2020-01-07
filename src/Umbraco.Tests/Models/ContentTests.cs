@@ -10,7 +10,7 @@ using Umbraco.Core;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Composing.CompositionExtensions;
+using Umbraco.Web.Composing.CompositionExtensions;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;

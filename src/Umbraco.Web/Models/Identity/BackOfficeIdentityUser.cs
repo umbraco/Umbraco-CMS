@@ -4,12 +4,14 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 
-namespace Umbraco.Core.Models.Identity
+namespace Umbraco.Web.Models.Identity
 {
     public class BackOfficeIdentityUser : IdentityUser<int, IIdentityUserLogin, IdentityUserRole<string>, IdentityUserClaim<int>>, IRememberBeingDirty
     {

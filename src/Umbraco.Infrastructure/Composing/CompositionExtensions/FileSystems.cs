@@ -1,9 +1,12 @@
-﻿using Umbraco.Core.Configuration;
+﻿using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.IO.MediaPathSchemes;
 using Umbraco.Core.Logging;
+using Umbraco.Core;
 
-namespace Umbraco.Core.Composing.CompositionExtensions
+namespace Umbraco.Web.Composing.CompositionExtensions
 {
     internal static class FileSystems
     {
@@ -74,10 +77,10 @@ namespace Umbraco.Core.Composing.CompositionExtensions
             // it needs to be registered (not only the interface) because it provides additional
             // functionality eg for scoping, and is injected in the scope provider - whereas the
             // interface is really for end-users to get access to filesystems.
-            composition.RegisterUnique(factory => factory.CreateInstance<IO.FileSystems>(factory));
+            composition.RegisterUnique(factory => factory.CreateInstance<Core.IO.FileSystems>(factory));
 
             // register IFileSystems, which gives access too all filesystems
-            composition.RegisterUnique<IFileSystems>(factory => factory.GetInstance<IO.FileSystems>());
+            composition.RegisterUnique<IFileSystems>(factory => factory.GetInstance<Core.IO.FileSystems>());
 
             // register the scheme for media paths
             composition.RegisterUnique<IMediaPathScheme, UniqueMediaPathScheme>();

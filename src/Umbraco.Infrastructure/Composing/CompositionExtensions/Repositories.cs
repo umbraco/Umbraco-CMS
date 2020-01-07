@@ -1,7 +1,9 @@
-﻿using Umbraco.Core.Persistence.Repositories;
+﻿using Umbraco.Core;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 
-namespace Umbraco.Core.Composing.CompositionExtensions
+namespace Umbraco.Web.Composing.CompositionExtensions
 {
     /// <summary>
     /// Composes repositories.

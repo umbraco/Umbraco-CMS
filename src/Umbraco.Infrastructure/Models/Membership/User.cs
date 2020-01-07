@@ -322,7 +322,7 @@ namespace Umbraco.Core.Models.Membership
         }
 
         [IgnoreDataMember]
-        internal bool DefaultToLiveEditing
+        public bool DefaultToLiveEditing
         {
             get => _defaultToLiveEditing;
             set => SetPropertyValueAndDetectChanges(value, ref _defaultToLiveEditing, nameof(DefaultToLiveEditing));
