@@ -11,7 +11,6 @@ using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Reflection;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
 using Umbraco.Core.Cache;
@@ -51,7 +50,6 @@ namespace Umbraco.Web.Editors
     {
         private readonly ITreeService _treeService;
         private readonly UmbracoTreeSearcher _treeSearcher;
-        private readonly IShortStringHelper _shortStringHelper;
         private readonly SearchableTreeCollection _searchableTreeCollection;
 
         public EntityController(
@@ -67,12 +65,12 @@ namespace Umbraco.Web.Editors
             SearchableTreeCollection searchableTreeCollection,
             UmbracoTreeSearcher treeSearcher,
             IShortStringHelper shortStringHelper)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
+
         {
             _treeService = treeService;
             _searchableTreeCollection = searchableTreeCollection;
             _treeSearcher = treeSearcher;
-            _shortStringHelper = shortStringHelper;
         }
 
         /// <summary>
@@ -102,7 +100,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public dynamic GetSafeAlias(string value, bool camelCase = true)
         {
-            var returnValue = string.IsNullOrWhiteSpace(value) ? string.Empty : value.ToSafeAlias(_shortStringHelper, camelCase);
+            var returnValue = string.IsNullOrWhiteSpace(value) ? string.Empty : value.ToSafeAlias(ShortStringHelper, camelCase);
             dynamic returnObj = new System.Dynamic.ExpandoObject();
             returnObj.alias = returnValue;
             returnObj.original = value;

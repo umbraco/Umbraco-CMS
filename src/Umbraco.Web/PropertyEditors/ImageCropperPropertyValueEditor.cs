@@ -10,6 +10,7 @@ using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using File = System.IO.File;
 
 namespace Umbraco.Web.PropertyEditors
@@ -22,8 +23,8 @@ namespace Umbraco.Web.PropertyEditors
         private readonly ILogger _logger;
         private readonly IMediaFileSystem _mediaFileSystem;
 
-        public ImageCropperPropertyValueEditor(DataEditorAttribute attribute, ILogger logger, IMediaFileSystem mediaFileSystem, IDataTypeService dataTypeService, ILocalizationService localizationService)
-            : base(dataTypeService, localizationService, Current.Services.TextService, Current.ShortStringHelper, attribute)
+        public ImageCropperPropertyValueEditor(DataEditorAttribute attribute, ILogger logger, IMediaFileSystem mediaFileSystem, IDataTypeService dataTypeService, ILocalizationService localizationService, IShortStringHelper shortStringHelper)
+            : base(dataTypeService, localizationService, Current.Services.TextService, shortStringHelper, attribute)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));

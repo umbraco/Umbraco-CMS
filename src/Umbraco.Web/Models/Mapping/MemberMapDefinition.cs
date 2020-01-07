@@ -26,12 +26,13 @@ namespace Umbraco.Web.Models.Mapping
             mapper.Define<IMember, MemberBasic>((source, context) => new MemberBasic(), Map);
             mapper.Define<IMemberGroup, MemberGroupDisplay>((source, context) => new MemberGroupDisplay(), Map);
             mapper.Define<IMember, ContentPropertyCollectionDto>((source, context) => new ContentPropertyCollectionDto(), Map);
-        }      
+        }
 
         // Umbraco.Code.MapAll -Properties -Errors -Edited -Updater -Alias -IsChildOfListView
         // Umbraco.Code.MapAll -Trashed -IsContainer -VariesByCulture
         private void Map(IMember source, MemberDisplay target, MapperContext context)
         {
+            target.ContentApps = _commonMapper.GetContentApps(source);
             target.ContentTypeId = source.ContentType.Id;
             target.ContentTypeAlias = source.ContentType.Alias;
             target.ContentTypeName = source.ContentType.Name;

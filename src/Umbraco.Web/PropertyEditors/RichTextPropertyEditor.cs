@@ -28,16 +28,17 @@ namespace Umbraco.Web.PropertyEditors
         Icon = "icon-browser-window")]
     public class RichTextPropertyEditor : DataEditor
     {
-        private IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly HtmlImageSourceParser _imageSourceParser;
         private readonly HtmlLocalLinkParser _localLinkParser;
         private readonly RichTextEditorPastedImages _pastedImages;
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizationService _localizationService;
         private readonly IIOHelper _ioHelper;
-        private ILogger _logger;
+        private readonly ILogger _logger;
         private readonly IMediaService _mediaService;
         private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+        private readonly IShortStringHelper _shortStringHelper;
 
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
@@ -55,7 +56,7 @@ namespace Umbraco.Web.PropertyEditors
             IShortStringHelper shortStringHelper,
             IIOHelper ioHelper,
             ILocalizedTextService localizedTextService)
-            : base(logger, dataTypeService, localizationService, localizedTextService,shortStringHelper)
+            : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _imageSourceParser = imageSourceParser;
@@ -67,13 +68,14 @@ namespace Umbraco.Web.PropertyEditors
             _logger = logger;
             _mediaService = mediaService;
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
+            _shortStringHelper = shortStringHelper;
         }
 
         /// <summary>
         /// Create a custom value editor
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider, _umbracoContextAccessor, _logger, _dataTypeService, _localizationService, _imageSourceParser, _localLinkParser, _pastedImages);
+        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider, _umbracoContextAccessor, _logger, _dataTypeService, _localizationService, _shortStringHelper, _imageSourceParser, _localLinkParser, _pastedImages);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new RichTextConfigurationEditor(_ioHelper);
 
@@ -89,8 +91,8 @@ namespace Umbraco.Web.PropertyEditors
             private readonly HtmlLocalLinkParser _localLinkParser;
             private readonly RichTextEditorPastedImages _pastedImages;
 
-            public RichTextPropertyValueEditor(DataEditorAttribute attribute, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor, ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, HtmlImageSourceParser imageSourceParser, HtmlLocalLinkParser localLinkParser, RichTextEditorPastedImages pastedImages)
-                : base(dataTypeService, localizationService,Current.Services.TextService, Current.ShortStringHelper, attribute)
+            public RichTextPropertyValueEditor(DataEditorAttribute attribute, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor, ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, IShortStringHelper shortStringHelper, HtmlImageSourceParser imageSourceParser, HtmlLocalLinkParser localLinkParser, RichTextEditorPastedImages pastedImages)
+                : base(dataTypeService, localizationService,Current.Services.TextService, shortStringHelper, attribute)
             {
                 _umbracoContextAccessor = umbracoContextAccessor;
                 _imageSourceParser = imageSourceParser;

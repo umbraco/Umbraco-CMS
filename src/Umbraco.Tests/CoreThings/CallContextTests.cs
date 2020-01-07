@@ -1,6 +1,7 @@
-﻿using System.Runtime.Remoting.Messaging;
-using NUnit.Framework;
+﻿using NUnit.Framework;
+using System;
 using Umbraco.Core;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Tests.CoreThings
 {
@@ -13,10 +14,10 @@ namespace Umbraco.Tests.CoreThings
         {
             SafeCallContext.Register(() =>
             {
-                CallContext.FreeNamedDataSlot("test1");
-                CallContext.FreeNamedDataSlot("test2");
+                CallContext<string>.SetData("test1", null);
+                CallContext<string>.SetData("test2", null);
                 return null;
-            }, o => {});
+            }, o => { });
         }
 
         [OneTimeSetUp]
@@ -44,10 +45,10 @@ namespace Umbraco.Tests.CoreThings
         [Test]
         public void Test1()
         {
-            CallContext.LogicalSetData("test1", "test1");
-            Assert.IsNull(CallContext.LogicalGetData("test2"));
+            CallContext<string>.SetData("test1", "test1");
+            Assert.IsNull(CallContext<string>.GetData("test2"));
 
-            CallContext.LogicalSetData("test3b", "test3b");
+            CallContext<string>.SetData("test3b", "test3b");
 
             if (_first)
             {
@@ -55,21 +56,21 @@ namespace Umbraco.Tests.CoreThings
             }
             else
             {
-                Assert.IsNotNull(CallContext.LogicalGetData("test3a")); // leak!
+                Assert.IsNotNull(CallContext<string>.GetData("test3a")); // leak!
             }
         }
 
         [Test]
         public void Test2()
         {
-            CallContext.LogicalSetData("test2", "test2");
-            Assert.IsNull(CallContext.LogicalGetData("test1"));
+            CallContext<string>.SetData("test2", "test2");
+            Assert.IsNull(CallContext<string>.GetData("test1"));
         }
 
         [Test]
         public void Test3()
         {
-            CallContext.LogicalSetData("test3a", "test3a");
+            CallContext<string>.SetData("test3a", "test3a");
 
             if (_first)
             {
@@ -77,7 +78,7 @@ namespace Umbraco.Tests.CoreThings
             }
             else
             {
-                Assert.IsNotNull(CallContext.LogicalGetData("test3b")); // leak!
+                Assert.IsNotNull(CallContext<string>.GetData("test3b")); // leak!
             }
         }
     }

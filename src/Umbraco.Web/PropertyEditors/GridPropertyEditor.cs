@@ -10,11 +10,11 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Templates;
 
 namespace Umbraco.Web.PropertyEditors
 {
-
     /// <summary>
     /// Represents a grid property and parameter editor.
     /// </summary>
@@ -28,11 +28,11 @@ namespace Umbraco.Web.PropertyEditors
         Group = Constants.PropertyEditors.Groups.RichContent)]
     public class GridPropertyEditor : DataEditor
     {
-        private IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizationService _localizationService;
         private readonly IIOHelper _ioHelper;
-        private ILogger _logger;
+        private readonly ILogger _logger;
         private readonly IMediaService _mediaService;
         private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
         private readonly HtmlImageSourceParser _imageSourceParser;
@@ -49,8 +49,9 @@ namespace Umbraco.Web.PropertyEditors
             HtmlImageSourceParser imageSourceParser,
             RichTextEditorPastedImages pastedImages,
             HtmlLocalLinkParser localLinkParser,
-            IIOHelper ioHelper)
-            : base(logger, dataTypeService, localizationService, Current.Services.TextService, Current.ShortStringHelper)
+            IIOHelper ioHelper,
+            IShortStringHelper shortStringHelper)
+            : base(logger, dataTypeService, localizationService, Current.Services.TextService, shortStringHelper)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _dataTypeService = dataTypeService;
@@ -70,7 +71,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Overridden to ensure that the value is validated
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider, _umbracoContextAccessor, _logger, _dataTypeService, _localizationService, _imageSourceParser, _pastedImages, _localLinkParser);
+        protected override IDataValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider, _umbracoContextAccessor, _logger, _dataTypeService, _localizationService, _imageSourceParser, _pastedImages, _localLinkParser, ShortStringHelper);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new GridConfigurationEditor(_ioHelper);
 
@@ -92,14 +93,15 @@ namespace Umbraco.Web.PropertyEditors
                 ILocalizationService localizationService,
                 HtmlImageSourceParser imageSourceParser,
                 RichTextEditorPastedImages pastedImages,
-                HtmlLocalLinkParser localLinkParser)
-                : base(dataTypeService, localizationService, Current.Services.TextService, Current.ShortStringHelper, attribute)
+                HtmlLocalLinkParser localLinkParser,
+                IShortStringHelper shortStringHelper)
+                : base(dataTypeService, localizationService, Current.Services.TextService, shortStringHelper, attribute)
             {
                 _umbracoContextAccessor = umbracoContextAccessor;
                 _imageSourceParser = imageSourceParser;
                 _pastedImages = pastedImages;
-                _richTextPropertyValueEditor = new RichTextPropertyEditor.RichTextPropertyValueEditor(attribute, mediaService, contentTypeBaseServiceProvider, umbracoContextAccessor,logger, dataTypeService, localizationService, imageSourceParser, localLinkParser, pastedImages);
-                _mediaPickerPropertyValueEditor = new MediaPickerPropertyEditor.MediaPickerPropertyValueEditor(dataTypeService, localizationService, attribute);
+                _richTextPropertyValueEditor = new RichTextPropertyEditor.RichTextPropertyValueEditor(attribute, mediaService, contentTypeBaseServiceProvider, umbracoContextAccessor,logger, dataTypeService, localizationService, shortStringHelper, imageSourceParser, localLinkParser, pastedImages);
+                _mediaPickerPropertyValueEditor = new MediaPickerPropertyEditor.MediaPickerPropertyValueEditor(dataTypeService, localizationService, shortStringHelper, attribute);
             }
 
             /// <summary>

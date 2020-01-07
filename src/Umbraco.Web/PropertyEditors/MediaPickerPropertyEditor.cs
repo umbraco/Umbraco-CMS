@@ -47,11 +47,12 @@ namespace Umbraco.Web.PropertyEditors
         /// <inheritdoc />
         protected override IConfigurationEditor CreateConfigurationEditor() => new MediaPickerConfigurationEditor(_ioHelper);
 
-        protected override IDataValueEditor CreateValueEditor() => new MediaPickerPropertyValueEditor(_dataTypeService, _localizationService, Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new MediaPickerPropertyValueEditor(_dataTypeService, _localizationService, ShortStringHelper, Attribute);
 
         internal class MediaPickerPropertyValueEditor : DataValueEditor, IDataValueReference
         {
-            public MediaPickerPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute) : base(dataTypeService,localizationService, Current.Services.TextService,Current.ShortStringHelper,attribute)
+            public MediaPickerPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute)
+                : base(dataTypeService,localizationService, Current.Services.TextService, shortStringHelper,attribute)
             {
             }
 

@@ -4,6 +4,14 @@ using System.Collections.Generic;
 
 namespace Umbraco.Core
 {
+    /// <summary>
+    /// Provides a way to stop the data flow of a logical call context (i.e. CallContext or AsyncLocal) from within
+    /// a SafeCallContext and then have the original data restored to the current logical call context.
+    /// </summary>
+    /// <remarks>
+    /// Some usages of this might be when spawning async thread or background threads in which the current logical call context will be flowed but
+    /// you don't want it to flow there yet you don't want to clear it either since you want the data to remain on the current thread.
+    /// </remarks>
     public class SafeCallContext : IDisposable
     {
         private static readonly List<Func<object>> EnterFuncs = new List<Func<object>>();

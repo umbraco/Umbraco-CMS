@@ -15,10 +15,10 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
+using Umbraco.Tests.Strings;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.PublishedCache;
@@ -78,7 +78,8 @@ namespace Umbraco.Tests.Services
                 Mock.Of<IPublishedModelFactory>(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(ShortStringHelper) }),
                 typeFinder,
-                hostingEnvironment);
+                hostingEnvironment,
+                new MockShortStringHelper());
         }
 
         public class LocalServerMessenger : ServerMessengerBase

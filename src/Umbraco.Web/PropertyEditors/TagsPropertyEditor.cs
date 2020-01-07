@@ -10,6 +10,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -28,22 +29,22 @@ namespace Umbraco.Web.PropertyEditors
         private readonly IIOHelper _ioHelper;
         private readonly ILocalizedTextService _localizedTextService;
 
-        public TagsPropertyEditor(ManifestValueValidatorCollection validators, ILogger logger, IIOHelper ioHelper, ILocalizedTextService localizedTextService)
-            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService, Current.Services.TextService,Current.ShortStringHelper)
+        public TagsPropertyEditor(ManifestValueValidatorCollection validators, ILogger logger, IIOHelper ioHelper, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper)
+            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService, Current.Services.TextService, shortStringHelper)
         {
             _validators = validators;
             _ioHelper = ioHelper;
             _localizedTextService = localizedTextService;
         }
 
-        protected override IDataValueEditor CreateValueEditor() => new TagPropertyValueEditor(Current.Services.DataTypeService, Current.Services.LocalizationService, Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new TagPropertyValueEditor(Current.Services.DataTypeService, Current.Services.LocalizationService, ShortStringHelper, Attribute);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new TagConfigurationEditor(_validators, _ioHelper, _localizedTextService);
 
         internal class TagPropertyValueEditor : DataValueEditor
         {
-            public TagPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, DataEditorAttribute attribute)
-                : base(dataTypeService, localizationService,Current.Services.TextService, Current.ShortStringHelper, attribute)
+            public TagPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute)
+                : base(dataTypeService, localizationService,Current.Services.TextService, shortStringHelper, attribute)
             { }
 
             /// <inheritdoc />

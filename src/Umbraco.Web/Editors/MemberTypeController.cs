@@ -13,6 +13,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
@@ -20,7 +21,6 @@ using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
-
     /// <summary>
     /// An API controller used for dealing with member types
     /// </summary>
@@ -28,8 +28,8 @@ namespace Umbraco.Web.Editors
     [UmbracoTreeAuthorize(new string[] { Constants.Trees.MemberTypes, Constants.Trees.Members})]
     public class MemberTypeController : ContentTypeControllerBase<IMemberType>
     {
-        public MemberTypeController(ICultureDictionary cultureDictionary, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
-            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        public MemberTypeController(ICultureDictionary cultureDictionary, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IShortStringHelper shortStringHelper)
+            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
         {
         }
 
@@ -98,7 +98,7 @@ namespace Umbraco.Web.Editors
         [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
         public MemberTypeDisplay GetEmpty()
         {
-            var ct = new MemberType(Current.ShortStringHelper, -1);
+            var ct = new MemberType(ShortStringHelper, -1);
             ct.Icon = Constants.Icons.Member;
 
             var dto = Mapper.Map<IMemberType, MemberTypeDisplay>(ct);

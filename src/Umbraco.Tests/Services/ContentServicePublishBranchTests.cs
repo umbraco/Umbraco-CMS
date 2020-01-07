@@ -200,7 +200,7 @@ namespace Umbraco.Tests.Services
 
             //update the child
             iv1.SetValue("vp", "UPDATED-iv1.de", "de");
-            ServiceContext.ContentService.Save(iv1);
+            var saveResult = ServiceContext.ContentService.Save(iv1);
 
             var r = ServiceContext.ContentService.SaveAndPublishBranch(vRoot, false, "de").ToArray();
             Assert.AreEqual(PublishResultType.SuccessPublishAlready, r[0].Result);
@@ -344,7 +344,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentService.Save(iv11);
 
             iv11.SetCultureName("iv11.ru", "ru");
-            ServiceContext.ContentService.SaveAndPublish(iv11, new []{"de", "ru"});
+            var xxx = ServiceContext.ContentService.SaveAndPublish(iv11, new []{"de", "ru"});
 
             Assert.AreEqual("iv11.de", iv11.GetValue("vp", "de", published: true));
             Assert.AreEqual("iv11.ru", iv11.GetValue("vp", "ru", published: true));

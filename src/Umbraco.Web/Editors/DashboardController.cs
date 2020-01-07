@@ -16,6 +16,7 @@ using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Core.Dashboards;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Services;

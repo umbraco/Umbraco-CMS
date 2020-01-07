@@ -19,9 +19,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("logging")]
         public LoggingElement Logging => (LoggingElement)this["logging"];
 
-
         [ConfigurationProperty("web.routing")]
         public WebRoutingElement WebRouting => (WebRoutingElement)this["web.routing"];
+
+        [ConfigurationProperty("keepAlive")]
+        internal KeepAliveElement KeepAlive => (KeepAliveElement)this["keepAlive"];
 
         IContentSection IUmbracoSettingsSection.Content => Content;
 
@@ -34,5 +36,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         ILoggingSection IUmbracoSettingsSection.Logging => Logging;
 
         IWebRoutingSection IUmbracoSettingsSection.WebRouting => WebRouting;
+
+        IKeepAliveSection IUmbracoSettingsSection.KeepAlive => KeepAlive;
     }
 }

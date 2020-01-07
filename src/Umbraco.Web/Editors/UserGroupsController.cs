@@ -8,6 +8,7 @@ using Umbraco.Web.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Editors.Filters;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
@@ -106,7 +107,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public UserGroupDisplay GetEmptyUserGroup()
         {
-            return Mapper.Map<UserGroupDisplay>(new UserGroup(Current.ShortStringHelper));
+            return Mapper.Map<UserGroupDisplay>(new UserGroup(ShortStringHelper));
         }
 
         /// <summary>

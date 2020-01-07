@@ -152,6 +152,7 @@
     <Compile Include="Security\IUserSessionStore.cs" />
     <Compile Include="Security\UmbracoEmailMessage.cs" />
     <Compile Include="Security\UserAwarePasswordHasher.cs" />
+    <Compile Include="ServiceContextExtensions.cs" />
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>

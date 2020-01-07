@@ -13,6 +13,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Web.Composing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Security.Providers;
 using System.ComponentModel.DataAnnotations;
@@ -31,6 +32,7 @@ namespace Umbraco.Web.Security
         private readonly IPublicAccessService _publicAccessService;
         private readonly AppCaches _appCaches;
         private readonly ILogger _logger;
+        private readonly IShortStringHelper _shortStringHelper;
 
         #region Constructors
 
@@ -44,7 +46,8 @@ namespace Umbraco.Web.Security
             IMemberTypeService memberTypeService,
             IPublicAccessService publicAccessService,
             AppCaches appCaches,
-            ILogger logger
+            ILogger logger,
+            IShortStringHelper shortStringHelper
         )
         {
             HttpContext = httpContext;
@@ -54,6 +57,7 @@ namespace Umbraco.Web.Security
             _publicAccessService = publicAccessService;
             _appCaches = appCaches;
             _logger = logger;
+            _shortStringHelper = shortStringHelper;
 
             _membershipProvider = membershipProvider ?? throw new ArgumentNullException(nameof(membershipProvider));
             _roleProvider = roleProvider ?? throw new ArgumentNullException(nameof(roleProvider));
@@ -396,7 +400,7 @@ namespace Umbraco.Web.Security
 
             var memberType = _memberTypeService.Get(member.ContentTypeId);
 
-            var builtIns = ConventionsHelper.GetStandardPropertyTypeStubs(Current.ShortStringHelper).Select(x => x.Key).ToArray();
+            var builtIns = ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper).Select(x => x.Key).ToArray();
 
             model.MemberProperties = GetMemberPropertiesViewModel(memberType, builtIns, member).ToList();
 
@@ -416,7 +420,7 @@ namespace Umbraco.Web.Security
             if (memberType == null)
                 throw new InvalidOperationException("Could not find a member type with alias " + memberTypeAlias);
 
-            var builtIns = ConventionsHelper.GetStandardPropertyTypeStubs(Current.ShortStringHelper).Select(x => x.Key).ToArray();
+            var builtIns = ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper).Select(x => x.Key).ToArray();
             var model = RegisterModel.CreateModel();
             model.MemberTypeAlias = memberTypeAlias;
             model.MemberProperties = GetMemberPropertiesViewModel(memberType, builtIns).ToList();

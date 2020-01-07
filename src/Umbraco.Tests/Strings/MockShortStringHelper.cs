@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Umbraco.Core.Strings;
+﻿using Umbraco.Core.Strings;
 
 namespace Umbraco.Tests.Strings
 {

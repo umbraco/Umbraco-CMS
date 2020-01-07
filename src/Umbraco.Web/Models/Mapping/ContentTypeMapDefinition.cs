@@ -31,7 +31,7 @@ namespace Umbraco.Web.Models.Mapping
 
         public ContentTypeMapDefinition(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IFileService fileService,
             IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService,
-            ILogger logger)
+            ILogger logger, IShortStringHelper shortStringHelper)
         {
             _propertyEditors = propertyEditors;
             _dataTypeService = dataTypeService;
@@ -40,7 +40,7 @@ namespace Umbraco.Web.Models.Mapping
             _mediaTypeService = mediaTypeService;
             _memberTypeService = memberTypeService;
             _logger = logger;
-            _shortStringHelper = Current.ShortStringHelper;
+            _shortStringHelper = shortStringHelper;
 
         }
 
@@ -510,7 +510,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             MapTypeToDisplayBase(source, target);
 
-            var groupsMapper = new PropertyTypeGroupMapper<TTargetPropertyType>(_propertyEditors, _dataTypeService, _logger);
+            var groupsMapper = new PropertyTypeGroupMapper<TTargetPropertyType>(_propertyEditors, _dataTypeService, _shortStringHelper, _logger);
             target.Groups = groupsMapper.Map(source);
         }
 

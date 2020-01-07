@@ -1,17 +1,10 @@
 ﻿using System;
-using System.Collections;
-using System.Runtime.Remoting.Messaging;
-using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
-using CallContext = Umbraco.Core.Scoping.CallContext;
-
-//using CallContext = Umbraco.Core.Scoping.CallContext;
-
 
 namespace Umbraco.Tests.Scoping
 {
@@ -126,8 +119,8 @@ namespace Umbraco.Tests.Scoping
                     Assert.AreSame(scope, ((Scope) nested).ParentScope);
 
                     // it's moved over to call context
-                    var callContextKey = CallContext.GetData(ScopeProvider.ScopeItemKey).AsGuid();
-                    Assert.AreNotEqual(Guid.Empty, callContextKey);
+                    var callContextScope = CallContext<IScope>.GetData(ScopeProvider.ScopeItemKey);
+                    Assert.IsNotNull(callContextScope);
 
                     // only if Core.DEBUG_SCOPES are defined
                     //var ccnested = scopeProvider.CallContextObjects[callContextKey];
