@@ -35,7 +35,7 @@ namespace Umbraco.Core.IO
 
         public static string Css => IOHelper.ReturnPath("umbracoCssPath", "~/css");
 
-        public static string Umbraco => IOHelper.ReturnPath("umbracoPath", "~/umbraco");
+        public static string Umbraco => IOHelper.ReturnPath(Constants.AppSettings.Path, "~/umbraco");
 
         public static string Packages => Data + "/packages";
 
