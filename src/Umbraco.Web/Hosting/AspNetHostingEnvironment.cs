@@ -1,10 +1,13 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Web;
 using System.Web.Hosting;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
+using IRegisteredObject = Umbraco.Core.IRegisteredObject;
 
 namespace Umbraco.Web.Hosting
 {
@@ -44,6 +47,23 @@ namespace Umbraco.Web.Hosting
             HttpRuntime.UnloadAppDomain();
         }
 
+        private IDictionary<IRegisteredObject, RegisteredObjectWrapper> RegisteredObjects { get;  } = new Dictionary<IRegisteredObject, RegisteredObjectWrapper>();
+
+        public void RegisterObject(IRegisteredObject registeredObject)
+        {
+            var wrapped = new RegisteredObjectWrapper(registeredObject);
+            RegisteredObjects.Add(registeredObject, wrapped);
+
+            HostingEnvironment.RegisterObject(wrapped);
+        }
+
+        public void UnregisterObject(IRegisteredObject registeredObject)
+        {
+            if (RegisteredObjects.TryGetValue(registeredObject, out var wrapped))
+            {
+                HostingEnvironment.UnregisterObject(wrapped);
+            }
+        }
 
         public string LocalTempPath
         {
@@ -82,6 +102,21 @@ namespace Umbraco.Web.Hosting
                 }
             }
         }
+        private class RegisteredObjectWrapper : System.Web.Hosting.IRegisteredObject
+        {
+            private readonly IRegisteredObject _inner;
 
+            public RegisteredObjectWrapper(IRegisteredObject inner)
+            {
+                _inner = inner;
+            }
+
+            public void Stop(bool immediate)
+            {
+                _inner.Stop(immediate);
+            }
+        }
     }
+
+
 }

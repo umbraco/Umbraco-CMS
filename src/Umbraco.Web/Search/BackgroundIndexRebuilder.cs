@@ -4,6 +4,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Examine;
 using System.Threading.Tasks;
 using Umbraco.Core;
+using Umbraco.Core.Hosting;
 using Umbraco.Web.Scheduling;
 
 namespace Umbraco.Web.Search
@@ -17,12 +18,14 @@ namespace Umbraco.Web.Search
         private readonly IndexRebuilder _indexRebuilder;
         private readonly IMainDom _mainDom;
         private readonly IProfilingLogger _logger;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private static BackgroundTaskRunner<IBackgroundTask> _rebuildOnStartupRunner;
 
-        public BackgroundIndexRebuilder(IMainDom mainDom, IProfilingLogger logger, IndexRebuilder indexRebuilder)
+        public BackgroundIndexRebuilder(IMainDom mainDom, IProfilingLogger logger, IHostingEnvironment hostingEnvironment, IndexRebuilder indexRebuilder)
         {
             _mainDom = mainDom;
             _logger = logger;
+            _hostingEnvironment = hostingEnvironment;
             _indexRebuilder = indexRebuilder;
         }
 
@@ -51,7 +54,7 @@ namespace Umbraco.Web.Search
 
                 _rebuildOnStartupRunner = new BackgroundTaskRunner<IBackgroundTask>(
                     "RebuildIndexesOnStartup",
-                    _logger);
+                    _logger, _hostingEnvironment);
 
                 _rebuildOnStartupRunner.TryAdd(task);
             }
