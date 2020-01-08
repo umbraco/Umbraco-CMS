@@ -5,10 +5,8 @@ using Umbraco.Core.IO;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web.PublishedCache;
-using System.Collections.Generic;
-using Umbraco.Core.Models.Editors;
-using Newtonsoft.Json;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -28,8 +26,8 @@ namespace Umbraco.Web.PropertyEditors
         private readonly ILocalizationService _localizationService;
         private readonly IIOHelper _ioHelper;
 
-        public MultiUrlPickerPropertyEditor(ILogger logger, IEntityService entityService, IPublishedSnapshotAccessor publishedSnapshotAccessor, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper)
-            : base(logger, dataTypeService, localizationService, Current.Services.TextService,Current.ShortStringHelper, EditorType.PropertyValue)
+        public MultiUrlPickerPropertyEditor(ILogger logger, IEntityService entityService, IPublishedSnapshotAccessor publishedSnapshotAccessor, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper, IShortStringHelper shortStringHelper)
+            : base(logger, dataTypeService, localizationService, Current.Services.TextService, shortStringHelper, EditorType.PropertyValue)
         {
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
             _publishedSnapshotAccessor = publishedSnapshotAccessor ?? throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
@@ -40,6 +38,6 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new MultiUrlPickerConfigurationEditor(_ioHelper);
 
-        protected override IDataValueEditor CreateValueEditor() => new MultiUrlPickerValueEditor(_entityService, _publishedSnapshotAccessor, Logger, _dataTypeService, _localizationService, Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new MultiUrlPickerValueEditor(_entityService, _publishedSnapshotAccessor, Logger, _dataTypeService, _localizationService, ShortStringHelper, Attribute);
     }
 }

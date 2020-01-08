@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.PackageActions;
-using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core
 {
-    internal static class TypeLoaderExtensions
+    public static class TypeLoaderExtensions
     {
         /// <summary>
         /// Gets all classes implementing <see cref="IDataEditor"/>.

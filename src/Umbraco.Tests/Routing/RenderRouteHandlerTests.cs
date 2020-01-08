@@ -5,6 +5,7 @@ using System.Web.Routing;
 using System.Web.Security;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
@@ -32,6 +33,7 @@ using Umbraco.Web.Runtime;
 using Umbraco.Web.Security;
 using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Web.Security.Providers;
+using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Tests.Routing
 {
@@ -54,7 +56,7 @@ namespace Umbraco.Tests.Routing
         public class TestRuntime : WebRuntime
         {
             public TestRuntime(UmbracoApplicationBase umbracoApplication, Configs configs, IUmbracoVersion umbracoVersion, IIOHelper ioHelper, ILogger logger, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
-                : base(umbracoApplication, configs, umbracoVersion, ioHelper, Mock.Of<ILogger>(), Mock.Of<IProfiler>(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.BulkSqlInsertProvider)
+                : base(umbracoApplication, configs, umbracoVersion, ioHelper, Mock.Of<ILogger>(), Mock.Of<IProfiler>(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.BulkSqlInsertProvider, TestHelper.MainDom)
             {
             }
 
@@ -147,16 +149,16 @@ namespace Umbraco.Tests.Routing
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;
 
             var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContextAccessor, Mock.Of<ILogger>(), context =>
-            {
-                var membershipHelper = new MembershipHelper(
-                    umbracoContext.HttpContext, Mock.Of<IPublishedMemberCache>(), Mock.Of<MembersMembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IPublicAccessService>(), AppCaches.Disabled, Mock.Of<ILogger>());
-               return new CustomDocumentController(Factory.GetInstance<IGlobalSettings>(),
-                    umbracoContextAccessor,
-                    Factory.GetInstance<ServiceContext>(),
-                    Factory.GetInstance<AppCaches>(),
-                    Factory.GetInstance<IProfilingLogger>(),
-                    new UmbracoHelper(Mock.Of<IPublishedContent>(), Mock.Of<ITagQuery>(), Mock.Of<ICultureDictionaryFactory>(), Mock.Of<IUmbracoComponentRenderer>(), Mock.Of<IPublishedContentQuery>(), membershipHelper));
-            }), ShortStringHelper);
+                {
+                    var membershipHelper = new MembershipHelper(
+                        umbracoContext.HttpContext, Mock.Of<IPublishedMemberCache>(), Mock.Of<MembersMembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IPublicAccessService>(), AppCaches.Disabled, Mock.Of<ILogger>(), ShortStringHelper);
+                   return new CustomDocumentController(Factory.GetInstance<IGlobalSettings>(),
+                        umbracoContextAccessor,
+                        Factory.GetInstance<ServiceContext>(),
+                        Factory.GetInstance<AppCaches>(),
+                        Factory.GetInstance<IProfilingLogger>(),
+                        new UmbracoHelper(Mock.Of<IPublishedContent>(), Mock.Of<ITagQuery>(), Mock.Of<ICultureDictionaryFactory>(), Mock.Of<IUmbracoComponentRenderer>(), Mock.Of<IPublishedContentQuery>(), membershipHelper));
+                }), ShortStringHelper);
 
             handler.GetHandlerForRoute(umbracoContext.HttpContext.Request.RequestContext, frequest);
             Assert.AreEqual("CustomDocument", routeData.Values["controller"].ToString());

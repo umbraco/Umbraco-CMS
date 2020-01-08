@@ -78,7 +78,7 @@ namespace Umbraco.Tests.Runtimes
             composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper, umbracoVersion, TestHelper.DbProviderFactoryCreator, TestHelper.BulkSqlInsertProvider);
 
             // create the core runtime and have it compose itself
-            var coreRuntime = new CoreRuntime(configs, umbracoVersion, ioHelper, logger, profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.BulkSqlInsertProvider);coreRuntime.Compose(composition);
+            var coreRuntime = new CoreRuntime(configs, umbracoVersion, ioHelper, logger, profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.BulkSqlInsertProvider, TestHelper.MainDom);coreRuntime.Compose(composition);
 
             // determine actual runtime level
             runtimeState.DetermineRuntimeLevel(databaseFactory, logger);
@@ -89,7 +89,7 @@ namespace Umbraco.Tests.Runtimes
             var composerTypes = typeLoader.GetTypes<IComposer>() // all of them
                 .Where(x => !x.FullName.StartsWith("Umbraco.Tests.")) // exclude test components
                 .Where(x => x != typeof(WebInitialComposer) && x != typeof(WebFinalComposer)); // exclude web runtime
-            var composers = new Composers(composition, composerTypes, profilingLogger);
+            var composers = new Composers(composition, composerTypes, Enumerable.Empty<Attribute>(), profilingLogger);
             composers.Compose();
 
             // must registers stuff that WebRuntimeComponent would register otherwise
@@ -273,7 +273,7 @@ namespace Umbraco.Tests.Runtimes
             composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper, umbracoVersion, TestHelper.DbProviderFactoryCreator, TestHelper.BulkSqlInsertProvider);
 
             // create the core runtime and have it compose itself
-            var coreRuntime = new CoreRuntime(configs, umbracoVersion, ioHelper, logger, profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.BulkSqlInsertProvider);
+            var coreRuntime = new CoreRuntime(configs, umbracoVersion, ioHelper, logger, profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.BulkSqlInsertProvider, TestHelper.MainDom);
             coreRuntime.Compose(composition);
 
             // get the components
@@ -284,7 +284,7 @@ namespace Umbraco.Tests.Runtimes
                 .Where(x => !x.FullName.StartsWith("Umbraco.Tests"));
             // single?
             //var componentTypes = new[] { typeof(CoreRuntimeComponent) };
-            var composers = new Composers(composition, composerTypes, profilingLogger);
+            var composers = new Composers(composition, composerTypes, Enumerable.Empty<Attribute>(), profilingLogger);
 
             // get components to compose themselves
             composers.Compose();

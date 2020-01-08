@@ -22,8 +22,9 @@ namespace Umbraco.Web
 
             var dbProviderFactoryCreator = new UmbracoDbProviderFactoryCreator(connectionStringConfig.ProviderName);
             var bulkSqlInsertProvider = connectionStringConfig.ProviderName == Constants.DbProviderNames.SqlCe ? (IBulkSqlInsertProvider) new SqlCeBulkSqlInsertProvider() : new SqlServerBulkSqlInsertProvider();
+            var mainDom = new MainDom(logger, hostingEnvironment);
 
-            return new WebRuntime(this, configs, umbracoVersion, ioHelper, logger, profiler, hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, bulkSqlInsertProvider);
+            return new WebRuntime(this, configs, umbracoVersion, ioHelper, logger, profiler, hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, bulkSqlInsertProvider, mainDom);
         }
 
         /// <summary>

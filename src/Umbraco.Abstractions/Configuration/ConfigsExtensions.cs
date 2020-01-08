@@ -28,9 +28,6 @@ namespace Umbraco.Core
         public static IUmbracoSettingsSection Settings(this Configs configs)
             => configs.GetConfig<IUmbracoSettingsSection>();
 
-        public static IUserPasswordConfiguration UserPasswordConfig(this Configs configs)
-            => configs.GetConfig<IUserPasswordConfiguration>();
-
         public static IHealthChecks HealthChecks(this Configs configs)
             => configs.GetConfig<IHealthChecks>();
 
@@ -40,10 +37,27 @@ namespace Umbraco.Core
         public static ICoreDebug CoreDebug(this Configs configs)
             => configs.GetConfig<ICoreDebug>();
 
+        public static IUserPasswordConfiguration UserPasswordConfiguration(this Configs configs)
+            => configs.GetConfig<IUserPasswordConfiguration>();
+
+        public static IMemberPasswordConfiguration MemberPasswordConfiguration(this Configs configs)
+            => configs.GetConfig<IMemberPasswordConfiguration>();
+
+        public static void AddPasswordConfigurations(this Configs configs)
+        {
+            configs.Add<IUserPasswordConfiguration>(() =>
+            {
+                return new UserPasswordConfiguration(configs.Settings().Security.UserPasswordConfiguration);
+            });
+            configs.Add<IMemberPasswordConfiguration>(() =>
+            {
+                return new MemberPasswordConfiguration(configs.Settings().Security.MemberPasswordConfiguration);
+            });
+        }
+
         public static void AddCoreConfigs(this Configs configs, IIOHelper ioHelper)
         {
             var configDir = new DirectoryInfo(ioHelper.MapPath(Constants.SystemDirectories.Config));
-
 
             // GridConfig depends on runtime caches, manifest parsers... and cannot be available during composition
             configs.Add<IGridConfig>(factory => new GridConfig(

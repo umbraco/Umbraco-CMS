@@ -48,6 +48,11 @@ namespace Umbraco.Tests.TestHelpers
             var logging = new Mock<ILoggingSection>();
             var routing = new Mock<IWebRoutingSection>();
 
+            var userPasswordConfig = new Mock<IUserPasswordConfigurationSection>();
+            var memberPasswordConfig = new Mock<IMemberPasswordConfigurationSection>();
+            security.Setup(x => x.UserPasswordConfiguration).Returns(userPasswordConfig.Object);
+            security.Setup(x => x.MemberPasswordConfiguration).Returns(memberPasswordConfig.Object);
+
             settings.Setup(x => x.Content).Returns(content.Object);
             settings.Setup(x => x.Security).Returns(security.Object);
             settings.Setup(x => x.RequestHandler).Returns(requestHandler.Object);

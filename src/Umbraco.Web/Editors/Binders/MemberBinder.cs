@@ -5,6 +5,7 @@ using System.Web.Http.ModelBinding;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Models.ContentEditing;
 using System.Linq;
 using Umbraco.Web.Composing;
@@ -17,15 +18,17 @@ namespace Umbraco.Web.Editors.Binders
     internal class MemberBinder : IModelBinder
     {
         private readonly ContentModelBinderHelper _modelBinderHelper;
+        private readonly IShortStringHelper _shortStringHelper;
         private readonly ServiceContext _services;
 
-        public MemberBinder() : this(Current.Services)
+        public MemberBinder() : this(Current.Services, Current.ShortStringHelper)
         {
         }
 
-        public MemberBinder(ServiceContext services)
+        public MemberBinder(ServiceContext services, IShortStringHelper shortStringHelper)
         {
-            _services = services;
+            _services = services ?? throw new ArgumentNullException(nameof(services));
+            _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
             _modelBinderHelper = new ContentModelBinderHelper();
         }
 
@@ -107,7 +110,7 @@ namespace Umbraco.Web.Editors.Binders
         /// <param name="contentType"></param>
         private void FilterMembershipProviderProperties(IContentTypeBase contentType)
         {
-            var defaultProps = ConventionsHelper.GetStandardPropertyTypeStubs(Current.ShortStringHelper);
+            var defaultProps = ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper);
             //remove all membership properties, these values are set with the membership provider.
             var exclude = defaultProps.Select(x => x.Value.Alias).ToArray();
             FilterContentTypeProperties(contentType, exclude);

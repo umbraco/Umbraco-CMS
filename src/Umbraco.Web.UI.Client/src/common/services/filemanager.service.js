@@ -16,7 +16,7 @@ function fileManager($rootScope) {
     var mgr = {
         /**
          * @ngdoc function
-         * @name umbraco.services.fileManager#addFiles
+         * @name umbraco.services.fileManager#setFiles
          * @methodOf umbraco.services.fileManager
          * @function
          *

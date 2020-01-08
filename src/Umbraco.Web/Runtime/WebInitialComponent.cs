@@ -15,6 +15,7 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.Strings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Install;
@@ -177,7 +178,7 @@ namespace Umbraco.Web.Runtime
                 umbracoPath + "/RenderMvc/{action}/{id}",
                 new { controller = "RenderMvc", action = "Index", id = UrlParameter.Optional }
             );
-            defaultRoute.RouteHandler = new RenderRouteHandler(umbracoContextAccessor, ControllerBuilder.Current.GetControllerFactory(),shortStringHelper);
+            defaultRoute.RouteHandler = new RenderRouteHandler(umbracoContextAccessor, ControllerBuilder.Current.GetControllerFactory(), shortStringHelper);
 
             // register install routes
             RouteTable.Routes.RegisterArea<UmbracoInstallArea>();

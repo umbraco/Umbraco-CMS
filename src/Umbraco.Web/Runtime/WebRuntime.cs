@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿using System;
+using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
@@ -37,8 +38,9 @@ namespace Umbraco.Web.Runtime
             IHostingEnvironment hostingEnvironment,
             IBackOfficeInfo backOfficeInfo,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
-            IBulkSqlInsertProvider bulkSqlInsertProvider):
-            base(configs, umbracoVersion, ioHelper, logger, profiler ,new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, bulkSqlInsertProvider)
+            IBulkSqlInsertProvider bulkSqlInsertProvider,
+            IMainDom mainDom):
+            base(configs, umbracoVersion, ioHelper, logger, profiler ,new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, bulkSqlInsertProvider, mainDom)
         {
             _umbracoApplication = umbracoApplication;
 

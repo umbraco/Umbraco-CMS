@@ -38,7 +38,8 @@ namespace Umbraco.Core.Runtime
             IHostingEnvironment hostingEnvironment,
             IBackOfficeInfo backOfficeInfo,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
-            IBulkSqlInsertProvider bulkSqlInsertProvider)
+            IBulkSqlInsertProvider bulkSqlInsertProvider,
+            IMainDom mainDom)
         {
             IOHelper = ioHelper;
             Configs = configs;
@@ -52,12 +53,14 @@ namespace Umbraco.Core.Runtime
             _umbracoBootPermissionChecker = umbracoBootPermissionChecker;
 
             Logger = logger;
+            MainDom = mainDom;
+
             // runtime state
             // beware! must use '() => _factory.GetInstance<T>()' and NOT '_factory.GetInstance<T>'
             // as the second one captures the current value (null) and therefore fails
            _state = new RuntimeState(Logger,
                 Configs.Settings(), Configs.Global(),
-                new Lazy<IMainDom>(() => _factory.GetInstance<IMainDom>()),
+                new Lazy<IMainDom>(() => mainDom),
                 new Lazy<IServerRegistrar>(() => _factory.GetInstance<IServerRegistrar>()),
                 UmbracoVersion,HostingEnvironment, BackOfficeInfo)
             {
@@ -99,6 +102,8 @@ namespace Umbraco.Core.Runtime
 
         /// <inheritdoc />
         public IRuntimeState State => _state;
+
+        public IMainDom MainDom { get; private set; }
 
         /// <inheritdoc/>
         public virtual IFactory Boot(IRegister register)
@@ -179,15 +184,21 @@ namespace Umbraco.Core.Runtime
                 Compose(composition);
 
                 // acquire the main domain - if this fails then anything that should be registered with MainDom will not operate
-                AcquireMainDom(mainDom);
+                AcquireMainDom(MainDom);
 
                 // determine our runtime level
                 DetermineRuntimeLevel(databaseFactory, ProfilingLogger);
 
                 // get composers, and compose
                 var composerTypes = ResolveComposerTypes(typeLoader);
-                composition.WithCollectionBuilder<ComponentCollectionBuilder>();
-                var composers = new Composers(composition, composerTypes, ProfilingLogger);
+
+                IEnumerable<Attribute> enableDisableAttributes;
+                using (ProfilingLogger.DebugDuration<CoreRuntime>("Scanning enable/disable composer attributes"))
+                {
+                    enableDisableAttributes = typeLoader.GetAssemblyAttributes(typeof(EnableComposerAttribute), typeof(DisableComposerAttribute));
+                }
+
+                var composers = new Composers(composition, composerTypes, enableDisableAttributes, ProfilingLogger);
                 composers.Compose();
 
                 // create the factory
@@ -196,6 +207,8 @@ namespace Umbraco.Core.Runtime
                 // create & initialize the components
                 _components = _factory.GetInstance<ComponentCollection>();
                 _components.Initialize();
+
+
             }
             catch (Exception e)
             {
@@ -262,13 +275,13 @@ namespace Umbraco.Core.Runtime
                 IOHelper.SetRootDirectory(path);
         }
 
-        private bool AcquireMainDom(MainDom mainDom)
+        private bool AcquireMainDom(IMainDom mainDom)
         {
             using (var timer = ProfilingLogger.DebugDuration<CoreRuntime>("Acquiring MainDom.", "Acquired."))
             {
                 try
                 {
-                    return mainDom.Acquire();
+                    return mainDom.IsMainDom;
                 }
                 catch
                 {

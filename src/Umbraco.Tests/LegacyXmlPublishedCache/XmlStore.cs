@@ -47,16 +47,16 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private readonly IEntityXmlSerializer _entitySerializer;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IShortStringHelper _shortStringHelper;
-        private XmlStoreFilePersister _persisterTask;
-        private volatile bool _released;
-        private bool _withRepositoryEvents;
-
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly PublishedContentTypeCache _contentTypeCache;
         private readonly RoutesCache _routesCache;
         private readonly IContentTypeService _contentTypeService;
         private readonly IContentService _contentService;
         private readonly IScopeProvider _scopeProvider;
+
+        private XmlStoreFilePersister _persisterTask;
+        private volatile bool _released;
+        private bool _withRepositoryEvents;
 
         #region Constructors
 
@@ -65,7 +65,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         /// </summary>
         /// <remarks>The default constructor will boot the cache, load data from file or database, /// wire events in order to manage changes, etc.</remarks>
         public XmlStore(IContentTypeService contentTypeService, IContentService contentService, IScopeProvider scopeProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache,
-            IPublishedSnapshotAccessor publishedSnapshotAccessor, MainDom mainDom, IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository, IGlobalSettings globalSettings, IEntityXmlSerializer entitySerializer, IHostingEnvironment hostingEnvironment, IShortStringHelper  shortStringHelper)
+            IPublishedSnapshotAccessor publishedSnapshotAccessor, MainDom mainDom, IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository, IGlobalSettings globalSettings, IEntityXmlSerializer entitySerializer, IHostingEnvironment hostingEnvironment, IShortStringHelper shortStringHelper)
             : this(contentTypeService, contentService, scopeProvider, routesCache, contentTypeCache, publishedSnapshotAccessor, mainDom, false, false, documentRepository, mediaRepository, memberRepository, globalSettings, entitySerializer, hostingEnvironment, shortStringHelper)
         { }
 
@@ -74,7 +74,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         // TODO: er, we DO have a DB?
         internal XmlStore(IContentTypeService contentTypeService, IContentService contentService, IScopeProvider scopeProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache,
             IPublishedSnapshotAccessor publishedSnapshotAccessor, MainDom mainDom,
-            bool testing, bool enableRepositoryEvents, IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository, IGlobalSettings globalSettings, IEntityXmlSerializer entitySerializer, IHostingEnvironment hostingEnvironment, IShortStringHelper  shortStringHelper)
+            bool testing, bool enableRepositoryEvents, IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository, IGlobalSettings globalSettings, IEntityXmlSerializer entitySerializer, IHostingEnvironment hostingEnvironment, IShortStringHelper shortStringHelper)
         {
             if (testing == false)
                 EnsureConfigurationIsValid();
@@ -312,7 +312,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         private XmlDocument _xmlDocument; // supplied xml document (for tests)
         private volatile XmlDocument _xml; // master xml document
-        private readonly AsyncLock _xmlLock = new AsyncLock(); // protects _xml
+        private readonly SystemLock _xmlLock = new SystemLock(); // protects _xml
 
         // to be used by PublishedContentCache only
         // for non-preview content only

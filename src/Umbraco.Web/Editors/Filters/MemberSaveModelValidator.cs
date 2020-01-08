@@ -6,12 +6,11 @@ using System.Net.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Editors.Filters
 {
@@ -22,17 +21,20 @@ namespace Umbraco.Web.Editors.Filters
     {
         private readonly IMemberTypeService _memberTypeService;
         private readonly IMemberService _memberService;
+        private readonly IShortStringHelper _shortStringHelper;
 
         public MemberSaveModelValidator(
             ILogger logger,
             IUmbracoContextAccessor umbracoContextAccessor,
             ILocalizedTextService textService,
             IMemberTypeService memberTypeService,
-            IMemberService memberService)
+            IMemberService memberService,
+            IShortStringHelper shortStringHelper)
             : base(logger, umbracoContextAccessor, textService)
         {
             _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
             _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
+            _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
         }
 
         /// <summary>
@@ -90,7 +92,7 @@ namespace Umbraco.Web.Editors.Filters
         public override bool ValidateProperties(MemberSave model, IContentProperties<ContentPropertyBasic> modelWithProperties, HttpActionContext actionContext)
         {
             var propertiesToValidate = model.Properties.ToList();
-            var defaultProps = ConventionsHelper.GetStandardPropertyTypeStubs(Current.ShortStringHelper);
+            var defaultProps = ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper);
             var exclude = defaultProps.Select(x => x.Value.Alias).ToArray();
             foreach (var remove in exclude)
             {

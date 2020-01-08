@@ -183,6 +183,17 @@ h5.-black {
 .umb-control-group .umb-el-wrap {
   padding: 0;
 }
+.umb-control-group .control-header {
+    
+    .control-label {
+        float: left;
+    }
+
+    .control-description {
+        display: block;
+        clear: both;
+    }
+}
 .form-horizontal .umb-control-group .control-header {
     float: left;
     width: 160px;
@@ -190,15 +201,12 @@ h5.-black {
     text-align: left;
 
     .control-label {
-        float: left;
         width: auto;
         padding-top: 0;
         text-align: left;
     }
 
     .control-description {
-        display: block;
-        clear: both;
         max-width:480px;// avoiding description becoming too wide when its placed on top of property.
         margin-bottom: 10px;
     }

@@ -23,6 +23,7 @@ using Umbraco.Web.WebApi;
 using Umbraco.Core.Logging;
 using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web.Security.Providers;
+using Umbraco.Tests.Strings;
 
 namespace Umbraco.Tests.TestHelpers.ControllerTesting
 {
@@ -152,7 +153,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             urlHelper.Setup(provider => provider.GetUrl(It.IsAny<UmbracoContext>(), It.IsAny<IPublishedContent>(), It.IsAny<UrlMode>(), It.IsAny<string>(), It.IsAny<Uri>()))
                 .Returns(UrlInfo.Url("/hello/world/1234"));
 
-            var membershipHelper = new MembershipHelper(umbCtx.HttpContext, Mock.Of<IPublishedMemberCache>(), Mock.Of<MembersMembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IPublicAccessService>(), AppCaches.Disabled, Mock.Of<ILogger>());
+            var membershipHelper = new MembershipHelper(umbCtx.HttpContext, Mock.Of<IPublishedMemberCache>(), Mock.Of<MembersMembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IPublicAccessService>(), AppCaches.Disabled, Mock.Of<ILogger>(), new MockShortStringHelper());
 
             var umbHelper = new UmbracoHelper(Mock.Of<IPublishedContent>(),
                 Mock.Of<ITagQuery>(),

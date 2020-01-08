@@ -1231,7 +1231,7 @@ namespace Umbraco.Core.Packaging
                     var name = prop.Element("Name")?.Value;
                     if (sp == null)
                     {
-                        sp = new StylesheetProperty(name, "#" + name.ToSafeAlias(_shortStringHelper), "");
+                        sp = new StylesheetProperty(name, "#" + name.ToSafeAlias(_shortStringHelper), string.Empty);
                         s.AddProperty(sp);
                     }
                     else
