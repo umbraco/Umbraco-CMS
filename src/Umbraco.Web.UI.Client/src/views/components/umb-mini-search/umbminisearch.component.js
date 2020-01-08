@@ -9,8 +9,8 @@
             controllerAs: 'vm',
             bindings: {
                 model: "=",
-                onStartTyping: "&",
-                onSearch: "&"
+                onStartTyping: "&?",
+                onSearch: "&?"
             }
         });
 
@@ -20,7 +20,9 @@
         
         var searchDelay = _.debounce(function () {
             $scope.$apply(function () {
-                vm.onSearch();
+                if (vm.onSearch) {
+                    vm.onSearch();
+                }
             });
         }, 500);
     
@@ -28,13 +30,17 @@
             //13: enter
             switch (ev.keyCode) {
                 case 13:
-                    vm.onSearch();
+                    if (vm.onSearch) {
+                        vm.onSearch();
+                    }
                     break;
             }
         };
     
         vm.onChange = function () {
-            vm.onStartTyping();
+            if (vm.onStartTyping) {
+                vm.onStartTyping();
+            }
             searchDelay();
         };
 
