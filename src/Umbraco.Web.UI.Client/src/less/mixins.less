@@ -434,7 +434,7 @@
 
 // Button backgrounds
 // ------------------
-.buttonBackground(@startColor, @hoverColor: @startColor, @textColor: @white, @textColorHover: @textColor) {
+.buttonBackground(@startColor, @hoverColor: @startColor, @textColor: @white, @textColorHover: @textColor, @disabledColor: @sand-1, @disabledTextColor: @white) {
 
   color: @textColor;
   border-color: @startColor @startColor darken(@startColor, 15%);
@@ -454,8 +454,8 @@
   }
 
   &.disabled, &[disabled] {
-    color: @white;
-    background-color: @sand-1;
+    background-color: @disabledColor;
+    color: @disabledTextColor;
   }
 }
 
