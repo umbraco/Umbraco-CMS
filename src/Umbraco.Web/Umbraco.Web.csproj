@@ -580,9 +580,6 @@
     <Compile Include="SignalR\PreviewHub.cs" />
     <Compile Include="SignalR\PreviewHubComponent.cs" />
     <Compile Include="Suspendable.cs" />
-    <Compile Include="Tour\BackOfficeTourFilter.cs" />
-    <Compile Include="Tour\TourFilterCollection.cs" />
-    <Compile Include="Tour\TourFilterCollectionBuilder.cs" />
     <Compile Include="Trees\ContentBlueprintTreeController.cs" />
     <Compile Include="Trees\RelationTypeTreeController.cs" />
     <Compile Include="Trees\MacrosTreeController.cs" />
@@ -1106,7 +1103,6 @@
     <Compile Include="Search\ExamineComponent.cs" />
     <Compile Include="Compose\DatabaseServerRegistrarAndMessengerComponent.cs" />
     <Compile Include="Templates\TemplateRenderer.cs" />
-    <Compile Include="Templates\TemplateUtilities.cs" />
     <Compile Include="Trees\PartialViewMacrosTreeController.cs" />
     <Compile Include="Trees\PartialViewsTreeController.cs" />
     <Compile Include="Models\ContentEditing\NotificationStyle.cs" />
