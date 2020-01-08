@@ -1,4 +1,5 @@
 ﻿.umb-code-snippet {
+
     .umb-code-snippet__header {
         box-sizing: content-box;
         background-color: @gray-10;
@@ -6,6 +7,7 @@
         flex-direction: row;
         font-size: .8rem;
         border: 1px solid @gray-8;
+        border-radius: 3px 3px 0 0;
         border-bottom: 0;
         margin-top: 16px;
         min-height: 30px;
@@ -33,7 +35,7 @@
 
     .umb-code-snippet__content {
         pre {
-            border-radius: 0;
+            border-radius: 0 0 3px 3px;
             overflow: auto;
             white-space: nowrap;
         }
