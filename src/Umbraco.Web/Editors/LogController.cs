@@ -33,10 +33,12 @@ namespace Umbraco.Web.Editors
             IProfilingLogger logger,
             IRuntimeState runtimeState,
             UmbracoHelper umbracoHelper,
-            IMediaFileSystem mediaFileSystem)
+            IMediaFileSystem mediaFileSystem,
+            IAuditService auditService)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _mediaFileSystem = mediaFileSystem;
+            _auditService = auditService;
         }
 
         [UmbracoApplicationAuthorize(Core.Constants.Applications.Content, Core.Constants.Applications.Media)]
