@@ -658,7 +658,6 @@
     <Compile Include="UmbracoDefaultOwinStartup.cs" />
     <Compile Include="IUmbracoContextAccessor.cs" />
     <Compile Include="HtmlStringUtilities.cs" />
-    <Compile Include="ITagQuery.cs" />
     <Compile Include="IUmbracoComponentRenderer.cs" />
     <Compile Include="Models\Mapping\RelationMapDefinition.cs" />
     <Compile Include="Models\UnLinkLoginModel.cs" />
@@ -788,7 +787,6 @@
     <Compile Include="Models\Mapping\MacroMapDefinition.cs" />
     <Compile Include="Models\Mapping\MemberMapDefinition.cs" />
     <Compile Include="Models\Mapping\TagMapDefinition.cs" />
-    <Compile Include="Models\TagModel.cs" />
     <Compile Include="Models\UpgradeCheckResponse.cs" />
     <Compile Include="Models\PasswordChangedModel.cs" />
     <Compile Include="PropertyEditors\ColorPickerConfigurationEditor.cs" />
