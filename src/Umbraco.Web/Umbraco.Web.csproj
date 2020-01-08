@@ -246,16 +246,8 @@
     <Compile Include="PropertyEditors\MultiUrlPickerValueEditor.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MultiUrlPickerValueConverter.cs" />
     <Compile Include="Templates\ITemplateRenderer.cs" />
-    <Compile Include="Sections\SectionCollectionBuilder.cs" />
-    <Compile Include="Sections\FormsSection.cs" />
-    <Compile Include="Sections\MediaSection.cs" />
-    <Compile Include="Sections\MembersSection.cs" />
-    <Compile Include="Sections\PackagesSection.cs" />
-    <Compile Include="Sections\SettingsSection.cs" />
-    <Compile Include="Sections\TranslationSection.cs" />
     <Compile Include="Trees\TreeCollectionBuilder.cs" />
     <Compile Include="Trees\TreeUse.cs" />
-    <Compile Include="Sections\UsersSection.cs" />
     <Compile Include="Trees\Tree.cs" />
     <Compile Include="Trees\ITree.cs" />
     <Compile Include="Models\ContentEditing\PublicAccess.cs" />
@@ -269,7 +261,6 @@
     <Compile Include="Models\ContentEditing\UnpublishContent.cs" />
     <Compile Include="Services\ITreeService.cs" />
     <Compile Include="Services\ISectionService.cs" />
-    <Compile Include="Sections\SectionCollection.cs" />
     <Compile Include="PropertyEditors\GridPropertyIndexValueFactory.cs" />
     <Compile Include="PropertyEditors\PropertyEditorsComposer.cs" />
     <Compile Include="PublishedCache\NuCache\NuCacheComposer.cs" />
@@ -627,7 +618,6 @@
     <Compile Include="Actions\ActionUpdate.cs" />
     <Compile Include="Actions\IAction.cs" />
     <Compile Include="Models\ContentEditing\EntityBasic.cs" />
-    <Compile Include="Sections\ContentSection.cs" />
     <Compile Include="Services\SectionService.cs" />
     <Compile Include="Trees\TreeAttribute.cs" />
     <Compile Include="Models\Trees\TreeNode.cs" />
