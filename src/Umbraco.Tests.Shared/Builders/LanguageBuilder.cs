@@ -13,10 +13,11 @@ namespace Umbraco.Tests.Shared.Builders
     }
 
 
-    public class LanguageBuilder<TParent> : ChildBuilderBase<TParent, ILanguage>
+    public class LanguageBuilder<TParent> : ChildBuilderBase<TParent, ILanguage>, IWithIdBuilder
     {
-        private int? _id = null;
+
         private string _isoCode = null;
+        private int? _id;
 
         public LanguageBuilder(TParent parentBuilder) : base(parentBuilder)
         {
@@ -34,10 +35,10 @@ namespace Umbraco.Tests.Shared.Builders
             };
         }
 
-        public LanguageBuilder<TParent> WithId(int id)
+        int? IWithIdBuilder.Id
         {
-            _id = id;
-            return this;
+            get => _id;
+            set => _id = value;
         }
     }
 }

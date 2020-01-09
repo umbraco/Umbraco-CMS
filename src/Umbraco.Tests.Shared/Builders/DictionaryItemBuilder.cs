@@ -1,19 +1,17 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Tests.Shared.Builders
 {
-    public class DictionaryItemBuilder
+    public class DictionaryItemBuilder : IWithIdBuilder, IWithCreateDateBuilder, IWithUpdateDateBuilder
     {
         private string _itemkey = null;
         private readonly List<DictionaryTranslationBuilder> _translationBuilders = new List<DictionaryTranslationBuilder>();
         private DateTime? _createDate;
         private DateTime? _updateDate;
         private int? _id = null;
-
 
         public DictionaryItem Build()
         {
@@ -38,24 +36,6 @@ namespace Umbraco.Tests.Shared.Builders
             return builder;
         }
 
-        public DictionaryItemBuilder WithCreateData(DateTime createDate)
-        {
-            _createDate = createDate;
-            return this;
-        }
-
-        public DictionaryItemBuilder WithUpdateData(DateTime updateDate)
-        {
-            _updateDate = updateDate;
-            return this;
-        }
-
-        public DictionaryItemBuilder WithId(int id)
-        {
-            _id = id;
-            return this;
-        }
-
         public DictionaryItemBuilder WithRandomTranslations(int count)
         {
             for (var i = 0; i < count; i++)
@@ -63,6 +43,24 @@ namespace Umbraco.Tests.Shared.Builders
                 AddTranslation().Done();
             }
             return this;
+        }
+
+        int? IWithIdBuilder.Id
+        {
+            get => _id;
+            set => _id = value;
+        }
+
+        DateTime? IWithCreateDateBuilder.CreateDate
+        {
+            get => _createDate;
+            set => _createDate = value;
+        }
+
+        DateTime? IWithUpdateDateBuilder.UpdateDate
+        {
+            get => _updateDate;
+            set => _updateDate = value;
         }
     }
 }

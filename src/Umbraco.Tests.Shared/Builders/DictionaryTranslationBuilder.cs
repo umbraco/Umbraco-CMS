@@ -1,10 +1,9 @@
 using System;
-using System.Globalization;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Tests.Shared.Builders
 {
-    public class DictionaryTranslationBuilder : ChildBuilderBase<DictionaryItemBuilder,IDictionaryTranslation>
+    public class DictionaryTranslationBuilder : ChildBuilderBase<DictionaryItemBuilder,IDictionaryTranslation>, IWithIdBuilder, IWithCreateDateBuilder, IWithUpdateDateBuilder
     {
         private string _value = null;
         private Guid? _uniqueId = null;
@@ -50,22 +49,22 @@ namespace Umbraco.Tests.Shared.Builders
             return this;
         }
 
-        public DictionaryTranslationBuilder WithCreateData(DateTime createDate)
+        int? IWithIdBuilder.Id
         {
-            _createDate = createDate;
-            return this;
+            get => _id;
+            set => _id = value;
         }
 
-        public DictionaryTranslationBuilder WithUpdateData(DateTime updateDate)
+        DateTime? IWithCreateDateBuilder.CreateDate
         {
-            _updateDate = updateDate;
-            return this;
+            get => _createDate;
+            set => _createDate = value;
         }
 
-        public DictionaryTranslationBuilder WithId(int id)
+        DateTime? IWithUpdateDateBuilder.UpdateDate
         {
-            _id = id;
-            return this;
+            get => _updateDate;
+            set => _updateDate = value;
         }
     }
 }
