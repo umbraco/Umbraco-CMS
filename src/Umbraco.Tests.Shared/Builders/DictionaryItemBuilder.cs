@@ -55,5 +55,14 @@ namespace Umbraco.Tests.Shared.Builders
             _id = id;
             return this;
         }
+
+        public DictionaryItemBuilder WithRandomTranslations(int count)
+        {
+            for (var i = 0; i < count; i++)
+            {
+                AddTranslation().Done();
+            }
+            return this;
+        }
     }
 }

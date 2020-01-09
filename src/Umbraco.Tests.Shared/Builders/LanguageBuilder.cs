@@ -5,6 +5,14 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Tests.Shared.Builders
 {
+    public class LanguageBuilder : LanguageBuilder<object>
+    {
+        public LanguageBuilder() : base(null)
+        {
+        }
+    }
+
+
     public class LanguageBuilder<TParent> : ChildBuilderBase<TParent, ILanguage>
     {
         private int? _id = null;
