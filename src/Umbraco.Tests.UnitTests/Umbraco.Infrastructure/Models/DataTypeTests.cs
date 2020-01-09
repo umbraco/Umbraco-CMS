@@ -46,8 +46,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
         [Test]
         public void Can_Serialize_Without_Error()
         {
-            var item = _builder
-                .Build();
+            var item = _builder.Build();
 
             Assert.DoesNotThrow(() => JsonConvert.SerializeObject(item));
         }
