@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Tests.Shared.Builders.Markers
+﻿namespace Umbraco.Tests.Shared.Builders.Interfaces
 {
     public interface IWithAliasBuilder
     {

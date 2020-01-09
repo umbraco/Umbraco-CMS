@@ -1,5 +1,5 @@
 using System;
-using Umbraco.Tests.Shared.Builders.Markers;
+using Umbraco.Tests.Shared.Builders.Interfaces;
 
 namespace Umbraco.Tests.Shared.Builders.Extensions
 {

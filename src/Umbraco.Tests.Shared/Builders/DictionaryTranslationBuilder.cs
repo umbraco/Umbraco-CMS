@@ -1,6 +1,6 @@
 using System;
 using Umbraco.Core.Models;
-using Umbraco.Tests.Shared.Builders.Markers;
+using Umbraco.Tests.Shared.Builders.Interfaces;
 
 namespace Umbraco.Tests.Shared.Builders
 {
