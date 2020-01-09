@@ -42,6 +42,21 @@ namespace Umbraco.Core
             public const string Path = "Umbraco.Core.Path";
 
             /// <summary>
+            /// Gets the path to umbraco's root directory (/umbraco by default).
+            /// </summary>
+            public const string CssPath = "umbracoCssPath";
+
+            /// <summary>
+            /// Gets the path to umbraco's root directory (/umbraco by default).
+            /// </summary>
+            public const string ScriptsPath = "umbracoScriptsPath";
+
+            /// <summary>
+            /// Gets the path to umbraco's root directory (/umbraco by default).
+            /// </summary>
+            public const string MediaPath = "umbracoMediaPath";
+
+            /// <summary>
             /// The reserved urls from web.config.
             /// </summary>
             public const string ReservedUrls = "Umbraco.Core.ReservedUrls";
