@@ -42,17 +42,17 @@ namespace Umbraco.Core
             public const string Path = "Umbraco.Core.Path";
 
             /// <summary>
-            /// Gets the path to umbraco's root directory (/umbraco by default).
+            /// Gets the path to the css directory (/css by default).
             /// </summary>
             public const string CssPath = "umbracoCssPath";
 
             /// <summary>
-            /// Gets the path to umbraco's root directory (/umbraco by default).
+            /// Gets the path to the scripts directory (/scripts by default).
             /// </summary>
             public const string ScriptsPath = "umbracoScriptsPath";
 
             /// <summary>
-            /// Gets the path to umbraco's root directory (/umbraco by default).
+            /// Gets the path to  media directory (/media by default).
             /// </summary>
             public const string MediaPath = "umbracoMediaPath";
 
