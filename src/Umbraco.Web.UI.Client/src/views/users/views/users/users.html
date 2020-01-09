@@ -11,7 +11,7 @@
             <umb-editor-sub-header-content-left ng-if="vm.selection.length === 0">
                 <umb-button-group
                     ng-if="vm.defaultButton"
-                    button-style="action"
+                    button-style="outline"
                     default-button="vm.defaultButton"
                     sub-buttons="vm.subButtons">
                 </umb-button-group>
@@ -27,24 +27,10 @@
                     </umb-layout-selector>
                 </umb-editor-sub-header-section>
                 <umb-editor-sub-header-section>
-                    <div class="form-search -no-margin-bottom pull-right">
-                        <div class="inner-addon left-addon">
-                            <label for="users-search" class="form-search__label-icon">
-                                <i class="icon icon-search" aria-hidden="true"></i>
-                                <span class="sr-only">
-                                    <localize key="visuallyHiddenTexts_userSearchLabel">Search the users section</localize>
-                                </span>
-                            </label>
-                            <input class="form-control search-input"
-                                   type="text" localize="placeholder"
-                                   placeholder="@general_typeToSearch"
-                                   ng-model="vm.usersOptions.filter"
-                                   ng-change="vm.searchUsers()"
-                                   id="users-search"
-                                   prevent-enter-submit
-                                   no-dirty-check>
-                        </div>
-                    </div>
+
+                    <umb-mini-search model="vm.usersOptions.filter" on-search="vm.searchUsers()" on-start-typing="vm.searchUsers()">
+                    </umb-mini-search>
+
                 </umb-editor-sub-header-section>
             </umb-editor-sub-header-content-right>
 
@@ -186,7 +172,7 @@
 
         <!-- Layout: Cards -->
         <div class="umb-user-cards" ng-if="vm.activeLayout.path === '1' && vm.loading === false">
-            <div class="umb-user-card" ng-class="{'-selected': user.selected, '-selectable': vm.isSelectable(user)}" ng-repeat="user in vm.users track by user.key" ng-click="vm.selectUser(user, $event)">
+            <div class="umb-user-card umb-outline umb-outline--surrounding" ng-class="{'-selected': user.selected, '-selectable': vm.isSelectable(user)}" ng-repeat="user in vm.users track by user.key" ng-click="vm.selectUser(user, $event)">
                 <div class="umb-user-card__content">
                     <umb-badge class="umb-user-card__badge" size="xs" ng-if="user.userDisplayState.key !== 'Active'" color="{{user.userDisplayState.color}}">
                         {{ user.userDisplayState.name }}
@@ -239,7 +225,7 @@
                     <div ng-repeat="user in vm.users track by user.key"
                         ng-click="vm.selectUser(user, vm.selection, $event)"
                         ng-class="{'-selected': user.selected, '-selectable': vm.isSelectable(user)}"
-                        class="umb-table-row umb-user-table-row">
+                        class="umb-table-row umb-user-table-row umb-outline umb-outline--surrounding">
                         <div class="umb-table-cell umb-user-table-col-avatar not-fixed" scope="row" style="width: 70px; padding:10px 15px;">
                             <a ng-click="vm.clickUser(user, $event)" ng-href="#{{::vm.getEditPath(user)}}">
                                 <umb-avatar
