@@ -215,7 +215,7 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         // Umbraco.Code.MapAll -CreateDate -DeleteDate -UpdateDate
-        // Umbraco.Code.MapAll -SupportsPublishing -Key -PropertyEditorAlias -ValueStorageType
+        // Umbraco.Code.MapAll -SupportsPublishing -Key -PropertyEditorAlias -ValueStorageType -Variations
         private static void Map(PropertyTypeBasic source, PropertyType target, MapperContext context)
         {
             target.Name = source.Label;
@@ -225,9 +225,7 @@ namespace Umbraco.Web.Models.Mapping
             target.MandatoryMessage = source.Validation.MandatoryMessage;
             target.ValidationRegExp = source.Validation.Pattern;
             target.ValidationRegExpMessage = source.Validation.PatternMessage;
-            target.Variations = source.AllowCultureVariant
-                ? target.Variations | ContentVariation.Culture // Set flag using bitwise logical OR
-                : target.Variations & ~ContentVariation.Culture; // Remove flag using bitwise logical AND with bitwise complement (reversing the bit)
+            target.SetVariesBy(ContentVariation.Culture, source.AllowCultureVariant);
             
             if (source.Id > 0)
                 target.Id = source.Id;
@@ -369,7 +367,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Validation = source.Validation;
         }
 
-        // Umbraco.Code.MapAll -CreatorId -Level -SortOrder
+        // Umbraco.Code.MapAll -CreatorId -Level -SortOrder -Variations
         // Umbraco.Code.MapAll -CreateDate -UpdateDate -DeleteDate
         // Umbraco.Code.MapAll -ContentTypeComposition (done by AfterMapSaveToType)
         private static void MapSaveToTypeBase<TSource, TSourcePropertyType>(TSource source, IContentTypeComposition target, MapperContext context)
@@ -399,9 +397,7 @@ namespace Umbraco.Web.Models.Mapping
 
             if (!(target is IMemberType))
             {
-                target.Variations = source.AllowCultureVariant
-                    ? target.Variations | ContentVariation.Culture // Set flag using bitwise logical OR
-                    : target.Variations & ~ContentVariation.Culture; // Remove flag using bitwise logical AND with bitwise complement (reversing the bit)
+                target.SetVariesBy(ContentVariation.Culture, source.AllowCultureVariant);
             }
 
             // handle property groups and property types
