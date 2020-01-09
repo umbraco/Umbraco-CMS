@@ -5,6 +5,9 @@
 
         var vm = this;
 
+        vm.header = {};
+        vm.header.editorfor = "visuallyHiddenTexts_newPartialViewMacro";
+        vm.header.setPageTitle = true;
         vm.page = {};
         vm.page.loading = true;
         vm.partialViewMacroFile = {};
@@ -65,17 +68,21 @@
                 saveMethod: codefileResource.save,
                 scope: $scope,
                 content: vm.partialViewMacro,
-                // We do not redirect on failure for partial view macros - this is because it is not possible to actually save the partial view
-                // when server side validation fails - as opposed to content where we are capable of saving the content
-                // item if server side validation fails
-                redirectOnFailure: false,
                 rebindCallback: function (orignal, saved) {}
             }).then(function (saved) {
                 // create macro if needed
                 if($routeParams.create && $routeParams.nomacro !== "true") {
-                    macroResource.createPartialViewMacroWithFile(saved.virtualPath, saved.name).then(function(created) {
+                    macroResource.createPartialViewMacroWithFile(saved.virtualPath, saved.name).then(function (created) {
+                        navigationService.syncTree({
+                            tree: "macros",
+                            path: '-1,new',
+                            forceReload: true,
+                            activate: false
+                        });
                         completeSave(saved);
                     }, angular.noop);
+
+                    
                 } else {
                     completeSave(saved);
                 }

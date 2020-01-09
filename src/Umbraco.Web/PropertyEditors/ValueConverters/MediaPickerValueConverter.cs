@@ -29,26 +29,20 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             _publishedModelFactory = publishedModelFactory;
         }
 
-        public override bool IsConverter(PublishedPropertyType propertyType)
+        public override bool IsConverter(IPublishedPropertyType propertyType)
         {
             return propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MediaPicker);
         }
 
-        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
+        public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
         {
             var isMultiple = IsMultipleDataType(propertyType.DataType);
-            var isOnlyImages = IsOnlyImagesDataType(propertyType.DataType);
-
             return isMultiple
-                ? isOnlyImages
-                    ? typeof(IEnumerable<>).MakeGenericType(ModelType.For(ImageTypeAlias))
-                    : typeof(IEnumerable<IPublishedContent>)
-                : isOnlyImages
-                    ? ModelType.For(ImageTypeAlias)
+                    ? typeof(IEnumerable<IPublishedContent>)
                     : typeof(IPublishedContent);
         }
 
-        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+        public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Snapshot;
 
         private bool IsMultipleDataType(PublishedDataType dataType)
@@ -57,13 +51,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return config.Multiple;
         }
 
-        private bool IsOnlyImagesDataType(PublishedDataType dataType)
-        {
-            var config = ConfigurationEditor.ConfigurationAs<MediaPickerConfiguration>(dataType.Configuration);
-            return config.OnlyImages;
-        }
-
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType,
+        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType,
             object source, bool preview)
         {
             if (source == null) return null;
@@ -75,16 +63,13 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return nodeIds;
         }
 
-        public override object ConvertIntermediateToObject(IPublishedElement owner, PublishedPropertyType propertyType,
+        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType,
             PropertyCacheLevel cacheLevel, object source, bool preview)
         {
             var isMultiple = IsMultipleDataType(propertyType.DataType);
-            var isOnlyImages = IsOnlyImagesDataType(propertyType.DataType);
 
             var udis = (Udi[]) source;
-            var mediaItems = isOnlyImages
-                ? _publishedModelFactory.CreateModelList(ImageTypeAlias)
-                : new List<IPublishedContent>();
+            var mediaItems = new List<IPublishedContent>();
 
             if (source == null) return isMultiple ? mediaItems : null;
 

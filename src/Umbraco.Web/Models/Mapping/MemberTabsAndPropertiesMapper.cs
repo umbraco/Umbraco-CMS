@@ -96,7 +96,7 @@ namespace Umbraco.Web.Models.Mapping
                         linkText = source.ContentType.Name,
                         url = memberTypeLink,
                         target = "_self",
-                        icon = "icon-item-arrangement"
+                        icon = Constants.Icons.ContentType
                     }
                 };
                 docTypeProperty.View = "urllist";

@@ -12,6 +12,10 @@ function DictionaryEditController($scope, $routeParams, $location, dictionaryRes
 
     //setup scope vars
     vm.nameDirty = false;
+    vm.header = {};
+    vm.header.editorfor = "template_insertDictionaryItem";
+    vm.header.setPageTitle = true;
+
     vm.page = {};
     vm.page.loading = false;
     vm.page.nameLocked = false;
@@ -91,7 +95,6 @@ function DictionaryEditController($scope, $routeParams, $location, dictionaryRes
                     function (err) {
 
                         contentEditingHelper.handleSaveError({
-                            redirectOnFailure: false,
                             err: err
                         });
                         

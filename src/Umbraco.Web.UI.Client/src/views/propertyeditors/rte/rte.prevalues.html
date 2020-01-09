@@ -1,17 +1,13 @@
-<div ng-controller="Umbraco.PrevalueEditors.RteController" class="rte-editor-preval">
+<div ng-controller="Umbraco.PrevalueEditors.RteController" class="rte-editor-preval umb-rte">
 
     <umb-control-group label="Toolbar" description="Pick the toolbar options that should be available when editing">
         <div ng-repeat="cmd in tinyMceConfig.commands">
-            <label>
-                <umb-checkbox model="cmd.selected"
-                              on-change="selectCommand(cmd)"
-                              class="mce-cmd" />
-                
-                <!--<img ng-src="{{cmd.icon}}" />-->
-                <i class="mce-ico" ng-class="(cmd.isCustom ? ' mce-i-custom ' : ' mce-i-') + cmd.fontIcon"></i>
-
-                {{cmd.name}}
-            </label>
+                <umb-checkbox
+                    model="cmd.selected"
+                    on-change="selectCommand(cmd)"
+                    icon-class="mce-ico {{(cmd.isCustom ? ' mce-i-custom ' : ' mce-i-') + cmd.fontIcon}}"
+                    text="{{cmd.name}}"
+                    class="mce-cmd" />
         </div>
     </umb-control-group>
 
@@ -22,14 +18,6 @@
                 model="css.selected"
                 on-change="selectStylesheet(css)"
                 text="{{css.name}}"/>
-        </div>
-    </umb-control-group>
-
-    <umb-control-group label="Ignore user start nodes" description="Selecting this option allows a user to choose nodes that they normally don't have access to. Note: this applies only to rich text editors in this grid editor.">
-        <div>
-            <label>
-                <umb-checkbox model="model.value.ignoreUserStartNodes"/>
-            </label>
         </div>
     </umb-control-group>
 
@@ -54,4 +42,5 @@
             </select>
         </div>
     </umb-control-group>
+
 </div>

@@ -10,10 +10,11 @@
     <RootNamespace>Umbraco.Examine</RootNamespace>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <TargetFrameworkProfile />
+    <AdditionalFileItemNames>$(AdditionalFileItemNames);Content</AdditionalFileItemNames>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
+    <DebugType>portable</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
@@ -23,7 +24,7 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>portable</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
@@ -48,9 +49,19 @@
   </ItemGroup>
   <ItemGroup>
     <!-- note: NuGet deals with transitive references now -->
-    <PackageReference Include="Examine" Version="1.0.0" />
+    <PackageReference Include="Examine" Version="1.0.1" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub">
+      <Version>1.0.0-beta2-19324-01</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
     <PackageReference Include="NPoco" Version="3.9.4" />
+    <PackageReference Include="SecurityCodeScan">
+      <Version>3.3.0</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseValueSetBuilder.cs" />
@@ -59,14 +70,19 @@
     <Compile Include="ExamineExtensions.cs" />
     <Compile Include="IContentValueSetBuilder.cs" />
     <Compile Include="IContentValueSetValidator.cs" />
+    <Compile Include="IUmbracoContentIndex.cs" />
+    <Compile Include="IUmbracoIndexConfig.cs" />
     <Compile Include="IIndexCreator.cs" />
     <Compile Include="IIndexDiagnostics.cs" />
     <Compile Include="IIndexPopulator.cs" />
+    <Compile Include="IUmbracoMemberIndex.cs" />
+    <Compile Include="UmbracoIndexConfig.cs" />
     <Compile Include="IndexPopulator.cs" />
     <Compile Include="IndexRebuilder.cs" />
     <Compile Include="IPublishedContentValueSetBuilder.cs" />
     <Compile Include="IUmbracoIndex.cs" />
     <Compile Include="IValueSetBuilder.cs" />
+    <Compile Include="LuceneIndexDiagnostics.cs" />
     <Compile Include="MediaIndexPopulator.cs" />
     <Compile Include="MediaValueSetBuilder.cs" />
     <Compile Include="MemberIndexPopulator.cs" />

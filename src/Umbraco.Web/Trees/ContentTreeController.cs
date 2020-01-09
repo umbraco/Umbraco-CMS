@@ -15,6 +15,10 @@ using Umbraco.Web.WebApi.Filters;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Search;
 using Constants = Umbraco.Core.Constants;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
 
 namespace Umbraco.Web.Trees
 {
@@ -36,19 +40,20 @@ namespace Umbraco.Web.Trees
         private readonly UmbracoTreeSearcher _treeSearcher;
         private readonly ActionCollection _actions;
 
-        public ContentTreeController(UmbracoTreeSearcher treeSearcher, ActionCollection actions)
-        {
-            _treeSearcher = treeSearcher;
-            _actions = actions;
-        }
-
         protected override int RecycleBinId => Constants.System.RecycleBinContent;
 
         protected override bool RecycleBinSmells => Services.ContentService.RecycleBinSmells();
 
         private int[] _userStartNodes;
+
         protected override int[] UserStartNodes
             => _userStartNodes ?? (_userStartNodes = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService));
+
+        public ContentTreeController(UmbracoTreeSearcher treeSearcher, ActionCollection actions, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        {
+            _treeSearcher = treeSearcher;
+            _actions = actions;
+        }
 
         /// <inheritdoc />
         protected override TreeNode GetSingleTreeNode(IEntitySlim entity, string parentId, FormDataCollection queryStrings)
@@ -124,8 +129,8 @@ namespace Umbraco.Web.Trees
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
                 // we need to get the default permissions as you can't set permissions on the very root node
-                var permission = Services.UserService.GetPermissions(Security.CurrentUser, Constants.System.Root).First();
-                var nodeActions = _actions.FromEntityPermission(permission)
+                var assignedPermissions = Services.UserService.GetAssignedPermissions(Security.CurrentUser, Constants.System.Root);
+                var nodeActions = _actions.GetByLetters(assignedPermissions)
                     .Select(x => new MenuItem(x));
 
                 //these two are the standard items
@@ -201,9 +206,6 @@ namespace Umbraco.Web.Trees
             return HasPathAccess(entity, queryStrings);
         }
 
-        internal override IEnumerable<IEntitySlim> GetChildrenFromEntityService(int entityId)
-            => Services.EntityService.GetChildren(entityId, UmbracoObjectType).ToList();
-
         protected override IEnumerable<IEntitySlim> GetChildEntities(string id, FormDataCollection queryStrings)
         {
             var result = base.GetChildEntities(id, queryStrings);
@@ -220,7 +222,6 @@ namespace Umbraco.Web.Trees
 
             return result;
         }
-
         /// <summary>
         /// Returns a collection of all menu items that can be on a content node
         /// </summary>

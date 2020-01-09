@@ -286,11 +286,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return list;
         }
 
-        protected override Guid NodeObjectTypeId => throw new WontImplementException();
+        protected override Guid NodeObjectTypeId => throw new InvalidOperationException("This property won't be implemented.");
 
         protected override void PersistNewItem(IUserGroup entity)
         {
-            ((UserGroup) entity).AddingEntity();
+            entity.AddingEntity();
 
             var userGroupDto = UserGroupFactory.BuildDto(entity);
 
@@ -304,7 +304,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistUpdatedItem(IUserGroup entity)
         {
-            ((UserGroup) entity).UpdatingEntity();
+            entity.UpdatingEntity();
 
             var userGroupDto = UserGroupFactory.BuildDto(entity);
 
@@ -370,35 +370,35 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             protected override UserGroupWithUsers PerformGet(int id)
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
             protected override IEnumerable<UserGroupWithUsers> PerformGetAll(params int[] ids)
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
             protected override IEnumerable<UserGroupWithUsers> PerformGetByQuery(IQuery<UserGroupWithUsers> query)
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
             protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
             protected override string GetBaseWhereClause()
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
             protected override IEnumerable<string> GetDeleteClauses()
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
-            protected override Guid NodeObjectTypeId => throw new WontImplementException();
+            protected override Guid NodeObjectTypeId => throw new InvalidOperationException("This property won't be implemented.");
 
             #endregion
 
@@ -411,8 +411,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     return;
 
                 //now the user association
-                RemoveAllUsersFromGroup(entity.UserGroup.Id);
-                AddUsersToGroup(entity.UserGroup.Id, entity.UserIds);
+                RefreshUsersInGroup(entity.UserGroup.Id, entity.UserIds);
             }
 
             protected override void PersistUpdatedItem(UserGroupWithUsers entity)
@@ -424,8 +423,18 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     return;
 
                 //now the user association
-                RemoveAllUsersFromGroup(entity.UserGroup.Id);
-                AddUsersToGroup(entity.UserGroup.Id, entity.UserIds);
+                RefreshUsersInGroup(entity.UserGroup.Id, entity.UserIds);
+            }
+
+            /// <summary>
+            /// Adds a set of users to a group, first removing any that exist
+            /// </summary>
+            /// <param name="groupId">Id of group</param>
+            /// <param name="userIds">Ids of users</param>
+            private void RefreshUsersInGroup(int groupId, int[] userIds)
+            {
+                RemoveAllUsersFromGroup(groupId);
+                AddUsersToGroup(groupId, userIds);
             }
 
             /// <summary>
@@ -444,7 +453,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             /// <param name="userIds">Ids of users</param>
             private void AddUsersToGroup(int groupId, int[] userIds)
             {
-                // TODO: Check if the user exists?
                 foreach (var userId in userIds)
                 {
                     var dto = new User2UserGroupDto

@@ -9,8 +9,7 @@
 @{
     var disableDevicePreview = Model.DisableDevicePreview.ToString().ToLowerInvariant();
 
-    Html
-        .RequiresCss("assets/css/canvasdesigner.css", "Umbraco");
+    Html.RequiresCss("assets/css/canvasdesigner.css", "Umbraco");
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -24,7 +23,7 @@
         new BasicPath("Umbraco", IOHelper.ResolveUrl(SystemDirectories.Umbraco)))
 
 </head>
-<body id="canvasdesignerPanel" ng-mouseover="outlinePositionHide()" ng-controller="previewController">
+<body id="canvasdesignerPanel" ng-mouseover="outlinePositionHide()" ng-controller="previewController" ng-class="{'tabbing-active': tabbingActive === true}" ng-click="windowClickHandler($event)">
     <div class="wait" ng-show="!frameLoaded"></div>
 
     @if (string.IsNullOrWhiteSpace(Model.PreviewExtendedHeaderView) == false)
@@ -36,31 +35,40 @@
         <preview-i-frame src="pageUrl" on-loaded="onFrameLoaded(iframe)"></preview-i-frame>
     </div>
     <div class="canvasdesigner" ng-init="showDevicesPreview = true; showDevices = !@(disableDevicePreview);" ng-mouseenter="positionSelectedHide()">
-        <div class="fix-left-menu selected">
-            <div class="avatar">
-                <img ng-src="../assets/img/application/logo.png"
-                     ng-srcset="../assets/img/application/logo@2x.png 2x,
-                    ../assets/img/application/logo@3x.png 3x" />
-            </div>
-            <ul class="sections" ng-class="{selected: showDevicesPreview && showDevices}">
-                <li ng-repeat="device in devices" ng-class="{ current:previewDevice==device }">
-                    <a href="" ng-click="updatePreviewDevice(device)"><i class="icon {{device.icon}}" title="{{device.title}}"></i><span></span></a>
-                </li>
+        <div class="menu-bar selected">
+
+            <div class="menu-bar__title">Preview Mode</div>
+
+            <div class="menu-bar__right-part">
+
+                <div class="preview-menu-option" ng-class="{'--open': sizeOpen === true}" ng-click="$event.stopPropagation()">
+                    <button class="menu-bar__button umb-outline" ng-click="toggleSizeOpen()"><i class="icon {{previewDevice.icon}}"></i><span>{{previewDevice.title}}</span></button>
+                    <div class="dropdown-menu">
+                        <button ng-repeat="device in devices" class="menu-bar__button umb-outline" ng-class="{ '--active':previewDevice === device }" ng-click="updatePreviewDevice(device)">
+                            <i class="icon {{device.icon}}"></i><span>{{device.title}}</span>
+                        </button>
+                    </div>
+                </div>
 
                 @if (Model.Languages != null && Model.Languages.Count() > 1)
                 {
-                    foreach (var previewLink in Model.Languages)
-                     {
-                         <li>
-                             <a href="" ng-click="changeCulture('@previewLink.IsoCode')" title="Preview in @previewLink.CultureName"><i class="icon icon-globe-europe---africa"></i><span>@previewLink.CultureName</span></a>
-                         </li>
-                     }
+                    <div class="preview-menu-option" ng-class="{'--open': cultureOpen === true}" ng-click="$event.stopPropagation()">
+                        <button class="menu-bar__button umb-outline" ng-click="toggleCultureOpen()"><i class="icon icon-globe-europe---africa"></i><span>{{currentCulture.title}}</span></button>
+                        <div class="dropdown-menu">
+                            @foreach (var language in Model.Languages)
+                            {
+                                <button class="menu-bar__button umb-outline" ng-class="{ '--active': currentCultureIso === '@language.IsoCode' || (@language.IsDefault.ToString().ToLower() && currentCultureIso === null) }" ng-click="changeCulture('@language.IsoCode')" ng-init="registerCulture('@language.IsoCode', '@language.CultureName', @language.IsDefault.ToString().ToLower())">
+                                    <i class="icon icon-globe-europe---africa"></i><span>@language.CultureName</span>
+                                </button>
+                            }
+                        </div>
+                    </div>
                 }
 
-                <li>
-                    <a href="" ng-click="exitPreview()" title="Exit Preview"><i class="icon icon-wrong"></i><span> </span></a>
-                </li>
-            </ul>
+                <button ng-click="exitPreview()" title="Exit Preview" class="menu-bar__button umb-outline"><i class="icon icon-power"></i><span>Exit</span>
+                </button>
+
+            </div>
         </div>
 
     </div>

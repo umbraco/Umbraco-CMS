@@ -18,6 +18,8 @@
         var documentTypeId = $routeParams.id;
         var create = $routeParams.create;
         var noTemplate = $routeParams.notemplate;
+        var isElement = $routeParams.iselement;
+        var allowVaryByCulture = $routeParams.culturevary;
         var infiniteMode = $scope.model && $scope.model.infiniteMode;
 
         vm.save = save;
@@ -25,6 +27,9 @@
 
         vm.currentNode = null;
         vm.contentType = {};
+        vm.header = {};
+        vm.header.editorfor = "content_documentType";
+        vm.header.setPageTitle = true;
         vm.labels = {};
         vm.submitButtonKey = "buttons_save";
         vm.generateModelsKey = "buttons_saveAndGenerateModels";
@@ -33,7 +38,7 @@
         vm.page.loading = false;
         vm.page.saveButtonState = "init";
         vm.page.navigation = [];
-
+     
         var labelKeys = [
             "general_design",
             "general_listView",
@@ -56,10 +61,13 @@
 
         function onInit() {
             // get init values from model when in infinite mode
-            if(infiniteMode) {
+            if (infiniteMode) {
                 documentTypeId = $scope.model.id;
                 create = $scope.model.create;
-                noTemplate = $scope.model.notemplate;
+                if (create && !documentTypeId) documentTypeId = -1;
+                noTemplate = $scope.model.notemplate || $scope.model.noTemplate;
+                isElement = $scope.model.isElement;
+                allowVaryByCulture = $scope.model.allowVaryByCulture;
                 vm.submitButtonKey = "buttons_saveAndClose";
                 vm.generateModelsKey = "buttons_generateModelsAndClose";
             }
@@ -89,8 +97,7 @@
                     "name": vm.labels.design,
                     "alias": "design",
                     "icon": "icon-document-dashed-line",
-                    "view": "views/documenttypes/views/design/design.html",
-                    "active": true
+                    "view": "views/documenttypes/views/design/design.html"
                 },
                 {
                     "name": vm.labels.listview,
@@ -291,6 +298,28 @@
                 });
 
             vm.page.navigation = buttons;
+            initializeActiveNavigationPanel();
+        }
+
+        function initializeActiveNavigationPanel() {
+            // Initialise first loaded panel based on page route paramater
+            // i.e. ?view=design|listview|permissions
+            var initialViewSetFromRouteParams = false;
+            var view = $routeParams.view;
+            if (view) {
+                var viewPath = "views/documenttypes/views/" + view + "/" + view + ".html";
+                for (var i = 0; i < vm.page.navigation.length; i++) {
+                    if (vm.page.navigation[i].view === viewPath) {
+                        vm.page.navigation[i].active = true;
+                        initialViewSetFromRouteParams = true;
+                        break;
+                    }
+                }
+            }
+
+            if (initialViewSetFromRouteParams === false) {
+                vm.page.navigation[0].active = true;
+            }
         }
 
         /* ---------- SAVE ---------- */
@@ -317,10 +346,7 @@
                     saveMethod: contentTypeResource.save,
                     scope: $scope,
                     content: vm.contentType,
-                    //We do not redirect on failure for doc types - this is because it is not possible to actually save the doc
-                    // type when server side validation fails - as opposed to content where we are capable of saving the content
-                    // item if server side validation fails
-                    redirectOnFailure: false,
+                    infiniteMode: infiniteMode,
                     // we need to rebind... the IDs that have been created!
                     rebindCallback: function (origContentType, savedContentType) {
                         vm.contentType.id = savedContentType.id;
@@ -409,7 +435,14 @@
                 contentType.defaultTemplate = contentTypeHelper.insertDefaultTemplatePlaceholder(contentType.defaultTemplate);
                 contentType.allowedTemplates = contentTypeHelper.insertTemplatePlaceholder(contentType.allowedTemplates);
             }
-
+            // set isElement checkbox by default
+            if (isElement) {
+                contentType.isElement = true;
+            }
+            // set vary by culture checkbox by default
+            if (allowVaryByCulture) {
+                contentType.allowCultureVariant = true;
+            }
             // convert icons for content type
             convertLegacyIcons(contentType);
 
@@ -480,13 +513,28 @@
             loadDocumentType();
         }));
 
-        evts.push(eventsService.on("editors.documentType.saved", function(name, args) {
-            if(args.documentType.allowedTemplates.length > 0){
-                navigationService.syncTree({ tree: "templates", path: [], forceReload: true })
-                    .then(function (syncArgs) {
-                        navigationService.reloadNode(syncArgs.node)
-                    });
+        evts.push(eventsService.on("editors.documentType.reload", function (name, args) {
+            if (args && args.node && vm.contentType.id === args.node.id) {
+                loadDocumentType();
             }
+        }));
+
+        evts.push(eventsService.on("editors.documentType.saved", function(name, args) {
+            if(args.documentType.allowedTemplates.length > 0) {
+                navigationService.hasTree("templates").then(function (treeExists) {
+                    if (treeExists) {
+                        navigationService.syncTree({ tree: "templates", path: [], forceReload: true })
+                            .then(function (syncArgs) {
+                                navigationService.reloadNode(syncArgs.node)
+                            }
+                        );
+                    }
+                }); 
+            }
+        }));
+
+        evts.push(eventsService.on("editors.groupsBuilder.changed", function(name, args) {
+            angularHelper.getCurrentForm($scope).$setDirty();
         }));
 
         //ensure to unregister from all events!

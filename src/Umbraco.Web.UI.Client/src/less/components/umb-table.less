@@ -27,15 +27,18 @@
 
 }
 
+.umb-table__action,
 .umb-table a {
+    background: transparent;
+    border: 0 none;
     text-decoration: none;
-    cursor: pointer;
-
-    &:focus {
-        outline: none;
-        text-decoration: none;
+    padding: 0;
+    margin-left: 1px;
+    body:not(.tabbing-active) & {
+        outline: 0;
     }
 }
+
 
 input.umb-table__input {
     margin: 0 auto;
@@ -48,25 +51,35 @@ input.umb-table__input {
 .umb-table-head {
     font-size: 14px;
     font-weight: bold;
+
+    color: @ui-disabled-type;
 }
 
 .umb-table-head__link {
+    background: transparent;
+    border: 0 none;
     position: relative;
-    cursor: default;
     text-decoration: none;
     color: @gray-3;
+    font-size: inherit;
+    font-weight: inherit;
+    padding: 0 1px;
+
     &:hover {
         text-decoration: none;
+        cursor: default;
         color: @gray-3;
     }
 }
 
-.umb-table-head__link .sortable {
+.umb-table-head__link.sortable {
+    cursor: pointer;
+    color: @ui-action-discreet-type;
     &:hover {
-        text-decoration: none;
-        cursor: pointer;
-        color: @black;
+        color: @ui-action-discreet-type-hover;
     }
+
+    outline-offset: 1px;
 }
 
 .umb-table-thead__icon {
@@ -124,6 +137,9 @@ input.umb-table__input {
         &::before {
             opacity:.66;
         }
+        .umb-table-body__checkicon {
+            color: @ui-selected-border;
+        }
     }
 }
 
@@ -136,34 +152,32 @@ input.umb-table__input {
 }
 
 .umb-table-body__link {
-    
+    position: relative;
     color: @ui-option-type;
     font-size: 14px;
     font-weight: bold;
     text-decoration: none;
-    
-    &:hover, &:focus {
+
+    &:hover {
         color: @ui-option-type-hover;
         text-decoration: underline;
     }
 }
 
-.umb-table-body__icon,
-.umb-table-body__icon[class^="icon-"],
-.umb-table-body__icon[class*=" icon-"] {
+.umb-table-body__icon {
     margin: 0 auto;
     font-size: 20px;
     line-height: 20px;
     color: @ui-option-type;
+    vertical-align: bottom;
+    text-decoration: none;
 }
 
-.umb-table-body__checkicon,
-.umb-table-body__checkicon[class^="icon-"],
-.umb-table-body__checkicon[class*=" icon-"] {
+.umb-table-body__checkicon {
     display: none;
     font-size: 18px;
     line-height: 20px;
-    color: @green;
+    color: @ui-selected-border;
 }
 
 .umb-table-body .umb-table__name {
@@ -172,7 +186,8 @@ input.umb-table__input {
     font-weight: bold;
     a {
         color: @ui-option-type;
-        &:hover, &:focus {
+        outline-offset: 1px;
+        &:hover {
             color: @ui-option-type-hover;
             text-decoration: underline;
         }
@@ -240,10 +255,10 @@ input.umb-table__input {
 .umb-table-cell {
     display: flex;
     flex-flow: row nowrap;
-    flex: 1 1 1%; //NOTE 1% is a Internet Explore hack, so that cells don't collapse
+    flex: 1 1 5%;
     position: relative;
-    margin: auto 14px;
-    padding: 6px 2px;
+    margin: auto 0;
+    padding: 6px 16px;
     text-align: left;
     overflow:hidden;
 }
@@ -253,17 +268,25 @@ input.umb-table__input {
     white-space: nowrap; //NOTE Disable/Enable this to keep textstring on one line
     text-overflow: ellipsis;
 }
+.umb-table-cell.--noOverflow > * {
+    overflow: visible;
+    white-space: normal;
+    text-overflow: unset;
+}
 
 .umb-table-cell:first-of-type:not(.not-fixed) {
     flex: 0 0 25px;
-    margin: 0 0 0 15px;
-    padding: 15px 0;
+    margin: 0;
+    padding: 15px 0 15px 15px;
 }
 
 .umb-table-cell--auto-width {
     flex: 0 0 auto !important;
 }
 
+.umb-table-cell--nano {
+    flex: 0 0 50px;
+}
 .umb-table-cell--small {
     flex: .5 .5 1%;
     max-width: 12.5%;
@@ -280,8 +303,8 @@ input.umb-table__input {
 
 // Increases the space for the name cell
 .umb-table__name {
-    flex: 1 1 25%;
-    max-width: 25%;
+    flex: 1 1 20%;
+    max-width: 300px;
 }
 
 .umb-table__loading-overlay {
@@ -295,7 +318,11 @@ input.umb-table__input {
 .umb-table__row-expand {
     font-size: 12px;
     text-decoration: none;
-    color: @black;
+    color: @gray-4;
+
+    &:hover {
+        color: @black;
+    }
 }
 
 .umb-table__row-expand--hidden {

@@ -2,6 +2,7 @@
 // Core variables and mixins
 @import "fonts.less"; // Loading fonts
 @import "variables.less"; // Modify this for custom colors, font-sizes, etc
+@import "colors.less"; // Colors from variables but as specific CSS classes
 @import "mixins.less";
 
 // CSS Reset
@@ -74,11 +75,14 @@
 @import "sections.less";
 @import "helveticons.less";
 @import "main.less";
-@import "listview.less"; 
+@import "listview.less";
 @import "gridview.less";
-@import "footer.less";
+@import "filter-toggle.less";
 
 @import "forms/umb-validation-label.less";
+
+// Umbraco Accessibility
+@import "accessibility/sr-only.less";
 
 // Umbraco Components
 @import "components/application/umb-app-header.less";
@@ -99,7 +103,6 @@
 @import "components/tree/umb-actions.less";
 @import "components/tree/umb-tree-item.less";
 
-
 @import "components/editor.less";
 @import "components/overlays.less";
 @import "components/card.less";
@@ -109,7 +112,7 @@
 @import "components/umb-editor-navigation-item.less";
 @import "components/umb-editor-sub-views.less";
 @import "components/editor/subheader/umb-editor-sub-header.less";
-@import "components/umb-flatpickr.less";
+@import "components/umb-date-time-picker.less";
 @import "components/umb-grid-selector.less";
 @import "components/umb-child-selector.less";
 @import "components/umb-group-builder.less";
@@ -121,12 +124,15 @@
 @import "components/umb-form-check.less";
 @import "components/umb-locked-field.less";
 @import "components/umb-tabs.less";
+@import "components/umb-loader.less";
 @import "components/umb-load-indicator.less";
 @import "components/umb-breadcrumbs.less";
 @import "components/umb-media-grid.less";
 @import "components/umb-folder-grid.less";
 @import "components/umb-content-grid.less";
+@import "components/umb-contextmenu.less";
 @import "components/umb-layout-selector.less";
+@import "components/umb-mini-search.less";
 @import "components/tooltip/umb-tooltip.less";
 @import "components/tooltip/umb-tooltip-list.less";
 @import "components/overlays/umb-overlay-backdrop.less";
@@ -134,8 +140,11 @@
 @import "components/umb-grid.less";
 @import "components/umb-empty-state.less";
 @import "components/umb-property-editor.less";
+@import "components/umb-property-actions.less";
+@import "components/umb-code-snippet.less";
 @import "components/umb-color-swatches.less";
 @import "components/check-circle.less";
+@import "components/umb-file-icon.less";
 @import "components/umb-iconpicker.less";
 @import "components/umb-insert-code-box.less";
 @import "components/umb-packages.less";
@@ -162,6 +171,7 @@
 @import "components/umb-textarea.less";
 @import "components/umb-dropdown.less";
 @import "components/umb-range-slider.less";
+@import "components/umb-number.less";
 
 @import "components/buttons/umb-button.less";
 @import "components/buttons/umb-button-group.less";
@@ -182,6 +192,8 @@
 @import "components/users/umb-user-preview.less";
 @import "components/users/umb-user-picker-list.less";
 
+@import "components/contextdialogs/umb-dialog-datatype-delete.less";
+
 
 // Utilities
 @import "utilities/layout/_display.less";
@@ -196,7 +208,6 @@
 @import "utilities/_cursor.less";
 
 //page specific styles
-@import "pages/document-type-editor.less";
 @import "pages/login.less";
 @import "pages/welcome-dashboard.less";
 
@@ -212,6 +223,7 @@
 @import "dashboards/umbraco-forms.less";
 @import "dashboards/examine-management.less";
 @import "dashboards/healthcheck.less";
+@import "dashboards/nucache.less";
 
 @import "typeahead.less";
 @import "hacks.less";

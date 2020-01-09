@@ -55,6 +55,7 @@ App_Data/TEMP/*
 src/Umbraco.Web.UI/[Cc]ss/*
 src/Umbraco.Web.UI/App_Code/*
 src/Umbraco.Web.UI/App_Data/*
+src/Umbraco.Web.UI/data/*
 src/Umbraco.Tests/App_Data/*
 src/Umbraco.Web.UI/[Mm]edia/*
 src/Umbraco.Web.UI/[Mm]aster[Pp]ages/*
@@ -132,7 +133,8 @@ src/Umbraco.Web.UI.Client/bower_components/*
 preserve.belle
 
 #Ignore Rule for output of generated documentation files from Grunt docserve
-src/Umbraco.Web.UI.Client/docs/api
+src/Umbraco.Web.UI.Docs/api
+src/Umbraco.Web.UI.Docs/package-lock.json
 src/*.boltdata/
 src/umbraco.sln.ide/*
 src/.vs/

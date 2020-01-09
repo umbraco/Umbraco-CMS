@@ -2,7 +2,7 @@
 
     <umb-editor-view>
 
-        <form novalidate name="dataTypeSettingsForm" val-form-manager>
+        <form novalidate name="copyNodesForm" class="form-horizontal" val-form-manager>
     
             <umb-editor-header
                 name="model.title"
@@ -59,12 +59,11 @@
                             </umb-mini-list-view>
                         </div>
                     
-                        <div class="umb-control-group -no-border">
-                            <label>
-                                <input type="checkbox" class="pull-left" style="margin-right: 10px;" ng-model="model.relateToOriginal" />
-                                <localize key="defaultdialogs_relateToOriginalLabel">Relate to originalt</localize>
-                            </label>
-                        </div>
+                        <umb-pane>
+                            <umb-control-group localize="label" label="@defaultdialogs_relateToOriginalLabel">
+                                <umb-toggle label-position="left" checked="model.relateToOriginal" on-click="vm.onToggle('relate')"></umb-toggle>
+                            </umb-control-group>
+                        </umb-pane>
                     </umb-box-content>
                 </umb-box>
             </umb-editor-container>

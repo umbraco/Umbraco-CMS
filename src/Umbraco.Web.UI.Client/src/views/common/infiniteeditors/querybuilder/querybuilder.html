@@ -15,164 +15,157 @@
 			<umb-box>
 				<umb-box-content>
 
-					<div class="umb-control-group umb-querybuilder">
+                    <div class="umb-control-group umb-querybuilder">
 
-						<div class="row">
-							<div class="query-items">
+                        <div class="row">
+                            <div class="query-items">
 
-								<span><localize key="template_iWant">I want</localize></span>
+                                <span><localize key="template_iWant">I want</localize></span>
 
-								<div class="btn-group">
+                                <div class="btn-group">
 
-									<umb-button
-										type="button"
-										button-style="outline"
-										action="vm.contentTypeSelectOpen = !vm.contentTypeSelectOpen"
-										label="{{vm.query.contentType.name}}"
-										show-caret="true">
-									</umb-button>
+                                    <umb-button type="button"
+                                                button-style="outline"
+                                                action="vm.contentTypeSelectOpen = !vm.contentTypeSelectOpen"
+                                                label="{{vm.query.contentType.name}}"
+                                                show-caret="true">
+                                    </umb-button>
 
-									<umb-dropdown ng-if="vm.contentTypeSelectOpen" on-close="vm.contentTypeSelectOpen = false">
-										<umb-dropdown-item ng-repeat="contentType in vm.contentTypes">
-											<a href ng-click="vm.setContentType(contentType); vm.contentTypeSelectOpen = false;">
-												{{contentType.name}}
-											</a>
-										</umb-dropdown-item>
-									</umb-dropdown>
+                                    <umb-dropdown ng-if="vm.contentTypeSelectOpen" on-close="vm.contentTypeSelectOpen = false">
+                                        <umb-dropdown-item ng-repeat="contentType in vm.contentTypes">
+                                            <a href ng-click="vm.setContentType(contentType); vm.contentTypeSelectOpen = false;">
+                                                {{contentType.name}}
+                                            </a>
+                                        </umb-dropdown-item>
+                                    </umb-dropdown>
 
-								</div>
+                                </div>
 
-								<span><localize key="template_from">from</localize></span>
+                                <span><localize key="template_from">from</localize></span>
 
-								<umb-button
-									type="button"
-									button-style="outline"
-									action="vm.chooseSource(vm.query)"
-									label="{{vm.query.source.name}}">
-								</umb-button>
+                                <umb-button type="button"
+                                            button-style="outline"
+                                            action="vm.chooseSource(vm.query)"
+                                            label="{{vm.query.source.name}}">
+                                </umb-button>
 
-							</div>
+                            </div>
 
-							<div class="query-items" ng-repeat="filter in vm.query.filters ">
+                            <div class="query-items" ng-repeat="filter in vm.query.filters ">
 
-								<span ng-if="$first">
-									<localize key="template_where">where</localize>
-								</span>
-								<span ng-if="!$first">
-									<localize key="template_and">and</localize>
-								</span>
+                                <span ng-if="$first">
+                                    <localize key="template_where">where</localize>
+                                </span>
+                                <span ng-if="!$first">
+                                    <localize key="template_and">and</localize>
+                                </span>
 
-								<div class="btn-group">
+                                <div class="btn-group">
 
-									<umb-button
-										type="button"
-										button-style="outline"
-										action="vm.propertyFilterOpen[$index] = !vm.propertyFilterOpen[$index]"
-										label="{{filter.property.name}}"
-										show-caret="true">
-									</umb-button>
+                                    <umb-button type="button"
+                                                button-style="outline"
+                                                action="vm.propertyFilterOpen[$index] = !vm.propertyFilterOpen[$index]"
+                                                label="{{filter.property.name}}"
+                                                show-caret="true">
+                                    </umb-button>
 
-									<umb-dropdown ng-if="vm.propertyFilterOpen[$index]" on-close="console.log(1);vm.propertyFilterOpen[$index] = false">
-										<umb-dropdown-item ng-repeat="property in vm.properties">
-											<a href ng-click="vm.setFilterProperty(filter, property); vm.propertyFilterOpen[$parent.$parent.$index] = false;">
-												{{property.name}}
-											</a>
-										</umb-dropdown-item>
-									</umb-dropdown>
+                                    <umb-dropdown ng-if="vm.propertyFilterOpen[$index]" on-close="console.log(1);vm.propertyFilterOpen[$index] = false">
+                                        <umb-dropdown-item ng-repeat="property in vm.properties">
+                                            <a href ng-click="vm.setFilterProperty(filter, property); vm.propertyFilterOpen[$parent.$parent.$index] = false;">
+                                                {{property.name}}
+                                            </a>
+                                        </umb-dropdown-item>
+                                    </umb-dropdown>
 
-								</div>
+                                </div>
 
-								<div class="btn-group" ng-if="filter.property">
+                                <div class="btn-group" ng-if="filter.property">
 
-									<umb-button
-										type="button"
-										button-style="outline"
-										action="vm.termFilterOpen[$index] = !vm.termFilterOpen[$index]"
-										label="{{filter.term.name}}"
-										show-caret="true">
-									</umb-button>
+                                    <umb-button type="button"
+                                                button-style="outline"
+                                                action="vm.termFilterOpen[$index] = !vm.termFilterOpen[$index]"
+                                                label="{{filter.term.name}}"
+                                                show-caret="true">
+                                    </umb-button>
 
-									<umb-dropdown ng-if="vm.termFilterOpen[$index]" on-close="vm.termFilterOpen[$index] = false">
-										<umb-dropdown-item ng-repeat="term in vm.getPropertyOperators(filter.property)">
-											<a href ng-click="vm.setFilterTerm(filter, term); vm.termFilterOpen[$parent.$parent.$index] = false;">
-												{{term.name}}
-											</a>
-										</umb-dropdown-item>
-									</umb-dropdown>
+                                    <umb-dropdown ng-if="vm.termFilterOpen[$index]" on-close="vm.termFilterOpen[$index] = false">
+                                        <umb-dropdown-item ng-repeat="term in vm.getPropertyOperators(filter.property)">
+                                            <a href ng-click="vm.setFilterTerm(filter, term); vm.termFilterOpen[$parent.$parent.$index] = false;">
+                                                {{term.name}}
+                                            </a>
+                                        </umb-dropdown-item>
+                                    </umb-dropdown>
 
-								</div>
+                                </div>
 
-								<span ng-switch="filter.term.appliesTo[0]">
+                                <span ng-switch="filter.term.appliesTo[0]">
 
-									<!-- Filter term types  (string, int, date) -->
-									<input type="text" ng-switch-when="string" style="width:90px; margin-bottom: 0;" ng-model="filter.constraintValue" ng-change="vm.changeConstraintValue()" />
-									<input type="number" ng-switch-when="int" style="width:90px; margin-bottom: 0;" ng-model="filter.constraintValue" ng-change="vm.changeConstraintValue()" />
+                                    <!-- Filter term types  (string, int, date) -->
+                                    <input type="text" ng-switch-when="string" style="width:90px; margin-bottom: 0;" ng-model="filter.constraintValue" ng-change="vm.changeConstraintValue()" />
+                                    <input type="number" ng-switch-when="int" style="width:90px; margin-bottom: 0;" ng-model="filter.constraintValue" ng-change="vm.changeConstraintValue()" />
 
-									<span ng-switch-when="datetime">
-										<umb-flatpickr
-											options="vm.datePickerConfig"
-											on-change="vm.datePickerChange(dateStr, filter)">
-										</umb-flatpickr>
-									</span>
+                                    <span ng-switch-when="datetime">
+                                        <umb-date-time-picker options="vm.datePickerConfig"
+                                                              on-change="vm.datePickerChange(dateStr, filter)">
+                                        </umb-date-time-picker>
+                                    </span>
 
-								</span>
+                                </span>
 
-								<a href ng-click="vm.addFilter(vm.query)">
-									<i class="icon-add"></i>
-								</a>
+                                <a href ng-click="vm.addFilter(vm.query)">
+                                    <i class="icon-add" aria-hidden="true"></i>
+                                </a>
 
-								<a href ng-click="vm.trashFilter(vm.query, filter)">
-									<i class="icon-trash"></i>
-								</a>
+                                <a href ng-click="vm.trashFilter(vm.query, filter)">
+                                    <i class="icon-trash" aria-hidden="true"></i>
+                                </a>
 
-							</div>
+                            </div>
 
-							<div class="query-items">
+                            <div class="query-items">
 
-								<span><localize key="template_orderBy">order by</localize></span>
+                                <span><localize key="template_orderBy">order by</localize></span>
 
-								<div class="btn-group">
+                                <div class="btn-group">
 
-									<umb-button
-										type="button"
-										button-style="outline"
-										action="vm.sortPropertyOpen = !vm.sortPropertyOpen"
-										label="{{vm.query.sort.property.name}}"
-										show-caret="true">
-									</umb-button>
+                                    <umb-button type="button"
+                                                button-style="outline"
+                                                action="vm.sortPropertyOpen = !vm.sortPropertyOpen"
+                                                label="{{vm.query.sort.property.name}}"
+                                                show-caret="true">
+                                    </umb-button>
 
-									<umb-dropdown ng-if="vm.sortPropertyOpen" on-close="vm.sortPropertyOpen = false">
-										<umb-dropdown-item ng-repeat="property in vm.properties">
-											<a href ng-click="vm.setSortProperty(vm.query, property); vm.sortPropertyOpen = false;">
-												{{property.name}}
-											</a>
-										</umb-dropdown-item>
-									</umb-dropdown>
+                                    <umb-dropdown ng-if="vm.sortPropertyOpen" on-close="vm.sortPropertyOpen = false">
+                                        <umb-dropdown-item ng-repeat="property in vm.properties">
+                                            <a href ng-click="vm.setSortProperty(vm.query, property); vm.sortPropertyOpen = false;">
+                                                {{property.name}}
+                                            </a>
+                                        </umb-dropdown-item>
+                                    </umb-dropdown>
 
-								</div>
+                                </div>
 
-								<umb-button
-									ng-show="vm.query.sort.property.name"
-									type="button"
-									button-style="outline"
-									action="vm.changeSortOrder(vm.query)"
-									label="{{vm.query.sort.translation.currentLabel}}">
-								</umb-button>
+                                <umb-button ng-show="vm.query.sort.property.name"
+                                            type="button"
+                                            button-style="outline"
+                                            action="vm.changeSortOrder(vm.query)"
+                                            label="{{vm.query.sort.translation.currentLabel}}">
+                                </umb-button>
 
-							</div>
-						</div>
+                            </div>
+                        </div>
 
                         <h5>{{model.result.resultCount}} <localize key="template_itemsReturned">items, returned in</localize> {{model.result.executionTime}} ms</h5>
 
-						<ul class="nav unstyled">
-							<li ng-repeat="item in model.result.sampleResults">
-								<i class="icon icon-document turquoise-d1"></i> {{item.name}}
-							</li>
-						</ul>
+                        <ul class="nav unstyled">
+                            <li ng-repeat="item in model.result.sampleResults">
+                                <i class="icon icon-document turquoise-d1" aria-hidden="true"></i> {{item.name}}
+                            </li>
+                        </ul>
 
-						<pre>{{model.result.queryExpression}}</pre>
+                        <umb-code-snippet language="'csharp'">{{model.result.queryExpression}}</umb-code-snippet>
 
-					</div>
+                    </div>
 
 				</umb-box-content>
 			</umb-box>

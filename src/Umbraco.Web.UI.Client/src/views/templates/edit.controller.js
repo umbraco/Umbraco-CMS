@@ -8,6 +8,10 @@
         var infiniteMode = $scope.model && $scope.model.infiniteMode;
         var id = infiniteMode ? $scope.model.id : $routeParams.id;
         var create = infiniteMode ? $scope.model.create : $routeParams.create;
+        
+        vm.header = {};
+        vm.header.editorfor = "template_template";
+        vm.header.setPageTitle = true;
 
         vm.page = {};
         vm.page.loading = true;
@@ -83,10 +87,6 @@
                 saveMethod: templateResource.save,
                 scope: $scope,
                 content: vm.template,
-                // We do not redirect on failure for templates - this is because it is not possible to actually save the template
-                // type when server side validation fails - as opposed to content where we are capable of saving the content
-                // item if server side validation fails
-                redirectOnFailure: false,
                 rebindCallback: function (orignal, saved) {}
             }).then(function (saved) {
 

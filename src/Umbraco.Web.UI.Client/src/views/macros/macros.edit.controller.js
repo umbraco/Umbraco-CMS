@@ -11,7 +11,10 @@ function MacrosEditController($scope, $q, $routeParams, macroResource, editorSta
     var vm = this;
 
     vm.promises = {};
-    
+    vm.header = {};
+    vm.header.editorfor = "general_macro";
+    vm.header.setPageTitle = true;
+
     vm.page = {};
     vm.page.loading = false;
     vm.page.saveButtonState = "init";
@@ -35,7 +38,6 @@ function MacrosEditController($scope, $q, $routeParams, macroResource, editorSta
                 vm.page.saveButtonState = "success";
             }, function (error) {
                 contentEditingHelper.handleSaveError({
-                    redirectOnFailure: false,
                     err: error
                 });
 
@@ -61,18 +63,6 @@ function MacrosEditController($scope, $q, $routeParams, macroResource, editorSta
         var deferred = $q.defer();
 
         macroResource.getPartialViews().then(function (data) {
-            deferred.resolve(data);
-        }, function () {
-            deferred.reject();
-        });
-
-        return deferred.promise;
-    }
-
-    function getParameterEditors() {
-        var deferred = $q.defer();
-
-        macroResource.getParameterEditors().then(function (data) {
             deferred.resolve(data);
         }, function () {
             deferred.reject();
@@ -111,7 +101,6 @@ function MacrosEditController($scope, $q, $routeParams, macroResource, editorSta
         vm.page.loading = true;
 
         vm.promises['partialViews'] = getPartialViews();
-        vm.promises['parameterEditors'] = getParameterEditors();
         vm.promises['macro'] = getMacro();
 
         vm.views = [];
@@ -125,10 +114,6 @@ function MacrosEditController($scope, $q, $routeParams, macroResource, editorSta
 
                 if (key === 'partialViews') {
                     vm.views = values[key];
-                }
-
-                if (key === 'parameterEditors') {
-                    vm.parameterEditors = values[key];                    
                 }
 
                 if (key === 'macro') {
@@ -148,7 +133,7 @@ function MacrosEditController($scope, $q, $routeParams, macroResource, editorSta
             // navigation
             vm.labels.settings = values[0];
             vm.labels.parameters = values[1];
-
+            
             vm.page.navigation = [
                 {
                     "name": vm.labels.settings,

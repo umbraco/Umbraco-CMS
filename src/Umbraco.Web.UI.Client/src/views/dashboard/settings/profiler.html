@@ -1,0 +1,57 @@
+<div ng-controller="Umbraco.Dashboard.ProfilerController as vm">
+
+    <div ng-show="vm.loading">
+        <umb-load-indicator></umb-load-indicator>
+    </div>
+
+    <umb-box ng-hide="vm.loading">
+        <umb-box-content>
+            <h3 class="bold">
+                <localize key="profiling_performanceProfiling">Performance profiling</localize>
+            </h3>
+            <div ng-show="vm.profilerEnabled">
+                <div class="mb4">
+                    <localize key="profiling_performanceProfilingDescription">
+                        <p>
+                            Umbraco currently runs in debug mode. This means you can use the built-in performance profiler to assess the performance when rendering pages.
+                        </p>
+                        <p>
+                            If you want to activate the profiler for a specific page rendering, simply add <b>umbDebug=true</b> to the querystring when requesting the page.
+                        </p>
+                        <p>
+                            If you want the profiler to be activated by default for all page renderings, you can use the toggle below.
+                            It will set a cookie in your browser, which then activates the profiler automatically.
+                            In other words, the profiler will only be active by default in <i>your</i> browser - not everyone else's.
+                        </p>
+                    </localize>
+                </div>
+                <div class="mb4">
+                    <div class="flex items-center">
+                        <umb-toggle checked="vm.alwaysOn" input-id="profilerAlwaysOn" on-click="vm.toggle()"></umb-toggle>
+                        <label for="profilerAlwaysOn" class="mb0 ml2">
+                            <localize key="profiling_activateByDefault">Activate the profiler by default</localize>
+                        </label>
+                    </div>
+                </div>
+                <h4>
+                    <localize key="profiling_reminder">Friendly reminder</localize>
+                </h4>
+                <localize key="profiling_reminderDescription">
+                    <p>
+                        You should never let a production site run in debug mode. Debug mode is turned off by setting <b>debug="false"</b> on the <b>&lt;compilation /&gt;</b> element in web.config.
+                    </p>
+                </localize>
+            </div>
+            <div ng-hide="vm.profilerEnabled">
+                <localize key="profiling_profilerEnabledDescription">
+                    <p>
+                        Umbraco currently does not run in debug mode, so you can't use the built-in profiler. This is how it should be for a production site.
+                    </p>
+                    <p>
+                        Debug mode is turned on by setting <b>debug="true"</b> on the <b>&lt;compilation /&gt;</b> element in web.config.
+                    </p>
+                </localize>
+            </div>
+        </umb-box-content>
+    </umb-box>
+</div>

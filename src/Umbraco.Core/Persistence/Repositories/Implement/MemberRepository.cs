@@ -6,6 +6,7 @@ using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
@@ -132,7 +133,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 // joining the type so we can do a query against the member type - not sure if this adds much overhead or not?
                 // the execution plan says it doesn't so we'll go with that and in that case, it might be worth joining the content
-                // types by default on the document and media repo's so we can query by content type there too.
+                // types by default on the document and media repos so we can query by content type there too.
                 .InnerJoin<ContentTypeDto>().On<ContentDto, ContentTypeDto>(left => left.ContentTypeId, right => right.NodeId);
 
             sql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
@@ -232,8 +233,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(IMember entity)
         {
+            if (entity.ProviderUserKey == null)
+            {
+                entity.ProviderUserKey = entity.Key;
+            }
+            entity.AddingEntity();
+
             var member = (Member) entity;
-            member.AddingEntity();
 
             // ensure that strings don't contain characters that are invalid in xml
             // TODO: do we really want to keep doing this here?
@@ -539,6 +545,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             if (ordering.OrderBy.InvariantEquals("userName"))
                 return SqlSyntax.GetFieldName<MemberDto>(x => x.LoginName);
+
+            if (ordering.OrderBy.InvariantEquals("updateDate"))
+                return SqlSyntax.GetFieldName<ContentVersionDto>(x => x.VersionDate);
+
+            if (ordering.OrderBy.InvariantEquals("createDate"))
+                return SqlSyntax.GetFieldName<NodeDto>(x => x.CreateDate);
+
+            if (ordering.OrderBy.InvariantEquals("contentTypeAlias"))
+                return SqlSyntax.GetFieldName<ContentTypeDto>(x => x.Alias);
 
             return base.ApplySystemOrdering(ref sql, ordering);
         }

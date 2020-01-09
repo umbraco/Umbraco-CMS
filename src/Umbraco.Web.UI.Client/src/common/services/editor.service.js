@@ -251,7 +251,7 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @param {Object} editor rendering options
          * @param {String} editor.view Path to view
-         * @param {String} editor.size Sets the size of the editor ("small"). If nothing is set it will use full width.
+         * @param {String} editor.size Sets the size of the editor ("small" || "medium"). If nothing is set it will use full width.
          */
         function open(editor) {
 
@@ -261,7 +261,7 @@ When building a custom infinite editor view you can use the same components as a
             */
             unbindKeyboardShortcuts();
 
-            // set flag so we know when the editor is open in "infinie mode"
+            // set flag so we know when the editor is open in "infinite mode"
             editor.infiniteMode = true;
 
             editors.push(editor);
@@ -331,13 +331,17 @@ When building a custom infinite editor view you can use the same components as a
          * @methodOf umbraco.services.editorService
          *
          * @description
-         * Opens a media editor in infinite editing, the submit callback returns the updated content item
+         * Opens a content editor in infinite editing, the submit callback returns the updated content item
          * @param {Object} editor rendering options
          * @param {String} editor.id The id of the content item
          * @param {Boolean} editor.create Create new content item
          * @param {Function} editor.submit Callback function when the publish and close button is clicked. Returns the editor model object
          * @param {Function} editor.close Callback function when the close button is clicked.
-         *
+         * @param {String} editor.parentId If editor.create is true, provide parentId for the creation of the content item
+         * @param {String} editor.documentTypeAlias If editor.create is true, provide document type alias for the creation of the content item
+         * @param {Boolean} editor.allowSaveAndClose If editor is being used in infinite editing allows the editor to close when the save action is performed
+         * @param {Boolean} editor.allowPublishAndClose If editor is being used in infinite editing allows the editor to close when the publish action is performed
+         * 
          * @returns {Object} editor object
          */
         function contentEditor(editor) {
@@ -355,6 +359,7 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @param {Object} editor rendering options
          * @param {Boolean} editor.multiPicker Pick one or multiple items
+         * @param {Int} editor.startNodeId Set the startnode of the picker (optional)
          * @param {Function} editor.submit Callback function when the submit button is clicked. Returns the editor model object
          * @param {Function} editor.close Callback function when the close button is clicked.
          *
@@ -368,6 +373,74 @@ When building a custom infinite editor view you can use the same components as a
             open(editor);
         }
 
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#contentTypePicker
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens a content type picker in infinite editing, the submit callback returns an array of selected items
+         *
+         * @param {Object} editor rendering options
+         * @param {Boolean} editor.multiPicker Pick one or multiple items
+         * @param {Function} editor.submit Callback function when the submit button is clicked. Returns the editor model object
+         * @param {Function} editor.close Callback function when the close button is clicked.
+         *
+         * @returns {Object} editor object
+         */
+        function contentTypePicker(editor) {
+            editor.view = "views/common/infiniteeditors/treepicker/treepicker.html";
+            editor.size = "small";
+            editor.section = "settings";
+            editor.treeAlias = "documentTypes";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#mediaTypePicker
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens a media type picker in infinite editing, the submit callback returns an array of selected items
+         *
+         * @param {Object} editor rendering options
+         * @param {Boolean} editor.multiPicker Pick one or multiple items
+         * @param {Function} editor.submit Callback function when the submit button is clicked. Returns the editor model object
+         * @param {Function} editor.close Callback function when the close button is clicked.
+         *
+         * @returns {Object} editor object
+         */
+        function mediaTypePicker(editor) {
+            editor.view = "views/common/infiniteeditors/treepicker/treepicker.html";
+            editor.size = "small";
+            editor.section = "settings";
+            editor.treeAlias = "mediaTypes";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#memberTypePicker
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens a member type picker in infinite editing, the submit callback returns an array of selected items
+         *
+         * @param {Object} editor rendering options
+         * @param {Boolean} editor.multiPicker Pick one or multiple items
+         * @param {Function} editor.submit Callback function when the submit button is clicked. Returns the editor model object
+         * @param {Function} editor.close Callback function when the close button is clicked.
+         *
+         * @returns {Object} editor object
+         */
+        function memberTypePicker(editor) {
+            editor.view = "views/common/infiniteeditors/treepicker/treepicker.html";
+            editor.size = "small";
+            editor.section = "settings";
+            editor.treeAlias = "memberTypes";
+            open(editor);
+        }
         /**
          * @ngdoc method
          * @name umbraco.services.editorService#copy
@@ -492,9 +565,11 @@ When building a custom infinite editor view you can use the same components as a
          * @description
          * Opens a media picker in infinite editing, the submit callback returns an array of selected media items
          * @param {Object} editor rendering options
+         * @param {Int} editor.startNodeId Set the startnode of the picker (optional)
          * @param {Boolean} editor.multiPicker Pick one or multiple items
          * @param {Boolean} editor.onlyImages Only display files that have an image file-extension
          * @param {Boolean} editor.disableFolderSelect Disable folder selection
+         * @param {Boolean} editor.disableFocalPoint Disable focal point editor for selected media
          * @param {Array} editor.updatedMediaNodes A list of ids for media items that have been updated through the media picker
          * @param {Callback} editor.submit Submits the editor
          * @param {Callback} editor.close Closes the editor
@@ -533,10 +608,15 @@ When building a custom infinite editor view you can use the same components as a
          * @methodOf umbraco.services.editorService
          *
          * @description
-         * Opens the document type editor in infinite editing, the submit callback returns the saved document type
+         * Opens the document type editor in infinite editing, the submit callback returns the alias of the saved document type.
          * @param {Object} editor rendering options
-         * @param {Callback} editor.submit Submits the editor
-         * @param {Callback} editor.close Closes the editor
+         * @param {Number} editor.id Indicates the ID of the document type to be edited. Alternatively the ID may be set to `-1` in combination with `create` being set to `true` to open the document type editor for creating a new document type.
+         * @param {Boolean} editor.create Set to `true` to open the document type editor for creating a new document type.
+         * @param {Boolean} editor.noTemplate If `true` and in combination with `create` being set to `true`, the document type editor will not create a corresponding template by default. This is similar to selecting the "Document Type without a template" in the Create dialog.
+         * @param {Boolean} editor.isElement If `true` and in combination with `create` being set to `true`, the "Is an Element type" option will be selected by default in the document type editor.
+         * @param {Boolean} editor.allowVaryByCulture If `true` and in combination with `create`, the "Allow varying by culture" option will be selected by default in the document type editor.
+         * @param {Callback} editor.submit Submits the editor.
+         * @param {Callback} editor.close Closes the editor.
          * @returns {Object} editor object
          */
         function documentTypeEditor(editor) {
@@ -558,6 +638,23 @@ When building a custom infinite editor view you can use the same components as a
          */
         function mediaTypeEditor(editor) {
             editor.view = "views/mediatypes/edit.html";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#memberTypeEditor
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens the member type editor in infinite editing, the submit callback returns the saved member type
+         * @param {Object} editor rendering options
+         * @param {Callback} editor.submit Submits the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+        function memberTypeEditor(editor) {
+            editor.view = "views/membertypes/edit.html";
             open(editor);
         }
 
@@ -826,6 +923,27 @@ When building a custom infinite editor view you can use the same components as a
             open(editor);
         }
 
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#memberEditor
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens a member editor in infinite editing, the submit callback returns the updated member
+         * @param {Object} editor rendering options
+         * @param {String} editor.id The id (GUID) of the member
+         * @param {Boolean} editor.create Create new member
+         * @param {Function} editor.submit Callback function when the submit button is clicked. Returns the editor model object
+         * @param {Function} editor.close Callback function when the close button is clicked.
+         * @param {String} editor.doctype If editor.create is true, provide member type for the creation of the member
+         * 
+         * @returns {Object} editor object
+         */
+        function memberEditor(editor) {
+            editor.view = "views/member/edit.html";
+            open(editor);
+        }
+
         ///////////////////////
 
         /**
@@ -881,6 +999,9 @@ When building a custom infinite editor view you can use the same components as a
             mediaEditor: mediaEditor,
             contentEditor: contentEditor,
             contentPicker: contentPicker,
+            contentTypePicker: contentTypePicker,
+            mediaTypePicker: mediaTypePicker,
+            memberTypePicker: memberTypePicker,
             copy: copy,
             move: move,
             embed: embed,
@@ -903,7 +1024,8 @@ When building a custom infinite editor view you can use the same components as a
             itemPicker: itemPicker,
             macroPicker: macroPicker,
             memberGroupPicker: memberGroupPicker,
-            memberPicker: memberPicker
+            memberPicker: memberPicker,
+            memberEditor: memberEditor
         };
 
         return service;

@@ -66,7 +66,7 @@ namespace Umbraco.Core.Models.Entities
         public int ParentId { get; set; }
 
         /// <inheritdoc />
-        public void SetParent(ITreeEntity parent) => throw new WontImplementException();
+        public void SetParent(ITreeEntity parent) => throw new InvalidOperationException("This property won't be implemented.");
 
         /// <inheritdoc />
         [DataMember]
@@ -111,58 +111,12 @@ namespace Umbraco.Core.Models.Entities
         public virtual bool IsContainer { get; set; }
 
 
-        /// <summary>
-        /// Represents a lightweight property.
-        /// </summary>
-        public class PropertySlim
-        {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="PropertySlim"/> class.
-            /// </summary>
-            public PropertySlim(string editorAlias, object value)
-            {
-                PropertyEditorAlias = editorAlias;
-                Value = value;
-            }
-
-            /// <summary>
-            /// Gets the property editor alias.
-            /// </summary>
-            public string PropertyEditorAlias { get; }
-
-            /// <summary>
-            /// Gets the property value.
-            /// </summary>
-            public object Value { get; }
-
-            protected bool Equals(PropertySlim other)
-            {
-                return PropertyEditorAlias.Equals(other.PropertyEditorAlias) && Equals(Value, other.Value);
-            }
-
-            public override bool Equals(object obj)
-            {
-                if (ReferenceEquals(null, obj)) return false;
-                if (ReferenceEquals(this, obj)) return true;
-                if (obj.GetType() != GetType()) return false;
-                return Equals((PropertySlim) obj);
-            }
-
-            public override int GetHashCode()
-            {
-                unchecked
-                {
-                    return (PropertyEditorAlias.GetHashCode() * 397) ^ (Value != null ? Value.GetHashCode() : 0);
-                }
-            }
-        }
-
         #region IDeepCloneable
 
         /// <inheritdoc />
         public object DeepClone()
         {
-            throw new WontImplementException();
+            throw new InvalidOperationException("This method won't be implemented.");
         }
 
         #endregion
@@ -174,47 +128,47 @@ namespace Umbraco.Core.Models.Entities
 
         public bool IsDirty()
         {
-            throw new WontImplementException();
+            throw new InvalidOperationException("This method won't be implemented.");
         }
 
         public bool IsPropertyDirty(string propName)
         {
-            throw new WontImplementException();
+            throw new InvalidOperationException("This method won't be implemented.");
         }
 
         public IEnumerable<string> GetDirtyProperties()
         {
-            throw new WontImplementException();
+            throw new InvalidOperationException("This method won't be implemented.");
         }
 
         public void ResetDirtyProperties()
         {
-            throw new WontImplementException();
+            throw new InvalidOperationException("This method won't be implemented.");
         }
 
         public bool WasDirty()
         {
-            throw new WontImplementException();
+            throw new InvalidOperationException("This method won't be implemented.");
         }
 
         public bool WasPropertyDirty(string propertyName)
         {
-            throw new WontImplementException();
+            throw new InvalidOperationException("This method won't be implemented.");
         }
 
         public void ResetWereDirtyProperties()
         {
-            throw new WontImplementException();
+            throw new InvalidOperationException("This method won't be implemented.");
         }
 
         public void ResetDirtyProperties(bool rememberDirty)
         {
-            throw new WontImplementException();
+            throw new InvalidOperationException("This method won't be implemented.");
         }
 
         public IEnumerable<string> GetWereDirtyProperties()
         {
-            throw new WontImplementException();
+            throw new InvalidOperationException("This method won't be implemented.");
         }
 
         #endregion

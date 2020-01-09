@@ -204,14 +204,15 @@ namespace Umbraco.Web.Compose
             private void SendNotification(IUser sender, IEnumerable<IContent> entities, IAction action, Uri siteUri)
             {
                 if (sender == null) throw new ArgumentNullException(nameof(sender));
-                if (siteUri == null) throw new ArgumentNullException(nameof(siteUri));
+                if (siteUri == null)
+                {
+                    _logger.Warn(typeof(Notifier), "Notifications can not be sent, no site url is set (might be during boot process?)");
+                    return;
+                }
 
                 //group by the content type variation since the emails will be different
                 foreach(var contentVariantGroup in entities.GroupBy(x => x.ContentType.Variations))
                 {
-                    if (contentVariantGroup.Key == ContentVariation.CultureAndSegment || contentVariantGroup.Key == ContentVariation.Segment)
-                        throw new NotSupportedException("Segments are not yet supported in Umbraco");
-
                     _notificationService.SendNotifications(
                         sender,
                         contentVariantGroup,
