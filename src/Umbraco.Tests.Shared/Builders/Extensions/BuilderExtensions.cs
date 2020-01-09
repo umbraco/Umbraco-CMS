@@ -1,6 +1,6 @@
 using System;
 
-namespace Umbraco.Tests.Shared.Builders.Extensions
+namespace Umbraco.Tests.Shared.Builders
 {
     public static class BuilderExtensions
     {

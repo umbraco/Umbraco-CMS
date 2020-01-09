@@ -2,7 +2,6 @@
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Shared.Builders;
-using Umbraco.Tests.Shared.Builders.Extensions;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Models
 {
