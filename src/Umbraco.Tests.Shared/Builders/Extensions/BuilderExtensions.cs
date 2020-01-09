@@ -1,4 +1,5 @@
 using System;
+using Umbraco.Tests.Shared.Builders.Markers;
 
 namespace Umbraco.Tests.Shared.Builders.Extensions
 {
@@ -22,6 +23,20 @@ namespace Umbraco.Tests.Shared.Builders.Extensions
             where T : IWithUpdateDateBuilder
         {
             builder.UpdateDate = updateDate;
+            return builder;
+        }
+
+        public static T WithAlias<T>(this T builder, string alias)
+            where T : IWithAliasBuilder
+        {
+            builder.Alias = alias;
+            return builder;
+        }
+
+        public static T WithName<T>(this T builder, string name)
+            where T : IWithNameBuilder
+        {
+            builder.Name = name;
             return builder;
         }
     }

@@ -1,6 +1,6 @@
 using System;
 
-namespace Umbraco.Tests.Shared.Builders
+namespace Umbraco.Tests.Shared.Builders.Markers
 {
     public interface IWithUpdateDateBuilder
     {
