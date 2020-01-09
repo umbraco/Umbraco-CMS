@@ -18,6 +18,16 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Umbraco.Abstractions\Umbraco.Abstractions.csproj" />
+      <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Faker.Net" Version="1.1.1" />
+      <PackageReference Include="Moq" Version="4.13.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Fakers" />
     </ItemGroup>
 
 </Project>
