@@ -252,7 +252,7 @@ input[type="color"],
     outline: 0;
 
     .tabbing-active & {
-        outline: 2px solid @inputBorderTabFocus;
+        outline: 2px solid @ui-outline;
     }
   }
 }
@@ -297,11 +297,11 @@ select[size] {
 }
 
 // Focus for select, file, radio, and checkbox
-select:focus,
-input[type="file"]:focus,
-input[type="radio"]:focus,
-input[type="checkbox"]:focus {
-  .tab-focus();
+select,
+input[type="file"],
+input[type="radio"],
+input[type="checkbox"] {
+  .umb-outline();
 }
 
 
@@ -528,7 +528,8 @@ input[type="checkbox"][readonly] {
 .help-inline {
   display: inline-block;
   vertical-align: middle;
-  padding-left: 5px;
+  padding-top: 4px;
+  padding-left: 2px;
 }
 
 div.help {

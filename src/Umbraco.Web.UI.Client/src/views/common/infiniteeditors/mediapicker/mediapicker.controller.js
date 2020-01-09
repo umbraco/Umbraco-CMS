@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Editors.MediaPickerController",
-        function ($scope, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService) {
+        function ($scope, $timeout, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService) {
 
             var vm = this;
             
@@ -130,7 +130,7 @@ angular.module("umbraco")
                     
                     // ID of a UDI or legacy int ID still could be null/undefinied here
                     // As user may dragged in an image that has not been saved to media section yet
-                    if(id){
+                    if (id) {
                         entityResource.getById(id, "Media")
                         .then(function (node) {
                             $scope.target = node;
@@ -142,8 +142,7 @@ angular.module("umbraco")
                                 openDetailsDialog();
                             }
                         }, gotoStartNode);
-                    }
-                    else {
+                    } else {
                         // No ID set - then this is going to be a tmpimg that has not been uploaded
                         // User editing this will want to be changing the ALT text
                         openDetailsDialog();
@@ -293,13 +292,20 @@ angular.module("umbraco")
 
             function onUploadComplete(files) {
                 gotoFolder($scope.currentFolder).then(function () {
-                    if (files.length === 1 && $scope.model.selection.length === 0) {
-                        var image = $scope.images[$scope.images.length - 1];
-                        $scope.target = image;
-                        $scope.target.url = mediaHelper.resolveFile(image);
-                        selectMedia(image);
-                    }
-                })
+                    $timeout(function () {
+                        if ($scope.multiPicker) {
+                            var images = _.rest($scope.images, $scope.images.length - files.length);
+                            _.each(images, function(image) {
+                                selectMedia(image);
+                            });
+                        } else {
+                            var image = $scope.images[$scope.images.length - 1];
+                            $scope.target = image;
+                            $scope.target.url = mediaHelper.resolveFile(image);
+                            selectMedia(image);
+                        }
+                    });
+                });
             }
 
             function onFilesQueue() {

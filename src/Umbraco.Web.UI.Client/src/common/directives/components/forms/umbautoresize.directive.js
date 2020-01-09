@@ -138,7 +138,11 @@ angular.module("umbraco.directives")
             var unbindModelWatcher = scope.$watch(function() {
                return ngModelController.$modelValue;
             }, function(newValue) {
-               update(true);
+                $timeout(
+                    function() {
+                        update(true);
+                    }
+                );
             });
 
             scope.$on('$destroy', function() {
