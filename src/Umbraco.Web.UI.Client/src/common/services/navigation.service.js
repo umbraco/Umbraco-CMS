@@ -338,6 +338,22 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
             });
         },
 
+        /**     
+         * @ngdoc method
+         * @name umbraco.services.navigationService#hasTree
+         * @methodOf umbraco.services.navigationService
+         *
+         * @description
+         * Checks if a tree with the given alias exists.
+         * 
+         * @param {String} treeAlias the tree alias to check
+         */
+        hasTree: function (treeAlias) {
+            return navReadyPromise.promise.then(function () {
+                return mainTreeApi.hasTree(treeAlias);
+            });
+        },
+
         /**
             Internal method that should ONLY be used by the legacy API wrapper, the legacy API used to
             have to set an active tree and then sync, the new API does this in one method by using syncTree
@@ -464,6 +480,8 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
             if (!section) {
                 throw "section cannot be null";
             }
+
+            appState.setMenuState("currentNode", node);
 
             if (action.metaData && action.metaData["actionRoute"] && angular.isString(action.metaData["actionRoute"])) {
                 //first check if the menu item simply navigates to a route

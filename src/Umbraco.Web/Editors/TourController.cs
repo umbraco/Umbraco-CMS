@@ -51,29 +51,35 @@ namespace Umbraco.Web.Editors
             }
 
             //collect all tour files in packages
-            foreach (var plugin in Directory.EnumerateDirectories(IOHelper.MapPath(SystemDirectories.AppPlugins)))
+            var appPlugins = IOHelper.MapPath(SystemDirectories.AppPlugins);
+            if (Directory.Exists(appPlugins))
             {
-                var pluginName = Path.GetFileName(plugin.TrimEnd('\\'));
-                var pluginFilters = _filters.Where(x => x.PluginName != null && x.PluginName.IsMatch(pluginName)).ToList();
-
-                //If there is any filter applied to match the plugin only (no file or tour alias) then ignore the plugin entirely
-                var isPluginFiltered = pluginFilters.Any(x => x.TourFileName == null && x.TourAlias == null);
-                if (isPluginFiltered) continue;
-
-                //combine matched package filters with filters not specific to a package
-                var combinedFilters = nonPluginFilters.Concat(pluginFilters).ToList();
-
-                foreach (var backofficeDir in Directory.EnumerateDirectories(plugin, "backoffice"))
+                foreach (var plugin in Directory.EnumerateDirectories(appPlugins))
                 {
-                    foreach (var tourDir in Directory.EnumerateDirectories(backofficeDir, "tours"))
+                    var pluginName = Path.GetFileName(plugin.TrimEnd('\\'));
+                    var pluginFilters = _filters.Where(x => x.PluginName != null && x.PluginName.IsMatch(pluginName))
+                        .ToList();
+
+                    //If there is any filter applied to match the plugin only (no file or tour alias) then ignore the plugin entirely
+                    var isPluginFiltered = pluginFilters.Any(x => x.TourFileName == null && x.TourAlias == null);
+                    if (isPluginFiltered) continue;
+
+                    //combine matched package filters with filters not specific to a package
+                    var combinedFilters = nonPluginFilters.Concat(pluginFilters).ToList();
+
+                    foreach (var backofficeDir in Directory.EnumerateDirectories(plugin, "backoffice"))
                     {
-                        foreach (var tourFile in Directory.EnumerateFiles(tourDir, "*.json"))
+                        foreach (var tourDir in Directory.EnumerateDirectories(backofficeDir, "tours"))
                         {
-                            TryParseTourFile(tourFile, result, combinedFilters, aliasOnlyFilters, pluginName);
+                            foreach (var tourFile in Directory.EnumerateFiles(tourDir, "*.json"))
+                            {
+                                TryParseTourFile(tourFile, result, combinedFilters, aliasOnlyFilters, pluginName);
+                            }
                         }
                     }
                 }
             }
+
             //Get all allowed sections for the current user
             var allowedSections = user.AllowedSections.ToList();
 

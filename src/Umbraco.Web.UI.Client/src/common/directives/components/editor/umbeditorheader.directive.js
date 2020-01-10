@@ -199,19 +199,55 @@ Use this directive to construct a header inside the main editor window.
 @param {boolean=} hideAlias Set to <code>true</code> to hide alias.
 @param {string=} description Add a description to the content.
 @param {boolean=} hideDescription Set to <code>true</code> to hide description.
-
+@param {boolean=} setpagetitle If true the page title will be set to reflect the type of data the header is working with 
+@param {string=} editorfor The localization to use to aid accessibility on the edit and create screen
 **/
 
 (function () {
     'use strict';
 
-    function EditorHeaderDirective(editorService) {
+    function EditorHeaderDirective(editorService, localizationService, editorState) {
+        
+        function link(scope, $injector) {
 
-        function link(scope) {
             scope.vm = {};
             scope.vm.dropdownOpen = false;
             scope.vm.currentVariant = "";
+            scope.loading = true;
+            scope.accessibility = {};
+            scope.accessibility.a11yMessage = "";
+            scope.accessibility.a11yName = "";
+            scope.accessibility.a11yMessageVisible = false;
+            scope.accessibility.a11yNameVisible = false;
 
+            // need to call localizationService service outside of routine to set a11y due to promise requirements
+            if (editorState.current) {
+                //to do make work for user create/edit
+                // to do make it work for user group create/ edit
+                // to do make it work for language edit/create
+                // to do make it work for log viewer
+                scope.isNew = editorState.current.id === 0 ||
+                    editorState.current.id === "0" ||
+                    editorState.current.id === -1 ||
+                    editorState.current.id === 0 ||
+                    editorState.current.id === "-1";
+
+                var localizeVars = [
+                    scope.isNew ? "placeholders_a11yCreateItem" : "placeholders_a11yEdit",
+                    "placeholders_a11yName",
+                    scope.isNew ? "general_new" : "general_edit"
+                ];
+
+                if (scope.editorfor) {
+                    localizeVars.push(scope.editorfor);
+                }
+                localizationService.localizeMany(localizeVars).then(function(data) {
+                    setAccessibilityForEditor(data);
+                    scope.loading = false;
+                });
+            } else {
+                scope.loading = false;
+            }
             scope.goBack = function () {
                 if (scope.onBack) {
                     scope.onBack();
@@ -247,6 +283,57 @@ Use this directive to construct a header inside the main editor window.
                 editorService.iconPicker(iconPicker);
             };
 
+            function setAccessibilityForEditor(data) {
+                
+               if (editorState.current) {
+                   if (scope.nameLocked) {
+                       scope.accessibility.a11yName = scope.name;
+                       SetPageTitle(scope.name);
+                   } else {
+                      
+                       scope.accessibility.a11yMessage = data[0];
+                       scope.accessibility.a11yName = data[1];
+                           var title = data[2] + ":";
+                           if (!scope.isNew) {
+                               scope.accessibility.a11yMessage += " " + scope.name;
+                               title += " " + scope.name;
+                           } else {
+                               var name = "";
+                               if (editorState.current.contentTypeName) {
+                                   name = editorState.current.contentTypeName;
+                               } else if (scope.editorfor) {
+                                   name = data[3];
+                               }
+                               if (name !== "") {
+                                   scope.accessibility.a11yMessage += " " + name;
+                                   scope.accessibility.a11yName = name + " " + scope.accessibility.a11yName;
+                                   title += " " + name;
+                               }
+                           }
+                           if (title !== data[2] + ":") {
+                               SetPageTitle(title);
+                           }
+                     
+                   }
+                   scope.accessibility.a11yMessageVisible = !isEmptyOrSpaces(scope.accessibility.a11yMessage);
+                   scope.accessibility.a11yNameVisible = !isEmptyOrSpaces(scope.accessibility.a11yName);
+                }
+               
+            }
+
+           function isEmptyOrSpaces(str) {
+               return str === null || str===undefined || str.trim ==='';
+            }
+
+            function SetPageTitle(title) {
+                var setTitle = false;
+                if (scope.setpagetitle !== undefined) {
+                    setTitle = scope.setpagetitle;
+                }
+                if (setTitle) {
+                    scope.$emit("$changeTitle", title);
+                }
+            }
         }
 
         var directive = {
@@ -271,7 +358,9 @@ Use this directive to construct a header inside the main editor window.
                 onSelectNavigationItem: "&?",
                 key: "=",
                 onBack: "&?",
-                showBackButton: "<?"
+                showBackButton: "<?",
+                editorfor: "=",
+                setpagetitle:"="
             },
             link: link
         };
