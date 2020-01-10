@@ -1202,12 +1202,6 @@ namespace Umbraco.Web
             if (umbracoContext.UrlProvider == null)
                 throw new InvalidOperationException("Cannot resolve a Url when Current.UmbracoContext.UrlProvider is null.");
 
-            // if it is the default mode, get the one that is configured
-            if (mode == UrlMode.Default)
-            {
-                mode = umbracoContext.UrlProvider.Mode;
-            }
-
             switch (content.ContentType.ItemType)
             {
                 case PublishedItemType.Content:
