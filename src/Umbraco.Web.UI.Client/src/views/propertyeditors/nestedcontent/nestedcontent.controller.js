@@ -55,8 +55,8 @@
         });
 
         function setCurrentNode(node) {
-            vm.currentNode = node;
             updateModel();
+            vm.currentNode = node;
         }
         
         var copyAllEntries = function() {
@@ -134,7 +134,7 @@
         };
 
         vm.openNodeTypePicker = function ($event) {
-            if (vm.nodes.length >= vm.maxItems) {
+            if (vm.overlayMenu || vm.nodes.length >= vm.maxItems) {
                 return;
             }
 
