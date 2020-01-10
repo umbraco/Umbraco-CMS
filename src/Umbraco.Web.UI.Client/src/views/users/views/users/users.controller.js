@@ -14,7 +14,7 @@
         vm.userStates = [];
         vm.selection = [];
         vm.newUser = {};
-        vm.usersOptions = {};
+        vm.usersOptions = {filter:null};
         vm.userSortData = [
             { label: "Name (A-Z)", key: "Name", direction: "Ascending" },
             { label: "Name (Z-A)", key: "Name", direction: "Descending" },
