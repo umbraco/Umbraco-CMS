@@ -265,6 +265,9 @@
         };
 
         vm.getName = function (idx) {
+            if (!model.value || !model.value.length) {
+                return "";
+            }
 
             var name = "";
 
@@ -314,6 +317,10 @@
         };
 
         vm.getIcon = function (idx) {
+            if (!model.value || !model.value.length) {
+                return "";
+            }
+
             var scaffold = getScaffold(model.value[idx].ncContentTypeAlias);
             return scaffold && scaffold.icon ? iconHelper.convertFromLegacyIcon(scaffold.icon) : "icon-folder";
         }
