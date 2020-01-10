@@ -292,14 +292,7 @@ Use this directive to generate a thumbnail grid of media items.
                     scope.onDetailsHover(item, $event, hover);
                 }
             };
-
-            scope.clickEdit = function(item, $event) {
-                if (scope.onClickEdit) {
-                    scope.onClickEdit({"item": item})
-                    $event.stopPropagation();
-                }
-            };
-
+            
             var unbindItemsWatcher = scope.$watch('items', function(newValue, oldValue) {
                 if (angular.isArray(newValue)) {
                     activate();
@@ -321,8 +314,8 @@ Use this directive to generate a thumbnail grid of media items.
                 onDetailsHover: "=",
                 onClick: '=',
                 onClickName: "=",
-                onClickEdit: "&?",
-                allowOnClickEdit: "@?",
+                allowOpenFolder: "=",
+                allowOpenFile: "=",
                 filterBy: "=",
                 itemMaxWidth: "@",
                 itemMaxHeight: "@",
