@@ -8,27 +8,27 @@
     width: @drawerWidth;
     background: @brownGrayLight;
     box-shadow: inset 5px 0 20px rgba(0, 0, 0, .3);
+}
 
-    &-view {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        overflow: hidden;
-    }
+.umb-drawer-view {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
 
-    &-content {
-        flex: 1 1 auto;
-        overflow-y: auto;
-        overflow-x: hidden;
-        padding: 0 30px 20px 30px;
-    }
+.umb-drawer-content {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0 30px 20px 30px;
+}
 
-    &-footer {
-        flex-grow: 0;
-        flex-shrink: 0;
-        flex-basis: 31px;
-        padding: 15px 30px;
-    }
+.umb-drawer-footer {
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 31px;
+    padding: 15px 30px;
 }
 
 /* Header */
@@ -141,7 +141,6 @@
 
 /* the outer container for each help type - tours, video etc */
 .umb-help-section {
-
     + .umb-help-section {
         margin-top: 20px;
     }
@@ -164,69 +163,69 @@
     [data-element*="help-tours"] & {
         margin-bottom: 5px;
     }
+}
 
-    &-item {
-        margin-bottom: 1px;
-        border-radius: 0;
-        border-bottom: 1px solid @gray-9;
-        padding: 10px;
+.umb-help-list-item {
+    margin-bottom: 1px;
+    border-radius: 0;
+    border-bottom: 1px solid @gray-9;
+    padding: 10px;
 
-        &:hover .umb-help-list-item__group-title {
+    &:hover .umb-help-list-item__group-title {
+        text-decoration: underline;
+    }
+
+    &:hover,
+    &:focus,
+    &:active,
+    > a:hover,
+    > a:focus,
+    > a:active {
+        text-decoration: none;
+
+        .umb-help-list-item__title {
             text-decoration: underline;
         }
+    }
 
-        &:hover,
-        &:focus,
-        &:active,
-        > a:hover,
-        > a:focus,
-        > a:active {
-            text-decoration: none;
+    &:last-child {
+        border-bottom: none;
+    }
 
-            .umb-help-list-item__title {
-                text-decoration: underline;
-            }
-        }
+    &__group-title i {
+        margin-right: 2px;
+        text-decoration: none;
+    }
 
-        &:last-child {
-            border-bottom: none;
-        }
+    &__content {
+        display: flex;
+        align-items: center;
+        padding: 10px 20px 10px 10px;
+        text-decoration: none;
+    }
 
-        &__group-title i {
-            margin-right: 2px;
-            text-decoration: none;
-        }
+    &__title {
+        font-size: 14px;
+        display: block;
+    }
 
-        &__content {
-            display: flex;
-            align-items: center;
-            padding: 10px 20px 10px 10px;
-            text-decoration: none;
-        }
+    &__description {
+        margin-top: 5px;
+        display: block;
+        font-size: 14px;
+    }
 
-        &__title {
-            font-size: 14px;
-            display: block;
-        }
+    &__icon {
+        margin-right: 8px;
+        color: @gray-4;
+        font-size: 18px;
+        float: left;
+    }
 
-        &__description {
-            margin-top: 5px;
-            display: block;
-            font-size: 14px;
-        }
-
-        &__icon {
-            margin-right: 8px;
-            color: @gray-4;
-            font-size: 18px;
-            float: left;
-        }
-
-        &__open-icon {
-            font-size: 14px;
-            color: @gray-6;
-            margin-left: auto;
-        }
+    &__open-icon {
+        font-size: 14px;
+        color: @gray-6;
+        margin-left: auto;
     }
 }
 
