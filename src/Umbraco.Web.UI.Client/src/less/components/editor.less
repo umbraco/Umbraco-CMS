@@ -73,6 +73,11 @@
     height: @editorHeaderHeight;
 }
 
+.umb-editor-header .umb-button__button[disabled] {
+    // do not dim down the background color of disabled buttons in the header
+    background-color: unset;
+}
+
 .umb-editor-header__back {
     background: transparent;
     border: 0;
