@@ -8,12 +8,34 @@
 
         <umb-drawer-content>
 
-        <!-- Tours -->
-        <div class="umb-help-section" ng-if="vm.tours.length > 0" data-element="help-tours">
+            <!-- Doctype Tours -->
+            <div class="umb-help-section" ng-if="vm.showDocTypeTour" data-element="doctype-tour">
+                <h5>Need help editing current item '{{vm.nodeName}}' ?</h5>
 
-            <h5 class="umb-help-section__title">Tours</h5>
+                <div class="umb-help-list">
 
-            <div ng-repeat="tourGroup in vm.tours | orderBy:'groupOrder'">
+
+                    <div ng-repeat="tour in vm.docTypeTours | orderBy:'groupOrder'">
+                        <div data-element="tour-{{tour.alias}}" class="umb-help-list-item">
+                            <div class="umb-help-list-item__content justify-between">
+                                <div class="flex items-center">                                   
+                                    <span class="umb-help-list-item__title">{{ tour.name }}</span>
+                                </div>
+                                <div>
+                                    <umb-button  button-style="primary" size="xxs" type="button" label="Start" action="vm.startTour(tour)"></umb-button>                                   
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>           
+            </div>
+
+            <!-- Tours -->
+            <div class="umb-help-section" ng-if="vm.tours.length > 0" data-element="help-tours">
+
+                <h5 class="umb-help-section__title">Tours</h5>
+
+                <div ng-repeat="tourGroup in vm.tours | orderBy:'groupOrder'">
 
                     <div class="umb-help-list">
 
@@ -51,33 +73,33 @@
                     </div>
                 </div>
 
-        </div>
+            </div>
 
-        <!-- Show in custom help dashboard -->
-        <div class="umb-help-section" data-element="help-custom-dashboard" ng-if="vm.customDashboard.length > 0">
-            <div ng-repeat="dashboard in vm.customDashboard">
-                <h5 ng-show="dashboard.label">{{dashboard.label}}</h5>
-                <div ng-repeat="property in dashboard.properties">
-                    <div>
-                        <div ng-include="property.view"></div>
+            <!-- Show in custom help dashboard -->
+            <div class="umb-help-section" data-element="help-custom-dashboard" ng-if="vm.customDashboard.length > 0">
+                <div ng-repeat="dashboard in vm.customDashboard">
+                    <h5 ng-show="dashboard.label">{{dashboard.label}}</h5>
+                    <div ng-repeat="property in dashboard.properties">
+                        <div>
+                            <div ng-include="property.view"></div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!--  Help Content -->
-        <div class="umb-help-section" data-element="help-articles" ng-if="vm.topics.length > 0">
-            <h5 class="umb-help-section__title">Articles</h5>
-            <ul class="umb-help-list">
-                <li class="umb-help-list-item" ng-repeat="topic in vm.topics track by $index">
-                <a class="umb-help-list-item__content" data-element="help-article-{{topic.name}}" target="_blank" ng-href="{{topic.url}}?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv">
-                        <span>
-                            <span class="umb-help-list-item__title">
-                                <span class="bold">{{topic.name}}</span>
-                                <span class="umb-help-list-item__open-icon icon-out"></span>
-                            </span>
-                            <span class="umb-help-list-item__description">{{topic.description}}</span>
-                        </span>
+            <!--  Help Content -->
+            <div class="umb-help-section" data-element="help-articles" ng-if="vm.topics.length > 0">
+                <h5 class="umb-help-section__title">Articles</h5>
+                <ul class="umb-help-list">
+                    <li class="umb-help-list-item" ng-repeat="topic in vm.topics track by $index">
+                        <a class="umb-help-list-item__content" data-element="help-article-{{topic.name}}" target="_blank" ng-href="{{topic.url}}?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv">
+                            <span>
+                                <span class="umb-help-list-item__title">
+                                    <span class="bold">{{topic.name}}</span>
+                                    <span class="umb-help-list-item__open-icon icon-out"></span>
+                                </span>
+                                <span class="umb-help-list-item__description">{{topic.description}}</span>
+                            </span>                            
                     </a>
                 </li>
             </ul>

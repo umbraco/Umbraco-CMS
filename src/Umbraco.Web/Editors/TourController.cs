@@ -110,6 +110,39 @@ namespace Umbraco.Web.Editors
             return result.Except(toursToBeRemoved).OrderBy(x => x.FileName, StringComparer.InvariantCultureIgnoreCase);
         }
 
+        /// <summary>
+        /// Gets a tours for a specific doctype
+        /// </summary>
+        /// <param name="doctypeAlias">The documenttype alias</param>
+        /// <returns>A <see cref="BackOfficeTour"/></returns>
+        public IEnumerable<BackOfficeTour> GetToursForDoctype(string doctypeAlias)
+        {
+            var tourFiles = this.GetTours();
+
+            var doctypeAliasWithCompositions = new List<string>
+                                                   {
+                                                       doctypeAlias
+                                                   };
+
+            var contentType = this.Services.ContentTypeService.Get(doctypeAlias);
+
+            if (contentType != null)
+            {
+                doctypeAliasWithCompositions.AddRange(contentType.CompositionAliases());
+            }
+
+            return tourFiles.SelectMany(x => x.Tours)
+                .Where(x =>
+                    {
+                        if (string.IsNullOrEmpty(x.ContentType))
+                        {
+                            return false;
+                        }
+                        var contentTypes = x.ContentType.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(ct => ct.Trim());
+                        return contentTypes.Intersect(doctypeAliasWithCompositions).Any();
+                    });
+        }
+
         private void TryParseTourFile(string tourFile,
             ICollection<BackOfficeTourFile> result,
             List<BackOfficeTourFilter> filters,
