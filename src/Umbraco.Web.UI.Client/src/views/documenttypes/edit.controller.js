@@ -48,7 +48,7 @@
             "shortcuts_navigateSections",
             "shortcuts_addGroup",
             "shortcuts_addProperty",
-            "shortcuts_addEditor",
+            "defaultdialogs_selectEditor",
             "shortcuts_editDataType",
             "shortcuts_toggleListView",
             "shortcuts_toggleAllowAsRoot",

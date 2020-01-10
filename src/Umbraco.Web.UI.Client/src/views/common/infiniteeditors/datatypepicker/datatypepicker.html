@@ -34,8 +34,8 @@
 
                     <div ng-if="vm.loading === false && vm.showDataTypes === true">
                         <div ng-repeat="(key,value) in vm.dataTypes">
-                            <h5>{{key}}</h5>
-                            <ul class="umb-card-grid -four-in-row">
+                            <h5>{{key | umbCmsTitleCase}}</h5>
+                            <ul class="umb-card-grid -six-in-row">
                                 <li ng-repeat="dataType in value | orderBy:'name'"
                                     data-element="datatype-{{dataType.name}}"
                                     ng-click="vm.pickType(dataType)">
@@ -55,8 +55,8 @@
                         <h5 class="-border-bottom -black"><localize key="contentTypeEditor_searchResultSettings"></localize></h5>
                         <div ng-repeat="result in vm.searchResult.configs">
                             <div ng-if="result.entries.length > 0">
-                                <h5>{{result.group}}</h5>
-                                <ul class="umb-card-grid -four-in-row">
+                                <h5>{{result.group | umbCmsTitleCase}}</h5>
+                                <ul class="umb-card-grid -six-in-row">
                                     <li ng-repeat="dataType in result.entries | orderBy:'name'"
                                         ng-mouseover="vm.showDetailsOverlay(dataType)"
                                         ng-click="vm.pickDataType(dataType)">
@@ -76,8 +76,8 @@
                         <h5 class="-border-bottom -black"><localize key="contentTypeEditor_searchResultEditors"></localize></h5>
                         <div ng-repeat="result in vm.searchResult.dataTypes">
                             <div ng-if="result.entries.length > 0">
-                                <h5>{{result.group}}</h5>
-                                <ul class="umb-card-grid -four-in-row">
+                                <h5>{{result.group | umbCmsTitleCase}}</h5>
+                                <ul class="umb-card-grid -six-in-row">
                                     <li ng-repeat="dataType in result.entries | orderBy:'name'"
                                         ng-click="vm.pickEditor(dataType)">
                                         <a class="umb-card-grid-item" href="" title="{{ dataType.name }}">

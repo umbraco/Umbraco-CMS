@@ -19,7 +19,7 @@
 
                     <div ng-if="!vm.loading">
 
-                        <ul class="umb-card-grid -four-in-row">
+                        <ul class="umb-card-grid -three-in-row">
                             <li ng-repeat="dataTypeConfig in vm.configs | orderBy:'name'"
                                 data-element="datatypeconfig-{{dataTypeConfig.name}}"
                                 ng-click="vm.pickConfig(dataTypeConfig)">
@@ -34,7 +34,7 @@
                                 </a>
                             </li>
                         </ul>
-                        <ul class="umb-card-grid -four-in-row">
+                        <ul class="umb-card-grid -three-in-row">
                             <li ng-click="vm.newConfig()">
                                 <a class="umb-card-grid-item-slot" href="" title="Create a new configuration of {{ model.dataType.name }}">
                                     <span>

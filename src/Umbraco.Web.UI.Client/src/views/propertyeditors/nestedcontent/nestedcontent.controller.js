@@ -207,7 +207,8 @@
                 });
             });
 
-            vm.overlayMenu.title = vm.overlayMenu.pasteItems.length > 0 ? labels.grid_addElement : labels.content_createEmpty;
+            vm.overlayMenu.title = labels.grid_addElement;
+            vm.overlayMenu.hideHeader = vm.overlayMenu.pasteItems.length > 0;
 
             vm.overlayMenu.clickClearPaste = function ($event) {
                 $event.stopPropagation();
@@ -215,6 +216,7 @@
                 clipboardService.clearEntriesOfType("elementType", contentTypeAliases);
                 clipboardService.clearEntriesOfType("elementTypeArray", contentTypeAliases);
                 vm.overlayMenu.pasteItems = [];// This dialog is not connected via the clipboardService events, so we need to update manually.
+                vm.overlayMenu.hideHeader = false;
             };
 
             if (vm.overlayMenu.availableItems.length === 1 && vm.overlayMenu.pasteItems.length === 0) {

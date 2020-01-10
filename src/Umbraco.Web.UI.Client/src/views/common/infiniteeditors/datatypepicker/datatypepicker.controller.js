@@ -22,6 +22,7 @@
         vm.searchResult = null;
         
         vm.pickType = pickType;
+        vm.pickEditor = pickEditor;
         vm.close = close;
         vm.searchTermChanged = searchTermChanged;
 
@@ -106,7 +107,7 @@
         
         function pickType(dataType) {
             
-            var dataTypeSettings = {
+            var dataTypeConfigurationPicker = {
                 dataType: dataType,
                 property: $scope.model.property,
                 contentTypeName: $scope.model.contentTypeName,
@@ -115,6 +116,29 @@
                 submit: function(model) {
                     editorService.close();
                     $scope.model.submit(model);
+                },
+                close: function() {
+                    editorService.close();
+                }
+            };
+
+            editorService.open(dataTypeConfigurationPicker);
+
+        }
+
+        function pickEditor(propertyEditor) {
+
+            var dataTypeSettings = {
+                propertyEditor: propertyEditor,
+                property: $scope.model.property,
+                contentTypeName: $scope.model.contentTypeName,
+                create: true,
+                view: "views/common/infiniteeditors/datatypesettings/datatypesettings.html",
+                submit: function(model) {
+                    contentTypeResource.getPropertyTypeScaffold(model.dataType.id).then(function(propertyType) {
+                        $scope.model.submit(model);
+                        editorService.close();
+                    });
                 },
                 close: function() {
                     editorService.close();

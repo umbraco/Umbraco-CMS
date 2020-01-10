@@ -112,7 +112,7 @@
                 property: $scope.model.property,
                 contentTypeName: $scope.model.contentTypeName,
                 view: "views/common/infiniteeditors/datatypepicker/datatypepicker.html",
-                size: "small",
+                size: "medium",
                 submit: function(model) {
 
                     $scope.model.updateSameDataTypes = model.updateSameDataTypes;

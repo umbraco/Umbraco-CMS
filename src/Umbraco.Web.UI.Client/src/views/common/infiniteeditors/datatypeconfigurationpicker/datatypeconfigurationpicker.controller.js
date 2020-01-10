@@ -40,13 +40,6 @@
 
             dataTypeResource.getGroupedDataTypes().then(function(configs) {
                 
-                console.log("configs:");
-                console.log(configs);
-                
-                
-                console.log("$scope.model")
-                console.log($scope.model)
-                
                 var filteredConfigs = [];
                 
                 _.each(configs, function(configGroup) {
@@ -64,10 +57,10 @@
 
         }
         
-        function newConfig(propertyEditor) {
+        function newConfig() {
 
             var dataTypeSettings = {
-                propertyEditor: propertyEditor,
+                propertyEditor: $scope.model.dataType,
                 property: $scope.model.property,
                 contentTypeName: $scope.model.contentTypeName,
                 create: true,
@@ -89,7 +82,6 @@
 
         function pickConfig(selectedConfig) {
             selectedConfig.loading = true;
-            console.log("pickConfig:", selectedConfig)
             dataTypeResource.getById(selectedConfig.id).then(function(dataType) {
                 contentTypeResource.getPropertyTypeScaffold(dataType.id).then(function(propertyType) {
                     selectedConfig.loading = false;
@@ -108,8 +100,6 @@
             $scope.model.property.dataTypeName = dataType.name;
 
             $scope.model.updateSameDataTypes = isNew;
-            
-            console.log("model submit");
             
             $scope.model.submit($scope.model);
         }
