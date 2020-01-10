@@ -1,20 +1,18 @@
 <div class="umb-content-grid">
 
    <div
-      class="umb-content-grid__item"
+      class="umb-content-grid__item umb-outline umb-outline--surrounding"
       ng-repeat="item in content"
       ng-class="{'-selected': item.selected}"
       ng-click="clickItem(item, $event, $index)">
 
-      <!--<i ng-if="item.selected" class="icon-check umb-content-grid__checkmark"></i>-->
-
       <div class="umb-content-grid__content">
 
-        <a class="umb-content-grid__item-name"
+        <a class="umb-content-grid__item-name umb-outline"
            ng-href="{{'#' + item.editPath}}"
            ng-click="clickItemName(item, $event, $index)"
            ng-class="{'-light': !item.published && item.updater != null}">
-            <i class="umb-content-grid__icon {{ item.icon }}"></i>
+            <i class="umb-content-grid__icon {{ item.icon }}" aria-hidden="true"></i>
             <span>{{ item.name }}</span>
         </a>
 

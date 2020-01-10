@@ -20,7 +20,9 @@ namespace Umbraco.Core.Models.PublishedContent
     {
         private ModelType(string contentTypeAlias)
         {
-            if (string.IsNullOrWhiteSpace(contentTypeAlias)) throw new ArgumentNullOrEmptyException(nameof(contentTypeAlias));
+            if (contentTypeAlias == null) throw new ArgumentNullException(nameof(contentTypeAlias));
+            if (string.IsNullOrWhiteSpace(contentTypeAlias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(contentTypeAlias));
+
             ContentTypeAlias = contentTypeAlias;
             Name = "{" + ContentTypeAlias + "}";
         }
@@ -75,7 +77,7 @@ namespace Umbraco.Core.Models.PublishedContent
                 return type;
             var def = type.GetGenericTypeDefinition();
             if (def == null)
-                throw new InvalidOperationException("panic");
+                throw new PanicException($"The type {type} has not generic type definition");
 
             var args = type.GetGenericArguments().Select(x => Map(x, modelTypes, true)).ToArray();
             return def.MakeGenericType(args);
@@ -114,7 +116,7 @@ namespace Umbraco.Core.Models.PublishedContent
                 return type.FullName;
             var def = type.GetGenericTypeDefinition();
             if (def == null)
-                throw new InvalidOperationException("panic");
+                throw new PanicException($"The type {type} has not generic type definition");
 
             var args = type.GetGenericArguments().Select(x => MapToName(x, map, true)).ToArray();
             var defFullName = def.FullName.Substring(0, def.FullName.IndexOf('`'));

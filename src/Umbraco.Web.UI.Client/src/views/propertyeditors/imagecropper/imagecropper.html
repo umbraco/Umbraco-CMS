@@ -5,6 +5,7 @@
         <umb-property-file-upload culture="{{model.culture}}"
                                   property-alias="{{model.alias}}"
                                   value="model.value.src"
+                                  required="model.validation.mandatory"
                                   on-files-selected="filesSelected(value, files)"
                                   on-files-changed="filesChanged(files)"
                                   on-init="fileUploaderInit(value, files)"
@@ -40,7 +41,8 @@
                                        on-value-changed="focalPointChanged(left, top)"
                                        on-image-loaded="imageLoaded(isCroppable, hasDimensions)">
                     </umb-image-gravity>
-                    <a href class="btn btn-link btn-crop-delete" ng-click="clear()"><i class="icon-delete red"></i> <localize key="content_uploadClear">Remove file</localize></a>
+                    <button class="btn btn-link btn-crop-delete" aria-hidden="true" ng-click="clear()"><i class="icon-delete red"></i> <localize key="content_uploadClear">Remove file</localize></button>
+                    <button class="sr-only" ng-click="vm.clear()"><localize key="content_uploadClearImageContext">Click here to remove the image from the media item</localize></button>
                 </div>
 
                 

@@ -6,22 +6,40 @@
  * @description
  * The controller for the content editor
  */
-function DataTypeEditController($scope, $routeParams, appState, navigationService, dataTypeResource, serverValidationManager, contentEditingHelper, formHelper, editorState, dataTypeHelper, eventsService) {
+function DataTypeEditController($scope, $routeParams, appState, navigationService, dataTypeResource, serverValidationManager, contentEditingHelper, formHelper, editorState, dataTypeHelper, eventsService, localizationService) {
+    
+    var evts = [];
+    var vm = this;
+
+    vm.header = {};
+    vm.header.editorfor = "visuallyHiddenTexts_newDataType";
+    vm.header.setPageTitle = true;
 
     //setup scope vars
-    $scope.page = {};
-    $scope.page.loading = false;
-    $scope.page.nameLocked = false;
-    $scope.page.menu = {};
-    $scope.page.menu.currentSection = appState.getSectionState("currentSection");
-    $scope.page.menu.currentNode = null;
-    var evts = [];
+    vm.page = {};
+    vm.page.loading = false;
+    vm.page.menu = {};
+    vm.page.menu.currentSection = appState.getSectionState("currentSection");
+    vm.page.menu.currentNode = null;
 
+    //set up the standard data type props
+    vm.properties = {
+        selectedEditor: {
+            alias: "selectedEditor",
+            description: "Select a property editor",
+            label: "Property editor"
+        }
+    };
+
+    //setup the pre-values as props
+    vm.preValues = [];
+    
+    
     //method used to configure the pre-values when we retrieve them from the server
     function createPreValueProps(preVals) {
-        $scope.preValues = [];
+        vm.preValues = [];
         for (var i = 0; i < preVals.length; i++) {
-            $scope.preValues.push({
+            vm.preValues.push({
                 hideLabel: preVals[i].hideLabel,
                 alias: preVals[i].key,
                 description: preVals[i].description,
@@ -32,67 +50,33 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
             });
         }
     }
-
-    //set up the standard data type props
-    $scope.properties = {
-        selectedEditor: {
-            alias: "selectedEditor",
-            description: "Select a property editor",
-            label: "Property editor"
-        },
-        selectedEditorId: {
-            alias: "selectedEditorId",
-            label: "Property editor alias"
+    
+    
+    function setHeaderNameState(content) {
+        if(content.isSystem == 1) {
+            vm.page.nameLocked = true;
         }
-    };
-
-    //setup the pre-values as props
-    $scope.preValues = [];
-
-    if ($routeParams.create) {
-        
-        $scope.page.loading = true;
-        $scope.showIdentifier = false;
-
-        //we are creating so get an empty data type item
-        dataTypeResource.getScaffold($routeParams.id)
-            .then(function(data) {
-
-                $scope.preValuesLoaded = true;
-                $scope.content = data;
-
-                setHeaderNameState($scope.content);
-
-                //set a shared state
-                editorState.set($scope.content);
-
-                $scope.page.loading = false;
-
-            });
     }
-    else {
-        loadDataType();
-    }
-
+    
+    
     function loadDataType() {
 
-        $scope.page.loading = true;
-
-        $scope.showIdentifier = true;
+        vm.page.loading = true;
+        vm.showIdentifier = true;
 
         //we are editing so get the content item from the server
         dataTypeResource.getById($routeParams.id)
             .then(function(data) {
 
-                $scope.preValuesLoaded = true;
-                $scope.content = data;
+                vm.preValuesLoaded = true;
+                vm.content = data;
 
-                createPreValueProps($scope.content.preValues);
+                createPreValueProps(vm.content.preValues);
 
-                setHeaderNameState($scope.content);
+                setHeaderNameState(vm.content);
 
                 //share state
-                editorState.set($scope.content);
+                editorState.set(vm.content);
 
                 //in one particular special case, after we've created a new item we redirect back to the edit
                 // route but there might be server validation errors in the collection which we need to display
@@ -101,49 +85,22 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
                 serverValidationManager.notifyAndClearAllSubscriptions();
 
                 navigationService.syncTree({ tree: "datatypes", path: data.path }).then(function (syncArgs) {
-                    $scope.page.menu.currentNode = syncArgs.node;
+                    vm.page.menu.currentNode = syncArgs.node;
                 });
 
-                $scope.page.loading = false;
+                vm.page.loading = false;
 
             });
-    }
-
-    $scope.$watch("content.selectedEditor", function (newVal, oldVal) {
-
-        //when the value changes, we need to dynamically load in the new editor
-        if (newVal && (newVal != oldVal && (oldVal || $routeParams.create))) {
-            //we are editing so get the content item from the server
-            var currDataTypeId = $routeParams.create ? undefined : $routeParams.id;
-            dataTypeResource.getPreValues(newVal, currDataTypeId)
-                .then(function (data) {
-                    $scope.preValuesLoaded = true;
-                    $scope.content.preValues = data;
-                    createPreValueProps($scope.content.preValues);
-
-                    setHeaderNameState($scope.content);
-
-                    //share state
-                    editorState.set($scope.content);
-                });
-        }
-    });
-
-    function setHeaderNameState(content) {
-
-      if(content.isSystem == 1) {
-         $scope.page.nameLocked = true;
-      }
 
     }
 
-    $scope.save = function() {
+    function saveDataType() {
 
         if (formHelper.submitForm({ scope: $scope })) {
 
-            $scope.page.saveButtonState = "busy";
+            vm.page.saveButtonState = "busy";
 
-            dataTypeResource.save($scope.content, $scope.preValues, $routeParams.create)
+            dataTypeResource.save(vm.content, vm.preValues, $routeParams.create)
                 .then(function(data) {
 
                     formHelper.resetForm({ scope: $scope });
@@ -156,18 +113,18 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
                         }
                     });
 
-                    setHeaderNameState($scope.content);
+                    setHeaderNameState(vm.content);
 
                     //share state
-                    editorState.set($scope.content);
+                    editorState.set(vm.content);
 
                     navigationService.syncTree({ tree: "datatypes", path: data.path, forceReload: true }).then(function (syncArgs) {
-                        $scope.page.menu.currentNode = syncArgs.node;
+                        vm.page.menu.currentNode = syncArgs.node;
                     });
 
-                    $scope.page.saveButtonState = "success";
+                    vm.page.saveButtonState = "success";
 
-                    dataTypeHelper.rebindChangedProperties($scope.content, data);
+                    dataTypeHelper.rebindChangedProperties(vm.content, data);
 
                 }, function(err) {
 
@@ -177,25 +134,101 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
                         err: err
                     });
 
-                    $scope.page.saveButtonState = "error";
+                    vm.page.saveButtonState = "error";
 
                     //share state
-                    editorState.set($scope.content);
+                    editorState.set(vm.content);
                 });
         }
 
     };
-
+    
+    vm.save = saveDataType;
+    
     evts.push(eventsService.on("app.refreshEditor", function(name, error) {
         loadDataType();
     }));
-
+    
     //ensure to unregister from all events!
     $scope.$on('$destroy', function () {
         for (var e in evts) {
             eventsService.unsubscribe(evts[e]);
         }
     });
+
+    function init() {
+        
+        $scope.$watch("vm.content.selectedEditor", function (newVal, oldVal) {
+            
+            //when the value changes, we need to dynamically load in the new editor
+            if (newVal && (newVal != oldVal && (oldVal || $routeParams.create))) {
+                //we are editing so get the content item from the server
+                var currDataTypeId = $routeParams.create ? undefined : $routeParams.id;
+                dataTypeResource.getPreValues(newVal, currDataTypeId)
+                    .then(function (data) {
+                        vm.preValuesLoaded = true;
+                        vm.content.preValues = data;
+                        createPreValueProps(vm.content.preValues);
+                        
+                        setHeaderNameState(vm.content);
+                        
+                        //share state
+                        editorState.set(vm.content);
+                    });
+            }
+        });
+        
+        if ($routeParams.create) {
+            
+            vm.page.loading = true;
+            vm.showIdentifier = false;
+            
+            //we are creating so get an empty data type item
+            dataTypeResource.getScaffold($routeParams.id)
+                .then(function(data) {
+
+                    vm.preValuesLoaded = true;
+                    vm.content = data;
+
+                    setHeaderNameState(vm.content);
+
+                    //set a shared state
+                    editorState.set(vm.content);
+
+                    vm.page.loading = false;
+
+                });
+        }
+        else {
+            loadDataType();
+        }
+        
+        var labelKeys = [
+            "general_settings",
+            "general_info"
+        ];
+        
+        localizationService.localizeMany(labelKeys).then(function (values) {
+            
+            vm.page.navigation = [
+                {
+                    "name": values[0],
+                    "alias": "settings",
+                    "icon": "icon-settings",
+                    "view": "views/datatypes/views/datatype.settings.html",
+                    "active": true
+                },
+                {
+                    "name": values[1],
+                    "alias": "info",
+                    "icon": "icon-info",
+                    "view": "views/datatypes/views/datatype.info.html"
+                }
+            ];
+        });
+    }
+
+    init();
 
 }
 

@@ -45,8 +45,8 @@ namespace Umbraco.Web.Install
         /// <summary>
         /// This will test the directories for write access
         /// </summary>
-        /// <param name="directories"></param>
-        /// <param name="errorReport"></param>
+        /// <param name="dirs"></param>
+        /// <param name="errors"></param>
         /// <param name="writeCausesRestart">
         /// If this is false, the easiest way to test for write access is to write a temp file, however some folder will cause
         /// an App Domain restart if a file is written to the folder, so in that case we need to use the ACL APIs which aren't as

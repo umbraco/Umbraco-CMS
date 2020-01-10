@@ -21,21 +21,52 @@
 
     margin: 10px;
     position: relative;
-    //overflow: hidden;
-    
     user-select: none;
-    
-    cursor: pointer;
-    
     box-shadow: 0 1px 1px 0 rgba(0,0,0,.2);
-    //border: 2px solid transparent;
-    
     transition: box-shadow 150ms ease-in-out;
+}
+
+.umb-media-grid__item.-unselectable {
+    &::before {
+        content: "";
+        position: absolute;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(230, 230, 230, .5);
+        pointer-events: none;
+    }
+}
+
+.umb-media-grid__item.-selectable, 
+.umb-media-grid__item.-folder {// If folders isnt selectable, they opens if clicked, therefor...
+    cursor: pointer;
 }
 
 .umb-media-grid__item.-file {
     background-color: @white;
 }
+
+.umb-media-grid__item.-folder {
+
+    &.-selectable {
+        .media-grid-item-edit:hover .umb-media-grid__item-name,
+        .media-grid-item-edit:focus .umb-media-grid__item-name {
+            text-decoration: underline;
+        }
+    }
+
+    &.-unselectable {
+        &:hover, &:focus {
+            .umb-media-grid__item-name {
+                text-decoration: underline;
+            }
+        }
+    }
+}
+
 
 .umb-media-grid__item.-selected {
     color:@ui-selected-type;
@@ -43,7 +74,8 @@
         color: @ui-selected-type;
     }
 }
-.umb-media-grid__item.-selected, .umb-media-grid__item:hover {
+.umb-media-grid__item.-selected, 
+.umb-media-grid__item.-selectable:hover {
     &::before {
         content: "";
         position: absolute;
@@ -58,7 +90,7 @@
         pointer-events: none;
     }
 }
-.umb-media-grid__item:hover {
+.umb-media-grid__item.-selectable:hover {
     &::before {
         opacity: .33;
     }
@@ -69,16 +101,11 @@
     }
 }
 
-.umb-media-grid__item-file-icon > span {
-    color: @white;
-    background: @gray-4;
-    padding: 1px 3px;
-    font-size: 10px;
-    line-height: 130%;
-    display: block;
-    margin-top: -30px;
-    margin-left: -10px;
-    position: relative;
+.umb-media-grid__item-file-icon {
+    transform: translate(-50%,-50%);
+    position: absolute;
+    top: 45%;
+    left: 50%;
 }
 
 .umb-media-grid__item:hover {
@@ -86,38 +113,32 @@
 }
 
 .umb-media-grid__item-image {
-   //max-width: 100% !important;
-   //height: auto;
    position: relative;
-   
    object-fit: contain;
    height: 100%;
 }
 
 .umb-media-grid__item-image-placeholder {
     width: 100%;
-    //max-width: 100%;
-    //height: auto;
     position: relative;
-    
     object-fit: contain;
     height: 100%;
 }
 
 .umb-media-grid__image-background {
     content: "";
-    background: url("../img/checkered-background.png");
-    background-repeat: repeat;
     opacity: 0.5;
     top: 0;
     left: 0;
     bottom: 0;
     right: 0;
     position: absolute;
+    .checkeredBackground();
 }
 
 .umb-media-grid__item-overlay {
    display: flex;
+   width: 100%;
    opacity: 0;
    position: absolute;
    right: 0;
@@ -130,28 +151,19 @@
    overflow: hidden;
    color: @black;
    white-space: nowrap;
-   border-top:1px solid fade(black, 4%);
+   border-top:1px solid fade(@black, 4%);
    background: fade(@white, 92%);
    transition: opacity 150ms;
-   
-   &:hover {
+
+   &.-can-open:hover {
        text-decoration: underline;
+   }
+   
+   .tabbing-active &:focus {
+       opacity: 1;
    }
 }
 
-/*
-.umb-media-grid__item.-file .umb-media-grid__item-overlay {
-    opacity: 1;
-    color: @gray-4;
-    background: @white;
-}
-
-.umb-media-grid__item.-file:hover .umb-media-grid__item-overlay,
-.umb-media-grid__item.-file.-selected .umb-media-grid__item-overlay {
-    color: @white;
-    background: @blueExtraDark;
-}
-*/
 .umb-media-grid__info {
     margin-right: 5px;
 }
@@ -168,38 +180,16 @@
 }
 
 .umb-media-grid__item-name {
+   cursor: pointer;
+}
+
+.umb-media-grid__item-name {
    white-space: nowrap;
    overflow: hidden;
    text-overflow: ellipsis;
 }
 
-.umb-media-grid__item-icon {
-   color: @gray-4;
-   position: absolute;
-   top: 45%;
-   left: 50%;
-   font-size: 40px !important;
-   transform: translate(-50%,-50%);
-}
-/*
-.umb-media-grid__checkmark {
-    position: absolute;
-    z-index: 2;
-    top: 10px;
-    left: 10px;
-    width: 26px;
-    height: 26px;
-    border: 2px solid @white;
-    background: @green;
-    border-radius: 50px;
-    box-sizing: border-box;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: @white;
-    transition: background 100ms;
-}
-*/
+
 .umb-media-grid__edit {
     position: absolute;
     opacity: 0;

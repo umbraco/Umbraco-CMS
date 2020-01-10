@@ -1240,6 +1240,11 @@
         // Perform the button's action.
         function doClick(button) {
 
+            // don't do anything if the editor input or button bar isn't the currently active element
+            if (document.activeElement !== panels.input && !panels.buttonBar.contains(document.activeElement)) {
+                return;
+            }
+
             inputBox.focus();
 
             if (button.textOp) {
