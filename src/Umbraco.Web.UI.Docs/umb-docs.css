@@ -76,3 +76,12 @@ a:hover {
     width: 50px;
     margin-top: 5px;
 }
+
+.content .methods code {
+    border: 1px solid #e1e1e8;
+    background-color: #f7f7f9;
+    padding: 0px 3px;
+    font-size: 85%;
+    color: #d14;
+    white-space: nowrap;
+}

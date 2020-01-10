@@ -11,7 +11,7 @@
 
         <i class="icon umb-tree-icon sprTree" ng-class="::node.cssClass" title="{{::node.title}}" ng-click="select(node, $event)" ng-style="::node.style" tabindex="-1"></i>
         <span class="umb-tree-item__annotation"></span>
-        <a class="umb-tree-item__label umb-outline" ng-href="#/{{::node.routePath}}" ng-click="select(node, $event)" title="{{::node.title}}">{{node.name}}</a>
+        <a class="umb-tree-item__label" ng-href="#/{{::node.routePath}}" ng-click="select(node, $event)" title="{{::node.title}}">{{node.name}}</a>
 
         <!-- NOTE: These are the 'option' elipses -->
         <button data-element="tree-item-options" class="umb-options btn-reset sr-only sr-only--focusable sr-only--hoverable" ng-click="options(node, $event)" ng-if="::node.menuUrl" aria-label="{{optionsText}} {{node.name}}"><i></i><i></i><i></i></button>

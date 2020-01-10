@@ -19,7 +19,10 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
     var currentForm = angularHelper.getCurrentForm($scope);
 
     $scope.sortableOptions = {
+        axis: "y",
+        containment: "parent",
         distance: 10,
+        opacity: 0.7,
         tolerance: "pointer",
         scroll: true,
         zIndex: 6000,

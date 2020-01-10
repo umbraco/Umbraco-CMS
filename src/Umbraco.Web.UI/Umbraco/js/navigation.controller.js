@@ -510,6 +510,14 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
         if (!event) {
             return;
         }
+        closeTree();
+    };
+
+    $scope.onOutsideClick = function() {
+        closeTree();
+    };
+
+    function closeTree() {
         if (!appState.getGlobalState("touchDevice")) {
             treeActive = false;
             $timeout(function () {
@@ -518,7 +526,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
                 }
             }, 300);
         }
-    };
+    }
 
     $scope.toggleLanguageSelector = function () {
         $scope.page.languageSelectorIsOpen = !$scope.page.languageSelectorIsOpen;
