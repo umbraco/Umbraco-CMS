@@ -1,23 +1,52 @@
-.shadow-depth-min {
-    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);    
+// map stores a stack of box-shadow definitions, in order of size
+@shadows: {
+    0: 0 1px 1px 0 rgba(0, 0, 0, 0.16);
+    1: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    2: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+    3: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+    4: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+    5: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
 }
-.shadow-depth-min__hover {
-    box-shadow: 0 3px 6px 0 rgba(0,0,0,0.16);   
-    transition: box-shadow 150ms ease-in-out;
+    
+// corresponding map to store hover-state box-shadows. When a hover shadow isn't defined, it must reference
+// the shadows map as there is no way to effectively null-check a map value
+@hoverShadows: {
+    0: 0 3px 6px 0 rgba(0, 0, 0, 0.16);
+    1: @shadows[1];
+    2: @shadows[2];
+    3: @shadows[3];
+    4: @shadows[4];
+    5: @shadows[5];
 }
 
-.shadow-depth-1{
-	box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+// mixin for applying the shadow and its hover state
+// disable hover state by passing .umb-shadow(level, false);
+.umb-box-shadow(@level, @hover: true) {
+    box-shadow: @shadows[$@level];
+    .umb-box-shadow--hover(@level, @hover);
 }
-.shadow-depth-2{
-	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+
+// mixin for hover shadow, with transition
+.umb-box-shadow--hover(@level, @hover) when (@hover = true) {    
+    &:hover {
+        box-shadow: @hoverShadows[$@level];            
+        transition: box-shadow 150ms ease-in-out;
+    }
 }
-.shadow-depth-3{
-	box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+
+// ---------------------------------------
+// loop for generating .shadow-depth-n classes (from 1 - 5)
+// ---------------------------------------
+@iterations: 5;
+@i: 0;
+
+.umb-box-shadow-loop (@i) when (@i < iterations) {
+    .shadow-depth-@{i} {
+        box-shadow: @shadows[$@i];
+        .umb-box-shadow--hover(@i);
+    }
+
+    .umb-box-shadow-loop(@i + 1);
 }
-.shadow-depth-4{
-	box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
-}
-.shadow-depth-5{
-	box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);
-}
+
+.umb-box-shadow-loop (@iterations);
