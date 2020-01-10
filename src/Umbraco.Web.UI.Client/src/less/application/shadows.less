@@ -20,14 +20,14 @@
 }
 
 // mixin for applying the shadow and its hover state
-// disable hover state by passing .umb-shadow(level, false);
-.umb-box-shadow(@level, @hover: true) {
+// enable hover state by passing .umb-shadow(level, true);
+.umb-box-shadow(@level, @hover: false) {
     box-shadow: @shadows[$@level];
     .umb-box-shadow--hover(@level, @hover);
 }
 
 // mixin for hover shadow, with transition
-.umb-box-shadow--hover(@level, @hover) when (@hover = true) {    
+.umb-box-shadow--hover(@level, @hover: false) when (@hover = true) {    
     &:hover {
         box-shadow: @hoverShadows[$@level];            
         transition: box-shadow 150ms ease-in-out;
@@ -37,16 +37,13 @@
 // ---------------------------------------
 // loop for generating .shadow-depth-n classes (from 1 - 5)
 // ---------------------------------------
-@iterations: 5;
-@i: 0;
-
-.umb-box-shadow-loop (@i) when (@i < iterations) {
+.umb-box-shadow-loop (@i) when (@i > -1) {
     .shadow-depth-@{i} {
         box-shadow: @shadows[$@i];
         .umb-box-shadow--hover(@i);
     }
 
-    .umb-box-shadow-loop(@i + 1);
+    .umb-box-shadow-loop(@i - 1);
 }
 
-.umb-box-shadow-loop (@iterations);
+.umb-box-shadow-loop (5);
