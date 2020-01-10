@@ -3,154 +3,156 @@
     grid-gap: 20px;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
 
-    &-view-title {
-        font-size: 20px;
-        font-weight: bold;
-        color: @black;
-        margin-bottom: 30px;
-    }
-
-    &-view-wrapper {
-        padding: 20px 60px;
-
-        @media (max-width: 768px) {
-            padding: 0;
-        }
-    }
-
-    &-section {
-        margin-bottom: 40px;
-    }
-
-    &-search {
-        width: 100%;
-        border-radius: 3px;
-        box-sizing: border-box;
-
-        input {
-            border-width: 2px;
-            border-radius: 3px;
-            min-height: 44px;
-            padding: 4px 10px;
-            font-size: 16px;
-            margin-bottom: 0;
-            border-color: @gray-8;
-
-            &:hover,
-            &:focus {
-                border-color: @gray-8;
-            }
-        }
-    }
-
     &__pagination {
         display: flex;
         justify-content: center;
     }
 }
 
+.umb-packages-view-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: @black;
+    margin-bottom: 30px;
+}
+
+.umb-packages-view-wrapper {
+    padding: 20px 60px;
+
+    @media (max-width: 768px) {
+        padding: 0;
+    }
+}
+
+.umb-packages-section {
+    margin-bottom: 40px;
+}
+
+.umb-packages-search {
+    width: 100%;
+    border-radius: 3px;
+    box-sizing: border-box;
+
+    input {
+        border-width: 2px;
+        border-radius: 3px;
+        min-height: 44px;
+        padding: 4px 10px;
+        font-size: 16px;
+        margin-bottom: 0;
+        border-color: @gray-8;
+
+        &:hover,
+        &:focus {
+            border-color: @gray-8;
+        }
+    }
+}
+
+
 // Cards
 .umb-package {
     box-sizing: border-box;
+}
 
-    &-link {
-        .flex-center;
-        flex-wrap: wrap;
-        flex-direction: column;
-        position: relative;
-        box-sizing: border-box;
-        height: 100%;
-        width: 100%;
-        border-radius: 3px;
-        border: 0 none;
-        transition: border-color 100ms ease;
-        background-color: @white;
-        .umb-box-shadow(0, true);
-    }
+.umb-package-link {
+    .flex-center;
+    flex-wrap: wrap;
+    flex-direction: column;
+    position: relative;
+    box-sizing: border-box;
+    height: 100%;
+    width: 100%;
+    border-radius: 3px;
+    border: 0 none;
+    transition: border-color 100ms ease;
+    background-color: @white;
+    .umb-box-shadow(0, true);
 
-    // Icon
-    &-icon {
-        .flex-center;
-        padding: 10px;
-        background-color: @white;
-        min-height: 60px;
-        .border-top-radius(3px);
-
-        img {
-            max-width: 70px;
-            width: 70px;
-            height: auto;
-        }
-    }
-
-    // Info
-    &-info {
-        padding-bottom: 15px;
-    }
-
-    // Name
-    &-name {
-        font-size: 14px;
-        max-width: 250px;
-        margin-bottom: 5px;
-        font-weight: bold;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        line-height: normal;
-        margin: 0 auto 5px;
-    }
-
-    &-description {
-        font-size: 12px;
-        color: @gray-4;
-        word-wrap: break-word;
-        line-height: 1.1rem;
-        white-space: nowrap;
-        max-width: calc(100% - 30px);
-        overflow: hidden;
-        text-overflow: ellipsis;
-        margin: 0 auto;
-    }
-
-    // Numbers
-    &-numbers {
-        display: flex;
-        flex-wrap: wrap;
-        flex-direction: row;
-        justify-content: center;
-        opacity: .6;
-        margin-top: 10px;
-
-        small {
-            padding: 0 5px;
-            .flex-center;
-        }
-
-        i {
-            font-size: 14px;
-        }
-    }
-
-    .umb-package-link:hover .umb-package-numbers {
+    &:hover .umb-package-numbers {
         opacity: 1;
 
         .icon-hearts {
             color: @red  !important;
         }
     }
+}
 
-    // Version
-    &-version {
-        display: inline-flex;
-        font-size: 12px;
-        font-weight: bold;
-        padding: 1px 5px;
-        background: @gray-8;
-        border-radius: 3px;
-        color: @black;
+// Icon
+.umb-package-icon {
+    .flex-center;
+    padding: 10px;
+    background-color: @white;
+    min-height: 60px;
+    .border-top-radius(3px);
+
+    img {
+        max-width: 70px;
+        width: 70px;
+        height: auto;
     }
 }
+
+// Info
+.umb-package-info {
+    padding-bottom: 15px;
+}
+
+// Name
+.umb-package-name {
+    font-size: 14px;
+    max-width: 250px;
+    margin-bottom: 5px;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: normal;
+    margin: 0 auto 5px;
+}
+
+.umb-package-description {
+    font-size: 12px;
+    color: @gray-4;
+    word-wrap: break-word;
+    line-height: 1.1rem;
+    white-space: nowrap;
+    max-width: calc(100% - 30px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0 auto;
+}
+
+// Numbers
+.umb-package-numbers {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+    opacity: .6;
+    margin-top: 10px;
+
+    small {
+        padding: 0 5px;
+        .flex-center;
+    }
+
+    i {
+        font-size: 14px;
+    }
+}
+
+// Version
+.umb-package-version {
+    display: inline-flex;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 1px 5px;
+    background: @gray-8;
+    border-radius: 3px;
+    color: @black;
+}
+
 
 /* CATEGORIES */
 
@@ -342,22 +344,22 @@
     &__owner-profile {
         display: flex;
         align-items: center;
+    }
 
-        &-avatar {
-            margin-right: 15px;
-            flex: 0 0 auto;
-        }
+    &__owner-profile-avatar {
+        margin-right: 15px;
+        flex: 0 0 auto;
+    }
 
-        &-name {
-            font-size: 15px;
-            color: @black;
-            font-weight: bold;
-        }
+    &__owner-profile-name {
+        font-size: 15px;
+        color: @black;
+        font-weight: bold;
+    }
 
-        &-karma {
-            font-size: 12px;
-            color: @gray-4;
-        }
+    &__owner-profile-karma {
+        font-size: 12px;
+        color: @gray-4;
     }
 }
 

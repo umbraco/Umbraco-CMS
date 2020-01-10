@@ -225,20 +225,6 @@ input.umb-table__input {
     position: relative;
     min-height: 52px;
 
-    &--empty {
-        flex: 1 1 auto;
-        display: flex;
-        justify-content: center;
-        padding: 5px 0;
-        cursor: auto;
-        user-select: auto;
-
-        &:hover {
-            background-color: transparent;
-            cursor: auto;
-        }
-    }
-
     // Show checkmark when checked, hide file icon
     &.-selected {
 
@@ -289,6 +275,20 @@ input.umb-table__input {
     }
 }
 
+.umb-table-row--empty {
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: center;
+    padding: 5px 0;
+    cursor: auto;
+    user-select: auto;
+
+    &:hover {
+        background-color: transparent;
+        cursor: auto;
+    }
+}
+
 // Table Cell Styles
 .umb-table-cell {
     display: flex;
@@ -317,26 +317,26 @@ input.umb-table__input {
         margin: 0;
         padding: 15px 0 15px 15px;
     }
+}
 
-    &--auto-width {
-        flex: 0 0 auto !important;
-    }
+.umb-table-cell--auto-width {
+    flex: 0 0 auto !important;
+}
 
-    &--nano {
-        flex: 0 0 50px;
-    }
+.umb-table-cell--nano {
+    flex: 0 0 50px;
+}
 
-    &--small {
-        flex: .5 .5 1%;
-        max-width: 12.5%;
-    }
+.umb-table-cell--small {
+    flex: .5 .5 1%;
+    max-width: 12.5%;
+}
 
-    &--large {
-        flex: 1 1 25%;
-        max-width: 25%;
-    }
+.umb-table-cell--large {
+    flex: 1 1 25%;
+    max-width: 25%;
+}
 
-    &--faded {
-        opacity: 0.4;
-    }
+.umb-table-cell--faded {
+    opacity: 0.4;
 }

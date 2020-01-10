@@ -41,19 +41,6 @@
             flex-flow: row wrap;
             border: 1px solid @gray-8;
 
-            &-inner {
-                display: flex;
-                flex-flow: column wrap;
-                flex: 0 0 100%;
-                max-width: 100%;
-                min-height: 80px;
-                padding: 0;
-
-                .check_circle {
-                    margin: 15px auto;
-                }
-            }
-
             &__label {
                 background: @white;
                 font-size: 14px;
@@ -77,6 +64,19 @@
                 font-size: 12px;
                 line-height: 1.5em;
                 color: @gray-3;
+            }
+        }
+
+        .umb-color-box-inner {
+            display: flex;
+            flex-flow: column wrap;
+            flex: 0 0 100%;
+            max-width: 100%;
+            min-height: 80px;
+            padding: 0;
+
+            .check_circle {
+                margin: 15px auto;
             }
         }
     }
