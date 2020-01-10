@@ -228,7 +228,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             entity.SanitizeEntityPropertiesForXmlStorage();
 
             // create the dto
-            var dto = ContentBaseFactory.BuildDto(entity);
+            var dto = ContentBaseFactory.BuildDto(PropertyEditors, entity);
 
             // derive path and level from parent
             var parent = GetParentNodeDto(entity.ParentId);
@@ -317,7 +317,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             // create the dto
-            var dto = ContentBaseFactory.BuildDto(entity);
+            var dto = ContentBaseFactory.BuildDto(PropertyEditors, entity);
 
             // update the node dto
             var nodeDto = dto.ContentDto.NodeDto;
@@ -542,6 +542,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             media.ResetDirtyProperties(false);
             return media;
         }
-        
+
     }
 }

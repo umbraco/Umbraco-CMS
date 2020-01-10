@@ -15,7 +15,22 @@ function textAreaController($scope, validationMessageService) {
     if ($scope.model.config && $scope.model.config.maxChars) {
         $scope.model.maxlength = true;
     }
-    
+
+    $scope.$on("formSubmitting", function() {
+        if ($scope.isLengthValid()) {
+            $scope.textareaFieldForm.textarea.$setValidity("maxChars", true);
+        } else {
+            $scope.textareaFieldForm.textarea.$setValidity("maxChars", false);
+        }
+    });
+
+    $scope.isLengthValid = function() {
+        if (!$scope.model.maxlength) {
+            return true;
+        } 
+        return $scope.model.config.maxChars >= $scope.model.count;
+    }
+
     $scope.model.change = function () {
         if ($scope.model.value) {
             $scope.model.count = $scope.model.value.length;
