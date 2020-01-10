@@ -38,7 +38,7 @@
                             <ul class="umb-card-grid -six-in-row">
                                 <li ng-repeat="dataType in value | orderBy:'name'"
                                     data-element="datatype-{{dataType.name}}"
-                                    ng-click="vm.pickType(dataType)">
+                                    ng-click="vm.viewOptionsForEditor(dataType)">
                                     <a class="umb-card-grid-item" href="" title="{{ dataType.name }}">
                                         <span>
                                             <i class="{{ dataType.icon }}" ng-class="{'icon-autofill': dataType.icon == null}"></i>

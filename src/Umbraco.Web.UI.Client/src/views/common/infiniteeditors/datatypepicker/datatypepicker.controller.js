@@ -21,7 +21,8 @@
         vm.searchTerm = "";
         vm.searchResult = null;
         
-        vm.pickType = pickType;
+        vm.viewOptionsForEditor = viewOptionsForEditor;
+        vm.pickDataType = pickDataType;
         vm.pickEditor = pickEditor;
         vm.close = close;
         vm.searchTermChanged = searchTermChanged;
@@ -105,17 +106,17 @@
         }
 
         
-        function pickType(dataType) {
+        function viewOptionsForEditor(editor) {
             
             var dataTypeConfigurationPicker = {
-                dataType: dataType,
+                editor: editor,
                 property: $scope.model.property,
                 contentTypeName: $scope.model.contentTypeName,
                 view: "views/common/infiniteeditors/datatypeconfigurationpicker/datatypeconfigurationpicker.html",
                 size: "small",
-                submit: function(model) {
+                submit: function(dataType, propertyType, isNew) {
+                    submit(dataType, propertyType, isNew);
                     editorService.close();
-                    $scope.model.submit(model);
                 },
                 close: function() {
                     editorService.close();
@@ -124,6 +125,16 @@
 
             editorService.open(dataTypeConfigurationPicker);
 
+        }
+
+        function pickDataType(selectedDataType) {
+            selectedDataType.loading = true;
+            dataTypeResource.getById(selectedDataType.id).then(function(dataType) {
+                contentTypeResource.getPropertyTypeScaffold(dataType.id).then(function(propertyType) {
+                    selectedDataType.loading = false;
+                    submit(dataType, propertyType, false);
+                });
+            });
         }
 
         function pickEditor(propertyEditor) {
@@ -136,7 +147,7 @@
                 view: "views/common/infiniteeditors/datatypesettings/datatypesettings.html",
                 submit: function(model) {
                     contentTypeResource.getPropertyTypeScaffold(model.dataType.id).then(function(propertyType) {
-                        $scope.model.submit(model);
+                        submit(model.dataType, propertyType, true);
                         editorService.close();
                     });
                 },
@@ -147,6 +158,20 @@
 
             editorService.open(dataTypeSettings);
 
+        }
+
+        function submit(dataType, propertyType, isNew) {
+            // update property
+            $scope.model.property.config = propertyType.config;
+            $scope.model.property.editor = propertyType.editor;
+            $scope.model.property.view = propertyType.view;
+            $scope.model.property.dataTypeId = dataType.id;
+            $scope.model.property.dataTypeIcon = dataType.icon;
+            $scope.model.property.dataTypeName = dataType.name;
+
+            $scope.model.updateSameDataTypes = isNew;
+
+            $scope.model.submit($scope.model);
         }
         
         function close() {
