@@ -8,7 +8,8 @@
     <key alias="assignDomain">Tilføj domæne</key>
     <key alias="auditTrail">Revisionsspor</key>
     <key alias="browse">Gennemse elementer</key>
-    <key alias="changeDocType">Skift dokumenttype</key>
+    <key alias="changeDocType">Skift Dokument Type</key>
+    <key alias="changeDataType">Skift Input Type</key>
     <key alias="copy">Kopier</key>
     <key alias="create">Opret</key>
     <key alias="export">Eksportér</key>

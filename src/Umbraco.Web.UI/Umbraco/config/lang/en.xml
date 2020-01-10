@@ -9,6 +9,7 @@
     <key alias="auditTrail">Audit Trail</key>
     <key alias="browse">Browse Node</key>
     <key alias="changeDocType">Change Document Type</key>
+    <key alias="changeDataType">Change Data Type</key>
     <key alias="copy">Copy</key>
     <key alias="create">Create</key>
     <key alias="export">Export</key>

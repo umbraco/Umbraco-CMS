@@ -501,27 +501,41 @@ input.umb-group-builder__group-sort-value {
         }
     }
 
-    .editor {
+    .editor-wrapper {
         margin-bottom: 10px;
 
+        .editor {
+            display: flex;
+            align-items: center;
+
+            border: 1px solid @gray-10;
+            color: @ui-action-discreet-type;
+            border-radius: @baseBorderRadius;
+
+            box-shadow: 0 2px 5px 0 rgba(0,0,0,.12);
+        }
+
+        .editor-info {
+            flex: 1 0 auto;
+            text-align: left;
+            display: flex;
+            align-items: center;
+        }
+
         .editor-icon-wrapper {
-            border: 1px solid @gray-8;
             width: 60px;
             height: 60px;
             text-align: center;
             line-height: 60px;
-            border-radius: 5px;
-            float: left;
-            margin-right: 20px;
+            flex: 0 0 60px;
 
             .icon {
-                font-size: 26px;
+                font-size: 32px;
             }
         }
-
+        
         .editor-details {
-            float: left;
-            margin-top: 10px;
+            flex: 0 0 auto;
 
             .editor-name {
                 display: block;
@@ -534,9 +548,15 @@ input.umb-group-builder__group-sort-value {
             }
         }
 
-        .editor-settings-icon {
+        .editor-remove-icon {
+            flex: 0 0 48px;
+            width: 48px;
+            height: 100%;
             font-size: 18px;
-            margin-top: 8px;
+            color: @ui-action-type;
+            &:hover {
+                color: @ui-action-type-hover;
+            }
         }
     }
 

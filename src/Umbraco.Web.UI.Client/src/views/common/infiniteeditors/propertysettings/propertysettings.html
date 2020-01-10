@@ -41,7 +41,7 @@
                             </div>
                         </div>
 
-                        <div class="umb-control-group control-group">
+                        <div class="umb-control-group control-group -no-border">
                             <textarea data-element="property-description"
                                     class="editor-description"
                                     ng-model="model.property.description"
@@ -63,21 +63,26 @@
 
                             <div class="editor clearfix" ng-if="model.property.editor">
 
-                                <a href="" class="editor-icon-wrapper" ng-click="vm.openDataTypePicker(model.property)">
-                                    <i class="icon {{ model.property.dataTypeIcon }}" ng-class="{'icon-autofill': model.property.dataTypeIcon == null}"></i>
-                                </a>
+                                <button class="btn-reset editor-info" ng-click="vm.openDataTypeSettings(model.property)">
+                                    <div class="editor-icon-wrapper">
+                                        <i class="icon {{ model.property.dataTypeIcon }}" ng-class="{'icon-autofill': model.property.dataTypeIcon == null}"></i>
+                                    </div>
 
-                                <div class="editor-details">
-                                    <a href="" class="editor-name" ng-click="vm.openDataTypePicker(model.property)">{{ model.property.dataTypeName }}</a>
-                                    <a href="" class="editor-editor" ng-click="vm.openDataTypePicker(model.property)">{{ model.property.editor }}</a>
-                                </div>
+                                    <div class="editor-details">
+                                        <span class="editor-name">{{ model.property.dataTypeName }}</span>
+                                        <span class="editor-editor">{{ model.property.editor }}</span>
+                                    </div>
 
-                                <a href class="editor-settings-icon pull-right"
-                                ng-click="vm.openDataTypeSettings(model.property)"
-                                hotkey="alt+shift+d"
-                                ng-if="model.property.editor">
-                                    <i class="icon icon-settings"></i>
-                                </a>
+                                </button>
+
+                                <button class="editor-remove-icon btn-reset pull-right"
+                                    ng-click="vm.openDataTypePicker(model.property)"
+                                    hotkey="alt+shift+d"
+                                    localize="title"
+                                    title="@actions_changeDataType"
+                                >
+                                    <i class="icon icon-wrong"></i>
+                                </button>
 
                             </div>
 
