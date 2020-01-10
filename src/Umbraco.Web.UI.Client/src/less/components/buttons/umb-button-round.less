@@ -1,0 +1,41 @@
+.umb-btn-round {
+    padding: 4px 6px 4px 6px;
+    display: inline-block;
+    cursor: pointer;
+    border-radius: 200px;
+    background: @gray-10;
+    border: 1px solid @gray-6;
+    margin: 2px;
+    
+    &:hover,
+    &:hover * {
+        background: @blueDark  !important;
+        color: @white  !important;
+        border-color: @blueDark  !important;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: none;
+        color: @white  !important;
+    }
+
+    i {
+        font-size: 16px !important;
+        color: @gray-8;
+        display: block;
+    }
+
+    &.alert:hover,
+    &.alert:hover * {
+        background: @red  !important;
+        color: @white  !important;
+        border-color: @red  !important;
+        text-decoration: none;
+    }
+
+    &.no-border {
+        border: none !important;
+        background: none !important;
+    }
+}
