@@ -128,7 +128,8 @@
     </Compile>
     -->
     <Compile Include="AssemblyExtensions.cs" />
-    <Compile Include="AsyncLock.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_6_0\MissingContentVersionsIndexes.cs" />
+    <Compile Include="SystemLock.cs" />
     <Compile Include="Attempt.cs" />
     <Compile Include="AttemptOfTResult.cs" />
     <Compile Include="AttemptOfTResultTStatus.cs" />
@@ -280,6 +281,7 @@
     <Compile Include="Models\PublishedContent\IPublishedContentType.cs" />
     <Compile Include="Models\PublishedContent\IPublishedPropertyType.cs" />
     <Compile Include="PropertyEditors\ConfigurationFieldsExtensions.cs" />
+    <Compile Include="PropertyEditors\IDataEditorWithMediaPath.cs" />
     <Compile Include="PropertyEditors\IIgnoreUserStartNodesConfig.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="Models\PublishedContent\UrlMode.cs" />
@@ -351,6 +353,7 @@
     <Compile Include="Configuration\UmbracoSettings\ITourSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IUmbracoSettingsSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IWebRoutingSection.cs" />
+    <Compile Include="Configuration\UmbracoSettings\IKeepAliveSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\LoggingElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\NotificationsElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\RequestHandlerElement.cs" />
@@ -360,6 +363,7 @@
     <Compile Include="Configuration\UmbracoSettings\UmbracoSettingsSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\UrlReplacingElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\WebRoutingElement.cs" />
+    <Compile Include="Configuration\UmbracoSettings\KeepAliveElement.cs" />
     <Compile Include="Configuration\UmbracoVersion.cs" />
     <Compile Include="Constants-Applications.cs" />
     <Compile Include="Constants-Conventions.cs" />
