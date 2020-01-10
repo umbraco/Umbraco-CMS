@@ -12,13 +12,17 @@
         <div class="flex items-center" style="flex: 1;">
 
             <ng-form data-element="editor-icon" name="iconForm">
-                <div class="umb-panel-header-icon" ng-if="!hideIcon" ng-click="openIconPicker()" ng-class="{'-placeholder': $parent.icon==='' || $parent.icon===null}"
-                     title="{{$parent.icon}}">
-                    <i class="icon {{$parent.icon}}" ng-if="$parent.icon!=='' && $parent.icon!==null"></i>
-                    <div class="umb-panel-header-icon-text" ng-if="$parent.icon==='' || $parent.icon===null">
-                        <localize key="settings_addIcon"></localize>
-                    </div>
-                </div>
+                <button 
+                    type="button" class="umb-panel-header-icon" 
+                    ng-if="!hideIcon" 
+                    ng-click="openIconPicker()" 
+                    ng-class="{'-placeholder': $parent.icon==='' || $parent.icon===null}"
+                    title="{{$parent.icon}}">
+                        <i class="icon {{$parent.icon}}" ng-if="$parent.icon!=='' && $parent.icon!==null" aria-hidden="true"></i>
+                        <div class="umb-panel-header-icon-text" ng-if="$parent.icon==='' || $parent.icon===null">
+                            <localize key="settings_addIcon">Add icon</localize>
+                        </div>
+                </button>
             </ng-form>
 
             <div id="nameField" class="umb-editor-header__name-and-description" style="flex: 1 1 auto;">

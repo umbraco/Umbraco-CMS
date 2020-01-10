@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Web;
 using Umbraco.Core;
+using Umbraco.Core.Logging.Serilog;
 using Umbraco.Web.Runtime;
 
 namespace Umbraco.Web
@@ -12,7 +13,8 @@ namespace Umbraco.Web
     {
         protected override IRuntime GetRuntime()
         {
-            return new WebRuntime(this);
+            var logger = SerilogLogger.CreateWithDefaultConfiguration();
+            return new WebRuntime(this, logger, new MainDom(logger));
         }
 
         /// <summary>
