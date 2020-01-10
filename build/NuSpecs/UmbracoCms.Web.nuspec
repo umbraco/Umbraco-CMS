@@ -52,14 +52,17 @@
         <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.dll" target="lib\net472\Umbraco.Web.dll" />
         <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.UI.dll" target="lib\net472\Umbraco.Web.UI.dll" />
         <file src="$BuildTmp$\WebApp\bin\Umbraco.Examine.dll" target="lib\net472\Umbraco.Examine.dll" />
+        <file src="$BuildTmp$\WebApp\bin\Umbraco.ModelsBuilder.Embedded.dll" target="lib\net472\Umbraco.ModelsBuilder.Embedded.dll" />
 
         <!-- docs -->
         <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.xml" target="lib\net472\Umbraco.Web.xml" />
         <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.UI.xml" target="lib\net472\Umbraco.Web.UI.xml" />
         <file src="$BuildTmp$\WebApp\bin\Umbraco.Examine.xml" target="lib\net472\Umbraco.Examine.xml" />
+        <file src="$BuildTmp$\WebApp\bin\Umbraco.ModelsBuilder.Embedded.xml" target="lib\net472\Umbraco.ModelsBuilder.Embedded.xml" />
 
         <!-- symbols -->
         <file src="$BuildTmp$\bin\Umbraco.Web.pdb" target="lib\net472\Umbraco.Web.pdb" />
         <file src="$BuildTmp$\bin\Umbraco.Examine.pdb" target="lib\net472\Umbraco.Examine.pdb" />
+        <file src="$BuildTmp$\bin\Umbraco.ModelsBuilder.Embedded.pdb" target="lib\net472\Umbraco.ModelsBuilder.Embedded.pdb" />
     </files>
 </package>
