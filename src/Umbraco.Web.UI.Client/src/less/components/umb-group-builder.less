@@ -93,7 +93,7 @@
     }
 }
 
-.umb-group-builder__group-wrapper {
+.umb-group-builder__group-title-wrapper {
     display: flex;
     align-items: center;
     border-bottom: 1px solid @gray-9;
@@ -104,11 +104,11 @@
     margin-left: 5px;
 }
 
-.umb-group-builder__group-title-input {
+input.umb-group-builder__group-title-input {
     border-color: transparent;
     background: transparent;
     font-weight: bold;
-    color: @black;
+    color: @black;   
     margin-bottom: 0;
 
     &:disabled:hover {
@@ -126,9 +126,8 @@
 
 .umb-group-builder__group-inherited-label {
     font-size: 13px;
-    display: inline-block;
-    position: relative;
-    top: 2px;
+    display: flex;
+    align-items: center;
 }
 
 .umb-group-builder__group-sort-order {
