@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using Moq;
 using Umbraco.Core.Configuration;
@@ -13,33 +14,107 @@ namespace Umbraco.Tests.Shared.Builders
         }
     }
 
-
-    public class LanguageBuilder<TParent> : ChildBuilderBase<TParent, ILanguage>, IWithIdBuilder
+    public class LanguageBuilder<TParent>
+        : ChildBuilderBase<TParent, ILanguage>,
+            IWithIdBuilder,
+            IWithKeyBuilder,
+            IWithCreateDateBuilder,
+            IWithUpdateDateBuilder,
+            IWithDeleteDateBuilder,
+            IWithCultureInfoBuilder
     {
-
-        private string _isoCode = null;
+        private DateTime? _createDate;
+        private CultureInfo _cultureInfo;
+        private DateTime? _deleteDate;
+        private int? _fallbackLanguageId;
         private int? _id;
+        private bool? _isDefault;
+        private bool? _isMandatory;
+        private Guid? _key;
+        private DateTime? _updateDate;
 
         public LanguageBuilder(TParent parentBuilder) : base(parentBuilder)
         {
         }
 
-        public override ILanguage Build()
+        DateTime? IWithCreateDateBuilder.CreateDate
         {
-            var culture = CultureInfo.GetCultureInfo("en-US");
-            var isoCode = _isoCode ?? culture.Name;
-            return new Language(Mock.Of<IGlobalSettings>(), isoCode)
-            {
-                Id = _id ?? 1,
-                CultureName = culture.TwoLetterISOLanguageName,
-                IsoCode =  new RegionInfo(culture.LCID).Name,
-            };
+            get => _createDate;
+            set => _createDate = value;
+        }
+
+        CultureInfo IWithCultureInfoBuilder.CultureInfo
+        {
+            get => _cultureInfo;
+            set => _cultureInfo = value;
+        }
+
+        DateTime? IWithDeleteDateBuilder.DeleteDate
+        {
+            get => _deleteDate;
+            set => _deleteDate = value;
         }
 
         int? IWithIdBuilder.Id
         {
             get => _id;
             set => _id = value;
+        }
+
+        Guid? IWithKeyBuilder.Key
+        {
+            get => _key;
+            set => _key = value;
+        }
+
+        DateTime? IWithUpdateDateBuilder.UpdateDate
+        {
+            get => _updateDate;
+            set => _updateDate = value;
+        }
+
+        public override ILanguage Build()
+        {
+            var cultureInfo = _cultureInfo ?? CultureInfo.GetCultureInfo("en-US");
+            var key = _key ?? Guid.NewGuid();
+            var createDate = _createDate ?? DateTime.Now;
+            var updateDate = _updateDate ?? DateTime.Now;
+            var deleteDate = _deleteDate ?? null;
+            var fallbackLanguageId = _fallbackLanguageId ?? null;
+            var isDefault = _isDefault ?? false;
+            var isMandatory = _isMandatory ?? false;
+
+            return new Language(Mock.Of<IGlobalSettings>(), cultureInfo.Name)
+            {
+                Id = _id ?? 1,
+                CultureName = cultureInfo.TwoLetterISOLanguageName,
+                IsoCode = new RegionInfo(cultureInfo.LCID).Name,
+                Key = key,
+                CreateDate = createDate,
+                UpdateDate = updateDate,
+                DeleteDate = deleteDate,
+                IsDefault = isDefault,
+                IsMandatory = isMandatory,
+                FallbackLanguageId = fallbackLanguageId
+            };
+        }
+
+        public LanguageBuilder<TParent> WithIsDefault(bool isDefault)
+        {
+            _isDefault = isDefault;
+            return this;
+        }
+
+        public LanguageBuilder<TParent> WithIsMandatory(bool isMandatory)
+        {
+            _isMandatory = isMandatory;
+            return this;
+        }
+
+        public LanguageBuilder<TParent> WithFallbackLanguageId(int fallbackLanguageId)
+        {
+            _fallbackLanguageId = fallbackLanguageId;
+            return this;
         }
     }
 }

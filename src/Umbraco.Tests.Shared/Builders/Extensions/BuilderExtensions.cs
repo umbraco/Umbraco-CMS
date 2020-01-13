@@ -39,5 +39,12 @@ namespace Umbraco.Tests.Shared.Builders.Extensions
             builder.Name = name;
             return builder;
         }
+
+        public static T WithKey<T>(this T builder, Guid key)
+            where T : IWithKeyBuilder
+        {
+            builder.Key = key;
+            return builder;
+        }
     }
 }
