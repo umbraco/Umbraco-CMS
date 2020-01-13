@@ -11,7 +11,10 @@ function MacrosEditController($scope, $q, $routeParams, macroResource, editorSta
     var vm = this;
 
     vm.promises = {};
-    
+    vm.header = {};
+    vm.header.editorfor = "general_macro";
+    vm.header.setPageTitle = true;
+
     vm.page = {};
     vm.page.loading = false;
     vm.page.saveButtonState = "init";
