@@ -143,9 +143,8 @@
                         },
                         submit: function (model) {
                             overlayService.close();
-                            if (model.changePassword.newPassword !== model.changePassword.oldPassword) {
-                                save();
-                            }
+                            vm.user.changePassword = model.changePassword;
+                            save();                            
                         }
                     };
                     overlayService.open(overlay);
