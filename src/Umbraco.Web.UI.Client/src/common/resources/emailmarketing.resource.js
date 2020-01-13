@@ -10,13 +10,10 @@ function emailMarketingResource($http, umbRequestHelper) {
     // LOCAL
     // http://localhost:7071/api/EmailProxy
 
-    // DEV
-    // https://devwecmsfunctions.azurewebsites.net/api/EmailProxy
-
     // LIVE
-    // http://prwecmsfunctions.azurewebsites.net/api/EmailProxy
+    // https://emailcollector.umbraco.io/api/EmailProxy
 
-    const emailApiUrl = 'https://devwecmsfunctions.azurewebsites.net/api/EmailProxy';
+    const emailApiUrl = 'https://emailcollector.umbraco.io/api/EmailProxy';
 
     //the factory object returned
     return {
