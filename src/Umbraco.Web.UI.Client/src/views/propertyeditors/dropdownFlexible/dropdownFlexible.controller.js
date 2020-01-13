@@ -1,5 +1,5 @@
 angular.module("umbraco").controller("Umbraco.PropertyEditors.DropdownFlexibleController",
-    function($scope) {
+    function ($scope, validationMessageService) {
 
         //setup the default config
         var config = {
@@ -89,4 +89,10 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.DropdownFlexibleCo
                 $scope.model.value = null;
             }
         }
+
+        // Set the message to use for when a mandatory field isn't completed.
+        // Will either use the one provided on the property type or a localised default.
+        validationMessageService.getMandatoryMessage($scope.model.validation).then(function (value) {
+            $scope.mandatoryMessage = value;
+        });
     });

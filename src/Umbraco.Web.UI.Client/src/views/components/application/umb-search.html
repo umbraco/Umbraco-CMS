@@ -14,7 +14,8 @@
             ng-model="vm.searchQuery"
             ng-model-options="{ debounce: 200 }"
             ng-change="vm.search(vm.searchQuery)"
-            placeholder="Search..."
+            localize="placeholder"
+            placeholder="@placeholders_search" 
             id="app-search"
             focus-when="{{vm.searchHasFocus}}" />
         <button ng-show="vm.searchQuery.length > 0" tabindex="-1" class="umb-search-input-clear umb-animated" ng-click="vm.clearSearch()">

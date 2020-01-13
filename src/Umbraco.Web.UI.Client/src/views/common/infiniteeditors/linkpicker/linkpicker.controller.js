@@ -33,6 +33,7 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
         };
 
         $scope.showTarget = $scope.model.hideTarget !== true;
+        $scope.showAnchor = $scope.model.hideAnchor !== true;
 
         // this ensures that we only sync the tree once and only when it's ready
         var oneTimeTreeSync = {
