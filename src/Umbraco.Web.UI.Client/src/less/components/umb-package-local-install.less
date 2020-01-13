@@ -22,7 +22,7 @@
     &.drag-over {
         border-color: @ui-action-border-hover;
         border-style: solid;
-        box-shadow: 0 3px 8px rgba(0, 0, 0, .1);
+        .umb-box-shadow(2);
         transition: 100ms box-shadow ease, 100ms border ease;
     }
 
@@ -74,12 +74,10 @@
 
 // Info state
 .umb-info-local-items {
+    .flex-center();
+    flex-direction: column;
     border-radius: 3px;
     background: @gray-10;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
     margin: 0 20px;
     width: 100%;
     max-width: 540px;
