@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Upgrade;
@@ -278,8 +277,10 @@ namespace Umbraco.Core.Migrations.Install
         /// <param name="logger">A logger.</param>
         private static void SaveConnectionString(string connectionString, string providerName, ILogger logger)
         {
-            if (string.IsNullOrWhiteSpace(connectionString)) throw new ArgumentNullOrEmptyException(nameof(connectionString));
-            if (string.IsNullOrWhiteSpace(providerName)) throw new ArgumentNullOrEmptyException(nameof(providerName));
+            if (connectionString == null) throw new ArgumentNullException(nameof(connectionString));
+            if (string.IsNullOrWhiteSpace(connectionString)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(connectionString));
+            if (providerName == null) throw new ArgumentNullException(nameof(providerName));
+            if (string.IsNullOrWhiteSpace(providerName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(providerName));
 
             var fileSource = "web.config";
             var fileName = IOHelper.MapPath(SystemDirectories.Root +"/" + fileSource);

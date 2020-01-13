@@ -145,6 +145,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //default listview
             target.ListViewEditorName = Constants.Conventions.DataTypes.ListViewPrefix + "Media";
+            target.IsSystemMediaType = source.IsSystemMediaType();
 
             if (string.IsNullOrEmpty(source.Name)) return;
 
@@ -222,9 +223,13 @@ namespace Umbraco.Web.Models.Mapping
             target.DataTypeId = source.DataTypeId;
             target.DataTypeKey = source.DataTypeKey;
             target.Mandatory = source.Validation.Mandatory;
+            target.MandatoryMessage = source.Validation.MandatoryMessage;
             target.ValidationRegExp = source.Validation.Pattern;
-            target.Variations = source.AllowCultureVariant ? ContentVariation.Culture : ContentVariation.Nothing;
-
+            target.ValidationRegExpMessage = source.Validation.PatternMessage;
+            target.Variations = source.AllowCultureVariant
+                ? target.Variations.SetFlag(ContentVariation.Culture)
+                : target.Variations.UnsetFlag(ContentVariation.Culture);
+            
             if (source.Id > 0)
                 target.Id = source.Id;
 
@@ -395,9 +400,9 @@ namespace Umbraco.Web.Models.Mapping
 
             if (!(target is IMemberType))
             {
-                target.Variations = ContentVariation.Nothing;
-                if (source.AllowCultureVariant)
-                    target.Variations |= ContentVariation.Culture;
+                target.Variations = source.AllowCultureVariant                    
+                    ? target.Variations.SetFlag(ContentVariation.Culture)                    
+                    : target.Variations.UnsetFlag(ContentVariation.Culture);
             }
 
             // handle property groups and property types

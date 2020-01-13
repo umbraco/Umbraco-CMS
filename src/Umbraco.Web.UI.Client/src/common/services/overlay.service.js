@@ -89,6 +89,7 @@
         }
 
         function confirmDelete(overlay) {
+            overlay.confirmType = "delete";
             confirm(overlay);
         }
 
