@@ -18,7 +18,7 @@
 
                     <div class="content-type-editor-dialog edit-property-settings">
 
-                        <div class="umb-control-group" ng-if="!model.property.locked">
+                        <div class="umb-control-group -no-border" ng-if="!model.property.locked">
                             <div class="control-group -no-margin">
                                 <textarea class="editor-label"
                                           data-element="property-name"
@@ -36,7 +36,7 @@
                                     <span class="umb-validation-label" ng-message="required">Required label</span>
                                 </div>
                             </div>
-                            <div class="control-group -no-margin">
+                            <div class="control-group -no-margin" style="margin-top:2px;">
                                 <umb-generate-alias enable-lock="true" alias-from="model.property.label" alias="model.property.alias"></umb-generate-alias>
                             </div>
                         </div>

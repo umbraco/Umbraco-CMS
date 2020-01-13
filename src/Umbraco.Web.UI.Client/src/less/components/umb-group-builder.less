@@ -473,7 +473,7 @@ input.umb-group-builder__group-sort-value {
         font-weight: bold;
         resize: none;
         line-height: 1.5em;
-        padding-left: 0;
+        padding: 0;
         border: none;
 
         &:focus {
@@ -503,65 +503,76 @@ input.umb-group-builder__group-sort-value {
 
     .editor-wrapper {
         margin-bottom: 10px;
+    }
 
-        .editor {
-            display: flex;
-            align-items: center;
+    .editor {
+        display: flex;
+        align-items: center;
+        align-content: stretch;
 
-            border: 1px solid @gray-10;
-            color: @ui-action-discreet-type;
-            border-radius: @baseBorderRadius;
+        min-height: 80px;
 
-            box-shadow: 0 2px 5px 0 rgba(0,0,0,.12);
+        border: 1px solid @gray-9;
+        color: @ui-action-discreet-type;
+        border-radius: @baseBorderRadius;
+
+        //box-shadow: 0 2px 5px 0 rgba(0,0,0,.08);
+    }
+
+    .editor-info {
+        flex: 1 0 auto;
+        text-align: left;
+        display: flex;
+        align-items: center;
+        max-width: calc(100% - 48px);
+    }
+
+    .editor-icon-wrapper {
+        width: 60px;
+        height: 60px;
+        text-align: center;
+        line-height: 60px;
+        flex: 0 0 60px;
+
+        .icon {
+            font-size: 32px;
         }
-
-        .editor-info {
-            flex: 1 0 auto;
-            text-align: left;
-            display: flex;
-            align-items: center;
-        }
-
-        .editor-icon-wrapper {
-            width: 60px;
-            height: 60px;
-            text-align: center;
-            line-height: 60px;
-            flex: 0 0 60px;
-
-            .icon {
-                font-size: 32px;
-            }
-        }
+    }
+    
+    .editor-details {
+        flex: 1 1 auto;
+        margin-top: 10px;
+        margin-bottom: 10px;
         
-        .editor-details {
-            flex: 0 0 auto;
-
-            .editor-name {
-                display: block;
-                font-weight: bold;
-            }
-
-            .editor-editor {
-                display: block;
-                font-size: 12px;
-            }
+        .editor-name {
+            display: block;
+            font-weight: bold;
         }
 
-        .editor-remove-icon {
-            flex: 0 0 48px;
-            width: 48px;
-            height: 100%;
-            font-size: 18px;
-            color: @ui-action-type;
-            &:hover {
-                color: @ui-action-type-hover;
-            }
+        .editor-editor {
+            display: block;
+            font-size: 12px;
+        }
+    }
+
+    .editor-remove-icon {
+        flex: 0 0 48px;
+        width: 48px;
+        height: 48px;
+        font-size: 18px;
+        color: @ui-action-type;
+        &:hover {
+            color: @ui-action-type-hover;
         }
     }
 
     .checkbox {
         margin-bottom: 20px;
+    }
+
+    .editor-description {
+        margin-top: 20px;
+        padding: 0;
     }
 
     .editor-description,
