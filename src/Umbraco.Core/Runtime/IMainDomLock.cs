@@ -16,9 +16,8 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         /// <param name="millisecondsTimeout"></param>
         /// <returns>
-        /// A disposable object which will be disposed in order to release the lock
+        /// An awaitable boolean value which will be false if the elapsed millsecondsTimeout value is exceeded
         /// </returns>
-        /// <exception cref="TimeoutException">Throws a <see cref="TimeoutException"/> if the elapsed millsecondsTimeout value is exceeded</exception>
         Task<bool> AcquireLockAsync(int millisecondsTimeout);
 
         /// <summary>
