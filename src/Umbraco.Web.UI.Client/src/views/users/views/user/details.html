@@ -196,23 +196,22 @@
 
                         <div class="flex items-center" ng-if="model.avatarFile.uploadStatus !== 'uploading'">
 
-                            <a href=""
-                               class="umb-user-group-preview__action"
-                               ngf-select ng-model="filesHolder"
-                               ngf-change="model.changeAvatar($files, $event)"
-                               ngf-multiple="false"
-                               ngf-pattern="{{model.acceptedFileTypes}}"
-                               ngf-max-size="{{ model.maxFileSize }}">
+                            <button class="btn-link umb-user-group-preview__action"
+                                    ngf-select ng-model="filesHolder"
+                                    ngf-change="model.changeAvatar($files, $event)"
+                                    ngf-multiple="false"
+                                    ngf-pattern="{{model.acceptedFileTypes}}"
+                                    ngf-max-size="{{ model.maxFileSize }}">
                                 <localize key="user_changePhoto">Change photo</localize>
-                            </a>
+                            </button>
 
-                            <a href=""
-                               ng-if="model.user.avatars"
-                               class="umb-user-group-preview__action umb-user-group-preview__action--red"
-                               ng-click="model.clearAvatar()"
-                               prevent-default>
+
+                            <button ng-if="model.user.avatars.length > 0"
+                                    class="btn-link umb-user-group-preview__action umb-user-group-preview__action--red"
+                                    ng-click="model.clearAvatar()"
+                                    prevent-default>
                                 <localize key="user_removePhoto">Remove photo</localize>
-                            </a>
+                            </button>
 
                         </div>
 
@@ -249,7 +248,7 @@
                     <div>
                         <umb-button ng-if="model.user.userDisplayState.key !== 'Disabled' && model.user.userDisplayState.key !== 'Invited' && !model.user.isCurrentUser"
                                     type="button"
-                                    button-style="[info,block]"
+                                    button-style="[warning,block]"
                                     action="model.disableUser()"
                                     state="model.disableUserButtonState"
                                     label="Disable"

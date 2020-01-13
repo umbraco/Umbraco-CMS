@@ -195,19 +195,29 @@ namespace Umbraco.Web.Trees
             //get the current user start node/paths
             GetUserStartNodes(out var userStartNodes, out var userStartNodePaths);
 
-            nodes.AddRange(entities.Select(x => GetSingleTreeNodeWithAccessCheck(x, id, queryStrings, userStartNodes, userStartNodePaths)).Where(x => x != null));
-
             // if the user does not have access to the root node, what we have is the start nodes,
-            // but to provide some context we also need to add their topmost nodes when they are not
+            // but to provide some context we need to add their topmost nodes when they are not
             // topmost nodes themselves (level > 1).
             if (id == rootIdString && hasAccessToRoot == false)
             {
-                var topNodeIds = entities.Where(x => x.Level > 1).Select(GetTopNodeId).Where(x => x != 0).Distinct().ToArray();
+                // first add the entities that are topmost to the nodes collection
+                var topMostEntities = entities.Where(x => x.Level == 1).ToArray();
+                nodes.AddRange(topMostEntities.Select(x => GetSingleTreeNodeWithAccessCheck(x, id, queryStrings, userStartNodes, userStartNodePaths)).Where(x => x != null));
+
+                // now add the topmost nodes of the entities that aren't topmost to the nodes collection as well
+                // - these will appear as "no-access" nodes in the tree, but will allow the editors to drill down through the tree
+                //   until they reach their start nodes
+                var topNodeIds = entities.Except(topMostEntities).Select(GetTopNodeId).Where(x => x != 0).Distinct().ToArray();
                 if (topNodeIds.Length > 0)
                 {
                     var topNodes = Services.EntityService.GetAll(UmbracoObjectType, topNodeIds.ToArray());
                     nodes.AddRange(topNodes.Select(x => GetSingleTreeNodeWithAccessCheck(x, id, queryStrings, userStartNodes, userStartNodePaths)).Where(x => x != null));
                 }
+            }
+            else
+            {
+                // the user has access to the root, just add the entities
+                nodes.AddRange(entities.Select(x => GetSingleTreeNodeWithAccessCheck(x, id, queryStrings, userStartNodes, userStartNodePaths)).Where(x => x != null));
             }
 
             return nodes;
@@ -454,8 +464,8 @@ namespace Umbraco.Web.Trees
 
         internal IEnumerable<MenuItem> GetAllowedUserMenuItemsForNode(IUmbracoEntity dd)
         {
-            var permission = Services.UserService.GetPermissions(Security.CurrentUser, dd.Path);
-            return Current.Actions.FromEntityPermission(permission).Select(x => new MenuItem(x));
+            var permissionsForPath = Services.UserService.GetPermissionsForPath(Security.CurrentUser, dd.Path).GetAllPermissions();
+            return Current.Actions.GetByLetters(permissionsForPath).Select(x => new MenuItem(x));
         }
 
         /// <summary>
