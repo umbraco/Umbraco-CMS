@@ -10,9 +10,10 @@
         ],
         "steps": [
             {
-                "title": "Welcome to Umbraco - The Friendly CMS",
-                "content": "<p>Do you want emails?</p>",
-                "view": "emails"
+                "title": "Do you want to stay updated on everything Umbraco?",
+                "content": "<p>Thank you for using Umbraco! Would you like to stay up-to-date with Umbraco product updates, security advisories, community news and special offers? Sign up for our newsletter and never miss out on the latest Umbraco news.</p> <p>By signing up, you agree that we can use your info according to our <a href='https://umbraco.com/about-us/privacy/'>privacy policy</a>.</p>",
+                "view": "emails",
+                "type": "promotion"
             }
         ]
     },
