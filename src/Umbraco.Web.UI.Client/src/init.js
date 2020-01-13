@@ -1,6 +1,6 @@
 /** Executed when the application starts, binds to events and set global state */
-app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 'appState', 'assetsService', 'eventsService', '$cookies', 'tourService',
-    function ($rootScope, $route, $location, urlHelper, navigationService, appState, assetsService, eventsService, $cookies, tourService) {
+app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 'appState', 'assetsService', 'eventsService', '$cookies', 'tourService', 'localStorageService',
+    function ($rootScope, $route, $location, urlHelper, navigationService, appState, assetsService, eventsService, $cookies, tourService, localStorageService) {
 
         //This sets the default jquery ajax headers to include our csrf token, we
         // need to user the beforeSend method because our token changes per user/login so
@@ -37,7 +37,14 @@ app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 
                                 // Unless invoked from tourService JS Client code explicitly.
                                 // Accepted mails = Completed and Declicned mails = Disabled
                                 if (emailMarketingTour && emailMarketingTour.disabled !== true && emailMarketingTour.completed !== true) {
-                                    tourService.startTour(emailMarketingTour);
+
+                                    // Only show the email tour once per logged in session
+                                    // The localstorage key is removed on logout or user session timeout
+                                    const emailMarketingTourShown = localStorageService.get("emailMarketingTourShown");
+                                    if(!emailMarketingTourShown){
+                                        tourService.startTour(emailMarketingTour);
+                                        localStorageService.set("emailMarketingTourShown", true);
+                                    }
                                 }
                             });
                         }
