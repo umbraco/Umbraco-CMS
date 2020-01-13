@@ -324,31 +324,17 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
         });
     };
 
-    var searchListView = _.debounce(function () {
-        $scope.$apply(function () {
-            makeSearch();
-        });
-    }, 500);
+    
 
-    $scope.forceSearch = function (ev) {
-        //13: enter
-        switch (ev.keyCode) {
-            case 13:
-                makeSearch();
-                break;
-        }
-    };
-
-    $scope.enterSearch = function () {
-        $scope.viewLoaded = false;
-        searchListView();
-    };
-
-    function makeSearch() {
+    $scope.makeSearch = function() {
         if ($scope.options.filter !== null && $scope.options.filter !== undefined) {
             $scope.options.pageNumber = 1;
             $scope.reloadView($scope.contentId);
         }
+    }
+
+    $scope.onSearchStartTyping = function() {
+        $scope.viewLoaded = false;
     }
 
     $scope.selectedItemsCount = function () {

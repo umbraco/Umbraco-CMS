@@ -303,7 +303,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Gets the content json for the content id
+        /// Gets the content json for the content guid
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -323,7 +323,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Gets the content json for the content id
+        /// Gets the content json for the content udi
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -341,7 +341,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Gets an empty content item for the
+        /// Gets an empty content item for the document type.
         /// </summary>
         /// <param name="contentTypeAlias"></param>
         /// <param name="parentId"></param>
