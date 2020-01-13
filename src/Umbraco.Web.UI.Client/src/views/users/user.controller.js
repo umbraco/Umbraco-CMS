@@ -125,9 +125,31 @@
         }
 
         function toggleChangePassword() {
-          vm.changePasswordModel.isChanging = !vm.changePasswordModel.isChanging;
-          //reset it
-          vm.user.changePassword = null;
+            //reset it
+            vm.user.changePassword = null;
+
+            localizationService.localizeMany(["general_cancel", "general_confirm", "general_changePassword"])
+                .then(function (data) {
+                    const overlay = {
+                        view: "changepassword",
+                        title: data[2],
+                        changePassword: vm.user.changePassword,
+                        config: vm.changePasswordModel.config,
+                        closeButtonLabel: data[0],
+                        submitButtonLabel: data[1],
+                        submitButtonStyle: 'success',
+                        close: function () {
+                            overlayService.close();
+                        },
+                        submit: function (model) {
+                            overlayService.close();
+                            if (model.changePassword.newPassword !== model.changePassword.oldPassword) {
+                                save();
+                            }
+                        }
+                    };
+                    overlayService.open(overlay);
+              });
         }
 
         function save() {
