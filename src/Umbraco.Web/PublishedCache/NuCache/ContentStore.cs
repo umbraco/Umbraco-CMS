@@ -462,6 +462,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// </exception>
         public void UpdateDataTypesLocked(IEnumerable<int> dataTypeIds, Func<int, IPublishedContentType> getContentType)
         {
+            EnsureLocked();
+
             var contentTypes = _contentTypesById
                     .Where(kvp =>
                         kvp.Value.Value != null &&
