@@ -272,6 +272,7 @@
     <key alias="scheduledPublishServerTime">Dette oversætter til den følgende tid på serveren:</key>
     <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Hvad betyder det?</a>]]></key>
     <key alias="nestedContentDeleteItem">Er du sikker på, at du vil slette dette element?</key>
+    <key alias="nestedContentDeleteAllItems">Er du sikker på, at du vil slette alle elementer?</key>
     <key alias="nestedContentEditorNotSupported">Egenskaben %0% anvender editoren %1% som ikke er understøttet af Nested Content.</key>
     <key alias="nestedContentNoContentTypes">Der er ikke konfigureret nogen indholdstyper for denne egenskab.</key>
     <key alias="nestedContentCopyAllItemsName">%0% fra %1%</key>
@@ -445,6 +446,7 @@
     <key alias="viewCacheItem">Se cache element</key>
     <key alias="relateToOriginalLabel">Relatér til original</key>
     <key alias="includeDescendants">Inkludér undersider</key>
+    <key alias="theFriendliestCommunity">Det venligste community</key>
     <key alias="linkToPage">Link til side</key>
     <key alias="openInNewWindow">Åben linket i et nyt vindue eller fane</key>
     <key alias="linkToMedia">Link til medie</key>
@@ -514,6 +516,10 @@
     <key alias="tools">Værktøjer</key>
     <key alias="toolsDescription">Værktøjer til at administrere indekset</key>
     <key alias="fields">felter</key>
+    <key alias="indexCannotRead">Indexet skal bygges igen, for at kunne læses</key>
+    <key alias="processIsTakingLonger">Processen tager længere tid end forventet. Kontrollér Umbraco loggen for at se om der er sket fejl under operationen</key>
+    <key alias="indexCannotRebuild">Dette index kan ikke genbygess for det ikke har nogen</key>
+    <key alias="iIndexPopulator">IIndexPopulator</key>
   </area>
   <area alias="placeholders">
     <key alias="username">Indtast dit brugernavn</key>
@@ -615,6 +621,7 @@
     <key alias="cancel">Fortryd</key>
     <key alias="cellMargin">Celle margen</key>
     <key alias="choose">Vælg</key>
+    <key alias="clear">Ryd</key>
     <key alias="close">Luk</key>
     <key alias="closewindow">Luk vindue</key>
     <key alias="comment">Kommentar</key>
@@ -745,6 +752,9 @@
     <key alias="current">nuværende</key>
     <key alias="embed">Indlejring</key>
     <key alias="selected">valgt</key>
+    <key alias="other">Andet</key>
+    <key alias="articles">Artikler</key>
+    <key alias="videos">Videoer</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blå</key>
@@ -931,7 +941,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="includeAllChildNodes">Inkludér alle underliggende sider</key>
     <key alias="orClickHereToUpload">eller klik her for at vælge pakkefil</key>
     <key alias="uploadPackage">Upload pakke</key>
-    <key alias="localPackageDescription">Installer en lokal pakke ved at vælge den fra din computer. Installer kun pakker fra kilder, du kender og stoler på</key>
+    <key alias="localPackageDescription">Installér en lokal pakke ved at vælge den fra din computer. Installér kun pakker fra kilder, du kender og stoler på</key>
     <key alias="uploadAnother">Upload en anden pakke</key>
     <key alias="cancelAndUploadAnother">Annuller og upload en anden pakke</key>
     <key alias="accept">Jeg accepterer</key>
@@ -1109,7 +1119,10 @@ Mange hilsner fra Umbraco robotten
     <key alias="forms">Formularer</key>
   </area>
   <area alias="help">
+    <key alias="tours">Tours</key>
     <key alias="theBestUmbracoVideoTutorials">De bedste Umbraco video tutorials</key>
+    <key alias="umbracoForum">Besøg our.umbraco.com</key>
+    <key alias="umbracoTv">Besøg umbraco.tv</key>
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Standardskabelon</key>
@@ -1172,6 +1185,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="editUserSaved">Bruger gemt</key>
     <key alias="editUserTypeSaved">Brugertype gemt</key>
     <key alias="editUserGroupSaved">Brugergruppe gemt</key>
+    <key alias="editCulturesAndHostnamesSaved">Sprog og domæner gemt</key>
+    <key alias="editCulturesAndHostnamesError">Der opstod en fejl ved at gemme sprog og domæner</key>
     <key alias="fileErrorHeader">Fil ikke gemt</key>
     <key alias="fileErrorText">Filen kunne ikke gemmes. Tjek filrettighederne</key>
     <key alias="fileSavedHeader">Fil gemt</key>
@@ -1411,6 +1426,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="noFallbackLanguageOption">Intet fallback-sprog</key>
     <key alias="fallbackLanguageDescription">For at tillade flersproget indhold, som ikke er tilgængeligt i det anmodede sprog, skal du her vælge et sprog at falde tilbage på.</key>
     <key alias="fallbackLanguage">Fallback-sprog</key>
+    <key alias="none">ingen</key>
   </area>
   <area alias="macro">
     <key alias="addParameter">Tilføj parameter</key>
@@ -1645,6 +1661,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="invalidDate">Ugyldig dato</key>
     <key alias="invalidNumber">Ikke et tal</key>
     <key alias="invalidEmail">Ugyldig e-mail</key>
+    <key alias="entriesShort"><![CDATA[Minimum %0% entries, needs <strong>%1%</strong> more.]]></key>
+    <key alias="entriesExceed"><![CDATA[Maximum %0% entries, <strong>%1%</strong> too many.]]></key>
   </area>
   <area alias="redirectUrls">
     <key alias="disableUrlTracker">Slå URL tracker fra</key>
@@ -1734,5 +1752,40 @@ Mange hilsner fra Umbraco robotten
     <key alias="noMemberTypes">Ingen referencer til Medlems Typer.</key>
     <key alias="usedByProperties">Brugt af</key>
   </area>
-
+  <area alias="logViewer">
+    <key alias="logLevels">Log type</key>
+    <key alias="savedSearches">Gemte søgninger</key>
+    <key alias="totalItems">Samlet resultat</key>
+    <key alias="timestamp">Dato</key>
+    <key alias="level">Type</key>
+    <key alias="machine">Maskine</key>
+    <key alias="message">Besked</key>
+    <key alias="exception">Exception</key>
+    <key alias="properties">Egenskaber</key>
+    <key alias="searchWithGoogle">Søg med Google</key>
+    <key alias="searchThisMessageWithGoogle">Søg efter denne besked på Google</key>
+    <key alias="searchWithBing">Søg med Bing</key>
+    <key alias="searchThisMessageWithBing">Søg efter denne besked på Bing</key>
+    <key alias="searchOurUmbraco">Søg på Our Umbraco</key>
+    <key alias="searchThisMessageOnOurUmbracoForumsAndDocs">Søg efter denne besked på Our Umbraco forum og dokumentation</key>
+    <key alias="searchOurUmbracoWithGoogle">Søg på Our Umbraco med Google</key>
+    <key alias="searchOurUmbracoForumsUsingGoogle">Søg på Our Umbraco forum med Google</key>
+    <key alias="searchUmbracoSource">Søg i Umbraco kildekoden</key>
+    <key alias="searchWithinUmbracoSourceCodeOnGithub">Søg i Umbraco kildekoden på Github</key>
+    <key alias="searchUmbracoIssues">Søg i Umbraco issues</key>
+    <key alias="searchUmbracoIssuesOnGithub">Søg i Umbraco issues på Github</key>
+    <key alias="deleteThisSearch">Slet denne søgning</key>
+    <key alias="findLogsWithRequestId">Find logs med request Id</key>
+    <key alias="findLogsWithNamespace">Find logs med Namespace</key>
+    <key alias="findLogsWithMachineName">Find logs med maskin navn</key>
+    <key alias="open">Åben</key>
+  </area>
+  <area alias="clipboard">
+    <key alias="labelForCopyAllEntries">Kopier %0%</key>
+    <key alias="labelForArrayOfItemsFrom">%0% fra %1%</key>
+    <key alias="labelForRemoveAllEntries">Fjern alle elementer</key>
+  </area>
+  <area alias="propertyActions">
+    <key alias="tooltipForPropertyActionsMenu">Åben egenskabshandlinger</key>
+  </area>
 </language>

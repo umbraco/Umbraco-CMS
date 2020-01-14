@@ -35,14 +35,17 @@ namespace Umbraco.Core.PropertyEditors.Validators
         {
             if (value == null)
             {
-                yield return new ValidationResult(_textService.Localize("validation", "invalidNull"), new[] {"value"});
+                yield return new ValidationResult(_textService.Localize("validation", "invalidNull"), new[] { "value" });
                 yield break;
             }
 
             if (valueType.InvariantEquals(ValueTypes.Json))
             {
                 if (value.ToString().DetectIsEmptyJson())
+                {
                     yield return new ValidationResult(_textService.Localize("validation", "invalidEmpty"), new[] { "value" });
+                }
+
                 yield break;
             }
 
