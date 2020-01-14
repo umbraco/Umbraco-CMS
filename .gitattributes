@@ -41,7 +41,7 @@
 *.fs text=auto
 *.fsx text=auto
 *.hs text=auto
-*.json text
+*.json text=auto
 
 *.csproj text=auto merge=union
 *.vbproj text=auto merge=union
