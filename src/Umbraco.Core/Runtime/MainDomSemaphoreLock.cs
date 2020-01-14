@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Runtime
 {
@@ -14,16 +15,17 @@ namespace Umbraco.Core.Runtime
         // event wait handle used to notify current main domain that it should
         // release the lock because a new domain wants to be the main domain
         private readonly EventWaitHandle _signal;
-
+        private readonly ILogger _logger;
         private IDisposable _lockRelease;
 
-        public MainDomSemaphoreLock()
+        public MainDomSemaphoreLock(ILogger logger)
         {
             var lockName = "UMBRACO-" + MainDom.GetMainDomId() + "-MAINDOM-LCK";
             _systemLock = new SystemLock(lockName);
 
             var eventName = "UMBRACO-" + MainDom.GetMainDomId() + "-MAINDOM-EVT";
             _signal = new EventWaitHandle(false, EventResetMode.AutoReset, eventName);
+            _logger = logger;
         }
 
         //WaitOneAsync (ext method) will wait for a signal without blocking the main thread, the waiting is done on a background thread
@@ -47,8 +49,9 @@ namespace Umbraco.Core.Runtime
                 _lockRelease = _systemLock.Lock(millisecondsTimeout);
                 return Task.FromResult(true);
             }
-            catch (TimeoutException)
+            catch (TimeoutException ex)
             {
+                _logger.Error<MainDomSemaphoreLock>(ex);
                 return Task.FromResult(false);
             }
             finally

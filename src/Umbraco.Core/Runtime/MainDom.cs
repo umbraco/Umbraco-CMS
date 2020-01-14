@@ -36,7 +36,7 @@ namespace Umbraco.Core.Runtime
         // actions to run before releasing the main domain
         private readonly List<KeyValuePair<int, Action>> _callbacks = new List<KeyValuePair<int, Action>>();
 
-        private const int LockTimeoutMilliseconds = 90000; // (1.5 * 60 * 1000) == 1 min 30 seconds
+        private const int LockTimeoutMilliseconds = 40000; // 40 seconds
 
         #endregion
 
@@ -106,6 +106,7 @@ namespace Umbraco.Core.Runtime
                 {
                     _logger.Info<MainDom>("Stopping ({SignalSource})", source);
                     foreach (var callback in _callbacks.OrderBy(x => x.Key).Select(x => x.Value))
+                    {
                         try
                         {
                             callback(); // no timeout on callbacks
@@ -115,6 +116,8 @@ namespace Umbraco.Core.Runtime
                             _logger.Error<MainDom>(e, "Error while running callback");
                             continue;
                         }
+                    }
+                        
                     _logger.Debug<MainDom>("Stopped ({SignalSource})", source);
                 }
                 finally
@@ -142,17 +145,31 @@ namespace Umbraco.Core.Runtime
             _logger.Info<MainDom>("Acquiring.");
 
             // Get the lock 
-            _mainDomLock.AcquireLockAsync(LockTimeoutMilliseconds).Wait();
+            var acquired = _mainDomLock.AcquireLockAsync(LockTimeoutMilliseconds).GetAwaiter().GetResult();
+
+            if (!acquired)
+            {
+                _logger.Info<MainDom>("Cannot acquire (timeout).");
+
+                // In previous versions we'd let a TimeoutException be thrown
+                // and the appdomain would not start. We have the opportunity to allow it to
+                // start without having MainDom? This would mean that it couldn't write
+                // to nucache/examine and would only be ok if this was a super short lived appdomain.
+                // maybe safer to just keep throwing in this case.
+
+                throw new TimeoutException("Cannot acquire MainDom");
+                // return false;
+            }
 
             try
             {
                 // Listen for the signal from another AppDomain coming online to release the lock
-                _mainDomLock.ListenAsync()
-                    .ContinueWith(_ => OnSignal("signal"));
+                _mainDomLock.ListenAsync().ContinueWith(_ => OnSignal("signal"));
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
                 // the waiting task could be canceled if this appdomain is naturally shutting down, we'll just swallow this exception
+                _logger.Warn<MainDom>(ex, ex.Message);
             }
 
             _logger.Info<MainDom>("Acquired.");
