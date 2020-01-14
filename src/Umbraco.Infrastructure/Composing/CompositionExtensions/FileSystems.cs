@@ -1,12 +1,9 @@
-﻿using Umbraco.Core.Composing;
-using Umbraco.Web.Composing;
-using Umbraco.Core.Configuration;
+﻿using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.IO.MediaPathSchemes;
 using Umbraco.Core.Logging;
-using Umbraco.Core;
 
-namespace Umbraco.Web.Composing.CompositionExtensions
+namespace Umbraco.Core.Composing.CompositionExtensions
 {
     internal static class FileSystems
     {

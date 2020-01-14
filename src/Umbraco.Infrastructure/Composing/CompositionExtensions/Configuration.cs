@@ -1,8 +1,6 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration.UmbracoSettings;
+﻿using Umbraco.Core.Configuration.UmbracoSettings;
 
-namespace Umbraco.Web.Composing.CompositionExtensions
+namespace Umbraco.Core.Composing.CompositionExtensions
 {
     /// <summary>
     /// Compose configurations.
