@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Umbraco.Core;
-using Umbraco.Web.Composing;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -22,12 +22,14 @@ namespace Umbraco.Web.PropertyEditors
     {
         private readonly ILogger _logger;
         private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
 
-        public ImageCropperPropertyValueEditor(DataEditorAttribute attribute, ILogger logger, IMediaFileSystem mediaFileSystem, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper)
+        public ImageCropperPropertyValueEditor(DataEditorAttribute attribute, ILogger logger, IMediaFileSystem mediaFileSystem, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, IUmbracoSettingsSection umbracoSettingsSection)
             : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, attribute)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
+            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
         }
 
         /// <summary>
@@ -144,7 +146,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             // process the file
             // no file, invalid file, reject change
-            if (UploadFileTypeValidator.IsValidFileExtension(file.FileName) == false)
+            if (UploadFileTypeValidator.IsValidFileExtension(file.FileName, _umbracoSettingsSection) == false)
                 return null;
 
             // get the filepath

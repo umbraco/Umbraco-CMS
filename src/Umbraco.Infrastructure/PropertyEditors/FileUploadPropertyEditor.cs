@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -28,8 +27,9 @@ namespace Umbraco.Web.PropertyEditors
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizationService _localizationService;
         private readonly ILocalizedTextService _localizedTextService;
+        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
 
-        public FileUploadPropertyEditor(ILogger logger, IMediaFileSystem mediaFileSystem, IContentSection contentSection, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper)
+        public FileUploadPropertyEditor(ILogger logger, IMediaFileSystem mediaFileSystem, IContentSection contentSection, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, IUmbracoSettingsSection umbracoSettingsSection)
             : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
@@ -38,6 +38,7 @@ namespace Umbraco.Web.PropertyEditors
             _localizationService = localizationService;
             _localizedTextService = localizedTextService;
             _uploadAutoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, logger, contentSection);
+            _umbracoSettingsSection = umbracoSettingsSection;
         }
 
         /// <summary>
@@ -46,8 +47,8 @@ namespace Umbraco.Web.PropertyEditors
         /// <returns>The corresponding property value editor.</returns>
         protected override IDataValueEditor CreateValueEditor()
         {
-            var editor = new FileUploadPropertyValueEditor(Attribute, _mediaFileSystem, _dataTypeService, _localizationService, _localizedTextService, ShortStringHelper);
-            editor.Validators.Add(new UploadFileTypeValidator(_localizedTextService));
+            var editor = new FileUploadPropertyValueEditor(Attribute, _mediaFileSystem, _dataTypeService, _localizationService, _localizedTextService, ShortStringHelper, _umbracoSettingsSection);
+            editor.Validators.Add(new UploadFileTypeValidator(_localizedTextService, _umbracoSettingsSection));
             return editor;
         }
 
