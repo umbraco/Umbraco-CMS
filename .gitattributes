@@ -42,6 +42,7 @@
 *.fsx text=auto
 *.hs text=auto
 *.json text=auto
+*.xml text=auto
 
 *.csproj text=auto merge=union
 *.vbproj text=auto merge=union
@@ -49,4 +50,4 @@
 *.dbproj text=auto merge=union
 *.sln text=auto eol=crlf merge=union
 
-*.gitattributes text
+*.gitattributes text=auto
