@@ -148,7 +148,7 @@ angular.module('umbraco.services')
                     break;
                 case 1:
                     //info
-                    this.success(args.header, args.message);
+                    this.info(args.header, args.message);
                     break;
                 case 2:
                     //error

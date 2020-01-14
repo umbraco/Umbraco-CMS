@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function AssignDomainController($scope, localizationService, languageResource, contentResource, navigationService) {
+    function AssignDomainController($scope, localizationService, languageResource, contentResource, navigationService, notificationsService) {
         var vm = this;
         
         vm.closeDialog = closeDialog;
@@ -114,8 +114,10 @@
 
                     // validation is interesting. Check if response is valid
                     if(response.valid) {
-
                         vm.submitButtonState = "success";
+                        localizationService.localize('speechBubbles_editCulturesAndHostnamesSaved').then(function(value) {
+                            notificationsService.success(value);
+                        });
                         closeDialog();
 
                     // show validation messages for each domain
@@ -129,6 +131,9 @@
                             });
                         });
                         vm.submitButtonState = "error";
+                        localizationService.localize('speechBubbles_editCulturesAndHostnamesError').then(function(value) {
+                            notificationsService.error(value);
+                        });
                     }
 
                 }, function (e) {
