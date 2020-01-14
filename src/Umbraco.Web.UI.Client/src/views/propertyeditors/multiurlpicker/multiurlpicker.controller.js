@@ -19,7 +19,10 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
     var currentForm = angularHelper.getCurrentForm($scope);
 
     $scope.sortableOptions = {
+        axis: "y",
+        containment: "parent",
         distance: 10,
+        opacity: 0.7,
         tolerance: "pointer",
         scroll: true,
         zIndex: 6000,
@@ -79,6 +82,7 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
             currentTarget: target,
             dataTypeKey: $scope.model.dataTypeKey,
             ignoreUserStartNodes : ($scope.model.config && $scope.model.config.ignoreUserStartNodes) ? $scope.model.config.ignoreUserStartNodes : "0",
+            hideAnchor: $scope.model.config && $scope.model.config.hideAnchor ? true : false,
             submit: function (model) {
                 if (model.target.url || model.target.anchor) {
                     // if an anchor exists, check that it is appropriately prefixed

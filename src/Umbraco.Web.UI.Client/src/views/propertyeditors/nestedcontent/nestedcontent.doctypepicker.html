@@ -24,12 +24,7 @@
                     <td>
                         {{ph = placeholder(config);""}}
                         <div class="umb-nested-content__placeholder" ng-class="{'umb-nested-content__placeholder--selected':ph}" ng-click="openElemTypeModal($event, config)">
-                            <span class="umb-nested-content__placeholder-icon-holder" ng-if="ph">
-                                <i class="umb-nested-content__placeholder-icon {{ ph.icon }}"></i>
-                            </span>
-                            <span class="umb-nested-content__placeholder-name" ng-if="ph">
-                                {{ ph.name }}
-                            </span>
+                            <umb-node-preview ng-if="ph" icon="ph.icon" name="ph.name"></umb-node-preview>
                             <localize key="content_nestedContentAddElementType" ng-if="!ph">Add element type</localize>
                         </div>
 

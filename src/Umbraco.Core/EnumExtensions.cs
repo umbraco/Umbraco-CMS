@@ -41,5 +41,43 @@ namespace Umbraco.Core
 
             return (num & nums) > 0;
         }
+
+        /// <summary>
+        /// Sets a flag of the given input enum
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="input">Enum to set flag of</param>
+        /// <param name="flag">Flag to set</param>
+        /// <returns>A new enum with the flag set</returns>
+        public static T SetFlag<T>(this T input, T flag)
+             where T : Enum
+        {
+            var i = Convert.ToUInt64(input);
+            var f = Convert.ToUInt64(flag);
+
+            // bitwise OR to set flag f of enum i
+            var result = i | f;
+            
+            return (T)Enum.ToObject(typeof(T), result);
+        }
+
+        /// <summary>
+        /// Unsets a flag of the given input enum
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="input">Enum to unset flag of</param>
+        /// <param name="flag">Flag to unset</param>
+        /// <returns>A new enum with the flag unset</returns>
+        public static T UnsetFlag<T>(this T input, T flag)
+             where T : Enum
+        {
+            var i = Convert.ToUInt64(input);
+            var f = Convert.ToUInt64(flag);
+
+            // bitwise AND combined with bitwise complement to unset flag f of enum i
+            var result = i & ~f;
+            
+            return (T)Enum.ToObject(typeof(T), result);
+        }
     }
 }
