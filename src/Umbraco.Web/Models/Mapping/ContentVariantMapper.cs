@@ -108,6 +108,13 @@ namespace Umbraco.Web.Models.Mapping
             }
         }
 
+        /// <summary>
+        /// Returns all segments assigned to the content
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns>
+        /// Returns all segments assigned to the content including 'null' values
+        /// </returns>
         private IEnumerable<string> GetSegments(IContent content)
         {
             return content.Properties.SelectMany(p => p.Values.Select(v => v.Segment)).Distinct();
