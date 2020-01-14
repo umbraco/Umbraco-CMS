@@ -30,7 +30,7 @@ namespace Umbraco.Web
         protected IGlobalSettings GlobalSettings => Current.Configs.Global();
         protected IUmbracoSettingsSection UmbracoSettings => Current.Configs.Settings();
         protected IUserPasswordConfiguration UserPasswordConfig => Current.Configs.UserPasswordConfiguration();
-        protected IRuntimeState RuntimeState => Core.Composing.Current.RuntimeState;
+        protected IRuntimeState RuntimeState => Current.RuntimeState;
         protected ServiceContext Services => Current.Services;
         protected UmbracoMapper Mapper => Current.Mapper;
         protected IIpResolver IpResolver => Current.IpResolver;

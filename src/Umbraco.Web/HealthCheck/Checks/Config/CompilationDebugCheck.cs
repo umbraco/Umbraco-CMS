@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.Checks.Config
@@ -8,8 +9,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         Group = "Live Environment")]
     public class CompilationDebugCheck : AbstractConfigCheck
     {
-        public CompilationDebugCheck(ILocalizedTextService textService)
-            : base(textService)
+        public CompilationDebugCheck(ILocalizedTextService textService, IIOHelper ioHelper)
+            : base(textService, ioHelper)
         { }
 
         public override string FilePath => "~/Web.config";

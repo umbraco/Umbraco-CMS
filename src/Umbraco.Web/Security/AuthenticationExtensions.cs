@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using System.Security.Claims;
-using System.Security.Principal;
 using System.Threading;
 using System.Web;
 using Microsoft.AspNet.Identity;
@@ -12,8 +8,7 @@ using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Newtonsoft.Json;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Security;
 using Constants = Umbraco.Core.Constants;
 

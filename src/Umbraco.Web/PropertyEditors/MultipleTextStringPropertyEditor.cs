@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -38,7 +38,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Initializes a new instance of the <see cref="MultipleTextStringPropertyEditor"/> class.
         /// </summary>
         public MultipleTextStringPropertyEditor(ILogger logger, IIOHelper ioHelper, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper)
-            : base(logger, dataTypeService, localizationService, Current.Services.TextService, shortStringHelper)
+            : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             _ioHelper = ioHelper;
             _dataTypeService = dataTypeService;
@@ -60,7 +60,7 @@ namespace Umbraco.Web.PropertyEditors
             private readonly ILocalizedTextService _localizedTextService;
 
             public MultipleTextStringPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute)
-                : base(dataTypeService, localizationService, Current.Services.TextService, shortStringHelper, attribute)
+                : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, attribute)
             {
                 _localizedTextService = localizedTextService;
             }

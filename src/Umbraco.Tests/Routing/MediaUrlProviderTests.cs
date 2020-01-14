@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Routing
 
             var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(new IDataEditor[]
             {
-                new FileUploadPropertyEditor(logger, mediaFileSystemMock, contentSection, dataTypeService, LocalizationService, ShortStringHelper),
+                new FileUploadPropertyEditor(logger, mediaFileSystemMock, contentSection, dataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper),
                 new ImageCropperPropertyEditor(logger, mediaFileSystemMock, contentSection, dataTypeService, LocalizationService, IOHelper, ShortStringHelper, LocalizedTextService),
             }));
             _mediaUrlProvider = new DefaultMediaUrlProvider(propertyEditors);

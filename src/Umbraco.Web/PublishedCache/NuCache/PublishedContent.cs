@@ -26,7 +26,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             ContentData contentData,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
             IVariationContextAccessor variationContextAccessor,
-            IPublishedModelFactory publishedModelFactory)
+            IPublishedModelFactory publishedModelFactory) : base(variationContextAccessor)
         {
             _contentNode = contentNode ?? throw new ArgumentNullException(nameof(contentNode));
             ContentData = contentData ?? throw new ArgumentNullException(nameof(contentData));
@@ -71,7 +71,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         // used when cloning in ContentNode
-        public PublishedContent(ContentNode contentNode, PublishedContent origin)
+        public PublishedContent(
+            ContentNode contentNode,
+            PublishedContent origin,
+            IVariationContextAccessor variationContextAccessor)
+            : base(variationContextAccessor)
         {
             _contentNode = contentNode;
             _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
@@ -88,7 +92,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         // clone for previewing as draft a published content that is published and has no draft
-        private PublishedContent(PublishedContent origin)
+        private PublishedContent(PublishedContent origin) : base(origin.VariationContextAccessor)
         {
             _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
             VariationContextAccessor = origin.VariationContextAccessor;

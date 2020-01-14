@@ -1,8 +1,5 @@
-﻿using System;
-using Examine;
-using Examine.Providers;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Composing;
+﻿using Umbraco.Core.Logging;
+using Umbraco.Web.Composing;
 using Umbraco.Examine;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Search;

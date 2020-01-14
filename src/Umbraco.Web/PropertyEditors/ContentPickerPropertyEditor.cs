@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Editors;
@@ -24,18 +24,21 @@ namespace Umbraco.Web.PropertyEditors
     {
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizationService _localizationService;
+        private readonly ILocalizedTextService _localizedTextService;
         private readonly IIOHelper _ioHelper;
 
         public ContentPickerPropertyEditor(
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
+            ILocalizedTextService localizedTextService,
             ILogger logger,
             IIOHelper ioHelper,
             IShortStringHelper shortStringHelper)
-            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService,Current.Services.TextService, shortStringHelper)
+            : base(logger, dataTypeService,localizationService,localizedTextService, shortStringHelper)
         {
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
+            _localizedTextService = localizedTextService;
             _ioHelper = ioHelper;
         }
 
@@ -44,11 +47,11 @@ namespace Umbraco.Web.PropertyEditors
             return new ContentPickerConfigurationEditor(_ioHelper);
         }
 
-        protected override IDataValueEditor CreateValueEditor() => new ContentPickerPropertyValueEditor(_dataTypeService, _localizationService, ShortStringHelper, Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new ContentPickerPropertyValueEditor(_dataTypeService, _localizationService, _localizedTextService, ShortStringHelper, Attribute);
 
         internal class ContentPickerPropertyValueEditor  : DataValueEditor, IDataValueReference
         {
-            public ContentPickerPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute) : base(dataTypeService, localizationService,Current.Services.TextService, shortStringHelper, attribute)
+            public ContentPickerPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute) : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, attribute)
             {
             }
 

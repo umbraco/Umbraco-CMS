@@ -1,6 +1,6 @@
 ﻿using System;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -14,8 +14,8 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     internal class DateValueEditor : DataValueEditor
     {
-        public DateValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute)
-            : base(dataTypeService, localizationService, Current.Services.TextService, shortStringHelper, attribute)
+        public DateValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute)
+            : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, attribute)
         {
             Validators.Add(new DateTimeValidator());
         }

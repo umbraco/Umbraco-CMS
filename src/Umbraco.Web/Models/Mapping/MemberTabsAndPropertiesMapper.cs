@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Mapping;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Core.Dictionary;
-using Umbraco.Web.Security;
-using Umbraco.Web.Security.Providers;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Models.Mapping
@@ -125,10 +123,10 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password",
                     Label = _localizedTextService.Localize("password"),
-                    
+
                     Value = new Dictionary<string, object>
                     {
-                        // TODO: why ignoreCase, what are we doing here?!                    
+                        // TODO: why ignoreCase, what are we doing here?!
                         {"newPassword", member.GetAdditionalDataValueIgnoreCase("NewPassword", null)},
                     },
                     // TODO: Hard coding this because the changepassword doesn't necessarily need to be a resolvable (real) property editor

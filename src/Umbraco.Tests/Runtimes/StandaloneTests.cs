@@ -35,6 +35,7 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Runtime;
 using File = System.IO.File;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Runtimes
 {
@@ -48,7 +49,7 @@ namespace Umbraco.Tests.Runtimes
             IFactory factory = null;
 
             // clear
-            foreach (var file in Directory.GetFiles(Path.Combine(Current.IOHelper.MapPath("~/App_Data")), "NuCache.*"))
+            foreach (var file in Directory.GetFiles(Path.Combine(TestHelper.IOHelper.MapPath("~/App_Data")), "NuCache.*"))
                 File.Delete(file);
 
             // settings
@@ -71,6 +72,7 @@ namespace Umbraco.Tests.Runtimes
             var backOfficeInfo = TestHelper.GetBackOfficeInfo();
             var runtimeState = new RuntimeState(logger, null, null, new Lazy<IMainDom>(() => mainDom), new Lazy<IServerRegistrar>(() => factory.GetInstance<IServerRegistrar>()), umbracoVersion, hostingEnvironment, backOfficeInfo);
             var configs = TestHelper.GetConfigs();
+            var variationContextAccessor = TestHelper.VariationContextAccessor;
 
             // create the register and the composition
             var register = TestHelper.GetRegister();
@@ -103,7 +105,7 @@ namespace Umbraco.Tests.Runtimes
             composition.Register<IVariationContextAccessor, TestVariationContextAccessor>(Lifetime.Singleton);
             composition.Register<IDefaultCultureAccessor, TestDefaultCultureAccessor>(Lifetime.Singleton);
             composition.Register<ISiteDomainHelper>(_ => Mock.Of<ISiteDomainHelper>(), Lifetime.Singleton);
-            composition.RegisterUnique(f => new DistributedCache());
+            composition.RegisterUnique(f => new DistributedCache(f.GetInstance<IServerMessenger>(), f.GetInstance<CacheRefresherCollection>()));
             composition.WithCollectionBuilder<UrlProviderCollectionBuilder>().Append<DefaultUrlProvider>();
             composition.RegisterUnique<IDistributedCacheBinder, DistributedCacheBinder>();
             composition.RegisterUnique<IExamineManager>(f => ExamineManager.Instance);
@@ -203,7 +205,7 @@ namespace Umbraco.Tests.Runtimes
             // but a draft document
             pcontent = umbracoContext.Content.GetById(true, content.Id);
             Assert.IsNotNull(pcontent);
-            Assert.AreEqual("test", pcontent.Name());
+            Assert.AreEqual("test", pcontent.Name(variationContextAccessor));
             Assert.IsTrue(pcontent.IsDraft());
 
             // no published url
@@ -217,7 +219,7 @@ namespace Umbraco.Tests.Runtimes
             // assert that snapshot has been updated and there is now a published document
             pcontent = umbracoContext.Content.GetById(content.Id);
             Assert.IsNotNull(pcontent);
-            Assert.AreEqual("test", pcontent.Name());
+            Assert.AreEqual("test", pcontent.Name(variationContextAccessor));
             Assert.IsFalse(pcontent.IsDraft());
 
             // but the url is the published one - no draft url
@@ -226,7 +228,7 @@ namespace Umbraco.Tests.Runtimes
             // and also an updated draft document
             pcontent = umbracoContext.Content.GetById(true, content.Id);
             Assert.IsNotNull(pcontent);
-            Assert.AreEqual("testx", pcontent.Name());
+            Assert.AreEqual("testx", pcontent.Name(variationContextAccessor));
             Assert.IsTrue(pcontent.IsDraft());
 
             // and the published document has a url

@@ -4,6 +4,7 @@ using System.Web.Security;
 using Examine;
 using Microsoft.AspNet.SignalR;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Dashboards;
 using Umbraco.Core.Dictionary;
@@ -15,6 +16,7 @@ using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
+using Umbraco.Core.Sync;
 using Umbraco.Net;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Cache;
@@ -133,7 +135,7 @@ namespace Umbraco.Web.Runtime
                 composition.Register(_ => new UmbracoHelper());
 
             // register distributed cache
-            composition.RegisterUnique(f => new DistributedCache());
+            composition.RegisterUnique(f => new DistributedCache(f.GetInstance<IServerMessenger>(), f.GetInstance<CacheRefresherCollection>()));
 
             composition.RegisterUnique<RoutableDocumentFilter>();
 

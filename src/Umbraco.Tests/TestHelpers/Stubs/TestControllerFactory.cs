@@ -7,9 +7,10 @@ using System.Web.Routing;
 using System.Web.SessionState;
 using Moq;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
 using Umbraco.Web;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.TestHelpers.Stubs
 {

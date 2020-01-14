@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.Checks.Config
@@ -10,8 +11,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
     {
         private const string DefaultFromEmail = "your@email.here";
 
-        public NotificationEmailCheck(ILocalizedTextService textService)
-            : base(textService)
+        public NotificationEmailCheck(ILocalizedTextService textService, IIOHelper ioHelper)
+            : base(textService, ioHelper)
         { }
 
         public override string FilePath => "~/Config/umbracoSettings.config";

@@ -1,8 +1,9 @@
 ﻿using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Web.PropertyEditors
@@ -24,8 +25,8 @@ namespace Umbraco.Web.PropertyEditors
         /// Initializes a new instance of the <see cref="DateTimePropertyEditor"/> class.
         /// </summary>
         /// <param name="logger"></param>
-        public DateTimePropertyEditor(ILogger logger, IIOHelper ioHelper, IShortStringHelper shortStringHelper)
-            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService,Current.Services.TextService, shortStringHelper)
+        public DateTimePropertyEditor(ILogger logger, IIOHelper ioHelper, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper)
+            : base(logger, dataTypeService, localizationService,localizedTextService, shortStringHelper)
         {
             _ioHelper = ioHelper;
         }

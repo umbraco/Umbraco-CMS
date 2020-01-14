@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Web.Mvc;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Web.JavaScript;

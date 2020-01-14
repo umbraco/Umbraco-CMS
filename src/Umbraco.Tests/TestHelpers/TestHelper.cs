@@ -19,12 +19,14 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Net;
+using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.Hosting;
 using File = System.IO.File;
@@ -86,10 +88,12 @@ namespace Umbraco.Tests.TestHelpers
         }
 
         public static IShortStringHelper ShortStringHelper { get; } = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
+        public static IVariationContextAccessor VariationContextAccessor { get; } = new TestVariationContextAccessor();
         public static IDbProviderFactoryCreator DbProviderFactoryCreator { get; } = new UmbracoDbProviderFactoryCreator(Constants.DbProviderNames.SqlCe);
         public static IBulkSqlInsertProvider BulkSqlInsertProvider { get; } = new SqlCeBulkSqlInsertProvider();
         public static IMarchal Marchal { get; } = new FrameworkMarchal();
         public static ICoreDebug CoreDebug { get; } =  new CoreDebug();
+
 
         public static IIOHelper IOHelper { get; } = new IOHelper(GetHostingEnvironment());
         public static IMainDom MainDom { get; } = new MainDom(Mock.Of<ILogger>(), GetHostingEnvironment());

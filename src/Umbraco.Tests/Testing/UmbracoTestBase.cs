@@ -38,23 +38,22 @@ using Umbraco.Web.Actions;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
-using Umbraco.Web.Trees;
 using Umbraco.Core.Composing.CompositionExtensions;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Serialization;
 using Umbraco.Web.Composing.CompositionExtensions;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Hosting;
 using Umbraco.Web.Sections;
-using Current = Umbraco.Core.Composing.Current;
 using FileSystems = Umbraco.Core.IO.FileSystems;
 using Umbraco.Web.Templates;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Core.Dictionary;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Net;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Testing
 {

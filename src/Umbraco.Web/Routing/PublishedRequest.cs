@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Threading;
 using System.Web;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Macros;

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Web.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.Checks.Config
@@ -10,8 +11,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         Group = "Live Environment")]
     public class CustomErrorsCheck : AbstractConfigCheck
     {
-        public CustomErrorsCheck(ILocalizedTextService textService)
-            : base(textService)
+        public CustomErrorsCheck(ILocalizedTextService textService, IIOHelper ioHelper)
+            : base(textService, ioHelper)
         { }
 
         public override string FilePath => "~/Web.config";

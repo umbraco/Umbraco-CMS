@@ -22,7 +22,7 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Security;
 using Umbraco.Web.Routing;
 using File = System.IO.File;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.Testing;
@@ -55,6 +55,7 @@ namespace Umbraco.Tests.TestHelpers
         protected override ISqlSyntaxProvider SqlSyntax => GetSyntaxProvider();
 
         protected ServiceContext ServiceContext => Current.Services;
+        protected IVariationContextAccessor VariationContextAccessor => new TestVariationContextAccessor();
 
         internal ScopeProvider ScopeProvider => Current.ScopeProvider as ScopeProvider;
 

@@ -1,20 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Deploy;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Serialization;
-using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.CoreThings
 {
@@ -24,7 +16,7 @@ namespace Umbraco.Tests.CoreThings
         [SetUp]
         public void SetUp()
         {
-            UdiParser.ResetUdiTypes();            
+            UdiParser.ResetUdiTypes();
         }
 
         [Test]
@@ -284,20 +276,20 @@ namespace Umbraco.Tests.CoreThings
             Assert.IsNull(udi);
 
             UdiParser.ResetUdiTypes();
-            
+
             // unless we want to know
             Assert.IsFalse(UdiParser.TryParse("umb://whatever/1234", true, out udi));
             Assert.AreEqual(Constants.UdiEntityType.Unknown, udi.EntityType);
             Assert.AreEqual("Umbraco.Core.UnknownTypeUdi", udi.GetType().FullName);
 
             UdiParser.ResetUdiTypes();
-            
+
             // not known
             Assert.IsFalse(UdiParser.TryParse("umb://foo/A87F65C8D6B94E868F6949BA92C93045", true, out udi));
             Assert.AreEqual(Constants.UdiEntityType.Unknown, udi.EntityType);
             Assert.AreEqual("Umbraco.Core.UnknownTypeUdi", udi.GetType().FullName);
 
-            // scanned            
+            // scanned
             UdiParserServiceConnectors.RegisterServiceConnector<FooConnector>(); // this is the equivalent of scanning but we'll just manually register this one
             Assert.IsTrue(UdiParser.TryParse("umb://foo/A87F65C8D6B94E868F6949BA92C93045", out udi));
             Assert.IsInstanceOf<GuidUdi>(udi);

@@ -13,9 +13,8 @@ using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
 using Umbraco.Examine;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Examine.LuceneEngine.Directories;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using System.ComponentModel;
 
 namespace Umbraco.Web.Search
@@ -30,17 +29,17 @@ namespace Umbraco.Web.Search
         private readonly BackgroundIndexRebuilder _backgroundIndexRebuilder;
         private static object _isConfiguredLocker = new object();
         private readonly IScopeProvider _scopeProvider;
-        private readonly ServiceContext _services;        
+        private readonly ServiceContext _services;
         private readonly IMainDom _mainDom;
         private readonly IProfilingLogger _logger;
         private readonly IUmbracoIndexesCreator _indexCreator;
-        
+
 
         // the default enlist priority is 100
         // enlist with a lower priority to ensure that anything "default" runs after us
         // but greater that SafeXmlReaderWriter priority which is 60
         private const int EnlistPriority = 80;
-        
+
         public ExamineComponent(IMainDom mainDom,
             IExamineManager examineManager, IProfilingLogger profilingLogger,
             IScopeProvider scopeProvider, IUmbracoIndexesCreator indexCreator,
@@ -706,6 +705,6 @@ namespace Umbraco.Web.Search
         }
         #endregion
 
-        
+
     }
 }

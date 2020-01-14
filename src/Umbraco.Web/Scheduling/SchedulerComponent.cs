@@ -4,15 +4,14 @@ using System.IO;
 using System.Threading;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Routing;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Scheduling
 {

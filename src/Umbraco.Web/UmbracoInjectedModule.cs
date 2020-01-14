@@ -366,7 +366,7 @@ namespace Umbraco.Web
                     // also, if something goes wrong with our DI setup, the logging subsystem may
                     // not even kick in, so here we try to give as much detail as possible
 
-                    BootFailedException.Rethrow(Core.Composing.Current.RuntimeState.BootFailedException);
+                    BootFailedException.Rethrow(Current.RuntimeState.BootFailedException);
                 };
                 return;
             }

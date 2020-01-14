@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.Checks.Config
@@ -9,8 +10,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         Group = "Configuration")]
     public class MacroErrorsCheck : AbstractConfigCheck
     {
-        public MacroErrorsCheck(ILocalizedTextService textService)
-            : base(textService)
+        public MacroErrorsCheck(ILocalizedTextService textService, IIOHelper ioHelper)
+            : base(textService, ioHelper)
         { }
 
         public override string FilePath => "~/Config/umbracoSettings.config";

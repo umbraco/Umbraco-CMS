@@ -129,14 +129,12 @@
     <Compile Include="Compose\AuditEventsComponent.cs" />
     <Compile Include="Compose\AuditEventsComposer.cs" />
     <Compile Include="Composing\CompositionExtensions\CoreMappingProfiles.cs" />
-    <Compile Include="Composing\Current.cs" />
     <Compile Include="Models\Identity\BackOfficeIdentityUser.cs" />
     <Compile Include="Models\Identity\IdentityMapDefinition.cs" />
     <Compile Include="Models\Identity\IdentityUser.cs" />
     <Compile Include="Models\Identity\UserLoginInfoWrapper.cs" />
     <Compile Include="Persistence\SqlCeBulkSqlInsertProvider.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlCeSyntaxProvider.cs" />
-    <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="Runtime\CoreInitialComposer.cs" />
     <Compile Include="Runtime\CoreRuntime.cs" />
     <Compile Include="Security\AuthenticationExtensions.cs" />
@@ -153,7 +151,6 @@
     <Compile Include="Security\IUserSessionStore.cs" />
     <Compile Include="Security\UmbracoEmailMessage.cs" />
     <Compile Include="Security\UserAwarePasswordHasher.cs" />
-    <Compile Include="ServiceContextExtensions.cs" />
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>

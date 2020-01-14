@@ -8,8 +8,6 @@ namespace Umbraco.Core
 {
     public static class PublishedContentExtensions
     {
-        private static IVariationContextAccessor VariationContextAccessor => Current.VariationContextAccessor;
-
         /// <summary>
         /// Determines whether the content has a culture.
         /// </summary>
@@ -28,13 +26,14 @@ namespace Umbraco.Core
         /// Filters a sequence of <see cref="IPublishedContent"/> to return invariant items, and items that are published for the specified culture.
         /// </summary>
         /// <param name="contents">The content items.</param>
+        /// <param name="variationContextAccessor"></param>
         /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null).</param>
-        internal static IEnumerable<T> WhereIsInvariantOrHasCulture<T>(this IEnumerable<T> contents, string culture = null)
+        internal static IEnumerable<T> WhereIsInvariantOrHasCulture<T>(this IEnumerable<T> contents, IVariationContextAccessor variationContextAccessor, string culture = null)
             where T : class, IPublishedContent
         {
             if (contents == null) throw new ArgumentNullException(nameof(contents));
 
-            culture = culture ?? Current.VariationContextAccessor.VariationContext?.Culture ?? "";
+            culture = culture ?? variationContextAccessor.VariationContext?.Culture ?? "";
 
             // either does not vary by culture, or has the specified culture
             return contents.Where(x => !x.ContentType.VariesByCulture() || HasCulture(x, culture));
@@ -44,8 +43,9 @@ namespace Umbraco.Core
         /// Gets the name of the content item.
         /// </summary>
         /// <param name="content">The content item.</param>
+        /// <param name="variationContextAccessor"></param>
         /// <param name="culture">The specific culture to get the name for. If null is used the current culture is used (Default is null).</param>
-        public static string Name(this IPublishedContent content, string culture = null)
+        public static string Name(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string culture = null)
         {
             // invariant has invariant value (whatever the requested culture)
             if (!content.ContentType.VariesByCulture())
@@ -53,7 +53,7 @@ namespace Umbraco.Core
 
             // handle context culture for variant
             if (culture == null)
-                culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
+                culture = variationContextAccessor?.VariationContext?.Culture ?? "";
 
             // get
             return culture != "" && content.Cultures.TryGetValue(culture, out var infos) ? infos.Name : null;
@@ -64,8 +64,9 @@ namespace Umbraco.Core
         /// Gets the url segment of the content item.
         /// </summary>
         /// <param name="content">The content item.</param>
+        /// <param name="variationContextAccessor"></param>
         /// <param name="culture">The specific culture to get the url segment for. If null is used the current culture is used (Default is null).</param>
-        public static string UrlSegment(this IPublishedContent content, string culture = null)
+        public static string UrlSegment(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string culture = null)
         {
             // invariant has invariant value (whatever the requested culture)
             if (!content.ContentType.VariesByCulture())
@@ -73,7 +74,7 @@ namespace Umbraco.Core
 
             // handle context culture for variant
             if (culture == null)
-                culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
+                culture = variationContextAccessor?.VariationContext?.Culture ?? "";
 
             // get
             return culture != "" && content.Cultures.TryGetValue(culture, out var infos) ? infos.UrlSegment : null;
@@ -83,8 +84,9 @@ namespace Umbraco.Core
         /// Gets the culture date of the content item.
         /// </summary>
         /// <param name="content">The content item.</param>
+        /// <param name="variationContextAccessor"></param>
         /// <param name="culture">The specific culture to get the name for. If null is used the current culture is used (Default is null).</param>
-        public static DateTime CultureDate(this IPublishedContent content, string culture = null)
+        public static DateTime CultureDate(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string culture = null)
         {
             // invariant has invariant value (whatever the requested culture)
             if (!content.ContentType.VariesByCulture())
@@ -92,7 +94,7 @@ namespace Umbraco.Core
 
             // handle context culture for variant
             if (culture == null)
-                culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
+                culture = variationContextAccessor?.VariationContext?.Culture ?? "";
 
             // get
             return culture != "" && content.Cultures.TryGetValue(culture, out var infos) ? infos.Date : DateTime.MinValue;
@@ -103,14 +105,15 @@ namespace Umbraco.Core
         /// Gets the children of the content item.
         /// </summary>
         /// <param name="content">The content item.</param>
+        /// <param name="variationContextAccessor"></param>
         /// <param name="culture">
-        /// The specific culture to get the url children for. Default is null which will use the current culture in <see cref="VariationContext"/>        
+        /// The specific culture to get the url children for. Default is null which will use the current culture in <see cref="VariationContext"/>
         /// </param>
         /// <remarks>
         /// <para>Gets children that are available for the specified culture.</para>
         /// <para>Children are sorted by their sortOrder.</para>
         /// <para>
-        /// For culture, 
+        /// For culture,
         /// if null is used the current culture is used.
         /// If an empty string is used only invariant children are returned.
         /// If "*" is used all children are returned.
@@ -121,11 +124,11 @@ namespace Umbraco.Core
         /// However, if an empty string is specified only invariant children are returned.
         /// </para>
         /// </remarks>
-        public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, string culture = null)
+        public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string culture = null)
         {
             // handle context culture for variant
             if (culture == null)
-                culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
+                culture = variationContextAccessor?.VariationContext?.Culture ?? "";
 
             var children = content.ChildrenForAllCultures;
             return culture == "*"
