@@ -766,6 +766,7 @@
     <key alias="articles">Articles</key>
     <key alias="videos">Videos</key>
     <key alias="clear">Clear</key>
+    <key alias="installing">Installing</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blue</key>
@@ -2375,4 +2376,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="fallbackHeadline">Welcome to The Friendly CMS</key>
     <key alias="fallbackDescription">Thank you for choosing Umbraco - we think this could be the beginning of something beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast as possible.</key>
   </area>  
+  <area alias="formsDashboard">
+    <key alias="formsHeadline">Umbraco Forms</key>
+    <key alias="formsDescription">Create forms using an intuitive drag and drop interface. From simple contact forms that sends e-mails to advanced questionaires that integrate with CRM systems. Your clients will love it!</key>
+  </area>
 </language>
