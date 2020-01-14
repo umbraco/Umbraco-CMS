@@ -170,7 +170,13 @@ namespace Umbraco.Core.Runtime
 
                 // get composers, and compose
                 var composerTypes = ResolveComposerTypes(typeLoader);
-                var enableDisableAttributes = typeLoader.GetAssemblyAttributes(typeof(EnableComposerAttribute), typeof(DisableComposerAttribute));
+
+                IEnumerable<Attribute> enableDisableAttributes;
+                using (ProfilingLogger.DebugDuration<CoreRuntime>("Scanning enable/disable composer attributes"))
+                {
+                    enableDisableAttributes = typeLoader.GetAssemblyAttributes(typeof(EnableComposerAttribute), typeof(DisableComposerAttribute));
+                }   
+
                 var composers = new Composers(composition, composerTypes, enableDisableAttributes, ProfilingLogger);
                 composers.Compose();
 

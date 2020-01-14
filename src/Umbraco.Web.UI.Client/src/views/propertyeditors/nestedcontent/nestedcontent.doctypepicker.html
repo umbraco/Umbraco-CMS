@@ -56,11 +56,13 @@
     <div class="umb-nested-content__help-text" ng-show="showHelpText">
         <p>
             <b><localize key="general_group">Group</localize>:</b><br />
-            Select the group whose properties should be displayed. If left blank, the first group on the element type will be used.
+            <localize key="content_nestedContentGroupHelpText">Select the group whose properties should be displayed. If left blank, the first group on the element type will be used.</localize>
         </p>
         <p>
             <b><localize key="template_template">Template</localize>:</b><br />
-            Enter an angular expression to evaluate against each item for its name. Use <code ng-non-bindable>{{$index}}</code> to display the item index
+            <localize key="content_nestedContentTemplateHelpTextPart1">Enter an angular expression to evaluate against each item for its name. Use</localize>
+            <code ng-non-bindable>{{$index}}</code>
+            <localize key="content_nestedContentTemplateHelpTextPart2">to display the item index</localize>
         </p>
     </div>
 </div>

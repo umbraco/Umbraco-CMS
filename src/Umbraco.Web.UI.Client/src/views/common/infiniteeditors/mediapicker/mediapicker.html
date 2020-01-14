@@ -56,19 +56,19 @@
                     <div class="row umb-control-group" ng-show="!vm.searchOptions.filter">
                         <ul class="umb-breadcrumbs">
                             <li ng-hide="startNodeId != -1" class="umb-breadcrumbs__ancestor">
-                            <button type="button" class="umb-breadcrumbs__action" ng-click="vm.gotoFolder()">
+                            <button type="button" class="umb-breadcrumbs__action umb-outline umb-outline--surronding" ng-click="vm.gotoFolder()" ng-class="{'--current':path.length === 0}">
                                 <localize key="treeHeaders_media">Media</localize>
                             </button>
                             <span class="umb-breadcrumbs__separator" aria-hidden="true">&#47;</span>
                             </li>
 
                             <li ng-repeat="item in path" class="umb-breadcrumbs__ancestor">
-                            <button type="button" class="umb-breadcrumbs__action" ng-click="vm.gotoFolder(item)">{{item.name}}</button>
+                            <button type="button" class="umb-breadcrumbs__action umb-outline umb-outline--surronding" ng-click="vm.gotoFolder(item)" ng-class="{'--current':$last}">{{item.name}}</button>
                             <span class="umb-breadcrumbs__separator" aria-hidden="true">&#47;</span>
                             </li>
 
                             <li class="umb-breadcrumbs__ancestor" ng-show="!lockedFolder">
-                            <button type="button" class="umb-breadcrumbs__action" ng-hide="model.showFolderInput" ng-click="model.showFolderInput = true">
+                            <button type="button" class="umb-breadcrumbs__action umb-outline umb-outline--surronding" ng-hide="model.showFolderInput" ng-click="model.showFolderInput = true">
                                 <i class="icon icon-add small" aria-hidden="true"></i>
                                 <span class="sr-only">
                                     <localize key="visuallyHiddenTexts_createNewFolder">Create new folder</localize>
@@ -105,8 +105,6 @@
                             items="images"
                             on-click="vm.clickHandler"
                             on-click-name="vm.clickItemName"
-                            on-click-edit="vm.editMediaItem(item)"
-                            allow-on-click-edit="{{allowMediaEdit}}"
                             item-max-width="150"
                             item-max-height="150"
                             item-min-width="100"
@@ -115,7 +113,8 @@
                             only-images={{onlyImages}}
                             only-folders={{onlyFolders}}
                             include-sub-folders={{showChilds}}
-                            current-folder-id="{{currentFolder.id}}">
+                            current-folder-id="{{currentFolder.id}}"
+                            allow-open-folder="!disableFolderSelect">
                     </umb-media-grid>
 
 
