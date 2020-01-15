@@ -11,6 +11,7 @@ using Umbraco.Web.Routing;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Security;
 using Umbraco.Web.Composing;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web
 {

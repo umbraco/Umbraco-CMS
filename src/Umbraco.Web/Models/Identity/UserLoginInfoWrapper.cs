@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNet.Identity;
+using Umbraco.Core.Models.Identity;
 
-namespace Umbraco.Core.Models.Identity
+namespace Umbraco.Web.Models.Identity
 {
     internal class UserLoginInfoWrapper : IUserLoginInfo
     {

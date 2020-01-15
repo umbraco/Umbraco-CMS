@@ -169,12 +169,9 @@ namespace Umbraco.Core.Runtime
                 // type finder/loader
                 var typeLoader = new TypeLoader(IOHelper, TypeFinder, appCaches.RuntimeCache, new DirectoryInfo(HostingEnvironment.LocalTempPath), ProfilingLogger);
 
-                // main dom
-                var mainDom = new MainDom(Logger, HostingEnvironment);
-
                 // create the composition
                 composition = new Composition(register, typeLoader, ProfilingLogger, _state, Configs, IOHelper, appCaches);
-                composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, mainDom, appCaches, databaseFactory, typeLoader, _state, TypeFinder, IOHelper, UmbracoVersion, DbProviderFactoryCreator, BulkSqlInsertProvider);
+                composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, MainDom, appCaches, databaseFactory, typeLoader, _state, TypeFinder, IOHelper, UmbracoVersion, DbProviderFactoryCreator, BulkSqlInsertProvider);
 
                 // run handlers
                 RuntimeOptions.DoRuntimeEssentials(composition, appCaches, typeLoader, databaseFactory);

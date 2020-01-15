@@ -10,6 +10,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
+using Umbraco.Web.Models.Identity;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 using Task = System.Threading.Tasks.Task;
 
@@ -80,7 +81,6 @@ namespace Umbraco.Core.Security
 
             var userEntity = new User(_globalSettings, user.Name, user.Email, user.UserName, emptyPasswordValue)
             {
-                DefaultToLiveEditing = false,
                 Language = user.Culture ?? _globalSettings.DefaultUILanguage,
                 StartContentIds = user.StartContentIds ?? new int[] { },
                 StartMediaIds = user.StartMediaIds ?? new int[] { },

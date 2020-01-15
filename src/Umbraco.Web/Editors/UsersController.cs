@@ -27,6 +27,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Editors.Filters;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Models.Identity;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;

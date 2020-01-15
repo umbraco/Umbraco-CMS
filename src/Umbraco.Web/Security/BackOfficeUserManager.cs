@@ -12,6 +12,7 @@ using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Net;
+using Umbraco.Web.Models.Identity;
 using IPasswordHasher = Microsoft.AspNet.Identity.IPasswordHasher;
 
 namespace Umbraco.Web.Security

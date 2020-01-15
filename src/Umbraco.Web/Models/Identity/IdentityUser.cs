@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.AspNet.Identity;
+using Umbraco.Core.Models.Identity;
 
-namespace Umbraco.Core.Models.Identity
+namespace Umbraco.Web.Models.Identity
 {
     /// <summary>
     /// Default IUser implementation
