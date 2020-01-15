@@ -191,8 +191,8 @@
   </location>
   <location path="umbraco" xdt:Locator="Match(path)">
     <system.webServer>
-      <urlCompression doStaticCompression="false" doDynamicCompression="false" dynamicCompressionBeforeCache="false" xdt:Transform="SetAttributes(doStaticCompression,doDynamicCompression,dynamicCompressionBeforeCache)" />
-      <httpErrors errorMode="Custom" existingResponse="PassThrough" xdt:Transform="SetAttributes(errorMode,existingResponse)"/>
+      <urlCompression doStaticCompression="false" doDynamicCompression="false" dynamicCompressionBeforeCache="false" xdt:Transform="SetAttributes" />
+      <httpErrors existingResponse="Auto" xdt:Transform="SetAttributes" />
     </system.webServer>
   </location>
   
@@ -208,8 +208,8 @@
   </location>
   <location path="App_Plugins" xdt:Locator="Match(path)">
     <system.webServer>
-      <urlCompression doStaticCompression="false" doDynamicCompression="false" dynamicCompressionBeforeCache="false" xdt:Transform="SetAttributes(doStaticCompression,doDynamicCompression,dynamicCompressionBeforeCache)" />
-      <httpErrors errorMode="Custom" existingResponse="PassThrough" xdt:Transform="SetAttributes(errorMode,existingResponse)"/>
+      <urlCompression doStaticCompression="false" doDynamicCompression="false" dynamicCompressionBeforeCache="false" xdt:Transform="SetAttributes" />
+      <httpErrors existingResponse="Auto" xdt:Transform="SetAttributes" />
     </system.webServer>
   </location>
 
