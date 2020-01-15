@@ -13,7 +13,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Web.Composing.CompositionExtensions;
+using Umbraco.Core.Composing.CompositionExtensions;
 using Current = Umbraco.Web.Composing.Current;
 using FileSystems = Umbraco.Core.IO.FileSystems;
 

@@ -81,7 +81,6 @@ namespace Umbraco.Core.Security
 
             var userEntity = new User(_globalSettings, user.Name, user.Email, user.UserName, emptyPasswordValue)
             {
-                DefaultToLiveEditing = false,
                 Language = user.Culture ?? _globalSettings.DefaultUILanguage,
                 StartContentIds = user.StartContentIds ?? new int[] { },
                 StartMediaIds = user.StartMediaIds ?? new int[] { },

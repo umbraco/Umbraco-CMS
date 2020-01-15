@@ -1,7 +1,7 @@
 ﻿using System;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Web.Composing.CompositionExtensions;
+using Umbraco.Core.Composing.CompositionExtensions;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;

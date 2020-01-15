@@ -13,7 +13,7 @@ namespace Umbraco.Web.Media
     /// <summary>
     /// Provides methods to manage auto-fill properties for upload fields.
     /// </summary>
-    internal class UploadAutoFillProperties
+    public class UploadAutoFillProperties
     {
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly ILogger _logger;
@@ -40,7 +40,7 @@ namespace Umbraco.Web.Media
 
             ResetProperties(content, autoFillConfig, culture, segment);
         }
-        
+
         /// <summary>
         /// Populates the auto-fill properties of a content item, for a specified auto-fill configuration.
         /// </summary>

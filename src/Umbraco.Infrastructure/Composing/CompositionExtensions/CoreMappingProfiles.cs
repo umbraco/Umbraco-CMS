@@ -1,8 +1,6 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Mapping;
+﻿using Umbraco.Core.Mapping;
 
-namespace Umbraco.Web.Composing.CompositionExtensions
+namespace Umbraco.Core.Composing.CompositionExtensions
 
 {
     public static class CoreMappingProfiles

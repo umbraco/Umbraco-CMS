@@ -1,11 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -13,7 +10,7 @@ using Umbraco.Core.Packaging;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 
-namespace Umbraco.Web.Composing.CompositionExtensions
+namespace Umbraco.Core.Composing.CompositionExtensions
 {
     internal static class Services
     {
