@@ -4,7 +4,6 @@ using System.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core.IO;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.PropertyEditors.Validators;
 
 namespace Umbraco.Web.PropertyEditors
 {

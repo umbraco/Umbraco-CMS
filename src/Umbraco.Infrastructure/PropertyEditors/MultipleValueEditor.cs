@@ -2,7 +2,6 @@
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -17,12 +16,12 @@ namespace Umbraco.Web.PropertyEditors
     /// <remarks>
     /// This is re-used by editors such as the multiple drop down list or check box list
     /// </remarks>
-    internal class MultipleValueEditor : DataValueEditor
+    public class MultipleValueEditor : DataValueEditor
     {
         private readonly ILogger _logger;
 
-        internal MultipleValueEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute)
-            : base(dataTypeService, localizationService, localizedTextService,shortStringHelper, attribute)
+        public MultipleValueEditor(ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute)
+            : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, attribute)
         {
             _logger = logger;
         }

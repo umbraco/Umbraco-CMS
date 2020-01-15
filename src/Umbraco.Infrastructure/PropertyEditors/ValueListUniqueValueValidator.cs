@@ -10,7 +10,7 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Represents a validator which ensures that all values in the list are unique.
     /// </summary>
-    internal class ValueListUniqueValueValidator : IValueValidator
+    public class ValueListUniqueValueValidator : IValueValidator
     {
         public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)
         {
@@ -24,7 +24,7 @@ namespace Umbraco.Web.PropertyEditors
 
             var groupedValues = json.OfType<JObject>()
                 .Where(x => x["value"] != null)
-                .Select((x, index) => new { value = x["value"].ToString(), index})
+                .Select((x, index) => new { value = x["value"].ToString(), index })
                 .Where(x => x.value.IsNullOrWhiteSpace() == false)
                 .GroupBy(x => x.value);
 

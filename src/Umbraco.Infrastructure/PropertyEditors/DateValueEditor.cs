@@ -1,6 +1,5 @@
 ﻿using System;
 using Umbraco.Core;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
