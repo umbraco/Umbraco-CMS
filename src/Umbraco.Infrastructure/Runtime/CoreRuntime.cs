@@ -38,7 +38,6 @@ namespace Umbraco.Core.Runtime
             IHostingEnvironment hostingEnvironment,
             IBackOfficeInfo backOfficeInfo,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
-            IBulkSqlInsertProvider bulkSqlInsertProvider,
             IMainDom mainDom)
         {
             IOHelper = ioHelper;
@@ -48,7 +47,6 @@ namespace Umbraco.Core.Runtime
             HostingEnvironment = hostingEnvironment;
             BackOfficeInfo = backOfficeInfo;
             DbProviderFactoryCreator = dbProviderFactoryCreator;
-            BulkSqlInsertProvider = bulkSqlInsertProvider;
 
             _umbracoBootPermissionChecker = umbracoBootPermissionChecker;
 
@@ -75,7 +73,7 @@ namespace Umbraco.Core.Runtime
 
         protected IBackOfficeInfo BackOfficeInfo { get; }
         public IDbProviderFactoryCreator DbProviderFactoryCreator { get; }
-        public IBulkSqlInsertProvider BulkSqlInsertProvider { get; }
+        //public IBulkSqlInsertProvider BulkSqlInsertProvider { get; }
 
         /// <summary>
         /// Gets the profiler.
@@ -171,7 +169,7 @@ namespace Umbraco.Core.Runtime
 
                 // create the composition
                 composition = new Composition(register, typeLoader, ProfilingLogger, _state, Configs, IOHelper, appCaches);
-                composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, MainDom, appCaches, databaseFactory, typeLoader, _state, TypeFinder, IOHelper, UmbracoVersion, DbProviderFactoryCreator, BulkSqlInsertProvider);
+                composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, MainDom, appCaches, databaseFactory, typeLoader, _state, TypeFinder, IOHelper, UmbracoVersion, DbProviderFactoryCreator);
 
                 // run handlers
                 RuntimeOptions.DoRuntimeEssentials(composition, appCaches, typeLoader, databaseFactory);
@@ -387,7 +385,7 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         /// <remarks>This is strictly internal, for tests only.</remarks>
         protected internal virtual IUmbracoDatabaseFactory GetDatabaseFactory()
-            => new UmbracoDatabaseFactory(Logger, new Lazy<IMapperCollection>(() => _factory.GetInstance<IMapperCollection>()), Configs, DbProviderFactoryCreator, BulkSqlInsertProvider);
+            => new UmbracoDatabaseFactory(Logger, new Lazy<IMapperCollection>(() => _factory.GetInstance<IMapperCollection>()), Configs, DbProviderFactoryCreator);
 
 
         #endregion
