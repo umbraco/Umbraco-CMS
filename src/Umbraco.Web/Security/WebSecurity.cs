@@ -10,6 +10,7 @@ using Microsoft.Owin;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
+using Umbraco.Web.Models.Identity;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Security

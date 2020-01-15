@@ -11,6 +11,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
+using Umbraco.Web.Models.Identity;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Security

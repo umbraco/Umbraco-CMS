@@ -27,6 +27,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Web.Composing;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 using Umbraco.Core.Mapping;
+using Umbraco.Web.Models.Identity;
 
 namespace Umbraco.Web.Editors
 {

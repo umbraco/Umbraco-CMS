@@ -46,7 +46,8 @@ namespace Umbraco.Tests.Composing
                     //typeof(TabPage).Assembly,
                     typeof(System.Web.Mvc.ActionResult).Assembly,
                     typeof(TypeFinder).Assembly,
-                    typeof(UmbracoContext).Assembly
+                    typeof(UmbracoContext).Assembly,
+                    typeof(CheckBoxListPropertyEditor).Assembly
                 });
 
 
@@ -274,7 +275,7 @@ AnotherContentFinder
         public void GetDataEditors()
         {
             var types = _typeLoader.GetDataEditors();
-            Assert.AreEqual(37, types.Count());
+            Assert.AreEqual(38, types.Count());
         }
 
         /// <summary>

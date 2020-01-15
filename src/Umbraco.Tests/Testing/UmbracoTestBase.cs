@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
-using System.Threading;
 using System.Xml.Linq;
 using Examine;
 using Moq;
@@ -43,7 +42,6 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Serialization;
 using Umbraco.Web.Composing.CompositionExtensions;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Hosting;
 using Umbraco.Web.Sections;
 using FileSystems = Umbraco.Core.IO.FileSystems;
@@ -417,8 +415,7 @@ namespace Umbraco.Tests.Testing
                 Logger,
                 new Lazy<IMapperCollection>(f.GetInstance<IMapperCollection>),
                 TestHelper.GetConfigs(),
-                TestHelper.DbProviderFactoryCreator,
-                TestHelper.BulkSqlInsertProvider));
+                TestHelper.DbProviderFactoryCreator));
             Composition.RegisterUnique(f => f.TryGetInstance<IUmbracoDatabaseFactory>().SqlContext);
 
             Composition.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty

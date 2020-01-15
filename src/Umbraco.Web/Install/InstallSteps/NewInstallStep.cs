@@ -12,6 +12,7 @@ using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Services;
 using Umbraco.Web.Install.Models;
+using Umbraco.Web.Models.Identity;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Install.InstallSteps

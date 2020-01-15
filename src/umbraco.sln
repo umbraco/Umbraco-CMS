@@ -110,6 +110,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Infrastructure", "U
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Configuration", "Umbraco.Configuration\Umbraco.Configuration.csproj", "{FBE7C065-DAC0-4025-A78B-63B24D3AB00B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Infrastrucure.Persistance.SqlCe", "Umbraco.Infrastrucure.Persistance.SqlCe\Umbraco.Infrastrucure.Persistance.SqlCe.csproj", "{33085570-9BF2-4065-A9B0-A29D920D13BA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -158,6 +160,10 @@ Global
 		{FBE7C065-DAC0-4025-A78B-63B24D3AB00B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FBE7C065-DAC0-4025-A78B-63B24D3AB00B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FBE7C065-DAC0-4025-A78B-63B24D3AB00B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33085570-9BF2-4065-A9B0-A29D920D13BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33085570-9BF2-4065-A9B0-A29D920D13BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33085570-9BF2-4065-A9B0-A29D920D13BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33085570-9BF2-4065-A9B0-A29D920D13BA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
