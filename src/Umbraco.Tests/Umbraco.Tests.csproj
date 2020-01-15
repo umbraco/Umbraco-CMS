@@ -570,6 +570,10 @@
       <Project>{3ae7bf57-966b-45a5-910a-954d7c554441}</Project>
       <Name>Umbraco.Infrastructure</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Umbraco.Infrastrucure.Persistance.SqlCe\Umbraco.Infrastrucure.Persistance.SqlCe.csproj">
+      <Project>{33085570-9bf2-4065-a9b0-a29d920d13ba}</Project>
+      <Name>Umbraco.Infrastrucure.Persistance.SqlCe</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Umbraco.ModelsBuilder.Embedded\Umbraco.ModelsBuilder.Embedded.csproj">
       <Project>{52ac0ba8-a60e-4e36-897b-e8b97a54ed1c}</Project>
       <Name>Umbraco.ModelsBuilder.Embedded</Name>

@@ -82,6 +82,10 @@
       <Project>{3ae7bf57-966b-45a5-910a-954d7c554441}</Project>
       <Name>Umbraco.Infrastructure</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Umbraco.Infrastrucure.Persistance.SqlCe\Umbraco.Infrastrucure.Persistance.SqlCe.csproj">
+      <Project>{33085570-9bf2-4065-a9b0-a29d920d13ba}</Project>
+      <Name>Umbraco.Infrastrucure.Persistance.SqlCe</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Tests\Umbraco.Tests.csproj">
       <Project>{5d3b8245-ada6-453f-a008-50ed04bfe770}</Project>
       <Name>Umbraco.Tests</Name>

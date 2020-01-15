@@ -45,12 +45,14 @@ namespace Umbraco.Web.Composing
         {
             get
             {
-                if (_factory == null) throw new InvalidOperationException("No factory has been set.");
+                if (_factory == null)
+                    throw new InvalidOperationException("No factory has been set.");
                 return _factory;
             }
             set
             {
-                if (_factory != null) throw new InvalidOperationException("A factory has already been set.");
+                if (_factory != null)
+                    throw new InvalidOperationException("A factory has already been set.");
                 _factory = value;
             }
         }
