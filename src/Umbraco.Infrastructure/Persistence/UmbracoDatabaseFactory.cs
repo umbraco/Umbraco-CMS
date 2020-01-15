@@ -29,7 +29,6 @@ namespace Umbraco.Core.Persistence
     {
         private readonly Configs _configs;
         private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
-        private readonly IBulkSqlInsertProvider _bulkSqlInsertProvider;
         private readonly Lazy<IMapperCollection> _mappers;
         private readonly ILogger _logger;
 
@@ -41,6 +40,7 @@ namespace Umbraco.Core.Persistence
         private string _providerName;
         private DatabaseType _databaseType;
         private ISqlSyntaxProvider _sqlSyntax;
+        private IBulkSqlInsertProvider _bulkSqlInsertProvider;
         private RetryPolicy _connectionRetryPolicy;
         private RetryPolicy _commandRetryPolicy;
         private NPoco.MapperCollection _pocoMappers;
@@ -71,8 +71,8 @@ namespace Umbraco.Core.Persistence
         /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
         /// </summary>
         /// <remarks>Used by core runtime.</remarks>
-        public UmbracoDatabaseFactory(ILogger logger, Lazy<IMapperCollection> mappers, Configs configs, IDbProviderFactoryCreator dbProviderFactoryCreator, IBulkSqlInsertProvider bulkSqlInsertProvider)
-            : this(Constants.System.UmbracoConnectionName, logger, mappers, configs, dbProviderFactoryCreator, bulkSqlInsertProvider)
+        public UmbracoDatabaseFactory(ILogger logger, Lazy<IMapperCollection> mappers, Configs configs, IDbProviderFactoryCreator dbProviderFactoryCreator)
+            : this(Constants.System.UmbracoConnectionName, logger, mappers, configs, dbProviderFactoryCreator)
         {
             _configs = configs;
         }
@@ -81,7 +81,7 @@ namespace Umbraco.Core.Persistence
         /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
         /// </summary>
         /// <remarks>Used by the other ctor and in tests.</remarks>
-        public UmbracoDatabaseFactory(string connectionStringName, ILogger logger, Lazy<IMapperCollection> mappers, Configs configs, IDbProviderFactoryCreator dbProviderFactoryCreator, IBulkSqlInsertProvider bulkSqlInsertProvider)
+        public UmbracoDatabaseFactory(string connectionStringName, ILogger logger, Lazy<IMapperCollection> mappers, Configs configs, IDbProviderFactoryCreator dbProviderFactoryCreator)
         {
             if (connectionStringName == null) throw new ArgumentNullException(nameof(connectionStringName));
             if (string.IsNullOrWhiteSpace(connectionStringName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(connectionStringName));
@@ -89,7 +89,6 @@ namespace Umbraco.Core.Persistence
             _mappers = mappers ?? throw new ArgumentNullException(nameof(mappers));
             _configs = configs;
             _dbProviderFactoryCreator = dbProviderFactoryCreator  ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
-            _bulkSqlInsertProvider = bulkSqlInsertProvider ?? throw new ArgumentNullException(nameof(bulkSqlInsertProvider));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             var settings = configs.ConnectionStrings()[connectionStringName];
@@ -117,12 +116,11 @@ namespace Umbraco.Core.Persistence
         /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
         /// </summary>
         /// <remarks>Used in tests.</remarks>
-        public UmbracoDatabaseFactory(string connectionString, string providerName, ILogger logger, Lazy<IMapperCollection> mappers, IDbProviderFactoryCreator dbProviderFactoryCreator, IBulkSqlInsertProvider bulkSqlInsertProvider)
+        public UmbracoDatabaseFactory(string connectionString, string providerName, ILogger logger, Lazy<IMapperCollection> mappers, IDbProviderFactoryCreator dbProviderFactoryCreator)
         {
             _mappers = mappers ?? throw new ArgumentNullException(nameof(mappers));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _dbProviderFactoryCreator = dbProviderFactoryCreator ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
-            _bulkSqlInsertProvider = bulkSqlInsertProvider ?? throw new ArgumentNullException(nameof(bulkSqlInsertProvider));
 
             if (string.IsNullOrWhiteSpace(connectionString) || string.IsNullOrWhiteSpace(providerName))
             {
@@ -206,6 +204,17 @@ namespace Umbraco.Core.Persistence
         }
 
         /// <inheritdoc />
+        public IBulkSqlInsertProvider BulkSqlInsertProvider
+        {
+            get
+            {
+                // must be initialized to have a bulk insert provider
+                EnsureInitialized();
+                return _bulkSqlInsertProvider;
+            }
+        }
+
+        /// <inheritdoc />
         public void ConfigureForUpgrade()
         {
             _upgrading = true;
@@ -259,6 +268,8 @@ namespace Umbraco.Core.Persistence
             _sqlSyntax = _dbProviderFactoryCreator.GetSqlSyntaxProvider(_providerName);
             if (_sqlSyntax == null)
                 throw new Exception($"Can't find a sql syntax provider for provider name \"{_providerName}\".");
+
+            _bulkSqlInsertProvider = _dbProviderFactoryCreator.CreateBulkSqlInsertProvider(_providerName);
 
             if (_databaseType.IsSqlServer())
                 UpdateSqlServerDatabaseType();

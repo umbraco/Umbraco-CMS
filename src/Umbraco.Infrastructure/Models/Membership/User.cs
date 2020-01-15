@@ -321,13 +321,6 @@ namespace Umbraco.Core.Models.Membership
             set => SetPropertyValueAndDetectChanges(value, ref _language, nameof(Language));
         }
 
-        [IgnoreDataMember]
-        public bool DefaultToLiveEditing
-        {
-            get => _defaultToLiveEditing;
-            set => SetPropertyValueAndDetectChanges(value, ref _defaultToLiveEditing, nameof(DefaultToLiveEditing));
-        }
-
         /// <summary>
         /// Gets the groups that user is part of
         /// </summary>

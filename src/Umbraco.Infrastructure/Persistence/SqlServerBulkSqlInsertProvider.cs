@@ -8,6 +8,10 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence
 {
+
+    /// <summary>
+    /// A bulk sql insert provider for Sql Server
+    /// </summary>
     public class SqlServerBulkSqlInsertProvider : IBulkSqlInsertProvider
     {
         public int BulkInsertRecords<T>(IUmbracoDatabase database, IEnumerable<T> records)
@@ -20,22 +24,7 @@ namespace Umbraco.Core.Persistence
 
             return database.DatabaseType.IsSqlServer2008OrLater()
                 ? BulkInsertRecordsSqlServer(database, pocoData, recordsA)
-                : BulkInsertRecordsWithCommands(database, recordsA);
-        }
-
-        /// <summary>
-        /// Bulk-insert records using commands.
-        /// </summary>
-        /// <typeparam name="T">The type of the records.</typeparam>
-        /// <param name="database">The database.</param>
-        /// <param name="records">The records.</param>
-        /// <returns>The number of records that were inserted.</returns>
-        private static int BulkInsertRecordsWithCommands<T>(IUmbracoDatabase database, T[] records)
-        {
-            foreach (var command in database.GenerateBulkInsertCommands(records))
-                command.ExecuteNonQuery();
-
-            return records.Length; // what else?
+                : BasicBulkSqlInsertProvider.BulkInsertRecordsWithCommands(database, recordsA);
         }
 
         /// <summary>

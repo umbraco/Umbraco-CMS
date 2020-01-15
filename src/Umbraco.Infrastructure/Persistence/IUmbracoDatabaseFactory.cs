@@ -48,12 +48,20 @@ namespace Umbraco.Core.Persistence
         void Configure(string connectionString, string providerName);
 
         /// <summary>
-        /// Gets the Sql context.
+        /// Gets the <see cref="ISqlContext"/>.
         /// </summary>
         /// <remarks>
-        /// <para>Getting the Sql context causes the factory to initialize if it is not already initialized.</para>
+        /// <para>Getting the <see cref="ISqlContext"/> causes the factory to initialize if it is not already initialized.</para>
         /// </remarks>
         ISqlContext SqlContext { get; }
+
+        /// <summary>
+        /// Gets the <see cref="IBulkSqlInsertProvider"/>.
+        /// </summary>
+        /// <remarks>
+        /// <para>Getting the <see cref="IBulkSqlInsertProvider"/> causes the factory to initialize if it is not already initialized.</para>
+        /// </remarks>
+        IBulkSqlInsertProvider BulkSqlInsertProvider { get; }
 
         /// <summary>
         /// Configures the database factory for upgrades.

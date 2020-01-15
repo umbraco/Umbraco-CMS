@@ -39,9 +39,8 @@ namespace Umbraco.Web.Runtime
             IHostingEnvironment hostingEnvironment,
             IBackOfficeInfo backOfficeInfo,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
-            IBulkSqlInsertProvider bulkSqlInsertProvider,
             IMainDom mainDom):
-            base(configs, umbracoVersion, ioHelper, logger, profiler ,new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, bulkSqlInsertProvider, mainDom)
+            base(configs, umbracoVersion, ioHelper, logger, profiler ,new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom)
         {
             _umbracoApplication = umbracoApplication;
 

@@ -1,10 +1,9 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
-using System.Web;
 using System.Xml;
 using Umbraco.Core.Media;
 
@@ -19,7 +18,7 @@ namespace Umbraco.Web.Media.EmbedProviders
         public abstract string[] UrlSchemeRegex { get; }
 
         public abstract Dictionary<string, string> RequestParams { get; }
-        
+
         public abstract string GetMarkup(string url, int maxWidth = 0, int maxHeight = 0);
 
         public virtual string GetEmbedProviderUrl(string url, int maxWidth, int maxHeight)
@@ -30,7 +29,7 @@ namespace Umbraco.Web.Media.EmbedProviders
             var fullUrl = new StringBuilder();
 
             fullUrl.Append(ApiEndpoint);
-            fullUrl.Append("?url=" + HttpUtility.UrlEncode(url));
+            fullUrl.Append("?url=" + WebUtility.UrlEncode(url));
 
             foreach (var param in RequestParams)
                 fullUrl.Append($"&{param.Key}={param.Value}");
@@ -43,7 +42,7 @@ namespace Umbraco.Web.Media.EmbedProviders
 
             return fullUrl.ToString();
         }
-        
+
         public virtual string DownloadResponse(string url)
         {
             if (_httpClient == null)
