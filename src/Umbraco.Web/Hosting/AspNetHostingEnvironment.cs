@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Web;
 using System.Web.Hosting;
@@ -13,6 +14,8 @@ namespace Umbraco.Web.Hosting
 {
     public class AspNetHostingEnvironment : IHostingEnvironment
     {
+        private readonly ConcurrentDictionary<IRegisteredObject, RegisteredObjectWrapper> _registeredObjects =
+            new ConcurrentDictionary<IRegisteredObject, RegisteredObjectWrapper>();
         private readonly IHostingSettings _hostingSettings;
         private string _localTempPath;
 
@@ -47,19 +50,19 @@ namespace Umbraco.Web.Hosting
             HttpRuntime.UnloadAppDomain();
         }
 
-        private IDictionary<IRegisteredObject, RegisteredObjectWrapper> RegisteredObjects { get;  } = new Dictionary<IRegisteredObject, RegisteredObjectWrapper>();
-
         public void RegisterObject(IRegisteredObject registeredObject)
         {
             var wrapped = new RegisteredObjectWrapper(registeredObject);
-            RegisteredObjects.Add(registeredObject, wrapped);
-
+            if (!_registeredObjects.TryAdd(registeredObject, wrapped))
+            {
+                throw new InvalidOperationException("Could not register object");
+            }
             HostingEnvironment.RegisterObject(wrapped);
         }
 
         public void UnregisterObject(IRegisteredObject registeredObject)
         {
-            if (RegisteredObjects.TryGetValue(registeredObject, out var wrapped))
+            if (_registeredObjects.TryGetValue(registeredObject, out var wrapped))
             {
                 HostingEnvironment.UnregisterObject(wrapped);
             }
