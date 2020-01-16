@@ -76,11 +76,11 @@
 @gray-10:               #F3F3F5;
 @gray-11:               #F6F6F7;
 
-@sand-1:                hsl(22, 18%, 84%);// added 2019
-@sand-2:                hsl(22, 34%, 88%);// added 2019
-@sand-5:                hsl(22, 31%, 93%);// added 2019
-@sand-6:                hsl(22, 29%, 95%);// added 2019
-@sand-7:                hsl(22, 26%, 97%);// added 2019
+@sand-1:                #DED4CF;// added 2019
+@sand-2:                #EBDED6;// added 2019
+@sand-5:                #F3ECE8;// added 2019
+@sand-6:                #F6F1EF;// added 2019
+@sand-7:                #F9F7F5;// added 2019
 
 
 // Additional Icon Colours
@@ -108,6 +108,7 @@
 //@blueLight:               #4f89de;
 @blue:                  #2E8AEA;
 @blueMid:               #2152A3;// updated 2019
+@blueMidLight:          rgb(99, 174, 236);
 @blueDark:              #3544b1;// updated 2019
 @blueExtraDark:         #1b264f;// added 2019
 @blueLight:             #ADD8E6;
@@ -124,7 +125,7 @@
 
 //@u-greyLight:           #f2ebe6;// added 2019
 @u-white:               #f9f7f4;// added 2019
-@u-black:               black;// added 2019
+@u-black:               @black;// added 2019
 
 
 // UI colors
@@ -132,11 +133,15 @@
 
 @ui-option-type:        @blueExtraDark;
 @ui-option-type-hover:  @blueMid;
+@ui-option:             @white;
 @ui-option-hover:       @sand-7;
 
 @ui-option-disabled-type:        @gray-6;
 @ui-option-disabled-type-hover:  @gray-5;
 @ui-option-disabled-hover:       @sand-7;
+
+@ui-disabled-type:        @gray-6;
+@ui-disabled-border:        @gray-6;
 
 //@ui-active:           #346ab3;
 @ui-active:             @pinkLight;
@@ -148,8 +153,8 @@
 @ui-selected-hover:     ligthen(@sand-5, 10);
 @ui-selected-type:           @blueExtraDark;
 @ui-selected-type-hover:     @blueMid;
-@ui-selected-border:           @pinkLight;
-@ui-selected-border-hover:     darken(@pinkLight, 10);
+@ui-selected-border:           @blueDark;
+@ui-selected-border-hover:     darken(@blueDark, 10);
 
 @ui-light-border:           @pinkLight;
 @ui-light-type:             @gray-4;
@@ -160,19 +165,21 @@
 @ui-light-active-type-hover:  @blueMid;
 
 
-@ui-action:             white;
+@ui-action:             @white;
 @ui-action-hover:       @sand-7;
 @ui-action-type:             @blueExtraDark;
 @ui-action-type-hover:       @blueMid;
 @ui-action-border:             @blueExtraDark;
 @ui-action-border-hover:       @blueMid;
 
-@ui-action-discreet:              white;
+@ui-action-discreet:              @white;
 @ui-action-discreet-hover:        @sand-7;
 @ui-action-discreet-type:         @blueExtraDark;
 @ui-action-discreet-type-hover:   @blueMid;
 @ui-action-discreet-border:         @gray-7;
 @ui-action-discreet-border-hover:   @blueMid;
+
+@ui-outline:                      @blueMidLight;
 
 @type-white:                      @white;
 @type-black:                      @blueNight;
@@ -193,96 +200,11 @@
 
 
 
-
-.red{color: @red;}
-.blue{color: @blue;}
-.black{color: @black;}
-.turquoise{color: @turquoise;}
-.turquoise-d1{color: @turquoise-d1;}
-
-.text-warning {
-    color: @orange;
-}
-.text-error {
-    color: @red;
-}
-.text-success {
-    color: @green;
-}
-
-
-//icon colors for tree icons
-.color-red, .color-red i{color: @red-d1 !important;}
-.color-blue, .color-blue i{color: @turquoise-d1 !important;}
-.color-orange, .color-orange i{color: @orange !important;}
-.color-green, .color-green i{color: @green-d1 !important;}
-.color-yellow, .color-yellow i{color: @yellowIcon !important;}
-
-/* Colors based on https://zavoloklom.github.io/material-design-color-palette/colors.html */
-.btn-color-black {background-color: @black;}
-.color-black i { color: @black;}
-
-.btn-color-blue-grey {background-color: @blueGrey;}
-.color-blue-grey, .color-blue-grey i { color: @blueGrey !important;}
-
-.btn-color-grey{background-color: @grayIcon;}
-.color-grey, .color-grey i { color: @grayIcon !important; }
-
-.btn-color-brown{background-color: @brownIcon;}
-.color-brown, .color-brown i { color: @brownIcon !important; }
-
-.btn-color-blue{background-color: @blueIcon;}
-.color-blue, .color-blue i { color: @blueIcon !important; }
-
-.btn-color-light-blue{background-color: @lightBlueIcon;}
-.color-light-blue, .color-light-blue i {color: @lightBlueIcon !important;}
-
-.btn-color-cyan{background-color: @cyanIcon;}
-.color-cyan, .color-cyan i { color: @cyanIcon !important; }
-
-.btn-color-green{background-color: @greenIcon;}
-.color-green, .color-green i { color: @greenIcon !important; }
-
-.btn-color-light-green{background-color: @lightGreenIcon;}
-.color-light-green, .color-light-green i {color: @lightGreenIcon !important; }
-
-.btn-color-lime{background-color: @limeIcon;}
-.color-lime, .color-lime i { color: @limeIcon !important; }
-
-.btn-color-yellow{background-color: @yellowIcon;}
-.color-yellow, .color-yellow i { color: @yellowIcon !important; }
-
-.btn-color-amber{background-color: @amberIcon;}
-.color-amber, .color-amber i { color: @amberIcon !important; }
-
-.btn-color-orange{background-color: @orangeIcon;}
-.color-orange, .color-orange i { color: @orangeIcon !important; }
-
-.btn-color-deep-orange{background-color: @deepOrangeIcon;}
-.color-deep-orange, .color-deep-orange i { color: @deepOrangeIcon !important; }
-
-.btn-color-red{background-color: @redIcon;}
-.color-red, .color-red i { color: @redIcon !important; }
-
-.btn-color-pink{background-color: @pinkIcon;}
-.color-pink, .color-pink i { color: @pinkIcon !important; }
-
-.btn-color-purple{background-color: @purpleIcon;}
-.color-purple, .color-purple i { color: @purpleIcon !important; }
-
-.btn-color-deep-purple{background-color: @deepPurpleIcon;}
-.color-deep-purple, .color-deep-purple i { color: @deepPurpleIcon !important; }
-
-.btn-color-indigo{background-color: @indigoIcon;}
-.color-indigo, .color-indigo i { color: @indigoIcon !important; }
-
-
-
 // Scaffolding
 // -------------------------
 @appHeaderHeight:       55px;
 @bodyBackground:        @gray-10;
-@textColor:             #000;
+@textColor:             @black;
 
 @editorHeaderHeight:    70px;
 @editorFooterHeight:    50px;
@@ -339,7 +261,7 @@
 // Buttons
 // -------------------------
 @btnBackground:                     @gray-9;
-@btnBackgroundHighlight:            @gray-9;
+@btnBackgroundHighlight:            @gray-10;
 @btnBorder:                         @gray-9;
 
 @btnPrimaryBackground:              @ui-btn-positive;
@@ -377,7 +299,7 @@
 @inputBackground:               @white;
 @inputBorder:                   @gray-8;
 @inputBorderFocus:              @gray-7;
-@inputBorderTabFocus:           @blueExtraDark;
+@inputBorderTabFocus:           @ui-outline;
 @inputBorderRadius:             0;
 @inputDisabledBackground:       @gray-10;
 @formActionsBackground:         @gray-9;
@@ -532,7 +454,7 @@
 @successBorder:           transparent;
 
 @infoText:                @white;
-@infoBackground:          @turquoise-d1;
+@infoBackground:          @blueDark;
 @infoBorder:              transparent;
 
 @alertBorderRadius:       0;

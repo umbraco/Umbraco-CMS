@@ -15,11 +15,11 @@
 		</div>
 
 		<div class="controls" ng-if="installer.current.model.dbType == 0">
-            <p>Great!, no need to configure anything then, you simply click the <strong>continue</strong> button below to continue to the next step</p>
+            <p>Great! No need to configure anything, you can simply click the <strong>continue</strong> button below to continue to the next step</p>
 		</div>
 
 		<div ng-if="installer.current.model.dbType < 0">
-			<legend>What is the exact connectionstring we should use?</legend>
+			<legend>What is the exact connection string we should use?</legend>
 			<div class="control-group">
 				<label class="control-label" for="server">Connection string</label>
 				  <div class="controls">
@@ -64,7 +64,7 @@
 							<label class="control-label" for="login">Login</label>
 							<div class="controls">
 								<input type="text" id="login" name="login"
-									placeholder="databaseuser"
+									placeholder="umbraco-database-user"
 									required ng-model="installer.current.model.login"  />
 								<small class="inline-help">Enter the database user name</small>
 							</div>

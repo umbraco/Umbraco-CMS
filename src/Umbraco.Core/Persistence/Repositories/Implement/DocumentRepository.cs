@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
@@ -229,6 +228,21 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return MapDtosToContent(Database.Fetch<DocumentDto>(sql), true);
         }
 
+        // TODO: This method needs to return a readonly version of IContent! The content returned
+        // from this method does not contain all of the data required to re-persist it and if that
+        // is attempted some odd things will occur.
+        // Either we create an IContentReadOnly (which ultimately we should for vNext so we can
+        // differentiate between methods that return entities that can be re-persisted or not), or
+        // in the meantime to not break API compatibility, we can add a property to IContentBase
+        // (or go further and have it on IUmbracoEntity): "IsReadOnly" and if that is true we throw
+        // an exception if that entity is passed to a Save method.
+        // Ideally we return "Slim" versions of content for all sorts of methods here and in ContentService.
+        // Perhaps another non-breaking alternative is to have new services like IContentServiceReadOnly
+        // which can return IContentReadOnly.
+        // We have the ability with `MapDtosToContent` to reduce the amount of data looked up for a
+        // content item. Ideally for paged data that populates list views, these would be ultra slim
+        // content items, there's no reason to populate those with really anything apart from property data,
+        // but until we do something like the above, we can't do that since it would be breaking and unclear.
         public override IEnumerable<IContent> GetAllVersionsSlim(int nodeId, int skip, int take)
         {
             var sql = GetBaseQuery(QueryType.Many, false)
@@ -236,7 +250,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .OrderByDescending<ContentVersionDto>(x => x.Current)
                 .AndByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            return MapDtosToContent(Database.Fetch<DocumentDto>(sql), true, true).Skip(skip).Take(take);
+            return MapDtosToContent(Database.Fetch<DocumentDto>(sql), true,
+                // load bare minimum, need variants though since this is used to rollback with variants
+                false, false, false, true).Skip(skip).Take(take);
         }
 
         public override IContent GetVersion(int versionId)
@@ -924,32 +940,32 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             protected override IEnumerable<IContent> PerformGetByQuery(IQuery<IContent> query)
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
             protected override IEnumerable<string> GetDeleteClauses()
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
             protected override void PersistNewItem(IContent entity)
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
             protected override void PersistUpdatedItem(IContent entity)
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
             protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
             protected override string GetBaseWhereClause()
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
         }
 
@@ -1056,7 +1072,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return base.ApplySystemOrdering(ref sql, ordering);
         }
 
-        private IEnumerable<IContent> MapDtosToContent(List<DocumentDto> dtos, bool withCache = false, bool slim = false)
+        private IEnumerable<IContent> MapDtosToContent(List<DocumentDto> dtos,
+            bool withCache = false,
+            bool loadProperties = true,
+            bool loadTemplates = true,
+            bool loadSchedule = true,
+            bool loadVariants = true)
         {
             var temps = new List<TempContent<Content>>();
             var contentTypes = new Dictionary<int, IContentType>();
@@ -1089,7 +1110,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 var c = content[i] = ContentBaseFactory.BuildEntity(dto, contentType);
 
-                if (!slim)
+                if (loadTemplates)
                 {
                     // need templates
                     var templateId = dto.DocumentVersionDto.TemplateId;
@@ -1114,49 +1135,71 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 temps.Add(temp);
             }
 
-            if (!slim)
+            Dictionary<int, ITemplate> templates = null;
+            if (loadTemplates)
             {
                 // load all required templates in 1 query, and index
-                var templates = _templateRepository.GetMany(templateIds.ToArray())
+                templates = _templateRepository.GetMany(templateIds.ToArray())
                     .ToDictionary(x => x.Id, x => x);
+            }
 
+            IDictionary<int, PropertyCollection> properties = null;
+            if (loadProperties)
+            {
                 // load all properties for all documents from database in 1 query - indexed by version id
-                var properties = GetPropertyCollections(temps);
-                var schedule = GetContentSchedule(temps.Select(x => x.Content.Id).ToArray());
+                properties = GetPropertyCollections(temps);
+            }
 
-                // assign templates and properties
-                foreach (var temp in temps)
+            var schedule = GetContentSchedule(temps.Select(x => x.Content.Id).ToArray());
+
+            // assign templates and properties
+            foreach (var temp in temps)
+            {
+                if (loadTemplates)
                 {
                     // set the template ID if it matches an existing template
                     if (temp.Template1Id.HasValue && templates.ContainsKey(temp.Template1Id.Value))
                         temp.Content.TemplateId = temp.Template1Id;
                     if (temp.Template2Id.HasValue && templates.ContainsKey(temp.Template2Id.Value))
                         temp.Content.PublishTemplateId = temp.Template2Id;
+                }
+                
 
-                    // set properties
+                // set properties
+                if (loadProperties)
+                {
                     if (properties.ContainsKey(temp.VersionId))
                         temp.Content.Properties = properties[temp.VersionId];
                     else
                         throw new InvalidOperationException($"No property data found for version: '{temp.VersionId}'.");
+                }
 
+                if (loadSchedule)
+                {
                     // load in the schedule
                     if (schedule.TryGetValue(temp.Content.Id, out var s))
                         temp.Content.ContentSchedule = s;
                 }
+
             }
 
-            // set variations, if varying
-            temps = temps.Where(x => x.ContentType.VariesByCulture()).ToList();
-            if (temps.Count > 0)
+            if (loadVariants)
             {
-                // load all variations for all documents from database, in one query
-                var contentVariations = GetContentVariations(temps);
-                var documentVariations = GetDocumentVariations(temps);
-                foreach (var temp in temps)
-                    SetVariations(temp.Content, contentVariations, documentVariations);
+                // set variations, if varying
+                temps = temps.Where(x => x.ContentType.VariesByCulture()).ToList();
+                if (temps.Count > 0)
+                {
+                    // load all variations for all documents from database, in one query
+                    var contentVariations = GetContentVariations(temps);
+                    var documentVariations = GetDocumentVariations(temps);
+                    foreach (var temp in temps)
+                        SetVariations(temp.Content, contentVariations, documentVariations);
+                }
             }
+            
 
-            foreach(var c in content)
+
+            foreach (var c in content)
                 c.ResetDirtyProperties(false); // reset dirty initial properties (U4-1946)
 
             return content;
