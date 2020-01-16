@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Web.Hosting;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Scheduling
 {

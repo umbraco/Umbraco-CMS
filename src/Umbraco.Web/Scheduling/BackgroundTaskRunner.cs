@@ -5,6 +5,7 @@ using System.Threading.Tasks.Dataflow;
 using System.Web.Hosting;
 using Umbraco.Core;
 using Umbraco.Core.Events;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Scheduling
@@ -81,6 +82,7 @@ namespace Umbraco.Web.Scheduling
         private readonly string _logPrefix;
         private readonly BackgroundTaskRunnerOptions _options;
         private readonly ILogger _logger;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly object _locker = new object();
 
         private readonly BufferBlock<T> _tasks = new BufferBlock<T>(new DataflowBlockOptions());
@@ -102,9 +104,10 @@ namespace Umbraco.Web.Scheduling
         /// Initializes a new instance of the <see cref="BackgroundTaskRunner{T}"/> class.
         /// </summary>
         /// <param name="logger">A logger.</param>
+        /// <param name="hostingEnvironment">The hosting environment</param>
         /// <param name="hook">An optional main domain hook.</param>
-        public BackgroundTaskRunner(ILogger logger, MainDomHook hook = null)
-            : this(typeof(T).FullName, new BackgroundTaskRunnerOptions(), logger, hook)
+        public BackgroundTaskRunner(ILogger logger, IHostingEnvironment hostingEnvironment, MainDomHook hook = null)
+            : this(typeof(T).FullName, new BackgroundTaskRunnerOptions(), logger, hostingEnvironment, hook)
         { }
 
         /// <summary>
@@ -112,9 +115,10 @@ namespace Umbraco.Web.Scheduling
         /// </summary>
         /// <param name="name">The name of the runner.</param>
         /// <param name="logger">A logger.</param>
+        /// <param name="hostingEnvironment">The hosting environment</param>
         /// <param name="hook">An optional main domain hook.</param>
-        public BackgroundTaskRunner(string name, ILogger logger, MainDomHook hook = null)
-            : this(name, new BackgroundTaskRunnerOptions(), logger, hook)
+        public BackgroundTaskRunner(string name, ILogger logger, IHostingEnvironment hostingEnvironment, MainDomHook hook = null)
+            : this(name, new BackgroundTaskRunnerOptions(), logger, hostingEnvironment, hook)
         { }
 
         /// <summary>
@@ -122,9 +126,10 @@ namespace Umbraco.Web.Scheduling
         /// </summary>
         /// <param name="options">The set of options.</param>
         /// <param name="logger">A logger.</param>
+        /// <param name="hostingEnvironment">The hosting environment</param>
         /// <param name="hook">An optional main domain hook.</param>
-        public BackgroundTaskRunner(BackgroundTaskRunnerOptions options, ILogger logger, MainDomHook hook = null)
-            : this(typeof(T).FullName, options, logger, hook)
+        public BackgroundTaskRunner(BackgroundTaskRunnerOptions options, ILogger logger, IHostingEnvironment hostingEnvironment, MainDomHook hook = null)
+            : this(typeof(T).FullName, options, logger, hostingEnvironment, hook)
         { }
 
         /// <summary>
@@ -133,15 +138,17 @@ namespace Umbraco.Web.Scheduling
         /// <param name="name">The name of the runner.</param>
         /// <param name="options">The set of options.</param>
         /// <param name="logger">A logger.</param>
+        /// <param name="hostingEnvironment">The hosting environment</param>
         /// <param name="hook">An optional main domain hook.</param>
-        public BackgroundTaskRunner(string name, BackgroundTaskRunnerOptions options, ILogger logger, MainDomHook hook = null)
+        public BackgroundTaskRunner(string name, BackgroundTaskRunnerOptions options, ILogger logger, IHostingEnvironment hostingEnvironment, MainDomHook hook = null)
         {
             _options = options ?? throw new ArgumentNullException(nameof(options));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _hostingEnvironment = hostingEnvironment;
             _logPrefix = "[" + name + "] ";
 
             if (options.Hosted)
-                HostingEnvironment.RegisterObject(this);
+                _hostingEnvironment.RegisterObject(this);
 
             if (hook != null)
                 _completed = _terminated = hook.Register() == false;
@@ -212,7 +219,7 @@ namespace Umbraco.Web.Scheduling
         /// <remarks>
         /// <para>Used to wait until the runner has terminated.</para>
         /// <para>
-        /// The only time the runner will be terminated is by the Hosting Environment when the application is being shutdown. 
+        /// The only time the runner will be terminated is by the Hosting Environment when the application is being shutdown.
         /// </para>
         /// </remarks>
         internal ThreadingTaskImmutable TerminatedAwaitable
@@ -350,14 +357,14 @@ namespace Umbraco.Web.Scheduling
 
             if (force)
             {
-                // we must bring everything down, now                
+                // we must bring everything down, now
                 lock (_locker)
                 {
                     // was Complete() enough?
                     // if _tasks.Complete() ended up triggering code to stop the runner and reset
                     // the _isRunning flag, then there's no need to initiate a cancel on the cancelation token.
                     if (_isRunning == false)
-                        return; 
+                        return;
                 }
 
                 // try to cancel running async tasks (cannot do much about sync tasks)
@@ -805,7 +812,7 @@ namespace Umbraco.Web.Scheduling
             if (immediate)
             {
                 //only unregister when it's the final call, else we won't be notified of the final call
-                HostingEnvironment.UnregisterObject(this);
+                _hostingEnvironment.UnregisterObject(this);
             }
 
             if (_terminated) return; // already taken care of
