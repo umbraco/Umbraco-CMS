@@ -233,8 +233,8 @@ Use this directive to construct a header inside the main editor window.
                     editorState.current.id === "-1";
 
                 var localizeVars = [
-                    scope.isNew ? "placeholders_a11yCreateItem" : "placeholders_a11yEdit",
-                    "placeholders_a11yName",
+                    scope.isNew ? "visuallyHiddenTexts_createItem" : "visuallyHiddenTexts_edit",
+                    "visuallyHiddenTexts_name",
                     scope.isNew ? "general_new" : "general_edit"
                 ];
 
