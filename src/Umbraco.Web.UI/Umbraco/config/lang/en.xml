@@ -37,6 +37,7 @@
     <key alias="chooseWhereToMove">Choose where to move</key>
     <key alias="toInTheTreeStructureBelow">to in the tree structure below</key>
     <key alias="infiniteEditorChooseWhereToCopy">Choose where to copy the selected item(s)</key>
+    <key alias="infiniteEditorChooseWhereToMove">Choose where to move the selected item(s)</key>
     <key alias="wasMovedTo">was moved to</key>
     <key alias="wasCopiedTo">was copied to</key>
     <key alias="wasDeleted">was deleted</key>
