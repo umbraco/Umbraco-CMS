@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Web;
 using Umbraco.Core;
-using Umbraco.Core.Collections;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Routing;
@@ -102,11 +101,5 @@ namespace Umbraco.Web
 
             return end;
         }
-
-        /// <summary>
-        /// This is used internally to track any registered callback paths for Identity providers. If the request path matches
-        /// any of the registered paths, then the module will let the request keep executing
-        /// </summary>
-        internal static readonly ConcurrentHashSet<string> ReservedPaths = new ConcurrentHashSet<string>();
     }
 }

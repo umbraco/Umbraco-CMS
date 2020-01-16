@@ -16,11 +16,13 @@ function RelationTypeCreateController($scope, $location, relationTypeResource, n
     init();
 
     function init() {
-        relationTypeResource.getRelationObjectTypes().then(function (data) {
-            vm.objectTypes = data;
-        }, function (err) {
-            notificationsService.error("Could not load form.")
-        })
+        $scope.$emit("$changeTitle", "");
+        relationTypeResource.getRelationObjectTypes().then(function(data) {
+                vm.objectTypes = data;
+            },
+            function(err) {
+                notificationsService.error("Could not load form.");
+            });
     }
 
     function createRelationType() {

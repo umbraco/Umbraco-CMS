@@ -73,7 +73,7 @@ namespace Umbraco.Web.Runtime
             // register accessors for cultures
             composition.RegisterUnique<IDefaultCultureAccessor, DefaultCultureAccessor>();
             composition.RegisterUnique<IVariationContextAccessor, HybridVariationContextAccessor>();
-
+            
             // register the http context and umbraco context accessors
             // we *should* use the HttpContextUmbracoContextAccessor, however there are cases when
             // we have no http context, eg when booting Umbraco or in background threads, so instead
@@ -124,6 +124,8 @@ namespace Umbraco.Web.Runtime
 
             // register distributed cache
             composition.RegisterUnique(f => new DistributedCache());
+
+            composition.RegisterUnique<RoutableDocumentFilter>();
 
             // replace some services
             composition.RegisterUnique<IEventMessagesFactory, DefaultEventMessagesFactory>();

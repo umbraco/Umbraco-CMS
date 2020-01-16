@@ -79,9 +79,9 @@
 // Hover/Focus state
 // -----------
 .dropdown-menu > li > a:hover,
-.dropdown-menu > li > a:focus,
+.dropdown-menu > li > button:hover,
 .dropdown-submenu:hover > a,
-.dropdown-submenu:focus > a {
+.dropdown-submenu:hover > button {
   text-decoration: none;
   color: @dropdownLinkColorHover;
   #gradient > .vertical(@dropdownLinkBackgroundHover, darken(@dropdownLinkBackgroundHover, 5%));
@@ -90,8 +90,7 @@
 // Active state
 // ------------
 .dropdown-menu > .active > a,
-.dropdown-menu > .active > a:hover,
-.dropdown-menu > .active > a:focus {
+.dropdown-menu > .active > a:hover {
   color: @dropdownLinkColorActive;
   text-decoration: none;
   outline: 0;
@@ -102,13 +101,11 @@
 // --------------
 // Gray out text and ensure the hover/focus state remains gray
 .dropdown-menu > .disabled > a,
-.dropdown-menu > .disabled > a:hover,
-.dropdown-menu > .disabled > a:focus {
+.dropdown-menu > .disabled > a:hover {
   color: @grayLight;
 }
 // Nuke hover/focus effects
-.dropdown-menu > .disabled > a:hover,
-.dropdown-menu > .disabled > a:focus {
+.dropdown-menu > .disabled > a:hover {
   text-decoration: none;
   background-color: transparent;
   background-image: none; // Remove CSS gradient

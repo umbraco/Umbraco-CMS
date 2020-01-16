@@ -32,7 +32,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
     /// Represents the Xml storage for the Xml published cache.
     /// </summary>
     /// <remarks>
-    /// <para>One instance of <see cref="XmlStore"/> is instantiated by the <see cref="PublishedSnapshotService"/> and
+    /// <para>One instance of <see cref="XmlStore"/> is instantiated by the <see cref="XmlPublishedSnapshotService"/> and
     /// then passed to all <see cref="PublishedContentCache"/> instances that are created (one per request).</para>
     /// <para>This class should *not* be public.</para>
     /// </remarks>
@@ -305,7 +305,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         private XmlDocument _xmlDocument; // supplied xml document (for tests)
         private volatile XmlDocument _xml; // master xml document
-        private readonly AsyncLock _xmlLock = new AsyncLock(); // protects _xml
+        private readonly SystemLock _xmlLock = new SystemLock(); // protects _xml
 
         // to be used by PublishedContentCache only
         // for non-preview content only

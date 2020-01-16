@@ -42,14 +42,20 @@ namespace Umbraco.Web.Models.Mapping
             target.Trashed = source.Trashed;
             target.Udi = Udi.Create(ObjectTypes.GetUdiType(source.NodeObjectType), source.Key);
 
-            if (source.NodeObjectType == Constants.ObjectTypes.Member && target.Icon.IsNullOrWhiteSpace())
-                target.Icon = Constants.Icons.Member;
-
             if (source is IContentEntitySlim contentSlim)
+            {
                 source.AdditionalData["ContentTypeAlias"] = contentSlim.ContentTypeAlias;
+            }
+
+            if (source is IDocumentEntitySlim documentSlim)
+            {
+                source.AdditionalData["IsPublished"] = documentSlim.Published;
+            }
 
             if (source is IMediaEntitySlim mediaSlim)
+            {
                 source.AdditionalData["MediaPath"] = mediaSlim.MediaPath;
+            }
 
             // NOTE: we're mapping the objects in AdditionalData by object reference here.
             // it works fine for now, but it's something to keep in mind in the future
@@ -171,6 +177,14 @@ namespace Umbraco.Web.Models.Mapping
 
             target.Name = source.Values.ContainsKey("nodeName") ? source.Values["nodeName"] : "[no name]";
 
+            if (source.Values.TryGetValue(UmbracoExamineIndex.UmbracoFileFieldName, out var umbracoFile))
+            {
+                if (umbracoFile != null)
+                {
+                    target.Name = $"{target.Name} ({umbracoFile})";
+                }
+            }
+
             if (source.Values.ContainsKey(UmbracoExamineIndex.NodeKeyFieldName))
             {
                 if (Guid.TryParse(source.Values[UmbracoExamineIndex.NodeKeyFieldName], out var key))
@@ -217,7 +231,18 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         private static string MapContentTypeIcon(IEntitySlim entity)
-            => entity is ContentEntitySlim contentEntity ? contentEntity.ContentTypeIcon : null;
+        {
+            switch (entity)
+            {
+                case ContentEntitySlim contentEntity:
+                    // NOTE: this case covers both content and media entities
+                    return contentEntity.ContentTypeIcon;
+                case MemberEntitySlim memberEntity:
+                    return memberEntity.ContentTypeIcon.IfNullOrWhiteSpace(Constants.Icons.Member);
+            }
+
+            return null;
+        }
 
         private static string MapName(IEntitySlim source, MapperContext context)
         {

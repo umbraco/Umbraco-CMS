@@ -3,7 +3,7 @@
 angular.module('umbraco')
 .controller("Umbraco.PrevalueEditors.TreeSourceController",
 	
-	function($scope, entityResource, iconHelper, editorService){
+	function($scope, $timeout, entityResource, iconHelper, editorService, eventsService){
 
 	    if (!$scope.model) {
 	        $scope.model = {};
@@ -19,11 +19,16 @@ angular.module('umbraco')
             };
         }
 
-		if($scope.model.value.id && $scope.model.value.type !== "member"){
-			entityResource.getById($scope.model.value.id, entityType()).then(function(item){
+        if($scope.model.value.id && $scope.model.value.type !== "member"){
+            entityResource.getById($scope.model.value.id, entityType()).then(function(item){
                 populate(item);
-			});
-		}
+            });
+        }
+        else {
+            $timeout(function () {
+                treeSourceChanged();
+            }, 100);
+        }
 
         function entityType() {
 			var ent = "Document";
@@ -58,8 +63,13 @@ angular.module('umbraco')
 			$scope.model.value.id = null;
             $scope.node = null;
             $scope.model.value.query = null;
+
+		    treeSourceChanged();
 		};
-		
+
+        function treeSourceChanged() {
+            eventsService.emit("treeSourceChanged", { value: $scope.model.value.type });
+        }
 
 		//we always need to ensure we dont submit anything broken
 	    var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
