@@ -719,14 +719,6 @@
     <Compile Include="Models\Mapping\MacroMapDefinition.cs" />
     <Compile Include="Models\Mapping\MemberMapDefinition.cs" />
     <Compile Include="Models\Mapping\TagMapDefinition.cs" />
-    <Compile Include="PropertyEditors\ColorPickerConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\EmailAddressPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\ImageCropperPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\ImageCropperPropertyValueEditor.cs" />
-    <Compile Include="PropertyEditors\ListViewPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\MarkdownPropertyEditor.cs" />
-    <Compile Include="Models\UpgradeCheckResponse.cs" />
-    <Compile Include="Models\PasswordChangedModel.cs" />
     <Compile Include="PropertyEditors\MemberGroupPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\ContentTypeParameterEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleContentTypeParameterEditor.cs" />
