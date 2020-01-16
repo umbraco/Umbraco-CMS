@@ -1,10 +1,8 @@
-﻿using System;
-using System.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using System.Linq;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
-using Umbraco.Core.PropertyEditors.ValueConverters;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Models
 {
@@ -18,29 +16,12 @@ namespace Umbraco.Core.Models
             if (!media.Properties.TryGetValue(propertyAlias, out var property))
                 return string.Empty;
 
-            // TODO: would need to be adjusted to variations, when media become variants
-            if (!(property.GetValue() is string jsonString))
-                return string.Empty;
-
-            if (property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.UploadField)
-                return jsonString;
-
-            if (property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.ImageCropper)
+            if (Current.PropertyEditors.TryGet(property.PropertyType.PropertyEditorAlias, out var editor)
+                && editor is IDataEditorWithMediaPath dataEditor)
             {
-                if (jsonString.DetectIsJson() == false)
-                    return jsonString;
-
-                try
-                {
-                    var json = JsonConvert.DeserializeObject<JObject>(jsonString);
-                    if (json["src"] != null)
-                        return json["src"].Value<string>();
-                }
-                catch (Exception ex)
-                {
-                    logger.Error<ImageCropperValueConverter>(ex, "Could not parse the string '{JsonString}' to a json object", jsonString);
-                    return string.Empty;
-                }
+                // TODO: would need to be adjusted to variations, when media become variants
+                var value = property.GetValue();
+                return dataEditor.GetMediaPath(value);
             }
 
             // Without knowing what it is, just adding a string here might not be very nice

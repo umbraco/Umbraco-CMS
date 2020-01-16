@@ -1,13 +1,13 @@
 //
 // Container styles
 // --------------------------------------------------
-.umb-property-editor { 
+.umb-property-editor {
     width: 100%;
 }
 
 .umb-property-editor-tiny {
     width: 60px;
-    
+
 	&.umb-editor-push {
 		width:30%;
 		min-width:0;
@@ -30,7 +30,7 @@
 }
 
 .umb-codeeditor{
-  width: 99%; 
+  width: 99%;
 }
 
 // displays property inline with preceeding
@@ -139,7 +139,7 @@
             margin-bottom: 0;
             vertical-align: middle;
             padding: 6px 10px;
-            background: #f7f7f7;
+            background: @gray-11;
             flex: 0 0 auto;
         }
 
@@ -169,8 +169,8 @@
         border: 1px solid @white;
         padding: 6px 10px;
         font-family: monospace;
-        border: 1px solid #dfdfe1;
-        background: #f7f7f7;
+        border: 1px solid @gray-8;
+        background: @gray-11;
         margin: 0 15px 0 3px;
         border-radius: 3px;
     }
@@ -232,6 +232,7 @@
 }
 .umb-mediapicker-multi > div {
     width:100%;
+    .umb-property-editor--limit-width();
 }
 
 
@@ -248,25 +249,10 @@
 
     transition: all 150ms ease-in-out;
 
-    &:focus,
+    &:active,
     &:hover {
         color: @ui-action-discreet-type-hover;
         border-color: @ui-action-discreet-type-hover;
-    }
-    
-    &:focus {
-        outline: none;
-        .tabbing-active &:after {
-            content: '';
-            position: absolute;
-            z-index: 10000;
-            top: -6px;
-            bottom: -6px;
-            left: -6px;
-            right: -6px;
-            border-radius: 3px;
-            box-shadow: 0 0 2px @blueMid, inset 0 0 2px 1px @blueMid;
-        }
     }
 }
 
@@ -358,11 +344,11 @@
     max-width: 100%;
 }
 .umb-mediapicker {
-    
+
     .umb-sortable-thumbnails li {
         border:none;
     }
-    
+
 }
 
 .umb-mediapicker .umb-sortable-thumbnails li {
@@ -415,8 +401,6 @@
     text-decoration: none;
     display: flex;
     flex-direction: row;
-    opacity: 0;
-    visibility: hidden;
 }
 
 .umb-sortable-thumbnails.ui-sortable:not(.ui-sortable-disabled) {
@@ -425,9 +409,8 @@
     }
 }
 
-.umb-sortable-thumbnails li:hover .umb-sortable-thumbnails__actions  {
+.umb-sortable-thumbnails li:hover .umb-sortable-thumbnails__action  {
     opacity: 1;
-    visibility: visible;
 }
 
 .umb-sortable-thumbnails .umb-sortable-thumbnails__action {
@@ -443,6 +426,12 @@
     margin-left: 5px;
     text-decoration: none;
     .box-shadow(0 1px 2px rgba(0,0,0,0.25));
+    opacity: 0;
+    transition: opacity .1s ease-in-out;
+
+    .tabbing-active &:focus {
+        opacity: 1;
+    }
 }
 
 .umb-sortable-thumbnails .umb-sortable-thumbnails__action.-red {
@@ -620,7 +609,7 @@
     .imagecropper .umb-cropper__container {
         position: relative;
         margin-bottom: 10px;
-        max-width: 100%; 
+        max-width: 100%;
         border: 1px solid @gray-10;
 
         @media (min-width: 769px) {
@@ -819,7 +808,7 @@
         background: @blueExtraDark;
         position: relative;
         user-select: all;
-        
+
         .icon-trash {
             position: relative;
             cursor: pointer;
@@ -840,7 +829,7 @@
         border: none;
         background: @white;
     }
-    
+
     .twitter-typeahead {
         margin: 10px;
         margin-top: 16px;
@@ -876,6 +865,21 @@
 }
 .umb-datepicker p {margin-top:10px;}
 .umb-datepicker p a{color: @gray-3;}
+
+//
+// Link picker
+// --------------------------------------------------
+.umb-linkpicker {
+    .umb-linkpicker__url {
+        width: 50%;
+        padding-right: 5px;
+    }
+
+    .umb-linkpicker__anchor {
+        width: 50%;
+        padding-left: 5px;
+    }
+}
 
 //
 // Code mirror - even though this isn't a proprety editor right now, it could be so I'm putting the styles here

@@ -54,10 +54,20 @@ namespace Umbraco.Web.Models.ContentEditing
         public string Culture { get; set; }
 
         /// <summary>
+        /// The segment of the property
+        /// </summary>
+        /// <remarks>
+        /// The segment value of a property can always be null but can only have a non-null value
+        /// when the property can be varied by segment.
+        /// </remarks>
+        [DataMember(Name = "segment")]
+        [ReadOnly(true)]
+        public string Segment { get; set; }
+
+        /// <summary>
         /// Used internally during model mapping
         /// </summary>
         [IgnoreDataMember]
         internal IDataEditor PropertyEditor { get; set; }
-
     }
 }
