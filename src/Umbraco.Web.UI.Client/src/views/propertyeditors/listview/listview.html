@@ -14,7 +14,7 @@
 
                     <!-- Renders when it's only possible to create one specific document type for, which no blueprint exists-->
                    <div class="btn-group" ng-show="createAllowedButtonSingle">
-                       <button type="button" class="btn btn-white" ng-click="createBlank(entityType,listViewAllowedTypes[0].alias)" prevent-default>
+                       <button type="button" class="btn btn-outline umb-outline" ng-click="createBlank(entityType,listViewAllowedTypes[0].alias)" prevent-default>
                            <localize key="actions_create">Create</localize> {{listViewAllowedTypes[0].name}}
                        </button>
                    </div>
@@ -50,7 +50,7 @@
                            <localize key="actions_create">Create</localize>
                            <span class="caret" aria-hidden="true"></span>
                        </button>
-                       
+
                        <umb-dropdown ng-if="page.createDropdownOpen" on-close="page.createDropdownOpen = false">
                            <umb-dropdown-item ng-repeat="contentType in listViewAllowedTypes track by contentType.key | orderBy:'name':false">
                                <button type="button" ng-click="createBlank(entityType,contentType.alias)" prevent-default>

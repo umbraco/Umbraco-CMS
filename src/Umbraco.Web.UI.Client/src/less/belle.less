@@ -2,6 +2,7 @@
 // Core variables and mixins
 @import "fonts.less"; // Loading fonts
 @import "variables.less"; // Modify this for custom colors, font-sizes, etc
+@import "colors.less"; // Colors from variables but as specific CSS classes
 @import "mixins.less";
 
 // CSS Reset
@@ -74,9 +75,9 @@
 @import "sections.less";
 @import "helveticons.less";
 @import "main.less";
-@import "listview.less"; 
+@import "listview.less";
 @import "gridview.less";
-@import "footer.less";
+@import "filter-toggle.less";
 
 @import "forms/umb-validation-label.less";
 
@@ -129,7 +130,9 @@
 @import "components/umb-media-grid.less";
 @import "components/umb-folder-grid.less";
 @import "components/umb-content-grid.less";
+@import "components/umb-contextmenu.less";
 @import "components/umb-layout-selector.less";
+@import "components/umb-mini-search.less";
 @import "components/tooltip/umb-tooltip.less";
 @import "components/tooltip/umb-tooltip-list.less";
 @import "components/overlays/umb-overlay-backdrop.less";
@@ -137,6 +140,8 @@
 @import "components/umb-grid.less";
 @import "components/umb-empty-state.less";
 @import "components/umb-property-editor.less";
+@import "components/umb-property-actions.less";
+@import "components/umb-code-snippet.less";
 @import "components/umb-color-swatches.less";
 @import "components/check-circle.less";
 @import "components/umb-file-icon.less";
@@ -187,6 +192,8 @@
 @import "components/users/umb-user-preview.less";
 @import "components/users/umb-user-picker-list.less";
 
+@import "components/contextdialogs/umb-dialog-datatype-delete.less";
+
 
 // Utilities
 @import "utilities/layout/_display.less";
@@ -201,7 +208,6 @@
 @import "utilities/_cursor.less";
 
 //page specific styles
-@import "pages/document-type-editor.less";
 @import "pages/login.less";
 @import "pages/welcome-dashboard.less";
 
@@ -217,6 +223,7 @@
 @import "dashboards/umbraco-forms.less";
 @import "dashboards/examine-management.less";
 @import "dashboards/healthcheck.less";
+@import "dashboards/nucache.less";
 
 @import "typeahead.less";
 @import "hacks.less";
