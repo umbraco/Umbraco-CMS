@@ -90,7 +90,9 @@ angular.module("umbraco.directives")
                     css.push("umb-tree-item--deleted");
                 }
 
-                if (actionNode) {
+                // checking the nodeType to ensure that this node and actionNode is from the same treeAlias
+                if (actionNode && actionNode.nodeType === node.nodeType) {
+
                     if (actionNode.id === node.id && String(node.id) !== "-1") {
                         css.push("active");
                     }
