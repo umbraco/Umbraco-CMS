@@ -86,6 +86,7 @@ namespace Umbraco.Web.Cache
             var payload = new JsonPayload
             {
                 Id = media.Id,
+                Key = media.Key,
                 Path = media.Path,
                 Operation = operation
             };
@@ -108,6 +109,7 @@ namespace Umbraco.Web.Cache
             public string Path { get; set; }
             public int Id { get; set; }
             public OperationType Operation { get; set; }
+            public Guid? Key { get; set; }
         }
 
         #endregion
@@ -142,7 +144,7 @@ namespace Umbraco.Web.Cache
         public override void Remove(int id)
         {
             ClearCache(FromMedia(ApplicationContext.Current.Services.MediaService.GetById(id),
-                //NOTE: we'll just default to trashed for this one.    
+                //NOTE: we'll just default to trashed for this one.
                 OperationType.Trashed));
             base.Remove(id);
         }
@@ -150,7 +152,7 @@ namespace Umbraco.Web.Cache
         private static void ClearCache(params JsonPayload[] payloads)
         {
             if (payloads == null) return;
-            
+
             ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
 
             foreach (var payload in payloads)
@@ -159,7 +161,7 @@ namespace Umbraco.Web.Cache
                     ApplicationContext.Current.Services.IdkMap.ClearCache(payload.Id);
 
                 var mediaCache = ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<IMedia>();
-
+                mediaCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IMedia>(payload.Key));
                 //if there's no path, then just use id (this will occur on permanent deletion like emptying recycle bin)
                 if (payload.Path.IsNullOrWhiteSpace())
                 {

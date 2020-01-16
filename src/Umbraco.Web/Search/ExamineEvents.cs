@@ -436,6 +436,13 @@ namespace Umbraco.Web.Search
                                     DeleteIndexForEntity(payload.Id, false);
 
                                     break;
+                                case UnpublishedPageCacheRefresher.OperationType.Refresh:// RefreshNode or RefreshBranch (maybe trashed)
+                                    var c2 = ApplicationContext.Current.Services.ContentService.GetById(payload.Id);
+                                    if (c2 != null)
+                                    {
+                                        ReIndexForContent(c2, false);
+                                    }
+                                    break;
                                 default:
                                     throw new ArgumentOutOfRangeException();
                             }
