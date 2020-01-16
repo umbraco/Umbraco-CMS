@@ -13,7 +13,7 @@
 
             <ul class="umb-actions umb-actions-child">
                 <li class="umb-action" ng-repeat="documentType in vm.documentTypes |orderBy:'name':false">
-                    <button ng-if="!documentType.isElement" class="umb-action-link umb-outline btn-reset" ng-click="vm.createBlueprint(documentType)" prevent-default>
+                    <button class="umb-action-link umb-outline btn-reset" ng-click="vm.createBlueprint(documentType)" prevent-default>
                         <i class="large icon {{documentType.icon}}" aria-hidden="true"></i>
                         <span class="menu-label">
                             {{documentType.name}}
