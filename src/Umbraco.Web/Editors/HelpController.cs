@@ -13,14 +13,23 @@ namespace Umbraco.Web.Editors
         {
             var url = string.Format(baseUrl + "/Umbraco/Documentation/Lessons/GetContextHelpDocs?sectionAlias={0}&treeAlias={1}", section, tree);
 
-            if (_httpClient == null)
-                _httpClient = new HttpClient();
+            try
+            {
 
-            //fetch dashboard json and parse to JObject
-            var json = await _httpClient.GetStringAsync(url);
-            var result = JsonConvert.DeserializeObject<List<HelpPage>>(json);
-            if (result != null)
-                return result;
+                if (_httpClient == null)
+                    _httpClient = new HttpClient();
+
+                //fetch dashboard json and parse to JObject
+                var json = await _httpClient.GetStringAsync(url);
+                var result = JsonConvert.DeserializeObject<List<HelpPage>>(json);
+                if (result != null)
+                    return result;
+
+            }
+            catch (HttpRequestException rex)
+            {
+                Logger.Info(GetType(), $"Check your network connection, exception: {rex.Message}");
+            }
 
             return new List<HelpPage>();
         }
