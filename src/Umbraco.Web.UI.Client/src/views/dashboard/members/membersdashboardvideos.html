@@ -4,13 +4,15 @@
 
 	<umb-box>
 		<umb-box-content>
-			<h3>Hours of Umbraco training videos are only a click away</h3>
-			<p>Want to master Umbraco? Spend a couple of minutes learning some best practices by watching one of these videos about using Umbraco. And visit <a href="https://umbraco.tv" target="_blank">umbraco.tv</a> for even more Umbraco videos</p>
+			<h3><localize key="settingsDashboardVideos_trainingHeadline">Hours of Umbraco training videos are only a click away</localize></h3>
+			<localize key="settingsDashboardVideos_trainingDescription">
+        <p>Want to master Umbraco? Spend a couple of minutes learning some best practices by watching one of these videos about using Umbraco. And visit <a href="http://umbraco.tv" target="_blank">umbraco.tv</a> for even more Umbraco videos</p>
+      </localize>
 		</umb-box-content>
 	</umb-box>
 
 	<div ng-show="videos.length">
-          <h4>To get you started:</h4>
+          <h4><localize key="settingsDashboardVideos_getStarted">To get you started</localize>:</h4>
             <ul class="thumbnails" >
                 <li class="span2" ng-repeat="video in videos">
                   <div class="thumbnail" style="margin-right: 20px">

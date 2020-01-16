@@ -113,11 +113,11 @@
                                 </span>
 
                                 <a href ng-click="vm.addFilter(vm.query)">
-                                    <i class="icon-add"></i>
+                                    <i class="icon-add" aria-hidden="true"></i>
                                 </a>
 
                                 <a href ng-click="vm.trashFilter(vm.query, filter)">
-                                    <i class="icon-trash"></i>
+                                    <i class="icon-trash" aria-hidden="true"></i>
                                 </a>
 
                             </div>
@@ -159,14 +159,11 @@
 
                         <ul class="nav unstyled">
                             <li ng-repeat="item in model.result.sampleResults">
-                                <i class="icon icon-document turquoise-d1"></i> {{item.name}}
+                                <i class="icon icon-document turquoise-d1" aria-hidden="true"></i> {{item.name}}
                             </li>
                         </ul>
 
-                        <pre>{{model.result.queryExpression}}</pre>
-                        <a href ng-click="vm.copyQuery()">
-                            <i class="icon-document"></i> <localize key="template_copyToClipboard">copy to clipboard</localize>
-                        </a>
+                        <umb-code-snippet language="'csharp'">{{model.result.queryExpression}}</umb-code-snippet>
 
                     </div>
 

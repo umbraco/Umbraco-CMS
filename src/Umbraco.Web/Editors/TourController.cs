@@ -51,29 +51,35 @@ namespace Umbraco.Web.Editors
             }
 
             //collect all tour files in packages
-            foreach (var plugin in Directory.EnumerateDirectories(IOHelper.MapPath(SystemDirectories.AppPlugins)))
+            var appPlugins = IOHelper.MapPath(SystemDirectories.AppPlugins);
+            if (Directory.Exists(appPlugins))
             {
-                var pluginName = Path.GetFileName(plugin.TrimEnd('\\'));
-                var pluginFilters = _filters.Where(x => x.PluginName != null && x.PluginName.IsMatch(pluginName)).ToList();
-
-                //If there is any filter applied to match the plugin only (no file or tour alias) then ignore the plugin entirely
-                var isPluginFiltered = pluginFilters.Any(x => x.TourFileName == null && x.TourAlias == null);
-                if (isPluginFiltered) continue;
-
-                //combine matched package filters with filters not specific to a package
-                var combinedFilters = nonPluginFilters.Concat(pluginFilters).ToList();
-
-                foreach (var backofficeDir in Directory.EnumerateDirectories(plugin, "backoffice"))
+                foreach (var plugin in Directory.EnumerateDirectories(appPlugins))
                 {
-                    foreach (var tourDir in Directory.EnumerateDirectories(backofficeDir, "tours"))
+                    var pluginName = Path.GetFileName(plugin.TrimEnd('\\'));
+                    var pluginFilters = _filters.Where(x => x.PluginName != null && x.PluginName.IsMatch(pluginName))
+                        .ToList();
+
+                    //If there is any filter applied to match the plugin only (no file or tour alias) then ignore the plugin entirely
+                    var isPluginFiltered = pluginFilters.Any(x => x.TourFileName == null && x.TourAlias == null);
+                    if (isPluginFiltered) continue;
+
+                    //combine matched package filters with filters not specific to a package
+                    var combinedFilters = nonPluginFilters.Concat(pluginFilters).ToList();
+
+                    foreach (var backofficeDir in Directory.EnumerateDirectories(plugin, "backoffice"))
                     {
-                        foreach (var tourFile in Directory.EnumerateFiles(tourDir, "*.json"))
+                        foreach (var tourDir in Directory.EnumerateDirectories(backofficeDir, "tours"))
                         {
-                            TryParseTourFile(tourFile, result, combinedFilters, aliasOnlyFilters, pluginName);
+                            foreach (var tourFile in Directory.EnumerateFiles(tourDir, "*.json"))
+                            {
+                                TryParseTourFile(tourFile, result, combinedFilters, aliasOnlyFilters, pluginName);
+                            }
                         }
                     }
                 }
             }
+
             //Get all allowed sections for the current user
             var allowedSections = user.AllowedSections.ToList();
 
@@ -102,6 +108,39 @@ namespace Umbraco.Web.Editors
             }
 
             return result.Except(toursToBeRemoved).OrderBy(x => x.FileName, StringComparer.InvariantCultureIgnoreCase);
+        }
+
+        /// <summary>
+        /// Gets a tours for a specific doctype
+        /// </summary>
+        /// <param name="doctypeAlias">The documenttype alias</param>
+        /// <returns>A <see cref="BackOfficeTour"/></returns>
+        public IEnumerable<BackOfficeTour> GetToursForDoctype(string doctypeAlias)
+        {
+            var tourFiles = this.GetTours();
+
+            var doctypeAliasWithCompositions = new List<string>
+                                                   {
+                                                       doctypeAlias
+                                                   };
+
+            var contentType = this.Services.ContentTypeService.Get(doctypeAlias);
+
+            if (contentType != null)
+            {
+                doctypeAliasWithCompositions.AddRange(contentType.CompositionAliases());
+            }
+
+            return tourFiles.SelectMany(x => x.Tours)
+                .Where(x =>
+                    {
+                        if (string.IsNullOrEmpty(x.ContentType))
+                        {
+                            return false;
+                        }
+                        var contentTypes = x.ContentType.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(ct => ct.Trim());
+                        return contentTypes.Intersect(doctypeAliasWithCompositions).Any();
+                    });
         }
 
         private void TryParseTourFile(string tourFile,

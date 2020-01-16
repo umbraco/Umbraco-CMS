@@ -9,12 +9,12 @@
     </div>
     <div ui-sortable="sortableOptions">
         <div class="control-group umb-prevalues-multivalues__listitem" ng-repeat="item in model.value">
-            <i class="icon icon-navigation handle"></i>
+            <i class="icon icon-navigation handle" aria-hidden="true"></i>
             <div class="umb-prevalues-multivalues__left">
                 <input type="text" ng-model="item.value" val-server="item_{{$index}}" required />
             </div>
             <div class="umb-prevalues-multivalues__right">
-                <a class="umb-node-preview__action umb-node-preview__action--red" ng-click="remove(item, $event)"><localize key="general_remove">Remove</localize></a>
+                <button class="umb-node-preview__action umb-node-preview__action--red" ng-click="remove(item, $event)"><localize key="general_remove">Remove</localize></button>
             </div>
         </div>
     </div>
