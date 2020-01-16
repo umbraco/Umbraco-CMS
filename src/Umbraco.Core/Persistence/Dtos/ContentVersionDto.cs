@@ -19,6 +19,7 @@ namespace Umbraco.Core.Persistence.Dtos
 
         [Column("nodeId")]
         [ForeignKey(typeof(ContentDto))]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_NodeId", ForColumns = "nodeId,current")]
         public int NodeId { get; set; }
 
         [Column("versionDate")] // TODO: db rename to 'updateDate'
@@ -30,7 +31,6 @@ namespace Umbraco.Core.Persistence.Dtos
         [NullSetting(NullSetting = NullSettings.Null)]
         public int? UserId { get => _userId == 0 ? null : _userId; set => _userId = value; } //return null if zero
 
-        // TODO: we need an index on this it is used almost always in querying and sorting
         [Column("current")]
         public bool Current { get; set; }
 

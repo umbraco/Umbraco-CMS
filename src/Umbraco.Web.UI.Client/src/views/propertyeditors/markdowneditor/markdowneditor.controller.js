@@ -27,6 +27,20 @@ function MarkdownEditorController($scope, $element, assetsService, editorService
         editorService.mediaPicker(mediaPicker);
     }
 
+    function openLinkPicker(callback) {
+        var linkPicker = {
+            hideTarget: true,
+            submit: function(model) {
+                callback(model.target.url, model.target.name);
+                editorService.close();
+            },
+            close: function() {
+                editorService.close();
+            }
+        };
+        editorService.linkPicker(linkPicker);
+    }
+
     assetsService
         .load([
             "lib/markdown/markdown.converter.js",
@@ -51,6 +65,12 @@ function MarkdownEditorController($scope, $element, assetsService, editorService
                     editor2.hooks.set("insertImageDialog", function (callback) {
                         openMediaPicker(callback);
                         return true; // tell the editor that we'll take care of getting the image url
+                    });
+
+                    //subscribe to the link dialog clicks
+                    editor2.hooks.set("insertLinkDialog", function (callback) {
+                        openLinkPicker(callback);
+                        return true; // tell the editor that we'll take care of getting the link url
                     });
 
                     editor2.hooks.set("onPreviewRefresh", function () {
