@@ -1,15 +1,21 @@
 using System;
+using System.Collections;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Web;
 using System.Web.Hosting;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
+using IRegisteredObject = Umbraco.Core.IRegisteredObject;
 
 namespace Umbraco.Web.Hosting
 {
     public class AspNetHostingEnvironment : IHostingEnvironment
     {
+        private readonly ConcurrentDictionary<IRegisteredObject, RegisteredObjectWrapper> _registeredObjects =
+            new ConcurrentDictionary<IRegisteredObject, RegisteredObjectWrapper>();
         private readonly IHostingSettings _hostingSettings;
         private string _localTempPath;
 
@@ -44,6 +50,23 @@ namespace Umbraco.Web.Hosting
             HttpRuntime.UnloadAppDomain();
         }
 
+        public void RegisterObject(IRegisteredObject registeredObject)
+        {
+            var wrapped = new RegisteredObjectWrapper(registeredObject);
+            if (!_registeredObjects.TryAdd(registeredObject, wrapped))
+            {
+                throw new InvalidOperationException("Could not register object");
+            }
+            HostingEnvironment.RegisterObject(wrapped);
+        }
+
+        public void UnregisterObject(IRegisteredObject registeredObject)
+        {
+            if (_registeredObjects.TryGetValue(registeredObject, out var wrapped))
+            {
+                HostingEnvironment.UnregisterObject(wrapped);
+            }
+        }
 
         public string LocalTempPath
         {
@@ -82,6 +105,21 @@ namespace Umbraco.Web.Hosting
                 }
             }
         }
+        private class RegisteredObjectWrapper : System.Web.Hosting.IRegisteredObject
+        {
+            private readonly IRegisteredObject _inner;
 
+            public RegisteredObjectWrapper(IRegisteredObject inner)
+            {
+                _inner = inner;
+            }
+
+            public void Stop(bool immediate)
+            {
+                _inner.Stop(immediate);
+            }
+        }
     }
+
+
 }

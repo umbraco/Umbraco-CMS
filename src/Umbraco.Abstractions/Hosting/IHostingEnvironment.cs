@@ -23,5 +23,8 @@ namespace Umbraco.Core.Hosting
         /// Terminates the current application. The application restarts the next time a request is received for it.
         /// </summary>
         void LazyRestartApplication();
+
+        void RegisterObject(IRegisteredObject registeredObject);
+        void UnregisterObject(IRegisteredObject registeredObject);
     }
 }

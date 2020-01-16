@@ -148,7 +148,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                 LongRunning = true,
                 KeepAlive = true,
                 Hosted = false // main domain will take care of stopping the runner (see below)
-            }, logger);
+            }, logger, _hostingEnvironment);
 
             // create (and add to runner)
             _persisterTask = new XmlStoreFilePersister(runner, this, logger);

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading;
-using System.Web.Hosting;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 
@@ -16,11 +15,12 @@ namespace Umbraco.Core
     /// <para>When an AppDomain starts, it tries to acquire the main domain status.</para>
     /// <para>When an AppDomain stops (eg the application is restarting) it should release the main domain status.</para>
     /// </remarks>
-    internal class MainDom : IMainDom, IRegisteredObject, IDisposable
+    public class MainDom : IMainDom, IRegisteredObject, IDisposable
     {
         #region Vars
 
         private readonly ILogger _logger;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
         // our own lock for local consistency
         private object _locko = new object();
@@ -50,9 +50,11 @@ namespace Umbraco.Core
         // initializes a new instance of MainDom
         public MainDom(ILogger logger, IHostingEnvironment hostingEnvironment)
         {
-            HostingEnvironment.RegisterObject(this);
+
+            hostingEnvironment.RegisterObject(this);
 
             _logger = logger;
+            _hostingEnvironment = hostingEnvironment;
 
             // HostingEnvironment.ApplicationID is null in unit tests, making ReplaceNonAlphanumericChars fail
             var appId =  hostingEnvironment.ApplicationId?.ReplaceNonAlphanumericChars(string.Empty);
@@ -216,7 +218,7 @@ namespace Umbraco.Core
             // The web app is stopping, need to wind down
             Dispose(true);
 
-            HostingEnvironment.UnregisterObject(this);
+            _hostingEnvironment.UnregisterObject(this);
         }
 
         #region IDisposable Support

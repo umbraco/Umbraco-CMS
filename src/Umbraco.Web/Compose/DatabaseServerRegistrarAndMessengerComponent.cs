@@ -2,6 +2,7 @@
 using System.Threading;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
@@ -92,7 +93,7 @@ namespace Umbraco.Web.Compose
         private IBackgroundTask[] _tasks;
         private IndexRebuilder _indexRebuilder;
 
-        public DatabaseServerRegistrarAndMessengerComponent(IRuntimeState runtime, IServerRegistrar serverRegistrar, IServerMessenger serverMessenger, IServerRegistrationService registrationService, ILogger logger, IndexRebuilder indexRebuilder)
+        public DatabaseServerRegistrarAndMessengerComponent(IRuntimeState runtime, IServerRegistrar serverRegistrar, IServerMessenger serverMessenger, IServerRegistrationService registrationService, ILogger logger, IHostingEnvironment hostingEnvironment, IndexRebuilder indexRebuilder)
         {
             _runtime = runtime;
             _logger = logger;
@@ -104,7 +105,7 @@ namespace Umbraco.Web.Compose
             if (_registrar != null)
             {
                 _touchTaskRunner = new BackgroundTaskRunner<IBackgroundTask>("ServerRegistration",
-                    new BackgroundTaskRunnerOptions { AutoStart = true }, logger);
+                    new BackgroundTaskRunnerOptions { AutoStart = true }, logger, hostingEnvironment);
             }
 
             // create task runner for BatchedDatabaseServerMessenger
@@ -112,7 +113,7 @@ namespace Umbraco.Web.Compose
             if (_messenger != null)
             {
                 _processTaskRunner = new BackgroundTaskRunner<IBackgroundTask>("ServerInstProcess",
-                    new BackgroundTaskRunnerOptions { AutoStart = true }, logger);
+                    new BackgroundTaskRunnerOptions { AutoStart = true }, logger, hostingEnvironment);
             }
         }
 
