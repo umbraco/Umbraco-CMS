@@ -305,6 +305,9 @@ namespace Umbraco.Core
         /// <param name="contentType">The content type.</param>
         /// <param name="variation">The variation to set or remove.</param>
         /// <param name="value">If set to <c>true</c> sets the variation; otherwise, removes the variation.</param>
+        /// <remarks>
+        /// This method does not support setting the variation to nothing.
+        /// </remarks>
         public static void SetVariesBy(this IContentTypeBase contentType, ContentVariation variation, bool value = true) => contentType.Variations = contentType.Variations.SetVariesBy(variation, value);
 
         /// <summary>
@@ -313,17 +316,23 @@ namespace Umbraco.Core
         /// <param name="propertyType">The property type.</param>
         /// <param name="variation">The variation to set or remove.</param>
         /// <param name="value">If set to <c>true</c> sets the variation; otherwise, removes the variation.</param>
+        /// <remarks>
+        /// This method does not support setting the variation to nothing.
+        /// </remarks>
         public static void SetVariesBy(this PropertyType propertyType, ContentVariation variation, bool value = true) => propertyType.Variations = propertyType.Variations.SetVariesBy(variation, value);
 
         /// <summary>
-        /// Sets or removes the variation depending on the specified value.
+        /// Returns the variations with the variation set or removed depending on the specified value.
         /// </summary>
         /// <param name="variations">The existing variations.</param>
         /// <param name="variation">The variation to set or remove.</param>
         /// <param name="value">If set to <c>true</c> sets the variation; otherwise, removes the variation.</param>
         /// <returns>
-        /// The variations with the specified variation set or removed.
+        /// The variations with the variation set or removed.
         /// </returns>
+        /// <remarks>
+        /// This method does not support setting the variation to nothing.
+        /// </remarks>
         public static ContentVariation SetVariesBy(this ContentVariation variations, ContentVariation variation, bool value = true)
         {
             return value
