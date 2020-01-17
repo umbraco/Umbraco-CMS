@@ -28,6 +28,24 @@ namespace Umbraco.Core
         public static bool VariesByCulture(this ISimpleContentType contentType) => contentType.Variations.VariesByCulture();
 
         /// <summary>
+        /// Determines whether the content type varies by segment.
+        /// </summary>
+        /// <param name="contentType">The content type.</param>
+        /// <returns>
+        /// A value indicating whether the content type varies by segment.
+        /// </returns>
+        public static bool VariesBySegment(this ISimpleContentType contentType) => contentType.Variations.VariesBySegment();
+
+        /// <summary>
+        /// Determines whether the content type varies by culture and segment.
+        /// </summary>
+        /// <param name="contentType">The content type.</param>
+        /// <returns>
+        /// A value indicating whether the content type varies by culture and segment.
+        /// </returns>
+        public static bool VariesByCultureAndSegment(this ISimpleContentType contentType) => contentType.Variations.VariesByCultureAndSegment();
+
+        /// <summary>
         /// Determines whether the content type is invariant.
         /// </summary>
         /// <param name="contentType">The content type.</param>
