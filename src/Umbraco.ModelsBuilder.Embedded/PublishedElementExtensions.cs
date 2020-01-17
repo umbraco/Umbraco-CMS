@@ -17,14 +17,14 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the value of a property.
         /// </summary>
-        public static TValue Value<TModel, TValue>(this TModel model, Expression<Func<TModel, TValue>> property, string culture = null, string segment = null, Fallback fallback = default, TValue defaultValue = default)
+        public static TValue ValueByExpression<TModel, TValue>(this TModel model, Expression<Func<TModel, TValue>> property, string culture = null, string segment = null, Fallback fallback = default, TValue defaultValue = default)
             where TModel : IPublishedElement
         {
             var alias = GetAlias(model, property);
             return model.Value<TValue>(alias, culture, segment, fallback, defaultValue);
         }
 
-        // fixme that one should be public so ppl can use it
+        //This cannot be public due to ambiguous issue with external ModelsBuilder if we do not rename.
         private static string GetAlias<TModel, TValue>(TModel model, Expression<Func<TModel, TValue>> property)
         {
             if (property.NodeType != ExpressionType.Lambda)
@@ -45,7 +45,7 @@ namespace Umbraco.Web
             var attribute = member.GetCustomAttribute<ImplementPropertyTypeAttribute>();
             if (attribute == null)
                 throw new InvalidOperationException("Property is not marked with ImplementPropertyType attribute.");
-            
+
             return attribute.Alias;
         }
     }
