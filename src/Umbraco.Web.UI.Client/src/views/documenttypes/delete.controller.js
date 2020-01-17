@@ -6,7 +6,7 @@
  * @description
  * The controller for deleting content
  */
-function DocumentTypesDeleteController($scope, dataTypeResource, contentTypeResource, treeService, navigationService) {
+function DocumentTypesDeleteController($scope, dataTypeResource, contentTypeResource, treeService, navigationService, localizationService) {
 
     $scope.performDelete = function() {
 
@@ -47,6 +47,13 @@ function DocumentTypesDeleteController($scope, dataTypeResource, contentTypeReso
     $scope.cancel = function() {
         navigationService.hideDialog();
     };
+
+    $scope.labels = {};
+    localizationService
+        .format(["contentTypeEditor_yesDelete", "contentTypeEditor_andAllDocuments"], "%0% " + $scope.currentNode.name + " %1%")
+        .then(function (data) {
+            $scope.labels.deleteConfirm = data;
+        });
 }
 
 angular.module("umbraco").controller("Umbraco.Editors.DocumentTypes.DeleteController", DocumentTypesDeleteController);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
@@ -22,9 +23,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             ContentNode contentNode,
             ContentData contentData,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
-            IVariationContextAccessor variationContextAccessor,
-            IUmbracoContextAccessor umbracoContextAccessor)
-            : base(umbracoContextAccessor)
+            IVariationContextAccessor variationContextAccessor)
         {
             _contentNode = contentNode ?? throw new ArgumentNullException(nameof(contentNode));
             ContentData = contentData ?? throw new ArgumentNullException(nameof(contentData));
@@ -67,12 +66,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return user?.Name;
         }
 
-        // (see ContentNode.CloneParent)
-        public PublishedContent(
-            ContentNode contentNode,
-            PublishedContent origin,
-            IUmbracoContextAccessor umbracoContextAccessor)
-            : base(umbracoContextAccessor)
+        // used when cloning in ContentNode
+        public PublishedContent(ContentNode contentNode, PublishedContent origin)
         {
             _contentNode = contentNode;
             _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
@@ -89,10 +84,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         // clone for previewing as draft a published content that is published and has no draft
-        private PublishedContent(
-            PublishedContent origin,
-            IUmbracoContextAccessor umbracoContextAccessor)
-            : base(umbracoContextAccessor)
+        private PublishedContent(PublishedContent origin)
         {
             _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
             VariationContextAccessor = origin.VariationContextAccessor;
@@ -119,45 +111,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
         internal static Func<IPublishedSnapshot, bool, int, IPublishedContent> GetMediaByIdFunc { get; set; }
             = (publishedShapshot, previewing, id) => publishedShapshot.Media.GetById(previewing, id);
 
-        private IPublishedContent GetContentById(bool previewing, int id)
+        private Func<IPublishedSnapshot, bool, int, IPublishedContent> GetGetterById()
         {
-            return GetContentByIdFunc(_publishedSnapshotAccessor.PublishedSnapshot, previewing, id);
-        }
-
-        private IEnumerable<IPublishedContent> GetContentByIds(bool previewing, IEnumerable<int> ids)
-        {
-            var publishedSnapshot = _publishedSnapshotAccessor.PublishedSnapshot;
-
-            // beware! the loop below CANNOT be converted to query such as:
-            //return ids.Select(x => _getContentByIdFunc(publishedSnapshot, previewing, x)).Where(x => x != null);
-            // because it would capture the published snapshot and cause all sorts of issues
-            //
-            // we WANT to get the actual current published snapshot each time we run
-
-            // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (var id in ids)
+            switch (ContentType.ItemType)
             {
-                var content = GetContentByIdFunc(publishedSnapshot, previewing, id);
-                if (content != null) yield return content;
-            }
-        }
-
-        private IPublishedContent GetMediaById(bool previewing, int id)
-        {
-            return GetMediaByIdFunc(_publishedSnapshotAccessor.PublishedSnapshot, previewing, id);
-        }
-
-        private IEnumerable<IPublishedContent> GetMediaByIds(bool previewing, IEnumerable<int> ids)
-        {
-            var publishedShapshot = _publishedSnapshotAccessor.PublishedSnapshot;
-
-            // see note above for content
-
-            // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (var id in ids)
-            {
-                var content = GetMediaByIdFunc(publishedShapshot, previewing, id);
-                if (content != null) yield return content;
+                case PublishedItemType.Content:
+                    return GetContentByIdFunc;
+                case PublishedItemType.Media:
+                    return GetMediaByIdFunc;
+                default:
+                    throw new PanicException("invalid item type");
             }
         }
 
@@ -166,7 +129,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         #region Content Type
 
         /// <inheritdoc />
-        public override PublishedContentType ContentType => _contentNode.ContentType;
+        public override IPublishedContentType ContentType => _contentNode.ContentType;
 
         #endregion
 
@@ -183,38 +146,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         /// <inheritdoc />
         public override int Id => _contentNode.Id;
-
-        /// <inheritdoc />
-        public override string Name
-        {
-            get
-            {
-                if (!ContentType.VariesByCulture())
-                    return ContentData.Name;
-
-                var culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
-                if (culture == "")
-                    return ContentData.Name;
-
-                return Cultures.TryGetValue(culture, out var cultureInfos) ? cultureInfos.Name : null;
-            }
-        }
-
-        /// <inheritdoc />
-        public override string UrlSegment
-        {
-            get
-            {
-                if (!ContentType.VariesByCulture())
-                    return _urlSegment;
-
-                var culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
-                if (culture == "")
-                    return _urlSegment;
-
-                return Cultures.TryGetValue(culture, out var cultureInfos) ? cultureInfos.UrlSegment : null;
-            }
-        }
 
         /// <inheritdoc />
         public override int SortOrder => _contentNode.SortOrder;
@@ -246,38 +177,27 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// <inheritdoc />
         public override DateTime UpdateDate => ContentData.VersionDate;
 
-        private IReadOnlyDictionary<string, PublishedCultureInfo> _cultureInfos;
-
-        private static readonly IReadOnlyDictionary<string, PublishedCultureInfo> NoCultureInfos = new Dictionary<string, PublishedCultureInfo>();
-
-        /// <inheritdoc />
-        public override PublishedCultureInfo GetCulture(string culture = null)
-        {
-            // handle context culture
-            if (culture == null)
-                culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
-
-            // no invariant culture infos
-            if (culture == "") return null;
-
-            // get
-            return Cultures.TryGetValue(culture, out var cultureInfos) ? cultureInfos : null;
-        }
+        // ReSharper disable once CollectionNeverUpdated.Local
+        private static readonly IReadOnlyDictionary<string, PublishedCultureInfo> EmptyCultures = new Dictionary<string, PublishedCultureInfo>();
+        private IReadOnlyDictionary<string, PublishedCultureInfo> _cultures;
 
         /// <inheritdoc />
         public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures
         {
             get
             {
-                if (!ContentType.VariesByCulture())
-                    return NoCultureInfos;
+                if (_cultures != null) return _cultures;
 
-                if (_cultureInfos != null) return _cultureInfos;
+                if (!ContentType.VariesByCulture())
+                    return _cultures = new Dictionary<string, PublishedCultureInfo>
+                    {
+                        { "", new PublishedCultureInfo("", ContentData.Name, _urlSegment, CreateDate) }
+                    };
 
                 if (ContentData.CultureInfos == null)
-                    throw new Exception("oops: _contentDate.CultureInfos is null.");
+                    throw new PanicException("_contentDate.CultureInfos is null.");
 
-                return _cultureInfos = ContentData.CultureInfos
+                return _cultures = ContentData.CultureInfos
                     .ToDictionary(x => x.Key, x => new PublishedCultureInfo(x.Key, x.Value.Name, x.Value.UrlSegment, x.Value.Date), StringComparer.OrdinalIgnoreCase);
             }
         }
@@ -313,8 +233,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // invariant content items)
 
             // if there is no 'published' published content, no culture can be published
-            var hasPublished = _contentNode.PublishedContent != null;
-            if (!hasPublished)
+            if (!_contentNode.HasPublished)
                 return false;
 
             // if there is a 'published' published content, and does not vary = published
@@ -327,7 +246,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             // there is a 'published' published content, and varies
             // = depends on the culture
-            return _contentNode.PublishedContent.ContentData.CultureInfos.ContainsKey(culture);
+            return _contentNode.HasPublishedCulture(culture);
         }
 
         #endregion
@@ -339,59 +258,46 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             get
             {
-                // have to use the "current" cache because a PublishedContent can be shared
-                // amongst many snapshots and other content depend on the snapshots
-                switch (_contentNode.ContentType.ItemType)
-                {
-                    case PublishedItemType.Content:
-                        return GetContentById(IsPreviewing, _contentNode.ParentContentId);
-                    case PublishedItemType.Media:
-                        return GetMediaById(IsPreviewing, _contentNode.ParentContentId);
-                    default:
-                        throw new Exception($"Panic: unsupported item type \"{_contentNode.ContentType.ItemType}\".");
-                }
+                var getById = GetGetterById();
+                var publishedSnapshot = _publishedSnapshotAccessor.PublishedSnapshot;
+                return getById(publishedSnapshot, IsPreviewing, ParentId);
             }
         }
 
         /// <inheritdoc />
-        public override IEnumerable<IPublishedContent> Children
+        public override IEnumerable<IPublishedContent> ChildrenForAllCultures
         {
             get
             {
-                var cache = GetAppropriateCache();
-                if (cache == null || PublishedSnapshotService.CachePublishedContentChildren == false)
-                    return GetChildren();
+                var getById = GetGetterById();
+                var publishedSnapshot = _publishedSnapshotAccessor.PublishedSnapshot;
+                var id = _contentNode.FirstChildContentId;
 
-                // note: ToArray is important here, we want to cache the result, not the function!
-                return (IEnumerable<IPublishedContent>)cache.Get(ChildrenCacheKey, () => GetChildren().ToArray());
+                while (id > 0)
+                {
+                    // is IsPreviewing is false, then this can return null
+                    var content = getById(publishedSnapshot, IsPreviewing, id);
+
+                    if (content != null)
+                    {
+                        yield return content;
+                    }
+                    else
+                    {
+                        // but if IsPreviewing is true, we should have a child
+                        if (IsPreviewing)
+                            throw new PanicException($"failed to get content with id={id}");
+
+                        // if IsPreviewing is false, get the unpublished child nevertheless
+                        // we need it to keep enumerating children! but we don't return it
+                        content = getById(publishedSnapshot, true, id);
+                        if (content == null)
+                            throw new PanicException($"failed to get content with id={id}");
+                    }
+
+                    id = UnwrapIPublishedContent(content)._contentNode.NextSiblingContentId;
+                }
             }
-        }
-
-        private string _childrenCacheKey;
-
-        private string ChildrenCacheKey => _childrenCacheKey ?? (_childrenCacheKey = CacheKeys.PublishedContentChildren(Key, IsPreviewing));
-
-        private IEnumerable<IPublishedContent> GetChildren()
-        {
-            IEnumerable<IPublishedContent> c;
-            switch (_contentNode.ContentType.ItemType)
-            {
-                case PublishedItemType.Content:
-                    c = GetContentByIds(IsPreviewing, _contentNode.ChildContentIds);
-                    break;
-                case PublishedItemType.Media:
-                    c = GetMediaByIds(IsPreviewing, _contentNode.ChildContentIds);
-                    break;
-                default:
-                    throw new Exception("oops");
-            }
-
-            return c.OrderBy(x => x.SortOrder);
-
-            // notes:
-            // _contentNode.ChildContentIds is an unordered int[]
-            // needs to fetch & sort - do it only once, lazily, though
-            // Q: perfs-wise, is it better than having the store managed an ordered list
         }
 
         #endregion
@@ -423,7 +329,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var publishedSnapshot = (PublishedSnapshot)_publishedSnapshotAccessor.PublishedSnapshot;
             var cache = publishedSnapshot == null
                 ? null
-                : ((IsPreviewing == false || PublishedSnapshotService.FullCacheWhenPreviewing) && (ItemType != PublishedItemType.Member)
+                : ((IsPreviewing == false || PublishedSnapshotService.FullCacheWhenPreviewing) && (ContentType.ItemType != PublishedItemType.Member)
                     ? publishedSnapshot.ElementsCache
                     : publishedSnapshot.SnapshotCache);
             return cache;
@@ -451,7 +357,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // used by navigable content
         // includes all children, published or unpublished
         // NavigableNavigator takes care of selecting those it wants
-        internal IList<int> ChildIds => _contentNode.ChildContentIds;
+        // note: this is not efficient - we do not try to be (would require a double-linked list)
+        internal IList<int> ChildIds => Children.Select(x => x.Id).ToList();
 
         // used by Property
         // gets a value indicating whether the content or media exists in
@@ -470,18 +377,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return this;
 
             var cache = GetAppropriateCache();
-            if (cache == null) return new PublishedContent(this, UmbracoContextAccessor).CreateModel();
-            return (IPublishedContent)cache.Get(AsPreviewingCacheKey, () => new PublishedContent(this, UmbracoContextAccessor).CreateModel());
+            if (cache == null) return new PublishedContent(this).CreateModel();
+            return (IPublishedContent)cache.Get(AsPreviewingCacheKey, () => new PublishedContent(this).CreateModel());
         }
 
         // used by Navigable.Source,...
         internal static PublishedContent UnwrapIPublishedContent(IPublishedContent content)
         {
-            PublishedContentWrapped wrapped;
-            while ((wrapped = content as PublishedContentWrapped) != null)
+            while (content is PublishedContentWrapped wrapped)
                 content = wrapped.Unwrap();
-            var inner = content as PublishedContent;
-            if (inner == null)
+            if (!(content is PublishedContent inner))
                 throw new InvalidOperationException("Innermost content is not PublishedContent.");
             return inner;
         }

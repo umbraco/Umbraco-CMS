@@ -96,6 +96,7 @@ Use this directive to generate a list of breadcrumbs.
             templateUrl: 'views/components/editor/umb-breadcrumbs.html',
             scope: {
                 ancestors: "=",
+                forNewEntity: "=",
                 entityType: "@",
                 onOpen: "&"
             },

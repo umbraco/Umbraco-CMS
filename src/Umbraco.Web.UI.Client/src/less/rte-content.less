@@ -1,0 +1,45 @@
+@import "variables.less";
+@import "colors.less";
+
+.mce-content-body .umb-macro-holder {
+    border: 3px dotted @pinkLight;
+    padding: 7px;
+    display: block;
+    margin: 3px;
+}
+
+
+.umb-rte .mce-content-body .umb-macro-holder.loading {
+    background: url(assets/img/loader.gif) right no-repeat;
+    background-size: 18px; background-position-x: 99%;
+}
+
+
+.umb-rte .embeditem {
+    position:relative;
+    > * {
+        user-select: none;
+        pointer-events: none;
+    }
+}
+
+.umb-rte .embeditem[data-mce-selected] {
+    outline: 2px solid @pinkLight;
+}
+
+.umb-rte .embeditem::before {
+    z-index:1000;
+    width:100%;
+    height:100%;
+    position:absolute;
+    content:' ';
+}
+
+.umb-rte .embeditem[data-mce-selected]::before {
+    background:rgba(0,0,0,0.025);
+}
+
+.umb-rte *[data-mce-selected="inline-boundary"] {
+    background:rgba(0,0,0,0.025);
+    outline: 2px solid @pinkLight;
+}

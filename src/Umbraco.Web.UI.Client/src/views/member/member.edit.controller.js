@@ -8,6 +8,16 @@
  */
 function MemberEditController($scope, $routeParams, $location, appState, memberResource, entityResource, navigationService, notificationsService, localizationService, serverValidationManager, contentEditingHelper, fileManager, formHelper, editorState, umbRequestHelper, $http) {
 
+    var infiniteMode = $scope.model && $scope.model.infiniteMode;
+    var id = infiniteMode ? $scope.model.id : $routeParams.id;
+    var create = infiniteMode ? $scope.model.create : $routeParams.create;
+    var listName = infiniteMode ? $scope.model.listname : $routeParams.listName;
+    var docType = infiniteMode ? $scope.model.doctype : $routeParams.doctype;
+
+    $scope.header = {};
+    $scope.header.editorfor = "visuallyHiddenTexts_newMember";
+    $scope.header.setPageTitle = true;
+
     //setup scope vars
     $scope.page = {};
     $scope.page.loading = true;
@@ -20,24 +30,22 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
 
     //build a path to sync the tree with
     function buildTreePath(data) {
-        return $routeParams.listName ? "-1," + $routeParams.listName : "-1";
+        return listName ? "-1," + listName : "-1";
     }
 
-    if ($routeParams.create) {
+    if (create) {
 
         //if there is no doc type specified then we are going to assume that
         // we are not using the umbraco membership provider
-        if ($routeParams.doctype) {
+        if (docType) {
 
             //we are creating so get an empty member item
-            memberResource.getScaffold($routeParams.doctype)
+            memberResource.getScaffold(docType)
                 .then(function(data) {
 
                     $scope.content = data;
 
-                    setHeaderNameState($scope.content);
-
-                    editorState.set($scope.content);
+                    init();
 
                     $scope.page.loading = false;
 
@@ -49,9 +57,7 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
                 .then(function (data) {
                     $scope.content = data;
 
-                    setHeaderNameState($scope.content);
-
-                    editorState.set($scope.content);
+                    init();
 
                     $scope.page.loading = false;
 
@@ -66,29 +72,28 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
         //The reason this might be an INT is due to the routing used for the member list view
         //but this is now configured to use the key, so this is just a fail safe
 
-        if ($routeParams.id && $routeParams.id.length < 9) {
+        if (id && id.length < 9) {
 
-            entityResource.getById($routeParams.id, "Member").then(function(entity) {
+            entityResource.getById(id, "Member").then(function(entity) {
                 $location.path("/member/member/edit/" + entity.key);
             });
         }
         else {
 
             //we are editing so get the content item from the server
-            memberResource.getByKey($routeParams.id)
+            memberResource.getByKey(id)
                 .then(function(data) {
 
                     $scope.content = data;
 
-                    setHeaderNameState($scope.content);
+                    init();
 
-                    editorState.set($scope.content);
+                    if (!infiniteMode) {
+                        var path = buildTreePath(data);
 
-                    var path = buildTreePath(data);
-
-                    //sync the tree (only for ui purposes)
-                    navigationService.syncTree({ tree: "member", path: path.split(",") });
-
+                        //sync the tree (only for ui purposes)
+                        navigationService.syncTree({ tree: "member", path: path.split(",") });
+                    }
                     //it's the initial load of the editor, we need to get the tree node
                     // from the server so that we can load in the actions menu.
                     umbRequestHelper.resourcePromise(
@@ -110,11 +115,48 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
 
     }
 
-    function setHeaderNameState(content) {
+    function init() {
 
-      if(content.membershipScenario === 0) {
-         $scope.page.nameLocked = true;
-      }
+        var content = $scope.content;
+
+        // we need to check wether an app is present in the current data, if not we will present the default app.
+        var isAppPresent = false;
+
+        // on first init, we dont have any apps. but if we are re-initializing, we do, but ...
+        if ($scope.app) {
+
+            // lets check if it still exists as part of our apps array. (if not we have made a change to our docType, even just a re-save of the docType it will turn into new Apps.)
+            _.forEach(content.apps, function (app) {
+                if (app === $scope.app) {
+                    isAppPresent = true;
+                }
+            });
+
+            // if we did reload our DocType, but still have the same app we will try to find it by the alias.
+            if (isAppPresent === false) {
+                _.forEach(content.apps, function (app) {
+                    if (app.alias === $scope.app.alias) {
+                        isAppPresent = true;
+                        app.active = true;
+                        $scope.appChanged(app);
+                    }
+                });
+            }
+
+        }
+
+        // if we still dont have a app, lets show the first one:
+        if (isAppPresent === false) {
+            content.apps[0].active = true;
+            $scope.appChanged(content.apps[0]);
+        }
+
+        if (content.membershipScenario === 0) {
+            $scope.page.nameLocked = true;
+        }
+
+        editorState.set($scope.content);
+
     }
 
     /** Just shows a simple notification that there are client side validation issues to be fixed */
@@ -139,12 +181,12 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
 
             //anytime a user is changing a member's password without the oldPassword, we are in effect resetting it so we need to set that flag here
             var passwordProp = _.find(contentEditingHelper.getAllProps($scope.content), function (e) { return e.alias === '_umb_password' });
-            if (!passwordProp.value.reset) {
+            if (passwordProp && passwordProp.value && (typeof passwordProp.value.reset !== 'undefined') && !passwordProp.value.reset) {
                 //so if the admin is not explicitly resetting the password, flag it for resetting if a new password is being entered
                 passwordProp.value.reset = !passwordProp.value.oldPassword && passwordProp.config.allowManuallyChangingPassword;
             }
 
-            memberResource.save($scope.content, $routeParams.create, fileManager.getFiles())
+            memberResource.save($scope.content, create, fileManager.getFiles())
                 .then(function(data) {
 
                     formHelper.resetForm({ scope: $scope });
@@ -183,13 +225,22 @@ function MemberEditController($scope, $routeParams, $location, appState, memberR
 
     };
 
+    $scope.appChanged = function (app) {
+        $scope.app = app;
+
+        // setup infinite mode
+        if (infiniteMode) {
+            $scope.page.submitButtonLabelKey = "buttons_saveAndClose";
+        }
+    }
+
     $scope.showBack = function () {
-        return !!$routeParams.listName;
+        return !!listName;
     }
 
     /** Callback for when user clicks the back-icon */
     $scope.onBack = function () {
-        $location.path("/member/member/list/" + $routeParams.listName);
+        $location.path("/member/member/list/" + listName);
         $location.search("listName", null);
         if ($routeParams.page) {
             $location.search("page", $routeParams.page);

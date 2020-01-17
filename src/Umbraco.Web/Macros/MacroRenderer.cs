@@ -186,7 +186,7 @@ namespace Umbraco.Web.Macros
             foreach (var prop in model.Properties)
             {
                 var key = prop.Key.ToLowerInvariant();
-                prop.Value = macroParams.ContainsKey(key)
+                prop.Value = macroParams != null && macroParams.ContainsKey(key)
                     ? macroParams[key]?.ToString() ?? string.Empty
                     : string.Empty;
             }
@@ -197,7 +197,8 @@ namespace Umbraco.Web.Macros
 
         public MacroContent Render(string macroAlias, IPublishedContent content, IDictionary<string, object> macroParams)
         {
-            var m = _macroService.GetByAlias(macroAlias);
+            var m = _appCaches.RuntimeCache.GetCacheItem(CacheKeys.MacroFromAliasCacheKey + macroAlias, () => _macroService.GetByAlias(macroAlias));
+
             if (m == null)
                 throw new InvalidOperationException("No macro found by alias " + macroAlias);
 
@@ -439,7 +440,7 @@ namespace Umbraco.Web.Macros
             // this was, and still is, an ugly piece of nonsense
 
             var value = string.Empty;
-            var cache = _umbracoContextAccessor.UmbracoContext.ContentCache;
+            var cache = _umbracoContextAccessor.UmbracoContext.Content;
 
             var splitpath = (string[])pageElements["splitpath"];
             for (var i = splitpath.Length - 1; i > 0; i--) // at 0 we have root (-1)

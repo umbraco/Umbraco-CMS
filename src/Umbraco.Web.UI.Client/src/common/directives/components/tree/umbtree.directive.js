@@ -38,7 +38,7 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                 treeOptionsClick: [],
                 treeNodeAltSelect: []
             };
-            
+
             //this is the API exposed by this directive, for either hosting controllers or for other directives
             vm.callbacks = {
                 treeNodeExpanded: function (f) {
@@ -65,6 +65,7 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
             vm.reloadNode = reloadNode;
             vm.syncTree = syncTree;
             vm.loadChildren = loadChildren;
+            vm.hasTree = hasTree;
 
             //wire up the exposed api object for hosting controllers
             if ($scope.api) {
@@ -72,6 +73,7 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                 $scope.api.load = vm.load;
                 $scope.api.reloadNode = vm.reloadNode;
                 $scope.api.syncTree = vm.syncTree;
+                $scope.api.hasTree = vm.hasTree;
             }
 
             //flag to track the last loaded section when the tree 'un-loads'. We use this to determine if we should
@@ -82,7 +84,7 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
             // since it saves on data retreival and DOM processing.
             // TODO: This isn't used!?
             var lastSection = "";
-            
+
             /** Helper function to emit tree events */
             function emitEvent(eventName, args) {
                 if (registeredCallbacks[eventName] && angular.isArray(registeredCallbacks[eventName])) {
@@ -92,10 +94,6 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                 }
             }
 
-            // TODO: This isn't used!?
-            function clearCache(section) {
-                treeService.clearCache({ section: section });
-            }
 
             /**
              * Re-loads the tree with the updated parameters
@@ -119,7 +117,7 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                         $scope.cachekey = args.cacheKey;
                     }
                 }
-                
+
                 return loadTree();
             }
 
@@ -148,7 +146,7 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                 if (!args.path) {
                     throw "args.path cannot be null";
                 }
-                
+
                 if (angular.isString(args.path)) {
                     args.path = args.path.replace('"', '').split(',');
                 }
@@ -172,8 +170,16 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                     emitEvent("treeSynced", { node: data, activate: args.activate });
 
                     return $q.when({ node: data, activate: args.activate });
+                }, function (data) {
+                    return $q.reject(data);
+                }, function (data) {
+                    //on notification
+                    if (data.type === "treeNodeExpanded") {
+                        //raise the event
+                        emitEvent("treeNodeExpanded", { tree: $scope.tree, node: data.node, children: data.children });
+                    }
                 });
-                
+
             }
 
             /** This will check the section tree loaded and return all actual root nodes based on a tree type (non group nodes, non section groups) */
@@ -200,8 +206,27 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
             }
 
             //given a tree alias, this will search the current section tree for the specified tree alias and set the current active tree to it's root node
+            function hasTree(treeAlias) {
+
+                if (!$scope.tree) {
+                    throw "Err in umbtree.directive.loadActiveTree, $scope.tree is null";
+                }
+
+                if (!treeAlias) {
+                    return false;
+                }
+
+                var treeRoots = getTreeRootNodes();
+                var foundTree = _.find(treeRoots, function (node) {
+                    return node.metaData.treeAlias.toUpperCase() === treeAlias.toUpperCase();
+                });
+
+                return foundTree !== undefined;
+            }
+
+            //given a tree alias, this will search the current section tree for the specified tree alias and set the current active tree to it's root node
             function loadActiveTree(treeAlias) {
-                
+
                 if (!$scope.tree) {
                     throw "Err in umbtree.directive.loadActiveTree, $scope.tree is null";
                 }
@@ -279,7 +304,7 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                 if (forceReload || (node.hasChildren && node.children.length === 0)) {
                     //get the children from the tree service
                     return treeService.loadNodeChildren({ node: node, section: $scope.section, isDialog: $scope.isdialog })
-                        .then(function(data) {
+                        .then(function (data) {
                             //emit expanded event
                             emitEvent("treeNodeExpanded", { tree: $scope.tree, node: node, children: data });
 
@@ -302,7 +327,7 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
 
                 // TODO: This is called constantly because as a method in a template it's re-evaluated pretty much all the time
                 // it would be better if we could cache the processing. The problem is that some of these things are dynamic.
-                
+
                 var css = [];
                 if (node.cssClasses) {
                     _.each(node.cssClasses, function (c) {
@@ -322,7 +347,7 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
             };
 
             /* helper to force reloading children of a tree node */
-            $scope.loadChildren = function(node, forceReload) {
+            $scope.loadChildren = function (node, forceReload) {
                 return loadChildren(node, forceReload);
             };
 
@@ -359,7 +384,7 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
             $scope.altSelect = function (n, ev) {
                 emitEvent("treeNodeAltSelect", { element: $element, tree: $scope.tree, node: n, event: ev });
             };
-            
+
             //call the onInit method, if the result is a promise then load the tree after that resolves (if it's not a promise this will just resolve automatically).
             //NOTE: The promise cannot be rejected, else the tree won't be loaded and we'll get exceptions if some API calls syncTree or similar.
             $q.when($scope.onInit(), function (args) {

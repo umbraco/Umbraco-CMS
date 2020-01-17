@@ -11,6 +11,7 @@ using Umbraco.Core.Services;
 using Umbraco.Examine;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web
 {
@@ -20,137 +21,12 @@ namespace Umbraco.Web
     public static class PublishedContentExtensions
     {
         // see notes in PublishedElementExtensions
+        // (yes, this is not pretty, but works for now)
         //
         private static IPublishedValueFallback PublishedValueFallback => Current.PublishedValueFallback;
         private static IPublishedSnapshot PublishedSnapshot => Current.PublishedSnapshot;
-
-        #region Urls
-
-        /// <summary>
-        /// Gets the url for the content.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <returns>The url for the content.</returns>
-        /// <remarks>Better use the <c>Url</c> property but that method is here to complement <c>UrlAbsolute()</c>.</remarks>
-        public static string Url(this IPublishedContent content)
-        {
-            return content.Url;
-        }
-
-        /// <summary>
-        /// Gets the absolute url for the content.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <returns>The absolute url for the content.</returns>
-        public static string UrlAbsolute(this IPublishedContent content) => content.UrlAbsolute(null);
-
-        /// <summary>
-        /// Gets the absolute url for the content.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <param name="culture">The culture to get the url for</param>
-        /// <returns>The absolute url for the content.</returns>
-        public static string UrlAbsolute(this IPublishedContent content, string culture)
-        {
-            // adapted from PublishedContentBase.Url
-
-            if (Current.UmbracoContext == null)
-                throw new InvalidOperationException("Cannot resolve a Url for a content item when Current.UmbracoContext is null.");
-            if (Current.UmbracoContext.UrlProvider == null)
-                throw new InvalidOperationException("Cannot resolve a Url for a content item when Current.UmbracoContext.UrlProvider is null.");
-
-            switch (content.ItemType)
-            {
-                case PublishedItemType.Content:
-                    return Current.UmbracoContext.UrlProvider.GetUrl(content.Id, true, culture);
-                case PublishedItemType.Media:
-                    return Current.UmbracoContext.UrlProvider.GetMediaUrl(content, Constants.Conventions.Media.File, true);
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        /// <summary>
-        /// Gets the url for the media.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <param name="propertyAlias">The property alias to resolve the url from.</param>
-        /// <param name="culture">The variation language.</param>
-        /// <returns>The url for the content.</returns>
-        /// <remarks>Better use the <c>GetMediaUrl</c> method but that method is here to complement <c>MediaUrlAbsolute()</c>.</remarks>
-        public static string MediaUrl(this IPublishedContent content, string propertyAlias, string culture = null)
-        {
-            if (Current.UmbracoContext == null)
-                throw new InvalidOperationException("Cannot resolve a Url for a content item when Current.UmbracoContext is null.");
-            if (Current.UmbracoContext.UrlProvider == null)
-                throw new InvalidOperationException("Cannot resolve a Url for a content item when Current.UmbracoContext.UrlProvider is null.");
-
-            return Current.UmbracoContext.UrlProvider.GetMediaUrl(content, propertyAlias, culture);
-        }
-
-        /// <summary>
-        /// Gets the absolute url for the media.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <param name="propertyAlias">The property alias to resolve the url from.</param>
-        /// <param name="culture">The variation language.</param>
-        /// <returns>The absolute url for the media.</returns>
-        public static string MediaUrlAbsolute(this IPublishedContent content, string propertyAlias, string culture = null)
-        {
-            if (Current.UmbracoContext == null)
-                throw new InvalidOperationException("Cannot resolve a Url for a content item when Current.UmbracoContext is null.");
-            if (Current.UmbracoContext.UrlProvider == null)
-                throw new InvalidOperationException("Cannot resolve a Url for a content item when Current.UmbracoContext.UrlProvider is null.");
-
-            return Current.UmbracoContext.UrlProvider.GetMediaUrl(content, propertyAlias, true, culture);
-        }
-
-        /// <summary>
-        /// Gets the Url segment.
-        /// </summary>
-        /// <remarks>
-        /// <para>Gets the url segment for the document, taking its content type and a specified
-        /// culture in account. For invariant content types, the culture is ignored, else it is
-        /// used to try and find the segment corresponding to the culture. May return null.</para>
-        /// </remarks>
-        public static string GetUrlSegment(this IPublishedContent content, string culture = null)
-        {
-            // for invariant content, return the invariant url segment
-            if (!content.ContentType.VariesByCulture())
-                return content.UrlSegment;
-
-            // content.GetCulture(culture) will use the 'current' culture (via accessor) in case 'culture'
-            // is null (meaning, 'current') - and can return 'null' if that culture is not published - and
-            // will return 'null' if the content is variant and culture is invariant
-
-            // else try and get the culture info
-            // return the corresponding url segment, or null if none
-            var cultureInfo = content.GetCulture(culture);
-            return cultureInfo?.UrlSegment;
-		}
-
-        public static bool IsAllowedTemplate(this IPublishedContent content, int templateId)
-        {
-            if (Current.Configs.Settings().WebRouting.DisableAlternativeTemplates)
-                return content.TemplateId == templateId;
-
-            if (content.TemplateId == templateId || !Current.Configs.Settings().WebRouting.ValidateAlternativeTemplates)
-                return true;
-
-            var publishedContentContentType = Current.Services.ContentTypeService.Get(content.ContentType.Id);
-            if (publishedContentContentType == null)
-                throw new NullReferenceException("No content type returned for published content (contentType='" + content.ContentType.Id + "')");
-
-            return publishedContentContentType.IsAllowedTemplate(templateId);
-
-        }
-        public static bool IsAllowedTemplate(this IPublishedContent content, string templateAlias)
-        {
-            var template = Current.Services.FileService.GetTemplate(templateAlias);
-            return template != null && content.IsAllowedTemplate(template.Id);
-        }
-
-        #endregion
+        private static UmbracoContext UmbracoContext => Current.UmbracoContext;
+        private static ISiteDomainHelper SiteDomainHelper => Current.Factory.GetInstance<ISiteDomainHelper>();
 
         #region IsComposedOf
 
@@ -162,7 +38,7 @@ namespace Umbraco.Web
         /// <returns>A value indicating whether the content is of a content type composed of a content type identified by the alias.</returns>
         public static bool IsComposedOf(this IPublishedContent content, string alias)
         {
-            return content.ContentType.CompositionAliases.Contains(alias);
+            return content.ContentType.CompositionAliases.InvariantContains(alias);
         }
 
         #endregion
@@ -183,6 +59,27 @@ namespace Umbraco.Web
 
             var template = Current.Services.FileService.GetTemplate(content.TemplateId.Value);
             return template == null ? string.Empty : template.Alias;
+        }
+
+        public static bool IsAllowedTemplate(this IPublishedContent content, int templateId)
+        {
+            if (Current.Configs.Settings().WebRouting.DisableAlternativeTemplates)
+                return content.TemplateId == templateId;
+
+            if (content.TemplateId == templateId || !Current.Configs.Settings().WebRouting.ValidateAlternativeTemplates)
+                return true;
+
+            var publishedContentContentType = Current.Services.ContentTypeService.Get(content.ContentType.Id);
+            if (publishedContentContentType == null)
+                throw new NullReferenceException("No content type returned for published content (contentType='" + content.ContentType.Id + "')");
+
+            return publishedContentContentType.IsAllowedTemplate(templateId);
+
+        }
+        public static bool IsAllowedTemplate(this IPublishedContent content, string templateAlias)
+        {
+            var template = Current.Services.FileService.GetTemplate(templateAlias);
+            return template != null && content.IsAllowedTemplate(template.Id);
         }
 
         #endregion
@@ -271,26 +168,24 @@ namespace Umbraco.Web
         #region Variations
 
         /// <summary>
-        /// Determines whether the content has a culture.
+        /// Gets the culture assigned to a document by domains, in the context of a current Uri.
         /// </summary>
-        /// <remarks>Culture is case-insensitive.</remarks>
-        public static bool HasCulture(this IPublishedContent content, string culture)
-            => content.Cultures.ContainsKey(culture ?? string.Empty);
-
-        /// <summary>
-        /// Filters a sequence of <see cref="IPublishedContent"/> to return invariant items, and items that are published for the specified culture.
-        /// </summary>
-        /// <param name="contents">The content items.</param>
-        /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null).</param>
-        internal static IEnumerable<T> WhereIsInvariantOrHasCulture<T>(this IEnumerable<T> contents, string culture = null)
-            where T : class, IPublishedContent
+        /// <param name="content">The document.</param>
+        /// <param name="current">An optional current Uri.</param>
+        /// <returns>The culture assigned to the document by domains.</returns>
+        /// <remarks>
+        /// <para>In 1:1 multilingual setup, a document contains several cultures (there is not
+        /// one document per culture), and domains, withing the context of a current Uri, assign
+        /// a culture to that document.</para>
+        /// </remarks>
+        public static string GetCultureFromDomains(this IPublishedContent content, Uri current = null)
         {
-            if (contents == null) throw new ArgumentNullException(nameof(contents));
+            var umbracoContext = UmbracoContext;
 
-            culture = culture ?? Current.VariationContextAccessor.VariationContext?.Culture ?? "";
+            if (umbracoContext == null)
+                throw new InvalidOperationException("A current UmbracoContext is required.");
 
-            // either does not vary by culture, or has the specified culture
-            return contents.Where(x => !x.ContentType.VariesByCulture() || x.HasCulture(culture));
+            return DomainUtilities.GetCultureFromDomains(content.Id, content.Path, current, umbracoContext, SiteDomainHelper);
         }
 
         #endregion
@@ -315,7 +210,7 @@ namespace Umbraco.Web
                 .And()
                 .ManagedQuery(term);
 
-            return query.Execute().ToPublishedSearchResults(Current.UmbracoContext.ContentCache);
+            return query.Execute().ToPublishedSearchResults(Current.UmbracoContext.Content);
         }
 
         public static IEnumerable<PublishedSearchResult> SearchChildren(this IPublishedContent content, string term, string indexName = null)
@@ -336,7 +231,7 @@ namespace Umbraco.Web
                 .And()
                 .ManagedQuery(term);
 
-            return query.Execute().ToPublishedSearchResults(Current.UmbracoContext.ContentCache);
+            return query.Execute().ToPublishedSearchResults(Current.UmbracoContext.Content);
         }
 
         #endregion
@@ -526,7 +421,7 @@ namespace Umbraco.Web
         /// <remarks>Does not consider the content itself. Returns all ancestors, of the specified content type.</remarks>
         public static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content, string contentTypeAlias)
         {
-            return content.AncestorsOrSelf(false, n => n.ContentType.Alias == contentTypeAlias);
+            return content.AncestorsOrSelf(false, n => n.ContentType.Alias.InvariantEquals(contentTypeAlias));
         }
 
         /// <summary>
@@ -591,7 +486,7 @@ namespace Umbraco.Web
         /// <remarks>May or may not begin with the content itself, depending on its content type.</remarks>
         public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, string contentTypeAlias)
         {
-            return content.AncestorsOrSelf(true, n => n.ContentType.Alias == contentTypeAlias);
+            return content.AncestorsOrSelf(true, n => n.ContentType.Alias.InvariantEquals(contentTypeAlias));
         }
 
         /// <summary>
@@ -654,7 +549,7 @@ namespace Umbraco.Web
         /// <remarks>Does not consider the content itself. May return <c>null</c>.</remarks>
         public static IPublishedContent Ancestor(this IPublishedContent content, string contentTypeAlias)
         {
-            return content.EnumerateAncestors(false).FirstOrDefault(x => x.ContentType.Alias == contentTypeAlias);
+            return content.EnumerateAncestors(false).FirstOrDefault(x => x.ContentType.Alias.InvariantEquals(contentTypeAlias));
         }
 
         /// <summary>
@@ -717,7 +612,7 @@ namespace Umbraco.Web
         /// <remarks>May or may not return the content itself depending on its content type. May return <c>null</c>.</remarks>
         public static IPublishedContent AncestorOrSelf(this IPublishedContent content, string contentTypeAlias)
         {
-            return content.EnumerateAncestors(true).FirstOrDefault(x => x.ContentType.Alias == contentTypeAlias);
+            return content.EnumerateAncestors(true).FirstOrDefault(x => x.ContentType.Alias.InvariantEquals(contentTypeAlias));
         }
 
         /// <summary>
@@ -832,7 +727,7 @@ namespace Umbraco.Web
 
         public static IEnumerable<IPublishedContent> DescendantsOfType(this IPublishedContent content, string contentTypeAlias, string culture = null)
         {
-            return content.DescendantsOrSelf(false, p => p.ContentType.Alias == contentTypeAlias, culture);
+            return content.DescendantsOrSelf(false, p => p.ContentType.Alias.InvariantEquals(contentTypeAlias), culture);
         }
 
         public static IEnumerable<T> Descendants<T>(this IPublishedContent content, string culture = null)
@@ -859,7 +754,7 @@ namespace Umbraco.Web
 
         public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(this IPublishedContent content, string contentTypeAlias, string culture = null)
         {
-            return content.DescendantsOrSelf(true, p => p.ContentType.Alias == contentTypeAlias, culture);
+            return content.DescendantsOrSelf(true, p => p.ContentType.Alias.InvariantEquals(contentTypeAlias), culture);
         }
 
         public static IEnumerable<T> DescendantsOrSelf<T>(this IPublishedContent content, string culture = null)
@@ -886,7 +781,7 @@ namespace Umbraco.Web
 
         public static IPublishedContent DescendantOfType(this IPublishedContent content, string contentTypeAlias, string culture = null)
         {
-            return content.EnumerateDescendants(false, culture).FirstOrDefault(x => x.ContentType.Alias == contentTypeAlias);
+            return content.EnumerateDescendants(false, culture).FirstOrDefault(x => x.ContentType.Alias.InvariantEquals(contentTypeAlias));
         }
 
         public static T Descendant<T>(this IPublishedContent content, string culture = null)
@@ -913,7 +808,7 @@ namespace Umbraco.Web
 
         public static IPublishedContent DescendantOrSelfOfType(this IPublishedContent content, string contentTypeAlias, string culture = null)
         {
-            return content.EnumerateDescendants(true, culture).FirstOrDefault(x => x.ContentType.Alias == contentTypeAlias);
+            return content.EnumerateDescendants(true, culture).FirstOrDefault(x => x.ContentType.Alias.InvariantEquals(contentTypeAlias));
         }
 
         public static T DescendantOrSelf<T>(this IPublishedContent content, string culture = null)
@@ -938,7 +833,7 @@ namespace Umbraco.Web
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (orSelf) yield return content;
 
-            foreach (var desc in content.Children(culture).SelectMany(x => x.EnumerateDescendants()))
+            foreach (var desc in content.Children(culture).SelectMany(x => x.EnumerateDescendants(culture)))
                 yield return desc;
         }
 
@@ -946,7 +841,7 @@ namespace Umbraco.Web
         {
             yield return content;
 
-            foreach (var desc in content.Children(culture).SelectMany(x => x.EnumerateDescendants()))
+            foreach (var desc in content.Children(culture).SelectMany(x => x.EnumerateDescendants(culture)))
                 yield return desc;
         }
 
@@ -974,23 +869,6 @@ namespace Umbraco.Web
         #region Axes: children
 
         /// <summary>
-        /// Gets the children of the content.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
-        /// <returns>The children of the content.</returns>
-        /// <remarks>
-        /// <para>Children are sorted by their sortOrder.</para>
-        /// <para>This method exists for consistency, it is the same as calling content.Children as a property.</para>
-        /// </remarks>
-        public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, string culture = null)
-        {
-            if (content == null) throw new ArgumentNullException(nameof(content));
-
-            return content.Children.WhereIsInvariantOrHasCulture(culture);
-        }
-
-        /// <summary>
         /// Gets the children of the content, filtered by a predicate.
         /// </summary>
         /// <param name="content">The content.</param>
@@ -1014,7 +892,7 @@ namespace Umbraco.Web
         /// <returns>The children of the content, of any of the specified types.</returns>
         public static IEnumerable<IPublishedContent> ChildrenOfType(this IPublishedContent content, string contentTypeAlias, string culture = null)
         {
-            return content.Children(x => contentTypeAlias.InvariantContains(x.ContentType.Alias), culture);
+            return content.Children(x => x.ContentType.Alias.InvariantEquals(contentTypeAlias), culture);
         }
 
         /// <summary>
@@ -1095,7 +973,7 @@ namespace Umbraco.Web
                                 ? content.Children(culture).Any()
                                     ? content.Children(culture).ElementAt(0)
                                     : null
-                                : content.Children(culture).FirstOrDefault(x => x.ContentType.Alias == contentTypeAliasFilter);
+                                : content.Children(culture).FirstOrDefault(x => x.ContentType.Alias.InvariantEquals(contentTypeAliasFilter));
             if (firstNode == null)
                 return new DataTable(); //no children found
 
@@ -1111,24 +989,24 @@ namespace Umbraco.Web
                     //create all row data
                     var tableData = Core.DataTableExtensions.CreateTableData();
                     //loop through each child and create row data for it
-                    foreach (var n in content.Children.OrderBy(x => x.SortOrder))
+                    foreach (var n in content.Children().OrderBy(x => x.SortOrder))
                     {
                         if (contentTypeAliasFilter.IsNullOrWhiteSpace() == false)
                         {
-                            if (n.ContentType.Alias != contentTypeAliasFilter)
+                            if (n.ContentType.Alias.InvariantEquals(contentTypeAliasFilter) == false)
                                 continue; //skip this one, it doesn't match the filter
                         }
 
                         var standardVals = new Dictionary<string, object>
                             {
                                     { "Id", n.Id },
-                                    { "NodeName", n.Name },
+                                    { "NodeName", n.Name() },
                                     { "NodeTypeAlias", n.ContentType.Alias },
                                     { "CreateDate", n.CreateDate },
                                     { "UpdateDate", n.UpdateDate },
                                     { "CreatorName", n.CreatorName },
                                     { "WriterName", n.WriterName },
-                                    { "Url", n.Url }
+                                    { "Url", n.Url() }
                                 };
 
                         var userVals = new Dictionary<string, object>();
@@ -1189,7 +1067,7 @@ namespace Umbraco.Web
         /// <remarks>
         ///   <para>Note that in V7 this method also return the content node self.</para>
         /// </remarks>
-        public static IEnumerable<IPublishedContent> Siblings<T>(this IPublishedContent content, string culture = null)
+        public static IEnumerable<T> Siblings<T>(this IPublishedContent content, string culture = null)
             where T : class, IPublishedContent
         {
             return SiblingsAndSelf<T>(content, culture).Where(x => x.Id != content.Id);
@@ -1297,6 +1175,44 @@ namespace Umbraco.Web
         private static Dictionary<string, string> GetAliasesAndNames(IContentTypeBase contentType)
         {
             return contentType.PropertyTypes.ToDictionary(x => x.Alias, x => x.Name);
+        }
+
+        #endregion
+
+        #region Url
+
+        /// <summary>
+        /// Gets the url of the content item.
+        /// </summary>
+        /// <remarks>
+        /// <para>If the content item is a document, then this method returns the url of the
+        /// document. If it is a media, then this methods return the media url for the
+        /// 'umbracoFile' property. Use the MediaUrl() method to get the media url for other
+        /// properties.</para>
+        /// <para>The value of this property is contextual. It depends on the 'current' request uri,
+        /// if any. In addition, when the content type is multi-lingual, this is the url for the
+        /// specified culture. Otherwise, it is the invariant url.</para>
+        /// </remarks>
+        public static string Url(this IPublishedContent content, string culture = null, UrlMode mode = UrlMode.Default)
+        {
+            var umbracoContext = Composing.Current.UmbracoContext;
+
+            if (umbracoContext == null)
+                throw new InvalidOperationException("Cannot resolve a Url when Current.UmbracoContext is null.");
+            if (umbracoContext.UrlProvider == null)
+                throw new InvalidOperationException("Cannot resolve a Url when Current.UmbracoContext.UrlProvider is null.");
+
+            switch (content.ContentType.ItemType)
+            {
+                case PublishedItemType.Content:
+                    return umbracoContext.UrlProvider.GetUrl(content, mode, culture);
+
+                case PublishedItemType.Media:
+                    return umbracoContext.UrlProvider.GetMediaUrl(content, mode, culture, Constants.Conventions.Media.File);
+
+                default:
+                    throw new NotSupportedException();
+            }
         }
 
         #endregion

@@ -1,18 +1,21 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Web;
+using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
-using Umbraco.Web.Runtime;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web
 {
+
     /// <summary>
     /// Class that encapsulates Umbraco information of a specific HTTP request
     /// </summary>
@@ -20,7 +23,6 @@ namespace Umbraco.Web
     {
         private readonly IGlobalSettings _globalSettings;
         private readonly Lazy<IPublishedSnapshot> _publishedSnapshot;
-        private DomainHelper _domainHelper;
         private string _previewToken;
         private bool? _previewing;
 
@@ -109,18 +111,32 @@ namespace Umbraco.Web
         /// </summary>
         public IPublishedSnapshot PublishedSnapshot => _publishedSnapshot.Value;
 
-        // for unit tests
-        internal bool HasPublishedSnapshot => _publishedSnapshot.IsValueCreated;
+        /// <summary>
+        /// Gets the published content cache.
+        /// </summary>
+        [Obsolete("Use the Content property.")]
+        public IPublishedContentCache ContentCache => PublishedSnapshot.Content;
 
         /// <summary>
         /// Gets the published content cache.
         /// </summary>
-        public IPublishedContentCache ContentCache => PublishedSnapshot.Content;
+        public IPublishedContentCache Content => PublishedSnapshot.Content;
 
         /// <summary>
         /// Gets the published media cache.
         /// </summary>
+        [Obsolete("Use the Media property.")]
         public IPublishedMediaCache MediaCache => PublishedSnapshot.Media;
+
+        /// <summary>
+        /// Gets the published media cache.
+        /// </summary>
+        public IPublishedMediaCache Media => PublishedSnapshot.Media;
+
+        /// <summary>
+        /// Gets the domains cache.
+        /// </summary>
+        public IDomainCache Domains => PublishedSnapshot.Domains;
 
         /// <summary>
         /// Boolean value indicating whether the current request is a front-end umbraco request
@@ -146,20 +162,6 @@ namespace Umbraco.Web
         /// Gets the variation context accessor.
         /// </summary>
         public IVariationContextAccessor VariationContextAccessor { get; }
-
-        /// <summary>
-        /// Creates and caches an instance of a DomainHelper
-        /// </summary>
-        /// <remarks>
-        /// We keep creating new instances of DomainHelper, it would be better if we didn't have to do that so instead we can
-        /// have one attached to the UmbracoContext. This method accepts an external ISiteDomainHelper otherwise the UmbracoContext
-        /// ctor will have to have another parameter added only for this one method which is annoying and doesn't make a ton of sense
-        /// since the UmbracoContext itself doesn't use this.
-        ///
-        /// TODO: The alternative is to have a IDomainHelperAccessor singleton which is cached per UmbracoContext
-        /// </remarks>
-        internal DomainHelper GetDomainHelper(ISiteDomainHelper siteDomainHelper)
-            => _domainHelper ?? (_domainHelper = new DomainHelper(PublishedSnapshot.Domains, siteDomainHelper));
 
         /// <summary>
         /// Gets a value indicating whether the request has debugging enabled
@@ -202,7 +204,7 @@ namespace Umbraco.Web
         /// <returns>The url for the content.</returns>
         public string Url(int contentId, string culture = null)
         {
-            return UrlProvider.GetUrl(contentId, culture);
+            return UrlProvider.GetUrl(contentId, culture: culture);
         }
 
         /// <summary>
@@ -213,7 +215,7 @@ namespace Umbraco.Web
         /// <returns>The url for the content.</returns>
         public string Url(Guid contentId, string culture = null)
         {
-            return UrlProvider.GetUrl(contentId, culture);
+            return UrlProvider.GetUrl(contentId, culture: culture);
         }
 
         /// <summary>
@@ -223,7 +225,7 @@ namespace Umbraco.Web
         /// <param name="mode">The mode.</param>
         /// <param name="culture"></param>
         /// <returns>The url for the content.</returns>
-        public string Url(int contentId, UrlProviderMode mode, string culture = null)
+        public string Url(int contentId, UrlMode mode, string culture = null)
         {
             return UrlProvider.GetUrl(contentId, mode, culture);
         }
@@ -235,7 +237,7 @@ namespace Umbraco.Web
         /// <param name="mode">The mode.</param>
         /// <param name="culture"></param>
         /// <returns>The url for the content.</returns>
-        public string Url(Guid contentId, UrlProviderMode mode, string culture = null)
+        public string Url(Guid contentId, UrlMode mode, string culture = null)
         {
             return UrlProvider.GetUrl(contentId, mode, culture);
         }
@@ -246,9 +248,10 @@ namespace Umbraco.Web
         /// <param name="contentId">The content identifier.</param>
         /// <param name="culture"></param>
         /// <returns>The absolute url for the content.</returns>
+        [Obsolete("Use the Url() method with UrlMode.Absolute.")]
         public string UrlAbsolute(int contentId, string culture = null)
         {
-            return UrlProvider.GetUrl(contentId, true, culture);
+            return UrlProvider.GetUrl(contentId, UrlMode.Absolute, culture);
         }
 
         /// <summary>
@@ -257,9 +260,10 @@ namespace Umbraco.Web
         /// <param name="contentId">The content identifier.</param>
         /// <param name="culture"></param>
         /// <returns>The absolute url for the content.</returns>
+        [Obsolete("Use the Url() method with UrlMode.Absolute.")]
         public string UrlAbsolute(Guid contentId, string culture = null)
         {
-            return UrlProvider.GetUrl(contentId, true, culture);
+            return UrlProvider.GetUrl(contentId, UrlMode.Absolute, culture);
         }
 
         #endregion
@@ -286,7 +290,7 @@ namespace Umbraco.Web
 
             _previewing = _previewToken.IsNullOrWhiteSpace() == false;
         }
-
+        
         // say we render a macro or RTE in a give 'preview' mode that might not be the 'current' one,
         // then due to the way it all works at the moment, the 'current' published snapshot need to be in the proper
         // default 'preview' mode - somehow we have to force it. and that could be recursive.

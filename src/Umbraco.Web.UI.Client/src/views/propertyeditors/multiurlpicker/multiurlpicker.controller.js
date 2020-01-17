@@ -1,5 +1,11 @@
 function multiUrlPickerController($scope, angularHelper, localizationService, entityResource, iconHelper, editorService) {
 
+    var vm = {
+        labels: {
+            general_recycleBin: ""
+        }
+    };
+
     $scope.renderModel = [];
 
     if ($scope.preview) {
@@ -13,7 +19,10 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
     var currentForm = angularHelper.getCurrentForm($scope);
 
     $scope.sortableOptions = {
+        axis: "y",
+        containment: "parent",
         distance: 10,
+        opacity: 0.7,
         tolerance: "pointer",
         scroll: true,
         zIndex: 6000,
@@ -71,6 +80,9 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
 
         var linkPicker = {
             currentTarget: target,
+            dataTypeKey: $scope.model.dataTypeKey,
+            ignoreUserStartNodes : ($scope.model.config && $scope.model.config.ignoreUserStartNodes) ? $scope.model.config.ignoreUserStartNodes : "0",
+            hideAnchor: $scope.model.config && $scope.model.config.hideAnchor ? true : false,
             submit: function (model) {
                 if (model.target.url || model.target.anchor) {
                     // if an anchor exists, check that it is appropriately prefixed
@@ -102,7 +114,7 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
                             link.published = (data.metaData && data.metaData.IsPublished === false && entityType === "Document") ? false : true;
                             link.trashed = data.trashed;
                             if (link.trashed) {
-                                item.url = localizationService.dictionary.general_recycleBin;
+                                item.url = vm.labels.general_recycleBin;
                             }
                         });
                     } else {
@@ -120,6 +132,31 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
         };
         editorService.linkPicker(linkPicker);
     };
+
+    function init() {
+        localizationService.localizeMany(["general_recycleBin"])
+            .then(function (data) {
+                vm.labels.general_recycleBin = data[0];
+            });
+
+        // if the property is mandatory, set the minCount config to 1 (unless of course it is set to something already),
+        // that way the minCount/maxCount validation handles the mandatory as well
+        if ($scope.model.validation && $scope.model.validation.mandatory && !$scope.model.config.minNumber) {
+            $scope.model.config.minNumber = 1;
+        }
+
+        _.each($scope.model.value, function (item){
+            // we must reload the "document" link URLs to match the current editor culture
+            if (item.udi.indexOf("/document/") > 0) {
+                item.url = null;
+                entityResource.getUrlByUdi(item.udi).then(function (data) {
+                    item.url = data;
+                });
+            }
+        });
+    }
+
+    init();
 }
 
 angular.module("umbraco").controller("Umbraco.PropertyEditors.MultiUrlPickerController", multiUrlPickerController);

@@ -146,28 +146,6 @@ namespace Umbraco.Web.WebApi.Filters
                     Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request.Content is not ObjectContent, it is {RequestObjectType}", actionExecutedContext.Request.Content.GetType());
                 }
             }
-
-            //Now remove all old files so that the temp folder(s) never grow
-            foreach (var tempFolder in tempFolders.Distinct())
-            {
-                var files = Directory.GetFiles(tempFolder);
-                foreach (var file in files)
-                {
-                    if (DateTime.UtcNow - File.GetLastWriteTimeUtc(file) > TimeSpan.FromDays(1))
-                    {
-                        try
-                        {
-                            File.Delete(file);
-                        }
-                        catch (System.Exception ex)
-                        {
-                            Current.Logger.Error<FileUploadCleanupFilterAttribute>(ex, "Could not delete temp file {FileName}", file);
-                        }
-                    }
-                }
-
-            }
-
         }
     }
 }

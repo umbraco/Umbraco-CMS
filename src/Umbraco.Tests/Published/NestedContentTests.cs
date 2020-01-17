@@ -11,6 +11,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Models;
@@ -23,7 +24,7 @@ namespace Umbraco.Tests.Published
     [TestFixture]
     public class NestedContentTests
     {
-        private (PublishedContentType, PublishedContentType) CreateContentTypes()
+        private (IPublishedContentType, IPublishedContentType) CreateContentTypes()
         {
             Current.Reset();
 
@@ -125,13 +126,24 @@ namespace Umbraco.Tests.Published
 
             var factory = new PublishedContentTypeFactory(publishedModelFactory.Object, converters, dataTypeService);
 
-            var propertyType1 = factory.CreatePropertyType("property1", 1);
-            var propertyType2 = factory.CreatePropertyType("property2", 2);
-            var propertyTypeN1 = factory.CreatePropertyType("propertyN1", 3);
+            IEnumerable<IPublishedPropertyType> CreatePropertyTypes1(IPublishedContentType contentType)
+            {
+                yield return factory.CreatePropertyType(contentType, "property1", 1);
+            }
 
-            var contentType1 = factory.CreateContentType(1, "content1", new[] { propertyType1 });
-            var contentType2 = factory.CreateContentType(2, "content2", new[] { propertyType2 });
-            var contentTypeN1 = factory.CreateContentType(2, "contentN1", new[] { propertyTypeN1 }, isElement: true);
+            IEnumerable<IPublishedPropertyType> CreatePropertyTypes2(IPublishedContentType contentType)
+            {
+                yield return factory.CreatePropertyType(contentType, "property2", 2);
+            }
+
+            IEnumerable<IPublishedPropertyType> CreatePropertyTypesN1(IPublishedContentType contentType)
+            {
+                yield return factory.CreatePropertyType(contentType, "propertyN1", 3);
+            }
+
+            var contentType1 = factory.CreateContentType(1, "content1", CreatePropertyTypes1);
+            var contentType2 = factory.CreateContentType(2, "content2", CreatePropertyTypes2);
+            var contentTypeN1 = factory.CreateContentType(2, "contentN1", CreatePropertyTypesN1, isElement: true);
 
             // mocked content cache returns content types
             contentCache
@@ -156,12 +168,16 @@ namespace Umbraco.Tests.Published
 
             var key = Guid.NewGuid();
             var keyA = Guid.NewGuid();
-            var content = new TestPublishedContent(contentType1, key, new[]
+            var content = new SolidPublishedContent(contentType1)
             {
-                new TestPublishedProperty(contentType1.GetPropertyType("property1"), $@"[
+                Key = key,
+                Properties = new []
+                {
+                    new TestPublishedProperty(contentType1.GetPropertyType("property1"), $@"[
                     {{ ""key"": ""{keyA}"", ""propertyN1"": ""foo"", ""ncContentTypeAlias"": ""contentN1"" }}
                 ]")
-            }, Mock.Of<IUmbracoContextAccessor>());
+                }
+            };
             var value = content.Value("property1");
 
             // nested single converter returns proper TestModel value
@@ -183,14 +199,17 @@ namespace Umbraco.Tests.Published
             var key = Guid.NewGuid();
             var keyA = Guid.NewGuid();
             var keyB = Guid.NewGuid();
-            var content = new TestPublishedContent(contentType2, key, new[]
+            var content = new SolidPublishedContent(contentType2)
             {
-                new TestPublishedProperty(contentType2.GetPropertyType("property2"), $@"[
+                Key = key,
+                Properties = new[]
+                {
+                    new TestPublishedProperty(contentType2.GetPropertyType("property2"), $@"[
                     {{ ""key"": ""{keyA}"", ""propertyN1"": ""foo"", ""ncContentTypeAlias"": ""contentN1"" }},
                     {{ ""key"": ""{keyB}"", ""propertyN1"": ""bar"", ""ncContentTypeAlias"": ""contentN1"" }}
                 ]")
-            },
-                Mock.Of<IUmbracoContextAccessor>());
+                }
+            };
             var value = content.Value("property2");
 
             // nested many converter returns proper IEnumerable<TestModel> value
@@ -219,14 +238,14 @@ namespace Umbraco.Tests.Published
             private readonly bool _hasValue;
             private IPublishedElement _owner;
 
-            public TestPublishedProperty(PublishedPropertyType propertyType, object source)
+            public TestPublishedProperty(IPublishedPropertyType propertyType, object source)
                 : base(propertyType, PropertyCacheLevel.Element) // initial reference cache level always is .Content
             {
                 _sourceValue = source;
                 _hasValue = source != null && (!(source is string ssource) || !string.IsNullOrWhiteSpace(ssource));
             }
 
-            public TestPublishedProperty(PublishedPropertyType propertyType, IPublishedElement element, bool preview, PropertyCacheLevel referenceCacheLevel, object source)
+            public TestPublishedProperty(IPublishedPropertyType propertyType, IPublishedElement element, bool preview, PropertyCacheLevel referenceCacheLevel, object source)
                 : base(propertyType, referenceCacheLevel)
             {
                 _sourceValue = source;
@@ -245,54 +264,7 @@ namespace Umbraco.Tests.Published
             public override bool HasValue(string culture = null, string segment = null) => _hasValue;
             public override object GetSourceValue(string culture = null, string segment = null) => _sourceValue;
             public override object GetValue(string culture = null, string segment = null) => PropertyType.ConvertInterToObject(_owner, ReferenceCacheLevel, InterValue, _preview);
-            public override object GetXPathValue(string culture = null, string segment = null) => throw new WontImplementException();
-        }
-
-        class TestPublishedContent : PublishedContentBase
-        {
-            public TestPublishedContent(PublishedContentType contentType, Guid key, IEnumerable<TestPublishedProperty> properties, IUmbracoContextAccessor umbracoContextAccessor): base(umbracoContextAccessor)
-            {
-                ContentType = contentType;
-                Key = key;
-                var propertiesA = properties.ToArray();
-                Properties = propertiesA;
-                foreach (var property in propertiesA)
-                    property.SetOwner(this);
-            }
-
-            // ReSharper disable UnassignedGetOnlyAutoProperty
-            public override PublishedItemType ItemType { get; }
-            public override bool IsDraft(string culture = null) => false;
-            public override bool IsPublished(string culture = null) => true;
-            public override IPublishedContent Parent { get; }
-            public override IEnumerable<IPublishedContent> Children { get; }
-            public override PublishedContentType ContentType { get; }
-            // ReSharper restore UnassignedGetOnlyAutoProperty
-
-            // ReSharper disable UnassignedGetOnlyAutoProperty
-            public override int Id { get; }
-            public override int? TemplateId { get; }
-            public override int SortOrder { get; }
-            public override string Name { get; }
-            public override PublishedCultureInfo GetCulture(string culture = ".") => throw new NotSupportedException();
-            public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => throw new NotSupportedException();
-            public override string UrlSegment { get; }
-            public override string WriterName { get; }
-            public override string CreatorName { get; }
-            public override int WriterId { get; }
-            public override int CreatorId { get; }
-            public override string Path { get; }
-            public override DateTime CreateDate { get; }
-            public override DateTime UpdateDate { get; }
-            public override int Level { get; }
-            public override Guid Key { get; }
-            // ReSharper restore UnassignedGetOnlyAutoProperty
-
-            public override IEnumerable<IPublishedProperty> Properties { get; }
-            public override IPublishedProperty GetProperty(string alias)
-            {
-                return Properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
-            }
+            public override object GetXPathValue(string culture = null, string segment = null) => throw new InvalidOperationException("This method won't be implemented.");
         }
     }
 }

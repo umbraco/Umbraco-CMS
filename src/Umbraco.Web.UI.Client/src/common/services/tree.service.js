@@ -41,7 +41,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
     return {
 
         /** Internal method to return the tree cache */
-        _getTreeCache: function() {
+        _getTreeCache: function () {
             return treeCache;
         },
 
@@ -69,12 +69,14 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                 if (childPath.startsWith(p + ",")) {
                     //this means that the node's path supercedes this path stored so we can remove the current 'p' and replace it with node.path
                     expandedPaths.splice(expandedPaths.indexOf(p), 1); //remove it
-                    expandedPaths.push(childPath); //replace it
+                    if (expandedPaths.indexOf(childPath) === -1) {
+                        expandedPaths.push(childPath); //replace it
+                    }
                 }
                 else if (p.startsWith(childPath + ",")) {
                     //this means we've already tracked a deeper node so we shouldn't track this one
                 }
-                else {
+                else if (expandedPaths.indexOf(childPath) === -1) {
                     expandedPaths.push(childPath); //track it
                 }
             });
@@ -97,7 +99,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             }
 
             //create a method outside of the loop to return the parent - otherwise jshint blows up
-            var funcParent = function() {
+            var funcParent = function () {
                 return parentNode;
             };
 
@@ -168,7 +170,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          *
          * @param {String} treeAlias The tree alias to check
          */
-        getTreePackageFolder: function(treeAlias) {
+        getTreePackageFolder: function (treeAlias) {
             //we determine this based on the server variables
             if (Umbraco.Sys.ServerVariables.umbracoPlugins &&
                 Umbraco.Sys.ServerVariables.umbracoPlugins.trees &&
@@ -220,7 +222,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                     var self = this;
                     this.clearCache({
                         cacheKey: args.cacheKey,
-                        filter: function(cc) {
+                        filter: function (cc) {
                             //get the new parent node from the tree cache
                             var parent = self.getDescendantNode(cc.root, args.childrenOf);
                             if (parent) {
@@ -288,7 +290,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          * @param {object} args.node The tree node
          * @param {object} args.section The current section
          */
-        loadNodeChildren: function(args) {
+        loadNodeChildren: function (args) {
             if (!args) {
                 throw "No args object defined for loadNodeChildren";
             }
@@ -303,7 +305,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             args.node.loading = true;
 
             return this.getChildren(args)
-                .then(function(data) {
+                .then(function (data) {
 
                     //set state to done and expand (only if there actually are children!)
                     args.node.loading = false;
@@ -320,10 +322,10 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
 
                     return $q.when(data);
 
-                }, function(reason) {
+                }, function (reason) {
 
                     //in case of error, emit event
-                    eventsService.emit("treeService.treeNodeLoadError", {error: reason } );
+                    eventsService.emit("treeService.treeNodeLoadError", { error: reason });
 
                     //stop show the loading indicator
                     args.node.loading = false;
@@ -346,7 +348,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          * Removes a given node from the tree
          * @param {object} treeNode the node to remove
          */
-        removeNode: function(treeNode) {
+        removeNode: function (treeNode) {
             if (!angular.isFunction(treeNode.parent)) {
                 return;
             }
@@ -359,7 +361,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             parent.children.splice(parent.children.indexOf(treeNode), 1);
 
             parent.hasChildren = parent.children.length !== 0;
-            
+
             //Notify that the node has been removed
             eventsService.emit("treeService.removeNode", { node: treeNode });
         },
@@ -374,7 +376,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          * Removes all child nodes from a given tree node
          * @param {object} treeNode the node to remove children from
          */
-        removeChildNodes : function(treeNode) {
+        removeChildNodes: function (treeNode) {
             treeNode.expanded = false;
             treeNode.children = [];
             treeNode.hasChildren = false;
@@ -413,7 +415,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          * @param {int} id id of descendant node
          * @param {string} treeAlias - optional tree alias, if fetching descendant node from a child of a listview document
          */
-        getDescendantNode: function(treeNode, id, treeAlias) {
+        getDescendantNode: function (treeNode, id, treeAlias) {
 
             //validate if it is a section container since we'll need a treeAlias if it is one
             if (treeNode.isContainer === true && !treeAlias) {
@@ -432,7 +434,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                             var root = getTreeRoot(tn.children[c]);
 
                             //only return if we found the root in this child, otherwise continue.
-                            if(root){
+                            if (root) {
                                 return root;
                             }
                         }
@@ -531,7 +533,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          * Gets the node's tree alias, this is done by looking up the meta-data of the current node's root node
          * @param {object} treeNode to retrive tree alias from
          */
-        getTreeAlias : function(treeNode) {
+        getTreeAlias: function (treeNode) {
             var root = this.getTreeRoot(treeNode);
             if (root) {
                 return root.metaData["treeAlias"];
@@ -570,7 +572,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
 
             var self = this;
             return treeResource.loadApplication(args)
-                .then(function(data) {
+                .then(function (data) {
                     //this will be called once the tree app data has loaded
                     var result = {
                         name: data.name,
@@ -624,7 +626,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             }
 
             return treeResource.loadMenu(args.treeNode)
-                .then(function(data) {
+                .then(function (data) {
                     //need to convert the icons to new ones
                     for (var i = 0; i < data.length; i++) {
                         data[i].cssclass = iconHelper.convertFromLegacyIcon(data[i].cssclass);
@@ -677,7 +679,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          * Re-loads the single node from the server
          * @param {object} node Tree node to reload
          */
-        reloadNode: function(node) {
+        reloadNode: function (node) {
             if (!node) {
                 throw "node cannot be null";
             }
@@ -691,10 +693,10 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             //set the node to loading
             node.loading = true;
 
-            return this.getChildren({ node: node.parent(), section: node.section }).then(function(data) {
+            return this.getChildren({ node: node.parent(), section: node.section }).then(function (data) {
 
                 //ok, now that we have the children, find the node we're reloading
-                var found = _.find(data, function(item) {
+                var found = _.find(data, function (item) {
                     return item.id === node.id;
                 });
                 if (found) {
@@ -720,7 +722,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                 else {
                     return $q.reject();
                 }
-            }, function() {
+            }, function () {
                 return $q.reject();
             });
         },
@@ -735,7 +737,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          * This will return the current node's path by walking up the tree
          * @param {object} node Tree node to retrieve path for
          */
-        getPath: function(node) {
+        getPath: function (node) {
             if (!node) {
                 throw "node cannot be null";
             }
@@ -760,7 +762,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             return reversePath.reverse();
         },
 
-        syncTree: function(args) {
+        syncTree: function (args) {
 
             if (!args) {
                 throw "No args object defined for syncTree";
@@ -800,6 +802,8 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                 }
             }
 
+            var deferred = $q.defer();
+
             //now that we have the first id to lookup, we can start the process
 
             var self = this;
@@ -831,6 +835,10 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                 else {
                     //couldn't find it in the
                     return self.loadNodeChildren({ node: node, section: node.section }).then(function (children) {
+
+                        //send back some progress to allow the caller to deal with expanded nodes
+                        deferred.notify({ type: "treeNodeExpanded", node: node, children: children })
+
                         //ok, got the children, let's find it
                         var found = self.getChildNode(node, args.path[currPathIndex]);
                         if (found) {
@@ -858,8 +866,16 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             };
 
             //start
-            return doSync();
+            var wrappedPromise = doSync();
 
+            //then wrap it 
+            wrappedPromise.then(function (args) {
+                deferred.resolve(args);
+            }, function (args) {
+                deferred.reject(args);
+            });
+
+            return deferred.promise;
         }
 
     };

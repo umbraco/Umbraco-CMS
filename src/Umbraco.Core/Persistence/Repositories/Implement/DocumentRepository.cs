@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
@@ -205,7 +205,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersionCultureVariation + " WHERE versionId IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.AccessRule + " WHERE accessId IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.Access + " WHERE nodeId = @id OR loginNodeId = @id OR noAccessNodeId = @id)",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.Access + " WHERE nodeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.Access + " WHERE loginNodeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.Access + " WHERE noAccessNodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.Node + " WHERE id = @id"
             };
             return list;
@@ -225,6 +228,21 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return MapDtosToContent(Database.Fetch<DocumentDto>(sql), true);
         }
 
+        // TODO: This method needs to return a readonly version of IContent! The content returned
+        // from this method does not contain all of the data required to re-persist it and if that
+        // is attempted some odd things will occur.
+        // Either we create an IContentReadOnly (which ultimately we should for vNext so we can
+        // differentiate between methods that return entities that can be re-persisted or not), or
+        // in the meantime to not break API compatibility, we can add a property to IContentBase
+        // (or go further and have it on IUmbracoEntity): "IsReadOnly" and if that is true we throw
+        // an exception if that entity is passed to a Save method.
+        // Ideally we return "Slim" versions of content for all sorts of methods here and in ContentService.
+        // Perhaps another non-breaking alternative is to have new services like IContentServiceReadOnly
+        // which can return IContentReadOnly.
+        // We have the ability with `MapDtosToContent` to reduce the amount of data looked up for a
+        // content item. Ideally for paged data that populates list views, these would be ultra slim
+        // content items, there's no reason to populate those with really anything apart from property data,
+        // but until we do something like the above, we can't do that since it would be breaking and unclear.
         public override IEnumerable<IContent> GetAllVersionsSlim(int nodeId, int skip, int take)
         {
             var sql = GetBaseQuery(QueryType.Many, false)
@@ -232,7 +250,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .OrderByDescending<ContentVersionDto>(x => x.Current)
                 .AndByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            return MapDtosToContent(Database.Fetch<DocumentDto>(sql), true, true).Skip(skip).Take(take);
+            return MapDtosToContent(Database.Fetch<DocumentDto>(sql), true,
+                // load bare minimum, need variants though since this is used to rollback with variants
+                false, false, false, true).Skip(skip).Take(take);
         }
 
         public override IContent GetVersion(int versionId)
@@ -244,14 +264,63 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return dto == null ? null : MapDtoToContent(dto);
         }
 
+        // deletes a specific version
+        public override void DeleteVersion(int versionId)
+        {
+            // TODO: test object node type?
+
+            // get the version we want to delete
+            var template = SqlContext.Templates.Get("Umbraco.Core.DocumentRepository.GetVersion", tsql =>
+                tsql.Select<ContentVersionDto>()
+                    .AndSelect<DocumentVersionDto>()
+                    .From<ContentVersionDto>()
+                    .InnerJoin<DocumentVersionDto>()
+                    .On<ContentVersionDto, DocumentVersionDto>((c, d) => c.Id == d.Id)
+                    .Where<ContentVersionDto>(x => x.Id == SqlTemplate.Arg<int>("versionId"))
+            );
+            var versionDto = Database.Fetch<DocumentVersionDto>(template.Sql(new { versionId })).FirstOrDefault();
+
+            // nothing to delete
+            if (versionDto == null)
+                return;
+
+            // don't delete the current or published version
+            if (versionDto.ContentVersionDto.Current)
+                throw new InvalidOperationException("Cannot delete the current version.");
+            else if (versionDto.Published)
+                throw new InvalidOperationException("Cannot delete the published version.");
+
+            PerformDeleteVersion(versionDto.ContentVersionDto.NodeId, versionId);
+        }
+
+        //  deletes all versions of an entity, older than a date.
+        public override void DeleteVersions(int nodeId, DateTime versionDate)
+        {
+            // TODO: test object node type?
+
+            // get the versions we want to delete, excluding the current one
+            var template = SqlContext.Templates.Get("Umbraco.Core.DocumentRepository.GetVersions", tsql =>
+               tsql.Select<ContentVersionDto>()
+                    .From<ContentVersionDto>()
+                    .InnerJoin<DocumentVersionDto>()
+                    .On<ContentVersionDto, DocumentVersionDto>((c, d) => c.Id == d.Id)
+                    .Where<ContentVersionDto>(x => x.NodeId == SqlTemplate.Arg<int>("nodeId") && !x.Current && x.VersionDate < SqlTemplate.Arg<DateTime>("versionDate"))
+                    .Where<DocumentVersionDto>( x => !x.Published)                    
+            );
+            var versionDtos = Database.Fetch<ContentVersionDto>(template.Sql(new { nodeId, versionDate }));
+            foreach (var versionDto in versionDtos)
+                PerformDeleteVersion(versionDto.NodeId, versionDto.Id);
+        }
+
         protected override void PerformDeleteVersion(int id, int versionId)
         {
             // raise event first else potential FK issues
             OnUowRemovingVersion(new ScopedVersionEventArgs(AmbientScope, id, versionId));
 
             Database.Delete<PropertyDataDto>("WHERE versionId = @versionId", new { versionId });
-            Database.Delete<ContentVersionDto>("WHERE id = @versionId", new { versionId });
+            Database.Delete<ContentVersionCultureVariationDto>("WHERE versionId = @versionId", new { versionId });
             Database.Delete<DocumentVersionDto>("WHERE id = @versionId", new { versionId });
+            Database.Delete<ContentVersionDto>("WHERE id = @versionId", new { versionId });
         }
 
         #endregion
@@ -260,21 +329,16 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(IContent entity)
         {
-            // TODO: https://github.com/umbraco/Umbraco-CMS/issues/4234 - sort out IContent vs Content
-            // however, it's not just so we have access to AddingEntity
-            // there are tons of things at the end of the methods, that can only work with a true Content
-            // and basically, the repository requires a Content, not an IContent
-            var content = (Content)entity;
+            entity.AddingEntity();
 
-            content.AddingEntity();
-            var publishing = content.PublishedState == PublishedState.Publishing;
+            var publishing = entity.PublishedState == PublishedState.Publishing;
 
             // ensure that the default template is assigned
             if (entity.TemplateId.HasValue == false)
                 entity.TemplateId = entity.ContentType.DefaultTemplate?.Id;
 
             // sanitize names
-            SanitizeNames(content, publishing);
+            SanitizeNames(entity, publishing);
 
             // ensure that strings don't contain characters that are invalid in xml
             // TODO: do we really want to keep doing this here?
@@ -324,11 +388,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             contentVersionDto.NodeId = nodeDto.NodeId;
             contentVersionDto.Current = !publishing;
             Database.Insert(contentVersionDto);
-            content.VersionId = contentVersionDto.Id;
+            entity.VersionId = contentVersionDto.Id;
 
             // persist the document version dto
             var documentVersionDto = dto.DocumentVersionDto;
-            documentVersionDto.Id = content.VersionId;
+            documentVersionDto.Id = entity.VersionId;
             if (publishing)
                 documentVersionDto.Published = true;
             Database.Insert(documentVersionDto);
@@ -336,62 +400,62 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // and again in case we're publishing immediately
             if (publishing)
             {
-                content.PublishedVersionId = content.VersionId;
+                entity.PublishedVersionId = entity.VersionId;
                 contentVersionDto.Id = 0;
                 contentVersionDto.Current = true;
-                contentVersionDto.Text = content.Name;
+                contentVersionDto.Text = entity.Name;
                 Database.Insert(contentVersionDto);
-                content.VersionId = contentVersionDto.Id;
+                entity.VersionId = contentVersionDto.Id;
 
-                documentVersionDto.Id = content.VersionId;
+                documentVersionDto.Id = entity.VersionId;
                 documentVersionDto.Published = false;
                 Database.Insert(documentVersionDto);
             }
 
             // persist the property data
-            var propertyDataDtos = PropertyFactory.BuildDtos(content.ContentType.Variations, content.VersionId, content.PublishedVersionId, entity.Properties, LanguageRepository, out var edited, out var editedCultures);
+            var propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, entity.PublishedVersionId, entity.Properties, LanguageRepository, out var edited, out var editedCultures);
             foreach (var propertyDataDto in propertyDataDtos)
                 Database.Insert(propertyDataDto);
 
             // if !publishing, we may have a new name != current publish name,
             // also impacts 'edited'
-            if (!publishing && content.PublishName != content.Name)
+            if (!publishing && entity.PublishName != entity.Name)
                 edited = true;
 
             // persist the document dto
             // at that point, when publishing, the entity still has its old Published value
             // so we need to explicitly update the dto to persist the correct value
-            if (content.PublishedState == PublishedState.Publishing)
+            if (entity.PublishedState == PublishedState.Publishing)
                 dto.Published = true;
             dto.NodeId = nodeDto.NodeId;
-            content.Edited = dto.Edited = !dto.Published || edited; // if not published, always edited
+            entity.Edited = dto.Edited = !dto.Published || edited; // if not published, always edited
             Database.Insert(dto);
 
             //insert the schedule
-            PersistContentSchedule(content, false);
+            PersistContentSchedule(entity, false);
 
             // persist the variations
-            if (content.ContentType.VariesByCulture())
+            if (entity.ContentType.VariesByCulture())
             {
                 // bump dates to align cultures to version
                 if (publishing)
-                    content.AdjustDates(contentVersionDto.VersionDate);
+                    entity.AdjustDates(contentVersionDto.VersionDate);
 
                 // names also impact 'edited'
                 // ReSharper disable once UseDeconstruction
-                foreach (var cultureInfo in content.CultureInfos)
-                    if (cultureInfo.Name != content.GetPublishName(cultureInfo.Culture))
+                foreach (var cultureInfo in entity.CultureInfos)
+                    if (cultureInfo.Name != entity.GetPublishName(cultureInfo.Culture))
                         (editedCultures ?? (editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase))).Add(cultureInfo.Culture);
 
                 // insert content variations
-                Database.BulkInsertRecords(GetContentVariationDtos(content, publishing));
+                Database.BulkInsertRecords(GetContentVariationDtos(entity, publishing));
 
                 // insert document variations
-                Database.BulkInsertRecords(GetDocumentVariationDtos(content, publishing, editedCultures));
+                Database.BulkInsertRecords(GetDocumentVariationDtos(entity, editedCultures));
             }
 
             // refresh content
-            content.SetCultureEdited(editedCultures);
+            entity.SetCultureEdited(editedCultures);
 
             // trigger here, before we reset Published etc
             OnUowRefreshedEntity(new ScopedEntityEventArgs(AmbientScope, entity));
@@ -399,23 +463,23 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // flip the entity's published property
             // this also flips its published state
             // note: what depends on variations (eg PublishNames) is managed directly by the content
-            if (content.PublishedState == PublishedState.Publishing)
+            if (entity.PublishedState == PublishedState.Publishing)
             {
-                content.Published = true;
-                content.PublishTemplateId = content.TemplateId;
-                content.PublisherId = content.WriterId;
-                content.PublishName = content.Name;
-                content.PublishDate = content.UpdateDate;
+                entity.Published = true;
+                entity.PublishTemplateId = entity.TemplateId;
+                entity.PublisherId = entity.WriterId;
+                entity.PublishName = entity.Name;
+                entity.PublishDate = entity.UpdateDate;
 
                 SetEntityTags(entity, _tagRepository);
             }
-            else if (content.PublishedState == PublishedState.Unpublishing)
+            else if (entity.PublishedState == PublishedState.Unpublishing)
             {
-                content.Published = false;
-                content.PublishTemplateId = null;
-                content.PublisherId = null;
-                content.PublishName = null;
-                content.PublishDate = null;
+                entity.Published = false;
+                entity.PublishTemplateId = null;
+                entity.PublisherId = null;
+                entity.PublishName = null;
+                entity.PublishDate = null;
 
                 ClearEntityTags(entity, _tagRepository);
             }
@@ -437,34 +501,33 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistUpdatedItem(IContent entity)
         {
-            // however, it's not just so we have access to AddingEntity
-            // there are tons of things at the end of the methods, that can only work with a true Content
-            // and basically, the repository requires a Content, not an IContent
-            var content = (Content)entity;
+            var entityBase = entity as EntityBase;
+            var isEntityDirty = entityBase != null && entityBase.IsDirty();
 
             // check if we need to make any database changes at all
-            if ((content.PublishedState == PublishedState.Published || content.PublishedState == PublishedState.Unpublished)
-                    && !content.IsEntityDirty() && !content.IsAnyUserPropertyDirty())
+            if ((entity.PublishedState == PublishedState.Published || entity.PublishedState == PublishedState.Unpublished)
+                    && !isEntityDirty && !entity.IsAnyUserPropertyDirty())
                 return; // no change to save, do nothing, don't even update dates
 
             // whatever we do, we must check that we are saving the current version
-            var version = Database.Fetch<ContentVersionDto>(SqlContext.Sql().Select<ContentVersionDto>().From<ContentVersionDto>().Where<ContentVersionDto>(x => x.Id == content.VersionId)).FirstOrDefault();
+            var version = Database.Fetch<ContentVersionDto>(SqlContext.Sql().Select<ContentVersionDto>().From<ContentVersionDto>().Where<ContentVersionDto>(x => x.Id == entity.VersionId)).FirstOrDefault();
             if (version == null || !version.Current)
                 throw new InvalidOperationException("Cannot save a non-current version.");
 
             // update
-            content.UpdatingEntity();
-            var publishing = content.PublishedState == PublishedState.Publishing;
+            entity.UpdatingEntity();
+
+            var publishing = entity.PublishedState == PublishedState.Publishing;
 
             // check if we need to create a new version
-            if (publishing && content.PublishedVersionId > 0)
+            if (publishing && entity.PublishedVersionId > 0)
             {
                 // published version is not published anymore
-                Database.Execute(Sql().Update<DocumentVersionDto>(u => u.Set(x => x.Published, false)).Where<DocumentVersionDto>(x => x.Id == content.PublishedVersionId));
+                Database.Execute(Sql().Update<DocumentVersionDto>(u => u.Set(x => x.Published, false)).Where<DocumentVersionDto>(x => x.Id == entity.PublishedVersionId));
             }
 
             // sanitize names
-            SanitizeNames(content, publishing);
+            SanitizeNames(entity, publishing);
 
             // ensure that strings don't contain characters that are invalid in xml
             // TODO: do we really want to keep doing this here?
@@ -504,45 +567,45 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // and, if publishing, insert new content & document version dtos
             if (publishing)
             {
-                content.PublishedVersionId = content.VersionId;
+                entity.PublishedVersionId = entity.VersionId;
 
                 contentVersionDto.Id = 0; // want a new id
                 contentVersionDto.Current = true; // current version
-                contentVersionDto.Text = content.Name;
+                contentVersionDto.Text = entity.Name;
                 Database.Insert(contentVersionDto);
-                content.VersionId = documentVersionDto.Id = contentVersionDto.Id; // get the new id
+                entity.VersionId = documentVersionDto.Id = contentVersionDto.Id; // get the new id
 
                 documentVersionDto.Published = false; // non-published version
-                Database.Insert(documentVersionDto);
+                Database.Insert(documentVersionDto); 
             }
 
             // replace the property data (rather than updating)
             // only need to delete for the version that existed, the new version (if any) has no property data yet
-            var versionToDelete = publishing ? content.PublishedVersionId : content.VersionId;
+            var versionToDelete = publishing ? entity.PublishedVersionId : entity.VersionId;
             var deletePropertyDataSql = Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == versionToDelete);
             Database.Execute(deletePropertyDataSql);
 
             // insert property data
-            var propertyDataDtos = PropertyFactory.BuildDtos(content.ContentType.Variations, content.VersionId, publishing ? content.PublishedVersionId : 0,
+            var propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, publishing ? entity.PublishedVersionId : 0,
                 entity.Properties, LanguageRepository, out var edited, out var editedCultures);
             foreach (var propertyDataDto in propertyDataDtos)
                 Database.Insert(propertyDataDto);
 
             // if !publishing, we may have a new name != current publish name,
             // also impacts 'edited'
-            if (!publishing && content.PublishName != content.Name)
+            if (!publishing && entity.PublishName != entity.Name)
                 edited = true;
 
-            if (content.ContentType.VariesByCulture())
+            if (entity.ContentType.VariesByCulture())
             {
                 // bump dates to align cultures to version
                 if (publishing)
-                    content.AdjustDates(contentVersionDto.VersionDate);
+                    entity.AdjustDates(contentVersionDto.VersionDate);
 
                 // names also impact 'edited'
                 // ReSharper disable once UseDeconstruction
-                foreach (var cultureInfo in content.CultureInfos)
-                    if (cultureInfo.Name != content.GetPublishName(cultureInfo.Culture))
+                foreach (var cultureInfo in entity.CultureInfos)
+                    if (cultureInfo.Name != entity.GetPublishName(cultureInfo.Culture))
                     {
                         edited = true;
                         (editedCultures ?? (editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase))).Add(cultureInfo.Culture);
@@ -560,7 +623,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 Database.Execute(deleteContentVariations);
 
                 // replace the document version variations (rather than updating)
-                var deleteDocumentVariations = Sql().Delete<DocumentCultureVariationDto>().Where<DocumentCultureVariationDto>(x => x.NodeId == content.Id);
+                var deleteDocumentVariations = Sql().Delete<DocumentCultureVariationDto>().Where<DocumentCultureVariationDto>(x => x.NodeId == entity.Id);
                 Database.Execute(deleteDocumentVariations);
 
                 // TODO: NPoco InsertBulk issue?
@@ -570,32 +633,32 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 // (same in PersistNewItem above)
 
                 // insert content variations
-                Database.BulkInsertRecords(GetContentVariationDtos(content, publishing));
+                Database.BulkInsertRecords(GetContentVariationDtos(entity, publishing));
 
                 // insert document variations
-                Database.BulkInsertRecords(GetDocumentVariationDtos(content, publishing, editedCultures));
+                Database.BulkInsertRecords(GetDocumentVariationDtos(entity, editedCultures));
             }
 
             // refresh content
-            content.SetCultureEdited(editedCultures);
+            entity.SetCultureEdited(editedCultures);
 
             // update the document dto
             // at that point, when un/publishing, the entity still has its old Published value
             // so we need to explicitly update the dto to persist the correct value
-            if (content.PublishedState == PublishedState.Publishing)
+            if (entity.PublishedState == PublishedState.Publishing)
                 dto.Published = true;
-            else if (content.PublishedState == PublishedState.Unpublishing)
+            else if (entity.PublishedState == PublishedState.Unpublishing)
                 dto.Published = false;
-            content.Edited = dto.Edited = !dto.Published || edited; // if not published, always edited
+            entity.Edited = dto.Edited = !dto.Published || edited; // if not published, always edited
             Database.Update(dto);
 
             //update the schedule
-            if (content.IsPropertyDirty("ContentSchedule"))
-                PersistContentSchedule(content, true);
+            if (entity.IsPropertyDirty("ContentSchedule"))
+                PersistContentSchedule(entity, true);
 
             // if entity is publishing, update tags, else leave tags there
             // means that implicitly unpublished, or trashed, entities *still* have tags in db
-            if (content.PublishedState == PublishedState.Publishing)
+            if (entity.PublishedState == PublishedState.Publishing)
                 SetEntityTags(entity, _tagRepository);
 
             // trigger here, before we reset Published etc
@@ -603,23 +666,23 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             // flip the entity's published property
             // this also flips its published state
-            if (content.PublishedState == PublishedState.Publishing)
+            if (entity.PublishedState == PublishedState.Publishing)
             {
-                content.Published = true;
-                content.PublishTemplateId = content.TemplateId;
-                content.PublisherId = content.WriterId;
-                content.PublishName = content.Name;
-                content.PublishDate = content.UpdateDate;
+                entity.Published = true;
+                entity.PublishTemplateId = entity.TemplateId;
+                entity.PublisherId = entity.WriterId;
+                entity.PublishName = entity.Name;
+                entity.PublishDate = entity.UpdateDate;
 
                 SetEntityTags(entity, _tagRepository);
             }
-            else if (content.PublishedState == PublishedState.Unpublishing)
+            else if (entity.PublishedState == PublishedState.Unpublishing)
             {
-                content.Published = false;
-                content.PublishTemplateId = null;
-                content.PublisherId = null;
-                content.PublishName = null;
-                content.PublishDate = null;
+                entity.Published = false;
+                entity.PublishTemplateId = null;
+                entity.PublisherId = null;
+                entity.PublishName = null;
+                entity.PublishDate = null;
 
                 ClearEntityTags(entity, _tagRepository);
             }
@@ -877,32 +940,32 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             protected override IEnumerable<IContent> PerformGetByQuery(IQuery<IContent> query)
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
             protected override IEnumerable<string> GetDeleteClauses()
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
             protected override void PersistNewItem(IContent entity)
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
             protected override void PersistUpdatedItem(IContent entity)
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
             protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
 
             protected override string GetBaseWhereClause()
             {
-                throw new WontImplementException();
+                throw new InvalidOperationException("This method won't be implemented.");
             }
         }
 
@@ -1009,7 +1072,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return base.ApplySystemOrdering(ref sql, ordering);
         }
 
-        private IEnumerable<IContent> MapDtosToContent(List<DocumentDto> dtos, bool withCache = false, bool slim = false)
+        private IEnumerable<IContent> MapDtosToContent(List<DocumentDto> dtos,
+            bool withCache = false,
+            bool loadProperties = true,
+            bool loadTemplates = true,
+            bool loadSchedule = true,
+            bool loadVariants = true)
         {
             var temps = new List<TempContent<Content>>();
             var contentTypes = new Dictionary<int, IContentType>();
@@ -1042,7 +1110,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 var c = content[i] = ContentBaseFactory.BuildEntity(dto, contentType);
 
-                if (!slim)
+                if (loadTemplates)
                 {
                     // need templates
                     var templateId = dto.DocumentVersionDto.TemplateId;
@@ -1067,49 +1135,71 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 temps.Add(temp);
             }
 
-            if (!slim)
+            Dictionary<int, ITemplate> templates = null;
+            if (loadTemplates)
             {
                 // load all required templates in 1 query, and index
-                var templates = _templateRepository.GetMany(templateIds.ToArray())
+                templates = _templateRepository.GetMany(templateIds.ToArray())
                     .ToDictionary(x => x.Id, x => x);
+            }
 
+            IDictionary<int, PropertyCollection> properties = null;
+            if (loadProperties)
+            {
                 // load all properties for all documents from database in 1 query - indexed by version id
-                var properties = GetPropertyCollections(temps);
-                var schedule = GetContentSchedule(temps.Select(x => x.Content.Id).ToArray());
+                properties = GetPropertyCollections(temps);
+            }
 
-                // assign templates and properties
-                foreach (var temp in temps)
+            var schedule = GetContentSchedule(temps.Select(x => x.Content.Id).ToArray());
+
+            // assign templates and properties
+            foreach (var temp in temps)
+            {
+                if (loadTemplates)
                 {
                     // set the template ID if it matches an existing template
                     if (temp.Template1Id.HasValue && templates.ContainsKey(temp.Template1Id.Value))
                         temp.Content.TemplateId = temp.Template1Id;
                     if (temp.Template2Id.HasValue && templates.ContainsKey(temp.Template2Id.Value))
                         temp.Content.PublishTemplateId = temp.Template2Id;
+                }
+                
 
-                    // set properties
+                // set properties
+                if (loadProperties)
+                {
                     if (properties.ContainsKey(temp.VersionId))
                         temp.Content.Properties = properties[temp.VersionId];
                     else
                         throw new InvalidOperationException($"No property data found for version: '{temp.VersionId}'.");
+                }
 
+                if (loadSchedule)
+                {
                     // load in the schedule
                     if (schedule.TryGetValue(temp.Content.Id, out var s))
                         temp.Content.ContentSchedule = s;
                 }
+
             }
 
-            // set variations, if varying
-            temps = temps.Where(x => x.ContentType.VariesByCulture()).ToList();
-            if (temps.Count > 0)
+            if (loadVariants)
             {
-                // load all variations for all documents from database, in one query
-                var contentVariations = GetContentVariations(temps);
-                var documentVariations = GetDocumentVariations(temps);
-                foreach (var temp in temps)
-                    SetVariations(temp.Content, contentVariations, documentVariations);
+                // set variations, if varying
+                temps = temps.Where(x => x.ContentType.VariesByCulture()).ToList();
+                if (temps.Count > 0)
+                {
+                    // load all variations for all documents from database, in one query
+                    var contentVariations = GetContentVariations(temps);
+                    var documentVariations = GetDocumentVariations(temps);
+                    foreach (var temp in temps)
+                        SetVariations(temp.Content, contentVariations, documentVariations);
+                }
             }
+            
 
-            foreach(var c in content)
+
+            foreach (var c in content)
                 c.ResetDirtyProperties(false); // reset dirty initial properties (U4-1946)
 
             return content;
@@ -1299,25 +1389,28 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 };
         }
 
-        private IEnumerable<DocumentCultureVariationDto> GetDocumentVariationDtos(IContent content, bool publishing, HashSet<string> editedCultures)
+        private IEnumerable<DocumentCultureVariationDto> GetDocumentVariationDtos(IContent content, HashSet<string> editedCultures)
         {
             var allCultures = content.AvailableCultures.Union(content.PublishedCultures); // union = distinct
             foreach (var culture in allCultures)
-                yield return new DocumentCultureVariationDto
+            {
+                var dto = new DocumentCultureVariationDto
                 {
                     NodeId = content.Id,
                     LanguageId = LanguageRepository.GetIdByIsoCode(culture) ?? throw new InvalidOperationException("Not a valid culture."),
                     Culture = culture,
 
                     Name = content.GetCultureName(culture) ?? content.GetPublishName(culture),
-
-                    // note: can't use IsCultureEdited at that point - hasn't been updated yet - see PersistUpdatedItem
-
                     Available = content.IsCultureAvailable(culture),
                     Published = content.IsCulturePublished(culture),
+                    // note: can't use IsCultureEdited at that point - hasn't been updated yet - see PersistUpdatedItem
                     Edited = content.IsCultureAvailable(culture) &&
                              (!content.IsCulturePublished(culture) || (editedCultures != null && editedCultures.Contains(culture)))
                 };
+
+                yield return dto;
+            }
+                
         }
 
         private class ContentVariation
@@ -1335,7 +1428,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #region Utilities
 
-        private void SanitizeNames(Content content, bool publishing)
+        private void SanitizeNames(IContent content, bool publishing)
         {
             // a content item *must* have an invariant name, and invariant published name
             // else we just cannot write the invariant rows (node, content version...) to the database
@@ -1400,7 +1493,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                                  x.NodeId != SqlTemplate.Arg<int>("id"))
             .OrderBy<ContentVersionCultureVariationDto>(x => x.LanguageId));
 
-        private void EnsureVariantNamesAreUnique(Content content, bool publishing)
+        private void EnsureVariantNamesAreUnique(IContent content, bool publishing)
         {
             if (!EnsureUniqueNaming || !content.ContentType.VariesByCulture() || content.CultureInfos.Count == 0) return;
 

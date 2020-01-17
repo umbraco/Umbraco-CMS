@@ -10,6 +10,11 @@ using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
+using Umbraco.Web.Search;
 
 namespace Umbraco.Web.Trees
 {
@@ -19,6 +24,13 @@ namespace Umbraco.Web.Trees
     [CoreTree]
     public class MediaTypeTreeController : TreeController, ISearchableTree
     {
+        private readonly UmbracoTreeSearcher _treeSearcher;
+
+        public MediaTypeTreeController(UmbracoTreeSearcher treeSearcher, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+        {
+            _treeSearcher = treeSearcher;
+        }
+
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
             var intId = id.TryConvertTo<int>();
@@ -50,7 +62,7 @@ namespace Umbraco.Web.Trees
                         // since 7.4+ child type creation is enabled by a config option. It defaults to on, but can be disabled if we decide to.
                         // need this check to keep supporting sites where children have already been created.
                         var hasChildren = dt.HasChildren;
-                        var node = CreateTreeNode(dt, Constants.ObjectTypes.MediaType, id, queryStrings, "icon-thumbnails", hasChildren);
+                        var node = CreateTreeNode(dt, Constants.ObjectTypes.MediaType, id, queryStrings, Constants.Icons.MediaType, hasChildren);
 
                         node.Path = dt.Path;
                         return node;
@@ -108,7 +120,10 @@ namespace Umbraco.Web.Trees
                 }
 
                 menu.Items.Add<ActionCopy>(Services.TextService, opensDialog: true);
-                menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
+                if(ct.IsSystemMediaType() == false)
+                {
+                    menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
+                }
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
 
             }
@@ -117,10 +132,7 @@ namespace Umbraco.Web.Trees
         }
 
         public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
-        {
-            var results = Services.EntityService.GetPagedDescendants(UmbracoObjectTypes.MediaType, pageIndex, pageSize, out totalFound,
-                filter: SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(query)));
-            return Mapper.MapEnumerable<IEntitySlim, SearchResultEntity>(results);
-        }
+            => _treeSearcher.EntitySearch(UmbracoObjectTypes.MediaType, query, pageSize, pageIndex, out totalFound, searchFrom);
+
     }
 }

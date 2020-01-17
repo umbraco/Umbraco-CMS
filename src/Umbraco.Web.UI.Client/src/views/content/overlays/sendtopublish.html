@@ -1,6 +1,6 @@
 <div ng-controller="Umbraco.Overlays.SendToPublishController as vm">
 
-    <div style="margin-bottom: 15px;">
+    <div class="mb3">
         <p><localize key="content_languagesToSendForApproval"></localize></p>
     </div>
 
@@ -12,31 +12,28 @@
 
         <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.modifiedVariantFilter">
             <ng-form name="publishVariantSelectorForm">
-                <div class="flex" ng-class="{'umb-list-item--error': publishVariantSelectorForm.publishVariantSelector.$invalid}">
+                <div ng-class="{'umb-list-item--error': publishVariantSelectorForm.publishVariantSelector.$invalid}">
 
                     <umb-checkbox
                         input-id="{{variant.htmlId}}"
                         name="publishVariantSelector"
                         model="variant.save"
                         on-change="vm.changeSelection(variant)"
-                        server-validation-field="{{variant.htmlId}}"/>
+                        server-validation-field="{{variant.htmlId}}"
+                        text="{{ variant.language.name }}"
+                    />
 
                     <div>
-                        <label for="{{variant.htmlId}}" style="margin-bottom: 2px;">
-                            <span>{{ variant.language.name }}</span>
-                            <strong ng-if="variant.language.isMandatory" class="umb-control-required">*</strong>
+                        <span class="db umb-list-item__description umb-list-item__description--checkbox" ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
+                            <umb-variant-state variant="variant"></umb-variant-state>
+                            <span ng-if="variant.language.isMandatory"> - <localize key="languages_mandatoryLanguage"></localize></span>
+                        </span>
 
-                            <span class="db" ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
-                                <umb-variant-state class="umb-list-item__description" variant="variant"></umb-variant-state>
-                            </span>
+                        <span class="db" ng-messages="publishVariantSelectorForm.publishVariantSelector.$error" show-validation-on-submit>
+                            <span class="db umb-list-item__description umb-list-item__description--checkbox text-error" ng-message="valServerField">{{publishVariantSelectorForm.publishVariantSelector.errorMsg}}</span>
+                        </span>
 
-                            <span class="db" ng-messages="publishVariantSelectorForm.publishVariantSelector.$error" show-validation-on-submit>
-                                <span class="db umb-list-item__description text-error" ng-message="valServerField">{{publishVariantSelectorForm.publishVariantSelector.errorMsg}}</span>
-                            </span>
-
-                            <umb-variant-notification-list notifications="variant.notifications"></umb-variant-notification-list>
-
-                        </label>
+                        <umb-variant-notification-list notifications="variant.notifications"></umb-variant-notification-list>
                     </div>
                 </div>
 
@@ -46,7 +43,7 @@
     </div>
 
     <div class="umb-list umb-list--condensed" ng-if="!vm.loading && (vm.variants | filter:vm.unmodifiedVariantFilter).length > 0">
-        <div style="margin-bottom: 15px; font-weight: bold;">
+        <div class="bold mb3">
             <p><localize key="content_unmodifiedLanguages"></localize></p>
         </div>
 

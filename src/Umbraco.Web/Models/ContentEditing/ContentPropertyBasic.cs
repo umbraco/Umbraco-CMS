@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Umbraco.Core.PropertyEditors;
@@ -20,6 +21,10 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "id", IsRequired = true)]
         [Required]
         public int Id { get; set; }
+
+        [DataMember(Name = "dataTypeKey", IsRequired = false)]
+        [ReadOnly(true)]
+        public Guid DataTypeKey { get; set; }
 
         [DataMember(Name = "value")]
         public object Value { get; set; }
@@ -49,10 +54,20 @@ namespace Umbraco.Web.Models.ContentEditing
         public string Culture { get; set; }
 
         /// <summary>
+        /// The segment of the property
+        /// </summary>
+        /// <remarks>
+        /// The segment value of a property can always be null but can only have a non-null value
+        /// when the property can be varied by segment.
+        /// </remarks>
+        [DataMember(Name = "segment")]
+        [ReadOnly(true)]
+        public string Segment { get; set; }
+
+        /// <summary>
         /// Used internally during model mapping
         /// </summary>
         [IgnoreDataMember]
         internal IDataEditor PropertyEditor { get; set; }
-
     }
 }

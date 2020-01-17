@@ -67,7 +67,7 @@ namespace Umbraco.Core.Models
 
             if (user.Avatar.IsNullOrWhiteSpace())
             {
-                var gravatarHash = user.Email.ToMd5();
+                var gravatarHash = user.Email.GenerateHash<MD5>();
                 var gravatarUrl = "https://www.gravatar.com/avatar/" + gravatarHash + "?d=404";
 
                 //try Gravatar
@@ -191,19 +191,6 @@ namespace Umbraco.Core.Models
         {
             if (entity == null) throw new ArgumentNullException(nameof(entity));
             return ContentPermissionsHelper.HasPathAccess(entity.Path, user.CalculateMediaStartNodeIds(entityService), Constants.System.RecycleBinMedia);
-        }
-
-        internal static bool IsInBranchOfStartNode(this IUser user, IUmbracoEntity entity, IEntityService entityService, int recycleBinId, out bool hasPathAccess)
-        {
-            switch (recycleBinId)
-            {
-                case Constants.System.RecycleBinMedia:
-                    return ContentPermissionsHelper.IsInBranchOfStartNode(entity.Path, user.CalculateMediaStartNodeIds(entityService), user.GetMediaStartNodePaths(entityService), out hasPathAccess);
-                case Constants.System.RecycleBinContent:
-                    return ContentPermissionsHelper.IsInBranchOfStartNode(entity.Path, user.CalculateContentStartNodeIds(entityService), user.GetContentStartNodePaths(entityService), out hasPathAccess);
-                default:
-                    throw new NotSupportedException("Path access is only determined on content or media");
-            }
         }
 
         /// <summary>

@@ -29,11 +29,9 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
     
 
     //A list of query strings defined that when changed will not cause a reload of the route
-    var nonRoutingQueryStrings = ["mculture", "cculture", "lq"];
+    var nonRoutingQueryStrings = ["mculture", "cculture", "lq", "sr"];
     var retainedQueryStrings = ["mculture"];
-    //A list of trees that don't cause a route when creating new items (TODO: eventually all trees should do this!)
-    var nonRoutingTreesOnCreate = ["content", "contentblueprints"];
-        
+    
     function setMode(mode) {
         switch (mode) {
         case 'tree':
@@ -140,11 +138,8 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
                 nextUrlParams = pathToRouteParts(nextUrlParams);
             }
 
-            //first check if this is a ?create=true url being redirected to it's true url
-            if (currUrlParams.create === "true" && currUrlParams.id && currUrlParams.section && currUrlParams.tree && currUrlParams.method === "edit" && 
-                !nextUrlParams.create && nextUrlParams.id && nextUrlParams.section === currUrlParams.section && nextUrlParams.tree === currUrlParams.tree && nextUrlParams.method === currUrlParams.method &&
-                nonRoutingTreesOnCreate.indexOf(nextUrlParams.tree.toLowerCase()) >= 0) {
-                //this means we're coming from a path like /content/content/edit/1234?create=true to the created path like /content/content/edit/9999
+            //check if there is a query string to indicate that a "soft redirect" is taking place, if so we are not changing navigation
+            if (nextUrlParams.sr === true) {
                 return false;
             }
 
@@ -206,6 +201,18 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
 
         /**
          * @ngdoc method
+         * @name umbraco.services.navigationService#setSoftRedirect
+         * @methodOf umbraco.services.navigationService
+         *
+         * @description
+         * utility to set a special query string to indicate that the pending navigation change is a soft redirect
+         */
+        setSoftRedirect: function () {
+            $location.search("sr", true);
+        },
+
+        /**
+         * @ngdoc method
          * @name umbraco.services.navigationService#retainQueryStrings
          * @methodOf umbraco.services.navigationService
          *
@@ -218,8 +225,10 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
         retainQueryStrings: function (currRouteParams, nextRouteParams) {
             var toRetain = angular.copy(nextRouteParams);
             var updated = false;
+
             _.each(retainedQueryStrings, function (r) {
-                if (currRouteParams[r] && !nextRouteParams[r]) {
+                // if mculture is set to null in nextRouteParams, the value will be undefined and we will not retain any query string that has a value of "null"
+                if (currRouteParams[r] && nextRouteParams[r] !== undefined && !nextRouteParams[r]) {
                     toRetain[r] = currRouteParams[r];
                     updated = true;
                 }
@@ -329,6 +338,22 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
             });
         },
 
+        /**     
+         * @ngdoc method
+         * @name umbraco.services.navigationService#hasTree
+         * @methodOf umbraco.services.navigationService
+         *
+         * @description
+         * Checks if a tree with the given alias exists.
+         * 
+         * @param {String} treeAlias the tree alias to check
+         */
+        hasTree: function (treeAlias) {
+            return navReadyPromise.promise.then(function () {
+                return mainTreeApi.hasTree(treeAlias);
+            });
+        },
+
         /**
             Internal method that should ONLY be used by the legacy API wrapper, the legacy API used to
             have to set an active tree and then sync, the new API does this in one method by using syncTree
@@ -349,7 +374,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
         
         reloadSection: function(sectionAlias) {
             return navReadyPromise.promise.then(function () {
-                mainTreeApi.clearCache({ section: sectionAlias });
+                treeService.clearCache({ section: sectionAlias });
                 return mainTreeApi.load(sectionAlias);
             });
         },
@@ -455,6 +480,8 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
             if (!section) {
                 throw "section cannot be null";
             }
+
+            appState.setMenuState("currentNode", node);
 
             if (action.metaData && action.metaData["actionRoute"] && angular.isString(action.metaData["actionRoute"])) {
                 //first check if the menu item simply navigates to a route
