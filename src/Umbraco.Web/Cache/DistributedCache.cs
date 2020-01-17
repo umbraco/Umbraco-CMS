@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Sync;
 using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Cache
@@ -21,6 +22,15 @@ namespace Umbraco.Web.Cache
     /// </remarks>
     public sealed class DistributedCache
     {
+        private readonly IServerMessenger _serverMessenger;
+        private readonly CacheRefresherCollection _cacheRefreshers;
+
+        public DistributedCache(IServerMessenger serverMessenger, CacheRefresherCollection cacheRefreshers)
+        {
+            _serverMessenger = serverMessenger;
+            _cacheRefreshers = cacheRefreshers;
+        }
+
         #region Core notification methods
 
         /// <summary>
@@ -37,7 +47,7 @@ namespace Umbraco.Web.Cache
         {
             if (refresherGuid == Guid.Empty || instances.Length == 0 || getNumericId == null) return;
 
-            Current.ServerMessenger.PerformRefresh(
+            _serverMessenger.PerformRefresh(
                 GetRefresherById(refresherGuid),
                 getNumericId,
                 instances);
@@ -52,7 +62,7 @@ namespace Umbraco.Web.Cache
         {
             if (refresherGuid == Guid.Empty || id == default(int)) return;
 
-            Current.ServerMessenger.PerformRefresh(
+            _serverMessenger.PerformRefresh(
                 GetRefresherById(refresherGuid),
                 id);
         }
@@ -66,7 +76,7 @@ namespace Umbraco.Web.Cache
         {
             if (refresherGuid == Guid.Empty || id == Guid.Empty) return;
 
-            Current.ServerMessenger.PerformRefresh(
+            _serverMessenger.PerformRefresh(
                 GetRefresherById(refresherGuid),
                 id);
         }
@@ -77,7 +87,7 @@ namespace Umbraco.Web.Cache
         {
             if (refresherGuid == Guid.Empty || payload == null) return;
 
-            Current.ServerMessenger.PerformRefresh(
+            _serverMessenger.PerformRefresh(
                 GetRefresherById(refresherGuid),
                 payload);
         }
@@ -88,7 +98,7 @@ namespace Umbraco.Web.Cache
         {
             if (refresherGuid == Guid.Empty || payloads == null) return;
 
-            Current.ServerMessenger.PerformRefresh(
+            _serverMessenger.PerformRefresh(
                 GetRefresherById(refresherGuid),
                 payloads.ToArray());
         }
@@ -101,7 +111,7 @@ namespace Umbraco.Web.Cache
         {
             if (refresherGuid == Guid.Empty || jsonPayload.IsNullOrWhiteSpace()) return;
 
-            Current.ServerMessenger.PerformRefresh(
+            _serverMessenger.PerformRefresh(
                 GetRefresherById(refresherGuid),
                 jsonPayload);
         }
@@ -115,7 +125,7 @@ namespace Umbraco.Web.Cache
         //{
         //    if (refresherId == Guid.Empty || payload == null) return;
 
-        //    Current.ServerMessenger.Notify(
+        //    _serverMessenger.Notify(
         //        Current.ServerRegistrar.Registrations,
         //        GetRefresherById(refresherId),
         //        json);
@@ -129,7 +139,7 @@ namespace Umbraco.Web.Cache
         {
             if (refresherGuid == Guid.Empty) return;
 
-            Current.ServerMessenger.PerformRefreshAll(
+            _serverMessenger.PerformRefreshAll(
                 GetRefresherById(refresherGuid));
         }
 
@@ -142,7 +152,7 @@ namespace Umbraco.Web.Cache
         {
             if (refresherGuid == Guid.Empty || id == default(int)) return;
 
-            Current.ServerMessenger.PerformRemove(
+            _serverMessenger.PerformRemove(
                 GetRefresherById(refresherGuid),
                 id);
         }
@@ -159,7 +169,7 @@ namespace Umbraco.Web.Cache
         /// </remarks>
         public void Remove<T>(Guid refresherGuid, Func<T, int> getNumericId, params T[] instances)
         {
-            Current.ServerMessenger.PerformRemove(
+            _serverMessenger.PerformRemove(
                 GetRefresherById(refresherGuid),
                 getNumericId,
                 instances);
@@ -168,9 +178,9 @@ namespace Umbraco.Web.Cache
         #endregion
 
         // helper method to get an ICacheRefresher by its unique identifier
-        private static ICacheRefresher GetRefresherById(Guid refresherGuid)
+        private  ICacheRefresher GetRefresherById(Guid refresherGuid)
         {
-            return Current.CacheRefreshers[refresherGuid];
+            return _cacheRefreshers[refresherGuid];
         }
     }
 }

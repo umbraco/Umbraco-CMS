@@ -3,7 +3,7 @@ using System.Web;
 using System.Web.Mvc;
 using Microsoft.Owin;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core;

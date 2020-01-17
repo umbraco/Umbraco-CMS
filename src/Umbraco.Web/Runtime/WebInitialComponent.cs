@@ -80,7 +80,7 @@ namespace Umbraco.Web.Runtime
             ConfigureGlobalFilters();
 
             // set routes
-            CreateRoutes(_umbracoContextAccessor, _globalSettings, _shortStringHelper, _surfaceControllerTypes, _apiControllerTypes);
+            CreateRoutes(_umbracoContextAccessor, _globalSettings, _shortStringHelper, _surfaceControllerTypes, _apiControllerTypes, _ioHelper);
         }
 
         public void Terminate()
@@ -168,9 +168,10 @@ namespace Umbraco.Web.Runtime
             IGlobalSettings globalSettings,
             IShortStringHelper shortStringHelper,
             SurfaceControllerTypeCollection surfaceControllerTypes,
-            UmbracoApiControllerTypeCollection apiControllerTypes)
+            UmbracoApiControllerTypeCollection apiControllerTypes,
+            IIOHelper ioHelper)
         {
-            var umbracoPath = globalSettings.GetUmbracoMvcArea(Current.IOHelper);
+            var umbracoPath = globalSettings.GetUmbracoMvcArea(ioHelper);
 
             // create the front-end route
             var defaultRoute = RouteTable.Routes.MapRoute(
@@ -184,18 +185,19 @@ namespace Umbraco.Web.Runtime
             RouteTable.Routes.RegisterArea<UmbracoInstallArea>();
 
             // register all back office routes
-            RouteTable.Routes.RegisterArea(new BackOfficeArea(globalSettings));
+            RouteTable.Routes.RegisterArea(new BackOfficeArea(globalSettings, ioHelper));
 
             // plugin controllers must come first because the next route will catch many things
-            RoutePluginControllers(globalSettings, surfaceControllerTypes, apiControllerTypes);
+            RoutePluginControllers(globalSettings, surfaceControllerTypes, apiControllerTypes, ioHelper);
         }
 
         private static void RoutePluginControllers(
             IGlobalSettings globalSettings,
             SurfaceControllerTypeCollection surfaceControllerTypes,
-            UmbracoApiControllerTypeCollection apiControllerTypes)
+            UmbracoApiControllerTypeCollection apiControllerTypes,
+            IIOHelper ioHelper)
         {
-            var umbracoPath = globalSettings.GetUmbracoMvcArea(Current.IOHelper);
+            var umbracoPath = globalSettings.GetUmbracoMvcArea(ioHelper);
 
             // need to find the plugin controllers and route them
             var pluginControllers = surfaceControllerTypes.Concat(apiControllerTypes).ToArray();
@@ -217,7 +219,7 @@ namespace Umbraco.Web.Runtime
             foreach (var g in groupedAreas)
             {
                 // create & register an area for the controllers (this will throw an exception if all controllers are not in the same area)
-                var pluginControllerArea = new PluginControllerArea(globalSettings, g.Select(PluginController.GetMetadata));
+                var pluginControllerArea = new PluginControllerArea(globalSettings, ioHelper, g.Select(PluginController.GetMetadata));
                 RouteTable.Routes.RegisterArea(pluginControllerArea);
             }
         }

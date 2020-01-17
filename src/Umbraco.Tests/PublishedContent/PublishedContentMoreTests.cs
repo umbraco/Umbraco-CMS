@@ -102,7 +102,7 @@ namespace Umbraco.Tests.PublishedContent
         public void First()
         {
             var content = Current.UmbracoContext.Content.GetAtRoot().First();
-            Assert.AreEqual("Content 1", content.Name());
+            Assert.AreEqual("Content 1", content.Name(VariationContextAccessor));
         }
 
         [Test]

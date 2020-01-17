@@ -3,12 +3,9 @@ using System.Security.Principal;
 using System.Threading;
 using System.Web;
 using System.Web.Security;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
 using Umbraco.Web.Models.Membership;
 using Umbraco.Web.Security.Providers;
 

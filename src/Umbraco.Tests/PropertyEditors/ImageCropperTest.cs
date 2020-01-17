@@ -7,7 +7,6 @@ using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -22,6 +21,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Models;
 using Umbraco.Web;
 using Umbraco.Web.PropertyEditors;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.PropertyEditors
 {
@@ -84,8 +84,10 @@ namespace Umbraco.Tests.PropertyEditors
 
                 var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), scheme, logger, shortStringHelper);
 
+                var umbracoSettingsSection = Mock.Of<IUmbracoSettingsSection>();
+
                 var dataTypeService = new TestObjects.TestDataTypeService(
-                    new DataType(new ImageCropperPropertyEditor(Mock.Of<ILogger>(), mediaFileSystem, Mock.Of<IContentSection>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), TestHelper.IOHelper, TestHelper.ShortStringHelper, Mock.Of<ILocalizedTextService>())) { Id = 1 });
+                    new DataType(new ImageCropperPropertyEditor(Mock.Of<ILogger>(), mediaFileSystem, Mock.Of<IContentSection>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), TestHelper.IOHelper, TestHelper.ShortStringHelper, Mock.Of<ILocalizedTextService>(), umbracoSettingsSection)) { Id = 1 });
 
                 var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
 

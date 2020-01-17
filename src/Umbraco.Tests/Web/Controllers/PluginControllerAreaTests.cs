@@ -14,7 +14,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void Ensure_Same_Area1()
         {
             Assert.Throws<InvalidOperationException>(() =>
-                                                     new PluginControllerArea(TestObjects.GetGlobalSettings(),
+                                                     new PluginControllerArea(TestObjects.GetGlobalSettings(), IOHelper,
                                                          new PluginControllerMetadata[]
                                                          {
                                                             PluginController.GetMetadata(typeof(Plugin1Controller)),
@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Web.Controllers
         public void Ensure_Same_Area3()
         {
             Assert.Throws<InvalidOperationException>(() =>
-                                                     new PluginControllerArea(TestObjects.GetGlobalSettings(),
+                                                     new PluginControllerArea(TestObjects.GetGlobalSettings(), IOHelper,
                                                          new PluginControllerMetadata[]
                                                          {
                                                             PluginController.GetMetadata(typeof(Plugin1Controller)),
@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public void Ensure_Same_Area2()
         {
-            var area = new PluginControllerArea(TestObjects.GetGlobalSettings(),
+            var area = new PluginControllerArea(TestObjects.GetGlobalSettings(), IOHelper,
                 new PluginControllerMetadata[]
                 {
                     PluginController.GetMetadata(typeof(Plugin1Controller)),

@@ -1,9 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Web.Mvc;
-using Lucene.Net.Util;
-using Umbraco.Core.Composing;
-using Umbraco.Core.IO;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Mvc
 {

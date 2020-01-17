@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.Install.Models;
 

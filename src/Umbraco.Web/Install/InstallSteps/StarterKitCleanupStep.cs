@@ -3,8 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
-using Umbraco.Core.Composing;
-using Umbraco.Core.IO;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps

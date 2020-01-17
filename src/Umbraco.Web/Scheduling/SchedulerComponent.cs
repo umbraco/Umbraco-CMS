@@ -4,15 +4,15 @@ using System.IO;
 using System.Threading;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.IO;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Routing;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Scheduling
 {
@@ -27,6 +27,7 @@ namespace Umbraco.Web.Scheduling
         private readonly IContentService _contentService;
         private readonly IAuditService _auditService;
         private readonly IProfilingLogger _logger;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IScopeProvider _scopeProvider;
         private readonly HealthCheckCollection _healthChecks;
         private readonly HealthCheckNotificationMethodCollection _notifications;
@@ -46,13 +47,14 @@ namespace Umbraco.Web.Scheduling
         public SchedulerComponent(IRuntimeState runtime,
             IContentService contentService, IAuditService auditService,
             HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
-            IScopeProvider scopeProvider, IUmbracoContextFactory umbracoContextFactory, IProfilingLogger logger)
+            IScopeProvider scopeProvider, IUmbracoContextFactory umbracoContextFactory, IProfilingLogger logger, IHostingEnvironment hostingEnvironment)
         {
             _runtime = runtime;
             _contentService = contentService;
             _auditService = auditService;
             _scopeProvider = scopeProvider;
             _logger = logger;
+            _hostingEnvironment = hostingEnvironment;
             _umbracoContextFactory = umbracoContextFactory;
 
             _healthChecks = healthChecks;
@@ -62,12 +64,12 @@ namespace Umbraco.Web.Scheduling
         public void Initialize()
         {
             // backgrounds runners are web aware, if the app domain dies, these tasks will wind down correctly
-            _keepAliveRunner = new BackgroundTaskRunner<IBackgroundTask>("KeepAlive", _logger);
-            _publishingRunner = new BackgroundTaskRunner<IBackgroundTask>("ScheduledPublishing", _logger);
-            _tasksRunner = new BackgroundTaskRunner<IBackgroundTask>("ScheduledTasks", _logger);
-            _scrubberRunner = new BackgroundTaskRunner<IBackgroundTask>("LogScrubber", _logger);
-            _fileCleanupRunner = new BackgroundTaskRunner<IBackgroundTask>("TempFileCleanup", _logger);
-            _healthCheckRunner = new BackgroundTaskRunner<IBackgroundTask>("HealthCheckNotifier", _logger);
+            _keepAliveRunner = new BackgroundTaskRunner<IBackgroundTask>("KeepAlive", _logger, _hostingEnvironment);
+            _publishingRunner = new BackgroundTaskRunner<IBackgroundTask>("ScheduledPublishing", _logger, _hostingEnvironment);
+            _tasksRunner = new BackgroundTaskRunner<IBackgroundTask>("ScheduledTasks", _logger, _hostingEnvironment);
+            _scrubberRunner = new BackgroundTaskRunner<IBackgroundTask>("LogScrubber", _logger, _hostingEnvironment);
+            _fileCleanupRunner = new BackgroundTaskRunner<IBackgroundTask>("TempFileCleanup", _logger, _hostingEnvironment);
+            _healthCheckRunner = new BackgroundTaskRunner<IBackgroundTask>("HealthCheckNotifier", _logger, _hostingEnvironment);
 
             // we will start the whole process when a successful request is made
             UmbracoModule.RouteAttempt += RegisterBackgroundTasksOnce;

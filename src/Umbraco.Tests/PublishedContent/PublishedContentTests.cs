@@ -1,32 +1,28 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Web;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Core.Composing;
 using Moq;
-using Newtonsoft.Json;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Templates;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -184,7 +180,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetNode(1173);
 
-            var items = doc.Children().Where(x => x.IsVisible()).ToIndexedArray();
+            var items = doc.Children(VariationContextAccessor).Where(x => x.IsVisible()).ToIndexedArray();
 
             foreach (var item in items)
             {
@@ -205,7 +201,7 @@ namespace Umbraco.Tests.PublishedContent
             var doc = GetNode(1173);
 
             var items = doc
-                .Children()
+                .Children(VariationContextAccessor)
                 .Where(x => x.IsVisible())
                 .ToIndexedArray();
 
@@ -260,7 +256,7 @@ namespace Umbraco.Tests.PublishedContent
             var doc = GetNode(1173);
             var ct = doc.ContentType;
 
-            var items = doc.Children()
+            var items = doc.Children(VariationContextAccessor)
                 .Select(x => x.CreateModel(Current.PublishedModelFactory)) // linq, returns IEnumerable<IPublishedContent>
 
                 // only way around this is to make sure every IEnumerable<T> extension
@@ -292,7 +288,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetNode(1173);
 
-            var items = doc.Children().Take(4).ToIndexedArray();
+            var items = doc.Children(VariationContextAccessor).Take(4).ToIndexedArray();
 
             foreach (var item in items)
             {
@@ -312,7 +308,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetNode(1173);
 
-            foreach (var d in doc.Children().Skip(1).ToIndexedArray())
+            foreach (var d in doc.Children(VariationContextAccessor).Skip(1).ToIndexedArray())
             {
                 if (d.Content.Id != 1176)
                 {
@@ -330,7 +326,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetNode(1173);
 
-            var items = doc.Children()
+            var items = doc.Children(VariationContextAccessor)
                 .Concat(new[] { GetNode(1175), GetNode(4444) })
                 .ToIndexedArray();
 
@@ -415,7 +411,7 @@ namespace Umbraco.Tests.PublishedContent
 
             var doc = GetNode(1046);
 
-            var found1 = doc.Children().GroupBy(x => x.ContentType.Alias).ToArray();
+            var found1 = doc.Children(VariationContextAccessor).GroupBy(x => x.ContentType.Alias).ToArray();
 
             Assert.AreEqual(2, found1.Length);
             Assert.AreEqual(2, found1.Single(x => x.Key.ToString() == "Home").Count());
@@ -436,8 +432,8 @@ namespace Umbraco.Tests.PublishedContent
 
             var doc = GetNode(1046);
 
-            var found1 = doc.Children().Where(x => x.ContentType.Alias == "CustomDocument");
-            var found2 = doc.Children().Where(x => x.ContentType.Alias == "Home");
+            var found1 = doc.Children(VariationContextAccessor).Where(x => x.ContentType.Alias == "CustomDocument");
+            var found2 = doc.Children(VariationContextAccessor).Where(x => x.ContentType.Alias == "Home");
 
             Assert.AreEqual(1, found1.Count());
             Assert.AreEqual(2, found2.Count());
@@ -448,7 +444,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetNode(1173);
 
-            var ordered = doc.Children().OrderBy(x => x.UpdateDate);
+            var ordered = doc.Children(VariationContextAccessor).OrderBy(x => x.UpdateDate);
 
             var correctOrder = new[] { 1178, 1177, 1174, 1176 };
             for (var i = 0; i < correctOrder.Length; i++)

@@ -3,10 +3,8 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Composing.CompositionExtensions;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Services;
-using Umbraco.Core.Dictionary;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -18,6 +16,7 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.PropertyEditors;
 using Current = Umbraco.Web.Composing.Current;
+using Umbraco.Core.Composing.CompositionExtensions;
 
 namespace Umbraco.Tests.Models.Mapping
 {

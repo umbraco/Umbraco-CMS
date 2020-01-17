@@ -1,7 +1,8 @@
 ﻿using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Web.PropertyEditors.ParameterEditors
@@ -20,8 +21,12 @@ namespace Umbraco.Web.PropertyEditors.ParameterEditors
         /// <summary>
         /// Initializes a new instance of the <see cref="MultipleMediaPickerParameterEditor"/> class.
         /// </summary>
-        public MultipleMediaPickerParameterEditor(ILogger logger, IShortStringHelper shortStringHelper)
-            : base(logger, Current.Services.DataTypeService, Current.Services.LocalizationService, Current.Services.TextService, shortStringHelper)
+        public MultipleMediaPickerParameterEditor(ILogger logger,
+            IDataTypeService dataTypeService,
+            ILocalizationService localizationService,
+            ILocalizedTextService localizedTextService,
+            IShortStringHelper shortStringHelper)
+            : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             DefaultConfiguration.Add("multiPicker", "1");
         }

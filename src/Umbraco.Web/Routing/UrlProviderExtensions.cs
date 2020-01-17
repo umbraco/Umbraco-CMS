@@ -5,6 +5,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Routing
 {
@@ -23,6 +24,7 @@ namespace Umbraco.Web.Routing
             ILocalizationService localizationService,
             ILocalizedTextService textService,
             IContentService contentService,
+            IVariationContextAccessor variationContextAccessor,
             ILogger logger)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
@@ -32,6 +34,7 @@ namespace Umbraco.Web.Routing
             if (textService == null) throw new ArgumentNullException(nameof(textService));
             if (contentService == null) throw new ArgumentNullException(nameof(contentService));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
+            if (variationContextAccessor == null) throw new ArgumentNullException(nameof(variationContextAccessor));
 
             if (content.Published == false)
             {
@@ -56,7 +59,7 @@ namespace Umbraco.Web.Routing
 
             //get all URLs for all cultures
             //in a HashSet, so de-duplicates too
-            foreach (var cultureUrl in GetContentUrlsByCulture(content, cultures, publishedRouter, umbracoContext, contentService, textService, logger))
+            foreach (var cultureUrl in GetContentUrlsByCulture(content, cultures, publishedRouter, umbracoContext, contentService, textService, variationContextAccessor, logger))
             {
                 urls.Add(cultureUrl);
             }
@@ -78,7 +81,7 @@ namespace Umbraco.Web.Routing
                 if (urls.Add(otherUrl)) //avoid duplicates
                     yield return otherUrl;
         }
-        
+
         /// <summary>
         /// Tries to return a <see cref="UrlInfo"/> for each culture for the content while detecting collisions/errors
         /// </summary>
@@ -96,6 +99,7 @@ namespace Umbraco.Web.Routing
             UmbracoContext umbracoContext,
             IContentService contentService,
             ILocalizedTextService textService,
+            IVariationContextAccessor variationContextAccessor,
             ILogger logger)
         {
             foreach (var culture in cultures)
@@ -131,7 +135,7 @@ namespace Umbraco.Web.Routing
 
                     // got a url, deal with collisions, add url
                     default:
-                        if (DetectCollision(content, url, culture, umbracoContext, publishedRouter, textService, out var urlInfo)) // detect collisions, etc
+                        if (DetectCollision(content, url, culture, umbracoContext, publishedRouter, textService, variationContextAccessor, out var urlInfo)) // detect collisions, etc
                             yield return urlInfo;
                         else
                             yield return UrlInfo.Url(url, culture);
@@ -161,7 +165,7 @@ namespace Umbraco.Web.Routing
                 return UrlInfo.Message(textService.Localize("content/parentCultureNotPublished", new[] {parent.Name}), culture);
         }
 
-        private static bool DetectCollision(IContent content, string url, string culture, UmbracoContext umbracoContext, IPublishedRouter publishedRouter, ILocalizedTextService textService, out UrlInfo urlInfo)
+        private static bool DetectCollision(IContent content, string url, string culture, UmbracoContext umbracoContext, IPublishedRouter publishedRouter, ILocalizedTextService textService, IVariationContextAccessor variationContextAccessor, out UrlInfo urlInfo)
         {
             // test for collisions on the 'main' url
             var uri = new Uri(url.TrimEnd('/'), UriKind.RelativeOrAbsolute);
@@ -187,7 +191,7 @@ namespace Umbraco.Web.Routing
                 var l = new List<string>();
                 while (o != null)
                 {
-                    l.Add(o.Name());
+                    l.Add(o.Name(variationContextAccessor));
                     o = o.Parent;
                 }
                 l.Reverse();

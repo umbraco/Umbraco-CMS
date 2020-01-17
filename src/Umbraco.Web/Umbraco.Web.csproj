@@ -119,6 +119,10 @@
       <Project>{3ae7bf57-966b-45a5-910a-954d7c554441}</Project>
       <Name>Umbraco.Infrastructure</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Umbraco.Infrastrucure.Persistance.SqlCe\Umbraco.Infrastrucure.Persistance.SqlCe.csproj">
+      <Project>{33085570-9bf2-4065-a9b0-a29d920d13ba}</Project>
+      <Name>Umbraco.Infrastrucure.Persistance.SqlCe</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <!-- no globbing for now, painful -->
@@ -138,6 +142,8 @@
     <Compile Include="Cache\UserGroupCacheRefresher.cs" />
     <Compile Include="Cache\UserGroupPermissionsCacheRefresher.cs" />
     <Compile Include="Cache\WebCachingAppCache.cs" />
+    <Compile Include="Compose\AuditEventsComponent.cs" />
+    <Compile Include="Compose\AuditEventsComposer.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComposer.cs" />
     <Compile Include="Compose\NotificationsComposer.cs" />
     <Compile Include="Compose\PublicAccessComposer.cs" />
@@ -182,6 +188,10 @@
     <Compile Include="Models\ContentEditing\MacroDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroParameterDisplay.cs" />
     <Compile Include="Models\ContentEditing\UrlAndAnchors.cs" />
+    <Compile Include="Models\Identity\BackOfficeIdentityUser.cs" />
+    <Compile Include="Models\Identity\IdentityMapDefinition.cs" />
+    <Compile Include="Models\Identity\IdentityUser.cs" />
+    <Compile Include="Models\Identity\UserLoginInfoWrapper.cs" />
     <Compile Include="Models\Mapping\CommonMapper.cs" />
     <Compile Include="Models\Mapping\MapperContextExtensions.cs" />
     <Compile Include="Models\Membership\UmbracoMembershipMember.cs" />
@@ -217,9 +227,19 @@
     <Compile Include="Search\ExamineFinalComposer.cs" />
     <Compile Include="Search\ExamineUserComponent.cs" />
     <Compile Include="Security\CurrentUserAccessor.cs" />
+    <Compile Include="Security\BackOfficeUserStore.cs" />
+    <Compile Include="Security\BackOfficeUserValidator.cs" />
+    <Compile Include="Security\ConfiguredPasswordValidator.cs" />
+    <Compile Include="Security\EmailService.cs" />
+    <Compile Include="Security\IUserAwarePasswordHasher.cs" />
+    <Compile Include="Security\IUserSessionStore.cs" />
     <Compile Include="Security\MembershipProviderBase.cs" />
     <Compile Include="Security\MembershipProviderExtensions.cs" />
+    <Compile Include="Security\PasswordSecurity.cs" />
+    <Compile Include="Security\UmbracoBackOfficeIdentity.cs" />
+    <Compile Include="Security\UmbracoEmailMessage.cs" />
     <Compile Include="Security\UmbracoMembershipProviderBase.cs" />
+    <Compile Include="Security\UserAwarePasswordHasher.cs" />
     <Compile Include="Services\DashboardService.cs" />
     <Compile Include="Services\IDashboardService.cs" />
     <Compile Include="Models\Link.cs" />
@@ -442,23 +462,6 @@
     <Compile Include="Mvc\FilteredControllerFactoryCollection.cs" />
     <Compile Include="Mvc\FilteredControllerFactoryCollectionBuilder.cs" />
     <Compile Include="Mvc\SurfaceControllerTypeCollection.cs" />
-    <Compile Include="PropertyEditors\ContentPickerPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\ContentPickerConfiguration.cs" />
-    <Compile Include="PropertyEditors\ContentPickerConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\DateValueEditor.cs" />
-    <Compile Include="PropertyEditors\DecimalConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\DropDownFlexiblePropertyEditor.cs" />
-    <Compile Include="PropertyEditors\DropDownFlexibleConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\EmailAddressConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\EmailAddressConfiguration.cs" />
-    <Compile Include="PropertyEditors\GridConfiguration.cs" />
-    <Compile Include="PropertyEditors\GridConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\ImageCropperConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\IntegerConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\ListViewConfiguration.cs" />
-    <Compile Include="PropertyEditors\ListViewConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\MarkdownConfiguration.cs" />
-    <Compile Include="PropertyEditors\MarkdownConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\MediaPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MediaPickerConfiguration.cs" />
     <Compile Include="PropertyEditors\MediaPickerConfigurationEditor.cs" />
@@ -475,18 +478,8 @@
     <Compile Include="PropertyEditors\NestedContentController.cs" />
     <Compile Include="PropertyEditors\NestedContentPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleContentPickerParameterEditor.cs" />
-    <Compile Include="PropertyEditors\PropertyEditorsComponent.cs" />
     <Compile Include="PropertyEditors\RichTextConfiguration.cs" />
     <Compile Include="PropertyEditors\SliderConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\TagConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\TextAreaConfiguration.cs" />
-    <Compile Include="PropertyEditors\TextAreaConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\TextboxConfiguration.cs" />
-    <Compile Include="PropertyEditors\TextboxConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\TextOnlyValueEditor.cs" />
-    <Compile Include="PropertyEditors\TrueFalseConfiguration.cs" />
-    <Compile Include="PropertyEditors\TrueFalseConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\UserPickerConfiguration.cs" />
     <Compile Include="PropertyEditors\ValueConverters\FlexibleDropdownPropertyValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\NestedContentManyValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\NestedContentValueConverterBase.cs" />
@@ -494,7 +487,6 @@
     <Compile Include="PropertyEditors\ValueConverters\MediaPickerValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MemberPickerValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MultiNodeTreePickerValueConverter.cs" />
-    <Compile Include="PropertyEditors\ValueListUniqueValueValidator.cs" />
     <Compile Include="PublishedCache\IPublishedSnapshot.cs" />
     <Compile Include="PublishedCache\IDefaultCultureAccessor.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.ContentDataSerializer.cs" />
@@ -626,8 +618,6 @@
     <Compile Include="Mvc\UmbracoRequireHttpsAttribute.cs" />
     <Compile Include="Mvc\ValidateMvcAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="OwinMiddlewareConfiguredEventArgs.cs" />
-    <Compile Include="PropertyEditors\DateTimeConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\DecimalPropertyEditor.cs" />
     <Compile Include="Routing\RedirectTrackingComponent.cs" />
     <Compile Include="Editors\RedirectUrlManagementController.cs" />
     <Compile Include="Models\ContentEditing\RedirectUrlSearchResults.cs" />
@@ -654,7 +644,6 @@
     <Compile Include="UmbracoDefaultOwinStartup.cs" />
     <Compile Include="IUmbracoContextAccessor.cs" />
     <Compile Include="HtmlStringUtilities.cs" />
-    <Compile Include="ITagQuery.cs" />
     <Compile Include="IUmbracoComponentRenderer.cs" />
     <Compile Include="Models\Mapping\RelationMapDefinition.cs" />
     <Compile Include="Models\UnLinkLoginModel.cs" />
@@ -783,15 +772,8 @@
     <Compile Include="Models\Mapping\MacroMapDefinition.cs" />
     <Compile Include="Models\Mapping\MemberMapDefinition.cs" />
     <Compile Include="Models\Mapping\TagMapDefinition.cs" />
-    <Compile Include="Models\TagModel.cs" />
     <Compile Include="Models\UpgradeCheckResponse.cs" />
     <Compile Include="Models\PasswordChangedModel.cs" />
-    <Compile Include="PropertyEditors\ColorPickerConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\EmailAddressPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\ImageCropperPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\ImageCropperPropertyValueEditor.cs" />
-    <Compile Include="PropertyEditors\ListViewPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\MarkdownPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MemberGroupPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\ContentTypeParameterEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleContentTypeParameterEditor.cs" />
@@ -811,21 +793,11 @@
     <Compile Include="Models\ContentEditing\PropertyEditorBasic.cs" />
     <Compile Include="Models\Mapping\DataTypeMapDefinition.cs" />
     <Compile Include="Models\Mapping\EntityMapDefinition.cs" />
-    <Compile Include="PropertyEditors\CheckBoxListPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\ColorPickerPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\DateTimePropertyEditor.cs" />
-    <Compile Include="PropertyEditors\DateTimeValidator.cs" />
-    <Compile Include="PropertyEditors\IntegerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MultipleTextStringPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\MultipleValueEditor.cs" />
     <Compile Include="PropertyEditors\RadioButtonsPropertyEditor.cs" />
     <Compile Include="PropertyEditors\RichTextPreValueController.cs" />
     <Compile Include="PropertyEditors\RichTextConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\SliderPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\TagsPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\UploadFileTypeValidator.cs" />
-    <Compile Include="PropertyEditors\UserPickerPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\ValueListConfigurationEditor.cs" />
     <Compile Include="PublishedContentQuery.cs" />
     <Compile Include="ImageCropperTemplateExtensions.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />
@@ -923,12 +895,7 @@
     <Compile Include="Models\Mapping\SectionMapDefinition.cs" />
     <Compile Include="Models\Mapping\TabsAndPropertiesMapper.cs" />
     <Compile Include="Models\Mapping\UserMapDefinition.cs" />
-    <Compile Include="PropertyEditors\FileUploadPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\FileUploadPropertyValueEditor.cs" />
     <Compile Include="PropertyEditors\RichTextPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\TextAreaPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\TextboxPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\TrueFalsePropertyEditor.cs" />
     <Compile Include="Trees\MediaTreeController.cs" />
     <Compile Include="Models\Trees\ActionMenuItem.cs" />
     <Compile Include="Trees\ActionUrlMethod.cs" />

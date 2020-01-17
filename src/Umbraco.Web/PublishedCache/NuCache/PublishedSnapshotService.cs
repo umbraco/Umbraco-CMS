@@ -28,6 +28,7 @@ using Umbraco.Web.Install;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 using Umbraco.Web.Routing;
 using File = System.IO.File;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
@@ -138,16 +139,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     // figure out whether it can read the databases or it should populate them from sql
 
                     _logger.Info<PublishedSnapshotService>("Creating the content store, localContentDbExists? {LocalContentDbExists}", _localContentDbExists);
-                    _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger,  Current.PublishedModelFactory, _localContentDb);
+                    _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger,  publishedModelFactory, _localContentDb);
                     _logger.Info<PublishedSnapshotService>("Creating the media store, localMediaDbExists? {LocalMediaDbExists}", _localMediaDbExists);
-                    _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, Current.PublishedModelFactory, _localMediaDb);
+                    _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, publishedModelFactory, _localMediaDb);
                 }
                 else
                 {
                     _logger.Info<PublishedSnapshotService>("Creating the content store (local db ignored)");
-                    _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, Current.PublishedModelFactory);
+                    _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, publishedModelFactory);
                     _logger.Info<PublishedSnapshotService>("Creating the media store (local db ignored)");
-                    _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, Current.PublishedModelFactory);
+                    _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, publishedModelFactory);
                 }
 
                 _domainStore = new SnapDictionary<int, Domain>();

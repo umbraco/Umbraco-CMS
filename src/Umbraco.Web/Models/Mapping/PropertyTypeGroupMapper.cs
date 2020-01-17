@@ -7,8 +7,8 @@ using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
-using Current = Umbraco.Core.Composing.Current;
 
 namespace Umbraco.Web.Models.Mapping
 {

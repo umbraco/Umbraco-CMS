@@ -10,9 +10,9 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
 using System.Web.Compilation;
-using System.Web.Hosting;
 using System.Web.WebPages.Razor;
 using Umbraco.Core;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded.Building;
@@ -41,20 +41,22 @@ namespace Umbraco.ModelsBuilder.Embedded
         private static readonly string[] OurFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err" };
 
         private readonly IModelsBuilderConfig _config;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ModelsGenerationError _errors;
 
-        public PureLiveModelFactory(Lazy<UmbracoServices> umbracoServices, IProfilingLogger logger, IModelsBuilderConfig config)
+        public PureLiveModelFactory(Lazy<UmbracoServices> umbracoServices, IProfilingLogger logger, IModelsBuilderConfig config, IHostingEnvironment hostingEnvironment)
         {
             _umbracoServices = umbracoServices;
             _logger = logger;
             _config = config;
+            _hostingEnvironment = hostingEnvironment;
             _errors = new ModelsGenerationError(config);
             _ver = 1; // zero is for when we had no version
             _skipver = -1; // nothing to skip
 
             RazorBuildProvider.CodeGenerationStarted += RazorBuildProvider_CodeGenerationStarted;
 
-            if (!HostingEnvironment.IsHosted) return;
+            if (!_hostingEnvironment.IsHosted) return;
 
             var modelsDirectory = _config.ModelsDirectory;
             if (!Directory.Exists(modelsDirectory))
@@ -63,7 +65,7 @@ namespace Umbraco.ModelsBuilder.Embedded
             // BEWARE! if the watcher is not properly released then for some reason the
             // BuildManager will start confusing types - using a 'registered object' here
             // though we should probably plug into Umbraco's MainDom - which is internal
-            HostingEnvironment.RegisterObject(this);
+            _hostingEnvironment.RegisterObject(this);
             _watcher = new FileSystemWatcher(modelsDirectory);
             _watcher.Changed += WatcherOnChanged;
             _watcher.EnableRaisingEvents = true;
@@ -667,7 +669,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         {
             _watcher.EnableRaisingEvents = false;
             _watcher.Dispose();
-            HostingEnvironment.UnregisterObject(this);
+            _hostingEnvironment.UnregisterObject(this);
         }
 
         #endregion

@@ -1,6 +1,7 @@
 @using Umbraco.Core.Models.PublishedContent
 @using Umbraco.Web
 @using Umbraco.Core
+@using Umbraco.Web.Composing
 @inherits Umbraco.Web.Macros.PartialViewMacroPage
 
 @*
@@ -33,7 +34,7 @@
             }
 
             @* a folder with images under it *@
-            foreach (var image in media.Children())
+            foreach (var image in media.Children(Current.VariationContextAccessor))
             {
                 @Render(image);
             }

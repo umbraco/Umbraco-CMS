@@ -104,8 +104,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // hideTopLevelNode = support legacy stuff, look for /*/path/to/node
                 // else normal, look for /path/to/node
                 content = hideTopLevelNode.Value
-                    ? GetAtRoot(preview).SelectMany(x => x.Children(culture)).FirstOrDefault(x => x.UrlSegment(culture) == parts[0])
-                    : GetAtRoot(preview).FirstOrDefault(x => x.UrlSegment(culture) == parts[0]);
+                    ? GetAtRoot(preview).SelectMany(x => x.Children(_variationContextAccessor, culture)).FirstOrDefault(x => x.UrlSegment(_variationContextAccessor, culture) == parts[0])
+                    : GetAtRoot(preview).FirstOrDefault(x => x.UrlSegment(_variationContextAccessor, culture) == parts[0]);
                 content = FollowRoute(content, parts, 1, culture);
             }
 
@@ -114,7 +114,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // have to look for /foo (see note in ApplyHideTopLevelNodeFromPath).
             if (content == null && hideTopLevelNode.Value && parts.Length == 1)
             {
-                content = GetAtRoot(preview).FirstOrDefault(x => x.UrlSegment(culture) == parts[0]);
+                content = GetAtRoot(preview).FirstOrDefault(x => x.UrlSegment(_variationContextAccessor, culture) == parts[0]);
             }
 
             return content;
@@ -144,7 +144,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // or we reach the content root, collecting urls in the way
             var pathParts = new List<string>();
             var n = node;
-            var urlSegment = n.UrlSegment(culture);
+            var urlSegment = n.UrlSegment(_variationContextAccessor, culture);
             var hasDomains = _domainCache.HasAssigned(n.Id);
             while (hasDomains == false && n != null) // n is null at root
             {
@@ -156,7 +156,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // move to parent node
                 n = n.Parent;
                 if (n != null)
-                    urlSegment = n.UrlSegment(culture);
+                    urlSegment = n.UrlSegment(_variationContextAccessor, culture);
 
                 hasDomains = n != null && _domainCache.HasAssigned(n.Id);
             }
@@ -184,9 +184,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             while (content != null && i < parts.Count)
             {
                 var part = parts[i++];
-                content = content.Children(culture).FirstOrDefault(x =>
+                content = content.Children(_variationContextAccessor, culture).FirstOrDefault(x =>
                 {
-                    var urlSegment = x.UrlSegment(culture);
+                    var urlSegment = x.UrlSegment(_variationContextAccessor, culture);
                     return urlSegment == part;
                 });
             }

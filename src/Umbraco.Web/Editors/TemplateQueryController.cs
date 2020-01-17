@@ -4,8 +4,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Models.TemplateQuery;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -19,6 +24,24 @@ namespace Umbraco.Web.Editors
     [JsonCamelCaseFormatter]
     public class TemplateQueryController : UmbracoAuthorizedJsonController
     {
+        private readonly IVariationContextAccessor _variationContextAccessor;
+
+        public TemplateQueryController(
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoHelper umbracoHelper,
+            IVariationContextAccessor variationContextAccessor,
+            IShortStringHelper shortStringHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
+        {
+            _variationContextAccessor = variationContextAccessor;
+        }
+
         private IEnumerable<OperatorTerm> Terms => new List<OperatorTerm>
         {
                 new OperatorTerm(Services.TextService.Localize("template/is"), Operator.Equals, new [] {"string"}),
@@ -52,7 +75,7 @@ namespace Umbraco.Web.Editors
 
             if (model == null)
             {
-                contents = Umbraco.ContentAtRoot().FirstOrDefault().Children();
+                contents = Umbraco.ContentAtRoot().FirstOrDefault().Children(_variationContextAccessor);
                 queryExpression.Append("Umbraco.ContentAtRoot().FirstOrDefault().Children()");
             }
             else
@@ -110,7 +133,7 @@ namespace Umbraco.Web.Editors
             {
                 contents = sourceDocument == null
                     ? Enumerable.Empty<IPublishedContent>()
-                    : sourceDocument.Children();
+                    : sourceDocument.Children(_variationContextAccessor);
                 queryExpression.Append(".Children()");
             }
 

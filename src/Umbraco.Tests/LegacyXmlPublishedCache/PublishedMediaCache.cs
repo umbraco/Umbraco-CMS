@@ -42,13 +42,14 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private readonly PublishedContentTypeCache _contentTypeCache;
         private readonly IEntityXmlSerializer _entitySerializer;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IVariationContextAccessor _variationContextAccessor;
 
         // must be specified by the ctor
         private readonly IAppCache _appCache;
 
         public PublishedMediaCache(XmlStore xmlStore, IMediaService mediaService, IUserService userService,
             IAppCache appCache, PublishedContentTypeCache contentTypeCache, IEntityXmlSerializer entitySerializer,
-            IUmbracoContextAccessor umbracoContextAccessor)
+            IUmbracoContextAccessor umbracoContextAccessor, IVariationContextAccessor variationContextAccessor)
             : base(false)
         {
             _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
@@ -59,6 +60,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             _contentTypeCache = contentTypeCache;
             _entitySerializer = entitySerializer;
             _umbracoContextAccessor = umbracoContextAccessor;
+            _variationContextAccessor = variationContextAccessor;
         }
 
         /// <summary>
@@ -672,6 +674,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                 GetChildrenMedia,
                 GetProperty,
                 _appCache,
+                _variationContextAccessor,
                 _contentTypeCache,
                 cacheValues.XPath, // though, outside of tests, that should be null
                 cacheValues.FromExamine

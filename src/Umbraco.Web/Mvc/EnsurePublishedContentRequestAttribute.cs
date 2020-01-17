@@ -72,7 +72,7 @@ namespace Umbraco.Web.Mvc
         protected UmbracoContext UmbracoContext => _umbracoContextAccessor?.UmbracoContext ?? Current.UmbracoContext;
 
         // TODO: try lazy property injection?
-        private IPublishedRouter PublishedRouter => Core.Composing.Current.Factory.GetInstance<IPublishedRouter>();
+        private IPublishedRouter PublishedRouter => Current.Factory.GetInstance<IPublishedRouter>();
 
         /// <summary>
         /// Exposes an UmbracoHelper

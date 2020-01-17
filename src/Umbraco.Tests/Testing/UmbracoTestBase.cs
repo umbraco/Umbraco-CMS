@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
-using System.Threading;
 using System.Xml.Linq;
 using Examine;
 using Moq;
@@ -38,7 +37,6 @@ using Umbraco.Web.Actions;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
-using Umbraco.Web.Trees;
 using Umbraco.Core.Composing.CompositionExtensions;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Mapping;
@@ -46,7 +44,6 @@ using Umbraco.Core.Serialization;
 using Umbraco.Web.Composing.CompositionExtensions;
 using Umbraco.Web.Hosting;
 using Umbraco.Web.Sections;
-using Current = Umbraco.Core.Composing.Current;
 using FileSystems = Umbraco.Core.IO.FileSystems;
 using Umbraco.Web.Templates;
 using Umbraco.Web.PropertyEditors;
@@ -57,6 +54,7 @@ using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Net;
 using Umbraco.Web.Security;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Testing
 {
@@ -358,7 +356,7 @@ namespace Umbraco.Tests.Testing
         {
             return new TypeLoader(ioHelper, typeFinder, runtimeCache, new DirectoryInfo(hostingEnvironment.LocalTempPath), logger, false, new[]
             {
-                Assembly.Load("Umbraco.Core"),
+                Assembly.Load("Umbraco.Abstractions"),
                 Assembly.Load("Umbraco.Web"),
                 Assembly.Load("Umbraco.Tests"),
                 Assembly.Load("Umbraco.Infrastructure")
@@ -421,8 +419,7 @@ namespace Umbraco.Tests.Testing
                 Logger,
                 new Lazy<IMapperCollection>(f.GetInstance<IMapperCollection>),
                 TestHelper.GetConfigs(),
-                TestHelper.DbProviderFactoryCreator,
-                TestHelper.BulkSqlInsertProvider));
+                TestHelper.DbProviderFactoryCreator));
             Composition.RegisterUnique(f => f.TryGetInstance<IUmbracoDatabaseFactory>().SqlContext);
 
             Composition.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty

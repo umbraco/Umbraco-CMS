@@ -14,6 +14,13 @@ namespace Umbraco.Web.Models
     [DebuggerDisplay("Content Id: {Id}")]
     public abstract class PublishedContentBase : IPublishedContent
     {
+        private readonly IVariationContextAccessor _variationContextAccessor;
+
+        protected PublishedContentBase(IVariationContextAccessor variationContextAccessor)
+        {
+            _variationContextAccessor = variationContextAccessor;
+        }
+
         #region ContentType
 
         public abstract IPublishedContentType ContentType { get; }
@@ -33,10 +40,10 @@ namespace Umbraco.Web.Models
         public abstract int Id { get; }
 
         /// <inheritdoc />
-        public virtual string Name => this.Name();
+        public virtual string Name => this.Name(_variationContextAccessor);
 
         /// <inheritdoc />
-        public virtual string UrlSegment => this.UrlSegment();
+        public virtual string UrlSegment => this.UrlSegment(_variationContextAccessor);
 
         /// <inheritdoc />
         public abstract int SortOrder { get; }
@@ -91,7 +98,7 @@ namespace Umbraco.Web.Models
         public abstract IPublishedContent Parent { get; }
 
         /// <inheritdoc />
-        public virtual IEnumerable<IPublishedContent> Children => this.Children();
+        public virtual IEnumerable<IPublishedContent> Children => this.Children(_variationContextAccessor);
 
         /// <inheritdoc />
         public abstract IEnumerable<IPublishedContent> ChildrenForAllCultures { get; }

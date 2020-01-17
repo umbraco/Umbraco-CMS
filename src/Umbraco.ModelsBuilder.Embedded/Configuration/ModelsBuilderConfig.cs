@@ -78,7 +78,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Configuration
             value = ConfigurationManager.AppSettings[prefix + "ModelsDirectory"];
             if (!string.IsNullOrWhiteSpace(value))
             {
-                var root = Current.IOHelper.MapPath("~/");
+                var root = _ioHelper.MapPath("~/");
                 if (root == null)
                     throw new ConfigurationErrorsException("Could not determine root directory.");
 

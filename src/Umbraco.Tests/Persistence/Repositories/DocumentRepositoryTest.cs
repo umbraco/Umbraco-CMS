@@ -359,7 +359,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository dataTypeDefinitionRepository);
 
-                var editor = new DecimalPropertyEditor(Logger, ShortStringHelper);
+                var editor = new DecimalPropertyEditor(Logger, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper);
                 var dtd = new DataType(editor) { Name = "test", DatabaseType = ValueStorageType.Decimal };
                 dataTypeDefinitionRepository.Save(dtd);
 

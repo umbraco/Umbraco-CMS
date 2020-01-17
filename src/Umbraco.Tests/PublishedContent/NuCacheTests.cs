@@ -26,6 +26,7 @@ using Umbraco.Web.Cache;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -175,7 +176,7 @@ namespace Umbraco.Tests.PublishedContent
 
             // create a published content type factory
             var contentTypeFactory = new PublishedContentTypeFactory(
-                Mock.Of<IPublishedModelFactory>(),
+                publishedModelFactory,
                 new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()),
                 dataTypeService);
 
@@ -203,7 +204,7 @@ namespace Umbraco.Tests.PublishedContent
                 dataSource,
                 globalSettings,
                 Mock.Of<IEntityXmlSerializer>(),
-                Mock.Of<IPublishedModelFactory>(),
+                publishedModelFactory,
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }),
                 typeFinder,
                 TestHelper.GetHostingEnvironment(),
@@ -232,30 +233,30 @@ namespace Umbraco.Tests.PublishedContent
             Assert.AreEqual("val-fr1", publishedContent.Value<string>("prop", "fr-FR"));
             Assert.AreEqual("val-uk1", publishedContent.Value<string>("prop", "en-UK"));
 
-            Assert.IsNull(publishedContent.Name()); // no invariant name for varying content
-            Assert.AreEqual("name-fr1", publishedContent.Name("fr-FR"));
-            Assert.AreEqual("name-uk1", publishedContent.Name("en-UK"));
+            Assert.IsNull(publishedContent.Name(_variationAccesor)); // no invariant name for varying content
+            Assert.AreEqual("name-fr1", publishedContent.Name(_variationAccesor, "fr-FR"));
+            Assert.AreEqual("name-uk1", publishedContent.Name(_variationAccesor, "en-UK"));
 
             var draftContent = snapshot.Content.GetById(true, 1);
             Assert.AreEqual("val2", draftContent.Value<string>("prop"));
             Assert.AreEqual("val-fr2", draftContent.Value<string>("prop", "fr-FR"));
             Assert.AreEqual("val-uk2", draftContent.Value<string>("prop", "en-UK"));
 
-            Assert.IsNull(draftContent.Name()); // no invariant name for varying content
-            Assert.AreEqual("name-fr2", draftContent.Name("fr-FR"));
-            Assert.AreEqual("name-uk2", draftContent.Name("en-UK"));
+            Assert.IsNull(draftContent.Name(_variationAccesor)); // no invariant name for varying content
+            Assert.AreEqual("name-fr2", draftContent.Name(_variationAccesor, "fr-FR"));
+            Assert.AreEqual("name-uk2", draftContent.Name(_variationAccesor, "en-UK"));
 
             // now french is default
             _variationAccesor.VariationContext = new VariationContext("fr-FR");
             Assert.AreEqual("val-fr1", publishedContent.Value<string>("prop"));
-            Assert.AreEqual("name-fr1", publishedContent.Name());
-            Assert.AreEqual(new DateTime(2018, 01, 01, 01, 00, 00), publishedContent.CultureDate());
+            Assert.AreEqual("name-fr1", publishedContent.Name(_variationAccesor));
+            Assert.AreEqual(new DateTime(2018, 01, 01, 01, 00, 00), publishedContent.CultureDate(_variationAccesor));
 
             // now uk is default
             _variationAccesor.VariationContext = new VariationContext("en-UK");
             Assert.AreEqual("val-uk1", publishedContent.Value<string>("prop"));
-            Assert.AreEqual("name-uk1", publishedContent.Name());
-            Assert.AreEqual(new DateTime(2018, 01, 02, 01, 00, 00), publishedContent.CultureDate());
+            Assert.AreEqual("name-uk1", publishedContent.Name(_variationAccesor));
+            Assert.AreEqual(new DateTime(2018, 01, 02, 01, 00, 00), publishedContent.CultureDate(_variationAccesor));
 
             // invariant needs to be retrieved explicitly, when it's not default
             Assert.AreEqual("val1", publishedContent.Value<string>("prop", culture: ""));
@@ -275,7 +276,7 @@ namespace Umbraco.Tests.PublishedContent
             Assert.AreEqual(ContentVariation.Nothing, againContent.ContentType.GetPropertyType("prop").Variations);
 
             // now, "no culture" means "invariant"
-            Assert.AreEqual("It Works1!", againContent.Name());
+            Assert.AreEqual("It Works1!", againContent.Name(_variationAccesor));
             Assert.AreEqual("val1", againContent.Value<string>("prop"));
         }
 

@@ -5,13 +5,14 @@ using System.Threading.Tasks;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Web.Security;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
+using Umbraco.Web.Models.Identity;
 
 namespace Umbraco.Web.WebApi.Filters
 {

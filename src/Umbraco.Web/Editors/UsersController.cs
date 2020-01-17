@@ -13,7 +13,7 @@ using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -27,6 +27,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Editors.Filters;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Models.Identity;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
@@ -295,7 +296,7 @@ namespace Umbraco.Web.Editors
 
             //we want to create the user with the UserManager, this ensures the 'empty' (special) password
             //format is applied without us having to duplicate that logic
-            var identityUser = BackOfficeIdentityUser.CreateNew(userSave.Username, userSave.Email, GlobalSettings.DefaultUILanguage);
+            var identityUser = BackOfficeIdentityUser.CreateNew(GlobalSettings, userSave.Username, userSave.Email, GlobalSettings.DefaultUILanguage);
             identityUser.Name = userSave.Name;
 
             var created = await UserManager.CreateAsync(identityUser);
@@ -389,7 +390,7 @@ namespace Umbraco.Web.Editors
             {
                 //we want to create the user with the UserManager, this ensures the 'empty' (special) password
                 //format is applied without us having to duplicate that logic
-                var identityUser = BackOfficeIdentityUser.CreateNew(userSave.Username, userSave.Email, GlobalSettings.DefaultUILanguage);
+                var identityUser = BackOfficeIdentityUser.CreateNew(GlobalSettings, userSave.Username, userSave.Email, GlobalSettings.DefaultUILanguage);
                 identityUser.Name = userSave.Name;
 
                 var created = await UserManager.CreateAsync(identityUser);

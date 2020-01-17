@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Mail;
 using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 
@@ -19,7 +19,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
         private readonly ILogger _logger;
         private readonly IGlobalSettings _globalSettings;
 
-        public EmailNotificationMethod(ILocalizedTextService textService, IRuntimeState runtimeState, ILogger logger, IGlobalSettings globalSettings)
+        public EmailNotificationMethod(ILocalizedTextService textService, IRuntimeState runtimeState, ILogger logger, IGlobalSettings globalSettings, IHealthChecks healthChecks): base(healthChecks)
         {
             var recipientEmail = Settings["recipientEmail"]?.Value;
             if (string.IsNullOrWhiteSpace(recipientEmail))

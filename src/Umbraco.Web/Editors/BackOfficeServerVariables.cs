@@ -11,7 +11,7 @@ using ClientDependency.Core.Config;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;

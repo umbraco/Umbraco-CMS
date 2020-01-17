@@ -1,7 +1,5 @@
 ﻿using Moq;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Tests.TestHelpers;
 

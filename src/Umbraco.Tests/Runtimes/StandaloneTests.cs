@@ -35,6 +35,7 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Runtime;
 using File = System.IO.File;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Runtimes
 {
@@ -48,7 +49,7 @@ namespace Umbraco.Tests.Runtimes
             IFactory factory = null;
 
             // clear
-            foreach (var file in Directory.GetFiles(Path.Combine(Current.IOHelper.MapPath("~/App_Data")), "NuCache.*"))
+            foreach (var file in Directory.GetFiles(Path.Combine(TestHelper.IOHelper.MapPath("~/App_Data")), "NuCache.*"))
                 File.Delete(file);
 
             // settings
@@ -61,7 +62,7 @@ namespace Umbraco.Tests.Runtimes
             var profiler = new LogProfiler(logger);
             var profilingLogger = new ProfilingLogger(logger, profiler);
             var appCaches = AppCaches.Disabled;
-            var databaseFactory = new UmbracoDatabaseFactory(logger, new Lazy<IMapperCollection>(() => factory.GetInstance<IMapperCollection>()), TestHelper.GetConfigs(), TestHelper.DbProviderFactoryCreator, TestHelper.BulkSqlInsertProvider);
+            var databaseFactory = new UmbracoDatabaseFactory(logger, new Lazy<IMapperCollection>(() => factory.GetInstance<IMapperCollection>()), TestHelper.GetConfigs(), TestHelper.DbProviderFactoryCreator);
             var typeFinder = new TypeFinder(logger);
             var ioHelper = TestHelper.IOHelper;
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
@@ -71,14 +72,15 @@ namespace Umbraco.Tests.Runtimes
             var backOfficeInfo = TestHelper.GetBackOfficeInfo();
             var runtimeState = new RuntimeState(logger, null, null, new Lazy<IMainDom>(() => mainDom), new Lazy<IServerRegistrar>(() => factory.GetInstance<IServerRegistrar>()), umbracoVersion, hostingEnvironment, backOfficeInfo);
             var configs = TestHelper.GetConfigs();
+            var variationContextAccessor = TestHelper.VariationContextAccessor;
 
             // create the register and the composition
             var register = TestHelper.GetRegister();
             var composition = new Composition(register, typeLoader, profilingLogger, runtimeState, configs, ioHelper, appCaches);
-            composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper, umbracoVersion, TestHelper.DbProviderFactoryCreator, TestHelper.BulkSqlInsertProvider);
+            composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper, umbracoVersion, TestHelper.DbProviderFactoryCreator);
 
             // create the core runtime and have it compose itself
-            var coreRuntime = new CoreRuntime(configs, umbracoVersion, ioHelper, logger, profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.BulkSqlInsertProvider, TestHelper.MainDom);coreRuntime.Compose(composition);
+            var coreRuntime = new CoreRuntime(configs, umbracoVersion, ioHelper, logger, profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom);coreRuntime.Compose(composition);
 
             // determine actual runtime level
             runtimeState.DetermineRuntimeLevel(databaseFactory, logger);
@@ -103,7 +105,7 @@ namespace Umbraco.Tests.Runtimes
             composition.Register<IVariationContextAccessor, TestVariationContextAccessor>(Lifetime.Singleton);
             composition.Register<IDefaultCultureAccessor, TestDefaultCultureAccessor>(Lifetime.Singleton);
             composition.Register<ISiteDomainHelper>(_ => Mock.Of<ISiteDomainHelper>(), Lifetime.Singleton);
-            composition.RegisterUnique(f => new DistributedCache());
+            composition.RegisterUnique(f => new DistributedCache(f.GetInstance<IServerMessenger>(), f.GetInstance<CacheRefresherCollection>()));
             composition.WithCollectionBuilder<UrlProviderCollectionBuilder>().Append<DefaultUrlProvider>();
             composition.RegisterUnique<IDistributedCacheBinder, DistributedCacheBinder>();
             composition.RegisterUnique<IExamineManager>(f => ExamineManager.Instance);
@@ -203,7 +205,7 @@ namespace Umbraco.Tests.Runtimes
             // but a draft document
             pcontent = umbracoContext.Content.GetById(true, content.Id);
             Assert.IsNotNull(pcontent);
-            Assert.AreEqual("test", pcontent.Name());
+            Assert.AreEqual("test", pcontent.Name(variationContextAccessor));
             Assert.IsTrue(pcontent.IsDraft());
 
             // no published url
@@ -217,7 +219,7 @@ namespace Umbraco.Tests.Runtimes
             // assert that snapshot has been updated and there is now a published document
             pcontent = umbracoContext.Content.GetById(content.Id);
             Assert.IsNotNull(pcontent);
-            Assert.AreEqual("test", pcontent.Name());
+            Assert.AreEqual("test", pcontent.Name(variationContextAccessor));
             Assert.IsFalse(pcontent.IsDraft());
 
             // but the url is the published one - no draft url
@@ -226,7 +228,7 @@ namespace Umbraco.Tests.Runtimes
             // and also an updated draft document
             pcontent = umbracoContext.Content.GetById(true, content.Id);
             Assert.IsNotNull(pcontent);
-            Assert.AreEqual("testx", pcontent.Name());
+            Assert.AreEqual("testx", pcontent.Name(variationContextAccessor));
             Assert.IsTrue(pcontent.IsDraft());
 
             // and the published document has a url
@@ -270,10 +272,10 @@ namespace Umbraco.Tests.Runtimes
             var register = TestHelper.GetRegister();
             var composition = new Composition(register, typeLoader, profilingLogger, runtimeState, configs, ioHelper, appCaches);
             var umbracoVersion = TestHelper.GetUmbracoVersion();
-            composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper, umbracoVersion, TestHelper.DbProviderFactoryCreator, TestHelper.BulkSqlInsertProvider);
+            composition.RegisterEssentials(logger, profiler, profilingLogger, mainDom, appCaches, databaseFactory, typeLoader, runtimeState, typeFinder, ioHelper, umbracoVersion, TestHelper.DbProviderFactoryCreator);
 
             // create the core runtime and have it compose itself
-            var coreRuntime = new CoreRuntime(configs, umbracoVersion, ioHelper, logger, profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.BulkSqlInsertProvider, TestHelper.MainDom);
+            var coreRuntime = new CoreRuntime(configs, umbracoVersion, ioHelper, logger, profiler, new AspNetUmbracoBootPermissionChecker(), hostingEnvironment, backOfficeInfo, TestHelper.DbProviderFactoryCreator, TestHelper.MainDom);
             coreRuntime.Compose(composition);
 
             // get the components

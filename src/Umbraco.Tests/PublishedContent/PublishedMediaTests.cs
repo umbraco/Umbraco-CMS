@@ -72,7 +72,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var cache = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null, HostingEnvironment),
                 ServiceContext.MediaService, ServiceContext.UserService, new DictionaryAppCache(), ContentTypesCache,
-                Factory.GetInstance<IEntityXmlSerializer>(), Factory.GetInstance<IUmbracoContextAccessor>());
+                Factory.GetInstance<IEntityXmlSerializer>(), Factory.GetInstance<IUmbracoContextAccessor>(), VariationContextAccessor);
             var doc = cache.GetById(id);
             Assert.IsNotNull(doc);
             return doc;
@@ -133,7 +133,7 @@ namespace Umbraco.Tests.PublishedContent
 
                 //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
                 var publishedMedia = cache.GetById(1111);
-                var rootChildren = publishedMedia.Children().ToArray();
+                var rootChildren = publishedMedia.Children(VariationContextAccessor).ToArray();
                 var currSort = 0;
                 for (var i = 0; i < rootChildren.Count(); i++)
                 {
@@ -210,11 +210,11 @@ namespace Umbraco.Tests.PublishedContent
 
                 //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
                 var publishedMedia = cache.GetById(1111);
-                var rootChildren = publishedMedia.Children();
+                var rootChildren = publishedMedia.Children(VariationContextAccessor);
                 Assert.IsTrue(rootChildren.Select(x => x.Id).ContainsAll(new[] { 2222, 1113, 1114, 1115, 1116 }));
 
                 var publishedChild1 = cache.GetById(2222);
-                var subChildren = publishedChild1.Children();
+                var subChildren = publishedChild1.Children(VariationContextAccessor);
                 Assert.IsTrue(subChildren.Select(x => x.Id).ContainsAll(new[] { 2112 }));
             }
         }
@@ -342,11 +342,11 @@ namespace Umbraco.Tests.PublishedContent
             var mSubChild3 = MakeNewMedia("SubChild3", mType, user, mChild1.Id);
 
             var publishedMedia = GetNode(mRoot.Id);
-            var rootChildren = publishedMedia.Children();
+            var rootChildren = publishedMedia.Children(VariationContextAccessor);
             Assert.IsTrue(rootChildren.Select(x => x.Id).ContainsAll(new[] { mChild1.Id, mChild2.Id, mChild3.Id }));
 
             var publishedChild1 = GetNode(mChild1.Id);
-            var subChildren = publishedChild1.Children();
+            var subChildren = publishedChild1.Children(VariationContextAccessor);
             Assert.IsTrue(subChildren.Select(x => x.Id).ContainsAll(new[] { mSubChild1.Id, mSubChild2.Id, mSubChild3.Id }));
         }
 
@@ -485,7 +485,7 @@ namespace Umbraco.Tests.PublishedContent
             </Image>");
             var node = xml.DescendantsAndSelf("Image").Single(x => (int)x.Attribute("id") == nodeId);
 
-            var publishedMedia = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null, HostingEnvironment), ServiceContext.MediaService, ServiceContext.UserService, new DictionaryAppCache(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>(), Factory.GetInstance<IUmbracoContextAccessor>());
+            var publishedMedia = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null, HostingEnvironment), ServiceContext.MediaService, ServiceContext.UserService, new DictionaryAppCache(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>(), Factory.GetInstance<IUmbracoContextAccessor>(), VariationContextAccessor);
 
             var nav = node.CreateNavigator();
 
@@ -505,7 +505,7 @@ namespace Umbraco.Tests.PublishedContent
             var errorXml = new XElement("error", string.Format("No media is maching '{0}'", 1234));
             var nav = errorXml.CreateNavigator();
 
-            var publishedMedia = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null, HostingEnvironment), ServiceContext.MediaService, ServiceContext.UserService, new DictionaryAppCache(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>(), Factory.GetInstance<IUmbracoContextAccessor>());
+            var publishedMedia = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null, HostingEnvironment), ServiceContext.MediaService, ServiceContext.UserService, new DictionaryAppCache(), ContentTypesCache, Factory.GetInstance<IEntityXmlSerializer>(), Factory.GetInstance<IUmbracoContextAccessor>(), VariationContextAccessor);
             var converted = publishedMedia.ConvertFromXPathNodeIterator(nav.Select("/"), 1234);
 
             Assert.IsNull(converted);

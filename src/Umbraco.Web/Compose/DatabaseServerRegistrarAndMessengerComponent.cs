@@ -2,12 +2,14 @@
 using System.Threading;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Sync;
 using Umbraco.Examine;
 using Umbraco.Web.Cache;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Scheduling;
 using Umbraco.Web.Search;
@@ -36,9 +38,6 @@ namespace Umbraco.Web.Compose
     {
         public static DatabaseServerMessengerOptions GetDefaultOptions(IFactory factory)
         {
-            var logger = factory.GetInstance<ILogger>();
-            var indexRebuilder = factory.GetInstance<IndexRebuilder>();
-
             return new DatabaseServerMessengerOptions
             {
                 //These callbacks will be executed if the server has not been synced
@@ -47,21 +46,26 @@ namespace Umbraco.Web.Compose
                 {
                     //rebuild the xml cache file if the server is not synced
                     () =>
-                    {
+                    {   
+                        var publishedSnapshotService = factory.GetInstance<IPublishedSnapshotService>();
+
                         // rebuild the published snapshot caches entirely, if the server is not synced
                         // this is equivalent to DistributedCache RefreshAll... but local only
                         // (we really should have a way to reuse RefreshAll... locally)
                         // note: refresh all content & media caches does refresh content types too
-                        var svc = Current.PublishedSnapshotService;
-                        svc.Notify(new[] { new DomainCacheRefresher.JsonPayload(0, DomainChangeTypes.RefreshAll) });
-                        svc.Notify(new[] { new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out _, out _);
-                        svc.Notify(new[] { new MediaCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out _);
+                        publishedSnapshotService.Notify(new[] { new DomainCacheRefresher.JsonPayload(0, DomainChangeTypes.RefreshAll) });
+                        publishedSnapshotService.Notify(new[] { new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out _, out _);
+                        publishedSnapshotService.Notify(new[] { new MediaCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out _);
                     },
 
                     //rebuild indexes if the server is not synced
                     // NOTE: This will rebuild ALL indexes including the members, if developers want to target specific
                     // indexes then they can adjust this logic themselves.
-                    () => { ExamineComponent.RebuildIndexes(indexRebuilder, logger, false, 5000); }
+                    () =>
+                    {
+                        var indexRebuilder = factory.GetInstance<BackgroundIndexRebuilder>();
+                        indexRebuilder.RebuildIndexes(false, 5000);
+                    }
                 }
             };
         }
@@ -89,7 +93,7 @@ namespace Umbraco.Web.Compose
         private IBackgroundTask[] _tasks;
         private IndexRebuilder _indexRebuilder;
 
-        public DatabaseServerRegistrarAndMessengerComponent(IRuntimeState runtime, IServerRegistrar serverRegistrar, IServerMessenger serverMessenger, IServerRegistrationService registrationService, ILogger logger, IndexRebuilder indexRebuilder)
+        public DatabaseServerRegistrarAndMessengerComponent(IRuntimeState runtime, IServerRegistrar serverRegistrar, IServerMessenger serverMessenger, IServerRegistrationService registrationService, ILogger logger, IHostingEnvironment hostingEnvironment, IndexRebuilder indexRebuilder)
         {
             _runtime = runtime;
             _logger = logger;
@@ -101,7 +105,7 @@ namespace Umbraco.Web.Compose
             if (_registrar != null)
             {
                 _touchTaskRunner = new BackgroundTaskRunner<IBackgroundTask>("ServerRegistration",
-                    new BackgroundTaskRunnerOptions { AutoStart = true }, logger);
+                    new BackgroundTaskRunnerOptions { AutoStart = true }, logger, hostingEnvironment);
             }
 
             // create task runner for BatchedDatabaseServerMessenger
@@ -109,7 +113,7 @@ namespace Umbraco.Web.Compose
             if (_messenger != null)
             {
                 _processTaskRunner = new BackgroundTaskRunner<IBackgroundTask>("ServerInstProcess",
-                    new BackgroundTaskRunnerOptions { AutoStart = true }, logger);
+                    new BackgroundTaskRunnerOptions { AutoStart = true }, logger, hostingEnvironment);
             }
         }
 

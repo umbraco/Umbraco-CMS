@@ -3,15 +3,14 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration.HealthChecks;
 
 namespace Umbraco.Web.HealthCheck.NotificationMethods
 {
     public abstract class NotificationMethodBase : IHealthCheckNotificationMethod
     {
-        protected NotificationMethodBase()
+        protected NotificationMethodBase(IHealthChecks healthCheckConfig)
         {
             var type = GetType();
             var attribute = type.GetCustomAttribute<HealthCheckNotificationMethodAttribute>();
@@ -21,7 +20,6 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
                 return;
             }
 
-            var healthCheckConfig = Current.Configs.HealthChecks();
             var notificationMethods = healthCheckConfig.NotificationSettings.NotificationMethods;
             var notificationMethod = notificationMethods[attribute.Alias];
             if (notificationMethod == null)

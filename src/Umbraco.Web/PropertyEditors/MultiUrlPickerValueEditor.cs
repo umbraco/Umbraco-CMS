@@ -23,8 +23,8 @@ namespace Umbraco.Web.PropertyEditors
         private readonly ILogger _logger;
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
-        public MultiUrlPickerValueEditor(IEntityService entityService, IPublishedSnapshotAccessor publishedSnapshotAccessor, ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute)
-            : base(dataTypeService, localizationService, Current.Services.TextService, shortStringHelper, attribute)
+        public MultiUrlPickerValueEditor(IEntityService entityService, IPublishedSnapshotAccessor publishedSnapshotAccessor, ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute)
+            : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, attribute)
         {
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
             _publishedSnapshotAccessor = publishedSnapshotAccessor ?? throw new ArgumentNullException(nameof(publishedSnapshotAccessor));

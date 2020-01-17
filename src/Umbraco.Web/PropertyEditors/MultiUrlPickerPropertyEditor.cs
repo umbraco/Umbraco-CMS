@@ -1,6 +1,6 @@
 using System;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Logging;
@@ -22,22 +22,18 @@ namespace Umbraco.Web.PropertyEditors
     {
         private readonly IEntityService _entityService;
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
-        private readonly IDataTypeService _dataTypeService;
-        private readonly ILocalizationService _localizationService;
         private readonly IIOHelper _ioHelper;
 
-        public MultiUrlPickerPropertyEditor(ILogger logger, IEntityService entityService, IPublishedSnapshotAccessor publishedSnapshotAccessor, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper, IShortStringHelper shortStringHelper)
-            : base(logger, dataTypeService, localizationService, Current.Services.TextService, shortStringHelper, EditorType.PropertyValue)
+        public MultiUrlPickerPropertyEditor(ILogger logger, IEntityService entityService, IPublishedSnapshotAccessor publishedSnapshotAccessor, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IIOHelper ioHelper, IShortStringHelper shortStringHelper)
+            : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper, EditorType.PropertyValue)
         {
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
             _publishedSnapshotAccessor = publishedSnapshotAccessor ?? throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
-            _dataTypeService = dataTypeService;
-            _localizationService = localizationService;
             _ioHelper = ioHelper;
         }
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new MultiUrlPickerConfigurationEditor(_ioHelper);
 
-        protected override IDataValueEditor CreateValueEditor() => new MultiUrlPickerValueEditor(_entityService, _publishedSnapshotAccessor, Logger, _dataTypeService, _localizationService, ShortStringHelper, Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new MultiUrlPickerValueEditor(_entityService, _publishedSnapshotAccessor, Logger, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, Attribute);
     }
 }

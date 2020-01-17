@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 using System.Web;
 using Newtonsoft.Json;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Services;
 using Umbraco.Web.Install.Models;
+using Umbraco.Web.Models.Identity;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Install.InstallSteps

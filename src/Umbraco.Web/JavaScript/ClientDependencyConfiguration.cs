@@ -9,8 +9,7 @@ using System.Xml.Linq;
 using ClientDependency.Core.CompositeFiles.Providers;
 using ClientDependency.Core.Config;
 using Semver;
-using Umbraco.Core.Composing;
-using Umbraco.Core.IO;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.JavaScript

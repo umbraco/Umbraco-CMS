@@ -3,15 +3,13 @@ using System.IO;
 using System.Web;
 using System.Web.Routing;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Configuration;
 using System.Threading;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.IO;
 using System.Collections.Concurrent;
 using Umbraco.Core.Collections;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web
 {

@@ -20,11 +20,11 @@ namespace Umbraco.Web
 
             var connectionStringConfig = configs.ConnectionStrings()[Constants.System.UmbracoConnectionName];
 
-            var dbProviderFactoryCreator = new UmbracoDbProviderFactoryCreator(connectionStringConfig.ProviderName);
-            var bulkSqlInsertProvider = connectionStringConfig.ProviderName == Constants.DbProviderNames.SqlCe ? (IBulkSqlInsertProvider) new SqlCeBulkSqlInsertProvider() : new SqlServerBulkSqlInsertProvider();
+            var dbProviderFactoryCreator = new UmbracoDbProviderFactoryCreator(connectionStringConfig?.ProviderName);
+          
             var mainDom = new MainDom(logger, hostingEnvironment);
 
-            return new WebRuntime(this, configs, umbracoVersion, ioHelper, logger, profiler, hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, bulkSqlInsertProvider, mainDom);
+            return new WebRuntime(this, configs, umbracoVersion, ioHelper, logger, profiler, hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom);
         }
 
         /// <summary>

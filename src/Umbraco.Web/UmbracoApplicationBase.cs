@@ -11,8 +11,8 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
-using Umbraco.Core.Strings;
 using Umbraco.Web.Hosting;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web
 {
@@ -113,7 +113,7 @@ namespace Umbraco.Web
             // the boot manager is responsible for registrations
             var register = GetRegister(globalSettings);
             _runtime = GetRuntime(_configs, umbracoVersion, _ioHelper, _logger, _profiler, _hostingEnvironment, _backOfficeInfo);
-            _factory = _runtime.Boot(register);
+            _factory =_runtime.Boot(register);
         }
 
         // called by ASP.NET (auto event wireup) once per app domain

@@ -4,8 +4,7 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -54,6 +53,7 @@ namespace Umbraco.Tests.Routing
             var urls = content.GetContentUrls(publishedRouter,
                 umbContext,
                 GetLangService("en-US", "fr-FR"), GetTextService(), ServiceContext.ContentService,
+                VariationContextAccessor,
                 Logger).ToList();
 
             Assert.AreEqual(1, urls.Count);
@@ -79,7 +79,7 @@ namespace Umbraco.Tests.Routing
             var urls = content.GetContentUrls(publishedRouter,
                 umbContext,
                 GetLangService("en-US", "fr-FR"), GetTextService(), ServiceContext.ContentService,
-                Logger).ToList();
+                VariationContextAccessor, Logger).ToList();
 
             Assert.AreEqual(1, urls.Count);
             Assert.AreEqual("/home/", urls[0].Text);
@@ -111,7 +111,7 @@ namespace Umbraco.Tests.Routing
             var urls = child.GetContentUrls(publishedRouter,
                 umbContext,
                 GetLangService("en-US", "fr-FR"), GetTextService(), ServiceContext.ContentService,
-                Logger).ToList();
+                VariationContextAccessor, Logger).ToList();
 
             Assert.AreEqual(1, urls.Count);
             Assert.AreEqual("/home/sub1/", urls[0].Text);

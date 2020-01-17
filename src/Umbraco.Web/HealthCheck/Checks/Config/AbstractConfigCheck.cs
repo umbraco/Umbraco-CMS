@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.Checks.Config
@@ -13,6 +13,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         private readonly ConfigurationService _configurationService;
 
         protected ILocalizedTextService TextService { get; }
+        protected IIOHelper IOHelper { get; }
 
         /// <summary>
         /// Gets the config file path.
@@ -52,9 +53,10 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
             get { return false; }
         }
 
-        protected AbstractConfigCheck(ILocalizedTextService textService)
+        protected AbstractConfigCheck(ILocalizedTextService textService, IIOHelper ioHelper)
         {
             TextService = textService;
+            IOHelper = ioHelper;
             _configurationService = new ConfigurationService(AbsoluteFilePath, XPath, textService);
         }
 
@@ -66,7 +68,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         /// <summary>
         /// Gets the absolute file path.
         /// </summary>
-        private string AbsoluteFilePath => Current.IOHelper.MapPath(FilePath);
+        private string AbsoluteFilePath => IOHelper.MapPath(FilePath);
 
         /// <summary>
         /// Gets the message for when the check has succeeded.

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Web.Http;
 using System.Xml;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security;
 using Umbraco.Core.Logging;
@@ -11,7 +10,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using File = System.IO.File;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Editors
 {

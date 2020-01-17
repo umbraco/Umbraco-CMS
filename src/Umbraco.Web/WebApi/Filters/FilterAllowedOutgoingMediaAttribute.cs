@@ -5,10 +5,11 @@ using System.Linq;
 using System.Net.Http;
 using System.Web.Http.Filters;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Security;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.WebApi.Filters
 {

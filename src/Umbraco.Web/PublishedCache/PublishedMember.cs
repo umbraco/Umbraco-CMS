@@ -24,7 +24,8 @@ namespace Umbraco.Web.PublishedCache
         public PublishedMember(
             IMember member,
             IPublishedContentType publishedMemberType,
-            IUserService userService)
+            IUserService userService,
+            IVariationContextAccessor variationContextAccessor) : base(variationContextAccessor)
         {
             _member = member ?? throw new ArgumentNullException(nameof(member));
             _membershipUser = member;

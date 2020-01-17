@@ -4,7 +4,7 @@ using System.IO;
 using System.Web;
 using System.Web.Routing;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;

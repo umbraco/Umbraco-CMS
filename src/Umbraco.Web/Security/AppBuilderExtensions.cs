@@ -20,6 +20,7 @@ using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Net;
 using Umbraco.Web.Composing;
+using Umbraco.Web.Models.Identity;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Security

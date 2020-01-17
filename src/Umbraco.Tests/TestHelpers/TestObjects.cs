@@ -22,6 +22,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers.Stubs;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -243,7 +244,7 @@ namespace Umbraco.Tests.TestHelpers
                 // mappersBuilder.AddCore();
                 // var mappers = mappersBuilder.CreateCollection();
                 var mappers = Current.Factory.GetInstance<IMapperCollection>();
-                databaseFactory = new UmbracoDatabaseFactory(Constants.System.UmbracoConnectionName, logger, new Lazy<IMapperCollection>(() => mappers), TestHelper.GetConfigs(), TestHelper.DbProviderFactoryCreator, TestHelper.BulkSqlInsertProvider);
+                databaseFactory = new UmbracoDatabaseFactory(Constants.System.UmbracoConnectionName, logger, new Lazy<IMapperCollection>(() => mappers), TestHelper.GetConfigs(), TestHelper.DbProviderFactoryCreator);
             }
 
             typeFinder = typeFinder ?? new TypeFinder(logger);

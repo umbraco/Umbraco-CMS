@@ -1,6 +1,6 @@
 <%@ Page Language="C#" AutoEventWireup="True" Inherits="Umbraco.Web.UI.Config.Splashes.NoNodes" CodeBehind="NoNodes.aspx.cs" %>
 <%@ Import Namespace="Umbraco.Core" %>
-<%@ Import Namespace="Umbraco.Core.Composing" %>
+<%@ Import Namespace="Umbraco.Web.Composing" %>
 <%@ Import Namespace="Umbraco.Core.Configuration" %>
 <%@ Import Namespace="Umbraco.Core.IO" %>
 
