@@ -32,7 +32,12 @@
 
                 <ng-form class="form-search -no-margin-bottom pull-right" novalidate>
                     <div class="inner-addon left-addon">
-                        <i class="icon icon-search"></i>
+                        <label for="redirect-search" class="form-search__label-icon">
+                            <i class="icon icon-search" aria-hidden="true"></i>
+                            <span class="sr-only">
+                                <localize key="visuallyHiddenTexts_redirectDashboardSearchLabel">Search the redirect dashboard</localize>
+                            </span>
+                        </label>
                         <input
                             class="form-control search-input"
                             type="text"
@@ -40,6 +45,7 @@
                             placeholder="@general_typeToSearch"
                             ng-model="vm.dashboard.searchTerm"
                             ng-change="vm.filter()"
+                            id="redirect-search"
                             prevent-enter-submit
                             no-dirty-check>
                     </div>

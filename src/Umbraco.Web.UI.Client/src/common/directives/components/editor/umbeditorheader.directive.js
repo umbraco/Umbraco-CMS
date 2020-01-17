@@ -195,6 +195,7 @@ Use this directive to construct a header inside the main editor window.
 @param {string=} icon Show and edit the content icon. Opens an overlay to change the icon.
 @param {boolean=} hideIcon Set to <code>true</code> to hide icon.
 @param {string=} alias show and edit the content alias.
+@param {boolean=} aliasLocked Set to <code>true</code> to lock the alias.
 @param {boolean=} hideAlias Set to <code>true</code> to hide alias.
 @param {string=} description Add a description to the content.
 @param {boolean=} hideDescription Set to <code>true</code> to hide description.
@@ -223,7 +224,8 @@ Use this directive to construct a header inside the main editor window.
             if (editorState.current) {
                 //to do make work for user create/edit
                 // to do make it work for user group create/ edit
-                // to make it work for language edit/create
+                // to do make it work for language edit/create
+                // to do make it work for log viewer
                 scope.isNew = editorState.current.id === 0 ||
                     editorState.current.id === "0" ||
                     editorState.current.id === -1 ||
@@ -231,8 +233,8 @@ Use this directive to construct a header inside the main editor window.
                     editorState.current.id === "-1";
 
                 var localizeVars = [
-                    scope.isNew ? "placeholders_a11yCreateItem" : "placeholders_a11yEdit",
-                    "placeholders_a11yName",
+                    scope.isNew ? "visuallyHiddenTexts_createItem" : "visuallyHiddenTexts_edit",
+                    "visuallyHiddenTexts_name",
                     scope.isNew ? "general_new" : "general_edit"
                 ];
 
@@ -347,6 +349,7 @@ Use this directive to construct a header inside the main editor window.
                 icon: "=",
                 hideIcon: "@",
                 alias: "=",
+                aliasLocked: "<",
                 hideAlias: "=",
                 description: "=",
                 hideDescription: "@",
