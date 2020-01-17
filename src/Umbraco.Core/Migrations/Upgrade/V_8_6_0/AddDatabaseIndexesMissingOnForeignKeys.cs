@@ -1,8 +1,4 @@
-﻿using NPoco;
-using System;
-using System.Linq;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
-using Umbraco.Core.Persistence.Dtos;
+﻿using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_6_0
 {
@@ -14,40 +10,26 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_6_0
 
         }
 
+        /// <summary>
+        /// Adds an index to the foreign key column <c>parent</c> on <c>DictionaryDto</c>'s table
+        /// if it doesn't already exist
+        /// </summary>
         public override void Migrate()
         {
-            var newIndexes = new[]
-            {
-                (typeof(DictionaryDto), nameof(DictionaryDto.Parent))
-            };
+            var tableInfo = Context.Database.PocoDataFactory.ForType(typeof(DictionaryDto)).TableInfo;
+            tableInfo.TableName = tableInfo.TableName;
+            var indexName = "IX_" + tableInfo.TableName + "_Parent";
 
-            foreach (var (type, propertyName) in newIndexes)
+            if (IndexExists(indexName) == false)
             {
-                CreateIndexIfNotExists(type, propertyName);
+                Create
+                     .Index(indexName)
+                     .OnTable(tableInfo.TableName)
+                     .OnColumn("parent")
+                     .Ascending()
+                     .WithOptions().NonClustered()
+                     .Do();
             }
-        }
-
-        private void CreateIndexIfNotExists(Type dto, string propertyName)
-        {
-            var property = dto.GetProperty(propertyName);
-            var indexName = property.GetCustomAttributes(false).OfType<IndexAttribute>().Single().Name;
-
-            if (IndexExists(indexName))
-            {
-                return;
-            }
-
-            var tableName = dto.GetCustomAttributes<TableNameAttribute>(false).Single().Value;
-            var columnName = property.GetCustomAttributes(false).OfType<ColumnAttribute>().Single().Name;
-
-
-            Create
-                .Index(indexName)
-                .OnTable(tableName)
-                .OnColumn(columnName)
-                .Ascending()
-                .WithOptions().NonClustered() // All newly defined indexes are non-clustered
-                .Do();
         }
     }
 }
