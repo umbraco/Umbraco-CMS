@@ -19,33 +19,6 @@ namespace Umbraco.Core
         public static bool VariesByNothing(this ISimpleContentType contentType) => contentType.Variations.VariesByNothing();
 
         /// <summary>
-        /// Determines whether the content type varies by culture.
-        /// </summary>
-        /// <param name="contentType">The content type.</param>
-        /// <returns>
-        /// A value indicating whether the content type varies by culture.
-        /// </returns>
-        public static bool VariesByCulture(this ISimpleContentType contentType) => contentType.Variations.VariesByCulture();
-
-        /// <summary>
-        /// Determines whether the content type varies by segment.
-        /// </summary>
-        /// <param name="contentType">The content type.</param>
-        /// <returns>
-        /// A value indicating whether the content type varies by segment.
-        /// </returns>
-        public static bool VariesBySegment(this ISimpleContentType contentType) => contentType.Variations.VariesBySegment();
-
-        /// <summary>
-        /// Determines whether the content type varies by culture and segment.
-        /// </summary>
-        /// <param name="contentType">The content type.</param>
-        /// <returns>
-        /// A value indicating whether the content type varies by culture and segment.
-        /// </returns>
-        public static bool VariesByCultureAndSegment(this ISimpleContentType contentType) => contentType.Variations.VariesByCultureAndSegment();
-
-        /// <summary>
         /// Determines whether the content type is invariant.
         /// </summary>
         /// <param name="contentType">The content type.</param>
@@ -53,69 +26,6 @@ namespace Umbraco.Core
         /// A value indicating whether the content type is invariant.
         /// </returns>
         public static bool VariesByNothing(this IContentTypeBase contentType) => contentType.Variations.VariesByNothing();
-
-        /// <summary>
-        /// Determines whether the content type varies by culture.
-        /// </summary>
-        /// <param name="contentType">The content type.</param>
-        /// <returns>
-        /// A value indicating whether the content type varies by culture.
-        /// </returns>
-        public static bool VariesByCulture(this IContentTypeBase contentType) => contentType.Variations.VariesByCulture();
-
-        /// <summary>
-        /// Determines whether the content type varies by segment.
-        /// </summary>
-        /// <param name="contentType">The content type.</param>
-        /// <returns>
-        /// A value indicating whether the content type varies by segment.
-        /// </returns>
-        public static bool VariesBySegment(this IContentTypeBase contentType) => contentType.Variations.VariesBySegment();
-
-        /// <summary>
-        /// Determines whether the content type varies by culture and segment.
-        /// </summary>
-        /// <param name="contentType">The content type.</param>
-        /// <returns>
-        /// A value indicating whether the content type varies by culture and segment.
-        /// </returns>
-        public static bool VariesByCultureAndSegment(this IContentTypeBase contentType) => contentType.Variations.VariesByCultureAndSegment();
-
-        /// <summary>
-        /// Determines whether the property type is invariant.
-        /// </summary>
-        /// <param name="propertyType">The property type.</param>
-        /// <returns>
-        /// A value indicating whether the property type is invariant.
-        /// </returns>
-        public static bool VariesByNothing(this PropertyType propertyType) => propertyType.Variations.VariesByNothing();
-
-        /// <summary>
-        /// Determines whether the property type varies by culture.
-        /// </summary>
-        /// <param name="propertyType">The property type.</param>
-        /// <returns>
-        /// A value indicating whether the property type varies by culture.
-        /// </returns>
-        public static bool VariesByCulture(this PropertyType propertyType) => propertyType.Variations.VariesByCulture();
-
-        /// <summary>
-        /// Determines whether the property type varies by segment.
-        /// </summary>
-        /// <param name="propertyType">The property type.</param>
-        /// <returns>
-        /// A value indicating whether the property type varies by segment.
-        /// </returns>
-        public static bool VariesBySegment(this PropertyType propertyType) => propertyType.Variations.VariesBySegment();
-
-        /// <summary>
-        /// Determines whether the property type varies by culture and segment.
-        /// </summary>
-        /// <param name="propertyType">The property type.</param>
-        /// <returns>
-        /// A value indicating whether the property type varies by culture and segment.
-        /// </returns>
-        public static bool VariesByCultureAndSegment(this PropertyType propertyType) => propertyType.Variations.VariesByCultureAndSegment();
 
         /// <summary>
         /// Determines whether the content type is invariant.
@@ -127,31 +37,13 @@ namespace Umbraco.Core
         public static bool VariesByNothing(this IPublishedContentType contentType) => contentType.Variations.VariesByNothing();
 
         /// <summary>
-        /// Determines whether the content type varies by culture.
+        /// Determines whether the property type is invariant.
         /// </summary>
-        /// <param name="contentType">The content type.</param>
+        /// <param name="propertyType">The property type.</param>
         /// <returns>
-        /// A value indicating whether the content type varies by culture.
+        /// A value indicating whether the property type is invariant.
         /// </returns>
-        public static bool VariesByCulture(this IPublishedContentType contentType) => contentType.Variations.VariesByCulture();
-
-        /// <summary>
-        /// Determines whether the content type varies by segment.
-        /// </summary>
-        /// <param name="contentType">The content type.</param>
-        /// <returns>
-        /// A value indicating whether the content type varies by segment.
-        /// </returns>
-        public static bool VariesBySegment(this IPublishedContentType contentType) => contentType.Variations.VariesBySegment();
-
-        /// <summary>
-        /// Determines whether the content type varies by culture and segment.
-        /// </summary>
-        /// <param name="contentType">The content type.</param>
-        /// <returns>
-        /// A value indicating whether the content type varies by culture and segment.
-        /// </returns>
-        public static bool VariesByCultureAndSegment(this IPublishedContentType contentType) => contentType.Variations.VariesByCultureAndSegment();
+        public static bool VariesByNothing(this PropertyType propertyType) => propertyType.Variations.VariesByNothing();
 
         /// <summary>
         /// Determines whether the property type is invariant.
@@ -163,33 +55,6 @@ namespace Umbraco.Core
         public static bool VariesByNothing(this IPublishedPropertyType propertyType) => propertyType.Variations.VariesByNothing();
 
         /// <summary>
-        /// Determines whether the property type varies by culture.
-        /// </summary>
-        /// <param name="propertyType">The property type.</param>
-        /// <returns>
-        /// A value indicating whether the property type varies by culture.
-        /// </returns>
-        public static bool VariesByCulture(this IPublishedPropertyType propertyType) => propertyType.Variations.VariesByCulture();
-
-        /// <summary>
-        /// Determines whether the property type varies by segment.
-        /// </summary>
-        /// <param name="propertyType">The property type.</param>
-        /// <returns>
-        /// A value indicating whether the property type varies by segment.
-        /// </returns>
-        public static bool VariesBySegment(this IPublishedPropertyType propertyType) => propertyType.Variations.VariesBySegment();
-
-        /// <summary>
-        /// Determines whether the property type varies by culture and segment.
-        /// </summary>
-        /// <param name="propertyType">The property type.</param>
-        /// <returns>
-        /// A value indicating whether the property type varies by culture and segment.
-        /// </returns>
-        public static bool VariesByCultureAndSegment(this IPublishedPropertyType propertyType) => propertyType.Variations.VariesByCultureAndSegment();
-
-        /// <summary>
         /// Determines whether a variation is invariant.
         /// </summary>
         /// <param name="variation">The variation.</param>
@@ -197,6 +62,51 @@ namespace Umbraco.Core
         /// A value indicating whether the variation is invariant.
         /// </returns>
         public static bool VariesByNothing(this ContentVariation variation) => variation == ContentVariation.Nothing;
+
+        /// <summary>
+        /// Determines whether the content type varies by culture.
+        /// </summary>
+        /// <param name="contentType">The content type.</param>
+        /// <returns>
+        /// A value indicating whether the content type varies by culture.
+        /// </returns>
+        public static bool VariesByCulture(this ISimpleContentType contentType) => contentType.Variations.VariesByCulture();
+
+        /// <summary>
+        /// Determines whether the content type varies by culture.
+        /// </summary>
+        /// <param name="contentType">The content type.</param>
+        /// <returns>
+        /// A value indicating whether the content type varies by culture.
+        /// </returns>
+        public static bool VariesByCulture(this IContentTypeBase contentType) => contentType.Variations.VariesByCulture();
+
+        /// <summary>
+        /// Determines whether the content type varies by culture.
+        /// </summary>
+        /// <param name="contentType">The content type.</param>
+        /// <returns>
+        /// A value indicating whether the content type varies by culture.
+        /// </returns>
+        public static bool VariesByCulture(this IPublishedContentType contentType) => contentType.Variations.VariesByCulture();
+
+        /// <summary>
+        /// Determines whether the property type varies by culture.
+        /// </summary>
+        /// <param name="propertyType">The property type.</param>
+        /// <returns>
+        /// A value indicating whether the property type varies by culture.
+        /// </returns>
+        public static bool VariesByCulture(this PropertyType propertyType) => propertyType.Variations.VariesByCulture();
+
+        /// <summary>
+        /// Determines whether the property type varies by culture.
+        /// </summary>
+        /// <param name="propertyType">The property type.</param>
+        /// <returns>
+        /// A value indicating whether the property type varies by culture.
+        /// </returns>
+        public static bool VariesByCulture(this IPublishedPropertyType propertyType) => propertyType.Variations.VariesByCulture();
 
         /// <summary>
         /// Determines whether a variation varies by culture.
@@ -208,6 +118,51 @@ namespace Umbraco.Core
         public static bool VariesByCulture(this ContentVariation variation) => (variation & ContentVariation.Culture) > 0;
 
         /// <summary>
+        /// Determines whether the content type varies by segment.
+        /// </summary>
+        /// <param name="contentType">The content type.</param>
+        /// <returns>
+        /// A value indicating whether the content type varies by segment.
+        /// </returns>
+        public static bool VariesBySegment(this ISimpleContentType contentType) => contentType.Variations.VariesBySegment();
+
+        /// <summary>
+        /// Determines whether the content type varies by segment.
+        /// </summary>
+        /// <param name="contentType">The content type.</param>
+        /// <returns>
+        /// A value indicating whether the content type varies by segment.
+        /// </returns>
+        public static bool VariesBySegment(this IContentTypeBase contentType) => contentType.Variations.VariesBySegment();
+
+        /// <summary>
+        /// Determines whether the content type varies by segment.
+        /// </summary>
+        /// <param name="contentType">The content type.</param>
+        /// <returns>
+        /// A value indicating whether the content type varies by segment.
+        /// </returns>
+        public static bool VariesBySegment(this IPublishedContentType contentType) => contentType.Variations.VariesBySegment();
+
+        /// <summary>
+        /// Determines whether the property type varies by segment.
+        /// </summary>
+        /// <param name="propertyType">The property type.</param>
+        /// <returns>
+        /// A value indicating whether the property type varies by segment.
+        /// </returns>
+        public static bool VariesBySegment(this PropertyType propertyType) => propertyType.Variations.VariesBySegment();
+
+        /// <summary>
+        /// Determines whether the property type varies by segment.
+        /// </summary>
+        /// <param name="propertyType">The property type.</param>
+        /// <returns>
+        /// A value indicating whether the property type varies by segment.
+        /// </returns>
+        public static bool VariesBySegment(this IPublishedPropertyType propertyType) => propertyType.Variations.VariesBySegment();
+
+        /// <summary>
         /// Determines whether a variation varies by segment.
         /// </summary>
         /// <param name="variation">The variation.</param>
@@ -217,6 +172,51 @@ namespace Umbraco.Core
         public static bool VariesBySegment(this ContentVariation variation) => (variation & ContentVariation.Segment) > 0;
 
         /// <summary>
+        /// Determines whether the content type varies by culture and segment.
+        /// </summary>
+        /// <param name="contentType">The content type.</param>
+        /// <returns>
+        /// A value indicating whether the content type varies by culture and segment.
+        /// </returns>
+        public static bool VariesByCultureAndSegment(this ISimpleContentType contentType) => contentType.Variations.VariesByCultureAndSegment();
+
+        /// <summary>
+        /// Determines whether the content type varies by culture and segment.
+        /// </summary>
+        /// <param name="contentType">The content type.</param>
+        /// <returns>
+        /// A value indicating whether the content type varies by culture and segment.
+        /// </returns>
+        public static bool VariesByCultureAndSegment(this IContentTypeBase contentType) => contentType.Variations.VariesByCultureAndSegment();
+
+        /// <summary>
+        /// Determines whether the content type varies by culture and segment.
+        /// </summary>
+        /// <param name="contentType">The content type.</param>
+        /// <returns>
+        /// A value indicating whether the content type varies by culture and segment.
+        /// </returns>
+        public static bool VariesByCultureAndSegment(this IPublishedContentType contentType) => contentType.Variations.VariesByCultureAndSegment();
+
+        /// <summary>
+        /// Determines whether the property type varies by culture and segment.
+        /// </summary>
+        /// <param name="propertyType">The property type.</param>
+        /// <returns>
+        /// A value indicating whether the property type varies by culture and segment.
+        /// </returns>
+        public static bool VariesByCultureAndSegment(this PropertyType propertyType) => propertyType.Variations.VariesByCultureAndSegment();
+
+        /// <summary>
+        /// Determines whether the property type varies by culture and segment.
+        /// </summary>
+        /// <param name="propertyType">The property type.</param>
+        /// <returns>
+        /// A value indicating whether the property type varies by culture and segment.
+        /// </returns>
+        public static bool VariesByCultureAndSegment(this IPublishedPropertyType propertyType) => propertyType.Variations.VariesByCultureAndSegment();
+
+        /// <summary>
         /// Determines whether a variation varies by culture and segment.
         /// </summary>
         /// <param name="variation">The variation.</param>
@@ -224,6 +224,47 @@ namespace Umbraco.Core
         /// A value indicating whether the variation varies by culture and segment.
         /// </returns>
         public static bool VariesByCultureAndSegment(this ContentVariation variation) => (variation & ContentVariation.CultureAndSegment) == ContentVariation.CultureAndSegment;
+
+        /// <summary>
+        /// Sets or removes the content type variation depending on the specified value.
+        /// </summary>
+        /// <param name="contentType">The content type.</param>
+        /// <param name="variation">The variation to set or remove.</param>
+        /// <param name="value">If set to <c>true</c> sets the variation; otherwise, removes the variation.</param>
+        /// <remarks>
+        /// This method does not support setting the variation to nothing.
+        /// </remarks>
+        public static void SetVariesBy(this IContentTypeBase contentType, ContentVariation variation, bool value = true) => contentType.Variations = contentType.Variations.SetVariesBy(variation, value);
+
+        /// <summary>
+        /// Sets or removes the property type variation depending on the specified value.
+        /// </summary>
+        /// <param name="propertyType">The property type.</param>
+        /// <param name="variation">The variation to set or remove.</param>
+        /// <param name="value">If set to <c>true</c> sets the variation; otherwise, removes the variation.</param>
+        /// <remarks>
+        /// This method does not support setting the variation to nothing.
+        /// </remarks>
+        public static void SetVariesBy(this PropertyType propertyType, ContentVariation variation, bool value = true) => propertyType.Variations = propertyType.Variations.SetVariesBy(variation, value);
+
+        /// <summary>
+        /// Returns the variations with the variation set or removed depending on the specified value.
+        /// </summary>
+        /// <param name="variations">The existing variations.</param>
+        /// <param name="variation">The variation to set or remove.</param>
+        /// <param name="value">If set to <c>true</c> sets the variation; otherwise, removes the variation.</param>
+        /// <returns>
+        /// The variations with the variation set or removed.
+        /// </returns>
+        /// <remarks>
+        /// This method does not support setting the variation to nothing.
+        /// </remarks>
+        public static ContentVariation SetVariesBy(this ContentVariation variations, ContentVariation variation, bool value = true)
+        {
+            return value
+                ? variations | variation // Set flag using bitwise logical OR
+                : variations & ~variation; // Remove flag using bitwise logical AND with bitwise complement (reversing the bit)
+        }
 
         /// <summary>
         /// Validates that a combination of culture and segment is valid for the variation.
@@ -297,47 +338,6 @@ namespace Umbraco.Core
             }
 
             return true;
-        }
-
-        /// <summary>
-        /// Sets or removes the content type variation depending on the specified value.
-        /// </summary>
-        /// <param name="contentType">The content type.</param>
-        /// <param name="variation">The variation to set or remove.</param>
-        /// <param name="value">If set to <c>true</c> sets the variation; otherwise, removes the variation.</param>
-        /// <remarks>
-        /// This method does not support setting the variation to nothing.
-        /// </remarks>
-        public static void SetVariesBy(this IContentTypeBase contentType, ContentVariation variation, bool value = true) => contentType.Variations = contentType.Variations.SetVariesBy(variation, value);
-
-        /// <summary>
-        /// Sets or removes the property type variation depending on the specified value.
-        /// </summary>
-        /// <param name="propertyType">The property type.</param>
-        /// <param name="variation">The variation to set or remove.</param>
-        /// <param name="value">If set to <c>true</c> sets the variation; otherwise, removes the variation.</param>
-        /// <remarks>
-        /// This method does not support setting the variation to nothing.
-        /// </remarks>
-        public static void SetVariesBy(this PropertyType propertyType, ContentVariation variation, bool value = true) => propertyType.Variations = propertyType.Variations.SetVariesBy(variation, value);
-
-        /// <summary>
-        /// Returns the variations with the variation set or removed depending on the specified value.
-        /// </summary>
-        /// <param name="variations">The existing variations.</param>
-        /// <param name="variation">The variation to set or remove.</param>
-        /// <param name="value">If set to <c>true</c> sets the variation; otherwise, removes the variation.</param>
-        /// <returns>
-        /// The variations with the variation set or removed.
-        /// </returns>
-        /// <remarks>
-        /// This method does not support setting the variation to nothing.
-        /// </remarks>
-        public static ContentVariation SetVariesBy(this ContentVariation variations, ContentVariation variation, bool value = true)
-        {
-            return value
-                ? variations | variation // Set flag using bitwise logical OR
-                : variations & ~variation; // Remove flag using bitwise logical AND with bitwise complement (reversing the bit)
         }
     }
 }
