@@ -140,7 +140,6 @@
     <Compile Include="Cache\ContentCacheRefresher.cs" />
     <Compile Include="Cache\IDistributedCacheBinder.cs" />
     <Compile Include="Cache\UserGroupCacheRefresher.cs" />
-    <Compile Include="Cache\UserGroupPermissionsCacheRefresher.cs" />
     <Compile Include="Cache\WebCachingAppCache.cs" />
     <Compile Include="Compose\AuditEventsComponent.cs" />
     <Compile Include="Compose\AuditEventsComposer.cs" />
@@ -346,7 +345,6 @@
     <Compile Include="Editors\TourController.cs" />
     <Compile Include="HealthCheck\Checks\Security\XssProtectionCheck.cs" />
     <Compile Include="HealthCheck\Checks\Security\HstsCheck.cs" />
-    <Compile Include="Security\UmbracoAntiForgeryAdditionalDataProvider.cs" />
     <Compile Include="Editors\UserEditorAuthorizationHelper.cs" />
     <Compile Include="Editors\Filters\UserGroupAuthorizationAttribute.cs" />
     <Compile Include="Editors\Filters\UserGroupEditorAuthorizationHelper.cs" />
@@ -722,7 +720,6 @@
     <Compile Include="Install\Models\DatabaseType.cs" />
     <Compile Include="Install\Models\InstallationType.cs" />
     <Compile Include="Install\Models\InstallInstructions.cs" />
-    <Compile Include="Install\Models\InstallPackageModel.cs" />
     <Compile Include="Install\Models\InstallProgressResultModel.cs" />
     <Compile Include="Install\Models\InstallSetup.cs" />
     <Compile Include="Install\Models\InstallSetupResult.cs" />
