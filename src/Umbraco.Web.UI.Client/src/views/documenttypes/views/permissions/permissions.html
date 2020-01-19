@@ -61,11 +61,13 @@
                 <div class="sub-view-column-left">
                     <h5><localize key="contentTypeEditor_elementHeading" /></h5>
                     <small><localize key="contentTypeEditor_elementDescription" /></small>
+                    <small ng-if="!vm.canToggleIsElement"><br/><localize key="contentTypeEditor_elementCannotToggle" /></small>
                 </div>
 
                 <div class="sub-view-column-right">
                     <umb-toggle data-element="permissions-is-element"
                                 checked="model.isElement"
+                                disabled="!vm.canToggleIsElement"
                                 on-click="vm.toggleIsElement()">
                     </umb-toggle>
                 </div>
