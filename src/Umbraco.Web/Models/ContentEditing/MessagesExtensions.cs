@@ -10,7 +10,7 @@ namespace Umbraco.Web.Models.ContentEditing
         {
             if (model.Exists(header, msg, type)) return;
 
-            model.Notifications.Add(new Notification()
+            model.Notifications.Add(new BackOfficeNotification()
                 {
                     Header = header,
                     Message = msg,
@@ -22,7 +22,7 @@ namespace Umbraco.Web.Models.ContentEditing
         {
             if (model.Exists(header, msg, NotificationStyle.Success)) return;
 
-            model.Notifications.Add(new Notification()
+            model.Notifications.Add(new BackOfficeNotification()
                 {
                     Header = header,
                     Message = msg,
@@ -34,7 +34,7 @@ namespace Umbraco.Web.Models.ContentEditing
         {
             if (model.Exists(header, msg, NotificationStyle.Error)) return;
 
-            model.Notifications.Add(new Notification()
+            model.Notifications.Add(new BackOfficeNotification()
                 {
                     Header = header,
                     Message = msg,
@@ -46,7 +46,7 @@ namespace Umbraco.Web.Models.ContentEditing
         {
             if (model.Exists(header, msg, NotificationStyle.Warning)) return;
 
-            model.Notifications.Add(new Notification()
+            model.Notifications.Add(new BackOfficeNotification()
                 {
                     Header = header,
                     Message = msg,
@@ -58,7 +58,7 @@ namespace Umbraco.Web.Models.ContentEditing
         {
             if (model.Exists(header, msg, NotificationStyle.Info)) return;
 
-            model.Notifications.Add(new Notification()
+            model.Notifications.Add(new BackOfficeNotification()
                 {
                     Header = header,
                     Message = msg,

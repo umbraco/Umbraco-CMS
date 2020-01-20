@@ -31,10 +31,10 @@ namespace Umbraco.Web.Models.ContentEditing
         /// <inheritdoc />
         [IgnoreDataMember]
         TPersisted IContentSave<TPersisted>.PersistedContent { get; set; }
-        
+
         //Non explicit internal getter so we don't need to explicitly cast in our own code
         [IgnoreDataMember]
-        internal TPersisted PersistedContent
+        public TPersisted PersistedContent
         {
             get => ((IContentSave<TPersisted>)this).PersistedContent;
             set => ((IContentSave<TPersisted>) this).PersistedContent = value;
@@ -49,7 +49,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// This is not used for outgoing model information.
         /// </remarks>
         [IgnoreDataMember]
-        internal ContentPropertyCollectionDto PropertyCollectionDto { get; set; }
+        public ContentPropertyCollectionDto PropertyCollectionDto { get; set; }
 
         #endregion
 

@@ -6,7 +6,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// An interface exposes the shared parts of content, media, members that we use during model binding in order to share logic
     /// </summary>
     /// <typeparam name="TPersisted"></typeparam>
-    internal interface IContentSave<TPersisted> : IHaveUploadedFiles
+    public interface IContentSave<TPersisted> : IHaveUploadedFiles
         where TPersisted : IContentBase
     {
         /// <summary>

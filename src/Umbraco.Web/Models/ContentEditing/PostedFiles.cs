@@ -14,11 +14,11 @@ namespace Umbraco.Web.Models.ContentEditing
         public PostedFiles()
         {
             UploadedFiles = new List<ContentPropertyFile>();
-            Notifications = new List<Notification>();
+            Notifications = new List<BackOfficeNotification>();
         }
         public List<ContentPropertyFile> UploadedFiles { get; private set; }
 
         [DataMember(Name = "notifications")]
-        public List<Notification> Notifications { get; private set; }
+        public List<BackOfficeNotification> Notifications { get; private set; }
     }
 }

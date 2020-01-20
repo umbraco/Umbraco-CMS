@@ -15,7 +15,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         public DictionaryDisplay()
         {
-            this.Notifications = new List<Notification>();
+            this.Notifications = new List<BackOfficeNotification>();
             this.Translations = new List<DictionaryTranslationDisplay>();
         }
 
@@ -24,7 +24,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.
         /// </summary>
         [DataMember(Name = "notifications")]
-        public List<Notification> Notifications { get; private set; }
+        public List<BackOfficeNotification> Notifications { get; private set; }
 
         /// <summary>
         /// Gets or sets the parent id.

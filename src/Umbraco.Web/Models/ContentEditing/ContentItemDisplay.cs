@@ -21,7 +21,7 @@ namespace Umbraco.Web.Models.ContentEditing
         public ContentItemDisplay()
         {
             AllowPreview = true;
-            Notifications = new List<Notification>();
+            Notifications = new List<BackOfficeNotification>();
             Errors = new Dictionary<string, object>();
             Variants = new List<ContentVariantDisplay>();
             ContentApps = new List<ContentApp>();
@@ -191,7 +191,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "notifications")]
         [ReadOnly(true)]
-        public List<Notification> Notifications { get; private set; }
+        public List<BackOfficeNotification> Notifications { get; private set; }
 
         /// <summary>
         /// This is used for validation of a content item.

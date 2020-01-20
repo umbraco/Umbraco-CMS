@@ -11,7 +11,7 @@ namespace Umbraco.Web.Models.ContentEditing
             //initialize collections so at least their never null
             AllowedContentTypes = new List<int>();
             CompositeContentTypes = new List<string>();
-            Notifications = new List<Notification>();
+            Notifications = new List<BackOfficeNotification>();
         }
 
         //name, alias, icon, thumb, desc, inherited from basic
@@ -40,7 +40,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "notifications")]
         [ReadOnly(true)]
-        public List<Notification> Notifications { get; private set; }
+        public List<BackOfficeNotification> Notifications { get; private set; }
 
         /// <summary>
         /// This is used for validation of a content item.

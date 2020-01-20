@@ -57,7 +57,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// The real persisted user group
         /// </summary>
         [IgnoreDataMember]
-        internal IUserGroup PersistedUserGroup { get; set; }
+        public IUserGroup PersistedUserGroup { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

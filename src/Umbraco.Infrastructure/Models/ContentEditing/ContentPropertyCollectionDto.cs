@@ -11,7 +11,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// <remarks>
     /// This is only used during mapping operations, it is not used for angular purposes
     /// </remarks>
-    internal class ContentPropertyCollectionDto : IContentProperties<ContentPropertyDto>
+    public class ContentPropertyCollectionDto : IContentProperties<ContentPropertyDto>
     {
         public ContentPropertyCollectionDto()
         {

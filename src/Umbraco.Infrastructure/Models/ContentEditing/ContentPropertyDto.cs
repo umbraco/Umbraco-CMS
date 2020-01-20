@@ -8,7 +8,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// <summary>
     /// Represents a content property from the database
     /// </summary>
-    internal class ContentPropertyDto : ContentPropertyBasic
+    public class ContentPropertyDto : ContentPropertyBasic
     {
         public IDataType DataType { get; set; }
 

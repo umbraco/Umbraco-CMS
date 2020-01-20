@@ -8,19 +8,19 @@ namespace Umbraco.Web.Models.ContentEditing
     {
         public SimpleNotificationModel()
         {
-            Notifications = new List<Notification>();
+            Notifications = new List<BackOfficeNotification>();
         }
 
-        public SimpleNotificationModel(params Notification[] notifications)
+        public SimpleNotificationModel(params BackOfficeNotification[] notifications)
         {
-            Notifications = new List<Notification>(notifications);
+            Notifications = new List<BackOfficeNotification>(notifications);
         }
 
         /// <summary>
         /// This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.
         /// </summary>
         [DataMember(Name = "notifications")]
-        public List<Notification> Notifications { get; private set; }
+        public List<BackOfficeNotification> Notifications { get; private set; }
 
         /// <summary>
         ///  A default message

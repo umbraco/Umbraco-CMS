@@ -18,7 +18,7 @@ namespace Umbraco.Web.Models.ContentEditing
         public ContentVariantDisplay()
         {
             Tabs = new List<Tab<ContentPropertyDisplay>>();
-            Notifications = new List<Notification>();
+            Notifications = new List<BackOfficeNotification>();
         }
 
         [DataMember(Name = "name", IsRequired = true)]
@@ -76,7 +76,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </remarks>
         [DataMember(Name = "notifications")]
         [ReadOnly(true)]
-        public List<Notification> Notifications { get; private set; }
+        public List<BackOfficeNotification> Notifications { get; private set; }
 
     }
 }

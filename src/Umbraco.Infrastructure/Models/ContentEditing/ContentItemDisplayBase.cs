@@ -10,7 +10,7 @@ namespace Umbraco.Web.Models.ContentEditing
     {
         protected ContentItemDisplayBase()
         {
-            Notifications = new List<Notification>();
+            Notifications = new List<BackOfficeNotification>();
             Errors = new Dictionary<string, object>();
         }
 
@@ -31,7 +31,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "notifications")]
         [ReadOnly(true)]
-        public List<Notification> Notifications { get; private set; }
+        public List<BackOfficeNotification> Notifications { get; private set; }
 
         /// <summary>
         /// This is used for validation of a content item.

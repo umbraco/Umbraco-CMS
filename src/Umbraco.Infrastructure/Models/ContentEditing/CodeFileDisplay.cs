@@ -15,7 +15,7 @@ namespace Umbraco.Web.Models.ContentEditing
     {
         public CodeFileDisplay()
         {
-            Notifications = new List<Notification>();
+            Notifications = new List<BackOfficeNotification>();
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Umbraco.Web.Models.ContentEditing
         [ReadOnly(true)]
         public string Id { get; set; }
 
-        public List<Notification> Notifications { get; private set; }
+        public List<BackOfficeNotification> Notifications { get; private set; }
 
         /// <summary>
         /// Some custom validation is required for valid file names

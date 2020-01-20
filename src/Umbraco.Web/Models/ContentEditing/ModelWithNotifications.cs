@@ -13,7 +13,7 @@ namespace Umbraco.Web.Models.ContentEditing
         public ModelWithNotifications(T value)
         {
             Value = value;
-            Notifications = new List<Notification>();
+            Notifications = new List<BackOfficeNotification>();
         }
 
         /// <summary>
@@ -26,6 +26,6 @@ namespace Umbraco.Web.Models.ContentEditing
         /// The notifications
         /// </summary>
         [DataMember(Name = "notifications")]
-        public List<Notification> Notifications { get; private set; }
+        public List<BackOfficeNotification> Notifications { get; private set; }
     }
 }

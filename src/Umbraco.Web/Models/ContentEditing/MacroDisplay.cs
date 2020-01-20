@@ -14,13 +14,13 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         public MacroDisplay()
         {
-            this.Notifications = new List<Notification>();
+            this.Notifications = new List<BackOfficeNotification>();
             this.Parameters = new List<MacroParameterDisplay>();
         }
 
         /// <inheritdoc />
         [DataMember(Name = "notifications")]
-        public List<Notification> Notifications { get; }
+        public List<BackOfficeNotification> Notifications { get; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the macro can be used in a rich text editor.

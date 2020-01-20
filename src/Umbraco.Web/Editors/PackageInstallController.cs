@@ -24,7 +24,6 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using File = System.IO.File;
-using Notification = Umbraco.Web.Models.ContentEditing.Notification;
 
 namespace Umbraco.Web.Editors
 {
@@ -193,7 +192,7 @@ namespace Umbraco.Web.Editors
                 }
                 else
                 {
-                    model.Notifications.Add(new Notification(
+                    model.Notifications.Add(new BackOfficeNotification(
                         Services.TextService.Localize("speechBubbles/operationFailedHeader"),
                         Services.TextService.Localize("media/disallowedFileType"),
                         NotificationStyle.Warning));

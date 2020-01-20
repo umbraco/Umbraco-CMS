@@ -13,7 +13,7 @@ namespace Umbraco.Web.Models.ContentEditing
     {
         public DataTypeDisplay()
         {
-            Notifications = new List<Notification>();
+            Notifications = new List<BackOfficeNotification>();
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.
         /// </summary>
         [DataMember(Name = "notifications")]
-        public List<Notification> Notifications { get; private set; }
+        public List<BackOfficeNotification> Notifications { get; private set; }
 
     }
 }

@@ -3,14 +3,14 @@
 namespace Umbraco.Web.Models.ContentEditing
 {
     [DataContract(Name = "notification", Namespace = "")]
-    public class Notification
+    public class BackOfficeNotification
     {
-        public Notification()
+        public BackOfficeNotification()
         {
 
         }
 
-        public Notification(string header, string message, NotificationStyle notificationType)
+        public BackOfficeNotification(string header, string message, NotificationStyle notificationType)
         {
             Header = header;
             Message = message;
@@ -25,6 +25,6 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "type")]
         public NotificationStyle NotificationType { get; set; }
-        
+
     }
 }
