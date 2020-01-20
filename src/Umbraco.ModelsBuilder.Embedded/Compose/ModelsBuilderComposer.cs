@@ -19,120 +19,13 @@ using Umbraco.Web;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.Features;
 
-[assembly: PreApplicationStartMethod(typeof(ModelsBuilderComposer), "Initialize")]
-
 namespace Umbraco.ModelsBuilder.Embedded.Compose
 {
-
-    internal static class RazorBuildProviderExtensions
-    {
-        public static void RemoveAssemblyReference(this RazorBuildProvider provider, Assembly assembly)
-        {
-            if (provider == null) throw new ArgumentNullException(nameof(provider));
-            if (assembly == null) throw new ArgumentNullException(nameof(assembly));
-
-            var assemblySet = provider.GetType().GetProperty("ReferencedAssemblies", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(provider);
-            var removeMethod = assemblySet?.GetType().GetMethod("Remove", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-            if (removeMethod == null)
-                throw new InvalidOperationException("Could not reflect required Remove property");
-            removeMethod.Invoke(assemblySet, new object[] { assembly });
-        }
-
-        public static void RemoveAssemblyReference(this AssemblyBuilder assemblyBuilder, Assembly assembly)
-        {
-            if (assemblyBuilder == null) throw new ArgumentNullException(nameof(assemblyBuilder));
-            if (assembly == null) throw new ArgumentNullException(nameof(assembly));
-
-            var assemblySet = assemblyBuilder.GetType().GetField("_initialReferencedAssemblies", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(assemblyBuilder);
-            var removeMethod = assemblySet?.GetType().GetMethod("Remove", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-            if (removeMethod == null)
-                throw new InvalidOperationException("Could not reflect required Remove property");
-            removeMethod.Invoke(assemblySet, new object[] { assembly });
-        }
-    }
-
-    public class BuildProviderWrapper : BuildProvider
-    {
-        private readonly BuildProvider _bp;
-
-        public BuildProviderWrapper(BuildProvider bp)
-        {
-            _bp = bp;
-        }
-
-        public override void GenerateCode(AssemblyBuilder assemblyBuilder)
-        {
-            // If legacy MB is in place then remove the embedded assembly reference
-            if (ModelsBuilderComposer.IsLegacyModelsBuilderInstalled.Value)
-                assemblyBuilder.RemoveAssemblyReference(_bp.GetType().Assembly);
-
-            base.GenerateCode(assemblyBuilder);
-        }
-
-        public override string GetCustomString(CompilerResults results) => _bp.GetCustomString(results);
-
-        public override CompilerType CodeCompilerType
-        {
-            get
-            {
-                return GetDefaultCompilerTypeForLanguage("C#");
-                //return _bp.CodeCompilerType;
-            }
-        }
-        public override Type GetGeneratedType(CompilerResults results) => _bp.GetGeneratedType(results);
-        public override BuildProviderResultFlags GetResultFlags(CompilerResults results) => _bp.GetResultFlags(results);
-        public override void ProcessCompileErrors(CompilerResults results) => _bp.ProcessCompileErrors(results);
-        protected override CodeCompileUnit GetCodeCompileUnit(out IDictionary linePragmasTable)
-        {
-            var methodParams = new object[] {null};
-            var result = (CodeCompileUnit)_bp.GetType()
-                .GetMethod(nameof(GetCodeCompileUnit), BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
-                .Invoke(this, methodParams);
-            linePragmasTable = (IDictionary)methodParams[0];
-            return result;
-        }
-        public override ICollection VirtualPathDependencies => _bp.VirtualPathDependencies;
-        public override bool Equals(object obj) => _bp.Equals(obj);
-        public override int GetHashCode() => _bp.GetHashCode();
-        public override string ToString() => _bp.ToString();
-    }
-
-    public class WebObjectActivatorWrapper : IServiceProvider
-    {
-        private readonly IServiceProvider _wrapped;
-
-        public WebObjectActivatorWrapper(IServiceProvider wrapped)
-        {
-            _wrapped = wrapped;
-        }
-
-        public object GetService(Type serviceType)
-        {
-            var service = _wrapped?.GetService(serviceType) ?? Activator.CreateInstance(serviceType,
-                              BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.CreateInstance,
-                              null, null, null);
-
-            if (service is BuildProvider bp)
-            {
-                return new BuildProviderWrapper(bp);
-            }
-
-            return service;
-        }
-    }
 
     [ComposeBefore(typeof(NuCacheComposer))]
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public sealed class ModelsBuilderComposer : ICoreComposer
     {
-        public static void Initialize()
-        {
-            //BuildProvider.RegisterBuildProvider(".cshtml", typeof(CustomRazorBuildProvider));
-            HttpRuntime.WebObjectActivator = new WebObjectActivatorWrapper(HttpRuntime.WebObjectActivator);
-
-          
-        }
-
         public void Compose(Composition composition)
         {
             var isLegacyModelsBuilderInstalled = IsLegacyModelsBuilderInstalled.Value;
@@ -187,28 +80,10 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
         /// </remarks>
         private void ConfigureRazorBuildProviderForLegacyModelsBuilder()
         {
-            
-
-            //// Bind to the CompilingPath event of the RazorBuildProvider. There are 3x events:
-            //// CompilingPath = occurs first
-            //// CodeGenerationCompleted = occurs second
-            //// CodeGenerationStarted = occurs last -- yes that is true
-            //// Removing the assembly in CodeGenerationStarted is too late since the ReferencedAssemblies have already been passed to it's underlying
-            //// AssemblyBuilder class which is used to generate the csc.exe command with all of the referenced assemblies so we will remove the embedded
-            //// assembly in CompilingPath. When in legacy mode, there's no code within the embedded assembly that should run, 
-            //RazorBuildProvider.CompilingPath += (sender, args) =>
-            //{
-            //    if (!(sender is RazorBuildProvider provider)) return;
-
-            //    var assemblySet = provider.GetType().GetProperty("ReferencedAssemblies", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(provider);
-            //    var removeMethod = assemblySet.GetType().GetMethod("Remove", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-            //    removeMethod.Invoke(assemblySet, new object[] { this.GetType().Assembly });
-            //};
-
             // Bind to this event to remove the embedded assembly from the underlying AssemblyBuilder. This is the latest we can remove
             // this assembly and it will only be removed from the collection attached to this particular AssemblyBuilder. It is possible
             // to modify the RazorBuildProvider.ReferencedAssemblies collection in the same way, however that collection is a shared collection
-            // between all build providers... hrm, maybe that's actually better since it would solve the App_Code problem too.
+            // between all build providers so this is sort of safer.
             RazorBuildProvider.CodeGenerationStarted += (sender, args) =>
             {
                 if (!(sender is RazorBuildProvider provider)) return;
@@ -256,6 +131,21 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
                 modelsNamespace = Configuration.Config.DefaultModelsNamespace;
             System.Web.WebPages.Razor.WebPageRazorHost.AddGlobalImport(modelsNamespace);
             */
+        }
+    }
+
+    internal static class RazorBuildProviderExtensions
+    {
+        public static void RemoveAssemblyReference(this AssemblyBuilder assemblyBuilder, Assembly assembly)
+        {
+            if (assemblyBuilder == null) throw new ArgumentNullException(nameof(assemblyBuilder));
+            if (assembly == null) throw new ArgumentNullException(nameof(assembly));
+
+            var assemblySet = assemblyBuilder.GetType().GetField("_initialReferencedAssemblies", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(assemblyBuilder);
+            var removeMethod = assemblySet?.GetType().GetMethod("Remove", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            if (removeMethod == null)
+                throw new InvalidOperationException("Could not reflect required Remove property");
+            removeMethod.Invoke(assemblySet, new object[] { assembly });
         }
     }
 }
