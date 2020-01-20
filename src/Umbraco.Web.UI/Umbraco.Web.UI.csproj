@@ -135,9 +135,6 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="App_Code\AddCustomFieldWithAnalyzer.cs" />
-    <Compile Include="App_Code\RemoveStarterKitComponent.cs" />
-    <Compile Include="App_Code\RemoveStarterKitFromInstallationComposer.cs" />
     <Compile Include="Config\splashes\NoNodes.aspx.cs">
       <DependentUpon>noNodes.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
