@@ -10,6 +10,7 @@ namespace Umbraco.Web.Install
     {
         private readonly InstallHelper _installHelper;
         private List<InstallSetupStep> _orderedInstallerSteps;
+        private InstallSetupStep _finalstep;
         public event EventHandler<InstallStepCollection> PrepareListEvent;
 
         public InstallStepCollection(InstallHelper installHelper, IEnumerable<InstallSetupStep> installerSteps)
@@ -32,8 +33,9 @@ namespace Umbraco.Web.Install
                 a.OfType<StarterKitInstallStep>().First(),
                 a.OfType<StarterKitCleanupStep>().First(),
 
-                a.OfType<SetUmbracoVersionStep>().First(),
+
             };
+            _finalstep =   a.OfType<SetUmbracoVersionStep>().First();
         }
 
 
@@ -47,6 +49,7 @@ namespace Umbraco.Web.Install
         public IEnumerable<InstallSetupStep> GetAllSteps()
         {
             OnPreparingList(this);
+            _orderedInstallerSteps.Add(_finalstep);
             return _orderedInstallerSteps;
 
         }
