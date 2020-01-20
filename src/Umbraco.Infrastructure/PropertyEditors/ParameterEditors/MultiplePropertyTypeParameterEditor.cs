@@ -1,5 +1,4 @@
-﻿using Umbraco.Web.Composing;
-using Umbraco.Core.Logging;
+﻿using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
@@ -7,14 +6,13 @@ using Umbraco.Core.Strings;
 namespace Umbraco.Web.PropertyEditors.ParameterEditors
 {
     [DataEditor(
-        "propertyTypePicker",
+        "propertyTypePickerMultiple",
         EditorType.MacroParameter,
-        "Property Type Picker",
+        "Multiple Property Type Picker",
         "entitypicker")]
-    public class PropertyTypeParameterEditor : DataEditor
+    public class MultiplePropertyTypeParameterEditor : DataEditor
     {
-        public PropertyTypeParameterEditor(
-            ILogger logger,
+        public MultiplePropertyTypeParameterEditor(ILogger logger,
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
             ILocalizedTextService localizedTextService,
@@ -22,7 +20,7 @@ namespace Umbraco.Web.PropertyEditors.ParameterEditors
             : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             // configure
-            DefaultConfiguration.Add("multiple", "0");
+            DefaultConfiguration.Add("multiple", "1");
             DefaultConfiguration.Add("entityType", "PropertyType");
             //don't publish the id for a property type, publish its alias
             DefaultConfiguration.Add("publishBy", "alias");

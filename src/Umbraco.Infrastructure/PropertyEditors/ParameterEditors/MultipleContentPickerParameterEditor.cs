@@ -1,4 +1,4 @@
-﻿using Umbraco.Web.Composing;
+﻿using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -7,19 +7,19 @@ using Umbraco.Core.Strings;
 namespace Umbraco.Web.PropertyEditors.ParameterEditors
 {
     /// <summary>
-    /// Represents a content type parameter editor.
+    /// Represents a parameter editor of some sort.
     /// </summary>
     [DataEditor(
-        "contentType",
+        Constants.PropertyEditors.Aliases.MultiNodeTreePicker,
         EditorType.MacroParameter,
-        "Content Type Picker",
-        "entitypicker")]
-    public class ContentTypeParameterEditor : DataEditor
+        "Multiple Content Picker",
+        "contentpicker")]
+    public class MultipleContentPickerParameterEditor : DataEditor
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ContentTypeParameterEditor"/> class.
+        /// Initializes a new instance of the <see cref="MultipleContentPickerParameterEditor"/> class.
         /// </summary>
-        public ContentTypeParameterEditor(
+        public MultipleContentPickerParameterEditor(
             ILogger logger,
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
@@ -28,8 +28,9 @@ namespace Umbraco.Web.PropertyEditors.ParameterEditors
             : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             // configure
-            DefaultConfiguration.Add("multiple", false);
-            DefaultConfiguration.Add("entityType", "DocumentType");
+            DefaultConfiguration.Add("multiPicker", "1");
+            DefaultConfiguration.Add("minNumber",0 );
+            DefaultConfiguration.Add("maxNumber", 0);
         }
     }
 }

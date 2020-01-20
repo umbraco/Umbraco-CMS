@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.IO;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
@@ -45,7 +44,7 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override IDataValueEditor CreateValueEditor() => new MediaPickerPropertyValueEditor(DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, Attribute);
 
-        internal class MediaPickerPropertyValueEditor : DataValueEditor, IDataValueReference
+        public class MediaPickerPropertyValueEditor : DataValueEditor, IDataValueReference
         {
             public MediaPickerPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute)
                 : base(dataTypeService,localizationService, localizedTextService, shortStringHelper,attribute)
@@ -64,6 +63,4 @@ namespace Umbraco.Web.PropertyEditors
             }
         }
     }
-
-
 }
