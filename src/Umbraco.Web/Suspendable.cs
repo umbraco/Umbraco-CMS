@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Logging;
+﻿using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Web.Composing;
 using Umbraco.Examine;
 using Umbraco.Web.Cache;
@@ -78,8 +79,7 @@ namespace Umbraco.Web
                 if (_tried == false) return;
                 _tried = false;
 
-                // TODO: when resuming do we always want a full rebuild of all indexes?
-                ExamineComponent.RebuildIndexes(indexRebuilder, logger, false);
+                Current.Factory.GetInstance<BackgroundIndexRebuilder>().RebuildIndexes(false);
             }
         }
 

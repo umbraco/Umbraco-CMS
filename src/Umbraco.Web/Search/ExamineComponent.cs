@@ -118,10 +118,6 @@ namespace Umbraco.Web.Search
         public void Terminate()
         { }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This method should not be used and will be removed in future versions, rebuilding indexes can be done with the IndexRebuilder or the BackgroundIndexRebuilder")]
-        public static void RebuildIndexes(IndexRebuilder indexRebuilder, ILogger logger, bool onlyEmptyIndexes, int waitMilliseconds = 0) => Current.Factory.GetInstance<BackgroundIndexRebuilder>().RebuildIndexes(onlyEmptyIndexes, waitMilliseconds);
-
         #region Cache refresher updated event handlers
 
         /// <summary>
