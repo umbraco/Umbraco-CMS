@@ -39,7 +39,8 @@ namespace Umbraco.Web.Routing
                 node = FindContentByAlias(frequest.UmbracoContext.Content,
                     frequest.HasDomain ? frequest.Domain.ContentId : 0,
                     frequest.Culture.Name,
-                    frequest.Uri.GetAbsolutePathDecoded());
+                    frequest.Uri.GetAbsolutePathDecoded(),
+                    frequest.HasDomain ? frequest.Domain.Name : string.Empty);
 
                 if (node != null)
                 {
@@ -51,7 +52,7 @@ namespace Umbraco.Web.Routing
             return node != null;
         }
 
-        private static IPublishedContent FindContentByAlias(IPublishedContentCache cache, int rootNodeId, string culture, string alias)
+        private static IPublishedContent FindContentByAlias(IPublishedContentCache cache, int rootNodeId, string culture, string alias, string domaineName)
         {
             if (alias == null) throw new ArgumentNullException(nameof(alias));
 
@@ -64,9 +65,11 @@ namespace Umbraco.Web.Routing
 
             const string propertyAlias = Constants.Conventions.Content.UrlAlias;
 
-            var test1 = alias.TrimStart('/') + ",";
-            var test2 = ",/" + test1; // test2 is ",/alias,"
-            test1 = "," + test1; // test1 is ",alias,"
+            var hasDomain = !domaineName.IsNullOrWhiteSpace();
+
+            var test1 = $"{alias.TrimStart('/')}";
+            var test2 = $"/{test1}"; // test2 is "/alias"
+            test1 = $"{test1}"; // test1 is "alias"
 
             bool IsMatch(IPublishedContent c, string a1, string a2)
             {
@@ -91,8 +94,10 @@ namespace Umbraco.Web.Routing
                     v = c.Value<string>(propertyAlias);
                 }
                 if (string.IsNullOrWhiteSpace(v)) return false;
-                v = "," + v.Replace(" ", "") + ",";
-                return v.InvariantContains(a1) || v.InvariantContains(a2);
+                v = v.Replace(" ", "");
+                // Split UrlAlias to a list and add the domain name if hasDomain
+                var vList = v.Split(',').Select(x => hasDomain ? $"{domaineName.TrimStart('/')}/{x}" : x).ToList();
+                return vList.InvariantContains(a1) || vList.InvariantContains(a2);
             }
 
             // TODO: even with Linq, what happens below has to be horribly slow
