@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using Umbraco.Core.Logging;
@@ -67,11 +68,17 @@ namespace Umbraco.Web.Routing
 
             var hasDomain = !domaineName.IsNullOrWhiteSpace();
 
-            var test1 = $"{alias.TrimStart('/')}";
-            var test2 = $"/{test1}"; // test2 is "/alias"
-            test1 = $"{test1}"; // test1 is "alias"
+            // Create the list of potential alias that can be found on umbracoAliasUrl
+            var trimAlias = alias.TrimStart('/');
+            var testList = new List<string>
+            {
+                trimAlias, // is "alias"
+                $"/{trimAlias}", // is "/alias"
+                $"{trimAlias}/", // is "alias/"
+                $"/{trimAlias}/" // is "/alias/"
+            };
 
-            bool IsMatch(IPublishedContent c, string a1, string a2)
+            bool IsMatch(IPublishedContent c)
             {
                 // this basically implements the original XPath query ;-(
                 //
@@ -96,8 +103,10 @@ namespace Umbraco.Web.Routing
                 if (string.IsNullOrWhiteSpace(v)) return false;
                 v = v.Replace(" ", "");
                 // Split UrlAlias to a list and add the domain name if hasDomain
-                var vList = v.Split(',').Select(x => hasDomain ? $"{domaineName.TrimStart('/')}/{x}" : x).ToList();
-                return vList.InvariantContains(a1) || vList.InvariantContains(a2);
+                var t = v.Split(',');
+                var vList = t.Select(x => hasDomain ? $"{domaineName.TrimStart('/').TrimEnd('/')}/{x}" : x).ToList();
+                vList.AddRange(t);
+                return vList.ContainsAny(testList);
             }
 
             // TODO: even with Linq, what happens below has to be horribly slow
@@ -106,12 +115,12 @@ namespace Umbraco.Web.Routing
             if (rootNodeId > 0)
             {
                 var rootNode = cache.GetById(rootNodeId);
-                return rootNode?.Descendants().FirstOrDefault(x => IsMatch(x, test1, test2));
+                return rootNode?.Descendants().FirstOrDefault(IsMatch);
             }
 
             foreach (var rootContent in cache.GetAtRoot())
             {
-                var c = rootContent.DescendantsOrSelf().FirstOrDefault(x => IsMatch(x, test1, test2));
+                var c = rootContent.DescendantsOrSelf().FirstOrDefault(IsMatch);
                 if (c != null) return c;
             }
 
