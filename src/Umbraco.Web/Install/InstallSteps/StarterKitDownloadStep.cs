@@ -15,7 +15,7 @@ namespace Umbraco.Web.Install.InstallSteps
     [InstallSetupStep(InstallationType.NewInstall,
         "StarterKitDownload", "starterKit", 30, "Adding a simple website to Umbraco, will make it easier for you to get started",
         PerformsAppRestart = true)]
-    internal class StarterKitDownloadStep : InstallSetupStep<Guid?>
+    public class StarterKitDownloadStep : InstallSetupStep<Guid?>
     {
         private readonly InstallHelper _installHelper;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
@@ -28,6 +28,7 @@ namespace Umbraco.Web.Install.InstallSteps
             _umbracoContextAccessor = umbracoContextAccessor;
             _contentService = contentService;
             _packageService = packageService;
+            Removable = true;
         }
 
         //private const string RepoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";

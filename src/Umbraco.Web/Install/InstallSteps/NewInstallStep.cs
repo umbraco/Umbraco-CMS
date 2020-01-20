@@ -40,6 +40,7 @@ namespace Umbraco.Web.Install.InstallSteps
             _userService = userService;
             _databaseBuilder = databaseBuilder;
             _globalSettings = globalSettings;
+            Removable = false;
         }
 
         // TODO: Change all logic in this step to use ASP.NET Identity NOT MembershipProviders

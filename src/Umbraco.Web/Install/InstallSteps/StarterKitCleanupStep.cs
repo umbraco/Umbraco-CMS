@@ -10,8 +10,13 @@ namespace Umbraco.Web.Install.InstallSteps
 {
     [InstallSetupStep(InstallationType.NewInstall,
         "StarterKitCleanup", 32, "Almost done")]
-    internal class StarterKitCleanupStep : InstallSetupStep<object>
+    public class StarterKitCleanupStep : InstallSetupStep<object>
     {
+        public StarterKitCleanupStep()
+        {
+            Removable = true;
+        }
+
         public override Task<InstallSetupResult> ExecuteAsync(object model)
         {
             var installSteps = InstallStatusTracker.GetStatus().ToArray();
