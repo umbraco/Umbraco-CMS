@@ -35,7 +35,8 @@ namespace Umbraco.Web.Install
 
 
             };
-            _finalstep =   a.OfType<SetUmbracoVersionStep>().First();
+            OnPreparingList(this);
+            _orderedInstallerSteps.Add(a.OfType<SetUmbracoVersionStep>().First());
         }
 
 
@@ -48,10 +49,7 @@ namespace Umbraco.Web.Install
         /// </remarks>
         public IEnumerable<InstallSetupStep> GetAllSteps()
         {
-            OnPreparingList(this);
-            _orderedInstallerSteps.Add(_finalstep);
             return _orderedInstallerSteps;
-
         }
 
         public void OnPreparingList(InstallStepCollection stepColletion)
@@ -64,8 +62,9 @@ namespace Umbraco.Web.Install
         /// </summary>
         /// <returns></returns>
         public IEnumerable<InstallSetupStep> GetStepsForCurrentInstallType()
-        {
-            return GetAllSteps().Where(x => x.InstallTypeTarget.HasFlag(_installHelper.GetInstallationType()));
+    {
+        var allSteps = GetAllSteps().ToList();
+            return allSteps.Where(x => x.InstallTypeTarget.HasFlag(_installHelper.GetInstallationType()));
         }
         public void RemoveStepByType(Type type)
         {
