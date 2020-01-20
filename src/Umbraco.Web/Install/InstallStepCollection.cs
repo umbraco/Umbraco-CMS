@@ -10,7 +10,6 @@ namespace Umbraco.Web.Install
     {
         private readonly InstallHelper _installHelper;
         private List<InstallSetupStep> _orderedInstallerSteps;
-        private InstallSetupStep _finalstep;
         public event EventHandler<InstallStepCollection> PrepareListEvent;
 
         public InstallStepCollection(InstallHelper installHelper, IEnumerable<InstallSetupStep> installerSteps)
