@@ -9,7 +9,7 @@
                 alias="compositions"
                 ng-if="compositions !== false"
                 type="button"
-                button-style="action"
+                button-style="outline"
                 label-key="contentTypeEditor_compositions"
                 icon="icon-merge"
                 action="openCompositionsDialog()"
@@ -22,7 +22,7 @@
                 alias="reorder"
                 ng-if="sorting !== false"
                 type="button"
-                button-style="action"
+                button-style="outline"
                 label-key="{{sortingButtonKey}}"
                 icon="icon-navigation"
                 action="toggleSortingMode();"
@@ -37,7 +37,7 @@
         <localize key="contentTypeEditor_noGroups"></localize>
     </div>
 
-    <a ng-if="!sortingMode" hotkey="alt+shift+p" ng-click="addPropertyToActiveGroup()"></a>    
+    <a ng-if="!sortingMode" hotkey="alt+shift+p" ng-click="addPropertyToActiveGroup()"></a>
 
     <ul class="umb-group-builder__groups" ui-sortable="sortableOptionsGroup" ng-model="model.groups">
 
