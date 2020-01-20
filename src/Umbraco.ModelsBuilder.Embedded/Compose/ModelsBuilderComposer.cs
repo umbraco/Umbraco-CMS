@@ -19,7 +19,7 @@ using Umbraco.Web;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.Features;
 
-//[assembly: PreApplicationStartMethod(typeof(ModelsBuilderComposer), "Initialize")]
+[assembly: PreApplicationStartMethod(typeof(ModelsBuilderComposer), "Initialize")]
 
 namespace Umbraco.ModelsBuilder.Embedded.Compose
 {
@@ -51,20 +51,75 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
         }
     }
 
-    ///// <summary>
-    ///// A custom <see cref="RazorBuildProvider"/> to provide extra functionality
-    ///// </summary>
-    //public class CustomRazorBuildProvider : RazorBuildProvider
-    //{
-    //    public override void GenerateCode(AssemblyBuilder assemblyBuilder)
-    //    {
-    //        // If legacy MB is in place then remove the embedded assembly reference
-    //        if (ModelsBuilderComposer.IsLegacyModelsBuilderInstalled.Value)
-    //            assemblyBuilder.RemoveAssemblyReference(this.GetType().Assembly);
-            
-    //        base.GenerateCode(assemblyBuilder);
-    //    }
-    //}
+    public class BuildProviderWrapper : BuildProvider
+    {
+        private readonly BuildProvider _bp;
+
+        public BuildProviderWrapper(BuildProvider bp)
+        {
+            _bp = bp;
+        }
+
+        public override void GenerateCode(AssemblyBuilder assemblyBuilder)
+        {
+            // If legacy MB is in place then remove the embedded assembly reference
+            if (ModelsBuilderComposer.IsLegacyModelsBuilderInstalled.Value)
+                assemblyBuilder.RemoveAssemblyReference(_bp.GetType().Assembly);
+
+            base.GenerateCode(assemblyBuilder);
+        }
+
+        public override string GetCustomString(CompilerResults results) => _bp.GetCustomString(results);
+
+        public override CompilerType CodeCompilerType
+        {
+            get
+            {
+                return GetDefaultCompilerTypeForLanguage("C#");
+                //return _bp.CodeCompilerType;
+            }
+        }
+        public override Type GetGeneratedType(CompilerResults results) => _bp.GetGeneratedType(results);
+        public override BuildProviderResultFlags GetResultFlags(CompilerResults results) => _bp.GetResultFlags(results);
+        public override void ProcessCompileErrors(CompilerResults results) => _bp.ProcessCompileErrors(results);
+        protected override CodeCompileUnit GetCodeCompileUnit(out IDictionary linePragmasTable)
+        {
+            var methodParams = new object[] {null};
+            var result = (CodeCompileUnit)_bp.GetType()
+                .GetMethod(nameof(GetCodeCompileUnit), BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+                .Invoke(this, methodParams);
+            linePragmasTable = (IDictionary)methodParams[0];
+            return result;
+        }
+        public override ICollection VirtualPathDependencies => _bp.VirtualPathDependencies;
+        public override bool Equals(object obj) => _bp.Equals(obj);
+        public override int GetHashCode() => _bp.GetHashCode();
+        public override string ToString() => _bp.ToString();
+    }
+
+    public class WebObjectActivatorWrapper : IServiceProvider
+    {
+        private readonly IServiceProvider _wrapped;
+
+        public WebObjectActivatorWrapper(IServiceProvider wrapped)
+        {
+            _wrapped = wrapped;
+        }
+
+        public object GetService(Type serviceType)
+        {
+            var service = _wrapped?.GetService(serviceType) ?? Activator.CreateInstance(serviceType,
+                              BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.CreateInstance,
+                              null, null, null);
+
+            if (service is BuildProvider bp)
+            {
+                return new BuildProviderWrapper(bp);
+            }
+
+            return service;
+        }
+    }
 
     [ComposeBefore(typeof(NuCacheComposer))]
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
@@ -73,6 +128,9 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
         public static void Initialize()
         {
             //BuildProvider.RegisterBuildProvider(".cshtml", typeof(CustomRazorBuildProvider));
+            HttpRuntime.WebObjectActivator = new WebObjectActivatorWrapper(HttpRuntime.WebObjectActivator);
+
+          
         }
 
         public void Compose(Composition composition)
@@ -129,7 +187,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
         /// </remarks>
         private void ConfigureRazorBuildProviderForLegacyModelsBuilder()
         {
-            //HttpRuntime.WebObjectActivator
+            
 
             //// Bind to the CompilingPath event of the RazorBuildProvider. There are 3x events:
             //// CompilingPath = occurs first
