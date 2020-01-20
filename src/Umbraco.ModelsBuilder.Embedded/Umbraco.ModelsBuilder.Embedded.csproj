@@ -69,7 +69,7 @@
     <Compile Include="ModelsBuilderAssemblyAttribute.cs" />
     <Compile Include="ModelsBuilderDashboard.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PublishedElementExtensions.cs" />
+    <Compile Include="ModelsBuilderPublishedElementExtensions.cs" />
     <Compile Include="ReferencedAssemblies.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="HashCombiner.cs" />

@@ -12,8 +12,11 @@ namespace Umbraco.Web
     /// <summary>
     /// Provides extension methods to models.
     /// </summary>
-    public static class PublishedElementExtensions
+    public static class ModelsBuilderPublishedElementExtensions
     {
+        // NOTE: The orig name of this class is was PublishedElementExtensions but this overlaps with the legacy MB which can cause ambiguous naming issues
+        // changing this name at least provides a way to call the ext methods statically
+
         /// <summary>
         /// Gets the value of a property.
         /// </summary>
