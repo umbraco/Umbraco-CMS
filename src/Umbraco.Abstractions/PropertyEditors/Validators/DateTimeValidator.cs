@@ -9,7 +9,7 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Used to validate if the value is a valid date/time
     /// </summary>
-    internal class DateTimeValidator : IValueValidator
+    public class DateTimeValidator : IValueValidator
     {
         public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)
         {
