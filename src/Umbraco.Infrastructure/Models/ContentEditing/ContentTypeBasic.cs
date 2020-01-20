@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Umbraco.Core;
-using Umbraco.Web.Composing;
+
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -67,15 +67,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "iconFilePath")]
         [ReadOnly(true)]
-        public string IconFilePath
-        {
-            get
-            {
-                return IconIsClass
-                    ? string.Empty
-                    : string.Format("{0}images/umbraco/{1}", Current.Configs.Global().Path.EnsureEndsWith("/"), Icon);
-            }
-        }
+        public string IconFilePath { get; set; }
 
         /// <summary>
         /// Returns true if the icon represents a CSS class instead of a file path
@@ -100,15 +92,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "thumbnailFilePath")]
         [ReadOnly(true)]
-        public string ThumbnailFilePath
-        {
-            get
-            {
-                return ThumbnailIsClass
-                           ? string.Empty
-                           : Current.IOHelper.ResolveUrl("~/umbraco/images/thumbnails/" + Thumbnail);
-            }
-        }
+        public string ThumbnailFilePath { get; set; }
 
         [DataMember(Name = "blueprints")]
         [ReadOnly(true)]

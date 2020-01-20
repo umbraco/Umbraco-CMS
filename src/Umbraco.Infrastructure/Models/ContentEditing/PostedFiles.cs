@@ -9,7 +9,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// temporary files that were created.
     /// </summary>
     [DataContract]
-    internal class PostedFiles : IHaveUploadedFiles, INotificationModel
+    public class PostedFiles : IHaveUploadedFiles, INotificationModel
     {
         public PostedFiles()
         {

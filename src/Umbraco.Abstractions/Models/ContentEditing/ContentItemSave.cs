@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 
@@ -30,7 +28,7 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "variants", IsRequired = true)]
         public IEnumerable<ContentVariantSave> Variants { get; set; }
-        
+
         [DataMember(Name = "contentTypeAlias", IsRequired = true)]
         [Required(AllowEmptyStrings = false)]
         public string ContentTypeAlias { get; set; }
@@ -40,7 +38,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "templateAlias")]
         public string TemplateAlias { get; set; }
-        
+
         #region IContentSave
 
         [DataMember(Name = "action", IsRequired = true)]
@@ -54,7 +52,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// <inheritdoc />
         [IgnoreDataMember]
         IContent IContentSave<IContent>.PersistedContent { get; set; }
-        
+
         //Non explicit internal getter so we don't need to explicitly cast in our own code
         [IgnoreDataMember]
         internal IContent PersistedContent

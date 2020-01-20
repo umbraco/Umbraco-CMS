@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Web.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
@@ -10,6 +11,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Core.Services;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.IO;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Web.Models.Mapping
@@ -27,11 +29,13 @@ namespace Umbraco.Web.Models.Mapping
         private readonly IMemberTypeService _memberTypeService;
         private readonly ILogger _logger;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IIOHelper _ioHelper;
+        private readonly IGlobalSettings _globalSettings;
 
 
         public ContentTypeMapDefinition(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IFileService fileService,
             IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService,
-            ILogger logger, IShortStringHelper shortStringHelper)
+            ILogger logger, IShortStringHelper shortStringHelper, IIOHelper ioHelper, IGlobalSettings globalSettings)
         {
             _propertyEditors = propertyEditors;
             _dataTypeService = dataTypeService;
@@ -41,7 +45,8 @@ namespace Umbraco.Web.Models.Mapping
             _memberTypeService = memberTypeService;
             _logger = logger;
             _shortStringHelper = shortStringHelper;
-
+            _ioHelper = ioHelper;
+            _globalSettings = globalSettings;
         }
 
         public void DefineMaps(UmbracoMapper mapper)
@@ -184,6 +189,11 @@ namespace Umbraco.Web.Models.Mapping
             target.CreateDate = source.CreateDate;
             target.Description = source.Description;
             target.Icon = source.Icon;
+            target.IconFilePath = target.IconIsClass
+                ? string.Empty
+                : $"{Current.Configs.Global().Path.EnsureEndsWith("/")}images/umbraco/{source.Icon}";
+
+            target.Trashed = source.Trashed;
             target.Id = source.Id;
             target.IsContainer = source.IsContainer;
             target.IsElement = source.IsElement;
@@ -192,7 +202,9 @@ namespace Umbraco.Web.Models.Mapping
             target.ParentId = source.ParentId;
             target.Path = source.Path;
             target.Thumbnail = source.Thumbnail;
-            target.Trashed = source.Trashed;
+            target.ThumbnailFilePath = target.ThumbnailIsClass
+                ? string.Empty
+                : Current.IOHelper.ResolveUrl("~/umbraco/images/thumbnails/" + source.Thumbnail);
             target.UpdateDate = source.UpdateDate;
         }
 
@@ -487,6 +499,9 @@ namespace Umbraco.Web.Models.Mapping
             target.CreateDate = source.CreateDate;
             target.Description = source.Description;
             target.Icon = source.Icon;
+            target.IconFilePath = target.IconIsClass
+                ? string.Empty
+                : $"{Current.Configs.Global().Path.EnsureEndsWith("/")}images/umbraco/{source.Icon}";
             target.Id = source.Id;
             target.IsContainer = source.IsContainer;
             target.IsElement = source.IsElement;
@@ -495,6 +510,9 @@ namespace Umbraco.Web.Models.Mapping
             target.ParentId = source.ParentId;
             target.Path = source.Path;
             target.Thumbnail = source.Thumbnail;
+            target.ThumbnailFilePath = target.ThumbnailIsClass
+                ? string.Empty
+                : Current.IOHelper.ResolveUrl("~/umbraco/images/thumbnails/" + source.Thumbnail);
             target.Udi = MapContentTypeUdi(source);
             target.UpdateDate = source.UpdateDate;
 
@@ -524,6 +542,9 @@ namespace Umbraco.Web.Models.Mapping
             target.CompositeContentTypes = source.CompositeContentTypes;
             target.Description = source.Description;
             target.Icon = source.Icon;
+            target.IconFilePath = target.IconIsClass
+                ? string.Empty
+                : $"{Current.Configs.Global().Path.EnsureEndsWith("/")}images/umbraco/{source.Icon}";
             target.Id = source.Id;
             target.IsContainer = source.IsContainer;
             target.IsElement = source.IsElement;
@@ -532,6 +553,9 @@ namespace Umbraco.Web.Models.Mapping
             target.ParentId = source.ParentId;
             target.Path = source.Path;
             target.Thumbnail = source.Thumbnail;
+            target.ThumbnailFilePath = target.ThumbnailIsClass
+                ? string.Empty
+                : Current.IOHelper.ResolveUrl("~/umbraco/images/thumbnails/" + source.Thumbnail);
             target.Trashed = source.Trashed;
             target.Udi = source.Udi;
         }

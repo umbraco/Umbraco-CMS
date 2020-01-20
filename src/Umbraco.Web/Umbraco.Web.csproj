@@ -187,11 +187,6 @@
     <Compile Include="Logging\WebProfilerProvider.cs" />
     <Compile Include="Macros\IMacroRenderer.cs" />
     <Compile Include="Migrations\PostMigrations\PublishedSnapshotRebuilder.cs" />
-    <Compile Include="Models\ContentEditing\ContentItemDisplay.cs" />
-    <Compile Include="Models\ContentEditing\ContentTypeBasic.cs" />
-    <Compile Include="Models\ContentEditing\ListViewAwareContentItemDisplayBase.cs" />
-    <Compile Include="Models\ContentEditing\MacroDisplay.cs" />
-    <Compile Include="Models\ContentEditing\MediaItemDisplay.cs" />
     <Compile Include="Models\ContentEditing\UserInvite.cs" />
     <Compile Include="Models\Identity\BackOfficeIdentityUser.cs" />
     <Compile Include="Models\Identity\IdentityMapDefinition.cs" />
@@ -266,7 +261,6 @@
     <Compile Include="Trees\TreeUse.cs" />
     <Compile Include="Trees\Tree.cs" />
     <Compile Include="Trees\ITree.cs" />
-    <Compile Include="Models\ContentEditing\PublicAccess.cs" />
     <Compile Include="Services\ITreeService.cs" />
     <Compile Include="Services\ISectionService.cs" />
     <Compile Include="PropertyEditors\GridPropertyIndexValueFactory.cs" />
@@ -393,7 +387,6 @@
     <Compile Include="HealthCheck\HealthCheckStatus.cs" />
     <Compile Include="HealthCheck\Checks\Security\HttpsCheck.cs" />
     <Compile Include="HealthCheck\StatusResultType.cs" />
-    <Compile Include="Models\ContentEditing\ContentVariantSave.cs" />
     <Compile Include="Editors\IEditorValidator.cs" />
     <Compile Include="Editors\EditorModelEventManager.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
@@ -537,17 +530,6 @@
     <Compile Include="Trees\TreeAttribute.cs" />
     <Compile Include="Models\Trees\TreeNode.cs" />
     <Compile Include="Routing\NotFoundHandlerHelper.cs" />
-    <Compile Include="Models\ContentEditing\DocumentTypeDisplay.cs" />
-    <Compile Include="Models\ContentEditing\ContentTypeCompositionDisplay.cs" />
-    <Compile Include="Models\ContentEditing\ContentTypeSave.cs" />
-    <Compile Include="Models\ContentEditing\DocumentTypeSave.cs" />
-    <Compile Include="Models\ContentEditing\MediaTypeDisplay.cs" />
-    <Compile Include="Models\ContentEditing\MediaTypeSave.cs" />
-    <Compile Include="Models\ContentEditing\MemberPropertyTypeBasic.cs" />
-    <Compile Include="Models\ContentEditing\MemberPropertyTypeDisplay.cs" />
-    <Compile Include="Models\ContentEditing\MemberTypeDisplay.cs" />
-    <Compile Include="Models\ContentEditing\MemberTypeSave.cs" />
-    <Compile Include="Models\ContentEditing\PostedFiles.cs" />
     <Compile Include="Models\LocalPackageInstallModel.cs" />
     <Compile Include="Mvc\ControllerContextExtensions.cs" />
     <Compile Include="Mvc\DisableBrowserCacheAttribute.cs" />
@@ -560,7 +542,6 @@
     <Compile Include="OwinMiddlewareConfiguredEventArgs.cs" />
     <Compile Include="Routing\RedirectTrackingComponent.cs" />
     <Compile Include="Editors\RedirectUrlManagementController.cs" />
-    <Compile Include="Models\ContentEditing\RedirectUrlSearchResults.cs" />
     <Compile Include="DefaultEventMessagesFactory.cs" />
     <Compile Include="Routing\ContentFinderByRedirectUrl.cs" />
     <Compile Include="Scheduling\LatchedBackgroundTaskBase.cs" />
@@ -569,7 +550,6 @@
     <Compile Include="Security\ForceRenewalCookieAuthenticationHandler.cs" />
     <Compile Include="Security\ForceRenewalCookieAuthenticationMiddleware.cs" />
     <Compile Include="Security\GetUserSecondsMiddleWare.cs" />
-    <Compile Include="Models\ContentEditing\PropertyGroupDisplay.cs" />
     <Compile Include="Security\IUmbracoBackOfficeTwoFactorOptions.cs" />
     <Compile Include="Models\Mapping\PropertyTypeGroupMapper.cs" />
     <Compile Include="Services\TreeService.cs" />
@@ -621,11 +601,7 @@
     <Compile Include="Editors\PackageInstallController.cs" />
     <Compile Include="Editors\RelationController.cs" />
     <Compile Include="GridTemplateExtensions.cs" />
-    <Compile Include="Models\ContentEditing\DataTypeBasic.cs" />
-    <Compile Include="Models\ContentEditing\MemberBasic.cs" />
-    <Compile Include="Models\ContentEditing\MemberListDisplay.cs" />
     <Compile Include="Editors\TemplateQueryController.cs" />
-    <Compile Include="Models\ContentEditing\MediaItemSave.cs" />
     <Compile Include="Install\InstallException.cs" />
     <Compile Include="Install\InstallStatusTracker.cs" />
     <Compile Include="Install\InstallSteps\DatabaseConfigureStep.cs" />
@@ -673,10 +649,7 @@
     <Compile Include="Editors\MemberTypeController.cs" />
     <Compile Include="Editors\UpdateCheckController.cs" />
     <Compile Include="PasswordConfigurationExtensions.cs" />
-    <Compile Include="Models\ContentEditing\ModelWithNotifications.cs" />
     <Compile Include="Editors\StylesheetController.cs" />
-    <Compile Include="Models\ContentEditing\MemberDisplay.cs" />
-    <Compile Include="Models\ContentEditing\MemberSave.cs" />
     <Compile Include="Models\Mapping\MacroMapDefinition.cs" />
     <Compile Include="Models\Mapping\MemberMapDefinition.cs" />
     <Compile Include="Models\Mapping\TagMapDefinition.cs" />
@@ -692,8 +665,6 @@
     <Compile Include="Editors\EntityController.cs" />
     <Compile Include="Editors\MemberController.cs" />
     <Compile Include="Editors\CurrentUserController.cs" />
-    <Compile Include="Models\ContentEditing\DataTypeDisplay.cs" />
-    <Compile Include="Models\ContentEditing\DataTypeConfigurationFieldDisplay.cs" />
     <Compile Include="Models\Mapping\DataTypeMapDefinition.cs" />
     <Compile Include="Models\Mapping\EntityMapDefinition.cs" />
     <Compile Include="PropertyEditors\MultipleTextStringPropertyEditor.cs" />
@@ -770,7 +741,6 @@
     <Compile Include="Editors\SectionController.cs" />
     <Compile Include="Editors\UmbracoAuthorizedJsonController.cs" />
     <Compile Include="HttpCookieExtensions.cs" />
-    <Compile Include="Models\ContentEditing\MessagesExtensions.cs" />
     <Compile Include="FormDataCollectionExtensions.cs" />
     <Compile Include="Models\Mapping\ContentPropertyBasicMapper.cs" />
     <Compile Include="Models\Mapping\ContentPropertyDisplayMapper.cs" />
@@ -807,7 +777,6 @@
     <Compile Include="Trees\TreeRenderingEventArgs.cs" />
     <Compile Include="Trees\UrlHelperExtensions.cs" />
     <Compile Include="JavaScript\JsInitialization.cs" />
-    <Compile Include="Models\ContentEditing\ContentItemSave.cs" />
     <Compile Include="HttpRequestExtensions.cs" />
     <Compile Include="HttpUrlHelperExtensions.cs" />
     <Compile Include="Install\FilePermissionHelper.cs" />

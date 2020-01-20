@@ -173,7 +173,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// This is not used for outgoing model information.
         /// </remarks>
         [IgnoreDataMember]
-        internal IContent PersistedContent { get; set; }
+        public IContent PersistedContent { get; set; }
 
         /// <summary>
         /// The DTO object used to gather all required content data including data type information etc... for use with validation - used during inbound model binding
@@ -184,7 +184,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// This is not used for outgoing model information.
         /// </remarks>
         [IgnoreDataMember]
-        internal ContentPropertyCollectionDto ContentDto { get; set; }
+        public ContentPropertyCollectionDto ContentDto { get; set; }
 
         /// <summary>
         /// This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.

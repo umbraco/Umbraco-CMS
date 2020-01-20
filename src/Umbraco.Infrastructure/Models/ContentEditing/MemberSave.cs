@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
-using Newtonsoft.Json.Linq;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Validation;
-using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core;
 
 namespace Umbraco.Web.Models.ContentEditing
