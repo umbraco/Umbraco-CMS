@@ -29,24 +29,29 @@ app.run(['$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 
                         // start intro tour if it hasn't been completed or disabled
                         if (introTour && introTour.disabled !== true && introTour.completed !== true) {
                             tourService.startTour(introTour);
+                            localStorageService.set("introTourShown", true);
                         }
                         else {
-                            // Go & show email marketing tour (ONLY when intro tour is completed or been dismissed)
-                            tourService.getTourByAlias("umbEmailMarketing").then(function (emailMarketingTour) {
-                                // Only show the email marketing tour one time - dismissing it or saying no will make sure it never appears again
-                                // Unless invoked from tourService JS Client code explicitly.
-                                // Accepted mails = Completed and Declicned mails = Disabled
-                                if (emailMarketingTour && emailMarketingTour.disabled !== true && emailMarketingTour.completed !== true) {
 
-                                    // Only show the email tour once per logged in session
-                                    // The localstorage key is removed on logout or user session timeout
-                                    const emailMarketingTourShown = localStorageService.get("emailMarketingTourShown");
-                                    if(!emailMarketingTourShown){
-                                        tourService.startTour(emailMarketingTour);
-                                        localStorageService.set("emailMarketingTourShown", true);
+                            const introTourShown = localStorageService.get("introTourShown");
+                            if(!introTourShown){
+                                // Go & show email marketing tour (ONLY when intro tour is completed or been dismissed)
+                                tourService.getTourByAlias("umbEmailMarketing").then(function (emailMarketingTour) {
+                                    // Only show the email marketing tour one time - dismissing it or saying no will make sure it never appears again
+                                    // Unless invoked from tourService JS Client code explicitly.
+                                    // Accepted mails = Completed and Declicned mails = Disabled
+                                    if (emailMarketingTour && emailMarketingTour.disabled !== true && emailMarketingTour.completed !== true) {
+
+                                        // Only show the email tour once per logged in session
+                                        // The localstorage key is removed on logout or user session timeout
+                                        const emailMarketingTourShown = localStorageService.get("emailMarketingTourShown");
+                                        if(!emailMarketingTourShown){
+                                            tourService.startTour(emailMarketingTour);
+                                            localStorageService.set("emailMarketingTourShown", true);
+                                        }
                                     }
-                                }
-                            });
+                                });
+                            }
                         }
                     });
                 });

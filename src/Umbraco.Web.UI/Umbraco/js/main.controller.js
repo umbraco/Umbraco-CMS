@@ -75,8 +75,10 @@ function MainController($scope, $location, appState, treeService, notificationsS
         const isTimedOut = data && data.isTimedOut ? true : false;
         $scope.showLoginScreen(isTimedOut);
 
-        // Remove the localstorage item - to indicate if the email marketing tour has been shown
+        // Remove the localstorage items for tours shown
+        // Means that when next logged in they can be re-shown if not already dismissed etc
         localStorageService.remove("emailMarketingTourShown");
+        localStorageService.remove("introTourShown");
     }));
 
     evts.push(eventsService.on("app.userRefresh", function(evt) {
