@@ -34,6 +34,7 @@ using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.Composing;
 using Task = System.Threading.Tasks.Task;
+using Umbraco.Core.Mapping;
 
 namespace Umbraco.Tests.Web.Controllers
 {
@@ -268,7 +269,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
-                    ShortStringHelper);
+                    ShortStringHelper,
+                    Factory.GetInstance<UmbracoMapper>());
 
                 return controller;
             }
@@ -303,7 +305,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
-                    ShortStringHelper);
+                    ShortStringHelper,
+                    Factory.GetInstance<UmbracoMapper>());
 
                 return controller;
             }
@@ -346,7 +349,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
-                    ShortStringHelper);
+                    ShortStringHelper,
+                    Factory.GetInstance<UmbracoMapper>());
 
                 return controller;
             }
@@ -394,7 +398,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
-                    ShortStringHelper);
+                    ShortStringHelper,
+                    Factory.GetInstance<UmbracoMapper>());
 
                 return controller;
             }
@@ -434,7 +439,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
-                    ShortStringHelper);
+                    ShortStringHelper,
+                    Factory.GetInstance<UmbracoMapper>());
 
                 return controller;
             }
@@ -480,7 +486,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
-                    ShortStringHelper);
+                    ShortStringHelper,
+                    Factory.GetInstance<UmbracoMapper>());
 
                 return controller;
             }
