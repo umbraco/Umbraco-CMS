@@ -19,7 +19,7 @@ using Umbraco.Web;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.Features;
 
-[assembly: PreApplicationStartMethod(typeof(ModelsBuilderComposer), "Initialize")]
+//[assembly: PreApplicationStartMethod(typeof(ModelsBuilderComposer), "Initialize")]
 
 namespace Umbraco.ModelsBuilder.Embedded.Compose
 {
@@ -51,20 +51,20 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
         }
     }
 
-    /// <summary>
-    /// A custom <see cref="RazorBuildProvider"/> to provide extra functionality
-    /// </summary>
-    public class CustomRazorBuildProvider : RazorBuildProvider
-    {
-        public override void GenerateCode(AssemblyBuilder assemblyBuilder)
-        {
-            // If legacy MB is in place then remove the embedded assembly reference
-            if (ModelsBuilderComposer.IsLegacyModelsBuilderInstalled.Value)
-                assemblyBuilder.RemoveAssemblyReference(this.GetType().Assembly);
+    ///// <summary>
+    ///// A custom <see cref="RazorBuildProvider"/> to provide extra functionality
+    ///// </summary>
+    //public class CustomRazorBuildProvider : RazorBuildProvider
+    //{
+    //    public override void GenerateCode(AssemblyBuilder assemblyBuilder)
+    //    {
+    //        // If legacy MB is in place then remove the embedded assembly reference
+    //        if (ModelsBuilderComposer.IsLegacyModelsBuilderInstalled.Value)
+    //            assemblyBuilder.RemoveAssemblyReference(this.GetType().Assembly);
             
-            base.GenerateCode(assemblyBuilder);
-        }
-    }
+    //        base.GenerateCode(assemblyBuilder);
+    //    }
+    //}
 
     [ComposeBefore(typeof(NuCacheComposer))]
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
@@ -72,7 +72,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
     {
         public static void Initialize()
         {
-            BuildProvider.RegisterBuildProvider(".cshtml", typeof(CustomRazorBuildProvider));
+            //BuildProvider.RegisterBuildProvider(".cshtml", typeof(CustomRazorBuildProvider));
         }
 
         public void Compose(Composition composition)
@@ -129,15 +129,15 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
         /// </remarks>
         private void ConfigureRazorBuildProviderForLegacyModelsBuilder()
         {
+            //HttpRuntime.WebObjectActivator
+
             //// Bind to the CompilingPath event of the RazorBuildProvider. There are 3x events:
             //// CompilingPath = occurs first
             //// CodeGenerationCompleted = occurs second
             //// CodeGenerationStarted = occurs last -- yes that is true
             //// Removing the assembly in CodeGenerationStarted is too late since the ReferencedAssemblies have already been passed to it's underlying
             //// AssemblyBuilder class which is used to generate the csc.exe command with all of the referenced assemblies so we will remove the embedded
-            //// assembly in CompilingPath. When in legacy mode, there's no code within the embedded assembly that should run, this effectively removes
-            //// this assembly from the app domain for razor views - this will *not* solve the ambiguous issue for other dynamically compiled code
-            //// such as code in App_Code. It would be possible to solve that issue with a custom build provider.
+            //// assembly in CompilingPath. When in legacy mode, there's no code within the embedded assembly that should run, 
             //RazorBuildProvider.CompilingPath += (sender, args) =>
             //{
             //    if (!(sender is RazorBuildProvider provider)) return;
@@ -146,6 +146,18 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
             //    var removeMethod = assemblySet.GetType().GetMethod("Remove", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
             //    removeMethod.Invoke(assemblySet, new object[] { this.GetType().Assembly });
             //};
+
+            // Bind to this event to remove the embedded assembly from the underlying AssemblyBuilder. This is the latest we can remove
+            // this assembly and it will only be removed from the collection attached to this particular AssemblyBuilder. It is possible
+            // to modify the RazorBuildProvider.ReferencedAssemblies collection in the same way, however that collection is a shared collection
+            // between all build providers... hrm, maybe that's actually better since it would solve the App_Code problem too.
+            RazorBuildProvider.CodeGenerationStarted += (sender, args) =>
+            {
+                if (!(sender is RazorBuildProvider provider)) return;
+
+                // Remove the embedded assembly from the assembly builder
+                provider.AssemblyBuilder.RemoveAssemblyReference(typeof(ModelsBuilderComposer).Assembly);
+            };
         }
 
         private void ComposeForLegacyModelsBuilder(Composition composition)
