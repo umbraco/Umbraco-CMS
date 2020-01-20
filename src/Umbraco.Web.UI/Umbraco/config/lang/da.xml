@@ -1180,6 +1180,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="editUserSaved">Bruger gemt</key>
     <key alias="editUserTypeSaved">Brugertype gemt</key>
     <key alias="editUserGroupSaved">Brugergruppe gemt</key>
+    <key alias="editCulturesAndHostnamesSaved">Sprog og domæner gemt</key>
+    <key alias="editCulturesAndHostnamesError">Der opstod en fejl ved at gemme sprog og domæner</key>
     <key alias="fileErrorHeader">Fil ikke gemt</key>
     <key alias="fileErrorText">Filen kunne ikke gemmes. Tjek filrettighederne</key>
     <key alias="fileSavedHeader">Fil gemt</key>

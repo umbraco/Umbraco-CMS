@@ -266,6 +266,8 @@
     <key alias="updateDate">Last edited</key>
     <key alias="updateDateDesc" version="7.0">Date/time this document was edited</key>
     <key alias="uploadClear">Remove file(s)</key>
+	<key alias="uploadClearImageContext">Click here to remove the image from the media item</key>
+    <key alias="uploadClearFileContext">Click here to remove the file from the media item</key>
     <key alias="urls">Link to document</key>
     <key alias="memberof">Member of group(s)</key>
     <key alias="notmemberof">Not a member of group(s)</key>
@@ -484,7 +486,6 @@
     <key alias="unLinkYour">Un-link your</key>
     <key alias="account">account</key>
     <key alias="selectEditor">Select editor</key>
-    <key alias="selectEditorConfiguration">Select configuration</key>
     <key alias="selectSnippet">Select snippet</key>
     <key alias="variantdeletewarning">This will delete the node and all its languages. If you only want to delete one language, you should unpublish the node in that language instead.</key>
   </area>
@@ -1406,6 +1407,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="editUserSaved">User Saved</key>
     <key alias="editUserTypeSaved">User type saved</key>
     <key alias="editUserGroupSaved">User group saved</key>
+    <key alias="editCulturesAndHostnamesSaved">Cultures and hostnames saved</key>
+    <key alias="editCulturesAndHostnamesError">Error saving cultures and hostnames</key>
     <key alias="fileErrorHeader">File not saved</key>
     <key alias="fileErrorText">file could not be saved. Please check file permissions</key>
     <key alias="fileSavedHeader">File saved</key>
@@ -1574,6 +1577,11 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="chooseExtra">Choose extra</key>
     <key alias="chooseDefault">Choose default</key>
     <key alias="areAdded">are added</key>
+        <key alias="warning">Warning</key>
+        <key alias="youAreDeleting">You are deleting the row configuration</key>
+        <key alias="deletingARow">
+            Deleting a row configuration name will result in loss of data for any existing content that is based on this configuration.
+        </key>
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">Compositions</key>
@@ -1599,8 +1607,6 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="availableEditors">Create new</key>
     <key alias="reuse">Use existing</key>
     <key alias="editorSettings">Editor settings</key>
-    <key alias="searchResultSettings">Available configurations</key>
-    <key alias="searchResultEditors">Create a new configuration</key>
     <key alias="configuration">Configuration</key>
     <key alias="yesDelete">Yes, delete</key>
     <key alias="movedUnderneath">was moved underneath</key>
@@ -1976,6 +1982,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="sortCreateDateAscending">Newest</key>
     <key alias="sortCreateDateDescending">Oldest</key>
     <key alias="sortLastLoginDateDescending">Last login</key>
+    <key alias="noUserGroupsAdded">No user groups have been added</key>
   </area>
   <area alias="validation">
     <key alias="validation">Validation</key>
@@ -2101,6 +2108,14 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Notification email is still set to the default value of <strong>%0%</strong>.]]></key>
     <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Results of the scheduled Umbraco Health Checks run on %0% at %1% are as follows:</p>%2%</body></html>]]></key>
     <key alias="scheduledHealthCheckEmailSubject">Umbraco Health Check Status: %0%</key>
+    <key alias="checkAllGroups">Check All Groups</key>
+    <key alias="checkGroup">Check group</key>
+    <key alias="helpText">
+        <![CDATA[
+        <p>The health checker evaluates various areas of your site for best practice settings, configuration, potential problems, etc. You can easily fix problems by pressing a button.
+        You can add your own health checks, have a look at <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" class="btn-link -underline">the documentation for more information</a> about custom health checks.</p>
+        ]]>
+    </key>
   </area>
   <area alias="redirectUrls">
     <key alias="disableUrlTracker">Disable URL tracker</key>
@@ -2185,6 +2200,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="newPartialViewMacro">Partial View Macro</key>
     <key alias="newMember">Member</key>
     <key alias="newDataType">Data type</key>
+    <key alias="redirectDashboardSearchLabel">Search the redirect dashboard</key>
+    <key alias="userGroupSearchLabel">Search the user group section</key>
+    <key alias="userSearchLabel">Search the users section</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>
@@ -2343,5 +2361,9 @@ To manage your website, simply open the Umbraco back office and start adding con
         Find out about real-life <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank">training and certification</a> opportunities
     ]]>
     </key>
+  </area>
+  <area alias="startupDashboard">
+    <key alias="fallbackHeadline">Welcome to The Friendly CMS</key>
+    <key alias="fallbackDescription">Thank you for choosing Umbraco - we think this could be the beginning of something beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast as possible.</key>
   </area>
 </language>
