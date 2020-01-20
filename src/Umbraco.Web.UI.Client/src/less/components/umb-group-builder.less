@@ -344,8 +344,9 @@ input.umb-group-builder__group-title-input:disabled:hover {
 
 .umb-group-builder__property-actions {
     flex: 0 0 44px;
-    text-align: right;
-    margin-top: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
 }
 
 .umb-group-builder__property-action {
@@ -498,6 +499,7 @@ input.umb-group-builder__group-sort-value {
             text-decoration: none;
             color: @ui-action-type-hover;
             border-color: @ui-action-border-hover;
+            background-color: @ui-action-discreet-hover;
         }
     }
 
@@ -525,6 +527,13 @@ input.umb-group-builder__group-sort-value {
         display: flex;
         align-items: center;
         max-width: calc(100% - 48px);
+        min-height: 80px;
+        color: @ui-action-discreet-type;
+
+        &:hover {
+            color: @ui-action-discreet-type-hover;
+            background-color: @ui-action-discreet-hover;
+        }
     }
 
     .editor-icon-wrapper {
@@ -533,6 +542,7 @@ input.umb-group-builder__group-sort-value {
         text-align: center;
         line-height: 60px;
         flex: 0 0 60px;
+        padding-left: 10px;
 
         .icon {
             font-size: 32px;
@@ -560,10 +570,14 @@ input.umb-group-builder__group-sort-value {
         width: 48px;
         height: 48px;
         font-size: 18px;
-        color: @ui-action-type;
+        
+        min-height: 80px;
+        color: @ui-action-discreet-type;
         &:hover {
-            color: @ui-action-type-hover;
+            color: @ui-action-discreet-type-hover;
+            background-color: @ui-action-discreet-hover;
         }
+        color: @ui-action-discreet-type;
     }
 
     .checkbox {
