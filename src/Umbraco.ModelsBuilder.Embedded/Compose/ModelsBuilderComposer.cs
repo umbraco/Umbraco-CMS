@@ -141,11 +141,19 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
             if (assemblyBuilder == null) throw new ArgumentNullException(nameof(assemblyBuilder));
             if (assembly == null) throw new ArgumentNullException(nameof(assembly));
 
-            var assemblySet = assemblyBuilder.GetType().GetField("_initialReferencedAssemblies", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(assemblyBuilder);
-            var removeMethod = assemblySet?.GetType().GetMethod("Remove", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-            if (removeMethod == null)
-                throw new InvalidOperationException("Could not reflect required Remove property");
-            removeMethod.Invoke(assemblySet, new object[] { assembly });
+            var assemblySet = RefAssemblies.Value?.GetValue(assemblyBuilder);
+
+            // this is not thread safe but that's ok, it would just get overwritten
+            if (_removeMethod == null)
+            {
+                _removeMethod = assemblySet?.GetType().GetMethod("Remove", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                if (_removeMethod == null)
+                    throw new InvalidOperationException("Could not reflect required Remove property");
+            }
+            _removeMethod.Invoke(assemblySet, new object[] { assembly });
         }
+
+        private static readonly Lazy<FieldInfo> RefAssemblies = new Lazy<FieldInfo>(() => typeof(AssemblyBuilder).GetField("_initialReferencedAssemblies", BindingFlags.Instance | BindingFlags.NonPublic));
+        private static MethodInfo _removeMethod;
     }
 }
