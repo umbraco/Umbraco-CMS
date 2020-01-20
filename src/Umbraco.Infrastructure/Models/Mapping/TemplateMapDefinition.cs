@@ -5,7 +5,7 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class TemplateMapDefinition : IMapDefinition
+    public class TemplateMapDefinition : IMapDefinition
     {
         private readonly IShortStringHelper _shortStringHelper;
 

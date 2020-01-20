@@ -13,7 +13,7 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// The dictionary model mapper.
     /// </summary>
-    internal class DictionaryMapDefinition : IMapDefinition
+    public class DictionaryMapDefinition : IMapDefinition
     {
         private readonly ILocalizationService _localizationService;
 

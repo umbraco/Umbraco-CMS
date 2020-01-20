@@ -10,7 +10,7 @@ namespace Umbraco.Web.Models.Mapping
     /// Returns the <see cref="ContentSavedState?"/> for an <see cref="IContent"/> item
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    internal class ContentBasicSavedStateMapper<T>
+    public class ContentBasicSavedStateMapper<T>
         where T : ContentPropertyBasic
     {
         private readonly ContentSavedStateMapper<T> _inner = new ContentSavedStateMapper<T>();
@@ -25,7 +25,7 @@ namespace Umbraco.Web.Models.Mapping
     /// Returns the <see cref="ContentSavedState"/> for an <see cref="IContent"/> item
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    internal class ContentSavedStateMapper<T>
+    public class ContentSavedStateMapper<T>
         where T : ContentPropertyBasic
     {
         public ContentSavedState Map(IContent source, MapperContext context)

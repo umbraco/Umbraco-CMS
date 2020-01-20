@@ -8,7 +8,7 @@ using Language = Umbraco.Web.Models.ContentEditing.Language;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class LanguageMapDefinition : IMapDefinition
+    public class LanguageMapDefinition : IMapDefinition
     {
         public void DefineMaps(UmbracoMapper mapper)
         {

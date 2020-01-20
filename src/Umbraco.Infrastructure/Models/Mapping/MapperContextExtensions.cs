@@ -5,7 +5,7 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// Provides extension methods for the <see cref="MapperContext"/> class.
     /// </summary>
-    internal static class MapperContextExtensions
+    public static class MapperContextExtensions
     {
         private const string CultureKey = "Map.Culture";
         private const string IncludedPropertiesKey = "Map.IncludedProperties";

@@ -10,7 +10,7 @@ using Language = Umbraco.Web.Models.ContentEditing.Language;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class ContentVariantMapper
+    public class ContentVariantMapper
     {
         private readonly ILocalizationService _localizationService;
 

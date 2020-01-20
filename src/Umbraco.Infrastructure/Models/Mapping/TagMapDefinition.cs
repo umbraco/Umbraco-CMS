@@ -3,7 +3,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class TagMapDefinition : IMapDefinition
+    public class TagMapDefinition : IMapDefinition
     {
         public void DefineMaps(UmbracoMapper mapper)
         {

@@ -7,7 +7,7 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class RelationMapDefinition : IMapDefinition
+    public class RelationMapDefinition : IMapDefinition
     {
         private readonly IEntityService _entityService;
         private readonly IRelationService _relationService;

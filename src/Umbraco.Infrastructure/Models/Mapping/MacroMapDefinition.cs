@@ -9,7 +9,7 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class MacroMapDefinition : IMapDefinition
+    public class MacroMapDefinition : IMapDefinition
     {
         private readonly ParameterEditorCollection _parameterEditors;
         private readonly ILogger _logger;
