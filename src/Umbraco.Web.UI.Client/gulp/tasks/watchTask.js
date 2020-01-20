@@ -12,6 +12,7 @@ var processLess = require('../util/processLess');
 //const { less } = require('./less');
 //const { views } = require('./views');
 
+var {js} = require('./js');
 
 function watchTask(cb) {
     
@@ -39,6 +40,7 @@ function watchTask(cb) {
             viewWatcher.on('change', function(path, stats) {
                 console.log("copying " + group.files + " to " + config.root + config.targets.views + group.folder);
                 src(group.files).pipe( dest(config.root + config.targets.views + group.folder) );
+                js();
             });
         }
     });
