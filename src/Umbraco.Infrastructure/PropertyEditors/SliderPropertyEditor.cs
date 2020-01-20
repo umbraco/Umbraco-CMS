@@ -1,5 +1,4 @@
 ﻿using Umbraco.Core;
-using Umbraco.Web.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
