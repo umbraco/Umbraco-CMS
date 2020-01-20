@@ -1,19 +1,24 @@
-﻿using Umbraco.Web.Composing;
-using Umbraco.Core.Logging;
+﻿using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Web.PropertyEditors.ParameterEditors
 {
+    /// <summary>
+    /// Represents a content type parameter editor.
+    /// </summary>
     [DataEditor(
-        "tabPicker",
+        "contentType",
         EditorType.MacroParameter,
-        "Tab Picker",
+        "Content Type Picker",
         "entitypicker")]
-    public class PropertyGroupParameterEditor : DataEditor
+    public class ContentTypeParameterEditor : DataEditor
     {
-        public PropertyGroupParameterEditor(
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContentTypeParameterEditor"/> class.
+        /// </summary>
+        public ContentTypeParameterEditor(
             ILogger logger,
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
@@ -22,10 +27,8 @@ namespace Umbraco.Web.PropertyEditors.ParameterEditors
             : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             // configure
-            DefaultConfiguration.Add("multiple", "0");
-            DefaultConfiguration.Add("entityType", "PropertyGroup");
-            //don't publish the id for a property group, publish it's alias (which is actually just it's lower cased name)
-            DefaultConfiguration.Add("publishBy", "alias");
+            DefaultConfiguration.Add("multiple", false);
+            DefaultConfiguration.Add("entityType", "DocumentType");
         }
     }
 }

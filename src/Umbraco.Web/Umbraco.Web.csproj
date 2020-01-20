@@ -213,7 +213,6 @@
     <Compile Include="Net\AspNetPasswordHasher.cs" />
     <Compile Include="Net\AspNetSessionIdResolver.cs" />
     <Compile Include="Profiling\WebProfilingController.cs" />
-    <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
@@ -465,8 +464,6 @@
     <Compile Include="Mvc\SurfaceControllerTypeCollection.cs" />
     <Compile Include="PropertyEditors\NestedContentController.cs" />
     <Compile Include="PropertyEditors\NestedContentPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\ParameterEditors\MultipleContentPickerParameterEditor.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\FlexibleDropdownPropertyValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\NestedContentManyValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\NestedContentValueConverterBase.cs" />
     <Compile Include="PropertyEditors\ValueConverters\NestedContentSingleValueConverter.cs" />
@@ -761,12 +758,6 @@
     <Compile Include="Models\Mapping\TagMapDefinition.cs" />
     <Compile Include="Models\UpgradeCheckResponse.cs" />
     <Compile Include="Models\PasswordChangedModel.cs" />
-    <Compile Include="PropertyEditors\ParameterEditors\ContentTypeParameterEditor.cs" />
-    <Compile Include="PropertyEditors\ParameterEditors\MultipleContentTypeParameterEditor.cs" />
-    <Compile Include="PropertyEditors\ParameterEditors\MultiplePropertyGroupParameterEditor.cs" />
-    <Compile Include="PropertyEditors\ParameterEditors\MultiplePropertyTypeParameterEditor.cs" />
-    <Compile Include="PropertyEditors\ParameterEditors\PropertyGroupParameterEditor.cs" />
-    <Compile Include="PropertyEditors\ParameterEditors\PropertyTypeParameterEditor.cs" />
     <Compile Include="PropertyEditors\PropertyEditorAssetAttribute.cs" />
     <Compile Include="PropertyEditors\RteEmbedController.cs" />
     <Compile Include="Editors\EntityController.cs" />
