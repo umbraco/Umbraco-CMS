@@ -9,6 +9,8 @@ var MergeStream = require('merge-stream');
 var processJs = require('../util/processJs');
 var processLess = require('../util/processLess');
 
+var {js} = require('./js');
+
 function watchTask(cb) {
     
     var watchInterval = 500;
@@ -33,8 +35,15 @@ function watchTask(cb) {
         if(group.watch !== false) {
             viewWatcher = watch(group.files, { ignoreInitial: true, interval: watchInterval });
             viewWatcher.on('change', function(path, stats) {
+
                 console.log("copying " + group.files + " to " + config.root + config.targets.views + group.folder);
-                src(group.files).pipe( dest(config.root + config.targets.views + group.folder) );
+                
+                return MergeStream(
+                    src(group.files)
+                    .pipe( dest(config.root + config.targets.views + group.folder) )
+                    , js()
+                );
+
             });
         }
     });
