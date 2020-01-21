@@ -26,9 +26,10 @@ namespace Umbraco.Web.Install
                 a.OfType<DatabaseInstallStep>().First(),
                 a.OfType<DatabaseUpgradeStep>().First(),
 
-                a.OfType<StarterKitDownloadStep>().First(),
-                a.OfType<StarterKitInstallStep>().First(),
-                a.OfType<StarterKitCleanupStep>().First(),
+                // TODO: Add these back once we have a compatible Starter kit
+                // a.OfType<StarterKitDownloadStep>().First(),
+                // a.OfType<StarterKitInstallStep>().First(),
+                // a.OfType<StarterKitCleanupStep>().First(),
 
                 a.OfType<SetUmbracoVersionStep>().First(),
             };
