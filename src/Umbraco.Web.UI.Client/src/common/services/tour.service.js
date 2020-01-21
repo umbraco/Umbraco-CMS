@@ -168,12 +168,12 @@
                         }
                     }
 
-                });
+                }
 
                 deferred.resolve(groupedTours);
             });
             return deferred.promise;
-        }
+        });
 
         /**
          * @ngdoc method
