@@ -1180,7 +1180,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="contentTypePropertyTypeCreated">Type de propriété créé</key>
     <key alias="contentTypePropertyTypeCreatedText"><![CDATA[Nom : %0% <br /> Type de données : %1%]]></key>
     <key alias="contentTypePropertyTypeDeleted">Type de propriété supprimé</key>
-    <key alias="contentTypeSavedHeader">Type de documet sauvegardé</key>
+    <key alias="contentTypeSavedHeader">Type de document sauvegardé</key>
     <key alias="contentTypeTabCreated">Onglet créé</key>
     <key alias="contentTypeTabDeleted">Onglet supprimé</key>
     <key alias="contentTypeTabDeletedText">Onglet avec l'ID : %0% supprimé</key>
