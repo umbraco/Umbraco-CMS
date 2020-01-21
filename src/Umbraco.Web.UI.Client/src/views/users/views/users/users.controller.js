@@ -451,7 +451,7 @@
 
         var search = _.debounce(function () {
             $scope.$apply(function () {
-                getUsers();
+                changePageNumber(1);
             });
         }, 500);
 
@@ -512,7 +512,7 @@
             }
 
             updateLocation("userStates", vm.usersOptions.userStates.join(","));
-            getUsers();
+            changePageNumber(1);
         }
 
         function setUserGroupFilter(userGroup) {
@@ -529,7 +529,7 @@
             }
 
             updateLocation("userGroups", vm.usersOptions.userGroups.join(","));
-            getUsers();
+            changePageNumber(1);
         }
 
         function setOrderByFilter(value, direction) {

@@ -145,6 +145,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //default listview
             target.ListViewEditorName = Constants.Conventions.DataTypes.ListViewPrefix + "Media";
+            target.IsSystemMediaType = source.IsSystemMediaType();
 
             if (string.IsNullOrEmpty(source.Name)) return;
 
@@ -492,7 +493,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Udi = MapContentTypeUdi(source);
             target.UpdateDate = source.UpdateDate;
 
-            target.AllowedContentTypes = source.AllowedContentTypes.Select(x => x.Id.Value);
+            target.AllowedContentTypes = source.AllowedContentTypes.OrderBy(c => c.SortOrder).Select(x => x.Id.Value);
             target.CompositeContentTypes = source.ContentTypeComposition.Select(x => x.Alias);
             target.LockedCompositeContentTypes = MapLockedCompositions(source);
         }
