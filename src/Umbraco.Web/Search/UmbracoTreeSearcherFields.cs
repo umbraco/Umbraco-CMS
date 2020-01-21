@@ -1,8 +1,8 @@
 using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Examine;
-using Umbraco.Web.Search;
 
-namespace Umbraco.Web
+namespace Umbraco.Web.Search
 {
     public class UmbracoTreeSearcherFields : IUmbracoTreeSearcherFields
     {
@@ -23,10 +23,9 @@ namespace Umbraco.Web
         {
             return _backOfficeMediaFields;
         }
-        private IReadOnlyList<string> _backOfficeDocumentFields = new List<string> ();
         public IEnumerable<string> GetBackOfficeDocumentFields()
         {
-            return _backOfficeDocumentFields;
+            return Enumerable.Empty<string>();
         }
     }
 }
