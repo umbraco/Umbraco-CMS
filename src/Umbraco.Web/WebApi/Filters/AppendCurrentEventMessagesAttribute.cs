@@ -53,7 +53,7 @@ namespace Umbraco.Web.WebApi.Filters
                         throw new ArgumentOutOfRangeException();
                 }
 
-                notifications.Notifications.Add(new Notification
+                notifications.Notifications.Add(new BackOfficeNotification
                 {
                     Message = eventMessage.Message,
                     Header = eventMessage.Category,

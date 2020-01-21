@@ -47,7 +47,6 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
-using Notification = Umbraco.Web.Models.ContentEditing.Notification;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Mapping;
 
@@ -460,7 +459,7 @@ namespace Umbraco.Web.Editors
 
             if (sourceParentID == destinationParentID)
             {
-                return Request.CreateValidationErrorResponse(new SimpleNotificationModel(new Notification("",Services.TextService.Localize("media/moveToSameFolderFailed"),NotificationStyle.Error)));
+                return Request.CreateValidationErrorResponse(new SimpleNotificationModel(new BackOfficeNotification("",Services.TextService.Localize("media/moveToSameFolderFailed"),NotificationStyle.Error)));
             }
             if (moveResult == false)
             {
@@ -773,7 +772,7 @@ namespace Umbraco.Web.Editors
                 }
                 else
                 {
-                    tempFiles.Notifications.Add(new Notification(
+                    tempFiles.Notifications.Add(new BackOfficeNotification(
                         Services.TextService.Localize("speechBubbles/operationFailedHeader"),
                         Services.TextService.Localize("media/disallowedFileType"),
                         NotificationStyle.Warning));
@@ -864,7 +863,7 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(Request.CreateResponse(
                     HttpStatusCode.Forbidden,
-                    new SimpleNotificationModel(new Notification(
+                    new SimpleNotificationModel(new BackOfficeNotification(
                         Services.TextService.Localize("speechBubbles/operationFailedHeader"),
                         Services.TextService.Localize("speechBubbles/invalidUserPermissionsText"),
                         NotificationStyle.Warning))));

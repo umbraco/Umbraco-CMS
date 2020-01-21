@@ -15,7 +15,7 @@ namespace Umbraco.Web.Models
         public string Name { get; set; }
 
         [DataMember(Name = "notifications")]
-        public List<Notification> Notifications { get; } = new List<Notification>();
+        public List<BackOfficeNotification> Notifications { get; } = new List<BackOfficeNotification>();
 
         [DataMember(Name = "tempFileName")]
         public string TempFileName { get; set; }
