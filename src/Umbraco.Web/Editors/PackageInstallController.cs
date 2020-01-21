@@ -11,6 +11,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Packaging;
@@ -38,8 +39,8 @@ namespace Umbraco.Web.Editors
         private readonly IUmbracoVersion _umbracoVersion;
         public PackageInstallController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor,
             ISqlContext sqlContext, ServiceContext services, AppCaches appCaches,
-            IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IShortStringHelper shortStringHelper, IUmbracoVersion umbracoVersion)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
+            IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IShortStringHelper shortStringHelper, IUmbracoVersion umbracoVersion, UmbracoMapper umbracoMapper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
         {
             _umbracoVersion = umbracoVersion;
 

@@ -32,6 +32,7 @@ using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Strings;
+using Umbraco.Core.Mapping;
 
 namespace Umbraco.Web.Editors
 {
@@ -56,8 +57,9 @@ namespace Umbraco.Web.Editors
             IProfilingLogger logger,
             IRuntimeState runtimeState,
             UmbracoHelper umbracoHelper,
-            IShortStringHelper shortStringHelper)
-            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            UmbracoMapper umbracoMapper)
+            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
         {
             _passwordConfig = passwordConfig ?? throw new ArgumentNullException(nameof(passwordConfig));
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));

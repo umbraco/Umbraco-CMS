@@ -8,7 +8,6 @@ using System.Web.Mvc;
 using System.Web.Mvc.Html;
 using System.Web.Routing;
 using Umbraco.Core;
-using Umbraco.Core.IO;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Security;
 using Current = Umbraco.Web.Composing.Current;
@@ -862,14 +861,14 @@ namespace Umbraco.Web
         private static readonly HtmlStringUtilities StringUtilities = new HtmlStringUtilities();
 
         /// <summary>
-        /// Replaces text line breaks with HTML line breaks
+        /// HTML encodes the text and replaces text line breaks with HTML line breaks.
         /// </summary>
         /// <param name="helper"></param>
         /// <param name="text">The text.</param>
-        /// <returns>The text with text line breaks replaced with HTML line breaks (<br/>)</returns>
-        public static IHtmlString ReplaceLineBreaksForHtml(this HtmlHelper helper, string text)
+        /// <returns>The HTML encoded text with text line breaks replaced with HTML line breaks (<c>&lt;br /&gt;</c>).</returns>
+        public static IHtmlString ReplaceLineBreaks(this HtmlHelper helper, string text)
         {
-            return StringUtilities.ReplaceLineBreaksForHtml(text);
+            return StringUtilities.ReplaceLineBreaks(text);
         }
 
         /// <summary>

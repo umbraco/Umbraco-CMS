@@ -15,6 +15,8 @@
         vm.selectUserGroup = selectUserGroup;
         vm.deleteUserGroups = deleteUserGroups;
 
+        vm.filter = null;
+
         var currentUser = null;
 
         function onInit() {

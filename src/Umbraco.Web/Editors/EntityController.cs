@@ -30,6 +30,7 @@ using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
+using Umbraco.Core.Mapping;
 
 namespace Umbraco.Web.Editors
 {
@@ -64,9 +65,9 @@ namespace Umbraco.Web.Editors
             UmbracoHelper umbracoHelper,
             SearchableTreeCollection searchableTreeCollection,
             UmbracoTreeSearcher treeSearcher,
-            IShortStringHelper shortStringHelper)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
-
+            IShortStringHelper shortStringHelper,
+            UmbracoMapper umbracoMapper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
         {
             _treeService = treeService;
             _searchableTreeCollection = searchableTreeCollection;

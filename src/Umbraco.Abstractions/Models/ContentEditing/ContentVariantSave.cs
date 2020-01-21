@@ -30,6 +30,12 @@ namespace Umbraco.Web.Models.ContentEditing
         public string Culture { get; set; }
 
         /// <summary>
+        /// The segment of this variant, if this is invariant than this is null or empty
+        /// </summary>
+        [DataMember(Name = "segment")]
+        public string Segment { get; set; }
+
+        /// <summary>
         /// Indicates if the variant should be updated
         /// </summary>
         /// <remarks>

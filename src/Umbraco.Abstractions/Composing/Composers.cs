@@ -27,28 +27,6 @@ namespace Umbraco.Core.Composing
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="composerTypes">The <see cref="IComposer" /> types.</param>
-        /// <param name="logger">The profiling logger.</param>
-        [Obsolete("This overload only gets the EnableComposer/DisableComposer attributes from the composerTypes assemblies.")]
-        public Composers(Composition composition, IEnumerable<Type> composerTypes, IProfilingLogger logger)
-            : this(composition, composerTypes, Enumerable.Empty<Attribute>(), logger)
-        {
-            var enableDisableAttributes = new List<Attribute>();
-
-            var assemblies = composerTypes.Select(t => t.Assembly).Distinct();
-            foreach (var assembly in assemblies)
-            {
-                enableDisableAttributes.AddRange(assembly.GetCustomAttributes(typeof(EnableComposerAttribute)));
-                enableDisableAttributes.AddRange(assembly.GetCustomAttributes(typeof(DisableComposerAttribute)));
-            }
-
-            _enableDisableAttributes = enableDisableAttributes;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Composers" /> class.
-        /// </summary>
-        /// <param name="composition">The composition.</param>
-        /// <param name="composerTypes">The <see cref="IComposer" /> types.</param>
         /// <param name="enableDisableAttributes">The <see cref="EnableComposerAttribute" /> and/or <see cref="DisableComposerAttribute" /> attributes.</param>
         /// <param name="logger">The profiling logger.</param>
         /// <exception cref="ArgumentNullException">composition

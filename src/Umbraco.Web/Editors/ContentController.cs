@@ -38,6 +38,7 @@ using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Strings;
+using Umbraco.Core.Mapping;
 
 namespace Umbraco.Web.Editors
 {
@@ -69,8 +70,8 @@ namespace Umbraco.Web.Editors
             IProfilingLogger logger,
             IRuntimeState runtimeState,
             UmbracoHelper umbracoHelper,
-            IShortStringHelper shortStringHelper)
-            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
+            IShortStringHelper shortStringHelper, UmbracoMapper umbracoMapper)
+            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _allLangs = new Lazy<IDictionary<string, ILanguage>>(() => Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
@@ -315,7 +316,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Gets the content json for the content id
+        /// Gets the content json for the content guid
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -335,7 +336,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Gets the content json for the content id
+        /// Gets the content json for the content udi
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -353,7 +354,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Gets an empty content item for the
+        /// Gets an empty content item for the document type.
         /// </summary>
         /// <param name="contentTypeAlias"></param>
         /// <param name="parentId"></param>
@@ -1849,8 +1850,13 @@ namespace Umbraco.Web.Editors
         /// <param name="contentSave"></param>
         private void MapValuesForPersistence(ContentItemSave contentSave)
         {
-            // inline method to determine if a property type varies
-            bool Varies(IProperty property) => property.PropertyType.VariesByCulture();
+            // inline method to determine the culture and segment to persist the property
+            (string culture, string segment) PropertyCultureAndSegment(IProperty property, ContentVariantSave variant)
+            {
+                var culture = property.PropertyType.VariesByCulture() ? variant.Culture : null;
+                var segment = property.PropertyType.VariesBySegment() ? variant.Segment : null;
+                return (culture, segment);
+            }
 
             var variantIndex = 0;
 
@@ -1889,8 +1895,18 @@ namespace Umbraco.Web.Editors
                 MapPropertyValuesForPersistence<IContent, ContentItemSave>(
                     contentSave,
                     propertyCollection,
-                    (save, property) => Varies(property) ? property.GetValue(variant.Culture) : property.GetValue(),         //get prop val
-                    (save, property, v) => { if (Varies(property)) property.SetValue(v, variant.Culture); else property.SetValue(v); },  //set prop val
+                    (save, property) =>
+                    {
+                        // Get property value
+                        (var culture, var segment) = PropertyCultureAndSegment(property, variant);
+                        return property.GetValue(culture, segment);
+                    },
+                    (save, property, v) =>
+                    {
+                        // Set property value
+                        (var culture, var segment) = PropertyCultureAndSegment(property, variant);
+                        property.SetValue(v, culture, segment);
+                    },
                     variant.Culture);
 
                 variantIndex++;

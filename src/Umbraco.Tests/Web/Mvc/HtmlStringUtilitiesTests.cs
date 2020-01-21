@@ -16,14 +16,6 @@ namespace Umbraco.Tests.Web.Mvc
         }
 
         [Test]
-        public void ReplaceLineBreaksWithHtmlBreak()
-        {
-            var output = _htmlStringUtilities.ReplaceLineBreaksForHtml("<div><h1>hello world</h1><p>hello world\r\nhello world\rhello world\nhello world</p></div>").ToString();
-            var expected = "<div><h1>hello world</h1><p>hello world<br />hello world<br />hello world<br />hello world</p></div>";
-            Assert.AreEqual(expected, output);
-        }
-
-        [Test]
         public void TruncateWithElipsis()
         {
             var output = _htmlStringUtilities.Truncate("hello world", 5, true, false).ToString();

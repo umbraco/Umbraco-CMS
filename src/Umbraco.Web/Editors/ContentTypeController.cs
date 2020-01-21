@@ -29,6 +29,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
+using Umbraco.Core.Mapping;
 
 namespace Umbraco.Web.Editors
 {
@@ -58,8 +59,8 @@ namespace Umbraco.Web.Editors
             ServiceContext services, AppCaches appCaches,
             IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper,
             IScopeProvider scopeProvider,
-            IShortStringHelper shortStringHelper)
-            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
+            IShortStringHelper shortStringHelper, UmbracoMapper umbracoMapper)
+            : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
         {
             _serializer = serializer;
             _globalSettings = globalSettings;

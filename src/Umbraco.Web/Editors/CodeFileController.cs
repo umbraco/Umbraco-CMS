@@ -24,6 +24,7 @@ using Umbraco.Web.WebApi.Filters;
 using Umbraco.Web.Trees;
 using Stylesheet = Umbraco.Core.Models.Stylesheet;
 using StylesheetRule = Umbraco.Web.Models.ContentEditing.StylesheetRule;
+using Umbraco.Core.Mapping;
 
 namespace Umbraco.Web.Editors
 {
@@ -43,9 +44,9 @@ namespace Umbraco.Web.Editors
             IProfilingLogger logger,
             IRuntimeState runtimeState,
             UmbracoHelper umbracoHelper,
-            IShortStringHelper shortStringHelper)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
-
+            IShortStringHelper shortStringHelper,
+            UmbracoMapper umbracoMapper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
         {
         }
 
