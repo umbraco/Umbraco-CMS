@@ -101,13 +101,12 @@
                     </ng-form>
 
                     <div class="umb-group-builder__group-remove" ng-if="!sortingMode && canRemoveGroup(tab)">
-                        <i class="icon-trash" ng-click="togglePrompt(tab)"></i>
-                        <umb-confirm-action
-                            ng-if="tab.deletePrompt"
-                            direction="left"
-                            on-confirm="removeGroup($index)"
-                            on-cancel="hidePrompt(tab)">
+                        <umb-confirm-action ng-if="tab.deletePrompt"
+                                            direction="left"
+                                            on-confirm="removeGroup($index)"
+                                            on-cancel="hidePrompt(tab)">
                         </umb-confirm-action>
+                        <i class="icon-trash" ng-click="togglePrompt(tab)"></i>
                     </div>
 
                 </div>
@@ -259,13 +258,12 @@
 
                                     <!-- delete property -->
                                     <div ng-if="!property.locked" class="umb-group-builder__property-action">
-                                        <button aria-label="Delete property" class="icon-trash" ng-click="togglePrompt(property)"></button>
-                                        <umb-confirm-action
-                                            ng-if="property.deletePrompt"
-                                            direction="left"
-                                            on-confirm="deleteProperty(tab, $index)"
-                                            on-cancel="hidePrompt(property)">
+                                        <umb-confirm-action ng-if="property.deletePrompt"
+                                                            direction="left"
+                                                            on-confirm="deleteProperty(tab, $index)"
+                                                            on-cancel="hidePrompt(property)">
                                         </umb-confirm-action>
+                                        <button aria-label="Delete property" class="icon-trash" ng-click="togglePrompt(property)"></button>
                                     </div>
 
                                 </div>

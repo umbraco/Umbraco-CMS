@@ -10,14 +10,14 @@
 
             <span ng-repeat="tag in vm.viewModel track by $index" class="label label-primary tag" ng-keyup="vm.onKeyUpOnTag(tag, $event)" tabindex="0">
                 <span ng-bind-html="tag"></span>
-
-                <i class="icon-trash" ng-click="vm.showPrompt($index, tag)" localize="title" title="@buttons_deleteTag"></i>
-
                 <umb-confirm-action ng-if="vm.promptIsVisible === $index"
                                     direction="left"
                                     on-confirm="vm.removeTag(tag)"
                                     on-cancel="vm.hidePrompt()">
                 </umb-confirm-action>
+                <i class="icon-trash" ng-click="vm.showPrompt($index, tag)" localize="title" title="@buttons_deleteTag"></i>
+
+
             </span>
 
             <input type="text"

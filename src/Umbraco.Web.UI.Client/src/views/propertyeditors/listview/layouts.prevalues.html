@@ -30,15 +30,15 @@
 
          <div>
            <umb-checkbox ng-if="layout.isSystem === 1" model="layout.selected" /> 
-            <div class="list-view-layout__remove" ng-if="layout.isSystem !== 1">
-                <i class="icon-trash" ng-click="vm.showPrompt(layout)"></i>
-                <umb-confirm-action
-                    ng-if="layout.deletePrompt"
-                    direction="left"
-                    on-confirm="vm.removeLayout($index, layout)"
-                    on-cancel="vm.hidePrompt(layout)">
-                </umb-confirm-action>
-            </div>
+           <div class="list-view-layout__remove" ng-if="layout.isSystem !== 1">
+               <umb-confirm-action ng-if="layout.deletePrompt"
+                                   direction="left"
+                                   on-confirm="vm.removeLayout($index, layout)"
+                                   on-cancel="vm.hidePrompt(layout)">
+               </umb-confirm-action>
+               <i class="icon-trash" ng-click="vm.showPrompt(layout)"></i>
+
+           </div>
          </div>
 
       </div>
