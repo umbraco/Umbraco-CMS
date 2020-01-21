@@ -2,26 +2,24 @@
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Repositories;
-using System.Linq;
-using System.Xml.Linq;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
-using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.Cache
 {
     public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRefresher, MediaCacheRefresher.JsonPayload>
     {
+        private readonly AppCaches _appCaches;
         private readonly IPublishedSnapshotService _publishedSnapshotService;
-        private readonly IdkMap _idkMap;
+        private readonly IIdkMap _idkMap;
 
-        public MediaCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IPublishedSnapshotService publishedSnapshotService, IdkMap idkMap)
+        public MediaCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IPublishedSnapshotService publishedSnapshotService, IIdkMap idkMap)
             : base(appCaches, serializer)
         {
+            _appCaches = appCaches;
             _publishedSnapshotService = publishedSnapshotService;
             _idkMap = idkMap;
         }
@@ -48,7 +46,7 @@ namespace Umbraco.Web.Cache
 
             if (anythingChanged)
             {
-                Current.AppCaches.ClearPartialViewCache();
+                _appCaches.ClearPartialViewCache();
 
                 var mediaCache = AppCaches.IsolatedCaches.Get<IMedia>();
 

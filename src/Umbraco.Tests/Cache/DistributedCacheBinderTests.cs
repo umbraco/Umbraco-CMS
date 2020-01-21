@@ -7,6 +7,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Testing;
 using Umbraco.Tests.Testing.Objects.Accessors;
@@ -164,7 +165,7 @@ namespace Umbraco.Tests.Cache
                 IOHelper);
 
             // just assert it does not throw
-            var refreshers = new DistributedCacheBinder(null, umbracoContextFactory, null);
+            var refreshers = new DistributedCacheBinder(null, umbracoContextFactory, null, JsonNetSerializer);
             refreshers.HandleEvents(definitions);
         }
     }

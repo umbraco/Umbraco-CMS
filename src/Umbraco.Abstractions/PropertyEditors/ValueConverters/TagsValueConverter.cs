@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
@@ -13,10 +12,12 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     public class TagsValueConverter : PropertyValueConverterBase
     {
         private readonly IDataTypeService _dataTypeService;
+        private readonly IJsonSerializer _jsonSerializer;
 
-        public TagsValueConverter(IDataTypeService dataTypeService)
+        public TagsValueConverter(IDataTypeService dataTypeService, IJsonSerializer jsonSerializer)
         {
             _dataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
+            _jsonSerializer = jsonSerializer ?? throw new ArgumentNullException(nameof(jsonSerializer));
         }
 
         public override bool IsConverter(IPublishedPropertyType propertyType)
@@ -35,8 +36,8 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             // if Json storage type deserialize and return as string array
             if (JsonStorageType(propertyType.DataType.Id))
             {
-                var jArray = JsonConvert.DeserializeObject<JArray>(source.ToString());
-                return jArray.ToObject<string[]>() ?? Array.Empty<string>();
+                var array = _jsonSerializer.Deserialize<string[]>(source.ToString());
+                return array ?? Array.Empty<string>();
             }
 
             // Otherwise assume CSV storage type and return as string array

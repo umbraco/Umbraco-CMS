@@ -7,7 +7,8 @@ using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services
 {
-    public class IdkMap
+    //Todo rename to IdKeyMap
+    public class IdkMap : IIdkMap
     {
         private readonly IScopeProvider _scopeProvider;
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();

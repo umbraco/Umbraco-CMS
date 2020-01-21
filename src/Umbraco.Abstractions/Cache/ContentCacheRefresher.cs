@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
-using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.Cache
@@ -19,10 +15,10 @@ namespace Umbraco.Web.Cache
     public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCacheRefresher, ContentCacheRefresher.JsonPayload>
     {
         private readonly IPublishedSnapshotService _publishedSnapshotService;
-        private readonly IdkMap _idkMap;
+        private readonly IIdkMap _idkMap;
         private readonly IDomainService _domainService;
 
-        public ContentCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IPublishedSnapshotService publishedSnapshotService, IdkMap idkMap, IDomainService domainService)
+        public ContentCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IPublishedSnapshotService publishedSnapshotService, IIdkMap idkMap, IDomainService domainService)
             : base(appCaches, serializer)
         {
             _publishedSnapshotService = publishedSnapshotService;
@@ -141,7 +137,6 @@ namespace Umbraco.Web.Cache
 
         public class JsonPayload
         {
-            [JsonConstructor]
             public JsonPayload(int id, Guid? key, TreeChangeTypes changeTypes)
             {
                 Id = id;

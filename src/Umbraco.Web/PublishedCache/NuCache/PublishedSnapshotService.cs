@@ -76,7 +76,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         //private static int _singletonCheck;
 
         public PublishedSnapshotService(PublishedSnapshotServiceOptions options, IMainDom mainDom, IRuntimeState runtime,
-            ServiceContext serviceContext, IPublishedContentTypeFactory publishedContentTypeFactory, IdkMap idkMap,
+            ServiceContext serviceContext, IPublishedContentTypeFactory publishedContentTypeFactory, IIdkMap idkMap,
             IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor, IProfilingLogger logger, IScopeProvider scopeProvider,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             IDefaultCultureAccessor defaultCultureAccessor,

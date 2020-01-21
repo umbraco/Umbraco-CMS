@@ -1,19 +1,21 @@
 ﻿using System;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Repositories;
 using System.Linq;
-using Newtonsoft.Json;
 using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Web.Cache
 {
     public sealed class MacroCacheRefresher : JsonCacheRefresherBase<MacroCacheRefresher>
     {
-        public MacroCacheRefresher(AppCaches appCaches)
+        private readonly IJsonSerializer _jsonSerializer;
+
+        public MacroCacheRefresher(AppCaches appCaches, IJsonSerializer jsonSerializer)
             : base(appCaches)
-        { }
+        {
+            _jsonSerializer = jsonSerializer;
+        }
 
         #region Define
 
@@ -41,7 +43,7 @@ namespace Umbraco.Web.Cache
 
         public override void Refresh(string json)
         {
-            var payloads = Deserialize(json);
+            var payloads = Deserialize(_jsonSerializer, json);
 
             foreach (var payload in payloads)
             {
@@ -75,19 +77,15 @@ namespace Umbraco.Web.Cache
             public string Alias { get; }
         }
 
-        private static JsonPayload[] Deserialize(string json)
+        public static JsonPayload[] Deserialize(IJsonSerializer jsonSerializer, string json)
         {
-            return JsonConvert.DeserializeObject<JsonPayload[]>(json);
+            return jsonSerializer.Deserialize<JsonPayload[]>(json);
         }
 
-        internal static string Serialize(params Macro[] macros)
-        {
-            return JsonConvert.SerializeObject(macros.Select(x => new JsonPayload(x.Id, x.Alias)).ToArray());
-        }
 
-        internal static string Serialize(params IMacro[] macros)
+        public static string Serialize( IJsonSerializer jsonSerializer, params IMacro[] macros)
         {
-            return JsonConvert.SerializeObject(macros.Select(x => new JsonPayload(x.Id, x.Alias)).ToArray());
+            return jsonSerializer.Serialize(macros.Select(x => new JsonPayload(x.Id, x.Alias)).ToArray());
         }
 
         #endregion

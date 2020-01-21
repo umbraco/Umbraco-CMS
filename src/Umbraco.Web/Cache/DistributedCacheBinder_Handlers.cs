@@ -390,13 +390,13 @@ namespace Umbraco.Web.Cache
         private void MacroService_Deleted(IMacroService sender, DeleteEventArgs<IMacro> e)
         {
             foreach (var entity in e.DeletedEntities)
-                _distributedCache.RemoveMacroCache(entity);
+                _distributedCache.RemoveMacroCache(_jsonSerializer, entity);
         }
 
         private void MacroService_Saved(IMacroService sender, SaveEventArgs<IMacro> e)
         {
             foreach (var entity in e.SavedEntities)
-                _distributedCache.RefreshMacroCache(entity);
+                _distributedCache.RefreshMacroCache(_jsonSerializer, entity);
         }
 
         #endregion

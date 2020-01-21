@@ -15,9 +15,9 @@ namespace Umbraco.Web.Cache
     {
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly IPublishedModelFactory _publishedModelFactory;
-        private readonly IdkMap _idkMap;
+        private readonly IIdkMap _idkMap;
 
-        public DataTypeCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IPublishedSnapshotService publishedSnapshotService, IPublishedModelFactory publishedModelFactory, IdkMap idkMap)
+        public DataTypeCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IPublishedSnapshotService publishedSnapshotService, IPublishedModelFactory publishedModelFactory, IIdkMap idkMap)
             : base(appCaches, serializer)
         {
             _publishedSnapshotService = publishedSnapshotService;

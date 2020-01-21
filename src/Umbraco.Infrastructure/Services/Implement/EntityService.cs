@@ -19,9 +19,9 @@ namespace Umbraco.Core.Services.Implement
         private readonly IEntityRepository _entityRepository;
         private readonly Dictionary<string, UmbracoObjectTypes> _objectTypes;
         private IQuery<IUmbracoEntity> _queryRootEntity;
-        private readonly IdkMap _idkMap;
+        private readonly IIdkMap _idkMap;
 
-        public EntityService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IdkMap idkMap, IEntityRepository entityRepository)
+        public EntityService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IIdkMap idkMap, IEntityRepository entityRepository)
             : base(provider, logger, eventMessagesFactory)
         {
             _idkMap = idkMap;

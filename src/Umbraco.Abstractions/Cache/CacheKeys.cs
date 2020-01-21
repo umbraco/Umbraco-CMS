@@ -12,5 +12,7 @@
 
         public const string MacroContentCacheKey = "macroContent_"; // used in MacroRenderers
         public const string MacroFromAliasCacheKey = "macroFromAlias_";
+
+        public const string UserGroupGetByAliasCacheKeyPrefix = "UserGroupRepository_GetByAlias_";
     }
 }

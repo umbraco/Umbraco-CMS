@@ -8,10 +8,10 @@ namespace Umbraco.Web.Cache
 {
     public sealed class TemplateCacheRefresher : CacheRefresherBase<TemplateCacheRefresher>
     {
-        private readonly IdkMap _idkMap;
+        private readonly IIdkMap _idkMap;
         private readonly IContentTypeCommonRepository _contentTypeCommonRepository;
 
-        public TemplateCacheRefresher(AppCaches appCaches, IdkMap idkMap, IContentTypeCommonRepository contentTypeCommonRepository)
+        public TemplateCacheRefresher(AppCaches appCaches, IIdkMap idkMap, IContentTypeCommonRepository contentTypeCommonRepository)
             : base(appCaches)
         {
             _idkMap = idkMap;

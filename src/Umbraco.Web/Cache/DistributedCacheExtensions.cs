@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Umbraco.Core.Models;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services.Changes;
 
 namespace Umbraco.Web.Cache
@@ -189,16 +190,16 @@ namespace Umbraco.Web.Cache
 
         #region MacroCache
 
-        public static void RefreshMacroCache(this DistributedCache dc, IMacro macro)
+        public static void RefreshMacroCache(this DistributedCache dc, IJsonSerializer jsonSerializer, IMacro macro)
         {
             if (macro == null) return;
-            dc.RefreshByJson(MacroCacheRefresher.UniqueId, MacroCacheRefresher.Serialize(macro));
+            dc.RefreshByJson(MacroCacheRefresher.UniqueId, MacroCacheRefresher.Serialize(jsonSerializer, macro));
         }
 
-        public static void RemoveMacroCache(this DistributedCache dc, IMacro macro)
+        public static void RemoveMacroCache(this DistributedCache dc, IJsonSerializer jsonSerializer, IMacro macro)
         {
             if (macro == null) return;
-            dc.RefreshByJson(MacroCacheRefresher.UniqueId, MacroCacheRefresher.Serialize(macro));
+            dc.RefreshByJson(MacroCacheRefresher.UniqueId, MacroCacheRefresher.Serialize(jsonSerializer, macro));
         }
 
         #endregion

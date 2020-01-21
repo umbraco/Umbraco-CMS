@@ -4,7 +4,6 @@ using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Sync;
-using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Cache
 {

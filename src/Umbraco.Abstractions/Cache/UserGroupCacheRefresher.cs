@@ -38,7 +38,7 @@ namespace Umbraco.Web.Cache
             var userGroupCache = AppCaches.IsolatedCaches.Get<IUserGroup>();
             if (userGroupCache)
             {
-                userGroupCache.Result.ClearByKey(UserGroupRepository.GetByAliasCacheKeyPrefix);
+                userGroupCache.Result.ClearByKey(CacheKeys.UserGroupGetByAliasCacheKeyPrefix);
             }
 
             //We'll need to clear all user cache too
@@ -59,7 +59,7 @@ namespace Umbraco.Web.Cache
             if (userGroupCache)
             {
                 userGroupCache.Result.Clear(RepositoryCacheKeys.GetKey<IUserGroup>(id));
-                userGroupCache.Result.ClearByKey(UserGroupRepository.GetByAliasCacheKeyPrefix);
+                userGroupCache.Result.ClearByKey(CacheKeys.UserGroupGetByAliasCacheKeyPrefix);
             }
 
             //we don't know what user's belong to this group without doing a look up so we'll need to just clear them all
