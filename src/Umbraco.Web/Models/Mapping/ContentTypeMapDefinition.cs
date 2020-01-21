@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
@@ -182,7 +181,7 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         // Umbraco.Code.MapAll -Blueprints
-        private static void Map(IContentTypeBase source, ContentTypeBasic target, string entityType)
+        private void Map(IContentTypeBase source, ContentTypeBasic target, string entityType)
         {
             target.Udi = Udi.Create(entityType, source.Key);
             target.Alias = source.Alias;
@@ -191,7 +190,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Icon = source.Icon;
             target.IconFilePath = target.IconIsClass
                 ? string.Empty
-                : $"{Current.Configs.Global().Path.EnsureEndsWith("/")}images/umbraco/{source.Icon}";
+                : $"{_globalSettings.Path.EnsureEndsWith("/")}images/umbraco/{source.Icon}";
 
             target.Trashed = source.Trashed;
             target.Id = source.Id;
@@ -204,30 +203,30 @@ namespace Umbraco.Web.Models.Mapping
             target.Thumbnail = source.Thumbnail;
             target.ThumbnailFilePath = target.ThumbnailIsClass
                 ? string.Empty
-                : Current.IOHelper.ResolveUrl("~/umbraco/images/thumbnails/" + source.Thumbnail);
+                : _ioHelper.ResolveUrl("~/umbraco/images/thumbnails/" + source.Thumbnail);
             target.UpdateDate = source.UpdateDate;
         }
 
         // no MapAll - uses the IContentTypeBase map method, which has MapAll
-        private static void Map(IContentTypeComposition source, ContentTypeBasic target, MapperContext context)
+        private void Map(IContentTypeComposition source, ContentTypeBasic target, MapperContext context)
         {
             Map(source, target, Constants.UdiEntityType.MemberType);
         }
 
         // no MapAll - uses the IContentTypeBase map method, which has MapAll
-        private static void Map(IContentType source, ContentTypeBasic target, MapperContext context)
+        private void Map(IContentType source, ContentTypeBasic target, MapperContext context)
         {
             Map(source, target, Constants.UdiEntityType.DocumentType);
         }
 
         // no MapAll - uses the IContentTypeBase map method, which has MapAll
-        private static void Map(IMediaType source, ContentTypeBasic target, MapperContext context)
+        private void Map(IMediaType source, ContentTypeBasic target, MapperContext context)
         {
             Map(source, target, Constants.UdiEntityType.MediaType);
         }
 
         // no MapAll - uses the IContentTypeBase map method, which has MapAll
-        private static void Map(IMemberType source, ContentTypeBasic target, MapperContext context)
+        private void Map(IMemberType source, ContentTypeBasic target, MapperContext context)
         {
             Map(source, target, Constants.UdiEntityType.MemberType);
         }
@@ -501,7 +500,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Icon = source.Icon;
             target.IconFilePath = target.IconIsClass
                 ? string.Empty
-                : $"{Current.Configs.Global().Path.EnsureEndsWith("/")}images/umbraco/{source.Icon}";
+                : $"{_globalSettings.Path.EnsureEndsWith("/")}images/umbraco/{source.Icon}";
             target.Id = source.Id;
             target.IsContainer = source.IsContainer;
             target.IsElement = source.IsElement;
@@ -512,7 +511,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Thumbnail = source.Thumbnail;
             target.ThumbnailFilePath = target.ThumbnailIsClass
                 ? string.Empty
-                : Current.IOHelper.ResolveUrl("~/umbraco/images/thumbnails/" + source.Thumbnail);
+                : _ioHelper.ResolveUrl("~/umbraco/images/thumbnails/" + source.Thumbnail);
             target.Udi = MapContentTypeUdi(source);
             target.UpdateDate = source.UpdateDate;
 
@@ -544,7 +543,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Icon = source.Icon;
             target.IconFilePath = target.IconIsClass
                 ? string.Empty
-                : $"{Current.Configs.Global().Path.EnsureEndsWith("/")}images/umbraco/{source.Icon}";
+                : $"{_globalSettings.Path.EnsureEndsWith("/")}images/umbraco/{source.Icon}";
             target.Id = source.Id;
             target.IsContainer = source.IsContainer;
             target.IsElement = source.IsElement;
@@ -555,7 +554,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Thumbnail = source.Thumbnail;
             target.ThumbnailFilePath = target.ThumbnailIsClass
                 ? string.Empty
-                : Current.IOHelper.ResolveUrl("~/umbraco/images/thumbnails/" + source.Thumbnail);
+                : _ioHelper.ResolveUrl("~/umbraco/images/thumbnails/" + source.Thumbnail);
             target.Trashed = source.Trashed;
             target.Udi = source.Udi;
         }
