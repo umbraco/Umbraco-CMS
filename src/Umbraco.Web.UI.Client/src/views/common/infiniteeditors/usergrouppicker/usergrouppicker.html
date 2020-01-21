@@ -13,10 +13,10 @@
         <umb-editor-container>
 
             <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
-                
+
             <umb-box>
                 <umb-box-content>
-                
+
                     <div class="form-search" style="margin-bottom: 15px;">
                         <i class="icon-search"></i>
                         <input type="text"
@@ -27,26 +27,31 @@
                                 umb-auto-focus
                                 no-dirty-check />
                     </div>
-                
+
                     <div class="umb-user-group-picker-list">
-            
-                        <a href="" class="umb-user-group-picker-list-item" ng-repeat="userGroup in vm.userGroups | filter:searchTerm" ng-click="vm.selectUserGroup(userGroup)">
-            
+
+                        <div class="umb-user-group-picker-list-item" ng-repeat="userGroup in vm.userGroups | filter:searchTerm">
+
+                            <button type="button" class="umb-user-group-picker__action" ng-click="vm.selectUserGroup(userGroup)">
+                                <span class="sr-only" ng-if="!userGroup.selected"><localize key="buttons_select">Select</localize> {{userGroup.name}}</span>
+                                <span class="sr-only" ng-if="userGroup.selected">{{userGroup.name}} <localize key="general_selected">Selected</localize></span>
+                            </button>
+
                             <div class="umb-user-group-picker-list-item__icon">
-                                <i ng-if="!userGroup.selected" class="{{userGroup.icon}}"></i>
+                                <i ng-if="!userGroup.selected" class="{{userGroup.icon}}" aria-hidden="true"></i>
                                 <umb-checkmark ng-if="userGroup.selected" checked="userGroup.selected" size="xs"></umb-checkmark>
                             </div>
-            
+
                             <div>
                                 <div class="umb-user-group-picker-list-item__name">{{ userGroup.name }}</div>
-            
+
                                 <div class="umb-user-group-picker-list-item__permission" ng-if="userGroup.sections">
                                     <span>
                                         <span class="bold"><localize key="main_sections">Sections</localize>:</span>
                                         <span ng-repeat="section in userGroup.sections">{{ section.name }}<span ng-if="!$last">, </span></span>
                                     </span>
                                 </div>
-            
+
                                 <div class="umb-user-group-picker-list-item__permission">
                                     <span>
                                         <span class="bold"><localize key="user_startnode">Content start node</localize>:</span>
@@ -54,7 +59,7 @@
                                         <span ng-if="userGroup.contentStartNode">{{ userGroup.contentStartNode.name }}</span>
                                     </span>
                                 </div>
-            
+
                                 <div class="umb-user-group-picker-list-item__permission">
                                     <span>
                                         <span class="bold"><localize key="user_mediastartnode">Media start node</localize>:</span>
@@ -63,16 +68,16 @@
                                     </span>
                                 </div>
                             </div>
-                        </a>
-            
+                        </div>
+
                     </div>
-                
+
                     <umb-empty-state
                         ng-if="vm.userGroups.length === 0 && !vm.loading"
                         position="center">
-                        No user groups have been added
+                        <localize key="user_noUserGroupsAdded">No user groups have been added</localize>
                     </umb-empty-state>
-                    
+
                 </umb-box-content>
             </umb-box>
 

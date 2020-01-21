@@ -249,25 +249,10 @@
 
     transition: all 150ms ease-in-out;
 
-    &:focus,
+    &:active,
     &:hover {
         color: @ui-action-discreet-type-hover;
         border-color: @ui-action-discreet-type-hover;
-    }
-
-    &:focus {
-        outline: none;
-        .tabbing-active &:after {
-            content: '';
-            position: absolute;
-            z-index: 10000;
-            top: -6px;
-            bottom: -6px;
-            left: -6px;
-            right: -6px;
-            border-radius: 3px;
-            box-shadow: 0 0 2px @blueMid, inset 0 0 2px 1px @blueMid;
-        }
     }
 }
 
