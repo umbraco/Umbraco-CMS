@@ -14,7 +14,7 @@ namespace Umbraco.Web.Models
         public List<ContentPropertyFile> UploadedFiles { get; } = new List<ContentPropertyFile>();
 
         [DataMember(Name = "notifications")]
-        public List<Notification> Notifications { get; } = new List<Notification>();
+        public List<BackOfficeNotification> Notifications { get; } = new List<BackOfficeNotification>();
 
         /// <summary>
         /// A flag to determine if this package is compatible to be installed

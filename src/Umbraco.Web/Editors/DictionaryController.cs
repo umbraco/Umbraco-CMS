@@ -18,7 +18,6 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
-using Notification = Umbraco.Web.Models.ContentEditing.Notification;
 
 namespace Umbraco.Web.Editors
 {
@@ -188,7 +187,7 @@ namespace Umbraco.Web.Editors
 
                 var model = Mapper.Map<IDictionaryItem, DictionaryDisplay>(dictionaryItem);
 
-                model.Notifications.Add(new Notification(
+                model.Notifications.Add(new BackOfficeNotification(
                     Services.TextService.Localize("speechBubbles/dictionaryItemSaved", userCulture), string.Empty,
                     NotificationStyle.Success));
 

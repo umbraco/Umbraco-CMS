@@ -213,7 +213,7 @@ namespace Umbraco.Web.Editors
 
                 macroDisplay.Notifications.Clear();
 
-                macroDisplay.Notifications.Add(new Models.ContentEditing.Notification("Success", "Macro saved", NotificationStyle.Success));
+                macroDisplay.Notifications.Add(new BackOfficeNotification("Success", "Macro saved", NotificationStyle.Success));
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, macroDisplay);
             }
