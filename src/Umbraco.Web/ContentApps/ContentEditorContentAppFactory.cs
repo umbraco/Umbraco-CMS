@@ -14,6 +14,7 @@ namespace Umbraco.Web.ContentApps
 
         private ContentApp _contentApp;
         private ContentApp _mediaApp;
+        private ContentApp _memberApp;
 
         public ContentApp GetContentAppFor(object o, IEnumerable<IReadOnlyUserGroup> userGroups)
         {
@@ -44,6 +45,16 @@ namespace Umbraco.Web.ContentApps
 
                 case IMedia _:
                     return null;
+
+                case IMember _:
+                    return _memberApp ?? (_memberApp = new ContentApp
+                    {
+                        Alias = "umbContent",
+                        Name = "Content",
+                        Icon = Constants.Icons.Content,
+                        View = "views/member/apps/content/content.html",
+                        Weight = Weight
+                    });
 
                 default:
                     throw new NotSupportedException($"Object type {o.GetType()} is not supported here.");

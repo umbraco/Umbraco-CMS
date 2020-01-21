@@ -1,53 +1,45 @@
 <div class="usky-grid usky-grid-configuration" ng-controller="Umbraco.PropertyEditors.GridPrevalueEditor.DeleteRowConfirmController">
 
+    <umb-editor-view>
+        <umb-editor-container>
+            <umb-box>
+                <umb-box-content>
+                    <h3 class="alert alert-danger ng-scope"><localize key="grid_warning">Warning!</localize></h3>
 
-        <umb-editor-view>
+                    <p>
+                        <localize key="grid_youAreDeleting">You are deleting the row configuration </localize> <strong>{{model.dialogData.rowName}}</strong>
+                    </p>
 
-            <umb-editor-container>
-                <umb-box>
-                    <umb-box-content>
+                    <p>
+                        <localize key="grid_deletingARow">
+                            Modifying a row configuration name will result in loss of
+                            data for any existing content that is based on this configuration.
+                        </localize>
+                    </p>
 
+                    <p>
+                        <localize key="general_areyousure">Are you sure?</localize>
+                    </p>
 
+                </umb-box-content>
+            </umb-box>
+        </umb-editor-container>
 
-   <h3 class="alert alert-warn ng-scope">Warning!</h3>
-
-   <p>
-      You are deleting the row configuration '<strong>{{model.dialogData.rowName}}</strong>'
-   </p>
-
-   <p>
-      Modifying a row configuration name will result in loss of
-      data for any existing content that is based on this configuration.
-   </p>
-
-   <p>
-      <localize key="general_areyousure">Are you sure?</localize>
-   </p>
-
-
-
-
-                            </umb-box-content>
-                        </umb-box>
-                    </umb-editor-container>
-
-                    <umb-editor-footer>
-                    <umb-editor-footer-content-right>
-                        <umb-button
-                            type="button"
+        <umb-editor-footer>
+            <umb-editor-footer-content-right>
+                <umb-button type="button"
                             button-style="link"
                             label-key="general_close"
                             shortcut="esc"
                             action="close()">
-                        </umb-button>
-                        <umb-button
-                            type="button"
-                            button-style="warning"
+                </umb-button>
+                <umb-button type="button"
+                            button-style="danger"
                             label-key="general_delete"
                             action="submit(model)">
-                        </umb-button>
-                </umb-editor-footer-content-right>
-            </umb-editor-footer>
+                </umb-button>
+            </umb-editor-footer-content-right>
+        </umb-editor-footer>
 
     </umb-editor-view>
 
