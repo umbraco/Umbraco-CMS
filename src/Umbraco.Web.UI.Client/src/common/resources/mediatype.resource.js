@@ -100,6 +100,36 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter, locali
                'Failed to retrieve allowed types for media id ' + mediaId);
         },
 
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.mediaTypeResource#getAllowedImageTypes
+         * @methodOf umbraco.resources.mediaTypeResource
+         *
+         * @description
+         * Returns a list of allowed media types for images underneath a media item with a given ID
+         *
+         * ##usage
+         * <pre>
+         * mediaTypeResource.getAllowedImageTypes(1234)
+         *    .then(function(array) {
+         *        $scope.type = type;
+         *    });
+         * </pre>
+         * @param {Int} mediaId id of the media item to retrive allowed child types for
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        getAllowedImageTypes: function (mediaId) {
+
+             return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "mediaTypeApiBaseUrl",
+                        "GetAllowedImageChildren",
+                        [{ contentId: mediaId }])),
+                'Failed to retrieve allowed types for media id ' + mediaId);
+        },
+
         getById: function (id) {
 
             return umbRequestHelper.resourcePromise(
