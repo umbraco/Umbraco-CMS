@@ -703,7 +703,8 @@ namespace Umbraco.Web.Editors
 
                     if (result.FormData["contentTypeAlias"] == Constants.Conventions.MediaTypes.AutoSelect)
                     {
-                        if (Current.Configs.Settings().Content.ImageFileTypes.Contains(ext))
+                        if (Current.Configs.Settings().Content.ImageFileTypes.Contains(ext) &&
+                            Services.MediaTypeService.Get(Constants.Conventions.MediaTypes.Image) != null)
                         {
                             mediaType = Constants.Conventions.MediaTypes.Image;
                         }
