@@ -81,7 +81,7 @@
     <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.0.1" />
     <PackageReference Include="Microsoft.Owin.Security.OAuth" Version="4.0.1" />
     <PackageReference Include="Microsoft.SourceLink.GitHub">
-      <Version>1.0.0-beta2-19324-01</Version>
+      <Version>1.0.0-beta2-19554-01</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -140,7 +140,6 @@
     <Compile Include="Cache\ContentCacheRefresher.cs" />
     <Compile Include="Cache\IDistributedCacheBinder.cs" />
     <Compile Include="Cache\UserGroupCacheRefresher.cs" />
-    <Compile Include="Cache\UserGroupPermissionsCacheRefresher.cs" />
     <Compile Include="Cache\WebCachingAppCache.cs" />
     <Compile Include="Compose\AuditEventsComponent.cs" />
     <Compile Include="Compose\AuditEventsComposer.cs" />
@@ -342,7 +341,6 @@
     <Compile Include="Editors\TourController.cs" />
     <Compile Include="HealthCheck\Checks\Security\XssProtectionCheck.cs" />
     <Compile Include="HealthCheck\Checks\Security\HstsCheck.cs" />
-    <Compile Include="Security\UmbracoAntiForgeryAdditionalDataProvider.cs" />
     <Compile Include="Editors\UserEditorAuthorizationHelper.cs" />
     <Compile Include="Editors\Filters\UserGroupAuthorizationAttribute.cs" />
     <Compile Include="Editors\Filters\UserGroupEditorAuthorizationHelper.cs" />
@@ -701,7 +699,6 @@
     <Compile Include="Install\Models\DatabaseType.cs" />
     <Compile Include="Install\Models\InstallationType.cs" />
     <Compile Include="Install\Models\InstallInstructions.cs" />
-    <Compile Include="Install\Models\InstallPackageModel.cs" />
     <Compile Include="Install\Models\InstallProgressResultModel.cs" />
     <Compile Include="Install\Models\InstallSetup.cs" />
     <Compile Include="Install\Models\InstallSetupResult.cs" />

@@ -20,6 +20,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Core.Dashboards;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Services;
+using Umbraco.Core.Mapping;
 
 namespace Umbraco.Web.Editors
 {
@@ -50,8 +51,9 @@ namespace Umbraco.Web.Editors
             IDashboardService dashboardService,
             UmbracoHelper umbracoHelper,
             IUmbracoVersion umbracoVersion,
-            IShortStringHelper shortStringHelper)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+            IShortStringHelper shortStringHelper,
+            UmbracoMapper umbracoMapper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper)
         {
             _dashboardService = dashboardService;
             _umbracoVersion = umbracoVersion;

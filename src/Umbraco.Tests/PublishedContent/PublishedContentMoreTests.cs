@@ -7,6 +7,8 @@ using Umbraco.Web;
 using Umbraco.Core;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Composing;
+using Moq;
+using Examine;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -201,7 +203,8 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void PublishedContentQueryTypedContentList()
         {
-            var query = new PublishedContentQuery(Current.UmbracoContext.PublishedSnapshot, Current.UmbracoContext.VariationContextAccessor);
+            var examineManager = new Mock<IExamineManager>();
+            var query = new PublishedContentQuery(Current.UmbracoContext.PublishedSnapshot, Current.UmbracoContext.VariationContextAccessor, examineManager.Object);
             var result = query.Content(new[] { 1, 2, 4 }).ToArray();
             Assert.AreEqual(2, result.Length);
             Assert.AreEqual(1, result[0].Id);

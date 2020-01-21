@@ -313,13 +313,6 @@ namespace Umbraco.Core.Services
         OperationResult MoveToRecycleBin(IContent content, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
-        /// Empties the recycle bin.
-        /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use EmptyRecycleBin with explicit indication of user ID instead")]
-        OperationResult EmptyRecycleBin();
-
-        /// <summary>
         /// Empties the Recycle Bin by deleting all <see cref="IContent"/> that resides in the bin
         /// </summary>
         /// <param name="userId">Optional Id of the User emptying the Recycle Bin</param>

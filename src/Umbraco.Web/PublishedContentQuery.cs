@@ -22,12 +22,6 @@ namespace Umbraco.Web
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IExamineManager _examineManager;
 
-        [Obsolete("Use the constructor with all parameters instead")]
-        public PublishedContentQuery(IPublishedSnapshot publishedSnapshot, IVariationContextAccessor variationContextAccessor)
-            : this (publishedSnapshot, variationContextAccessor, ExamineManager.Instance)
-        {
-        }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedContentQuery"/> class.
         /// </summary>

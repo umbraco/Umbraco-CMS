@@ -72,7 +72,7 @@ namespace Umbraco.Web.Search
                 IOHelper,
                 RuntimeState,
                 LanguageService,
-                GetContentValueSetValidator()
+                UmbracoIndexConfig.GetContentValueSetValidator()
                 );
             return index;
         }
@@ -88,7 +88,7 @@ namespace Umbraco.Web.Search
                 IOHelper,
                 RuntimeState,
                 LanguageService,
-                GetPublishedContentValueSetValidator());
+                UmbracoIndexConfig.GetPublishedContentValueSetValidator());
             return index;
         }
 
@@ -102,31 +102,9 @@ namespace Umbraco.Web.Search
                 ProfilingLogger,
                 IOHelper,
                 RuntimeState,
-                GetMemberValueSetValidator()
+                UmbracoIndexConfig.GetMemberValueSetValidator()
                 );
             return index;
         }
-        [Obsolete("This method should not be used and will be removed in future versions. GetContentValueSetValidator was moved to IUmbracoIndexConfig")]
-        public virtual IContentValueSetValidator GetContentValueSetValidator()
-        {
-            return UmbracoIndexConfig.GetContentValueSetValidator();
-        }
-        [Obsolete("This method should not be used and will be removed in future versions. GetPublishedContentValueSetValidator was moved to IUmbracoIndexConfig")]
-        public virtual IContentValueSetValidator GetPublishedContentValueSetValidator()
-        {
-            return UmbracoIndexConfig.GetPublishedContentValueSetValidator();
-        }
-
-        /// <summary>
-        /// Returns the <see cref="IValueSetValidator"/> for the member indexer
-        /// </summary>
-        /// <returns></returns>
-        [Obsolete("This method should not be used and will be removed in future versions. GetMemberValueSetValidator was moved to IUmbracoIndexConfig")]
-        public virtual IValueSetValidator GetMemberValueSetValidator()
-        {
-            return UmbracoIndexConfig.GetMemberValueSetValidator();
-        }
-
-
     }
 }

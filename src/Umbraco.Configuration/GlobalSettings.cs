@@ -186,23 +186,6 @@ namespace Umbraco.Core.Configuration
         }
 
         /// <summary>
-        /// Gets the name of the content XML file.
-        /// </summary>
-        /// <value>The content XML.</value>
-        /// <remarks>
-        /// Defaults to ~/App_Data/umbraco.config
-        /// </remarks>
-        public string ContentXmlFile
-        {
-            get
-            {
-                return ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.ContentXML)
-                    ? ConfigurationManager.AppSettings[Constants.AppSettings.ContentXML]
-                    : "~/App_Data/umbraco.config";
-            }
-        }
-
-        /// <summary>
         /// Gets the path to umbraco's root directory (/umbraco by default).
         /// </summary>
         /// <value>The path.</value>

@@ -2033,13 +2033,6 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Empties the Recycle Bin by deleting all <see cref="IContent"/> that resides in the bin
         /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use EmptyRecycleBin with explicit indication of user ID instead")]
-        public OperationResult EmptyRecycleBin() => EmptyRecycleBin(Constants.Security.SuperUserId);
-
-        /// <summary>
-        /// Empties the Recycle Bin by deleting all <see cref="IContent"/> that resides in the bin
-        /// </summary>
         public OperationResult EmptyRecycleBin(int userId = Constants.Security.SuperUserId)
         {
             var nodeObjectType = Constants.ObjectTypes.Document;

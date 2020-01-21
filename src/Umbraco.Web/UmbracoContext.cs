@@ -119,19 +119,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the published content cache.
         /// </summary>
-        [Obsolete("Use the Content property.")]
-        public IPublishedContentCache ContentCache => PublishedSnapshot.Content;
-
-        /// <summary>
-        /// Gets the published content cache.
-        /// </summary>
         public IPublishedContentCache Content => PublishedSnapshot.Content;
-
-        /// <summary>
-        /// Gets the published media cache.
-        /// </summary>
-        [Obsolete("Use the Media property.")]
-        public IPublishedMediaCache MediaCache => PublishedSnapshot.Media;
 
         /// <summary>
         /// Gets the published media cache.
@@ -245,30 +233,6 @@ namespace Umbraco.Web
         public string Url(Guid contentId, UrlMode mode, string culture = null)
         {
             return UrlProvider.GetUrl(contentId, mode, culture);
-        }
-
-        /// <summary>
-        /// Gets the absolute url of a content identified by its identifier.
-        /// </summary>
-        /// <param name="contentId">The content identifier.</param>
-        /// <param name="culture"></param>
-        /// <returns>The absolute url for the content.</returns>
-        [Obsolete("Use the Url() method with UrlMode.Absolute.")]
-        public string UrlAbsolute(int contentId, string culture = null)
-        {
-            return UrlProvider.GetUrl(contentId, UrlMode.Absolute, culture);
-        }
-
-        /// <summary>
-        /// Gets the absolute url of a content identified by its identifier.
-        /// </summary>
-        /// <param name="contentId">The content identifier.</param>
-        /// <param name="culture"></param>
-        /// <returns>The absolute url for the content.</returns>
-        [Obsolete("Use the Url() method with UrlMode.Absolute.")]
-        public string UrlAbsolute(Guid contentId, string culture = null)
-        {
-            return UrlProvider.GetUrl(contentId, UrlMode.Absolute, culture);
         }
 
         #endregion
