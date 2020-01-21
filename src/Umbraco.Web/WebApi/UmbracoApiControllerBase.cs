@@ -61,22 +61,6 @@ namespace Umbraco.Web.WebApi
             Mapper = umbracoMapper;
         }
 
-        [Obsolete("This constructor is obsolete since it doesn't inject the UmbracoMapper. The UmbracoMapper will be resolved from the service locator Current.Mapper, which is not good for testability. Inject the UmbracoMapper using full constructor injection instead.")]
-        protected UmbracoApiControllerBase(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
-        {
-            UmbracoContextAccessor = umbracoContextAccessor;
-            GlobalSettings = globalSettings;
-            SqlContext = sqlContext;
-            Services = services;
-            AppCaches = appCaches;
-            Logger = logger;
-            RuntimeState = runtimeState;
-            Umbraco = umbracoHelper;
-
-            // not good for testability, hence the obsolete.
-            Mapper = Current.Mapper;
-        }
-
         /// <summary>
         /// Gets a unique instance identifier.
         /// </summary>

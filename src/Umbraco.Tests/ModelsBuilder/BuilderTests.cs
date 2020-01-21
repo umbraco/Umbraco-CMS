@@ -251,7 +251,7 @@ namespace Umbraco.Web.PublishedModels
             {
                 Alias = "prop3",
                 ClrName = "Prop3",
-                ModelClrType = typeof(global::Umbraco.Core.IO.FileSecurityException),
+                ModelClrType = typeof(global::Umbraco.Core.Exceptions.BootFailedException),
             });
             var types = new[] { type1 };
 
@@ -272,7 +272,7 @@ namespace Umbraco.Web.PublishedModels
 
             Assert.IsTrue(gen.Contains(" global::Umbraco.Core.Models.PublishedContent.IPublishedContent Prop1"));
             Assert.IsTrue(gen.Contains(" global::System.Text.StringBuilder Prop2"));
-            Assert.IsTrue(gen.Contains(" global::Umbraco.Core.IO.FileSecurityException Prop3"));
+            Assert.IsTrue(gen.Contains(" global::Umbraco.Core.Exceptions.BootFailedException Prop3"));
         }
 
         [TestCase("int", typeof(int))]

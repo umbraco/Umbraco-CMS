@@ -17,25 +17,6 @@ namespace Umbraco.Core
         /// <returns></returns>
         public static bool IsLiveFactory(this IPublishedModelFactory factory) => factory is ILivePublishedModelFactory;
 
-        [Obsolete("This method is no longer used or necessary and will be removed from future")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void WithSafeLiveFactory(this IPublishedModelFactory factory, Action action)
-        {
-            if (factory is ILivePublishedModelFactory liveFactory)
-            {
-                lock (liveFactory.SyncRoot)
-                {
-                    //Call refresh on the live factory to re-compile the models
-                    liveFactory.Refresh();
-                    action();
-                }
-            }
-            else
-            {
-                action();
-            }
-        }
-
         /// <summary>
         /// Sets a flag to reset the ModelsBuilder models if the <see cref="IPublishedModelFactory"/> is <see cref="ILivePublishedModelFactory"/>
         /// </summary>

@@ -13,6 +13,7 @@ using Umbraco.Web.Trees;
 using Section = Umbraco.Web.Models.ContentEditing.Section;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Services;
+using Umbraco.Core.Mapping;
 
 namespace Umbraco.Web.Editors
 {
@@ -27,8 +28,8 @@ namespace Umbraco.Web.Editors
         private readonly ITreeService _treeService;
 
         public SectionController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState,
-            IDashboardService dashboardService, ISectionService sectionService, ITreeService treeService, UmbracoHelper umbracoHelper, IShortStringHelper shortStringHelper)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper)
+            IDashboardService dashboardService, ISectionService sectionService, ITreeService treeService, UmbracoHelper umbracoHelper, IShortStringHelper shortStringHelper, UmbracoMapper umbracoMapper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
         {
             _dashboardService = dashboardService;
             _sectionService = sectionService;
@@ -43,7 +44,7 @@ namespace Umbraco.Web.Editors
 
             // this is a bit nasty since we'll be proxying via the app tree controller but we sort of have to do that
             // since tree's by nature are controllers and require request contextual data
-            var appTreeController = new ApplicationTreeController(GlobalSettings, UmbracoContextAccessor, SqlContext, Services, AppCaches, Logger, RuntimeState, _treeService, _sectionService, Umbraco)
+            var appTreeController = new ApplicationTreeController(GlobalSettings, UmbracoContextAccessor, SqlContext, Services, AppCaches, Logger, RuntimeState, _treeService, _sectionService, Umbraco, Mapper)
             {
                 ControllerContext = ControllerContext
             };

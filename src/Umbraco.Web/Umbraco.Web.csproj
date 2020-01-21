@@ -62,7 +62,7 @@
   <ItemGroup>
     <PackageReference Include="ClientDependency" Version="1.9.8" />
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
-    <PackageReference Include="Examine" Version="1.0.1" />
+    <PackageReference Include="Examine" Version="1.0.2" />
     <PackageReference Include="HtmlAgilityPack" Version="1.8.14" />
     <PackageReference Include="ImageProcessor">
       <Version>2.7.0.100</Version>
@@ -81,7 +81,7 @@
     <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.0.1" />
     <PackageReference Include="Microsoft.Owin.Security.OAuth" Version="4.0.1" />
     <PackageReference Include="Microsoft.SourceLink.GitHub">
-      <Version>1.0.0-beta2-19324-01</Version>
+      <Version>1.0.0-beta2-19554-01</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -140,7 +140,6 @@
     <Compile Include="Cache\ContentCacheRefresher.cs" />
     <Compile Include="Cache\IDistributedCacheBinder.cs" />
     <Compile Include="Cache\UserGroupCacheRefresher.cs" />
-    <Compile Include="Cache\UserGroupPermissionsCacheRefresher.cs" />
     <Compile Include="Cache\WebCachingAppCache.cs" />
     <Compile Include="Compose\AuditEventsComponent.cs" />
     <Compile Include="Compose\AuditEventsComposer.cs" />
@@ -208,7 +207,6 @@
     <Compile Include="Net\AspNetPasswordHasher.cs" />
     <Compile Include="Net\AspNetSessionIdResolver.cs" />
     <Compile Include="Profiling\WebProfilingController.cs" />
-    <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
@@ -256,8 +254,6 @@
     <Compile Include="ViewDataExtensions.cs" />
     <Compile Include="WebApi\Filters\AdminUsersAuthorizeAttribute.cs" />
     <Compile Include="WebApi\Filters\OnlyLocalRequestsAttribute.cs" />
-    <Compile Include="PropertyEditors\MultiUrlPickerConfiguration.cs" />
-    <Compile Include="PropertyEditors\MultiUrlPickerConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\MultiUrlPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MultiUrlPickerValueEditor.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MultiUrlPickerValueConverter.cs" />
@@ -278,7 +274,6 @@
     <Compile Include="Services\ITreeService.cs" />
     <Compile Include="Services\ISectionService.cs" />
     <Compile Include="PropertyEditors\GridPropertyIndexValueFactory.cs" />
-    <Compile Include="PropertyEditors\PropertyEditorsComposer.cs" />
     <Compile Include="PublishedCache\NuCache\NuCacheComposer.cs" />
     <Compile Include="Routing\RedirectTrackingComposer.cs" />
     <Compile Include="Runtime\WebInitialComposer.cs" />
@@ -342,7 +337,6 @@
     <Compile Include="Editors\TourController.cs" />
     <Compile Include="HealthCheck\Checks\Security\XssProtectionCheck.cs" />
     <Compile Include="HealthCheck\Checks\Security\HstsCheck.cs" />
-    <Compile Include="Security\UmbracoAntiForgeryAdditionalDataProvider.cs" />
     <Compile Include="Editors\UserEditorAuthorizationHelper.cs" />
     <Compile Include="Editors\Filters\UserGroupAuthorizationAttribute.cs" />
     <Compile Include="Editors\Filters\UserGroupEditorAuthorizationHelper.cs" />
@@ -462,25 +456,8 @@
     <Compile Include="Mvc\FilteredControllerFactoryCollection.cs" />
     <Compile Include="Mvc\FilteredControllerFactoryCollectionBuilder.cs" />
     <Compile Include="Mvc\SurfaceControllerTypeCollection.cs" />
-    <Compile Include="PropertyEditors\MediaPickerPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\MediaPickerConfiguration.cs" />
-    <Compile Include="PropertyEditors\MediaPickerConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\MemberPickerPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\MemberPickerConfiguration.cs" />
-    <Compile Include="PropertyEditors\MultiNodePickerConfiguration.cs" />
-    <Compile Include="PropertyEditors\MultiNodePickerConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\MultiNodePickerConfigurationTreeSource.cs" />
-    <Compile Include="PropertyEditors\MultiNodeTreePickerPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\MultipleTextStringConfiguration.cs" />
-    <Compile Include="PropertyEditors\MultipleTextStringConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\NestedContentConfiguration.cs" />
-    <Compile Include="PropertyEditors\NestedContentConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\NestedContentController.cs" />
     <Compile Include="PropertyEditors\NestedContentPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\ParameterEditors\MultipleContentPickerParameterEditor.cs" />
-    <Compile Include="PropertyEditors\RichTextConfiguration.cs" />
-    <Compile Include="PropertyEditors\SliderConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\FlexibleDropdownPropertyValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\NestedContentManyValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\NestedContentValueConverterBase.cs" />
     <Compile Include="PropertyEditors\ValueConverters\NestedContentSingleValueConverter.cs" />
@@ -718,7 +695,6 @@
     <Compile Include="Install\Models\DatabaseType.cs" />
     <Compile Include="Install\Models\InstallationType.cs" />
     <Compile Include="Install\Models\InstallInstructions.cs" />
-    <Compile Include="Install\Models\InstallPackageModel.cs" />
     <Compile Include="Install\Models\InstallProgressResultModel.cs" />
     <Compile Include="Install\Models\InstallSetup.cs" />
     <Compile Include="Install\Models\InstallSetupResult.cs" />
@@ -774,13 +750,6 @@
     <Compile Include="Models\Mapping\TagMapDefinition.cs" />
     <Compile Include="Models\UpgradeCheckResponse.cs" />
     <Compile Include="Models\PasswordChangedModel.cs" />
-    <Compile Include="PropertyEditors\MemberGroupPickerPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\ParameterEditors\ContentTypeParameterEditor.cs" />
-    <Compile Include="PropertyEditors\ParameterEditors\MultipleContentTypeParameterEditor.cs" />
-    <Compile Include="PropertyEditors\ParameterEditors\MultiplePropertyGroupParameterEditor.cs" />
-    <Compile Include="PropertyEditors\ParameterEditors\MultiplePropertyTypeParameterEditor.cs" />
-    <Compile Include="PropertyEditors\ParameterEditors\PropertyGroupParameterEditor.cs" />
-    <Compile Include="PropertyEditors\ParameterEditors\PropertyTypeParameterEditor.cs" />
     <Compile Include="PropertyEditors\PropertyEditorAssetAttribute.cs" />
     <Compile Include="PropertyEditors\RteEmbedController.cs" />
     <Compile Include="Editors\EntityController.cs" />
@@ -793,11 +762,7 @@
     <Compile Include="Models\ContentEditing\PropertyEditorBasic.cs" />
     <Compile Include="Models\Mapping\DataTypeMapDefinition.cs" />
     <Compile Include="Models\Mapping\EntityMapDefinition.cs" />
-    <Compile Include="PropertyEditors\MultipleTextStringPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\RadioButtonsPropertyEditor.cs" />
     <Compile Include="PropertyEditors\RichTextPreValueController.cs" />
-    <Compile Include="PropertyEditors\RichTextConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\SliderPropertyEditor.cs" />
     <Compile Include="PublishedContentQuery.cs" />
     <Compile Include="ImageCropperTemplateExtensions.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />
