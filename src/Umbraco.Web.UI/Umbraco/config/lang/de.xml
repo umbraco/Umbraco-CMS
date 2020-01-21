@@ -100,11 +100,10 @@
     <key alias="domainExists">Die Domain '%0%' ist bereits zugeordnet</key>
     <key alias="domainUpdated">Domain '%0%' aktualisiert</key>
     <key alias="orEdit">Domains bearbeiten</key>
-    <key alias="domainHelp">
-      <![CDATA[
-    	Beispiel: example.com, www.example.com
-    ]]>
-    </key>
+    <key alias="domainHelpWithVariants">
+    	<![CDATA[Gültige Domain-Namen sind: "example.com", "www.example.com", "example.com:8080", oder "https://www.example.com/".
+     Außerdem werden Pfade mit erstem URL-Segment unterstützt z. B.: "example.com/en" or "/en".]]></key>
+
     <key alias="inherit">Vererben</key>
     <key alias="setLanguage">Kultur</key>
     <key alias="setLanguageHelp">Definiert die Kultureinstellung für untergeordnete Elemente dieses Elements oder vererbt vom übergeordneten Element. Wird auch auf das aktuelle Element angewendet, sofern auf tieferer Ebene keine Domain zugeordnet ist.</key>
@@ -156,7 +155,8 @@
     <key alias="confirmActionConfirm">Bestätigen</key>
   </area>
   <area alias="auditTrails">
-    <key alias="atViewingFor">Anzeigen als</key><!--???-->
+    <key alias="atViewingFor">Anzeigen als</key>
+    <!--???-->
     <key alias="delete">Inhalt gelöscht</key>
     <key alias="unpublish">Inhalt unveröffentlicht</key>
     <key alias="unpublishvariant">Inhalt unveröffentlicht für Sprache: %0% </key>
@@ -293,6 +293,7 @@
     </key>
     <key alias="nestedContentDeleteItem">Wollen Sie dieses Element wirklich entfernen?</key>
     <key alias="nestedContentEditorNotSupported">Eigenschaft %0% verwendet Editor %1%, welcher nicht von Nested Content unterstützt wird.</key>
+    <key alias="nestedContentNoContentTypes">Es wurden keine Dokument-(Inhalts-)Typen für diese Eigenschaft definiert.</key>
     <key alias="addTextBox">Füge ein weiteres Textfeld hinzu</key>
     <key alias="removeTextBox">Entferne dieses Textfeld</key>
     <key alias="contentRoot">Inhalt-Basis</key>
@@ -309,10 +310,13 @@
     <key alias="publishedLanguages">Veröffentlichte Sprachen</key>
     <key alias="unpublishedLanguages">Unveröffentlichte Sprachen</key>
     <key alias="unmodifiedLanguages">Unveränderte Sprachen</key>
+    <key alias="untouchedLanguagesForFirstTime">Diese Sprachen wurden nicht angelegt</key>
     <key alias="readyToPublish">Bereit zu Veröffentlichen?</key>
     <key alias="readyToSave">Bereit zu Sichern?</key>
     <key alias="sendForApproval">Freigabe anfordern</key>
     <key alias="schedulePublishHelp">Wählen Sie Datum und Uhrzeit für die Veröffentlichung bzw. deren Rücknahme.</key>
+    <key alias="createEmpty">Neues Element anlegen</key>
+    <key alias="createFromClipboard">Aus der Zwischenablage einfügen</key>
   </area>
   <area alias="blueprints">
     <key alias="createBlueprintFrom">Erzeuge eine neue Inhaltsvorlage von '%0%'</key>
@@ -348,7 +352,11 @@
     <key alias="enterFolderName">Geben Sie einen Verzeichnisnamen ein</key>
     <key alias="updateData">Wählen Sie einen Namen und einen Typ</key>
     <key alias="noDocumentTypes" version="7.0"><![CDATA[Es stehen keine erlaubten Dokumenttypen zur Verfügung. Sie müssen diese in den Einstellungen (unter "Dokumenttypen") aktivieren.]]></key>
+    <key alias="noDocumentTypesWithNoSettingsAccess">Die im Inhaltsbaum ausgewählte Seite erlaubt keine Unterseiten.</key>
+    <key alias="noDocumentTypesEditPermissions">Bearbeitungsrechte für diesen Dokumenttyp</key>  
     <key alias="noMediaTypes" version="7.0"><![CDATA[Es stehen keine erlaubten Medientypen zur Verfügung. Sie müssen diese in den Einstellungen (unter "Medientypen") aktivieren.]]></key>
+    <key alias="noMediaTypesWithNoSettingsAccess">Das im Strukturbaum ausgewählte Medienelement erlaubt keine untergeordneten Elemente.</key>
+    <key alias="noMediaTypesEditPermissions">Bearbeitungsrechte für diesen Medientyp</key>
     <key alias="documentTypeWithoutTemplate">Dokumenttyp ohne Vorlage</key>
     <key alias="newFolder">Neues Verzeichnis</key>
     <key alias="newDataType">Neuer Datentyp</key>
@@ -408,7 +416,6 @@
     <key alias="urlLinkPicker">Link</key>
     <key alias="anchorLinkPicker">Anker / querystring</key>
     <key alias="anchorInsert">Name</key>
-    <key alias="assignDomain">Hostnamen verwalten</key>
     <key alias="closeThisWindow">Fenster schließen</key>
     <key alias="confirmdelete">Wollen Sie dies wirklich entfernen</key>
     <key alias="confirmdisable">Wollen Sie folgendes wirklich deaktivieren</key>
@@ -425,11 +432,14 @@
     <key alias="insertMacro">klicken um Macro hinzuzufügen</key>
     <key alias="inserttable">Tabelle einfügen</key>
     <key alias="languagedeletewarning">Dies entfernt die Sprache</key>
+    <key alias="languageChangeWarning">
+      Die Kultur-Variante einer Sprache zu ändern ist möglicherweise eine aufwendige Operation und führt zum Erneuern von Inhalts-Zwischenspeicher und Such-Index.</key>
     <key alias="lastEdited">Zuletzt bearbeitet</key>
     <key alias="link">Verknüpfung</key>
     <key alias="linkinternal">Anker:</key>
     <key alias="linklocaltip">Wenn lokale Links verwendet werden, füge ein "#" vor den Link ein</key>
     <key alias="linknewwindow">In einem neuen Fenster öffnen?</key>
+    <key alias="macroContainerSettings">Macro Einstellungen</key>
     <key alias="macroDoesNotHaveProperties">Dieses Makro enthält keine einstellbaren Eigenschaften.</key>
     <key alias="paste">Einfügen</key>
     <key alias="permissionsEdit">Berechtigungen bearbeiten für</key>
@@ -464,6 +474,7 @@
     <key alias="selectLink">Link wählen</key>
     <key alias="selectMacro">Makro wählen</key>
     <key alias="selectContent">Inhalt wählen</key>
+    <key alias="selectContentType">Inhaltstyp wählen</key>
     <key alias="selectMediaStartNode">Medien-Startknoten wählen</key>
     <key alias="selectMember">Mitglied wählen</key>
     <key alias="selectMemberGroup">Mitgliedergruppe wählen</key>
@@ -637,7 +648,8 @@
     <key alias="closewindow">Fenster schließen</key>
     <key alias="comment">Kommentar</key>
     <key alias="confirm">bestätigen</key>
-    <key alias="constrain">Beschneiden</key><!--???-->
+    <key alias="constrain">Beschneiden</key>
+    <!--???-->
     <key alias="constrainProportions">Seitenverhältnis beibehalten</key>
     <key alias="content">Inhalt</key>
     <key alias="continue">Weiter</key>
@@ -702,7 +714,8 @@
     <key alias="ok">Ok</key>
     <key alias="open">Öffnen</key>
     <key alias="options">Optionen</key>
-    <key alias="on">An</key><!--???-->
+    <key alias="on">An</key>
+    <!--???-->
     <key alias="or">oder</key>
     <key alias="orderBy">Sortieren nach</key>
     <key alias="password">Kennwort</key>
@@ -756,7 +769,8 @@
     <key alias="reorderDone">Sortierung abschließen</key>
     <key alias="preview">Vorschau</key>
     <key alias="changePassword">Kennwort ändern</key>
-    <key alias="to">nach</key><!--???-->
+    <key alias="to">nach</key>
+    <!--???-->
     <key alias="listView">Listenansicht</key>
     <key alias="saving">Sichern läuft...</key>
     <key alias="current">Aktuelle(s)</key>
@@ -844,8 +858,8 @@
     <key alias="permissionsHowtoResolveText">Schauen Sie sich die &lt;strong&gt;Video-Lehrgänge&lt;/strong&gt; zum Thema Verzeichnisberechtigungen für Umbraco an oder lesen Sie den technischen Artikel.</key>
     <key alias="permissionsMaybeAnIssue">&lt;strong&gt;Die Dateiberechtigungen sind möglicherweise fehlerhaft!&lt;/strong&gt;Sie können Umbraco vermutlich ohne Probleme verwenden, werden aber viele Erweiterungspakete können nicht installiert werden.</key>
     <key alias="permissionsNotReady">
-    &lt;strong&gt;Die Dateiberechtigungen sind nicht geeignet!&lt;/strong&gt;&lt;br /&gt;&lt;br /&gt;
-    Die Dateiberechtigungen müssen angepasst werden.
+      &lt;strong&gt;Die Dateiberechtigungen sind nicht geeignet!&lt;/strong&gt;&lt;br /&gt;&lt;br /&gt;
+      Die Dateiberechtigungen müssen angepasst werden.
     </key>
     <key alias="permissionsPerfect">&lt;strong&gt;Die Dateiberechtigungen sind perfekt eingestellt!&lt;/strong&gt;&lt;br /&gt;&lt;br /&gt; Damit ist Umbraco komplett eingerichtet und es können problemlos Erweiterungspakete installiert werden.</key>
     <key alias="permissionsResolveFolderIssues">Verzeichnisprobleme lösen</key>
@@ -1301,7 +1315,8 @@
     <key alias="nodePublish">%0% wurde veröffentlicht</key>
     <key alias="nodePublishAll">%0% und die untergeordneten Elemente wurden veröffentlicht</key>
     <key alias="publishAll">%0% und alle untergeordneten Elemente veröffentlichen</key>
-    <key alias="publishHelp"><![CDATA[
+    <key alias="publishHelp">
+      <![CDATA[
     Klicken Sie <em>Sichern und Veröffentlichen</em>, um <strong>%0%</strong> zu veröffentlicht und auf der Website sichtbar zu machen.<br><br>
     Sie können dieses Element mitsamt seinen untergeordneten Elementen veröffentlichen, indem Sie <em>Unveröffentlichte Unterelemente einschließen</em> markieren.
     ]]>
@@ -1309,13 +1324,14 @@
   </area>
   <area alias="colorpicker">
     <key alias="noColors">Sie haben keine freigegeben Farben konfiguriert</key>
-
   </area>
   <area alias="contentPicker">
+    <key alias="allowedItemTypes">Sie können nur Elemente folgender Typen wählen: %0%</key>
     <key alias="pickedTrashedItem">Sie haben ein entferntes oder im Papierkorb befindliches Inhaltselement ausgewählt</key>
     <key alias="pickedTrashedItems">Sie haben entfernte oder im Papierkorb befindliche Inhaltselemente ausgewählt</key>
   </area>
   <area alias="mediaPicker">
+    <key alias="deletedItem">Element entfernen</key>
     <key alias="pickedTrashedItem">Sie haben ein entferntes oder im Papierkorb befindliches Medienelement ausgewählt</key>
     <key alias="pickedTrashedItems">Sie haben entfernte oder im Papierkorb befindliche medienelemente ausgewählt</key>
     <key alias="trashed">Verworfen</key>
@@ -1481,8 +1497,9 @@
     <key alias="editRule">Stil bearbeiten</key>
     <key alias="editorRules">Rich text editor Stile</key>
     <key alias="editorRulesHelp">
-    Definiere die Stile, die im 'Rich-Text-Editor' verfügbar sein sollen.</key>
-    
+      Definiere die Stile, die im 'Rich-Text-Editor' verfügbar sein sollen.
+    </key>
+    <key alias="editorRulesHelp">Definiere die Styles, die im Rich-Text-Editor dieses Stylesheets verfügbar sein sollen.</key>
     <key alias="editstylesheet">Stylesheet bearbeiten</key>
     <key alias="editstylesheetproperty">Stylesheet-Regel bearbeiten</key>
     <key alias="nameHelp">Bezeichnung im Auswahlmenü des Rich-Text-Editors  </key>
@@ -1504,21 +1521,22 @@
     <key alias="insert">Einfügen</key>
     <key alias="insertDesc">Wählen Sie, was in die Vorlage eingefügt werden soll</key>
     <key alias="insertDictionaryItem">Wörterbucheintrag einfügen</key>
-    <key alias="insertDictionaryItemDesc">Ein Wörterbuchelement ist ein Platzhalter für lokalisierbaren Text. 
-    Das macht es einfach mehrsprachige Websites zu gestalten.</key>
+    <key alias="insertDictionaryItemDesc">Ein Wörterbuchelement ist ein Platzhalter für lokalisierbaren Text. Das macht es einfach mehrsprachige Websites zu gestalten.</key>
     <key alias="insertMacro">Makro</key>
     <key alias="insertMacroDesc">
-    Ein Makro ist eine konfigurierbare Komponente, die großartig für wiederverwendbare Teile Ihres Entwurfes sind,
-    für welche Sie optionale Parameter benötigen, wie z. B. Galerien, Formulare oder Listen.
+       Ein Makro ist eine konfigurierbare Komponente, die großartig 
+       für wiederverwendbare Teile Ihres Entwurfes sind,
+      für welche Sie optionale Parameter benötigen, wie z. B. Galerien, Formulare oder Listen.
     </key>
     <key alias="insertPageField">Umbraco-Feld</key>
     <key alias="insertPageFieldDesc">
-    Zeigt den Wert eines benannten Feldes der aktuellen Seite an, mit der Möglichkeit den Wert zu verändern 
-    oder einen alternativen Ersatzwert zu wählen.</key>
+      Zeigt den Wert eines benannten Feldes der aktuellen Seite an, mit der Möglichkeit den Wert zu verändern
+      oder einen alternativen Ersatzwert zu wählen.
+    </key>
     <key alias="insertPartialView">Teilansicht (Partial View)</key>
     <key alias="insertPartialViewDesc">
-    Eine Teilansicht ist eine eigenständige Vorlagen-Datei, die innerhalb einer anderen Vorlage verwendet werden kann.
-    Sie ist gut geeignet, um "Markup"-Kode wiederzuverwenden oder komplexe Vorlagen in mehrere Dateien aufzuteilen.
+      Eine Teilansicht ist eine eigenständige Vorlagen-Datei, die innerhalb einer anderen Vorlage verwendet werden kann.
+      Sie ist gut geeignet, um "Markup"-Kode wiederzuverwenden oder komplexe Vorlagen in mehrere Dateien aufzuteilen.
     </key>
     <key alias="mastertemplate">Basisvorlage</key>
     <key alias="noMaster">Keine Basis</key>
@@ -1547,8 +1565,8 @@
     <key alias="sectionName">Bereichsname</key>
     <key alias="sectionMandatory">Bereich ist notwendig</key>
     <key alias="sectionMandatoryDesc">
-    Wenn notwendig, dann muss die untergeordnete Vorlage eine <code>@section</code> Definition gleichen Namens enthalten,
-    anderfalls tritt ein Fehler auf.
+      Wenn notwendig, dann muss die untergeordnete Vorlage eine <code>@section</code> Definition gleichen Namens enthalten,
+      anderfalls tritt ein Fehler auf.
     </key>
     <key alias="queryBuilder">Abfrage-Generator</key>
     <key alias="itemsReturned">zurückgegebene Elemente, in</key>
@@ -1589,7 +1607,7 @@
     <key alias="insertControl">Neues Element</key>
     <key alias="chooseLayout">Layout auswählen</key>
     <key alias="addRows">Neue Zeile</key>
-    <key alias="addElement">Inhalt hinzufügen</key>
+    <key alias="addElement">Neuer Inhalt</key>
     <key alias="dropElement">Inhalt entfernen</key>
     <key alias="settingsApplied">Einstellungen anwenden</key>
     <key alias="contentNotAllowed"><![CDATA[Dieser Inhalt ist hier <strong>nicht</strong> zugelassen]]></key>
@@ -1623,6 +1641,7 @@
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">Mischungen</key>
+    <key alias="group">Gruppe</key>
     <key alias="noGroups">Sie haben keine Gruppen hinzugefügt</key>
     <key alias="addGroup">Gruppe hinzufügen</key>
     <key alias="inheritedFrom">Übernimm von</key>
@@ -1630,18 +1649,23 @@
     <key alias="requiredLabel">Notwendige Bezeichnung</key>
     <key alias="enableListViewHeading">Listenansicht aktivieren</key>
     <key alias="enableListViewDescription">
-    Konfiguriert die Verwendung einer sortier- und filterbaren Listenansicht der Unterknoten für diesen Dokumenttyp.
-    Die Unterknoten werden nicht in Baumstruktur angezeigt.</key>
+      Konfiguriert die Verwendung einer sortier- und filterbaren Listenansicht der Unterknoten für diesen Dokumenttyp.
+      Die Unterknoten werden nicht in Baumstruktur angezeigt.
+    </key>
     <key alias="allowedTemplatesHeading">Erlaubte Vorlagen</key>
     <key alias="allowedTemplatesDescription">
-    Wählen Sie die Vorlagen, die Editoren für diesen Dokumenttyp wählen dürfen</key>
+      Wählen Sie die Vorlagen, die Editoren für diesen Dokumenttyp wählen dürfen
+    </key>
     <key alias="allowAsRootHeading">Als Wurzelknoten zulassen</key>
     <key alias="allowAsRootDescription">
-    Ermöglicht es Editoren diesen Dokumenttyp in der obersten Ebene der Inhalt-Baum-Strukur zu wählen</key>
+      Ermöglicht es Editoren diesen Dokumenttyp in der obersten Ebene der Inhalt-Baum-Strukur zu wählen
+    </key>
     <key alias="childNodesHeading">Erlaubte Dokumenttypen für Unterknoten</key>
     <key alias="childNodesDescription">
-    Erlaubt es Inhalt der angegebenen Typen unterhalb Inhalten dieses Typs anzulegen</key>
-    <key alias="chooseChildNode">Wählen Sie einen Unterknoten</key><!--???-->    
+      Erlaubt es Inhalt der angegebenen Typen unterhalb Inhalten dieses Typs anzulegen
+    </key>
+    <key alias="chooseChildNode">Wählen Sie einen Unterknoten</key>
+    <!--???-->
     <key alias="compositionsDescription">Übernimm Tabs und Eigenschaften vone einem vorhandenen Dokumenttyp. Neue Tabs werden zum vorliegenden Dokumenttyp hinzugefügt oder mit einem gleichnamigen Tab zusammengeführt.</key>
     <key alias="compositionInUse">Dieser Dokumenttyp wird in einer Mischung verwendet und kann deshalb nicht selbst zusammengemischt werden.</key>
     <key alias="noAvailableCompositions">Es sind keine Dokumenttypen für eine Mischung vorhanden.</key>
@@ -1666,23 +1690,28 @@
     <key alias="andAllMembers">und alle Mitglieder, die auf diesem Typ basieren</key>
     <key alias="memberCanEdit">Mitglied kann bearbeiten</key>
     <key alias="memberCanEditDescription">
-    Diese Eigenschaft zur Bearbeitung des Mitglieds auf seiner Profileseite freigeben</key>
+      Diese Eigenschaft zur Bearbeitung des Mitglieds auf seiner Profileseite freigeben
+    </key>
     <key alias="isSensitiveData">sensibelle Daten</key>
     <key alias="isSensitiveDataDescription">
-    Diese Eigenschaft für Editoren, die keine Berechtigung für sensibelle Daten haben, verbergen</key>
+      Diese Eigenschaft für Editoren, die keine Berechtigung für sensibelle Daten haben, verbergen
+    </key>
     <key alias="showOnMemberProfile">Auf Mitgliedsprofil anzeigen</key>
     <key alias="showOnMemberProfileDescription">Diesen Eigenschaftswert für die Anzeige auf der Profilseite des Mitglieds zulassen</key>
     <key alias="tabHasNoSortOrder">Tab hat keine Sortierung</key>
     <key alias="compositionUsageHeading">Wo wird diese Mischung verwendet?</key>
     <key alias="compositionUsageSpecification">
-    Diese Mischung wird aktuell in den Mischungen folgender Dokumenttypen verwendet:</key>
+      Diese Mischung wird aktuell in den Mischungen folgender Dokumenttypen verwendet:
+    </key>
     <key alias="variantsHeading">Kultur basierte Variationen zulassen</key>
     <key alias="variantsDescription">Editoren erlauben, Inhalt dieses Typs in verschiedenen Sprachen anzulegen</key>
     <key alias="allowVaryByCulture">Kultur basierte Variationen zulassen</key>
     <key alias="elementHeading">Ist ein Elementtyp</key>
-    <key alias="elementDescription"><![CDATA[
+    <key alias="elementDescription">
+      <![CDATA[
     Ein Elementtyp ist z. B. für die Verwendung in <em>Nested Content</em> vorgesehen, nicht jedoch als Inhalt-Knoten in der Baumstruktur
-    ]]></key>
+    ]]>
+    </key>
     <key alias="elementDoesNotSupport">Dies kann nicht für Elementtypen verwendet werden</key>
   </area>
   <area alias="languages">
@@ -1695,8 +1724,9 @@
     <key alias="fallsbackToLabel">Wird ersetzt durch</key>
     <key alias="noFallbackLanguageOption">Kein Ersatzsprache</key>
     <key alias="fallbackLanguageDescription">
-    Um mehrsprachigem Inhalt zu ermöglichen durch eine andere Sprache ersetzt zu werden,
-    falls die angefragte Sprache nicht verfügbar ist, wählen Sie diese Option hier aus.</key>
+      Um mehrsprachigem Inhalt zu ermöglichen durch eine andere Sprache ersetzt zu werden,
+      falls die angefragte Sprache nicht verfügbar ist, wählen Sie diese Option hier aus.
+    </key>
     <key alias="fallbackLanguage">Ersatzsprache</key>
   </area>
   <area alias="macro">
@@ -1758,7 +1788,7 @@
     <key alias="fields">Felder</key>
     <key alias="includeSubpages">Einschließlich der Unterseiten</key>
     <key alias="mailBody">
-	<![CDATA[
+      <![CDATA[
       Hallo %0%,
 
       das Dokument '%1%' wurde von '%2%' zur Übersetzung in '%5%' freigegeben.
@@ -1845,8 +1875,8 @@
     <key alias="contentChannel">Schnittstelle für externe Editoren</key>
     <key alias="createAnotherUser">Weiteren Benutzer anlegen</key>
     <key alias="createUserHelp">
-    Lege neue Benutzer an, um ihnen Zugang zum Umbraco-Back-Office zu geben.
-    Während des Anlegens eines neuen Benutzer wird ein Kennwort erzeugt, das Sie dem Benutzer mitteilen können.
+      Lege neue Benutzer an, um ihnen Zugang zum Umbraco-Back-Office zu geben.
+      Während des Anlegens eines neuen Benutzer wird ein Kennwort erzeugt, das Sie dem Benutzer mitteilen können.
     </key>
     <key alias="descriptionField">Feld für Beschreibung</key>
     <key alias="disabled">Benutzer endgültig deaktivieren</key>
@@ -1854,12 +1884,14 @@
     <key alias="editors">Editor</key>
     <key alias="excerptField">Feld für Textausschnitt</key>
     <key alias="failedPasswordAttempts">Fehlgeschlagene Anmeldeversuche</key>
-    <key alias="goToProfile">Bneutzerprofil aufrufen</key>
+    <key alias="goToProfile">Benutzerprofil aufrufen</key>
     <key alias="groupsHelp">Gruppen hinzufügen, um Zugang und Berechtigungen zuzuweisen</key>
     <key alias="inviteAnotherUser">Weitere Benutzer einladen</key>
-    <key alias="inviteUserHelp">Laden Sie neue Benutzer ein, um ihnen Zugang zum Umbraco-Back-Office zu geben.
-    Eine Einladungs-E-Mail wird an dem Benutzer geschickt. Diese enthält Informationen, wie sich der Benutzer im Umbraco-Back-Office anmelden kann.
-    Einladungen sind 72 Stunden lang gültig.</key>
+    <key alias="inviteUserHelp">
+      Laden Sie neue Benutzer ein, um ihnen Zugang zum Umbraco-Back-Office zu geben.
+      Eine Einladungs-E-Mail wird an dem Benutzer geschickt. Diese enthält Informationen, wie sich der Benutzer im Umbraco-Back-Office anmelden kann.
+      Einladungen sind 72 Stunden lang gültig.
+    </key>
     <key alias="language">Sprache</key>
     <key alias="languageHelp">Bestimmen Sie die Sprache für Menüs und Dialoge</key>
     <key alias="lastLockoutDate">Letztes Abmeldedatum</key>
@@ -1914,15 +1946,16 @@
     <key alias="userinviteExpiredMessage">Willkommen bei Umbraco! Bedauerlicherweise ist Ihre Einladung verfallen. Bitte kontaktieren Sie Ihren Administrator und bitten Sie ihn, diese erneut zu schicken.</key>
     <key alias="userinviteAvatarMessage">Laden Sie ein Foto von sich hoch, um es anderen Benutzern zu erleichtern, sie zu erkennen. Klicken Sie auf den Kreis oben, um Ihr Foto hochzuladen.</key>
     <key alias="writer">Autor</key>
-    <key alias="change">Änderung</key><!--???-->
+    <key alias="change">Änderung</key>
+    <!--???-->
     <key alias="yourProfile" version="7.0">Ihr Profil</key>
     <key alias="yourHistory" version="7.0">Ihr Verlauf</key>
     <key alias="sessionExpires" version="7.0">Sitzung läuft ab in</key>
-    <key alias="inviteUser">Invite user</key>
-    <key alias="createUser">Create user</key>
-    <key alias="sendInvite">Send invite</key>
-    <key alias="backToUsers">Back to users</key>
-    <key alias="inviteEmailCopySubject">Umbraco: Invitation</key>
+    <key alias="inviteUser">Benutzer einladen</key>
+    <key alias="createUser">Benutzer anlegen</key>
+    <key alias="sendInvite">Einladung schicken</key>
+    <key alias="backToUsers">Zurück zu den Benutzern</key>
+    <key alias="inviteEmailCopySubject">Umbraco: Einladung</key>
     <key alias="inviteEmailCopyFormat">
       <![CDATA[
  <html>
@@ -2064,8 +2097,10 @@
     <key alias="customErrorsCheckErrorMessage">"customErrors" aktuell auf '%0%' gesetzt. Es wird empfohlen, diese vor dem Live-Gang auf '%1%' zu setzen.</key>
     <key alias="customErrorsCheckRectifySuccessMessage">"customErrors" erfolgreich auf '%0%' gesetzt.</key>
     <key alias="macroErrorModeCheckSuccessMessage">"MacroErrors" auf '%0%' gesetzt.</key>
-    <key alias="macroErrorModeCheckErrorMessage">"MacroErrors" sind auf '%0%' gesetzt,
-    was verhindert, dass einige oder alle Seiten Ihrer Website vollständig geladen werden, falls Fehler in Makros auftreten. Schaltfläche "Beheben" setzt den Wert auf '%1%'.</key>
+    <key alias="macroErrorModeCheckErrorMessage">
+      "MacroErrors" sind auf '%0%' gesetzt,
+      was verhindert, dass einige oder alle Seiten Ihrer Website vollständig geladen werden, falls Fehler in Makros auftreten. Schaltfläche "Beheben" setzt den Wert auf '%1%'.
+    </key>
     <key alias="macroErrorModeCheckRectifySuccessMessage">"MacroErrors" sind jetzt auf '%0%' gesetzt.</key>
     <key alias="trySkipIisCustomErrorsCheckSuccessMessage">"trySkipIisCustomErrors" ist auf '%0%' gestellt und Sie verwenden IIS-Version '%1%'.</key>
     <key alias="trySkipIisCustomErrorsCheckErrorMessage">"trySkipIisCustomErrors" ist aktuell auf '%0%' gestellt. Für Ihre IIS-Version (%2%) wird empfohlen, diese auf '%1%' zu stellen.</key>
@@ -2116,7 +2151,9 @@
     <key alias="noSniffSetHeaderInConfigSuccess">Der 'web.config'-Datei wurde eine Einstellung zum Schutz gegen MIME-'Schnüffeln'-Schwachstellen hinzugefügt.</key>
     <key alias="hSTSCheckHeaderFound"><![CDATA[Der Header <strong>Strict-Transport-Security</strong>, auch bekannt als HSTS-Header, ist vorhanden.]]></key>
     <key alias="hSTSCheckHeaderNotFound"><![CDATA[Der Header <strong>Strict-Transport-Security</strong>, auch bekannt als HSTS-Header, ist <strong>nicht</strong> vorhanden.]]></key>
-    <key alias="hSTSSetHeaderInConfigDescription">Fügt den Header 'Strict-Transport-Security' mit dem Wert 'max-age=10886400; preload' im Abschnitt 'httpProtocol/customHeaders' der 'web.config'-Datei hinzu. Benutzen Sie dies nur, wenn Sie Ihre <em>Domain</em>en für mindestens 18 Wochen unter HTTPS laufen lassen.</key>
+    <key alias="hSTSSetHeaderInConfigDescription">
+      Fügt den Header 'Strict-Transport-Security' mit dem Wert 'max-age=10886400; preload' im Abschnitt 'httpProtocol/customHeaders' der 'web.config'-Datei hinzu. Benutzen Sie dies nur, wenn Sie Ihre <em>Domain</em>en für mindestens 18 Wochen unter HTTPS laufen lassen.
+    </key>
     <key alias="hSTSSetHeaderInConfigSuccess">Die HSTS-Header-Einstellung wurde der 'web.config'-Datei hinzugefügt.</key>
     <key alias="xssProtectionCheckHeaderFound"><![CDATA[Der Header <strong>X-XSS-Protection</strong> ist vorhanden.]]></key>
     <key alias="xssProtectionCheckHeaderNotFound"><![CDATA[Der Header <strong>X-XSS-Protection</strong> ist <strong>nicht</strong> vorhanden]]></key>
@@ -2130,11 +2167,13 @@
     <key alias="smtpMailSettingsConnectionFail">Der konfigurierte SMTP-Server mit Host '%0%' und Port '%1%' konnte nicht erreicht werden. Bitte überprüfen Sie die SMTP-Einstellungen in der 'web.config'-Datei im Abschnitt 'system.net/mailsettings'.</key>
     <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Die E-Mail-Adresse für Benachrichtigungen wurde auf <strong>%0%</strong> eingestellt.]]></key>
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Die E-Mail-Adresse für Benachrichtigungen ist noch auf den Standardwert <strong>%0%</strong> gestellt.]]></key>
-    <key alias="scheduledHealthCheckEmailBody"><![CDATA[
+    <key alias="scheduledHealthCheckEmailBody">
+      <![CDATA[
     <html><body><p>
     Die Ergebnisse der geplanten Systemzustandsprüfung läuft am %0% um %1% lauten wie folgt:
     </p>%2%</body></html>
-    ]]></key>
+    ]]>
+    </key>
     <key alias="scheduledHealthCheckEmailSubject">Status der Umbraco Systemzustand: %0%</key>
   </area>
   <area alias="redirectUrls">
@@ -2182,7 +2221,8 @@
     <key alias="bidirectional">Bidirektional</key>
     <key alias="parent">Oberknoten</key>
     <key alias="child">Unterknoten</key>
-    <key alias="count">Anzahl</key><!--???-->
+    <key alias="count">Anzahl</key>
+    <!--???-->
     <key alias="relations">Relationen</key>
     <key alias="created">Angelegt</key>
     <key alias="comment">Kommentar</key>
@@ -2202,5 +2242,20 @@
     <key alias="settingsHealthCheck">Systemzustand prüfen</key>
     <key alias="memberIntro">Lassen Sie uns beginnen</key>
     <key alias="formsInstall">Umbraco Forms installieren</key>
+  </area>
+  <area alias="visuallyHiddenTexts">
+    <key alias="goBack">zurück gehen</key>
+    <key alias="activeListLayout">Aktives Layout:</key>
+    <key alias="jumpTo">Springe zu</key>
+    <key alias="group">Gruppe</key>
+    <key alias="passed">bestanden</key>
+    <key alias="warning">alarmierend</key>
+    <key alias="failed">fehlgeschlagen</key>
+    <key alias="suggestion">Vorschlag</key>
+    <key alias="checkPassed">Prüfung bestanden</key>
+    <key alias="checkFailed">Prüfung fehlgeschlagen</key>
+    <key alias="openBackofficeSearch">Back-Office Suche öffnen</key>
+    <key alias="openCloseBackofficeHelp">Back-Office Hilfe öffnen / schliessen</key>
+    <key alias="openCloseBackofficeProfileOptions">Ihre Profil-Einstellungen öffnen / schliessen</key>
   </area>
 </language>
