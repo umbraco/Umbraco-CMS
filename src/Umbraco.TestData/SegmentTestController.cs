@@ -62,11 +62,17 @@ namespace Umbraco.TestData
             if (content == null)
                 return Content($"No content found by id {contentId}");
 
-            if (!content.HasProperty(propertyAlias))
-                return Content($"The content by id {contentId} does not contain a property with alias {propertyAlias}");
+            if (propertyAlias.IsNullOrWhiteSpace() || !content.HasProperty(propertyAlias))
+                return Content($"The content by id {contentId} does not contain a property with alias {propertyAlias ?? "null"}");
 
             if (content.ContentType.VariesByCulture() && culture.IsNullOrWhiteSpace())
                 return Content($"The content by id {contentId} varies by culture but no culture was specified");
+
+            if (value.IsNullOrWhiteSpace())
+                return Content("'value' cannot be null");
+
+            if (segment.IsNullOrWhiteSpace())
+                return Content("'segment' cannot be null");
 
             content.SetValue(propertyAlias, value, culture, segment);
             Services.ContentService.Save(content);
