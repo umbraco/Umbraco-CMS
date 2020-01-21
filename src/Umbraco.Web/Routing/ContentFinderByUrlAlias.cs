@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Umbraco.Core.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
@@ -68,14 +69,17 @@ namespace Umbraco.Web.Routing
 
             var hasDomain = !domaineName.IsNullOrWhiteSpace();
 
+            // Try to find any first relative path
+            var match = Regex.Match(domaineName, @"(?<!http:\/|http:|https:\/|https:)\/.+");
+
             // Create the list of potential alias that can be found on umbracoAliasUrl
-            var trimAlias = alias.TrimStart('/');
+            var trimAlias = hasDomain ? alias.TrimStart(match.Value) : alias;
             var testList = new List<string>
             {
-                trimAlias, // is "alias"
-                $"/{trimAlias}", // is "/alias"
-                $"{trimAlias}/", // is "alias/"
-                $"/{trimAlias}/" // is "/alias/"
+                trimAlias.TrimStart('/'), // is "alias"
+                $"{trimAlias}", // is "/alias"
+                $"{trimAlias.TrimStart('/')}/", // is "alias/"
+                $"{trimAlias}/" // is "/alias/"
             };
 
             bool IsMatch(IPublishedContent c)
@@ -102,11 +106,9 @@ namespace Umbraco.Web.Routing
                 }
                 if (string.IsNullOrWhiteSpace(v)) return false;
                 v = v.Replace(" ", "");
-                // Split UrlAlias to a list and add the domain name if hasDomain
+                // Split UrlAlias to a list
                 var t = v.Split(',');
-                var vList = t.Select(x => hasDomain ? $"{domaineName.TrimStart('/').TrimEnd('/')}/{x}" : x).ToList();
-                vList.AddRange(t);
-                return vList.ContainsAny(testList);
+                return t.ContainsAny(testList);
             }
 
             // TODO: even with Linq, what happens below has to be horribly slow
