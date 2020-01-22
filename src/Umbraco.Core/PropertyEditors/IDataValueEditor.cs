@@ -7,6 +7,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Core.PropertyEditors
 {
+
     /// <summary>
     /// Represents an editor for editing data values.
     /// </summary>
@@ -63,8 +64,26 @@ namespace Umbraco.Core.PropertyEditors
 
         // TODO: / deal with this when unplugging the xml cache
         // why property vs propertyType? services should be injected! etc...
+
+        /// <summary>
+        /// Used for serializing an <see cref="IContent"/> item for packaging
+        /// </summary>
+        /// <param name="property"></param>
+        /// <param name="dataTypeService"></param>
+        /// <param name="localizationService"></param>
+        /// <param name="published"></param>
+        /// <returns></returns>
         IEnumerable<XElement> ConvertDbToXml(Property property, IDataTypeService dataTypeService, ILocalizationService localizationService, bool published);
+
+        /// <summary>
+        /// Used for serializing an <see cref="IContent"/> item for packaging
+        /// </summary>
+        /// <param name="propertyType"></param>
+        /// <param name="value"></param>
+        /// <param name="dataTypeService"></param>
+        /// <returns></returns>
         XNode ConvertDbToXml(PropertyType propertyType, object value, IDataTypeService dataTypeService);
+
         string ConvertDbToString(PropertyType propertyType, object value, IDataTypeService dataTypeService);
     }
 }
