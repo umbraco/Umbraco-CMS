@@ -292,17 +292,17 @@ function serverValidationManager($timeout) {
         
         /**
          * @ngdoc function
-         * @name getCultureCallbacks
+         * @name getVariantCallbacks
          * @methodOf umbraco.services.serverValidationManager
          * @function
          *
          * @description
-         * Gets all callbacks that has been registered using the subscribe method for the culture.         
+         * Gets all callbacks that has been registered using the subscribe method for the culture and segment.         
          */
-        getCultureCallbacks: function (culture) {
+        getVariantCallbacks: function (culture, segment) {
             var found = _.filter(callbacks, function (item) {
                 //returns any callback that have been registered directly/ONLY against the culture
-                return (item.culture === culture && item.propertyAlias === null && item.fieldName === null);
+                return (item.culture === culture && item.segment === segment && item.propertyAlias === null && item.fieldName === null);
             });
             return found;
         },
