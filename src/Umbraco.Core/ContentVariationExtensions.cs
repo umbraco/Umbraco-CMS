@@ -28,11 +28,6 @@ namespace Umbraco.Core
         public static bool VariesByNothing(this IContentTypeBase contentType) => contentType.Variations.VariesByNothing();
 
         /// <summary>
-        /// Determines whether the content type varies by segment.
-        /// </summary>
-        public static bool VariesBySegment(this ISimpleContentType contentType) => contentType.Variations.VariesBySegment();
-
-        /// <summary>
         /// Determines whether the content type is invariant.
         /// </summary>
         /// <param name="contentType">The content type.</param>
