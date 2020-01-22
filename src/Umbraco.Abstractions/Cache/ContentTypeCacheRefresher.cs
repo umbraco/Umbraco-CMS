@@ -17,14 +17,14 @@ namespace Umbraco.Web.Cache
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly IContentTypeCommonRepository _contentTypeCommonRepository;
-        private readonly IIdkMap _idkMap;
+        private readonly IIdKeyMap _idKeyMap;
 
-        public ContentTypeCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IPublishedSnapshotService publishedSnapshotService, IPublishedModelFactory publishedModelFactory, IIdkMap idkMap, IContentTypeCommonRepository contentTypeCommonRepository)
+        public ContentTypeCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IPublishedSnapshotService publishedSnapshotService, IPublishedModelFactory publishedModelFactory, IIdKeyMap idKeyMap, IContentTypeCommonRepository contentTypeCommonRepository)
             : base(appCaches, serializer)
         {
             _publishedSnapshotService = publishedSnapshotService;
             _publishedModelFactory = publishedModelFactory;
-            _idkMap = idkMap;
+            _idKeyMap = idKeyMap;
             _contentTypeCommonRepository = contentTypeCommonRepository;
         }
 
@@ -70,7 +70,7 @@ namespace Umbraco.Web.Cache
 
             foreach (var id in payloads.Select(x => x.Id))
             {
-                _idkMap.ClearCache(id);
+                _idKeyMap.ClearCache(id);
             }
 
             if (payloads.Any(x => x.ItemType == typeof(IContentType).Name))

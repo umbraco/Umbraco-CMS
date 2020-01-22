@@ -107,10 +107,6 @@
       <Project>{fbe7c065-dac0-4025-a78b-63b24d3ab00b}</Project>
       <Name>Umbraco.Configuration</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
-      <Project>{31785bc3-256c-4613-b2f5-a1b0bdded8c1}</Project>
-      <Name>Umbraco.Core</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Examine\Umbraco.Examine.csproj">
       <Name>Umbraco.Examine</Name>
       <Project>{07FBC26B-2927-4A22-8D96-D644C667FECC}</Project>

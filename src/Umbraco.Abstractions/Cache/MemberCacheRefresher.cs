@@ -10,14 +10,12 @@ namespace Umbraco.Web.Cache
 {
     public sealed class MemberCacheRefresher : TypedCacheRefresherBase<MemberCacheRefresher, IMember>
     {
-        private readonly AppCaches _appCaches;
-        private readonly IIdkMap _idkMap;
+        private readonly IIdKeyMap _idKeyMap;
 
-        public MemberCacheRefresher(AppCaches appCaches, IIdkMap idkMap)
+        public MemberCacheRefresher(AppCaches appCaches, IIdKeyMap idKeyMap)
             : base(appCaches)
         {
-            _appCaches = appCaches;
-            _idkMap = idkMap;
+            _idKeyMap = idKeyMap;
         }
 
         #region Define
@@ -60,8 +58,8 @@ namespace Umbraco.Web.Cache
 
         private void ClearCache(int id)
         {
-            _idkMap.ClearCache(id);
-            _appCaches.ClearPartialViewCache();
+            _idKeyMap.ClearCache(id);
+            AppCaches.ClearPartialViewCache();
 
             var memberCache = AppCaches.IsolatedCaches.Get<IMember>();
             if (memberCache)

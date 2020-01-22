@@ -12,16 +12,14 @@ namespace Umbraco.Web.Cache
 {
     public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRefresher, MediaCacheRefresher.JsonPayload>
     {
-        private readonly AppCaches _appCaches;
         private readonly IPublishedSnapshotService _publishedSnapshotService;
-        private readonly IIdkMap _idkMap;
+        private readonly IIdKeyMap _idKeyMap;
 
-        public MediaCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IPublishedSnapshotService publishedSnapshotService, IIdkMap idkMap)
+        public MediaCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IPublishedSnapshotService publishedSnapshotService, IIdKeyMap idKeyMap)
             : base(appCaches, serializer)
         {
-            _appCaches = appCaches;
             _publishedSnapshotService = publishedSnapshotService;
-            _idkMap = idkMap;
+            _idKeyMap = idKeyMap;
         }
 
         #region Define
@@ -46,14 +44,14 @@ namespace Umbraco.Web.Cache
 
             if (anythingChanged)
             {
-                _appCaches.ClearPartialViewCache();
+                AppCaches.ClearPartialViewCache();
 
                 var mediaCache = AppCaches.IsolatedCaches.Get<IMedia>();
 
                 foreach (var payload in payloads)
                 {
                     if (payload.ChangeTypes == TreeChangeTypes.Remove)
-                       _idkMap.ClearCache(payload.Id);
+                       _idKeyMap.ClearCache(payload.Id);
 
                     if (!mediaCache) continue;
 

@@ -6,14 +6,12 @@ using Umbraco.Core.Serialization;
 
 namespace Umbraco.Web.Cache
 {
-    public sealed class MemberGroupCacheRefresher : JsonCacheRefresherBase<MemberGroupCacheRefresher>
+    public sealed class MemberGroupCacheRefresher : JsonCacheRefresherBase<MemberGroupCacheRefresher, MemberGroupCacheRefresher.JsonPayload>
     {
-        private readonly IJsonSerializer _jsonSerializer;
-
         public MemberGroupCacheRefresher(AppCaches appCaches, IJsonSerializer jsonSerializer)
-            : base(appCaches)
+            : base(appCaches, jsonSerializer)
         {
-            _jsonSerializer = jsonSerializer;
+
         }
 
         #region Define
@@ -72,15 +70,15 @@ namespace Umbraco.Web.Cache
             public int Id { get; }
         }
 
-        private JsonPayload[] Deserialize(string json)
-        {
-            return _jsonSerializer.Deserialize<JsonPayload[]>(json);
-        }
-
-        private string Serialize(params IMemberGroup[] groups)
-        {
-            return _jsonSerializer.Serialize(groups.Select(x => new JsonPayload(x.Id, x.Name)).ToArray());
-        }
+        // private JsonPayload[] Deserialize(string json)
+        // {
+        //     return _jsonSerializer.Deserialize<JsonPayload[]>(json);
+        // }
+        //
+        // private string Serialize(params IMemberGroup[] groups)
+        // {
+        //     return _jsonSerializer.Serialize(groups.Select(x => new JsonPayload(x.Id, x.Name)).ToArray());
+        // }
 
         #endregion
     }

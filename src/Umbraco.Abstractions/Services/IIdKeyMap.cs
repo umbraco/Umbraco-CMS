@@ -3,7 +3,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Services
 {
-    public interface IIdkMap
+    public interface IIdKeyMap
     {
         void SetMapper(UmbracoObjectTypes umbracoObjectType, Func<int, Guid> id2key, Func<Guid, int> key2id);
         Attempt<int> GetIdForKey(Guid key, UmbracoObjectTypes umbracoObjectType);

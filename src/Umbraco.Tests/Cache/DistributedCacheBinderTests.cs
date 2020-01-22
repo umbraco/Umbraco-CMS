@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
@@ -165,7 +166,7 @@ namespace Umbraco.Tests.Cache
                 IOHelper);
 
             // just assert it does not throw
-            var refreshers = new DistributedCacheBinder(null, umbracoContextFactory, null, JsonNetSerializer);
+            var refreshers = new DistributedCacheBinder(null, umbracoContextFactory, null, new CacheRefresherCollection(Array.Empty<ICacheRefresher>()));
             refreshers.HandleEvents(definitions);
         }
     }

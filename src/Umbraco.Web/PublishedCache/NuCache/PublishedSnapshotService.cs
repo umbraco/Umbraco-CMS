@@ -76,7 +76,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         //private static int _singletonCheck;
 
         public PublishedSnapshotService(PublishedSnapshotServiceOptions options, IMainDom mainDom, IRuntimeState runtime,
-            ServiceContext serviceContext, IPublishedContentTypeFactory publishedContentTypeFactory, IIdkMap idkMap,
+            ServiceContext serviceContext, IPublishedContentTypeFactory publishedContentTypeFactory, IIdKeyMap idKeyMap,
             IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor, IProfilingLogger logger, IScopeProvider scopeProvider,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             IDefaultCultureAccessor defaultCultureAccessor,
@@ -160,10 +160,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
             Guid GetUid(ContentStore store, int id) => store.LiveSnapshot.Get(id)?.Uid ?? default;
             int GetId(ContentStore store, Guid uid) => store.LiveSnapshot.Get(uid)?.Id ?? default;
 
-            if (idkMap != null)
+            if (idKeyMap != null)
             {
-                idkMap.SetMapper(UmbracoObjectTypes.Document, id => GetUid(_contentStore, id), uid => GetId(_contentStore, uid));
-                idkMap.SetMapper(UmbracoObjectTypes.Media, id => GetUid(_mediaStore, id), uid => GetId(_mediaStore, uid));
+                idKeyMap.SetMapper(UmbracoObjectTypes.Document, id => GetUid(_contentStore, id), uid => GetId(_contentStore, uid));
+                idKeyMap.SetMapper(UmbracoObjectTypes.Media, id => GetUid(_mediaStore, id), uid => GetId(_mediaStore, uid));
             }
         }
 

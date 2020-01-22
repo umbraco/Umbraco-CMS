@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Serialization;
@@ -19,16 +20,16 @@ namespace Umbraco.Web.Cache
         private readonly DistributedCache _distributedCache;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly ILogger _logger;
-        private readonly IJsonSerializer _jsonSerializer;
+        private readonly CacheRefresherCollection _cacheRefresherCollection;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DistributedCacheBinder"/> class.
         /// </summary>
-        public DistributedCacheBinder(DistributedCache distributedCache, IUmbracoContextFactory umbracoContextFactory, ILogger logger, IJsonSerializer jsonSerializer)
+        public DistributedCacheBinder(DistributedCache distributedCache, IUmbracoContextFactory umbracoContextFactory, ILogger logger, CacheRefresherCollection cacheRefresherCollection)
         {
             _distributedCache = distributedCache;
             _logger = logger;
-            _jsonSerializer = jsonSerializer;
+            _cacheRefresherCollection = cacheRefresherCollection;
             _umbracoContextFactory = umbracoContextFactory;
         }
 

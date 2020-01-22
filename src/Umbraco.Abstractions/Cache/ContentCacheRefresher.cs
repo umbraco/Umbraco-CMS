@@ -15,14 +15,14 @@ namespace Umbraco.Web.Cache
     public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCacheRefresher, ContentCacheRefresher.JsonPayload>
     {
         private readonly IPublishedSnapshotService _publishedSnapshotService;
-        private readonly IIdkMap _idkMap;
+        private readonly IIdKeyMap _idKeyMap;
         private readonly IDomainService _domainService;
 
-        public ContentCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IPublishedSnapshotService publishedSnapshotService, IIdkMap idkMap, IDomainService domainService)
+        public ContentCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IPublishedSnapshotService publishedSnapshotService, IIdKeyMap idKeyMap, IDomainService domainService)
             : base(appCaches, serializer)
         {
             _publishedSnapshotService = publishedSnapshotService;
-            _idkMap = idkMap;
+            _idKeyMap = idKeyMap;
             _domainService = domainService;
         }
 
@@ -54,7 +54,7 @@ namespace Umbraco.Web.Cache
                 //By GUID Key
                 isolatedCache.Clear(RepositoryCacheKeys.GetKey<IContent>(payload.Key));
 
-                _idkMap.ClearCache(payload.Id);
+                _idKeyMap.ClearCache(payload.Id);
 
                 // remove those that are in the branch
                 if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.RefreshBranch | TreeChangeTypes.Remove))

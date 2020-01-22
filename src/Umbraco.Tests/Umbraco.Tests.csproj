@@ -562,10 +562,6 @@
       <Project>{fbe7c065-dac0-4025-a78b-63b24d3ab00b}</Project>
       <Name>Umbraco.Configuration</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
-      <Project>{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}</Project>
-      <Name>Umbraco.Core</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj">
       <Project>{3ae7bf57-966b-45a5-910a-954d7c554441}</Project>
       <Name>Umbraco.Infrastructure</Name>

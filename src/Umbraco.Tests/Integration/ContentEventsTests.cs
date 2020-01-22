@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Integration
         {
             base.SetUp();
 
-            _h1 = new DistributedCacheBinder(new DistributedCache(Current.ServerMessenger, Current.CacheRefreshers), Mock.Of<IUmbracoContextFactory>(), Mock.Of<ILogger>(), JsonNetSerializer);
+            _h1 = new DistributedCacheBinder(new DistributedCache(Current.ServerMessenger, Current.CacheRefreshers), Mock.Of<IUmbracoContextFactory>(), Mock.Of<ILogger>(), Current.CacheRefreshers);
             _h1.BindEvents(true);
 
             _events = new List<EventInstance>();

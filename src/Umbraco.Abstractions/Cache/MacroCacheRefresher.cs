@@ -7,14 +7,12 @@ using Umbraco.Core.Serialization;
 
 namespace Umbraco.Web.Cache
 {
-    public sealed class MacroCacheRefresher : JsonCacheRefresherBase<MacroCacheRefresher>
+    public sealed class MacroCacheRefresher : JsonCacheRefresherBase<MacroCacheRefresher, MacroCacheRefresher.JsonPayload>
     {
-        private readonly IJsonSerializer _jsonSerializer;
-
         public MacroCacheRefresher(AppCaches appCaches, IJsonSerializer jsonSerializer)
-            : base(appCaches)
+            : base(appCaches, jsonSerializer)
         {
-            _jsonSerializer = jsonSerializer;
+
         }
 
         #region Define
@@ -43,7 +41,7 @@ namespace Umbraco.Web.Cache
 
         public override void Refresh(string json)
         {
-            var payloads = Deserialize(_jsonSerializer, json);
+            var payloads = Deserialize(json);
 
             foreach (var payload in payloads)
             {
@@ -59,7 +57,6 @@ namespace Umbraco.Web.Cache
 
             base.Refresh(json);
         }
-
         #endregion
 
         #region Json
@@ -75,17 +72,6 @@ namespace Umbraco.Web.Cache
             public int Id { get; }
 
             public string Alias { get; }
-        }
-
-        public static JsonPayload[] Deserialize(IJsonSerializer jsonSerializer, string json)
-        {
-            return jsonSerializer.Deserialize<JsonPayload[]>(json);
-        }
-
-
-        public static string Serialize( IJsonSerializer jsonSerializer, params IMacro[] macros)
-        {
-            return jsonSerializer.Serialize(macros.Select(x => new JsonPayload(x.Id, x.Alias)).ToArray());
         }
 
         #endregion
