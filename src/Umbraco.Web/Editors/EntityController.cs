@@ -693,6 +693,9 @@ namespace Umbraco.Web.Editors
             if (pageSize <= 0)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
+            // re-normalize since NULL can be passed in
+            filter = filter ?? string.Empty;
+
             var objectType = ConvertToObjectType(type);
             if (objectType.HasValue)
             {

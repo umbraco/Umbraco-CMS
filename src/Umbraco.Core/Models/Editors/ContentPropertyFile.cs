@@ -1,5 +1,6 @@
 ﻿namespace Umbraco.Core.Models.Editors
 {
+
     /// <summary>
     /// Represents an uploaded file for a property.
     /// </summary>
