@@ -78,7 +78,7 @@ namespace Umbraco.Web.Routing
             {
                 trimAlias.TrimStart('/'), // is "alias"
                 trimAlias, // is "/alias"
-                $"{trimAlias.TrimStart('/')}/", // is "alias/"
+                trimAlias.EnsureEndsWith('/'), // is "alias/"
                 trimAlias.EnsureEndsWith('/') // is "/alias/"
             };
 
