@@ -77,7 +77,7 @@ namespace Umbraco.Web.Routing
             var testList = new List<string>
             {
                 trimAlias.TrimStart('/'), // is "alias"
-                $"{trimAlias}", // is "/alias"
+                trimAlias, // is "/alias"
                 $"{trimAlias.TrimStart('/')}/", // is "alias/"
                 $"{trimAlias}/" // is "/alias/"
             };
