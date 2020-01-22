@@ -234,7 +234,7 @@ namespace Umbraco.Core
         /// <remarks>
         /// This method does not support setting the variation to nothing.
         /// </remarks>
-        public static void SetVariesBy(this IContentTypeBase contentType, ContentVariation variation, bool value = true) => contentType.Variations = contentType.Variations.SetVariesBy(variation, value);
+        public static void SetVariesBy(this IContentTypeBase contentType, ContentVariation variation, bool value = true) => contentType.Variations = contentType.Variations.SetFlag(variation, value);
 
         /// <summary>
         /// Sets or removes the property type variation depending on the specified value.
@@ -245,7 +245,7 @@ namespace Umbraco.Core
         /// <remarks>
         /// This method does not support setting the variation to nothing.
         /// </remarks>
-        public static void SetVariesBy(this PropertyType propertyType, ContentVariation variation, bool value = true) => propertyType.Variations = propertyType.Variations.SetVariesBy(variation, value);
+        public static void SetVariesBy(this PropertyType propertyType, ContentVariation variation, bool value = true) => propertyType.Variations = propertyType.Variations.SetFlag(variation, value);
 
         /// <summary>
         /// Returns the variations with the variation set or removed depending on the specified value.
@@ -259,7 +259,7 @@ namespace Umbraco.Core
         /// <remarks>
         /// This method does not support setting the variation to nothing.
         /// </remarks>
-        public static ContentVariation SetVariesBy(this ContentVariation variations, ContentVariation variation, bool value = true)
+        public static ContentVariation SetFlag(this ContentVariation variations, ContentVariation variation, bool value = true)
         {
             return value
                 ? variations | variation // Set flag using bitwise logical OR
