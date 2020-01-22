@@ -23,6 +23,7 @@ using Umbraco.Core.Persistence;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Mapping;
 using System.Web.Http.Controllers;
+using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Web.Editors
 {
@@ -41,11 +42,13 @@ namespace Umbraco.Web.Editors
     public class DataTypeController : BackOfficeNotificationsController
     {
         private readonly PropertyEditorCollection _propertyEditors;
+        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
 
-        public DataTypeController(PropertyEditorCollection propertyEditors, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IShortStringHelper shortStringHelper, UmbracoMapper umbracoMapper)
+        public DataTypeController(PropertyEditorCollection propertyEditors, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IShortStringHelper shortStringHelper, UmbracoMapper umbracoMapper, IUmbracoSettingsSection umbracoSettingsSection)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
         {
             _propertyEditors = propertyEditors;
+            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
         }
 
         /// <summary>
@@ -452,7 +455,7 @@ namespace Umbraco.Web.Editors
         public IDictionary<string, IEnumerable<DataTypeBasic>> GetGroupedPropertyEditors()
         {
             var datatypes = new List<DataTypeBasic>();
-            var showDeprecatedPropertyEditors = Current.Configs.Settings().Content.ShowDeprecatedPropertyEditors;
+            var showDeprecatedPropertyEditors = _umbracoSettingsSection.Content.ShowDeprecatedPropertyEditors;
 
             var propertyEditors = Current.PropertyEditors
                 .Where(x=>x.IsDeprecated == false || showDeprecatedPropertyEditors);

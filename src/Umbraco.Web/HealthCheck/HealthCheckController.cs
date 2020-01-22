@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 using Umbraco.Core;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Editors;
 using Umbraco.Web.WebApi.Filters;
+using Umbraco.Core.Configuration.HealthChecks;
 
 namespace Umbraco.Web.HealthCheck
 {
@@ -20,12 +20,12 @@ namespace Umbraco.Web.HealthCheck
         private readonly IList<Guid> _disabledCheckIds;
         private readonly ILogger _logger;
 
-        public HealthCheckController(HealthCheckCollection checks, ILogger logger)
+        public HealthCheckController(HealthCheckCollection checks, ILogger logger, IHealthChecks healthChecks)
         {
             _checks = checks ?? throw new ArgumentNullException(nameof(checks));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            var healthCheckConfig = Current.Configs.HealthChecks();
+            var healthCheckConfig = healthChecks ?? throw new ArgumentNullException(nameof(healthChecks));
             _disabledCheckIds = healthCheckConfig.DisabledChecks
                 .Select(x => x.Id)
                 .ToList();

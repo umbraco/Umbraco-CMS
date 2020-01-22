@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Umbraco.Core;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Web.Install.Models;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
@@ -15,10 +15,12 @@ namespace Umbraco.Web.Install.InstallSteps
     {
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly ILogger _logger;
+        private readonly IConnectionStrings _connectionStrings;
 
-        public DatabaseConfigureStep(DatabaseBuilder databaseBuilder)
+        public DatabaseConfigureStep(DatabaseBuilder databaseBuilder, IConnectionStrings connectionStrings)
         {
             _databaseBuilder = databaseBuilder;
+            _connectionStrings = connectionStrings ?? throw new ArgumentNullException(nameof(connectionStrings));
         }
 
         public override Task<InstallSetupResult> ExecuteAsync(DatabaseModel database)
@@ -72,7 +74,7 @@ namespace Umbraco.Web.Install.InstallSteps
         private bool ShouldDisplayView()
         {
             //If the connection string is already present in web.config we don't need to show the settings page and we jump to installing/upgrading.
-            var databaseSettings = Current.Configs.ConnectionStrings()[Constants.System.UmbracoConnectionName];
+            var databaseSettings = _connectionStrings[Constants.System.UmbracoConnectionName];
 
             if (databaseSettings.IsConnectionStringConfigured())
             {

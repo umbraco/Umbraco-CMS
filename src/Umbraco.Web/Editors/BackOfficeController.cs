@@ -27,6 +27,8 @@ using Umbraco.Web.Models.Identity;
 using Umbraco.Web.Security;
 using Constants = Umbraco.Core.Constants;
 using JArray = Newtonsoft.Json.Linq.JArray;
+using Umbraco.Core.Configuration.Grid;
+using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Web.Editors
 {
@@ -44,14 +46,18 @@ namespace Umbraco.Web.Editors
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
         private readonly IUmbracoVersion _umbracoVersion;
+        private readonly IGridConfig _gridConfig;
+        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
 
-        public BackOfficeController(IManifestParser manifestParser, UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IUmbracoVersion umbracoVersion)
+        public BackOfficeController(IManifestParser manifestParser, UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IUmbracoVersion umbracoVersion, IGridConfig gridConfig, IUmbracoSettingsSection umbracoSettingsSection)
             : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger, umbracoHelper)
         {
             _manifestParser = manifestParser;
             _features = features;
             _runtimeState = runtimeState;
             _umbracoVersion = umbracoVersion;
+            _gridConfig = gridConfig ?? throw new ArgumentNullException(nameof(gridConfig));
+            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
         }
 
         protected BackOfficeSignInManager SignInManager => _signInManager ?? (_signInManager = OwinContext.GetBackOfficeSignInManager());
@@ -67,8 +73,8 @@ namespace Umbraco.Web.Editors
         public async Task<ActionResult> Default()
         {
             return await RenderDefaultOrProcessExternalLoginAsync(
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion)),
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion)));
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _umbracoSettingsSection)),
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _umbracoSettingsSection)));
         }
 
         [HttpGet]
@@ -151,7 +157,7 @@ namespace Umbraco.Web.Editors
         {
             return await RenderDefaultOrProcessExternalLoginAsync(
                 //The default view to render when there is no external login info or errors
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion)),
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml", new BackOfficeModel(_features, GlobalSettings, _umbracoVersion, _umbracoSettingsSection)),
                 //The ActionResult to perform if external login is successful
                 () => Redirect("/"));
         }
@@ -206,7 +212,7 @@ namespace Umbraco.Web.Editors
             var initCss = new CssInitialization(_manifestParser);
 
             var files = initJs.OptimizeBackOfficeScriptFiles(HttpContext, JsInitialization.GetDefaultInitialization());
-            var result = JsInitialization.GetJavascriptInitialization(HttpContext, files, "umbraco");
+            var result = JsInitialization.GetJavascriptInitialization(HttpContext, files, "umbraco", GlobalSettings);
             result += initCss.GetStylesheetInitialization(HttpContext);
 
             return JavaScript(result);
@@ -245,8 +251,7 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public JsonNetResult GetGridConfig()
         {
-            var gridConfig = Current.Configs.Grids();
-            return new JsonNetResult { Data = gridConfig.EditorsConfig.Editors, Formatting = Formatting.None };
+            return new JsonNetResult { Data = _gridConfig.EditorsConfig.Editors, Formatting = Formatting.None };
         }
 
 
@@ -259,7 +264,7 @@ namespace Umbraco.Web.Editors
         [MinifyJavaScriptResult(Order = 1)]
         public JavaScriptResult ServerVariables()
         {
-            var serverVars = new BackOfficeServerVariables(Url, _runtimeState, _features, GlobalSettings, _umbracoVersion);
+            var serverVars = new BackOfficeServerVariables(Url, _runtimeState, _features, GlobalSettings, _umbracoVersion, _umbracoSettingsSection);
 
             //cache the result if debugging is disabled
             var result = HttpContext.IsDebuggingEnabled

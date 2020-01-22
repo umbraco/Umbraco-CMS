@@ -152,9 +152,10 @@ namespace Umbraco.Web.Security
             IUserService userService,
             IGlobalSettings globalSettings,
             ISecuritySection securitySection,
-            IIOHelper ioHelper)
+            IIOHelper ioHelper,
+            IUmbracoSettingsSection umbracoSettingsSection)
         {
-            return app.UseUmbracoBackOfficeCookieAuthentication(umbracoContextAccessor, runtimeState, userService, globalSettings, securitySection, ioHelper, PipelineStage.Authenticate);
+            return app.UseUmbracoBackOfficeCookieAuthentication(umbracoContextAccessor, runtimeState, userService, globalSettings, securitySection, ioHelper, PipelineStage.Authenticate, umbracoSettingsSection);
         }
 
         /// <summary>
@@ -178,12 +179,13 @@ namespace Umbraco.Web.Security
             IGlobalSettings globalSettings,
             ISecuritySection securitySection,
             IIOHelper ioHelper,
-            PipelineStage stage)
+            PipelineStage stage,
+            IUmbracoSettingsSection umbracoSettingsSection)
         {
             //Create the default options and provider
             var authOptions = app.CreateUmbracoCookieAuthOptions(umbracoContextAccessor, globalSettings, runtimeState, securitySection, ioHelper);
 
-            authOptions.Provider = new BackOfficeCookieAuthenticationProvider(userService, runtimeState, globalSettings, ioHelper)
+            authOptions.Provider = new BackOfficeCookieAuthenticationProvider(userService, runtimeState, globalSettings, ioHelper, umbracoSettingsSection)
             {
                 // Enables the application to validate the security stamp when the user
                 // logs in. This is a security feature which is used when you

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
@@ -15,11 +16,13 @@ namespace Umbraco.Web.Models.Mapping
     {
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly ILogger _logger;
+        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
 
-        public DataTypeMapDefinition(PropertyEditorCollection propertyEditors, ILogger logger)
+        public DataTypeMapDefinition(PropertyEditorCollection propertyEditors, ILogger logger, IUmbracoSettingsSection umbracoSettingsSection)
         {
             _propertyEditors = propertyEditors;
             _logger = logger;
+            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
         }
 
         private static readonly int[] SystemIds =
@@ -126,7 +129,7 @@ namespace Umbraco.Web.Models.Mapping
 
         private IEnumerable<PropertyEditorBasic> MapAvailableEditors(IDataType source, MapperContext context)
         {
-            var contentSection = Current.Configs.Settings().Content;
+            var contentSection = _umbracoSettingsSection.Content;
             var properties = _propertyEditors
                 .Where(x => !x.IsDeprecated || contentSection.ShowDeprecatedPropertyEditors || source.EditorAlias == x.Alias)
                 .OrderBy(x => x.Name);

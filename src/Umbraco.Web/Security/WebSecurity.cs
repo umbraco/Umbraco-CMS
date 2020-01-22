@@ -196,7 +196,7 @@ namespace Umbraco.Web.Security
             var user = CurrentUser;
 
             // Check for console access
-            if (user == null || (requiresApproval && user.IsApproved == false) || (user.IsLockedOut && RequestIsInUmbracoApplication(_httpContext)))
+            if (user == null || (requiresApproval && user.IsApproved == false) || (user.IsLockedOut && RequestIsInUmbracoApplication(_httpContext, _globalSettings)))
             {
                 if (throwExceptions) throw new ArgumentException("You have no privileges to the umbraco console. Please contact your administrator");
                 return ValidateRequestAttempt.FailedNoPrivileges;
@@ -205,9 +205,9 @@ namespace Umbraco.Web.Security
 
         }
 
-        private static bool RequestIsInUmbracoApplication(HttpContextBase context)
+        private static bool RequestIsInUmbracoApplication(HttpContextBase context, IGlobalSettings globalSettings)
         {
-            return context.Request.Path.ToLower().IndexOf(Current.IOHelper.ResolveUrl(Current.Configs.Global().UmbracoPath).ToLower(), StringComparison.Ordinal) > -1;
+            return context.Request.Path.ToLower().IndexOf(Current.IOHelper.ResolveUrl(globalSettings.UmbracoPath).ToLower(), StringComparison.Ordinal) > -1;
         }
 
         /// <summary>
