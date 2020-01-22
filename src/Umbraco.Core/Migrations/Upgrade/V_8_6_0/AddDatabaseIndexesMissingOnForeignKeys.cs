@@ -15,16 +15,14 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_6_0
         /// if it doesn't already exist
         /// </summary>
         public override void Migrate()
-        {
-            var tableInfo = Context.Database.PocoDataFactory.ForType(typeof(DictionaryDto)).TableInfo;
-            tableInfo.TableName = tableInfo.TableName;
-            var indexName = "IX_" + tableInfo.TableName + "_Parent";
+        {          
+            var indexName = "IX_" + DictionaryDto.TableName + "_Parent";
 
             if (IndexExists(indexName) == false)
             {
                 Create
                      .Index(indexName)
-                     .OnTable(tableInfo.TableName)
+                     .OnTable(DictionaryDto.TableName)
                      .OnColumn("parent")
                      .Ascending()
                      .WithOptions().NonClustered()
