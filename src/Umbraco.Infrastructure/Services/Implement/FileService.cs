@@ -88,7 +88,6 @@ namespace Umbraco.Core.Services.Implement
                 saveEventArgs.CanCancel = false;
                 scope.Events.Dispatch(SavedStylesheet, this, saveEventArgs);
 
-                Audit(AuditType.Save, userId, -1, UmbracoObjectTypes.Stylesheet.GetName());
                 scope.Complete();
             }
         }
@@ -116,7 +115,6 @@ namespace Umbraco.Core.Services.Implement
                 deleteEventArgs.CanCancel = false;
                 scope.Events.Dispatch(DeletedStylesheet, this, deleteEventArgs);
 
-                Audit(AuditType.Delete, userId, -1, UmbracoObjectTypes.Stylesheet.GetName());
                 scope.Complete();
             }
         }

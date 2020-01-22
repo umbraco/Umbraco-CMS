@@ -84,14 +84,6 @@ namespace Umbraco.Core.Models
         RecycleBin,
 
         /// <summary>
-        /// Stylesheet
-        /// </summary>
-        [UmbracoObjectType(Constants.ObjectTypes.Strings.Stylesheet)]
-        [FriendlyName("Stylesheet")]
-        [UmbracoUdiType(Constants.UdiEntityType.Stylesheet)]
-        Stylesheet,
-
-        /// <summary>
         /// Member
         /// </summary>
         [UmbracoObjectType(Constants.ObjectTypes.Strings.Member, typeof(IMember))]
