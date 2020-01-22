@@ -105,7 +105,7 @@ function dependencies() {
             "name": "angular-messages",
             "src":  ["./node_modules/angular-messages/angular-messages.js"],
             "base": "./node_modules/angular-messages"
-        },        
+        },
         {
             "name": "angular-mocks",
             "src":  ["./node_modules/angular-mocks/angular-mocks.js"],
@@ -193,6 +193,11 @@ function dependencies() {
             "base": "./node_modules/moment/locale"
         },
         {
+            "name": "monaco-editor",
+            "src":  ["./node_modules/monaco-editor/min/vs/**"],
+            "base": "./node_modules/monaco-editor/min/vs"
+        },
+        {
             "name": "ng-file-upload",
             "src":  ["./node_modules/ng-file-upload/dist/ng-file-upload.min.js"],
             "base": "./node_modules/ng-file-upload/dist"
@@ -257,7 +262,7 @@ function dependencies() {
 
     //Copies all static assets into /root / assets folder
     //css, fonts and image files
-    
+
     var assetsTask = gulp.src(config.sources.globs.assets, { allowEmpty: true });
     assetsTask = assetsTask.pipe(imagemin([
         imagemin.gifsicle({interlaced: true}),
@@ -270,9 +275,9 @@ function dependencies() {
             ]
         })
     ]));
-    
+
     assetsTask = assetsTask.pipe(gulp.dest(config.root + config.targets.assets));
-    
+
     stream.add(assetsTask);
 
     // Copies all the less files related to the preview into their folder
