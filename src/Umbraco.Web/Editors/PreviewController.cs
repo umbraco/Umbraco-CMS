@@ -75,7 +75,7 @@ namespace Umbraco.Web.Editors
         public JavaScriptResult Application()
         {
             var files = JsInitialization.OptimizeScriptFiles(HttpContext, JsInitialization.GetPreviewInitialization());
-            var result = JsInitialization.GetJavascriptInitialization(HttpContext, files, "umbraco.preview", GlobalSettings);
+            var result = JsInitialization.GetJavascriptInitialization(HttpContext, files, "umbraco.preview", _globalSettings);
 
             return JavaScript(result);
         }
