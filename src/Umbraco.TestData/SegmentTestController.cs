@@ -30,9 +30,9 @@ namespace Umbraco.TestData
             if (ct.Variations.VariesBySegment())
                 return Content($"The document type {alias} already allows segments, nothing has been changed");
 
-            ct.Variations = ct.Variations.SetFlag(ContentVariation.Segment);
-            
-            propType.Variations = propType.Variations.SetFlag(ContentVariation.Segment);
+            ct.Variations = ct.Variations.SetVariesBy(ContentVariation.Segment);
+
+            propType.Variations = propType.Variations.SetVariesBy(ContentVariation.Segment);
 
             Services.ContentTypeService.Save(ct);
             return Content($"The document type {alias} and property type {propertyTypeAlias} now allows segments");
@@ -50,7 +50,7 @@ namespace Umbraco.TestData
             if (!ct.VariesBySegment())
                 return Content($"The document type {alias} does not allow segments, nothing has been changed");
 
-            ct.Variations = ct.Variations.UnsetFlag(ContentVariation.Segment);
+            ct.Variations = ct.Variations.SetVariesBy(ContentVariation.Nothing);
 
             Services.ContentTypeService.Save(ct);
             return Content($"The document type {alias} no longer allows segments");

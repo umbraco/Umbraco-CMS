@@ -30,6 +30,10 @@ namespace Umbraco.Core
         /// <summary>
         /// Determines whether the content type varies by segment.
         /// </summary>
+        /// <param name="contentType">The content type.</param>
+        /// <returns>
+        /// A value indicating whether the content type varies by segment.
+        /// </returns>
         public static bool VariesBySegment(this ISimpleContentType contentType) => contentType.Variations.VariesBySegment();
 
         /// <summary>
@@ -121,15 +125,6 @@ namespace Umbraco.Core
         /// A value indicating whether the variation varies by culture.
         /// </returns>
         public static bool VariesByCulture(this ContentVariation variation) => (variation & ContentVariation.Culture) > 0;
-
-        /// <summary>
-        /// Determines whether the content type varies by segment.
-        /// </summary>
-        /// <param name="contentType">The content type.</param>
-        /// <returns>
-        /// A value indicating whether the content type varies by segment.
-        /// </returns>
-        public static bool VariesBySegment(this ISimpleContentType contentType) => contentType.Variations.VariesBySegment();
 
         /// <summary>
         /// Determines whether the content type varies by segment.
