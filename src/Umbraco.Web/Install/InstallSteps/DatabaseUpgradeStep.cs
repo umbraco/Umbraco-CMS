@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -20,14 +21,16 @@ namespace Umbraco.Web.Install.InstallSteps
         private readonly ILogger _logger;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IGlobalSettings _globalSettings;
+        private readonly IConnectionStrings _connectionStrings;
 
-        public DatabaseUpgradeStep(DatabaseBuilder databaseBuilder, IRuntimeState runtime, ILogger logger, IUmbracoVersion umbracoVersion, IGlobalSettings globalSettings)
+        public DatabaseUpgradeStep(DatabaseBuilder databaseBuilder, IRuntimeState runtime, ILogger logger, IUmbracoVersion umbracoVersion, IGlobalSettings globalSettings, IConnectionStrings connectionStrings)
         {
             _databaseBuilder = databaseBuilder;
             _runtime = runtime;
             _logger = logger;
             _umbracoVersion = umbracoVersion;
             _globalSettings = globalSettings;
+            _connectionStrings = connectionStrings ?? throw new ArgumentNullException(nameof(connectionStrings));
         }
 
         public override Task<InstallSetupResult> ExecuteAsync(object model)
@@ -69,7 +72,7 @@ namespace Umbraco.Web.Install.InstallSteps
                 return false;
             }
 
-            var databaseSettings = Current.Configs.ConnectionStrings()[Constants.System.UmbracoConnectionName];
+            var databaseSettings = _connectionStrings[Constants.System.UmbracoConnectionName];
 
             if (databaseSettings.IsConnectionStringConfigured())
             {

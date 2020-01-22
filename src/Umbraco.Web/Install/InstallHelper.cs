@@ -22,17 +22,19 @@ namespace Umbraco.Web.Install
         private readonly ILogger _logger;
         private readonly IGlobalSettings _globalSettings;
         private readonly IUmbracoVersion _umbracoVersion;
+        private readonly IConnectionStrings _connectionStrings;
         private InstallationType? _installationType;
 
         public InstallHelper(IUmbracoContextAccessor umbracoContextAccessor,
             DatabaseBuilder databaseBuilder,
-            ILogger logger, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion)
+            ILogger logger, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IConnectionStrings connectionStrings)
         {
             _httpContext = umbracoContextAccessor.UmbracoContext.HttpContext;
             _logger = logger;
             _globalSettings = globalSettings;
             _umbracoVersion = umbracoVersion;
             _databaseBuilder = databaseBuilder;
+            _connectionStrings = connectionStrings ?? throw new ArgumentNullException(nameof(connectionStrings));
         }
 
         public InstallationType GetInstallationType()
@@ -112,7 +114,7 @@ namespace Umbraco.Web.Install
         {
             get
             {
-                var databaseSettings = Current.Configs.ConnectionStrings()[Constants.System.UmbracoConnectionName];
+                var databaseSettings = _connectionStrings[Constants.System.UmbracoConnectionName];
                 if (_globalSettings.ConfigurationStatus.IsNullOrWhiteSpace()
                     && databaseSettings.IsConnectionStringConfigured() == false)
                 {

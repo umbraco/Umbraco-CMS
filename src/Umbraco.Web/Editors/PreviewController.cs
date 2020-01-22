@@ -5,6 +5,7 @@ using System.Web.Mvc;
 using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Features;
@@ -25,6 +26,7 @@ namespace Umbraco.Web.Editors
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILocalizationService _localizationService;
         private readonly IUmbracoVersion _umbracoVersion;
+        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
 
         public PreviewController(
             UmbracoFeatures features,
@@ -32,7 +34,8 @@ namespace Umbraco.Web.Editors
             IPublishedSnapshotService publishedSnapshotService,
             IUmbracoContextAccessor umbracoContextAccessor,
             ILocalizationService localizationService,
-            IUmbracoVersion umbracoVersion)
+            IUmbracoVersion umbracoVersion,
+            IUmbracoSettingsSection umbracoSettingsSection)
         {
             _features = features;
             _globalSettings = globalSettings;
@@ -40,6 +43,7 @@ namespace Umbraco.Web.Editors
             _umbracoContextAccessor = umbracoContextAccessor;
             _localizationService = localizationService;
             _umbracoVersion = umbracoVersion;
+            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
         }
 
         [UmbracoAuthorize(redirectToUmbracoLogin: true)]
@@ -48,7 +52,7 @@ namespace Umbraco.Web.Editors
         {
             var availableLanguages = _localizationService.GetAllLanguages();
 
-            var model = new BackOfficePreviewModel(_features, _globalSettings, _umbracoVersion, availableLanguages);
+            var model = new BackOfficePreviewModel(_features, _globalSettings, _umbracoVersion, availableLanguages, _umbracoSettingsSection);
 
             if (model.PreviewExtendedHeaderView.IsNullOrWhiteSpace() == false)
             {
@@ -71,7 +75,7 @@ namespace Umbraco.Web.Editors
         public JavaScriptResult Application()
         {
             var files = JsInitialization.OptimizeScriptFiles(HttpContext, JsInitialization.GetPreviewInitialization());
-            var result = JsInitialization.GetJavascriptInitialization(HttpContext, files, "umbraco.preview");
+            var result = JsInitialization.GetJavascriptInitialization(HttpContext, files, "umbraco.preview", GlobalSettings);
 
             return JavaScript(result);
         }

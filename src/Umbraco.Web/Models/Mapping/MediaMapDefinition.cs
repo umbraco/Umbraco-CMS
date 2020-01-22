@@ -1,5 +1,4 @@
 ﻿using Umbraco.Core;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
@@ -8,6 +7,8 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Trees;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using System;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -22,15 +23,17 @@ namespace Umbraco.Web.Models.Mapping
         private readonly IMediaTypeService _mediaTypeService;
         private readonly PropertyEditorCollection _propertyEditorCollection;
         private readonly TabsAndPropertiesMapper<IMedia> _tabsAndPropertiesMapper;
+        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
 
         public MediaMapDefinition(ICultureDictionary cultureDictionary, ILogger logger, CommonMapper commonMapper, IMediaService mediaService, IMediaTypeService mediaTypeService,
-            ILocalizedTextService localizedTextService, PropertyEditorCollection propertyEditorCollection)
+            ILocalizedTextService localizedTextService, PropertyEditorCollection propertyEditorCollection, IUmbracoSettingsSection umbracoSettingsSection)
         {
             _logger = logger;
             _commonMapper = commonMapper;
             _mediaService = mediaService;
             _mediaTypeService = mediaTypeService;
             _propertyEditorCollection = propertyEditorCollection;
+            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
 
             _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IMedia>(cultureDictionary, localizedTextService);
         }
@@ -61,7 +64,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Id = source.Id;
             target.IsChildOfListView = DermineIsChildOfListView(source);
             target.Key = source.Key;
-            target.MediaLink = string.Join(",", source.GetUrls(Current.Configs.Settings().Content, _logger, _propertyEditorCollection));
+            target.MediaLink = string.Join(",", source.GetUrls(_umbracoSettingsSection.Content, _logger, _propertyEditorCollection));
             target.Name = source.Name;
             target.Owner = _commonMapper.GetOwner(source, context);
             target.ParentId = source.ParentId;

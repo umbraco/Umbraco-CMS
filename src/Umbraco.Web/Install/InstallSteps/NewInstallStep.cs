@@ -14,6 +14,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Install.Models;
 using Umbraco.Web.Models.Identity;
 using Umbraco.Web.Security;
+using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
@@ -35,14 +36,18 @@ namespace Umbraco.Web.Install.InstallSteps
         private readonly IGlobalSettings _globalSettings;
         private readonly IUserPasswordConfiguration _passwordConfiguration;
         private readonly BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
+        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+        private readonly IConnectionStrings _connectionStrings;
 
-        public NewInstallStep(HttpContextBase http, IUserService userService, DatabaseBuilder databaseBuilder, IGlobalSettings globalSettings, IUserPasswordConfiguration passwordConfiguration)
+        public NewInstallStep(HttpContextBase http, IUserService userService, DatabaseBuilder databaseBuilder, IGlobalSettings globalSettings, IUserPasswordConfiguration passwordConfiguration, IUmbracoSettingsSection umbracoSettingsSection, IConnectionStrings connectionStrings)
         {
             _http = http;
             _userService = userService;
             _databaseBuilder = databaseBuilder;
             _globalSettings = globalSettings;
             _passwordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
+            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
+            _connectionStrings = connectionStrings ?? throw new ArgumentNullException(nameof(connectionStrings));
             _userManager = _http.GetOwinContext().GetBackOfficeUserManager();
         }
 
@@ -122,7 +127,7 @@ namespace Umbraco.Web.Install.InstallSteps
         public override bool RequiresExecution(UserModel model)
         {
             //now we have to check if this is really a new install, the db might be configured and might contain data
-            var databaseSettings = Current.Configs.ConnectionStrings()[Constants.System.UmbracoConnectionName];
+            var databaseSettings = _connectionStrings[Constants.System.UmbracoConnectionName];
 
             //if there's already a version then there should def be a user but in some cases someone may have
             // left a version number in there but cleared out their db conn string, in that case, it's really a new install.
@@ -133,7 +138,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             // In this one case when it's a brand new install and nothing has been configured, make sure the
             // back office cookie is cleared so there's no old cookies lying around causing problems
-            _http.ExpireCookie(Current.Configs.Settings().Security.AuthCookieName);
+            _http.ExpireCookie(_umbracoSettingsSection.Security.AuthCookieName);
 
                 return true;
         }

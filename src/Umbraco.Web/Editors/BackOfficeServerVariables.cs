@@ -21,6 +21,7 @@ using Umbraco.Web.Profiling;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Trees;
 using Constants = Umbraco.Core.Constants;
+using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Web.Editors
 {
@@ -36,8 +37,9 @@ namespace Umbraco.Web.Editors
         private readonly HttpContextBase _httpContext;
         private readonly IOwinContext _owinContext;
         private readonly IUmbracoVersion _umbracoVersion;
+        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
 
-        internal BackOfficeServerVariables(UrlHelper urlHelper, IRuntimeState runtimeState, UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion)
+        internal BackOfficeServerVariables(UrlHelper urlHelper, IRuntimeState runtimeState, UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IUmbracoSettingsSection umbracoSettingsSection)
         {
             _urlHelper = urlHelper;
             _runtimeState = runtimeState;
@@ -46,6 +48,7 @@ namespace Umbraco.Web.Editors
             _httpContext = _urlHelper.RequestContext.HttpContext;
             _owinContext = _httpContext.GetOwinContext();
             _umbracoVersion = umbracoVersion;
+            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
         }
 
         /// <summary>
@@ -101,7 +104,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         internal Dictionary<string, object> GetServerVariables()
         {
-            var globalSettings = Current.Configs.Global();
+            var globalSettings = _globalSettings;
             var defaultVals = new Dictionary<string, object>
             {
                 {
@@ -324,25 +327,25 @@ namespace Umbraco.Web.Editors
                         {"appPluginsPath", Current.IOHelper.ResolveUrl(Constants.SystemDirectories.AppPlugins).TrimEnd('/')},
                         {
                             "imageFileTypes",
-                            string.Join(",", Current.Configs.Settings().Content.ImageFileTypes)
+                            string.Join(",", _umbracoSettingsSection.Content.ImageFileTypes)
                         },
                         {
                             "disallowedUploadFiles",
-                            string.Join(",", Current.Configs.Settings().Content.DisallowedUploadFiles)
+                            string.Join(",", _umbracoSettingsSection.Content.DisallowedUploadFiles)
                         },
                         {
                             "allowedUploadFiles",
-                            string.Join(",", Current.Configs.Settings().Content.AllowedUploadFiles)
+                            string.Join(",", _umbracoSettingsSection.Content.AllowedUploadFiles)
                         },
                         {
                             "maxFileSize",
                             GetMaxRequestLength()
                         },
-                        {"keepUserLoggedIn", Current.Configs.Settings().Security.KeepUserLoggedIn},
-                        {"usernameIsEmail", Current.Configs.Settings().Security.UsernameIsEmail},
+                        {"keepUserLoggedIn", _umbracoSettingsSection.Security.KeepUserLoggedIn},
+                        {"usernameIsEmail", _umbracoSettingsSection.Security.UsernameIsEmail},
                         {"cssPath", Current.IOHelper.ResolveUrl(globalSettings.UmbracoCssPath).TrimEnd('/')},
-                        {"allowPasswordReset", Current.Configs.Settings().Security.AllowPasswordReset},
-                        {"loginBackgroundImage",  Current.Configs.Settings().Content.LoginBackgroundImage},
+                        {"allowPasswordReset", _umbracoSettingsSection.Security.AllowPasswordReset},
+                        {"loginBackgroundImage",  _umbracoSettingsSection.Content.LoginBackgroundImage},
                         {"showUserInvite", EmailSender.CanSendRequiredEmail(globalSettings)},
                         {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail(globalSettings)},
                     }

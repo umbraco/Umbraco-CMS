@@ -5,6 +5,7 @@ using Umbraco.Core;
 using Umbraco.Web.Composing;
 using Umbraco.Core.Services;
 using Umbraco.Web.Install;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.HealthCheck.Checks.Permissions
 {
@@ -28,10 +29,12 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
     public class FolderAndFilePermissionsCheck : HealthCheck
     {
         private readonly ILocalizedTextService _textService;
+        private readonly IGlobalSettings _globalSettings;
 
-        public FolderAndFilePermissionsCheck(ILocalizedTextService textService)
+        public FolderAndFilePermissionsCheck(ILocalizedTextService textService, IGlobalSettings globalSettings)
         {
             _textService = textService;
+            _globalSettings = globalSettings;
         }
 
         /// <summary>
@@ -65,10 +68,10 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
                 { Constants.SystemDirectories.Preview, PermissionCheckRequirement.Required },
                 { Constants.SystemDirectories.AppPlugins, PermissionCheckRequirement.Required },
                 { Constants.SystemDirectories.Config, PermissionCheckRequirement.Optional },
-                { Current.Configs.Global().UmbracoCssPath, PermissionCheckRequirement.Optional },
-                { Current.Configs.Global().UmbracoMediaPath, PermissionCheckRequirement.Optional },
-                { Current.Configs.Global().UmbracoScriptsPath, PermissionCheckRequirement.Optional },
-                { Current.Configs.Global().UmbracoPath, PermissionCheckRequirement.Optional },
+                { _globalSettings.UmbracoCssPath, PermissionCheckRequirement.Optional },
+                { _globalSettings.UmbracoMediaPath, PermissionCheckRequirement.Optional },
+                { _globalSettings.UmbracoScriptsPath, PermissionCheckRequirement.Optional },
+                { _globalSettings.UmbracoPath, PermissionCheckRequirement.Optional },
                 { Constants.SystemDirectories.MvcViews, PermissionCheckRequirement.Optional }
             };
 

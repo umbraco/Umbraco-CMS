@@ -9,6 +9,7 @@ using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Web.Composing;
 using Umbraco.Core.Manifest;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.JavaScript
 {
@@ -42,7 +43,7 @@ namespace Umbraco.Web.JavaScript
         /// The angular module name to boot
         /// </param>
         /// <returns></returns>
-        public static string GetJavascriptInitialization(HttpContextBase httpContext, IEnumerable<string> scripts, string angularModule)
+        public static string GetJavascriptInitialization(HttpContextBase httpContext, IEnumerable<string> scripts, string angularModule, IGlobalSettings globalSettings)
         {
             var jarray = new StringBuilder();
             jarray.AppendLine("[");
@@ -58,7 +59,7 @@ namespace Umbraco.Web.JavaScript
             }
             jarray.Append("]");
 
-            return WriteScript(jarray.ToString(), Current.IOHelper.ResolveUrl(Current.Configs.Global().UmbracoPath), angularModule);
+            return WriteScript(jarray.ToString(), Current.IOHelper.ResolveUrl(globalSettings.UmbracoPath), angularModule);
         }
 
         /// <summary>

@@ -110,7 +110,7 @@
         on-login="hideLoginScreen()">
     </umb-login>
 
-    @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewData.GetUmbracoPath() }), Model.Features, Current.Configs.Global(), Model.UmbracoVersion)
+    @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewData.GetUmbracoPath() }), Model.Features, Current.Configs.Global(), Model.UmbracoVersion, Current.Configs.Settings())
 
     <script>
 
