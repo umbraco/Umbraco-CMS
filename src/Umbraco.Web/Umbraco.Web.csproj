@@ -249,6 +249,8 @@
     <Compile Include="Search\ExamineFinalComponent.cs" />
     <Compile Include="Search\ExamineFinalComposer.cs" />
     <Compile Include="Search\ExamineUserComponent.cs" />
+    <Compile Include="Search\IUmbracoTreeSearcherFields.cs" />
+    <Compile Include="Search\UmbracoTreeSearcherFields.cs" />
     <Compile Include="Services\DashboardService.cs" />
     <Compile Include="Services\IDashboardService.cs" />
     <Compile Include="Models\Link.cs" />
