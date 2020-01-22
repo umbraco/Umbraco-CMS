@@ -70,6 +70,13 @@ namespace Umbraco.Web.Editors
             return Services.ContentTypeService.Count();
         }
 
+        [HttpGet]
+        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
+        public bool HasContentNodes(int id)
+        {
+            return Services.ContentTypeService.HasContentNodes(id);
+        }
+
         public DocumentTypeDisplay GetById(int id)
         {
             var ct = Services.ContentTypeService.Get(id);
@@ -425,11 +432,11 @@ namespace Umbraco.Web.Editors
                 }
 
                 var contentType = Services.ContentTypeBaseServices.GetContentTypeOf(contentItem);
-                var ids = contentType.AllowedContentTypes.Select(x => x.Id.Value).ToArray();
+                var ids = contentType.AllowedContentTypes.OrderBy(c => c.SortOrder).Select(x => x.Id.Value).ToArray();
 
                 if (ids.Any() == false) return Enumerable.Empty<ContentTypeBasic>();
 
-                types = Services.ContentTypeService.GetAll(ids).ToList();
+                types = Services.ContentTypeService.GetAll(ids).OrderBy(c => ids.IndexOf(c.Id)).ToList();
             }
 
             var basics = types.Where(type => type.IsElement == false).Select(Mapper.Map<IContentType, ContentTypeBasic>).ToList();
@@ -452,7 +459,7 @@ namespace Umbraco.Web.Editors
                 }
             }
 
-            return basics;
+            return basics.OrderBy(c => contentId == Constants.System.Root ? c.Name : string.Empty);
         }
 
         /// <summary>

@@ -166,7 +166,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// to not run if MainDom wasn't acquired.
         /// If MainDom was not acquired, then _localContentDb and _localMediaDb will remain null which means this appdomain
         /// will load in published content via the DB and in that case this appdomain will probably not exist long enough to
-        /// serve more than a page of content. 
+        /// serve more than a page of content.
         /// </remarks>
         private void MainDomRegister()
         {
@@ -670,7 +670,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 publishedChanged = publishedChanged2;
             }
 
-            
+
             if (draftChanged || publishedChanged)
                 ((PublishedSnapshot)CurrentPublishedSnapshot)?.Resync();
         }
@@ -987,7 +987,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        //Methods used to prevent allocations of lists        
+        //Methods used to prevent allocations of lists
         private void AddToList(ref List<int> list, int val) => GetOrCreateList(ref list).Add(val);
         private List<int> GetOrCreateList(ref List<int> list) => list ?? (list = new List<int>());
 
@@ -1144,7 +1144,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // Here we are reading/writing to shared objects so we need to lock (can't be _storesLock which manages the actual nucache files
             // and would result in a deadlock). Even though we are locking around underlying readlocks (within CreateSnapshot) it's because
             // we need to ensure that the result of contentSnap.Gen (etc) and the re-assignment of these values and _elements cache
-            // are done atomically. 
+            // are done atomically.
 
             lock (_elementsLock)
             {
