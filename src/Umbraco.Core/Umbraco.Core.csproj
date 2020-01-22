@@ -252,6 +252,9 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\RichTextPreValueMigrator.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\DropDownFlexiblePreValueMigrator.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\MergeDateAndDateTimePropertyEditor.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_6_0\AddNewRelationTypes.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_6_0\UpdateRelationTypeTable.cs" />
+    <Compile Include="Models\Editors\UmbracoEntityReference.cs" />
     <Compile Include="Models\ContentEditing\ContentAppBadge.cs" />
     <Compile Include="Models\ContentEditing\ContentAppBadgeType.cs" />
     <Compile Include="Models\Entities\EntityExtensions.cs" />
@@ -277,10 +280,15 @@
     <Compile Include="Models\Entities\MediaEntitySlim.cs" />
     <Compile Include="Models\PagedResult.cs" />
     <Compile Include="Models\Entities\MemberEntitySlim.cs" />
+    <Compile Include="Models\MediaTypeExtensions.cs" />
     <Compile Include="Models\PublishedContent\ILivePublishedModelFactory.cs" />
     <Compile Include="Models\PublishedContent\IPublishedContentType.cs" />
     <Compile Include="Models\PublishedContent\IPublishedPropertyType.cs" />
     <Compile Include="PropertyEditors\ConfigurationFieldsExtensions.cs" />
+    <Compile Include="PropertyEditors\DataValueReferenceFactoryCollection.cs" />
+    <Compile Include="PropertyEditors\DataValueReferenceFactoryCollectionBuilder.cs" />
+    <Compile Include="PropertyEditors\IDataValueReference.cs" />
+    <Compile Include="PropertyEditors\IDataValueReferenceFactory.cs" />
     <Compile Include="PropertyEditors\IDataEditorWithMediaPath.cs" />
     <Compile Include="PropertyEditors\IIgnoreUserStartNodesConfig.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
@@ -1530,7 +1538,7 @@
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="Udi.cs" />
     <Compile Include="UdiDefinitionAttribute.cs" />
-    <Compile Include="UdiEntityType.cs" />
+    <Compile Include="Contants-UdiEntityType.cs" />
     <Compile Include="UdiGetterExtensions.cs" />
     <Compile Include="UdiRange.cs" />
     <Compile Include="UdiType.cs" />

@@ -185,40 +185,38 @@ iframe, .content-column-body {
 
 // Inline code
 // 1: Revert border radius to match look and feel of 7.4+
-code{
-  .border-radius(@baseBorderRadius); // 1
+code {
+    .border-radius(@baseBorderRadius); // 1
 }
 
 // Blocks of code
 // 1: Wrapping code is unreadable on small devices.
 pre {
-  display: block;
-  padding: (@baseLineHeight - 1) / 2;
-  margin: 0 0 @baseLineHeight / 2;
-  font-family: @sansFontFamily;
-  //font-size: @baseFontSize - 1; // 14px to 13px
-  color: @gray-2;
-  line-height: @baseLineHeight;
-  white-space: pre-wrap; // 1
-  overflow-x: auto; // 1
-  background-color: @gray-10;
-  border: 1px solid @gray-8;
-  .border-radius(@baseBorderRadius);
+    display: block;
+    padding: (@baseLineHeight - 1) / 2;
+    margin: 0 0 @baseLineHeight / 2;
+    font-family: @sansFontFamily;
+    color: @gray-2;
+    line-height: @baseLineHeight;
+    white-space: pre-wrap; // 1
+    overflow-x: auto; // 1
+    background-color: @brownGrayLight;
+    border: 1px solid @gray-8;
+    .border-radius(@baseBorderRadius);
 
+    // Make prettyprint styles more spaced out for readability
+    &.prettyprint {
+        margin-bottom: @baseLineHeight;
+    }
 
-  // Make prettyprint styles more spaced out for readability
-  &.prettyprint {
-    margin-bottom: @baseLineHeight;
-  }
-
-  // Account for some code outputs that place code tags in pre tags
-  code {
-    padding: 0;
-    white-space: pre; // 1 
-    word-wrap: normal; // 1
-    background-color: transparent;
-    border: 0;
-  }
+    // Account for some code outputs that place code tags in pre tags
+    code {
+        padding: 0;
+        white-space: pre; // 1
+        word-wrap: normal; // 1
+        background-color: transparent;
+        border: 0;
+    }
 }
 
 /* Styling for content/media sort order dialog */
