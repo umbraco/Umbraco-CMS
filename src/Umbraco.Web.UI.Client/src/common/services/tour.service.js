@@ -148,7 +148,10 @@
                                     group.groupOrder = item.groupOrder;
                                 }
                                 groupExists = true;
+
+                            if(item.hidden === false){
                                 group.tours.push(item);
+                            }
                             }
                         });
 
@@ -158,17 +161,19 @@
                             if (item.groupOrder) {
                                 newGroup.groupOrder = item.groupOrder;
                             }
+
+                        if(item.hidden === false){
                             newGroup.tours.push(item);
                             groupedTours.push(newGroup);
                         }
                     }
 
-                });
+                }
 
                 deferred.resolve(groupedTours);
             });
             return deferred.promise;
-        }
+        });
 
         /**
          * @ngdoc method

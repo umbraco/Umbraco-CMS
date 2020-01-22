@@ -126,27 +126,10 @@
                </umb-editor-sub-header-section>
 
                <umb-editor-sub-header-section ng-show="(selection.length == 0)">
-                   <ng-form class="form-search -no-margin-bottom pull-right" novalidate>
-                       <div class="inner-addon left-addon">
-                           <label for="listview-search" class="form-search__label-icon">
-                                <i class="icon icon-search" aria-hidden="true"></i>
-                                <span class="sr-only">
-                                    <localize key="visuallyHiddenTexts_listviewSearchLabel">Search the listview</localize>
-                                </span>
-                           </label>
-                           <input
-                               class="form-control search-input"
-                               id="listview-search"
-                               type="text"
-                               localize="placeholder"
-                               placeholder="@general_typeToSearch"
-                               ng-model="options.filter"
-                               ng-change="enterSearch()"
-                               ng-keydown="forceSearch($event)"
-                               prevent-enter-submit
-                               no-dirty-check>
-                       </div>
-                   </ng-form>
+
+                    <umb-mini-search model="options.filter" on-search="makeSearch()" on-start-typing="onSearchStartTyping()">
+                    </umb-mini-search>
+
                </umb-editor-sub-header-section>
 
                <umb-editor-sub-header-section ng-show="(selection.length > 0)">
