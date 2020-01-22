@@ -38,7 +38,8 @@ function valPropertyMsg(serverValidationManager, localizationService) {
             
             var currentProperty = umbPropCtrl.property;
             scope.currentProperty = currentProperty;
-            var currentCulture = currentProperty.culture;         
+            var currentCulture = currentProperty.culture;
+            var currentSegment = currentProperty.segment;   
 
             var labels = {};
             localizationService.localize("errors_propertyHasErrors").then(function (data) {
@@ -51,7 +52,7 @@ function valPropertyMsg(serverValidationManager, localizationService) {
                 var currentVariant = umbVariantCtrl.editor.content;
 
                 // Lets check if we have variants and we are on the default language then ...
-                if (umbVariantCtrl.content.variants.length > 1 && !currentVariant.language.isDefault && !currentCulture && !currentProperty.unlockInvariantValue) {
+                if (umbVariantCtrl.content.variants.length > 1 && (!currentVariant.language || !currentVariant.language.isDefault) && !currentCulture && !currentSegment && !currentProperty.unlockInvariantValue) {
                     //This property is locked cause its a invariant property shown on a non-default language.
                     //Therefor do not validate this field.
                     return;
@@ -67,7 +68,7 @@ function valPropertyMsg(serverValidationManager, localizationService) {
                 //this can be null if no property was assigned
                 if (scope.currentProperty) {
                     //first try to get the error msg from the server collection
-                    var err = serverValidationManager.getPropertyError(scope.currentProperty.alias, null, "");
+                    var err = serverValidationManager.getPropertyError(scope.currentProperty.alias, null, null, "");
                     //if there's an error message use it
                     if (err && err.errorMsg) {
                         return err.errorMsg;
@@ -203,6 +204,7 @@ function valPropertyMsg(serverValidationManager, localizationService) {
             if (scope.currentProperty) { //this can be null if no property was assigned
                 unsubscribe.push(serverValidationManager.subscribe(scope.currentProperty.alias,
                     currentCulture,
+                    currentSegment, 
                     "",
                     function(isValid, propertyErrors, allErrors) {
                         hasError = !isValid;

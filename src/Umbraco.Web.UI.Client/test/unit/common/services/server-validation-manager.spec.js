@@ -61,12 +61,12 @@
         it('can retrieve property validation errors for a sub field', function () {
 
             //arrange
-            serverValidationManager.addPropertyError("myProperty", null, "value1", "Some value 1");
-            serverValidationManager.addPropertyError("myProperty", null, "value2", "Another value 2");
+            serverValidationManager.addPropertyError("myProperty", null, null, "value1", "Some value 1");
+            serverValidationManager.addPropertyError("myProperty", null, null, "value2", "Another value 2");
 
             //act
-            var err1 = serverValidationManager.getPropertyError("myProperty", null, "value1");
-            var err2 = serverValidationManager.getPropertyError("myProperty", null, "value2");
+            var err1 = serverValidationManager.getPropertyError("myProperty", null, null, "value1");
+            var err2 = serverValidationManager.getPropertyError("myProperty", null, null, "value2");
 
             //assert            
             expect(err1).not.toBeUndefined();
@@ -85,14 +85,14 @@
         it('can retrieve property validation errors for a sub field for culture', function () {
 
             //arrange
-            serverValidationManager.addPropertyError("myProperty", "en-US", "value1", "Some value 1");
-            serverValidationManager.addPropertyError("myProperty", "fr-FR", "value2", "Another value 2");
+            serverValidationManager.addPropertyError("myProperty", "en-US", null, "value1", "Some value 1");
+            serverValidationManager.addPropertyError("myProperty", "fr-FR", null, "value2", "Another value 2");
 
             //act
-            var err1 = serverValidationManager.getPropertyError("myProperty", "en-US", "value1");
-            var err1NotFound = serverValidationManager.getPropertyError("myProperty", null, "value2");
-            var err2 = serverValidationManager.getPropertyError("myProperty", "fr-FR", "value2");
-            var err2NotFound = serverValidationManager.getPropertyError("myProperty", null, "value2");
+            var err1 = serverValidationManager.getPropertyError("myProperty", "en-US", null, "value1");
+            var err1NotFound = serverValidationManager.getPropertyError("myProperty", null, null, "value2");
+            var err2 = serverValidationManager.getPropertyError("myProperty", "fr-FR", null, "value2");
+            var err2NotFound = serverValidationManager.getPropertyError("myProperty", null, null, "value2");
 
 
             //assert            
@@ -115,8 +115,8 @@
         it('can add a property errors with multiple sub fields and it the first will be retreived with only the property alias', function () {
 
             //arrange
-            serverValidationManager.addPropertyError("myProperty", null, "value1", "Some value 1");
-            serverValidationManager.addPropertyError("myProperty", null, "value2", "Another value 2");
+            serverValidationManager.addPropertyError("myProperty", null, null, "value1", "Some value 1");
+            serverValidationManager.addPropertyError("myProperty", null, null, "value2", "Another value 2");
 
             //act
             var err = serverValidationManager.getPropertyError("myProperty");
@@ -132,10 +132,10 @@
         it('will return null for a non-existing property error', function () {
 
             //arrage
-            serverValidationManager.addPropertyError("myProperty", null, "value", "Required");
+            serverValidationManager.addPropertyError("myProperty", null, null, "value", "Required");
 
             //act
-            var err = serverValidationManager.getPropertyError("DoesntExist", null, "value");
+            var err = serverValidationManager.getPropertyError("DoesntExist", null, null, "value");
 
             //assert
             expect(err).toBeUndefined();
@@ -145,15 +145,15 @@
         it('detects if a property error exists', function () {
 
             //arrange
-            serverValidationManager.addPropertyError("myProperty", null, "value1", "Some value 1");
-            serverValidationManager.addPropertyError("myProperty", null, "value2", "Another value 2");
+            serverValidationManager.addPropertyError("myProperty", null, null, "value1", "Some value 1");
+            serverValidationManager.addPropertyError("myProperty", null, null, "value2", "Another value 2");
 
             //act
             var err1 = serverValidationManager.hasPropertyError("myProperty");
-            var err2 = serverValidationManager.hasPropertyError("myProperty", null, "value1");
-            var err3 = serverValidationManager.hasPropertyError("myProperty", null, "value2");
+            var err2 = serverValidationManager.hasPropertyError("myProperty", null, null, "value1");
+            var err3 = serverValidationManager.hasPropertyError("myProperty", null, null, "value2");
             var err4 = serverValidationManager.hasPropertyError("notFound");
-            var err5 = serverValidationManager.hasPropertyError("myProperty", null, "notFound");
+            var err5 = serverValidationManager.hasPropertyError("myProperty", null, null, "notFound");
 
             //assert
             expect(err1).toBe(true);            
@@ -167,15 +167,15 @@
         it('can remove a property error with a sub field specified', function () {
 
             //arrage
-            serverValidationManager.addPropertyError("myProperty", null, "value1", "Some value 1");
-            serverValidationManager.addPropertyError("myProperty", null, "value2", "Another value 2");
+            serverValidationManager.addPropertyError("myProperty", null, null, "value1", "Some value 1");
+            serverValidationManager.addPropertyError("myProperty", null, null, "value2", "Another value 2");
 
             //act
-            serverValidationManager.removePropertyError("myProperty", null, "value1");
+            serverValidationManager.removePropertyError("myProperty", null, null, "value1");
 
             //assert
-            expect(serverValidationManager.hasPropertyError("myProperty", null, "value1")).toBe(false);
-            expect(serverValidationManager.hasPropertyError("myProperty", null, "value2")).toBe(true);
+            expect(serverValidationManager.hasPropertyError("myProperty", null, null, "value1")).toBe(false);
+            expect(serverValidationManager.hasPropertyError("myProperty", null, null, "value2")).toBe(true);
 
         });
         
@@ -189,8 +189,8 @@
             serverValidationManager.removePropertyError("myProperty");
 
             //assert
-            expect(serverValidationManager.hasPropertyError("myProperty", null, "value1")).toBe(false);
-            expect(serverValidationManager.hasPropertyError("myProperty", null, "value2")).toBe(false);
+            expect(serverValidationManager.hasPropertyError("myProperty", null, null, "value1")).toBe(false);
+            expect(serverValidationManager.hasPropertyError("myProperty", null, null, "value2")).toBe(false);
 
         });
 
@@ -201,16 +201,16 @@
         it('can retrieve culture validation errors', function () {
 
             //arrange
-            serverValidationManager.addPropertyError("myProperty", null, "value1", "Some value 1");
-            serverValidationManager.addPropertyError("myProperty", "en-US", "value1", "Some value 2");
-            serverValidationManager.addPropertyError("myProperty", null, "value2", "Another value 2");
-            serverValidationManager.addPropertyError("myProperty", "fr-FR", "value2", "Another value 3");
+            serverValidationManager.addPropertyError("myProperty", null, null, "value1", "Some value 1");
+            serverValidationManager.addPropertyError("myProperty", "en-US", null, "value1", "Some value 2");
+            serverValidationManager.addPropertyError("myProperty", null, null, "value2", "Another value 2");
+            serverValidationManager.addPropertyError("myProperty", "fr-FR", null, "value2", "Another value 3");
 
             //assert
-            expect(serverValidationManager.hasCultureError(null)).toBe(true);
-            expect(serverValidationManager.hasCultureError("en-US")).toBe(true);
-            expect(serverValidationManager.hasCultureError("fr-FR")).toBe(true);
-            expect(serverValidationManager.hasCultureError("es-ES")).toBe(false);
+            expect(serverValidationManager.hasVariantError(null, null)).toBe(true);
+            expect(serverValidationManager.hasVariantError("en-US", null)).toBe(true);
+            expect(serverValidationManager.hasVariantError("fr-FR", null)).toBe(true);
+            expect(serverValidationManager.hasVariantError("es-ES", null)).toBe(false);
 
         });
 
@@ -222,7 +222,7 @@
             var args;
 
             //arrange
-            serverValidationManager.subscribe(null, null, "Name", function (isValid, propertyErrors, allErrors) {
+            serverValidationManager.subscribe(null, null, null, "Name", function (isValid, propertyErrors, allErrors) {
                 args = {
                     isValid: isValid,
                     propertyErrors: propertyErrors,
@@ -232,7 +232,7 @@
             
             //act
             serverValidationManager.addFieldError("Name", "Required");
-            serverValidationManager.addPropertyError("myProperty", null, "value1", "Some value 1");
+            serverValidationManager.addPropertyError("myProperty", null, null, "value1", "Some value 1");
 
             //assert
             expect(args).not.toBeUndefined();
@@ -249,8 +249,8 @@
             };
             var cb2 = function () {
             };
-            serverValidationManager.subscribe(null, null, "Name", cb1);
-            serverValidationManager.subscribe(null, null, "Title", cb2);
+            serverValidationManager.subscribe(null, null, null, "Name", cb1);
+            serverValidationManager.subscribe(null, null, null, "Title", cb2);
 
             //act
             serverValidationManager.addFieldError("Name", "Required");
@@ -278,7 +278,7 @@
             var numCalled = 0;
 
             //arrange
-            serverValidationManager.subscribe("myProperty", null, "value1", function (isValid, propertyErrors, allErrors) {
+            serverValidationManager.subscribe("myProperty", null, null, "value1", function (isValid, propertyErrors, allErrors) {
                 args1 = {
                     isValid: isValid,
                     propertyErrors: propertyErrors,
@@ -286,7 +286,7 @@
                 };
             });
             
-            serverValidationManager.subscribe("myProperty", null, "", function (isValid, propertyErrors, allErrors) {
+            serverValidationManager.subscribe("myProperty", null, null, "", function (isValid, propertyErrors, allErrors) {
                 numCalled++;
                 args2 = {
                     isValid: isValid,
@@ -296,9 +296,9 @@
             });
 
             //act
-            serverValidationManager.addPropertyError("myProperty", null, "value1", "Some value 1");
-            serverValidationManager.addPropertyError("myProperty", null, "value2", "Some value 2");
-            serverValidationManager.addPropertyError("myProperty", null, "", "Some value 3");
+            serverValidationManager.addPropertyError("myProperty", null, null, "value1", "Some value 1");
+            serverValidationManager.addPropertyError("myProperty", null, null, "value2", "Some value 2");
+            serverValidationManager.addPropertyError("myProperty", null, null, "", "Some value 3");
 
             //assert
             expect(args1).not.toBeUndefined();
@@ -328,7 +328,7 @@
             var numCalled = 0;
 
             //arrange
-            serverValidationManager.subscribe(null, "en-US", null, function (isValid, propertyErrors, allErrors) {
+            serverValidationManager.subscribe(null, "en-US", null, null, function (isValid, propertyErrors, allErrors) {
                 numCalled++;
                 args1 = {
                     isValid: isValid,
@@ -337,7 +337,7 @@
                 };
             });
 
-            serverValidationManager.subscribe(null, "es-ES", null, function (isValid, propertyErrors, allErrors) {
+            serverValidationManager.subscribe(null, "es-ES", null, null, function (isValid, propertyErrors, allErrors) {
                 numCalled++;
                 args2 = {
                     isValid: isValid,
@@ -347,10 +347,10 @@
             });
 
             //act
-            serverValidationManager.addPropertyError("myProperty", null, "value1", "Some value 1");
-            serverValidationManager.addPropertyError("myProperty", "en-US", "value1", "Some value 1");
-            serverValidationManager.addPropertyError("myProperty", "en-US", "value2", "Some value 2");
-            serverValidationManager.addPropertyError("myProperty", "fr-FR", "", "Some value 3");
+            serverValidationManager.addPropertyError("myProperty", null, null, "value1", "Some value 1");
+            serverValidationManager.addPropertyError("myProperty", "en-US", null, "value1", "Some value 1");
+            serverValidationManager.addPropertyError("myProperty", "en-US", null, "value2", "Some value 2");
+            serverValidationManager.addPropertyError("myProperty", "fr-FR", null, "", "Some value 3");
 
             //assert
             expect(args1).not.toBeUndefined();

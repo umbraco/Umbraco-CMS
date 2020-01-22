@@ -67,7 +67,7 @@
                 
                 // find default.
                 angular.forEach(scope.content.variants, function (variant) {
-                    if (variant.language.isDefault) {
+                    if (variant.language !== null && variant.language.isDefault) {
                         scope.vm.defaultVariant = variant;
                     }
                 });
@@ -82,10 +82,10 @@
                 
                 
                 angular.forEach(scope.content.variants, function (variant) {
-                    unsubscribe.push(serverValidationManager.subscribe(null, variant.language.culture, null, onCultureValidation));
+                    unsubscribe.push(serverValidationManager.subscribe(null, variant.language !== null ? variant.language.culture : null, variant.segment, null, onCultureValidation));
                 });
                 
-                unsubscribe.push(serverValidationManager.subscribe(null, null, null, onCultureValidation));
+                unsubscribe.push(serverValidationManager.subscribe(null, null, null, null, onCultureValidation));
                 
                 
                 

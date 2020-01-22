@@ -36,6 +36,7 @@ function valServerField(serverValidationManager) {
                     //subscribe to the server validation changes
                     unsubscribe.push(serverValidationManager.subscribe(null,
                         null,
+                        null,
                         fieldName,
                         function(isValid, fieldErrors, allErrors) {
                             if (!isValid) {

@@ -179,15 +179,23 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
                         }
                     }
 
-                    //if it contains 3 '.' then we will wire it up to a property's html field
+                    htmlFieldReference = "";
                     if (parts.length > 3) {
-                        //add an error with a reference to the field for which the validation belongs too
-                        serverValidationManager.addPropertyError(propertyAlias, culture, parts[3], modelState[e][0]);
+                        htmlFieldReference = parts[3] || "";
                     }
-                    else {
-                        //add a generic error for the property, no reference to a specific html field
-                        serverValidationManager.addPropertyError(propertyAlias, culture, "", modelState[e][0]);
+
+                    // SEGMENTS_TODO: Need to investigate wether we have updated validation to handle segments, plus could it be the third parameter, so we leave the HTML Field ref as optional and last?
+                    var segment = null;
+                    if (parts.length > 4) {
+                        segment = parts[4];
+                        //special check in case the string is formatted this way
+                        if (segment === "null") {
+                            segment = null;
+                        }
                     }
+
+                    // add a generic error for the property
+                    serverValidationManager.addPropertyError(propertyAlias, culture, segment, htmlFieldReference, modelState[e][0]);
 
                 } else {
 
