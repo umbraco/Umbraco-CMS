@@ -48,9 +48,12 @@ using FileSystems = Umbraco.Core.IO.FileSystems;
 using Umbraco.Web.Templates;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.Models.Identity;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Net;
+using Umbraco.Web.Security;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Testing
@@ -192,6 +195,7 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique(backOfficeInfo);
             Composition.RegisterUnique(ipResolver);
             Composition.RegisterUnique<IPasswordHasher, AspNetPasswordHasher>();
+            Composition.RegisterUnique<ICurrentUserAccessor, CurrentUserAccessor>();
             Composition.RegisterUnique(TestHelper.ShortStringHelper);
 
 

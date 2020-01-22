@@ -2,10 +2,11 @@
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.ContentEditing;
-using Current = Umbraco.Web.Composing.Current;
+using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Web.ContentApps
 {
@@ -18,8 +19,8 @@ namespace Umbraco.Web.ContentApps
         {
             // get the logger just-in-time - see note below for manifest parser
             var logger = factory.GetInstance<ILogger>();
-
-            return new ContentAppFactoryCollection(CreateItems(factory), logger);
+            var currentUserAccessor = factory.GetInstance<ICurrentUserAccessor>();
+            return new ContentAppFactoryCollection(CreateItems(factory), logger, currentUserAccessor);
         }
 
         protected override IEnumerable<IContentAppFactory> CreateItems(IFactory factory)
@@ -28,8 +29,8 @@ namespace Umbraco.Web.ContentApps
             // simply getting the builder in order to configure the collection, would require
             // its dependencies too, and that can create cycles or other oddities
             var manifestParser = factory.GetInstance<IManifestParser>();
-
-            return base.CreateItems(factory).Concat(manifestParser.Manifest.ContentApps.Select(x => new ManifestContentAppFactory(x, Current.IOHelper)));
+            var ioHelper = factory.GetInstance<IIOHelper>();
+            return base.CreateItems(factory).Concat(manifestParser.Manifest.ContentApps.Select(x => new ManifestContentAppFactory(x, ioHelper)));
         }
     }
 }

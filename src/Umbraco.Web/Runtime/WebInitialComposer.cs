@@ -11,6 +11,7 @@ using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Migrations.PostMigrations;
+using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Runtime;
@@ -61,6 +62,7 @@ namespace Umbraco.Web.Runtime
             composition.Register<IHostingEnvironment, AspNetHostingEnvironment>();
             composition.Register<IBackOfficeInfo, AspNetBackOfficeInfo>();
             composition.Register<IPasswordHasher, AspNetPasswordHasher>();
+            composition.Register<ICurrentUserAccessor, CurrentUserAccessor>();
 
             composition.RegisterUnique<IHttpContextAccessor, AspNetHttpContextAccessor>(); // required for hybrid accessors
 

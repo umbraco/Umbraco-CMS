@@ -150,11 +150,6 @@
     <Compile Include="Composing\CompositionExtensions\Installer.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComponent.cs" />
-    <Compile Include="ContentApps\ContentAppFactoryCollection.cs" />
-    <Compile Include="ContentApps\ContentAppFactoryCollectionBuilder.cs" />
-    <Compile Include="ContentApps\ContentEditorContentAppFactory.cs" />
-    <Compile Include="ContentApps\ContentInfoContentAppFactory.cs" />
-    <Compile Include="ContentApps\ListViewContentAppFactory.cs" />
     <Compile Include="Dashboards\ContentDashboard.cs" />
     <Compile Include="Dashboards\DashboardCollection.cs" />
     <Compile Include="Dashboards\DashboardCollectionBuilder.cs" />
@@ -236,6 +231,7 @@
     <Compile Include="Search\ExamineFinalComponent.cs" />
     <Compile Include="Search\ExamineFinalComposer.cs" />
     <Compile Include="Search\ExamineUserComponent.cs" />
+    <Compile Include="Security\CurrentUserAccessor.cs" />
     <Compile Include="Security\BackOfficeUserStore.cs" />
     <Compile Include="Security\BackOfficeUserValidator.cs" />
     <Compile Include="Security\ConfiguredPasswordValidator.cs" />
