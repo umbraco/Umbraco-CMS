@@ -7,6 +7,21 @@ body {
     
 }
 
+.container, .navbar-static-top .container, .navbar-fixed-top .container, .navbar-fixed-bottom .container {
+    max-width: 1500px;
+    width: 95%;
+}
+
+.span3 {
+    width: 220px;
+    width: calc(90% / 12 * 3);
+}
+
+.span9 {
+    width: 700px;
+    width: calc(90% / 12 * 9);
+}
+
 .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
     font-family: inherit;
     font-weight: 400;
@@ -75,4 +90,13 @@ a:hover {
 .header img {
     width: 50px;
     margin-top: 5px;
+}
+
+.content .methods code {
+    border: 1px solid #e1e1e8;
+    background-color: #f7f7f9;
+    padding: 0px 3px;
+    font-size: 85%;
+    color: #d14;
+    white-space: nowrap;
 }

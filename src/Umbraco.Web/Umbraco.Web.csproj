@@ -63,7 +63,7 @@
   <ItemGroup>
     <PackageReference Include="ClientDependency" Version="1.9.8" />
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
-    <PackageReference Include="Examine" Version="1.0.1" />
+    <PackageReference Include="Examine" Version="1.0.2" />
     <PackageReference Include="HtmlAgilityPack" Version="1.8.14" />
     <PackageReference Include="ImageProcessor">
       <Version>2.7.0.100</Version>
@@ -234,6 +234,7 @@
     <Compile Include="Mvc\ValidateUmbracoFormRouteStringAttribute.cs" />
     <Compile Include="Profiling\WebProfilingController.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
+    <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />
@@ -249,11 +250,16 @@
     <Compile Include="Search\ExamineFinalComponent.cs" />
     <Compile Include="Search\ExamineFinalComposer.cs" />
     <Compile Include="Search\ExamineUserComponent.cs" />
+    <Compile Include="Search\IUmbracoTreeSearcherFields.cs" />
+    <Compile Include="Search\UmbracoTreeSearcherFields.cs" />
     <Compile Include="Services\DashboardService.cs" />
     <Compile Include="Services\IDashboardService.cs" />
     <Compile Include="Models\Link.cs" />
     <Compile Include="Models\LinkType.cs" />
     <Compile Include="Models\TemplateQuery\OperatorFactory.cs" />
+    <Compile Include="Templates\HtmlLocalLinkParser.cs" />
+    <Compile Include="Templates\HtmlImageSourceParser.cs" />
+    <Compile Include="Templates\HtmlUrlParser.cs" />
     <Compile Include="UmbracoContextFactory.cs" />
     <Compile Include="UmbracoContextReference.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeByUdiRouteHandler.cs" />

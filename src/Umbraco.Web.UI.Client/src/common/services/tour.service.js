@@ -134,31 +134,39 @@
                 var groupedTours = [];
                 tours.forEach(function (item) {
                     
-                    var groupExists = false;
-                    var newGroup = {
-                        "group": "",
-                        "tours": []
-                    };
+                    if (item.contentType === null || item.contentType === '') {
+                        var groupExists = false;
+                        var newGroup = {
+                            "group": "",
+                            "tours": []
+                        };
 
-                    groupedTours.forEach(function(group){
-                        // extend existing group if it is already added
-                        if(group.group === item.group) {
-                            if(item.groupOrder) {
-                                group.groupOrder = item.groupOrder
+                        groupedTours.forEach(function (group) {
+                            // extend existing group if it is already added
+                            if (group.group === item.group) {
+                                if (item.groupOrder) {
+                                    group.groupOrder = item.groupOrder;
+                                }
+                                groupExists = true;
+
+                            if(item.hidden === false){
+                                group.tours.push(item);
                             }
-                            groupExists = true;
-                            group.tours.push(item)
-                        }
-                    });
+                            }
+                        });
 
-                    // push new group to array if it doesn't exist
-                    if(!groupExists) {
-                        newGroup.group = item.group;
-                        if(item.groupOrder) {
-                            newGroup.groupOrder = item.groupOrder
+                        // push new group to array if it doesn't exist
+                        if (!groupExists) {
+                            newGroup.group = item.group;
+                            if (item.groupOrder) {
+                                newGroup.groupOrder = item.groupOrder;
+                            }
+
+                            if(item.hidden === false){
+                                newGroup.tours.push(item);
+                                groupedTours.push(newGroup);
+                            }
                         }
-                        newGroup.tours.push(item);
-                        groupedTours.push(newGroup);
                     }
 
                 });
@@ -184,6 +192,24 @@
             setTourStatuses(tours).then(function () {
                 var tour = _.findWhere(tours, { alias: tourAlias });
                 deferred.resolve(tour);
+            });
+            return deferred.promise;
+        }
+
+        /**
+        * @ngdoc method
+        * @name umbraco.services.tourService#getToursForDoctype
+        * @methodOf umbraco.services.tourService
+        *
+        * @description
+        * Returns a promise of the tours found by documenttype alias.
+        * @param {Object} doctypeAlias The doctype alias for which  the tours which should be returned
+        * @returns {Array} An array of tour objects for the doctype
+        */
+        function getToursForDoctype(doctypeAlias) {
+            var deferred = $q.defer();
+            tourResource.getToursForDoctype(doctypeAlias).then(function (tours) {
+                deferred.resolve(tours);
             });
             return deferred.promise;
         }
@@ -269,7 +295,8 @@
             completeTour: completeTour,
             getCurrentTour: getCurrentTour,
             getGroupedTours: getGroupedTours,
-            getTourByAlias: getTourByAlias
+            getTourByAlias: getTourByAlias,
+            getToursForDoctype : getToursForDoctype
         };
 
         return service;

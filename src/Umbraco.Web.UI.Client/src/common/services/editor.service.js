@@ -367,7 +367,7 @@ When building a custom infinite editor view you can use the same components as a
          */
         function contentPicker(editor) {
             editor.view = "views/common/infiniteeditors/treepicker/treepicker.html";
-            editor.size = "small";
+            if (!editor.size) editor.size = "small";
             editor.section = "content";
             editor.treeAlias = "content";
             open(editor);
@@ -390,7 +390,7 @@ When building a custom infinite editor view you can use the same components as a
          */
         function contentTypePicker(editor) {
             editor.view = "views/common/infiniteeditors/treepicker/treepicker.html";
-            editor.size = "small";
+            if (!editor.size) editor.size = "small";
             editor.section = "settings";
             editor.treeAlias = "documentTypes";
             open(editor);
@@ -413,7 +413,7 @@ When building a custom infinite editor view you can use the same components as a
          */
         function mediaTypePicker(editor) {
             editor.view = "views/common/infiniteeditors/treepicker/treepicker.html";
-            editor.size = "small";
+            if (!editor.size) editor.size = "small";
             editor.section = "settings";
             editor.treeAlias = "mediaTypes";
             open(editor);
@@ -436,7 +436,7 @@ When building a custom infinite editor view you can use the same components as a
          */
         function memberTypePicker(editor) {
             editor.view = "views/common/infiniteeditors/treepicker/treepicker.html";
-            editor.size = "small";
+            if (!editor.size) editor.size = "small";
             editor.section = "settings";
             editor.treeAlias = "memberTypes";
             open(editor);
@@ -457,7 +457,7 @@ When building a custom infinite editor view you can use the same components as a
 
         function copy(editor) {
             editor.view = "views/common/infiniteeditors/copy/copy.html";
-            editor.size = "small";
+            if (!editor.size) editor.size = "small";
             open(editor);
         }
 
@@ -477,7 +477,7 @@ When building a custom infinite editor view you can use the same components as a
 
         function move(editor) {
             editor.view = "views/common/infiniteeditors/move/move.html";
-            editor.size = "small";
+            if (!editor.size) editor.size = "small";
             open(editor);
         }
 
@@ -495,7 +495,7 @@ When building a custom infinite editor view you can use the same components as a
 
         function embed(editor) {
             editor.view = "views/common/infiniteeditors/embed/embed.html";
-            editor.size = "small";
+            if (!editor.size) editor.size = "small";
             open(editor);
         }
 
@@ -514,7 +514,7 @@ When building a custom infinite editor view you can use the same components as a
 
         function rollback(editor) {
             editor.view = "views/common/infiniteeditors/rollback/rollback.html";
-            editor.size = "small";
+            if (!editor.size) editor.size = "small";
             open(editor);
         }
 
@@ -534,7 +534,7 @@ When building a custom infinite editor view you can use the same components as a
          */
         function linkPicker(editor) {
             editor.view = "views/common/infiniteeditors/linkpicker/linkpicker.html";
-            editor.size = "small";
+            if (!editor.size) editor.size = "small";
             open(editor);
         }
 
@@ -577,7 +577,7 @@ When building a custom infinite editor view you can use the same components as a
          */
         function mediaPicker(editor) {
             editor.view = "views/common/infiniteeditors/mediapicker/mediapicker.html";
-            editor.size = "small";
+            if (!editor.size) editor.size = "small";
             editor.updatedMediaNodes = [];
             open(editor);
         }
@@ -598,7 +598,7 @@ When building a custom infinite editor view you can use the same components as a
          */
         function iconPicker(editor) {
             editor.view = "views/common/infiniteeditors/iconpicker/iconpicker.html";
-            editor.size = "small";
+            if (!editor.size) editor.size = "small";
             open(editor);
         }
 
@@ -638,6 +638,23 @@ When building a custom infinite editor view you can use the same components as a
          */
         function mediaTypeEditor(editor) {
             editor.view = "views/mediatypes/edit.html";
+            open(editor);
+        }
+        
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#memberTypeEditor
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens the member type editor in infinite editing, the submit callback returns the saved member type
+         * @param {Object} editor rendering options
+         * @param {Callback} editor.submit Submits the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+        function memberTypeEditor(editor) {
+            editor.view = "views/membertypes/edit.html";
             open(editor);
         }
 
@@ -692,7 +709,7 @@ When building a custom infinite editor view you can use the same components as a
          */
         function treePicker(editor) {
             editor.view = "views/common/infiniteeditors/treepicker/treepicker.html";
-            editor.size = "small";
+            if (!editor.size) editor.size = "small";
             open(editor);
         }
 
@@ -710,7 +727,7 @@ When building a custom infinite editor view you can use the same components as a
          */
         function nodePermissions(editor) {
             editor.view = "views/common/infiniteeditors/nodepermissions/nodepermissions.html";
-            editor.size = "small";
+            if (!editor.size) editor.size = "small";
             open(editor);
         }
 
@@ -728,7 +745,7 @@ When building a custom infinite editor view you can use the same components as a
          */
         function insertCodeSnippet(editor) {
             editor.view = "views/common/infiniteeditors/insertcodesnippet/insertcodesnippet.html";
-            editor.size = "small";
+            if (!editor.size) editor.size = "small";
             open(editor);
         }
 
@@ -746,7 +763,7 @@ When building a custom infinite editor view you can use the same components as a
          */
         function userGroupPicker(editor) {
             editor.view = "views/common/infiniteeditors/usergrouppicker/usergrouppicker.html";
-            editor.size = "small";
+            if (!editor.size) editor.size = "small";
             open(editor);
         }
 
@@ -782,7 +799,7 @@ When building a custom infinite editor view you can use the same components as a
          */
         function sectionPicker(editor) {
             editor.view = "views/common/infiniteeditors/sectionpicker/sectionpicker.html";
-            editor.size = "small";
+            if (!editor.size) editor.size = "small";
             open(editor);
         }
 
@@ -800,7 +817,7 @@ When building a custom infinite editor view you can use the same components as a
          */
         function insertField(editor) {
             editor.view = "views/common/infiniteeditors/insertfield/insertfield.html";
-            editor.size = "small";
+            if (!editor.size) editor.size = "small";
             open(editor);
         }
 
@@ -818,7 +835,7 @@ When building a custom infinite editor view you can use the same components as a
          */
         function templateSections(editor) {
             editor.view = "views/common/infiniteeditors/templatesections/templatesections.html";
-            editor.size = "small";
+            if (!editor.size) editor.size = "small";
             open(editor);
         }
 
@@ -836,7 +853,7 @@ When building a custom infinite editor view you can use the same components as a
          */
         function userPicker(editor) {
             editor.view = "views/common/infiniteeditors/userpicker/userpicker.html";
-            editor.size = "small";
+            if (!editor.size) editor.size = "small";
             open(editor);
         }
 
@@ -858,7 +875,7 @@ When building a custom infinite editor view you can use the same components as a
          */
         function itemPicker(editor) {
             editor.view = "views/common/infiniteeditors/itempicker/itempicker.html";
-            editor.size = "small";
+            if (!editor.size) editor.size = "small";
             open(editor);
         }
 
@@ -876,7 +893,7 @@ When building a custom infinite editor view you can use the same components as a
          */
         function macroPicker(editor) {
             editor.view = "views/common/infiniteeditors/macropicker/macropicker.html";
-            editor.size = "small";
+            if (!editor.size) editor.size = "small";
             open(editor);
         }
 
@@ -896,7 +913,7 @@ When building a custom infinite editor view you can use the same components as a
          */
         function memberGroupPicker(editor) {
             editor.view = "views/common/infiniteeditors/membergrouppicker/membergrouppicker.html";
-            editor.size = "small";
+            if (!editor.size) editor.size = "small";
             open(editor);
         }
 
@@ -917,7 +934,7 @@ When building a custom infinite editor view you can use the same components as a
          */
         function memberPicker(editor) {
             editor.view = "views/common/infiniteeditors/treepicker/treepicker.html";
-            editor.size = "small";
+            if (!editor.size) editor.size = "small";
             editor.section = "member";
             editor.treeAlias = "member";
             open(editor);
@@ -1011,6 +1028,7 @@ When building a custom infinite editor view you can use the same components as a
             iconPicker: iconPicker,
             documentTypeEditor: documentTypeEditor,
             mediaTypeEditor: mediaTypeEditor,
+            memberTypeEditor: memberTypeEditor,
             queryBuilder: queryBuilder,
             treePicker: treePicker,
             nodePermissions: nodePermissions,
