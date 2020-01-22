@@ -113,7 +113,6 @@ namespace Umbraco.Core.Models.Membership
         private DateTime _lastPasswordChangedDate;
         private DateTime _lastLoginDate;
         private DateTime _lastLockoutDate;
-        private bool _defaultToLiveEditing;
         private IDictionary<string, object> _additionalData;
         private object _additionalDataLock = new object();
 
