@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
@@ -15,17 +16,19 @@ namespace Umbraco.Web.Editors
     public class TourController : UmbracoAuthorizedJsonController
     {
         private readonly TourFilterCollection _filters;
+        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
 
-        public TourController(TourFilterCollection filters)
+        public TourController(TourFilterCollection filters, IUmbracoSettingsSection umbracoSettingsSection)
         {
             _filters = filters;
+            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
         }
 
         public IEnumerable<BackOfficeTourFile> GetTours()
         {
             var result = new List<BackOfficeTourFile>();
 
-            if (Current.Configs.Settings().BackOffice.Tours.EnableTours == false)
+            if (_umbracoSettingsSection.BackOffice.Tours.EnableTours == false)
                 return result;
 
             var user = Composing.Current.UmbracoContext.Security.CurrentUser;

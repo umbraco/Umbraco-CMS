@@ -35,6 +35,7 @@ using Constants = Umbraco.Core.Constants;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 using Task = System.Threading.Tasks.Task;
 using Umbraco.Core.Mapping;
+using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Web.Editors
 {
@@ -45,6 +46,7 @@ namespace Umbraco.Web.Editors
     public class UsersController : UmbracoAuthorizedJsonController
     {
         private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
 
         public UsersController(
             IGlobalSettings globalSettings,
@@ -57,10 +59,12 @@ namespace Umbraco.Web.Editors
             UmbracoHelper umbracoHelper,
             IMediaFileSystem mediaFileSystem,
             IShortStringHelper shortStringHelper,
-            UmbracoMapper umbracoMapper)
+            UmbracoMapper umbracoMapper,
+            IUmbracoSettingsSection umbracoSettingsSection)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
         {
             _mediaFileSystem = mediaFileSystem;
+            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
         }
 
         /// <summary>
@@ -81,10 +85,10 @@ namespace Umbraco.Web.Editors
         [AdminUsersAuthorize]
         public async Task<HttpResponseMessage> PostSetAvatar(int id)
         {
-            return await PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache, _mediaFileSystem, ShortStringHelper, id);
+            return await PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache, _mediaFileSystem, ShortStringHelper, _umbracoSettingsSection, id);
         }
 
-        internal static async Task<HttpResponseMessage> PostSetAvatarInternal(HttpRequestMessage request, IUserService userService, IAppCache cache, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, int id)
+        internal static async Task<HttpResponseMessage> PostSetAvatarInternal(HttpRequestMessage request, IUserService userService, IAppCache cache, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, IUmbracoSettingsSection umbracoSettingsSection, int id)
         {
             if (request.Content.IsMimeMultipartContent() == false)
             {
@@ -119,7 +123,7 @@ namespace Umbraco.Web.Editors
             var safeFileName = fileName.ToSafeFileName(shortStringHelper);
             var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 
-            if (Current.Configs.Settings().Content.DisallowedUploadFiles.Contains(ext) == false)
+            if (umbracoSettingsSection.Content.DisallowedUploadFiles.Contains(ext) == false)
             {
                 //generate a path of known data, we don't want this path to be guessable
                 user.Avatar = "UserAvatars/" + (user.Id + safeFileName).GenerateHash<SHA1>() + "." + ext;
@@ -218,7 +222,7 @@ namespace Umbraco.Web.Editors
             // so to do that here, we'll need to check if this current user is an admin and if not we should exclude all user who are
             // also admins
 
-            var hideDisabledUsers = Current.Configs.Settings().Security.HideDisabledUsersInBackoffice;
+            var hideDisabledUsers = _umbracoSettingsSection.Security.HideDisabledUsersInBackoffice;
             var excludeUserGroups = new string[0];
             var isAdmin = Security.CurrentUser.IsAdmin();
             if (isAdmin == false)
@@ -276,7 +280,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
 
-            if (Current.Configs.Settings().Security.UsernameIsEmail)
+            if (_umbracoSettingsSection.Security.UsernameIsEmail)
             {
                 //ensure they are the same if we're using it
                 userSave.Username = userSave.Email;
@@ -368,7 +372,7 @@ namespace Umbraco.Web.Editors
             }
 
             IUser user;
-            if (Current.Configs.Settings().Security.UsernameIsEmail)
+            if (_umbracoSettingsSection.Security.UsernameIsEmail)
             {
                 //ensure it's the same
                 userSave.Username = userSave.Email;
@@ -442,7 +446,7 @@ namespace Umbraco.Web.Editors
             if (user != null && (extraCheck == null || extraCheck(user)))
             {
                 ModelState.AddModelError(
-                    Current.Configs.Settings().Security.UsernameIsEmail ? "Email" : "Username",
+                    _umbracoSettingsSection.Security.UsernameIsEmail ? "Email" : "Username",
                     "A user with the username already exists");
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
@@ -562,7 +566,7 @@ namespace Umbraco.Web.Editors
 
             // if the found user has their email for username, we want to keep this synced when changing the email.
             // we have already cross-checked above that the email isn't colliding with anything, so we can safely assign it here.
-            if (Current.Configs.Settings().Security.UsernameIsEmail && found.Username == found.Email && userSave.Username != userSave.Email)
+            if (_umbracoSettingsSection.Security.UsernameIsEmail && found.Username == found.Email && userSave.Username != userSave.Email)
             {
                 userSave.Username = userSave.Email;
             }

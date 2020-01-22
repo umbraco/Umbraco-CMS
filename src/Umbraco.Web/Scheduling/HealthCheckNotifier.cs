@@ -2,10 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Core;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
 using Umbraco.Web.HealthCheck;
+using Umbraco.Core.Configuration.HealthChecks;
 
 namespace Umbraco.Web.Scheduling
 {
@@ -15,17 +15,18 @@ namespace Umbraco.Web.Scheduling
         private readonly HealthCheckCollection _healthChecks;
         private readonly HealthCheckNotificationMethodCollection _notifications;
         private readonly IProfilingLogger _logger;
+        private readonly IHealthChecks _healthChecksConfig;
 
         public HealthCheckNotifier(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
             HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
-            IRuntimeState runtimeState,
-            IProfilingLogger logger)
+            IRuntimeState runtimeState, IProfilingLogger logger, IHealthChecks healthChecksConfig)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _healthChecks = healthChecks;
             _notifications = notifications;
             _runtimeState = runtimeState;
             _logger = logger;
+            _healthChecksConfig = healthChecksConfig;
         }
 
         public override async Task<bool> PerformRunAsync(CancellationToken token)
@@ -52,7 +53,7 @@ namespace Umbraco.Web.Scheduling
 
             using (_logger.DebugDuration<HealthCheckNotifier>("Health checks executing", "Health checks complete"))
             {
-                var healthCheckConfig = Current.Configs.HealthChecks();
+                var healthCheckConfig = _healthChecksConfig;
 
                 // Don't notify for any checks that are disabled, nor for any disabled
                 // just for notifications

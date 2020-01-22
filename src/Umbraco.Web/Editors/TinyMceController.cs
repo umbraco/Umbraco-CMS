@@ -28,12 +28,14 @@ namespace Umbraco.Web.Editors
         private readonly IMediaService _mediaService;
         private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
 
-        public TinyMceController(IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IShortStringHelper shortStringHelper)
+        public TinyMceController(IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IShortStringHelper shortStringHelper, IUmbracoSettingsSection umbracoSettingsSection)
         {
             _mediaService = mediaService;
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
             _shortStringHelper = shortStringHelper;
+            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
         }
 
         [HttpPost]
@@ -78,7 +80,7 @@ namespace Umbraco.Web.Editors
             var safeFileName = fileName.ToSafeFileName(_shortStringHelper);
             var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 
-            if (Current.Configs.Settings().Content.IsFileAllowedForUpload(ext) == false || Current.Configs.Settings().Content.ImageFileTypes.Contains(ext) == false)
+            if (_umbracoSettingsSection.Content.IsFileAllowedForUpload(ext) == false || _umbracoSettingsSection.Content.ImageFileTypes.Contains(ext) == false)
             {
                 // Throw some error - to say can't upload this IMG type
                 return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "This is not an image filetype extension that is approved");

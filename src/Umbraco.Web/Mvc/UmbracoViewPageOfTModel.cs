@@ -5,6 +5,8 @@ using System.Web.Mvc;
 using System.Web.WebPages;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
@@ -20,6 +22,9 @@ namespace Umbraco.Web.Mvc
     /// </summary>
     public abstract class UmbracoViewPage<TModel> : WebViewPage<TModel>
     {
+        private readonly IGlobalSettings _globalSettings;
+        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+
         private UmbracoContext _umbracoContext;
         private UmbracoHelper _helper;
 
@@ -104,15 +109,19 @@ namespace Umbraco.Web.Mvc
         protected UmbracoViewPage()
             : this(
                 Current.Factory.GetInstance<ServiceContext>(),
-                Current.Factory.GetInstance<AppCaches>()
+                Current.Factory.GetInstance<AppCaches>(),
+                Current.Factory.GetInstance<IGlobalSettings>(),
+                Current.Factory.GetInstance<IUmbracoSettingsSection>()
             )
         {
         }
 
-        protected UmbracoViewPage(ServiceContext services, AppCaches appCaches)
+        protected UmbracoViewPage(ServiceContext services, AppCaches appCaches, IGlobalSettings globalSettings, IUmbracoSettingsSection umbracoSettingsSection)
         {
             Services = services;
             AppCaches = appCaches;
+            _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
+            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
         }
 
         // view logic below:
@@ -210,8 +219,8 @@ namespace Umbraco.Web.Mvc
                         {
                             // creating previewBadge markup
                             markupToInject =
-                                string.Format(Current.Configs.Settings().Content.PreviewBadge,
-                                    Current.IOHelper.ResolveUrl(Current.Configs.Global().UmbracoPath),
+                                string.Format(_umbracoSettingsSection.Content.PreviewBadge,
+                                    Current.IOHelper.ResolveUrl(_globalSettings.UmbracoPath),
                                     Server.UrlEncode(Current.UmbracoContext.HttpContext.Request.Url?.PathAndQuery),
                                     Current.UmbracoContext.PublishedRequest.PublishedContent.Id);
                         }

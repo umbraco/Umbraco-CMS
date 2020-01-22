@@ -6,7 +6,6 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Mapping;
-using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Net;
 using Umbraco.Web;
@@ -103,7 +102,7 @@ namespace Umbraco.Web
             // Ensure owin is configured for Umbraco back office authentication.
             // Front-end OWIN cookie configuration must be declared after this code.
             app
-                .UseUmbracoBackOfficeCookieAuthentication(UmbracoContextAccessor, RuntimeState, Services.UserService, GlobalSettings, UmbracoSettings.Security, IOHelper, PipelineStage.Authenticate)
+                .UseUmbracoBackOfficeCookieAuthentication(UmbracoContextAccessor, RuntimeState, Services.UserService, GlobalSettings, UmbracoSettings.Security, IOHelper, PipelineStage.Authenticate, UmbracoSettings)
                 .UseUmbracoBackOfficeExternalCookieAuthentication(UmbracoContextAccessor, RuntimeState, GlobalSettings, IOHelper, PipelineStage.Authenticate)
                 .UseUmbracoPreviewAuthentication(UmbracoContextAccessor, RuntimeState, GlobalSettings, UmbracoSettings.Security, IOHelper, PipelineStage.Authorize);
         }

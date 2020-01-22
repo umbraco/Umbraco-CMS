@@ -27,6 +27,7 @@ namespace Umbraco.Web.Routing
         private readonly IProfilingLogger _profilingLogger;
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly ILogger _logger;
+        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedRouter"/> class.
@@ -37,7 +38,8 @@ namespace Umbraco.Web.Routing
             IContentLastChanceFinder contentLastChanceFinder,
             IVariationContextAccessor variationContextAccessor,
             ServiceContext services,
-            IProfilingLogger proflog)
+            IProfilingLogger proflog,
+            IUmbracoSettingsSection umbracoSettingsSection)
         {
             _webRoutingSection = webRoutingSection ?? throw new ArgumentNullException(nameof(webRoutingSection));
             _contentFinders = contentFinders ?? throw new ArgumentNullException(nameof(contentFinders));
@@ -46,12 +48,13 @@ namespace Umbraco.Web.Routing
             _profilingLogger = proflog ?? throw new ArgumentNullException(nameof(proflog));
             _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
             _logger = proflog;
+            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
         }
 
         /// <inheritdoc />
         public PublishedRequest CreateRequest(UmbracoContext umbracoContext, Uri uri = null)
         {
-            return new PublishedRequest(this, umbracoContext, uri ?? umbracoContext.CleanedUmbracoUrl);
+            return new PublishedRequest(this, umbracoContext, _umbracoSettingsSection, uri ?? umbracoContext.CleanedUmbracoUrl);
         }
 
         #region Request

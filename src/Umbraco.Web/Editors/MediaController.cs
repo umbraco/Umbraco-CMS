@@ -61,6 +61,8 @@ namespace Umbraco.Web.Editors
     [MediaControllerControllerConfiguration]
     public class MediaController : ContentControllerBase
     {
+        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+
         public MediaController(
             ICultureDictionary cultureDictionary,
             PropertyEditorCollection propertyEditors,
@@ -74,11 +76,13 @@ namespace Umbraco.Web.Editors
             UmbracoHelper umbracoHelper,
             IMediaFileSystem mediaFileSystem,
             IShortStringHelper shortStringHelper,
-            UmbracoMapper umbracoMapper)
+            UmbracoMapper umbracoMapper,
+            IUmbracoSettingsSection umbracoSettingsSection)
             : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _mediaFileSystem = mediaFileSystem;
+            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
         }
 
         /// <summary>
@@ -726,13 +730,13 @@ namespace Umbraco.Web.Editors
                 var safeFileName = fileName.ToSafeFileName(ShortStringHelper);
                 var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 
-                if (Current.Configs.Settings().Content.IsFileAllowedForUpload(ext))
+                if (_umbracoSettingsSection.Content.IsFileAllowedForUpload(ext))
                 {
                     var mediaType = Constants.Conventions.MediaTypes.File;
 
                     if (result.FormData["contentTypeAlias"] == Constants.Conventions.MediaTypes.AutoSelect)
                     {
-                        if (Current.Configs.Settings().Content.ImageFileTypes.Contains(ext))
+                        if (_umbracoSettingsSection.Content.ImageFileTypes.Contains(ext))
                         {
                             mediaType = Constants.Conventions.MediaTypes.Image;
                         }

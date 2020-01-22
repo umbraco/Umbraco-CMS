@@ -28,6 +28,7 @@ using Umbraco.Web.Composing;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 using Umbraco.Core.Mapping;
 using Umbraco.Web.Models.Identity;
+using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Web.Editors
 {
@@ -43,11 +44,13 @@ namespace Umbraco.Web.Editors
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
         private readonly IUserPasswordConfiguration _passwordConfiguration;
+        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
 
-        public AuthenticationController(IUserPasswordConfiguration passwordConfiguration, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, UmbracoMapper umbracoMapper)
+        public AuthenticationController(IUserPasswordConfiguration passwordConfiguration, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, UmbracoMapper umbracoMapper, IUmbracoSettingsSection umbracoSettingsSection)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper)
         {
             _passwordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
+            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
         }
 
         protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager => _userManager
@@ -291,7 +294,7 @@ namespace Umbraco.Web.Editors
         {
             // If this feature is switched off in configuration the UI will be amended to not make the request to reset password available.
             // So this is just a server-side secondary check.
-            if (Current.Configs.Settings().Security.AllowPasswordReset == false)
+            if (_umbracoSettingsSection.Security.AllowPasswordReset == false)
             {
                 throw new HttpResponseException(HttpStatusCode.BadRequest);
             }

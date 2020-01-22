@@ -2,6 +2,7 @@
 using ClientDependency.Core.Controls;
 using ClientDependency.Core.FileRegistration.Providers;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.JavaScript
@@ -15,10 +16,10 @@ namespace Umbraco.Web.JavaScript
         /// <summary>
         /// Set the defaults
         /// </summary>
-        public UmbracoClientDependencyLoader()
+        public UmbracoClientDependencyLoader(IGlobalSettings globalSettings)
             : base()
         {
-            this.AddPath("UmbracoRoot", Current.IOHelper.ResolveUrl(Current.Configs.Global().UmbracoPath));
+            this.AddPath("UmbracoRoot", Current.IOHelper.ResolveUrl(globalSettings.UmbracoPath));
             this.ProviderName = LoaderControlProvider.DefaultName;
 
         }
@@ -27,7 +28,7 @@ namespace Umbraco.Web.JavaScript
         {
             if (ClientDependencyLoader.Instance == null)
             {
-                var loader = new UmbracoClientDependencyLoader();
+                var loader = new UmbracoClientDependencyLoader(Current.Factory.GetInstance<IGlobalSettings>());
                 parent.Controls.Add(loader);
                 isNew = true;
                 return loader;

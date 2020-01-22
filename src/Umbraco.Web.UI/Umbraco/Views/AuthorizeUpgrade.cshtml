@@ -24,7 +24,7 @@
     <title>Umbraco</title>
 
     @Html.RenderCssHere(
-        new BasicPath("Umbraco", Current.IOHelper.ResolveUrl(Current.Configs.Global().UmbracoPath)))
+        new BasicPath("Umbraco", Current.IOHelper.ResolveUrl(Model.GlobalSettings.UmbracoPath)))
 
     @*Because we're lazy loading angular js, the embedded cloak style will not be loaded initially, but we need it*@
     <style>
@@ -48,7 +48,7 @@
             redirectUrl = Url.Action("AuthorizeUpgrade", "BackOffice")
         });
     }
-    @Html.BareMinimumServerVariablesScript(Url, externalLoginUrl, Model.Features, Model.GlobalSettings, Model.UmbracoVersion)
+    @Html.BareMinimumServerVariablesScript(Url, externalLoginUrl, Model.Features, Model.GlobalSettings, Model.UmbracoVersion, Model.UmbracoSettingsSection)
 
     <script type="text/javascript">
     document.angularReady = function (app) {

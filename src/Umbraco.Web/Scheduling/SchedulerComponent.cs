@@ -32,6 +32,8 @@ namespace Umbraco.Web.Scheduling
         private readonly HealthCheckCollection _healthChecks;
         private readonly HealthCheckNotificationMethodCollection _notifications;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
+        private readonly IHealthChecks _healthChecksConfig;
+        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
 
         private BackgroundTaskRunner<IBackgroundTask> _keepAliveRunner;
         private BackgroundTaskRunner<IBackgroundTask> _publishingRunner;
@@ -47,7 +49,9 @@ namespace Umbraco.Web.Scheduling
         public SchedulerComponent(IRuntimeState runtime,
             IContentService contentService, IAuditService auditService,
             HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
-            IScopeProvider scopeProvider, IUmbracoContextFactory umbracoContextFactory, IProfilingLogger logger, IHostingEnvironment hostingEnvironment)
+            IScopeProvider scopeProvider, IUmbracoContextFactory umbracoContextFactory, IProfilingLogger logger,
+            IHostingEnvironment hostingEnvironment, IHealthChecks healthChecksConfig,
+            IUmbracoSettingsSection umbracoSettingsSection)
         {
             _runtime = runtime;
             _contentService = contentService;
@@ -59,6 +63,8 @@ namespace Umbraco.Web.Scheduling
 
             _healthChecks = healthChecks;
             _notifications = notifications;
+            _healthChecksConfig = healthChecksConfig ?? throw new ArgumentNullException(nameof(healthChecksConfig));
+            _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
         }
 
         public void Initialize()
@@ -97,7 +103,7 @@ namespace Umbraco.Web.Scheduling
             LazyInitializer.EnsureInitialized(ref _tasks, ref _started, ref _locker, () =>
             {
                 _logger.Debug<SchedulerComponent>("Initializing the scheduler");
-                var settings = Current.Configs.Settings();
+                var settings = _umbracoSettingsSection;
 
                 var tasks = new List<IBackgroundTask>();
 
@@ -110,7 +116,7 @@ namespace Umbraco.Web.Scheduling
                 tasks.Add(RegisterLogScrubber(settings));
                 tasks.Add(RegisterTempFileCleanup());
 
-                var healthCheckConfig = Current.Configs.HealthChecks();
+                var healthCheckConfig = _healthChecksConfig;
                 if (healthCheckConfig.NotificationSettings.Enabled)
                     tasks.Add(RegisterHealthCheckNotifier(healthCheckConfig, _healthChecks, _notifications, _logger));
 
@@ -157,7 +163,7 @@ namespace Umbraco.Web.Scheduling
             }
 
             var periodInMilliseconds = healthCheckConfig.NotificationSettings.PeriodInHours * 60 * 60 * 1000;
-            var task = new HealthCheckNotifier(_healthCheckRunner, delayInMilliseconds, periodInMilliseconds, healthChecks, notifications, _runtime, logger);
+            var task = new HealthCheckNotifier(_healthCheckRunner, delayInMilliseconds, periodInMilliseconds, healthChecks, notifications, _runtime, logger, _healthChecksConfig);
             _healthCheckRunner.TryAdd(task);
             return task;
         }

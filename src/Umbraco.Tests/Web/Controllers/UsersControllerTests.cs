@@ -35,6 +35,7 @@ using Umbraco.Web.Features;
 using Umbraco.Web.Models.ContentEditing;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 using Umbraco.Core.Mapping;
+using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Tests.Web.Controllers
 {
@@ -90,7 +91,8 @@ namespace Umbraco.Tests.Web.Controllers
                     helper,
                     Factory.GetInstance<IMediaFileSystem>(),
                     ShortStringHelper,
-                    Factory.GetInstance<UmbracoMapper>());
+                    Factory.GetInstance<UmbracoMapper>(),
+                    Factory.GetInstance<IUmbracoSettingsSection>());
                 return usersController;
             }
 
@@ -157,7 +159,8 @@ namespace Umbraco.Tests.Web.Controllers
                     helper,
                     Factory.GetInstance<IMediaFileSystem>(),
                     ShortStringHelper,
-                    Factory.GetInstance<UmbracoMapper>());
+                    Factory.GetInstance<UmbracoMapper>(),
+                    Factory.GetInstance<IUmbracoSettingsSection>());
                 return usersController;
             }
 
@@ -195,7 +198,8 @@ namespace Umbraco.Tests.Web.Controllers
                     helper,
                     Factory.GetInstance<IMediaFileSystem>(),
                     ShortStringHelper,
-                    Factory.GetInstance<UmbracoMapper>());
+                    Factory.GetInstance<UmbracoMapper>(),
+                    Factory.GetInstance<IUmbracoSettingsSection>());
                 return usersController;
             }
 
@@ -268,7 +272,8 @@ namespace Umbraco.Tests.Web.Controllers
                     helper,
                     Factory.GetInstance<IMediaFileSystem>(),
                     ShortStringHelper,
-                    Factory.GetInstance<UmbracoMapper>());
+                    Factory.GetInstance<UmbracoMapper>(),
+                    Factory.GetInstance<IUmbracoSettingsSection>());
                 return usersController;
             }
 
