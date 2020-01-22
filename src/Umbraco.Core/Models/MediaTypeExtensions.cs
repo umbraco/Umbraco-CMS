@@ -4,7 +4,6 @@
     {
         internal static bool IsSystemMediaType(this IMediaType mediaType) =>
             mediaType.Alias == Constants.Conventions.MediaTypes.File
-            || mediaType.Alias == Constants.Conventions.MediaTypes.Folder
-            || mediaType.Alias == Constants.Conventions.MediaTypes.Image;
+            || mediaType.Alias == Constants.Conventions.MediaTypes.Folder;
     }
 }

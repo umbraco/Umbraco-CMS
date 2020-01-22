@@ -25,15 +25,17 @@ namespace Umbraco.Web.PropertyEditors
         Group = Constants.PropertyEditors.Groups.RichContent)]
     public class GridPropertyEditor : DataEditor
     {
-        private IMediaService _mediaService;
-        private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
-        private IUmbracoContextAccessor _umbracoContextAccessor;
-        private ILogger _logger;
+        private readonly IMediaService _mediaService;
+        private readonly IMediaTypeService _mediaTypeService;
+        private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly ILogger _logger;
 
-        public GridPropertyEditor(ILogger logger, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor)
+        public GridPropertyEditor(ILogger logger, IMediaService mediaService, IMediaTypeService mediaTypeService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor)
             : base(logger)
         {
             _mediaService = mediaService;
+            _mediaTypeService = mediaTypeService;
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
             _umbracoContextAccessor = umbracoContextAccessor;
             _logger = logger;
@@ -45,21 +47,23 @@ namespace Umbraco.Web.PropertyEditors
         /// Overridden to ensure that the value is validated
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider, _umbracoContextAccessor, _logger);
+        protected override IDataValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute, _mediaService, _mediaTypeService, _contentTypeBaseServiceProvider, _umbracoContextAccessor, _logger);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new GridConfigurationEditor();
 
         internal class GridPropertyValueEditor : DataValueEditor
         {
-            private IMediaService _mediaService;
-            private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
-            private IUmbracoContextAccessor _umbracoContextAccessor;
-            private ILogger _logger;
+            private readonly IMediaService _mediaService;
+            private readonly IMediaTypeService _mediaTypeService;
+            private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+            private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+            private readonly ILogger _logger;
 
-            public GridPropertyValueEditor(DataEditorAttribute attribute, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor, ILogger logger)
+            public GridPropertyValueEditor(DataEditorAttribute attribute, IMediaService mediaService, IMediaTypeService mediaTypeService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor, ILogger logger)
                 : base(attribute)
             {
                 _mediaService = mediaService;
+                _mediaTypeService = mediaTypeService;
                 _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
                 _umbracoContextAccessor = umbracoContextAccessor;
                 _logger = logger;
@@ -97,7 +101,11 @@ namespace Umbraco.Web.PropertyEditors
                     // Parse the HTML
                     var html = rte.Value?.ToString();
 
-                    var parseAndSavedTempImages = TemplateUtilities.FindAndPersistPastedTempImages(html, mediaParentId, userId, _mediaService, _contentTypeBaseServiceProvider, _logger);
+                    var mediaTypeAlias = _mediaTypeService.Get(Constants.Conventions.MediaTypes.Image) != null
+                        ? Constants.Conventions.MediaTypes.Image
+                        : Constants.Conventions.MediaTypes.File;
+
+                    var parseAndSavedTempImages = TemplateUtilities.FindAndPersistPastedTempImages(html, mediaParentId, mediaTypeAlias, userId, _mediaService, _contentTypeBaseServiceProvider, _logger);
                     var editorValueWithMediaUrlsRemoved = TemplateUtilities.RemoveMediaUrlsFromTextString(parseAndSavedTempImages);
 
                     rte.Value = editorValueWithMediaUrlsRemoved;

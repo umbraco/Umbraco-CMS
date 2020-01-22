@@ -24,17 +24,19 @@ namespace Umbraco.Web.PropertyEditors
         Icon = "icon-browser-window")]
     public class RichTextPropertyEditor : DataEditor
     {
-        private IMediaService _mediaService;
-        private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
-        private IUmbracoContextAccessor _umbracoContextAccessor;
-        private ILogger _logger;
+        private readonly IMediaService _mediaService;
+        private readonly IMediaTypeService _mediaTypeService;
+        private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly ILogger _logger;
 
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public RichTextPropertyEditor(ILogger logger, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor) : base(logger)
+        public RichTextPropertyEditor(ILogger logger, IMediaService mediaService, IMediaTypeService mediaTypeService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor) : base(logger)
         {
             _mediaService = mediaService;
+            _mediaTypeService = mediaTypeService;
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
             _umbracoContextAccessor = umbracoContextAccessor;
             _logger = logger;
@@ -44,7 +46,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Create a custom value editor
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider, _umbracoContextAccessor, _logger);
+        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute, _mediaService, _mediaTypeService, _contentTypeBaseServiceProvider, _umbracoContextAccessor, _logger);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new RichTextConfigurationEditor();
 
@@ -55,15 +57,17 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         internal class RichTextPropertyValueEditor : DataValueEditor
         {
-            private IMediaService _mediaService;
-            private IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
-            private IUmbracoContextAccessor _umbracoContextAccessor;
-            private ILogger _logger;
+            private readonly IMediaService _mediaService;
+            private readonly IMediaTypeService _mediaTypeService;
+            private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+            private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+            private readonly ILogger _logger;
 
-            public RichTextPropertyValueEditor(DataEditorAttribute attribute, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor, ILogger logger)
+            public RichTextPropertyValueEditor(DataEditorAttribute attribute, IMediaService mediaService, IMediaTypeService mediaTypeService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IUmbracoContextAccessor umbracoContextAccessor, ILogger logger)
                 : base(attribute)
             {
                 _mediaService = mediaService;
+                _mediaTypeService = mediaTypeService;
                 _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
                 _umbracoContextAccessor = umbracoContextAccessor;
                 _logger = logger;
@@ -119,8 +123,11 @@ namespace Umbraco.Web.PropertyEditors
                 var config = editorValue.DataTypeConfiguration as RichTextConfiguration;
                 var mediaParent = config?.MediaParentId;
                 var mediaParentId = mediaParent == null ? Guid.Empty : mediaParent.Guid;
+                var mediaTypeAlias = _mediaTypeService.Get(Constants.Conventions.MediaTypes.Image) != null
+                    ? Constants.Conventions.MediaTypes.Image
+                    : Constants.Conventions.MediaTypes.File;
 
-                var parseAndSavedTempImages = TemplateUtilities.FindAndPersistPastedTempImages(editorValue.Value.ToString(), mediaParentId, userId, _mediaService, _contentTypeBaseServiceProvider, _logger);
+                var parseAndSavedTempImages = TemplateUtilities.FindAndPersistPastedTempImages(editorValue.Value.ToString(), mediaParentId, mediaTypeAlias, userId, _mediaService, _contentTypeBaseServiceProvider, _logger);
                 var editorValueWithMediaUrlsRemoved = TemplateUtilities.RemoveMediaUrlsFromTextString(parseAndSavedTempImages);
                 var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValueWithMediaUrlsRemoved);
 

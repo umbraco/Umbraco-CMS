@@ -40,7 +40,7 @@ namespace Umbraco.Tests.PublishedContent
             var converters = Factory.GetInstance<PropertyValueConverterCollection>();
 
             var dataTypeService = new TestObjects.TestDataTypeService(
-                new DataType(new RichTextPropertyEditor(Mock.Of<ILogger>(), Mock.Of<IMediaService>(), Mock.Of<IContentTypeBaseServiceProvider>(), Mock.Of<IUmbracoContextAccessor>())) { Id = 1 });
+                new DataType(new RichTextPropertyEditor(Mock.Of<ILogger>(), Mock.Of<IMediaService>(), Mock.Of<IMediaTypeService>(), Mock.Of<IContentTypeBaseServiceProvider>(), Mock.Of<IUmbracoContextAccessor>())) { Id = 1 });
 
             var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeService);
 

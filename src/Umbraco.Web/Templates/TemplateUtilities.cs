@@ -192,7 +192,7 @@ namespace Umbraco.Web.Templates
             // see comment in ResolveMediaFromTextString for group reference
             => ResolveImgPattern.Replace(text, "$1$3$4$5");
 
-        internal static string FindAndPersistPastedTempImages(string html, Guid mediaParentFolder, int userId, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, ILogger logger)
+        internal static string FindAndPersistPastedTempImages(string html, Guid mediaParentFolder, string mediaTypeAlias, int userId, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, ILogger logger)
         {
             // Find all img's that has data-tmpimg attribute
             // Use HTML Agility Pack - https://html-agility-pack.net
@@ -226,9 +226,9 @@ namespace Umbraco.Web.Templates
                 if (uploadedImages.ContainsKey(tmpImgPath) == false)
                 {
                     if (mediaParentFolder == Guid.Empty)
-                        mediaFile = mediaService.CreateMedia(mediaItemName, Constants.System.Root, Constants.Conventions.MediaTypes.Image, userId);
+                        mediaFile = mediaService.CreateMedia(mediaItemName, Constants.System.Root, mediaTypeAlias, userId);
                     else
-                        mediaFile = mediaService.CreateMedia(mediaItemName, mediaParentFolder, Constants.Conventions.MediaTypes.Image, userId);
+                        mediaFile = mediaService.CreateMedia(mediaItemName, mediaParentFolder, mediaTypeAlias, userId);
 
                     var fileInfo = new FileInfo(absoluteTempImagePath);
 

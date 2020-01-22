@@ -43,13 +43,14 @@ namespace Umbraco.Tests.PublishedContent
 
             var logger = Mock.Of<ILogger>();
             var mediaService = Mock.Of<IMediaService>();
+            var mediaTypeService = Mock.Of<IMediaTypeService>();
             var contentTypeBaseServiceProvider = Mock.Of<IContentTypeBaseServiceProvider>();
             var umbracoContextAccessor = Mock.Of<IUmbracoContextAccessor>();
 
             var dataTypeService = new TestObjects.TestDataTypeService(
                 new DataType(new VoidEditor(logger)) { Id = 1 },
                 new DataType(new TrueFalsePropertyEditor(logger)) { Id = 1001 },
-                new DataType(new RichTextPropertyEditor(logger, mediaService, contentTypeBaseServiceProvider, umbracoContextAccessor)) { Id = 1002 },
+                new DataType(new RichTextPropertyEditor(logger, mediaService, mediaTypeService, contentTypeBaseServiceProvider, umbracoContextAccessor)) { Id = 1002 },
                 new DataType(new IntegerPropertyEditor(logger)) { Id = 1003 },
                 new DataType(new TextboxPropertyEditor(logger)) { Id = 1004 },
                 new DataType(new MediaPickerPropertyEditor(logger)) { Id = 1005 });
@@ -123,12 +124,12 @@ namespace Umbraco.Tests.PublishedContent
                 <creatorName><![CDATA[Custom data with same property name as the member name]]></creatorName>
                 <testRecursive><![CDATA[]]></testRecursive>
             </Home>
-			<CustomDocument id=""117"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2018-07-18T10:06:37"" updateDate=""2018-07-18T10:06:37"" nodeName=""custom sub 1"" urlName=""custom-sub-1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,117"" isDoc="""" />
-			<CustomDocument id=""1177"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""3"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""custom sub 1"" urlName=""custom-sub-1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1177"" isDoc="""" />
-			<CustomDocument id=""1178"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""4"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-16T14:23:35"" nodeName=""custom sub 2"" urlName=""custom-sub-2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1178"" isDoc="""">
-				<CustomDocument id=""1179"" parentID=""1178"" level=""4"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""1"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""custom sub sub 1"" urlName=""custom-sub-sub-1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1178,1179"" isDoc="""" />
-			</CustomDocument>
-			<Home id=""1176"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""5"" createDate=""2012-07-20T18:08:08"" updateDate=""2012-07-20T19:10:52"" nodeName=""Sub 3"" urlName=""sub-3"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1176"" isDoc="""" key=""CDB83BBC-A83B-4BA6-93B8-AADEF67D3C09"">
+            <CustomDocument id=""117"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2018-07-18T10:06:37"" updateDate=""2018-07-18T10:06:37"" nodeName=""custom sub 1"" urlName=""custom-sub-1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,117"" isDoc="""" />
+            <CustomDocument id=""1177"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""3"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""custom sub 1"" urlName=""custom-sub-1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1177"" isDoc="""" />
+            <CustomDocument id=""1178"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""4"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-16T14:23:35"" nodeName=""custom sub 2"" urlName=""custom-sub-2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1178"" isDoc="""">
+                <CustomDocument id=""1179"" parentID=""1178"" level=""4"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""1"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""custom sub sub 1"" urlName=""custom-sub-sub-1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1178,1179"" isDoc="""" />
+            </CustomDocument>
+            <Home id=""1176"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""5"" createDate=""2012-07-20T18:08:08"" updateDate=""2012-07-20T19:10:52"" nodeName=""Sub 3"" urlName=""sub-3"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1176"" isDoc="""" key=""CDB83BBC-A83B-4BA6-93B8-AADEF67D3C09"">
                 <content><![CDATA[]]></content>
                 <umbracoNaviHide>1</umbracoNaviHide>
             </Home>
