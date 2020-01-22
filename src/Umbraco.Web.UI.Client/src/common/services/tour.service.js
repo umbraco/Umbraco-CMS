@@ -162,18 +162,19 @@
                                 newGroup.groupOrder = item.groupOrder;
                             }
 
-                        if(item.hidden === false){
-                            newGroup.tours.push(item);
-                            groupedTours.push(newGroup);
+                            if(item.hidden === false){
+                                newGroup.tours.push(item);
+                                groupedTours.push(newGroup);
+                            }
                         }
                     }
 
-                }
+                });
 
                 deferred.resolve(groupedTours);
             });
             return deferred.promise;
-        });
+        }
 
         /**
          * @ngdoc method
