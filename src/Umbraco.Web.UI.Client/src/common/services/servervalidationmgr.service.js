@@ -255,7 +255,7 @@ function serverValidationManager($timeout) {
          * This will always return any callbacks registered for just the property (i.e. field name is empty) and for ones with an 
          * explicit field name set.
          */
-        getPropertyCallbacks: function (propertyAlias, culture, fieldName) {
+        getPropertyCallbacks: function (propertyAlias, culture, segment, fieldName) {
 
             //normalize culture to "invariant"
             if (!culture) {
