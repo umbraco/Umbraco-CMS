@@ -167,6 +167,18 @@ namespace Umbraco.Core.Runtime
                 // type finder/loader
                 var typeLoader = new TypeLoader(IOHelper, TypeFinder, appCaches.RuntimeCache, new DirectoryInfo(HostingEnvironment.LocalTempPath), ProfilingLogger);
 
+                // runtime state
+                // beware! must use '() => _factory.GetInstance<T>()' and NOT '_factory.GetInstance<T>'
+                // as the second one captures the current value (null) and therefore fails
+                _state = new RuntimeState(Logger,
+                    Configs.Settings(), Configs.Global(),
+                    new Lazy<IMainDom>(() => _factory.GetInstance<IMainDom>()),
+                    new Lazy<IServerRegistrar>(() => _factory.GetInstance<IServerRegistrar>()),
+                    UmbracoVersion, HostingEnvironment, BackOfficeInfo)
+                {
+                    Level = RuntimeLevel.Boot
+                };
+
                 // create the composition
                 composition = new Composition(register, typeLoader, ProfilingLogger, _state, Configs, IOHelper, appCaches);
                 composition.RegisterEssentials(Logger, Profiler, ProfilingLogger, MainDom, appCaches, databaseFactory, typeLoader, _state, TypeFinder, IOHelper, UmbracoVersion, DbProviderFactoryCreator);

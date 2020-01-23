@@ -222,6 +222,35 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Gets the url of an entity
         /// </summary>
+        /// <param name="udi">UDI of the entity to fetch URL for</param>
+        /// <param name="culture">The culture to fetch the URL for</param>
+        /// <returns>The URL or path to the item</returns>
+        public HttpResponseMessage GetUrl(Udi udi, string culture = "*")
+        {
+            var intId = Services.EntityService.GetId(udi);
+            if (!intId.Success)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            UmbracoEntityTypes entityType;
+            switch(udi.EntityType)
+            {
+                case Constants.UdiEntityType.Document:
+                    entityType = UmbracoEntityTypes.Document;
+                    break;
+                case Constants.UdiEntityType.Media:
+                    entityType = UmbracoEntityTypes.Media;
+                    break;
+                case Constants.UdiEntityType.Member:
+                    entityType = UmbracoEntityTypes.Member;
+                    break;
+                default:
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+            return GetUrl(intId.Result, entityType, culture);
+        }
+
+        /// <summary>
+        /// Gets the url of an entity
+        /// </summary>
         /// <param name="id">Int id of the entity to fetch URL for</param>
         /// <param name="type">The type of entity such as Document, Media, Member</param>
         /// <param name="culture">The culture to fetch the URL for</param>
@@ -316,7 +345,9 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public UrlAndAnchors GetUrlAndAnchors(int id, string culture = "*")
         {
-            var url = UmbracoContext.UrlProvider.GetUrl(id);
+            culture = culture ?? ClientCulture();
+
+            var url = UmbracoContext.UrlProvider.GetUrl(id, culture: culture);
             var anchorValues = Services.ContentService.GetAnchorValuesFromRTEs(id, culture);
             return new UrlAndAnchors(url, anchorValues);
         }

@@ -22,6 +22,7 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Runtime;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
@@ -96,7 +97,7 @@ namespace Umbraco.Tests.TestHelpers
 
 
         public static IIOHelper IOHelper { get; } = new IOHelper(GetHostingEnvironment());
-        public static IMainDom MainDom { get; } = new MainDom(Mock.Of<ILogger>(), GetHostingEnvironment());
+        public static IMainDom MainDom { get; } = new MainDom(Mock.Of<ILogger>(), GetHostingEnvironment(), new MainDomSemaphoreLock(Mock.Of<ILogger>(), GetHostingEnvironment()));
         /// <summary>
         /// Maps the given <paramref name="relativePath"/> making it rooted on <see cref="CurrentAssemblyDirectory"/>. <paramref name="relativePath"/> must start with <code>~/</code>
         /// </summary>

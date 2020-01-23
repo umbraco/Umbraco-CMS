@@ -311,9 +311,19 @@ namespace Umbraco.Web.PropertyEditors
                     if (row.PropType.Mandatory)
                     {
                         if (row.JsonRowValue[row.PropKey] == null)
-                            validationResults.Add(new ValidationResult("Item " + (row.RowIndex + 1) + " '" + row.PropType.Name + "' cannot be null", new[] { row.PropKey }));
+                        {
+                            var message = string.IsNullOrWhiteSpace(row.PropType.MandatoryMessage)
+                                                      ? $"'{row.PropType.Name}' cannot be null"
+                                                      : row.PropType.MandatoryMessage;
+                            validationResults.Add(new ValidationResult($"Item {(row.RowIndex + 1)}: {message}", new[] { row.PropKey }));
+                        }                            
                         else if (row.JsonRowValue[row.PropKey].ToString().IsNullOrWhiteSpace() || (row.JsonRowValue[row.PropKey].Type == JTokenType.Array && !row.JsonRowValue[row.PropKey].HasValues))
-                            validationResults.Add(new ValidationResult("Item " + (row.RowIndex + 1) + " '" + row.PropType.Name + "' cannot be empty", new[] { row.PropKey }));
+                        {
+                            var message = string.IsNullOrWhiteSpace(row.PropType.MandatoryMessage)
+                                                      ? $"'{row.PropType.Name}' cannot be empty"
+                                                      : row.PropType.MandatoryMessage;
+                            validationResults.Add(new ValidationResult($"Item {(row.RowIndex + 1)}: {message}", new[] { row.PropKey }));
+                        }   
                     }
 
                     // Check regex
@@ -323,7 +333,10 @@ namespace Umbraco.Web.PropertyEditors
                         var regex = new Regex(row.PropType.ValidationRegExp);
                         if (!regex.IsMatch(row.JsonRowValue[row.PropKey].ToString()))
                         {
-                            validationResults.Add(new ValidationResult("Item " + (row.RowIndex + 1) + " '" + row.PropType.Name + "' is invalid, it does not match the correct pattern", new[] { row.PropKey }));
+                            var message = string.IsNullOrWhiteSpace(row.PropType.ValidationRegExpMessage)
+                                                      ? $"'{row.PropType.Name}' is invalid, it does not match the correct pattern"
+                                                      : row.PropType.ValidationRegExpMessage;
+                           validationResults.Add(new ValidationResult($"Item {(row.RowIndex + 1)}: {message}", new[] { row.PropKey }));
                         }
                     }
                 }
