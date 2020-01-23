@@ -90,7 +90,7 @@
 
             //act
             var err1 = serverValidationManager.getPropertyError("myProperty", "en-US", null, "value1");
-            var err1NotFound = serverValidationManager.getPropertyError("myProperty", null, null, "value2");
+            var err1NotFound = serverValidationManager.getPropertyError("myProperty", null, null, "value1");
             var err2 = serverValidationManager.getPropertyError("myProperty", "fr-FR", null, "value2");
             var err2NotFound = serverValidationManager.getPropertyError("myProperty", null, null, "value2");
 
@@ -110,6 +110,71 @@
             expect(err2.fieldName).toEqual("value2");
             expect(err2.errorMsg).toEqual("Another value 2");
             expect(err2.culture).toEqual("fr-FR");
+        });
+
+        it('can retrieve property validation errors for a sub field for segments', function () {
+
+            //arrange
+            serverValidationManager.addPropertyError("myProperty", null, "segment1", "value1", "Some value 1");
+            serverValidationManager.addPropertyError("myProperty", null, "segment2", "value2", "Another value 2");
+
+            //act
+            var err1 = serverValidationManager.getPropertyError("myProperty", null, "segment1", "value1");
+            var err1NotFound = serverValidationManager.getPropertyError("myProperty", null, null, "value1");
+            var err2 = serverValidationManager.getPropertyError("myProperty", null, "segment2", "value2");
+            var err2NotFound = serverValidationManager.getPropertyError("myProperty", null, null, "value2");
+
+
+            //assert            
+            expect(err1NotFound).toBeUndefined();
+            expect(err2NotFound).toBeUndefined();
+
+            expect(err1).not.toBeUndefined();
+            expect(err1.propertyAlias).toEqual("myProperty");
+            expect(err1.fieldName).toEqual("value1");
+            expect(err1.errorMsg).toEqual("Some value 1");
+            expect(err1.segment).toEqual("segment1");
+
+            expect(err2).not.toBeUndefined();
+            expect(err2.propertyAlias).toEqual("myProperty");
+            expect(err2.fieldName).toEqual("value2");
+            expect(err2.errorMsg).toEqual("Another value 2");
+            expect(err2.segment).toEqual("segment2");
+        });
+
+        
+        it('can retrieve property validation errors for a sub field for culture with segments', function () {
+
+            //arrange
+            serverValidationManager.addPropertyError("myProperty", "en-US", "segment1", "value1", "Some value 1");
+            serverValidationManager.addPropertyError("myProperty", "fr-FR", "segment2", "value2", "Another value 2");
+
+            //act
+            var err1 = serverValidationManager.getPropertyError("myProperty", "en-US", "segment1", "value1");
+            expect(serverValidationManager.getPropertyError("myProperty", null, null, "value1")).toBeUndefined();
+            expect(serverValidationManager.getPropertyError("myProperty", "en-US", null, "value1")).toBeUndefined();
+            expect(serverValidationManager.getPropertyError("myProperty", null, "segment1", "value1")).toBeUndefined();
+            var err2 = serverValidationManager.getPropertyError("myProperty", "fr-FR", "segment2", "value2");
+            expect(serverValidationManager.getPropertyError("myProperty", null, null, "value2")).toBeUndefined();
+            expect(serverValidationManager.getPropertyError("myProperty", "fr-FR", null, "value2")).toBeUndefined();
+            expect(serverValidationManager.getPropertyError("myProperty", null, "segment2", "value2")).toBeUndefined();
+
+
+            //assert
+
+            expect(err1).not.toBeUndefined();
+            expect(err1.propertyAlias).toEqual("myProperty");
+            expect(err1.fieldName).toEqual("value1");
+            expect(err1.errorMsg).toEqual("Some value 1");
+            expect(err1.culture).toEqual("en-US");
+            expect(err1.segment).toEqual("segment1");
+
+            expect(err2).not.toBeUndefined();
+            expect(err2.propertyAlias).toEqual("myProperty");
+            expect(err2.fieldName).toEqual("value2");
+            expect(err2.errorMsg).toEqual("Another value 2");
+            expect(err2.culture).toEqual("fr-FR");
+            expect(err2.segment).toEqual("segment2");
         });
         
         it('can add a property errors with multiple sub fields and it the first will be retreived with only the property alias', function () {
