@@ -427,12 +427,6 @@
 
                         _.each(invariantProperties, function (invProp) {
                             var tab = variant.tabs[invProp.tabIndex];
-                            var prop = tab.properties[invProp.propIndex];
-
-                            if (prop.segment) {
-                                // Do not touch segmented properties
-                                return;
-                            }
 
                             tab.properties[invProp.propIndex] = invProp.property;
                         });
