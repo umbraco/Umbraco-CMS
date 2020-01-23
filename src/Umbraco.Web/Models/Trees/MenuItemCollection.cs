@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Umbraco.Web.Actions;
 
 namespace Umbraco.Web.Models.Trees
 {
@@ -9,12 +10,13 @@ namespace Umbraco.Web.Models.Trees
     [DataContract(Name = "menuItems", Namespace = "")]
     public class MenuItemCollection
     {
-        public static MenuItemCollection Empty => new MenuItemCollection();
+        public static MenuItemCollection Empty = new MenuItemCollection();
 
-        private readonly MenuItemList _menuItems = new MenuItemList();
+        private readonly MenuItemList _menuItems;
 
         public MenuItemCollection()
         {
+            _menuItems = new MenuItemList();
         }
 
         public MenuItemCollection(IEnumerable<MenuItem> items)
@@ -39,8 +41,5 @@ namespace Umbraco.Web.Models.Trees
         {
             get { return _menuItems; }
         }
-
-
-
     }
 }

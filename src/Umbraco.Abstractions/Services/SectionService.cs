@@ -4,7 +4,6 @@ using System.Linq;
 using Umbraco.Core.Models.Sections;
 using Umbraco.Core.Services;
 using Umbraco.Web.Sections;
-using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Services
 {

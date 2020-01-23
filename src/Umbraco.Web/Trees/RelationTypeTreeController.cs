@@ -23,7 +23,7 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.RootString)
             {
                 //Create the normal create action
-                menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.ActionAlias));
+                menu.Items.Add<ActionNew>(Services.TextService);
 
                 //refresh action
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
@@ -34,7 +34,7 @@ namespace Umbraco.Web.Trees
             var relationType = Services.RelationService.GetRelationTypeById(int.Parse(id));
             if (relationType == null) return new MenuItemCollection();
 
-            menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.ActionAlias));
+            menu.Items.Add<ActionDelete>(Services.TextService);
 
             return menu;
         }
