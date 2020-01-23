@@ -241,8 +241,6 @@
     <Compile Include="Security\UserAwarePasswordHasher.cs" />
     <Compile Include="Search\IUmbracoTreeSearcherFields.cs" />
     <Compile Include="Search\UmbracoTreeSearcherFields.cs" />
-    <Compile Include="Services\DashboardService.cs" />
-    <Compile Include="Services\IDashboardService.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="Templates\HtmlLocalLinkParser.cs" />
     <Compile Include="Templates\HtmlImageSourceParser.cs" />
