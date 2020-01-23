@@ -39,11 +39,13 @@ namespace Umbraco.Web.Editors
     public class MediaTypeController : ContentTypeControllerBase<IMediaType>
     {
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IEntityService _entityService;
 
-        public MediaTypeController(ICultureDictionary cultureDictionary, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IShortStringHelper shortStringHelper, UmbracoMapper umbracoMapper)
+        public MediaTypeController(ICultureDictionary cultureDictionary, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IShortStringHelper shortStringHelper, UmbracoMapper umbracoMapper, IEntityService entityService)
             : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
         {
             _shortStringHelper = shortStringHelper;
+            _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
         }
 
         /// <summary>
@@ -270,7 +272,7 @@ namespace Umbraco.Web.Editors
         [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
         public IEnumerable<ContentTypeBasic> GetAllowedChildren(Guid contentId)
         {
-            var entity = Current.Services.EntityService.Get(contentId);
+            var entity = _entityService.Get(contentId);
             if (entity != null)
             {
                 return GetAllowedChildren(entity.Id);
@@ -289,7 +291,7 @@ namespace Umbraco.Web.Editors
             var guidUdi = contentId as GuidUdi;
             if (guidUdi != null)
             {
-                var entity = Current.Services.EntityService.Get(guidUdi.Guid);
+                var entity = _entityService.Get(guidUdi.Guid);
                 if (entity != null)
                 {
                     return GetAllowedChildren(entity.Id);

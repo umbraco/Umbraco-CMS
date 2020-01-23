@@ -118,15 +118,19 @@ namespace Umbraco.Web.Models.Mapping
     internal class TabsAndPropertiesMapper<TSource> : TabsAndPropertiesMapper
         where TSource : IContentBase
     {
-        public TabsAndPropertiesMapper(ICultureDictionary cultureDictionary, ILocalizedTextService localizedTextService)
+        private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+
+        public TabsAndPropertiesMapper(ICultureDictionary cultureDictionary, ILocalizedTextService localizedTextService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
             : base(cultureDictionary, localizedTextService)
-        { }
+        {
+            _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider ?? throw new ArgumentNullException(nameof(contentTypeBaseServiceProvider));
+        }
 
         public virtual IEnumerable<Tab<ContentPropertyDisplay>> Map(TSource source, MapperContext context)
         {
             var tabs = new List<Tab<ContentPropertyDisplay>>();
 
-            var contentType = Current.Services.ContentTypeBaseServices.GetContentTypeOf(source);
+            var contentType = _contentTypeBaseServiceProvider.GetContentTypeOf(source);
 
             // add the tabs, for properties that belong to a tab
             // need to aggregate the tabs, as content.PropertyGroups contains all the composition tabs,

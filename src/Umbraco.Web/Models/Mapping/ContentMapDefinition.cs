@@ -38,7 +38,7 @@ namespace Umbraco.Web.Models.Mapping
 
         public ContentMapDefinition(CommonMapper commonMapper, ICultureDictionary cultureDictionary, ILocalizedTextService localizedTextService, IContentService contentService, IContentTypeService contentTypeService,
             IFileService fileService, IUmbracoContextAccessor umbracoContextAccessor, IPublishedRouter publishedRouter, ILocalizationService localizationService, ILogger logger,
-            IUserService userService, IVariationContextAccessor variationContextAccessor)
+            IUserService userService, IVariationContextAccessor variationContextAccessor, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
         {
             _commonMapper = commonMapper;
             _cultureDictionary = cultureDictionary;
@@ -53,7 +53,7 @@ namespace Umbraco.Web.Models.Mapping
             _userService = userService;
             _variationContextAccessor = variationContextAccessor;
 
-            _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IContent>(cultureDictionary, localizedTextService);
+            _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IContent>(cultureDictionary, localizedTextService, contentTypeBaseServiceProvider);
             _stateMapper = new ContentSavedStateMapper<ContentPropertyDisplay>();
             _basicStateMapper = new ContentBasicSavedStateMapper<ContentPropertyBasic>();
             _contentVariantMapper = new ContentVariantMapper(_localizationService);
