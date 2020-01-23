@@ -76,7 +76,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         //private static int _singletonCheck;
 
         public PublishedSnapshotService(PublishedSnapshotServiceOptions options, IMainDom mainDom, IRuntimeState runtime,
-            ServiceContext serviceContext, IPublishedContentTypeFactory publishedContentTypeFactory, IdkMap idkMap,
+            ServiceContext serviceContext, IPublishedContentTypeFactory publishedContentTypeFactory,
             IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor, IProfilingLogger logger, IScopeProvider scopeProvider,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             IDefaultCultureAccessor defaultCultureAccessor,
@@ -156,16 +156,21 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 LoadCachesOnStartup();
             }
-
-            Guid GetUid(ContentStore store, int id) => store.LiveSnapshot.Get(id)?.Uid ?? default;
-            int GetId(ContentStore store, Guid uid) => store.LiveSnapshot.Get(uid)?.Id ?? default;
-
-            if (idkMap != null)
-            {
-                idkMap.SetMapper(UmbracoObjectTypes.Document, id => GetUid(_contentStore, id), uid => GetId(_contentStore, uid));
-                idkMap.SetMapper(UmbracoObjectTypes.Media, id => GetUid(_mediaStore, id), uid => GetId(_mediaStore, uid));
-            }
         }
+
+        #region Id <-> Key methods
+
+        // NOTE: These aren't used within this object but are made available internally to improve the IdKey lookup performance
+        // when nucache is enabled.
+
+        internal int GetDocumentId(Guid udi) => GetId(_contentStore, udi);
+        internal int GetMediaId(Guid udi) => GetId(_mediaStore, udi);
+        internal Guid GetDocumentUid(int id) => GetUid(_contentStore, id);
+        internal Guid GetMediaUid(int id) => GetUid(_mediaStore, id);
+        private int GetId(ContentStore store, Guid uid) => store.LiveSnapshot.Get(uid)?.Id ?? default;
+        private Guid GetUid(ContentStore store, int id) => store.LiveSnapshot.Get(id)?.Uid ?? default;
+
+        #endregion
 
         /// <summary>
         /// Install phase of <see cref="IMainDom"/>

@@ -92,7 +92,6 @@ namespace Umbraco.Tests.Scoping
                 runtimeStateMock.Object,
                 ServiceContext,
                 contentTypeFactory,
-                null,
                 publishedSnapshotAccessor,
                 Mock.Of<IVariationContextAccessor>(),
                 ProfilingLogger,

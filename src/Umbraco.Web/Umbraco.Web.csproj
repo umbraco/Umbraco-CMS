@@ -107,10 +107,6 @@
       <Project>{fbe7c065-dac0-4025-a78b-63b24d3ab00b}</Project>
       <Name>Umbraco.Configuration</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
-      <Project>{31785bc3-256c-4613-b2f5-a1b0bdded8c1}</Project>
-      <Name>Umbraco.Core</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Examine\Umbraco.Examine.csproj">
       <Name>Umbraco.Examine</Name>
       <Project>{07FBC26B-2927-4A22-8D96-D644C667FECC}</Project>
@@ -137,9 +133,6 @@
     <Compile Include="Cache\DistributedCacheBinder.cs" />
     <Compile Include="Cache\DistributedCacheBinderComposer.cs" />
     <Compile Include="Cache\DistributedCacheBinder_Handlers.cs" />
-    <Compile Include="Cache\ContentCacheRefresher.cs" />
-    <Compile Include="Cache\IDistributedCacheBinder.cs" />
-    <Compile Include="Cache\UserGroupCacheRefresher.cs" />
     <Compile Include="Cache\WebCachingAppCache.cs" />
     <Compile Include="Compose\AuditEventsComponent.cs" />
     <Compile Include="Compose\AuditEventsComposer.cs" />
@@ -351,7 +344,6 @@
     <Compile Include="HttpContextUmbracoContextAccessor.cs" />
     <Compile Include="HybridEventMessagesAccessor.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
-    <Compile Include="Cache\RelationTypeCacheRefresher.cs" />
     <Compile Include="Composing\CompositionExtensions\WebMappingProfiles.cs" />
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
     <Compile Include="Install\InstallStepCollection.cs" />
@@ -408,8 +400,6 @@
     <Compile Include="PropertyEditors\ValueConverters\MediaPickerValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MemberPickerValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MultiNodeTreePickerValueConverter.cs" />
-    <Compile Include="PublishedCache\IPublishedSnapshot.cs" />
-    <Compile Include="PublishedCache\IDefaultCultureAccessor.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.ContentDataSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.ContentNodeKitSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.DictionaryOfCultureVariationSerializer.cs" />
@@ -425,10 +415,6 @@
     <Compile Include="PublishedCache\PublishedElementPropertyBase.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ContentPickerValueConverter.cs" />
     <Compile Include="PublishedCache\PublishedSnapshotServiceBase.cs" />
-    <Compile Include="PublishedCache\IDomainCache.cs" />
-    <Compile Include="PublishedCache\IPublishedSnapshotAccessor.cs" />
-    <Compile Include="PublishedCache\IPublishedSnapshotService.cs" />
-    <Compile Include="PublishedCache\IPublishedMemberCache.cs" />
     <Compile Include="PublishedCache\NuCache\CacheKeys.cs" />
     <Compile Include="PublishedCache\NuCache\ContentCache.cs" />
     <Compile Include="PublishedCache\NuCache\ContentNode.cs" />
@@ -462,7 +448,6 @@
     <Compile Include="Routing\ContentFinderByUrlAndTemplate.cs" />
     <Compile Include="Routing\ContentFinderCollection.cs" />
     <Compile Include="Routing\ContentFinderCollectionBuilder.cs" />
-    <Compile Include="Routing\Domain.cs" />
     <Compile Include="Routing\IContentLastChanceFinder.cs" />
     <Compile Include="Routing\UrlProviderCollection.cs" />
     <Compile Include="Routing\UrlProviderCollectionBuilder.cs" />
@@ -546,22 +531,7 @@
     <Compile Include="Scheduling\BackgroundTaskRunner.cs" />
     <Compile Include="BatchedDatabaseServerMessenger.cs" />
     <Compile Include="CacheHelperExtensions.cs" />
-    <Compile Include="Cache\ApplicationCacheRefresher.cs" />
-    <Compile Include="Cache\ContentTypeCacheRefresher.cs" />
-    <Compile Include="Cache\DataTypeCacheRefresher.cs" />
-    <Compile Include="Cache\DictionaryCacheRefresher.cs" />
-    <Compile Include="Cache\DistributedCache.cs" />
     <Compile Include="Cache\DistributedCacheExtensions.cs" />
-    <Compile Include="Cache\DistributedCacheBinderComponent.cs" />
-    <Compile Include="Cache\DomainCacheRefresher.cs" />
-    <Compile Include="Cache\LanguageCacheRefresher.cs" />
-    <Compile Include="Cache\MacroCacheRefresher.cs" />
-    <Compile Include="Cache\MediaCacheRefresher.cs" />
-    <Compile Include="Cache\MemberCacheRefresher.cs" />
-    <Compile Include="Cache\MemberGroupCacheRefresher.cs" />
-    <Compile Include="Cache\PublicAccessCacheRefresher.cs" />
-    <Compile Include="Cache\TemplateCacheRefresher.cs" />
-    <Compile Include="Cache\UserCacheRefresher.cs" />
     <Compile Include="Editors\AuthenticationController.cs" />
     <Compile Include="Controllers\UmbProfileController.cs" />
     <Compile Include="Editors\ContentController.cs" />
@@ -784,9 +754,6 @@
     <Compile Include="Mvc\UmbracoControllerFactory.cs" />
     <Compile Include="Mvc\UmbracoMvcHandler.cs" />
     <Compile Include="Mvc\UmbracoViewPageOfTModel.cs" />
-    <Compile Include="PublishedCache\IPublishedCache.cs" />
-    <Compile Include="PublishedCache\IPublishedContentCache.cs" />
-    <Compile Include="PublishedCache\IPublishedMediaCache.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="ExamineExtensions.cs" />
     <Compile Include="FormlessPage.cs">

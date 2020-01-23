@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
@@ -9,12 +10,12 @@ namespace Umbraco.Web.Cache
 {
     public sealed class MemberCacheRefresher : TypedCacheRefresherBase<MemberCacheRefresher, IMember>
     {
-        private readonly IdkMap _idkMap;
+        private readonly IIdKeyMap _idKeyMap;
 
-        public MemberCacheRefresher(AppCaches appCaches, IdkMap idkMap)
+        public MemberCacheRefresher(AppCaches appCaches, IIdKeyMap idKeyMap)
             : base(appCaches)
         {
-            _idkMap = idkMap;
+            _idKeyMap = idKeyMap;
         }
 
         #region Define
@@ -57,7 +58,7 @@ namespace Umbraco.Web.Cache
 
         private void ClearCache(int id)
         {
-            _idkMap.ClearCache(id);
+            _idKeyMap.ClearCache(id);
             AppCaches.ClearPartialViewCache();
 
             var memberCache = AppCaches.IsolatedCaches.Get<IMember>();

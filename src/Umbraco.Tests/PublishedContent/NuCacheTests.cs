@@ -192,7 +192,6 @@ namespace Umbraco.Tests.PublishedContent
                 runtime,
                 serviceContext,
                 contentTypeFactory,
-                null,
                 new TestPublishedSnapshotAccessor(),
                 _variationAccesor,
                 Mock.Of<IProfilingLogger>(),

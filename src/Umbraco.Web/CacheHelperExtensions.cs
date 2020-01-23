@@ -12,9 +12,6 @@ namespace Umbraco.Web
     /// </summary>
     public static class CacheHelperExtensions
     {
-
-        public const string PartialViewCacheKey = "Umbraco.Web.PartialViewCacheKey";
-
         /// <summary>
         /// Outputs and caches a partial view in MVC
         /// </summary>
@@ -43,18 +40,10 @@ namespace Umbraco.Web
             }
 
             return appCaches.RuntimeCache.GetCacheItem<IHtmlString>(
-                PartialViewCacheKey + cacheKey,
+                Core.CacheHelperExtensions.PartialViewCacheKey + cacheKey,
                 () => htmlHelper.Partial(partialViewName, model, viewData),
                 timeout: new TimeSpan(0, 0, 0, cachedSeconds));
         }
 
-        /// <summary>
-        /// Clears the cache for partial views
-        /// </summary>
-        /// <param name="appCaches"></param>
-        public static void ClearPartialViewCache(this AppCaches appCaches)
-        {
-            appCaches.RuntimeCache.ClearByKey(PartialViewCacheKey);
-        }
     }
 }
