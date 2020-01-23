@@ -39,7 +39,7 @@ function valPropertyMsg(serverValidationManager, localizationService) {
             var currentProperty = umbPropCtrl.property;
             scope.currentProperty = currentProperty;
             var currentCulture = currentProperty.culture;
-            var currentSegment = currentProperty.segment;   
+            var currentSegment = currentProperty.segment;
 
             var labels = {};
             localizationService.localize("errors_propertyHasErrors").then(function (data) {
