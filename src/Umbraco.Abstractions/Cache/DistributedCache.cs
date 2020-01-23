@@ -4,7 +4,6 @@ using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Sync;
-using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Cache
 {
@@ -101,19 +100,6 @@ namespace Umbraco.Web.Cache
             _serverMessenger.PerformRefresh(
                 GetRefresherById(refresherGuid),
                 payloads.ToArray());
-        }
-        /// <summary>
-        /// Notifies the distributed cache, for a specified <see cref="ICacheRefresher"/>.
-        /// </summary>
-        /// <param name="refresherGuid">The unique identifier of the ICacheRefresher.</param>
-        /// <param name="jsonPayload">The notification content.</param>
-        public void RefreshByJson(Guid refresherGuid, string jsonPayload)
-        {
-            if (refresherGuid == Guid.Empty || jsonPayload.IsNullOrWhiteSpace()) return;
-
-            _serverMessenger.PerformRefresh(
-                GetRefresherById(refresherGuid),
-                jsonPayload);
         }
 
         ///// <summary>

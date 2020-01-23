@@ -19,12 +19,12 @@ namespace Umbraco.Core.Services.Implement
         private readonly IEntityRepository _entityRepository;
         private readonly Dictionary<string, UmbracoObjectTypes> _objectTypes;
         private IQuery<IUmbracoEntity> _queryRootEntity;
-        private readonly IdkMap _idkMap;
+        private readonly IIdKeyMap _idKeyMap;
 
-        public EntityService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IdkMap idkMap, IEntityRepository entityRepository)
+        public EntityService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IIdKeyMap idKeyMap, IEntityRepository entityRepository)
             : base(provider, logger, eventMessagesFactory)
         {
-            _idkMap = idkMap;
+            _idKeyMap = idKeyMap;
             _entityRepository = entityRepository;
 
             _objectTypes = new Dictionary<string, UmbracoObjectTypes>
@@ -440,19 +440,19 @@ namespace Umbraco.Core.Services.Implement
         /// <inheritdoc />
         public Attempt<int> GetId(Guid key, UmbracoObjectTypes objectType)
         {
-            return _idkMap.GetIdForKey(key, objectType);
+            return _idKeyMap.GetIdForKey(key, objectType);
         }
 
         /// <inheritdoc />
         public Attempt<int> GetId(Udi udi)
         {
-            return _idkMap.GetIdForUdi(udi);
+            return _idKeyMap.GetIdForUdi(udi);
         }
 
         /// <inheritdoc />
         public Attempt<Guid> GetKey(int id, UmbracoObjectTypes umbracoObjectType)
         {
-            return _idkMap.GetKeyForId(id, umbracoObjectType);
+            return _idKeyMap.GetKeyForId(id, umbracoObjectType);
         }
 
         /// <inheritdoc />

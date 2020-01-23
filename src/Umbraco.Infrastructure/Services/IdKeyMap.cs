@@ -7,7 +7,7 @@ using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services
 {
-    public class IdkMap
+    public class IdKeyMap : IIdKeyMap
     {
         private readonly IScopeProvider _scopeProvider;
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
@@ -15,7 +15,7 @@ namespace Umbraco.Core.Services
         private readonly Dictionary<int, TypedId<Guid>> _id2Key = new Dictionary<int, TypedId<Guid>>();
         private readonly Dictionary<Guid, TypedId<int>> _key2Id = new Dictionary<Guid, TypedId<int>>();
 
-        public IdkMap(IScopeProvider scopeProvider)
+        public IdKeyMap(IScopeProvider scopeProvider)
         {
             _scopeProvider = scopeProvider;
         }

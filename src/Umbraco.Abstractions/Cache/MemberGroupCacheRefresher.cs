@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Linq;
-using Newtonsoft.Json;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Web.Cache
 {
-    public sealed class MemberGroupCacheRefresher : JsonCacheRefresherBase<MemberGroupCacheRefresher>
+    public sealed class MemberGroupCacheRefresher : JsonCacheRefresherBase<MemberGroupCacheRefresher, MemberGroupCacheRefresher.JsonPayload>
     {
-        public MemberGroupCacheRefresher(AppCaches appCaches)
-            : base(appCaches)
-        { }
+        public MemberGroupCacheRefresher(AppCaches appCaches, IJsonSerializer jsonSerializer)
+            : base(appCaches, jsonSerializer)
+        {
+
+        }
 
         #region Define
 
@@ -68,15 +70,6 @@ namespace Umbraco.Web.Cache
             public int Id { get; }
         }
 
-        private JsonPayload[] Deserialize(string json)
-        {
-            return JsonConvert.DeserializeObject<JsonPayload[]>(json);
-        }
-
-        internal static string Serialize(params IMemberGroup[] groups)
-        {
-            return JsonConvert.SerializeObject(groups.Select(x => new JsonPayload(x.Id, x.Name)).ToArray());
-        }
 
         #endregion
     }

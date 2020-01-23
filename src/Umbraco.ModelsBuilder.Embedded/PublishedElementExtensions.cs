@@ -45,7 +45,7 @@ namespace Umbraco.Web
             var attribute = member.GetCustomAttribute<ImplementPropertyTypeAttribute>();
             if (attribute == null)
                 throw new InvalidOperationException("Property is not marked with ImplementPropertyType attribute.");
-            
+
             return attribute.Alias;
         }
     }

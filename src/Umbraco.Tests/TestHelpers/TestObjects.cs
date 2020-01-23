@@ -152,7 +152,7 @@ namespace Umbraco.Tests.TestHelpers
                     logger));
 
             var runtimeState = Mock.Of<IRuntimeState>();
-            var idkMap = new IdkMap(scopeProvider);
+            var idkMap = new IdKeyMap(scopeProvider);
 
             var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
 

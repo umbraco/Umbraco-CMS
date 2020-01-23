@@ -8,13 +8,13 @@ namespace Umbraco.Web.Cache
 {
     public sealed class TemplateCacheRefresher : CacheRefresherBase<TemplateCacheRefresher>
     {
-        private readonly IdkMap _idkMap;
+        private readonly IIdKeyMap _idKeyMap;
         private readonly IContentTypeCommonRepository _contentTypeCommonRepository;
 
-        public TemplateCacheRefresher(AppCaches appCaches, IdkMap idkMap, IContentTypeCommonRepository contentTypeCommonRepository)
+        public TemplateCacheRefresher(AppCaches appCaches, IIdKeyMap idKeyMap, IContentTypeCommonRepository contentTypeCommonRepository)
             : base(appCaches)
         {
-            _idkMap = idkMap;
+            _idKeyMap = idKeyMap;
             _contentTypeCommonRepository = contentTypeCommonRepository;
         }
 
@@ -55,7 +55,7 @@ namespace Umbraco.Web.Cache
 
         private void RemoveFromCache(int id)
         {
-            _idkMap.ClearCache(id);
+            _idKeyMap.ClearCache(id);
             AppCaches.RuntimeCache.Clear($"{CacheKeys.TemplateFrontEndCacheKey}{id}");
 
             //need to clear the runtime cache for templates

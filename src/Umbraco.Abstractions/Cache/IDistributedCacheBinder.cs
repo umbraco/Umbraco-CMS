@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core.Events;
-using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Web.Cache
 {

@@ -117,10 +117,6 @@
       <Project>{29aa69d9-b597-4395-8d42-43b1263c240a}</Project>
       <Name>Umbraco.Abstractions</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
-      <Project>{31785bc3-256c-4613-b2f5-a1b0bdded8c1}</Project>
-      <Name>Umbraco.Core</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Examine\Umbraco.Examine.csproj">
       <Name>Umbraco.Examine</Name>
       <Project>{07FBC26B-2927-4A22-8D96-D644C667FECC}</Project>

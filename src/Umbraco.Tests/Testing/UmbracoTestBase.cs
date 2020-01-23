@@ -111,6 +111,7 @@ namespace Umbraco.Tests.Testing
         #region Accessors
 
         protected ILogger Logger => Factory.GetInstance<ILogger>();
+        protected IJsonSerializer JsonNetSerializer { get; } = new JsonNetSerializer();
 
         protected IIOHelper IOHelper { get; private set; }
         protected IDataTypeService DataTypeService => Factory.GetInstance<IDataTypeService>();

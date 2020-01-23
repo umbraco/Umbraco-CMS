@@ -15,14 +15,14 @@ namespace Umbraco.Web.Cache
     {
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly IPublishedModelFactory _publishedModelFactory;
-        private readonly IdkMap _idkMap;
+        private readonly IIdKeyMap _idKeyMap;
 
-        public DataTypeCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IPublishedSnapshotService publishedSnapshotService, IPublishedModelFactory publishedModelFactory, IdkMap idkMap)
+        public DataTypeCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IPublishedSnapshotService publishedSnapshotService, IPublishedModelFactory publishedModelFactory, IIdKeyMap idKeyMap)
             : base(appCaches, serializer)
         {
             _publishedSnapshotService = publishedSnapshotService;
             _publishedModelFactory = publishedModelFactory;
-            _idkMap = idkMap;
+            _idKeyMap = idKeyMap;
         }
 
         #region Define
@@ -56,7 +56,7 @@ namespace Umbraco.Web.Cache
 
             foreach (var payload in payloads)
             {
-                _idkMap.ClearCache(payload.Id);
+                _idKeyMap.ClearCache(payload.Id);
             }
 
             // TODO: not sure I like these?

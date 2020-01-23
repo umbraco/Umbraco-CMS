@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -349,6 +350,7 @@ namespace Umbraco.Web.Cache
 
         private void UserService_DeletedUserGroup(IUserService sender, DeleteEventArgs<IUserGroup> e)
         {
+
             foreach (var entity in e.DeletedEntities)
                 _distributedCache.RemoveUserGroupCache(entity.Id);
         }
