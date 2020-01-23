@@ -39,6 +39,11 @@ namespace Umbraco.Core.Runtime
 
         public async Task<bool> AcquireLockAsync(int millisecondsTimeout)
         {
+            if (!(_dbFactory.SqlContext.SqlSyntax is SqlServerSyntaxProvider sqlServerSyntaxProvider))
+                throw new NotSupportedException("SqlMainDomLock is only supported for Sql Server");
+
+            _sqlServerSyntax = sqlServerSyntaxProvider;
+
             _logger.Debug<SqlMainDomLock>("Acquiring lock...");
 
             var db = GetDatabase();
@@ -52,7 +57,7 @@ namespace Umbraco.Core.Runtime
                 try
                 {
                     // wait to get a write lock
-                    _sqlServerSyntax.WriteLock(db, millisecondsTimeout, Constants.Locks.MainDom);                    
+                    _sqlServerSyntax.WriteLock(db, TimeSpan.FromMilliseconds(millisecondsTimeout), Constants.Locks.MainDom);                    
                 }
                 catch (Exception ex)
                 {
@@ -136,7 +141,7 @@ namespace Umbraco.Core.Runtime
                         db.BeginTransaction(IsolationLevel.ReadCommitted);
 
                         // get a read lock
-                        _sqlServerSyntax.ReadLock(db, Constants.Locks.MainDom);
+                        _dbFactory.SqlContext.SqlSyntax.ReadLock(db, Constants.Locks.MainDom);
 
                         // TODO: We could in theory just check if the main dom row doesn't exist, that could indicate that
                         // we are still the maindom. An empty value might be better because then we won't have any orphan rows
@@ -209,7 +214,7 @@ namespace Umbraco.Core.Runtime
                         db.BeginTransaction(IsolationLevel.ReadCommitted);
 
                         // get a read lock
-                        _sqlServerSyntax.ReadLock(db, Constants.Locks.MainDom);
+                        _dbFactory.SqlContext.SqlSyntax.ReadLock(db, Constants.Locks.MainDom);
 
                         // the row 
                         var mainDomRows = db.Fetch<KeyValueDto>("SELECT * FROM umbracoKeyValue WHERE [key] = @key", new { key = MainDomKey });
