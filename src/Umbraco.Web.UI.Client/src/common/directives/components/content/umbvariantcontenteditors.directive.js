@@ -86,15 +86,13 @@
             // set the active variant
             var activeVariant = null;
             _.each(vm.content.variants, function (v) {
-                if (
-                    (!v.language || v.language.culture === vm.culture)
-                    &&
-                    (v.segment === vm.segment)
-                ) {
+                if ((!v.language || v.language.culture === vm.culture) && v.segment === vm.segment) {
                     activeVariant = v;
                 }
             });
             if (!activeVariant) {
+                // Set the first variant to active if we can't find it.
+                // If the content item is invariant, then only one item exists in the array.
                 activeVariant = vm.content.variants[0];
             }
 

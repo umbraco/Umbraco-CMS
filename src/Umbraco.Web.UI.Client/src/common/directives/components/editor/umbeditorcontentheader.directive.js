@@ -4,9 +4,6 @@
     function EditorContentHeader(serverValidationManager, localizationService, editorState, variantHelper) {
 
         function link(scope) {
-            
-            console.log("scope.content", scope.content);
-            console.log("scope.content.variants", scope.content.variants);
 
             var unsubscribe = [];
             
@@ -19,9 +16,11 @@
 
             scope.isNew = scope.editorContent.state == "NotCreated";
 
-            localizationService.localizeMany([
+            localizationService.localizeMany(
+                [
                     scope.isNew ? "placeholders_a11yCreateItem" : "placeholders_a11yEdit",
-                    "placeholders_a11yName"]
+                    "placeholders_a11yName"
+                ]
             ).then(function (data) {
                 scope.a11yMessage = data[0];
                 scope.a11yName = data[1];
@@ -97,10 +96,6 @@
                 
             }
 
-            function getCultureFromVariant(variant) {
-                return variant.language ? variant.language.culture : null;
-            }
-
             scope.getVariantDisplayName = variantHelper.getDisplayName;
 
             scope.goBack = function () {
@@ -162,24 +157,7 @@
             }
 
             onInit();
-            /*
-            //watch for the active culture changing, if it changes, update the current variant
-            if (scope.content.variants) {
-                scope.$watch(function () {
-                    for (var i = 0; i < scope.content.variants.length; i++) {
-                        var v = scope.content.variants[i];
-                        if (v.active) {
-                            return v.language.culture;
-                        }
-                    }
-                    return scope.vm.currentVariant.language.culture; //should never get here
-                }, function (newValue, oldValue) {
-                    if (newValue !== scope.vm.currentVariant.language.culture) {
-                        setCurrentVariant();
-                    }
-                });
-            }
-            */
+            
             scope.$on('$destroy', function () {
                 for (var u in unsubscribe) {
                     unsubscribe[u]();
