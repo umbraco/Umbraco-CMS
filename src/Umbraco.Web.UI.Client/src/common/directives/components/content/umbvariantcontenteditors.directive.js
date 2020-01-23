@@ -20,12 +20,11 @@
         controller: umbVariantContentEditorsController
     };
 
-    function umbVariantContentEditorsController($scope, $location, $timeout, variantHelper) {
+    function umbVariantContentEditorsController($scope, $location) {
 
         var prevContentDateUpdated = null;
 
         var vm = this;
-        var activeAppAlias = null;
 
         vm.$onInit = onInit;
         vm.$onChanges = onChanges;
@@ -40,9 +39,6 @@
 
         //Used to track how many content views there are (for split view there will be 2, it could support more in theory)
         vm.editors = [];
-        //Used to track the open variants across the split views
-        // The values are the variant ids of the currently open variants. 
-        // See variantHelper.getId() for the current format.
 
         /** Called when the component initializes */
         function onInit() {
@@ -229,14 +225,6 @@
                 vm.onSelectAppAnchor({"app": app, "anchor": anchor});
             }
         }
-        
-        
-        $scope.$on("editors.apps.appChanged", function($event, $args) {
-            var app = $args.app;
-            if(app && app.alias) {
-                activeAppAlias = app.alias;
-            }
-        });
 
     }
 
