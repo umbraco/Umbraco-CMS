@@ -20,16 +20,14 @@ namespace Umbraco.Web.Cache
         private readonly DistributedCache _distributedCache;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly ILogger _logger;
-        private readonly CacheRefresherCollection _cacheRefresherCollection;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DistributedCacheBinder"/> class.
         /// </summary>
-        public DistributedCacheBinder(DistributedCache distributedCache, IUmbracoContextFactory umbracoContextFactory, ILogger logger, CacheRefresherCollection cacheRefresherCollection)
+        public DistributedCacheBinder(DistributedCache distributedCache, IUmbracoContextFactory umbracoContextFactory, ILogger logger)
         {
             _distributedCache = distributedCache;
             _logger = logger;
-            _cacheRefresherCollection = cacheRefresherCollection;
             _umbracoContextFactory = umbracoContextFactory;
         }
 

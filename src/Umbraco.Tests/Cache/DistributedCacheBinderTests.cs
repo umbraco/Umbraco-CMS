@@ -166,7 +166,7 @@ namespace Umbraco.Tests.Cache
                 IOHelper);
 
             // just assert it does not throw
-            var refreshers = new DistributedCacheBinder(null, umbracoContextFactory, null, new CacheRefresherCollection(Array.Empty<ICacheRefresher>()));
+            var refreshers = new DistributedCacheBinder(null, umbracoContextFactory, null);
             refreshers.HandleEvents(definitions);
         }
     }
