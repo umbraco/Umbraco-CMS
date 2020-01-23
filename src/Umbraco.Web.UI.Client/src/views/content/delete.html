@@ -14,8 +14,12 @@
                 <localize key="defaultdialogs_confirmdelete">Are you sure you want to delete</localize> <strong>{{currentNode.name}}</strong>?
             </p>
 
-            <div class="umb-alert umb-alert--warning">
+            <div class="umb-alert umb-alert--warning" ng-show="currentNode.metaData.variesByCulture && !currentNode.trashed">
                 <localize key="defaultdialogs_variantdeletewarning">This will delete the node and all its languages. If you only want to delete one language go and unpublish it instead.</localize>
+            </div>
+
+            <div class="umb-alert umb-alert--warning" ng-show="currentNode.trashed">
+                <localize key="defaultdialogs_recycleBinWarning">When items are deleted from the recycle bin, they will be gone forever</localize>.
             </div>
 
             <umb-confirm on-confirm="performDelete" confirm-button-style="danger" on-cancel="cancel"></umb-confirm>

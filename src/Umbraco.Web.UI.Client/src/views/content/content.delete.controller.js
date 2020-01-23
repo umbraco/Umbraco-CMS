@@ -1,12 +1,12 @@
 /**
  * @ngdoc controller
- * @name Umbraco.Editors.ContentDeleteController
+ * @name Umbraco.Editors.Content.DeleteController
  * @function
  * 
  * @description
  * The controller for deleting content
  */
-function ContentDeleteController($scope, $timeout, contentResource, treeService, navigationService, editorState, $location, overlayService) {
+function ContentDeleteController($scope, $timeout, contentResource, treeService, navigationService, editorState, $location, overlayService, languageResource) {
 
     /**
      * Used to toggle UI elements during delete operations

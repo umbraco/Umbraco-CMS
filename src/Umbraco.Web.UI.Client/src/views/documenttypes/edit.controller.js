@@ -18,6 +18,8 @@
         var documentTypeId = $routeParams.id;
         var create = $routeParams.create;
         var noTemplate = $routeParams.notemplate;
+        var isElement = $routeParams.iselement;
+        var allowVaryByCulture = $routeParams.culturevary;
         var infiniteMode = $scope.model && $scope.model.infiniteMode;
 
         vm.save = save;
@@ -25,6 +27,9 @@
 
         vm.currentNode = null;
         vm.contentType = {};
+        vm.header = {};
+        vm.header.editorfor = "content_documentType";
+        vm.header.setPageTitle = true;
         vm.labels = {};
         vm.submitButtonKey = "buttons_save";
         vm.generateModelsKey = "buttons_saveAndGenerateModels";
@@ -33,7 +38,7 @@
         vm.page.loading = false;
         vm.page.saveButtonState = "init";
         vm.page.navigation = [];
-
+     
         var labelKeys = [
             "general_design",
             "general_listView",
@@ -60,6 +65,8 @@
                 documentTypeId = $scope.model.id;
                 create = $scope.model.create;
                 noTemplate = $scope.model.notemplate;
+                isElement = $scope.model.isElement;
+                allowVaryByCulture = $scope.model.allowVaryByCulture;
                 vm.submitButtonKey = "buttons_saveAndClose";
                 vm.generateModelsKey = "buttons_generateModelsAndClose";
             }
@@ -338,6 +345,7 @@
                     saveMethod: contentTypeResource.save,
                     scope: $scope,
                     content: vm.contentType,
+                    infiniteMode: infiniteMode,
                     // we need to rebind... the IDs that have been created!
                     rebindCallback: function (origContentType, savedContentType) {
                         vm.contentType.id = savedContentType.id;
@@ -426,7 +434,14 @@
                 contentType.defaultTemplate = contentTypeHelper.insertDefaultTemplatePlaceholder(contentType.defaultTemplate);
                 contentType.allowedTemplates = contentTypeHelper.insertTemplatePlaceholder(contentType.allowedTemplates);
             }
-
+            // set isElement checkbox by default
+            if (isElement) {
+                contentType.isElement = true;
+            }
+            // set vary by culture checkbox by default
+            if (allowVaryByCulture) {
+                contentType.allowCultureVariant = true;
+            }
             // convert icons for content type
             convertLegacyIcons(contentType);
 
@@ -497,12 +512,23 @@
             loadDocumentType();
         }));
 
+        evts.push(eventsService.on("editors.documentType.reload", function (name, args) {
+            if (args && args.node && vm.contentType.id === args.node.id) {
+                loadDocumentType();
+            }
+        }));
+
         evts.push(eventsService.on("editors.documentType.saved", function(name, args) {
-            if(args.documentType.allowedTemplates.length > 0){
-                navigationService.syncTree({ tree: "templates", path: [], forceReload: true })
-                    .then(function (syncArgs) {
-                        navigationService.reloadNode(syncArgs.node)
-                    });
+            if(args.documentType.allowedTemplates.length > 0) {
+                navigationService.hasTree("templates").then(function (treeExists) {
+                    if (treeExists) {
+                        navigationService.syncTree({ tree: "templates", path: [], forceReload: true })
+                            .then(function (syncArgs) {
+                                navigationService.reloadNode(syncArgs.node)
+                            }
+                        );
+                    }
+                }); 
             }
         }));
 

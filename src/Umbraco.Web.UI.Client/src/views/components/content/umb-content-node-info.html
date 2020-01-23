@@ -46,6 +46,7 @@
                 title="{{historyLabel}}">
                 
                 <umb-button
+                    ng-hide="node.trashed"
                     type="button"
                     button-style="outline"
                     action="openRollback()"
@@ -140,6 +141,14 @@
                     {{currentVariant.createDateFormatted}}
                 </umb-control-group>
 
+                <umb-control-group ng-show="node.id !== 0 && currentVariant.releaseDateFormatted" data-element="node-info-publish-date" label="@content_releaseDate">
+                    {{currentVariant.releaseDateFormatted}}
+                </umb-control-group>
+
+                <umb-control-group ng-show="node.id !== 0 && currentVariant.expireDateFormatted" data-element="node-info-expire-date" label="@content_expireDate">
+                    {{currentVariant.expireDateFormatted}}
+                </umb-control-group>
+
                 <umb-control-group data-element="node-info-document-type" label="@content_documentType">
                     <umb-node-preview
                         style="min-width: 100%; margin-bottom: 0;"
@@ -160,9 +169,9 @@
                                 ng-change="updateTemplate(node.template)">
                             <option value="">{{chooseLabel}}...</option>
                         </select>
-                        <a href="" ng-show="allowChangeTemplate && node.template !== null" class="umb-node-preview__action" style="margin-left:15px;" ng-click="openTemplate()">
+                        <button ng-show="allowChangeTemplate && node.template !== null" class="umb-node-preview__action" style="margin-left:15px;" ng-click="openTemplate()">
                             <localize key="general_open">Open</localize>
-                        </a>
+                        </button>
                     </div>
                 </umb-control-group>
 

@@ -11,21 +11,21 @@
             </div>
         </div>
 
+        <div class="umb-packages-section" ng-if="vm.searchQuery == ''">
+            <div class="umb-packages-categories">
+                <a href=""
+                   class="umb-packages-category"
+                   ng-click="vm.selectCategory(category, vm.categories)"
+                   ng-repeat="category in vm.categories"
+                   ng-class="{'-active': category.active, '-first': $first, '-last': $last}">
+                    <div>{{category.name}}</div>
+                </a>
+            </div>
+        </div>
+
         <div ng-show="vm.loading === false">
 
-            <div class="umb-packages-section" ng-if="vm.searchQuery == ''">
-                <div class="umb-packages-categories">
-                    <a href=""
-                       class="umb-packages-category"
-                       ng-click="vm.selectCategory(category, vm.categories)"
-                       ng-repeat="category in vm.categories"
-                       ng-class="{'-active': category.active, '-first': $first, '-last': $last}">
-                        <div>{{ category.name }}</div>
-                    </a>
-                </div>
-            </div>
-
-            <div class="umb-packages-section" ng-if="vm.searchQuery == ''">
+            <div class="umb-packages-section" ng-if="vm.searchQuery == '' && vm.popular.length > 0">
                 <h4><strong><localize key="packager_packagesPopular">Popular</localize></strong></h4>
                 <div class="umb-packages">
 
@@ -37,15 +37,15 @@
                             </div>
 
                             <div class="umb-package-info">
-                                <div class="umb-package-name">{{ package.name }}</div>
-                                <div class="umb-package-description">{{ package.excerpt | limitTo: 40 }}<span ng-if="package.excerpt > (package.excerpt | limitTo: 40)">...</span></div>
+                                <div class="umb-package-name">{{package.name}}</div>
+                                <div class="umb-package-description">{{package.excerpt | limitTo: 40}}<span ng-if="package.excerpt > (package.excerpt | limitTo: 40)">...</span></div>
 
                                 <div class="umb-package-numbers">
                                     <small class="umb-package-downloads">
-                                        <i class="icon-download-alt"></i> <strong>{{ package.downloads }}</strong>
+                                        <i class="icon-download-alt"></i> <strong>{{package.downloads}}</strong>
                                     </small>
                                     <small class="umb-package-likes">
-                                        <i class="icon-hearts"></i> <strong>{{ package.likes }}</strong>
+                                        <i class="icon-hearts"></i> <strong>{{package.likes}}</strong>
                                     </small>
                                 </div>
 
@@ -67,7 +67,7 @@
                         <a class="umb-package-link" href="" ng-click="vm.showPackageDetails(package)">
 
                             <div class="umb-package-icon">
-                                <img ng-src="{{ package.icon }}" alt="" />
+                                <img ng-src="{{package.icon}}" alt="" />
                             </div>
 
                             <div class="umb-package-info">
@@ -102,10 +102,15 @@
             </div>
 
             <!-- Empty state -->
-            <umb-empty-state
-                ng-if="vm.packages.length === 0 && vm.loading === false && vm.searchQuery !== ''"
-                position="center">
+            <umb-empty-state ng-if="vm.packages.length === 0 && vm.loading === false && vm.searchQuery !== ''"
+                             position="center">
                 <h4><strong><localize key="packager_packageNoResults">We couldn't find anything for</localize> '{{ vm.searchQuery }}'</strong></h4>
+                <p class="faded"><localize key="packager_packageNoResultsDescription">Please try searching for another package or browse through the categories</localize>.</p>
+            </umb-empty-state>
+
+            <umb-empty-state ng-if="vm.popular.length === 0 && vm.loading === false && vm.searchQuery === ''"
+                             position="center">
+                <h4><strong><localize key="general_searchNoResult">Sorry, we can not find what you are looking for.</localize></strong></h4>
                 <p class="faded"><localize key="packager_packageNoResultsDescription">Please try searching for another package or browse through the categories</localize>.</p>
             </umb-empty-state>
 
@@ -182,7 +187,7 @@
                                 <div class="umb-package-details__owner-profile-avatar">
                                 <umb-avatar
                                     size="m"
-                                    img-src="{{ 'https://our.umbraco.org' + vm.package.ownerInfo.ownerAvatar }}">
+                                    img-src="{{ 'https://our.umbraco.com' + vm.package.ownerInfo.ownerAvatar }}">
                                 </umb-avatar>
                                 </div>
 
