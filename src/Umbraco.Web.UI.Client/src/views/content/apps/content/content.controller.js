@@ -23,25 +23,27 @@
 
             //if this variant has a culture/language assigned, then we need to watch it since it will change
             //if the language drop down changes and we need to re-init
-            if ($scope.variant.language) {
-                unbindLanguageWatcher = $scope.$watch(function () {
-                    return $scope.variant.language.culture;
+            if ($scope.variantContent) {
+                if ($scope.variantContent.language) {
+                    unbindLanguageWatcher = $scope.$watch(function () {
+                        return $scope.variantContent.language.culture;
+                    }, function (newVal, oldVal) {
+                        if (newVal !== oldVal) {
+                            requestUpdate();
+                        }
+                    });
+                } else {
+                    unbindLanguageWatcher = function() {}
+                }
+
+                unbindSegmentWatcher = $scope.$watch(function () {
+                    return $scope.variantContent.segment;
                 }, function (newVal, oldVal) {
                     if (newVal !== oldVal) {
                         requestUpdate();
                     }
                 });
-            } else {
-                unbindLanguageWatcher = function() {}
             }
-
-            unbindSegmentWatcher = $scope.$watch(function () {
-                return $scope.variant.segment;
-            }, function (newVal, oldVal) {
-                if (newVal !== oldVal) {
-                    requestUpdate();
-                }
-            });
             
         }
 

@@ -20,7 +20,7 @@
             templateUrl: 'views/components/editor/umb-editor-sub-view.html',
             scope: {
                 model: "=",
-                variant: "=?",
+                variantContent: "=?",
                 content: "="
             },
             link: link

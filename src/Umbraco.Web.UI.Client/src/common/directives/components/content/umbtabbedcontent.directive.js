@@ -19,8 +19,8 @@
                 
                 var viewFocusY = scrollableNode.scrollTop + scrollableNode.clientHeight * .5;
                 
-                for(var i in $scope.variant.tabs) {
-                    var group = $scope.variant.tabs[i];
+                for(var i in $scope.content.tabs) {
+                    var group = $scope.content.tabs[i];
                     var node = propertyGroupNodesDictionary[group.id];
                     if (viewFocusY >= node.offsetTop && viewFocusY <= node.offsetTop + node.clientHeight) {
                         setActiveAnchor(group);
@@ -32,18 +32,18 @@
             
             function setActiveAnchor(tab) {
                 if (tab.active !== true) {
-                    var i = $scope.variant.tabs.length;
+                    var i = $scope.content.tabs.length;
                     while(i--) {
-                        $scope.variant.tabs[i].active = false;
+                        $scope.content.tabs[i].active = false;
                     }
                     tab.active = true;
                 }
             }
             function getActiveAnchor() {
-                var i = $scope.variant.tabs.length;
+                var i = $scope.content.tabs.length;
                 while(i--) {
-                    if ($scope.variant.tabs[i].active === true)
-                        return $scope.variant.tabs[i];
+                    if ($scope.content.tabs[i].active === true)
+                        return $scope.content.tabs[i];
                 }
                 return false;
             }
@@ -115,18 +115,17 @@
             
         }
 
-        function controller($scope, $element, $attrs) {
+        function controller($scope) {
             
             
             //expose the property/methods for other directives to use
             this.content = $scope.content;
-            console.log($scope)
-            console.log(this.content);
-
-            $scope.defaultVariant = _.find(this.content.variants, variant => {
-                return variant.language && variant.language.isDefault;
-            });
-
+            if($scope.variantNodeModel) {
+                $scope.defaultVariant = _.find($scope.variantNodeModel.variants, variant => {
+                    return variant.language && variant.language.isDefault;
+                });
+            }
+            
             $scope.unlockInvariantValue = function(property) {
                 property.unlockInvariantValue = !property.unlockInvariantValue;
             };
@@ -134,7 +133,7 @@
             $scope.$watch("tabbedContentForm.$dirty",
                 function (newValue, oldValue) {
                     if (newValue === true) {
-                        $scope.variant.isDirty = true;
+                        $scope.content.isDirty = true;
                     }
                 }
             );
@@ -148,7 +147,7 @@
             link: link,
             scope: {
                 content: "=",
-                variant: "="
+                variantNodeModel: "=?"
             }
         };
 
