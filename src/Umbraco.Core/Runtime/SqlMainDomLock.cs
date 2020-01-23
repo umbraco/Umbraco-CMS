@@ -142,7 +142,7 @@ namespace Umbraco.Core.Runtime
                         db.BeginTransaction(IsolationLevel.ReadCommitted);
 
                         // get a read lock
-                        _dbFactory.SqlContext.SqlSyntax.ReadLock(db, Constants.Locks.MainDom);
+                        _sqlServerSyntax.ReadLock(db, Constants.Locks.MainDom);
 
                         // TODO: We could in theory just check if the main dom row doesn't exist, that could indicate that
                         // we are still the maindom. An empty value might be better because then we won't have any orphan rows
@@ -215,7 +215,7 @@ namespace Umbraco.Core.Runtime
                         db.BeginTransaction(IsolationLevel.ReadCommitted);
 
                         // get a read lock
-                        _dbFactory.SqlContext.SqlSyntax.ReadLock(db, Constants.Locks.MainDom);
+                        _sqlServerSyntax.ReadLock(db, Constants.Locks.MainDom);
 
                         // the row 
                         var mainDomRows = db.Fetch<KeyValueDto>("SELECT * FROM umbracoKeyValue WHERE [key] = @key", new { key = MainDomKey });
