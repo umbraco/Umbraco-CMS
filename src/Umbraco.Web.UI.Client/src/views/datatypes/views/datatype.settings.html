@@ -1,0 +1,25 @@
+<umb-box>
+
+    <umb-box-content>
+
+        <umb-property property="model.properties.selectedEditor">
+            <div>
+                <select name="selectedEditor"
+                        ng-model="model.content.selectedEditor"
+                        required
+                        ng-options="e.alias as e.name for e in model.content.availableEditors"></select>
+                <span ng-messages="contentForm.selectedEditor.$error" show-validation-on-submit>
+                    <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+                </span>
+            </div>
+
+        </umb-property>
+
+        <umb-property property="preValue"
+                    ng-repeat="preValue in model.preValues">
+            <umb-property-editor model="preValue" is-pre-value="true"></umb-property-editor>
+        </umb-property>
+
+    </umb-box-content>
+
+</umb-box>

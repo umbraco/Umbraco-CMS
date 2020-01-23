@@ -38,7 +38,7 @@ namespace Umbraco.Web
         /// <returns>A value indicating whether the content is of a content type composed of a content type identified by the alias.</returns>
         public static bool IsComposedOf(this IPublishedContent content, string alias)
         {
-            return content.ContentType.CompositionAliases.Contains(alias);
+            return content.ContentType.CompositionAliases.InvariantContains(alias);
         }
 
         #endregion
@@ -421,7 +421,7 @@ namespace Umbraco.Web
         /// <remarks>Does not consider the content itself. Returns all ancestors, of the specified content type.</remarks>
         public static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content, string contentTypeAlias)
         {
-            return content.AncestorsOrSelf(false, n => n.ContentType.Alias == contentTypeAlias);
+            return content.AncestorsOrSelf(false, n => n.ContentType.Alias.InvariantEquals(contentTypeAlias));
         }
 
         /// <summary>
@@ -486,7 +486,7 @@ namespace Umbraco.Web
         /// <remarks>May or may not begin with the content itself, depending on its content type.</remarks>
         public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, string contentTypeAlias)
         {
-            return content.AncestorsOrSelf(true, n => n.ContentType.Alias == contentTypeAlias);
+            return content.AncestorsOrSelf(true, n => n.ContentType.Alias.InvariantEquals(contentTypeAlias));
         }
 
         /// <summary>
@@ -549,7 +549,7 @@ namespace Umbraco.Web
         /// <remarks>Does not consider the content itself. May return <c>null</c>.</remarks>
         public static IPublishedContent Ancestor(this IPublishedContent content, string contentTypeAlias)
         {
-            return content.EnumerateAncestors(false).FirstOrDefault(x => x.ContentType.Alias == contentTypeAlias);
+            return content.EnumerateAncestors(false).FirstOrDefault(x => x.ContentType.Alias.InvariantEquals(contentTypeAlias));
         }
 
         /// <summary>
@@ -612,7 +612,7 @@ namespace Umbraco.Web
         /// <remarks>May or may not return the content itself depending on its content type. May return <c>null</c>.</remarks>
         public static IPublishedContent AncestorOrSelf(this IPublishedContent content, string contentTypeAlias)
         {
-            return content.EnumerateAncestors(true).FirstOrDefault(x => x.ContentType.Alias == contentTypeAlias);
+            return content.EnumerateAncestors(true).FirstOrDefault(x => x.ContentType.Alias.InvariantEquals(contentTypeAlias));
         }
 
         /// <summary>
@@ -727,7 +727,7 @@ namespace Umbraco.Web
 
         public static IEnumerable<IPublishedContent> DescendantsOfType(this IPublishedContent content, string contentTypeAlias, string culture = null)
         {
-            return content.DescendantsOrSelf(false, p => p.ContentType.Alias == contentTypeAlias, culture);
+            return content.DescendantsOrSelf(false, p => p.ContentType.Alias.InvariantEquals(contentTypeAlias), culture);
         }
 
         public static IEnumerable<T> Descendants<T>(this IPublishedContent content, string culture = null)
@@ -754,7 +754,7 @@ namespace Umbraco.Web
 
         public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(this IPublishedContent content, string contentTypeAlias, string culture = null)
         {
-            return content.DescendantsOrSelf(true, p => p.ContentType.Alias == contentTypeAlias, culture);
+            return content.DescendantsOrSelf(true, p => p.ContentType.Alias.InvariantEquals(contentTypeAlias), culture);
         }
 
         public static IEnumerable<T> DescendantsOrSelf<T>(this IPublishedContent content, string culture = null)
@@ -781,7 +781,7 @@ namespace Umbraco.Web
 
         public static IPublishedContent DescendantOfType(this IPublishedContent content, string contentTypeAlias, string culture = null)
         {
-            return content.EnumerateDescendants(false, culture).FirstOrDefault(x => x.ContentType.Alias == contentTypeAlias);
+            return content.EnumerateDescendants(false, culture).FirstOrDefault(x => x.ContentType.Alias.InvariantEquals(contentTypeAlias));
         }
 
         public static T Descendant<T>(this IPublishedContent content, string culture = null)
@@ -808,7 +808,7 @@ namespace Umbraco.Web
 
         public static IPublishedContent DescendantOrSelfOfType(this IPublishedContent content, string contentTypeAlias, string culture = null)
         {
-            return content.EnumerateDescendants(true, culture).FirstOrDefault(x => x.ContentType.Alias == contentTypeAlias);
+            return content.EnumerateDescendants(true, culture).FirstOrDefault(x => x.ContentType.Alias.InvariantEquals(contentTypeAlias));
         }
 
         public static T DescendantOrSelf<T>(this IPublishedContent content, string culture = null)
@@ -892,7 +892,7 @@ namespace Umbraco.Web
         /// <returns>The children of the content, of any of the specified types.</returns>
         public static IEnumerable<IPublishedContent> ChildrenOfType(this IPublishedContent content, string contentTypeAlias, string culture = null)
         {
-            return content.Children(x => contentTypeAlias.InvariantContains(x.ContentType.Alias), culture);
+            return content.Children(x => x.ContentType.Alias.InvariantEquals(contentTypeAlias), culture);
         }
 
         /// <summary>
@@ -973,7 +973,7 @@ namespace Umbraco.Web
                                 ? content.Children(culture).Any()
                                     ? content.Children(culture).ElementAt(0)
                                     : null
-                                : content.Children(culture).FirstOrDefault(x => x.ContentType.Alias == contentTypeAliasFilter);
+                                : content.Children(culture).FirstOrDefault(x => x.ContentType.Alias.InvariantEquals(contentTypeAliasFilter));
             if (firstNode == null)
                 return new DataTable(); //no children found
 
@@ -993,7 +993,7 @@ namespace Umbraco.Web
                     {
                         if (contentTypeAliasFilter.IsNullOrWhiteSpace() == false)
                         {
-                            if (n.ContentType.Alias != contentTypeAliasFilter)
+                            if (n.ContentType.Alias.InvariantEquals(contentTypeAliasFilter) == false)
                                 continue; //skip this one, it doesn't match the filter
                         }
 

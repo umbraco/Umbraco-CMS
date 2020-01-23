@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
@@ -15,7 +16,6 @@ using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
-using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -218,6 +218,7 @@ AND umbracoNode.nodeObjectType = @objectType",
 
         protected void PersistUpdatedBaseContentType(IContentTypeComposition entity)
         {
+            CorrectPropertyTypeVariations(entity);
             ValidateVariations(entity);
 
             var dto = ContentTypeFactory.BuildContentTypeDto(entity);
@@ -410,26 +411,7 @@ AND umbracoNode.id <> @id",
             // note: this only deals with *local* property types, we're dealing w/compositions later below
             foreach (var propertyType in entity.PropertyTypes)
             {
-                if (contentTypeVariationChanging)
-                {
-                    // content type is changing
-                    switch (newContentTypeVariation)
-                    {
-                        case ContentVariation.Nothing: // changing to Nothing
-                            // all property types must change to Nothing
-                            propertyType.Variations = ContentVariation.Nothing;
-                            break;
-                        case ContentVariation.Culture: // changing to Culture
-                            // all property types can remain Nothing
-                            break;
-                        case ContentVariation.CultureAndSegment:
-                        case ContentVariation.Segment:
-                        default:
-                            throw new NotSupportedException(); // TODO: Support this
-                    }
-                }
-
-                // then, track each property individually
+                // track each property individually
                 if (propertyType.IsPropertyDirty("Variations"))
                 {
                     // allocate the list only when needed
@@ -455,23 +437,19 @@ AND umbracoNode.id <> @id",
                 // via composition, with their original variations (ie not filtered by this
                 // content type variations - we need this true value to make decisions.
 
-                foreach (var propertyType in ((ContentTypeCompositionBase)entity).RawComposedPropertyTypes)
+                propertyTypeVariationChanges = propertyTypeVariationChanges ?? new Dictionary<int, (ContentVariation, ContentVariation)>();
+
+                foreach (var composedPropertyType in ((ContentTypeCompositionBase)entity).RawComposedPropertyTypes)
                 {
-                    if (propertyType.VariesBySegment() || newContentTypeVariation.VariesBySegment())
-                        throw new NotSupportedException(); // TODO: support this
+                    if (composedPropertyType.Variations == ContentVariation.Nothing) continue;
 
-                    if (propertyType.Variations == ContentVariation.Culture)
-                    {
-                        if (propertyTypeVariationChanges == null)
-                            propertyTypeVariationChanges = new Dictionary<int, (ContentVariation, ContentVariation)>();
+                    // Determine target variation of the composed property type.
+                    // The composed property is only considered culture variant when the base content type is also culture variant.
+                    // The composed property is only considered segment variant when the base content type is also segment variant.
+                    // Example: Culture variant content type with a Culture+Segment variant property type will become ContentVariation.Culture
+                    var target = newContentTypeVariation & composedPropertyType.Variations;
 
-                        // if content type moves to Culture, property type becomes Culture here again
-                        // if content type moves to Nothing, property type becomes Nothing here
-                        if (newContentTypeVariation == ContentVariation.Culture)
-                            propertyTypeVariationChanges[propertyType.Id] = (ContentVariation.Nothing, ContentVariation.Culture);
-                        else if (newContentTypeVariation == ContentVariation.Nothing)
-                            propertyTypeVariationChanges[propertyType.Id] = (ContentVariation.Culture, ContentVariation.Nothing);
-                    }
+                    propertyTypeVariationChanges[composedPropertyType.Id] = (composedPropertyType.Variations, target);
                 }
             }
 
@@ -512,7 +490,7 @@ AND umbracoNode.id <> @id",
             var impacted = GetImpactedContentTypes(entity, all);
 
             // if some property types have actually changed, move their variant data
-            if (propertyTypeVariationChanges != null)
+            if (propertyTypeVariationChanges?.Count > 0)
                 MovePropertyTypeVariantData(propertyTypeVariationChanges, impacted);
 
             // deal with orphan properties: those that were in a deleted tab,
@@ -525,22 +503,39 @@ AND umbracoNode.id <> @id",
         }
 
         /// <summary>
+        /// Corrects the property type variations for the given entity
+        /// to make sure the property type variation is compatible with the
+        /// variation set on the entity itself.
+        /// </summary>
+        /// <param name="entity">Entity to correct properties for</param>
+        private void CorrectPropertyTypeVariations(IContentTypeComposition entity)
+        {
+            // Update property variations based on the content type variation
+            foreach (var propertyType in entity.PropertyTypes)
+            {
+                // Determine variation for the property type.
+                // The property is only considered culture variant when the base content type is also culture variant.
+                // The property is only considered segment variant when the base content type is also segment variant.
+                // Example: Culture variant content type with a Culture+Segment variant property type will become ContentVariation.Culture
+                propertyType.Variations = entity.Variations & propertyType.Variations;
+            }
+        }
+
+        /// <summary>
         /// Ensures that no property types are flagged for a variance that is not supported by the content type itself
         /// </summary>
-        /// <param name="entity"></param>
+        /// <param name="entity">The entity for which the property types will be validated</param>
         private void ValidateVariations(IContentTypeComposition entity)
         {
-            //if the entity does not vary at all, then the property cannot have a variance value greater than it
-            if (entity.Variations == ContentVariation.Nothing)
+            foreach (var prop in entity.PropertyTypes)
             {
-                foreach (var prop in entity.PropertyTypes)
-                {
-                    if (prop.IsPropertyDirty(nameof(prop.Variations)) && prop.Variations > entity.Variations)
-                        throw new InvalidOperationException($"The property {prop.Alias} cannot have variations of {prop.Variations} with the content type variations of {entity.Variations}");
-                }
-                    
+                // The variation of a property is only allowed if all its variation flags
+                // are also set on the entity itself. It cannot set anything that is not also set by the content type.
+                // For example, when entity.Variations is set to Culture a property cannot be set to Segment.
+                var isValid = entity.Variations.HasFlag(prop.Variations);
+                if (!isValid)
+                    throw new InvalidOperationException($"The property {prop.Alias} cannot have variations of {prop.Variations} with the content type variations of {entity.Variations}");
             }
-                
         }
 
         private IEnumerable<IContentTypeComposition> GetImpactedContentTypes(IContentTypeComposition contentType, IEnumerable<IContentTypeComposition> all)
@@ -661,27 +656,27 @@ AND umbracoNode.id <> @id",
             var impactedL = impacted.Select(x => x.Id).ToList();
 
             //Group by the "To" variation so we can bulk update in the correct batches
-            foreach (var grouping in propertyTypeChanges.GroupBy(x => x.Value.ToVariation))
+            foreach (var grouping in propertyTypeChanges.GroupBy(x => x.Value))
             {
                 var propertyTypeIds = grouping.Select(x => x.Key).ToList();
-                var toVariation = grouping.Key;
+                var (FromVariation, ToVariation) = grouping.Key;
 
-                switch (toVariation)
+                var fromCultureEnabled = FromVariation.HasFlag(ContentVariation.Culture);
+                var toCultureEnabled = ToVariation.HasFlag(ContentVariation.Culture);
+
+                if (!fromCultureEnabled && toCultureEnabled)
                 {
-                    case ContentVariation.Culture:
-                        CopyPropertyData(null, defaultLanguageId, propertyTypeIds, impactedL);
-                        CopyTagData(null, defaultLanguageId, propertyTypeIds, impactedL);
-                        RenormalizeDocumentEditedFlags(propertyTypeIds, impactedL);                        
-                        break;
-                    case ContentVariation.Nothing:
-                        CopyPropertyData(defaultLanguageId, null, propertyTypeIds, impactedL);
-                        CopyTagData(defaultLanguageId, null, propertyTypeIds, impactedL);
-                        RenormalizeDocumentEditedFlags(propertyTypeIds, impactedL);                        
-                        break;
-                    case ContentVariation.CultureAndSegment:
-                    case ContentVariation.Segment:
-                    default:
-                        throw new NotSupportedException(); // TODO: Support this
+                    // Culture has been enabled
+                    CopyPropertyData(null, defaultLanguageId, propertyTypeIds, impactedL);
+                    CopyTagData(null, defaultLanguageId, propertyTypeIds, impactedL);
+                    RenormalizeDocumentEditedFlags(propertyTypeIds, impactedL);
+                }
+                else if (fromCultureEnabled && !toCultureEnabled)
+                {
+                    // Culture has been disabled
+                    CopyPropertyData(defaultLanguageId, null, propertyTypeIds, impactedL);
+                    CopyTagData(defaultLanguageId, null, propertyTypeIds, impactedL);
+                    RenormalizeDocumentEditedFlags(propertyTypeIds, impactedL);
                 }
             }
         }
@@ -693,78 +688,72 @@ AND umbracoNode.id <> @id",
         {
             var defaultLanguageId = GetDefaultLanguageId();
 
-            switch (toVariation)
+            var cultureIsNotEnabled = !fromVariation.HasFlag(ContentVariation.Culture);
+            var cultureWillBeEnabled = toVariation.HasFlag(ContentVariation.Culture);
+
+            if (cultureIsNotEnabled && cultureWillBeEnabled)
             {
-                case ContentVariation.Culture:
+                //move the names
+                //first clear out any existing names that might already exists under the default lang
+                //there's 2x tables to update
 
-                    //move the names
-                    //first clear out any existing names that might already exists under the default lang
-                    //there's 2x tables to update
+                //clear out the versionCultureVariation table
+                var sqlSelect = Sql().Select<ContentVersionCultureVariationDto>(x => x.Id)
+                    .From<ContentVersionCultureVariationDto>()
+                    .InnerJoin<ContentVersionDto>().On<ContentVersionDto, ContentVersionCultureVariationDto>(x => x.Id, x => x.VersionId)
+                    .InnerJoin<ContentDto>().On<ContentDto, ContentVersionDto>(x => x.NodeId, x => x.NodeId)
+                    .Where<ContentDto>(x => x.ContentTypeId == contentType.Id)
+                    .Where<ContentVersionCultureVariationDto>(x => x.LanguageId == defaultLanguageId);
+                var sqlDelete = Sql()
+                    .Delete<ContentVersionCultureVariationDto>()
+                    .WhereIn<ContentVersionCultureVariationDto>(x => x.Id, sqlSelect);
 
-                    //clear out the versionCultureVariation table
-                    var sqlSelect = Sql().Select<ContentVersionCultureVariationDto>(x => x.Id)
-                        .From<ContentVersionCultureVariationDto>()
-                        .InnerJoin<ContentVersionDto>().On<ContentVersionDto, ContentVersionCultureVariationDto>(x => x.Id, x => x.VersionId)
-                        .InnerJoin<ContentDto>().On<ContentDto, ContentVersionDto>(x => x.NodeId, x => x.NodeId)
-                        .Where<ContentDto>(x => x.ContentTypeId == contentType.Id)
-                        .Where<ContentVersionCultureVariationDto>(x => x.LanguageId == defaultLanguageId);
-                    var sqlDelete = Sql()
-                        .Delete<ContentVersionCultureVariationDto>()
-                        .WhereIn<ContentVersionCultureVariationDto>(x => x.Id, sqlSelect);
+                Database.Execute(sqlDelete);
 
-                    Database.Execute(sqlDelete);
+                //clear out the documentCultureVariation table
+                sqlSelect = Sql().Select<DocumentCultureVariationDto>(x => x.Id)
+                    .From<DocumentCultureVariationDto>()
+                    .InnerJoin<ContentDto>().On<ContentDto, DocumentCultureVariationDto>(x => x.NodeId, x => x.NodeId)
+                    .Where<ContentDto>(x => x.ContentTypeId == contentType.Id)
+                    .Where<DocumentCultureVariationDto>(x => x.LanguageId == defaultLanguageId);
+                sqlDelete = Sql()
+                    .Delete<DocumentCultureVariationDto>()
+                    .WhereIn<DocumentCultureVariationDto>(x => x.Id, sqlSelect);
 
-                    //clear out the documentCultureVariation table
-                    sqlSelect = Sql().Select<DocumentCultureVariationDto>(x => x.Id)
-                        .From<DocumentCultureVariationDto>()
-                        .InnerJoin<ContentDto>().On<ContentDto, DocumentCultureVariationDto>(x => x.NodeId, x => x.NodeId)
-                        .Where<ContentDto>(x => x.ContentTypeId == contentType.Id)
-                        .Where<DocumentCultureVariationDto>(x => x.LanguageId == defaultLanguageId);
-                    sqlDelete = Sql()
-                        .Delete<DocumentCultureVariationDto>()
-                        .WhereIn<DocumentCultureVariationDto>(x => x.Id, sqlSelect);
+                Database.Execute(sqlDelete);
 
-                    Database.Execute(sqlDelete);
+                //now we need to insert names into these 2 tables based on the invariant data
 
-                    //now we need to insert names into these 2 tables based on the invariant data
+                //insert rows into the versionCultureVariationDto table based on the data from contentVersionDto for the default lang
+                var cols = Sql().Columns<ContentVersionCultureVariationDto>(x => x.VersionId, x => x.Name, x => x.UpdateUserId, x => x.UpdateDate, x => x.LanguageId);
+                sqlSelect = Sql().Select<ContentVersionDto>(x => x.Id, x => x.Text, x => x.UserId, x => x.VersionDate)
+                    .Append($", {defaultLanguageId}") //default language ID
+                    .From<ContentVersionDto>()
+                    .InnerJoin<ContentDto>().On<ContentDto, ContentVersionDto>(x => x.NodeId, x => x.NodeId)
+                    .Where<ContentDto>(x => x.ContentTypeId == contentType.Id);
+                var sqlInsert = Sql($"INSERT INTO {ContentVersionCultureVariationDto.TableName} ({cols})").Append(sqlSelect);
 
-                    //insert rows into the versionCultureVariationDto table based on the data from contentVersionDto for the default lang
-                    var cols = Sql().Columns<ContentVersionCultureVariationDto>(x => x.VersionId, x => x.Name, x => x.UpdateUserId, x => x.UpdateDate, x => x.LanguageId);
-                    sqlSelect = Sql().Select<ContentVersionDto>(x => x.Id, x => x.Text, x => x.UserId, x => x.VersionDate)
-                        .Append($", {defaultLanguageId}") //default language ID
-                        .From<ContentVersionDto>()
-                        .InnerJoin<ContentDto>().On<ContentDto, ContentVersionDto>(x => x.NodeId, x => x.NodeId)
-                        .Where<ContentDto>(x => x.ContentTypeId == contentType.Id);
-                    var sqlInsert = Sql($"INSERT INTO {ContentVersionCultureVariationDto.TableName} ({cols})").Append(sqlSelect);
+                Database.Execute(sqlInsert);
 
-                    Database.Execute(sqlInsert);
+                //insert rows into the documentCultureVariation table
+                cols = Sql().Columns<DocumentCultureVariationDto>(x => x.NodeId, x => x.Edited, x => x.Published, x => x.Name, x => x.Available, x => x.LanguageId);
+                sqlSelect = Sql().Select<DocumentDto>(x => x.NodeId, x => x.Edited, x => x.Published)
+                    .AndSelect<NodeDto>(x => x.Text)
+                    .Append($", 1, {defaultLanguageId}") //make Available + default language ID
+                    .From<DocumentDto>()
+                    .InnerJoin<NodeDto>().On<NodeDto, DocumentDto>(x => x.NodeId, x => x.NodeId)
+                    .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(x => x.NodeId, x => x.NodeId)
+                    .Where<ContentDto>(x => x.ContentTypeId == contentType.Id);
+                sqlInsert = Sql($"INSERT INTO {DocumentCultureVariationDto.TableName} ({cols})").Append(sqlSelect);
 
-                    //insert rows into the documentCultureVariation table
-                    cols = Sql().Columns<DocumentCultureVariationDto>(x => x.NodeId, x => x.Edited, x => x.Published, x => x.Name, x => x.Available, x => x.LanguageId);
-                    sqlSelect = Sql().Select<DocumentDto>(x => x.NodeId, x => x.Edited, x => x.Published)
-                        .AndSelect<NodeDto>(x => x.Text)
-                        .Append($", 1, {defaultLanguageId}") //make Available + default language ID
-                        .From<DocumentDto>()
-                        .InnerJoin<NodeDto>().On<NodeDto, DocumentDto>(x => x.NodeId, x => x.NodeId)
-                        .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(x => x.NodeId, x => x.NodeId)
-                        .Where<ContentDto>(x => x.ContentTypeId == contentType.Id);
-                    sqlInsert = Sql($"INSERT INTO {DocumentCultureVariationDto.TableName} ({cols})").Append(sqlSelect);
+                Database.Execute(sqlInsert);
+            }
+            else
+            {
+                //we don't need to move the names! this is because we always keep the invariant names with the name of the default language.
 
-                    Database.Execute(sqlInsert);
-
-                    break;
-                case ContentVariation.Nothing:
-
-                    //we don't need to move the names! this is because we always keep the invariant names with the name of the default language.
-
-                    //however, if we were to move names, we could do this: BUT this doesn't work with SQLCE, for that we'd have to update row by row :(
-                    // if we want these SQL statements back, look into GIT history
-
-                    break;
-                case ContentVariation.CultureAndSegment:
-                case ContentVariation.Segment:
-                default:
-                    throw new NotSupportedException(); // TODO: Support this
+                //however, if we were to move names, we could do this: BUT this doesn't work with SQLCE, for that we'd have to update row by row :(
+                // if we want these SQL statements back, look into GIT history
             }
         }
 
@@ -1043,7 +1032,7 @@ AND umbracoNode.id <> @id",
 
             //keep track of this node/lang to mark or unmark a culture as edited
             var editedLanguageVersions = new Dictionary<(int nodeId, int? langId), bool>();
-            //keep track of which node to mark or unmark as edited 
+            //keep track of which node to mark or unmark as edited
             var editedDocument = new Dictionary<int, bool>();
             var nodeId = -1;
             var propertyTypeId = -1;
