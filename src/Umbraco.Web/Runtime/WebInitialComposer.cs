@@ -143,7 +143,7 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<IEventMessagesFactory, DefaultEventMessagesFactory>();
             composition.RegisterUnique<IEventMessagesAccessor, HybridEventMessagesAccessor>();
             composition.RegisterUnique<ITreeService, TreeService>();
-            composition.RegisterUnique<ISectionService, SectionService>();
+            composition.RegisterUnique<ISectionService, SectionService>();            
 
             composition.RegisterUnique<IDashboardService, DashboardService>();
 
