@@ -77,8 +77,8 @@ namespace Umbraco.Web.Macros
         /// <param name="content">The content.</param>
         /// <param name="variationContextAccessor"></param>
         /// <remarks>This is for <see cref="MacroRenderingController"/> usage only.</remarks>
-        internal PublishedContentHashtableConverter(IContent content, IVariationContextAccessor variationContextAccessor, IUserService userService, IShortStringHelper shortStringHelper)
-            : this(new PagePublishedContent(content, variationContextAccessor, userService, shortStringHelper))
+        internal PublishedContentHashtableConverter(IContent content, IVariationContextAccessor variationContextAccessor, IUserService userService, IShortStringHelper shortStringHelper, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IPublishedContentTypeFactory publishedContentTypeFactory, UrlSegmentProviderCollection urlSegmentProviders)
+            : this(new PagePublishedContent(content, variationContextAccessor, userService, shortStringHelper, contentTypeBaseServiceProvider, publishedContentTypeFactory, urlSegmentProviders))
         { }
 
         #endregion
@@ -186,6 +186,7 @@ namespace Umbraco.Web.Macros
             private IReadOnlyDictionary<string, PublishedCultureInfo> _cultureInfos;
             private readonly IVariationContextAccessor _variationContextAccessor;
             private readonly IShortStringHelper _shortStringHelper;
+            private readonly UrlSegmentProviderCollection _urlSegmentProviders;
 
             private static readonly IReadOnlyDictionary<string, PublishedCultureInfo> NoCultureInfos = new Dictionary<string, PublishedCultureInfo>();
 
@@ -194,11 +195,12 @@ namespace Umbraco.Web.Macros
                 Id = id;
             }
 
-            public PagePublishedContent(IContent inner, IVariationContextAccessor variationContextAccessor, IUserService userService, IShortStringHelper shortStringHelper)
+            public PagePublishedContent(IContent inner, IVariationContextAccessor variationContextAccessor, IUserService userService, IShortStringHelper shortStringHelper, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IPublishedContentTypeFactory publishedContentTypeFactory, UrlSegmentProviderCollection urlSegmentProviders)
             {
                 _inner = inner ?? throw new ArgumentNullException(nameof(inner));
                 _variationContextAccessor = variationContextAccessor;
                 _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
+                _urlSegmentProviders = urlSegmentProviders ?? throw new ArgumentNullException(nameof(urlSegmentProviders));
 
                 Id = _inner.Id;
                 Key = _inner.Key;
@@ -206,9 +208,8 @@ namespace Umbraco.Web.Macros
                 CreatorName = _inner.GetCreatorProfile(userService)?.Name;
                 WriterName = _inner.GetWriterProfile(userService)?.Name;
 
-                // TODO: inject
-                var contentType = Current.Services.ContentTypeBaseServices.GetContentTypeOf(_inner);
-                ContentType = Current.PublishedContentTypeFactory.CreateContentType(contentType);
+                var contentType = contentTypeBaseServiceProvider.GetContentTypeOf(_inner);
+                ContentType = publishedContentTypeFactory.CreateContentType(contentType);
 
                 _properties = ContentType.PropertyTypes
                     .Select(x =>
@@ -244,9 +245,8 @@ namespace Umbraco.Web.Macros
                     if (_cultureInfos != null)
                         return _cultureInfos;
 
-                    var urlSegmentProviders = Current.UrlSegmentProviders; // TODO inject
                     return _cultureInfos = _inner.PublishCultureInfos.Values
-                        .ToDictionary(x => x.Culture, x => new PublishedCultureInfo(x.Culture, x.Name, _inner.GetUrlSegment(_shortStringHelper, urlSegmentProviders, x.Culture), x.Date));
+                        .ToDictionary(x => x.Culture, x => new PublishedCultureInfo(x.Culture, x.Name, _inner.GetUrlSegment(_shortStringHelper, _urlSegmentProviders, x.Culture), x.Date));
                 }
             }
 

@@ -29,8 +29,8 @@ namespace Umbraco.Web.Models.Mapping
         private readonly IMemberGroupService _memberGroupService;
         private readonly IMemberPasswordConfiguration _memberPasswordConfiguration;
 
-        public MemberTabsAndPropertiesMapper(ICultureDictionary cultureDictionary, IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService localizedTextService, IMemberTypeService memberTypeService, IMemberService memberService, IMemberGroupService memberGroupService, IMemberPasswordConfiguration memberPasswordConfiguration)
-            : base(cultureDictionary, localizedTextService)
+        public MemberTabsAndPropertiesMapper(ICultureDictionary cultureDictionary, IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService localizedTextService, IMemberTypeService memberTypeService, IMemberService memberService, IMemberGroupService memberGroupService, IMemberPasswordConfiguration memberPasswordConfiguration, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
+            : base(cultureDictionary, localizedTextService, contentTypeBaseServiceProvider)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));

@@ -26,7 +26,7 @@ namespace Umbraco.Web.Models.Mapping
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
 
         public MediaMapDefinition(ICultureDictionary cultureDictionary, ILogger logger, CommonMapper commonMapper, IMediaService mediaService, IMediaTypeService mediaTypeService,
-            ILocalizedTextService localizedTextService, PropertyEditorCollection propertyEditorCollection, IUmbracoSettingsSection umbracoSettingsSection)
+            ILocalizedTextService localizedTextService, PropertyEditorCollection propertyEditorCollection, IUmbracoSettingsSection umbracoSettingsSection, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
         {
             _logger = logger;
             _commonMapper = commonMapper;
@@ -35,7 +35,7 @@ namespace Umbraco.Web.Models.Mapping
             _propertyEditorCollection = propertyEditorCollection;
             _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
 
-            _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IMedia>(cultureDictionary, localizedTextService);
+            _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IMedia>(cultureDictionary, localizedTextService, contentTypeBaseServiceProvider);
         }
 
         public void DefineMaps(UmbracoMapper mapper)

@@ -33,6 +33,7 @@ namespace Umbraco.Web.Security
         private readonly AppCaches _appCaches;
         private readonly ILogger _logger;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IEntityService _entityService;
 
         #region Constructors
 
@@ -47,7 +48,8 @@ namespace Umbraco.Web.Security
             IPublicAccessService publicAccessService,
             AppCaches appCaches,
             ILogger logger,
-            IShortStringHelper shortStringHelper
+            IShortStringHelper shortStringHelper,
+            IEntityService entityService
         )
         {
             HttpContext = httpContext;
@@ -61,6 +63,7 @@ namespace Umbraco.Web.Security
 
             _membershipProvider = membershipProvider ?? throw new ArgumentNullException(nameof(membershipProvider));
             _roleProvider = roleProvider ?? throw new ArgumentNullException(nameof(roleProvider));
+            _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
         }
 
         #endregion
@@ -311,12 +314,11 @@ namespace Umbraco.Web.Security
 
             var umbracoType = UdiEntityTypeHelper.ToUmbracoObjectType(udi.EntityType);
 
-            var entityService = Current.Services.EntityService;
             switch (umbracoType)
             {
                 case UmbracoObjectTypes.Member:
                     // TODO: need to implement Get(guid)!
-                    var memberAttempt = entityService.GetId(guidUdi.Guid, umbracoType);
+                    var memberAttempt = _entityService.GetId(guidUdi.Guid, umbracoType);
                     if (memberAttempt.Success)
                         return GetById(memberAttempt.Result);
                     break;
