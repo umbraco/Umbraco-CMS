@@ -191,7 +191,7 @@ FROM {PreTables.ContentVersion} v INNER JOIN {PreTables.Document} d ON d.version
                 var temp2 = Database.Fetch<dynamic>($@"SELECT cver.versionId, n.text
 FROM {PreTables.ContentVersion} cver
 JOIN {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.Node)} n ON cver.nodeId=n.id
-WHERE cver.versionId NOT IN (SELECT versionId FROM {SqlSyntax.GetQuotedTableName(PreTables.Document)})");
+WHERE cver.versionId NOT IN (SELECT nodeId FROM {SqlSyntax.GetQuotedTableName(PreTables.Document)})");
 
                 foreach (var t in temp2)
                     Database.Execute($@"UPDATE {PreTables.ContentVersion} SET text=@text, {SqlSyntax.GetQuotedColumnName("current")}=1, userId=0 WHERE versionId=@versionId",
@@ -202,7 +202,7 @@ WHERE cver.versionId NOT IN (SELECT versionId FROM {SqlSyntax.GetQuotedTableName
                 Database.Execute($@"UPDATE {PreTables.ContentVersion} SET text=n.text, {SqlSyntax.GetQuotedColumnName("current")}=1, userId=0
 FROM {PreTables.ContentVersion} cver
 JOIN {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.Node)} n ON cver.nodeId=n.id
-WHERE cver.versionId NOT IN (SELECT versionId FROM {SqlSyntax.GetQuotedTableName(PreTables.Document)})");
+WHERE cver.versionId NOT IN (SELECT nodeId FROM {SqlSyntax.GetQuotedTableName(PreTables.Document)})");
             }
 
             // create table
