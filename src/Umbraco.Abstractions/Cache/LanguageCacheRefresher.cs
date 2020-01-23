@@ -11,8 +11,6 @@ using static Umbraco.Web.Cache.LanguageCacheRefresher.JsonPayload;
 namespace Umbraco.Web.Cache
 {
     public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageCacheRefresher, LanguageCacheRefresher.JsonPayload>
-
-    //CacheRefresherBase<LanguageCacheRefresher>
     {
         public LanguageCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IPublishedSnapshotService publishedSnapshotService)
             : base(appCaches, serializer)

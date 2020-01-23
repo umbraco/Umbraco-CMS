@@ -101,19 +101,6 @@ namespace Umbraco.Web.Cache
                 GetRefresherById(refresherGuid),
                 payloads.ToArray());
         }
-        /// <summary>
-        /// Notifies the distributed cache, for a specified <see cref="ICacheRefresher"/>.
-        /// </summary>
-        /// <param name="refresherGuid">The unique identifier of the ICacheRefresher.</param>
-        /// <param name="jsonPayload">The notification content.</param>
-        public void RefreshByJson(Guid refresherGuid, string jsonPayload)
-        {
-            if (refresherGuid == Guid.Empty || jsonPayload.IsNullOrWhiteSpace()) return;
-
-            _serverMessenger.PerformRefresh(
-                GetRefresherById(refresherGuid),
-                jsonPayload);
-        }
 
         ///// <summary>
         ///// Notifies the distributed cache, for a specified <see cref="ICacheRefresher"/>.

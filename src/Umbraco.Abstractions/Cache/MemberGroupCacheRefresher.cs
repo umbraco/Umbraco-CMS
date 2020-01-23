@@ -70,15 +70,6 @@ namespace Umbraco.Web.Cache
             public int Id { get; }
         }
 
-        // private JsonPayload[] Deserialize(string json)
-        // {
-        //     return _jsonSerializer.Deserialize<JsonPayload[]>(json);
-        // }
-        //
-        // private string Serialize(params IMemberGroup[] groups)
-        // {
-        //     return _jsonSerializer.Serialize(groups.Select(x => new JsonPayload(x.Id, x.Name)).ToArray());
-        // }
 
         #endregion
     }

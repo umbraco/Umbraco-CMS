@@ -104,10 +104,10 @@ namespace Umbraco.Web.Cache
                 () => FileService.DeletedTemplate -= FileService_DeletedTemplate);
 
             // bind to macro events
-            Bind(() => MacroService.Saved += (sender, e) => MacroService_Saved(sender, e),
-                () => MacroService.Saved -= (sender, e) => MacroService_Saved(sender, e));
-            Bind(() => MacroService.Deleted += (sender, e) => MacroService_Deleted(sender, e),
-                () => MacroService.Deleted -= (sender, e) => MacroService_Deleted(sender, e));
+            Bind(() => MacroService.Saved += MacroService_Saved,
+                () => MacroService.Saved -= MacroService_Saved);
+            Bind(() => MacroService.Deleted += MacroService_Deleted,
+                () => MacroService.Deleted -= MacroService_Deleted);
 
             // bind to member events
             Bind(() => MemberService.Saved += MemberService_Saved,
@@ -389,18 +389,16 @@ namespace Umbraco.Web.Cache
 
         #region MacroService
 
-        private MacroCacheRefresher MacroCacheRefresher => _cacheRefresherCollection[MacroCacheRefresher.UniqueId] as MacroCacheRefresher;
-
         private void MacroService_Deleted(IMacroService sender, DeleteEventArgs<IMacro> e)
         {
             foreach (var entity in e.DeletedEntities)
-                _distributedCache.RemoveMacroCache(MacroCacheRefresher, entity);
+                _distributedCache.RemoveMacroCache(entity);
         }
 
         private void MacroService_Saved(IMacroService sender, SaveEventArgs<IMacro> e)
         {
             foreach (var entity in e.SavedEntities)
-                _distributedCache.RefreshMacroCache(MacroCacheRefresher, entity);
+                _distributedCache.RefreshMacroCache(entity);
         }
 
         #endregion

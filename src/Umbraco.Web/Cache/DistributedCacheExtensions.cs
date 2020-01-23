@@ -192,16 +192,18 @@ namespace Umbraco.Web.Cache
 
         #region MacroCache
 
-        public static void RefreshMacroCache(this DistributedCache dc, MacroCacheRefresher macroCacheRefresher, IMacro macro)
+        public static void RefreshMacroCache(this DistributedCache dc, IMacro macro)
         {
             if (macro == null) return;
-            dc.RefreshByJson(macroCacheRefresher.RefresherUniqueId, macroCacheRefresher.Serialize(new MacroCacheRefresher.JsonPayload(macro.Id, macro.Alias)));
+            var payloads = new[] { new MacroCacheRefresher.JsonPayload(macro.Id, macro.Alias) };
+            dc.RefreshByPayload(MacroCacheRefresher.UniqueId, payloads);
         }
 
-        public static void RemoveMacroCache(this DistributedCache dc, MacroCacheRefresher macroCacheRefresher, IMacro macro)
+        public static void RemoveMacroCache(this DistributedCache dc, IMacro macro)
         {
             if (macro == null) return;
-            dc.RefreshByJson(macroCacheRefresher.RefresherUniqueId, macroCacheRefresher.Serialize(new MacroCacheRefresher.JsonPayload(macro.Id, macro.Alias)));
+            var payloads = new[] { new MacroCacheRefresher.JsonPayload(macro.Id, macro.Alias) };
+            dc.RefreshByPayload(MacroCacheRefresher.UniqueId, payloads);
         }
 
         #endregion
