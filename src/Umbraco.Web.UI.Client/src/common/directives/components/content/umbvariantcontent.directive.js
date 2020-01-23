@@ -8,7 +8,7 @@
         templateUrl: 'views/components/content/umb-variant-content.html',
         bindings: {
             content: "=",
-            page: "=",
+            page: "<",
             editor: "=",
             editorIndex: "<",
             editorCount: "<",
