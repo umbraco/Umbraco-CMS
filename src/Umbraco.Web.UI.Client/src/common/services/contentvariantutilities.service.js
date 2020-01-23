@@ -1,9 +1,9 @@
 ﻿/**
 * @ngdoc service
-* @name umbraco.services.variantHelper
-* @description A helper service for dealing with variants
+* @name umbraco.services.contentVariantUtilities
+* @description A utility service for dealing with variants
 **/
-function variantHelper() {
+function contentVariantUtilities() {
     /**
      * Returns the id for this variant
      * @param {any} variant
@@ -36,4 +36,4 @@ function variantHelper() {
         getDisplayName
     }
 }
-angular.module('umbraco.services').factory('variantHelper', variantHelper);
+angular.module('umbraco.services').factory('contentVariantUtilities', contentVariantUtilities);

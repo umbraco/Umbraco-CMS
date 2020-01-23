@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PublishController($scope, localizationService, contentEditingHelper, variantHelper) {
+    function PublishController($scope, localizationService, contentEditingHelper, contentVariantUtilities) {
 
         var vm = this;
         vm.loading = true;
@@ -12,7 +12,7 @@
         vm.dirtyVariantFilter = dirtyVariantFilter;
         vm.pristineVariantFilter = pristineVariantFilter;
 
-        $scope.getVariantDisplayName = variantHelper.getDisplayName;
+        $scope.getVariantDisplayName = contentVariantUtilities.getDisplayName;
 
         /** Returns true if publishing is possible based on if there are un-published mandatory languages */
         function canPublish() {
