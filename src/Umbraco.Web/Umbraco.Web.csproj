@@ -234,6 +234,7 @@
     <Compile Include="Mvc\ValidateUmbracoFormRouteStringAttribute.cs" />
     <Compile Include="Profiling\WebProfilingController.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
+    <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />
@@ -256,6 +257,9 @@
     <Compile Include="Models\Link.cs" />
     <Compile Include="Models\LinkType.cs" />
     <Compile Include="Models\TemplateQuery\OperatorFactory.cs" />
+    <Compile Include="Templates\HtmlLocalLinkParser.cs" />
+    <Compile Include="Templates\HtmlImageSourceParser.cs" />
+    <Compile Include="Templates\HtmlUrlParser.cs" />
     <Compile Include="UmbracoContextFactory.cs" />
     <Compile Include="UmbracoContextReference.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeByUdiRouteHandler.cs" />
@@ -1218,7 +1222,7 @@
     <EmbeddedResource Include="JavaScript\PreviewInitialize.js" />
     <None Include="JavaScript\TinyMceInitialize.js" />
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
-    <Content Include="PublishedCache\NuCache\notes.txt" />
+    <None Include="PublishedCache\NuCache\readme.md" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Web References\org.umbraco.update\checkforupgrade.disco" />

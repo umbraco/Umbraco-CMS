@@ -2243,6 +2243,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="labelUsedByMemberTypes">Used in  Member Types</key>
     <key alias="noMemberTypes">No references to Member Types.</key>
     <key alias="usedByProperties">Used by</key>
+    <key alias="labelUsedByDocuments">Used in Documents</key>
+    <key alias="labelUsedByMembers">Used in Members</key>
+    <key alias="labelUsedByMedia">Used in Media</key>
   </area>
   <area alias="logViewer">
       <key alias="logLevels">Log Levels</key>

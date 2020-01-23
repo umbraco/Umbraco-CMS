@@ -11,6 +11,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
@@ -33,7 +34,7 @@ namespace Umbraco.Tests.Published
             var proflog = new ProfilingLogger(logger, profiler);
 
             PropertyEditorCollection editors = null;
-            var editor = new NestedContentPropertyEditor(logger, new Lazy<PropertyEditorCollection>(() => editors));
+            var editor = new NestedContentPropertyEditor(logger, new Lazy<PropertyEditorCollection>(() => editors), Mock.Of<IDataTypeService>(), Mock.Of<IContentTypeService>());
             editors = new PropertyEditorCollection(new DataEditorCollection(new DataEditor[] { editor }));
 
             var dataType1 = new DataType(editor)
