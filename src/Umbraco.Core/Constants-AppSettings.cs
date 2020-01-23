@@ -9,6 +9,8 @@ namespace Umbraco.Core
         /// </summary>
         public static class AppSettings
         {
+            public const string MainDomLock = "Umbraco.Core.MainDom.Lock";
+
             // TODO: Kill me - still used in Umbraco.Core.IO.SystemFiles:27
             [Obsolete("We need to kill this appsetting as we do not use XML content cache umbraco.config anymore due to NuCache")]
             public const string ContentXML = "Umbraco.Core.ContentXML"; //umbracoContentXML

@@ -251,6 +251,11 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
 
         public override void WriteLock(IDatabase db, params int[] lockIds)
         {
+            WriteLock(db, TimeSpan.FromMilliseconds(1800), lockIds);
+        }
+
+        public void WriteLock(IDatabase db, TimeSpan timeout, params int[] lockIds)
+        {
             // soon as we get Database, a transaction is started
 
             if (db.Transaction.IsolationLevel < IsolationLevel.ReadCommitted)
@@ -260,7 +265,7 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
             // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
             foreach (var lockId in lockIds)
             {
-                db.Execute(@"SET LOCK_TIMEOUT 1800;");
+                db.Execute($"SET LOCK_TIMEOUT {timeout.TotalMilliseconds};");
                 var i = db.Execute(@"UPDATE umbracoLock WITH (REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id", new { id = lockId });
                 if (i == 0) // ensure we are actually locking!
                     throw new ArgumentException($"LockObject with id={lockId} does not exist.");
