@@ -15,7 +15,9 @@
     overflow: hidden;
 }
 
-.umb-iconpicker-btn {
+.umb-iconpicker-item button {
+    background: transparent;
+    border: 0 none;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -31,8 +33,8 @@
     color: currentColor;
 }
 
-.umb-iconpicker-item a:hover,
-.umb-iconpicker-item a:focus {
+.umb-iconpicker-item button:hover,
+.umb-iconpicker-item button:focus {
     background: @gray-10;
     outline: none;
 }
@@ -44,33 +46,40 @@
     box-sizing: border-box;
 }
 
-.umb-iconpicker-svg svg{
+.umb-iconpicker-svg svg {
     display: block;
     width: 30px;
     height: 30px;
     fill: currentColor;
 }
 
-// This doesn't look like it's being used, but don't want to remove it yet just in case
-// // Color swatch
-//  .button {
-//         border: none;
-//         color: white;
-//         padding: 5px;
-//         text-align: center;
-//         text-decoration: none;
-//         display: inline-block;
-//         margin: 5px;
-//         border-radius: 3px;
-//     }
+.umb-iconpicker-item button:active {
+    background: @gray-10;
+}
 
-//     // Circle behind the checkmark
-//     .icon.small.active{
-//         font-size: 14px;
-//         display: inline-block;
-//         width: 20px;
-//         height: 20px;
-//         border-radius: 50%;
-//         background-color: rgba(0,0,0,.15);
-//         float: right;
-//     }
+.umb-iconpicker-item i {
+    font-size: 30px;
+}
+
+// Color swatch
+ .button {
+        border: none;
+        color: @white;
+        padding: 5px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        margin: 5px;
+        border-radius: 3px;
+    }
+
+    // Circle behind the checkmark
+    i.small.active{
+        font-size: 14px;
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: rgba(0,0,0,.15);
+        float: right;
+    }

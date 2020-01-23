@@ -3,43 +3,42 @@
 namespace Umbraco.Core
 {
     /// <summary>
-    /// Provides extension methods to enums.
+    /// Provides extension methods to <see cref="Enum"/>.
     /// </summary>
     public static class EnumExtensions
     {
-        // note:
-        // - no need to HasFlagExact, that's basically an == test
-        // - HasFlagAll cannot be named HasFlag because ext. methods never take priority over instance methods
-
         /// <summary>
-        /// Determines whether a flag enum has all the specified values.
+        /// Determines whether all the flags/bits are set within the enum value.
         /// </summary>
-        /// <remarks>
-        /// <para>True when all bits set in <paramref name="uses"/> are set in <paramref name="use"/>, though other bits may be set too.</para>
-        /// <para>This is the behavior of the original <see cref="Enum.HasFlag"/> method.</para>
-        /// </remarks>
-        public static bool HasFlagAll<T>(this T use, T uses)
+        /// <typeparam name="T">The enum type.</typeparam>
+        /// <param name="value">The enum value.</param>
+        /// <param name="flags">The flags.</param>
+        /// <returns>
+        ///   <c>true</c> if all the flags/bits are set within the enum value; otherwise, <c>false</c>.
+        /// </returns>
+        [Obsolete("Use Enum.HasFlag() or bitwise operations (if performance is important) instead.")]
+        public static bool HasFlagAll<T>(this T value, T flags)
             where T : Enum
         {
-            var num = Convert.ToUInt64(use);
-            var nums = Convert.ToUInt64(uses);
-
-            return (num & nums) == nums;
+            return value.HasFlag(flags);
         }
 
         /// <summary>
-        /// Determines whether a flag enum has any of the specified values.
+        /// Determines whether any of the flags/bits are set within the enum value.
         /// </summary>
-        /// <remarks>
-        /// <para>True when at least one of the bits set in <paramref name="uses"/> is set in <paramref name="use"/>.</para>
-        /// </remarks>
-        public static bool HasFlagAny<T>(this T use, T uses)
+        /// <typeparam name="T">The enum type.</typeparam>
+        /// <param name="value">The value.</param>
+        /// <param name="flags">The flags.</param>
+        /// <returns>
+        ///   <c>true</c> if any of the flags/bits are set within the enum value; otherwise, <c>false</c>.
+        /// </returns>
+        public static bool HasFlagAny<T>(this T value, T flags)
             where T : Enum
         {
-            var num = Convert.ToUInt64(use);
-            var nums = Convert.ToUInt64(uses);
+            var v = Convert.ToUInt64(value);
+            var f = Convert.ToUInt64(flags);
 
-            return (num & nums) > 0;
+            return (v & f) > 0;
         }
     }
 }

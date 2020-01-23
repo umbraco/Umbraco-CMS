@@ -402,6 +402,15 @@ angular.module("umbraco")
 
                 eventsService.emit("grid.rowAdded", { scope: $scope, element: $element, row: row });
 
+                // TODO: find a nicer way to do this without relying on setTimeout
+                setTimeout(function () {
+                    var newRowEl = $element.find("[data-rowid='" + row.$uniqueId + "']");
+
+                    if(newRowEl !== null) {
+                        newRowEl.focus();
+                    }
+                }, 0);
+
             };
 
             $scope.removeRow = function (section, $index) {
@@ -673,6 +682,7 @@ angular.module("umbraco")
                 return ((spans / $scope.model.config.items.columns) * 100).toFixed(8);
             };
 
+
             $scope.clearPrompt = function (scopedObject, e) {
                 scopedObject.deletePrompt = false;
                 e.preventDefault();
@@ -692,8 +702,15 @@ angular.module("umbraco")
             };
 
             $scope.getTemplateName = function (control) {
-                if (control.editor.nameExp) return control.editor.nameExp(control)
-                return control.editor.name;
+                var templateName = control.editor.name;
+                if (control.editor.nameExp) {
+                    var valueOfTemplate = control.editor.nameExp(control);
+                    if (valueOfTemplate != "") {
+                        templateName += ": ";
+                        templateName += valueOfTemplate;
+                    }
+                }
+                return templateName;
             }
 
             // *********************************************

@@ -14,6 +14,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Core.Runtime;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
@@ -305,7 +306,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         private XmlDocument _xmlDocument; // supplied xml document (for tests)
         private volatile XmlDocument _xml; // master xml document
-        private readonly AsyncLock _xmlLock = new AsyncLock(); // protects _xml
+        private readonly SystemLock _xmlLock = new SystemLock(); // protects _xml
 
         // to be used by PublishedContentCache only
         // for non-preview content only

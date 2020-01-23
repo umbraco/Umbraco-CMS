@@ -14,6 +14,7 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("Umbraco.Web")]
 [assembly: InternalsVisibleTo("Umbraco.Web.UI")]
 [assembly: InternalsVisibleTo("Umbraco.Examine")]
+[assembly: InternalsVisibleTo("Umbraco.ModelsBuilder.Embedded")]
 
 [assembly: InternalsVisibleTo("Umbraco.Tests")]
 [assembly: InternalsVisibleTo("Umbraco.Tests.Benchmarks")]

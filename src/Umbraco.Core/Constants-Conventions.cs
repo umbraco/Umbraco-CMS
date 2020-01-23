@@ -221,7 +221,8 @@ namespace Umbraco.Core
                             FailedPasswordAttempts,
                             new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Integer, true, FailedPasswordAttempts)
                             {
-                                Name = FailedPasswordAttemptsLabel
+                                Name = FailedPasswordAttemptsLabel,
+                                DataTypeId = Constants.DataTypes.LabelInt
                             }
                         },
                         {
@@ -242,35 +243,40 @@ namespace Umbraco.Core
                             LastLockoutDate,
                             new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Date, true, LastLockoutDate)
                             {
-                                Name = LastLockoutDateLabel
+                                Name = LastLockoutDateLabel,
+                                DataTypeId = Constants.DataTypes.LabelDateTime
                             }
                         },
                         {
                             LastLoginDate,
                             new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Date, true, LastLoginDate)
                             {
-                                Name = LastLoginDateLabel
+                                Name = LastLoginDateLabel,
+                                DataTypeId = Constants.DataTypes.LabelDateTime
                             }
                         },
                         {
                             LastPasswordChangeDate,
                             new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Date, true, LastPasswordChangeDate)
                             {
-                                Name = LastPasswordChangeDateLabel
+                                Name = LastPasswordChangeDateLabel,
+                                DataTypeId = Constants.DataTypes.LabelDateTime
                             }
                         },
                         {
                             PasswordAnswer,
                             new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Nvarchar, true, PasswordAnswer)
                             {
-                                Name = PasswordAnswerLabel
+                                Name = PasswordAnswerLabel,
+                                DataTypeId = Constants.DataTypes.LabelString
                             }
                         },
                         {
                             PasswordQuestion,
                             new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Nvarchar, true, PasswordQuestion)
                             {
-                                Name = PasswordQuestionLabel
+                                Name = PasswordQuestionLabel,
+                                DataTypeId = Constants.DataTypes.LabelString
                             }
                         }
                     };
@@ -309,34 +315,65 @@ namespace Umbraco.Core
             public static class RelationTypes
             {
                 /// <summary>
-                /// ContentType name for default relation type "Relate Document On Copy".
+                /// Name for default relation type "Related Media".
+                /// </summary>
+                public const string RelatedMediaName = "Related Media";
+
+                /// <summary>
+                /// Alias for default relation type "Related Media"
+                /// </summary>
+                public const string RelatedMediaAlias = "umbMedia";
+
+                /// <summary>
+                /// Name for default relation type "Related Document".
+                /// </summary>
+                public const string RelatedDocumentName = "Related Document";
+
+                /// <summary>
+                /// Alias for default relation type "Related Document"
+                /// </summary>
+                public const string RelatedDocumentAlias = "umbDocument";
+
+                /// <summary>
+                /// Name for default relation type "Relate Document On Copy".
                 /// </summary>
                 public const string RelateDocumentOnCopyName = "Relate Document On Copy";
 
                 /// <summary>
-                /// ContentType alias for default relation type "Relate Document On Copy".
+                /// Alias for default relation type "Relate Document On Copy".
                 /// </summary>
                 public const string RelateDocumentOnCopyAlias = "relateDocumentOnCopy";
 
                 /// <summary>
-                /// ContentType name for default relation type "Relate Parent Document On Delete".
+                /// Name for default relation type "Relate Parent Document On Delete".
                 /// </summary>
                 public const string RelateParentDocumentOnDeleteName = "Relate Parent Document On Delete";
 
                 /// <summary>
-                /// ContentType alias for default relation type "Relate Parent Document On Delete".
+                /// Alias for default relation type "Relate Parent Document On Delete".
                 /// </summary>
                 public const string RelateParentDocumentOnDeleteAlias = "relateParentDocumentOnDelete";
 
                 /// <summary>
-                /// ContentType name for default relation type "Relate Parent Media Folder On Delete".
+                /// Name for default relation type "Relate Parent Media Folder On Delete".
                 /// </summary>
                 public const string RelateParentMediaFolderOnDeleteName = "Relate Parent Media Folder On Delete";
 
                 /// <summary>
-                /// ContentType alias for default relation type "Relate Parent Media Folder On Delete".
+                /// Alias for default relation type "Relate Parent Media Folder On Delete".
                 /// </summary>
                 public const string RelateParentMediaFolderOnDeleteAlias = "relateParentMediaFolderOnDelete";
+
+                /// <summary>
+                /// Returns the types of relations that are automatically tracked
+                /// </summary>
+                /// <remarks>
+                /// Developers should not manually use these relation types since they will all be cleared whenever an entity
+                /// (content, media or member) is saved since they are auto-populated based on property values.
+                /// </remarks>
+                public static string[] AutomaticRelationTypes = new[] { RelatedMediaAlias, RelatedDocumentAlias };
+
+                //TODO: return a list of built in types so we can use that to prevent deletion in the uI
             }
         }
     }

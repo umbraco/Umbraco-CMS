@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
@@ -15,24 +14,26 @@ namespace Umbraco.Core.Models
         private string _name;
         private string _alias;
         private bool _isBidrectional;
-        private Guid _parentObjectType;
-        private Guid _childObjectType;
+        private Guid? _parentObjectType;
+        private Guid? _childObjectType;
 
-        public RelationType(Guid childObjectType, Guid parentObjectType, string alias)
+        //TODO: Should we put back the broken ctors with obsolete attributes?
+
+        public RelationType(string alias, string name)
+            : this(name, alias, false, null, null)
         {
-            if (string.IsNullOrWhiteSpace(alias)) throw new ArgumentNullOrEmptyException(nameof(alias));
-            _childObjectType = childObjectType;
-            _parentObjectType = parentObjectType;
+        }
+
+        public RelationType(string name, string alias, bool isBidrectional, Guid? parentObjectType, Guid? childObjectType)
+        {
+            _name = name;
             _alias = alias;
-            Name = _alias;
+            _isBidrectional = isBidrectional;
+            _parentObjectType = parentObjectType;
+            _childObjectType = childObjectType;
         }
 
-        public RelationType(Guid childObjectType, Guid parentObjectType, string alias, string name)
-            : this(childObjectType, parentObjectType, alias)
-        {
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
-            Name = name;
-        }
+
 
         /// <summary>
         /// Gets or sets the Name of the RelationType
@@ -69,7 +70,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <remarks>Corresponds to the NodeObjectType in the umbracoNode table</remarks>
         [DataMember]
-        public Guid ParentObjectType
+        public Guid? ParentObjectType
         {
             get => _parentObjectType;
             set => SetPropertyValueAndDetectChanges(value, ref _parentObjectType, nameof(ParentObjectType));
@@ -80,7 +81,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <remarks>Corresponds to the NodeObjectType in the umbracoNode table</remarks>
         [DataMember]
-        public Guid ChildObjectType
+        public Guid? ChildObjectType
         {
             get => _childObjectType;
             set => SetPropertyValueAndDetectChanges(value, ref _childObjectType, nameof(ChildObjectType));

@@ -28,13 +28,15 @@ namespace Umbraco.Web.Search
         private readonly IEntityService _entityService;
         private readonly UmbracoMapper _mapper;
         private readonly ISqlContext _sqlContext;
+        private readonly IUmbracoTreeSearcherFields _umbracoTreeSearcherFields;
+
 
         public UmbracoTreeSearcher(IExamineManager examineManager,
             UmbracoContext umbracoContext,
             ILocalizationService languageService,
             IEntityService entityService,
             UmbracoMapper mapper,
-            ISqlContext sqlContext)
+            ISqlContext sqlContext,IUmbracoTreeSearcherFields umbracoTreeSearcherFields)
         {
             _examineManager = examineManager ?? throw new ArgumentNullException(nameof(examineManager));
             _umbracoContext = umbracoContext;
@@ -42,6 +44,7 @@ namespace Umbraco.Web.Search
             _entityService = entityService;
             _mapper = mapper;
             _sqlContext = sqlContext;
+            _umbracoTreeSearcherFields = umbracoTreeSearcherFields;
         }
 
         /// <summary>
@@ -67,7 +70,7 @@ namespace Umbraco.Web.Search
 
             string type;
             var indexName = Constants.UmbracoIndexes.InternalIndexName;
-            var fields = new[] { "id", "__NodeId", "__Key" };
+            var fields = _umbracoTreeSearcherFields.GetBackOfficeFields().ToList();
 
             // TODO: WE should try to allow passing in a lucene raw query, however we will still need to do some manual string
             // manipulation for things like start paths, member types, etc...
@@ -87,7 +90,7 @@ namespace Umbraco.Web.Search
                 case UmbracoEntityTypes.Member:
                     indexName = Constants.UmbracoIndexes.MembersIndexName;
                     type = "member";
-                    fields = new[] { "id", "__NodeId", "__Key", "email", "loginName" };
+                    fields.AddRange(_umbracoTreeSearcherFields.GetBackOfficeMembersFields());
                     if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId && searchFrom.Trim() != "-1")
                     {
                         sb.Append("+__NodeTypeAlias:");
@@ -97,11 +100,13 @@ namespace Umbraco.Web.Search
                     break;
                 case UmbracoEntityTypes.Media:
                     type = "media";
+                    fields.AddRange(_umbracoTreeSearcherFields.GetBackOfficeMediaFields());
                     var allMediaStartNodes = _umbracoContext.Security.CurrentUser.CalculateMediaStartNodeIds(_entityService);
                     AppendPath(sb, UmbracoObjectTypes.Media, allMediaStartNodes, searchFrom, ignoreUserStartNodes, _entityService);
                     break;
                 case UmbracoEntityTypes.Document:
                     type = "content";
+                    fields.AddRange(_umbracoTreeSearcherFields.GetBackOfficeDocumentFields());
                     var allContentStartNodes = _umbracoContext.Security.CurrentUser.CalculateContentStartNodeIds(_entityService);
                     AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, searchFrom, ignoreUserStartNodes, _entityService);
                     break;
@@ -161,7 +166,7 @@ namespace Umbraco.Web.Search
             return _mapper.MapEnumerable<IEntitySlim, SearchResultEntity>(results);
         }
 
-        private bool BuildQuery(StringBuilder sb, string query, string searchFrom, string[] fields, string type)
+        private bool BuildQuery(StringBuilder sb, string query, string searchFrom, List<string> fields, string type)
         {
             //build a lucene query:
             // the nodeName will be boosted 10x without wildcards
@@ -234,11 +239,26 @@ namespace Umbraco.Web.Search
 
                     foreach (var f in fields)
                     {
+                        var queryWordsReplaced = new string[querywords.Length];
+
+                        // when searching file names containing hyphens we need to replace the hyphens with spaces
+                        if (f.Equals(UmbracoExamineIndex.UmbracoFileFieldName))
+                        {
+                            for (var index = 0; index < querywords.Length; index++)
+                            {
+                                queryWordsReplaced[index] = querywords[index].Replace("\\-", " ").Replace("_", " ").Trim(" ");
+                            }
+                        }
+                        else
+                        {
+                            queryWordsReplaced = querywords;
+                        }
+
                         //additional fields normally
                         sb.Append(f);
                         sb.Append(":");
                         sb.Append("(");
-                        foreach (var w in querywords)
+                        foreach (var w in queryWordsReplaced)
                         {
                             sb.Append(w.ToLower());
                             sb.Append("* ");

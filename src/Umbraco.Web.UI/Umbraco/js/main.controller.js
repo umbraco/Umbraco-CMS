@@ -67,13 +67,18 @@ function MainController($scope, $location, appState, treeService, notificationsS
     };
 
     var evts = [];
-    
+
     //when a user logs out or timesout
     evts.push(eventsService.on("app.notAuthenticated", function (evt, data) {
         $scope.authenticated = null;
         $scope.user = null;
         const isTimedOut = data && data.isTimedOut ? true : false;
         $scope.showLoginScreen(isTimedOut);
+
+        // Remove the localstorage items for tours shown
+        // Means that when next logged in they can be re-shown if not already dismissed etc
+        localStorageService.remove("emailMarketingTourShown");
+        localStorageService.remove("introTourShown");
     }));
 
     evts.push(eventsService.on("app.userRefresh", function(evt) {

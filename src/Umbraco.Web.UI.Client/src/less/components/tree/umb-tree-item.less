@@ -3,15 +3,15 @@
     min-width: 100%;
     width: auto;
     margin-top:1px;
-    
-    .umb-tree-item__label {
-        user-select: none;
-    }
-    
+
     &:hover .umb-tree-item__arrow {
         visibility: visible;
         cursor: pointer
     }
+}
+
+.umb-tree-item__label {
+    user-select: none;
 }
 
 .umb-tree-item__arrow {
@@ -36,7 +36,7 @@
         overflow: hidden;
         margin-right: 6px;
     }
-    
+
     // Loading Animation
     // ------------------------
     .umb-tree-item__loader {
@@ -46,7 +46,7 @@
     }
 
     .umb-tree-item__label {
-        padding: 7px 0 5px; 
+        padding: 7px 0 5px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -71,7 +71,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        border: 2px solid fade(white, 80%);
+        border: 2px solid fade(@white, 80%);
     }
 
     &:hover {
@@ -86,22 +86,10 @@
 .umb-tree-item.current > .umb-tree-item__inner {
     background: @ui-active;
     color:@ui-active-type;
-    
-    // override small icon color. TODO => check usage 
+
+    // override small icon color. TODO => check usage
     &:before {
         color: @blue;
-    }
-    
-    .umb-options {
-
-        &:hover i {
-            opacity: .7;
-        }
-
-        i {
-            background: @ui-active-type;
-            transition: opacity 120ms ease;
-        }
     }
 
     a,
@@ -113,5 +101,5 @@
 
 .umb-tree-item.current-not-active > .umb-tree-item__inner {
     background: @ui-active-blur;
-    color:@ui-active-type;    
+    color:@ui-active-type;
 }
