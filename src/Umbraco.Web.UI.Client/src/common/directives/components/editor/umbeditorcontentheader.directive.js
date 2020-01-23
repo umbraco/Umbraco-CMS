@@ -3,7 +3,7 @@
 
     function EditorContentHeader(serverValidationManager, localizationService, editorState, variantHelper) {
 
-        function link(scope, el, attr, ctrl) {
+        function link(scope) {
             
             var unsubscribe = [];
             
@@ -42,22 +42,24 @@
             function checkErrorsOnOtherVariants() {
                 var check = false;
                 angular.forEach(scope.content.variants, function (variant) {
-                    if (scope.openVariants.indexOf(variant.language.culture) === -1 && scope.variantHasError(variant.language.culture)) {
+                    // SEGMENTS_TODO: Check that this correction is okay, can we even see the active var here?
+                    if (variant.active !== true && scope.variantHasError(variant)) {
                         check = true;
                     }
                 });
                 scope.vm.errorsOnOtherVariants = check;
             }
             
-            function onCultureValidation(valid, errors, allErrors, culture) {
-                var index = scope.vm.variantsWithError.indexOf(culture);
+            function onVariantValidation(valid, errors, allErrors, culture, segment) {
+                // SEGMENTS_TODO: See wether we can use errors, allErrors?
+                var index = scope.vm.variantsWithError.findIndex((item) => item.culture === culture && item.segment === segment)
                 if(valid === true) {
                     if (index !== -1) {
                         scope.vm.variantsWithError.splice(index, 1);
                     }
                 } else {
                     if (index === -1) {
-                        scope.vm.variantsWithError.push(culture);
+                        scope.vm.variantsWithError.push({"culture": culture, "segment": segment});
                     }
                 }
                 checkErrorsOnOtherVariants();
@@ -82,10 +84,10 @@
                 
                 
                 angular.forEach(scope.content.variants, function (variant) {
-                    unsubscribe.push(serverValidationManager.subscribe(null, variant.language !== null ? variant.language.culture : null, variant.segment, null, onCultureValidation));
+                    unsubscribe.push(serverValidationManager.subscribe(null, variant.language !== null ? variant.language.culture : null, variant.segment, null, onVariantValidation));
                 });
                 
-                unsubscribe.push(serverValidationManager.subscribe(null, null, null, null, onCultureValidation));
+                unsubscribe.push(serverValidationManager.subscribe(null, null, null, null, onVariantValidation));
                 
                 
                 
@@ -98,6 +100,10 @@
                         checkErrorsOnOtherVariants();
                     }
                 });
+            }
+
+            function getCultureFromVariant(variant) {
+                return variant.language ? variant.language.culture : null;
             }
 
             scope.getVariantDisplayName = variantHelper.getDisplayName;
@@ -143,25 +149,30 @@
 
             /**
              * keep track of open variants - this is used to prevent the same variant to be open in more than one split view
-             * @param {any} culture
+             * @param {any} variant
              */
             scope.variantIsOpen = function (variant) {
-                var variantId = variantHelper.getId(variant);
-                return (scope.openVariants.indexOf(variantId) !== -1);
+
+                // SEGMENTS_TODO: ... does this work?
+                if (scope.content.variants.find((v) => variant.active === true && (getCultureFromVariant(v) === getCultureFromVariant(variant)) && variant.segment === variant.segment)) {
+                    console.log("VARIANT IS OPEN")
+                    return;
+                }
+                console.log("VARIANT IS closed", scope.content.variants)
             }
             
             /**
              * Check whether a variant has a error, used to display errors in variant switcher.
              * @param {any} culture
              */
-            scope.variantHasError = function(culture) {
+            scope.variantHasError = function(variant) {
                 // if we are looking for the default language we also want to check for invariant.
-                if (culture === scope.vm.defaultVariant.language.culture) {
-                    if(scope.vm.variantsWithError.indexOf("invariant") !== -1) {
+                if (variant.language.culture === scope.vm.defaultVariant.language.culture && variant.segment === null) {
+                    if(scope.vm.variantsWithError.find((item) => item.culture === "invariant" && item.segment === null) !== undefined) {
                         return true;
                     }
                 }
-                if(scope.vm.variantsWithError.indexOf(culture) !== -1) {
+                if(scope.vm.variantsWithError.find((item) => item.culture === variant.language.culture && item.segment === variant.segment) !== undefined) {
                     return true;
                 }
                 return false;
@@ -205,7 +216,6 @@
                 menu: "=",
                 hideActionsMenu: "<?",
                 content: "=",
-                openVariants: "<",
                 hideChangeVariant: "<?",
                 onSelectNavigationItem: "&?",
                 onSelectAnchorItem: "&?",

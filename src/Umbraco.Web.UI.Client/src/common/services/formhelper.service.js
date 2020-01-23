@@ -179,7 +179,7 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
                         }
                     }
 
-                    htmlFieldReference = "";
+                    var htmlFieldReference = "";
                     if (parts.length > 3) {
                         htmlFieldReference = parts[3] || "";
                     }

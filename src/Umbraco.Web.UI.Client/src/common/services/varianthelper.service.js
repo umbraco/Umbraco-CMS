@@ -8,27 +8,6 @@ function variantHelper() {
      * Returns the id for this variant
      * @param {any} variant
      */
-    function getId(variant) {
-        var hasLanguage = variant.language && !!variant.language.culture;
-        var hasSegment = !!variant.segment;
-
-        var sep = ";";
-
-        if (!hasLanguage && !hasSegment) {
-            // Invariant
-            return "";
-        } else if (hasLanguage && !hasSegment) {
-            // Culture only
-            return variant.language.culture;
-        } else if (!hasLanguage && hasSegment) {
-            // Segment only
-            return sep + variant.segment;
-        } else {
-            // Culture and Segment
-            return variant.language.culture + sep + variant.segment;
-        }
-    }
-
     function getDisplayName(variant) {
         if (variant == null) {
             return "";
@@ -54,7 +33,6 @@ function variantHelper() {
     }
 
     return {
-        getId,
         getDisplayName
     }
 }

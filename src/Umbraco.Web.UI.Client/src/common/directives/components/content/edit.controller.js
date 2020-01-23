@@ -1026,6 +1026,7 @@
                 getMethod: "&",
                 getScaffoldMethod: "&?",
                 culture: "=?",
+                segment: "=?",
                 infiniteModel: "=?"
             }
         };

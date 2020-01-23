@@ -1,6 +1,6 @@
 ﻿<div class="umb-split-views">
     <div class="umb-split-view"
-         ng-repeat="editor in vm.editors track by editor.variantId"
+         ng-repeat="editor in vm.editors track by editor.culture+'.'+editor.segment"
          ng-class="{'umb-split-view--collapsed': editor.collapsed}">
 
         <umb-variant-content
@@ -9,7 +9,6 @@
             editor="editor"
             editor-index="$index"
             editor-count="vm.editors.length"
-            open-variants="vm.openVariants"
             on-open-split-view="vm.openSplitView(variant)"
             on-close-split-view="vm.closeSplitView($index)"
             on-select-variant="vm.selectVariant(variant, $index)"

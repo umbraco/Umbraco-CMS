@@ -698,7 +698,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                 // /belle/#/content/edit/9876 (where 9876 is the new id)
 
                 //clear the query strings
-                navigationService.clearSearch(["cculture"]);
+                navigationService.clearSearch(["cculture", "csegment"]);
                 if (softRedirect) {
                     navigationService.setSoftRedirect();
                 }

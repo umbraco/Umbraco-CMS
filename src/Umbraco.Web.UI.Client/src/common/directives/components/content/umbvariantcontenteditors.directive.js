@@ -9,7 +9,8 @@
         bindings: {
             page: "<",
             content: "<", // TODO: Not sure if this should be = since we are changing the 'active' property of a variant
-            variantId: "<",
+            culture: "<",
+            segment: "<",
             onSelectApp: "&?",
             onSelectAppAnchor: "&?",
             onBack: "&?",
@@ -42,7 +43,6 @@
         //Used to track the open variants across the split views
         // The values are the variant ids of the currently open variants. 
         // See variantHelper.getId() for the current format.
-        vm.openVariants = [];
 
         /** Called when the component initializes */
         function onInit() {
@@ -61,7 +61,10 @@
          */
         function onChanges(changes) {
 
-            if (changes.variantId && !changes.variantId.isFirstChange() && changes.variantId.currentValue !== changes.variantId.previousValue) {
+            if (changes.culture && !changes.culture.isFirstChange() && changes.culture.currentValue !== changes.culture.previousValue) {
+                setActiveVariant();
+            }
+            if (changes.segment && !changes.segment.isFirstChange() && changes.segment.currentValue !== changes.segment.previousValue) {
                 setActiveVariant();
             }
         }
@@ -81,13 +84,17 @@
         }
 
         /**
-         * Set the active variant based on the current culture + segment (query string)
+         * Set the active variant based on the current culture or segment (query string)
          */
         function setActiveVariant() {
             // set the active variant
             var activeVariant = null;                     
             _.each(vm.content.variants, function (v) {
-                if (variantHelper.getId(v) === vm.variantId) {
+                if (
+                    (!v.language || v.language.culture === vm.culture)
+                    &&
+                    (v.segment === vm.segment)
+                ) {
                     v.active = true;
                     activeVariant = v;
                 }
@@ -107,10 +114,9 @@
             if (vm.editors.length > 1) {
                 //now re-sync any other editor content (i.e. if split view is open)
                 for (var s = 1; s < vm.editors.length; s++) {
-                    var editorVariantId = variantHelper.getId(vm.editors[s].content);
                     //get the variant from the scope model
                     var variant = _.find(vm.content.variants, function (v) {
-                        return variantHelper.getId(v) === editorVariantId;
+                        return (!v.language || v.language.culture === vm.editors[s].content.language.culture) && v.segment === vm.editors[s].content.segment;
                     });
                     vm.editors[s].content = initVariant(variant, s);
                 }
@@ -125,19 +131,25 @@
          */
         function insertVariantEditor(index, variant) {
 
-            var variantId = variantHelper.getId(variant);
 
-            //check if the variant at the index is the same, if it's null an editor will be added            
-            var currentVariantId = vm.editors.length === 0 || vm.editors.length <= index ? null : vm.editors[index].variantId;
+            var variantCulture = variant.language ? variant.language.culture : "invariant";
+            var variantSegment = variant.segment;
 
-            if (currentVariantId !== variantId) {
+            //check if the culture at the index is the same, if it's null an editor will be added
+            var currentCulture = vm.editors.length === 0 || vm.editors.length <= index ? null : vm.editors[index].culture;
+            //check if the segment at the index is the same, if it's null an editor will be added
+            var currentSegment = vm.editors.length === 0 || vm.editors.length <= index ? null : vm.editors[index].segment;
+
+            if (currentCulture !== variantCulture || currentSegment !== variantSegment) {
+
                 //Not the current culture which means we need to modify the array.
                 //NOTE: It is not good enough to just replace the `content` object at a given index in the array
                 // since that would mean that directives are not re-initialized.
                 vm.editors.splice(index, 1, {
                     content: variant,
                     //used for "track-by" ng-repeat
-                    variantId: variantId
+                    culture: variantCulture,
+                    segment: variantSegment
                 });
             }
             else {
@@ -147,6 +159,7 @@
         }
 
         function initVariant(variant, editorIndex) {
+
             //The model that is assigned to the editor contains the current content variant along
             //with a copy of the contentApps. This is required because each editor renders it's own
             //header and content apps section and the content apps contains the view for editing content itself
@@ -158,8 +171,8 @@
                 variant.apps = angular.copy(vm.content.apps);
             }
 
-            //if this is a variant has a culture/language than we need to assign the language drop down info 
-            if (variant.language) {
+            //if this is a variant it has a culture/language or segment than we need to assign the variant drop down 
+            if (variant.language || variant.segment !== null) {
                 //if the variant list that defines the header drop down isn't assigned to the variant then assign it now
                 if (!variant.variants) {
                     variant.variants = _.map(vm.content.variants,
@@ -178,8 +191,11 @@
 
                 //ensure the current culture is set as the active one
                 for (var i = 0; i < variant.variants.length; i++) {
-                    if (variant.variants[i].language.culture === variant.language.culture &&
-                        variant.variants[i].segment === variant.segment) {
+                    if (
+                        (!variant.variants[i].language || variant.variants[i].language.culture === variant.language.culture) 
+                        &&
+                        variant.variants[i].segment === variant.segment
+                    ) {
                         variant.variants[i].active = true;
                     }
                     else {
@@ -187,6 +203,8 @@
                     }
                 }
 
+                /*
+                //SEGMENTS_TODO: Remove this part if not used.
                 var variantId = variantHelper.getId(variant);
                 // keep track of the open variants across the different split views
                 // push the first variant then update the variant index based on the editor index
@@ -195,7 +213,7 @@
                 } else {
                     vm.openVariants[editorIndex] = variantId;
                 }
-
+                */
             }
 
             //then assign the variant to a view model to the content app
@@ -221,16 +239,19 @@
 
             return variant;
         }
+        
+        function getCultureFromVariant(variant) {
+            return variant.language ? variant.language.culture : null;
+        }
         /**
          * Adds a new editor to the editors array to show content in a split view
          * @param {any} selectedVariant
          */
         function openSplitView(selectedVariant) {
-            var variant = variantHelper.getId(selectedVariant);
-
+            
             //Find the whole variant model based on the culture that was chosen
             var variant = _.find(vm.content.variants, function (v) {
-                return variantHelper.getId(v) === variant;
+                return getCultureFromVariant(v) === getCultureFromVariant(selectedVariant) && v.segment === selectedVariant.segment;
             });
 
             insertVariantEditor(vm.editors.length, initVariant(variant, vm.editors.length));
@@ -273,9 +294,12 @@
             $timeout(function () {
                 vm.editors.splice(editorIndex, 1);
                 //remove variant from open variants
-                vm.openVariants.splice(editorIndex, 1);
+
+                // SEGMENTS_TODO: Test this scenario.
+
                 //update the current culture to reflect the last open variant (closing the split view corresponds to selecting the other variant)
-                $location.search("cculture", vm.openVariants[0]);
+                //$location.search({"cculture": vm.openVariants[0].language, "csegment": vm.openVariants[0]});
+                $location.search({"cculture": vm.editors[0].content.language ? vm.editors[0].content.language.culture : null, "csegment": vm.editors[0].content.segment});
                 splitViewChanged();
             }, 400);
         }
@@ -287,10 +311,10 @@
          */
         function selectVariant(variant, editorIndex) {
 
-            var variantId = variantHelper.getId(variant);
-
-            // prevent variants already open in a split view to be opened
-            if (vm.openVariants.indexOf(variantId) !== -1)  {
+            var variantCulture = variant.language ? variant.language.culture : "invariant";
+            var variantSegment = variant.segment || null;
+            
+            if (vm.editors.find((editor) => (!editor.content.language || editor.content.language.culture === variantCulture) && editor.content.segment === variantSegment)) {
                 return;
             }
             
@@ -299,7 +323,7 @@
             if (editorIndex === 0) {
                 //If we've made it this far, then update the query string.
                 //The editor will respond to this query string changing.
-                $location.search("cculture", variantId);
+                $location.search({"cculture": variantCulture, "csegment": variant.segment});
             }
             else {
 
@@ -311,12 +335,14 @@
                 }
                 variant.active = true;
 
+                
                 //get the variant content model and initialize the editor with that
                 var contentVariant = _.find(vm.content.variants,
                     function (v) {
-                        return variantHelper.getId(v) === variantId;
+                        return (!v.language || v.language.culture === variantCulture) && v.segment === variantSegment;
                     });
                 editor.content = initVariant(contentVariant, editorIndex);
+                
 
                 //update the editors collection
                 insertVariantEditor(editorIndex, contentVariant);
