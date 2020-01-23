@@ -5,6 +5,9 @@
 
         function link(scope) {
             
+            console.log("scope.content", scope.content);
+            console.log("scope.content.variants", scope.content.variants);
+
             var unsubscribe = [];
             
             if (!scope.serverValidationNameField) {
@@ -14,7 +17,7 @@
                 scope.serverValidationAliasField = "Alias";
             }
 
-            scope.isNew = scope.content.state == "NotCreated";
+            scope.isNew = scope.editorContent.state == "NotCreated";
 
             localizationService.localizeMany([
                     scope.isNew ? "placeholders_a11yCreateItem" : "placeholders_a11yEdit",
@@ -23,7 +26,7 @@
                 scope.a11yMessage = data[0];
                 scope.a11yName = data[1];
                 if (!scope.isNew) {
-                    scope.a11yMessage += " " + scope.content.name;
+                    scope.a11yMessage += " " + scope.editorContent.name;
 
                 } else {
                     var name = editorState.current.contentTypeName;
@@ -32,8 +35,8 @@
                 }
             });
             scope.vm = {};
+            scope.vm.hasVariants = false;
             scope.vm.dropdownOpen = false;
-            scope.vm.currentVariant = "";
             scope.vm.variantsWithError = [];
             scope.vm.defaultVariant = null;
             
@@ -42,7 +45,6 @@
             function checkErrorsOnOtherVariants() {
                 var check = false;
                 angular.forEach(scope.content.variants, function (variant) {
-                    // SEGMENTS_TODO: Check that this correction is okay, can we even see the active var here?
                     if (variant.active !== true && scope.variantHasError(variant)) {
                         check = true;
                     }
@@ -51,7 +53,6 @@
             }
             
             function onVariantValidation(valid, errors, allErrors, culture, segment) {
-                // SEGMENTS_TODO: See wether we can use errors, allErrors?
                 var index = scope.vm.variantsWithError.findIndex((item) => item.culture === culture && item.segment === segment)
                 if(valid === true) {
                     if (index !== -1) {
@@ -67,14 +68,17 @@
             
             function onInit() {
                 
-                // find default.
+                // find default + check if we have variants.
                 angular.forEach(scope.content.variants, function (variant) {
                     if (variant.language !== null && variant.language.isDefault) {
                         scope.vm.defaultVariant = variant;
                     }
+                    if (variant.language !== null || variant.segment !== null) {
+                        scope.vm.hasVariants = true;
+                    }
                 });
                 
-                setCurrentVariant();
+                checkErrorsOnOtherVariants();
                 
                 angular.forEach(scope.content.apps, (app) => {
                     if (app.alias === "umbContent") {
@@ -91,15 +95,6 @@
                 
                 
                 
-            }
-
-            function setCurrentVariant() {
-                angular.forEach(scope.content.variants, function (variant) {
-                    if (variant.active) {
-                        scope.vm.currentVariant = variant;
-                        checkErrorsOnOtherVariants();
-                    }
-                });
             }
 
             function getCultureFromVariant(variant) {
@@ -146,40 +141,28 @@
                     scope.onOpenInSplitView({ "variant": variant });
                 }
             };
-
-            /**
-             * keep track of open variants - this is used to prevent the same variant to be open in more than one split view
-             * @param {any} variant
-             */
-            scope.variantIsOpen = function (variant) {
-
-                // SEGMENTS_TODO: ... does this work?
-                if (scope.content.variants.find((v) => variant.active === true && (getCultureFromVariant(v) === getCultureFromVariant(variant)) && variant.segment === variant.segment)) {
-                    console.log("VARIANT IS OPEN")
-                    return;
-                }
-                console.log("VARIANT IS closed", scope.content.variants)
-            }
             
             /**
              * Check whether a variant has a error, used to display errors in variant switcher.
              * @param {any} culture
              */
             scope.variantHasError = function(variant) {
-                // if we are looking for the default language we also want to check for invariant.
-                if (variant.language.culture === scope.vm.defaultVariant.language.culture && variant.segment === null) {
-                    if(scope.vm.variantsWithError.find((item) => item.culture === "invariant" && item.segment === null) !== undefined) {
-                        return true;
+                if(variant.language) {
+                    // if we are looking for the variant with default language then we also want to check for invariant variant.
+                    if (variant.language.culture === scope.vm.defaultVariant.language.culture && variant.segment === null) {
+                        if(scope.vm.variantsWithError.find((item) => item.culture === "invariant" && item.segment === null) !== undefined) {
+                            return true;
+                        }
                     }
                 }
-                if(scope.vm.variantsWithError.find((item) => item.culture === variant.language.culture && item.segment === variant.segment) !== undefined) {
+                if(scope.vm.variantsWithError.find((item) => (!variant.language || item.culture === variant.language.culture) && item.segment === variant.segment) !== undefined) {
                     return true;
                 }
                 return false;
             }
 
             onInit();
-
+            /*
             //watch for the active culture changing, if it changes, update the current variant
             if (scope.content.variants) {
                 scope.$watch(function () {
@@ -196,7 +179,7 @@
                     }
                 });
             }
-            
+            */
             scope.$on('$destroy', function () {
                 for (var u in unsubscribe) {
                     unsubscribe[u]();
@@ -216,6 +199,7 @@
                 menu: "=",
                 hideActionsMenu: "<?",
                 content: "=",
+                editorContent: "=",
                 hideChangeVariant: "<?",
                 onSelectNavigationItem: "&?",
                 onSelectAnchorItem: "&?",

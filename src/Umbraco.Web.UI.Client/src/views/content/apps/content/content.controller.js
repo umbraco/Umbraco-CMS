@@ -16,17 +16,16 @@
         vm.loading = true;
 
         function onInit() {
-            //get the variant by index (see notes above)
-            vm.content = $scope.content.variants[$scope.model.viewModel];
+            
             serverValidationManager.notify();
             vm.loading = false;
             timeout = null;// ensure timeout is set to null, so we know that its not running anymore.
 
             //if this variant has a culture/language assigned, then we need to watch it since it will change
             //if the language drop down changes and we need to re-init
-            if (vm.content.language) {
+            if ($scope.variant.language) {
                 unbindLanguageWatcher = $scope.$watch(function () {
-                    return vm.content.language.culture;
+                    return $scope.variant.language.culture;
                 }, function (newVal, oldVal) {
                     if (newVal !== oldVal) {
                         requestUpdate();
@@ -37,7 +36,7 @@
             }
 
             unbindSegmentWatcher = $scope.$watch(function () {
-                return vm.content.segment;
+                return $scope.variant.segment;
             }, function (newVal, oldVal) {
                 if (newVal !== oldVal) {
                     requestUpdate();

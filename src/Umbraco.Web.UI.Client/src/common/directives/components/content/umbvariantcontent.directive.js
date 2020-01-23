@@ -7,9 +7,9 @@
     var umbVariantContent = {
         templateUrl: 'views/components/content/umb-variant-content.html',
         bindings: {
-            content: "<",
-            page: "<",
-            editor: "<",
+            content: "=",
+            page: "=",
+            editor: "=",
             editorIndex: "<",
             editorCount: "<",
             onCloseSplitView: "&",
@@ -24,7 +24,7 @@
         controller: umbVariantContentController
     };
     
-    function umbVariantContentController($scope, $element, $location) {
+    function umbVariantContentController($scope) {
 
         var unsubscribe = [];
 
@@ -43,7 +43,7 @@
         function onInit() {
             // disable the name field if the active content app is not "Content"
             vm.nameDisabled = false;
-            angular.forEach(vm.editor.content.apps, function(app){
+            angular.forEach(vm.content.apps, function(app){
                 if(app.active && app.alias !== "umbContent" && app.alias !== "umbInfo" && app.alias !== "umbListView") {
                     vm.nameDisabled = true;
                 }

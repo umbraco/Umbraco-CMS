@@ -44,7 +44,7 @@
 
             <umb-box-header
                 title="{{historyLabel}}">
-                
+
                 <umb-button
                     ng-hide="node.trashed"
                     type="button"
@@ -64,7 +64,7 @@
                     <umb-load-indicator ng-show="loadingAuditTrail"></umb-load-indicator>
 
                     <div ng-show="auditTrail.length === 0" style="padding: 10px;">
-                        <umb-empty-state 
+                        <umb-empty-state
                             position="center"
                             size="small">
                             <localize key="content_noChanges"></localize>
@@ -79,7 +79,7 @@
 
                             <div class="history-item__break">
                                 <div class="history-item__avatar">
-                                    <umb-avatar 
+                                    <umb-avatar
                                         color="secondary"
                                         size="xs"
                                         name="{{item.userName}}"
@@ -105,7 +105,7 @@
                                     <localize key="auditTrails_{{ item.logType | lowercase }}" tokens="[item.parameters]">{{ item.comment }}</localize>
                                 </span>
 
-                                
+
                             </div>
 
                         </div>
@@ -126,7 +126,7 @@
     </div>
 
     <div class="umb-package-details__sidebar">
-        
+
         <umb-box data-element="node-info-general">
             <umb-box-header title-key="general_general"></umb-box-header>
             <umb-box-content class="block-form">

@@ -1,6 +1,6 @@
 ﻿<div>
     <ng-form name="tabbedContentForm">
-        <div class="umb-group-panel" retrive-dom-element="registerPropertyGroup(element[0], attributes.appAnchor)" data-app-anchor="{{group.id}}" data-element="group-{{group.alias}}" ng-repeat="group in content.tabs track by group.label">
+        <div class="umb-group-panel" retrive-dom-element="registerPropertyGroup(element[0], attributes.appAnchor)" data-app-anchor="{{group.id}}" data-element="group-{{group.alias}}" ng-repeat="group in variant.tabs track by group.label">
 
             <div class="umb-group-panel__header">
                 <div id="group-{{group.id}}">{{ group.label }}</div>
@@ -11,13 +11,13 @@
                     data-element="property-{{property.alias}}"
                     ng-repeat="property in group.properties track by property.alias"
                     property="property"
-                    show-inherit="content.variants.length > 1 && ((!activeVariant.language.isDefault && !property.culture) || (activeVariant.segment && !property.segment)) && !property.unlockInvariantValue"
+                    show-inherit="content.variants.length > 1 && ((!variant.language.isDefault && !property.culture) || (variant.segment && !property.segment)) && !property.unlockInvariantValue"
                     inherits-from="defaultVariant.language.name">
 
-                    <div ng-class="{'o-40 cursor-not-allowed': content.variants.length > 1 && ((!activeVariant.language.isDefault && !property.culture) || (activeVariant.segment && !property.segment)) && !property.unlockInvariantValue}">
+                    <div ng-class="{'o-40 cursor-not-allowed': content.variants.length > 1 && ((!variant.language.isDefault && !property.culture) || (variant.segment && !property.segment)) && !property.unlockInvariantValue}">
                         <umb-property-editor
                             model="property"
-                            preview="content.variants.length > 1 && ((!activeVariant.language.isDefault && !property.culture) || (activeVariant.segment && !property.segment)) && !property.unlockInvariantValue">
+                            preview="content.variants.length > 1 && ((!variant.language.isDefault && !property.culture) || (variant.segment && !property.segment)) && !property.unlockInvariantValue">
                         </umb-property-editor>
                     </div>
 
@@ -27,7 +27,7 @@
         </div>
 
         <umb-empty-state
-            ng-if="content.tabs.length === 0"
+            ng-if="variant.tabs.length === 0"
             position="center">
             <localize key="content_noProperties"></localize>
         </umb-empty-state>

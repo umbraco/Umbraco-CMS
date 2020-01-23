@@ -1,7 +1,6 @@
 ﻿<div class="umb-split-views">
     <div class="umb-split-view"
-         ng-repeat="editor in vm.editors track by editor.culture+'.'+editor.segment"
-         ng-class="{'umb-split-view--collapsed': editor.collapsed}">
+         ng-repeat="editor in vm.editors track by editor.culture+'.'+editor.segment">
 
         <umb-variant-content
             page="vm.page"

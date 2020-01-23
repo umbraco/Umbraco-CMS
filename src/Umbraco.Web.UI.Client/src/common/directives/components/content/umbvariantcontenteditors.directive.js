@@ -8,7 +8,7 @@
         templateUrl: 'views/components/content/umb-variant-content-editors.html',
         bindings: {
             page: "<",
-            content: "<", // TODO: Not sure if this should be = since we are changing the 'active' property of a variant
+            content: "=", // TODO: Not sure if this should be = since we are changing the 'active' property of a variant
             culture: "<",
             segment: "<",
             onSelectApp: "&?",
@@ -47,6 +47,9 @@
         /** Called when the component initializes */
         function onInit() {
             prevContentDateUpdated = angular.copy(vm.content.updateDate);
+            _.each(vm.content.variants, function (v) {
+                v.active = false;// needs to be set before used for it to be re-active.
+            });
             setActiveVariant();
         }
 
@@ -95,21 +98,14 @@
                     &&
                     (v.segment === vm.segment)
                 ) {
-                    v.active = true;
                     activeVariant = v;
-                }
-                else {
-                    v.active = false;
                 }
             });
             if (!activeVariant) {
-                // Set the first variant to active if we can't find it.
-                // If the content item is invariant, then only one item exists in the array.
-                vm.content.variants[0].active = true;
                 activeVariant = vm.content.variants[0];
             }
 
-            insertVariantEditor(0, initVariant(activeVariant, 0));
+            insertVariantEditor(0, activeVariant);
 
             if (vm.editors.length > 1) {
                 //now re-sync any other editor content (i.e. if split view is open)
@@ -118,7 +114,7 @@
                     var variant = _.find(vm.content.variants, function (v) {
                         return (!v.language || v.language.culture === vm.editors[s].content.language.culture) && v.segment === vm.editors[s].content.segment;
                     });
-                    vm.editors[s].content = initVariant(variant, s);
+                    vm.editors[s].content = variant;
                 }
             }
 
@@ -131,6 +127,10 @@
          */
         function insertVariantEditor(index, variant) {
 
+            if (vm.editors[index]) {
+                vm.editors[index].content.active = false;
+            }
+            variant.active = true;
 
             var variantCulture = variant.language ? variant.language.culture : "invariant";
             var variantSegment = variant.segment;
@@ -140,6 +140,7 @@
             //check if the segment at the index is the same, if it's null an editor will be added
             var currentSegment = vm.editors.length === 0 || vm.editors.length <= index ? null : vm.editors[index].segment;
 
+            
             if (currentCulture !== variantCulture || currentSegment !== variantSegment) {
 
                 //Not the current culture which means we need to modify the array.
@@ -157,151 +158,30 @@
                 vm.editors[index].content = variant;
             }
         }
-
-        function initVariant(variant, editorIndex) {
-
-            //The model that is assigned to the editor contains the current content variant along
-            //with a copy of the contentApps. This is required because each editor renders it's own
-            //header and content apps section and the content apps contains the view for editing content itself
-            //and we need to assign a view model to the subView so that it is scoped to the current
-            //editor so that split views work.
-
-            //copy the apps from the main model if not assigned yet to the variant
-            if (!variant.apps) {
-                variant.apps = angular.copy(vm.content.apps);
-            }
-
-            //if this is a variant it has a culture/language or segment than we need to assign the variant drop down 
-            if (variant.language || variant.segment !== null) {
-                //if the variant list that defines the header drop down isn't assigned to the variant then assign it now
-                if (!variant.variants) {
-                    variant.variants = _.map(vm.content.variants,
-                        function (v) {
-                            return _.pick(v, "active", "language", "segment", "state");
-                        });
-                }
-                else {
-                    //merge the scope variants on top of the header variants collection (handy when needing to refresh)
-                    angular.extend(variant.variants,
-                        _.map(vm.content.variants,
-                            function (v) {
-                                return _.pick(v, "active", "language", "segment", "state");
-                            }));
-                }
-
-                //ensure the current culture is set as the active one
-                for (var i = 0; i < variant.variants.length; i++) {
-                    if (
-                        (!variant.variants[i].language || variant.variants[i].language.culture === variant.language.culture) 
-                        &&
-                        variant.variants[i].segment === variant.segment
-                    ) {
-                        variant.variants[i].active = true;
-                    }
-                    else {
-                        variant.variants[i].active = false;
-                    }
-                }
-
-                /*
-                //SEGMENTS_TODO: Remove this part if not used.
-                var variantId = variantHelper.getId(variant);
-                // keep track of the open variants across the different split views
-                // push the first variant then update the variant index based on the editor index
-                if (vm.openVariants && vm.openVariants.length === 0) {
-                    vm.openVariants.push(variantId);
-                } else {
-                    vm.openVariants[editorIndex] = variantId;
-                }
-                */
-            }
-
-            //then assign the variant to a view model to the content app
-            var contentApp = _.find(variant.apps, function (a) {
-                return a.alias === "umbContent";
-            });
-
-            if (contentApp) {
-                //The view model for the content app is simply the index of the variant being edited
-                var variantIndex = vm.content.variants.indexOf(variant);
-                contentApp.viewModel = variantIndex;
-            }
-
-            // make sure the same app it set to active in the new variant
-            if(activeAppAlias) {
-                angular.forEach(variant.apps, function(app) {
-                    app.active = false;
-                    if(app.alias === activeAppAlias) {
-                        app.active = true;
-                    }
-                });
-            }
-
-            return variant;
-        }
         
-        function getCultureFromVariant(variant) {
-            return variant.language ? variant.language.culture : null;
-        }
         /**
          * Adds a new editor to the editors array to show content in a split view
          * @param {any} selectedVariant
          */
         function openSplitView(selectedVariant) {
             
-            //Find the whole variant model based on the culture that was chosen
-            var variant = _.find(vm.content.variants, function (v) {
-                return getCultureFromVariant(v) === getCultureFromVariant(selectedVariant) && v.segment === selectedVariant.segment;
-            });
-
-            insertVariantEditor(vm.editors.length, initVariant(variant, vm.editors.length));
-
-            //only the content app can be selected since no other apps are shown, and because we copy all of these apps
-            //to the "editors" we need to update this across all editors
-            for (var e = 0; e < vm.editors.length; e++) {
-                var editor = vm.editors[e];
-                for (var i = 0; i < editor.content.apps.length; i++) {
-                    var app = editor.content.apps[i];
-                    if (app.alias === "umbContent") {
-                        app.active = true;
-                        // tell the world that the app has changed (but do it only once)
-                        if (e === 0) {
-                            selectApp(app);
-                        }
-                    }
-                    else {
-                        app.active = false;
-                    }
-                }
-            }
-
-            // TODO: hacking animation states - these should hopefully be easier to do when we upgrade angular
-            editor.collapsed = true;
-            editor.loading = true;
-            $timeout(function () {
-                editor.collapsed = false;
-                editor.loading = false;
-                splitViewChanged();
-            }, 100);
+            insertVariantEditor(vm.editors.length, selectedVariant);
+            
+            splitViewChanged();
+            
         }
 
         /** Closes the split view */
         function closeSplitView(editorIndex) {
             // TODO: hacking animation states - these should hopefully be easier to do when we upgrade angular
             var editor = vm.editors[editorIndex];
-            editor.loading = true;
-            editor.collapsed = true;
-            $timeout(function () {
-                vm.editors.splice(editorIndex, 1);
-                //remove variant from open variants
-
-                // SEGMENTS_TODO: Test this scenario.
-
-                //update the current culture to reflect the last open variant (closing the split view corresponds to selecting the other variant)
-                //$location.search({"cculture": vm.openVariants[0].language, "csegment": vm.openVariants[0]});
-                $location.search({"cculture": vm.editors[0].content.language ? vm.editors[0].content.language.culture : null, "csegment": vm.editors[0].content.segment});
-                splitViewChanged();
-            }, 400);
+            vm.editors.splice(editorIndex, 1);
+            editor.content.active = false;
+            
+            //update the current culture to reflect the last open variant (closing the split view corresponds to selecting the other variant)
+            
+            $location.search({"cculture": vm.editors[0].content.language ? vm.editors[0].content.language.culture : null, "csegment": vm.editors[0].content.segment});
+            splitViewChanged();
         }
 
         /**
@@ -314,6 +194,7 @@
             var variantCulture = variant.language ? variant.language.culture : "invariant";
             var variantSegment = variant.segment || null;
             
+            // Check if we already have this editor open, if so, do nothing.
             if (vm.editors.find((editor) => (!editor.content.language || editor.content.language.culture === variantCulture) && editor.content.segment === variantSegment)) {
                 return;
             }
@@ -327,25 +208,8 @@
             }
             else {
 
-                //Update the 'active' variant for this editor
-                var editor = vm.editors[editorIndex];
-                //set all variant drop down items as inactive for this editor and then set the selected one as active
-                for (var i = 0; i < editor.content.variants.length; i++) {
-                    editor.content.variants[i].active = false;
-                }
-                variant.active = true;
-
-                
-                //get the variant content model and initialize the editor with that
-                var contentVariant = _.find(vm.content.variants,
-                    function (v) {
-                        return (!v.language || v.language.culture === variantCulture) && v.segment === variantSegment;
-                    });
-                editor.content = initVariant(contentVariant, editorIndex);
-                
-
                 //update the editors collection
-                insertVariantEditor(editorIndex, contentVariant);
+                insertVariantEditor(editorIndex, variant);
                 
             }
         }

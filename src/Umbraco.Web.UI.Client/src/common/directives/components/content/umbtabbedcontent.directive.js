@@ -4,7 +4,7 @@
     /** This directive is used to render out the current variant tabs and properties and exposes an API for other directives to consume  */
     function tabbedContentDirective($timeout) {
 
-        function link($scope, $element, $attrs) {
+        function link($scope, $element) {
             
             var appRootNode = $element[0];
             
@@ -19,8 +19,8 @@
                 
                 var viewFocusY = scrollableNode.scrollTop + scrollableNode.clientHeight * .5;
                 
-                for(var i in $scope.content.tabs) {
-                    var group = $scope.content.tabs[i];
+                for(var i in $scope.variant.tabs) {
+                    var group = $scope.variant.tabs[i];
                     var node = propertyGroupNodesDictionary[group.id];
                     if (viewFocusY >= node.offsetTop && viewFocusY <= node.offsetTop + node.clientHeight) {
                         setActiveAnchor(group);
@@ -32,18 +32,18 @@
             
             function setActiveAnchor(tab) {
                 if (tab.active !== true) {
-                    var i = $scope.content.tabs.length;
+                    var i = $scope.variant.tabs.length;
                     while(i--) {
-                        $scope.content.tabs[i].active = false;
+                        $scope.variant.tabs[i].active = false;
                     }
                     tab.active = true;
                 }
             }
             function getActiveAnchor() {
-                var i = $scope.content.tabs.length;
+                var i = $scope.variant.tabs.length;
                 while(i--) {
-                    if ($scope.content.tabs[i].active === true)
-                        return $scope.content.tabs[i];
+                    if ($scope.variant.tabs[i].active === true)
+                        return $scope.variant.tabs[i];
                 }
                 return false;
             }
@@ -120,14 +120,11 @@
             
             //expose the property/methods for other directives to use
             this.content = $scope.content;
-            this.activeVariant = _.find(this.content.variants, variant => {
-                return variant.active;
-            });
-
-            $scope.activeVariant = this.activeVariant;
+            console.log($scope)
+            console.log(this.content);
 
             $scope.defaultVariant = _.find(this.content.variants, variant => {
-                return variant.language.isDefault;
+                return variant.language && variant.language.isDefault;
             });
 
             $scope.unlockInvariantValue = function(property) {
@@ -137,7 +134,7 @@
             $scope.$watch("tabbedContentForm.$dirty",
                 function (newValue, oldValue) {
                     if (newValue === true) {
-                        $scope.content.isDirty = true;
+                        $scope.variant.isDirty = true;
                     }
                 }
             );
@@ -150,7 +147,8 @@
             controller: controller,
             link: link,
             scope: {
-                content: "="
+                content: "=",
+                variant: "="
             }
         };
 
