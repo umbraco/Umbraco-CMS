@@ -20,11 +20,11 @@ namespace Umbraco.Web.PropertyEditors
         Icon = "icon-link")]
     public class MultiUrlPickerPropertyEditor : DataEditor
     {
-        private readonly IEntityService _entityService;
+        private readonly Lazy<IEntityService> _entityService;
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly IIOHelper _ioHelper;
 
-        public MultiUrlPickerPropertyEditor(ILogger logger, IEntityService entityService, IPublishedSnapshotAccessor publishedSnapshotAccessor, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IIOHelper ioHelper, IShortStringHelper shortStringHelper)
+        public MultiUrlPickerPropertyEditor(ILogger logger, Lazy<IEntityService> entityService, IPublishedSnapshotAccessor publishedSnapshotAccessor, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IIOHelper ioHelper, IShortStringHelper shortStringHelper)
             : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper, EditorType.PropertyValue)
         {
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
@@ -34,6 +34,6 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new MultiUrlPickerConfigurationEditor(_ioHelper);
 
-        protected override IDataValueEditor CreateValueEditor() => new MultiUrlPickerValueEditor(_entityService, _publishedSnapshotAccessor, Logger, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new MultiUrlPickerValueEditor(_entityService.Value, _publishedSnapshotAccessor, Logger, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, Attribute);
     }
 }
