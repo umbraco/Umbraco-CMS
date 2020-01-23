@@ -369,6 +369,15 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        public bool HasContentNodes(int id)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(ReadLockIds);
+                return Repository.HasContentNodes(id);
+            }
+        }
+
         #endregion
 
         #region Save

@@ -1,6 +1,9 @@
-﻿using System.Threading;
+﻿using System.Configuration;
+using System.Threading;
 using System.Web;
 using Umbraco.Core;
+using Umbraco.Core.Logging.Serilog;
+using Umbraco.Core.Runtime;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
@@ -21,8 +24,15 @@ namespace Umbraco.Web
             var connectionStringConfig = configs.ConnectionStrings()[Constants.System.UmbracoConnectionName];
 
             var dbProviderFactoryCreator = new UmbracoDbProviderFactoryCreator(connectionStringConfig?.ProviderName);
-          
-            var mainDom = new MainDom(logger, hostingEnvironment);
+
+            // Determine if we should use the sql main dom or the default
+            var appSettingMainDomLock = ConfigurationManager.AppSettings[Constants.AppSettings.MainDomLock];
+
+            var mainDomLock = appSettingMainDomLock == "SqlMainDomLock"
+                ? (IMainDomLock)new SqlMainDomLock(logger, configs, dbProviderFactoryCreator)
+                : new MainDomSemaphoreLock(logger, hostingEnvironment);
+
+            var mainDom = new MainDom(logger, hostingEnvironment, mainDomLock);
 
             return new WebRuntime(this, configs, umbracoVersion, ioHelper, logger, profiler, hostingEnvironment, backOfficeInfo, dbProviderFactoryCreator, mainDom);
         }

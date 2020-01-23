@@ -640,6 +640,23 @@ When building a custom infinite editor view you can use the same components as a
             editor.view = "views/mediatypes/edit.html";
             open(editor);
         }
+        
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#memberTypeEditor
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens the member type editor in infinite editing, the submit callback returns the saved member type
+         * @param {Object} editor rendering options
+         * @param {Callback} editor.submit Submits the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+        function memberTypeEditor(editor) {
+            editor.view = "views/membertypes/edit.html";
+            open(editor);
+        }
 
         /**
          * @ngdoc method
@@ -1011,6 +1028,7 @@ When building a custom infinite editor view you can use the same components as a
             iconPicker: iconPicker,
             documentTypeEditor: documentTypeEditor,
             mediaTypeEditor: mediaTypeEditor,
+            memberTypeEditor: memberTypeEditor,
             queryBuilder: queryBuilder,
             treePicker: treePicker,
             nodePermissions: nodePermissions,

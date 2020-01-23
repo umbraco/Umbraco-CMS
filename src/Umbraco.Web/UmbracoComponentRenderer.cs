@@ -119,51 +119,7 @@ namespace Umbraco.Web
                 x => x.Key.ToLowerInvariant(),
                 i => (i.Value is string) ? HttpUtility.HtmlDecode(i.Value.ToString()) : i.Value);
 
-            var macroControl = _macroRenderer.Render(alias, content, macroProps).GetAsControl();
-
-            string html;
-            if (macroControl is LiteralControl control)
-            {
-                // no need to execute, we already have text
-                html = control.Text;
-            }
-            else
-            {
-                using (var containerPage = new FormlessPage())
-                {
-                    containerPage.Controls.Add(macroControl);
-
-                    using (var output = new StringWriter())
-                    {
-                        // .Execute() does a PushTraceContext/PopTraceContext and writes trace output straight into 'output'
-                        // and I do not see how we could wire the trace context to the current context... so it creates dirty
-                        // trace output right in the middle of the page.
-                        //
-                        // The only thing we can do is fully disable trace output while .Execute() runs and restore afterwards
-                        // which means trace output is lost if the macro is a control (.ascx or user control) that is invoked
-                        // from within Razor -- which makes sense anyway because the control can _not_ run correctly from
-                        // within Razor since it will never be inserted into the page pipeline (which may even not exist at all
-                        // if we're running MVC).
-                        //
-                        // I'm sure there's more things that will get lost with this context changing but I guess we'll figure
-                        // those out as we go along. One thing we lose is the content type response output.
-                        // http://issues.umbraco.org/issue/U4-1599 if it is setup during the macro execution. So
-                        // here we'll save the content type response and reset it after execute is called.
-
-                        var contentType = _umbracoContextAccessor.UmbracoContext.HttpContext.Response.ContentType;
-                        var traceIsEnabled = containerPage.Trace.IsEnabled;
-                        containerPage.Trace.IsEnabled = false;
-                        _umbracoContextAccessor.UmbracoContext.HttpContext.Server.Execute(containerPage, output, true);
-                        containerPage.Trace.IsEnabled = traceIsEnabled;
-                        //reset the content type
-                        _umbracoContextAccessor.UmbracoContext.HttpContext.Response.ContentType = contentType;
-
-                        //Now, we need to ensure that local links are parsed
-                        html = _linkParser.EnsureInternalLinks(output.ToString());
-                    }
-                }
-
-            }
+            var html = _macroRenderer.Render(alias, content, macroProps).GetAsText();
 
             return new HtmlString(html);
         }
