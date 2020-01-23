@@ -43,9 +43,6 @@
         /** Called when the component initializes */
         function onInit() {
             prevContentDateUpdated = angular.copy(vm.content.updateDate);
-            _.each(vm.content.variants, function (v) {
-                v.active = false;// needs to be set before used for it to be re-active.
-            });
             setActiveVariant();
         }
 
