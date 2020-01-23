@@ -17,6 +17,7 @@ namespace Umbraco.Core.Runtime
     {
         private string _lockId;
         private const string MainDomKey = "Umbraco.Core.Runtime.SqlMainDom";
+        private const string UpdatedSuffix = "_updated";
         private readonly ILogger _logger;
         private IUmbracoDatabase _db;
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
@@ -197,7 +198,7 @@ namespace Umbraco.Core.Runtime
         /// <returns></returns>
         private Task<bool> WaitForExistingAsync(string tempId, int millisecondsTimeout)
         {
-            var updatedTempId = tempId + "_updated";
+            var updatedTempId = tempId + UpdatedSuffix;
 
             return Task.Run(() =>
             {
@@ -343,11 +344,11 @@ namespace Umbraco.Core.Runtime
         private bool IsLockTimeoutException(Exception exception) => exception is SqlException sqlException && sqlException.Number == 1222;
 
         #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
+        private bool _disposedValue = false; // To detect redundant calls
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!_disposedValue)
             {
                 if (disposing)
                 {
@@ -374,7 +375,7 @@ namespace Umbraco.Core.Runtime
                             if (_mainDomChanging)
                             {
                                 _logger.Debug<SqlMainDomLock>("Releasing MainDom, updating row, new application is booting.");
-                                db.Execute("UPDATE umbracoKeyValue SET [value] = [value] + '_updated' WHERE [key] = @key", new { key = MainDomKey });
+                                db.Execute($"UPDATE umbracoKeyValue SET [value] = [value] + '{UpdatedSuffix}' WHERE [key] = @key", new { key = MainDomKey });
                             }
                             else
                             {
@@ -396,7 +397,7 @@ namespace Umbraco.Core.Runtime
                     }
                 }
 
-                disposedValue = true;
+                _disposedValue = true;
             }
         }
 
