@@ -232,10 +232,10 @@ namespace Umbraco.Core.Mapping
                 if (ctor != null && map != null)
                 {
                     // register (for next time) and do it now (for this time)
-                    object NCtor(object s, MapperContext c) => MapEnumerableInternal<TTarget>((IEnumerable) s, targetGenericArg, ctor, map, c);
+                    object NCtor(object s, MapperContext c) => MapEnumerableInternal<TTarget>((IEnumerable)s, targetGenericArg, ctor, map, c);
                     DefineCtors(sourceType)[targetType] = NCtor;
                     DefineMaps(sourceType)[targetType] = Identity;
-                    return (TTarget) NCtor(source, context);
+                    return (TTarget)NCtor(source, context);
                 }
 
                 throw new InvalidOperationException($"Don't know how to map {sourceGenericArg.FullName} to {targetGenericArg.FullName}, so don't know how to map {sourceType.FullName} to {targetType.FullName}.");
@@ -266,7 +266,7 @@ namespace Umbraco.Core.Mapping
                 target = targetArray;
             }
 
-            return (TTarget) target;
+            return (TTarget)target;
         }
 
         /// <summary>
@@ -343,7 +343,21 @@ namespace Umbraco.Core.Mapping
 
             if (ctor == null) return null;
 
-            _ctors[sourceType] = sourceCtor;
+            _ctors.AddOrUpdate(sourceType, sourceCtor, (k, v) =>
+            {
+                // Add missing constructors
+                foreach (var c in sourceCtor)
+                {
+                    if (!v.ContainsKey(c.Key))
+                    {
+                        v.Add(c.Key, c.Value);
+                    }
+                }
+
+                return v;
+            });
+
+
             return ctor;
         }
 
@@ -368,7 +382,17 @@ namespace Umbraco.Core.Mapping
 
             if (map == null) return null;
 
-            _maps[sourceType] = sourceMap;
+            if (_maps.ContainsKey(sourceType))
+            {
+                foreach (var m in sourceMap)
+                {
+                    if (!_maps[sourceType].TryGetValue(m.Key, out _))
+                        _maps[sourceType].Add(m.Key, m.Value);
+                }
+            }
+            else
+                _maps[sourceType] = sourceMap;
+
             return map;
         }
 

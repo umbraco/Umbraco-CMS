@@ -248,14 +248,63 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return dto == null ? null : MapDtoToContent(dto);
         }
 
+        // deletes a specific version
+        public override void DeleteVersion(int versionId)
+        {
+            // TODO: test object node type?
+
+            // get the version we want to delete
+            var template = SqlContext.Templates.Get("Umbraco.Core.DocumentRepository.GetVersion", tsql =>
+                tsql.Select<ContentVersionDto>()
+                    .AndSelect<DocumentVersionDto>()
+                    .From<ContentVersionDto>()
+                    .InnerJoin<DocumentVersionDto>()
+                    .On<ContentVersionDto, DocumentVersionDto>((c, d) => c.Id == d.Id)
+                    .Where<ContentVersionDto>(x => x.Id == SqlTemplate.Arg<int>("versionId"))
+            );
+            var versionDto = Database.Fetch<DocumentVersionDto>(template.Sql(new { versionId })).FirstOrDefault();
+
+            // nothing to delete
+            if (versionDto == null)
+                return;
+
+            // don't delete the current or published version
+            if (versionDto.ContentVersionDto.Current)
+                throw new InvalidOperationException("Cannot delete the current version.");
+            else if (versionDto.Published)
+                throw new InvalidOperationException("Cannot delete the published version.");
+
+            PerformDeleteVersion(versionDto.ContentVersionDto.NodeId, versionId);
+        }
+
+        //  deletes all versions of an entity, older than a date.
+        public override void DeleteVersions(int nodeId, DateTime versionDate)
+        {
+            // TODO: test object node type?
+
+            // get the versions we want to delete, excluding the current one
+            var template = SqlContext.Templates.Get("Umbraco.Core.DocumentRepository.GetVersions", tsql =>
+               tsql.Select<ContentVersionDto>()
+                    .From<ContentVersionDto>()
+                    .InnerJoin<DocumentVersionDto>()
+                    .On<ContentVersionDto, DocumentVersionDto>((c, d) => c.Id == d.Id)
+                    .Where<ContentVersionDto>(x => x.NodeId == SqlTemplate.Arg<int>("nodeId") && !x.Current && x.VersionDate < SqlTemplate.Arg<DateTime>("versionDate"))
+                    .Where<DocumentVersionDto>( x => !x.Published)                    
+            );
+            var versionDtos = Database.Fetch<ContentVersionDto>(template.Sql(new { nodeId, versionDate }));
+            foreach (var versionDto in versionDtos)
+                PerformDeleteVersion(versionDto.NodeId, versionDto.Id);
+        }
+
         protected override void PerformDeleteVersion(int id, int versionId)
         {
             // raise event first else potential FK issues
             OnUowRemovingVersion(new ScopedVersionEventArgs(AmbientScope, id, versionId));
 
             Database.Delete<PropertyDataDto>("WHERE versionId = @versionId", new { versionId });
-            Database.Delete<ContentVersionDto>("WHERE id = @versionId", new { versionId });
+            Database.Delete<ContentVersionCultureVariationDto>("WHERE versionId = @versionId", new { versionId });
             Database.Delete<DocumentVersionDto>("WHERE id = @versionId", new { versionId });
+            Database.Delete<ContentVersionDto>("WHERE id = @versionId", new { versionId });
         }
 
         #endregion

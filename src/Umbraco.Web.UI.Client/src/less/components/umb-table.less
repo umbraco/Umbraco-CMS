@@ -27,14 +27,13 @@
 
 }
 
+.umb-table__action,
 .umb-table a {
+    background: transparent;
+    border: 0 none;
     text-decoration: none;
-    cursor: pointer;
-
-    &:focus {
-        outline: none;
-        text-decoration: none;
-    }
+    padding: 0;
+    margin-left: 1px;
 }
 
 input.umb-table__input {
@@ -51,20 +50,26 @@ input.umb-table__input {
 }
 
 .umb-table-head__link {
+    background: transparent;
+    border: 0 none;
     position: relative;
-    cursor: default;
     text-decoration: none;
     color: @gray-3;
+    font-size: inherit;
+    font-weight: inherit;
+    padding: 0 1px;
+
     &:hover {
         text-decoration: none;
+        cursor: default;
         color: @gray-3;
     }
 }
 
-.umb-table-head__link .sortable {
+.umb-table-head__link.sortable {
+    cursor: pointer;
     &:hover {
         text-decoration: none;
-        cursor: pointer;
         color: @black;
     }
 }
@@ -136,15 +141,15 @@ input.umb-table__input {
 }
 
 .umb-table-body__link {
-    
     color: @ui-option-type;
     font-size: 14px;
     font-weight: bold;
     text-decoration: none;
-    
+
     &:hover, &:focus {
         color: @ui-option-type-hover;
         text-decoration: underline;
+        outline: none;
     }
 }
 
@@ -155,6 +160,8 @@ input.umb-table__input {
     font-size: 20px;
     line-height: 20px;
     color: @ui-option-type;
+    vertical-align: bottom;
+    text-decoration: none;
 }
 
 .umb-table-body__checkicon,
@@ -240,7 +247,7 @@ input.umb-table__input {
 .umb-table-cell {
     display: flex;
     flex-flow: row nowrap;
-    flex: 1 1 1%; //NOTE 1% is a Internet Explore hack, so that cells don't collapse
+    flex: 1 1 5%;
     position: relative;
     margin: auto 14px;
     padding: 6px 2px;
@@ -253,6 +260,11 @@ input.umb-table__input {
     white-space: nowrap; //NOTE Disable/Enable this to keep textstring on one line
     text-overflow: ellipsis;
 }
+.umb-table-cell.--noOverflow > * {
+    overflow: visible;
+    white-space: normal;
+    text-overflow: unset;
+}
 
 .umb-table-cell:first-of-type:not(.not-fixed) {
     flex: 0 0 25px;
@@ -264,6 +276,9 @@ input.umb-table__input {
     flex: 0 0 auto !important;
 }
 
+.umb-table-cell--nano {
+    flex: 0 0 50px;
+}
 .umb-table-cell--small {
     flex: .5 .5 1%;
     max-width: 12.5%;
@@ -280,8 +295,8 @@ input.umb-table__input {
 
 // Increases the space for the name cell
 .umb-table__name {
-    flex: 1 1 25%;
-    max-width: 25%;
+    flex: 1 1 20%;
+    max-width: 300px;
 }
 
 .umb-table__loading-overlay {

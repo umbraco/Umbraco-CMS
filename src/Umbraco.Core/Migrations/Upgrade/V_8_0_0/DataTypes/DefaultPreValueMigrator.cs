@@ -24,8 +24,8 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes
             }
 
             // assuming we don't want to fall back to array
-            if (aliases.Length != preValuesA.Count || aliases.Any(string.IsNullOrWhiteSpace))
-                throw new InvalidOperationException($"Cannot migrate datatype w/ id={dataTypeId} preValues: duplicate or null/empty alias.");
+            if (aliases.Any(string.IsNullOrWhiteSpace))
+                throw new InvalidOperationException($"Cannot migrate prevalues for datatype id={dataTypeId}, editor={editorAlias}: null/empty alias.");
 
             // dictionary-base prevalues
             return GetPreValues(preValuesA).ToDictionary(x => x.Alias, GetPreValueValue);

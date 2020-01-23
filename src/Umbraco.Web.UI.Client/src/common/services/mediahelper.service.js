@@ -150,16 +150,19 @@ function mediaHelper(umbRequestHelper, $log) {
             }
 
             if (thumbnail) {
-                if (this.detectIfImageByExtension(mediaEntity.metaData.MediaPath)) {
-                    return this.getThumbnailFromPath(mediaEntity.metaData.MediaPath);
+                if (this.detectIfImageByExtension(mediaPath)) {
+                    return this.getThumbnailFromPath(mediaPath);
+                }
+                else if (this.getFileExtension(mediaPath) === "svg") {
+                    return this.getThumbnailFromPath(mediaPath);
                 }
                 else {
                     return null;
                 }
             }
             else {
-                return mediaEntity.metaData.MediaPath;
-            }            
+                return mediaPath;
+            }
         },
 
         /**
@@ -294,7 +297,17 @@ function mediaHelper(umbRequestHelper, $log) {
          */
         getThumbnailFromPath: function (imagePath) {
 
-            //If the path is not an image we cannot get a thumb
+            // Check if file is a svg
+            if (this.getFileExtension(imagePath) === "svg") {
+                return imagePath;
+            }
+
+            // Check if file is a svg
+            if (this.getFileExtension(imagePath) === "svg") {
+                return imagePath;
+            }
+
+            // If the path is not an image we cannot get a thumb
             if (!this.detectIfImageByExtension(imagePath)) {
                 return null;
             }
@@ -378,7 +391,7 @@ function mediaHelper(umbRequestHelper, $log) {
         getFileExtension: function (filePath) {
 
             if (!filePath) {
-                return false;
+                return null;
             }
 
             var lowered = filePath.toLowerCase();

@@ -9,7 +9,7 @@
 * and when an error is detected for this property we'll show the error message.
 * In order for this directive to work, the valFormManager directive must be placed on the containing form.
 **/
-function valPropertyMsg(serverValidationManager) {
+function valPropertyMsg(serverValidationManager, localizationService) {
 
     return {
         require: ['^^form', '^^valFormManager', '^^umbProperty', '?^^umbVariantContent'],
@@ -40,6 +40,11 @@ function valPropertyMsg(serverValidationManager) {
             scope.currentProperty = currentProperty;
             var currentCulture = currentProperty.culture;         
 
+            var labels = {};
+            localizationService.localize("errors_propertyHasErrors").then(function (data) {
+                labels.propertyHasErrors = data;
+            });
+
             if (umbVariantCtrl) {
                 //if we are inside of an umbVariantContent directive
 
@@ -68,13 +73,11 @@ function valPropertyMsg(serverValidationManager) {
                         return err.errorMsg;
                     }
                     else {
-                        // TODO: localize
-                        return scope.currentProperty.propertyErrorMessage ? scope.currentProperty.propertyErrorMessage : "Property has errors";
+                        return scope.currentProperty.propertyErrorMessage ? scope.currentProperty.propertyErrorMessage : labels.propertyHasErrors;
                     }
 
                 }
-                // TODO: localize
-                return "Property has errors";
+                return labels.propertyHasErrors;
             }
 
             // We need to subscribe to any changes to our model (based on user input)

@@ -7,12 +7,14 @@
     },
     {
         "name": "Image",
+        "nameTemplate": "{{ value && value.udi ? (value.udi | ncNodeName) : '' }}",
         "alias": "media",
         "view": "media",
         "icon": "icon-picture"
     },
     {
         "name": "Macro",
+        "nameTemplate": "{{ value && value.macroAlias ? value.macroAlias : '' }}",
         "alias": "macro",
         "view": "macro",
         "icon": "icon-settings-alt"
@@ -25,6 +27,7 @@
     },
     {
         "name": "Headline",
+        "nameTemplate": "{{ value }}",
         "alias": "headline",
         "view": "textstring",
         "icon": "icon-coin",
@@ -35,6 +38,7 @@
     },
     {
         "name": "Quote",
+        "nameTemplate": "{{ value ? value.substring(0,32) + (value.length > 32 ? '...' : '') : '' }}",
         "alias": "quote",
         "view": "textstring",
         "icon": "icon-quote",

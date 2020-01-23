@@ -22,7 +22,12 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
     function init() {
         vm.page.loading = true;
 
-        localizationService.localizeMany(["relationType_tabRelationType", "relationType_tabRelations"]).then(function (data) {
+        var labelKeys = [
+            "relationType_tabRelationType",
+            "relationType_tabRelations"
+        ];
+
+        localizationService.localizeMany(labelKeys).then(function (data) {
             vm.page.navigation = [
                 {
                     "name": data[0],
@@ -50,6 +55,10 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
     function bindRelationType(relationType) {
         formatDates(relationType.relations);
         getRelationNames(relationType);
+
+        // Convert property value to string, since the umb-radiobutton component at the moment only handle string values.
+        // Sometime later the umb-radiobutton might be able to handle value as boolean.
+        relationType.isBidirectional = (relationType.isBidirectional || false).toString();
 
         vm.relationType = relationType;
 

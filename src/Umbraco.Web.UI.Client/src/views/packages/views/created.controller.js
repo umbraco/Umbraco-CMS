@@ -28,6 +28,7 @@
                 view: "views/packages/overlays/delete.html",
                 package: createdPackage,
                 submitButtonLabelKey: "contentTypeEditor_yesDelete",
+                submitButtonStyle:"danger",
                 submit: function (model) {
                     performDelete(index, createdPackage);
                     overlayService.close();
