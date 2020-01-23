@@ -84,7 +84,7 @@
          */
         function setActiveVariant() {
             // set the active variant
-            var activeVariant = null;                     
+            var activeVariant = null;
             _.each(vm.content.variants, function (v) {
                 if (
                     (!v.language || v.language.culture === vm.culture)
