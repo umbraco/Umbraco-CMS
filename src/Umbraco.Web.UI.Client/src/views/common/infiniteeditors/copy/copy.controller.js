@@ -5,6 +5,7 @@
 
       var vm = this;
 
+      vm.labels = {};
       vm.hideSearch = hideSearch;
       vm.selectResult = selectResult;
       vm.onSearchResults = onSearchResults;
@@ -12,7 +13,6 @@
       vm.close = close;
 
       var dialogOptions = $scope.model;
-      var searchText = "Search...";
       var node = dialogOptions.currentNode;
 
       $scope.model.relateToOriginal = true;
@@ -29,23 +29,30 @@
       // get entity type based on the section
       $scope.entityType = entityHelper.getEntityTypeFromSection(dialogOptions.section);
 
-        function onInit() {
+    function onInit() {
 
-            if(!$scope.model.title) {
-                localizationService.localize("general_copy").then(function (value) {
-                    $scope.model.title = value;
-                });
-            }
+        var labelKeys = [
+            "general_copy",
+            "defaultdialogs_relateToOriginalLabel"
+        ];
 
-            localizationService.localize("general_search").then(function (value) {
-                searchText = value + "...";
-            });
-            
-        }
+        localizationService.localizeMany(labelKeys).then(function (data) {
 
+            vm.labels.title = data[0];
+            vm.labels.relateToOriginal = data[1]; 
+
+            setTitle(vm.labels.title);
+        });
+      }
+
+      function setTitle(value) {
+          if (!$scope.model.title) {
+              $scope.model.title = value;
+          }
+      }
 
       function nodeSelectHandler(args) {
-          if(args && args.event) {
+          if (args && args.event) {
             args.event.preventDefault();
             args.event.stopPropagation();
           }
@@ -108,19 +115,18 @@
       }
 
         function submit() {
-            if($scope.model && $scope.model.submit) {
+            if ($scope.model && $scope.model.submit) {
                 $scope.model.submit($scope.model);
             }
         }
 
         function close() {
-            if($scope.model && $scope.model.close) {
+            if ($scope.model && $scope.model.close) {
                 $scope.model.close();
             }
         }
 
         onInit();
-
 	}
 
 	angular.module("umbraco").controller("Umbraco.Editors.CopyController", CopyController);

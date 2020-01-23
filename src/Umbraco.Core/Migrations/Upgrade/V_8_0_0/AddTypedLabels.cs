@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 using NPoco;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
@@ -71,10 +72,21 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
             // flip known property types
 
-            var intPropertyTypes = new[] { 7, 8, 29 };
-            var bigintPropertyTypes = new[] { 9, 26 };
-            var dtPropertyTypes = new[] { 32, 33, 34 };
+            var labelPropertyTypes = Database.Fetch<PropertyTypeDto>(Sql()
+                .Select<PropertyTypeDto>(x => x.Id, x => x.Alias)
+                .From<PropertyTypeDto>()
+                .Where<PropertyTypeDto>(x => x.DataTypeId == Constants.DataTypes.LabelString)
+                );
 
+            var intPropertyAliases = new[] { Constants.Conventions.Media.Width, Constants.Conventions.Media.Height, Constants.Conventions.Member.FailedPasswordAttempts };
+            var bigintPropertyAliases = new[] { Constants.Conventions.Media.Bytes };
+            var dtPropertyAliases = new[] { Constants.Conventions.Member.LastLockoutDate, Constants.Conventions.Member.LastLoginDate, Constants.Conventions.Member.LastPasswordChangeDate };
+
+            var intPropertyTypes = labelPropertyTypes.Where(pt => intPropertyAliases.Contains(pt.Alias)).Select(pt => pt.Id).ToArray();
+            var bigintPropertyTypes = labelPropertyTypes.Where(pt => bigintPropertyAliases.Contains(pt.Alias)).Select(pt => pt.Id).ToArray();
+            var dtPropertyTypes = labelPropertyTypes.Where(pt => dtPropertyAliases.Contains(pt.Alias)).Select(pt => pt.Id).ToArray();
+
+            Database.Execute(Sql().Update<PropertyTypeDto>(u => u.Set(x => x.DataTypeId, Constants.DataTypes.LabelInt)).WhereIn<PropertyTypeDto>(x => x.Id, intPropertyTypes));
             Database.Execute(Sql().Update<PropertyTypeDto>(u => u.Set(x => x.DataTypeId, Constants.DataTypes.LabelInt)).WhereIn<PropertyTypeDto>(x => x.Id, intPropertyTypes));
             Database.Execute(Sql().Update<PropertyTypeDto>(u => u.Set(x => x.DataTypeId, Constants.DataTypes.LabelBigint)).WhereIn<PropertyTypeDto>(x => x.Id, bigintPropertyTypes));
             Database.Execute(Sql().Update<PropertyTypeDto>(u => u.Set(x => x.DataTypeId, Constants.DataTypes.LabelDateTime)).WhereIn<PropertyTypeDto>(x => x.Id, dtPropertyTypes));
@@ -89,16 +101,18 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             foreach (var value in values)
                 Database.Execute(Sql()
                     .Update<PropertyDataDto>(u => u
-                        .Set(x => x.IntegerValue, string.IsNullOrWhiteSpace(value.VarcharValue) ? (int?) null :  int.Parse(value.VarcharValue, NumberStyles.Any, CultureInfo.InvariantCulture))
-                        .Set(x => x.TextValue, null))
+                        .Set(x => x.IntegerValue, string.IsNullOrWhiteSpace(value.VarcharValue) ? (int?)null : int.Parse(value.VarcharValue, NumberStyles.Any, CultureInfo.InvariantCulture))
+                        .Set(x => x.TextValue, null)
+                        .Set(x => x.VarcharValue, null))
                     .Where<PropertyDataDto>(x => x.Id == value.Id));
 
             values = Database.Fetch<PropertyDataValue>(Sql().Select<PropertyDataDto>(x => x.Id, x => x.VarcharValue).From<PropertyDataDto>().WhereIn<PropertyDataDto>(x => x.PropertyTypeId, dtPropertyTypes));
             foreach (var value in values)
                 Database.Execute(Sql()
                     .Update<PropertyDataDto>(u => u
-                        .Set(x => x.DateValue, string.IsNullOrWhiteSpace(value.VarcharValue) ? (DateTime?) null : DateTime.Parse(value.VarcharValue, CultureInfo.InvariantCulture, DateTimeStyles.None))
-                        .Set(x => x.TextValue, null))
+                        .Set(x => x.DateValue, string.IsNullOrWhiteSpace(value.VarcharValue) ? (DateTime?)null : DateTime.Parse(value.VarcharValue, CultureInfo.InvariantCulture, DateTimeStyles.None))
+                        .Set(x => x.TextValue, null)
+                        .Set(x => x.VarcharValue, null))
                     .Where<PropertyDataDto>(x => x.Id == value.Id));
 
             // anything that's custom... ppl will have to figure it out manually, there isn't much we can do about it

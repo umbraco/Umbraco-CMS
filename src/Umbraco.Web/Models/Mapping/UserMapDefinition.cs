@@ -138,7 +138,7 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         // Umbraco.Code.MapAll -ContentStartNode -UserCount -MediaStartNode -Key -Sections
-        // Umbraco.Code.MapAll -Notifications -Udi -Trashed -AdditionalData
+        // Umbraco.Code.MapAll -Notifications -Udi -Trashed -AdditionalData -IsSystemUserGroup
         private void Map(IReadOnlyUserGroup source, UserGroupBasic target, MapperContext context)
         {
             target.Alias = source.Alias;
@@ -147,11 +147,13 @@ namespace Umbraco.Web.Models.Mapping
             target.Name = source.Name;
             target.ParentId = -1;
             target.Path = "-1," + source.Id;
+            target.IsSystemUserGroup = source.IsSystemUserGroup();
+
             MapUserGroupBasic(target, source.AllowedSections, source.StartContentId, source.StartMediaId, context);
         }
 
         // Umbraco.Code.MapAll -ContentStartNode -MediaStartNode -Sections -Notifications
-        // Umbraco.Code.MapAll -Udi -Trashed -AdditionalData
+        // Umbraco.Code.MapAll -Udi -Trashed -AdditionalData -IsSystemUserGroup
         private void Map(IUserGroup source, UserGroupBasic target, MapperContext context)
         {
             target.Alias = source.Alias;
@@ -162,6 +164,8 @@ namespace Umbraco.Web.Models.Mapping
             target.ParentId = -1;
             target.Path = "-1," + source.Id;
             target.UserCount = source.UserCount;
+            target.IsSystemUserGroup = source.IsSystemUserGroup();
+
             MapUserGroupBasic(target, source.AllowedSections, source.StartContentId, source.StartMediaId, context);
         }
 
@@ -210,6 +214,7 @@ namespace Umbraco.Web.Models.Mapping
             target.ParentId = -1;
             target.Path = "-1," + source.Id;
             target.UserCount = source.UserCount;
+            target.IsSystemUserGroup = source.IsSystemUserGroup();
 
             MapUserGroupBasic(target, source.AllowedSections, source.StartContentId, source.StartMediaId, context);
 

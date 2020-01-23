@@ -1,33 +1,32 @@
-<div data-element="overlay" class="umb-overlay umb-overlay-{{position}} umb-overlay--{{size}}" on-outside-click="outSideClick()">
+<div data-element="overlay" class="umb-overlay umb-overlay-{{position}} umb-overlay--{{size}}" on-outside-click="outSideClick()" role="dialog" aria-labelledby="umb-overlay-title" aria-describedby="umb-overlay-description">
     <ng-form class="umb-overlay__form" name="overlayForm" novalidate val-form-manager>
-
         <div data-element="overlay-header" class="umb-overlay-header">
-            <h4 class="umb-overlay__title">{{model.title}}</h4>
-            <p class="umb-overlay__subtitle">{{model.subtitle}}</p>
+            <h1 class="umb-overlay__title" id="umb-overlay-title">{{model.title}}</h1>
+            <p class="umb-overlay__subtitle" id="umb-overlay-description" ng-if="model.subtitle">{{model.subtitle}}</p>
         </div>
 
         <div data-element="overlay-content" class="umb-overlay-container form-horizontal">
             <ng-transclude></ng-transclude>
             <div ng-if="view && !parentScope" ng-include="view"></div>
-            <div class="scoped-view" style="display: none;"></div>
+            <div class="scoped-view"></div>
         </div>
 
+        <!-- If model contains the property of "itemDetails" we render  the relevant content here -->
         <div class="umb-overlay__item-details" ng-if="model.itemDetails">
-
             <div class="umb-overlay__item-details-title-wrapper" ng-if="model.itemDetails.icon || model.itemDetails.title">
-                <i class="{{ model.itemDetails.icon }} umb-overlay__item-details-icon" ng-if="model.itemDetails.icon"></i>
-                <h5 class="umb-overlay__item-details-title" ng-if="model.itemDetails.title">{{ model.itemDetails.title }}</h5>
+                <i class="{{ model.itemDetails.icon }} umb-overlay__item-details-icon" ng-if="model.itemDetails.icon" aria-hidden="true"></i>
+                <h2 class="umb-overlay__item-details-title" ng-if="model.itemDetails.title">{{ model.itemDetails.title }}</h2>
             </div>
-
-            <div class="umb-overlay__item-details-description" ng-if="model.itemDetails.description">{{ model.itemDetails.description }}</div>
-
+            <p class="umb-overlay__item-details-description" ng-if="model.itemDetails.description">{{ model.itemDetails.description }}</p>
         </div>
 
         <div data-element="overlay-footer" class="umb-overlay-drawer" ng-class="{'-auto-height': model.confirmSubmit.show}">
 
             <div ng-if="model.confirmSubmit.show">
 
-                <h5 class="red" ng-if="model.confirmSubmit.title"><i class="icon-alert"></i> {{ model.confirmSubmit.title }}</h5>
+                <h2 class="red" ng-if="model.confirmSubmit.title">
+                    <i class="icon-alert" aria-hidden="true"></i> {{ model.confirmSubmit.title }}
+                </h2>
                 <p ng-if="model.confirmSubmit.description">{{ model.confirmSubmit.description }}</p>
 
                 <label class="checkbox no-indent">

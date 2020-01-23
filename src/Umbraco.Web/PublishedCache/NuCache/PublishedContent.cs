@@ -233,8 +233,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // invariant content items)
 
             // if there is no 'published' published content, no culture can be published
-            var hasPublished = _contentNode.PublishedContent != null;
-            if (!hasPublished)
+            if (!_contentNode.HasPublished)
                 return false;
 
             // if there is a 'published' published content, and does not vary = published
@@ -247,7 +246,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             // there is a 'published' published content, and varies
             // = depends on the culture
-            return _contentNode.PublishedContent.ContentData.CultureInfos.ContainsKey(culture);
+            return _contentNode.HasPublishedCulture(culture);
         }
 
         #endregion

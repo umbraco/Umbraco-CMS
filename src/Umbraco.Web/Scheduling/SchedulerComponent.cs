@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
@@ -16,6 +18,11 @@ namespace Umbraco.Web.Scheduling
 {
     internal sealed class SchedulerComponent : IComponent
     {
+        private const int DefaultDelayMilliseconds = 180000; // 3 mins
+        private const int OneMinuteMilliseconds = 60000;
+        private const int FiveMinuteMilliseconds = 300000;
+        private const int OneHourMilliseconds = 3600000;
+
         private readonly IRuntimeState _runtime;
         private readonly IContentService _contentService;
         private readonly IAuditService _auditService;
@@ -29,6 +36,7 @@ namespace Umbraco.Web.Scheduling
         private BackgroundTaskRunner<IBackgroundTask> _publishingRunner;
         private BackgroundTaskRunner<IBackgroundTask> _tasksRunner;
         private BackgroundTaskRunner<IBackgroundTask> _scrubberRunner;
+        private BackgroundTaskRunner<IBackgroundTask> _fileCleanupRunner;
         private BackgroundTaskRunner<IBackgroundTask> _healthCheckRunner;
 
         private bool _started;
@@ -58,6 +66,7 @@ namespace Umbraco.Web.Scheduling
             _publishingRunner = new BackgroundTaskRunner<IBackgroundTask>("ScheduledPublishing", _logger);
             _tasksRunner = new BackgroundTaskRunner<IBackgroundTask>("ScheduledTasks", _logger);
             _scrubberRunner = new BackgroundTaskRunner<IBackgroundTask>("LogScrubber", _logger);
+            _fileCleanupRunner = new BackgroundTaskRunner<IBackgroundTask>("TempFileCleanup", _logger);
             _healthCheckRunner = new BackgroundTaskRunner<IBackgroundTask>("HealthCheckNotifier", _logger);
 
             // we will start the whole process when a successful request is made
@@ -93,6 +102,7 @@ namespace Umbraco.Web.Scheduling
                 tasks.Add(RegisterKeepAlive());
                 tasks.Add(RegisterScheduledPublishing());
                 tasks.Add(RegisterLogScrubber(settings));
+                tasks.Add(RegisterTempFileCleanup());
 
                 var healthCheckConfig = Current.Configs.HealthChecks();
                 if (healthCheckConfig.NotificationSettings.Enabled)
@@ -106,7 +116,7 @@ namespace Umbraco.Web.Scheduling
         {
             // ping/keepalive
             // on all servers
-            var task = new KeepAlive(_keepAliveRunner, 60000, 300000, _runtime, _logger);
+            var task = new KeepAlive(_keepAliveRunner, DefaultDelayMilliseconds, FiveMinuteMilliseconds, _runtime, _logger);
             _keepAliveRunner.TryAdd(task);
             return task;
         }
@@ -115,7 +125,7 @@ namespace Umbraco.Web.Scheduling
         {
             // scheduled publishing/unpublishing
             // install on all, will only run on non-replica servers
-            var task = new ScheduledPublishing(_publishingRunner, 60000, 60000, _runtime, _contentService, _umbracoContextFactory, _logger);
+            var task = new ScheduledPublishing(_publishingRunner, DefaultDelayMilliseconds, OneMinuteMilliseconds, _runtime, _contentService, _umbracoContextFactory, _logger);
             _publishingRunner.TryAdd(task);
             return task;
         }
@@ -128,15 +138,15 @@ namespace Umbraco.Web.Scheduling
             int delayInMilliseconds;
             if (string.IsNullOrEmpty(healthCheckConfig.NotificationSettings.FirstRunTime))
             {
-                delayInMilliseconds = 60000;
+                delayInMilliseconds = DefaultDelayMilliseconds;
             }
             else
             {
                 // Otherwise start at scheduled time
                 delayInMilliseconds = DateTime.Now.PeriodicMinutesFrom(healthCheckConfig.NotificationSettings.FirstRunTime) * 60 * 1000;
-                if (delayInMilliseconds < 60000)
+                if (delayInMilliseconds < DefaultDelayMilliseconds)
                 {
-                    delayInMilliseconds = 60000;
+                    delayInMilliseconds = DefaultDelayMilliseconds;
                 }
             }
 
@@ -150,7 +160,19 @@ namespace Umbraco.Web.Scheduling
         {
             // log scrubbing
             // install on all, will only run on non-replica servers
-            var task = new LogScrubber(_scrubberRunner, 60000, LogScrubber.GetLogScrubbingInterval(settings, _logger), _runtime, _auditService, settings, _scopeProvider, _logger);
+            var task = new LogScrubber(_scrubberRunner, DefaultDelayMilliseconds, LogScrubber.GetLogScrubbingInterval(settings, _logger), _runtime, _auditService, settings, _scopeProvider, _logger);
+            _scrubberRunner.TryAdd(task);
+            return task;
+        }
+
+        private IBackgroundTask RegisterTempFileCleanup()
+        {
+            // temp file cleanup, will run on all servers - even though file upload should only be handled on the master, this will
+            // ensure that in the case it happes on replicas that they are cleaned up.
+            var task = new TempFileCleanup(_fileCleanupRunner, DefaultDelayMilliseconds, OneHourMilliseconds,
+                new[] { new DirectoryInfo(IOHelper.MapPath(SystemDirectories.TempFileUploads)) },
+                TimeSpan.FromDays(1), //files that are over a day old
+                _runtime, _logger);
             _scrubberRunner.TryAdd(task);
             return task;
         }

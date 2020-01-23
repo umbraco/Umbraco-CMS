@@ -1,6 +1,8 @@
-<div ng-controller="Umbraco.PropertyEditors.RTEController" class="umb-property-editor umb-rte">
+<div ng-controller="Umbraco.PropertyEditors.RTEController" class="umb-property-editor umb-rte" ng-class="{'--initialized': !isLoading}">
     <umb-load-indicator ng-if="isLoading"></umb-load-indicator>
 
-    <div ng-style="{ visibility :  isLoading ? 'hidden' : 'visible', width :containerWidth, height: containerHeight, overflow: containerOverflow}"
-         id="{{textAreaHtmlId}}" class="umb-rte-editor"></div>
+    <div class="umb-rte-editor-con">
+        <input type="text" id="{{model.alias}}" ng-focus="focus()" style="position:absolute;top:0;width:0;height:0;" />
+        <div id="{{textAreaHtmlId}}" class="umb-rte-editor" ng-style="{ width: containerWidth, height: containerHeight, overflow: containerOverflow}"></div>
+    </div>
 </div>
