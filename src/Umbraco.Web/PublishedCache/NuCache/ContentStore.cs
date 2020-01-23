@@ -602,7 +602,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void ClearRootLocked()
         {
-            if (_root.Gen < _liveGen)
+            if (_root.Gen != _liveGen)
                 _root = new LinkedNode<ContentNode>(new ContentNode(), _liveGen, _root);
             else
                 _root.Value.FirstChildContentId = -1;
@@ -899,8 +899,18 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return link;
         }
 
+        /// <summary>
+        /// This removes this current node from the tree hiearchy by removing it from it's parent's linked list
+        /// </summary>
+        /// <param name="content"></param>
+        /// <remarks>
+        /// This is called within a lock which means a new Gen is being created therefore this will not modify any existing content in a Gen.
+        /// </remarks>
         private void RemoveTreeNodeLocked(ContentNode content)
         {
+            // NOTE: DO NOT modify `content` here, this would modify data for an existing Gen, all modifications are done to clones
+            // which would be targeting the new Gen.
+
             var parentLink = content.ParentContentId < 0
                 ? _root
                 : GetRequiredLinkedNode(content.ParentContentId, "parent", null);
@@ -937,9 +947,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 var prev = GenCloneLocked(prevLink);
                 prev.NextSiblingContentId = content.NextSiblingContentId;
             }
-
-            content.NextSiblingContentId = -1;
-            content.PreviousSiblingContentId = -1;
         }
 
         private bool ParentPublishedLocked(ContentNodeKit kit)
@@ -955,7 +962,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             var node = link.Value;
 
-            if (node != null && link.Gen < _liveGen)
+            if (node != null && link.Gen != _liveGen)
             {
                 node = new ContentNode(link.Value);
                 if (link == _root)
@@ -1109,7 +1116,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // this is safe only because we're write-locked
             foreach (var kvp in dict.Where(x => x.Value != null))
             {
-                if (kvp.Value.Gen < _liveGen)
+                if (kvp.Value.Gen != _liveGen)
                 {
                     var link = new LinkedNode<TValue>(null, _liveGen, kvp.Value);
                     dict.TryUpdate(kvp.Key, link, kvp.Value);

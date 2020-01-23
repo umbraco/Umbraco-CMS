@@ -449,6 +449,47 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Automatically_Track_Relations()
+        {
+            var mt = MockedContentTypes.CreateSimpleMediaType("testMediaType", "Test Media Type");
+            ServiceContext.MediaTypeService.Save(mt);
+            var m1 = MockedMedia.CreateSimpleMedia(mt, "hello 1", -1);
+            var m2 = MockedMedia.CreateSimpleMedia(mt, "hello 1", -1);
+            ServiceContext.MediaService.Save(m1);
+            ServiceContext.MediaService.Save(m2);
+
+            var ct = MockedContentTypes.CreateTextPageContentType("richTextTest");
+            ct.AllowedTemplates = Enumerable.Empty<ITemplate>();
+            
+            ServiceContext.ContentTypeService.Save(ct);
+
+            var c1 = MockedContent.CreateTextpageContent(ct, "my content 1", -1);
+            ServiceContext.ContentService.Save(c1);
+
+            var c2 = MockedContent.CreateTextpageContent(ct, "my content 2", -1);
+
+            //'bodyText' is a property with a RTE property editor which we knows tracks relations
+            c2.Properties["bodyText"].SetValue(@"<p>
+        <img src='/media/12312.jpg' data-udi='umb://media/" + m1.Key.ToString("N") + @"' />
+</p><p><img src='/media/234234.jpg' data-udi=""umb://media/" + m2.Key.ToString("N") + @""" />
+</p>
+<p>
+    <a href=""{locallink:umb://document/" + c1.Key.ToString("N") + @"}"">hello</a>
+</p>");
+
+            ServiceContext.ContentService.Save(c2);
+
+            var relations = ServiceContext.RelationService.GetByParentId(c2.Id).ToList();
+            Assert.AreEqual(3, relations.Count);
+            Assert.AreEqual(Constants.Conventions.RelationTypes.RelatedMediaAlias, relations[0].RelationType.Alias);
+            Assert.AreEqual(m1.Id, relations[0].ChildId);
+            Assert.AreEqual(Constants.Conventions.RelationTypes.RelatedMediaAlias, relations[1].RelationType.Alias);
+            Assert.AreEqual(m2.Id, relations[1].ChildId);
+            Assert.AreEqual(Constants.Conventions.RelationTypes.RelatedDocumentAlias, relations[2].RelationType.Alias);
+            Assert.AreEqual(c1.Id, relations[2].ChildId);
+        }
+
+        [Test]
         public void Can_Create_Content_Without_Explicitly_Set_User()
         {
             // Arrange
@@ -1778,7 +1819,7 @@ namespace Umbraco.Tests.Services
             admin.StartContentIds = new[] {content1.Id};
             ServiceContext.UserService.Save(admin);
 
-            ServiceContext.RelationService.Save(new RelationType(Constants.ObjectTypes.Document, Constants.ObjectTypes.Document, "test"));
+            ServiceContext.RelationService.Save(new RelationType("test", "test", false, Constants.ObjectTypes.Document, Constants.ObjectTypes.Document));
             Assert.IsNotNull(ServiceContext.RelationService.Relate(content1, content2, "test"));
 
             ServiceContext.PublicAccessService.Save(new PublicAccessEntry(content1, content2, content2, new List<PublicAccessRule>
@@ -3166,7 +3207,12 @@ namespace Umbraco.Tests.Services
             var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches);
             var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, Logger);
             contentTypeRepository = new ContentTypeRepository(accessor, AppCaches.Disabled, Logger, commonRepository, languageRepository);
-            var repository = new DocumentRepository(accessor, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository);
+            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, Logger);
+            var entityRepository = new EntityRepository(accessor);
+            var relationRepository = new RelationRepository(accessor, Logger, relationTypeRepository, entityRepository);
+            var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
+            var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
+            var repository = new DocumentRepository(accessor, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences);
             return repository;
         }
 

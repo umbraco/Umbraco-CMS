@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Moq;
@@ -6,6 +7,7 @@ using NUnit.Framework;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -25,7 +27,12 @@ namespace Umbraco.Tests.Persistence.Repositories
             var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches);
             languageRepository = new LanguageRepository(accessor, Core.Cache.AppCaches.Disabled, Logger);
             contentTypeRepository = new ContentTypeRepository(accessor, Core.Cache.AppCaches.Disabled, Logger, commonRepository, languageRepository);
-            documentRepository = new DocumentRepository(accessor, Core.Cache.AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository);
+            var relationTypeRepository = new RelationTypeRepository(accessor, Core.Cache.AppCaches.Disabled, Logger);
+            var entityRepository = new EntityRepository(accessor);
+            var relationRepository = new RelationRepository(accessor, Logger, relationTypeRepository, entityRepository);
+            var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
+            var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
+            documentRepository = new DocumentRepository(accessor, Core.Cache.AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences);
             var domainRepository = new DomainRepository(accessor, Core.Cache.AppCaches.Disabled, Logger);
             return domainRepository;
         }
