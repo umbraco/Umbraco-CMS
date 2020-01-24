@@ -791,6 +791,7 @@
                             $scope.content.variants[i].expireDate = model.variants[i].expireDate;
                             $scope.content.variants[i].releaseDateFormatted = model.variants[i].releaseDateFormatted;
                             $scope.content.variants[i].expireDateFormatted = model.variants[i].expireDateFormatted;
+                            $scope.content.variants[i].save = model.variants[i].save;
                         }
 
                         model.submitButtonState = "busy";

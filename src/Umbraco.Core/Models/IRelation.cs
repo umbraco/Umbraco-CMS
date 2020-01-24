@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System;
+using System.Runtime.Serialization;
 using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
@@ -11,11 +12,17 @@ namespace Umbraco.Core.Models
         [DataMember]
         int ParentId { get; set; }
 
+        [DataMember]
+        Guid ParentObjectType { get; set; }
+
         /// <summary>
         /// Gets or sets the Child Id of the Relation (Destination)
         /// </summary>
         [DataMember]
         int ChildId { get; set; }
+
+        [DataMember]
+        Guid ChildObjectType { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="RelationType"/> for the Relation

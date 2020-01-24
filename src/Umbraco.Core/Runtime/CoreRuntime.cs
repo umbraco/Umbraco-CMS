@@ -147,7 +147,7 @@ namespace Umbraco.Core.Runtime
                 // TODO: remove this in netcore, this is purely backwards compat hacks with the empty ctor
                 if (MainDom == null)
                 {
-                    MainDom = new MainDom(Logger);
+                    MainDom = new MainDom(Logger, new MainDomSemaphoreLock(Logger));
                 }
                 
 

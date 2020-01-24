@@ -36,6 +36,8 @@
     <key alias="chooseWhereToCopy">Choose where to copy</key>
     <key alias="chooseWhereToMove">Choose where to move</key>
     <key alias="toInTheTreeStructureBelow">to in the tree structure below</key>
+    <key alias="infiniteEditorChooseWhereToCopy">Choose where to copy the selected item(s)</key>
+    <key alias="infiniteEditorChooseWhereToMove">Choose where to move the selected item(s)</key>
     <key alias="wasMovedTo">was moved to</key>
     <key alias="wasCopiedTo">was copied to</key>
     <key alias="wasDeleted">was deleted</key>
@@ -265,6 +267,8 @@
     <key alias="updateDate">Last edited</key>
     <key alias="updateDateDesc" version="7.0">Date/time this document was edited</key>
     <key alias="uploadClear">Remove file(s)</key>
+	<key alias="uploadClearImageContext">Click here to remove the image from the media item</key>
+    <key alias="uploadClearFileContext">Click here to remove the file from the media item</key>
     <key alias="urls">Link to document</key>
     <key alias="memberof">Member of group(s)</key>
     <key alias="notmemberof">Not a member of group(s)</key>
@@ -278,6 +282,9 @@
     <key alias="nestedContentNoContentTypes">No content types are configured for this property.</key>
     <key alias="nestedContentAddElementType">Add element type</key>
     <key alias="nestedContentSelectElementTypeModalTitle">Select element type</key>
+    <key alias="nestedContentGroupHelpText">Select the group whose properties should be displayed. If left blank, the first group on the element type will be used.</key>
+    <key alias="nestedContentTemplateHelpTextPart1">Enter an angular expression to evaluate against each item for its name. Use</key>
+    <key alias="nestedContentTemplateHelpTextPart2">to display the item index</key>
     <key alias="addTextBox">Add another text box</key>
     <key alias="removeTextBox">Remove this text box</key>
     <key alias="contentRoot">Content root</key>
@@ -757,6 +764,11 @@
     <key alias="current">current</key>
     <key alias="embed">Embed</key>
     <key alias="selected">selected</key>
+    <key alias="other">Other</key>
+    <key alias="articles">Articles</key>
+    <key alias="videos">Videos</key>
+    <key alias="clear">Clear</key>
+    <key alias="installing">Installing</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blue</key>
@@ -1337,7 +1349,10 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="users">Users</key>
   </area>
   <area alias="help">
+    <key alias="tours">Tours</key>
     <key alias="theBestUmbracoVideoTutorials">The best Umbraco video tutorials</key>
+    <key alias="umbracoForum">Visit our.umbraco.com</key>
+    <key alias="umbracoTv">Visit umbraco.tv</key>
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Default template</key>
@@ -1404,6 +1419,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="editUserSaved">User Saved</key>
     <key alias="editUserTypeSaved">User type saved</key>
     <key alias="editUserGroupSaved">User group saved</key>
+    <key alias="editCulturesAndHostnamesSaved">Cultures and hostnames saved</key>
+    <key alias="editCulturesAndHostnamesError">Error saving cultures and hostnames</key>
     <key alias="fileErrorHeader">File not saved</key>
     <key alias="fileErrorText">file could not be saved. Please check file permissions</key>
     <key alias="fileSavedHeader">File saved</key>
@@ -1572,6 +1589,11 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="chooseExtra">Choose extra</key>
     <key alias="chooseDefault">Choose default</key>
     <key alias="areAdded">are added</key>
+        <key alias="warning">Warning</key>
+        <key alias="youAreDeleting">You are deleting the row configuration</key>
+        <key alias="deletingARow">
+            Deleting a row configuration name will result in loss of data for any existing content that is based on this configuration.
+        </key>
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">Compositions</key>
@@ -1628,6 +1650,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="elementType">Element type</key>
     <key alias="elementHeading">Is an Element type</key>
     <key alias="elementDescription">An Element type is meant to be used for instance in Nested Content, and not in the tree.</key>
+    <key alias="elementCannotToggle">A document type cannot be changed to an Element type once it has been used to create one or more content items.</key>
     <key alias="elementDoesNotSupport">This is not applicable for an Element type</key>
     <key alias="propertyHasChanges">You have made changes to this property. Are you sure you want to discard them?</key>
   </area>
@@ -1972,6 +1995,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="sortCreateDateAscending">Newest</key>
     <key alias="sortCreateDateDescending">Oldest</key>
     <key alias="sortLastLoginDateDescending">Last login</key>
+    <key alias="noUserGroupsAdded">No user groups have been added</key>
   </area>
   <area alias="validation">
     <key alias="validation">Validation</key>
@@ -2097,6 +2121,14 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Notification email is still set to the default value of <strong>%0%</strong>.]]></key>
     <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Results of the scheduled Umbraco Health Checks run on %0% at %1% are as follows:</p>%2%</body></html>]]></key>
     <key alias="scheduledHealthCheckEmailSubject">Umbraco Health Check Status: %0%</key>
+    <key alias="checkAllGroups">Check All Groups</key>
+    <key alias="checkGroup">Check group</key>
+    <key alias="helpText">
+        <![CDATA[
+        <p>The health checker evaluates various areas of your site for best practice settings, configuration, potential problems, etc. You can easily fix problems by pressing a button.
+        You can add your own health checks, have a look at <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" class="btn-link -underline">the documentation for more information</a> about custom health checks.</p>
+        ]]>
+    </key>
   </area>
   <area alias="redirectUrls">
     <key alias="disableUrlTracker">Disable URL tracker</key>
@@ -2181,6 +2213,13 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="newPartialViewMacro">Partial View Macro</key>
     <key alias="newMember">Member</key>
     <key alias="newDataType">Data type</key>
+    <key alias="redirectDashboardSearchLabel">Search the redirect dashboard</key>
+    <key alias="userGroupSearchLabel">Search the user group section</key>
+    <key alias="userSearchLabel">Search the users section</key>
+    <key alias="createItem">Create item</key>
+    <key alias="create">Create</key>
+    <key alias="edit">Edit</key>
+    <key alias="name">Name</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>
@@ -2192,6 +2231,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="labelUsedByMemberTypes">Used in Member Types</key>
     <key alias="noMemberTypes">No references to Member Types.</key>
     <key alias="usedByProperties">Used by</key>
+    <key alias="labelUsedByDocuments">Used in Documents</key>
+    <key alias="labelUsedByMembers">Used in Members</key>
+    <key alias="labelUsedByMedia">Used in Media</key>
   </area>
   <area alias="logViewer">
     <key alias="logLevels">Log Levels</key>
@@ -2339,5 +2381,13 @@ To manage your website, simply open the Umbraco back office and start adding con
         Find out about real-life <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank">training and certification</a> opportunities
     ]]>
     </key>
+  </area>
+  <area alias="startupDashboard">
+    <key alias="fallbackHeadline">Welcome to The Friendly CMS</key>
+    <key alias="fallbackDescription">Thank you for choosing Umbraco - we think this could be the beginning of something beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast as possible.</key>
+  </area>  
+  <area alias="formsDashboard">
+    <key alias="formsHeadline">Umbraco Forms</key>
+    <key alias="formsDescription">Create forms using an intuitive drag and drop interface. From simple contact forms that sends e-mails to advanced questionaires that integrate with CRM systems. Your clients will love it!</key>
   </area>
 </language>

@@ -14,7 +14,7 @@
         vm.userStates = [];
         vm.selection = [];
         vm.newUser = {};
-        vm.usersOptions = {};
+        vm.usersOptions = {filter:null};
         vm.userSortData = [
             { label: "Name (A-Z)", key: "Name", direction: "Ascending" },
             { label: "Name (Z-A)", key: "Name", direction: "Descending" },
@@ -451,7 +451,7 @@
 
         var search = _.debounce(function () {
             $scope.$apply(function () {
-                getUsers();
+                changePageNumber(1);
             });
         }, 500);
 
@@ -512,7 +512,7 @@
             }
 
             updateLocation("userStates", vm.usersOptions.userStates.join(","));
-            getUsers();
+            changePageNumber(1);
         }
 
         function setUserGroupFilter(userGroup) {
@@ -529,7 +529,7 @@
             }
 
             updateLocation("userGroups", vm.usersOptions.userGroups.join(","));
-            getUsers();
+            changePageNumber(1);
         }
 
         function setOrderByFilter(value, direction) {
