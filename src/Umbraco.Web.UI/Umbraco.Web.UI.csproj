@@ -113,12 +113,6 @@
     </PackageReference>
     <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-   <ProjectReference Include="..\Umbraco.TestData\Umbraco.TestData.csproj">
-     <Project>{fb5676ed-7a69-492c-b802-e7b24144c0fc}</Project>
-     <Name>Umbraco.TestData</Name>
-   </ProjectReference>
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
       <Project>{31785bc3-256c-4613-b2f5-a1b0bdded8c1}</Project>
@@ -131,10 +125,6 @@
     <ProjectReference Include="..\Umbraco.ModelsBuilder.Embedded\Umbraco.ModelsBuilder.Embedded.csproj">
       <Project>{52ac0ba8-a60e-4e36-897b-e8b97a54ed1c}</Project>
       <Name>Umbraco.ModelsBuilder.Embedded</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Umbraco.TestData\Umbraco.TestData.csproj">
-      <Project>{fb5676ed-7a69-492c-b802-e7b24144c0fc}</Project>
-      <Name>Umbraco.TestData</Name>
     </ProjectReference>
     <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
       <Project>{651e1350-91b6-44b7-bd60-7207006d7003}</Project>
@@ -355,9 +345,9 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>8600</DevelopmentServerPort>
+          <DevelopmentServerPort>8700</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:8600</IISUrl>
+          <IISUrl>http://localhost:8700</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
