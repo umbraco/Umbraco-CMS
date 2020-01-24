@@ -7,9 +7,9 @@
     var umbVariantContent = {
         templateUrl: 'views/components/content/umb-variant-content.html',
         bindings: {
-            content: "=",
+            content: "<",
             page: "<",
-            editor: "=",
+            editor: "<",
             editorIndex: "<",
             editorCount: "<",
             onCloseSplitView: "&",

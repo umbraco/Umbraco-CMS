@@ -8,7 +8,7 @@
         templateUrl: 'views/components/content/umb-variant-content-editors.html',
         bindings: {
             page: "<",
-            content: "=",
+            content: "<",
             culture: "<",
             segment: "<",
             onSelectApp: "&?",
