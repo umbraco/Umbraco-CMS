@@ -40,6 +40,11 @@ namespace Umbraco.Composing
             IHostingEnvironment hostingEnvironment,
             IBackOfficeInfo backOfficeInfo)
         {
+            if (_initialized)
+            {
+                throw new InvalidOperationException("Current cannot be initialized more than once");
+            }
+
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _configs = configs ?? throw new ArgumentNullException(nameof(configs));
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
