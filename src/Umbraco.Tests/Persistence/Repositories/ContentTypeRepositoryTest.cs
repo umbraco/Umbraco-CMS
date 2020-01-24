@@ -8,6 +8,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -35,7 +36,12 @@ namespace Umbraco.Tests.Persistence.Repositories
             var commonRepository = new ContentTypeCommonRepository(scopeAccessor, templateRepository, AppCaches.Disabled);
             contentTypeRepository = new ContentTypeRepository(scopeAccessor, AppCaches.Disabled, Logger, commonRepository, langRepository);
             var languageRepository = new LanguageRepository(scopeAccessor, AppCaches.Disabled, Logger);
-            var repository = new DocumentRepository(scopeAccessor, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository);
+            var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, Logger);
+            var entityRepository = new EntityRepository(scopeAccessor);
+            var relationRepository = new RelationRepository(scopeAccessor, Logger, relationTypeRepository, entityRepository);
+            var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
+            var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
+            var repository = new DocumentRepository(scopeAccessor, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences);
             return repository;
         }
 
@@ -962,6 +968,32 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(4));
                 Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "metaAuthor"), Is.True);
                 Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "keywords"), Is.False);
+            }
+        }
+
+        [Test]
+        public void Can_Verify_Content_Type_Has_Content_Nodes()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
+            {
+                ContentTypeRepository repository;
+                var contentRepository = CreateRepository((IScopeAccessor)provider, out repository);
+                var contentTypeId = NodeDto.NodeIdSeed + 1;
+                var contentType = repository.Get(contentTypeId);
+
+                // Act
+                var result = repository.HasContentNodes(contentTypeId);
+
+                var subpage = MockedContent.CreateTextpageContent(contentType, "Test Page 1", contentType.Id);
+                contentRepository.Save(subpage);
+
+                var result2 = repository.HasContentNodes(contentTypeId);
+
+                // Assert
+                Assert.That(result, Is.False);
+                Assert.That(result2, Is.True);
             }
         }
 

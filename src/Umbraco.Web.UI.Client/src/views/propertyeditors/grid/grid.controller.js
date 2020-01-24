@@ -402,6 +402,15 @@ angular.module("umbraco")
 
                 eventsService.emit("grid.rowAdded", { scope: $scope, element: $element, row: row });
 
+                // TODO: find a nicer way to do this without relying on setTimeout
+                setTimeout(function () {
+                    var newRowEl = $element.find("[data-rowid='" + row.$uniqueId + "']");
+
+                    if(newRowEl !== null) {
+                        newRowEl.focus();
+                    }
+                }, 0);
+
             };
 
             $scope.removeRow = function (section, $index) {

@@ -128,6 +128,10 @@
     </Compile>
     -->
     <Compile Include="AssemblyExtensions.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_6_0\AddMainDomLock.cs" />
+    <Compile Include="Runtime\IMainDomLock.cs" />
+    <Compile Include="Runtime\MainDomSemaphoreLock.cs" />
+    <Compile Include="Runtime\SqlMainDomLock.cs" />
     <Compile Include="Migrations\Upgrade\V_8_6_0\MissingContentVersionsIndexes.cs" />
     <Compile Include="SystemLock.cs" />
     <Compile Include="Attempt.cs" />
@@ -252,6 +256,9 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\RichTextPreValueMigrator.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\DropDownFlexiblePreValueMigrator.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\MergeDateAndDateTimePropertyEditor.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_6_0\AddNewRelationTypes.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_6_0\UpdateRelationTypeTable.cs" />
+    <Compile Include="Models\Editors\UmbracoEntityReference.cs" />
     <Compile Include="Models\ContentEditing\ContentAppBadge.cs" />
     <Compile Include="Models\ContentEditing\ContentAppBadgeType.cs" />
     <Compile Include="Models\Entities\EntityExtensions.cs" />
@@ -277,10 +284,15 @@
     <Compile Include="Models\Entities\MediaEntitySlim.cs" />
     <Compile Include="Models\PagedResult.cs" />
     <Compile Include="Models\Entities\MemberEntitySlim.cs" />
+    <Compile Include="Models\MediaTypeExtensions.cs" />
     <Compile Include="Models\PublishedContent\ILivePublishedModelFactory.cs" />
     <Compile Include="Models\PublishedContent\IPublishedContentType.cs" />
     <Compile Include="Models\PublishedContent\IPublishedPropertyType.cs" />
     <Compile Include="PropertyEditors\ConfigurationFieldsExtensions.cs" />
+    <Compile Include="PropertyEditors\DataValueReferenceFactoryCollection.cs" />
+    <Compile Include="PropertyEditors\DataValueReferenceFactoryCollectionBuilder.cs" />
+    <Compile Include="PropertyEditors\IDataValueReference.cs" />
+    <Compile Include="PropertyEditors\IDataValueReferenceFactory.cs" />
     <Compile Include="PropertyEditors\IDataEditorWithMediaPath.cs" />
     <Compile Include="PropertyEditors\IIgnoreUserStartNodesConfig.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
@@ -402,7 +414,7 @@
     <Compile Include="Events\ExportedMemberEventArgs.cs" />
     <Compile Include="Events\RolesEventArgs.cs" />
     <Compile Include="Events\UserGroupWithUsers.cs" />
-    <Compile Include="IMainDom.cs" />
+    <Compile Include="Runtime\IMainDom.cs" />
     <Compile Include="IO\IFileSystems.cs" />
     <Compile Include="IO\IMediaFileSystem.cs" />
     <Compile Include="GuidUtils.cs" />
@@ -733,7 +745,7 @@
     <Compile Include="Logging\ProfilingLogger.cs" />
     <Compile Include="Logging\VoidProfiler.cs" />
     <Compile Include="Macros\MacroErrorBehaviour.cs" />
-    <Compile Include="MainDom.cs" />
+    <Compile Include="Runtime\MainDom.cs" />
     <Compile Include="Manifest\ManifestParser.cs" />
     <Compile Include="Manifest\ValueValidatorConverter.cs" />
     <Compile Include="Manifest\ManifestWatcher.cs" />
@@ -1530,7 +1542,7 @@
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="Udi.cs" />
     <Compile Include="UdiDefinitionAttribute.cs" />
-    <Compile Include="UdiEntityType.cs" />
+    <Compile Include="Contants-UdiEntityType.cs" />
     <Compile Include="UdiGetterExtensions.cs" />
     <Compile Include="UdiRange.cs" />
     <Compile Include="UdiType.cs" />

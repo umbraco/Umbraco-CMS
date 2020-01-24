@@ -34,5 +34,13 @@ namespace Umbraco.Core.Persistence.Dtos
         [Column("comment")]
         [Length(1000)]
         public string Comment { get; set; }
+
+        [ResultColumn]
+        [Column("parentObjectType")]
+        public Guid ParentObjectType { get; set; }
+
+        [ResultColumn]
+        [Column("childObjectType")]
+        public Guid ChildObjectType { get; set; }
     }
 }

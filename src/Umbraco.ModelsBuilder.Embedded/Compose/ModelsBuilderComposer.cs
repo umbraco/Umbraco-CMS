@@ -22,6 +22,9 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
         {
             var isLegacyModelsBuilderInstalled = IsLegacyModelsBuilderInstalled();
 
+
+            composition.Configs.Add<IModelsBuilderConfig>(() => new ModelsBuilderConfig());
+
             if (isLegacyModelsBuilderInstalled)
             {
                 ComposeForLegacyModelsBuilder(composition);
@@ -30,7 +33,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
 
             composition.Components().Append<ModelsBuilderComponent>();
             composition.Register<UmbracoServices>(Lifetime.Singleton);
-            composition.Configs.Add<IModelsBuilderConfig>(() => new ModelsBuilderConfig());
+
             composition.RegisterUnique<ModelsGenerator>();
             composition.RegisterUnique<LiveModelsProvider>();
             composition.RegisterUnique<OutOfDateModelsStatus>();

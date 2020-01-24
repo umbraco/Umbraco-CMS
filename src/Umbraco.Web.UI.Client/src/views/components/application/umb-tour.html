@@ -4,7 +4,7 @@
 
     <div class="umb-tour__pulse"></div>
 
-    <div class="umb-tour__popover shadow-depth-2" ng-class="{'umb-tour__popover--l': model.currentStep.type === 'intro' || model.currentStepIndex === model.steps.length}">
+    <div class="umb-tour__popover shadow-depth-2" ng-class="{'umb-tour__popover--l': model.currentStep.type === 'intro' || model.currentStepIndex === model.steps.length, 'umb-tour__popover--promotion': model.currentStep.type === 'promotion'}">
 
         <div ng-if="!configuredView && !elementNotFound">
 
