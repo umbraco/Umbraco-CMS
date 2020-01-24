@@ -10,9 +10,9 @@ namespace Umbraco.Composing
 {
     public static class Current
     {
-        private static bool _initialized = false;
+        private static bool _initialized;
 
-        private static ILogger _logger;
+        private static ILogger _logger = new NullLogger();
         private static Configs _configs;
         private static IIOHelper _ioHelper;
         private static IHostingEnvironment _hostingEnvironment;
@@ -26,12 +26,19 @@ namespace Umbraco.Composing
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static T EnsureInitialized<T>(T returnValue)
+            where T : class
         {
-            if(!_initialized) throw new InvalidOperationException("Current cannot be used before initialize");
+            if (returnValue is null && !_initialized)
+                throw new InvalidOperationException("Current cannot be used before initialize");
             return returnValue;
         }
 
-        public static void Initialize(ILogger logger, Configs configs, IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
+        public static void Initialize(
+            ILogger logger,
+            Configs configs,
+            IIOHelper ioHelper,
+            IHostingEnvironment hostingEnvironment,
+            IBackOfficeInfo backOfficeInfo)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _configs = configs ?? throw new ArgumentNullException(nameof(configs));
