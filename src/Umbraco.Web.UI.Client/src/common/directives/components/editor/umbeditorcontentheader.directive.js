@@ -14,7 +14,7 @@
                 scope.serverValidationAliasField = "Alias";
             }
 
-            scope.isNew = scope.editorContent.state == "NotCreated";
+            scope.isNew = scope.editor.content.state == "NotCreated";
 
             localizationService.localizeMany(
                 [
@@ -25,7 +25,7 @@
                 scope.a11yMessage = data[0];
                 scope.a11yName = data[1];
                 if (!scope.isNew) {
-                    scope.a11yMessage += " " + scope.editorContent.name;
+                    scope.a11yMessage += " " + scope.editor.content.name;
 
                 } else {
                     var name = editorState.current.contentTypeName;
@@ -79,7 +79,7 @@
                 
                 checkErrorsOnOtherVariants();
                 
-                angular.forEach(scope.content.apps, (app) => {
+                angular.forEach(scope.editor.variantApps, (app) => {
                     if (app.alias === "umbContent") {
                         app.anchors = scope.content.tabs;
                     }
@@ -177,7 +177,7 @@
                 menu: "=",
                 hideActionsMenu: "<?",
                 content: "=",
-                editorContent: "=",
+                editor: "=",
                 hideChangeVariant: "<?",
                 onSelectNavigationItem: "&?",
                 onSelectAnchorItem: "&?",

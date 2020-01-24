@@ -48,6 +48,8 @@
                     vm.nameDisabled = true;
                 }
             });
+            console.log("what do we have on vm.editor.variantApps", vm.editor.variantApps)
+            vm.editor.variantApps = angular.copy(vm.content.apps);
         }
         
         function showBackButton() {

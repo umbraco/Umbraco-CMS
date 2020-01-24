@@ -11,7 +11,7 @@
                 hide-menu="vm.page.hideActionsMenu"
                 name="vm.editor.content.name"
                 name-disabled="vm.nameDisabled"
-                editor-content="vm.editor.content"
+                editor="vm.editor"
                 content="vm.content"
                 on-select-navigation-item="vm.selectApp(item)"
                 on-select-anchor-item="vm.selectAppAnchor(item, anchor)"
@@ -34,7 +34,7 @@
             </div>
 
             <div class="umb-editor-sub-views">
-                <div ng-repeat="app in vm.content.apps track by app.alias">
+                <div ng-repeat="app in vm.editor.variantApps track by app.alias">
                     <umb-editor-sub-view model="app" content="vm.content" variant-content="vm.editor.content"/>
                 </div>
             </div>
