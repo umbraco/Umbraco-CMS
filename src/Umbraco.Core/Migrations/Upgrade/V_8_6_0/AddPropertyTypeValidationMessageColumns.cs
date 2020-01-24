@@ -3,6 +3,7 @@ using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_6_0
 {
+
     public class AddPropertyTypeValidationMessageColumns : MigrationBase
     {
         public AddPropertyTypeValidationMessageColumns(IMigrationContext context)
