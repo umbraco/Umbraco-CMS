@@ -13,7 +13,7 @@ namespace Umbraco.Web.Actions
             : base(items)
         { }
 
-        internal T GetAction<T>()
+        public T GetAction<T>()
             where T : IAction
         {
             return this.OfType<T>().FirstOrDefault();

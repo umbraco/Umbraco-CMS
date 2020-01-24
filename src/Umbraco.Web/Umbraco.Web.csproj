@@ -137,8 +137,6 @@
     <Compile Include="Compose\AuditEventsComponent.cs" />
     <Compile Include="Compose\AuditEventsComposer.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComposer.cs" />
-    <Compile Include="Compose\NotificationsComposer.cs" />
-    <Compile Include="Compose\PublicAccessComposer.cs" />
     <Compile Include="Composing\BuildManagerTypeFinder.cs" />
     <Compile Include="Composing\CompositionExtensions\Installer.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
@@ -617,7 +615,6 @@
     <Compile Include="Security\UmbracoBackOfficeCookieAuthOptions.cs" />
     <Compile Include="Scheduling\TaskAndFactoryExtensions.cs" />
     <Compile Include="Migrations\PostMigrations\ClearCsrfCookies.cs" />
-    <Compile Include="Compose\NotificationsComponent.cs" />
     <Compile Include="TagQuery.cs" />
     <Compile Include="Trees\CoreTreeAttribute.cs" />
     <Compile Include="Trees\DataTypeTreeController.cs" />
@@ -722,7 +719,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="JavaScript\ServerVariablesParser.cs" />
-    <Compile Include="Compose\PublicAccessComponent.cs" />
     <Compile Include="CdfLogger.cs" />
     <Compile Include="Controllers\UmbLoginController.cs" />
     <Compile Include="UrlHelperExtensions.cs" />
@@ -836,11 +832,6 @@
     <Compile Include="Macros\PublishedContentHashtableConverter.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
     <Compile Include="UmbracoApplication.cs" />
     <Compile Include="UmbracoContext.cs" />
     <Compile Include="UmbracoInjectedModule.cs" />
@@ -898,10 +889,6 @@
     </None>
     <None Include="Web References\org.umbraco.update\UpgradeResult1.datasource">
       <DependentUpon>Reference.map</DependentUpon>
-    </None>
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <ItemGroup>
