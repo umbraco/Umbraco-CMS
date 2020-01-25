@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Web.Models.PropertyEditorsConfigs;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -9,13 +10,11 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     public class GridConfiguration : IIgnoreUserStartNodesConfig
     {
-        // TODO: Make these strongly typed, for now this works though
         [ConfigurationField("items", "Grid", "views/propertyeditors/grid/grid.prevalues.html", Description = "Grid configuration")]
-        public JObject Items { get; set; }
+        public GridItems Items { get; set; }
 
-        // TODO: Make these strongly typed, for now this works though
         [ConfigurationField("rte", "Rich text editor", "views/propertyeditors/rte/rte.prevalues.html", Description = "Rich text editor configuration", HideLabel = true)]
-        public JObject Rte { get; set; }
+        public RichTextSettings RichText { get; set; }
 
         [ConfigurationField(Core.Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes,
             "Ignore User Start Nodes", "boolean",

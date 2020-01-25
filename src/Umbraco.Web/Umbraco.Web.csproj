@@ -225,6 +225,15 @@
     <Compile Include="Models\ContentEditing\UrlAndAnchors.cs" />
     <Compile Include="Models\Mapping\CommonMapper.cs" />
     <Compile Include="Models\Mapping\MapperContextExtensions.cs" />
+    <Compile Include="Models\PropertyEditorsConfigs\GridArea.cs" />
+    <Compile Include="Models\PropertyEditorsConfigs\GridBasic.cs" />
+    <Compile Include="Models\PropertyEditorsConfigs\GridConfig.cs" />
+    <Compile Include="Models\PropertyEditorsConfigs\GridItems.cs" />
+    <Compile Include="Models\PropertyEditorsConfigs\GridLayout.cs" />
+    <Compile Include="Models\PropertyEditorsConfigs\GridSection.cs" />
+    <Compile Include="Models\PropertyEditorsConfigs\GridStyle.cs" />
+    <Compile Include="Models\PropertyEditorsConfigs\GridTemplate.cs" />
+    <Compile Include="Models\PropertyEditorsConfigs\RichTextSettings.cs" />
     <Compile Include="Models\PublishedContent\HybridVariationContextAccessor.cs" />
     <Compile Include="Models\TemplateQuery\QueryConditionExtensions.cs" />
     <Compile Include="Mvc\HttpUmbracoFormRouteStringException.cs" />
@@ -1259,7 +1268,6 @@
       <CachedSettingsPropName>umbraco_org_umbraco_update_CheckForUpgrade</CachedSettingsPropName>
     </WebReferenceUrl>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!--
     copied from Microsoft.CSharp.targets
