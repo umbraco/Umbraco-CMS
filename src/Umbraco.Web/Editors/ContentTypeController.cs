@@ -45,7 +45,7 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
     [EnableOverrideAuthorization]
-    [ContentTypeControllerControllerConfiguration]
+    [ContentTypeControllerConfiguration]
     public class ContentTypeController : ContentTypeControllerBase<IContentType>
     {
         private readonly IEntityXmlSerializer _serializer;
@@ -70,7 +70,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Configures this controller with a custom action selector
         /// </summary>
-        private class ContentTypeControllerControllerConfigurationAttribute : Attribute, IControllerConfiguration
+        private class ContentTypeControllerConfigurationAttribute : Attribute, IControllerConfiguration
         {
             public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
             {
