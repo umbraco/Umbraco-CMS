@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.Http.Controllers;
 using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core;
@@ -44,6 +45,7 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
     [EnableOverrideAuthorization]
+    [ContentTypeControllerControllerConfiguration]
     public class ContentTypeController : ContentTypeControllerBase<IContentType>
     {
         private readonly IEntityXmlSerializer _serializer;
@@ -63,6 +65,17 @@ namespace Umbraco.Web.Editors
             _serializer = serializer;
             _propertyEditors = propertyEditors;
             _scopeProvider = scopeProvider;
+        }
+
+        /// <summary>
+        /// Configures this controller with a custom action selector
+        /// </summary>
+        private class ContentTypeControllerControllerConfigurationAttribute : Attribute, IControllerConfiguration
+        {
+            public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
+            {
+                controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi))));            }
         }
 
         public int GetCount()
