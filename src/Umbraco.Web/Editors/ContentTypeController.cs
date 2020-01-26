@@ -77,15 +77,58 @@ namespace Umbraco.Web.Editors
             return Services.ContentTypeService.HasContentNodes(id);
         }
 
+        /// <summary>
+        /// Gets the document type a given id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public DocumentTypeDisplay GetById(int id)
         {
-            var ct = Services.ContentTypeService.Get(id);
-            if (ct == null)
+            var contentType = Services.ContentTypeService.Get(id);
+            if (contentType == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var dto = Mapper.Map<IContentType, DocumentTypeDisplay>(ct);
+            var dto = Mapper.Map<IContentType, DocumentTypeDisplay>(contentType);
+            return dto;
+        }
+
+        /// <summary>
+        /// Gets the document type a given guid
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public DocumentTypeDisplay GetById(Guid id)
+        {
+            var contentType = Services.ContentTypeService.Get(id);
+            if (contentType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var dto = Mapper.Map<IContentType, DocumentTypeDisplay>(contentType);
+            return dto;
+        }
+
+        /// <summary>
+        /// Gets the document type a given udi
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public DocumentTypeDisplay GetById(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var contentType = Services.ContentTypeService.Get(guidUdi.Guid);
+            if (contentType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var dto = Mapper.Map<IContentType, DocumentTypeDisplay>(contentType);
             return dto;
         }
 
