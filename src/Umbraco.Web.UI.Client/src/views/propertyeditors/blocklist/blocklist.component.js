@@ -84,8 +84,8 @@
             },
             {
                 alias: "contentTypeAlias",
-                name: "contentTypeName",
-                icon: "icon-text",
+                name: "Text",
+                icon: "icon-info",
                 prototype_paste_data: {
                     elementType: {
                         alias: 'contentTypeAlias',
@@ -132,7 +132,7 @@
             },
             {
                 alias: "contentTypeAlias",
-                name: "contentTypeName",
+                name: "Image",
                 icon: "icon-picture",
                 prototype_paste_data: {
                     elementType: {
@@ -176,6 +176,55 @@
                             }
                         ],
                         temp_image: "/umbraco/assets/img/login.jpg"
+                    }
+                }
+            },
+            {
+                alias: "contentTypeAlias",
+                name: "Inline editing",
+                icon: "icon-picture",
+                prototype_paste_data: {
+                    elementType: {
+                        alias: 'contentTypeAlias',
+                        icon: "icon-document",
+                        label: "Text"
+                    },
+                    label: "Label",
+                    editor: "views/blockelements/imageblock/imageblock.editor.html",
+                    content: {
+                        variants: [
+                            {
+                                language: {
+                                    isDefault: true
+                                }
+                            }
+                        ],
+                        tabs: [
+                            {
+                                id: 1234,
+                                label: "Group 1",
+                                properties: [
+                                    {
+                                        label: "Page Title",
+                                        description: "The title of the page",
+                                        view: "textbox",
+                                        config: {maxChars: 500},
+                                        hideLabel: false,
+                                        validation: {mandatory: true, mandatoryMessage: "", pattern: null, patternMessage: ""},
+                                        readonly: false,
+                                        id: 441,
+                                        dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
+                                        value: "Let's have a chat",
+                                        alias: "pageTitle",
+                                        editor: "Umbraco.TextBox",
+                                        isSensitive: false,
+                                        culture: null,
+                                        segment: null
+                                    }
+                                ]
+                            }
+                        ],
+                        temp_image: "/umbraco/assets/img/demo.png"
                     }
                 }
             }
