@@ -7,7 +7,7 @@ namespace Umbraco.ModelsBuilder.Embedded
     /// </summary>
     /// <remarks>And therefore it should not be generated.</remarks>
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
-    public sealed class ImplementPropertyTypeAttribute : Attribute
+    public class ImplementPropertyTypeAttribute : Attribute
     {
         public ImplementPropertyTypeAttribute(string alias)
         {

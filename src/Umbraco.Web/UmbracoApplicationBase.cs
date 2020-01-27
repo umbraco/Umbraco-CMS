@@ -23,43 +23,36 @@ namespace Umbraco.Web
     {
         private IRuntime _runtime;
 
-        private readonly ILogger _logger;
-        private readonly Configs _configs;
-        private readonly IIOHelper _ioHelper;
-        private readonly IProfiler _profiler;
-        private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IBackOfficeInfo _backOfficeInfo;
         private IFactory _factory;
 
         protected UmbracoApplicationBase()
         {
-            var configFactory = new ConfigsFactory();
 
-            var hostingSettings = configFactory.HostingSettings;
-            var coreDebug = configFactory.CoreDebug;
+            if (!Umbraco.Composing.Current.IsInitialized)
+            {
+                var configFactory = new ConfigsFactory();
 
-            _hostingEnvironment = new AspNetHostingEnvironment(hostingSettings);
-            _ioHelper = new IOHelper(_hostingEnvironment);
-            _configs = configFactory.Create(_ioHelper);
+                var hostingSettings = configFactory.HostingSettings;
+                var coreDebug = configFactory.CoreDebug;
 
-            _profiler = new LogProfiler(_logger);
+                var hostingEnvironment = new AspNetHostingEnvironment(hostingSettings);
+                var ioHelper = new IOHelper(hostingEnvironment);
+                var configs = configFactory.Create(ioHelper);
 
-            _logger = SerilogLogger.CreateWithDefaultConfiguration(_hostingEnvironment,  new AspNetSessionIdResolver(), () => _factory?.GetInstance<IRequestCache>(), coreDebug, _ioHelper, new FrameworkMarchal());
-            _backOfficeInfo = new AspNetBackOfficeInfo(_configs.Global(), _ioHelper, _configs.Settings(), _logger);
+                var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment,  new AspNetSessionIdResolver(), () => _factory?.GetInstance<IRequestCache>(), coreDebug, ioHelper, new FrameworkMarchal());
+                var backOfficeInfo = new AspNetBackOfficeInfo(configs.Global(), ioHelper, configs.Settings(), logger);
+                var profiler = new LogProfiler(logger);
+                Umbraco.Composing.Current.Initialize(logger, configs, ioHelper, hostingEnvironment, backOfficeInfo, profiler);
+            }
 
-            Umbraco.Composing.Current.Initialize(_logger, _configs, _ioHelper, _hostingEnvironment, _backOfficeInfo);
         }
 
         protected UmbracoApplicationBase(ILogger logger, Configs configs, IIOHelper ioHelper, IProfiler profiler, IHostingEnvironment hostingEnvironment, IBackOfficeInfo backOfficeInfo)
         {
-            _logger = logger;
-            _configs = configs;
-            _ioHelper = ioHelper;
-            _profiler = profiler;
-            _hostingEnvironment = hostingEnvironment;
-            _backOfficeInfo = backOfficeInfo;
-
-            Umbraco.Composing.Current.Initialize(_logger, _configs, _ioHelper, _hostingEnvironment, _backOfficeInfo);
+            if (!Umbraco.Composing.Current.IsInitialized)
+            {
+                Umbraco.Composing.Current.Initialize(logger, configs, ioHelper, hostingEnvironment, backOfficeInfo, profiler);
+            }
         }
 
 
@@ -105,13 +98,20 @@ namespace Umbraco.Web
             // ******** THIS IS WHERE EVERYTHING BEGINS ********
 
 
-            var globalSettings = _configs.Global();
+            var globalSettings =  Umbraco.Composing.Current.Configs.Global();
             var umbracoVersion = new UmbracoVersion(globalSettings);
 
             // create the register for the application, and boot
             // the boot manager is responsible for registrations
             var register = GetRegister(globalSettings);
-            _runtime = GetRuntime(_configs, umbracoVersion, _ioHelper, _logger, _profiler, _hostingEnvironment, _backOfficeInfo);
+            _runtime = GetRuntime(
+                Umbraco.Composing.Current.Configs,
+                umbracoVersion,
+                Umbraco.Composing.Current.IOHelper,
+                Umbraco.Composing.Current.Logger,
+                Umbraco.Composing.Current.Profiler,
+                Umbraco.Composing.Current.HostingEnvironment,
+                Umbraco.Composing.Current.BackOfficeInfo);
             _factory =_runtime.Boot(register);
         }
 
