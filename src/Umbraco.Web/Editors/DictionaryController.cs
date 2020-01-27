@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Http.Controllers;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -31,11 +32,25 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     [UmbracoTreeAuthorize(Constants.Trees.Dictionary)]
     [EnableOverrideAuthorization]
+    [DictionaryControllerConfiguration]
     public class DictionaryController : BackOfficeNotificationsController
     {
         public DictionaryController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
+        }
+
+        /// <summary>
+        /// Configures this controller with a custom action selector
+        /// </summary>
+        private class DictionaryControllerConfigurationAttribute : Attribute, IControllerConfiguration
+        {
+            public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
+            {
+                controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi))
+                ));
+            }
         }
 
         /// <summary>
@@ -129,7 +144,52 @@ namespace Umbraco.Web.Editors
         public DictionaryDisplay GetById(int id)
         {
             var dictionary = Services.LocalizationService.GetDictionaryItemById(id);
+            if (dictionary == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
 
+            return Mapper.Map<IDictionaryItem, DictionaryDisplay>(dictionary);
+        }
+
+        /// <summary>
+        /// Gets a dictionary item by guid
+        /// </summary>
+        /// <param name="id">
+        /// The id.
+        /// </param>
+        /// <returns>
+        /// The <see cref="DictionaryDisplay"/>.
+        /// </returns>
+        /// <exception cref="HttpResponseException">
+        ///  Returns a not found response when dictionary item does not exist
+        /// </exception>
+        public DictionaryDisplay GetById(Guid id)
+        {
+            var dictionary = Services.LocalizationService.GetDictionaryItemById(id);
+            if (dictionary == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            return Mapper.Map<IDictionaryItem, DictionaryDisplay>(dictionary);
+        }
+
+        /// <summary>
+        /// Gets a dictionary item by udi
+        /// </summary>
+        /// <param name="id">
+        /// The id.
+        /// </param>
+        /// <returns>
+        /// The <see cref="DictionaryDisplay"/>.
+        /// </returns>
+        /// <exception cref="HttpResponseException">
+        ///  Returns a not found response when dictionary item does not exist
+        /// </exception>
+        public DictionaryDisplay GetById(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var dictionary = Services.LocalizationService.GetDictionaryItemById(guidUdi.Guid);
             if (dictionary == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
