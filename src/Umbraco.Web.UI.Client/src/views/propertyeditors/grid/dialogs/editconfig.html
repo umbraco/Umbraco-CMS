@@ -20,6 +20,22 @@
 
                             <h4>{{model.name}}</h4>
                             <p>Settings will only save if the entered json configuration is valid</p>
+
+                            <!-- Code Editor -->
+                            <div
+                                umb-code-editor
+                                code-editor-config="vm.codeEditorOptions"
+                                editor-on-init="vm.onInit"
+                                editor-on-load="vm.onLoad"
+
+                                data-element="code-editor"
+                                auto-scale="85"
+                                style="border:3px solid hotpink;">
+                            </div>
+
+                            <pre>{{ model.config | json }}</pre>
+
+                            <!--
                             <textarea name="configSource"
                                 validate-on="'blur'"
                                 rows="20" class="umb-property-editor umb-textarea"
@@ -28,6 +44,7 @@
                             <div class="alert alert-error" ng-show="gridConfigEditor.$invalid === true">
                                 This configuration is not valid json, and will not be saved.
                             </div>
+                            -->
 
                         </ng-form>
 

@@ -47,110 +47,11 @@
                     //now copy back to the options we will use
                     options = defaults;
 
-                    // const modelUri = monaco.Uri.parse("json://grid/settings.json");
-                    // const jsonModel = monaco.editor.createModel("[{}]", "json", modelUri);
-
-                    // monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
-                    //     validate: true,
-                    //     schemas: [
-                    //         {
-                    //             uri: "",
-                    //             fileMatch: [modelUri.toString()],
-                    //             schema: {
-                    //                 "definitions": {},
-                    //                 "$schema": "",
-                    //                 "$id": "http://example.com/root.json",
-                    //                 "type": "array",
-                    //                 "title": "Umbraco Grid Settings Schema",
-                    //                 "default": null,
-                    //                 "items": {
-                    //                 "$id": "#/items",
-                    //                 "type": "object",
-                    //                 "title": "Grid Setting",
-                    //                 "default": null,
-                    //                 "required": [
-                    //                     "label",
-                    //                     "description",
-                    //                     "key",
-                    //                     "view"
-                    //                 ],
-                    //                 "properties": {
-                    //                     "label": {
-                    //                     "$id": "#/items/properties/label",
-                    //                     "type": "string",
-                    //                     "title": "The Label Schema",
-                    //                     "default": "",
-                    //                     "examples": [
-                    //                         "Class"
-                    //                     ],
-                    //                     "pattern": "^(.*)$"
-                    //                     },
-                    //                     "description": {
-                    //                     "$id": "#/items/properties/description",
-                    //                     "type": "string",
-                    //                     "title": "The Description Schema",
-                    //                     "default": "",
-                    //                     "examples": [
-                    //                         "Set a css class"
-                    //                     ],
-                    //                     "pattern": "^(.*)$"
-                    //                     },
-                    //                     "key": {
-                    //                     "$id": "#/items/properties/key",
-                    //                     "type": "string",
-                    //                     "title": "The Key Schema",
-                    //                     "default": "",
-                    //                     "examples": [
-                    //                         "class"
-                    //                     ],
-                    //                     "pattern": "^(.*)$"
-                    //                     },
-                    //                     "view": {
-                    //                     "$id": "#/items/properties/view",
-                    //                     "type": "string",
-                    //                     "title": "The View Schema",
-                    //                     "default": "",
-                    //                     "examples": [
-                    //                         "textstring"
-                    //                     ],
-                    //                     "pattern": "^(.*)$"
-                    //                     },
-                    //                     "modifier": {
-                    //                     "$id": "#/items/properties/modifier",
-                    //                     "type": "string",
-                    //                     "title": "The Modifier Schema",
-                    //                     "default": "",
-                    //                     "examples": [
-                    //                         "col-sm-{0}"
-                    //                     ],
-                    //                     "pattern": "^(.*)$"
-                    //                     },
-                    //                     "applyTo": {
-                    //                     "$id": "#/items/properties/applyTo",
-                    //                     "type": "string",
-                    //                     "title": "The Applyto Schema",
-                    //                     "default": "",
-                    //                     "examples": [
-                    //                         "row|cell"
-                    //                     ],
-                    //                     "pattern": "^(.*)$"
-                    //                     }
-                    //                 }
-                    //                 }
-                    //             }
-                    //         }
-                    //     ]
-                    // });
-
-
                     // Init & configure VS Code with options
                     const editor = monaco.editor.create(domEl, options);
 
-
                     // Value bind - contents of code editor to set from scope.model
-                    // TODO: Value can be set as options property or as a model
-                    if(scope.model){
-                        //editor.setModel(jsonModel);
+                    if(scope.model) {
                         editor.setValue(scope.model);
                     }
 
@@ -173,11 +74,15 @@
                     editor.onDidChangeModelContent((e) => {
                         const editorContents = editor.getValue();
 
-                        // TODO: Loads of events firing
-                        // Will it hammer perf - should it debounce/delay updating?!
-                        angularHelper.safeApply(scope, function () {
-                            scope.model = editorContents;
-                        });
+                        // We MAY NOT have a scope.model set
+                        // As we could have a VS Code Model that contains, lang, code and an ID
+                        if(scope.model !== undefined){
+                            // TODO: Loads of events firing
+                            // Will it hammer perf - should it debounce/delay updating?!
+                            angularHelper.safeApply(scope, function () {
+                                scope.model = editorContents;
+                            });
+                        }
                     });
 
                     // Use the windowResizeListener service to listen for window.resize
