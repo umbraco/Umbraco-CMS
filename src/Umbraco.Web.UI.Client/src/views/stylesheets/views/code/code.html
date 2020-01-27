@@ -1,9 +1,21 @@
 <umb-box>
     <umb-box-content>
-        <div data-element="code-editor"
+
+        <!-- Code Editor -->
+        <div
+            umb-code-editor
+            code-editor-config="model.codeEditorOptions"
+            model="model.stylesheet.content"
+            data-element="code-editor"
+            auto-scale="85"
+            style="border:3px solid hotpink;">
+        </div>
+
+        <!-- <div data-element="code-editor"
              auto-scale="85"
              umb-ace-editor="model.aceOption"
              model="model.stylesheet.content">
-        </div>
+        </div> -->
     </umb-box-content>
+
 </umb-box>

@@ -11,7 +11,7 @@
         vm.page.menu.currentSection = appState.getSectionState("currentSection");
         vm.page.menu.currentNode = null;
         vm.page.saveButtonState = "init";
-        
+
         vm.header = {};
         vm.header.editorfor = "settings_stylesheet";
         vm.header.setPageTitle = true;
@@ -35,6 +35,7 @@
             content: "",
             rules: []
         };
+
 
         // bind functions to view model
         vm.save = interpolateAndSave;
@@ -67,7 +68,7 @@
 
         /* Local functions */
 
-        function save(activeApp) {            
+        function save(activeApp) {
             contentEditingHelper.contentEditorPerformSave({
                 saveMethod: codefileResource.save,
                 scope: $scope,
@@ -105,7 +106,7 @@
             }, function (err) {
 
                 vm.page.saveButtonState = "error";
-                
+
                 localizationService.localizeMany(["speechBubbles_validationFailedHeader", "speechBubbles_validationFailedMessage"]).then(function(data){
                     var header = data[0];
                     var message = data[1];
@@ -120,7 +121,7 @@
         function init() {
 
             //we need to load this somewhere, for now its here.
-            assetsService.loadCss("lib/ace-razor-mode/theme/razor_chrome.css", $scope);
+            //assetsService.loadCss("lib/ace-razor-mode/theme/razor_chrome.css", $scope);
 
             if ($routeParams.create) {
                 codefileResource.getScaffold("stylesheets", $routeParams.id).then(function (stylesheet) {
@@ -171,6 +172,12 @@
 
             vm.stylesheet = stylesheet;
 
+            // Options to pass to code editor (VS-Code)
+            vm.codeEditorOptions = {
+                language: "css",
+                fontSize: 30
+            }
+
             vm.setDirty = function () {
                 setFormState("dirty");
             }
@@ -195,12 +202,12 @@
                     enableLiveAutocompletion: false
                 },
                 onLoad: function(_editor) {
-                    
+
                     vm.editor = _editor;
 
                     //Update the auto-complete method to use ctrl+alt+space
                     _editor.commands.bindKey("ctrl-alt-space", "startAutocomplete");
-                    
+
                     //Unassigns the keybinding (That was previously auto-complete)
                     //As conflicts with our own tree search shortcut
                     _editor.commands.bindKey("ctrl-space", null);
@@ -221,7 +228,7 @@
                             readOnly: true
                         }
                     ]);
-                    
+
                     // initial cursor placement
                     // Keep cursor in name field if we are create a new style sheet
                     // else set the cursor at the bottom of the code editor
@@ -242,7 +249,7 @@
             }
 
             function setFormState(state) {
-                
+
                 // get the current form
                 var currentForm = angularHelper.getCurrentForm($scope);
 
@@ -262,7 +269,7 @@
         function extractRules() {
             return codefileResource.extractStylesheetRules(vm.stylesheet.content);
         }
-        
+
         $scope.selectApp = function (app) {
             vm.page.loading = true;
 

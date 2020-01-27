@@ -1,3 +1,4 @@
+/// <reference path="../../../node_modules/monaco-editor/monaco.d.ts" />
 (function () {
     "use strict";
 
@@ -42,8 +43,8 @@
         function save() {
 
             vm.page.saveButtonState = "busy";
-            
-            vm.script.content = vm.editor.getValue();
+
+            //vm.script.content = vm.editor.getValue();
 
             contentEditingHelper.contentEditorPerformSave({
                 saveMethod: codefileResource.save,
@@ -78,7 +79,7 @@
             }, function (err) {
 
                 vm.page.saveButtonState = "error";
-                
+
                 localizationService.localizeMany(["speechBubbles_validationFailedHeader", "speechBubbles_validationFailedMessage"]).then(function(data){
                     var header = data[0];
                     var message = data[1];
@@ -124,6 +125,7 @@
                 });
             }
 
+            // TODO - need to remove but ensure we have same feature set
             vm.aceOption = {
                 mode: "javascript",
                 theme: "chrome",
@@ -135,12 +137,12 @@
                     enableLiveAutocompletion: false
                 },
                 onLoad: function(_editor) {
-                    
+
                     vm.editor = _editor;
 
                     //Update the auto-complete method to use ctrl+alt+space
                     _editor.commands.bindKey("ctrl-alt-space", "startAutocomplete");
-                    
+
                     //Unassigns the keybinding (That was previously auto-complete)
                     //As conflicts with our own tree search shortcut
                     _editor.commands.bindKey("ctrl-space", null);
@@ -161,7 +163,7 @@
                             readOnly: true
                         }
                     ]);
-                    
+
                     // initial cursor placement
                     // Keep cursor in name field if we are create a new script
                     // else set the cursor at the bottom of the code editor
@@ -177,12 +179,23 @@
             	}
             }
 
+            // Options to pass to code editor (VS-Code)
+            vm.codeEditorOptions = {
+                language: "javascript",
+                fontSize: 20
+            }
+
+
+            vm.onInit = function(monaco) {
+                monaco.editor.setTheme('vs-dark');
+            }
+
             function changeAceEditor() {
                 setFormState("dirty");
             }
 
             function setFormState(state) {
-                
+
                 // get the current form
                 var currentForm = angularHelper.getCurrentForm($scope);
 
