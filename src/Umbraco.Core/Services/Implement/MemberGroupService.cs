@@ -70,6 +70,14 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        public IMemberGroup GetById(Guid id)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                return _memberGroupRepository.GetMany().FirstOrDefault(x => x.Key == id);
+            }
+        }
+
         public IMemberGroup GetByName(string name)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
