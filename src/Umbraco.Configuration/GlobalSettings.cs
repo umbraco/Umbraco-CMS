@@ -133,6 +133,34 @@ namespace Umbraco.Core.Configuration
             }
         }
 
+        public string SmtpHost
+        {
+            get
+            {
+                var networkSection = ConfigurationManager.GetSection("system.net/mailSettings/smtp/network") as ConfigurationSection;
+                var host = networkSection?.ElementInformation.Properties["host"];
+                if (host != null
+                    && host.Value is string hostPropValue
+                    && string.IsNullOrEmpty(hostPropValue) == false)
+                    return hostPropValue;
+
+                return null;
+            }
+        }
+        public int? SmtpPort
+        {
+            get
+            {
+                var networkSection = ConfigurationManager.GetSection("system.net/mailSettings/smtp/network") as ConfigurationSection;
+                var port = networkSection?.ElementInformation.Properties["port"];
+                if (port != null
+                    && port.Value is int portPropValue)
+                    return portPropValue;
+
+                return null;
+            }
+        }
+
         /// <summary>
         /// For testing only
         /// </summary>

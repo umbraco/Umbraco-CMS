@@ -5,6 +5,7 @@ using System.Net.Configuration;
 using System.Net.Sockets;
 using System.Web.Configuration;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.Checks.Services
@@ -18,11 +19,13 @@ namespace Umbraco.Web.HealthCheck.Checks.Services
     {
         private readonly ILocalizedTextService _textService;
         private readonly IRuntimeState _runtime;
+        private readonly IGlobalSettings _globalSettings;
 
-        public SmtpCheck(ILocalizedTextService textService, IRuntimeState runtime)
+        public SmtpCheck(ILocalizedTextService textService, IRuntimeState runtime, IGlobalSettings globalSettings)
         {
             _textService = textService;
             _runtime = runtime;
+            _globalSettings = globalSettings;
         }
 
         /// <summary>
@@ -51,17 +54,15 @@ namespace Umbraco.Web.HealthCheck.Checks.Services
             var message = string.Empty;
             var success = false;
 
-            // appPath is the virtual application root path on the server
-            var config = WebConfigurationManager.OpenWebConfiguration(_runtime.ApplicationVirtualPath);
-            var settings = (MailSettingsSectionGroup)config.GetSectionGroup("system.net/mailSettings");
-            if (settings == null)
+            if (_globalSettings.IsSmtpServerConfigured == false)
             {
                 message = _textService.Localize("healthcheck/smtpMailSettingsNotFound");
             }
             else
             {
-                var host = settings.Smtp.Network.Host;
-                var port = settings.Smtp.Network.Port == 0 ? DefaultSmtpPort : settings.Smtp.Network.Port;
+                var host = _globalSettings.SmtpHost;
+                var port = _globalSettings.SmtpPort ?? DefaultSmtpPort;
+
                 if (string.IsNullOrEmpty(host))
                 {
                     message = _textService.Localize("healthcheck/smtpMailSettingsHostNotConfigured");
