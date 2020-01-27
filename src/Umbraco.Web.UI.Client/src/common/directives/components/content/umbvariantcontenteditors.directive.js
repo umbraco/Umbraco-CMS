@@ -155,6 +155,11 @@
          * @param {any} selectedVariant
          */
         function openSplitView(selectedVariant) {
+            // enforce content contentApp in splitview.
+            var contentApp = vm.content.apps.find((app) => app.alias === "umbContent");
+            if(contentApp) {
+                selectApp(contentApp);
+            }
             
             insertVariantEditor(vm.editors.length, selectedVariant);
             
