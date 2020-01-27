@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -218,7 +218,6 @@
     <Compile Include="Routing\MediaUrlProviderCollection.cs" />
     <Compile Include="Routing\MediaUrlProviderCollectionBuilder.cs" />
     <Compile Include="Runtime\AspNetUmbracoBootPermissionChecker.cs" />
-    <Compile Include="Scheduling\TempFileCleanup.cs" />
     <Compile Include="Search\BackgroundIndexRebuilder.cs" />
     <Compile Include="Search\ExamineFinalComponent.cs" />
     <Compile Include="Search\ExamineFinalComposer.cs" />
@@ -498,7 +497,6 @@
     <Compile Include="Editors\RedirectUrlManagementController.cs" />
     <Compile Include="DefaultEventMessagesFactory.cs" />
     <Compile Include="Routing\ContentFinderByRedirectUrl.cs" />
-    <Compile Include="Scheduling\LatchedBackgroundTaskBase.cs" />
     <Compile Include="Security\ExternalSignInAutoLinkOptions.cs" />
     <Compile Include="Security\FixWindowsAuthMiddlware.cs" />
     <Compile Include="Security\ForceRenewalCookieAuthenticationHandler.cs" />
@@ -516,7 +514,6 @@
     <Compile Include="IUmbracoContextAccessor.cs" />
     <Compile Include="HtmlStringUtilities.cs" />
     <Compile Include="IUmbracoComponentRenderer.cs" />
-    <Compile Include="Scheduling\ThreadingTaskImmutable.cs" />
     <Compile Include="Mvc\ProfilingView.cs" />
     <Compile Include="Mvc\ProfilingViewEngine.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunner.cs" />
@@ -595,16 +592,11 @@
     <Compile Include="ImageCropperTemplateExtensions.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />
     <Compile Include="Routing\UrlProviderExtensions.cs" />
-    <Compile Include="Scheduling\BackgroundTaskRunnerOptions.cs" />
-    <Compile Include="Scheduling\IBackgroundTaskRunner.cs" />
-    <Compile Include="Scheduling\ILatchedBackgroundTask.cs" />
-    <Compile Include="Scheduling\RecurringTaskBase.cs" />
     <Compile Include="Security\AppBuilderExtensions.cs" />
     <Compile Include="Security\AuthenticationOptionsExtensions.cs" />
     <Compile Include="Security\AuthenticationManagerExtensions.cs" />
     <Compile Include="Security\BackOfficeCookieManager.cs" />
     <Compile Include="Security\UmbracoBackOfficeCookieAuthOptions.cs" />
-    <Compile Include="Scheduling\TaskAndFactoryExtensions.cs" />
     <Compile Include="Migrations\PostMigrations\ClearCsrfCookies.cs" />
     <Compile Include="TagQuery.cs" />
     <Compile Include="Trees\DataTypeTreeController.cs" />
@@ -648,11 +640,7 @@
     <Compile Include="Mvc\ViewDataDictionaryExtensions.cs" />
     <Compile Include="Models\RegisterModel.cs" />
     <Compile Include="Editors\MediaTypeController.cs" />
-    <Compile Include="Scheduling\IBackgroundTask.cs" />
-    <Compile Include="Scheduling\KeepAlive.cs" />
-    <Compile Include="Scheduling\LogScrubber.cs" />
     <Compile Include="Scheduling\ScheduledPublishing.cs" />
-    <Compile Include="Scheduling\TaskEventArgs.cs" />
     <Compile Include="Security\MembershipHelper.cs" />
     <Compile Include="Editors\SectionController.cs" />
     <Compile Include="Editors\UmbracoAuthorizedJsonController.cs" />
