@@ -31,7 +31,7 @@
         $scope.page.hideActionsMenu = infiniteMode ? true : false;
         $scope.page.hideChangeVariant = false;
         $scope.allowOpen = true;
-        $scope.app = null;
+        $scope.activeApp = null;
 
         //initializes any watches
         function startWatches(content) {
@@ -74,11 +74,11 @@
             var isAppPresent = false;
 
             // on first init, we dont have any apps. but if we are re-initializing, we do, but ...
-            if ($scope.app) {
+            if ($scope.activeApp) {
 
                 // lets check if it still exists as part of our apps array. (if not we have made a change to our docType, even just a re-save of the docType it will turn into new Apps.)
                 _.forEach(content.apps, function (app) {
-                    if (app === $scope.app) {
+                    if (app.alias === $scope.activeApp.alias) {
                         isAppPresent = true;
                     }
                 });
@@ -86,9 +86,8 @@
                 // if we did reload our DocType, but still have the same app we will try to find it by the alias.
                 if (isAppPresent === false) {
                     _.forEach(content.apps, function (app) {
-                        if (app.alias === $scope.app.alias) {
+                        if (app.alias === $scope.activeApp.alias) {
                             isAppPresent = true;
-                            app.active = true;
                             $scope.appChanged(app);
                         }
                     });
@@ -98,7 +97,6 @@
 
             // if we still dont have a app, lets show the first one:
             if (isAppPresent === false && content.apps.length) {
-                content.apps[0].active = true;
                 $scope.appChanged(content.apps[0]);
             }
             // otherwise make sure the save options are up to date with the current content state
@@ -274,7 +272,7 @@
             $scope.page.saveButtonStyle = content.trashed || content.isElement || content.isBlueprint ? "primary" : "info";
             // only create the save/publish/preview buttons if the
             // content app is "Conent"
-            if ($scope.app && $scope.app.alias !== "umbContent" && $scope.app.alias !== "umbInfo" && $scope.app.alias !== "umbListView") {
+            if ($scope.activeApp && $scope.activeApp.alias !== "umbContent" && $scope.activeApp.alias !== "umbInfo" && $scope.activeApp.alias !== "umbListView") {
                 $scope.defaultButton = null;
                 $scope.subButtons = null;
                 $scope.page.showSaveButton = false;
@@ -961,11 +959,18 @@
          * Call back when a content app changes
          * @param {any} app
          */
-        $scope.appChanged = function (app) {
+        $scope.appChanged = function (activeApp) {
 
-            $scope.app = app;
+            $scope.activeApp = activeApp;
+            
+            _.forEach($scope.content.apps, function (app) {
+                app.active = false;
+                if (app.alias === $scope.activeApp.alias) {
+                    app.active = true;
+                }
+            });
 
-            $scope.$broadcast("editors.apps.appChanged", { app: app });
+            $scope.$broadcast("editors.apps.appChanged", { app: activeApp });
 
             createButtons($scope.content);
 
