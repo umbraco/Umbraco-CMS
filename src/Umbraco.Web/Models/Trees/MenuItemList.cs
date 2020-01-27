@@ -27,7 +27,7 @@ namespace Umbraco.Web.Models.Trees
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="hasSeparator"></param>
-        /// <param name="textService">The <see cref="ILocalizedTextService"/> used to localize the action name based on it's alias</param>
+        /// <param name="textService">The <see cref="ILocalizedTextService"/> used to localize the action name based on its alias</param>
         /// <param name="opensDialog">Whether or not this action opens a dialog</param>
         public MenuItem Add<T>(ILocalizedTextService textService, bool hasSeparator = false, bool opensDialog = false)
             where T : IAction
