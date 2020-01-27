@@ -3,7 +3,6 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
-using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Compose
 {
