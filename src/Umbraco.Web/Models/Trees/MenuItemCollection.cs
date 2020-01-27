@@ -39,8 +39,5 @@ namespace Umbraco.Web.Models.Trees
         {
             get { return _menuItems; }
         }
-
-
-
     }
 }

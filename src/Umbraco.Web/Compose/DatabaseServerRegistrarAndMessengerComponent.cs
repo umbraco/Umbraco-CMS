@@ -13,7 +13,6 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Scheduling;
 using Umbraco.Web.Search;
-using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Compose
 {
@@ -46,7 +45,7 @@ namespace Umbraco.Web.Compose
                 {
                     //rebuild the xml cache file if the server is not synced
                     () =>
-                    {   
+                    {
                         var publishedSnapshotService = factory.GetInstance<IPublishedSnapshotService>();
 
                         // rebuild the published snapshot caches entirely, if the server is not synced
