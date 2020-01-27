@@ -57,7 +57,8 @@ namespace Umbraco.Web.Templates
         /// <remarks>Umbraco image tags are identified by their data-udi attributes</remarks>
         public string EnsureImageSources(string text)
         {
-            // no point in doing an processing if we can't retrieve any urls
+            // no point in doing any processing if we don't have
+            // a function to retrieve Urls
             if (_getMediaUrl == null)
             {
                 return text;
