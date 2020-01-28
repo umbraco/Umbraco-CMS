@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
-using Umbraco.Web.Composing;
-using Umbraco.Core.Services;
-using Umbraco.Web.Install;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Install;
+using Umbraco.Core.IO;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.Checks.Permissions
 {
@@ -30,11 +30,15 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
     {
         private readonly ILocalizedTextService _textService;
         private readonly IGlobalSettings _globalSettings;
+        private readonly IFilePermissionHelper _filePermissionHelper;
+        private readonly IIOHelper _ioHelper;
 
-        public FolderAndFilePermissionsCheck(ILocalizedTextService textService, IGlobalSettings globalSettings)
+        public FolderAndFilePermissionsCheck(ILocalizedTextService textService, IGlobalSettings globalSettings, IFilePermissionHelper filePermissionHelper, IIOHelper ioHelper)
         {
             _textService = textService;
             _globalSettings = globalSettings;
+            _filePermissionHelper = filePermissionHelper;
+            _ioHelper = ioHelper;
         }
 
         /// <summary>
@@ -84,15 +88,15 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
             };
 
             // Run checks for required and optional paths for modify permission
-            var requiredPathCheckResult = FilePermissionHelper.EnsureDirectories(
+            var requiredPathCheckResult = _filePermissionHelper.EnsureDirectories(
                 GetPathsToCheck(pathsToCheck, PermissionCheckRequirement.Required), out var requiredFailedPaths);
-            var optionalPathCheckResult = FilePermissionHelper.EnsureDirectories(
+            var optionalPathCheckResult = _filePermissionHelper.EnsureDirectories(
                 GetPathsToCheck(pathsToCheck, PermissionCheckRequirement.Optional), out var optionalFailedPaths);
 
             //now check the special folders
-            var requiredPathCheckResult2 = FilePermissionHelper.EnsureDirectories(
+            var requiredPathCheckResult2 = _filePermissionHelper.EnsureDirectories(
                 GetPathsToCheck(pathsToCheckWithRestarts, PermissionCheckRequirement.Required), out var requiredFailedPaths2, writeCausesRestart:true);
-            var optionalPathCheckResult2 = FilePermissionHelper.EnsureDirectories(
+            var optionalPathCheckResult2 = _filePermissionHelper.EnsureDirectories(
                 GetPathsToCheck(pathsToCheckWithRestarts, PermissionCheckRequirement.Optional), out var optionalFailedPaths2, writeCausesRestart: true);
 
             requiredPathCheckResult = requiredPathCheckResult && requiredPathCheckResult2;
@@ -117,18 +121,18 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
             // Run checks for required and optional paths for modify permission
             IEnumerable<string> requiredFailedPaths;
             IEnumerable<string> optionalFailedPaths;
-            var requiredPathCheckResult = FilePermissionHelper.EnsureFiles(GetPathsToCheck(pathsToCheck, PermissionCheckRequirement.Required), out requiredFailedPaths);
-            var optionalPathCheckResult = FilePermissionHelper.EnsureFiles(GetPathsToCheck(pathsToCheck, PermissionCheckRequirement.Optional), out optionalFailedPaths);
+            var requiredPathCheckResult = _filePermissionHelper.EnsureFiles(GetPathsToCheck(pathsToCheck, PermissionCheckRequirement.Required), out requiredFailedPaths);
+            var optionalPathCheckResult = _filePermissionHelper.EnsureFiles(GetPathsToCheck(pathsToCheck, PermissionCheckRequirement.Optional), out optionalFailedPaths);
 
             return GetStatus(requiredPathCheckResult, requiredFailedPaths, optionalPathCheckResult, optionalFailedPaths, PermissionCheckFor.File);
         }
 
-        private static string[] GetPathsToCheck(Dictionary<string, PermissionCheckRequirement> pathsToCheck,
+        private string[] GetPathsToCheck(Dictionary<string, PermissionCheckRequirement> pathsToCheck,
             PermissionCheckRequirement requirement)
         {
             return pathsToCheck
                 .Where(x => x.Value == requirement)
-                .Select(x => Current.IOHelper.MapPath(x.Key))
+                .Select(x => _ioHelper.MapPath(x.Key))
                 .OrderBy(x => x)
                 .ToArray();
         }
@@ -168,7 +172,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
 
         private string GetMessageForPathCheckFailure(string messageKey, IEnumerable<string> failedPaths)
         {
-            var rootFolder = Current.IOHelper.MapPath("/");
+            var rootFolder = _ioHelper.MapPath("/");
             var failedFolders = failedPaths
                 .Select(x => ParseFolderFromFullPath(rootFolder, x));
             return _textService.Localize(messageKey,

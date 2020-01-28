@@ -4,33 +4,34 @@ using System.Linq;
 using System.IO;
 using System.Security.AccessControl;
 using Umbraco.Core;
+using Umbraco.Core.Install;
 using Umbraco.Core.IO;
 using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Install
 {
-    internal class FilePermissionHelper
+    internal class FilePermissionHelper: IFilePermissionHelper
     {
         // ensure that these directories exist and Umbraco can write to them
-        private static readonly string[] PermissionDirs = { Current.Configs.Global().UmbracoCssPath, Constants.SystemDirectories.Config, Constants.SystemDirectories.Data, Current.Configs.Global().UmbracoMediaPath, Constants.SystemDirectories.Preview };
-        private static readonly string[] PackagesPermissionsDirs = { Constants.SystemDirectories.Bin, Current.Configs.Global().UmbracoPath, Constants.SystemDirectories.Packages };
+        private readonly string[] _permissionDirs = { Current.Configs.Global().UmbracoCssPath, Constants.SystemDirectories.Config, Constants.SystemDirectories.Data, Current.Configs.Global().UmbracoMediaPath, Constants.SystemDirectories.Preview };
+        private readonly string[] _packagesPermissionsDirs = { Constants.SystemDirectories.Bin, Current.Configs.Global().UmbracoPath, Constants.SystemDirectories.Packages };
 
         // ensure Umbraco can write to these files (the directories must exist)
-        private static readonly string[] PermissionFiles = { };
+        private readonly string[] _permissionFiles = { };
 
-        public static bool RunFilePermissionTestSuite(out Dictionary<string, IEnumerable<string>> report)
+        public bool RunFilePermissionTestSuite(out Dictionary<string, IEnumerable<string>> report)
         {
             report = new Dictionary<string, IEnumerable<string>>();
 
             using (ChangesMonitor.Suspended()) // hack: ensure this does not trigger a restart
             {
-                if (EnsureDirectories(PermissionDirs, out var errors) == false)
+                if (EnsureDirectories(_permissionDirs, out var errors) == false)
                     report["Folder creation failed"] = errors.ToList();
 
-                if (EnsureDirectories(PackagesPermissionsDirs, out errors) == false)
+                if (EnsureDirectories(_packagesPermissionsDirs, out errors) == false)
                     report["File writing for packages failed"] = errors.ToList();
 
-                if (EnsureFiles(PermissionFiles, out errors) == false)
+                if (EnsureFiles(_permissionFiles, out errors) == false)
                     report["File writing failed"] = errors.ToList();
 
                 if (TestPublishedSnapshotService(out errors) == false)
@@ -54,7 +55,7 @@ namespace Umbraco.Web.Install
         /// reliable but we cannot write a file since it will cause an app domain restart.
         /// </param>
         /// <returns></returns>
-        public static bool EnsureDirectories(string[] dirs, out IEnumerable<string> errors, bool writeCausesRestart = false)
+        public bool EnsureDirectories(string[] dirs, out IEnumerable<string> errors, bool writeCausesRestart = false)
         {
             List<string> temp = null;
             var success = true;
@@ -74,7 +75,7 @@ namespace Umbraco.Web.Install
             return success;
         }
 
-        public static bool EnsureFiles(string[] files, out IEnumerable<string> errors)
+        public bool EnsureFiles(string[] files, out IEnumerable<string> errors)
         {
             List<string> temp = null;
             var success = true;
@@ -92,12 +93,12 @@ namespace Umbraco.Web.Install
             return success;
         }
 
-        public static bool EnsureCanCreateSubDirectory(string dir, out IEnumerable<string> errors)
+        public bool EnsureCanCreateSubDirectory(string dir, out IEnumerable<string> errors)
         {
             return EnsureCanCreateSubDirectories(new[] { dir }, out errors);
         }
 
-        public static bool EnsureCanCreateSubDirectories(IEnumerable<string> dirs, out IEnumerable<string> errors)
+        public bool EnsureCanCreateSubDirectories(IEnumerable<string> dirs, out IEnumerable<string> errors)
         {
             List<string> temp = null;
             var success = true;
@@ -115,7 +116,7 @@ namespace Umbraco.Web.Install
             return success;
         }
 
-        public static bool TestPublishedSnapshotService(out IEnumerable<string> errors)
+        public bool TestPublishedSnapshotService(out IEnumerable<string> errors)
         {
             var publishedSnapshotService = Current.PublishedSnapshotService;
             return publishedSnapshotService.EnsureEnvironment(out errors);
@@ -124,7 +125,7 @@ namespace Umbraco.Web.Install
         // tries to create a sub-directory
         // if successful, the sub-directory is deleted
         // creates the directory if needed - does not delete it
-        private static bool TryCreateSubDirectory(string dir)
+        private bool TryCreateSubDirectory(string dir)
         {
             try
             {
@@ -142,7 +143,7 @@ namespace Umbraco.Web.Install
         // tries to create a file
         // if successful, the file is deleted
         // creates the directory if needed - does not delete it
-        public static bool TryCreateDirectory(string dir)
+        public bool TryCreateDirectory(string dir)
         {
             try
             {
@@ -170,7 +171,7 @@ namespace Umbraco.Web.Install
         // use the ACL APIs to avoid creating files
         //
         // if the directory does not exist, do nothing & success
-        public static bool TryAccessDirectory(string dir, bool canWrite)
+        public bool TryAccessDirectory(string dir, bool canWrite)
         {
             try
             {
@@ -197,7 +198,7 @@ namespace Umbraco.Web.Install
             }
         }
 
-        private static bool HasWritePermission(string path)
+        private bool HasWritePermission(string path)
         {
             var writeAllow = false;
             var writeDeny = false;
@@ -235,7 +236,7 @@ namespace Umbraco.Web.Install
 
         // tries to write into a file
         // fails if the directory does not exist
-        private static bool TryWriteFile(string file)
+        private bool TryWriteFile(string file)
         {
             try
             {
@@ -249,7 +250,7 @@ namespace Umbraco.Web.Install
             }
         }
 
-        private static string CreateRandomName()
+        private string CreateRandomName()
         {
             return "umbraco-test." + Guid.NewGuid().ToString("N").Substring(0, 8);
         }
