@@ -16,13 +16,11 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
     {
         private readonly ILocalizedTextService _textService;
         private readonly IRuntimeState _runtime;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ExcessiveHeadersCheck(ILocalizedTextService textService, IRuntimeState runtime, IHttpContextAccessor httpContextAccessor)
+        public ExcessiveHeadersCheck(ILocalizedTextService textService, IRuntimeState runtime)
         {
             _textService = textService;
             _runtime = runtime;
-            _httpContextAccessor = httpContextAccessor;
         }
 
         /// <summary>

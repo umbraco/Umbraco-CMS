@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using Umbraco.Core;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Services;
+using Umbraco.Core.Logging;
 using Umbraco.Web.HealthCheck.Checks.Config;
 
 namespace Umbraco.Web.HealthCheck.Checks.Security
@@ -20,14 +21,18 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         private readonly ILocalizedTextService _textService;
         private readonly IRuntimeState _runtime;
         private readonly IGlobalSettings _globalSettings;
+        private readonly IIOHelper _ioHelper;
+        private readonly ILogger _logger;
 
         private const string FixHttpsSettingAction = "fixHttpsSetting";
 
-        public HttpsCheck(ILocalizedTextService textService, IRuntimeState runtime, IGlobalSettings globalSettings)
+        public HttpsCheck(ILocalizedTextService textService, IRuntimeState runtime, IGlobalSettings globalSettings, IIOHelper ioHelper, ILogger logger)
         {
             _textService = textService;
             _runtime = runtime;
             _globalSettings = globalSettings;
+            _ioHelper = ioHelper;
+            _logger = logger;
         }
 
         /// <summary>
@@ -74,7 +79,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 {
                     // Got a valid response, check now for if certificate expiring within 14 days
                     // Hat-tip: https://stackoverflow.com/a/15343898/489433
-                    const int NumberOfDaysForExpiryWarning = 14;
+                    const int numberOfDaysForExpiryWarning = 14;
                     var cert = request.ServicePoint.Certificate;
                     var cert2 = new X509Certificate2(cert);
                     var expirationDate = cert2.NotAfter;
@@ -85,7 +90,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                         result = StatusResultType.Error;
                         message = _textService.Localize("healthcheck/httpsCheckExpiredCertificate");
                     }
-                    else if (daysToExpiry < NumberOfDaysForExpiryWarning)
+                    else if (daysToExpiry < numberOfDaysForExpiryWarning)
                     {
                         result = StatusResultType.Warning;
                         message = _textService.Localize("healthcheck/httpsCheckExpiringCertificate", new[] { daysToExpiry.ToString() });
@@ -181,9 +186,9 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
 
         private HealthCheckStatus FixHttpsSetting()
         {
-            var configFile = Current.IOHelper.MapPath("~/Web.config");
+            var configFile = _ioHelper.MapPath("~/Web.config");
             const string xPath = "/configuration/appSettings/add[@key='Umbraco.Core.UseHttps']/@value";
-            var configurationService = new ConfigurationService(configFile, xPath, _textService);
+            var configurationService = new ConfigurationService(configFile, xPath, _textService, _logger);
             var updateConfigFile = configurationService.UpdateConfigFile("true");
 
             if (updateConfigFile.Success)
