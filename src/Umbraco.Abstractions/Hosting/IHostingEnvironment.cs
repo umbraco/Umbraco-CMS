@@ -1,3 +1,5 @@
+using System;
+
 namespace Umbraco.Core.Hosting
 {
     public interface IHostingEnvironment
@@ -16,6 +18,7 @@ namespace Umbraco.Core.Hosting
         /// Gets a value indicating whether Umbraco is hosted.
         /// </summary>
         bool IsHosted { get; }
+        Version IISVersion { get; }
         string MapPath(string path);
         string ToAbsolute(string virtualPath, string root);
 
