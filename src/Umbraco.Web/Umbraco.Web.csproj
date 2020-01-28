@@ -409,7 +409,6 @@
     <Compile Include="Routing\IContentLastChanceFinder.cs" />
     <Compile Include="Routing\UrlProviderCollection.cs" />
     <Compile Include="Routing\UrlProviderCollectionBuilder.cs" />
-    <Compile Include="Scheduling\HealthCheckNotifier.cs" />
     <Compile Include="Search\SearchableApplicationTree.cs" />
     <Compile Include="Search\SearchableTreeAttribute.cs" />
     <Compile Include="Search\SearchableTreeCollection.cs" />
@@ -481,7 +480,6 @@
     <Compile Include="IUmbracoComponentRenderer.cs" />
     <Compile Include="Mvc\ProfilingView.cs" />
     <Compile Include="Mvc\ProfilingViewEngine.cs" />
-    <Compile Include="Scheduling\BackgroundTaskRunner.cs" />
     <Compile Include="BatchedDatabaseServerMessenger.cs" />
     <Compile Include="CacheHelperExtensions.cs" />
     <Compile Include="Cache\DistributedCacheExtensions.cs" />

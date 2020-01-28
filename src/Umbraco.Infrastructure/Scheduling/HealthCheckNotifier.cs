@@ -2,14 +2,14 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
 using Umbraco.Web.HealthCheck;
-using Umbraco.Core.Configuration.HealthChecks;
 
 namespace Umbraco.Web.Scheduling
 {
-    internal class HealthCheckNotifier : RecurringTaskBase
+    public class HealthCheckNotifier : RecurringTaskBase
     {
         private readonly IRuntimeState _runtimeState;
         private readonly HealthCheckCollection _healthChecks;
