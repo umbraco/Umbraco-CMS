@@ -9,6 +9,7 @@
       <PackageReference Include="LightInject" Version="6.2.0" />
       <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
       <PackageReference Include="LightInject.Web" Version="2.0.0" />
+      <PackageReference Include="Markdown" Version="2.2.1" />
       <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
       <PackageReference Include="Microsoft.Owin" Version="4.0.1" />
       <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-19554-01" />
