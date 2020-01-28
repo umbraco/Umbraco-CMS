@@ -112,9 +112,9 @@
       <Project>{fbe7c065-dac0-4025-a78b-63b24d3ab00b}</Project>
       <Name>Umbraco.Configuration</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Umbraco.Examine2\Umbraco.Examine2.csproj">
+    <ProjectReference Include="..\Umbraco.Examine\Umbraco.Examine.csproj">
       <Project>{f9b7fe05-0f93-4d0d-9c10-690b33ecbbd8}</Project>
-      <Name>Umbraco.Examine2</Name>
+      <Name>Umbraco.Examine</Name>
     </ProjectReference>
     <ProjectReference Include="..\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj">
       <Project>{07fbc26b-2927-4a22-8d96-d644c667fecc}</Project>
