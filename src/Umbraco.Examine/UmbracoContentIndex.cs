@@ -20,7 +20,7 @@ namespace Umbraco.Examine
     /// </summary>
     public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex
     {
-        public const string VariesByCultureFieldName = SpecialFieldPrefix + "VariesByCulture";
+        
         protected ILocalizationService LanguageService { get; }
 
         #region Constructors
@@ -132,7 +132,7 @@ namespace Umbraco.Examine
             {
                 //find all descendants based on path
                 var descendantPath = $@"\-1\,*{nodeId}\,*";
-                var rawQuery = $"{IndexPathFieldName}:{descendantPath}";
+                var rawQuery = $"{UmbracoExamineFieldNames.IndexPathFieldName}:{descendantPath}";
                 var searcher = GetSearcher();
                 var c = searcher.CreateQuery();
                 var filtered = c.NativeQuery(rawQuery);

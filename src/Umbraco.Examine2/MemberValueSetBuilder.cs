@@ -24,7 +24,7 @@ namespace Umbraco.Examine
                 {
                     {"icon", m.ContentType.Icon?.Yield() ?? Enumerable.Empty<string>()},
                     {"id", new object[] {m.Id}},
-                    {UmbracoExamineIndex.NodeKeyFieldName, new object[] {m.Key}},
+                    {UmbracoExamineFieldNames.NodeKeyFieldName, new object[] {m.Key}},
                     {"parentID", new object[] {m.Level > 1 ? m.ParentId : -1}},
                     {"level", new object[] {m.Level}},
                     {"creatorID", new object[] {m.CreatorId}},

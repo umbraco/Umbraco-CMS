@@ -208,7 +208,7 @@ namespace Umbraco.Web
             //var luceneQuery = "+__Path:(" + content.Path.Replace("-", "\\-") + "*) +" + t;
 
             var query = searcher.CreateQuery()
-                .Field(UmbracoExamineIndex.IndexPathFieldName, (content.Path + ",").MultipleCharacterWildcard())
+                .Field(UmbracoExamineFieldNames.IndexPathFieldName, (content.Path + ",").MultipleCharacterWildcard())
                 .And()
                 .ManagedQuery(term);
 

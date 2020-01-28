@@ -77,7 +77,7 @@ namespace Umbraco.Examine
                 {
                     {"icon", m.ContentType.Icon?.Yield() ?? Enumerable.Empty<string>()},
                     {"id", new object[] {m.Id}},
-                    {UmbracoExamineIndex.NodeKeyFieldName, new object[] {m.Key}},
+                    {UmbracoExamineFieldNames.NodeKeyFieldName, new object[] {m.Key}},
                     {"parentID", new object[] {m.Level > 1 ? m.ParentId : -1}},
                     {"level", new object[] {m.Level}},
                     {"creatorID", new object[] {m.CreatorId}},
@@ -89,7 +89,7 @@ namespace Umbraco.Examine
                     {"path", m.Path?.Yield() ?? Enumerable.Empty<string>()},
                     {"nodeType", m.ContentType.Id.ToString().Yield() },
                     {"creatorName", (m.GetCreatorProfile(_userService)?.Name ?? "??").Yield()},
-                    {UmbracoExamineIndex.UmbracoFileFieldName, umbracoFile.Yield()}
+                    {UmbracoExamineFieldNames.UmbracoFileFieldName, umbracoFile.Yield()}
                 };
 
                 foreach (var property in m.Properties)

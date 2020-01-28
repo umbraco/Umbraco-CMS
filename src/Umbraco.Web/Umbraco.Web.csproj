@@ -63,10 +63,10 @@
     <PackageReference Include="ClientDependency" Version="1.9.8" />
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
     <PackageReference Include="Examine.Core">
-      <Version>2.0.0</Version>
+      <Version>2.0.0-alpha.20200128.15</Version>
     </PackageReference>
     <PackageReference Include="Examine.Lucene">
-      <Version>2.0.0</Version>
+      <Version>2.0.0-alpha.20200128.15</Version>
     </PackageReference>
     <PackageReference Include="HtmlAgilityPack" Version="1.8.14" />
     <PackageReference Include="ImageProcessor">
@@ -111,6 +111,10 @@
     <ProjectReference Include="..\Umbraco.Configuration\Umbraco.Configuration.csproj">
       <Project>{fbe7c065-dac0-4025-a78b-63b24d3ab00b}</Project>
       <Name>Umbraco.Configuration</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Umbraco.Examine2\Umbraco.Examine2.csproj">
+      <Project>{f9b7fe05-0f93-4d0d-9c10-690b33ecbbd8}</Project>
+      <Name>Umbraco.Examine2</Name>
     </ProjectReference>
     <ProjectReference Include="..\Umbraco.Examine\Umbraco.Examine.csproj">
       <Project>{07fbc26b-2927-4a22-8d96-d644c667fecc}</Project>

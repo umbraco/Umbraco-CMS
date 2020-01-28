@@ -1,4 +1,5 @@
-﻿Microsoft Visual Studio Solution File, Format Version 12.00
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29209.152
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -100,17 +101,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IssueTemplates", "IssueTemp
 		..\.github\ISSUE_TEMPLATE\5_Security_issue.md = ..\.github\ISSUE_TEMPLATE\5_Security_issue.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Abstractions", "Umbraco.Abstractions\Umbraco.Abstractions.csproj", "{29AA69D9-B597-4395-8D42-43B1263C240A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Abstractions", "Umbraco.Abstractions\Umbraco.Abstractions.csproj", "{29AA69D9-B597-4395-8D42-43B1263C240A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.ModelsBuilder.Embedded", "Umbraco.ModelsBuilder.Embedded\Umbraco.ModelsBuilder.Embedded.csproj", "{52AC0BA8-A60E-4E36-897B-E8B97A54ED1C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Infrastructure", "Umbraco.Infrastructure\Umbraco.Infrastructure.csproj", "{3AE7BF57-966B-45A5-910A-954D7C554441}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Infrastructure", "Umbraco.Infrastructure\Umbraco.Infrastructure.csproj", "{3AE7BF57-966B-45A5-910A-954D7C554441}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Configuration", "Umbraco.Configuration\Umbraco.Configuration.csproj", "{FBE7C065-DAC0-4025-A78B-63B24D3AB00B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Configuration", "Umbraco.Configuration\Umbraco.Configuration.csproj", "{FBE7C065-DAC0-4025-A78B-63B24D3AB00B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Infrastrucure.Persistance.SqlCe", "Umbraco.Infrastrucure.Persistance.SqlCe\Umbraco.Infrastrucure.Persistance.SqlCe.csproj", "{33085570-9BF2-4065-A9B0-A29D920D13BA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Infrastrucure.Persistance.SqlCe", "Umbraco.Infrastrucure.Persistance.SqlCe\Umbraco.Infrastrucure.Persistance.SqlCe.csproj", "{33085570-9BF2-4065-A9B0-A29D920D13BA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.TestData", "Umbraco.TestData\Umbraco.TestData.csproj", "{FB5676ED-7A69-492C-B802-E7B24144C0FC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Examine2", "Umbraco.Examine2\Umbraco.Examine2.csproj", "{F9B7FE05-0F93-4D0D-9C10-690B33ECBBD8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -164,6 +167,10 @@ Global
 		{FB5676ED-7A69-492C-B802-E7B24144C0FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB5676ED-7A69-492C-B802-E7B24144C0FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FB5676ED-7A69-492C-B802-E7B24144C0FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9B7FE05-0F93-4D0D-9C10-690B33ECBBD8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9B7FE05-0F93-4D0D-9C10-690B33ECBBD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9B7FE05-0F93-4D0D-9C10-690B33ECBBD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9B7FE05-0F93-4D0D-9C10-690B33ECBBD8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

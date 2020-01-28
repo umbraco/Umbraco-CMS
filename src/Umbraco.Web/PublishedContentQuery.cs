@@ -216,7 +216,7 @@ namespace Umbraco.Web
             else if (string.IsNullOrWhiteSpace(culture))
             {
                 // Only search invariant
-                queryExecutor = query.Field(UmbracoContentIndex.VariesByCultureFieldName, "n") // Must not vary by culture
+                queryExecutor = query.Field(UmbracoExamineFieldNames.VariesByCultureFieldName, "n") // Must not vary by culture
                     .And().ManagedQuery(term);
             }
             else

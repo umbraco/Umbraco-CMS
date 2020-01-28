@@ -171,13 +171,13 @@ namespace Umbraco.Web.Models.Mapping
             // TODO: Properly map this (not aftermap)
 
             //get the icon if there is one
-            target.Icon = source.Values.ContainsKey(UmbracoExamineIndex.IconFieldName)
-                ? source.Values[UmbracoExamineIndex.IconFieldName]
+            target.Icon = source.Values.ContainsKey(UmbracoExamineFieldNames.IconFieldName)
+                ? source.Values[UmbracoExamineFieldNames.IconFieldName]
                 : Constants.Icons.DefaultIcon;
 
             target.Name = source.Values.ContainsKey("nodeName") ? source.Values["nodeName"] : "[no name]";
 
-            if (source.Values.TryGetValue(UmbracoExamineIndex.UmbracoFileFieldName, out var umbracoFile))
+            if (source.Values.TryGetValue(UmbracoExamineFieldNames.UmbracoFileFieldName, out var umbracoFile))
             {
                 if (umbracoFile != null)
                 {
@@ -185,16 +185,16 @@ namespace Umbraco.Web.Models.Mapping
                 }
             }
 
-            if (source.Values.ContainsKey(UmbracoExamineIndex.NodeKeyFieldName))
+            if (source.Values.ContainsKey(UmbracoExamineFieldNames.NodeKeyFieldName))
             {
-                if (Guid.TryParse(source.Values[UmbracoExamineIndex.NodeKeyFieldName], out var key))
+                if (Guid.TryParse(source.Values[UmbracoExamineFieldNames.NodeKeyFieldName], out var key))
                 {
                     target.Key = key;
 
                     //need to set the UDI
-                    if (source.Values.ContainsKey(LuceneIndex.CategoryFieldName))
+                    if (source.Values.ContainsKey(ExamineFieldNames.CategoryFieldName))
                     {
-                        switch (source.Values[LuceneIndex.CategoryFieldName])
+                        switch (source.Values[ExamineFieldNames.CategoryFieldName])
                         {
                             case IndexTypes.Member:
                                 target.Udi = new GuidUdi(Constants.UdiEntityType.Member, target.Key);
@@ -222,11 +222,11 @@ namespace Umbraco.Web.Models.Mapping
                 }
             }
 
-            target.Path = source.Values.ContainsKey(UmbracoExamineIndex.IndexPathFieldName) ? source.Values[UmbracoExamineIndex.IndexPathFieldName] : "";
+            target.Path = source.Values.ContainsKey(UmbracoExamineFieldNames.IndexPathFieldName) ? source.Values[UmbracoExamineFieldNames.IndexPathFieldName] : "";
 
-            if (source.Values.ContainsKey(LuceneIndex.ItemTypeFieldName))
+            if (source.Values.ContainsKey(ExamineFieldNames.ItemTypeFieldName))
             {
-                target.AdditionalData.Add("contentType", source.Values[LuceneIndex.ItemTypeFieldName]);
+                target.AdditionalData.Add("contentType", source.Values[ExamineFieldNames.ItemTypeFieldName]);
             }
         }
 

@@ -42,17 +42,17 @@ namespace Umbraco.Tests.Web
                 indexer.IndexItem(new ValueSet("1", "content", new Dictionary<string, object>
                 {
                     [fieldNames[0]] = "Hello world, there are products here",
-                    [UmbracoContentIndex.VariesByCultureFieldName] = "n"
+                    [UmbracoExamineFieldNames.VariesByCultureFieldName] = "n"
                 }));
                 indexer.IndexItem(new ValueSet("2", "content", new Dictionary<string, object>
                 {
                     [fieldNames[1]] = "Hello world, there are products here",
-                    [UmbracoContentIndex.VariesByCultureFieldName] = "y"
+                    [UmbracoExamineFieldNames.VariesByCultureFieldName] = "y"
                 }));
                 indexer.IndexItem(new ValueSet("3", "content", new Dictionary<string, object>
                 {
                     [fieldNames[2]] = "Hello world, there are products here",
-                    [UmbracoContentIndex.VariesByCultureFieldName] = "y"
+                    [UmbracoExamineFieldNames.VariesByCultureFieldName] = "y"
                 }));
             }
             

@@ -79,7 +79,7 @@
   <ItemGroup>
     <PackageReference Include="Castle.Core" Version="4.3.1" />
     <PackageReference Include="Examine.Core">
-      <Version>2.0.0</Version>
+      <Version>2.0.0-alpha.20200128.15</Version>
     </PackageReference>
     <PackageReference Include="HtmlAgilityPack">
       <Version>1.8.14</Version>
@@ -563,6 +563,10 @@
     <ProjectReference Include="..\Umbraco.Configuration\Umbraco.Configuration.csproj">
       <Project>{fbe7c065-dac0-4025-a78b-63b24d3ab00b}</Project>
       <Name>Umbraco.Configuration</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Umbraco.Examine2\Umbraco.Examine2.csproj">
+      <Project>{f9b7fe05-0f93-4d0d-9c10-690b33ecbbd8}</Project>
+      <Name>Umbraco.Examine2</Name>
     </ProjectReference>
     <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj">
       <Project>{3ae7bf57-966b-45a5-910a-954d7c554441}</Project>

@@ -46,9 +46,9 @@ namespace Umbraco.Examine
                 var values = new Dictionary<string, IEnumerable<object>>
                 {
                     {"icon", c.ContentType.Icon?.Yield() ?? Enumerable.Empty<string>()},
-                    {UmbracoExamineIndex.PublishedFieldName, new object[] {c.Published ? "y" : "n"}},   //Always add invariant published value
+                    {UmbracoExamineFieldNames.PublishedFieldName, new object[] {c.Published ? "y" : "n"}},   //Always add invariant published value
                     {"id", new object[] {c.Id}},
-                    {UmbracoExamineIndex.NodeKeyFieldName, new object[] {c.Key}},
+                    {UmbracoExamineFieldNames.NodeKeyFieldName, new object[] {c.Key}},
                     {"parentID", new object[] {c.Level > 1 ? c.ParentId : -1}},
                     {"level", new object[] {c.Level}},
                     {"creatorID", new object[] {c.CreatorId}},
@@ -65,12 +65,12 @@ namespace Umbraco.Examine
                     {"writerName",(c.GetWriterProfile(_userService)?.Name ?? "??").Yield() },
                     {"writerID", new object[] {c.WriterId}},
                     {"templateID", new object[] {c.TemplateId ?? 0}},
-                    {UmbracoContentIndex.VariesByCultureFieldName, new object[] {"n"}},
+                    {UmbracoExamineFieldNames.VariesByCultureFieldName, new object[] {"n"}},
                 };
 
                 if (isVariant)
                 {
-                    values[UmbracoContentIndex.VariesByCultureFieldName] = new object[] { "y" };
+                    values[UmbracoExamineFieldNames.VariesByCultureFieldName] = new object[] { "y" };
 
                     foreach (var culture in c.AvailableCultures)
                     {
@@ -80,7 +80,7 @@ namespace Umbraco.Examine
                         values[$"nodeName_{lowerCulture}"] = (PublishedValuesOnly
                             ? c.GetPublishName(culture)?.Yield()
                             : c.GetCultureName(culture)?.Yield()) ?? Enumerable.Empty<string>();
-                        values[$"{UmbracoExamineIndex.PublishedFieldName}_{lowerCulture}"] = (c.IsCulturePublished(culture) ? "y" : "n").Yield<object>();
+                        values[$"{UmbracoExamineFieldNames.PublishedFieldName}_{lowerCulture}"] = (c.IsCulturePublished(culture) ? "y" : "n").Yield<object>();
                         values[$"updateDate_{lowerCulture}"] = (PublishedValuesOnly
                             ? c.GetPublishDate(culture)
                             : c.GetUpdateDate(culture))?.Yield<object>() ?? Enumerable.Empty<object>();

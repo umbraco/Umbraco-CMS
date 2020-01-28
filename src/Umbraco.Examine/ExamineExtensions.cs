@@ -8,7 +8,6 @@ using Lucene.Net.Analysis;
 using Lucene.Net.Index;
 using Lucene.Net.QueryParsers;
 using Lucene.Net.Search;
-using Lucene.Net.Store;
 using Umbraco.Core;
 using Version = Lucene.Net.Util.Version;
 using Umbraco.Core.Logging;

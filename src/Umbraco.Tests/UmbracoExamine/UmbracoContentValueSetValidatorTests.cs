@@ -179,7 +179,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 {
                     ["hello"] = "world",
                     ["path"] = "-1,555",
-                    [UmbracoExamineIndex.PublishedFieldName] = "y"
+                    [UmbracoExamineFieldNames.PublishedFieldName] = "y"
                 }));
             Assert.AreEqual(ValueSetValidationResult.Valid, result);
         }
@@ -213,7 +213,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 {
                     ["hello"] = "world",
                     ["path"] = "-1,555",
-                    [UmbracoExamineIndex.PublishedFieldName] = "n"
+                    [UmbracoExamineFieldNames.PublishedFieldName] = "n"
                 }));
             Assert.AreEqual(ValueSetValidationResult.Failed, result);
 
@@ -222,7 +222,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 {
                     ["hello"] = "world",
                     ["path"] = "-1,555",
-                    [UmbracoExamineIndex.PublishedFieldName] = "y"
+                    [UmbracoExamineFieldNames.PublishedFieldName] = "y"
                 }));
             Assert.AreEqual(ValueSetValidationResult.Valid, result);
         }
@@ -237,8 +237,8 @@ namespace Umbraco.Tests.UmbracoExamine
                 {
                     ["hello"] = "world",
                     ["path"] = "-1,555",
-                    [UmbracoContentIndex.VariesByCultureFieldName] = "y",
-                    [UmbracoExamineIndex.PublishedFieldName] = "n"
+                    [UmbracoExamineFieldNames.VariesByCultureFieldName] = "y",
+                    [UmbracoExamineFieldNames.PublishedFieldName] = "n"
                 }));
             Assert.AreEqual(ValueSetValidationResult.Failed, result);
 
@@ -247,8 +247,8 @@ namespace Umbraco.Tests.UmbracoExamine
                 {
                     ["hello"] = "world",
                     ["path"] = "-1,555",
-                    [UmbracoContentIndex.VariesByCultureFieldName] = "y",
-                    [UmbracoExamineIndex.PublishedFieldName] = "y"
+                    [UmbracoExamineFieldNames.VariesByCultureFieldName] = "y",
+                    [UmbracoExamineFieldNames.PublishedFieldName] = "y"
                 }));
             Assert.AreEqual(ValueSetValidationResult.Valid, result);
 
@@ -257,17 +257,17 @@ namespace Umbraco.Tests.UmbracoExamine
                 {
                     ["hello"] = "world",
                     ["path"] = "-1,555",
-                    [UmbracoContentIndex.VariesByCultureFieldName] = "y",
-                    [$"{UmbracoExamineIndex.PublishedFieldName}_en-us"] = "y",
+                    [UmbracoExamineFieldNames.VariesByCultureFieldName] = "y",
+                    [$"{UmbracoExamineFieldNames.PublishedFieldName}_en-us"] = "y",
                     ["hello_en-us"] = "world",
                     ["title_en-us"] = "my title",
-                    [$"{UmbracoExamineIndex.PublishedFieldName}_es-es"] = "n",
+                    [$"{UmbracoExamineFieldNames.PublishedFieldName}_es-es"] = "n",
                     ["hello_es-ES"] = "world",
                     ["title_es-ES"] = "my title",
-                    [UmbracoExamineIndex.PublishedFieldName] = "y"
+                    [UmbracoExamineFieldNames.PublishedFieldName] = "y"
                 });
             Assert.AreEqual(10, valueSet.Values.Count());
-            Assert.IsTrue(valueSet.Values.ContainsKey($"{UmbracoExamineIndex.PublishedFieldName}_es-es"));
+            Assert.IsTrue(valueSet.Values.ContainsKey($"{UmbracoExamineFieldNames.PublishedFieldName}_es-es"));
             Assert.IsTrue(valueSet.Values.ContainsKey("hello_es-ES"));
             Assert.IsTrue(valueSet.Values.ContainsKey("title_es-ES"));
 
@@ -275,7 +275,7 @@ namespace Umbraco.Tests.UmbracoExamine
             Assert.AreEqual(ValueSetValidationResult.Filtered, result);
 
             Assert.AreEqual(7, valueSet.Values.Count()); //filtered to 7 values (removes es-es values)
-            Assert.IsFalse(valueSet.Values.ContainsKey($"{UmbracoExamineIndex.PublishedFieldName}_es-es"));
+            Assert.IsFalse(valueSet.Values.ContainsKey($"{UmbracoExamineFieldNames.PublishedFieldName}_es-es"));
             Assert.IsFalse(valueSet.Values.ContainsKey("hello_es-ES"));
             Assert.IsFalse(valueSet.Values.ContainsKey("title_es-ES"));
         }

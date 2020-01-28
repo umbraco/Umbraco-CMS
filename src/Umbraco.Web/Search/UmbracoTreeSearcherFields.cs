@@ -18,7 +18,7 @@ namespace Umbraco.Web.Search
         {
             return _backOfficeMembersFields;
         }
-        private IReadOnlyList<string> _backOfficeMediaFields = new List<string> {UmbracoExamineIndex.UmbracoFileFieldName };
+        private IReadOnlyList<string> _backOfficeMediaFields = new List<string> { UmbracoExamineFieldNames.UmbracoFileFieldName };
         public IEnumerable<string> GetBackOfficeMediaFields()
         {
             return _backOfficeMediaFields;

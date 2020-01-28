@@ -65,7 +65,7 @@ namespace Umbraco.Web
             foreach (var result in results)
             {
                 if (int.TryParse(result.Id, out var contentId) &&
-                    result.Values.TryGetValue(LuceneIndex.CategoryFieldName, out var indexType))
+                    result.Values.TryGetValue(ExamineFieldNames.CategoryFieldName, out var indexType))
                 {
                     IPublishedContent content;
                     switch (indexType)

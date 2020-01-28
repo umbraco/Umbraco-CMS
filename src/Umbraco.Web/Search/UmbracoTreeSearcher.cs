@@ -242,7 +242,7 @@ namespace Umbraco.Web.Search
                         var queryWordsReplaced = new string[querywords.Length];
 
                         // when searching file names containing hyphens we need to replace the hyphens with spaces
-                        if (f.Equals(UmbracoExamineIndex.UmbracoFileFieldName))
+                        if (f.Equals(UmbracoExamineFieldNames.UmbracoFileFieldName))
                         {
                             for (var index = 0; index < querywords.Length; index++)
                             {
@@ -418,9 +418,9 @@ namespace Umbraco.Web.Search
                 {
                     m.AdditionalData["Email"] = result.Values["email"];
                 }
-                if (result.Values.ContainsKey(UmbracoExamineIndex.NodeKeyFieldName) && result.Values[UmbracoExamineIndex.NodeKeyFieldName] != null)
+                if (result.Values.ContainsKey(UmbracoExamineFieldNames.NodeKeyFieldName) && result.Values[UmbracoExamineFieldNames.NodeKeyFieldName] != null)
                 {
-                    if (Guid.TryParse(result.Values[UmbracoExamineIndex.NodeKeyFieldName], out var key))
+                    if (Guid.TryParse(result.Values[UmbracoExamineFieldNames.NodeKeyFieldName], out var key))
                     {
                         m.Key = key;
                     }
@@ -455,7 +455,7 @@ namespace Umbraco.Web.Search
                 if (intId.Success)
                 {
                     //if it varies by culture, return the default language URL
-                    if (result.Values.TryGetValue(UmbracoContentIndex.VariesByCultureFieldName, out var varies) && varies == "y")
+                    if (result.Values.TryGetValue(UmbracoExamineFieldNames.VariesByCultureFieldName, out var varies) && varies == "y")
                     {
                         entity.AdditionalData["Url"] = _umbracoContext.Url(intId.Result, defaultLang);
                     }
