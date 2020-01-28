@@ -4,20 +4,29 @@ using System.Linq;
 using System.IO;
 using System.Security.AccessControl;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Install;
 using Umbraco.Core.IO;
 using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Install
 {
-    internal class FilePermissionHelper: IFilePermissionHelper
+    internal class FilePermissionHelper : IFilePermissionHelper
     {
         // ensure that these directories exist and Umbraco can write to them
-        private readonly string[] _permissionDirs = { Current.Configs.Global().UmbracoCssPath, Constants.SystemDirectories.Config, Constants.SystemDirectories.Data, Current.Configs.Global().UmbracoMediaPath, Constants.SystemDirectories.Preview };
-        private readonly string[] _packagesPermissionsDirs = { Constants.SystemDirectories.Bin, Current.Configs.Global().UmbracoPath, Constants.SystemDirectories.Packages };
+        private readonly string[] _permissionDirs;
+        private readonly string[] _packagesPermissionsDirs;
 
         // ensure Umbraco can write to these files (the directories must exist)
         private readonly string[] _permissionFiles = { };
+        private readonly IGlobalSettings _globalSettings;
+
+        public FilePermissionHelper(IGlobalSettings globalSettings)
+        {
+            _globalSettings = globalSettings;
+            _permissionDirs = new[] { _globalSettings.UmbracoCssPath, Constants.SystemDirectories.Config, Constants.SystemDirectories.Data, _globalSettings.UmbracoMediaPath, Constants.SystemDirectories.Preview };
+            _packagesPermissionsDirs = new[] { Constants.SystemDirectories.Bin, _globalSettings.UmbracoPath, Constants.SystemDirectories.Packages };
+        }
 
         public bool RunFilePermissionTestSuite(out Dictionary<string, IEnumerable<string>> report)
         {
