@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using HeyRed.MarkdownSharp;
-using Umbraco.Web.Composing;
+using Umbraco.Composing;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Logging;
 

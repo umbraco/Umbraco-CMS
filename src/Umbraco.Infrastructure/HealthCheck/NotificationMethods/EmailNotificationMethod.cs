@@ -3,12 +3,11 @@ using System.Net.Mail;
 using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Core;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.HealthChecks;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
-using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Web.HealthCheck.NotificationMethods
 {
