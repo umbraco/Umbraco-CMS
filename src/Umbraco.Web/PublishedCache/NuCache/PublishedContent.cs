@@ -326,7 +326,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // beware what you use that one for - you don't want to cache its result
         private IAppCache GetAppropriateCache()
         {
-            var publishedSnapshot = (PublishedSnapshot)_publishedSnapshotAccessor.PublishedSnapshot;
+            var publishedSnapshot = _publishedSnapshotAccessor.PublishedSnapshot;
             var cache = publishedSnapshot == null
                 ? null
                 : ((IsPreviewing == false || PublishedSnapshotService.FullCacheWhenPreviewing) && (ContentType.ItemType != PublishedItemType.Member)
@@ -337,7 +337,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private IAppCache GetCurrentSnapshotCache()
         {
-            var publishedSnapshot = (PublishedSnapshot)_publishedSnapshotAccessor.PublishedSnapshot;
+            var publishedSnapshot = _publishedSnapshotAccessor.PublishedSnapshot;
             return publishedSnapshot?.SnapshotCache;
         }
 
