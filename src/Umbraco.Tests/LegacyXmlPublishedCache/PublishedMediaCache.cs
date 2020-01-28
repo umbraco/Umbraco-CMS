@@ -43,6 +43,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private readonly IEntityXmlSerializer _entitySerializer;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IVariationContextAccessor _variationContextAccessor;
+        private readonly IExamineManager _examineManager = new ExamineManager();
 
         // must be specified by the ctor
         private readonly IAppCache _appCache;
@@ -229,29 +230,14 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         public override bool HasContent(bool preview) { throw new NotImplementedException(); }
 
-        private static IExamineManager GetExamineManagerSafe()
-        {
-            try
-            {
-                return ExamineManager.Instance;
-            }
-            catch (TypeInitializationException)
-            {
-                return null;
-            }
-        }
-
         private ISearcher GetSearchProviderSafe()
         {
             if (_searchProvider != null)
                 return _searchProvider;
 
-            var eMgr = GetExamineManagerSafe();
-            if (eMgr == null) return null;
-
             try
             {
-                return eMgr.TryGetIndex(Constants.UmbracoIndexes.InternalIndexName, out var index) ? index.GetSearcher() : null;
+                return _examineManager.TryGetIndex(Constants.UmbracoIndexes.InternalIndexName, out var index) ? index.GetSearcher() : null;
             }
             catch (FileNotFoundException)
             {

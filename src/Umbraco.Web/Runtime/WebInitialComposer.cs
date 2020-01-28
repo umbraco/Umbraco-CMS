@@ -149,7 +149,7 @@ namespace Umbraco.Web.Runtime
 
             composition.RegisterUnique<IDashboardService, DashboardService>();
 
-            composition.RegisterUnique<IExamineManager>(factory => ExamineManager.Instance);
+            composition.RegisterUnique<IExamineManager, ExamineManager>();
 
             // configure the container for web
             composition.ConfigureForWeb();
