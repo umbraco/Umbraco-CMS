@@ -4,10 +4,13 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Web.Hosting;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
 
-namespace Umbraco.Core
+namespace Umbraco.Core.Runtime
 {
+
     /// <summary>
     /// Provides the full implementation of <see cref="IMainDom"/>.
     /// </summary>
@@ -20,17 +23,10 @@ namespace Umbraco.Core
         #region Vars
 
         private readonly ILogger _logger;
+        private readonly IMainDomLock _mainDomLock;
 
         // our own lock for local consistency
         private object _locko = new object();
-
-        // async lock representing the main domain lock
-        private readonly SystemLock _systemLock;
-        private IDisposable _systemLocker;
-
-        // event wait handle used to notify current main domain that it should
-        // release the lock because a new domain wants to be the main domain
-        private readonly EventWaitHandle _signal;
 
         private bool _isInitialized;
         // indicates whether...
@@ -40,39 +36,19 @@ namespace Umbraco.Core
         // actions to run before releasing the main domain
         private readonly List<KeyValuePair<int, Action>> _callbacks = new List<KeyValuePair<int, Action>>();
 
-        private const int LockTimeoutMilliseconds = 90000; // (1.5 * 60 * 1000) == 1 min 30 seconds
+        private const int LockTimeoutMilliseconds = 40000; // 40 seconds
 
         #endregion
 
         #region Ctor
 
         // initializes a new instance of MainDom
-        public MainDom(ILogger logger)
+        public MainDom(ILogger logger, IMainDomLock systemLock)
         {
             HostingEnvironment.RegisterObject(this);
 
             _logger = logger;
-
-            // HostingEnvironment.ApplicationID is null in unit tests, making ReplaceNonAlphanumericChars fail
-            var appId = HostingEnvironment.ApplicationID?.ReplaceNonAlphanumericChars(string.Empty) ?? string.Empty;
-            
-            // combining with the physical path because if running on eg IIS Express,
-            // two sites could have the same appId even though they are different.
-            //
-            // now what could still collide is... two sites, running in two different processes
-            // and having the same appId, and running on the same app physical path
-            //
-            // we *cannot* use the process ID here because when an AppPool restarts it is
-            // a new process for the same application path
-
-            var appPath = HostingEnvironment.ApplicationPhysicalPath?.ToLowerInvariant() ?? string.Empty;
-            var hash = (appId + ":::" + appPath).GenerateHash<SHA1>();
-
-            var lockName = "UMBRACO-" + hash + "-MAINDOM-LCK";
-            _systemLock = new SystemLock(lockName);
-
-            var eventName = "UMBRACO-" + hash + "-MAINDOM-EVT";
-            _signal = new EventWaitHandle(false, EventResetMode.AutoReset, eventName);
+            _mainDomLock = systemLock;
         }
 
         #endregion
@@ -141,13 +117,14 @@ namespace Umbraco.Core
                             continue;
                         }
                     }
+                        
                     _logger.Debug<MainDom>("Stopped ({SignalSource})", source);
                 }
                 finally
                 {
                     // in any case...
                     _isMainDom = false;
-                    _systemLocker?.Dispose();
+                    _mainDomLock.Dispose();
                     _logger.Info<MainDom>("Released ({SignalSource})", source);
                 }
 
@@ -167,36 +144,33 @@ namespace Umbraco.Core
 
             _logger.Info<MainDom>("Acquiring.");
 
-            // signal other instances that we want the lock, then wait one the lock,
-            // which may timeout, and this is accepted - see comments below
+            // Get the lock 
+            var acquired = _mainDomLock.AcquireLockAsync(LockTimeoutMilliseconds).GetAwaiter().GetResult();
 
-            // signal, then wait for the lock, then make sure the event is
-            // reset (maybe there was noone listening..)
-            _signal.Set();
+            if (!acquired)
+            {
+                _logger.Info<MainDom>("Cannot acquire (timeout).");
 
-            // if more than 1 instance reach that point, one will get the lock
-            // and the other one will timeout, which is accepted
+                // In previous versions we'd let a TimeoutException be thrown
+                // and the appdomain would not start. We have the opportunity to allow it to
+                // start without having MainDom? This would mean that it couldn't write
+                // to nucache/examine and would only be ok if this was a super short lived appdomain.
+                // maybe safer to just keep throwing in this case.
 
-            //This can throw a TimeoutException - in which case should this be in a try/finally to ensure the signal is always reset.
+                throw new TimeoutException("Cannot acquire MainDom");
+                // return false;
+            }
+
             try
             {
-                _systemLocker = _systemLock.Lock(LockTimeoutMilliseconds);
+                // Listen for the signal from another AppDomain coming online to release the lock
+                _mainDomLock.ListenAsync().ContinueWith(_ => OnSignal("signal"));
             }
-            finally
+            catch (OperationCanceledException ex)
             {
-                // we need to reset the event, because otherwise we would end up
-                // signaling ourselves and committing suicide immediately.
-                // only 1 instance can reach that point, but other instances may
-                // have started and be trying to get the lock - they will timeout,
-                // which is accepted
-
-                _signal.Reset();
+                // the waiting task could be canceled if this appdomain is naturally shutting down, we'll just swallow this exception
+                _logger.Warn<MainDom>(ex, ex.Message);
             }
-            
-            //WaitOneAsync (ext method) will wait for a signal without blocking the main thread, the waiting is done on a background thread
-
-            _signal.WaitOneAsync()
-                .ContinueWith(_ => OnSignal("signal"));
 
             _logger.Info<MainDom>("Acquired.");
             return true;
@@ -205,6 +179,10 @@ namespace Umbraco.Core
         /// <summary>
         /// Gets a value indicating whether the current domain is the main domain.
         /// </summary>
+        /// <remarks>
+        /// The lazy initializer call will only call the Acquire callback when it's not been initialized, else it will just return
+        /// the value from _isMainDom which means when we set _isMainDom to false again after being signaled, this will return false;
+        /// </remarks>
         public bool IsMainDom => LazyInitializer.EnsureInitialized(ref _isMainDom, ref _isInitialized, ref _locko, () => Acquire());
 
         // IRegisteredObject
@@ -230,8 +208,7 @@ namespace Umbraco.Core
             {
                 if (disposing)
                 {
-                    _signal?.Close();
-                    _signal?.Dispose();
+                    _mainDomLock.Dispose();
                 }
 
                 disposedValue = true;
@@ -244,5 +221,25 @@ namespace Umbraco.Core
         }
 
         #endregion
+
+        public static string GetMainDomId()
+        {
+            // HostingEnvironment.ApplicationID is null in unit tests, making ReplaceNonAlphanumericChars fail
+            var appId = HostingEnvironment.ApplicationID?.ReplaceNonAlphanumericChars(string.Empty) ?? string.Empty;
+
+            // combining with the physical path because if running on eg IIS Express,
+            // two sites could have the same appId even though they are different.
+            //
+            // now what could still collide is... two sites, running in two different processes
+            // and having the same appId, and running on the same app physical path
+            //
+            // we *cannot* use the process ID here because when an AppPool restarts it is
+            // a new process for the same application path
+
+            var appPath = HostingEnvironment.ApplicationPhysicalPath?.ToLowerInvariant() ?? string.Empty;
+            var hash = (appId + ":::" + appPath).GenerateHash<SHA1>();
+
+            return hash;
+        }
     }
 }

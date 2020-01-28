@@ -23,6 +23,7 @@ angular.module("umbraco")
             vm.clickHandler = clickHandler;
             vm.clickItemName = clickItemName;
             vm.gotoFolder = gotoFolder;
+            vm.shouldShowUrl = shouldShowUrl;
 
             var dialogOptions = $scope.model;
             
@@ -529,6 +530,19 @@ angular.module("umbraco")
                 if ($scope.model.updatedMediaNodes.indexOf(item.udi) === -1) {
                     $scope.model.updatedMediaNodes.push(item.udi);
                 }
+            }
+
+            function shouldShowUrl() {
+                if (!$scope.target) {
+                    return false;
+                }
+                if ($scope.target.id) {
+                    return false;
+                }
+                if ($scope.target.url && $scope.target.url.toLower().indexOf("blob:") === 0) {
+                    return false;
+                }
+                return true;
             }
 
             function submit() {
