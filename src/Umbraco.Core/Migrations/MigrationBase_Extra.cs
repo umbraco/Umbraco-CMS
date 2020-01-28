@@ -95,6 +95,7 @@ namespace Umbraco.Core.Migrations
             else
             {
                 Execute.Sql(SqlSyntax.FormatColumnRename(tableName, currentName, newName)).Do();
+                AlterColumn<T>(tableName, newName);
             }
         }
 
