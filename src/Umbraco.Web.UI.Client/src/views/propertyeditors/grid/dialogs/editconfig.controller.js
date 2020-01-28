@@ -135,15 +135,24 @@ function EditConfigController($scope) {
 
     function submit() {
         if ($scope.model && $scope.model.submit) {
-            // We manually assign ithe code editor contents when saving & closing
-            // As this implementation for this JSON editor uses
-            $scope.model.config = angular.fromJson(jsonModel.getValue());
 
-            // We need to dispose the model - as if we re-open
-            // VSCode errors with 'ModelService: Cannot add model because it already exists!'
-            jsonModel.dispose();
+            // Lets check & verify its valid JSON
+            const jsonCode = jsonModel.getValue();
 
-            $scope.model.submit($scope.model);
+            if(isValidJson(jsonCode) === false) {
+                // TODO: Show some UI to wanr user
+                alert('INVALID TRY AGAIN!');
+            } else {
+                // We need to dispose the model - as if we re-open
+                // VSCode errors with 'ModelService: Cannot add model because it already exists!'
+                jsonModel.dispose();
+
+                // We manually assign ithe code editor contents when saving & closing
+                // As this implementation for this JSON editor uses
+                $scope.model.config = angular.fromJson(jsonCode);
+                $scope.model.submit($scope.model);
+
+            }
         }
     }
 
@@ -157,6 +166,15 @@ function EditConfigController($scope) {
         }
     }
 
+    function isValidJson(jsonString) {
+        let isValid = true;
+        try {
+            angular.fromJson(jsonString);
+        } catch (err) {
+            isValid = false;
+        }
+        return isValid;
+    }
 }
 
 angular.module("umbraco").controller("Umbraco.PropertyEditors.GridPrevalueEditor.EditConfigController", EditConfigController);
