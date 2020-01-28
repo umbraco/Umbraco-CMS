@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Umbraco.Core.IO;
-using Umbraco.Web.Composing;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.Checks.Config
@@ -14,6 +14,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
 
         protected ILocalizedTextService TextService { get; }
         protected IIOHelper IOHelper { get; }
+        protected ILogger Logger { get; }
 
         /// <summary>
         /// Gets the config file path.
@@ -53,11 +54,12 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
             get { return false; }
         }
 
-        protected AbstractConfigCheck(ILocalizedTextService textService, IIOHelper ioHelper)
+        protected AbstractConfigCheck(ILocalizedTextService textService, IIOHelper ioHelper, ILogger logger)
         {
             TextService = textService;
             IOHelper = ioHelper;
-            _configurationService = new ConfigurationService(AbsoluteFilePath, XPath, textService);
+            Logger = logger;
+            _configurationService = new ConfigurationService(AbsoluteFilePath, XPath, textService, logger);
         }
 
         /// <summary>

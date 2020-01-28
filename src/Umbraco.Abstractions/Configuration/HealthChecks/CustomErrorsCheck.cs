@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Web.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.Checks.Config
@@ -11,8 +11,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         Group = "Live Environment")]
     public class CustomErrorsCheck : AbstractConfigCheck
     {
-        public CustomErrorsCheck(ILocalizedTextService textService, IIOHelper ioHelper)
-            : base(textService, ioHelper)
+        public CustomErrorsCheck(ILocalizedTextService textService, IIOHelper ioHelper, ILogger logger)
+            : base(textService, ioHelper, logger)
         { }
 
         public override string FilePath => "~/Web.config";
@@ -23,7 +23,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
 
         public override IEnumerable<AcceptableConfiguration> Values => new List<AcceptableConfiguration>
         {
-            new AcceptableConfiguration { IsRecommended = true, Value = CustomErrorsMode.RemoteOnly.ToString() },
+            new AcceptableConfiguration { IsRecommended = true, Value = "RemoteOnly" },
             new AcceptableConfiguration { IsRecommended = false, Value = "On" }
         };
 

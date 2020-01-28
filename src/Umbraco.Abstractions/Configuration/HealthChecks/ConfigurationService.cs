@@ -3,7 +3,6 @@ using System.IO;
 using System.Xml;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.HealthCheck.Checks.Config
 {
@@ -14,15 +13,19 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         private readonly string _configFilePath;
         private readonly string _xPath;
         private readonly ILocalizedTextService _textService;
+        private readonly ILogger _logger;
 
         /// <param name="configFilePath">The absolute file location of the configuration file</param>
         /// <param name="xPath">The XPath to select the value</param>
+        /// <param name="textService"></param>
+        /// <param name="logger"></param>
         /// <returns></returns>
-        public ConfigurationService(string configFilePath, string xPath, ILocalizedTextService textService)
+        public ConfigurationService(string configFilePath, string xPath, ILocalizedTextService textService, ILogger logger)
         {
             _configFilePath = configFilePath;
             _xPath = xPath;
             _textService = textService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -58,7 +61,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
             }
             catch (Exception ex)
             {
-                Current.Logger.Error<ConfigurationService>(ex, "Error trying to get configuration value");
+                _logger.Error<ConfigurationService>(ex, "Error trying to get configuration value");
                 return new ConfigurationServiceResult
                 {
                     Success = false,
@@ -104,7 +107,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
             }
             catch (Exception ex)
             {
-                Current.Logger.Error<ConfigurationService>(ex, "Error trying to update configuration");
+               _logger.Error<ConfigurationService>(ex, "Error trying to update configuration");
                 return new ConfigurationServiceResult
                 {
                     Success = false,
