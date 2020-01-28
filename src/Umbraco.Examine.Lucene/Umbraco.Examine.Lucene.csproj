@@ -6,7 +6,7 @@
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <ProjectGuid>{07FBC26B-2927-4A22-8D96-D644C667FECC}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AssemblyName>Umbraco.Examine</AssemblyName>
+    <AssemblyName>Umbraco.Examine.Lucene</AssemblyName>
     <RootNamespace>Umbraco.Examine</RootNamespace>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <TargetFrameworkProfile />
@@ -30,7 +30,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Umbraco.Examine.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\Umbraco.Examine.Lucene.xml</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>

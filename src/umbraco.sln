@@ -63,7 +63,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Web", "Umbraco.Web\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Tests", "Umbraco.Tests\Umbraco.Tests.csproj", "{5D3B8245-ADA6-453F-A008-50ED04BFE770}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Examine", "Umbraco.Examine\Umbraco.Examine.csproj", "{07FBC26B-2927-4A22-8D96-D644C667FECC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Examine.Lucene", "Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj", "{07FBC26B-2927-4A22-8D96-D644C667FECC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{E3F9F378-AFE1-40A5-90BD-82833375DBFE}"
 	ProjectSection(SolutionItems) = preProject
@@ -113,7 +113,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Infrastrucure.Persi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.TestData", "Umbraco.TestData\Umbraco.TestData.csproj", "{FB5676ED-7A69-492C-B802-E7B24144C0FC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Examine2", "Umbraco.Examine2\Umbraco.Examine2.csproj", "{F9B7FE05-0F93-4D0D-9C10-690B33ECBBD8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Examine2", "Umbraco.Examine2\Umbraco.Examine2.csproj", "{F9B7FE05-0F93-4D0D-9C10-690B33ECBBD8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

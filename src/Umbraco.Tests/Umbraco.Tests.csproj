@@ -584,9 +584,9 @@
       <Project>{651E1350-91B6-44B7-BD60-7207006D7003}</Project>
       <Name>Umbraco.Web</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Umbraco.Examine\Umbraco.Examine.csproj">
+    <ProjectReference Include="..\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj">
       <Project>{07fbc26b-2927-4a22-8d96-d644c667fecc}</Project>
-      <Name>Umbraco.Examine</Name>
+      <Name>Umbraco.Examine.Lucene</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
