@@ -175,7 +175,7 @@ namespace Umbraco.Web.Models.Mapping
                 ? source.Values[UmbracoExamineFieldNames.IconFieldName]
                 : Constants.Icons.DefaultIcon;
 
-            target.Name = source.Values.ContainsKey("nodeName") ? source.Values["nodeName"] : "[no name]";
+            target.Name = source.Values.ContainsKey(UmbracoExamineFieldNames.NodeNameFieldName) ? source.Values[UmbracoExamineFieldNames.NodeNameFieldName] : "[no name]";
 
             if (source.Values.TryGetValue(UmbracoExamineFieldNames.UmbracoFileFieldName, out var umbracoFile))
             {

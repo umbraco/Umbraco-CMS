@@ -55,7 +55,7 @@ namespace Umbraco.Examine
                     {"sortOrder", new object[] {c.SortOrder}},
                     {"createDate", new object[] {c.CreateDate}},    //Always add invariant createDate
                     {"updateDate", new object[] {c.UpdateDate}},    //Always add invariant updateDate
-                    {"nodeName", (PublishedValuesOnly               //Always add invariant nodeName
+                    {UmbracoExamineFieldNames.NodeNameFieldName, (PublishedValuesOnly               //Always add invariant nodeName
                         ? c.PublishName?.Yield()
                         : c.Name?.Yield()) ?? Enumerable.Empty<string>()},
                     {"urlName", urlValue?.Yield() ?? Enumerable.Empty<string>()},                  //Always add invariant urlName

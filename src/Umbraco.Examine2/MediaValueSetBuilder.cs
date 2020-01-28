@@ -2,7 +2,6 @@
 using Examine;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -10,6 +9,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Examine
 {
@@ -19,16 +19,18 @@ namespace Umbraco.Examine
         private readonly IUserService _userService;
         private readonly ILogger _logger;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IJsonSerializer _serializer;
 
         public MediaValueSetBuilder(PropertyEditorCollection propertyEditors,
             UrlSegmentProviderCollection urlSegmentProviders,
-            IUserService userService, ILogger logger, IShortStringHelper shortStringHelper)
+            IUserService userService, ILogger logger, IShortStringHelper shortStringHelper, IJsonSerializer serializer)
             : base(propertyEditors, false)
         {
             _urlSegmentProviders = urlSegmentProviders;
             _userService = userService;
             _logger = logger;
             _shortStringHelper = shortStringHelper;
+            _serializer = serializer;
         }
 
         /// <inheritdoc />
@@ -48,7 +50,7 @@ namespace Umbraco.Examine
                     ImageCropperValue cropper = null;
                     try
                     {
-                        cropper = JsonConvert.DeserializeObject<ImageCropperValue>(
+                        cropper = _serializer.Deserialize<ImageCropperValue>(
                             m.GetValue<string>(Constants.Conventions.Media.File));
                     }
                     catch (Exception ex)
@@ -84,7 +86,7 @@ namespace Umbraco.Examine
                     {"sortOrder", new object[] {m.SortOrder}},
                     {"createDate", new object[] {m.CreateDate}},
                     {"updateDate", new object[] {m.UpdateDate}},
-                    {"nodeName", m.Name?.Yield() ?? Enumerable.Empty<string>()},
+                    {UmbracoExamineFieldNames.NodeNameFieldName, m.Name?.Yield() ?? Enumerable.Empty<string>()},
                     {"urlName", urlValue?.Yield() ?? Enumerable.Empty<string>()},
                     {"path", m.Path?.Yield() ?? Enumerable.Empty<string>()},
                     {"nodeType", m.ContentType.Id.ToString().Yield() },

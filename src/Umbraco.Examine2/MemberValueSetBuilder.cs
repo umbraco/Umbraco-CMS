@@ -31,7 +31,7 @@ namespace Umbraco.Examine
                     {"sortOrder", new object[] {m.SortOrder}},
                     {"createDate", new object[] {m.CreateDate}},
                     {"updateDate", new object[] {m.UpdateDate}},
-                    {"nodeName", m.Name?.Yield() ?? Enumerable.Empty<string>()},
+                    {UmbracoExamineFieldNames.NodeNameFieldName, m.Name?.Yield() ?? Enumerable.Empty<string>()},
                     {"path", m.Path?.Yield() ?? Enumerable.Empty<string>()},
                     {"nodeType", m.ContentType.Id.ToString().Yield() },
                     {"loginName", m.Username?.Yield() ?? Enumerable.Empty<string>()},

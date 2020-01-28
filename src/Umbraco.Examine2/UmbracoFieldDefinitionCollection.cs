@@ -76,7 +76,7 @@ namespace Umbraco.Examine
             if (!fieldName.Contains("_") || !fieldName.Contains("-"))
                 return false;
 
-            var match = ExamineExtensions.CultureIsoCodeFieldNameMatchExpression.Match(fieldName);
+            var match = UmbracoExamineExtensions.CultureIsoCodeFieldNameMatchExpression.Match(fieldName);
             if (match.Success && match.Groups.Count == 3)
             {
                 var nonCultureFieldName = match.Groups[1].Value;

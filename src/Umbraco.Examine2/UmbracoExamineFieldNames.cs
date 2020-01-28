@@ -19,5 +19,7 @@ namespace Umbraco.Examine
         public const string RawFieldPrefix = ExamineFieldNames.SpecialFieldPrefix + "Raw_";
 
         public const string VariesByCultureFieldName = ExamineFieldNames.SpecialFieldPrefix + "VariesByCulture";
+
+        public const string NodeNameFieldName = "nodeName";
     }
 }

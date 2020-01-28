@@ -69,7 +69,7 @@ namespace Umbraco.Web.Editors
             if (!msg.IsSuccessStatusCode)
                 throw new HttpResponseException(msg);
 
-            var results = Examine.ExamineExtensions.TryParseLuceneQuery(query)
+            var results = global::Umbraco.Examine.ExamineExtensions.TryParseLuceneQuery(query)
                 ? searcher.CreateQuery().NativeQuery(query).Execute(maxResults: pageSize * (pageIndex + 1))
                 : searcher.Search(query, maxResults: pageSize * (pageIndex + 1));
 

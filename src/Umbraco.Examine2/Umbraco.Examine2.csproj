@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>Umbraco.Examine2</AssemblyName>
+    <RootNamespace>Umbraco.Examine</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
