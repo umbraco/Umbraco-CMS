@@ -36,7 +36,8 @@
                                required
                                aria-required="true"
                                aria-invalid="{{contentForm.headerNameForm.headerName.$invalid ? true : false}}"
-                               autocomplete="off" maxlength="255" />
+                               autocomplete="off"
+                               maxlength="255" />
                     </ng-form>
 
                     <button type="button" ng-if="vm.hasVariants === true && hideChangeVariant !== true" class="umb-variant-switcher__toggle umb-outline" ng-click="vm.dropdownOpen = !vm.dropdownOpen" ng-class="{'--error': vm.errorsOnOtherVariants}">
@@ -48,18 +49,39 @@
                         <span ng-bind="getVariantDisplayName(editor.content)"></span>
                     </span>
 
-                    <umb-dropdown ng-if="vm.dropdownOpen" style="min-width: 100%; max-height: 250px; overflow-y: auto; margin-top: 5px;" on-close="vm.dropdownOpen = false" umb-keyboard-list>
+                    <umb-dropdown ng-if="vm.dropdownOpen" class="umb-variant-switcher" ng-class="{'--has-sub-variants': vm.hasSegment === true}" on-close="vm.dropdownOpen = false" umb-keyboard-list>
                         <umb-dropdown-item
-                            ng-repeat="variant in content.variants track by $index"
+                            ng-repeat-start="entry in vm.variantMenu track by $index"
                             class="umb-variant-switcher__item"
-                            ng-class="{'--current': variant === editor.content, '--not-allowed': variant.active && vm.dropdownOpen, '--error': variantHasError(variant)}"
+                            ng-class="{'--current': entry.variant === editor.content, '--active': entry.variant.active && vm.dropdownOpen, '--error': variantHasError(entry.variant), '--state-notCreated':entry.variant.state==='NotCreated', '--state-draft':entry.variant.state==='Draft'}"
                         >
-                            <button type="button" class="umb-variant-switcher__name-wrapper" ng-click="selectVariant($event, variant)" prevent-default>
-                                <span class="umb-variant-switcher__name" ng-bind="getVariantDisplayName(variant)"></span>
-                                <umb-variant-state variant="variant" class="umb-variant-switcher__state"></umb-variant-state>
+                            <button type="button" ng-if="entry.subVariants && entry.subVariants.length > 0" class="umb-variant-switcher__item-expand-button umb-outline" ng-click="entry.open = !entry.open">
+                                <i class="icon icon-navigation-down" ng-if="entry.open"></i>
+                                <i class="icon icon-navigation-right" ng-if="!entry.open"></i>
                             </button>
-                            <div ng-if="splitViewOpen !== true && !variant.active" class="umb-variant-switcher__split-view" ng-click="openInSplitView($event, variant)">Open in split view</div>
+                            <button type="button" class="umb-variant-switcher__name-wrapper umb-outline" ng-click="selectVariant($event, entry.variant)" prevent-default>
+                                <span class="umb-variant-switcher__name" ng-bind="entry.variant.language ? entry.variant.language.name : entry.variant.segment"></span>
+                                <umb-variant-state variant="entry.variant" class="umb-variant-switcher__state"></umb-variant-state>
+                            </button>
+                            <div ng-if="splitViewOpen !== true && !entry.variant.active" class="umb-variant-switcher__split-view" ng-click="openInSplitView($event, entry.variant)">Open in split view</div>
                         </umb-dropdown-item>
+                        <div
+                            ng-repeat-end
+                            ng-if="entry.open === true && entry.subVariants && entry.subVariants.length > 0"
+                            class="umb-variant-switcher__sub-variants umb-outline"
+                        >
+                            <umb-dropdown-item
+                                ng-repeat="subVariant in entry.subVariants track by $index"
+                                class="umb-variant-switcher__item"
+                                ng-class="{'--current': subVariant === editor.content, '--active': subVariant.active && vm.dropdownOpen, '--error': variantHasError(subVariant), '--state-notCreated':subVariant.state==='NotCreated', '--state-draft':subVariant.state==='Draft'}"
+                            >
+                                <button type="button" class="umb-variant-switcher__name-wrapper umb-outline" ng-click="selectVariant($event, subVariant)" prevent-default>
+                                    <span class="umb-variant-switcher__name" ng-bind="subVariant.segment"></span>
+                                    <umb-variant-state variant="subVariant" class="umb-variant-switcher__state"></umb-variant-state>
+                                </button>
+                                <div ng-if="splitViewOpen !== true && !subVariant.active" class="umb-variant-switcher__split-view" ng-click="openInSplitView($event, subVariant)">Open in split view</div>
+                            </umb-dropdown-item>
+                        </div>
                     </umb-dropdown>
 
                 </div>
