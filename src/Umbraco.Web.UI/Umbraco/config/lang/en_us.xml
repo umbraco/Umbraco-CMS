@@ -738,6 +738,7 @@
     <key alias="sort">Sort</key>
     <key alias="status">Status</key>
     <key alias="submit">Submit</key>
+    <key alias="success">Success</key>
     <key alias="type">Type</key>
     <key alias="typeToSearch">Type to search...</key>
     <key alias="under">under</key>
@@ -1852,6 +1853,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="password">Password</key>
     <key alias="resetPassword">Reset password</key>
     <key alias="passwordChanged">Your password has been changed!</key>
+    <key alias="passwordChangedGeneric">Password changed</key>
     <key alias="passwordConfirm">Please confirm the new password</key>
     <key alias="passwordEnterNew">Enter your new password</key>
     <key alias="passwordIsBlank">Your new password cannot be blank!</key>

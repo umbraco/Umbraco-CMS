@@ -258,7 +258,7 @@
                     </div>
                     <div>
 
-                        <umb-button type="button" ng-if="model.user.userDisplayState.key !== 'Invited' && model.changePasswordModel.isChanging === false"
+                        <umb-button type="button" ng-if="model.user.userDisplayState.key !== 'Invited'"
                                     button-style="[action,block]"
                                     action="model.toggleChangePassword()"
                                     label="Change password"
@@ -277,21 +277,6 @@
                                     size="s">
                         </umb-button>
                     </div>
-
-                    <ng-form ng-if="model.changePasswordModel.isChanging" name="passwordForm" class="block-form" val-form-manager>
-
-                        <change-password password-values="model.user.changePassword"
-                                         config="model.changePasswordModel.config">
-                        </change-password>
-
-                        <umb-button type="button"
-                                    action="model.toggleChangePassword()"
-                                    label="Cancel"
-                                    label-key="general_cancel"
-                                    button-style="cancel">
-                        </umb-button>
-
-                    </ng-form>
 
                     <div ng-if="model.user.resetPasswordValue">
                         <p><br />Password reset to value: <strong>{{model.user.resetPasswordValue}}</strong></p>
