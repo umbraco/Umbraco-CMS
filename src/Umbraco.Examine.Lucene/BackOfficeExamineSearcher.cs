@@ -10,7 +10,6 @@ using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Search;
 
 namespace Umbraco.Examine
 {

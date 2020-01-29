@@ -1,6 +1,5 @@
 ﻿using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Web.Search;
 
 namespace Umbraco.Examine
 {
