@@ -24,13 +24,13 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
         public override bool IsConverter(IPublishedPropertyType propertyType) => Constants.PropertyEditors.Aliases.MultiUrlPicker.Equals(propertyType.EditorAlias);
 
+        public override bool? IsValue(object value, PropertyValueLevel level) => value?.ToString() is var jsonValue && !string.IsNullOrEmpty(jsonValue) && jsonValue != "[]";
+
         public override Type GetPropertyValueType(IPublishedPropertyType propertyType) => propertyType.DataType.ConfigurationAs<MultiUrlPickerConfiguration>().MaxNumber == 1
             ? typeof(Link)
             : typeof(IEnumerable<Link>);
 
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
-
-        public override bool? IsValue(object value, PropertyValueLevel level) => value?.ToString() is var jsonValue && !string.IsNullOrEmpty(jsonValue) && jsonValue != "[]";
 
         public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview) => source?.ToString();
 
@@ -38,16 +38,17 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         {
             using (_profilingLogger.DebugDuration<MultiUrlPickerValueConverter>($"ConvertPropertyToLinks ({propertyType.DataType.Id})"))
             {
+                var value = inter?.ToString();
                 var maxNumber = propertyType.DataType.ConfigurationAs<MultiUrlPickerConfiguration>().MaxNumber;
 
-                if (inter == null)
+                if (string.IsNullOrEmpty(value))
                 {
                     return maxNumber == 1 ? null : Enumerable.Empty<Link>();
                 }
 
+                // Process links
                 var links = new List<Link>();
-                var dtos = JsonConvert.DeserializeObject<IEnumerable<MultiUrlPickerValueEditor.LinkDto>>(inter.ToString());
-
+                var dtos = JsonConvert.DeserializeObject<IEnumerable<MultiUrlPickerValueEditor.LinkDto>>(value);
                 foreach (var dto in dtos)
                 {
                     var name = dto.Name;
@@ -72,9 +73,9 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                                 continue;
                         }
 
-                        if (content == null || content.ContentType.ItemType == PublishedItemType.Element)
+                        if (content == null)
                         {
-                            // Skip unavailable content and elements (in case the type has changed)
+                            // Skip unavailable content
                             continue;
                         }
 
@@ -86,19 +87,29 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                         url = content.Url();
                     }
 
-                    links.Add(new Link
+                    links.Add(new Link()
                     {
                         Name = name,
                         Target = dto.Target,
                         Type = type,
                         Udi = dto.Udi,
                         Content = content,
-                        Url = url + dto.QueryString,
+                        Url = url + dto.QueryString
                     });
+
+                    if (maxNumber > 0 && links.Count == maxNumber)
+                    {
+                        // Stop processing
+                        break;
+                    }
                 }
 
-                if (maxNumber == 1) return links.FirstOrDefault();
-                if (maxNumber > 0) return links.Take(maxNumber);
+                // Return the correct value type
+                if (maxNumber == 1)
+                {
+                    return links.FirstOrDefault();
+                }
+
                 return links;
             }
         }
