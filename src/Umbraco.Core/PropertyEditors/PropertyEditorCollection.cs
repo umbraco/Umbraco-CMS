@@ -4,6 +4,8 @@ using Umbraco.Core.Manifest;
 
 namespace Umbraco.Core.PropertyEditors
 {
+
+
     public class PropertyEditorCollection : BuilderCollectionBase<IDataEditor>
     {
         public PropertyEditorCollection(DataEditorCollection dataEditors, ManifestParser manifestParser)

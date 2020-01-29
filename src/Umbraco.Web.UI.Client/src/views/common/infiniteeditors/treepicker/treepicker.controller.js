@@ -58,6 +58,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
         vm.hideSearch = hideSearch;
         vm.closeMiniListView = closeMiniListView;
         vm.selectListViewNode = selectListViewNode;
+        vm.listViewItemsLoaded = listViewItemsLoaded;
         vm.submit = submit;
         vm.close = close;
 
@@ -415,7 +416,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             if ($scope.model.selection.length > 0) {
                 for (var i = 0; $scope.model.selection.length > i; i++) {
                     var selectedItem = $scope.model.selection[i];
-                    if (selectedItem.id === item.id) {
+                    if (selectedItem.id === parseInt(item.id)) {
                         found = true;
                         foundIndex = i;
                     }
@@ -630,8 +631,8 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             _.each(vm.searchInfo.results,
                 function (result) {
                     var exists = _.find($scope.model.selection,
-                        function (selectedId) {
-                            return result.id == selectedId;
+                        function (item) {
+                            return result.id == item.id;
                         });
                     if (exists) {
                         result.selected = true;
@@ -649,6 +650,15 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
 
         function closeMiniListView() {
             vm.miniListView = undefined;
+        }
+
+        function listViewItemsLoaded(items) {
+            var selectedIds = _.pluck($scope.model.selection, "id");
+            _.each(items, function (item) {
+                if (_.contains(selectedIds, item.id)) {
+                    item.selected = true;
+                }
+            });
         }
 
         function submit(model) {

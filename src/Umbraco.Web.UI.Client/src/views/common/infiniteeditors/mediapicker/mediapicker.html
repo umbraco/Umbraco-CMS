@@ -138,8 +138,8 @@
                 </div>
 
                 <umb-overlay ng-if="vm.mediaPickerDetailsOverlay.show" model="vm.mediaPickerDetailsOverlay" position="right">
-
-                <div class="umb-control-group" ng-if="!target.id">
+                
+                <div class="umb-control-group" ng-if="vm.shouldShowUrl()">
                     <h5>
                         <localize key="@general_url"></localize>
                     </h5>

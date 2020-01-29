@@ -188,6 +188,22 @@ Use this directive to render a ui component for selecting child items to a paren
               syncParentIcon();
             }));
 
+            // sortable options for allowed child content types
+            scope.sortableOptions = {
+                axis: "y",
+                containment: "parent",
+                distance: 10,
+                opacity: 0.7,
+                tolerance: "pointer",
+                scroll: true,
+                zIndex: 6000,
+                update: function (e, ui) {
+                    if(scope.onSort) {
+                        scope.onSort();
+                    }
+                }
+            };
+
             // clean up
             scope.$on('$destroy', function(){
               // unbind watchers
@@ -209,7 +225,8 @@ Use this directive to render a ui component for selecting child items to a paren
                 parentIcon: "=",
                 parentId: "=",
                 onRemove: "=",
-                onAdd: "="
+                onAdd: "=",
+                onSort: "="
             },
             link: link
         };

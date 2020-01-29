@@ -1,5 +1,6 @@
 ﻿using System;
 
+// TODO: Can't change namespace due to breaking changes, change in netcore
 namespace Umbraco.Core
 {
     /// <summary>

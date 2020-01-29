@@ -148,7 +148,10 @@
                                     group.groupOrder = item.groupOrder;
                                 }
                                 groupExists = true;
+
+                            if(item.hidden === false){
                                 group.tours.push(item);
+                            }
                             }
                         });
 
@@ -158,8 +161,11 @@
                             if (item.groupOrder) {
                                 newGroup.groupOrder = item.groupOrder;
                             }
-                            newGroup.tours.push(item);
-                            groupedTours.push(newGroup);
+
+                            if(item.hidden === false){
+                                newGroup.tours.push(item);
+                                groupedTours.push(newGroup);
+                            }
                         }
                     }
 
