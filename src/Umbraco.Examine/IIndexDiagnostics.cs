@@ -4,6 +4,7 @@ using Umbraco.Core;
 
 namespace Umbraco.Examine
 {
+
     /// <summary>
     /// Exposes diagnostic information about an index
     /// </summary>

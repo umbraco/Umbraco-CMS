@@ -5,7 +5,6 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Examine;
-using Examine.LuceneEngine.Providers;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
@@ -24,17 +23,19 @@ namespace Umbraco.Web.Editors
         private readonly IExamineManager _examineManager;
         private readonly ILogger _logger;
         private readonly IIOHelper _ioHelper;
+        private readonly IIndexDiagnosticsFactory _indexDiagnosticsFactory;
         private readonly IAppPolicyCache _runtimeCache;
         private readonly IndexRebuilder _indexRebuilder;
 
 
-        public ExamineManagementController(IExamineManager examineManager, ILogger logger, IIOHelper ioHelper,
+        public ExamineManagementController(IExamineManager examineManager, ILogger logger, IIOHelper ioHelper, IIndexDiagnosticsFactory indexDiagnosticsFactory,
             AppCaches appCaches,
             IndexRebuilder indexRebuilder)
         {
             _examineManager = examineManager;
             _logger = logger;
             _ioHelper = ioHelper;
+            _indexDiagnosticsFactory = indexDiagnosticsFactory;
             _runtimeCache = appCaches.RuntimeCache;
             _indexRebuilder = indexRebuilder;
         }
@@ -69,9 +70,8 @@ namespace Umbraco.Web.Editors
             if (!msg.IsSuccessStatusCode)
                 throw new HttpResponseException(msg);
 
-            var results = global::Umbraco.Examine.ExamineExtensions.TryParseLuceneQuery(query)
-                ? searcher.CreateQuery().NativeQuery(query).Execute(maxResults: pageSize * (pageIndex + 1))
-                : searcher.Search(query, maxResults: pageSize * (pageIndex + 1));
+            // NativeQuery will work for a single word/phrase too (but depends on the implementation) the lucene one will work. 
+            var results = searcher.CreateQuery().NativeQuery(query).Execute(maxResults: pageSize * (pageIndex + 1));
 
             var pagedResults = results.Skip(pageIndex * pageSize);
 
@@ -173,19 +173,11 @@ namespace Umbraco.Web.Editors
             }
         }
 
-
-
         private ExamineIndexModel CreateModel(IIndex index)
         {
             var indexName = index.Name;
 
-            if (!(index is IIndexDiagnostics indexDiag))
-            {
-                if (index is LuceneIndex luceneIndex)
-                    indexDiag = new LuceneIndexDiagnostics(luceneIndex, Logger, _ioHelper);
-                else
-                    indexDiag = new GenericIndexDiagnostics(index);
-            }
+            var indexDiag = _indexDiagnosticsFactory.Create(index);
 
             var isHealth = indexDiag.IsHealthy();
             var properties = new Dictionary<string, object>

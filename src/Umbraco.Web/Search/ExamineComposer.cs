@@ -30,7 +30,7 @@ namespace Umbraco.Web.Search
 
             composition.Register<IndexRebuilder>(Lifetime.Singleton);
             composition.RegisterUnique<IUmbracoIndexConfig, UmbracoIndexConfig>();
-            composition.RegisterUnique<IUmbracoIndexesCreator, UmbracoIndexesCreator>();
+            composition.RegisterUnique<IIndexDiagnosticsFactory, IndexDiagnosticsFactory>();            
             composition.RegisterUnique<IPublishedContentValueSetBuilder>(factory =>
                 new ContentValueSetBuilder(
                     factory.GetInstance<PropertyEditorCollection>(),

@@ -44,6 +44,7 @@ using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Web.PropertyEditors;
+using Umbraco.Examine;
 
 namespace Umbraco.Web.Runtime
 {

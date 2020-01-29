@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using Examine;
-using Examine.LuceneEngine;
+﻿using Examine;
 using Lucene.Net.Analysis;
 using Umbraco.Core;
 using Umbraco.Core.IO;

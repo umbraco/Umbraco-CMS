@@ -66,8 +66,14 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BackOfficeExamineSearcher.cs" />
     <Compile Include="ExamineExtensions.cs" />
+    <Compile Include="ExamineLuceneComponent.cs" />
+    <Compile Include="ExamineLuceneComposer.cs" />
+    <Compile Include="ExamineLuceneFinalComponent.cs" />
+    <Compile Include="ExamineLuceneFinalComposer.cs" />
     <Compile Include="LuceneIndexDiagnostics.cs" />
+    <Compile Include="LuceneIndexDiagnosticsFactory.cs" />
     <Compile Include="UmbracoExamineExtensions.cs" />
     <Compile Include="NoPrefixSimpleFsLockFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -75,6 +81,7 @@
     <Compile Include="UmbracoExamineIndexDiagnostics.cs" />
     <Compile Include="UmbracoExamineIndex.cs" />
     <Compile Include="LuceneIndexCreator.cs" />
+    <Compile Include="UmbracoIndexesCreator.cs" />
     <Compile Include="UmbracoMemberIndex.cs" />
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>

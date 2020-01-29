@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Examine;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
@@ -15,13 +13,12 @@ using System.Threading;
 
 namespace Umbraco.Examine
 {
+
     /// <summary>
     /// Extension methods for the LuceneIndex
     /// </summary>
     public static class ExamineExtensions
     {
-
-
         private static bool _isConfigured = false;
         private static object _configuredInit = null;
         private static object _isConfiguredLocker = new object();
@@ -74,7 +71,7 @@ namespace Umbraco.Examine
         /// <remarks>
         /// This is not thread safe, use with care
         /// </remarks>
-        internal static void ConfigureLuceneIndexes(this IExamineManager examineManager, ILogger logger, bool disableExamineIndexing)
+        private static void ConfigureLuceneIndexes(this IExamineManager examineManager, ILogger logger, bool disableExamineIndexing)
         {
             foreach (var luceneIndexer in examineManager.Indexes.OfType<LuceneIndex>())
             {
