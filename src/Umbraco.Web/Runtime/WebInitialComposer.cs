@@ -10,6 +10,7 @@ using Umbraco.Core.Dashboards;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.Install;
 using Umbraco.Core.Migrations.PostMigrations;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.PublishedContent;
@@ -27,6 +28,7 @@ using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Hosting;
+using Umbraco.Web.Install;
 using Umbraco.Web.Macros;
 using Umbraco.Web.Media.EmbedProviders;
 using Umbraco.Web.Models.PublishedContent;
@@ -63,6 +65,7 @@ namespace Umbraco.Web.Runtime
             composition.Register<IBackOfficeInfo, AspNetBackOfficeInfo>();
             composition.Register<IPasswordHasher, AspNetPasswordHasher>();
             composition.Register<ICurrentUserAccessor, CurrentUserAccessor>();
+            composition.Register<IFilePermissionHelper, FilePermissionHelper>(Lifetime.Singleton);
 
             composition.RegisterUnique<IHttpContextAccessor, AspNetHttpContextAccessor>(); // required for hybrid accessors
 

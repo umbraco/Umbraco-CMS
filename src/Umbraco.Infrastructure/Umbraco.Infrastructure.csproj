@@ -8,6 +8,7 @@
     <ItemGroup>
       <PackageReference Include="LightInject" Version="6.2.0" />
       <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
+      <PackageReference Include="Markdown" Version="2.2.1" />
       <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
       <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-19554-01" />
       <PackageReference Include="MiniProfiler.Shared" Version="4.1.0" />
@@ -25,12 +26,13 @@
       <PackageReference Include="Serilog.Sinks.Map" Version="1.0.0" />
       <PackageReference Include="System.Data.SqlClient" Version="4.8.0" />
       <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
+      <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.9.0" />
     </ItemGroup>
 
     <ItemGroup>
       <_UnmanagedRegistrationCache Remove="obj\Umbraco.Infrastructure.csproj.UnmanagedRegistration.cache" />
     </ItemGroup>
-    
+
 
     <ItemGroup>
       <Compile Remove="obj\**" />

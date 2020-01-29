@@ -11,6 +11,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.Install;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -51,6 +52,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly ITypeFinder _typeFinder;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IFilePermissionHelper _filePermissionHelper;
 
         // volatile because we read it with no lock
         private volatile bool _isReady;
@@ -87,7 +89,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             UrlSegmentProviderCollection urlSegmentProviders,
             ITypeFinder typeFinder,
             IHostingEnvironment hostingEnvironment,
-            IShortStringHelper shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IFilePermissionHelper filePermissionHelper)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
@@ -107,6 +110,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _typeFinder = typeFinder;
             _hostingEnvironment = hostingEnvironment;
             _shortStringHelper = shortStringHelper;
+            _filePermissionHelper = filePermissionHelper;
 
             // we need an Xml serializer here so that the member cache can support XPath,
             // for members this is done by navigating the serialized-to-xml member
@@ -360,7 +364,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override bool EnsureEnvironment(out IEnumerable<string> errors)
         {
             // must have app_data and be able to write files into it
-            var ok = FilePermissionHelper.TryCreateDirectory(GetLocalFilesPath());
+            var ok = _filePermissionHelper.TryCreateDirectory(GetLocalFilesPath());
             errors = ok ? Enumerable.Empty<string>() : new[] { "NuCache local files." };
             return ok;
         }

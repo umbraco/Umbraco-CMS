@@ -10,7 +10,7 @@ namespace Umbraco.Web.Scheduling
     /// a condition is met. However if the tasks runner has to terminate,
     /// latched background tasks can be executed immediately, depending on
     /// the value returned by RunsOnShutdown.</remarks>
-    internal interface ILatchedBackgroundTask : IBackgroundTask
+    public interface ILatchedBackgroundTask : IBackgroundTask
     {
         /// <summary>
         /// Gets a task on latch.
