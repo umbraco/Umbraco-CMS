@@ -35,10 +35,11 @@
             });
             scope.vm = {};
             scope.vm.hasVariants = false;
+            scope.vm.hasCulture = false;
+            scope.vm.hasSegments = false;
             scope.vm.dropdownOpen = false;
             scope.vm.variantsWithError = [];
             scope.vm.defaultVariant = null;
-            
             scope.vm.errorsOnOtherVariants = false;// indicating wether to show that other variants, than the current, have errors.
             
             function checkErrorsOnOtherVariants() {
@@ -72,19 +73,44 @@
                     if (variant.language !== null && variant.language.isDefault) {
                         scope.vm.defaultVariant = variant;
                     }
-                    if (variant.language !== null || variant.segment !== null) {
-                        scope.vm.hasVariants = true;
+                    if (variant.language !== null) {
+                        scope.vm.hasCulture = true;
+                    }
+                    if (variant.segment !== null) {
+                        scope.vm.hasSegment = true;
                     }
                 });
+
+                scope.vm.hasVariants = (scope.vm.hasCulture || scope.vm.hasSegment);
                 
                 checkErrorsOnOtherVariants();
+
+                scope.vm.variantMenu = [];
+                if (scope.vm.hasCulture) {
+                    angular.forEach(scope.content.variants, (v) => {
+                        if (v.language !== null && v.segment === null) {
+                            var variantMenuEntry = {
+                                open: v.language && v.language.culture === scope.editor.culture,
+                                variant: v,
+                                subVariants: scope.content.variants.filter( (subVariant) => subVariant.language.culture === v.language.culture && subVariant.segment !== null)
+                            };
+                            scope.vm.variantMenu.push(variantMenuEntry);
+                        }
+                    });
+                } else {
+                    angular.forEach(scope.content.variants, (v) => {
+                        scope.vm.variantMenu.push({
+                            variant: v
+                        });
+                    });
+                }
+
                 
                 angular.forEach(scope.editor.variantApps, (app) => {
                     if (app.alias === "umbContent") {
                         app.anchors = scope.content.tabs;
                     }
                 });
-                
                 
                 angular.forEach(scope.content.variants, function (variant) {
                     unsubscribe.push(serverValidationManager.subscribe(null, variant.language !== null ? variant.language.culture : null, variant.segment, null, onVariantValidation));
