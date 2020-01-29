@@ -1,7 +1,6 @@
 ﻿using Umbraco.Core.Logging;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Services;
 using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web.Templates;
 using Umbraco.Web;
@@ -13,12 +12,10 @@ using System;
 using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core;
-using Umbraco.Web.PropertyEditors;
+using System.Diagnostics;
 
 namespace Umbraco.Tests.Templates
 {
-
-
     [TestFixture]
     public class HtmlImageSourceParserTests
     {
@@ -31,10 +28,9 @@ namespace Umbraco.Tests.Templates
     </div>
 </p><p><img src='/media/234234.jpg' data-udi=""umb://media-type/B726D735E4C446D58F703F3FBCFC97A5"" /></p>";
 
-            var logger = Mock.Of<ILogger>();
             var umbracoContextAccessor = new TestUmbracoContextAccessor();
             var imageSourceParser = new HtmlImageSourceParser(umbracoContextAccessor);
-            
+
             var result = imageSourceParser.FindUdisFromDataAttributes(input).ToList();
             Assert.AreEqual(2, result.Count);
             Assert.AreEqual(Udi.Parse("umb://media/D4B18427A1544721B09AC7692F35C264"), result[0]);
@@ -44,7 +40,6 @@ namespace Umbraco.Tests.Templates
         [Test]
         public void Remove_Image_Sources()
         {
-            var logger = Mock.Of<ILogger>();
             var umbracoContextAccessor = new TestUmbracoContextAccessor();
             var imageSourceParser = new HtmlImageSourceParser(umbracoContextAccessor);
 
@@ -111,10 +106,83 @@ namespace Umbraco.Tests.Templates
 <p>
     <div><img src=""/media/1001/my-image.jpg?width=100"" data-udi=""umb://media/81BB2036-034F-418B-B61F-C7160D68DCD4"" /></div>
 </p>", result);
-
             }
+        }
 
+        [TestCase(
+            @"<div><img src="""" /></div>",
+            ExpectedResult = @"<div><img src="""" /></div>",
+            TestName = "Empty source is not updated with no data-udi set"
+        )]
+        [TestCase(
+            @"<div><img src="""" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
+            ExpectedResult = @"<div><img src=""/media/1001/image.jpg"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
+            TestName = "Empty source is updated with data-udi set"
+        )]
+        [TestCase(
+            @"<div><img src=""non empty src"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
+            ExpectedResult = @"<div><img src=""/media/1001/image.jpg"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
+            TestName = "Filled source is overwritten with data-udi set"
+        )]
+        [TestCase(
+            @"<div><img src=""some src"" some-attribute data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4"" another-attribute/></div>",
+            ExpectedResult = @"<div><img src=""/media/1001/image.jpg"" some-attribute data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4"" another-attribute/></div>",
+            TestName = "Attributes are persisted"
+        )]
+        [TestCase(
+            @"<div><img src=""somesrc?width=100&height=500"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
+            ExpectedResult = @"<div><img src=""/media/1001/image.jpg?width=100&height=500"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
+            TestName = "Source is trimmed and parameters are prefixed"
+        )]
+        [TestCase(
+            @"<div><img src=""?width=100&height=500"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
+            ExpectedResult = @"<div><img src=""/media/1001/image.jpg?width=100&height=500"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
+            TestName = "Parameters are prefixed"
+        )]
+        [TestCase(
+            @"<div>
+                <img src="""" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/>
+                <img src=""src"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD5""/>
+                <img src=""?asd"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD6""/>
+              </div>",
+            ExpectedResult =
+            @"<div>
+                <img src=""/media/1001/image.jpg"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/>
+                <img src=""/media/1001/image.jpg"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD5""/>
+                <img src=""/media/1001/image.jpg?asd"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD6""/>
+              </div>",
+            TestName = "Multiple img tags are handled"
+        )]
 
+        [Category("Ensure image sources")]
+        public string Ensure_ImageSources_Processing(string sourceHtml)
+        {
+            var fakeMediaUrl = "/media/1001/image.jpg";
+            var parser = new HtmlImageSourceParser((guid) => fakeMediaUrl);
+            var actual = parser.EnsureImageSources(sourceHtml);
+
+            return actual;
+        }
+
+        [Category("Ensure image sources")]
+        [Test]
+        public void Ensure_Large_Html_Is_Processed_Quickly()
+        {
+            int symbolCount = 25000;
+            int maxMsToRun = 200;
+
+            var longText = new string('*', symbolCount);
+            var text = $@"<img src=""{longText}"" />";
+
+            var fakeMediaUrl = "/media/1001/image.jpg";
+            var parser = new HtmlImageSourceParser((guid) => fakeMediaUrl);
+
+            var timer = new Stopwatch();
+            timer.Start();
+            var actual = parser.EnsureImageSources(text);
+            timer.Stop();
+
+            Assert.IsTrue(timer.ElapsedMilliseconds <= maxMsToRun);
         }
     }
 }
