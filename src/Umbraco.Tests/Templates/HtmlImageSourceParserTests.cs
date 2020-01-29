@@ -122,7 +122,7 @@ namespace Umbraco.Tests.Templates
         [TestCase(
             @"<div><img src=""non empty src"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
             ExpectedResult = @"<div><img src=""/media/1001/image.jpg"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/></div>",
-            TestName = "Filled source is overrwriten with data-udi set"
+            TestName = "Filled source is overwritten with data-udi set"
         )]
         [TestCase(
             @"<div><img src=""some src"" some-attribute data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4"" another-attribute/></div>",
@@ -153,8 +153,9 @@ namespace Umbraco.Tests.Templates
               </div>",
             TestName = "Multiple img tags are handled"
         )]
+
         [Category("Ensure image sources")]
-        public string EnsureImageSourcesProcessing(string sourceHtml)
+        public string Ensure_ImageSources_Processing(string sourceHtml)
         {
             var fakeMediaUrl = "/media/1001/image.jpg";
             var parser = new HtmlImageSourceParser((guid) => fakeMediaUrl);
@@ -165,7 +166,7 @@ namespace Umbraco.Tests.Templates
 
         [Category("Ensure image sources")]
         [Test]
-        public void EnsureBigHtmlIsProcessedQuickly()
+        public void Ensure_Large_Html_Is_Processed_Quickly()
         {
             int symbolCount = 25000;
             int maxMsToRun = 200;
