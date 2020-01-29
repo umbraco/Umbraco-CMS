@@ -60,8 +60,27 @@ namespace Umbraco.Web.Editors
 
             //redirect to ImageProcessor thumbnail with rnd generated from last modified time of original media file
             var response = Request.CreateResponse(HttpStatusCode.Found);
-            var imageLastModified = _mediaFileSystem.GetLastModified(imagePath);
-            response.Headers.Location = new Uri($"{imagePath}?rnd={imageLastModified:yyyyMMddHHmmss}&upscale=false&width={width}&animationprocessmode=first&mode=max", UriKind.Relative);
+
+            DateTimeOffset? imageLastModified = null;
+            try
+            {
+                imageLastModified = _mediaFileSystem.GetLastModified(imagePath);
+                
+            }
+            catch (Exception)
+            {
+                // if we get an exception here it's probably because the image path being requested is an image that doesn't exist
+                // in the local media file system. This can happen if someone is storing an absolute path to an image online, which
+                // is perfectly legal but in that case the media file system isn't going to resolve it.
+                // so ignore and we won't set a last modified date.
+            }
+
+            // TODO: When we abstract imaging for netcore, we are actually just going to be abstracting a URI builder for images, this
+            // is one of those places where this can be used.
+
+            var rnd = imageLastModified.HasValue ? $"&rnd={imageLastModified:yyyyMMddHHmmss}" : string.Empty;
+
+            response.Headers.Location = new Uri($"{imagePath}?upscale=false&width={width}&animationprocessmode=first&mode=max{rnd}", UriKind.RelativeOrAbsolute);
             return response;
         }
         

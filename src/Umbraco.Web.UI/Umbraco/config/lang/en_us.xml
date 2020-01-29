@@ -36,6 +36,8 @@
     <key alias="chooseWhereToCopy">Choose where to copy</key>
     <key alias="chooseWhereToMove">Choose where to move</key>
     <key alias="toInTheTreeStructureBelow">to in the tree structure below</key>
+    <key alias="infiniteEditorChooseWhereToCopy">Choose where to copy the selected item(s)</key>
+    <key alias="infiniteEditorChooseWhereToMove">Choose where to move the selected item(s)</key>
     <key alias="wasMovedTo">was moved to</key>
     <key alias="wasCopiedTo">was copied to</key>
     <key alias="wasDeleted">was deleted</key>
@@ -284,6 +286,9 @@
     <key alias="nestedContentNoContentTypes">No content types are configured for this property.</key>
     <key alias="nestedContentAddElementType">Add element type</key>
     <key alias="nestedContentSelectElementTypeModalTitle">Select element type</key>
+    <key alias="nestedContentGroupHelpText">Select the group whose properties should be displayed. If left blank, the first group on the element type will be used.</key>
+    <key alias="nestedContentTemplateHelpTextPart1">Enter an angular expression to evaluate against each item for its name. Use</key>
+    <key alias="nestedContentTemplateHelpTextPart2">to display the item index</key>
     <key alias="addTextBox">Add another text box</key>
     <key alias="removeTextBox">Remove this text box</key>
     <key alias="contentRoot">Content root</key>
@@ -551,10 +556,6 @@
     <key alias="anchor">#value or ?key=value</key>
     <key alias="enterAlias">Enter alias...</key>
     <key alias="generatingAlias">Generating alias...</key>
-    <key alias="a11yCreateItem">Create item</key>
-	<key alias="a11yCreate">Create</key>
-    <key alias="a11yEdit">Edit</key>
-    <key alias="a11yName">Name</key>
   </area>
   <area alias="editcontenttype">
     <key alias="createListView" version="7.2">Create custom list view</key>
@@ -737,6 +738,7 @@
     <key alias="sort">Sort</key>
     <key alias="status">Status</key>
     <key alias="submit">Submit</key>
+    <key alias="success">Success</key>
     <key alias="type">Type</key>
     <key alias="typeToSearch">Type to search...</key>
     <key alias="under">under</key>
@@ -764,6 +766,11 @@
     <key alias="current">current</key>
     <key alias="embed">Embed</key>
     <key alias="selected">selected</key>
+    <key alias="other">Other</key>
+    <key alias="articles">Articles</key>
+    <key alias="videos">Videos</key>
+    <key alias="clear">Clear</key>
+    <key alias="installing">Installing</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blue</key>
@@ -1339,7 +1346,10 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="users">Users</key>
   </area>
   <area alias="help">
+    <key alias="tours">Tours</key>
     <key alias="theBestUmbracoVideoTutorials">The best Umbraco video tutorials</key>
+    <key alias="umbracoForum">Visit our.umbraco.com</key>
+    <key alias="umbracoTv">Visit umbraco.tv</key>
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Default template</key>
@@ -1649,9 +1659,10 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="variantsDescription">Allow editors to create content of this type in different languages.</key>
     <key alias="allowVaryByCulture">Allow varying by culture</key>
     <key alias="elementType">Element type</key>
-    <key alias="elementHeading">Is an Element type</key>
-    <key alias="elementDescription">An Element type is meant to be used for instance in Nested Content, and not in the tree.</key>
-    <key alias="elementDoesNotSupport">This is not applicable for an Element type</key>
+    <key alias="elementHeading">Is an element type</key>
+    <key alias="elementDescription">An element type is meant to be used for instance in Nested Content, and not in the tree.</key>
+    <key alias="elementCannotToggle">A document type cannot be changed to an element type once it has been used to create one or more content items.</key>
+    <key alias="elementDoesNotSupport">This is not applicable for an element type</key>
     <key alias="propertyHasChanges">You have made changes to this property. Are you sure you want to discard them?</key>
   </area>
   <area alias="languages">
@@ -1842,6 +1853,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="password">Password</key>
     <key alias="resetPassword">Reset password</key>
     <key alias="passwordChanged">Your password has been changed!</key>
+    <key alias="passwordChangedGeneric">Password changed</key>
     <key alias="passwordConfirm">Please confirm the new password</key>
     <key alias="passwordEnterNew">Enter your new password</key>
     <key alias="passwordIsBlank">Your new password cannot be blank!</key>
@@ -2218,6 +2230,10 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="redirectDashboardSearchLabel">Search the redirect dashboard</key>
     <key alias="userGroupSearchLabel">Search the user group section</key>
     <key alias="userSearchLabel">Search the users section</key>
+    <key alias="createItem">Create item</key>
+    <key alias="create">Create</key>
+    <key alias="edit">Edit</key>
+    <key alias="name">Name</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>
@@ -2229,6 +2245,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="labelUsedByMemberTypes">Used in  Member Types</key>
     <key alias="noMemberTypes">No references to Member Types.</key>
     <key alias="usedByProperties">Used by</key>
+    <key alias="labelUsedByDocuments">Used in Documents</key>
+    <key alias="labelUsedByMembers">Used in Members</key>
+    <key alias="labelUsedByMedia">Used in Media</key>
   </area>
   <area alias="logViewer">
       <key alias="logLevels">Log Levels</key>
@@ -2381,4 +2400,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="fallbackHeadline">Welcome to The Friendly CMS</key>
     <key alias="fallbackDescription">Thank you for choosing Umbraco - we think this could be the beginning of something beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast as possible.</key>
   </area>  
+  <area alias="formsDashboard">
+    <key alias="formsHeadline">Umbraco Forms</key>
+    <key alias="formsDescription">Create forms using an intuitive drag and drop interface. From simple contact forms that sends e-mails to advanced questionaires that integrate with CRM systems. Your clients will love it!</key>
+  </area>
 </language>

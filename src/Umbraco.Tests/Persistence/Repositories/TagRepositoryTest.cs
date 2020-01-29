@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
@@ -7,6 +8,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -74,7 +76,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (ScopeProvider.CreateScope())
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
+                var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
 
                 // create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
@@ -104,7 +106,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (ScopeProvider.CreateScope())
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
+                var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
@@ -143,7 +145,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (ScopeProvider.CreateScope())
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
+                var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
@@ -185,7 +187,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (ScopeProvider.CreateScope())
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
+                var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
@@ -225,7 +227,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (ScopeProvider.CreateScope())
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
+                var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
@@ -261,7 +263,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (ScopeProvider.CreateScope())
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
+                var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
@@ -305,7 +307,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (ScopeProvider.CreateScope())
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
+                var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
@@ -349,7 +351,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (ScopeProvider.CreateScope())
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
+                var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
@@ -394,7 +396,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (ScopeProvider.CreateScope())
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
+                var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
@@ -429,7 +431,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (ScopeProvider.CreateScope())
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
+                var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
@@ -469,7 +471,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (ScopeProvider.CreateScope())
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
+                var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
@@ -513,7 +515,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (ScopeProvider.CreateScope())
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
+                var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
@@ -557,7 +559,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (ScopeProvider.CreateScope())
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
+                var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
@@ -601,7 +603,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (ScopeProvider.CreateScope())
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
+                var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
@@ -646,7 +648,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (ScopeProvider.CreateScope())
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
+                var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
                 var mediaRepository = CreateMediaRepository(provider, out var mediaTypeRepository);
 
                 //create data to relate to
@@ -703,7 +705,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (ScopeProvider.CreateScope())
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
+                var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
                 var mediaRepository = CreateMediaRepository(provider, out var mediaTypeRepository);
 
                 //create data to relate to
@@ -755,7 +757,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = ScopeProvider.CreateScope())
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
+                var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
@@ -791,7 +793,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (ScopeProvider.CreateScope())
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
+                var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
                 var mediaRepository = CreateMediaRepository(provider, out var mediaTypeRepository);
 
                 //create data to relate to
@@ -871,7 +873,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (ScopeProvider.CreateScope())
             {
-                var contentRepository = CreateContentRepository(provider, out var contentTypeRepository);
+                var contentRepository = CreateDocumentRepository(provider, out var contentTypeRepository);
                 var mediaRepository = CreateMediaRepository(provider, out var mediaTypeRepository);
 
                 //create data to relate to
@@ -950,7 +952,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             return new TagRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger);
         }
 
-        private DocumentRepository CreateContentRepository(IScopeProvider provider, out ContentTypeRepository contentTypeRepository)
+        private DocumentRepository CreateDocumentRepository(IScopeProvider provider, out ContentTypeRepository contentTypeRepository)
         {
             var accessor = (IScopeAccessor) provider;
             var templateRepository = new TemplateRepository(accessor, AppCaches.Disabled, Logger, TestObjects.GetFileSystemsMock());
@@ -958,7 +960,12 @@ namespace Umbraco.Tests.Persistence.Repositories
             var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches.Disabled);
             var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, Logger);
             contentTypeRepository = new ContentTypeRepository(accessor, AppCaches.Disabled, Logger, commonRepository, languageRepository);
-            var repository = new DocumentRepository(accessor, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository);
+            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, Logger);
+            var entityRepository = new EntityRepository(accessor);
+            var relationRepository = new RelationRepository(accessor, Logger, relationTypeRepository, entityRepository);
+            var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
+            var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
+            var repository = new DocumentRepository(accessor, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences);
             return repository;
         }
 
@@ -970,7 +977,12 @@ namespace Umbraco.Tests.Persistence.Repositories
             var commonRepository = new ContentTypeCommonRepository(accessor, templateRepository, AppCaches.Disabled);
             var languageRepository = new LanguageRepository(accessor, AppCaches.Disabled, Logger);
             mediaTypeRepository = new MediaTypeRepository(accessor, AppCaches.Disabled, Logger, commonRepository, languageRepository);
-            var repository = new MediaRepository(accessor, AppCaches.Disabled, Logger, mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>());
+            var relationTypeRepository = new RelationTypeRepository(accessor, AppCaches.Disabled, Logger);
+            var entityRepository = new EntityRepository(accessor);
+            var relationRepository = new RelationRepository(accessor, Logger, relationTypeRepository, entityRepository);
+            var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
+            var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
+            var repository = new MediaRepository(accessor, AppCaches.Disabled, Logger, mediaTypeRepository, tagRepository, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository, propertyEditors, dataValueReferences);
             return repository;
         }
     }

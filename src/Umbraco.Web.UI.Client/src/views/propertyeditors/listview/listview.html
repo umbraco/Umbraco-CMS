@@ -21,11 +21,11 @@
 
                    <!-- Renders when it's only possible to create one specific document type for which a blueprint exits-->
                    <div class="btn-group" ng-show="createAllowedButtonSingleWithBlueprints" deep-blur="leaveDropdown()">
-                       <button type="button" class="btn btn-outline umb-outline dropdown-toggle" aria-expanded="{{page.createDropdownOpen}}" data-toggle="dropdown" ng-click="toggleDropdown()" prevent-default>
+                       <button type="button" class="btn btn-white dropdown-toggle" aria-expanded="{{page.createDropdownOpen}}" ng-click="toggleDropdown()" prevent-default>
                            <span>
                                <localize key="actions_create">Create</localize> {{listViewAllowedTypes[0].name}}
                            </span>
-                           <span class="caret"></span>
+                           <span class="caret" aria-hidden="true"></span>
                         </button>
 
 
@@ -46,7 +46,7 @@
 
                    <!-- Renders when it's possible to create multiple document types and blueprints for one or more of the document types-->
                    <div class="btn-group" ng-show="createAllowedButtonMultiWithBlueprints" deep-blur="leaveDropdown()">
-                       <button type="button" class="btn btn-outline umb-outline dropdown-toggle" aria-expanded="{{page.createDropdownOpen === undefined ? false : page.createDropdownOpen}}" data-toggle="dropdown" ng-click="toggleDropdown()">
+                       <button type="button" class="btn btn-white dropdown-toggle" aria-expanded="{{page.createDropdownOpen === undefined ? false : page.createDropdownOpen}}" ng-click="toggleDropdown()">
                            <localize key="actions_create">Create</localize>
                            <span class="caret" aria-hidden="true"></span>
                        </button>
@@ -70,21 +70,21 @@
                    <ul class="umb-actions umb-actions-child">
 
                        <li ng-repeat="blueprint in docType.blueprints track by blueprint.id | orderBy:'name':false">
-                           <a ng-click="createFromBlueprint(blueprint.id)">
-                               <i class="large {{docType.icon}}"></i>
+                           <button type="button" ng-click="createFromBlueprint(blueprint.id)">
+                               <i class="large {{docType.icon}}" aria-hidden="true"></i>
                                <span class="menu-label">
                                    {{blueprint.name}}&nbsp;
                                </span>
-                           </a>
+                            </button>
                        </li>
 
                        <li class="sep" ng-show="allowBlank">
-                           <a ng-click="createBlank(docType)">
-                               <i class="large {{docType.icon}}"></i>
+                           <button type="button" ng-click="createBlank(docType)">
+                               <i class="large {{docType.icon}}" aria-hidden="true"></i>
                                <span class="menu-label">
                                    <localize key="blueprints_blankBlueprint">Blank</localize>
                                </span>
-                           </a>
+                            </button>
                        </li>
 
                    </ul>
