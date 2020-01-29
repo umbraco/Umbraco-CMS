@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
+using Umbraco.Core.Logging;
 
-namespace Umbraco.Core.Logging
+namespace Umbraco.Web.Logging
 {
     internal class OwinLogger : Microsoft.Owin.Logging.ILogger
     {

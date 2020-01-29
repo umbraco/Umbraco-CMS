@@ -2,7 +2,7 @@
 using Microsoft.Owin.Logging;
 using Umbraco.Composing;
 
-namespace Umbraco.Core.Logging
+namespace Umbraco.Web.Logging
 {
     public class OwinLoggerFactory : ILoggerFactory
     {

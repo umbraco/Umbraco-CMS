@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web.Http;
 using LightInject;
+using LightInject.Web;
 using Umbraco.Core.Composing.LightInject;
 
 namespace Umbraco.Web.Composing.LightInject
@@ -22,6 +23,16 @@ namespace Umbraco.Web.Composing.LightInject
         /// </summary>
         public new static LightInjectContainer Create()
             => new LightInjectContainer(CreateServiceContainer());
+
+        /// <summary>
+        /// Overridden to supply the .Net Framework based PerWebRequestScopeManagerProvider
+        /// </summary>
+        public override void EnablePerWebRequestScope()
+        {
+            if (!(Container.ScopeManagerProvider is MixedLightInjectScopeManagerProvider smp))
+                throw new Exception("Container.ScopeManagerProvider is not MixedLightInjectScopeManagerProvider.");
+            smp.EnablePerWebRequestScope(new PerWebRequestScopeManagerProvider());
+        }
 
         /// <inheritdoc />
         public override void ConfigureForWeb()
