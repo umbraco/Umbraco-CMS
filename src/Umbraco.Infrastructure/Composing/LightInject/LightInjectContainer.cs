@@ -244,11 +244,11 @@ namespace Umbraco.Core.Composing.LightInject
         { }
 
         /// <inheritdoc />
-        public void EnablePerWebRequestScope()
+        public virtual void EnablePerWebRequestScope()
         {
             if (!(Container.ScopeManagerProvider is MixedLightInjectScopeManagerProvider smp))
                 throw new Exception("Container.ScopeManagerProvider is not MixedLightInjectScopeManagerProvider.");
-            smp.EnablePerWebRequestScope();
+            smp.EnablePerWebRequestScope(new PerLogicalCallContextScopeManagerProvider());
         }
 
         private class AssemblyScanner : IAssemblyScanner
