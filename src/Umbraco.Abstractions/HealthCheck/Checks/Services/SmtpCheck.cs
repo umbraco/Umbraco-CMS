@@ -48,29 +48,27 @@ namespace Umbraco.Web.HealthCheck.Checks.Services
 
         private HealthCheckStatus CheckSmtpSettings()
         {
-            const int DefaultSmtpPort = 25;
             var message = string.Empty;
             var success = false;
 
-            if (_globalSettings.IsSmtpServerConfigured == false)
+            var smtpSettings = _globalSettings.SmtpSettings;
+
+            if (smtpSettings == null)
             {
                 message = _textService.Localize("healthcheck/smtpMailSettingsNotFound");
             }
             else
             {
-                var host = _globalSettings.SmtpHost;
-                var port = _globalSettings.SmtpPort ?? DefaultSmtpPort;
-
-                if (string.IsNullOrEmpty(host))
+                if (string.IsNullOrEmpty(smtpSettings.Host))
                 {
                     message = _textService.Localize("healthcheck/smtpMailSettingsHostNotConfigured");
                 }
                 else
                 {
-                    success = CanMakeSmtpConnection(host, port);
+                    success = CanMakeSmtpConnection(smtpSettings.Host, smtpSettings.Port);
                     message = success
                         ? _textService.Localize("healthcheck/smtpMailSettingsConnectionSuccess")
-                        : _textService.Localize("healthcheck/smtpMailSettingsConnectionFail", new [] { host, port.ToString() });
+                        : _textService.Localize("healthcheck/smtpMailSettingsConnectionFail", new [] { smtpSettings.Host, smtpSettings.Port.ToString() });
                 }
             }
 

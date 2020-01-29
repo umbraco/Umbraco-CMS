@@ -67,8 +67,7 @@
         string UmbracoMediaPath { get; }
 
         bool IsSmtpServerConfigured { get; }
-        string SmtpHost { get; }
-        int? SmtpPort { get; }
+        ISmtpSettings SmtpSettings { get; }
 
         /// <summary>
         /// Gets a value indicating whether the runtime should enter Install level when the database is missing.
