@@ -9,7 +9,7 @@ using Umbraco.Core.Sync;
 namespace Umbraco.Web.Scheduling
 {
 
-    internal class LogScrubber : RecurringTaskBase
+    public class LogScrubber : RecurringTaskBase
     {
         private readonly IRuntimeState _runtime;
         private readonly IAuditService _auditService;
