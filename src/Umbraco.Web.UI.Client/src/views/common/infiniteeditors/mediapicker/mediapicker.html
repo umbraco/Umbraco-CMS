@@ -32,7 +32,7 @@
 
                                 <div class="form-search__toggle">
                                     <umb-checkbox
-                                        model="showChilds"
+                                        model="vm.includeFromSubFolders"
                                         on-change="vm.toggle()"
                                         text="Include subfolders in search"
                                         label-key="general_includeFromsubFolders">
@@ -100,22 +100,22 @@
                         compact="{{ images.length > 0 }}">
                     </umb-file-dropzone>
 
-                    <umb-media-grid
-                            ng-if="!vm.loading"
-                            items="images"
-                            on-click="vm.clickHandler"
-                            on-click-name="vm.clickItemName"
-                            item-max-width="150"
-                            item-max-height="150"
-                            item-min-width="100"
-                            item-min-height="100"
-                            disable-folder-select={{disableFolderSelect}}
-                            only-images={{onlyImages}}
-                            only-folders={{onlyFolders}}
-                            include-sub-folders={{showChilds}}
-                            current-folder-id="{{currentFolder.id}}"
-                            allow-open-folder="!disableFolderSelect">
-                    </umb-media-grid>
+                <umb-media-grid
+                        ng-if="!vm.loading"
+                        items="images"
+                        on-click="vm.clickHandler"
+                        on-click-name="vm.clickItemName"
+                        on-click-edit="vm.editMediaItem(item)"
+                        allow-on-click-edit="{{allowMediaEdit}}"
+                        item-max-width="150"
+                        item-max-height="150"
+                        item-min-width="100"
+                        item-min-height="100"
+                        disable-folder-select={{disableFolderSelect}}
+                        only-images={{onlyImages}}
+                        only-folders={{onlyFolders}}
+                        allow-open-folder="!disableFolderSelect">
+                </umb-media-grid>
 
 
                     <umb-load-indicator
