@@ -6,16 +6,23 @@
     flex-wrap: wrap;
     align-items: center;
     position: relative;
-    padding: 0 !important;
+    padding: 0 0 0 26px !important;
     margin: 0;
     min-height: 22px;
     line-height: 22px;
     cursor: pointer !important;
 
+    &.-small-text{
+        font-size: 13px;
+    }
+
+    &.-bold{
+        font-weight: 700;
+    }
+
     &__text {
-        margin: 0 0 0 26px;
         position: relative;
-        top: 0;
+        top: 1px;
         user-select: none;
     }
 
@@ -24,7 +31,7 @@
         top: 0;
         left: 0;
         opacity: 0;
-        
+
         &:hover ~ .umb-form-check__state .umb-form-check__check {
             border-color: @inputBorderFocus;
         }
@@ -36,7 +43,7 @@
                 background: @ui-option-type-hover;
             }
         }
-        
+
         &:checked ~ .umb-form-check__state {
             .umb-form-check__check {
                 // This only happens if the state has a radiobutton modifier
@@ -62,8 +69,7 @@
             }
         }
     }
-    
-    
+
     .tabbing-active &.umb-form-check--radiobutton &__input:focus ~ .umb-form-check__state .umb-form-check__check {
         //outline: 2px solid @inputBorderTabFocus;
         border: 2px solid @inputBorderTabFocus;
@@ -73,7 +79,12 @@
         outline: 2px solid @inputBorderTabFocus;
     }
     .tabbing-active &.umb-form-check--checkbox &__input:checked:focus ~ .umb-form-check__state .umb-form-check__check {
-        border-color: white;
+        border-color: @white;
+    }
+
+    // add spacing between when flexed/inline, equal to the width of the input
+    .flex & + & {
+        margin-left:@checkboxWidth;
     }
 
     &__state {

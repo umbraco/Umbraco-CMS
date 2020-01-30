@@ -182,6 +182,8 @@ namespace Umbraco.Web.Composing
 
         public static DataEditorCollection DataEditors => CoreCurrent.DataEditors;
 
+        public static DataValueReferenceFactoryCollection DataValueReferenceFactories => CoreCurrent.DataValueReferenceFactories;
+
         public static PropertyEditorCollection PropertyEditors => CoreCurrent.PropertyEditors;
 
         public static ParameterEditorCollection ParameterEditors => CoreCurrent.ParameterEditors;

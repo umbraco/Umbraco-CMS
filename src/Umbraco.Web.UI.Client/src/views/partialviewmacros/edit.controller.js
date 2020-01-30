@@ -5,6 +5,9 @@
 
         var vm = this;
 
+        vm.header = {};
+        vm.header.editorfor = "visuallyHiddenTexts_newPartialViewMacro";
+        vm.header.setPageTitle = true;
         vm.page = {};
         vm.page.loading = true;
         vm.partialViewMacroFile = {};
@@ -69,9 +72,17 @@
             }).then(function (saved) {
                 // create macro if needed
                 if($routeParams.create && $routeParams.nomacro !== "true") {
-                    macroResource.createPartialViewMacroWithFile(saved.virtualPath, saved.name).then(function(created) {
+                    macroResource.createPartialViewMacroWithFile(saved.virtualPath, saved.name).then(function (created) {
+                        navigationService.syncTree({
+                            tree: "macros",
+                            path: '-1,new',
+                            forceReload: true,
+                            activate: false
+                        });
                         completeSave(saved);
                     }, angular.noop);
+
+                    
                 } else {
                     completeSave(saved);
                 }

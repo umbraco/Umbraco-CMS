@@ -1,20 +1,26 @@
 <div class="umb-layout-selector" ng-show="vm.showLayoutSelector">
 
-   <div class="umb-layout-selector__active-layout" ng-click="vm.toggleLayoutDropdown()">
-      <i class="{{ vm.activeLayout.icon }}"></i>
-   </div>
+   <button type="button" aria-expanded="{{vm.layoutDropDownIsOpen}}" class="umb-layout-selector__active-layout umb-outline" ng-click="vm.toggleLayoutDropdown()" prevent-default>
+      <i class="{{ vm.activeLayout.icon }}" aria-hidden="true"></i>
+      <span class="sr-only">
+          <localize key="visuallyHiddenTexts_activeListLayout">Active layout:</localize>&nbsp;
+          {{vm.activeLayout.name}}
+      </span>
+   </button>
 
    <div ng-if="vm.layoutDropDownIsOpen"
         class="umb-layout-selector__dropdown shadow-depth-3 animated -half-second fadeIn"
-        on-outside-click="vm.closeLayoutDropdown()">
+        on-outside-click="vm.closeLayoutDropdown()"
+        deep-blur="vm.leaveLayoutDropdown()">
 
-       <div ng-repeat="layout in vm.layouts | filter:{selected:true} track by $id(layout)"
+       <button type="button" prevent-default ng-repeat="layout in vm.layouts | filter:{selected:true} track by $id(layout)"
             class="umb-layout-selector__dropdown-item"
             ng-click="vm.pickLayout(layout)"
             ng-class="{'-active': layout.active }"
             ng-attr-title="{{layout.name}}">
 
-           <i class="{{ layout.icon }} umb-layout-selector__dropdown-item-icon"></i>
+           <i class="{{ layout.icon }} umb-layout-selector__dropdown-item-icon" aria-hidden="true"></i>
+           <span class="sr-only">{{layout.name}}</span>
        </div>
 
    </div>

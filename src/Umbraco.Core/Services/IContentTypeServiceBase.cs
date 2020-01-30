@@ -25,7 +25,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets a content type.
         /// </summary>
-        TItem Get(int id);
+        new TItem Get(int id);
 
         /// <summary>
         /// Gets a content type.
@@ -39,7 +39,13 @@ namespace Umbraco.Core.Services
 
         int Count();
 
+        /// <summary>
+        /// Returns true or false depending on whether content nodes have been created based on the provided content type id.
+        /// </summary>
+        bool HasContentNodes(int id);
+
         IEnumerable<TItem> GetAll(params int[] ids);
+        IEnumerable<TItem> GetAll(IEnumerable<Guid> ids);
 
         IEnumerable<TItem> GetDescendants(int id, bool andSelf); // parent-child axis
         IEnumerable<TItem> GetComposedOf(int id); // composition axis

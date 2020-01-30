@@ -104,13 +104,18 @@ function entityResource($q, $http, umbRequestHelper) {
          *
          * @param {Int} id Id of node to return the public url to
          * @param {string} type Object type name
+         * @param {string} culture Culture
          * @returns {Promise} resourcePromise object containing the url.
          *
          */
-        getUrl: function (id, type) {
+        getUrl: function (id, type, culture) {
 
             if (id === -1 || id === "-1") {
                 return "";
+            }
+
+            if (!culture) {
+                culture = "";
             }
 
             return umbRequestHelper.resourcePromise(
@@ -118,8 +123,27 @@ function entityResource($q, $http, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "entityApiBaseUrl",
                        "GetUrl",
-                       [{ id: id }, {type: type }])),
+                       [{ id: id }, {type: type }, {culture: culture }])),
                'Failed to retrieve url for id:' + id);
+        },
+
+        getUrlByUdi: function (udi, culture) {
+
+            if (!udi) {
+                return "";
+            }
+
+            if (!culture) {
+                culture = "";
+            }
+
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "entityApiBaseUrl",
+                       "GetUrl",
+                       [{ udi: udi }, {culture: culture }])),
+               'Failed to retrieve url for UDI:' + udi);
         },
 
         /**
@@ -133,7 +157,7 @@ function entityResource($q, $http, umbRequestHelper) {
          * ##usage
          * <pre>
          * //get media by id
-         * entityResource.getEntityById(0, "Media")
+         * entityResource.getById(0, "Media")
          *    .then(function(ent) {
          *        var myDoc = ent;
          *        alert('its here!');
@@ -161,10 +185,14 @@ function entityResource($q, $http, umbRequestHelper) {
         },
 
 
-        getUrlAndAnchors: function (id) {
+        getUrlAndAnchors: function (id, culture) {
 
             if (id === -1 || id === "-1") {
                 return null;
+            }
+
+            if (!culture) {
+                culture = "";
             }
 
             return umbRequestHelper.resourcePromise(
@@ -172,7 +200,7 @@ function entityResource($q, $http, umbRequestHelper) {
                     umbRequestHelper.getApiUrl(
                         "entityApiBaseUrl",
                         "GetUrlAndAnchors",
-                        [{ id: id }])),
+                        [{ id: id }, {culture: culture }])),
                 'Failed to retrieve url and anchors data for id ' + id);
         },
 
@@ -204,7 +232,7 @@ function entityResource($q, $http, umbRequestHelper) {
          * ##usage
          * <pre>
          * //Get templates for ids
-         * entityResource.getEntitiesByIds( [1234,2526,28262], "Template")
+         * entityResource.getByIds( [1234,2526,28262], "Template")
          *    .then(function(templateArray) {
          *        var myDoc = contentArray;
          *        alert('they are here!');

@@ -131,95 +131,64 @@
                                 <localize key="general_add">Add</localize>
                             </a>
 
-                            <label style="padding-left: 0;">
-                                <input type="checkbox" ng-model="vm.package.contentLoadChildNodes" ng-disabled="!vm.package.contentNodeId" />
-                                <localize key="packager_includeAllChildNodes">Include all child nodes</localize>
-                            </label>
-
+                                <umb-checkbox model="vm.package.contentLoadChildNodes"
+                                                disabled="!vm.package.contentNodeId"
+                                                text="{{vm.labels.includeAllChildNodes}}" />
                         </umb-control-group>
 
                         <umb-control-group label="@treeHeaders_documentTypes">
                             <div ng-repeat="doctype in ::vm.documentTypes | orderBy:'name'">
-                                <label>
-                                    <input
-                                        type="checkbox"
-                                        ng-model="doctype.selected"
-                                        checklist-model="vm.package.documentTypes"
-                                        checklist-value="doctype.id" />
-                                    {{doctype.name}}
-                                </label>
+                                    <umb-checkbox model="doctype.selected"
+                                                  on-change="vm.selectDocumentType(doctype)"
+                                                  text="{{doctype.name}}" />
                             </div>
                         </umb-control-group>
 
                         <umb-control-group label="@treeHeaders_templates">
                             <div ng-repeat="template in ::vm.templates | orderBy:'name'">
-                                <label>
-                                    <input
-                                        type="checkbox"
-                                        checklist-model="vm.package.templates"
-                                        checklist-value="template.id" />
-                                    {{template.name}}
-                                </label>
+                                    <umb-checkbox model="template.selected"
+                                                  on-change="vm.selectTemplate(template)"
+                                                  text="{{template.name}}" />
                             </div>
                         </umb-control-group>
 
                         <umb-control-group label="@treeHeaders_stylesheets">
                             <div ng-repeat="stylesheet in ::vm.stylesheets | orderBy:'name'">
-                                <label>
-                                    <input
-                                        type="checkbox"
-                                        checklist-model="vm.package.stylesheets"
-                                        checklist-value="stylesheet.name" />
-                                    {{stylesheet.path}}
-                                </label>
+                                    <umb-checkbox model="stylesheet.selected"
+                                                  on-change="vm.selectStyleSheet(stylesheet)"
+                                                  text="{{stylesheet.path}}" />
                             </div>
                         </umb-control-group>
 
                         <umb-control-group label="@treeHeaders_macros">
                             <div ng-repeat="macro in ::vm.macros | orderBy:'name'">
-                                <label>
-                                    <input type="checkbox"
-                                           checklist-model="vm.package.macros"
-                                           checklist-value="macro.id" />
-                                    {{macro.name}}
-                                </label>
+                                    <umb-checkbox model="macro.selected"
+                                                  on-change="vm.selectMacro(macro)"
+                                                  text="{{macro.name}}" />
                             </div>
-
                         </umb-control-group>
 
                         <umb-control-group label="@treeHeaders_languages">
                             <div ng-repeat="language in ::vm.languages | orderBy:'name'">
-                                <label>
-                                    <input
-                                        type="checkbox"
-                                        checklist-model="vm.package.languages"
-                                        checklist-value="language.id" />
-                                    {{language.name}}
-                                </label>
+                                    <umb-checkbox model="language.selected"
+                                                  on-change="vm.selectLanguage(language)"
+                                                  text="{{language.name}}" />
                             </div>
                         </umb-control-group>
 
                         <umb-control-group label="@treeHeaders_dictionary">
                             <div ng-repeat="dictionaryItem in ::vm.dictionaryItems | orderBy:'name'">
-                                <label>
-                                    <input
-                                        type="checkbox"
-                                        checklist-model="vm.package.dictionaryItems"
-                                        checklist-value="dictionaryItem.id" />
-                                    {{dictionaryItem.name}}
-                                </label>
+                                    <umb-checkbox model="dictionaryItem.selected"
+                                                  on-change="vm.selectDictionaryItem(dictionaryItem)"
+                                                  text="{{dictionaryItem.name}}" />
                             </div>
                         </umb-control-group>
 
                         <umb-control-group label="@treeHeaders_dataTypes">
                             <div ng-repeat="dataType in ::vm.dataTypes | orderBy:'name'">
-                                <label>
-                                    <input
-                                        type="checkbox"
-                                        checklist-model="vm.package.dataTypes"
-                                        checklist-value="dataType.id" />
-                                    {{dataType.name}}
-                                </label>
+                                    <umb-checkbox model="dataType.selected"
+                                                  on-change="vm.selectDataType(dataType)"
+                                                  text="{{dataType.name}}" />
                             </div>
                         </umb-control-group>
 
@@ -298,7 +267,7 @@
                             description="Here you can add custom installer / uninstaller events to perform certain tasks during installation and uninstallation.
                             All actions are formed as a xml node, containing data for the action to be performed.">
                             <div>
-                                <a ng-href="https://our.umbraco.com/documentation/Reference/Packaging/">Documentation</a>
+                                <a target="_blank" ng-href="https://our.umbraco.com/documentation/Reference/Packaging/">Documentation</a>
                                 <div>
                                     <textarea class="umb-property-editor" rows="10" ng-model="vm.package.actions"></textarea>
                                 </div>
@@ -325,7 +294,7 @@
                                 action="vm.createOrUpdatePackage(editPackageForm)"
                                 state="vm.buttonState"
                                 button-style="success"
-                                label="{{vm.buttonLabel}}"
+                                label="{{vm.labels.button}}"
                                 disabled="vm.loading">
                     </umb-button>
 

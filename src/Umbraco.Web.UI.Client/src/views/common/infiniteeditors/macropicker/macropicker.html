@@ -32,10 +32,10 @@
                             <ul class="umb-card-grid -three-in-row">
                                 <li ng-repeat="availableItem in macros | orderBy:'name' | filter:searchTerm"
                                     ng-click="selectMacro(availableItem)">
-                                    <a class="umb-card-grid-item" href="" title="{{ availableItem.name }}">
+                                    <a class="umb-card-grid-item" href="" title="{{availableItem.name}}">
                                         <span>
                                             <i class="icon-settings-alt"></i>
-                                            {{ availableItem.name }}
+                                            {{availableItem.name}}
                                         </span>
                                     </a>
                                 </li>

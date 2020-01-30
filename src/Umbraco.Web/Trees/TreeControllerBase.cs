@@ -265,6 +265,7 @@ namespace Umbraco.Web.Trees
             treeNode.Path = entity.Path;
             treeNode.Udi = Udi.Create(ObjectTypes.GetUdiType(entityObjectType), entity.Key);
             treeNode.HasChildren = hasChildren;
+            treeNode.Trashed = entity.Trashed;
             return treeNode;
         }
 

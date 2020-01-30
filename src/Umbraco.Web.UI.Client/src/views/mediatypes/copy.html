@@ -7,9 +7,7 @@
                 <localize key="contentTypeEditor_folderToCopy">Select the folder to copy</localize> <strong>{{source.name}}</strong>&nbsp;<localize key="contentTypeEditor_structureBelow">to in the tree structure below</localize>
             </p>
 
-            <div class="umb-loader-wrapper" ng-show="busy">
-                <div class="umb-loader"></div>
-            </div>
+            <umb-loader ng-show="busy"></umb-loader>
 
             <div ng-show="error">
                 <div class="alert alert-error">
@@ -45,9 +43,9 @@
     </div>
 
     <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="success">
-        <a class="btn btn-link" ng-click="close()" ng-show="!busy">
+        <button type="button" class="btn btn-link" ng-click="close()" ng-show="!busy">
             <localize key="general_cancel">Cancel</localize>
-        </a>
+        </button>
         <button class="btn btn-primary" ng-click="copy()" ng-disabled="busy || !target">
             <localize key="actions_copy">Copy</localize>
         </button>

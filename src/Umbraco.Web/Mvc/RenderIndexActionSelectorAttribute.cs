@@ -7,7 +7,7 @@ using System.Web.Mvc;
 namespace Umbraco.Web.Mvc
 {
     /// <summary>
-    /// A custom ActionMethodSelector which will ensure that the RenderMvcController.Index(RenderModel model) action will be executed
+    /// A custom ActionMethodSelector which will ensure that the RenderMvcController.Index(ContentModel model) action will be executed
     /// if the
     /// </summary>
     internal class RenderIndexActionSelectorAttribute : ActionMethodSelectorAttribute

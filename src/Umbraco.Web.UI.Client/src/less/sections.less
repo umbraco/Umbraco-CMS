@@ -2,129 +2,143 @@
 // -------------------------
 
 ul.sections {
-	margin: 0;
-	display: flex;
-	margin-left: -20px;
-}
-
-ul.sections>li {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	position: relative;
-}
-
-ul.sections>li>a {
-	color: @white;
-	height: @appHeaderHeight;
+    margin: 0;
     display: flex;
-	align-items: center;
-	justify-content: center;
-	position: relative;
-	padding: 0 10px;
-	text-decoration: none;
-	outline: none;
-	cursor: pointer;
-}
+    margin-left: -20px;
 
-ul.sections>li>a .section__name {
-    border-radius: 3px;
-    margin-top:1px;
-    padding: 3px 10px 4px 10px;
-	opacity: 0.8;
-	transition: opacity .1s linear, box-shadow .1s;
-}
+    > li {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
 
-ul.sections>li>a::after {
-	content: "";
-    left: 10px;
-    right: 10px;
-	height: 4px;
-	bottom: 0;
-    transform: translateY(4px);
-	background-color: @pinkLight;
-    position: absolute;
-	border-radius: 3px 3px 0 0;
-	opacity: 0;
-	padding: 0 2px;
-	transition: transform 240ms ease-in-out;
-}
+        > a {
+            color: @white;
+            height: @appHeaderHeight;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 0 10px;
+            text-decoration: none;
+            outline: none;
+            cursor: pointer;
 
-ul.sections>li.current>a {
-    color:@pinkLight;
-}
-ul.sections>li.current>a::after {
-	opacity: 1;
-    transform: translateY(0px);
-}
-ul.sections > li.current > a .section__name,
-ul.sections > li > a:hover .section__name {
-    opacity: 1;
-    -webkit-font-smoothing: subpixel-antialiased;
-}
+            &::after {
+                content: "";
+                left: 10px;
+                right: 10px;
+                height: 4px;
+                bottom: 0;
+                transform: translateY(4px);
+                background-color: @ui-active;
+                position: absolute;
+                border-radius: 3px 3px 0 0;
+                opacity: 0;
+                padding: 0 2px;
+                transition: transform 240ms ease-in-out;
+            }
 
-ul.sections > li > a:focus .section__name {
-    .tabbing-active & {
-        
-        border: 1px solid;
-        border-color: @gray-9;
+            &:focus .section__name {
+                .tabbing-active & {
+                    border: 1px solid;
+                    border-color: @gray-9;
+                }
+            }
+        }
+
+        .section__name {
+            border-radius: 3px;
+            margin-top: 1px;
+            padding: 3px 10px 4px 10px;
+            opacity: 0.8;
+            transition: opacity .1s linear, box-shadow .1s;
+        }
+
+        &.current a {
+            color: @ui-active;
+
+            &::after {
+                opacity: 1;
+                transform: translateY(0px);
+            }
+        }
+
+        &.expand {
+            i {
+                height: 5px;
+                width: 5px;
+                border-radius: 50%;
+                background: @white;
+                display: inline-block;
+                margin: 0 5px 0 0;
+                opacity: 0.6;
+                transition: opacity .1s linear;
+            }
+            
+            &:hover i {
+                opacity:1;
+            }
+        }
+
+        &.current .section__name,
+        a:hover .section__name {
+            opacity: 1;
+            -webkit-font-smoothing: subpixel-antialiased;
+        }
     }
 }
 
-
-
 /* Sections tray */
 
-ul.sections>li.expand i {
-	height: 5px;
-    width: 5px;
-    border-radius: 50%;
-    background: #fff;
-    display: inline-block;
-    margin: 0 5px 0 0;
-    opacity: 0.6;
-}
-
 ul.sections-tray {
-	position: absolute;
-	top: @appHeaderHeight;
-	left: 0;
-	margin: 0;
+    position: absolute;
+    top: @appHeaderHeight;
+    left: 0;
+    margin: 0;
     list-style: none;
-	background: @purple;
-	z-index: 10000;
-	border-radius: 0 0 3px 3px;
-}
+    background: @blueExtraDark;
+    z-index: 10000;
+    border-radius: 0 0 3px 3px;
 
-ul.sections-tray>li>a {
-	padding: 8px 24px;
-	color: @white;
-	text-decoration: none;
-	display: block;
-	position: relative;
-}
+    li {
 
-ul.sections-tray>li>a::after {
-	content: "";
-	width: 4px;
-	height: 100%;
-	background-color: @ui-active;
-	position: absolute;
-	border-radius: 0 3px 3px 0;
-	opacity: 0;
-	transition: all .2s linear;
-	top: 0;
-	left: 0;
-}
+        &.current a {
+            color: @ui-active;
+            opacity: 1;
 
-ul.sections-tray>li.current>a::after {
-	opacity: 1;
-}
+            &::after {
+                opacity: 1;
+            }
+        }
 
-ul.sections-tray>li>a .section__name {
-	opacity: 0.6;
-}
+        a {
+            padding: 8px 24px;
+            color: @white;
+            text-decoration: none;
+            display: block;
+            position: relative;
+            outline: none;
 
-ul.sections-tray>li>a:hover	.section__name {
-	opacity: 1;
+            &::after {
+                content: "";
+                width: 4px;
+                height: 100%;
+                background-color: @ui-active;
+                position: absolute;
+                border-radius: 0 3px 3px 0;
+                opacity: 0;
+                transition: all .2s linear;
+                top: 0;
+                left: 0;
+            }
+
+            &:focus .section__name {
+                .tabbing-active & {
+                    border: 1px solid;
+                    border-color: @gray-9;
+                }
+            }
+        }
+    }
 }

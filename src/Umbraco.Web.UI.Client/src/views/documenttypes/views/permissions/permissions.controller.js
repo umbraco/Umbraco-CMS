@@ -9,7 +9,7 @@
 (function() {
     'use strict';
 
-    function PermissionsController($scope, contentTypeResource, iconHelper, contentTypeHelper, localizationService, overlayService) {
+    function PermissionsController($scope, $timeout, contentTypeResource, iconHelper, contentTypeHelper, localizationService, overlayService) {
 
         /* ----------- SCOPE VARIABLES ----------- */
 
@@ -23,8 +23,10 @@
 
         vm.addChild = addChild;
         vm.removeChild = removeChild;
+        vm.sortChildren = sortChildren;
         vm.toggleAllowAsRoot = toggleAllowAsRoot;
         vm.toggleAllowCultureVariants = toggleAllowCultureVariants;
+        vm.canToggleIsElement = false;
         vm.toggleIsElement = toggleIsElement;
 
         /* ---------- INIT ---------- */
@@ -48,9 +50,16 @@
                 if($scope.model.id === 0) {
                    contentTypeHelper.insertChildNodePlaceholder(vm.contentTypes, $scope.model.name, $scope.model.icon, $scope.model.id);
                 }
-
             });
 
+            // Can only switch to an element type if there are no content nodes already created from the type.
+            if ($scope.model.id > 0 && !$scope.model.isElement ) {
+                contentTypeResource.hasContentNodes($scope.model.id).then(function (result) {
+                    vm.canToggleIsElement = !result;
+                });
+            } else {
+                vm.canToggleIsElement = true;
+            }
         }
 
         function addChild($event) {
@@ -82,6 +91,13 @@
            // remove from content type model
            var selectedChildIndex = $scope.model.allowedContentTypes.indexOf(selectedChild.id);
            $scope.model.allowedContentTypes.splice(selectedChildIndex, 1);
+        }
+
+        function sortChildren() {
+            // we need to wait until the next digest cycle for vm.selectedChildren to be updated
+            $timeout(function () {
+                $scope.model.allowedContentTypes = _.pluck(vm.selectedChildren, "id");
+            });
         }
 
         // note: "safe toggling" here ie handling cases where the value is undefined, etc

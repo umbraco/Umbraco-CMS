@@ -11,15 +11,20 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
+using Umbraco.Tests.Testing.Objects.Accessors;
+using Umbraco.Web;
+using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.Security.Providers;
 
 namespace Umbraco.Tests.Services
@@ -41,6 +46,60 @@ namespace Umbraco.Tests.Services
             var provider = providerMock.Object;
 
             ((MemberService)ServiceContext.MemberService).MembershipProvider = provider;
+        }
+
+        [Test]
+        public void Can_Create_Member_With_Properties()
+        {
+            var memberType = ServiceContext.MemberTypeService.Get("member");
+            IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true);
+            ServiceContext.MemberService.Save(member);
+
+            member = ServiceContext.MemberService.GetById(member.Id);
+            Assert.AreEqual("xemail", member.Email);
+
+            var dataTypeService = ServiceContext.DataTypeService;
+            var contentTypeFactory = new PublishedContentTypeFactory(new NoopPublishedModelFactory(), new PropertyValueConverterCollection(Enumerable.Empty<IPropertyValueConverter>()), dataTypeService);
+            var pmemberType = new PublishedContentType(memberType, contentTypeFactory);
+
+            var publishedSnapshotAccessor = new TestPublishedSnapshotAccessor();
+            var variationContextAccessor = new TestVariationContextAccessor();
+            var pmember = PublishedMember.Create(member, pmemberType, false, publishedSnapshotAccessor, variationContextAccessor);
+
+            // contains the umbracoMember... properties created when installing, on the member type
+            // contains the other properties, that PublishedContentType adds (BuiltinMemberProperties)
+            //
+            // TODO: see TODO in PublishedContentType, this list contains duplicates
+
+            var aliases = new[]
+            {
+                "umbracoMemberPasswordRetrievalQuestion",
+                "umbracoMemberPasswordRetrievalAnswer",
+                "umbracoMemberComments",
+                "umbracoMemberFailedPasswordAttempts",
+                "umbracoMemberApproved",
+                "umbracoMemberLockedOut",
+                "umbracoMemberLastLockoutDate",
+                "umbracoMemberLastLogin",
+                "umbracoMemberLastPasswordChangeDate",
+                "Email",
+                "Username",
+                "PasswordQuestion",
+                "Comments",
+                "IsApproved",
+                "IsLockedOut",
+                "LastLockoutDate",
+                "CreateDate",
+                "LastLoginDate",
+                "LastPasswordChangeDate"
+            };
+
+            var properties = pmember.Properties.ToList();
+
+            Assert.IsTrue(properties.Select(x => x.Alias).ContainsAll(aliases));
+
+            var email = properties[aliases.IndexOf("Email")];
+            Assert.AreEqual("xemail", email.GetSourceValue());
         }
 
         [Test]

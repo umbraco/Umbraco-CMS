@@ -119,6 +119,8 @@
         document.angularReady = function(app) {
             @Html.AngularValueExternalLoginInfoScript(ViewData.GetExternalSignInError())
             @Html.AngularValueResetPasswordCodeInfoScript(ViewData["PasswordResetCode"])
+            @Html.AngularValueTinyMceAssets()
+
             //required for the noscript trick
             document.getElementById("mainwrapper").style.display = "inherit";
         }

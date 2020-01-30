@@ -1,5 +1,11 @@
 ﻿namespace Umbraco.Web.PublishedCache.NuCache.Snap
 {
+    //NOTE: This cannot be struct because it references itself
+
+    /// <summary>
+    /// Used to represent an item in a linked list
+    /// </summary>
+    /// <typeparam name="TValue"></typeparam>
     internal class LinkedNode<TValue>
         where TValue : class
     {

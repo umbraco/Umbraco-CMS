@@ -1,21 +1,88 @@
 <div class="umb-node-preview" ng-class="{'umb-node-preview--sortable': sortable, 'umb-node-preview--unpublished': published === false }">
-    <i ng-if="icon" class="umb-node-preview__icon {{ icon }}"></i>
-    <div class="umb-node-preview__content">
-        
-        <div class="umb-node-preview__name" ng-attr-title="{{alias}}">{{ name }}</div>
-        <div class="umb-node-preview__description" ng-if="description">{{ description }}</div>
+    <div class="flex"> <!-- div keeps icon and nodename from wrapping -->
+        <i ng-if="icon" class="umb-node-preview__icon {{ icon }}" aria-hidden="true"></i>
+        <div class="umb-node-preview__content">
 
-        <div class="umb-user-group-preview__permissions" ng-if="permissions">
-            <span>
-                <span class="bold"><localize key="general_rights">Permissions</localize>:</span>
-                <span ng-repeat="permission in permissions" class="umb-user-group-preview__permission">{{ permission.name }}</span>
-            </span>
+            <div class="umb-node-preview__name" ng-attr-title="{{alias}}">{{ name }}</div>
+            <div class="umb-node-preview__description" ng-if="description">{{ description }}</div>
+
+            <div class="umb-user-group-preview__permissions" ng-if="permissions">
+                <span>
+                    <span class="bold"><localize key="general_rights">Permissions</localize>:</span>
+                    <span ng-repeat="permission in permissions" class="umb-user-group-preview__permission">{{ permission.name }}</span>
+                </span>
+            </div>
         </div>
     </div>
     <div class="umb-node-preview__actions">
-        <a class="umb-node-preview__action" title="Edit" ng-href="{{editUrl}}" ng-if="allowEdit"  ng-click="onEdit()"><localize key="general_edit">Edit</localize></a>
-        <a class="umb-node-preview__action" title="Open" ng-href="{{openUrl}}" ng-if="allowOpen"  ng-click="onOpen()"><localize key="general_open">Open</localize></a>
-        <a class="umb-node-preview__action umb-node-preview__action--red" title="Remove" ng-href="{{removeUrl}}" ng-if="allowRemove" ng-click="onRemove()"><localize key="general_remove">Remove</localize></i></a>
+        <!-- If editUrl has a value we render a link otherwise a button-->
+        <a
+            class="umb-node-preview__action"
+            title="Edit {{name}}"
+            ng-href="{{editUrl}}"
+            ng-if="allowEdit && editUrl"
+            ng-click="onEdit()"
+        >
+            <localize key="general_edit">Edit</localize>
+            <span class="sr-only">{{name}}</span>
+        </a>
+
+        <button
+            type="button"
+            class="umb-node-preview__action"
+            title="Edit {{name}}"
+            ng-if="allowEdit && !editUrl"
+            ng-click="onEdit()"
+        >
+            <localize key="general_edit">Edit</localize>
+            <span class="sr-only">{{name}}...</span>
+        </button>
+
+        <!-- If openUrl has a value we render a link otherwise a button-->
+        <a
+            class="umb-node-preview__action"
+            title="Open {{name}}"
+            ng-href="{{openUrl}}"
+            ng-if="allowOpen && openUrl"
+            ng-click="onOpen()"
+        >
+            <localize key="general_open">Open</localize>
+            <span class="sr-only">{{name}}</span>
+        </a>
+
+        <button
+            type="button"
+            class="umb-node-preview__action"
+            title="Open {{name}}"
+            ng-if="allowOpen && !openUrl"
+            ng-click="onOpen()"
+        >
+            <localize key="general_open">Open</localize>
+            <span class="sr-only">{{name}}...</span>
+        </button>
+
+        <!-- If removeUrl has a value we render a link otherwise a button-->
+        <a
+            class="umb-node-preview__action umb-node-preview__action--red"
+            title="Remove {{name}}"
+            ng-href="{{removeUrl}}"
+            ng-if="allowRemove && removeUrl"
+            ng-click="onRemove()"
+        >
+            <localize key="general_remove">Remove</localize>
+            <span class="sr-only">{{name}}</span>
+        </a>
+
+        <button
+            type="button"
+            class="umb-node-preview__action umb-node-preview__action--red"
+            title="Remove {{name}}"
+            ng-if="allowRemove && !removeUrl"
+            ng-click="onRemove()"
+        >
+            <localize key="general_remove">Remove</localize>
+            <span class="sr-only">{{name}}</span>
+        </button>
     </div>
 
 </div>

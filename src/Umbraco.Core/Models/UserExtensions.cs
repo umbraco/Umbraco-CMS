@@ -67,7 +67,7 @@ namespace Umbraco.Core.Models
 
             if (user.Avatar.IsNullOrWhiteSpace())
             {
-                var gravatarHash = user.Email.ToMd5();
+                var gravatarHash = user.Email.GenerateHash<MD5>();
                 var gravatarUrl = "https://www.gravatar.com/avatar/" + gravatarHash + "?d=404";
 
                 //try Gravatar
