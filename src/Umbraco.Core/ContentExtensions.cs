@@ -13,6 +13,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 
@@ -23,6 +24,8 @@ namespace Umbraco.Core
         // this ain't pretty
         private static IMediaFileSystem _mediaFileSystem;
         private static IMediaFileSystem MediaFileSystem => _mediaFileSystem ?? (_mediaFileSystem = Current.MediaFileSystem);
+        private static readonly PropertyEditorCollection _propertyEditors;
+        private static PropertyEditorCollection PropertyEditors = _propertyEditors ?? (_propertyEditors = Current.PropertyEditors);
 
         #region IContent
 
@@ -162,14 +165,12 @@ namespace Umbraco.Core
             // Fixes https://github.com/umbraco/Umbraco-CMS/issues/3937 - Assigning a new file to an
             // existing IMedia with extension SetValue causes exception 'Illegal characters in path'
             string oldpath = null;
-            if (property.GetValue(culture, segment) is string svalue)
+            var value = property.GetValue(culture, segment);
+
+            if (PropertyEditors.TryGet(propertyTypeAlias, out var editor)
+                && editor is IDataEditorWithMediaPath dataEditor)
             {
-                if (svalue.DetectIsJson())
-                {
-                    // the property value is a JSON serialized image crop data set - grab the "src" property as the file source
-                    var jObject = JsonConvert.DeserializeObject<JObject>(svalue);
-                    svalue = jObject != null ? jObject.GetValueAsString("src") : svalue;
-                }
+                var svalue = dataEditor.GetMediaPath(value);
                 oldpath = MediaFileSystem.GetRelativePath(svalue);
             }
 

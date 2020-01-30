@@ -71,7 +71,7 @@ function ColorPickerController($scope, $timeout) {
         );
         return {
             isValid: isValid,
-            errorMsg: "Value cannot be empty",
+            errorMsg: $scope.model.validation.mandatoryMessage || "Value cannot be empty",
             errorKey: "required"
         };
     }

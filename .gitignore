@@ -55,6 +55,7 @@ App_Data/TEMP/*
 src/Umbraco.Web.UI/[Cc]ss/*
 src/Umbraco.Web.UI/App_Code/*
 src/Umbraco.Web.UI/App_Data/*
+src/Umbraco.Web.UI/data/*
 src/Umbraco.Tests/App_Data/*
 src/Umbraco.Web.UI/[Mm]edia/*
 src/Umbraco.Web.UI/[Mm]aster[Pp]ages/*

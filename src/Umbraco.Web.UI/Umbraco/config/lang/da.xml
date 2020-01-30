@@ -35,7 +35,9 @@
     <key alias="SetPermissionsForThePage">Sæt rettigheder for siden %0%</key>
     <key alias="chooseWhereToCopy">Vælg hvor du vil kopiere</key>
     <key alias="chooseWhereToMove">Vælg hvortil du vil flytte</key>
+    <key alias="infiniteEditorChooseWhereToMove">Vælg hvor du vil flytte de valgte elementer hen</key>
     <key alias="toInTheTreeStructureBelow">til i træstrukturen nedenfor</key>
+    <key alias="infiniteEditorChooseWhereToCopy">Vælg hvor du vil kopiere de valgte elementer til</key>
     <key alias="wasMovedTo">blev flyttet til</key>
     <key alias="wasCopiedTo">blev kopieret til</key>
     <key alias="wasDeleted">blev slettet</key>
@@ -272,6 +274,7 @@
     <key alias="scheduledPublishServerTime">Dette oversætter til den følgende tid på serveren:</key>
     <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Hvad betyder det?</a>]]></key>
     <key alias="nestedContentDeleteItem">Er du sikker på, at du vil slette dette element?</key>
+    <key alias="nestedContentDeleteAllItems">Er du sikker på, at du vil slette alle elementer?</key>
     <key alias="nestedContentEditorNotSupported">Egenskaben %0% anvender editoren %1% som ikke er understøttet af Nested Content.</key>
     <key alias="nestedContentNoContentTypes">Der er ikke konfigureret nogen indholdstyper for denne egenskab.</key>
     <key alias="nestedContentCopyAllItemsName">%0% fra %1%</key>
@@ -445,6 +448,7 @@
     <key alias="viewCacheItem">Se cache element</key>
     <key alias="relateToOriginalLabel">Relatér til original</key>
     <key alias="includeDescendants">Inkludér undersider</key>
+    <key alias="theFriendliestCommunity">Det venligste community</key>
     <key alias="linkToPage">Link til side</key>
     <key alias="openInNewWindow">Åben linket i et nyt vindue eller fane</key>
     <key alias="linkToMedia">Link til medie</key>
@@ -538,9 +542,6 @@
     <key alias="anchor">#value eller ?key=value</key>
     <key alias="enterAlias">Indtast alias...</key>
     <key alias="generatingAlias">Genererer alias...</key>
-    <key alias="a11yCreateItem">Opret element</key>
-    <key alias="a11yEdit">Rediger</key>
-    <key alias="a11yName">Navn</key>
   </area>
   <area alias="editcontenttype">
     <key alias="createListView" version="7.2">Opret brugerdefineret listevisning</key>
@@ -619,6 +620,7 @@
     <key alias="cancel">Fortryd</key>
     <key alias="cellMargin">Celle margen</key>
     <key alias="choose">Vælg</key>
+    <key alias="clear">Ryd</key>
     <key alias="close">Luk</key>
     <key alias="closewindow">Luk vindue</key>
     <key alias="comment">Kommentar</key>
@@ -749,6 +751,9 @@
     <key alias="current">nuværende</key>
     <key alias="embed">Indlejring</key>
     <key alias="selected">valgt</key>
+    <key alias="other">Andet</key>
+    <key alias="articles">Artikler</key>
+    <key alias="videos">Videoer</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blå</key>
@@ -1113,7 +1118,10 @@ Mange hilsner fra Umbraco robotten
     <key alias="forms">Formularer</key>
   </area>
   <area alias="help">
+    <key alias="tours">Tours</key>
     <key alias="theBestUmbracoVideoTutorials">De bedste Umbraco video tutorials</key>
+    <key alias="umbracoForum">Besøg our.umbraco.com</key>
+    <key alias="umbracoTv">Besøg umbraco.tv</key>
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Standardskabelon</key>
@@ -1176,6 +1184,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="editUserSaved">Bruger gemt</key>
     <key alias="editUserTypeSaved">Brugertype gemt</key>
     <key alias="editUserGroupSaved">Brugergruppe gemt</key>
+    <key alias="editCulturesAndHostnamesSaved">Sprog og domæner gemt</key>
+    <key alias="editCulturesAndHostnamesError">Der opstod en fejl ved at gemme sprog og domæner</key>
     <key alias="fileErrorHeader">Fil ikke gemt</key>
     <key alias="fileErrorText">Filen kunne ikke gemmes. Tjek filrettighederne</key>
     <key alias="fileSavedHeader">Fil gemt</key>
@@ -1729,6 +1739,9 @@ Mange hilsner fra Umbraco robotten
     <key alias="currentLanguage">Aktivt sprog</key>
     <key alias="switchLanguage">Skift sprog til</key>
     <key alias="createNewFolder">Opret ny mappe</key>
+    <key alias="createItem">Opret element</key>
+    <key alias="edit">Rediger</key>
+    <key alias="name">Navn</key>
   </area>
   <area alias="references">
     <key alias="tabName">Referencer</key>
@@ -1772,6 +1785,7 @@ Mange hilsner fra Umbraco robotten
   <area alias="clipboard">
     <key alias="labelForCopyAllEntries">Kopier %0%</key>
     <key alias="labelForArrayOfItemsFrom">%0% fra %1%</key>
+    <key alias="labelForRemoveAllEntries">Fjern alle elementer</key>
   </area>
   <area alias="propertyActions">
     <key alias="tooltipForPropertyActionsMenu">Åben egenskabshandlinger</key>

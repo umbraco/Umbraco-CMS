@@ -12,14 +12,14 @@
         <div ng-messages="textboxFieldForm.textbox.$error" show-validation-on-submit>
             <p class="sr-only" ng-message="valServer" tabindex="0">{{model.label}} {{textboxFieldForm.textbox.errorMsg}}</p>
             <p class="help-inline" ng-message="valServer" tabindex="0" aria-hidden="true">{{textboxFieldForm.textbox.errorMsg}}</p>
-            <p class="help-inline" ng-message="required"><localize key="general_required">Required</localize></p>
+            <p class="help-inline" ng-message="required">{{mandatoryMessage}}</p>
         </div>
 
         <div class="help" ng-if="model.count >= (model.config.maxChars*.8) && model.count <= model.config.maxChars">
             <p class="sr-only" tabindex="0">{{model.label}} <localize key="textbox_characters_left" tokens="[model.config.maxChars - model.count]" watch-tokens="true">%0% characters left.</localize></p>
             <p aria-hidden="True"><localize key="textbox_characters_left" tokens="[model.config.maxChars - model.count]" watch-tokens="true">%0% characters left.</localize></p>
         </div>
-        <div class="help text-error" ng-if="model.count > model.config.maxChars">
+        <div class="help text-error" ng-if="!isLengthValid()">
             <p class="sr-only" tabindex="0">{{model.label}} <localize key="textbox_characters_exceed" tokens="[model.config.maxChars, model.count - model.config.maxChars]" watch-tokens="true">Maximum %0% characters, <strong>%1%</strong> too many.</localize></p>
             <p aria-hidden="true"><localize key="textbox_characters_exceed" tokens="[model.config.maxChars, model.count - model.config.maxChars]" watch-tokens="true">Maximum %0% characters, <strong>%1%</strong> too many.</localize></p>
         </div>

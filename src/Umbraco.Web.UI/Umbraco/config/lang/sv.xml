@@ -4,6 +4,9 @@
     <name>The Umbraco community</name>
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
+  <area alias="apps">
+    <key alias="umbContent">Innehåll</key>
+  </area>
   <area alias="actions">
     <key alias="assignDomain">Hantera domännamn</key>
     <key alias="auditTrail">Hantera versioner</key>
@@ -11,6 +14,7 @@
     <key alias="changeDocType">Ändra dokumenttyp</key>
     <key alias="copy">Kopiera</key>
     <key alias="create">Skapa</key>
+    <key alias="createGroup">Skapa grupp</key>
     <key alias="createPackage">Skapa paket</key>
     <key alias="createblueprint">Skapa innehållsmall</key>
     <key alias="defaultValue">Standardvärde</key>
@@ -37,6 +41,12 @@
     <key alias="translate">Översätt</key>
     <key alias="unpublish">Avpublicera</key>
     <key alias="update">Uppdatera</key>
+  </area>
+  <area alias="actionCategories">
+      <key alias="content">Innehåll</key>
+      <key alias="administration">Administration</key>
+      <key alias="structure">Struktur</key>
+      <key alias="other">Övrigt</key>
   </area>
   <area alias="assignDomain">
     <key alias="addNew">Lägg till nytt domännamn</key>
@@ -98,6 +108,7 @@
     <key alias="blueprintDescription">En innehållsmall är fördefinierat innehåll som en redaktör kan välja att använda som grund för att skapa nytt innehåll</key>
   </area>
   <area alias="buttons">
+    <key alias="clearSelection">Rensa urval</key>
     <key alias="bold">Fetstil</key>
     <key alias="deindent">Minska indrag</key>
     <key alias="formFieldInsert">Infoga formulärfält</key>
@@ -121,6 +132,7 @@
     <key alias="saveAndPublish">Spara och publicera</key>
     <key alias="saveAndSchedule">Spara och schemalägg</key>
     <key alias="saveToPublish">Spara och skicka för godkännande</key>
+    <key alias="schedulePublish">Schemaläggning</key>
     <key alias="select">Välj</key>
     <key alias="showPage">Förhandsgranska</key>
     <key alias="showPageDisabled">Förhandsgranskning är avstängt på grund av att det inte finns någon mall tilldelad</key>
@@ -295,6 +307,12 @@
     <key alias="sitereindexed">Webbplatsen har indexerats</key>
     <key alias="siterepublished">Cache för webbplatsen har uppdaterats. Allt publicerat innehåll är nu uppdaterat. Innehåll som inte har publicerats är fortfarande opublicerat.</key>
     <key alias="siterepublishHelp">Webbplatsens cache kommer att uppdateras. Allt innehåll som är publicerat kommer att uppdateras. Innehåll som inte är publicerat kommer att förbli opublicerat.</key>
+    <key alias="selectContentStartNode">Välj startnod för innehåll</key>
+    <key alias="selectIcon">Välj ikon</key>
+    <key alias="selectMediaStartNode">Välj startnod för media</key>
+    <key alias="selectUserGroups">Välj användargrupper</key>
+    <key alias="selectSections">Välj sektioner</key>
+    <key alias="selectUsers">Välj användare</key>
     <key alias="tableColumns">Antal kolumner</key>
     <key alias="tableRows">Antal rader</key>
     <key alias="thumbnailimageclickfororiginal">Klicka på förhandsgranskningsbilden för att se bilden i full storlek</key>
@@ -361,6 +379,7 @@
     <key alias="cancel">Avbryt</key>
     <key alias="cellMargin">Cellmarginal</key>
     <key alias="choose">Välj</key>
+    <key alias="clear">Rensa</key>
     <key alias="close">Stäng</key>
     <key alias="closewindow">Stäng fönstret</key>
     <key alias="comment">Kommentar</key>
@@ -424,6 +443,7 @@
     <key alias="properties">Egenskaper</key>
     <key alias="reciept">E-postadress för formulärsdata</key>
     <key alias="recycleBin">Papperskorg</key>
+    <key alias="recycleBinEmpty">Din papperskorg är tom</key>
     <key alias="remaining">Återstående</key>
     <key alias="remove">Ta bort</key>
     <key alias="rename">Döp om</key>
@@ -567,6 +587,7 @@
   <area alias="media">
     <key alias="clickToUpload">Klicka för att ladda upp</key>
     <key alias="orClickHereToUpload">eller klicka här för att välja filer</key>
+      <key alias="dragAndDropYourFilesIntoTheArea">Drag och släpp dina filer i denna yta</key>
   </area>
   <area alias="moveOrCopy">
     <key alias="choose">Välj sida ovan...</key>
@@ -600,6 +621,7 @@
     <key alias="packageOptions">Paketalternativ</key>
     <key alias="packageReadme">Paket läsmig</key>
     <key alias="packageRepository">Paketvalv</key>
+    <key alias="packageSearch">Sök efter paket</key>
     <key alias="packageUninstallConfirm">Bekräfta avinstallation</key>
     <key alias="packageUninstalledHeader">Paketet har avinstallerats</key>
     <key alias="packageUninstalledText">Paketet har avinstallerats utan problem</key>
@@ -620,6 +642,7 @@
     <key alias="password">Fyll i ditt lösenord</key>
     <key alias="search">Skriv för att söka...</key>
     <key alias="username">Fyll i ditt lösenord</key>
+    <key alias="enterAlias">Välj alias...</key>
     <key alias="enterTags">Skriv för att lägga till taggar (och tryck enter efter varje tagg)...</key>
   </area>
   <area alias="publicAccess">
@@ -690,6 +713,7 @@
     <key alias="media">Media</key>
     <key alias="member">Medlemmar</key>
     <key alias="newsletters">Nyhetsbrev</key>
+    <key alias="packages">Paket</key>
     <key alias="settings">Inställningar</key>
     <key alias="statistics">Statistik</key>
     <key alias="translation">Översättning</key>
@@ -785,7 +809,7 @@
     <key alias="template">Sidmall</key>
   </area>
   <area alias="grid">
-    <key alias="media">Image</key>
+    <key alias="media">Bild</key>
     <key alias="macro">Macro</key>
     <key alias="insertControl">Lägg till</key>
     <key alias="chooseLayout">Choose layout</key>
@@ -865,6 +889,7 @@
   </area>
   <area alias="treeHeaders">
     <key alias="cacheBrowser">Cacha webbläsare</key>
+    <key alias="content">Innehåll</key>
     <key alias="contentRecycleBin">Papperskorg</key>
     <key alias="createdPackages">Skapade paket</key>
     <key alias="dataTypes">Datatyper</key>
@@ -901,24 +926,52 @@
     <key alias="updateNoServerError">Fel vid kontroll av uppdatering. Se trace-stack för mer information.</key>
   </area>
   <area alias="user">
+    <key alias="access">Åtkomst</key>
+    <key alias="accessHelp">Baserat på tilldelade grupper och startnod så har användaren åtkomst till följande noder</key>
+    <key alias="assignAccess">Tilldela åtkomst</key>
     <key alias="administrators">Administratör</key>
     <key alias="categoryField">Kategorifält</key>
+    <key alias="createDate">Användare skapad</key>
     <key alias="changePassword">Ändra lösenord</key>
-    <key alias="changePasswordDescription">Du kan byta ditt lösenord för Umbraco Back Office genom att fylla i nedanstående formulär och klicka på knappen "Ändra lösenord".</key>
+    <key alias="changePhoto">Ändra bild</key>
     <key alias="confirmNewPassword">Bekräfta det nya lösenordet</key>
+    <key alias="changePasswordDescription">Du kan byta ditt lösenord för Umbraco Back Office genom att fylla i nedanstående formulär och klicka på knappen "Ändra lösenord".</key>
     <key alias="contentChannel">Innehållskanal</key>
+    <key alias="createAnotherUser">Skapa en till användare</key>
+    <key alias="createUserHelp">Skapa nya användare för att ge dom åtkomst till Umbraco. När en ny användare skapas kommer ett lösenord genereras som du kan dela med användaren.</key>
     <key alias="createUser">Skapa användare</key>
+    <key alias="deleteUser">Ta bort användare User</key>
+    <key alias="deleteUserConfirmation">Är du säker på att du vill ta bort användarens konto?</key>
     <key alias="descriptionField">Fält för beskrivning</key>
     <key alias="disabled">Avaktivera användare</key>
     <key alias="documentType">Dokumenttyp</key>
     <key alias="editors">Redaktör</key>
     <key alias="excerptField">Fält för utdrag</key>
+    <key alias="failedPasswordAttempts">Misslyckade inloggningsförsök</key>
+    <key alias="goToProfile">Gå till användarens profil</key>
+    <key alias="groupsHelp">Lägg till grupper för att tilldela åtkomst och rättigheter</key>
+    <key alias="invite">Bjud in</key>
+    <key alias="inviteAnotherUser">Bjud in en till användare</key>
+    <key alias="inviteUserHelp">Bjud in nya användare för att ge dom åtkomst till Umbraco. Ett e-postmeddelande kommer skikcas till användaren med information om hur man loggar in i Umbraco. Inbjudningar är giltiga i 72 timmar.</key>
     <key alias="language">Språk</key>
+    <key alias="languageHelp">Välj de språk som kommer visas i meny och dialoger</key>
+    <key alias="lastLockoutDate">Senast utlåst</key>
+    <key alias="lastLogin">Senast inloggad</key>
+    <key alias="lastPasswordChangeDate">Lösenordet ändrades</key>
     <key alias="loginname">Login</key>
     <key alias="mediastartnode">Startnod i mediabiblioteket</key>
+    <key alias="mediastartnodehelp">Begränsa media sectionen till en specifik startnod</key>
+    <key alias="mediastartnodes">Media startnoder</key>
+    <key alias="mediastartnodeshelp">Begränsa media sectionen till specifika startnoder</key>
     <key alias="modules">Sektioner</key>
     <key alias="newPassword">Byt ditt lösenord</key>
+    <key alias="noLockouts">har inte blivit utlåst</key>
+    <key alias="noLogin">har inte loggat in ännu</key>
     <key alias="noConsole">Inaktivera tillgång till Umbraco</key>
+    <key alias="noPasswordChange">Lösenordet har inte ändrats</key>
+    <key alias="noStartNode">Ingen startnod vald</key>
+    <key alias="noStartNodes">Inga startnoder valda</key>
+    <key alias="oldPassword">Gammalt lösenord</key>
     <key alias="password">Lösenord</key>
     <key alias="passwordChanged">Ditt lösenord är nu ändrat!</key>
     <key alias="passwordConfirm">Vänligen bekräfta ditt nya lösenord</key>
@@ -932,17 +985,36 @@
     <key alias="permissionSelectedPages">Du redigerar nu rättigheterna för sidorna:</key>
     <key alias="permissionSelectPages">Välj de sidor vars rättigheter du vill redigera</key>
     <key alias="resetPassword">Återställ lösenord</key>
+    <key alias="removePhoto">Ta bort bild</key>
+    <key alias="permissionsDefault">Standard rättigheter</key>
+    <key alias="permissionsGranular">Granulära rättigheter</key>
     <key alias="searchAllChildren">Sök igenom alla undernoder</key>
+    <key alias="permissionsGranularHelp">Sätt rättigheter för specifika noder</key>
+    <key alias="profile">Profil</key>
     <key alias="sessionExpires">Sessionen går ut</key>
+    <key alias="sectionsHelp">Välj sektioner för användaråtkomst</key>
+    <key alias="stateAll">Alla</key>
+    <key alias="stateActive">Aktiv</key>
+    <key alias="stateLockedOut">Utlåst</key>
+    <key alias="stateInvited">Inbjuden</key>
+    <key alias="stateInactive">Inaktiv</key>
     <key alias="sortNameAscending">Namn (A-Z)</key>
     <key alias="sortNameDescending">Namn (Z-A)</key>
-    <key alias="startnode">Startnod i innehåll</key>
+    <key alias="startnode">Startnod för innehåll</key>
+    <key alias="startnodehelp">Begränsa sidträdet till en specifik startnod</key>
+    <key alias="startnodes">Startnoder för innehåll</key>
+    <key alias="startnodeshelp">Begränsa sidträdet till specifika startnoder</key>
+    <key alias="updateDate">Användare ändrad</key>
     <key alias="username">Användarens namn</key>
+    <key alias="userManagement">Användarhantering</key>
     <key alias="userPermissions">Användarrättigheter</key>
     <key alias="usertype">Användartyp</key>
     <key alias="userTypes">Användartyper</key>
     <key alias="writer">Skribent</key>
     <key alias="yourHistory">Din nuvarande historik</key>
     <key alias="yourProfile">Din profil</key>
+    <key alias="sortCreateDateAscending">Nyast</key>
+    <key alias="sortCreateDateDescending">Äldst</key>
+    <key alias="sortLastLoginDateDescending">Senaste login</key>
   </area>
 </language>

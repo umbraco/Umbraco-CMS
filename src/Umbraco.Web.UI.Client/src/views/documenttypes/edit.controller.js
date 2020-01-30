@@ -64,7 +64,8 @@
             if (infiniteMode) {
                 documentTypeId = $scope.model.id;
                 create = $scope.model.create;
-                noTemplate = $scope.model.notemplate;
+                if (create && !documentTypeId) documentTypeId = -1;
+                noTemplate = $scope.model.notemplate || $scope.model.noTemplate;
                 isElement = $scope.model.isElement;
                 allowVaryByCulture = $scope.model.allowVaryByCulture;
                 vm.submitButtonKey = "buttons_saveAndClose";
@@ -519,11 +520,16 @@
         }));
 
         evts.push(eventsService.on("editors.documentType.saved", function(name, args) {
-            if(args.documentType.allowedTemplates.length > 0){
-                navigationService.syncTree({ tree: "templates", path: [], forceReload: true })
-                    .then(function (syncArgs) {
-                        navigationService.reloadNode(syncArgs.node)
-                    });
+            if(args.documentType.allowedTemplates.length > 0) {
+                navigationService.hasTree("templates").then(function (treeExists) {
+                    if (treeExists) {
+                        navigationService.syncTree({ tree: "templates", path: [], forceReload: true })
+                            .then(function (syncArgs) {
+                                navigationService.reloadNode(syncArgs.node)
+                            }
+                        );
+                    }
+                }); 
             }
         }));
 
