@@ -76,7 +76,7 @@ namespace Umbraco.Web.Models
         public abstract DateTime UpdateDate { get; }
 
         /// <inheritdoc />
-        public virtual string Url => this.Url();
+        public virtual string Url => string.Empty; // TODO: get from this.Url();
 
         /// <inheritdoc />
         public abstract IReadOnlyDictionary<string, PublishedCultureInfo> Cultures { get; }

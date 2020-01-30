@@ -4,9 +4,8 @@ using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Exceptions;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web.Composing;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 
@@ -46,28 +45,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 properties.Add(new Property(propertyType, this, pdatas, _publishedSnapshotAccessor));
             }
             PropertiesArray = properties.ToArray();
-        }
-
-        private string GetProfileNameById(int id)
-        {
-            var cache = GetCurrentSnapshotCache();
-            return cache == null
-                ? GetProfileNameByIdNoCache(id)
-                : (string)cache.Get(CacheKeys.ProfileName(id), () => GetProfileNameByIdNoCache(id));
-        }
-
-        private static string GetProfileNameByIdNoCache(int id)
-        {
-#if DEBUG
-            var userService = Current.Services?.UserService;
-            if (userService == null) return "[null]"; // for tests
-#else
-            // we don't want each published content to hold a reference to the service
-            // so where should they get the service from really? from the locator...
-            var userService = Current.Services.UserService;
-#endif
-            var user = userService.GetProfileById(id);
-            return user?.Name;
         }
 
         // used when cloning in ContentNode
@@ -171,7 +148,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override int CreatorId => _contentNode.CreatorId;
 
         /// <inheritdoc />
-        public override string CreatorName => GetProfileNameById(_contentNode.CreatorId);
+        public override string CreatorName => string.Empty; // TODO: remove (as want to avoid injecting user service to get these names)
 
         /// <inheritdoc />
         public override DateTime CreateDate => _contentNode.CreateDate;
@@ -180,7 +157,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override int WriterId => ContentData.WriterId;
 
         /// <inheritdoc />
-        public override string WriterName => GetProfileNameById(ContentData.WriterId);
+        public override string WriterName => string.Empty; // TODO: remove (as want to avoid injecting user service to get these names)
 
         /// <inheritdoc />
         public override DateTime UpdateDate => ContentData.VersionDate;

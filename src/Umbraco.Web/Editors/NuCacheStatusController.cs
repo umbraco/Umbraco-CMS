@@ -17,14 +17,16 @@ namespace Umbraco.Web.Editors
             _publishedSnapshotService = publishedSnapshotService ?? throw new ArgumentNullException(nameof(publishedSnapshotService));
         }
 
-        private PublishedSnapshotService PublishedSnapshotService
+        private IPublishedSnapshotService PublishedSnapshotService
         {
             get
             {
-                var svc = _publishedSnapshotService as PublishedSnapshotService;
-                if (svc == null)
-                    throw new NotSupportedException("Not running NuCache.");
-                return svc;
+                // TODO: do we need this?
+                //var svc = _publishedSnapshotService as PublishedSnapshotService;
+                //if (svc == null)
+                //    throw new NotSupportedException("Not running NuCache.");
+                // return svc;
+                return _publishedSnapshotService;
             }
         }
 
@@ -32,9 +34,7 @@ namespace Umbraco.Web.Editors
         public string RebuildDbCache()
         {
             var service = PublishedSnapshotService;
-            service.RebuildContentDbCache();
-            service.RebuildMediaDbCache();
-            service.RebuildMemberDbCache();
+            service.Rebuild();
             return service.GetStatus();
         }
 

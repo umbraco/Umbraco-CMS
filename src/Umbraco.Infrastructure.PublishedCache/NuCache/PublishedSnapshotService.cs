@@ -26,11 +26,9 @@ using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Cache;
-using Umbraco.Web.Install;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 using Umbraco.Web.Routing;
 using File = System.IO.File;
-using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
@@ -1767,7 +1765,7 @@ AND cmsContentNu.nodeId IS NULL
 
         #region Instrument
 
-        public string GetStatus()
+        public override string GetStatus()
         {
             var dbCacheIsOk = VerifyContentDbCache()
                 && VerifyMediaDbCache()
@@ -1790,7 +1788,7 @@ AND cmsContentNu.nodeId IS NULL
                 " and " + ms + " snapshot" + (ms > 1 ? "s" : "") + ".";
         }
 
-        public void Collect()
+        public override void Collect()
         {
             var contentCollect = _contentStore.CollectAsync();
             var mediaCollect = _mediaStore.CollectAsync();

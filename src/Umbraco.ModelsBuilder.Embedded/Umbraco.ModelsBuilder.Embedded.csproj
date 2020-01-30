@@ -105,6 +105,10 @@
       <Project>{29aa69d9-b597-4395-8d42-43b1263c240a}</Project>
       <Name>Umbraco.Abstractions</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Umbraco.Infrastructure.PublishedCache\Umbraco.Infrastructure.PublishedCache.csproj">
+      <Project>{f6de8da0-07cc-4ef2-8a59-2bc81dbb3830}</Project>
+      <Name>Umbraco.Infrastructure.PublishedCache</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj">
       <Project>{3ae7bf57-966b-45a5-910a-954d7c554441}</Project>
       <Name>Umbraco.Infrastructure</Name>

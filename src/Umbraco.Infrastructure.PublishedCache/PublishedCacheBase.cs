@@ -94,11 +94,14 @@ namespace Umbraco.Web.PublishedCache
 
         public virtual IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
         {
+            // TODO: move this extension method and get working again.
+
             // this is probably not super-efficient, but works
             // some cache implementation may want to override it, though
-            return GetAtRoot()
-                .SelectMany(x => x.DescendantsOrSelf())
-                .Where(x => x.ContentType.Id == contentType.Id);
+            return Enumerable.Empty<IPublishedContent>();
+            //return GetAtRoot()
+            //    .SelectMany(x => x.DescendantsOrSelf())
+            //    .Where(x => x.ContentType.Id == contentType.Id);
         }
     }
 }

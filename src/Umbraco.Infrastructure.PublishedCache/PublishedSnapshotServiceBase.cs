@@ -38,5 +38,11 @@ namespace Umbraco.Web.PublishedCache
 
         public virtual void Dispose()
         { }
+
+        public abstract string GetStatus();
+
+        public virtual void Collect()
+        {
+        }
     }
 }

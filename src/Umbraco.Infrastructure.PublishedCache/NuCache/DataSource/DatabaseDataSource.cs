@@ -10,7 +10,6 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Serialization;
-using Umbraco.Web.Composing;
 using static Umbraco.Core.Persistence.SqlExtensionsStatics;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
@@ -20,6 +19,13 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     // provides efficient database access for NuCache
     internal class DatabaseDataSource : IDataSource
     {
+        private readonly ILogger _logger;
+
+        public DatabaseDataSource(ILogger logger)
+        {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
         // we want arrays, we want them all loaded, not an enumerable
 
         private Sql<ISqlContext> ContentSourcesSelect(IScope scope, Func<Sql<ISqlContext>, Sql<ISqlContext>> joins = null)
@@ -181,7 +187,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             return scope.Database.Query<ContentSourceDto>(sql).Select(CreateMediaNodeKit);
         }
 
-        private static ContentNodeKit CreateContentNodeKit(ContentSourceDto dto)
+        private ContentNodeKit CreateContentNodeKit(ContentSourceDto dto)
         {
             ContentData d = null;
             ContentData p = null;
@@ -192,7 +198,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 {
                     if (Debugger.IsAttached)
                         throw new Exception("Missing cmsContentNu edited content for node " + dto.Id + ", consider rebuilding.");
-                    Current.Logger.Warn<DatabaseDataSource>("Missing cmsContentNu edited content for node {NodeId}, consider rebuilding.", dto.Id);
+                    _logger.Warn<DatabaseDataSource>("Missing cmsContentNu edited content for node {NodeId}, consider rebuilding.", dto.Id);
                 }
                 else
                 {
@@ -219,7 +225,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 {
                     if (Debugger.IsAttached)
                         throw new Exception("Missing cmsContentNu published content for node " + dto.Id + ", consider rebuilding.");
-                    Current.Logger.Warn<DatabaseDataSource>("Missing cmsContentNu published content for node {NodeId}, consider rebuilding.", dto.Id);
+                    _logger.Warn<DatabaseDataSource>("Missing cmsContentNu published content for node {NodeId}, consider rebuilding.", dto.Id);
                 }
                 else
                 {
