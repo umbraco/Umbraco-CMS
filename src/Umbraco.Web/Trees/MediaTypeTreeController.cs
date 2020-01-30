@@ -120,7 +120,10 @@ namespace Umbraco.Web.Trees
                 }
 
                 menu.Items.Add<ActionCopy>(Services.TextService, opensDialog: true);
-                menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
+                if(ct.IsSystemMediaType() == false)
+                {
+                    menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
+                }
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
 
             }

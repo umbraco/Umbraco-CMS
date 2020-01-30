@@ -1,6 +1,14 @@
 'use strict';
 
 module.exports = {
+    compile: {
+        build: {
+            sourcemaps: false
+        },
+        dev: {
+            sourcemaps: true
+        }
+    },
     sources: {
 
         // less files used by backoffice and preview

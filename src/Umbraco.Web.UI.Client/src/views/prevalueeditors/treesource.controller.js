@@ -19,15 +19,16 @@ angular.module('umbraco')
             };
         }
 
-		if($scope.model.value.id && $scope.model.value.type !== "member"){
-			entityResource.getById($scope.model.value.id, entityType()).then(function(item){
+        if($scope.model.value.id && $scope.model.value.type !== "member"){
+            entityResource.getById($scope.model.value.id, entityType()).then(function(item){
                 populate(item);
-			});
+            });
         }
-
-	    $timeout(function () {
-	        treeSourceChanged();
-	    }, 100);
+        else {
+            $timeout(function () {
+                treeSourceChanged();
+            }, 100);
+        }
 
         function entityType() {
 			var ent = "Document";

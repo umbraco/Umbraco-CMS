@@ -207,7 +207,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                         VersionDate = dto.EditVersionDate,
                         WriterId = dto.EditWriterId,
                         Properties = nested.PropertyData,
-                        CultureInfos = nested.CultureData
+                        CultureInfos = nested.CultureData,
+                        UrlSegment = nested.UrlSegment
                     };
                 }
             }
