@@ -7,6 +7,21 @@ body {
     
 }
 
+.container, .navbar-static-top .container, .navbar-fixed-top .container, .navbar-fixed-bottom .container {
+    max-width: 1500px;
+    width: 95%;
+}
+
+.span3 {
+    width: 220px;
+    width: calc(90% / 12 * 3);
+}
+
+.span9 {
+    width: 700px;
+    width: calc(90% / 12 * 9);
+}
+
 .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
     font-family: inherit;
     font-weight: 400;

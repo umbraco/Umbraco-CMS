@@ -620,7 +620,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             currentNode: $scope.contentId,
             submit: function (model) {
                 if (model.target) {
-                    performCopy(model.target, model.relateToOriginal);
+                    performCopy(model.target, model.relateToOriginal, model.includeDescendants);
                 }
                 editorService.close();
             },
@@ -631,9 +631,9 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
         editorService.copy(copyEditor);
     };
 
-    function performCopy(target, relateToOriginal) {
+    function performCopy(target, relateToOriginal, includeDescendants) {
         applySelected(
-            function (selected, index) { return contentResource.copy({ parentId: target.id, id: getIdCallback(selected[index]), relateToOriginal: relateToOriginal }); },
+            function (selected, index) { return contentResource.copy({ parentId: target.id, id: getIdCallback(selected[index]), relateToOriginal: relateToOriginal, recursive: includeDescendants }); },
             function (count, total) {
                 var key = (total === 1 ? "bulk_copiedItemOfItem" : "bulk_copiedItemOfItems");
                 return localizationService.localize(key, [count, total]);
