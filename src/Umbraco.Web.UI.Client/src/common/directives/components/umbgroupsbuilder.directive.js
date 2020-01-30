@@ -554,6 +554,7 @@
               property.validation.patternMessage = propertyModel.validation.patternMessage;
               property.showOnMemberProfile = propertyModel.showOnMemberProfile;
               property.memberCanEdit = propertyModel.memberCanEdit;
+              property.isSensitiveData = propertyModel.isSensitiveData;
               property.isSensitiveValue = propertyModel.isSensitiveValue;
               property.allowCultureVariant = propertyModel.allowCultureVariant;
 

@@ -4,7 +4,7 @@
 
     <div class="umb-tour__pulse"></div>
 
-    <div class="umb-tour__popover shadow-depth-2" ng-class="{'umb-tour__popover--l': model.currentStep.type === 'intro' || model.currentStepIndex === model.steps.length}">
+    <div class="umb-tour__popover shadow-depth-2" ng-class="{'umb-tour__popover--l': model.currentStep.type === 'intro' || model.currentStepIndex === model.steps.length, 'umb-tour__popover--promotion': model.currentStep.type === 'promotion'}">
 
         <div ng-if="!configuredView && !elementNotFound">
 
@@ -29,7 +29,7 @@
                                 total-steps="model.steps.length">
                             </umb-tour-step-counter>
                             <div ng-if="model.allowDisable && model.currentStep.type === 'intro'">
-                                <button type="button" class="underline" ng-click="model.disableTour()" style="font-size: 13px; background: transparent; border: none; padding: 0;" prevent-default>Don't show this tour again</button>
+                                <button type="button" class="underline" ng-click="model.disableTour()" prevent-default>Don't show this tour again</button>
                             </div>
                         </div>
 

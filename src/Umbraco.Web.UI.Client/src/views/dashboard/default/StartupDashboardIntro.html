@@ -40,8 +40,12 @@
     <div style="max-width: 1200px" ng-if="vm.showDefault">
 
         <div class="welcome-dashboard__intro">
-            <h1 class="welcome-dashboard__title">Welcome to The Friendly CMS</h1>
-            <p class="welcome-dashboard__intro-text">Thank you for choosing Umbraco - we think this could be the beginning of something beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast as possible.</p>
+            <h1 class="welcome-dashboard__title">
+                <localize key="startupDashboard_fallbackHeadline">Welcome to The Friendly CMS</localize>
+            </h1>
+            <p class="welcome-dashboard__intro-text">
+                <localize key="startupDashboard_fallbackDescription">Thank you for choosing Umbraco - we think this could be the beginning of something beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast as possible.</localize>
+            </p>
         </div>
 
         <div class="welcome-dashboard__info-box-boxes">

@@ -1,6 +1,9 @@
-﻿using System.Threading;
+﻿using System.Configuration;
+using System.Threading;
 using System.Web;
 using Umbraco.Core;
+using Umbraco.Core.Logging.Serilog;
+using Umbraco.Core.Runtime;
 using Umbraco.Web.Runtime;
 
 namespace Umbraco.Web
@@ -12,7 +15,18 @@ namespace Umbraco.Web
     {
         protected override IRuntime GetRuntime()
         {
-            return new WebRuntime(this);
+            var logger = SerilogLogger.CreateWithDefaultConfiguration();
+
+            // Determine if we should use the sql main dom or the default
+            var appSettingMainDomLock = ConfigurationManager.AppSettings[Constants.AppSettings.MainDomLock];
+
+            var mainDomLock = appSettingMainDomLock == "SqlMainDomLock"
+                ? (IMainDomLock)new SqlMainDomLock(logger)
+                : new MainDomSemaphoreLock(logger);
+            
+            var runtime = new WebRuntime(this, logger, new MainDom(logger, mainDomLock));
+
+            return runtime;
         }
 
         /// <summary>

@@ -12,7 +12,7 @@
         <span class="help-inline" ng-bind="errorMsg"</span>
     </div>
     <div class="control-group">
-        <table ng-show="model.value.length > 0">
+        <table class="table" ng-show="model.value.length > 0">
             <thead>
                 <tr>
                     <td></td>
@@ -31,7 +31,7 @@
                        <div class="list-view-layout__name flex-column content-start">
                             <span class="list-view-layout__name-text" ng-if="!val.isSystem" ng-bind="val.alias"></span>
                             <span class="list-view-layout__name-text" ng-if="val.isSystem == 1" ng-bind="val.alias"></span>
-                            <span class="list-view-layout__system" ng-show="val.isSystem == 1">(system field)</span> 
+                            <span class="list-view-layout__system" ng-show="val.isSystem == 1">(system field)</span>
                        </div>
                     </td>
                     <td>

@@ -42,9 +42,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(provider);
 
                 // Act
-                var relateMemberToContent = new RelationType(Constants.ObjectTypes.Member,
-                                                            Constants.ObjectTypes.Document,
-                                                            "relateMemberToContent") { IsBidirectional = true, Name = "Relate Member to Content" };
+                var relateMemberToContent = new RelationType("Relate Member to Content", "relateMemberToContent", true, Constants.ObjectTypes.Member, Constants.ObjectTypes.Document);
 
                 repository.Save(relateMemberToContent);
 
@@ -135,7 +133,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(relationTypes, Is.Not.Null);
                 Assert.That(relationTypes.Any(), Is.True);
                 Assert.That(relationTypes.Any(x => x == null), Is.False);
-                Assert.That(relationTypes.Count(), Is.EqualTo(5));
+                Assert.That(relationTypes.Count(), Is.EqualTo(7));
             }
         }
 
@@ -226,8 +224,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         public void CreateTestData()
         {
-            var relateContent = new RelationType(Constants.ObjectTypes.Document, new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"), "relateContentOnCopy") { IsBidirectional = true, Name = "Relate Content on Copy" };
-            var relateContentType = new RelationType(Constants.ObjectTypes.DocumentType, new Guid("A2CB7800-F571-4787-9638-BC48539A0EFB"), "relateContentTypeOnCopy") { IsBidirectional = true, Name = "Relate ContentType on Copy" };
+            var relateContent = new RelationType("Relate Content on Copy", "relateContentOnCopy", true, Constants.ObjectTypes.Document, new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"));
+            var relateContentType = new RelationType("Relate ContentType on Copy", "relateContentTypeOnCopy", true, Constants.ObjectTypes.DocumentType, new Guid("A2CB7800-F571-4787-9638-BC48539A0EFB"));
 
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = ScopeProvider.CreateScope())

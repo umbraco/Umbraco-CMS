@@ -213,7 +213,6 @@ Opens an overlay to show a custom YSOD. </br>
          var unsubscribe = [];
 
          function activate() {
-
             setView();
 
             setButtonText();
@@ -247,8 +246,18 @@ Opens an overlay to show a custom YSOD. </br>
                
                setOverlayIndent();
 
+               focusOnOverlayHeading()
             });
 
+         }
+
+         // Ideally this would focus on the first natively focusable element in the overlay, but as the content can be dynamic, it is focusing on the heading.
+         function focusOnOverlayHeading() {
+             var heading = el.find(".umb-overlay__title");
+
+             if(heading) {
+                 heading.focus();
+             }
          }
 
          function setView() {

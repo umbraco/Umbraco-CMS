@@ -303,7 +303,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Gets the content json for the content id
+        /// Gets the content json for the content guid
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -323,7 +323,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Gets the content json for the content id
+        /// Gets the content json for the content udi
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -341,7 +341,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Gets an empty content item for the
+        /// Gets an empty content item for the document type.
         /// </summary>
         /// <param name="contentTypeAlias"></param>
         /// <param name="parentId"></param>
@@ -1679,9 +1679,9 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(response);
             }
 
-            var permission = Services.UserService.GetPermissions(Security.CurrentUser, node.Path);
+            var assignedPermissions = Services.UserService.GetAssignedPermissions(Security.CurrentUser, node.Id);
 
-            if (permission.AssignedPermissions.Contains(ActionAssignDomain.ActionLetter.ToString(), StringComparer.Ordinal) == false)
+            if (assignedPermissions.Contains(ActionAssignDomain.ActionLetter.ToString(), StringComparer.Ordinal) == false)
             {
                 var response = Request.CreateResponse(HttpStatusCode.BadRequest);
                 response.Content = new StringContent("You do not have permission to assign domains on that node.");
@@ -1836,8 +1836,13 @@ namespace Umbraco.Web.Editors
         /// <param name="contentSave"></param>
         private void MapValuesForPersistence(ContentItemSave contentSave)
         {
-            // inline method to determine if a property type varies
-            bool Varies(Property property) => property.PropertyType.VariesByCulture();
+            // inline method to determine the culture and segment to persist the property
+            (string culture, string segment) PropertyCultureAndSegment(Property property, ContentVariantSave variant)
+            {
+                var culture = property.PropertyType.VariesByCulture() ? variant.Culture : null;
+                var segment = property.PropertyType.VariesBySegment() ? variant.Segment : null;
+                return (culture, segment);
+            }            
 
             var variantIndex = 0;
 
@@ -1876,8 +1881,18 @@ namespace Umbraco.Web.Editors
                 MapPropertyValuesForPersistence<IContent, ContentItemSave>(
                     contentSave,
                     propertyCollection,
-                    (save, property) => Varies(property) ? property.GetValue(variant.Culture) : property.GetValue(),         //get prop val
-                    (save, property, v) => { if (Varies(property)) property.SetValue(v, variant.Culture); else property.SetValue(v); },  //set prop val
+                    (save, property) =>
+                    {
+                        // Get property value
+                        (var culture, var segment) = PropertyCultureAndSegment(property, variant);                        
+                        return property.GetValue(culture, segment);                        
+                    },
+                    (save, property, v) =>
+                    {
+                        // Set property value
+                        (var culture, var segment) = PropertyCultureAndSegment(property, variant);
+                        property.SetValue(v, culture, segment);                        
+                    },  
                     variant.Culture);
 
                 variantIndex++;
