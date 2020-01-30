@@ -6,8 +6,8 @@
 
             <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
-            <div class="umb-pane" ng-show="!vm.loading">
-
+            <div class="umb-pane" ng-show="!vm.loading" role="dialog" aria-labelledby="content_rights_title" aria-describedby="content_rights_description">
+                
                 <form name="permissionsForm">
 
                     <div ng-show="vm.saveError">
@@ -23,8 +23,8 @@
                         </div>
                     </div>
 
-                    <h5><localize key="defaultdialogs_permissionsSet">Set permissions for</localize> {{ currentNode.name }}</h5>
-                    <p class="abstract" style="margin-bottom: 20px;"><localize key="defaultdialogs_permissionsHelp"></localize></p>
+                    <h5 id="content_rights_title"><localize key="defaultdialogs_permissionsSet">Set permissions for</localize> {{ currentNode.name }}</h5>
+                    <p id="content_rights_description" class="abstract" style="margin-bottom: 20px;"><localize key="defaultdialogs_permissionsHelp"></localize></p>
 
                     <div style="position: relative; display: inline-block; margin-bottom: 20px;">
                         <umb-button
