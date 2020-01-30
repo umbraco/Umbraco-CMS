@@ -11,6 +11,7 @@
     <key alias="changeDocType">Skift dokumenttype</key>
     <key alias="copy">Kopier</key>
     <key alias="create">Opret</key>
+    <key alias="export">Eksportér</key>
     <key alias="createPackage">Opret pakke</key>
     <key alias="createGroup">Opret gruppe</key>
     <key alias="delete">Slet</key>
@@ -34,9 +35,12 @@
     <key alias="SetPermissionsForThePage">Sæt rettigheder for siden %0%</key>
     <key alias="chooseWhereToCopy">Vælg hvor du vil kopiere</key>
     <key alias="chooseWhereToMove">Vælg hvortil du vil flytte</key>
+    <key alias="infiniteEditorChooseWhereToMove">Vælg hvor du vil flytte de valgte elementer hen</key>
     <key alias="toInTheTreeStructureBelow">til i træstrukturen nedenfor</key>
+    <key alias="infiniteEditorChooseWhereToCopy">Vælg hvor du vil kopiere de valgte elementer til</key>
     <key alias="wasMovedTo">blev flyttet til</key>
     <key alias="wasCopiedTo">blev kopieret til</key>
+    <key alias="wasDeleted">blev slettet</key>
     <key alias="rights">Rettigheder</key>
     <key alias="rollback">Fortryd ændringer</key>
     <key alias="sendtopublish">Send til udgivelse</key>
@@ -68,6 +72,7 @@
     <key alias="move">Tillad adgang til at flytte en node</key>
     <key alias="protect">Tillad adgang til at indstille og ændre offentlig adgang til en node</key>
     <key alias="publish">Tillad adgang til at udgive en node</key>
+    <key alias="unpublish">Tillad adgang til at afpublicere en node</key>
     <key alias="rights">Tillad adgang til at ændre rettigheder for en node</key>
     <key alias="rollback">Tillad adgang til at returnere en node til en tidligere tilstand</key>
     <key alias="sendtopublish">Tillad adgang til at sende en node til godkendelse før den udgives</key>
@@ -145,6 +150,7 @@
     <key alias="deleteTag">Slet tag</key>
     <key alias="confirmActionCancel">Fortryd</key>
     <key alias="confirmActionConfirm">Bekræft</key>
+	<key alias="morePublishingOptions">Flere publiseringsmuligheder</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">For</key>
@@ -153,6 +159,7 @@
     <key alias="publish">Brugeren har gemt og udgivet indholdet</key>
     <key alias="publishvariant">Brugeren har gemt og udgivet indholdet for sprogene: %0% </key>
     <key alias="save">Brugeren har gemt indholdet</key>
+    <key alias="savevariant">Brugeren har gemt indholdet for sprogene: %0%</key>
     <key alias="move">Brugeren har flyttet indholdet</key>
     <key alias="copy">Brugeren har kopieret indholdet</key>
     <key alias="rollback">Brugeren har tilbagerullet indholdet til en tidligere tilstand</key>
@@ -161,8 +168,10 @@
     <key alias="sort">Brugeren har sorteret de underliggende sider</key>
     <key alias="smallCopy">Kopieret</key>
     <key alias="smallPublish">Udgivet</key>
+    <key alias="smallPublishVariant">Udgivet</key>
     <key alias="smallMove">Flyttet</key>
     <key alias="smallSave">Gemt</key>
+    <key alias="smallSaveVariant">Gemt</key>
     <key alias="smallDelete">Slettet</key>
     <key alias="smallUnpublish">Afpubliceret</key>
     <key alias="smallRollBack">Indhold tilbagerullet</key>
@@ -227,14 +236,17 @@
     <key alias="noChanges">Der er endnu ikke lavet nogle ændringer.</key>
     <key alias="noDate">Ingen dato valgt</key>
     <key alias="nodeName">Sidetitel</key>
+    <key alias="noMediaLink">Dette medie har ikke noget link</key>
     <key alias="otherElements">Egenskaber</key>
     <key alias="parentNotPublished">Dette dokument er udgivet, men ikke synligt da den overliggende side '%0%' ikke er udgivet!</key>
+    <key alias="parentCultureNotPublished">Dette sprog er udgivet, men ikke synligt, da den overliggende side '%0%' ikke er udgivet!</key>
     <key alias="parentNotPublishedAnomaly">Ups: dette dokument er udgivet, men er ikke i cachen (intern fejl)</key>
     <key alias="getUrlException">Kunne ikke hente url'en</key>
     <key alias="routeError">Dette dokument er udgivet, men dets url ville kollidere med indholdet %0%</key>
+    <key alias="routeErrorCannotRoute">Dette dokument er udgivet, men dets URL kan ikke dirigeres</key>
     <key alias="publish">Udgiv</key>
     <key alias="published">Udgivet</key>
-    <key alias="publishedPendingChanges">Udgivet (Ventede ændringer)</key>
+    <key alias="publishedPendingChanges">Udgivet (Afventende ændringer)</key>
     <key alias="publishStatus">Udgivelsesstatus</key>
     <key alias="publishDescendantsHelp"><![CDATA[Klik <em>Udgiv med undersider</em> for at udgive <strong>%0%</strong> og alle sider under og dermed gøre deres indhold offentligt tilgængelige.]]></key>
     <key alias="publishDescendantsWithVariantsHelp"><![CDATA[Klik <em>Udgiv med undersider</em> for at udgive <strong>de valgte sprog</strong> og de samme sprog for sider under og dermed gøre deres indhold offentligt tilgængelige.]]></key>
@@ -262,8 +274,10 @@
     <key alias="scheduledPublishServerTime">Dette oversætter til den følgende tid på serveren:</key>
     <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Hvad betyder det?</a>]]></key>
     <key alias="nestedContentDeleteItem">Er du sikker på, at du vil slette dette element?</key>
+    <key alias="nestedContentDeleteAllItems">Er du sikker på, at du vil slette alle elementer?</key>
     <key alias="nestedContentEditorNotSupported">Egenskaben %0% anvender editoren %1% som ikke er understøttet af Nested Content.</key>
     <key alias="nestedContentNoContentTypes">Der er ikke konfigureret nogen indholdstyper for denne egenskab.</key>
+    <key alias="nestedContentCopyAllItemsName">%0% fra %1%</key>
     <key alias="addTextBox">Tilføj en ny tekstboks</key>
     <key alias="removeTextBox">Fjern denne tekstboks</key>
     <key alias="contentRoot">Indholdsrod</key>
@@ -308,6 +322,7 @@
     <key alias="copyFailed">Kopiering af mediet fejlede</key>
     <key alias="createFolderFailed">Oprettelse af mappen under parent med id %0% fejlede</key>
     <key alias="renameFolderFailed">Omdøbning af mappen med id %0% fejlede</key>
+    <key alias="dragAndDropYourFilesIntoTheArea">Træk dine filer ind i dropzonen for, at uploade dem til mediebiblioteketet.</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Opret et nyt medlem</key>
@@ -320,8 +335,14 @@
     <key alias="createContentBlueprint">Vælg den dokumenttype, du vil oprette en indholdsskabelon til</key>
     <key alias="enterFolderName">Angiv et navn for mappen</key>
     <key alias="updateData">Vælg en type og skriv en titel</key>
-    <key alias="noDocumentTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte dokument typer. Du skal tillade disse i indstillinger under <strong>"dokument typer"</strong>.]]></key>
+    <key alias="noDocumentTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte dokumenttyper. Du skal tillade disse i indstillinger under <strong>"dokumenttyper"</strong>.]]></key>
+    <key alias="noDocumentTypesAtRoot"><![CDATA[There are no document types available for creating content here. You must create these in <strong>Document Types</strong> within the <strong>Settings</strong> section.]]></key>
+    <key alias="noDocumentTypesWithNoSettingsAccess">Den valgte side i træet tillader ikke at sider oprettes under den.</key>
+    <key alias="noDocumentTypesEditPermissions">Rediger tilladelser for denne dokumenttype.</key>
+    <key alias="noDocumentTypesCreateNew">Opret en ny dokumenttype</key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte media typer. Du skal tillade disse i indstillinger under <strong>"media typer"</strong>.]]></key>
+    <key alias="noMediaTypesWithNoSettingsAccess">Det valgte medie i træet tillader ikke at medier oprettes under det.</key>
+    <key alias="noMediaTypesEditPermissions">Rediger tilladelser for denne medietype.</key>
     <key alias="documentTypeWithoutTemplate">Dokumenttype uden skabelon</key>
     <key alias="newFolder">Ny mappe</key>
     <key alias="newDataType">Ny datatype</key>
@@ -348,6 +369,8 @@
     <key alias="discardChanges">Kassér ændringer</key>
     <key alias="unsavedChanges">Du har ikke-gemte ændringer</key>
     <key alias="unsavedChangesWarning">Er du sikker på du vil navigere væk fra denne side? - du har ikke-gemte ændringer</key>
+    <key alias="confirmListViewPublish">Udgivelse vil gøre de valgte sider synlige på sitet.</key>
+    <key alias="confirmListViewUnpublish">Afpublicering vil fjerne de valgte sider og deres undersider fra sitet.</key>
     <key alias="confirmUnpublish">Afpublicering vil fjerne denne side og alle dets undersider fra websitet.</key>
     <key alias="doctypeChangeWarning">Du har ikke-gemte ændringer. Hvis du ændrer dokumenttype, kasseres ændringerne.</key>
   </area>
@@ -377,6 +400,7 @@
   <area alias="defaultdialogs">
     <key alias="nodeNameLinkPicker">Link titel</key>
     <key alias="urlLinkPicker">Link</key>
+    <key alias="anchorLinkPicker">Lokalt link / querystreng</key>
     <key alias="anchorInsert">Navn på lokalt link</key>
     <key alias="assignDomain">Rediger domæner</key>
     <key alias="closeThisWindow">Luk denne dialog</key>
@@ -387,6 +411,7 @@
     <key alias="cut">Klip</key>
     <key alias="editdictionary">Rediger ordbogsnøgle</key>
     <key alias="editlanguage">Rediger sprog</key>
+    <key alias="editSelectedMedia">Rediger det valgte medie</key>
     <key alias="insertAnchor">Indsæt lokalt link</key>
     <key alias="insertCharacter">Indsæt tegn</key>
     <key alias="insertgraphicheadline">Indsæt grafisk overskrift</key>
@@ -400,7 +425,6 @@
     <key alias="linkinternal">Internt link:</key>
     <key alias="linklocaltip">Ved lokalt link, indsæt da en "#" foran linket</key>
     <key alias="linknewwindow">Åben i nyt vindue?</key>
-    <key alias="macroContainerSettings">Makroindstillinger</key>
     <key alias="macroDoesNotHaveProperties">Denne makro har ingen egenskaber du kan redigere</key>
     <key alias="paste">Indsæt tekst</key>
     <key alias="permissionsEdit">Rediger rettigheder for</key>
@@ -424,26 +448,33 @@
     <key alias="viewCacheItem">Se cache element</key>
     <key alias="relateToOriginalLabel">Relatér til original</key>
     <key alias="includeDescendants">Inkludér undersider</key>
+    <key alias="theFriendliestCommunity">Det venligste community</key>
     <key alias="linkToPage">Link til side</key>
     <key alias="openInNewWindow">Åben linket i et nyt vindue eller fane</key>
     <key alias="linkToMedia">Link til medie</key>
-    <key alias="selectContentStartNode">Vælg indhold startnode</key>
+    <key alias="selectContentStartNode">Vælg startnode for indhold</key>
     <key alias="selectMedia">Vælg medie</key>
+    <key alias="selectMediaType">Vælg medietype</key>
     <key alias="selectIcon">Vælg ikon</key>
     <key alias="selectItem">Vælg item</key>
     <key alias="selectLink">Vælg link</key>
     <key alias="selectMacro">Vælg makro</key>
     <key alias="selectContent">Vælg indhold</key>
     <key alias="selectContentType">Vælg indholdstype</key>
-    <key alias="selectMediaStartNode">Vælg medie startnode</key>
+    <key alias="selectMediaStartNode">Vælg startnode for mediearkivet</key>
     <key alias="selectMember">Vælg medlem</key>
     <key alias="selectMemberGroup">Vælg medlemsgruppe</key>
+    <key alias="selectMemberType">Vælg medlemstype</key>
     <key alias="selectNode">Vælg node</key>
     <key alias="selectSections">Vælg sektioner</key>
     <key alias="selectUsers">Vælg brugere</key>
     <key alias="noIconsFound">Ingen ikoner blev fundet</key>
     <key alias="noMacroParams">Der er ingen parametre for denne makro</key>
     <key alias="noMacros">Der er ikke tilføjet nogen makroer</key>
+    <key alias="externalLoginProviders">Eksterne login-udbydere</key>
+    <key alias="exceptionDetail">Undtagelsesdetaljer</key>
+    <key alias="stacktrace">Stacktrace</key>
+    <key alias="innerException">Indre undtagelse</key>
     <key alias="linkYour">Link dit</key>
     <key alias="unLinkYour">Fjern link fra dit</key>
     <key alias="account">konto</key>
@@ -486,6 +517,11 @@
     <key alias="searchDescription">Søg i indekset og se resultaterne</key>
     <key alias="tools">Værktøjer</key>
     <key alias="toolsDescription">Værktøjer til at administrere indekset</key>
+    <key alias="fields">felter</key>
+    <key alias="indexCannotRead">Indexet skal bygges igen, for at kunne læses</key>
+    <key alias="processIsTakingLonger">Processen tager længere tid end forventet. Kontrollér Umbraco loggen for at se om der er sket fejl under operationen</key>
+    <key alias="indexCannotRebuild">Dette index kan ikke genbygess for det ikke har nogen</key>
+    <key alias="iIndexPopulator">IIndexPopulator</key>
   </area>
   <area alias="placeholders">
     <key alias="username">Indtast dit brugernavn</key>
@@ -498,17 +534,19 @@
     <key alias="label">Label...</key>
     <key alias="enterDescription">Indtast beskrivelse</key>
     <key alias="search">Søg...</key>
-    <key alias="filter">Filtrer...</key>
+    <key alias="filter">Filtrér...</key>
     <key alias="enterTags">Indtast nøgleord (tryk på Enter efter hvert nøgleord)...</key>
     <key alias="email">Indtast din e-mail</key>
     <key alias="enterMessage">Indtast en besked...</key>
     <key alias="usernameHint">Dit brugernavn er typisk din e-mailadresse</key>
+    <key alias="anchor">#value eller ?key=value</key>
     <key alias="enterAlias">Indtast alias...</key>
     <key alias="generatingAlias">Genererer alias...</key>
   </area>
   <area alias="editcontenttype">
     <key alias="createListView" version="7.2">Opret brugerdefineret listevisning</key>
     <key alias="removeListView" version="7.2">Fjern brugerdefineret listevisning</key>
+    <key alias="aliasAlreadyExists">En dokumenttype, medietype eller medlemstype med dette alias findes allerede</key>
   </area>
   <area alias="renamecontainer">
     <key alias="renamed">Omdøbt</key>
@@ -534,6 +572,8 @@
     <key alias="selectFolder">Vælg den mappe, der skal flyttes</key>
     <key alias="inTheTree">til i træstrukturen nedenfor</key>
     <key alias="wasMoved">blev flyttet under</key>
+    <key alias="hasReferencesDeleteConsequence"><![CDATA[Ved sletning af <strong>%0%</strong> fjernes egnskaber og egnskabernes data fra følgende elementer]]></key>
+    <key alias="acceptDeleteConsequence">I understand this action will delete the properties and data based on this Data Type</key>
   </area>
   <area alias="errorHandling">
     <key alias="errorButDataWasSaved">Dine data er blevet gemt, men før du kan udgive denne side er der nogle fejl der skal rettes:</key>
@@ -554,6 +594,7 @@
     <key alias="codemirroriewarning">OBS! Selvom CodeMirror er slået til i konfigurationen, så er den deaktiveret i Internet Explorer fordi den ikke er stabil nok.</key>
     <key alias="contentTypeAliasAndNameNotNull">Du skal udfylde både Alias &amp; Navn på den nye egenskabstype!</key>
     <key alias="filePermissionsError">Der mangler læse/skrive rettigheder til bestemte filer og mapper</key>
+    <key alias="macroErrorLoadingPartialView">Fejl ved indlæsning af Partial View script (fil: %0%)</key>
     <key alias="missingTitle">Skriv venligst en titel</key>
     <key alias="missingType">Du skal vælge en type</key>
     <key alias="pictureResizeBiggerThanOrg">Du er ved at gøre billedet større end originalen. Det vil forringe kvaliteten af billedet. Ønsker du at fortsætte?</key>
@@ -562,6 +603,7 @@
     <key alias="stylesNoStylesOnPage">Der er ingen aktive styles eller formatteringer på denne side</key>
     <key alias="tableColMergeLeft">Du skal stå til venstre for de 2 celler du ønsker at samle!</key>
     <key alias="tableSplitNotSplittable">Du kan ikke opdele en celle, som ikke allerede er delt.</key>
+    <key alias="propertyHasErrors">Denne egenskab er ugyldig</key>
   </area>
   <area alias="general">
     <key alias="about">Om</key>
@@ -569,6 +611,7 @@
     <key alias="actions">Muligheder</key>
     <key alias="add">Tilføj</key>
     <key alias="alias">Alias</key>
+    <key alias="all">Alle</key>
     <key alias="areyousure">Er du sikker?</key>
     <key alias="back">Tilbage</key>
     <key alias="backToOverview">Tilbage til oversigt</key>
@@ -577,10 +620,12 @@
     <key alias="cancel">Fortryd</key>
     <key alias="cellMargin">Celle margen</key>
     <key alias="choose">Vælg</key>
+    <key alias="clear">Ryd</key>
     <key alias="close">Luk</key>
     <key alias="closewindow">Luk vindue</key>
     <key alias="comment">Kommentar</key>
     <key alias="confirm">Bekræft</key>
+    <key alias="constrain">Proportioner</key>
     <key alias="constrainProportions">Behold proportioner</key>
     <key alias="content">Indhold</key>
     <key alias="continue">Fortsæt</key>
@@ -593,6 +638,7 @@
     <key alias="deleted">Slettet</key>
     <key alias="deleting">Sletter...</key>
     <key alias="design">Design</key>
+    <key alias="dictionary">Ordbog</key>
     <key alias="dimensions">Dimensioner</key>
     <key alias="down">Ned</key>
     <key alias="download">Hent</key>
@@ -604,6 +650,7 @@
     <key alias="field">Felt</key>
     <key alias="findDocument">Find</key>
     <key alias="first">Første</key>
+    <key alias="focalPoint">Fokuspunkt</key>
     <key alias="general">Generelt</key>
     <key alias="groups">Grupper</key>
     <key alias="group">Gruppe</key>
@@ -615,14 +662,17 @@
     <key alias="id">Id</key>
     <key alias="import">Importer</key>
     <key alias="includeFromsubFolders">Inkludér undermapper i søgning</key>
+    <key alias="info">Info</key>
     <key alias="innerMargin">Indre margen</key>
     <key alias="insert">Indsæt</key>
     <key alias="install">Installér</key>
     <key alias="invalid">Ugyldig</key>
     <key alias="justify">Justering</key>
+    <key alias="label">Mærke</key>
     <key alias="language">Sprog</key>
     <key alias="last">Sidste</key>
     <key alias="layout">Layout</key>
+    <key alias="links">Links</key>
     <key alias="loading">Henter</key>
     <key alias="locked">Låst</key>
     <key alias="login">Log ind</key>
@@ -637,8 +687,11 @@
     <key alias="next">Næste</key>
     <key alias="no">Nej</key>
     <key alias="of">af</key>
+    <key alias="off">Fra</key>
     <key alias="ok">OK</key>
     <key alias="open">Åben</key>
+    <key alias="options">Valgmuligheder</key>
+    <key alias="on">Til</key>
     <key alias="or">eller</key>
     <key alias="orderBy">Sortér efter</key>
     <key alias="password">Kodeord</key>
@@ -673,6 +726,7 @@
     <key alias="submit">Indsend</key>
     <key alias="type">Type</key>
     <key alias="typeToSearch">Skriv for at søge...</key>
+    <key alias="under">under</key>
     <key alias="up">Op</key>
     <key alias="update">Opdatér</key>
     <key alias="upgrade">Opdatér</key>
@@ -687,7 +741,7 @@
     <key alias="yes">Ja</key>
     <key alias="folder">Mappe</key>
     <key alias="searchResults">Søgeresultater</key>
-    <key alias="reorder">Sorter</key>
+    <key alias="reorder">Sortér</key>
     <key alias="reorderDone">Afslut sortering</key>
     <key alias="preview">Eksempel</key>
     <key alias="changePassword">Skift kodeord</key>
@@ -697,6 +751,9 @@
     <key alias="current">nuværende</key>
     <key alias="embed">Indlejring</key>
     <key alias="selected">valgt</key>
+    <key alias="other">Andet</key>
+    <key alias="articles">Artikler</key>
+    <key alias="videos">Videoer</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blå</key>
@@ -722,6 +779,7 @@
     <key alias="moveLineDown">Move Lines Down</key>
     <key alias="generalHeader">Generelt</key>
     <key alias="editorHeader">Editor</key>
+    <key alias="toggleAllowCultureVariants">Skift tillad sprogvarianter</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Baggrundsfarve</key>
@@ -882,7 +940,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="includeAllChildNodes">Inkludér alle underliggende sider</key>
     <key alias="orClickHereToUpload">eller klik her for at vælge pakkefil</key>
     <key alias="uploadPackage">Upload pakke</key>
-    <key alias="localPackageDescription">Installer en lokal pakke ved at vælge den fra din computer. Installer kun pakker fra kilder, du kender og stoler på</key>
+    <key alias="localPackageDescription">Installér en lokal pakke ved at vælge den fra din computer. Installér kun pakker fra kilder, du kender og stoler på</key>
     <key alias="uploadAnother">Upload en anden pakke</key>
     <key alias="cancelAndUploadAnother">Annuller og upload en anden pakke</key>
     <key alias="accept">Jeg accepterer</key>
@@ -890,7 +948,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="pathToFile">Sti til fil</key>
     <key alias="pathToFileDescription">Absolut sti til fil (f.eks.: /bin/umbraco.bin)</key>
     <key alias="installed">Installeret</key>
-    <key alias="installedPackages">Installeret pakker</key>
+    <key alias="installedPackages">Installerede pakker</key>
     <key alias="installLocal">Installér lokal</key>
     <key alias="installFinish">Afslut</key>
     <key alias="noConfigurationView">Denne pakke har ingen konfigurationsvisning</key>
@@ -985,6 +1043,10 @@ Mange hilsner fra Umbraco robotten
     <key alias="contentPublishedFailedInvalid"><![CDATA[
     %0% kunne ikke publiceres da følgende egenskaber :  %1%  ikke overholdte valderingsreglerne.
     ]]></key>
+    <key alias="contentPublishedFailedByEvent"><![CDATA[
+        %0% kunne ikke publiceres, et 3. part tilføjelsesprogram annullerede handlingen.
+    ]]>
+    </key>
     <key alias="contentPublishedFailedByEvent">%0% kunne ikke udgives, fordi et 3. parts modul annullerede handlingen</key>
     <key alias="contentPublishedFailedByMissingName"><![CDATA[%0% kan ikke udgives, fordi det mangler et navn.]]></key>
     <key alias="includeUnpublished">Medtag ikke-udgivede undersider</key>
@@ -1004,8 +1066,10 @@ Mange hilsner fra Umbraco robotten
     <key alias="pickedTrashedItems">Du har valgt dokumenter som er slettede eller lagt i papirkurven</key>
   </area>
   <area alias="mediaPicker">
+    <key alias="deletedItem">Slettet medie</key>
     <key alias="pickedTrashedItem">Du har valgt et medie som er slettet eller lagt i papirkurven</key>
     <key alias="pickedTrashedItems">Du har valgt medier som er slettede eller lagt i papirkurven</key>
+    <key alias="trashed">Slettet</key>
   </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">indtast eksternt link</key>
@@ -1018,6 +1082,8 @@ Mange hilsner fra Umbraco robotten
   </area>
   <area alias="imagecropper">
     <key alias="reset">Nulstil</key>
+    <key alias="saveCrop">Gem beskæring</key>
+    <key alias="addCrop">Tilføj ny beskæring</key>
     <key alias="updateEditCrop">Acceptér</key>
     <key alias="undoEditCrop">Fortryd</key>
   </area>
@@ -1052,7 +1118,10 @@ Mange hilsner fra Umbraco robotten
     <key alias="forms">Formularer</key>
   </area>
   <area alias="help">
+    <key alias="tours">Tours</key>
     <key alias="theBestUmbracoVideoTutorials">De bedste Umbraco video tutorials</key>
+    <key alias="umbracoForum">Besøg our.umbraco.com</key>
+    <key alias="umbracoTv">Besøg umbraco.tv</key>
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Standardskabelon</key>
@@ -1065,6 +1134,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="tab">Faneblad</key>
     <key alias="tabname">Titel på faneblad</key>
     <key alias="tabs">Faneblade</key>
+    <key alias="createMatchingTemplate">Opret tilsvarende skabelon</key>
+    <key alias="addIcon">Tilføj ikon</key>
   </area>
   <area alias="sort">
     <key alias="sortOrder">Sorteringsrækkefølge</key>
@@ -1081,6 +1152,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="invalidUserPermissionsText">Utilstrækkelige brugerrettigheder, kunne ikke fuldføre handlingen</key>
     <key alias="operationCancelledHeader">Annulleret</key>
     <key alias="operationCancelledText">Handlingen blev annulleret af et 3. part tilføjelsesprogram</key>
+    <key alias="contentPublishedFailedByEvent">Udgivelsen blev annulleret af et 3. part tilføjelsesprogram</key>
     <key alias="contentTypeDublicatePropertyType">Property type eksisterer allerede</key>
     <key alias="contentTypePropertyTypeCreated">Egenskabstype oprettet</key>
     <key alias="contentTypePropertyTypeCreatedText"><![CDATA[Navn: %0% <br /> DataType: %1%]]></key>
@@ -1094,6 +1166,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="cssSavedText">Stylesheet gemt uden fejl</key>
     <key alias="dataTypeSaved">Datatype gemt</key>
     <key alias="dictionaryItemSaved">Ordbogsnøgle gemt</key>
+    <key alias="editContentPublishedFailedByParent">Udgivelse fejlede da overliggende side ikke er udgivet</key>
     <key alias="editContentPublishedHeader">Indhold publiceret</key>
     <key alias="editContentPublishedText">og nu synligt for besøgende</key>
     <key alias="editContentSavedHeader">Indhold gemt</key>
@@ -1111,6 +1184,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="editUserSaved">Bruger gemt</key>
     <key alias="editUserTypeSaved">Brugertype gemt</key>
     <key alias="editUserGroupSaved">Brugergruppe gemt</key>
+    <key alias="editCulturesAndHostnamesSaved">Sprog og domæner gemt</key>
+    <key alias="editCulturesAndHostnamesError">Der opstod en fejl ved at gemme sprog og domæner</key>
     <key alias="fileErrorHeader">Fil ikke gemt</key>
     <key alias="fileErrorText">Filen kunne ikke gemmes. Tjek filrettighederne</key>
     <key alias="fileSavedHeader">Fil gemt</key>
@@ -1138,6 +1213,11 @@ Mange hilsner fra Umbraco robotten
     <key alias="setUserGroupOnUsersSuccess">Brugergrupper er blevet indstillet</key>
     <key alias="unlockUsersSuccess">Låste %0% brugere op</key>
     <key alias="unlockUserSuccess">%0% er nu låst op</key>
+    <key alias="deleteUserSuccess">Brugeren %0% blev slettet</key>
+    <key alias="resendInviteHeader">Invitér bruger</key>
+    <key alias="resendInviteSuccess">Invitationen blev gensendt til %0%</key>
+    <key alias="documentTypeExportedSuccess">Dokumenttypen blev eksporteret til en fil</key>
+    <key alias="documentTypeExportedError">Der skete en fejl under eksport af en dokumenttype</key>
   </area>
   <area alias="stylesheet">
     <key alias="addRule">Tilføj style</key>
@@ -1287,22 +1367,25 @@ Mange hilsner fra Umbraco robotten
     <key alias="enableListViewHeading">Aktivér listevisning</key>
     <key alias="enableListViewDescription">Konfigurér indholdet til at blive vist i en sortérbar og søgbar liste; undersider vil ikke blive vist i træet</key>
     <key alias="allowedTemplatesHeading">Tilladte skabeloner</key>
-    <key alias="allowedTemplatesDescription">Vælg hvilke skabeloner der er tilladt at bruge på dette indhold</key>
+    <key alias="allowedTemplatesDescription">Vælg hvilke skabeloner, der er tilladt at bruge på dette indhold.</key>
     <key alias="allowAsRootHeading">Tillad på rodniveau</key>
-    <key alias="allowAsRootDescription">Kun dokumenttyper med denne indstilling aktiveret kan oprettes i rodniveau under indhold og mediearkiv</key>
+    <key alias="allowAsRootDescription">Kun dokumenttyper med denne indstilling aktiveret kan oprettes i rodniveau under indhold og mediearkiv.</key>
     <key alias="childNodesHeading">Tilladte typer</key>
-    <key alias="childNodesDescription">Tillad at oprette indhold af en specifik type under denne</key>
+    <key alias="childNodesDescription">Tillad at oprette indhold af en specifik type under denne.</key>
     <key alias="chooseChildNode">Vælg child node</key>
     <key alias="compositionsDescription">Nedarv faner og egenskaber fra en anden dokumenttype. Nye faner vil blive tilføjet den nuværende dokumenttype eller sammenflettet hvis fanenavnene er ens.</key>
     <key alias="compositionInUse">Indholdstypen bliver brugt i en komposition og kan derfor ikke blive anvendt som komposition</key>
     <key alias="noAvailableCompositions">Der er ingen indholdstyper tilgængelige at bruge som komposition</key>
+    <key alias="compositionRemoveWarning">Når du fjerner en komposition vil alle associerede indholdsdata blive slettet. Når først dokumenttypen er gemt, er der ingen vej tilbage.</key>
     <key alias="availableEditors">Tilgængelige editors</key>
     <key alias="reuse">Genbrug</key>
     <key alias="editorSettings">Editor indstillinger</key>
     <key alias="configuration">Konfiguration</key>
     <key alias="yesDelete">Ja, slet</key>
     <key alias="movedUnderneath">blev flyttet til</key>
+    <key alias="copiedUnderneath">blev kopieret til</key>
     <key alias="folderToMove">Vælg hvor</key>
+    <key alias="folderToCopy">Vælg hvor</key>
     <key alias="structureBelow">skal flyttes til</key>
     <key alias="allDocumentTypes">Alle dokumenttyper</key>
     <key alias="allDocuments">Alle dokumenter</key>
@@ -1314,11 +1397,20 @@ Mange hilsner fra Umbraco robotten
     <key alias="andAllMediaItems">og alle medier, som benytter denne type</key>
     <key alias="andAllMembers">og alle medlemmer, som benytter denne type</key>
     <key alias="memberCanEdit">Medlem kan redigere</key>
+    <key alias="memberCanEditDescription">Tillad at denne egenskab kan redigeres af medlemmet på dets profil.</key>
+    <key alias="isSensitiveData">Er følsom data</key>
+    <key alias="isSensitiveDataDescription">Skjul værdien af denne egenskab for indholdsredaktører der ikke har adgang til at se følsomme data</key>
     <key alias="showOnMemberProfile">Vis på medlemsprofil</key>
+    <key alias="showOnMemberProfileDescription">Tillad at denne egenskab kan vises på medlemmets profil.</key>
     <key alias="tabHasNoSortOrder">fane har ingen sorteringsrækkefølge</key>
+    <key alias="compositionUsageHeading">Hvor er denne komposition brugt?</key>
+    <key alias="compositionUsageSpecification">Denne komposition brugt i kompositionen af de følgende indholdstyper:</key>
+    <key alias="variantsHeading">Tillad sprogvariation</key>
+    <key alias="variantsDescription">Tillad at redaktører kan oprette indhold af denne type på flere sprog.</key>
+    <key alias="allowVaryByCulture">Tillad sprogvariation</key>
     <key alias="elementType">Element-type</key>
     <key alias="elementHeading">Er en Element-type</key>
-    <key alias="elementDescription">En Element-type er tiltænkt brug i f.eks. Nested Content, ikke i indholdstræet</key>
+    <key alias="elementDescription">En Element-type er tiltænkt brug i f.eks. Nested Content, ikke i indholdstræet.</key>
     <key alias="elementDoesNotSupport">Dette benyttes ikke for en Element-type</key>
     <key alias="propertyHasChanges">Du har lavet ændringer til denne egenskab. Er du sikker på at du vil kassere dem?</key>
   </area>
@@ -1333,6 +1425,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="noFallbackLanguageOption">Intet fallback-sprog</key>
     <key alias="fallbackLanguageDescription">For at tillade flersproget indhold, som ikke er tilgængeligt i det anmodede sprog, skal du her vælge et sprog at falde tilbage på.</key>
     <key alias="fallbackLanguage">Fallback-sprog</key>
+    <key alias="none">ingen</key>
   </area>
   <area alias="macro">
     <key alias="addParameter">Tilføj parameter</key>
@@ -1342,14 +1435,28 @@ Mange hilsner fra Umbraco robotten
     <key alias="parametersDescription">Definér de parametre der skal være tilgængelige, når du bruger denne makro.</key>
     <key alias="selectViewFile">Vælg partial view makrofil</key>
   </area>
+  <area alias="modelsBuilder">
+    <key alias="buildingModels">Bygger modeller</key>
+    <key alias="waitingMessage">dette kan tage lidt tid</key>
+    <key alias="modelsGenerated">Modeller genereret</key>
+    <key alias="modelsGeneratedError">Modeller kunne ikke genereres</key>
+    <key alias="modelsExceptionInUlog">Modelgeneration fejlet, se fejlmeddelelse i log</key>
+  </area>
   <area alias="templateEditor">
+    <key alias="addFallbackField">Tilføj fallback felt</key>
+    <key alias="fallbackField">Fallback felt</key>
+    <key alias="addDefaultValue">Tilføj standard værdi</key>
+    <key alias="defaultValue">Standard værdi</key>
     <key alias="alternativeField">Alternativt felt</key>
     <key alias="alternativeText">Alternativ tekst</key>
     <key alias="casing">Casing</key>
+    <key alias="encoding">Kodning</key>
     <key alias="chooseField">Felt som skal indsættes</key>
     <key alias="convertLineBreaks">Konvertér linieskift</key>
     <key alias="convertLineBreaksHelp">Erstatter et linieskift med html-tag'et &amp;lt;br&amp;gt;</key>
+    <key alias="customFields">Custom felter</key>
     <key alias="dateOnly">Ja, kun dato</key>
+    <key alias="formatAndEncoding">Format og kodning</key>
     <key alias="formatAsDate">Formatér som dato</key>
     <key alias="htmlEncode">HTML indkod</key>
     <key alias="htmlEncodeHelp">Vil erstatte specielle karakterer med deres HTML jævnbyrdige.</key>
@@ -1421,6 +1528,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="scripts">Scripts</key>
     <key alias="stylesheets">Stylesheets</key>
     <key alias="templates">Skabeloner</key>
+    <key alias="logViewer">Logfremviser</key>
     <key alias="userPermissions">Brugertilladelser</key>
     <key alias="userTypes">Brugertyper</key>
     <key alias="users">Brugere</key>
@@ -1449,6 +1557,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="confirmNewPassword">Gentag dit nye kodeord</key>
     <key alias="changePasswordDescription">Du kan ændre dit kodeord, som giver dig adgang til Umbraco Back Office ved at udfylde formularen og klikke på knappen 'Skift dit kodeord'</key>
     <key alias="contentChannel">Indholdskanal</key>
+    <key alias="createAnotherUser">Opret endnu en bruger</key>
     <key alias="createUserHelp">Opret nye brugere for at give dem adgang til Umbraco. Når en ny bruger oprettes, genereres der en adgangskode, som du kan dele med brugeren.</key>
     <key alias="descriptionField">Beskrivelsesfelt</key>
     <key alias="disabled">Deaktivér bruger</key>
@@ -1462,7 +1571,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="inviteUserHelp">Invitér nye brugere til at give dem adgang til Umbraco. En invitation vil blive sendt via e-mail til brugeren med oplysninger om, hvordan man logger ind i Umbraco.</key>
     <key alias="language">Sprog</key>
     <key alias="languageHelp">Indstil det sprog, du vil se i menuer og dialoger</key>
-    <key alias="lastLockoutDate">Seneste låst ude dato</key>
+    <key alias="lastLockoutDate">Senest låst ude</key>
     <key alias="lastLogin">Seneste login</key>
     <key alias="lastPasswordChangeDate">Kodeord sidst ændret</key>
     <key alias="loginname">Brugernavn</key>
@@ -1488,7 +1597,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="permissionSelectedPages">Du ændrer i øjeblikket rettigheder for siderne:</key>
     <key alias="permissionSelectPages">Vælg sider for at ændre deres rettigheder</key>
     <key alias="removePhoto">Fjern billede</key>
-    <key alias="permissionsDefault">Standard rettigheder</key>
+    <key alias="permissionsDefault">Standardrettigheder</key>
     <key alias="permissionsGranular">Granulære rettigheder</key>
     <key alias="permissionsGranularHelp">Sæt rettigheder for specifikke noder</key>
     <key alias="profile">Profil</key>
@@ -1511,6 +1620,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="userInvited">er blevet inviteret</key>
     <key alias="userInvitedSuccessHelp">En invitation er blevet sendt til den nye bruger med oplysninger om, hvordan man logger ind i Umbraco.</key>
     <key alias="userinviteWelcomeMessage">Hej og velkommen til Umbraco! På bare 1 minut vil du være klar til at komme i gang, vi skal bare have dig til at oprette en adgangskode og tilføje et billede til din avatar.</key>
+      <key alias="userinviteExpiredMessage">Velkommen til Umbraco! Desværre er din invitation udløbet. Kontakt din administrator og bed om at gensende invitationen.</key>
     <key alias="userinviteAvatarMessage">Hvis du uploader et billede af dig selv, gør du det nemt for andre brugere at genkende dig. Klik på cirklen ovenfor for at uploade et billede.</key>
     <key alias="writer">Forfatter</key>
     <key alias="change">Skift</key>
@@ -1550,6 +1660,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="invalidDate">Ugyldig dato</key>
     <key alias="invalidNumber">Ikke et tal</key>
     <key alias="invalidEmail">Ugyldig e-mail</key>
+    <key alias="entriesShort"><![CDATA[Minimum %0% entries, needs <strong>%1%</strong> more.]]></key>
+    <key alias="entriesExceed"><![CDATA[Maximum %0% entries, <strong>%1%</strong> too many.]]></key>
   </area>
   <area alias="redirectUrls">
     <key alias="disableUrlTracker">Slå URL tracker fra</key>
@@ -1609,5 +1721,73 @@ Mange hilsner fra Umbraco robotten
     <key alias="settingsProfiler">Profiling</key>
     <key alias="memberIntro">Kom godt i gang</key>
     <key alias="formsInstall">Installer Umbraco Forms</key>
+  </area>
+  <area alias="visuallyHiddenTexts">
+    <key alias="goBack">Gå tilbage</key>
+    <key alias="activeListLayout">Aktivt layout:</key>
+    <key alias="jumpTo">Gå til</key>
+    <key alias="group">gruppe</key>
+    <key alias="passed">bestået</key>
+    <key alias="warning">advarsel</key>
+    <key alias="failed">fejlet</key>
+    <key alias="suggestion">forslag</key>
+    <key alias="checkPassed">Test bestået</key>
+    <key alias="checkFailed">Test fejlet</key>
+    <key alias="openBackofficeSearch">Åben backoffice søgning</key>
+    <key alias="openCloseBackofficeHelp">Åben/Luk backoffice hjælp</key>
+    <key alias="openCloseBackofficeProfileOptions">Åben/Luk dine profil indstillinger</key>
+    <key alias="currentLanguage">Aktivt sprog</key>
+    <key alias="switchLanguage">Skift sprog til</key>
+    <key alias="createNewFolder">Opret ny mappe</key>
+    <key alias="createItem">Opret element</key>
+    <key alias="edit">Rediger</key>
+    <key alias="name">Navn</key>
+  </area>
+  <area alias="references">
+    <key alias="tabName">Referencer</key>
+    <key alias="DataTypeNoReferences">Denne Data Type har ingen referencer.</key>
+    <key alias="labelsedByDocumentTypes">Brugt i Dokument Typer</key>
+    <key alias="noDocumentTypes">Ingen referencer til Dokument Typer.</key>
+    <key alias="labelUsedByMediaTypes">Brugt i Medie Typer</key>
+    <key alias="noMediaTypes">Ingen referencer til Medie Typer.</key>
+    <key alias="labelUsedByMemberTypes">Brugt i Medlems Typer</key>
+    <key alias="noMemberTypes">Ingen referencer til Medlems Typer.</key>
+    <key alias="usedByProperties">Brugt af</key>
+  </area>
+  <area alias="logViewer">
+    <key alias="logLevels">Log type</key>
+    <key alias="savedSearches">Gemte søgninger</key>
+    <key alias="totalItems">Samlet resultat</key>
+    <key alias="timestamp">Dato</key>
+    <key alias="level">Type</key>
+    <key alias="machine">Maskine</key>
+    <key alias="message">Besked</key>
+    <key alias="exception">Exception</key>
+    <key alias="properties">Egenskaber</key>
+    <key alias="searchWithGoogle">Søg med Google</key>
+    <key alias="searchThisMessageWithGoogle">Søg efter denne besked på Google</key>
+    <key alias="searchWithBing">Søg med Bing</key>
+    <key alias="searchThisMessageWithBing">Søg efter denne besked på Bing</key>
+    <key alias="searchOurUmbraco">Søg på Our Umbraco</key>
+    <key alias="searchThisMessageOnOurUmbracoForumsAndDocs">Søg efter denne besked på Our Umbraco forum og dokumentation</key>
+    <key alias="searchOurUmbracoWithGoogle">Søg på Our Umbraco med Google</key>
+    <key alias="searchOurUmbracoForumsUsingGoogle">Søg på Our Umbraco forum med Google</key>
+    <key alias="searchUmbracoSource">Søg i Umbraco kildekoden</key>
+    <key alias="searchWithinUmbracoSourceCodeOnGithub">Søg i Umbraco kildekoden på Github</key>
+    <key alias="searchUmbracoIssues">Søg i Umbraco issues</key>
+    <key alias="searchUmbracoIssuesOnGithub">Søg i Umbraco issues på Github</key>
+    <key alias="deleteThisSearch">Slet denne søgning</key>
+    <key alias="findLogsWithRequestId">Find logs med request Id</key>
+    <key alias="findLogsWithNamespace">Find logs med Namespace</key>
+    <key alias="findLogsWithMachineName">Find logs med maskin navn</key>
+    <key alias="open">Åben</key>
+  </area>
+  <area alias="clipboard">
+    <key alias="labelForCopyAllEntries">Kopier %0%</key>
+    <key alias="labelForArrayOfItemsFrom">%0% fra %1%</key>
+    <key alias="labelForRemoveAllEntries">Fjern alle elementer</key>
+  </area>
+  <area alias="propertyActions">
+    <key alias="tooltipForPropertyActionsMenu">Åben egenskabshandlinger</key>
   </area>
 </language>

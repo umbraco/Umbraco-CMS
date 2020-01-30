@@ -47,7 +47,7 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.RootString)
             {
                 //get all blueprint content types
-                var contentTypeAliases = entities.Select(x => ((ContentEntitySlim) x).ContentTypeAlias).Distinct();
+                var contentTypeAliases = entities.Select(x => ((IContentEntitySlim) x).ContentTypeAlias).Distinct();
                 //get the ids
                 var contentTypeIds = Services.ContentTypeService.GetAllContentTypeIds(contentTypeAliases.ToArray()).ToArray();
 
@@ -75,7 +75,7 @@ namespace Umbraco.Web.Trees
             var ct = Services.ContentTypeService.Get(intId.Result);
             if (ct == null) return nodes;
 
-            var blueprintsForDocType = entities.Where(x => ct.Alias == ((ContentEntitySlim) x).ContentTypeAlias);
+            var blueprintsForDocType = entities.Where(x => ct.Alias == ((IContentEntitySlim) x).ContentTypeAlias);
             nodes.AddRange(blueprintsForDocType
                 .Select(entity =>
                 {

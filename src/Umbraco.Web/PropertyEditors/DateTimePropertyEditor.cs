@@ -7,7 +7,12 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Represents a date and time property editor.
     /// </summary>
-    [DataEditor(Constants.PropertyEditors.Aliases.DateTime, "Date/Time", "datepicker", ValueType = ValueTypes.DateTime, Icon="icon-time")]
+    [DataEditor(
+        Constants.PropertyEditors.Aliases.DateTime,
+        "Date/Time",
+        "datepicker",
+        ValueType = ValueTypes.DateTime,
+        Icon = "icon-time")]
     public class DateTimePropertyEditor : DataEditor
     {
         /// <summary>

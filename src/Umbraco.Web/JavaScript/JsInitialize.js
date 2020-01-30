@@ -13,6 +13,7 @@
 
     'lib/angular-route/angular-route.js',
     'lib/angular-cookies/angular-cookies.js',
+    'lib/angular-aria/angular-aria.min.js',
     'lib/angular-touch/angular-touch.js',
     'lib/angular-sanitize/angular-sanitize.js',
     'lib/angular-animate/angular-animate.js',

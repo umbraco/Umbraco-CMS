@@ -54,7 +54,7 @@ namespace Umbraco.Examine
                     {"updateDate", new object[] {c.UpdateDate}},    //Always add invariant updateDate
                     {"nodeName", (PublishedValuesOnly               //Always add invariant nodeName
                         ? c.PublishName?.Yield()
-                        : c?.Name.Yield()) ?? Enumerable.Empty<string>()},
+                        : c.Name?.Yield()) ?? Enumerable.Empty<string>()},
                     {"urlName", urlValue?.Yield() ?? Enumerable.Empty<string>()},                  //Always add invariant urlName
                     {"path", c.Path?.Yield() ?? Enumerable.Empty<string>()},
                     {"nodeType", c.ContentType.Id.ToString().Yield() ?? Enumerable.Empty<string>()},

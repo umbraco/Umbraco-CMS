@@ -19,6 +19,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
+using System.Web.Http.Controllers;
 
 namespace Umbraco.Web.Editors
 {
@@ -28,6 +29,7 @@ namespace Umbraco.Web.Editors
     /// </summary>
     [PluginController("UmbracoApi")]
     [UmbracoTreeAuthorize(Constants.Trees.Macros)]
+    [MacrosControllerConfiguration]
     public class MacrosController : BackOfficeNotificationsController
     {
         private readonly IMacroService _macroService;
@@ -36,6 +38,19 @@ namespace Umbraco.Web.Editors
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _macroService = Services.MacroService;
+        }
+
+        /// <summary>
+        /// Configures this controller with a custom action selector
+        /// </summary>
+        private class MacrosControllerConfigurationAttribute : Attribute, IControllerConfiguration
+        {
+            public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
+            {
+                controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi))
+                ));
+            }
         }
 
         /// <summary>
@@ -60,6 +75,11 @@ namespace Umbraco.Web.Editors
             if (_macroService.GetByAlias(alias) != null)
             {
                 return this.ReturnErrorResponse("Macro with this alias already exists");
+            }
+
+            if (name == null || name.Length > 255)
+            {
+                return this.ReturnErrorResponse("Name cannnot be more than 255 characters in length.");
             }
 
             try
@@ -92,39 +112,43 @@ namespace Umbraco.Web.Editors
                 return this.ReturnErrorResponse($"Macro with id {id} does not exist");
             }
 
-            var macroDisplay = new MacroDisplay
-            {
-                Alias = macro.Alias,
-                Id = macro.Id,
-                Key = macro.Key,
-                Name = macro.Name,
-                CacheByPage = macro.CacheByPage,
-                CacheByUser = macro.CacheByMember,
-                CachePeriod = macro.CacheDuration,
-                View = macro.MacroSource,
-                RenderInEditor = !macro.DontRender,
-                UseInEditor = macro.UseInEditor,
-                Path = $"-1,{macro.Id}"
-            };
-
-            var parameters = new List<MacroParameterDisplay>();
-
-            foreach (var param in macro.Properties.Values.OrderBy(x => x.SortOrder))
-            {
-                parameters.Add(new MacroParameterDisplay
-                {
-                    Editor = param.EditorAlias,
-                    Key = param.Alias,
-                    Label = param.Name,
-                    Id = param.Id
-                });
-            }
-
-            macroDisplay.Parameters = parameters;
+            var macroDisplay = MapToDisplay(macro);
 
             return this.Request.CreateResponse(HttpStatusCode.OK, macroDisplay);
         }
 
+        [HttpGet]
+        public HttpResponseMessage GetById(Guid id)
+        {
+            var macro = _macroService.GetById(id);
+
+            if (macro == null)
+            {
+                return this.ReturnErrorResponse($"Macro with id {id} does not exist");
+            }
+
+            var macroDisplay = MapToDisplay(macro);
+
+            return this.Request.CreateResponse(HttpStatusCode.OK, macroDisplay);
+        }
+
+        [HttpGet]
+        public HttpResponseMessage GetById(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi == null)
+                this.ReturnErrorResponse($"Macro with id {id} does not exist");
+
+            var macro = _macroService.GetById(guidUdi.Guid);
+            if (macro == null)
+            {
+                return this.ReturnErrorResponse($"Macro with id {id} does not exist");
+            }
+
+            var macroDisplay = MapToDisplay(macro);
+
+            return this.Request.CreateResponse(HttpStatusCode.OK, macroDisplay);
+        }
 
         [HttpPost]
         public HttpResponseMessage DeleteById(int id)
@@ -147,6 +171,11 @@ namespace Umbraco.Web.Editors
             if (macroDisplay == null)
             {
                 return this.ReturnErrorResponse($"No macro data found in request");
+            }
+
+            if (macroDisplay.Name == null || macroDisplay.Name.Length > 255)
+            {
+                return this.ReturnErrorResponse("Name cannnot be more than 255 characters in length.");
             }
 
             var macro = _macroService.GetById(int.Parse(macroDisplay.Id.ToString()));
@@ -220,6 +249,39 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Gets the available parameter editors grouped by their group.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="HttpResponseMessage"/>.
+        /// </returns>
+        public HttpResponseMessage GetGroupedParameterEditors()
+        {
+            var parameterEditors = Current.ParameterEditors.ToArray();
+
+            var grouped = parameterEditors
+                .GroupBy(x => x.Group.IsNullOrWhiteSpace() ? "" : x.Group.ToLower())
+                .OrderBy(x => x.Key)
+                .ToDictionary(group => group.Key, group => group.OrderBy(d => d.Name).AsEnumerable());
+
+            return this.Request.CreateResponse(HttpStatusCode.OK, grouped);
+        }
+
+        /// <summary>
+        /// Get parameter editor by alias.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="HttpResponseMessage"/>.
+        /// </returns>
+        public HttpResponseMessage GetParameterEditorByAlias(string alias)
+        {
+            var parameterEditors = Current.ParameterEditors.ToArray();
+
+            var parameterEditor = parameterEditors.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
+
+            return this.Request.CreateResponse(HttpStatusCode.OK, parameterEditor);
+        }
+
+        /// <summary>
         /// Returns a error response and optionally logs it
         /// </summary>
         /// <param name="message">
@@ -280,7 +342,6 @@ namespace Umbraco.Web.Editors
         /// Finds partial view files in app plugin folders.
         /// </summary>
         /// <returns>
-        /// The <see cref="IEnumerable"/>.
         /// </returns>
         private IEnumerable<string> FindPartialViewFilesInPluginFolders()
         {
@@ -341,6 +402,30 @@ namespace Umbraco.Web.Editors
                     prefixVirtualPath.TrimEnd('/') + "/" + (path.Replace(orgPath, string.Empty).Trim('/') + "/" + file.Name).Trim('/')));
 
             return files;
+        }
+
+        /// <summary>
+        /// Used to map an <see cref="IMacro"/> instance to a <see cref="MacroDisplay"/>
+        /// </summary>
+        /// <param name="macro"></param>
+        /// <returns></returns>
+        private MacroDisplay MapToDisplay(IMacro macro)
+        {
+            var display = Mapper.Map<MacroDisplay>(macro);
+
+            var parameters = macro.Properties.Values
+                                .OrderBy(x => x.SortOrder)
+                                .Select(x => new MacroParameterDisplay()
+                                {
+                                    Editor = x.EditorAlias,
+                                    Key = x.Alias,
+                                    Label = x.Name,
+                                    Id = x.Id
+                                });
+
+            display.Parameters = parameters;
+
+            return display;
         }
     }
 }

@@ -180,7 +180,6 @@
     <key alias="linkinternal"><![CDATA[Link interno:]]></key>
     <key alias="linklocaltip"><![CDATA[Quando usi il link locale, inserisci # prima del link]]></key>
     <key alias="linknewwindow"><![CDATA[Apri in nuova finestra?]]></key>
-    <key alias="macroContainerSettings">Impostazioni Macro</key>
     <key alias="macroDoesNotHaveProperties"><![CDATA[Questa macro non contiene proprietà editabili]]></key>
     <key alias="paste">Incolla</key>
     <key alias="permissionsEdit">Modifica il Permesso per</key>
@@ -324,8 +323,7 @@
     <key alias="showPageOnSend">Mostra la pagina inviata</key>
     <key alias="size">Dimensione</key>
     <key alias="sort">Ordina</key>
-    <key alias="submit">Submit</key>
-    <!-- TODO: Translate this -->
+    <key alias="submit">Invia</key>
     <key alias="type">Tipo</key>
     <key alias="typeToSearch"><![CDATA[Parola da cercare...]]></key>
     <key alias="up">Su</key>
@@ -340,8 +338,8 @@
     <key alias="welcome">Benvenuto...</key>
     <key alias="width">Larghezza</key>
     <key alias="yes">Si</key>
-    <key alias="reorder">Reorder</key>
-    <key alias="reorderDone">I am done reordering</key>
+    <key alias="reorder">Riordina</key>
+    <key alias="reorderDone">Ho finito di ordinare</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Colore di sfondo</key>
@@ -619,8 +617,8 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="tabs">Tabs</key>
   </area>
   <area alias="sort">
-    <key alias="sortOrder">Sort order</key>
-    <key alias="sortCreationDate">Creation date</key>
+    <key alias="sortOrder">Ordinamento</key>
+    <key alias="sortCreationDate">Data creazione</key>
     <key alias="sortDone"><![CDATA[Ordinamento completato.]]></key>
     <key alias="sortHelp"><![CDATA[Sposta su o giù le pagine trascinandole per determinarne l'ordinamento. Oppure clicca la testata della colonna per ordinare l'intero gruppo di pagine]]></key>
     <key alias="sortPleaseWait"><![CDATA[Si prega di attendere. Gli elementi sono in fase di ordinamento, questo può richiedere del tempo.]]></key>
@@ -854,6 +852,6 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="userPermissions"><![CDATA[Permessi Utente]]></key>
     <key alias="usertype"><![CDATA[Tipo di utente]]></key>
     <key alias="userTypes"><![CDATA[Tipi Utente]]></key>
-    <key alias="writer">Writer</key>
+    <key alias="writer">Autore</key>
   </area>
 </language>

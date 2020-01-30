@@ -1,0 +1,106 @@
+<div ng-controller="Umbraco.Editors.MacroParameterPickerController as vm">
+
+    <umb-editor-view data-element="editor-macro-parameter">
+
+        <form novalidate name="MacroParameterForm" val-form-manager>
+
+        <umb-editor-header
+            name="model.title"
+            name-locked="true"
+            hide-alias="true"
+            hide-icon="true"
+            hide-description="true">
+        </umb-editor-header>
+
+        <umb-editor-container>
+            <umb-box>
+                <umb-box-content>
+
+                    <!-- FILTER -->
+                    <div class="umb-control-group -no-border">
+                        <div class="form-search">
+                            <i class="icon-search"></i>
+                            <input type="text"
+                                   style="width: 100%"
+                                   ng-change="vm.filterItems()"
+                                   ng-model="vm.searchTerm"
+                                   class="umb-search-field search-query search-input input-block-level"
+                                   localize="placeholder"
+                                   placeholder="@placeholders_filter"
+                                   umb-auto-focus
+                                   no-dirty-check />
+                        </div>
+                    </div>
+
+                    <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+                    <div ng-if="!vm.filterResult">
+                        <div ng-repeat="(key,value) in vm.parameterEditors">
+                            <h5>{{key}}</h5>
+                            <ul class="umb-card-grid -four-in-row" ng-mouseleave="vm.hideDetailsOverlay()">
+                                <li ng-repeat="parameterEditor in value | orderBy:'name'"
+                                    data-element="editor-{{parameterEditor.name}}"
+                                    ng-mouseover="vm.showDetailsOverlay(parameterEditor)"
+                                    ng-click="vm.pickParameterEditor(parameterEditor)">
+                                    <a class="umb-card-grid-item" href="" title="{{parameterEditor.name}}">
+                                        <span>
+                                            <i class="{{parameterEditor.icon}}" ng-class="{'icon-autofill': parameterEditor.icon == null}"></i>
+                                            {{parameterEditor.name}}
+                                        </span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- FILTER RESULTS -->
+                    <div ng-if="vm.filterResult">
+                        <div ng-if="vm.filterResult.totalResults > 0">
+                            <div ng-repeat="result in vm.filterResult.parameterEditors">
+                                <div ng-if="result.parameterEditors.length > 0">
+                                    <h5>{{result.group}}</h5>
+                                    <ul class="umb-card-grid -four-in-row" ng-mouseleave="vm.hideDetailsOverlay()">
+                                        <li ng-repeat="parameterEditor in result.parameterEditors | orderBy:'name'"
+                                            ng-mouseover="vm.showDetailsOverlay(parameterEditor)"
+                                            ng-click="vm.pickParameterEditor(parameterEditor)">
+                                            <div ng-if="parameterEditor.loading" class="umb-card-grid-item__loading">
+                                                <div class="umb-button__progress"></div>
+                                            </div>
+                                            <a class="umb-card-grid-item" href="" title="{{parameterEditor.name}}">
+                                                <span>
+                                                    <i class="{{parameterEditor.icon}}" ng-class="{'icon-autofill': parameterEditor.icon == null}"></i>
+                                                    {{parameterEditor.name}}
+                                                </span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <umb-empty-state position="center" ng-if="vm.filterResult.totalResults === 0">
+                            <localize key="general_searchNoResult"></localize>
+                        </umb-empty-state>
+                    </div>
+
+                </umb-box-content>
+            </umb-box>
+        </umb-editor-container>
+
+        <umb-editor-footer>
+            <umb-editor-footer-content-right>
+                <umb-button
+                    type="button"
+                    button-style="link"
+                    label-key="general_close"
+                    shortcut="esc"
+                    action="vm.close()">
+                </umb-button>
+            </umb-editor-footer-content-right>
+        </umb-editor-footer>
+
+        </form>
+
+    </umb-editor-view>
+
+</div>

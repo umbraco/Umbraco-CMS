@@ -43,6 +43,12 @@ namespace Umbraco.Core.Logging.Viewer
         bool CheckCanOpenLogs(LogTimePeriod logTimePeriod);
 
         /// <summary>
+        /// Gets the current Serilog minimum log level
+        /// </summary>
+        /// <returns></returns>
+        string GetLogLevel();
+
+        /// <summary>
         /// Returns the collection of logs
         /// </summary>
         PagedResult<LogMessage> GetLogs(LogTimePeriod logTimePeriod,

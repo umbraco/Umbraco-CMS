@@ -11,7 +11,7 @@ namespace Umbraco.Web.PropertyEditors
         [ConfigurationField("startNode", "Node type", "treesource")]
         public MultiNodePickerConfigurationTreeSource TreeSource { get; set; }
 
-        [ConfigurationField("filter", "Allow items of type", "contenttypepicker", Description = "Select the applicable content types")]
+        [ConfigurationField("filter", "Allow items of type", "treesourcetypepicker", Description = "Select the applicable types")]
         public string Filter { get; set; }
 
         [ConfigurationField("minNumber", "Minimum number of items", "number")]
@@ -20,7 +20,7 @@ namespace Umbraco.Web.PropertyEditors
         [ConfigurationField("maxNumber", "Maximum number of items", "number")]
         public int MaxNumber { get; set; }
 
-        [ConfigurationField("showOpenButton", "Show open button (this feature is in preview!)", "boolean", Description = "Opens the node in a dialog")]
+        [ConfigurationField("showOpenButton", "Show open button", "boolean", Description = "Opens the node in a dialog")]
         public bool ShowOpen { get; set; }
 
         [ConfigurationField(Core.Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes,

@@ -65,6 +65,8 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                     if (source is decimal sourceDecimal) return sourceDecimal;
                     if (source is string sourceDecimalString)
                         return decimal.TryParse(sourceDecimalString, NumberStyles.Any, CultureInfo.InvariantCulture, out var d) ? d : 0;
+					if (source is double sourceDouble)
+						return Convert.ToDecimal(sourceDouble);
                     return (decimal) 0;
                 case ValueTypes.Integer:
                     if (source is int sourceInt) return sourceInt;

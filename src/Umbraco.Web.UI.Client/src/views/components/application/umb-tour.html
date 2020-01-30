@@ -1,25 +1,26 @@
 <div class="umb-tour">
 
-    <div class="umb-loader umb-tour__loader" ng-if="loadingStep"></div>
+    <umb-loader class="umb-tour__loader" ng-if="loadingStep"></umb-loader>
+
     <div class="umb-tour__pulse"></div>
 
-    <div class="umb-tour__popover shadow-depth-2" ng-class="{'umb-tour__popover--l': model.currentStep.type === 'intro' || model.currentStepIndex === model.steps.length}">
-        
+    <div class="umb-tour__popover shadow-depth-2" ng-class="{'umb-tour__popover--l': model.currentStep.type === 'intro' || model.currentStepIndex === model.steps.length, 'umb-tour__popover--promotion': model.currentStep.type === 'promotion'}">
+
         <div ng-if="!configuredView && !elementNotFound">
 
             <!-- Regular steps -->
             <umb-tour-step ng-if="model.currentStepIndex < model.steps.length" on-close="model.endTour()">
-                    
+
                 <umb-tour-step-header
                     title="model.currentStep.title">
                 </umb-tour-step-header>
-    
+
                 <umb-tour-step-content
                     content="model.currentStep.content">
                 </umb-tour-step-content>
-    
+
                 <umb-tour-step-footer>
-                    
+
                     <div class="flex justify-between items-center">
 
                         <div>
@@ -27,9 +28,11 @@
                                 current-step="model.currentStepIndex + 1"
                                 total-steps="model.steps.length">
                             </umb-tour-step-counter>
-                            <div ng-if="model.allowDisable && model.currentStep.type === 'intro'" style="font-size: 13px;"><a href="" class="underline" ng-click="model.disableTour()">Don't show this tour again</a></div>
+                            <div ng-if="model.allowDisable && model.currentStep.type === 'intro'">
+                                <button type="button" class="underline" ng-click="model.disableTour()" prevent-default>Don't show this tour again</button>
+                            </div>
                         </div>
-                        
+
                         <div ng-if="model.currentStep.type !== 'intro'">
                             <umb-button size="xs" ng-if="!model.currentStep.event" button-style="action" type="button" action="model.nextStep()" label="Next"></umb-button>
                         </div>
@@ -40,7 +43,7 @@
                     </div>
 
                 </umb-tour-step-footer>
-        
+
             </umb-tour-step>
 
             <!-- Outro step -->
@@ -64,7 +67,7 @@
 
         <!-- Custom step view -->
         <div ng-if="configuredView && !loadingStep && !elementNotFound" ng-include="configuredView"></div>
-        
+
         <!-- Dom element not found error -->
         <div ng-if="elementNotFound && !loadingStep">
             <umb-tour-step class="tc">

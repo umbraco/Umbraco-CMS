@@ -1,10 +1,8 @@
 <div class="umb-notifications" id="umb-notifications-wrapper" ng-cloak>
-    <ul class="umb-notifications__notifications">
+    <ul class="umb-notifications__notifications" aria-live="assertive" aria-relevant="additions">
         <li ng-repeat="notification in notifications"
             class="alert alert-block alert-{{notification.type}} umb-notifications__notification animated -half-second fadeIn"
             ng-class="{'-no-border -extra-padding': notification.type === 'form'}">
-
-            <a class='close -align-right' ng-click="removeNotification($index)" prevent-default href>&times;</a>
 
             <div ng-if="notification.view">
                 <div ng-include="notification.view"></div>
@@ -19,6 +17,10 @@
                     <span ng-bind-html="notification.message"></span>
                 </div>
             </div>
+
+            <button type="button" class='close -align-right' ng-click="removeNotification($index)" aria-hidden="true">
+                <span aria-hidden="true">&times;</span>
+            </button>
         </li>
     </ul>
 </div>

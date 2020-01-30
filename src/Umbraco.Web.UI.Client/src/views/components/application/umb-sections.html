@@ -12,7 +12,9 @@
             </li>
 
             <li data-element="section-expand" class="expand" ng-class="{ 'open': showTray === true }" ng-show="needTray">
-                <a href ng-click="trayClick()"><i></i><i></i><i></i></a>
+                <a href="#" ng-click="trayClick()" prevent-default>
+                    <span class="section__name"><i></i><i></i><i></i></span>
+                </a>
 
                 <ul id="applications-tray" class="sections-tray shadow-depth-2" ng-if="showTray" on-outside-click="trayClick()">
                     <li ng-repeat="section in sections | limitTo: overflowingSections" ng-class="{current: section.alias == currentSection}">

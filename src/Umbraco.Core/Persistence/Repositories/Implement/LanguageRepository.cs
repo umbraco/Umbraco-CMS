@@ -102,17 +102,17 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
-
             var list = new List<string>
                            {
                                //NOTE: There is no constraint between the Language and cmsDictionary/cmsLanguageText tables (?)
                                // but we still need to remove them
-                               "DELETE FROM cmsLanguageText WHERE languageId = @id",
-                               "DELETE FROM umbracoPropertyData WHERE languageId = @id",
-                               "DELETE FROM umbracoContentVersionCultureVariation WHERE languageId = @id",
-                               "DELETE FROM umbracoDocumentCultureVariation WHERE languageId = @id",
-                               "DELETE FROM umbracoLanguage WHERE id = @id",
-                               "DELETE FROM " + Constants.DatabaseSchema.Tables.Tag + " WHERE languageId = @id"
+                               "DELETE FROM " + Constants.DatabaseSchema.Tables.DictionaryValue + " WHERE languageId = @id",
+                               "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE languageId = @id",
+                               "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersionCultureVariation + " WHERE languageId = @id",
+                               "DELETE FROM " + Constants.DatabaseSchema.Tables.DocumentCultureVariation + " WHERE languageId = @id",
+                               "DELETE FROM " + Constants.DatabaseSchema.Tables.TagRelationship + " WHERE tagId IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.Tag + " WHERE languageId = @id)",
+                               "DELETE FROM " + Constants.DatabaseSchema.Tables.Tag + " WHERE languageId = @id",
+                               "DELETE FROM " + Constants.DatabaseSchema.Tables.Language + " WHERE id = @id"
                            };
             return list;
         }
@@ -180,6 +180,19 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 var defaultId = Database.ExecuteScalar<int>(selectDefaultId);
                 if (entity.Id == defaultId)
                     throw new InvalidOperationException($"Cannot save the default language ({entity.IsoCode}) as non-default. Make another language the default language instead.");
+            }
+
+            if (entity.IsPropertyDirty(nameof(ILanguage.IsoCode)))
+            {
+                //if the iso code is changing, ensure there's not another lang with the same code already assigned
+                var sameCode = Sql()
+                   .SelectCount()                   
+                   .From<LanguageDto>()
+                   .Where<LanguageDto>(x => x.IsoCode == entity.IsoCode && x.Id != entity.Id);
+
+                var countOfSameCode = Database.ExecuteScalar<int>(sameCode);
+                if (countOfSameCode > 0)
+                    throw new InvalidOperationException($"Cannot update the language to a new culture: {entity.IsoCode} since that culture is already assigned to another language entity.");
             }
 
             // fallback cycles are detected at service level
@@ -250,7 +263,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             lock (_codeIdMap)
             {
                 if (_codeIdMap.TryGetValue(isoCode, out var id)) return id;
-                if (isoCode.Contains('-') && _codeIdMap.TryGetValue(isoCode.Split('-').First(), out var invariantId)) return invariantId;
             }
             if (throwOnNotFound)
                 throw new ArgumentException($"Code {isoCode} does not correspond to an existing language.", nameof(isoCode));

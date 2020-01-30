@@ -7,7 +7,14 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Represents a checkbox property and parameter editor.
     /// </summary>
-    [DataEditor(Constants.PropertyEditors.Aliases.Boolean, EditorType.PropertyValue | EditorType.MacroParameter, "Checkbox", "boolean", ValueType = ValueTypes.Integer, Group = "Common", Icon="icon-checkbox")]
+    [DataEditor(
+        Constants.PropertyEditors.Aliases.Boolean,
+        EditorType.PropertyValue | EditorType.MacroParameter,
+        "Checkbox",
+        "boolean",
+        ValueType = ValueTypes.Integer,
+        Group = Constants.PropertyEditors.Groups.Common,
+        Icon = "icon-checkbox")]
     public class TrueFalsePropertyEditor : DataEditor
     {
         /// <summary>

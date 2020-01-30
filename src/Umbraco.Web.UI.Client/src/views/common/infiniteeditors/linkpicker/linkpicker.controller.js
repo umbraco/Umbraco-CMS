@@ -33,6 +33,7 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
         };
 
         $scope.showTarget = $scope.model.hideTarget !== true;
+        $scope.showAnchor = $scope.model.hideAnchor !== true;
 
         // this ensures that we only sync the tree once and only when it's ready
         var oneTimeTreeSync = {
@@ -93,7 +94,7 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
                     });
 
                 }
-            } else if ($scope.model.target.url.length) {
+            } else if ($scope.model.target.url && $scope.model.target.url.length) {
                 // a url but no id/udi indicates an external link - trim the url to remove the anchor/qs
                 // only do the substring if there's a # or a ?
                 var indexOfAnchor = $scope.model.target.url.search(/(#|\?)/);

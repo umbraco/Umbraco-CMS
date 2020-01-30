@@ -20,6 +20,7 @@ using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using System.Web.Http.Controllers;
 
 namespace Umbraco.Web.Editors
 {
@@ -34,6 +35,7 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     [UmbracoTreeAuthorize(Constants.Trees.DataTypes, Constants.Trees.DocumentTypes, Constants.Trees.MediaTypes, Constants.Trees.MemberTypes)]
     [EnableOverrideAuthorization]
+    [DataTypeControllerConfiguration]
     public class DataTypeController : BackOfficeNotificationsController
     {
         private readonly PropertyEditorCollection _propertyEditors;
@@ -42,6 +44,19 @@ namespace Umbraco.Web.Editors
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _propertyEditors = propertyEditors;
+        }
+
+        /// <summary>
+        /// Configures this controller with a custom action selector
+        /// </summary>
+        private class DataTypeControllerConfigurationAttribute : Attribute, IControllerConfiguration
+        {
+            public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
+            {
+                controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi))
+                ));
+            }
         }
 
         /// <summary>
@@ -63,6 +78,40 @@ namespace Umbraco.Web.Editors
         public DataTypeDisplay GetById(int id)
         {
             var dataType = Services.DataTypeService.GetDataType(id);
+            if (dataType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+            return Mapper.Map<IDataType, DataTypeDisplay>(dataType);
+        }
+
+        /// <summary>
+        /// Gets the datatype json for the datatype guid
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public DataTypeDisplay GetById(Guid id)
+        {
+            var dataType = Services.DataTypeService.GetDataType(id);
+            if (dataType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+            return Mapper.Map<IDataType, DataTypeDisplay>(dataType);
+        }
+
+        /// <summary>
+        /// Gets the datatype json for the datatype udi
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public DataTypeDisplay GetById(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var dataType = Services.DataTypeService.GetDataType(guidUdi.Guid);
             if (dataType == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -281,6 +330,60 @@ namespace Umbraco.Web.Editors
             return result
                 ? Request.CreateResponse(HttpStatusCode.OK, result.Result)
                 : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
+        }
+
+        /// <summary>
+        /// Returns the references (usages) for the data type
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public DataTypeReferences GetReferences(int id)
+        {
+            var result = new DataTypeReferences();
+            var usages = Services.DataTypeService.GetReferences(id);
+
+            foreach(var groupOfEntityType in usages.GroupBy(x => x.Key.EntityType))
+            {
+                //get all the GUIDs for the content types to find
+                var guidsAndPropertyAliases = groupOfEntityType.ToDictionary(i => ((GuidUdi)i.Key).Guid, i => i.Value);
+
+                if (groupOfEntityType.Key == ObjectTypes.GetUdiType(UmbracoObjectTypes.DocumentType))
+                    result.DocumentTypes = GetContentTypeUsages(Services.ContentTypeService.GetAll(guidsAndPropertyAliases.Keys), guidsAndPropertyAliases);
+                else if (groupOfEntityType.Key == ObjectTypes.GetUdiType(UmbracoObjectTypes.MediaType))
+                    result.MediaTypes = GetContentTypeUsages(Services.MediaTypeService.GetAll(guidsAndPropertyAliases.Keys), guidsAndPropertyAliases);
+                else if (groupOfEntityType.Key == ObjectTypes.GetUdiType(UmbracoObjectTypes.MemberType))
+                    result.MemberTypes = GetContentTypeUsages(Services.MemberTypeService.GetAll(guidsAndPropertyAliases.Keys), guidsAndPropertyAliases);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Maps the found content types and usages to the resulting model
+        /// </summary>
+        /// <param name="cts"></param>
+        /// <param name="usages"></param>
+        /// <returns></returns>
+        private IEnumerable<DataTypeReferences.ContentTypeReferences> GetContentTypeUsages(
+            IEnumerable<IContentTypeBase> cts,
+            IReadOnlyDictionary<Guid, IEnumerable<string>> usages)
+        {
+            return cts.Select(x => new DataTypeReferences.ContentTypeReferences
+            {
+                Id = x.Id,
+                Key = x.Key,
+                Alias = x.Alias,
+                Icon = x.Icon,
+                Name = x.Name,
+                Udi = new GuidUdi(ObjectTypes.GetUdiType(UmbracoObjectTypes.DocumentType), x.Key),
+                //only select matching properties
+                Properties = x.PropertyTypes.Where(p => usages[x.Key].InvariantContains(p.Alias))
+                    .Select(p => new DataTypeReferences.ContentTypeReferences.PropertyTypeReferences
+                    {
+                        Alias = p.Alias,
+                        Name = p.Name
+                    })
+            });
         }
 
         #region ReadOnly actions to return basic data - allow access for: content ,media, members, settings, developer

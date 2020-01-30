@@ -15,6 +15,7 @@ module.exports = function (config) {
             'node_modules/angular/angular.js',
             'node_modules/angular-animate/angular-animate.js',
             'node_modules/angular-cookies/angular-cookies.js',
+            'node_modules/angular-aria/angular-aria.min.js',
             'node_modules/angular-local-storage/dist/angular-local-storage.min.js',
             'node_modules/angular-route/angular-route.js',
             'node_modules/angular-sanitize/angular-sanitize.js',
@@ -35,7 +36,6 @@ module.exports = function (config) {
             '../Umbraco.Web.UI/Umbraco/js/*.filters.js',
             '../Umbraco.Web.UI/Umbraco/js/*.services.js',
             '../Umbraco.Web.UI/Umbraco/js/*.interceptors.js',
-            '../Umbraco.Web.UI/Umbraco/js/*.security.js',
             '../Umbraco.Web.UI/Umbraco/js/*.resources.js',
 
             //mocked data and routing
@@ -50,9 +50,23 @@ module.exports = function (config) {
         exclude: [],
 
         // use dolts reporter, as travis terminal does not support escaping sequences
-        // possible values: 'dots', 'progress', 'junit', 'teamcity'
+        // possible values: 'dots', 'progress', 'junit', 'spec'
+        // ***
+        // progress: Outputs a simple list like: "Executed 128 of 144 SUCCESS (0 secs / 0.814 secs)"
+        // spec: Outputs a more verbose report which is more useful for debugging if one of the tests fails.
+        // ***
         // CLI --reporters progress
-        reporters: ['progress', 'junit'],
+
+        reporters: ['spec', 'junit'],
+        specReporter: {
+            maxLogLines: 5,         // limit number of lines logged per test
+            suppressErrorSummary: true,  // do not print error summary
+            suppressFailed: false,  // do not print information about failed tests
+            suppressPassed: false,  // do not print information about passed tests
+            suppressSkipped: true,  // do not print information about skipped tests
+            showSpecTiming: false // print the time elapsed for each spec
+        },
+
 
         // web server port
         // CLI --port 9876
@@ -101,7 +115,9 @@ module.exports = function (config) {
         plugins: [
             require('karma-jasmine'),
             require('karma-phantomjs-launcher'),
-            require('karma-junit-reporter')
+            require('karma-junit-reporter'),
+            require('karma-spec-reporter')
+
         ],
 
         // the default configuration

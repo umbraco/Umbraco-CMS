@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
@@ -79,39 +80,6 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        [Test]
-        public void Can_Perform_Get_By_Invariant_Code_On_LanguageRepository()
-        {
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
-            {
-                var repository = CreateRepository(provider);
-
-                var es = new CultureInfo("es");
-                var esSpecific = new CultureInfo("es-ES");
-
-                var language = (ILanguage)new Language(es.Name)
-                {
-                    CultureName = es.DisplayName,
-                    FallbackLanguageId = 1
-                };
-                repository.Save(language);
-
-                language = repository.GetByIsoCode(es.Name);
-                var languageSpecific = repository.GetByIsoCode(esSpecific.Name);
-                
-                // Assert
-                Assert.That(language, Is.Not.Null);
-                Assert.That(language.HasIdentity, Is.True);
-                Assert.That(language.IsoCode, Is.EqualTo(es.Name));
-
-                Assert.That(languageSpecific, Is.Not.Null);
-                Assert.That(languageSpecific.HasIdentity, Is.True);
-                Assert.That(languageSpecific.Id, Is.EqualTo(language.Id));
-                Assert.That(language.IsoCode, Is.EqualTo(language.IsoCode));
-            }
-        }
-        
         [Test]
         public void Get_When_Id_Doesnt_Exist_Returns_Null()
         {
@@ -327,6 +295,24 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(languageUpdated.IsoCode, Is.EqualTo("pt-BR"));
                 Assert.That(languageUpdated.CultureName, Is.EqualTo("pt-BR"));
                 Assert.That(languageUpdated.FallbackLanguageId, Is.EqualTo(1));
+            }
+        }
+
+        [Test]
+        public void Perform_Update_With_Existing_Culture()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
+            {
+                var repository = CreateRepository(provider);
+
+                // Act
+                var language = repository.Get(5);
+                language.IsoCode = "da-DK";
+                language.CultureName = "da-DK";
+
+                Assert.Throws<InvalidOperationException>(() => repository.Save(language));
             }
         }
 

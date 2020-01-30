@@ -64,7 +64,7 @@ namespace Umbraco.Web.Media.Exif
                     return new ExifInterOperability(tagid, 3, 1, ExifBitConverter.GetBytes((ushort)((object)mValue), BitConverterEx.SystemByteOrder, BitConverterEx.SystemByteOrder));
                 }
                 else
-                    throw new UnknownEnumTypeException();
+                    throw new InvalidOperationException($"An invalid enum type ({basetype.FullName}) was provided for type {type.FullName}");
             }
         }
     }

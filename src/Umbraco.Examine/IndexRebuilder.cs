@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 using Examine;
 
 namespace Umbraco.Examine
-{
+{   
+
     /// <summary>
     /// Utility to rebuild all indexes ensuring minimal data queries
     /// </summary>

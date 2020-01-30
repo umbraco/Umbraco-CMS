@@ -225,7 +225,6 @@
     <key alias="linkinternal">Místní odkaz:</key>
     <key alias="linklocaltip">Při používání místních odkazů vložte znak "#" před odkaz</key>
     <key alias="linknewwindow">Otevřít v novém okně?</key>
-    <key alias="macroContainerSettings">Nastavení makra</key>
     <key alias="macroDoesNotHaveProperties">Toto makro nemá žádné vlastnosti, které by bylo možno editovat</key>
     <key alias="paste">Vložit</key>
     <key alias="permissionsEdit">Editovat oprávnění pro</key>

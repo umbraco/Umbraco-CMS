@@ -73,7 +73,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Returns a list of cultures that have property validation errors errors
+        /// Returns a list of cultures that have property validation errors
         /// </summary>
         /// <param name="modelState"></param>
         /// <param name="localizationService"></param>

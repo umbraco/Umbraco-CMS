@@ -263,7 +263,6 @@
     <key alias="linkinternal">Interne link:</key>
     <key alias="linklocaltip">Plaats een hekje (“#”) voor voor interne links.</key>
     <key alias="linknewwindow">In nieuw venster openen?</key>
-    <key alias="macroContainerSettings">Macro Settings</key>
     <key alias="macroDoesNotHaveProperties">Deze macro heeft geen eigenschappen die u kunt bewerken</key>
     <key alias="paste">Plakken</key>
     <key alias="permissionsEdit">Bewerk rechten voor</key>

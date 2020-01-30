@@ -6,6 +6,7 @@ LazyLoad.js([
     'lib/angular-touch/angular-touch.js',
     'lib/angular-sanitize/angular-sanitize.js',
     'lib/angular-messages/angular-messages.js',
+    'lib/angular-aria/angular-aria.min.js',
     'lib/underscore/underscore-min.js',
     'lib/angular-ui-sortable/sortable.js', 
     'js/installer.app.js',

@@ -16,7 +16,7 @@
             <umb-editor-sub-header>
 
                 <umb-editor-sub-header-content-left>
-                    <umb-button button-style="success"
+                    <umb-button button-style="action"
                                 type="button"
                                 action="vm.addLanguage()"
                                 label-key="languages_addLanguage">
@@ -58,7 +58,9 @@
                         </td>
                         <td>
                             <span ng-if="language.fallbackLanguageId">{{vm.getLanguageById(language.fallbackLanguageId).name}}</span>
-                            <span ng-if="!language.fallbackLanguageId">(none)</span>
+                            <span ng-if="!language.fallbackLanguageId">
+                                (<localize key="languages_none">none</localize>)
+                            </span>
                         </td>
                         <td style="text-align: right;">
                             <umb-button ng-if="!language.isDefault"

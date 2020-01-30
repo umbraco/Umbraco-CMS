@@ -2,7 +2,7 @@
 <language alias="zh_tw" intName="Chinese (Taiwan)" localName="中文（正體，台灣）" lcid="0404" culture="zh-TW">
   <creator>
     <name>The Umbraco community</name>
-    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">管理主機名稱</key>
@@ -166,7 +166,7 @@
     <key alias="childItems" version="7.0">子項目</key>
     <key alias="target" version="7.0">目標</key>
     <key alias="scheduledPublishServerTime">預計發表的時間（伺服器端）</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.org/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">這是什麼意思？</a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">這是什麼意思？</a>]]></key>
   </area>
   <area alias="media">
     <key alias="clickToUpload">點選以便上傳</key>
@@ -248,7 +248,6 @@
     <key alias="linkinternal">內部連結：</key>
     <key alias="linklocaltip">本地連結請用“#”號開頭</key>
     <key alias="linknewwindow">在新視窗中打開？</key>
-    <key alias="macroContainerSettings">巨集設置</key>
     <key alias="macroDoesNotHaveProperties">本巨集沒有包含您可以編輯的屬性</key>
     <key alias="paste">粘貼</key>
     <key alias="permissionsEdit">編輯許可權</key>
@@ -508,7 +507,7 @@
               <p>請編輯檔案"web.config" (例如使用Visual Studio或您喜歡的編輯器)，移動到檔案底部，並在名稱為"UmbracoDbDSN"的字串中設定資料庫連結資訊，並存檔。</p>
               <p>
               點選<strong>重試</strong>按鈕當上述步驟完成。<br />
-              <a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
+              <a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
 			              在此查詢更多編輯web.config的資訊。</a></p>]]></key>
     <key alias="databaseText"><![CDATA[要完成此步驟，您必須瞭解連結資料庫伺服器的重要資訊("connection string")。<br />
         若需要時，請聯繫您的網路公司。如果您在本地機器或伺服器安裝的話，您也許需要聯絡系統管理者。]]></key>
