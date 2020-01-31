@@ -10,6 +10,13 @@ namespace Umbraco.Web.PublishedCache
 {
     abstract class PublishedCacheBase : IPublishedCache
     {
+        private readonly IVariationContextAccessor _variationContextAccessor;
+
+        public PublishedCacheBase(IVariationContextAccessor variationContextAccessor)
+        {
+            _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
+
+        }
         public bool PreviewDefault { get; }
 
         protected PublishedCacheBase(bool previewDefault)
@@ -94,14 +101,11 @@ namespace Umbraco.Web.PublishedCache
 
         public virtual IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
         {
-            // TODO: move this extension method and get working again.
-
             // this is probably not super-efficient, but works
             // some cache implementation may want to override it, though
-            return Enumerable.Empty<IPublishedContent>();
-            //return GetAtRoot()
-            //    .SelectMany(x => x.DescendantsOrSelf())
-            //    .Where(x => x.ContentType.Id == contentType.Id);
+            return GetAtRoot()
+                .SelectMany(x => x.DescendantsOrSelf(_variationContextAccessor))
+                .Where(x => x.ContentType.Id == contentType.Id);
         }
     }
 }
