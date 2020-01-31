@@ -170,8 +170,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         internal int GetMediaId(Guid udi) => GetId(_mediaStore, udi);
         internal Guid GetDocumentUid(int id) => GetUid(_contentStore, id);
         internal Guid GetMediaUid(int id) => GetUid(_mediaStore, id);
-        private int GetId(ContentStore store, Guid uid) => store.LiveSnapshot.Get(uid)?.Id ?? default;
-        private Guid GetUid(ContentStore store, int id) => store.LiveSnapshot.Get(id)?.Uid ?? default;
+        private int GetId(ContentStore store, Guid uid) => store.LiveSnapshot.Get(uid)?.Id ?? 0;
+        private Guid GetUid(ContentStore store, int id) => store.LiveSnapshot.Get(id)?.Uid ?? Guid.Empty;
 
         #endregion
 
