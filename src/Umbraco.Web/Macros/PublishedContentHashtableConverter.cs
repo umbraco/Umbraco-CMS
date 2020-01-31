@@ -25,19 +25,20 @@ namespace Umbraco.Web.Macros
         /// Initializes a new instance of the <see cref="PublishedContentHashtableConverter"/> class for a published document request.
         /// </summary>
         /// <param name="frequest">The <see cref="PublishedRequest"/> pointing to the document.</param>
+        /// <param name="userService">The <see cref="IUserService"/>.</param>
         /// <remarks>
         /// The difference between creating the page with PublishedRequest vs an IPublishedContent item is
         /// that the PublishedRequest takes into account how a template is assigned during the routing process whereas
         /// with an IPublishedContent item, the template id is assigned purely based on the default.
         /// </remarks>
-        internal PublishedContentHashtableConverter(PublishedRequest frequest)
+        internal PublishedContentHashtableConverter(PublishedRequest frequest, IUserService userService)
         {
             if (!frequest.HasPublishedContent)
                 throw new ArgumentException("Document request has no node.", nameof(frequest));
 
             PopulatePageData(frequest.PublishedContent.Id,
                 frequest.PublishedContent.Name, frequest.PublishedContent.ContentType.Id, frequest.PublishedContent.ContentType.Alias,
-                frequest.PublishedContent.WriterName, frequest.PublishedContent.CreatorName, frequest.PublishedContent.CreateDate, frequest.PublishedContent.UpdateDate,
+                frequest.PublishedContent.GetWriterName(userService), frequest.PublishedContent.GetCreatorName(userService), frequest.PublishedContent.CreateDate, frequest.PublishedContent.UpdateDate,
                 frequest.PublishedContent.Path, frequest.PublishedContent.Parent?.Id ?? -1);
 
             if (frequest.HasTemplate)
@@ -53,13 +54,13 @@ namespace Umbraco.Web.Macros
         /// Initializes a new instance of the page for a published document
         /// </summary>
         /// <param name="doc"></param>
-        internal PublishedContentHashtableConverter(IPublishedContent doc)
+        internal PublishedContentHashtableConverter(IPublishedContent doc, IUserService userService)
         {
             if (doc == null) throw new ArgumentNullException(nameof(doc));
 
             PopulatePageData(doc.Id,
                 doc.Name, doc.ContentType.Id, doc.ContentType.Alias,
-                doc.WriterName, doc.CreatorName, doc.CreateDate, doc.UpdateDate,
+                doc.GetWriterName(userService), doc.GetCreatorName(userService), doc.CreateDate, doc.UpdateDate,
                 doc.Path, doc.Parent?.Id ?? -1);
 
             if (doc.TemplateId.HasValue)
@@ -78,7 +79,7 @@ namespace Umbraco.Web.Macros
         /// <param name="variationContextAccessor"></param>
         /// <remarks>This is for <see cref="MacroRenderingController"/> usage only.</remarks>
         internal PublishedContentHashtableConverter(IContent content, IVariationContextAccessor variationContextAccessor, IUserService userService, IShortStringHelper shortStringHelper, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IPublishedContentTypeFactory publishedContentTypeFactory, UrlSegmentProviderCollection urlSegmentProviders)
-            : this(new PagePublishedContent(content, variationContextAccessor, userService, shortStringHelper, contentTypeBaseServiceProvider, publishedContentTypeFactory, urlSegmentProviders))
+            : this(new PagePublishedContent(content, variationContextAccessor, userService, shortStringHelper, contentTypeBaseServiceProvider, publishedContentTypeFactory, urlSegmentProviders), userService)
         { }
 
         #endregion

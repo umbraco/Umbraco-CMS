@@ -167,7 +167,6 @@ namespace Umbraco.Tests.PublishedContent
         {
             // initialize boring stuff
             TemplateId = 0;
-            WriterName = CreatorName = string.Empty;
             WriterId = CreatorId = 0;
             CreateDate = UpdateDate = DateTime.Now;
             Version = Guid.Empty;
@@ -193,8 +192,6 @@ namespace Umbraco.Tests.PublishedContent
         public string Name { get; set; }
         public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => _cultures ?? (_cultures = GetCultures());
         public string UrlSegment { get; set; }
-        public string WriterName { get; set; }
-        public string CreatorName { get; set; }
         public int WriterId { get; set; }
         public int CreatorId { get; set; }
         public string Path { get; set; }

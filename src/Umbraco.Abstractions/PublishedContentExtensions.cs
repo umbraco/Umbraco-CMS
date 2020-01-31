@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core
 {
@@ -134,6 +135,18 @@ namespace Umbraco.Core
             return culture == "*"
                 ? children
                 : children.Where(x => x.IsInvariantOrHasCulture(culture));
+        }
+
+        public static string GetCreatorName(this IPublishedContent content, IUserService userService)
+        {
+            var user = userService.GetProfileById(content.CreatorId);
+            return user?.Name;
+        }
+
+        public static string GetWriterName(this IPublishedContent content, IUserService userService)
+        {
+            var user = userService.GetProfileById(content.WriterId);
+            return user?.Name;
         }
     }
 }

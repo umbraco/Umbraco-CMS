@@ -61,11 +61,6 @@ namespace Umbraco.Core.Models.PublishedContent
         int CreatorId { get; }
 
         /// <summary>
-        /// Gets the name of the user who created the content item.
-        /// </summary>
-        string CreatorName { get; }
-
-        /// <summary>
         /// Gets the date the content item was created.
         /// </summary>
         DateTime CreateDate { get; }
@@ -74,11 +69,6 @@ namespace Umbraco.Core.Models.PublishedContent
         /// Gets the identifier of the user who last updated the content item.
         /// </summary>
         int WriterId { get; }
-
-        /// <summary>
-        /// Gets the name of the user who last updated the content item.
-        /// </summary>
-        string WriterName { get; }
 
         /// <summary>
         /// Gets the date the content item was last updated.

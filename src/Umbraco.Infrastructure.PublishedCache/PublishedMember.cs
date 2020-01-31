@@ -141,10 +141,6 @@ namespace Umbraco.Web.PublishedCache
 
         public override string UrlSegment => throw new NotSupportedException();
 
-        public override string WriterName => _member.GetCreatorProfile(_userService).Name;
-
-        public override string CreatorName => _member.GetCreatorProfile(_userService).Name;
-
         public override int WriterId => _member.CreatorId;
 
         public override int CreatorId => _member.CreatorId;

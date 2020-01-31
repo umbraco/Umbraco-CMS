@@ -61,16 +61,10 @@ namespace Umbraco.Web.Models
         public abstract int CreatorId { get; }
 
         /// <inheritdoc />
-        public abstract string CreatorName { get; }
-
-        /// <inheritdoc />
         public abstract DateTime CreateDate { get; }
 
         /// <inheritdoc />
         public abstract int WriterId { get; }
-
-        /// <inheritdoc />
-        public abstract string WriterName { get; }
 
         /// <inheritdoc />
         public abstract DateTime UpdateDate { get; }

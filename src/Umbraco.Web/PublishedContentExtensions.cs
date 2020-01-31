@@ -1000,15 +1000,15 @@ namespace Umbraco.Web
 
                         var standardVals = new Dictionary<string, object>
                             {
-                                    { "Id", n.Id },
-                                    { "NodeName", n.Name(VariationContextAccessor) },
-                                    { "NodeTypeAlias", n.ContentType.Alias },
-                                    { "CreateDate", n.CreateDate },
-                                    { "UpdateDate", n.UpdateDate },
-                                    { "CreatorName", n.CreatorName },
-                                    { "WriterName", n.WriterName },
-                                    { "Url", n.Url() }
-                                };
+                                { "Id", n.Id },
+                                { "NodeName", n.Name(VariationContextAccessor) },
+                                { "NodeTypeAlias", n.ContentType.Alias },
+                                { "CreateDate", n.CreateDate },
+                                { "UpdateDate", n.UpdateDate },
+                                { "CreatorId", n.CreatorId},
+                                { "WriterId", n.WriterId },
+                                { "Url", n.Url() }
+                            };
 
                         var userVals = new Dictionary<string, object>();
                         foreach (var p in from IPublishedProperty p in n.Properties where p.GetSourceValue() != null select p)

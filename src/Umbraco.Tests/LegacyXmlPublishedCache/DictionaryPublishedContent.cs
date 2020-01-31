@@ -61,8 +61,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             ValidateAndSetProperty(valueDictionary, val => _urlName = val, "urlName");
             ValidateAndSetProperty(valueDictionary, val => _documentTypeAlias = val, "nodeTypeAlias", LuceneIndex.ItemTypeFieldName);
             ValidateAndSetProperty(valueDictionary, val => _documentTypeId = Int32.Parse(val), "nodeType");
-            //ValidateAndSetProperty(valueDictionary, val => _writerName = val, "writerName");
-            ValidateAndSetProperty(valueDictionary, val => _creatorName = val, "creatorName", "writerName"); //this is a bit of a hack fix for: U4-1132
             //ValidateAndSetProperty(valueDictionary, val => _writerId = int.Parse(val), "writerID");
             ValidateAndSetProperty(valueDictionary, val => _creatorId = Int32.Parse(val), "creatorID", "writerID"); //this is a bit of a hack fix for: U4-1132
             ValidateAndSetProperty(valueDictionary, val => _path = val, "path", "__Path");
@@ -161,10 +159,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         public override string UrlSegment => _urlName;
 
-        public override string WriterName => _creatorName;
-
-        public override string CreatorName => _creatorName;
-
         public override int WriterId => _creatorId;
 
         public override int CreatorId => _creatorId;
@@ -203,8 +197,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private string _urlName;
         private string _documentTypeAlias;
         private int _documentTypeId;
-        //private string _writerName;
-        private string _creatorName;
         //private int _writerId;
         private int _creatorId;
         private string _path;

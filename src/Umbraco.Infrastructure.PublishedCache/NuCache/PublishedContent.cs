@@ -148,16 +148,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override int CreatorId => _contentNode.CreatorId;
 
         /// <inheritdoc />
-        public override string CreatorName => string.Empty; // TODO: remove (as want to avoid injecting user service to get these names)
-
-        /// <inheritdoc />
         public override DateTime CreateDate => _contentNode.CreateDate;
 
         /// <inheritdoc />
         public override int WriterId => ContentData.WriterId;
-
-        /// <inheritdoc />
-        public override string WriterName => string.Empty; // TODO: remove (as want to avoid injecting user service to get these names)
 
         /// <inheritdoc />
         public override DateTime UpdateDate => ContentData.VersionDate;
