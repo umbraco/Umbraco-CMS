@@ -97,6 +97,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <para>The value of this property is contextual. It depends on the 'current' request uri,
         /// if any.</para>
         /// </remarks>
+        [Obsolete("Use the Url() extension instead")]
         string Url { get; }
 
         /// <summary>
