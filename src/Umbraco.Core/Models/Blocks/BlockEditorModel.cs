@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.Models.Blocks
@@ -8,9 +10,20 @@ namespace Umbraco.Core.Models.Blocks
     /// </summary>
     public abstract class BlockEditorModel
     {
+        protected BlockEditorModel(IEnumerable<IPublishedElement> data)
+        {
+            Data = data ?? throw new ArgumentNullException(nameof(data));
+        }
+
+        public BlockEditorModel()
+        {
+        }
+
+
         /// <summary>
         /// The data items of the Block List editor
         /// </summary>
-        public IEnumerable<IPublishedElement> Data { get; }
+        [DataMember(Name = "data")]
+        public IEnumerable<IPublishedElement> Data { get; set; }
     }
 }

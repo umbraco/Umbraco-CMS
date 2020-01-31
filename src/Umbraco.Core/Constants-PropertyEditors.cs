@@ -39,6 +39,11 @@ namespace Umbraco.Core
                 /// <summary>
                 /// CheckBox List.
                 /// </summary>
+                public const string BlockList = "Umbraco.BlockList";
+
+                /// <summary>
+                /// CheckBox List.
+                /// </summary>
                 public const string CheckBoxList = "Umbraco.CheckBoxList";
 
                 /// <summary>

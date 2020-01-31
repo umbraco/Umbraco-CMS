@@ -119,10 +119,12 @@ namespace Umbraco.Tests.Published
                 .Setup(x => x.PublishedSnapshot)
                 .Returns(publishedSnapshot.Object);
 
+            var blockEditorConverter = new BlockEditorConverter(publishedSnapshotAccessor.Object, publishedModelFactory.Object);
+
             var converters = new PropertyValueConverterCollection(new IPropertyValueConverter[]
             {
-                new NestedContentSingleValueConverter(publishedSnapshotAccessor.Object, publishedModelFactory.Object, proflog),
-                new NestedContentManyValueConverter(publishedSnapshotAccessor.Object, publishedModelFactory.Object, proflog),
+                new NestedContentSingleValueConverter(blockEditorConverter, publishedModelFactory.Object, proflog),
+                new NestedContentManyValueConverter(blockEditorConverter, publishedModelFactory.Object, proflog),
             });
 
             var factory = new PublishedContentTypeFactory(publishedModelFactory.Object, converters, dataTypeService);

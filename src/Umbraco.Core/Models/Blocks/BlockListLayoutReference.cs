@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Serialization;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.Models.Blocks
@@ -6,6 +7,7 @@ namespace Umbraco.Core.Models.Blocks
     /// <summary>
     /// Represents a layout item for the Block List editor
     /// </summary>
+    [DataContract(Name = "blockListLayout", Namespace = "")]
     public class BlockListLayoutReference : IBlockElement<IPublishedElement>
     {
         public BlockListLayoutReference(Udi udi, IPublishedElement settings)
@@ -14,7 +16,10 @@ namespace Umbraco.Core.Models.Blocks
             Settings = settings ?? throw new ArgumentNullException(nameof(settings));
         }
 
-        public Udi Udi { get; }
-        public IPublishedElement Settings { get; }
+        [DataMember(Name = "udi")]
+        public Udi Udi { get; set; }
+
+        [DataMember(Name = "settings")]
+        public IPublishedElement Settings { get; set; }
     }
 }
