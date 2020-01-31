@@ -1329,7 +1329,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return _collectTask;
 
             // ReSharper disable InconsistentlySynchronizedField
-            var task = _collectTask = Task.Run(Collect);
+            var task = _collectTask = Task.Run((Action)Collect);
             _collectTask.ContinueWith(_ =>
             {
                 lock (_rlocko)
