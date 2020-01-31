@@ -81,15 +81,6 @@ namespace Umbraco.Core.Models.PublishedContent
         DateTime UpdateDate { get; }
 
         /// <summary>
-        /// Gets the url of the content item for the current culture.
-        /// </summary>
-        /// <remarks>
-        /// <para>The value of this property is contextual. It depends on the 'current' request uri,
-        /// if any.</para>
-        /// </remarks>
-        string Url { get; }
-
-        /// <summary>
         /// Gets available culture infos.
         /// </summary>
         /// <remarks>

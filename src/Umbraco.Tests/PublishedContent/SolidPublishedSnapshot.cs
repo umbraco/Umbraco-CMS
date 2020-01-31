@@ -199,7 +199,6 @@ namespace Umbraco.Tests.PublishedContent
         public DateTime UpdateDate { get; set; }
         public Guid Version { get; set; }
         public int Level { get; set; }
-        public string Url { get; set; }
 
         public PublishedItemType ItemType => PublishedItemType.Content;
         public bool IsDraft(string culture = null) => false;

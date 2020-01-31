@@ -88,9 +88,6 @@ namespace Umbraco.Core.Models.PublishedContent
         public virtual DateTime UpdateDate => _content.UpdateDate;
 
         /// <inheritdoc />
-        public virtual string Url => _content.Url;
-
-        /// <inheritdoc />
         public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => _content.Cultures;
 
         /// <inheritdoc />
