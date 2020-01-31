@@ -55,7 +55,6 @@ namespace Umbraco.Web.Models
 
         /// <inheritdoc />
         [Obsolete("Use CreatorName(IUserService) extension instead")]
-
         public abstract string CreatorName { get; }
 
         /// <inheritdoc />
@@ -66,7 +65,6 @@ namespace Umbraco.Web.Models
 
         /// <inheritdoc />
         [Obsolete("Use WriterName(IUserService) extension instead")]
-
         public abstract string WriterName { get; }
 
         /// <inheritdoc />

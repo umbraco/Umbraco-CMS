@@ -141,12 +141,10 @@ namespace Umbraco.Web.PublishedCache
 
         // TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
         [Obsolete("Use WriterName(IUserService) extension instead")]
-
         public override string WriterName => _member.GetCreatorProfile().Name;
 
         // TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
         [Obsolete("Use CreatorName(IUserService) extension instead")]
-
         public override string CreatorName => _member.GetCreatorProfile().Name;
 
         public override int WriterId => _member.CreatorId;
