@@ -41,6 +41,8 @@ namespace Umbraco.Web.PublishedCache
 
         public abstract string GetStatus();
 
+        public virtual string StatusUrl => string.Empty;
+
         public virtual void Collect()
         {
         }

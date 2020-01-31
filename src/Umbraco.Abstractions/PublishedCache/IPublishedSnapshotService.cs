@@ -161,7 +161,13 @@ namespace Umbraco.Web.PublishedCache
 
         #endregion
 
+        #region Status
+
         string GetStatus();
+
+        string StatusUrl { get; }
+
+        #endregion        
 
         void Collect();
     }

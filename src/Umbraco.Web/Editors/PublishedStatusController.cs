@@ -17,13 +17,12 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public string GetPublishedStatusUrl()
         {
-            return "views/dashboard/settings/nucache.html";
+            if (!string.IsNullOrWhiteSpace(_publishedSnapshotService.StatusUrl))
+            {
+                return _publishedSnapshotService.StatusUrl;
+            }
 
-            // TODO: do we need this check?
-            //if (_publishedSnapshotService is PublishedCache.NuCache.PublishedSnapshotService)
-            //    return "views/dashboard/settings/nucache.html";
-
-            //throw new NotSupportedException("Not supported: " + _publishedSnapshotService.GetType().FullName);
+            throw new NotSupportedException("Not supported: " + _publishedSnapshotService.GetType().FullName);
         }
     }
 }
