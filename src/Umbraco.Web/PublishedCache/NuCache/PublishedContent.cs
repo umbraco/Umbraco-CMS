@@ -163,6 +163,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override int CreatorId => _contentNode.CreatorId;
 
         /// <inheritdoc />
+        [Obsolete("Use CreatorName(IUserService) extension instead")]
+
         public override string CreatorName => GetProfileNameById(_contentNode.CreatorId);
 
         /// <inheritdoc />
@@ -172,6 +174,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override int WriterId => ContentData.WriterId;
 
         /// <inheritdoc />
+        [Obsolete("Use WriterName(IUserService) extension instead")]
+
         public override string WriterName => GetProfileNameById(ContentData.WriterId);
 
         /// <inheritdoc />
