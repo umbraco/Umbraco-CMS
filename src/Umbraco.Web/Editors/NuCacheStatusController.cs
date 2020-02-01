@@ -21,12 +21,10 @@ namespace Umbraco.Web.Editors
         {
             get
             {
-                // TODO: do we need this?
-                //var svc = _publishedSnapshotService as PublishedSnapshotService;
-                //if (svc == null)
-                //    throw new NotSupportedException("Not running NuCache.");
-                // return svc;
-                return _publishedSnapshotService;
+                var svc = _publishedSnapshotService as PublishedSnapshotService;
+                if (svc == null)
+                    throw new NotSupportedException("Not running NuCache.");
+                return svc;
             }
         }
 

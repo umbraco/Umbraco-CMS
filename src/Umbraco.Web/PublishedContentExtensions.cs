@@ -28,6 +28,7 @@ namespace Umbraco.Web
         private static UmbracoContext UmbracoContext => Current.UmbracoContext;
         private static ISiteDomainHelper SiteDomainHelper => Current.Factory.GetInstance<ISiteDomainHelper>();
         private static IVariationContextAccessor VariationContextAccessor => Current.VariationContextAccessor;
+        private static IUserService UserService => Current.Services.UserService;
 
         #region IsComposedOf
 
@@ -791,6 +792,20 @@ namespace Umbraco.Web
         private static Dictionary<string, string> GetAliasesAndNames(IContentTypeBase contentType)
         {
             return contentType.PropertyTypes.ToDictionary(x => x.Alias, x => x.Name);
+        }
+
+        #endregion
+
+        #region Writer and creator
+
+        public static string CreatorName(this IPublishedContent content)
+        {
+            return content.GetCreatorName(UserService);
+        }
+
+        public static string WriterName(this IPublishedContent content)
+        {
+            return content.GetWriterName(UserService);
         }
 
         #endregion
