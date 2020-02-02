@@ -86,7 +86,7 @@ namespace Umbraco.Core.Cache
 
         protected override void EnterWriteLock()
         {
-            _locker.EnterWriteLock();;
+            _locker.EnterWriteLock();
         }
 
         protected override void ExitReadLock()
