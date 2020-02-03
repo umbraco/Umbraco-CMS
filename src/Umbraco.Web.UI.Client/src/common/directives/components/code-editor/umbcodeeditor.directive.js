@@ -39,7 +39,7 @@
                         }
                     };
 
-                    let options = scope.codeEditorConfig;
+                    let options = scope.editorConfig;
 
                     // overwrite the defaults if there are any specified
                     angular.extend(defaults, options);
@@ -50,9 +50,9 @@
                     // Init & configure VS Code with options
                     const editor = monaco.editor.create(domEl, options);
 
-                    // Value bind - contents of code editor to set from scope.model
-                    if(scope.model) {
-                        editor.setValue(scope.model);
+                    // Value bind - contents of code editor to set from scope.editorContents
+                    if(scope.editorContents) {
+                        editor.setValue(scope.editorContents);
                     }
 
                     // Editor has loaded with contents
@@ -63,24 +63,19 @@
                         scope.editorOnLoad(monaco, editor);
                     }
 
-                    // TODO: When options in directive/component change
-                    // Update VS Code options (aka WATCH scope.codeEditorConfig)
-                    // editor.updateOptions();
-
-
                     // When content changes in code editor
                     // Ensure the scope.model that was
                     // passed into directive/component is updated
                     editor.onDidChangeModelContent((e) => {
                         const editorContents = editor.getValue();
 
-                        // We MAY NOT have a scope.model set
-                        // As we could have a VS Code Model that contains, lang, code and an ID
-                        if(scope.model !== undefined){
+                        // We MAY NOT have a scope.editorContents set
+                        // As we could have a VS Code 'Model' that contains, lang, code and an Identifier
+                        if(scope.editorContents !== undefined){
                             // TODO: Loads of events firing
                             // Will it hammer perf - should it debounce/delay updating?!
                             angularHelper.safeApply(scope, function () {
-                                scope.model = editorContents;
+                                scope.editorContents = editorContents;
                             });
                         }
                     });
@@ -97,6 +92,18 @@
                     // Along with disposing VSCode
                     el.on('$destroy', function() {
                         windowResizeListener.unregister(resizeCallback);
+
+                        // Register completion item providers outside directive
+                        // Need to be disposed, so lets use a callback func
+                        // To allow completionItemProviders to be disposed
+                        // When Angular is removing the DOM element
+                        // Otherwise VSCode/Monaco re-registers &
+                        // we get duplicate completion items
+                        if (angular.isFunction(scope.editorOnDispose)) {
+                            scope.editorOnDispose();
+                        }
+
+                        // Disposes the VSCode Editor
                         editor.dispose();
                     });
                 });
@@ -104,12 +111,13 @@
         }
 
         var directive = {
-            restrict: 'A',
+            restrict: 'E',
             scope: {
-                "model": "=",
-                "codeEditorConfig": "=",
+                "editorContents": "=",
+                "editorConfig": "=",
                 "editorOnInit": "=",
-                "editorOnLoad": "="
+                "editorOnLoad": "=",
+                "editorOnDispose": "="
             },
             link: link
         };
