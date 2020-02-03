@@ -15,7 +15,6 @@
 .umb-block-list__block {
     position: relative;
     width: 100%;
-    cursor: grab;
 
     .umb-block-list__block--head {
         opacity: 0;
@@ -107,6 +106,10 @@ label.umb-block-list__block--head {
     border-radius: @baseBorderRadius;
 }
 
+.blockelement__draggable-element {
+    cursor: grab;
+}
+
 
 .umb-block-list__block--create-button {
     position: absolute;
@@ -114,10 +117,10 @@ label.umb-block-list__block--head {
     z-index:1;
     opacity: 0;
     outline: none;
-    height: 20px;
-    margin-top: -10px;
-    padding-top: 10px;
-    margin-bottom: -10px;
+    height: 12px;
+    margin-top: -6px;
+    padding-top: 6px;
+    margin-bottom: -6px;
     transition: opacity 240ms;
 
     &::before {
@@ -125,7 +128,7 @@ label.umb-block-list__block--head {
         position: absolute;
         background-color: @ui-outline;
         border-radius: 2px;
-        top:9px;
+        top:5px;
         right: 0;
         left: 0;
         height: 2px;
@@ -141,6 +144,7 @@ label.umb-block-list__block--head {
         margin-left: auto;
         margin-right: auto;
         margin-top: -16px;
+        margin-bottom: -16px;
         width: 28px;
         height: 25px;
         padding-bottom: 3px;

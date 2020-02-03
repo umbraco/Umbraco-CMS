@@ -43,9 +43,10 @@
                         icon: "icon-document",
                         label: "Text"
                     },
-                    label: "{{pageTitle | truncate:true:36}}",
+                    labelTemplate: "{{pageTitle | truncate:true:36}}",
                     labelInterpolate: $interpolate("{{pageTitle | truncate:true:36}}"),
                     editor: "views/blockelements/labelblock/labelblock.editor.html",
+                    overlaySize: 'medium',
                     content: {
                         variants: [
                             {
@@ -94,6 +95,7 @@
                     },
                     label: "Label",
                     editor: "views/blockelements/textareablock/textareablock.editor.html",
+                    overlaySize: 'medium',
                     content: {
                         variants: [
                             {
@@ -142,6 +144,7 @@
                     },
                     label: "Label",
                     editor: "views/blockelements/imageblock/imageblock.editor.html",
+                    overlaySize: 'medium',
                     content: {
                         variants: [
                             {
@@ -191,6 +194,7 @@
                     },
                     label: "Label",
                     editor: "views/blockelements/imageblock/imageblock.editor.html",
+                    overlaySize: 'medium',
                     content: {
                         variants: [
                             {
@@ -243,7 +247,54 @@
                 label: "{{pageTitle | truncate:true:36}}",
                 labelInterpolate: $interpolate("{{pageTitle | truncate:true:36}}"),
                 key: 1,
+                editor: "views/blockelements/inlineblock/inlineblock.editor.html",
+                overlaySize: 'medium',
+                content: {
+                    variants: [
+                        {
+                            language: {
+                                isDefault: true
+                            }
+                        }
+                    ],
+                    tabs: [
+                        {
+                            id: 1234,
+                            label: "Group 1",
+                            properties: [
+                                {
+                                    label: "Page Title",
+                                    description: "The title of the page",
+                                    view: "textbox",
+                                    config: {maxChars: 500},
+                                    hideLabel: false,
+                                    validation: {mandatory: true, mandatoryMessage: "", pattern: null, patternMessage: ""},
+                                    readonly: false,
+                                    id: 441,
+                                    dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
+                                    value: "The purpose of lorem ipsum is to create a natural looking block of text (sentence, paragraph, page, etc.) that doesn't distract from the layout. A practice not without controversy, laying out pages with meaningless filler text can be very useful when the focus is meant to be on design, not content.",
+                                    alias: "pageTitle",
+                                    editor: "Umbraco.TextBox",
+                                    isSensitive: false,
+                                    culture: null,
+                                    segment: null
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
+                elementType: {
+                    alias: 'contentTypeAlias',
+                    icon: "icon-document",
+                    label: "Text"
+                },
+                label: "{{pageTitle | truncate:true:36}}",
+                labelInterpolate: $interpolate("{{pageTitle | truncate:true:36}}"),
+                key: 1,
                 editor: "views/blockelements/labelblock/labelblock.editor.html",
+                overlaySize: 'medium',
                 content: {
                     variants: [
                         {
@@ -289,6 +340,7 @@
                 labelInterpolate: $interpolate("{{pageTitle | truncate:true:36}}"),
                 key: 2,
                 editor: "views/blockelements/labelblock/labelblock.editor.html",
+                overlaySize: 'medium',
                 content: {
                     variants: [
                         {
@@ -335,6 +387,7 @@
                 labelInterpolate: $interpolate("{{pageTitle | truncate:true:36}}"),
                 key: 3,
                 editor: "views/blockelements/labelblock/labelblock.editor.html",
+                overlaySize: 'medium',
                 content: {
                     variants: [
                         {
@@ -438,10 +491,12 @@
             }
 
         }
-        
-        vm.getBlockLabel = function(block) {
 
-            var name = "";
+        function getBlockLabel(block) {
+
+            console.log("getBlockLabel", block)
+
+            // TODO: we should do something about this for performance.
 
             var props = new Object();
 
@@ -473,7 +528,7 @@
             var elementEditor = {
                 block: blockModel,
                 view: "views/common/infiniteeditors/elementeditor/elementeditor.html",
-                size: "large",
+                size: blockModel.overlaySize,
                 submit: function(model) {
                     blockModel.content = model.block.content;
                     editorService.close();
@@ -551,7 +606,7 @@
         vm.sortableOptions = {
             axis: "y",
             cursor: "grabbing",
-            handle: '.umb-block-list__block',
+            handle: '.blockelement__draggable-element',
             cancel: 'input,textarea,select,option',
             classes: '.blockelement--dragging',
             distance: 5,
@@ -595,6 +650,15 @@
                 this.umbProperty.setPropertyActions(propertyActions);
             }
         };
+
+        // TODO: We need to investigate if we can do a specific watch on each block, so we dont re-render all blocks.
+        $scope.$watch('vm.blocks', onBlocksUpdated, true);
+        function onBlocksUpdated(newVal, oldVal){
+            console.log("onBlocksUpdated");
+            for(const block of vm.blocks) {
+                block.label = getBlockLabel(block);
+            }
+        }
 
 
     }

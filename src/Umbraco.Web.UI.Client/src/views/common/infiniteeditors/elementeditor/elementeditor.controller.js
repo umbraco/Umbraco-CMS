@@ -7,6 +7,8 @@ angular.module("umbraco")
 
         vm.content = $scope.model.block.content;
 
+        vm.title = $scope.model.block.label;
+
         vm.saveAndClose = function() {
             if ($scope.model && $scope.model.submit) {
                 $scope.model.submit($scope.model);
