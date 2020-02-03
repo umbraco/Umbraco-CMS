@@ -10,16 +10,32 @@ namespace Umbraco.Core.Models.Blocks
     [DataContract(Name = "blockListLayout", Namespace = "")]
     public class BlockListLayoutReference : IBlockElement<IPublishedElement>
     {
-        public BlockListLayoutReference(Udi udi, IPublishedElement settings)
+        public BlockListLayoutReference(Udi udi, IPublishedElement data, IPublishedElement settings)
         {
             Udi = udi ?? throw new ArgumentNullException(nameof(udi));
+            Data = data ?? throw new ArgumentNullException(nameof(data));
             Settings = settings; // can be null
         }
 
+        /// <summary>
+        /// The Id of the data item
+        /// </summary>
         [DataMember(Name = "udi")]
         public Udi Udi { get; set; }
 
+        /// <summary>
+        /// The settings for the layout item
+        /// </summary>
         [DataMember(Name = "settings")]
         public IPublishedElement Settings { get; set; }
+
+        /// <summary>
+        /// The data item referenced
+        /// </summary>
+        /// <remarks>
+        /// This is ignored from serialization since it is just a reference to the actual data element
+        /// </remarks>
+        [IgnoreDataMember]
+        public IPublishedElement Data { get; set; }
     }
 }

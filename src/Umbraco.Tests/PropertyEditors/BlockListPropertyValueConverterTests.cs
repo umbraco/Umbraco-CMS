@@ -207,6 +207,31 @@ data: []}";
             Assert.IsNotNull(converted);
             Assert.AreEqual(0, converted.Data.Count());
             Assert.AreEqual(0, converted.Layout.Count());
+
+            // Everthing is ok except the udi reference in the layout doesn't match the data so it will be empty
+            json = @"
+{
+    layout: {
+        '" + Constants.PropertyEditors.Aliases.BlockList + @"': [
+            {
+                'udi': 'umb://element/1304E1DDAC87439684FE8A399231CB3D',
+                'settings': {}
+            }
+        ]
+    },
+        data: [
+        {
+            'contentTypeAlias': 'home',
+            'key': '1304E1DD-0000-4396-84FE-8A399231CB3D'
+        }
+    ]
+}";
+
+            converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
+
+            Assert.IsNotNull(converted);
+            Assert.AreEqual(1, converted.Data.Count());
+            Assert.AreEqual(0, converted.Layout.Count());
         }
 
         [Test]
@@ -245,6 +270,60 @@ data: []}";
             var layout0 = converted.Layout.ElementAt(0);
             Assert.IsNull(layout0.Settings);
             Assert.AreEqual(Udi.Parse("umb://element/1304E1DDAC87439684FE8A399231CB3D"), layout0.Udi);
+        }
+
+        [Test]
+        public void Get_Data_From_Layout_Item()
+        {
+            var editor = CreateConverter();
+            var config = ConfigForMany();
+            var propertyType = GetPropertyType(config);
+            var publishedElement = Mock.Of<IPublishedElement>();
+
+            var json = @"
+{
+    layout: {
+        '" + Constants.PropertyEditors.Aliases.BlockList + @"': [
+            {
+                'udi': 'umb://element/1304E1DDAC87439684FE8A399231CB3D',
+                'settings': {}
+            },
+            {
+                'udi': 'umb://element/0A4A416E547D464FABCC6F345C17809A',
+                'settings': {}
+            }
+        ]
+    },
+        data: [
+        {
+            'contentTypeAlias': 'home',
+            'key': '1304E1DD-AC87-4396-84FE-8A399231CB3D'
+        },
+        {
+            'contentTypeAlias': 'home',
+            'key': 'E05A0347-0442-4AB3-A520-E048E6197E79'
+        },
+        {
+            'contentTypeAlias': 'home',
+            'key': '0A4A416E-547D-464F-ABCC-6F345C17809A'
+        }
+    ]
+}";
+
+            var converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
+
+            Assert.IsNotNull(converted);
+            Assert.AreEqual(3, converted.Data.Count());
+            Assert.AreEqual(2, converted.Layout.Count());
+
+            var item0 = converted.Layout.ElementAt(0);
+            Assert.AreEqual(Guid.Parse("1304E1DD-AC87-4396-84FE-8A399231CB3D"), item0.Data.Key);
+            Assert.AreEqual("home", item0.Data.ContentType.Alias);
+
+            var item1 = converted.Layout.ElementAt(1);
+            Assert.AreEqual(Guid.Parse("0A4A416E-547D-464F-ABCC-6F345C17809A"), item1.Data.Key);
+            Assert.AreEqual("home", item1.Data.ContentType.Alias);
+
         }
 
     }

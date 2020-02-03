@@ -59,12 +59,13 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             {
                 var configuration = propertyType.DataType.ConfigurationAs<BlockListConfiguration>();
                 var contentTypes = configuration.ElementTypes;
-                var elements = contentTypes.Length == 1
+                var elements = (contentTypes.Length == 1
                     ? (IList<IPublishedElement>)_publishedModelFactory.CreateModelList(contentTypes[0].Alias)
-                    : new List<IPublishedElement>();
+                    : new List<IPublishedElement>())
+                    .ToDictionary(x => x.Key, x => x);
 
                 var layout = new List<BlockListLayoutReference>();
-                var model = new BlockListModel(elements, layout);
+                var model = new BlockListModel(elements.Values, layout);
 
                 var value = (string)inter;
                 if (string.IsNullOrWhiteSpace(value)) return model;
@@ -86,7 +87,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 {
                     var element = _blockConverter.ConvertToElement(data, BlockEditorPropertyEditor.ContentTypeAliasPropertyKey, referenceCacheLevel, preview);
                     if (element == null) continue;
-                    elements.Add(element);
+                    elements[element.Key] = element;
                 }
 
                 // if there's no elements just return since if there's no data it doesn't matter what is stored in layout
@@ -100,14 +101,16 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     // the result of this can be null, that's ok
                     var element = _blockConverter.ConvertToElement(settingsJson, BlockEditorPropertyEditor.ContentTypeAliasPropertyKey, referenceCacheLevel, preview);
 
-                    if (!Udi.TryParse(blockListLayout.Value<string>("udi"), out var udi))
+                    if (!Udi.TryParse(blockListLayout.Value<string>("udi"), out var udi) || !(udi is GuidUdi guidUdi))
                         continue;
 
-                    var layoutRef = new BlockListLayoutReference(udi, element);
+                    // get the data reference
+                    if (!elements.TryGetValue(guidUdi.Guid, out var data))
+                        continue;
+
+                    var layoutRef = new BlockListLayoutReference(udi, data, element);
                     layout.Add(layoutRef);
                 }
-
-                
 
                 return model;
             }
