@@ -179,31 +179,33 @@ SELECT cver.id, doc.templateId, doc.published
 FROM {SqlSyntax.GetQuotedTableName(PreTables.ContentVersion)} cver
 JOIN {SqlSyntax.GetQuotedTableName(PreTables.Document)} doc ON doc.nodeId=cver.nodeId AND doc.versionId=cver.versionId");
 
+
             // need to add extra rows for where published=newest
             // 'cos INSERT above has inserted the 'published' document version
             // and v8 always has a 'edited' document version too
-            var temp3 = Database.Fetch<dynamic>($@"SELECT doc.nodeId, doc.updateDate, doc.documentUser, doc.text, doc.templateId, cver.id versionId
+            Database.Execute($@"
+INSERT INTO {SqlSyntax.GetQuotedTableName(PreTables.ContentVersion)} (nodeId, versionId, versionDate, userId, {SqlSyntax.GetQuotedColumnName("current")}, text)
+SELECT doc.nodeId, NEWID(), doc.updateDate, doc.documentUser, 1, doc.text
 FROM {SqlSyntax.GetQuotedTableName(PreTables.Document)} doc
 JOIN {SqlSyntax.GetQuotedTableName(PreTables.ContentVersion)} cver ON doc.nodeId=cver.nodeId AND doc.versionId=cver.versionId
 WHERE doc.newest=1 AND doc.published=1");
-            var getIdentity = "@@@@IDENTITY";
-            foreach (var t in temp3)
-            {
-                Database.Execute($@"INSERT INTO {SqlSyntax.GetQuotedTableName(PreTables.ContentVersion)} (nodeId, versionId, versionDate, userId, {SqlSyntax.GetQuotedColumnName("current")}, text)
-VALUES (@nodeId, @versionId, @versionDate, @userId, 1, @text)", new { nodeId=t.nodeId, versionId=Guid.NewGuid(), versionDate=t.updateDate, userId=t.documentUser, text=t.text });
-                var id = Database.ExecuteScalar<int>("SELECT " + getIdentity);
-                Database.Execute($"UPDATE {SqlSyntax.GetQuotedTableName(PreTables.ContentVersion)} SET {SqlSyntax.GetQuotedColumnName("current")}=0 WHERE nodeId=@0 AND id<>@1", (int) t.nodeId, id);
-                Database.Execute($@"INSERT INTO {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.DocumentVersion)} (id, templateId, published)
-VALUES (@id, @templateId, 0)", new { id=id, templateId=t.templateId });
 
-                var versionId = (int) t.versionId;
-                var pdatas = Database.Fetch<PropertyDataDto>(Sql().Select<PropertyDataDto>().From<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == versionId));
-                foreach (var pdata in pdatas)
-                {
-                    pdata.VersionId = id;
-                    Database.Insert(pdata);
-                }
-            }
+            Database.Execute($@"
+INSERT INTO {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.DocumentVersion)} (id, templateId, published)
+SELECT cverNew.id, doc.templateId, 0
+FROM {SqlSyntax.GetQuotedTableName(PreTables.Document)} doc
+JOIN {SqlSyntax.GetQuotedTableName(PreTables.ContentVersion)} cverNew ON doc.nodeId = cverNew.nodeId
+WHERE doc.newest=1 AND doc.published=1 AND cverNew.{SqlSyntax.GetQuotedColumnName("current")} = 1");
+
+            Database.Execute($@"
+INSERT INTO {SqlSyntax.GetQuotedTableName(PreTables.PropertyData)} (propertytypeid,languageId,segment,textValue,varcharValue,decimalValue,intValue,dateValue,versionId)
+SELECT propertytypeid,languageId,segment,textValue,varcharValue,decimalValue,intValue,dateValue,cverNew.id
+FROM {SqlSyntax.GetQuotedTableName(PreTables.Document)} doc
+JOIN {SqlSyntax.GetQuotedTableName(PreTables.ContentVersion)} cver ON doc.nodeId=cver.nodeId AND doc.versionId=cver.versionId
+JOIN {SqlSyntax.GetQuotedTableName(PreTables.ContentVersion)} cverNew ON doc.nodeId = cverNew.nodeId
+JOIN {SqlSyntax.GetQuotedTableName(PreTables.PropertyData)} pd ON pd.versionId=cver.id
+WHERE doc.newest=1 AND doc.published=1 AND cverNew.{SqlSyntax.GetQuotedColumnName("current")} = 1");
+
 
             // reduce document to 1 row per content
             Database.Execute($@"DELETE FROM {PreTables.Document}
