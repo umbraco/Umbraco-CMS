@@ -154,10 +154,10 @@ HAVING COUNT(v2.id) <> 1").Any())
 
             // populate contentVersion text, current and userId columns for documents
             // SQLCE does not support UPDATE...FROM
-            var temp1 = Database.Fetch<dynamic>($"SELECT versionId, text, newest, documentUser FROM {PreTables.Document}");
+            var temp1 = Database.Fetch<dynamic>($"SELECT versionId, text, published, newest, documentUser FROM {PreTables.Document}");
             foreach (var t in temp1)
                 Database.Execute($@"UPDATE {PreTables.ContentVersion} SET text=@text, {SqlSyntax.GetQuotedColumnName("current")}=@current, userId=@userId WHERE versionId=@versionId",
-                    new { text = t.text, current = t.newest, userId=t.documentUser, versionId=t.versionId });
+                    new { text = t.text, current = t.newest && !t.published, userId=t.documentUser, versionId=t.versionId });
 
             // populate contentVersion text and current columns for non-documents, userId is default
             // SQLCE does not support UPDATE...FROM
