@@ -21,13 +21,13 @@ namespace Umbraco.Core.Models.Blocks
         /// The Id of the data item
         /// </summary>
         [DataMember(Name = "udi")]
-        public Udi Udi { get; set; }
+        public Udi Udi { get; }
 
         /// <summary>
         /// The settings for the layout item
         /// </summary>
         [DataMember(Name = "settings")]
-        public IPublishedElement Settings { get; set; }
+        public IPublishedElement Settings { get; }
 
         /// <summary>
         /// The data item referenced
@@ -36,6 +36,6 @@ namespace Umbraco.Core.Models.Blocks
         /// This is ignored from serialization since it is just a reference to the actual data element
         /// </remarks>
         [IgnoreDataMember]
-        public IPublishedElement Data { get; set; }
+        public IPublishedElement Data { get; }
     }
 }

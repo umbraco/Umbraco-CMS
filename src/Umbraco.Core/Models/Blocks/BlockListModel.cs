@@ -16,15 +16,11 @@ namespace Umbraco.Core.Models.Blocks
             Layout = layout;
         }
 
-        public BlockListModel()
-        {
-        }
-
         /// <summary>
         /// The layout items of the Block List editor
         /// </summary>
         [DataMember(Name = "layout")]
-        public IEnumerable<BlockListLayoutReference> Layout { get; set; }
+        public IEnumerable<BlockListLayoutReference> Layout { get; }
 
         
     }
