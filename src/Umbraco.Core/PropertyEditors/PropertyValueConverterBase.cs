@@ -30,18 +30,23 @@ namespace Umbraco.Core.PropertyEditors
             return value != null && (!(value is string) || string.IsNullOrWhiteSpace((string) value) == false);
         }
 
+        /// <inheritdoc />
         public virtual Type GetPropertyValueType(IPublishedPropertyType propertyType)
             => typeof (object);
 
+        /// <inheritdoc />
         public virtual PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Snapshot;
 
+        /// <inheritdoc />
         public virtual object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
             => source;
 
+        /// <inheritdoc />
         public virtual object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
             => inter;
 
+        /// <inheritdoc />
         public virtual object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
             => inter?.ToString() ?? string.Empty;
     }

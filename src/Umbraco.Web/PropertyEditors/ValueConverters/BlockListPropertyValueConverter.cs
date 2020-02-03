@@ -53,6 +53,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// <inheritdoc />
         public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
+            // NOTE: The intermediate object is just a json string, we don't actually convert from source -> intermediate since source is always just a json string
+
             using (_proflog.DebugDuration<BlockListPropertyValueConverter>($"ConvertPropertyToBlockList ({propertyType.DataType.Id})"))
             {
                 var configuration = propertyType.DataType.ConfigurationAs<BlockListConfiguration>();
@@ -79,24 +81,33 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 var blockListLayouts = jsonLayout[Constants.PropertyEditors.Aliases.BlockList] as JArray;
                 if (blockListLayouts == null) return model;
 
-                foreach(var blockListLayout in blockListLayouts)
-                {
-                    var settingsJson = blockListLayout["settings"] as JObject;
-                    if (settingsJson == null) continue;
-
-                    var element = _blockConverter.ConvertToElement(settingsJson, BlockEditorPropertyEditor.ContentTypeAliasPropertyKey, referenceCacheLevel, preview);
-                    if (element == null) continue;
-
-                    var layoutRef = new BlockListLayoutReference(blockListLayout.Value<Udi>("udi"), element);
-                    layout.Add(layoutRef);
-                }
-
+                // parse the data elements
                 foreach (var data in jsonData.Cast<JObject>())
                 {
                     var element = _blockConverter.ConvertToElement(data, BlockEditorPropertyEditor.ContentTypeAliasPropertyKey, referenceCacheLevel, preview);
                     if (element == null) continue;
                     elements.Add(element);
                 }
+
+                // if there's no elements just return since if there's no data it doesn't matter what is stored in layout
+                if (elements.Count == 0) return model;
+
+                foreach (var blockListLayout in blockListLayouts)
+                {
+                    var settingsJson = blockListLayout["settings"] as JObject;
+                    if (settingsJson == null) continue;
+
+                    // the result of this can be null, that's ok
+                    var element = _blockConverter.ConvertToElement(settingsJson, BlockEditorPropertyEditor.ContentTypeAliasPropertyKey, referenceCacheLevel, preview);
+
+                    if (!Udi.TryParse(blockListLayout.Value<string>("udi"), out var udi))
+                        continue;
+
+                    var layoutRef = new BlockListLayoutReference(udi, element);
+                    layout.Add(layoutRef);
+                }
+
+                
 
                 return model;
             }

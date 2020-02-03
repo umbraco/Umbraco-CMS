@@ -13,7 +13,7 @@ namespace Umbraco.Core.Models.Blocks
         public BlockListLayoutReference(Udi udi, IPublishedElement settings)
         {
             Udi = udi ?? throw new ArgumentNullException(nameof(udi));
-            Settings = settings ?? throw new ArgumentNullException(nameof(settings));
+            Settings = settings; // can be null
         }
 
         [DataMember(Name = "udi")]
