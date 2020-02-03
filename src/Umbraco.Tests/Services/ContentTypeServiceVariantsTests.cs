@@ -9,6 +9,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.Install;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -55,7 +56,7 @@ namespace Umbraco.Tests.Services
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
             var hostingEnvironment = Mock.Of<IHostingEnvironment>();
-
+            var filePermissionHelper = Mock.Of<IFilePermissionHelper>();
 
             var typeFinder = new TypeFinder(Mock.Of<ILogger>());
 
@@ -78,7 +79,8 @@ namespace Umbraco.Tests.Services
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(ShortStringHelper) }),
                 typeFinder,
                 hostingEnvironment,
-                new MockShortStringHelper());
+                new MockShortStringHelper(),
+                filePermissionHelper);
         }
 
         public class LocalServerMessenger : ServerMessengerBase

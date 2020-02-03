@@ -10,6 +10,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
+using Umbraco.Core.Install;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -83,6 +84,7 @@ namespace Umbraco.Tests.Scoping
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
             var hostingEnvironment = TestHelper.GetHostingEnvironment();
+            var filePermissionHelper = Mock.Of<IFilePermissionHelper>();
 
             var typeFinder = new TypeFinder(Mock.Of<ILogger>());
 
@@ -105,7 +107,8 @@ namespace Umbraco.Tests.Scoping
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(ShortStringHelper) }),
                 typeFinder,
                 hostingEnvironment,
-                new MockShortStringHelper());
+                new MockShortStringHelper(),
+                filePermissionHelper);
         }
 
         protected UmbracoContext GetUmbracoContextNu(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null)

@@ -63,9 +63,6 @@ namespace Umbraco.Tests.Web.Controllers
         {
             ApiController CtrlFactory(HttpRequestMessage message, IUmbracoContextAccessor umbracoContextAccessor, UmbracoHelper helper)
             {
-                //setup some mocks
-                Umbraco.Core.Configuration.GlobalSettings.HasSmtpServer = true;
-
                 var userServiceMock = Mock.Get(Current.Services.UserService);
 
                 userServiceMock.Setup(service => service.Save(It.IsAny<IUser>(), It.IsAny<bool>()))

@@ -27,6 +27,7 @@ namespace Umbraco.Web.Hosting
             ApplicationPhysicalPath = HostingEnvironment.ApplicationPhysicalPath;
             ApplicationVirtualPath = HostingEnvironment.ApplicationVirtualPath;
             CurrentDomainId = AppDomain.CurrentDomain.Id;
+            IISVersion = HttpRuntime.IISVersion;
         }
 
         public int CurrentDomainId { get; }
@@ -39,6 +40,9 @@ namespace Umbraco.Web.Hosting
         public bool IsDebugMode => HttpContext.Current?.IsDebuggingEnabled ?? _hostingSettings.DebugMode;
         /// <inheritdoc/>
         public bool IsHosted => (HttpContext.Current != null || HostingEnvironment.IsHosted);
+
+        public Version IISVersion { get; }
+
         public string MapPath(string path)
         {
             return HostingEnvironment.MapPath(path);

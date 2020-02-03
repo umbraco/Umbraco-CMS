@@ -1,5 +1,4 @@
 ﻿using LightInject;
-using LightInject.Web;
 
 namespace Umbraco.Core.Composing.LightInject
 {
@@ -29,10 +28,10 @@ namespace Umbraco.Core.Composing.LightInject
             _provider = new PerThreadScopeManagerProvider();
         }
 
-        public void EnablePerWebRequestScope()
+        public void EnablePerWebRequestScope(IScopeManagerProvider perRequestScopeProvider)
         {
-            if (_provider is PerWebRequestScopeManagerProvider) return;
-            _provider = new PerWebRequestScopeManagerProvider();
+            if (perRequestScopeProvider.GetType().IsAssignableFrom(_provider.GetType())) return;
+            _provider = perRequestScopeProvider;
         }
 
         public IScopeManager GetScopeManager(IServiceFactory factory)

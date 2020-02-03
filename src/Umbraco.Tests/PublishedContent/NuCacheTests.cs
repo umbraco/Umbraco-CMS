@@ -8,6 +8,7 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
+using Umbraco.Core.Install;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -185,6 +186,8 @@ namespace Umbraco.Tests.PublishedContent
 
             var typeFinder = new TypeFinder(Mock.Of<ILogger>());
 
+            var filePermissionHelper = Mock.Of<IFilePermissionHelper>();
+
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
             _snapshotService = new PublishedSnapshotService(options,
@@ -207,7 +210,8 @@ namespace Umbraco.Tests.PublishedContent
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }),
                 typeFinder,
                 TestHelper.GetHostingEnvironment(),
-                new MockShortStringHelper());
+                new MockShortStringHelper(),
+                filePermissionHelper);
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();

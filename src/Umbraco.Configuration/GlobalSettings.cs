@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Configuration;
 using System.Linq;
+using System.Net.Mail;
 using System.Xml.Linq;
+using Umbraco.Configuration;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Configuration
@@ -84,7 +86,6 @@ namespace Umbraco.Core.Configuration
         {
             _reservedPaths = null;
             _reservedUrls = null;
-            HasSmtpServer = null;
         }
 
         /// <summary>
@@ -95,29 +96,39 @@ namespace Umbraco.Core.Configuration
         {
             ResetInternal();
         }
+
+
         public bool IsSmtpServerConfigured
         {
             get
             {
-                var smtpSection = ConfigurationManager.GetSection("system.net/mailSettings/smtp") as ConfigurationSection;
-                if (smtpSection is null) return false;
+                var smtpSettings = SmtpSettings;
 
+                if (smtpSettings is null) return false;
+
+                if (!(smtpSettings.From is null)) return true;
+                if (!(smtpSettings.Host is null)) return true;
+                if (!(smtpSettings.PickupDirectoryLocation is null)) return true;
+
+                return false;
+            }
+        }
+
+        public ISmtpSettings SmtpSettings
+        {
+            get
+            {
+                var smtpSection = ConfigurationManager.GetSection("system.net/mailSettings/smtp") as ConfigurationSection;
+                if (smtpSection is null) return null;
+
+                var result = new SmtpSettings();
                 var from = smtpSection.ElementInformation.Properties["from"];
                 if (@from != null
                     && @from.Value is string fromPropValue
                     && string.IsNullOrEmpty(fromPropValue) == false
                     && !string.Equals("noreply@example.com", fromPropValue, StringComparison.OrdinalIgnoreCase))
                 {
-                    return true;
-                }
-
-                var networkSection = ConfigurationManager.GetSection("system.net/mailSettings/smtp/network") as ConfigurationSection;
-                var host = networkSection?.ElementInformation.Properties["host"];
-                if (host != null
-                    && host.Value is string hostPropValue
-                    && string.IsNullOrEmpty(hostPropValue) == false)
-                {
-                    return true;
+                    result.From = fromPropValue;
                 }
 
                 var specifiedPickupDirectorySection = ConfigurationManager.GetSection("system.net/mailSettings/smtp/specifiedPickupDirectory") as ConfigurationSection;
@@ -126,17 +137,20 @@ namespace Umbraco.Core.Configuration
                     && pickupDirectoryLocation.Value is string pickupDirectoryLocationPropValue
                     && string.IsNullOrEmpty(pickupDirectoryLocationPropValue) == false)
                 {
-                    return true;
+                    result.PickupDirectoryLocation = pickupDirectoryLocationPropValue;
                 }
 
-                return false;
+                // SmtpClient can magically read the section system.net/mailSettings/smtp/network, witch is always
+                // null if we use ConfigurationManager.GetSection. SmtpSection does not exist in .Net Standard
+                var smtpClient = new SmtpClient();
+
+                result.Host = smtpClient.Host;
+                result.Port = smtpClient.Port;
+
+                return result;
+
             }
         }
-
-        /// <summary>
-        /// For testing only
-        /// </summary>
-        internal static bool? HasSmtpServer { get; set; }
 
         /// <summary>
         /// Gets the reserved urls from web.config.

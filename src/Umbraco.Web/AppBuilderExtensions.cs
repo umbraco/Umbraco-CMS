@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
+﻿using System.Web;
 using Microsoft.AspNet.SignalR;
 using Microsoft.Owin.Logging;
 using Owin;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Web.Composing;
-using Umbraco.Web.SignalR;
+using Umbraco.Web.Logging;
 
 namespace Umbraco.Web
 {
