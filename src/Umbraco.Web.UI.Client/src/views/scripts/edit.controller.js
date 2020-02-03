@@ -5,7 +5,6 @@
     function ScriptsEditController($scope, $routeParams, $timeout, appState, editorState, navigationService, assetsService, codefileResource, contentEditingHelper, notificationsService, localizationService, templateHelper, angularHelper) {
 
         var vm = this;
-        var currentPosition = null;
 
         vm.header = {};
         vm.header.editorfor = "settings_script";
@@ -17,10 +16,6 @@
         vm.page.menu.currentSection = appState.getSectionState("currentSection");
         vm.page.menu.currentNode = null;
         vm.page.saveButtonState = "init";
-
-         //Used to toggle the keyboard shortcut modal
-        //From a custom keybinding in ace editor - that conflicts with our own to show the dialog
-        vm.showKeyboardShortcut = false;
 
         //Keyboard shortcuts for help dialog
         vm.page.keyboardShortcutsOverview = [];
@@ -43,8 +38,6 @@
         function save() {
 
             vm.page.saveButtonState = "busy";
-
-            //vm.script.content = vm.editor.getValue();
 
             contentEditingHelper.contentEditorPerformSave({
                 saveMethod: codefileResource.save,
@@ -95,9 +88,6 @@
 
         function init() {
 
-            //we need to load this somewhere, for now its here.
-            assetsService.loadCss("lib/ace-razor-mode/theme/razor_chrome.css", $scope);
-
             if ($routeParams.create) {
                 codefileResource.getScaffold("scripts", $routeParams.id).then(function (script) {
                     ready(script, false);
@@ -125,72 +115,45 @@
                 });
             }
 
-            // TODO - need to remove but ensure we have same feature set
-            vm.aceOption = {
-                mode: "javascript",
-                theme: "chrome",
-                showPrintMargin: false,
-                advanced: {
-                    fontSize: '14px',
-                    enableSnippets: true,
-                    enableBasicAutocompletion: true,
-                    enableLiveAutocompletion: false
-                },
-                onLoad: function(_editor) {
-
-                    vm.editor = _editor;
-
-                    //Update the auto-complete method to use ctrl+alt+space
-                    _editor.commands.bindKey("ctrl-alt-space", "startAutocomplete");
-
-                    //Unassigns the keybinding (That was previously auto-complete)
-                    //As conflicts with our own tree search shortcut
-                    _editor.commands.bindKey("ctrl-space", null);
-
-                    // TODO: Move all these keybinding config out into some helper/service
-                    _editor.commands.addCommands([
-                        //Disable (alt+shift+K)
-                        //Conflicts with our own show shortcuts dialog - this overrides it
-                        {
-                            name: 'unSelectOrFindPrevious',
-                            bindKey: 'Alt-Shift-K',
-                            exec: function() {
-                                //Toggle the show keyboard shortcuts overlay
-                                $scope.$apply(function(){
-                                    vm.showKeyboardShortcut = !vm.showKeyboardShortcut;
-                                });
-                            },
-                            readOnly: true
-                        }
-                    ]);
-
-                    // initial cursor placement
-                    // Keep cursor in name field if we are create a new script
-                    // else set the cursor at the bottom of the code editor
-                    if(!$routeParams.create) {
-                        $timeout(function(){
-                            vm.editor.navigateFileEnd();
-                            vm.editor.focus();
-                        });
-                    }
-
-                    vm.editor.on("change", changeAceEditor);
-
-            	}
-            }
-
             // Options to pass to code editor (VS-Code)
             vm.codeEditorOptions = {
-                language: "javascript",
-                fontSize: 20
+                language: "javascript"
             }
 
+            // When VS Code editor has loaded...
+            vm.codeEditorLoad = function(monaco, editor) {
 
-            vm.onInit = function(monaco) {
-                monaco.editor.setTheme('vs-dark');
-            }
+                // Wrapped in timeout as timing issue
+                // This runs before the directive on the filename focus
+                $timeout(function() {
+                    // initial cursor placement
+                    // Keep cursor in name field if we are create a new style sheet
+                    // else set the cursor at the bottom of the code editor
+                    if(!$routeParams.create) {
 
-            function changeAceEditor() {
+                        const codeModel = editor.getModel();
+                        const codeModelRange = codeModel.getFullModelRange();
+
+                        // Set cursor position
+                        editor.setPosition({column: codeModelRange.endColumn, lineNumber: codeModelRange.endLineNumber });
+
+                        // Give the editor focus
+                        editor.focus();
+
+                        // Scroll down to last line
+                        editor.revealLine(codeModelRange.endLineNumber);
+                    }
+                });
+
+                // Use the event listener to notify & set the formstate to dirty
+                // So if you navigate away without saving your prompted
+                editor.onDidChangeModelContent(function(e){
+                    vm.setDirty();
+                });
+
+            };
+
+            vm.setDirty = function () {
                 setFormState("dirty");
             }
 
@@ -206,8 +169,6 @@
                     currentForm.$setPristine();
                 }
             }
-
-
         }
 
         init();
