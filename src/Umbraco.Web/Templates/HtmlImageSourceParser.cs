@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Umbraco.Core;
 
@@ -7,17 +8,28 @@ namespace Umbraco.Web.Templates
 
     public sealed class HtmlImageSourceParser
     {
-        public HtmlImageSourceParser(IUmbracoContextAccessor umbracoContextAccessor)
+        public HtmlImageSourceParser(Func<Guid, string> getMediaUrl)
         {
-            _umbracoContextAccessor = umbracoContextAccessor;
+            this._getMediaUrl = getMediaUrl;
         }
 
-        private static readonly Regex ResolveImgPattern = new Regex(@"(<img[^>]*src="")([^""\?]*)([^""]*""[^>]*data-udi="")([^""]*)(""[^>]*>)",
+        public HtmlImageSourceParser(IUmbracoContextAccessor umbracoContextAccessor)
+        {
+            if (umbracoContextAccessor?.UmbracoContext?.UrlProvider == null)
+            {
+                return;
+            }
+
+            _getMediaUrl = (guid) => umbracoContextAccessor.UmbracoContext.UrlProvider.GetMediaUrl(guid);
+        }
+
+        private static readonly Regex ResolveImgPattern = new Regex(@"(<img[^>]*src="")([^""\?]*)((?:\?[^""]*)?""[^>]*data-udi="")([^""]*)(""[^>]*>)",
             RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;        
 
         private static readonly Regex DataUdiAttributeRegex = new Regex(@"data-udi=\\?(?:""|')(?<udi>umb://[A-z0-9\-]+/[A-z0-9]+)\\?(?:""|')",
             RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+
+        private readonly Func<Guid, string> _getMediaUrl;
 
         /// <summary>
         /// Parses out media UDIs from an html string based on 'data-udi' html attributes
@@ -45,13 +57,12 @@ namespace Umbraco.Web.Templates
         /// <remarks>Umbraco image tags are identified by their data-udi attributes</remarks>
         public string EnsureImageSources(string text)
         {
-            // don't attempt to proceed without a context
-            if (_umbracoContextAccessor?.UmbracoContext?.UrlProvider == null)
+            // no point in doing any processing if we don't have
+            // a function to retrieve Urls
+            if (_getMediaUrl == null)
             {
                 return text;
             }
-
-            var urlProvider = _umbracoContextAccessor.UmbracoContext.UrlProvider;
 
             return ResolveImgPattern.Replace(text, match =>
             {
@@ -66,7 +77,7 @@ namespace Umbraco.Web.Templates
                 {
                     return match.Value;
                 }
-                var mediaUrl = urlProvider.GetMediaUrl(guidUdi.Guid);
+                var mediaUrl = _getMediaUrl(guidUdi.Guid);
                 if (mediaUrl == null)
                 {
                     // image does not exist - we could choose to remove the image entirely here (return empty string),
@@ -86,7 +97,5 @@ namespace Umbraco.Web.Templates
         public string RemoveImageSources(string text)
             // see comment in ResolveMediaFromTextString for group reference
             => ResolveImgPattern.Replace(text, "$1$3$4$5");
-
-        
     }
 }
