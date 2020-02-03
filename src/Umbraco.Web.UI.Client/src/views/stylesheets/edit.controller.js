@@ -1,7 +1,8 @@
+/// <reference path="../../../node_modules/monaco-editor/monaco.d.ts" />
 (function () {
     "use strict";
 
-    function StyleSheetsEditController($scope, $routeParams, $timeout, $http, appState, editorState, navigationService, assetsService, codefileResource, contentEditingHelper, notificationsService, localizationService, templateHelper, angularHelper, umbRequestHelper) {
+    function StyleSheetsEditController($scope, $routeParams, $timeout, appState, editorState, navigationService, codefileResource, contentEditingHelper, notificationsService, localizationService, templateHelper, angularHelper) {
 
         var vm = this;
 
@@ -15,10 +16,6 @@
         vm.header = {};
         vm.header.editorfor = "settings_stylesheet";
         vm.header.setPageTitle = true;
-
-         //Used to toggle the keyboard shortcut modal
-        //From a custom keybinding in ace editor - that conflicts with our own to show the dialog
-        vm.showKeyboardShortcut = false;
 
         //Keyboard shortcuts for help dialog
         vm.page.keyboardShortcutsOverview = [];
@@ -35,7 +32,6 @@
             content: "",
             rules: []
         };
-
 
         // bind functions to view model
         vm.save = interpolateAndSave;
@@ -61,7 +57,6 @@
                 );
             } else {
                 // we're on the code tab: just save the editor value as stylesheet content
-                vm.stylesheet.content = vm.editor.getValue();
                 save(activeApp);
             }
         }
@@ -120,9 +115,6 @@
 
         function init() {
 
-            //we need to load this somewhere, for now its here.
-            //assetsService.loadCss("lib/ace-razor-mode/theme/razor_chrome.css", $scope);
-
             if ($routeParams.create) {
                 codefileResource.getScaffold("stylesheets", $routeParams.id).then(function (stylesheet) {
                     const mode = $routeParams.rtestyle ? "RTE" : null;
@@ -174,8 +166,80 @@
 
             // Options to pass to code editor (VS-Code)
             vm.codeEditorOptions = {
-                language: "css",
-                fontSize: 30
+                language: "css"
+            }
+
+            //monaco.languages.registerCompletionItemProvider().dispose();
+
+            let cssCompletionProvider;
+
+            // When VS Code editor has loaded...
+            vm.codeEditorLoad = function(monaco, editor) {
+
+                // Wrapped in timeout as timing issue
+                // This runs before the directive on the filename focus
+                $timeout(function() {
+                    // initial cursor placement
+                    // Keep cursor in name field if we are create a new style sheet
+                    // else set the cursor at the bottom of the code editor
+                    if(!$routeParams.create) {
+
+                        const codeModel = editor.getModel();
+                        const codeModelRange = codeModel.getFullModelRange();
+
+                        // Set cursor position
+                        editor.setPosition({column: codeModelRange.endColumn, lineNumber: codeModelRange.endLineNumber });
+
+                        // Give the editor focus
+                        editor.focus();
+
+                        // Scroll down to last line
+                        editor.revealLine(codeModelRange.endLineNumber);
+                    }
+                });
+
+                // Use the event listener to notify & set the formstate to dirty
+                // So if you navigate away without saving your prompted
+                editor.onDidChangeModelContent(function(e){
+                    vm.setDirty();
+                });
+
+                // Register AutoCompletion for CSS
+                // Just a snippet to help with 'magic' CSS comment syntax for RTE classes
+                cssCompletionProvider = monaco.languages.registerCompletionItemProvider("css", {
+                    triggerCharacters: [" "], // Trigger on the same as the CSS Lang Service which is a space
+                    provideCompletionItems: function(model, position) {
+
+                        // Regardless of what we type - we will always put this in the autosuggestion
+                        // No smart checking of whats before the cursor etc..
+
+                        // TODO: Future improvement would be that this can only be done outside of a CSS selector
+                        // as it will show when suggesting CSS properties to set, which does not make sense
+                        return {
+                            suggestions: [ {
+                                label: "Umbraco: Rich Text Editor Style",
+                                kind: monaco.languages.CompletionItemKind.Snippet,
+                                insertText: [
+                                    "/**umb_name:${1:RTE Friendly Name}*/",
+                                    "${2:h2.mySelector} {",
+                                    "    ${3:color:blue;}",
+                                    "}"
+                                    ].join('\n'),
+                                documentation: "This adds a snippet for adding CSS items to the Rich Text Editor",
+                                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                                detail: "Snippet",
+                                sortText: "__umbraco" // The list is sorted alpha, so a cheap hack to get it to the top
+                            }]
+                        }
+                    }
+                });
+            };
+
+            vm.codeEditorDispose = function(){
+                // Dispose the completion provider
+                // When Angular is removing/destroying the component
+                // If we don't do this then we get dupe's added
+                cssCompletionProvider.dispose();
             }
 
             vm.setDirty = function () {
@@ -189,63 +253,6 @@
                 navigationService.syncTree({ tree: "stylesheets", path: vm.stylesheet.path, forceReload: true }).then(function (syncArgs) {
                     vm.page.menu.currentNode = syncArgs.node;
                 });
-            }
-
-            vm.aceOption = {
-                mode: "css",
-                theme: "chrome",
-                showPrintMargin: false,
-                advanced: {
-                    fontSize: '14px',
-                    enableSnippets: true,
-                    enableBasicAutocompletion: true,
-                    enableLiveAutocompletion: false
-                },
-                onLoad: function(_editor) {
-
-                    vm.editor = _editor;
-
-                    //Update the auto-complete method to use ctrl+alt+space
-                    _editor.commands.bindKey("ctrl-alt-space", "startAutocomplete");
-
-                    //Unassigns the keybinding (That was previously auto-complete)
-                    //As conflicts with our own tree search shortcut
-                    _editor.commands.bindKey("ctrl-space", null);
-
-                    // TODO: Move all these keybinding config out into some helper/service
-                    _editor.commands.addCommands([
-                        //Disable (alt+shift+K)
-                        //Conflicts with our own show shortcuts dialog - this overrides it
-                        {
-                            name: 'unSelectOrFindPrevious',
-                            bindKey: 'Alt-Shift-K',
-                            exec: function() {
-                                //Toggle the show keyboard shortcuts overlay
-                                $scope.$apply(function(){
-                                    vm.showKeyboardShortcut = !vm.showKeyboardShortcut;
-                                });
-                            },
-                            readOnly: true
-                        }
-                    ]);
-
-                    // initial cursor placement
-                    // Keep cursor in name field if we are create a new style sheet
-                    // else set the cursor at the bottom of the code editor
-                    if(!$routeParams.create) {
-                        $timeout(function(){
-                            vm.editor.navigateFileEnd();
-                            vm.editor.focus();
-                        });
-                    }
-
-                    vm.editor.on("change", changeAceEditor);
-
-                }
-            }
-
-            function changeAceEditor() {
-                setFormState("dirty");
             }
 
             function setFormState(state) {
