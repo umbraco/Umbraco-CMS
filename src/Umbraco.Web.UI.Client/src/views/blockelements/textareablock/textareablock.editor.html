@@ -1,0 +1,15 @@
+
+<div class="blockelement-textareablock-editor"  ng-controller="Umbraco.Editors.TextAreaBlockElementEditorController as vm">
+
+    <!-- TODO: Each block should be wrapper in a Block Element Editor directive, handling validation messages etc. -->
+
+    <textarea
+        umb-auto-resize
+        ng-model="vm.firstProperty.value"
+        ng-keypress="vm.submitOnEnter($event)"
+        ng-blur="vm.onBlur()"
+        focus-when="{{moveFocusToBlock === block}}"
+    >
+    </textarea>
+
+</div>

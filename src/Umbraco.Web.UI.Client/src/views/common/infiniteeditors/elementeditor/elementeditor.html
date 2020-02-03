@@ -1,0 +1,84 @@
+<div class="umb-element-editor"  ng-controller="Umbraco.Editors.ElementEditorController as vm">
+
+    <ng-form name="elementTypeForm" val-form-manager>
+        <umb-editor-view ng-if="!page.loading">
+
+            <!-- editor header missing -->
+
+            <div class="umb-editor-container umb-panel-body umb-scrollable row-fluid">
+
+                <!-- Missing Deleted Message Bar (Displayed when viewing node in recycle bin) -->
+
+                <div class="umb-pane">
+
+                    <div class="umb-editor-sub-views" val-sub-view>
+                        <div class="form-horizontal">
+                            <ng-form name="elementTypeContentForm">
+                                <div class="umb-group-panel"
+                                    data-element="group-{{group.alias}}"
+                                    ng-repeat="group in vm.content.tabs track by group.label">
+
+                                    <div class="umb-group-panel__header">
+                                        <div id="group-{{group.id}}">{{ group.label }}</div>
+                                    </div>
+
+                                    <div class="umb-group-panel__content">
+                                        <umb-property
+                                            data-element="property-{{property.alias}}"
+                                            ng-repeat="property in group.properties track by property.alias"
+                                            property="property"
+                                            show-inherit="content.variants.length > 1 && !property.culture && !activeVariant.language.isDefault"
+                                            inherits-from="defaultVariant.language.name">
+
+                                            <div ng-class="{'o-40 cursor-not-allowed': content.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue}">
+                                                <umb-property-editor
+                                                    model="property"
+                                                    preview="content.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue">
+                                                </umb-property-editor>
+                                            </div>
+
+                                        </umb-property>
+                                    </div>
+
+                                </div>
+
+                                <umb-empty-state
+                                    ng-if="content.tabs.length === 0"
+                                    position="center">
+                                    <localize key="content_noProperties"></localize>
+                                </umb-empty-state>
+
+                            </ng-form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <umb-editor-footer>
+
+                <!-- Missing breadcrumbs -->
+
+                <umb-editor-footer-content-right>
+
+                    <umb-button
+                        action="vm.close()"
+                        button-style="link"
+                        label-key="general_close"
+                        type="button">
+                    </umb-button>
+
+                    <umb-button
+                        action="vm.saveAndClose()"
+                        button-style="primary"
+                        state="saveAndCloseButtonState"
+                        label-key="buttons_saveAndClose"
+                        type="button">
+                    </umb-button>
+
+                </umb-editor-footer-content-right>
+
+            </umb-editor-footer>
+        </umb-editor-view>
+    </ng-form>
+</div>
