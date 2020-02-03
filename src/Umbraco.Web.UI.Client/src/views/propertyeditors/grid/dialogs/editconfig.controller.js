@@ -24,7 +24,7 @@ function EditConfigController($scope) {
 
         // angular.toJson (this removes stuff like $$hashKey for us)
         // as the code contents needs to be a string & not the raw JSON object
-        jsonModel = monaco.editor.createModel(angular.toJson($scope.model.config), "json", modelUri);
+        jsonModel = monaco.editor.createModel(angular.toJson($scope.model.config, true), "json", modelUri);
 
         // TODO: Improve the JSON schema from the online generated tool
         monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
@@ -124,13 +124,15 @@ function EditConfigController($scope) {
         // For the JSON schema to apply
         editor.setModel(jsonModel);
 
-        // TODO: YUK see if we can remove timeout
-        // As waiting for the model/content to be set is weird
-        // Must be some nice native event?!
-        // ALSO ITS SUPER JARRING WITH FLASH OF CHANGE
-        setTimeout(function() {
-            editor.getAction('editor.action.formatDocument').run();
-        }, 100);
+        // Will give us a list of errors & warnings
+        // TODO: We can prevent saving if we have one or more errors
+        editor.onDidChangeModelDecorations(() => {
+
+            const modelOwner = jsonModel.getModeId();
+            const markers = monaco.editor.getModelMarkers({owner: modelOwner});
+            console.table(markers);
+        });
+
     }
 
     function submit() {
