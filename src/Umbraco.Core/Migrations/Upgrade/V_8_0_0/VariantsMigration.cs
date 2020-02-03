@@ -209,6 +209,10 @@ VALUES (@id, @templateId, 0)", new { id=id, templateId=t.templateId });
             Database.Execute($@"DELETE FROM {PreTables.Document}
 WHERE versionId NOT IN (SELECT (versionId) FROM {PreTables.ContentVersion} WHERE {SqlSyntax.GetQuotedColumnName("current")} = 1) AND (published<>1 OR newest<>1)");
 
+            // ensure that documents with a published version are marked as published
+            Database.Execute($@"UPDATE {PreTables.Document} SET published=1 WHERE nodeId IN (
+SELECT nodeId FROM {PreTables.ContentVersion} cv INNER JOIN {Constants.DatabaseSchema.Tables.DocumentVersion} dv ON dv.id = cv.id WHERE dv.published=1)");
+
             // drop some document columns
             Delete.Column("text").FromTable(PreTables.Document).Do();
             Delete.Column("templateId").FromTable(PreTables.Document).Do();
