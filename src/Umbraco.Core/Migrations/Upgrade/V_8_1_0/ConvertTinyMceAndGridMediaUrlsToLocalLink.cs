@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Migrations.PostMigrations;
+using Umbraco.Core.Migrations.Upgrade.V_8_0_0.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Services;
@@ -27,15 +28,15 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_1_0
                 RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
             var sqlPropertyData = Sql()
-                .Select<PropertyDataDto>(r => r.Select(x => x.PropertyTypeDto, r1 => r1.Select(x => x.DataTypeDto)))
-                .From<PropertyDataDto>()
-                    .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>((left, right) => left.PropertyTypeId == right.Id)
-                    .InnerJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>((left, right) => left.DataTypeId == right.NodeId)
+                .Select<PropertyDataDto80>(r => r.Select(x => x.PropertyTypeDto, r1 => r1.Select(x => x.DataTypeDto)))
+                .From<PropertyDataDto80>()
+                    .InnerJoin<PropertyTypeDto80>().On<PropertyDataDto80, PropertyTypeDto80>((left, right) => left.PropertyTypeId == right.Id)
+                    .InnerJoin<DataTypeDto>().On<PropertyTypeDto80, DataTypeDto>((left, right) => left.DataTypeId == right.NodeId)
                 .Where<DataTypeDto>(x =>
                     x.EditorAlias == Constants.PropertyEditors.Aliases.TinyMce ||
                     x.EditorAlias == Constants.PropertyEditors.Aliases.Grid);
 
-            var properties = Database.Fetch<PropertyDataDto>(sqlPropertyData);
+            var properties = Database.Fetch<PropertyDataDto80>(sqlPropertyData);
 
             var exceptions = new List<Exception>();
             foreach (var property in properties)
