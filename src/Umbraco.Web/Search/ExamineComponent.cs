@@ -13,9 +13,6 @@ using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
 using Umbraco.Examine;
-using Examine.LuceneEngine.Directories;
-using Umbraco.Web.Composing;
-using System.ComponentModel;
 
 namespace Umbraco.Web.Search
 {
@@ -65,15 +62,6 @@ namespace Umbraco.Web.Search
 
         public void Initialize()
         {
-            //we want to tell examine to use a different fs lock instead of the default NativeFSFileLock which could cause problems if the AppDomain
-            //terminates and in some rare cases would only allow unlocking of the file if IIS is forcefully terminated. Instead we'll rely on the simplefslock
-            //which simply checks the existence of the lock file
-            DirectoryFactory.DefaultLockFactory = d =>
-            {
-                var simpleFsLockFactory = new NoPrefixSimpleFsLockFactory(d);
-                return simpleFsLockFactory;
-            };
-
             //let's deal with shutting down Examine with MainDom
             var examineShutdownRegistered = _mainDom.Register(() =>
             {

@@ -28,6 +28,7 @@ namespace Umbraco.Web
         private static UmbracoContext UmbracoContext => Current.UmbracoContext;
         private static ISiteDomainHelper SiteDomainHelper => Current.Factory.GetInstance<ISiteDomainHelper>();
         private static IVariationContextAccessor VariationContextAccessor => Current.VariationContextAccessor;
+        private static IExamineManager ExamineManager => Current.Factory.GetInstance<IExamineManager>();
         private static IUserService UserService => Current.Services.UserService;
 
         #region IsComposedOf
@@ -199,7 +200,7 @@ namespace Umbraco.Web
             // TODO: inject examine manager
 
             indexName = string.IsNullOrEmpty(indexName) ? Constants.UmbracoIndexes.ExternalIndexName : indexName;
-            if (!ExamineManager.Instance.TryGetIndex(indexName, out var index))
+            if (!ExamineManager.TryGetIndex(indexName, out var index))
                 throw new InvalidOperationException("No index found with name " + indexName);
 
             var searcher = index.GetSearcher();
@@ -208,7 +209,7 @@ namespace Umbraco.Web
             //var luceneQuery = "+__Path:(" + content.Path.Replace("-", "\\-") + "*) +" + t;
 
             var query = searcher.CreateQuery()
-                .Field(UmbracoExamineIndex.IndexPathFieldName, (content.Path + ",").MultipleCharacterWildcard())
+                .Field(UmbracoExamineFieldNames.IndexPathFieldName, (content.Path + ",").MultipleCharacterWildcard())
                 .And()
                 .ManagedQuery(term);
 
@@ -220,7 +221,7 @@ namespace Umbraco.Web
             // TODO: inject examine manager
 
             indexName = string.IsNullOrEmpty(indexName) ? Constants.UmbracoIndexes.ExternalIndexName : indexName;
-            if (!ExamineManager.Instance.TryGetIndex(indexName, out var index))
+            if (!ExamineManager.TryGetIndex(indexName, out var index))
                 throw new InvalidOperationException("No index found with name " + indexName);
 
             var searcher = index.GetSearcher();

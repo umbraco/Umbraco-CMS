@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Examine;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
 using Lucene.Net.Index;
 using Lucene.Net.QueryParsers;
 using Lucene.Net.Search;
-using Lucene.Net.Store;
 using Umbraco.Core;
 using Version = Lucene.Net.Util.Version;
 using Umbraco.Core.Logging;
@@ -16,19 +13,12 @@ using System.Threading;
 
 namespace Umbraco.Examine
 {
+
     /// <summary>
     /// Extension methods for the LuceneIndex
     /// </summary>
     public static class ExamineExtensions
     {
-        /// <summary>
-        /// Matches a culture iso name suffix
-        /// </summary>
-        /// <remarks>
-        /// myFieldName_en-us will match the "en-us"
-        /// </remarks>
-        internal static readonly Regex CultureIsoCodeFieldNameMatchExpression = new Regex("^([_\\w]+)_([a-z]{2}-[a-z0-9]{2,4})$", RegexOptions.Compiled);
-
         private static bool _isConfigured = false;
         private static object _configuredInit = null;
         private static object _isConfiguredLocker = new object();
@@ -52,51 +42,6 @@ namespace Umbraco.Examine
                 });
         }
 
-        //TODO: We need a public method here to just match a field name against CultureIsoCodeFieldNameMatchExpression
-
-        /// <summary>
-        /// Returns all index fields that are culture specific (suffixed)
-        /// </summary>
-        /// <param name="index"></param>
-        /// <param name="culture"></param>
-        /// <returns></returns>
-        public static IEnumerable<string> GetCultureFields(this IUmbracoIndex index, string culture)
-        {
-            var allFields = index.GetFields();
-            // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (var field in allFields)
-            {
-                var match = CultureIsoCodeFieldNameMatchExpression.Match(field);
-                if (match.Success && match.Groups.Count == 3 && culture.InvariantEquals(match.Groups[2].Value))
-                    yield return field;
-            }
-        }
-
-        /// <summary>
-        /// Returns all index fields that are culture specific (suffixed) or invariant
-        /// </summary>
-        /// <param name="index"></param>
-        /// <param name="culture"></param>
-        /// <returns></returns>
-        public static IEnumerable<string> GetCultureAndInvariantFields(this IUmbracoIndex index, string culture)
-        {
-            var allFields = index.GetFields();
-            // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (var field in allFields)
-            {
-                var match = CultureIsoCodeFieldNameMatchExpression.Match(field);
-                if (match.Success && match.Groups.Count == 3 && culture.InvariantEquals(match.Groups[2].Value))
-                {
-                    yield return field; //matches this culture field
-                }
-                else if (!match.Success)
-                {
-                    yield return field; //matches no culture field (invariant)
-                }
-                    
-            }
-        }
-
         internal static bool TryParseLuceneQuery(string query)
         {
             // TODO: I'd assume there would be a more strict way to parse the query but not that i can find yet, for now we'll
@@ -107,7 +52,7 @@ namespace Umbraco.Examine
             try
             {
                 //This will pass with a plain old string without any fields, need to figure out a way to have it properly parse
-                var parsed = new QueryParser(Version.LUCENE_30, "nodeName", new KeywordAnalyzer()).Parse(query);
+                var parsed = new QueryParser(Version.LUCENE_30, UmbracoExamineFieldNames.NodeNameFieldName, new KeywordAnalyzer()).Parse(query);
                 return true;
             }
             catch (ParseException)
@@ -126,7 +71,7 @@ namespace Umbraco.Examine
         /// <remarks>
         /// This is not thread safe, use with care
         /// </remarks>
-        internal static void ConfigureLuceneIndexes(this IExamineManager examineManager, ILogger logger, bool disableExamineIndexing)
+        private static void ConfigureLuceneIndexes(this IExamineManager examineManager, ILogger logger, bool disableExamineIndexing)
         {
             foreach (var luceneIndexer in examineManager.Indexes.OfType<LuceneIndex>())
             {

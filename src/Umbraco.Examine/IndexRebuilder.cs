@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Examine;
 
 namespace Umbraco.Examine
-{   
+{
 
     /// <summary>
     /// Utility to rebuild all indexes ensuring minimal data queries
@@ -45,6 +45,8 @@ namespace Umbraco.Examine
 
             if (indexes.Length == 0) return;
 
+            OnRebuildingIndexes(new IndexRebuildingEventArgs(indexes));
+
             foreach (var index in indexes)
             {
                 index.CreateIndex(); // clear the index
@@ -54,5 +56,11 @@ namespace Umbraco.Examine
             Parallel.ForEach(_populators, populator => populator.Populate(indexes));
         }
 
+        /// <summary>
+        /// Event raised when indexes are being rebuilt
+        /// </summary>
+        public event EventHandler<IndexRebuildingEventArgs> RebuildingIndexes;
+
+        private void OnRebuildingIndexes(IndexRebuildingEventArgs args) => RebuildingIndexes?.Invoke(this, args);
     }
 }

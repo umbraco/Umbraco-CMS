@@ -30,7 +30,7 @@ namespace Umbraco.Web.Search
 
             composition.Register<IndexRebuilder>(Lifetime.Singleton);
             composition.RegisterUnique<IUmbracoIndexConfig, UmbracoIndexConfig>();
-            composition.RegisterUnique<IUmbracoIndexesCreator, UmbracoIndexesCreator>();
+            composition.RegisterUnique<IIndexDiagnosticsFactory, IndexDiagnosticsFactory>();            
             composition.RegisterUnique<IPublishedContentValueSetBuilder>(factory =>
                 new ContentValueSetBuilder(
                     factory.GetInstance<PropertyEditorCollection>(),
@@ -48,11 +48,6 @@ namespace Umbraco.Web.Search
             composition.RegisterUnique<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
             composition.RegisterUnique<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
             composition.RegisterUnique<BackgroundIndexRebuilder>();
-
-            //We want to manage Examine's AppDomain shutdown sequence ourselves so first we'll disable Examine's default behavior
-            //and then we'll use MainDom to control Examine's shutdown - this MUST be done in Compose ie before ExamineManager
-            //is instantiated, as the value is used during instantiation
-            ExamineManager.DisableDefaultHostingEnvironmentRegistration();
         }
     }
 }

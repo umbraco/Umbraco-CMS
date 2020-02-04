@@ -108,7 +108,7 @@ namespace Umbraco.Tests.Runtimes
             composition.RegisterUnique(f => new DistributedCache(f.GetInstance<IServerMessenger>(), f.GetInstance<CacheRefresherCollection>()));
             composition.WithCollectionBuilder<UrlProviderCollectionBuilder>().Append<DefaultUrlProvider>();
             composition.RegisterUnique<IDistributedCacheBinder, DistributedCacheBinder>();
-            composition.RegisterUnique<IExamineManager>(f => ExamineManager.Instance);
+            composition.RegisterUnique<IExamineManager, ExamineManager>();
             composition.RegisterUnique<IUmbracoContextFactory, UmbracoContextFactory>();
             composition.RegisterUnique<IMacroRenderer, MacroRenderer>();
             composition.RegisterUnique<MediaUrlProviderCollection>(_ => new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()));

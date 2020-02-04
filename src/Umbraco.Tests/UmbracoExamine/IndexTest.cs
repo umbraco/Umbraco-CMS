@@ -114,8 +114,8 @@ namespace Umbraco.Tests.UmbracoExamine
                 Assert.AreEqual("value2", result.AllValues["grid.row1"][1]);
                 Assert.IsTrue(result.Values.ContainsKey("grid"));
                 Assert.AreEqual("value1 value2 ", result["grid"]);
-                Assert.IsTrue(result.Values.ContainsKey($"{UmbracoExamineIndex.RawFieldPrefix}grid"));
-                Assert.AreEqual(json, result[$"{UmbracoExamineIndex.RawFieldPrefix}grid"]);
+                Assert.IsTrue(result.Values.ContainsKey($"{UmbracoExamineFieldNames.RawFieldPrefix}grid"));
+                Assert.AreEqual(json, result[$"{UmbracoExamineFieldNames.RawFieldPrefix}grid"]);
             }
         }
 
@@ -165,12 +165,12 @@ namespace Umbraco.Tests.UmbracoExamine
                 var protectedQuery = new BooleanQuery();
                 protectedQuery.Add(
                     new BooleanClause(
-                        new TermQuery(new Term(LuceneIndex.CategoryFieldName, IndexTypes.Content)),
+                        new TermQuery(new Term(ExamineFieldNames.CategoryFieldName, IndexTypes.Content)),
                         Occur.MUST));
 
                 protectedQuery.Add(
                     new BooleanClause(
-                        new TermQuery(new Term(LuceneIndex.ItemIdFieldName, ExamineDemoDataContentService.ProtectedNode.ToString())),
+                        new TermQuery(new Term(ExamineFieldNames.ItemIdFieldName, ExamineDemoDataContentService.ProtectedNode.ToString())),
                         Occur.MUST));
 
                 var collector = TopScoreDocCollector.Create(100, true);
@@ -287,7 +287,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 //create the whole thing
                 rebuilder.Populate(indexer);
 
-                var result = searcher.CreateQuery().Field(LuceneIndex.CategoryFieldName, IndexTypes.Content).Execute();
+                var result = searcher.CreateQuery().Field(ExamineFieldNames.CategoryFieldName, IndexTypes.Content).Execute();
                 Assert.AreEqual(21, result.TotalItemCount);
 
                 //delete all content
@@ -298,13 +298,13 @@ namespace Umbraco.Tests.UmbracoExamine
 
 
                 //ensure it's all gone
-                result = searcher.CreateQuery().Field(LuceneIndex.CategoryFieldName, IndexTypes.Content).Execute();
+                result = searcher.CreateQuery().Field(ExamineFieldNames.CategoryFieldName, IndexTypes.Content).Execute();
                 Assert.AreEqual(0, result.TotalItemCount);
 
                 //call our indexing methods
                 rebuilder.Populate(indexer);
 
-                result = searcher.CreateQuery().Field(LuceneIndex.CategoryFieldName, IndexTypes.Content).Execute();
+                result = searcher.CreateQuery().Field(ExamineFieldNames.CategoryFieldName, IndexTypes.Content).Execute();
                 Assert.AreEqual(21, result.TotalItemCount);
             }
         }
