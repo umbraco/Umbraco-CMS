@@ -42,13 +42,6 @@ namespace Umbraco.Examine
             var indexName = Constants.UmbracoIndexes.InternalIndexName;
             var fields = _treeSearcherFields.GetBackOfficeFields().ToList();
 
-            // TODO: WE should try to allow passing in a lucene raw query, however we will still need to do some manual string
-            // manipulation for things like start paths, member types, etc...
-            //if (Examine.ExamineExtensions.TryParseLuceneQuery(query))
-            //{
-
-            //}
-
             //special GUID check since if a user searches on one specifically we need to escape it
             if (Guid.TryParse(query, out var g))
             {
