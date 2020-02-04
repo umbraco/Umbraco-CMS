@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Examine;
-using Examine.LuceneEngine.Providers;
 using Umbraco.Core;
 
 namespace Umbraco.Examine

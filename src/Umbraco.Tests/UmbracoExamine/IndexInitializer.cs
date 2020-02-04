@@ -47,7 +47,7 @@ namespace Umbraco.Tests.UmbracoExamine
 
         public static MediaIndexPopulator GetMediaIndexRebuilder(PropertyEditorCollection propertyEditors, IMediaService mediaService)
         {
-            var mediaValueSetBuilder = new MediaValueSetBuilder(propertyEditors, new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }), GetMockUserService(), GetMockLogger(), TestHelper.ShortStringHelper);
+            var mediaValueSetBuilder = new MediaValueSetBuilder(propertyEditors, new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(TestHelper.ShortStringHelper) }), GetMockUserService(), GetMockLogger(), TestHelper.ShortStringHelper, TestHelper.JsonSerializer);
             var mediaIndexDataSource = new MediaIndexPopulator(null, mediaService, mediaValueSetBuilder);
             return mediaIndexDataSource;
         }
@@ -68,8 +68,8 @@ namespace Umbraco.Tests.UmbracoExamine
                         m.SortOrder == (int)x.Attribute("sortOrder") &&
                         m.CreateDate == (DateTime)x.Attribute("createDate") &&
                         m.UpdateDate == (DateTime)x.Attribute("updateDate") &&
-                        m.Name == (string)x.Attribute("nodeName") &&
-                        m.GetCultureName(It.IsAny<string>()) == (string)x.Attribute("nodeName") &&
+                        m.Name == (string)x.Attribute(UmbracoExamineFieldNames.NodeNameFieldName) &&
+                        m.GetCultureName(It.IsAny<string>()) == (string)x.Attribute(UmbracoExamineFieldNames.NodeNameFieldName) &&
                         m.Path == (string)x.Attribute("path") &&
                         m.Properties == new PropertyCollection() &&
                         m.ContentType == Mock.Of<ISimpleContentType>(mt =>
@@ -108,8 +108,8 @@ namespace Umbraco.Tests.UmbracoExamine
                         m.SortOrder == (int)x.Attribute("sortOrder") &&
                         m.CreateDate == (DateTime)x.Attribute("createDate") &&
                         m.UpdateDate == (DateTime)x.Attribute("updateDate") &&
-                        m.Name == (string)x.Attribute("nodeName") &&
-                        m.GetCultureName(It.IsAny<string>()) == (string)x.Attribute("nodeName") &&
+                        m.Name == (string)x.Attribute(UmbracoExamineFieldNames.NodeNameFieldName) &&
+                        m.GetCultureName(It.IsAny<string>()) == (string)x.Attribute(UmbracoExamineFieldNames.NodeNameFieldName) &&
                         m.Path == (string)x.Attribute("path") &&
                         m.Properties == new PropertyCollection() &&
                         m.ContentType == Mock.Of<ISimpleContentType>(mt =>

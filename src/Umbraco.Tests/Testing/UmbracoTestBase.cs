@@ -393,7 +393,7 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().Content);
             Composition.RegisterUnique(factory => factory.GetInstance<IUmbracoSettingsSection>().WebRouting);
 
-            Composition.RegisterUnique<IExamineManager>(factory => ExamineManager.Instance);
+            Composition.RegisterUnique<IExamineManager, ExamineManager>();
 
             Composition.RegisterUnique<IJsonSerializer, JsonNetSerializer>();
 

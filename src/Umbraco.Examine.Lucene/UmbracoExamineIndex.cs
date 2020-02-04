@@ -28,19 +28,7 @@ namespace Umbraco.Examine
         // call context (and the database it can contain)! ideally we should be able to override
         // SafelyProcessQueueItems but that's not possible in the current version of Examine.
 
-        /// <summary>
-        /// Used to store the path of a content object
-        /// </summary>
-        public const string IndexPathFieldName = SpecialFieldPrefix + "Path";
-        public const string NodeKeyFieldName = SpecialFieldPrefix + "Key";
-        public const string UmbracoFileFieldName = "umbracoFileSrc";
-        public const string IconFieldName = SpecialFieldPrefix + "Icon";
-        public const string PublishedFieldName = SpecialFieldPrefix + "Published";
-
-        /// <summary>
-        /// The prefix added to a field when it is duplicated in order to store the original raw value.
-        /// </summary>
-        public const string RawFieldPrefix = SpecialFieldPrefix + "Raw_";
+        
 
         /// <summary>
         /// Create a new <see cref="UmbracoExamineIndex"/>
@@ -141,7 +129,7 @@ namespace Umbraco.Examine
         {
             var d = docArgs.Document;
 
-            foreach (var f in docArgs.ValueSet.Values.Where(x => x.Key.StartsWith(RawFieldPrefix)).ToList())
+            foreach (var f in docArgs.ValueSet.Values.Where(x => x.Key.StartsWith(UmbracoExamineFieldNames.RawFieldPrefix)).ToList())
             {
                 if (f.Value.Count > 0)
                 {
@@ -182,13 +170,13 @@ namespace Umbraco.Examine
             var path = e.ValueSet.GetValue("path");
             if (path != null)
             {
-                e.ValueSet.Set(IndexPathFieldName, path);
+                e.ValueSet.Set(UmbracoExamineFieldNames.IndexPathFieldName, path);
             }
 
             //icon
-            if (e.ValueSet.Values.TryGetValue("icon", out var icon) && e.ValueSet.Values.ContainsKey(IconFieldName) == false)
+            if (e.ValueSet.Values.TryGetValue("icon", out var icon) && e.ValueSet.Values.ContainsKey(UmbracoExamineFieldNames.IconFieldName) == false)
             {
-                e.ValueSet.Values[IconFieldName] = icon;
+                e.ValueSet.Values[UmbracoExamineFieldNames.IconFieldName] = icon;
             }
         }
 

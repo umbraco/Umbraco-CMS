@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Examine;
-using Examine.LuceneEngine.Providers;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Examine;
 using Umbraco.Web.PublishedCache;
@@ -65,7 +63,7 @@ namespace Umbraco.Web
             foreach (var result in results)
             {
                 if (int.TryParse(result.Id, out var contentId) &&
-                    result.Values.TryGetValue(LuceneIndex.CategoryFieldName, out var indexType))
+                    result.Values.TryGetValue(ExamineFieldNames.CategoryFieldName, out var indexType))
                 {
                     IPublishedContent content;
                     switch (indexType)

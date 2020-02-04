@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Umbraco.Web.Search
+namespace Umbraco.Examine
 {
     /// <summary>
     /// Used to propagate hardcoded internal Field lists

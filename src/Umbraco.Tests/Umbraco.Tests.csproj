@@ -78,13 +78,14 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Castle.Core" Version="4.3.1" />
-    <PackageReference Include="Examine" Version="1.0.2" />
+    <PackageReference Include="Examine.Core">
+      <Version>2.0.0-alpha.20200128.15</Version>
+    </PackageReference>
     <PackageReference Include="HtmlAgilityPack">
       <Version>1.8.14</Version>
     </PackageReference>
     <PackageReference Include="LightInject" Version="5.4.0" />
     <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
-    <PackageReference Include="Lucene.Net" Version="3.0.3" />
     <PackageReference Include="Lucene.Net.Contrib" Version="3.0.3" />
     <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.7" />
@@ -146,6 +147,7 @@
     <Compile Include="Persistence\Mappers\MapperTestBase.cs" />
     <Compile Include="Persistence\Repositories\DocumentRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\EntityRepositoryTest.cs" />
+    <Compile Include="UmbracoExamine\ExamineExtensions.cs" />
     <Compile Include="PublishedContent\NuCacheChildrenTests.cs" />
     <Compile Include="PublishedContent\PublishedContentLanguageVariantTests.cs" />
     <Compile Include="PublishedContent\PublishedContentSnapshotTestBase.cs" />
@@ -562,6 +564,10 @@
       <Project>{fbe7c065-dac0-4025-a78b-63b24d3ab00b}</Project>
       <Name>Umbraco.Configuration</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Umbraco.Examine\Umbraco.Examine.csproj">
+      <Project>{f9b7fe05-0f93-4d0d-9c10-690b33ecbbd8}</Project>
+      <Name>Umbraco.Examine</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj">
       <Project>{3ae7bf57-966b-45a5-910a-954d7c554441}</Project>
       <Name>Umbraco.Infrastructure</Name>
@@ -578,9 +584,9 @@
       <Project>{651E1350-91B6-44B7-BD60-7207006D7003}</Project>
       <Name>Umbraco.Web</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Umbraco.Examine\Umbraco.Examine.csproj">
+    <ProjectReference Include="..\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj">
       <Project>{07fbc26b-2927-4a22-8d96-d644c667fecc}</Project>
-      <Name>Umbraco.Examine</Name>
+      <Name>Umbraco.Examine.Lucene</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
