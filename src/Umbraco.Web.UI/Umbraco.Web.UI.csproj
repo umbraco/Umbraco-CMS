@@ -382,9 +382,7 @@
     <Message Text="Skip Belle because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)." Importance="High" Condition="'$(UmbracoBuild)' != ''" />
     <Message Text="Skip Belle because $(ProjectDir)Umbraco\lib exists." Importance="High" Condition="Exists('$(ProjectDir)Umbraco\lib')" />
     <Message Text="Build Belle because UmbracoBuild is empty (this is Visual Studio), and $(ProjectDir)Umbraco\lib does not exist." Importance="High" Condition="!Exists('$(ProjectDir)Umbraco\lib') and '$(UmbracoBuild)' == ''" />
-    <!--
     <CallTarget Targets="BelleBuild" Condition="!Exists('$(ProjectDir)Umbraco\lib') and '$(UmbracoBuild)' == ''" />
-    -->
   </Target>
   <!-- clean Belle when cleaning and rebuilding, but only in Visual Studio -->
   <Target Name="CleanBelle" AfterTargets="Clean" Condition="'$(UmbracoBuild)' == ''">
