@@ -97,7 +97,14 @@ HAVING COUNT(v2.id) <> 1").Any())
             // It will be removed in CreateKeysAndIndexes before the normal indexes for the table are created
             var tableDefinition = Persistence.DatabaseModelDefinitions.DefinitionFactory.GetTableDefinition(typeof(PropertyDataDto), SqlSyntax);
             Execute.Sql(SqlSyntax.FormatPrimaryKey(tableDefinition)).Do();
-            Execute.Sql($"CREATE UNIQUE NONCLUSTERED INDEX IX_umbracoPropertyData_Temp ON {PreTables.PropertyData} (versionId,propertyTypeId,languageId,segment)").Do();
+            Create.Index("IX_umbracoPropertyData_Temp").OnTable(PropertyDataDto.TableName)
+                .WithOptions().Unique()
+                .WithOptions().NonClustered()
+                .OnColumn("versionId").Ascending()
+                .OnColumn("propertyTypeId").Ascending()
+                .OnColumn("languageId").Ascending()
+                .OnColumn("segment").Ascending()
+                .Do();                
         }
 
         private void MigrateContentAndPropertyTypes()
