@@ -14,13 +14,9 @@ function EditConfigController($scope) {
     let jsonModel;
 
     vm.onInit = function(monaco) {
+
+        // Need to make a fake URI to associate to our model so we get JSON Schema for this URI
         const modelUri = monaco.Uri.parse("json://grid/settings.json");
-
-        // TODO: If we set the value of editor & not model attribute on div
-        // How will I keep the code editor in sync with $scope.model.config !?
-        // OR put differently - how will I save the value when clicking Save/Done button
-
-        // Answer: Get the VALUE from VSCode editor when saving as opposed to updating model from VSCode own events
 
         // angular.toJson (this removes stuff like $$hashKey for us)
         // as the code contents needs to be a string & not the raw JSON object
@@ -33,17 +29,13 @@ function EditConfigController($scope) {
                 uri: "",
                 fileMatch: [modelUri.toString()],
                 schema: {
-                    "definitions": {},
-                    "$schema": "",
-                    "$id": "http://example.com/root.json",
+                    "$schema": "http://json-schema.org/draft-07/schema#",
+                    "title": "Umbraco Grid Settings Schema",
+                    "description": "A JSON array/collection of settings and style configurations for the grid editor",
                     "type": "array",
-                    "title": "Umbraco Grid Settings Schema WARREN",
-                    "default": null,
                     "items": {
-                        "$id": "#/items",
                         "type": "object",
-                        "title": "Grid Setting",
-                        "default": null,
+                        "title": "Editable grid setting",
                         "required": [
                             "label",
                             "description",
@@ -52,64 +44,104 @@ function EditConfigController($scope) {
                         ],
                         "properties": {
                             "label": {
-                                "$id": "#/items/properties/label",
                                 "type": "string",
-                                "title": "The Label Schema",
-                                "default": "",
+                                "title": "Field name displayed in the content editor UI",
                                 "examples": [
-                                    "Class"
-                                ],
-                                "pattern": "^(.*)$"
+                                    "Background image",
+                                    "Title",
+                                    "Custom data"
+                                ]
                             },
                             "description": {
-                                "$id": "#/items/properties/description",
                                 "type": "string",
-                                "title": "The Description Schema",
-                                "default": "",
+                                "title": "Descriptive text displayed in the content editor UI to guide the user",
                                 "examples": [
-                                    "Set a css class"
-                                ],
-                                "pattern": "^(.*)$"
+                                    "Choose an image",
+                                    "Set a title on this element",
+                                    "Set the custom data on this element"
+                                ]
                             },
                             "key": {
-                                "$id": "#/items/properties/key",
                                 "type": "string",
-                                "title": "The Key Schema",
-                                "default": "",
+                                "title": "The key the entered setting value will be stored under",
                                 "examples": [
-                                    "class"
-                                ],
-                                "pattern": "^(.*)$"
+                                    "background-image",
+                                    "title",
+                                    "data-custom"
+                                ]
                             },
                             "view": {
-                                "$id": "#/items/properties/view",
                                 "type": "string",
-                                "title": "The View Schema",
-                                "default": "",
+                                "title": "The prevalue editor used to enter a setting value with",
+                                "description": "This can be a value such as 'mediapicker', 'textstring' or '/app_plugins/grid/editors/view.html'",
                                 "examples": [
-                                    "textstring"
-                                ],
-                                "pattern": "^(.*)$"
+                                    "imagepicker",
+                                    "textstring",
+                                    "radiobuttonlist"
+                                ]
+                            },
+                            "prevalues": {
+                                "type": "array",
+                                "title": "An array of prevalues to use with the prevalue editor 'value' property",
+                                "minItems": 1,
+                                "uniqueItems": true,
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "label": {
+                                            "type": "string",
+                                            "title": "The label shown for the prevalue"
+                                        },
+                                        "value": {
+                                            "type": "string",
+                                            "title": "The value used for the prevalue"
+                                        }
+                                    },
+                                    "required": [ "label", "value" ]
+                                }
                             },
                             "modifier": {
-                                "$id": "#/items/properties/modifier",
                                 "type": "string",
-                                "title": "The Modifier Schema",
-                                "default": "",
-                                "examples": [
-                                    "col-sm-{0}"
-                                ],
-                                "pattern": "^(.*)$"
+                                "title": "A format to prepend, append or wrap the value from the editor in a string",
+                                "description": "This is optional and gives you more control of the output",
+                                "examples": ["url('{0}')"]
                             },
                             "applyTo": {
-                                "$id": "#/items/properties/applyTo",
-                                "type": "string",
-                                "title": "The Applyto Schema",
-                                "default": "",
-                                "examples": [
-                                    "row|cell"
-                                ],
-                                "pattern": "^(.*)$"
+                                "title": "Defines what this setting can be applied to, be it a row or cell or specific configurations.",
+                                "description": "States whether the setting can be used on a cell or a row. If either not present or empty, the setting will be shown both on Rows and Cells.",
+                                "anyOf": [
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "row": {
+                                                "type": "string",
+                                                "title": "Specify Row names to restrict this to",
+                                                "examples": [
+                                                    "Headline",
+                                                    "Headline,Article"
+                                                ]
+                                            },
+                                            "cell": {
+                                                "type": "string",
+                                                "title": "Specify Cell numbers to restrict this to",
+                                                "examples": [
+                                                    "4",
+                                                    "4,8,6"
+                                                ]
+                                            }
+                                        },
+                                        "minProperties": 1,
+                                        "maxProperties": 2
+                                    },
+                                    {
+                                        "type": "string",
+                                        "enum": [ "row", "cell" ],
+                                        "examples": [
+                                            "row",
+                                            "cell"
+                                        ]
+                                    }
+                                ]
                             }
                         }
                     }
@@ -131,6 +163,9 @@ function EditConfigController($scope) {
             const modelOwner = jsonModel.getModeId();
             const markers = monaco.editor.getModelMarkers({owner: modelOwner});
             console.table(markers);
+
+            // If count greater than 0 - mark as invalid
+            // else set the form back to being valid so the JSON can be saved
         });
 
     }
@@ -150,7 +185,7 @@ function EditConfigController($scope) {
                 jsonModel.dispose();
 
                 // We manually assign ithe code editor contents when saving & closing
-                // As this implementation for this JSON editor uses
+                // As opposed to using the attribute editor-contents to be an auto-updated Angular property
                 $scope.model.config = angular.fromJson(jsonCode);
                 $scope.model.submit($scope.model);
 
