@@ -12,6 +12,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
@@ -1478,12 +1479,56 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // assumes content tree lock
         private void RebuildContentDbCacheLocked(IScope scope, int groupSize, IEnumerable<int> contentTypeIds)
         {
+            RemoveAllThenInsertBack(scope, Constants.ObjectTypes.Document, _documentRepository, groupSize, contentTypeIds, ConvertContent);
+        }
+
+        public void RebuildMediaDbCache(int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
+        {
+            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
+            {
+                scope.ReadLock(Constants.Locks.MediaTree);
+                RebuildMediaDbCacheLocked(scope, groupSize, contentTypeIds);
+                scope.Complete();
+            }
+        }
+
+        // assumes media tree lock
+        public void RebuildMediaDbCacheLocked(IScope scope, int groupSize, IEnumerable<int> contentTypeIds)
+        {
+            RemoveAllThenInsertBack(scope, Constants.ObjectTypes.Media, _mediaRepository, groupSize, contentTypeIds, ConvertMediaOrMember);
+        }
+
+        public void RebuildMemberDbCache(int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
+        {
+            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
+            {
+                scope.ReadLock(Constants.Locks.MemberTree);
+                RebuildMemberDbCacheLocked(scope, groupSize, contentTypeIds);
+                scope.Complete();
+            }
+        }
+
+        // assumes member tree lock
+        public void RebuildMemberDbCacheLocked(IScope scope, int groupSize, IEnumerable<int> contentTypeIds)
+        {
+            RemoveAllThenInsertBack(scope, Constants.ObjectTypes.Member, _memberRepository, groupSize, contentTypeIds, ConvertMediaOrMember);
+        }
+
+        private void RemoveAllThenInsertBack<T>(IScope scope, Guid contentObjectType, IContentRepository<int, T> repository, int groupSize, IEnumerable<int> contentTypeIds, Func<IEnumerable<T>, IEnumerable<ContentNuDto>> conversion) where T : IContentBase
+        {
             var contentTypeIdsA = contentTypeIds?.ToArray();
-            var contentObjectType = Constants.ObjectTypes.Document;
-            var db = scope.Database;
 
             // remove all - if anything fails the transaction will rollback
-            if (contentTypeIds == null || contentTypeIdsA.Length == 0)
+            RemoveAll(scope, contentObjectType, contentTypeIdsA);
+
+            // insert back - if anything fails the transaction will rollback
+            InsertBack(scope, repository, groupSize, contentTypeIdsA, conversion);
+        }
+
+        private void RemoveAll(IScope scope, Guid contentObjectType, int[] contentTypeIds)
+        {
+            var db = scope.Database;
+            if (contentTypeIds == null || contentTypeIds.Length == 0)
             {
                 // must support SQL-CE
                 db.Execute(@"DELETE FROM cmsContentNu
@@ -1503,13 +1548,16 @@ WHERE cmsContentNu.nodeId IN (
     WHERE umbracoNode.nodeObjectType=@objType
     AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)
 )",
-                    new { objType = contentObjectType, ctypes = contentTypeIdsA });
+                    new { objType = contentObjectType, ctypes = contentTypeIds });
             }
 
-            // insert back - if anything fails the transaction will rollback
-            var query = scope.SqlContext.Query<IContent>();
-            if (contentTypeIds != null && contentTypeIdsA.Length > 0)
-                query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
+        }
+
+        private void InsertBack<T>(IScope scope, IContentRepository<int, T> repository, int groupSize, int[] contentTypeIds, Func<IEnumerable<T>, IEnumerable<ContentNuDto>> conversion) where T : IContentBase
+        {
+            var query = scope.SqlContext.Query<T>();
+            if (contentTypeIds != null && contentTypeIds.Any())
+                query = query.WhereIn(x => x.ContentTypeId, contentTypeIds); // assume number of ctypes won't blow IN(...)
 
             long pageIndex = 0;
             long processed = 0;
@@ -1517,143 +1565,34 @@ WHERE cmsContentNu.nodeId IN (
             do
             {
                 // the tree is locked, counting and comparing to total is safe
-                var descendants = _documentRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
-                var items = new List<ContentNuDto>();
-                var count = 0;
-                foreach (var c in descendants)
-                {
-                    // always the edited version
-                    items.Add(GetDto(c, false));
-
-                    // and also the published version if it makes any sense
-                    if (c.Published)
-                        items.Add(GetDto(c, true));
-
-                    count++;
-                }
-
-                db.BulkInsertRecords(items);
-                processed += count;
-            } while (processed < total);
-        }
-
-        public void RebuildMediaDbCache(int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
-        {
-            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
-            {
-                scope.ReadLock(Constants.Locks.MediaTree);
-                RebuildMediaDbCacheLocked(scope, groupSize, contentTypeIds);
-                scope.Complete();
-            }
-        }
-
-        // assumes media tree lock
-        public void RebuildMediaDbCacheLocked(IScope scope, int groupSize, IEnumerable<int> contentTypeIds)
-        {
-            var contentTypeIdsA = contentTypeIds?.ToArray();
-            var mediaObjectType = Constants.ObjectTypes.Media;
-            var db = scope.Database;
-
-            // remove all - if anything fails the transaction will rollback
-            if (contentTypeIds == null || contentTypeIdsA.Length == 0)
-            {
-                // must support SQL-CE
-                db.Execute(@"DELETE FROM cmsContentNu
-WHERE cmsContentNu.nodeId IN (
-    SELECT id FROM umbracoNode WHERE umbracoNode.nodeObjectType=@objType
-)",
-                    new { objType = mediaObjectType });
-            }
-            else
-            {
-                // assume number of ctypes won't blow IN(...)
-                // must support SQL-CE
-                db.Execute($@"DELETE FROM cmsContentNu
-WHERE cmsContentNu.nodeId IN (
-    SELECT id FROM umbracoNode
-    JOIN {Constants.DatabaseSchema.Tables.Content} ON {Constants.DatabaseSchema.Tables.Content}.nodeId=umbracoNode.id
-    WHERE umbracoNode.nodeObjectType=@objType
-    AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)
-)",
-                    new { objType = mediaObjectType, ctypes = contentTypeIdsA });
-            }
-
-            // insert back - if anything fails the transaction will rollback
-            var query = scope.SqlContext.Query<IMedia>();
-            if (contentTypeIds != null && contentTypeIdsA.Length > 0)
-                query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
-
-            long pageIndex = 0;
-            long processed = 0;
-            long total;
-            do
-            {
-                // the tree is locked, counting and comparing to total is safe
-                var descendants = _mediaRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
-                var items = descendants.Select(m => GetDto(m, false)).ToList();
-                db.BulkInsertRecords(items);
-                processed += items.Count;
-            } while (processed < total);
-        }
-
-        public void RebuildMemberDbCache(int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
-        {
-            using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
-            {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                RebuildMemberDbCacheLocked(scope, groupSize, contentTypeIds);
-                scope.Complete();
-            }
-        }
-
-        // assumes member tree lock
-        public void RebuildMemberDbCacheLocked(IScope scope, int groupSize, IEnumerable<int> contentTypeIds)
-        {
-            var contentTypeIdsA = contentTypeIds?.ToArray();
-            var memberObjectType = Constants.ObjectTypes.Member;
-            var db = scope.Database;
-
-            // remove all - if anything fails the transaction will rollback
-            if (contentTypeIds == null || contentTypeIdsA.Length == 0)
-            {
-                // must support SQL-CE
-                db.Execute(@"DELETE FROM cmsContentNu
-WHERE cmsContentNu.nodeId IN (
-    SELECT id FROM umbracoNode WHERE umbracoNode.nodeObjectType=@objType
-)",
-                    new { objType = memberObjectType });
-            }
-            else
-            {
-                // assume number of ctypes won't blow IN(...)
-                // must support SQL-CE
-                db.Execute($@"DELETE FROM cmsContentNu
-WHERE cmsContentNu.nodeId IN (
-    SELECT id FROM umbracoNode
-    JOIN {Constants.DatabaseSchema.Tables.Content} ON {Constants.DatabaseSchema.Tables.Content}.nodeId=umbracoNode.id
-    WHERE umbracoNode.nodeObjectType=@objType
-    AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)
-)",
-                    new { objType = memberObjectType, ctypes = contentTypeIdsA });
-            }
-
-            // insert back - if anything fails the transaction will rollback
-            var query = scope.SqlContext.Query<IMember>();
-            if (contentTypeIds != null && contentTypeIdsA.Length > 0)
-                query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
-
-            long pageIndex = 0;
-            long processed = 0;
-            long total;
-            do
-            {
-                var descendants = _memberRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
-                var items = descendants.Select(m => GetDto(m, false)).ToArray();
-                db.BulkInsertRecords(items);
+                var descendants = repository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
+                var items = conversion(descendants).ToArray();
+                scope.Database.BulkInsertRecords(items);
                 processed += items.Length;
             } while (processed < total);
         }
 
+        private IEnumerable<ContentNuDto> ConvertMediaOrMember<T>(IEnumerable<T> descendants) where T : IContentBase
+        {
+            return descendants.Select(m => GetDto(m, false));
+        }
+
+        private IEnumerable<ContentNuDto> ConvertContent(IEnumerable<IContent> descendants)
+        {
+            var items = new List<ContentNuDto>();
+            foreach (var c in descendants)
+            {
+                // always the edited version
+                items.Add(GetDto(c, false));
+
+                // and also the published version if it makes any sense
+                if (c.Published)
+                    items.Add(GetDto(c, true));
+
+            }
+            return items;
+        }
+        
         public bool VerifyContentDbCache()
         {
             using (var scope = _scopeProvider.CreateScope())
