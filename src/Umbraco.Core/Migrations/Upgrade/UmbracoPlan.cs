@@ -191,7 +191,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             To<AddMainDomLock>("{2AB29964-02A1-474D-BD6B-72148D2A53A2}");
 
 
-            To<AddDatabaseIndexesMissingOnForeignKeys>("{a78e3369-8ea3-40ec-ad3f-5f76929d2b20}");
+            To<MissingDictionaryIndex>("{a78e3369-8ea3-40ec-ad3f-5f76929d2b20}");
 
             //FINAL
         }

@@ -2,9 +2,9 @@
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_6_0
 {
-    public class AddDatabaseIndexesMissingOnForeignKeys : MigrationBase
+    public class MissingDictionaryIndex : MigrationBase
     {
-        public AddDatabaseIndexesMissingOnForeignKeys(IMigrationContext context)
+        public MissingDictionaryIndex(IMigrationContext context)
             : base(context)
         {
 
