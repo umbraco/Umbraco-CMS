@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using Umbraco.Core.Services;
 using Umbraco.Web.Mvc;
 
@@ -16,9 +11,9 @@ namespace Umbraco.Web.Editors
         {
             _imageSharpImageSertvice = imageSharpImageSertvice;
         }
-        public ActionResult ManipulateImage(int width, int height, string imageUri)
+        public ActionResult ManipulateImage(string imagePath, int? width, int? height)
         {
-            var imageModel = _imageSharpImageSertvice.GetImage(imageUri, width, height);
+            var imageModel = _imageSharpImageSertvice.GetImage(imagePath, width, height);
 
             return new FileContentResult(imageModel.Data, imageModel.MimeType);
         }
