@@ -1493,6 +1493,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         // assumes media tree lock
+        // TODO : Has no references outside of this class, would be safer as private (content version is private)
         public void RebuildMediaDbCacheLocked(IScope scope, int groupSize, IEnumerable<int> contentTypeIds)
         {
             RemoveAllThenInsertBack(scope, Constants.ObjectTypes.Media, _mediaRepository, groupSize, contentTypeIds, ConvertMediaOrMember);
@@ -1509,23 +1510,24 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         // assumes member tree lock
+        // TODO : Has no references outside of this class, would be safer as private (content version is private)
         public void RebuildMemberDbCacheLocked(IScope scope, int groupSize, IEnumerable<int> contentTypeIds)
         {
             RemoveAllThenInsertBack(scope, Constants.ObjectTypes.Member, _memberRepository, groupSize, contentTypeIds, ConvertMediaOrMember);
         }
 
-        private void RemoveAllThenInsertBack<T>(IScope scope, Guid contentObjectType, IContentRepository<int, T> repository, int groupSize, IEnumerable<int> contentTypeIds, Func<IEnumerable<T>, IEnumerable<ContentNuDto>> conversion) where T : IContentBase
+        private void RemoveAllThenInsertBack<T>(IScope scope, Guid objectType, IContentRepository<int, T> repository, int groupSize, IEnumerable<int> contentTypeIds, Func<IEnumerable<T>, IEnumerable<ContentNuDto>> conversion) where T : IContentBase
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
 
             // remove all - if anything fails the transaction will rollback
-            RemoveAll(scope, contentObjectType, contentTypeIdsA);
+            RemoveAll(scope, objectType, contentTypeIdsA);
 
             // insert back - if anything fails the transaction will rollback
             InsertBack(scope, repository, groupSize, contentTypeIdsA, conversion);
         }
 
-        private void RemoveAll(IScope scope, Guid contentObjectType, int[] contentTypeIds)
+        private void RemoveAll(IScope scope, Guid objectType, int[] contentTypeIds)
         {
             var db = scope.Database;
             if (contentTypeIds == null || contentTypeIds.Length == 0)
@@ -1535,7 +1537,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 WHERE cmsContentNu.nodeId IN (
     SELECT id FROM umbracoNode WHERE umbracoNode.nodeObjectType=@objType
 )",
-                    new { objType = contentObjectType });
+                    new { objType = objectType });
             }
             else
             {
@@ -1548,7 +1550,7 @@ WHERE cmsContentNu.nodeId IN (
     WHERE umbracoNode.nodeObjectType=@objType
     AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)
 )",
-                    new { objType = contentObjectType, ctypes = contentTypeIds });
+                    new { objType = objectType, ctypes = contentTypeIds });
             }
 
         }
