@@ -286,7 +286,7 @@ namespace Umbraco.Web.Editors
                                 controller => controller.DeleteById(int.MaxValue))
 						},
                         {
-                            "nuCacheStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<NuCacheStatusController>(
+                            "publishedSnapshotCacheStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PublishedSnapshotCacheStatusController>(
                                 controller => controller.GetStatus())
                         },
                         {

@@ -1788,8 +1788,6 @@ AND cmsContentNu.nodeId IS NULL
                 " and " + ms + " snapshot" + (ms > 1 ? "s" : "") + ".";
         }
 
-        public override string StatusUrl => "views/dashboard/settings/nucache.html";
-
         public override void Collect()
         {
             var contentCollect = _contentStore.CollectAsync();

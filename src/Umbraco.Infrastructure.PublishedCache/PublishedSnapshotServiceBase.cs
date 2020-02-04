@@ -41,7 +41,7 @@ namespace Umbraco.Web.PublishedCache
 
         public abstract string GetStatus();
 
-        public virtual string StatusUrl => string.Empty;
+        public virtual string StatusUrl => "views/dashboard/settings/publishedsnapshotcache.html";
 
         public virtual void Collect()
         {

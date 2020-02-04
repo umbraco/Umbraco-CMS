@@ -406,7 +406,7 @@
     <Compile Include="WebApi\UnhandledExceptionLogger.cs" />
     <Compile Include="Runtime\WebInitialComponent.cs" />
     <Compile Include="Editors\PublishedStatusController.cs" />
-    <Compile Include="Editors\NuCacheStatusController.cs" />
+    <Compile Include="Editors\PublishedSnapshotCacheStatusController.cs" />
     <Compile Include="Trees\TreeAttribute.cs" />
     <Compile Include="Routing\NotFoundHandlerHelper.cs" />
     <Compile Include="Models\LocalPackageInstallModel.cs" />
