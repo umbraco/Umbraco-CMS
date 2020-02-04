@@ -24,6 +24,7 @@
       <PackageReference Include="Serilog.Sinks.Async" Version="1.4.0" />
       <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
       <PackageReference Include="Serilog.Sinks.Map" Version="1.0.0" />
+      <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0007" />
       <PackageReference Include="System.Data.SqlClient" Version="4.8.0" />
       <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
       <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.9.0" />
