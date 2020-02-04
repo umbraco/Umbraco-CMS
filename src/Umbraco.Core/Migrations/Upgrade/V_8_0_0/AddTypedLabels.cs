@@ -75,8 +75,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             var labelPropertyTypes = Database.Fetch<PropertyTypeDto>(Sql()
                 .Select<PropertyTypeDto>(x => x.Id, x => x.Alias)
                 .From<PropertyTypeDto>()
-                .Where<PropertyTypeDto>(x => x.DataTypeId == Constants.DataTypes.LabelString)
-                );
+                .Where<PropertyTypeDto>(x => x.DataTypeId == Constants.DataTypes.LabelString));
 
             var intPropertyAliases = new[] { Constants.Conventions.Media.Width, Constants.Conventions.Media.Height, Constants.Conventions.Member.FailedPasswordAttempts };
             var bigintPropertyAliases = new[] { Constants.Conventions.Media.Bytes };

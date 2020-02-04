@@ -18,7 +18,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_6_0
         {          
             var indexName = "IX_" + DictionaryDto.TableName + "_Parent";
 
-            if (IndexExists(indexName) == false)
+            if (!IndexExists(indexName))
             {
                 Create
                      .Index(indexName)
