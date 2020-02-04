@@ -19,6 +19,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
         public override void Migrate()
         {
             MigratePropertyData();
+            CreatePropertyDataIndexes();
             MigrateContentAndPropertyTypes();
             MigrateContent();
             MigrateVersions();
@@ -88,6 +89,15 @@ HAVING COUNT(v2.id) <> 1").Any())
 
             // rename table
             Rename.Table(PreTables.PropertyData).To(Constants.DatabaseSchema.Tables.PropertyData).Do();
+        }
+
+        private void CreatePropertyDataIndexes()
+        {
+            // Creates a temporary index on umbracoPropertyData to speed up other migrations which update property values.
+            // It will be removed in CreateKeysAndIndexes before the normal indexes for the table are created
+            var tableDefinition = Persistence.DatabaseModelDefinitions.DefinitionFactory.GetTableDefinition(typeof(PropertyDataDto), SqlSyntax);
+            Execute.Sql(SqlSyntax.FormatPrimaryKey(tableDefinition)).Do();
+            Execute.Sql($"CREATE UNIQUE NONCLUSTERED INDEX IX_umbracoPropertyData_Temp ON {PreTables.PropertyData} (versionId,propertyTypeId,languageId,segment)").Do();
         }
 
         private void MigrateContentAndPropertyTypes()
