@@ -46,6 +46,7 @@ using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Web.PropertyEditors;
+using Umbraco.Examine;
 
 namespace Umbraco.Web.Runtime
 {
@@ -152,7 +153,7 @@ namespace Umbraco.Web.Runtime
 
             composition.RegisterUnique<IDashboardService, DashboardService>();
 
-            composition.RegisterUnique<IExamineManager>(factory => ExamineManager.Instance);
+            composition.RegisterUnique<IExamineManager, ExamineManager>();
 
             // configure the container for web
             composition.ConfigureForWeb();

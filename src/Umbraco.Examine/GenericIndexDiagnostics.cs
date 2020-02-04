@@ -4,9 +4,8 @@ using System.Linq;
 using Examine;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Examine;
 
-namespace Umbraco.Web.Search
+namespace Umbraco.Examine
 {
 
     /// <summary>

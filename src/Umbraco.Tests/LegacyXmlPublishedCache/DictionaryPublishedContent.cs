@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Examine;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Xml.XPath;
-using Examine.LuceneEngine.Providers;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
@@ -59,7 +59,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             ValidateAndSetProperty(valueDictionary, val => _sortOrder = Int32.Parse(val), "sortOrder");
             ValidateAndSetProperty(valueDictionary, val => _name = val, "nodeName");
             ValidateAndSetProperty(valueDictionary, val => _urlName = val, "urlName");
-            ValidateAndSetProperty(valueDictionary, val => _documentTypeAlias = val, "nodeTypeAlias", LuceneIndex.ItemTypeFieldName);
+            ValidateAndSetProperty(valueDictionary, val => _documentTypeAlias = val, "nodeTypeAlias", ExamineFieldNames.ItemTypeFieldName);
             ValidateAndSetProperty(valueDictionary, val => _documentTypeId = Int32.Parse(val), "nodeType");
             //ValidateAndSetProperty(valueDictionary, val => _writerId = int.Parse(val), "writerID");
             ValidateAndSetProperty(valueDictionary, val => _creatorId = Int32.Parse(val), "creatorID", "writerID"); //this is a bit of a hack fix for: U4-1132

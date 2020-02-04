@@ -23,6 +23,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Runtime;
+using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
@@ -89,6 +90,7 @@ namespace Umbraco.Tests.TestHelpers
         }
 
         public static IShortStringHelper ShortStringHelper { get; } = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
+        public static IJsonSerializer JsonSerializer { get; } = new JsonNetSerializer();
         public static IVariationContextAccessor VariationContextAccessor { get; } = new TestVariationContextAccessor();
         public static IDbProviderFactoryCreator DbProviderFactoryCreator { get; } = new UmbracoDbProviderFactoryCreator(Constants.DbProviderNames.SqlCe);
         public static IBulkSqlInsertProvider BulkSqlInsertProvider { get; } = new SqlCeBulkSqlInsertProvider();

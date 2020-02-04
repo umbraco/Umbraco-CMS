@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Umbraco.Core;
 
 namespace Umbraco.Examine
 {
+
     /// <summary>
     /// Exposes diagnostic information about an index
     /// </summary>

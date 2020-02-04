@@ -63,7 +63,7 @@ namespace Umbraco.Web.PropertyEditors
                     }
 
                     //First save the raw value to a raw field
-                    result.Add(new KeyValuePair<string, IEnumerable<object>>($"{UmbracoExamineIndex.RawFieldPrefix}{property.Alias}", new[] { rawVal }));
+                    result.Add(new KeyValuePair<string, IEnumerable<object>>($"{UmbracoExamineFieldNames.RawFieldPrefix}{property.Alias}", new[] { rawVal }));
 
                     if (sb.Length > 0)
                     {

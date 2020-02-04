@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
-using Umbraco.Examine;
 using Lucene.Net.Analysis.Standard;
 using Examine.LuceneEngine;
 using Examine;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
-using Umbraco.Web.PublishedCache.NuCache;
 
-namespace Umbraco.Web.Search
+namespace Umbraco.Examine
 {
     /// <summary>
     /// Creates the indexes used by Umbraco
@@ -53,7 +50,7 @@ namespace Umbraco.Web.Search
         /// <returns></returns>
         public override IEnumerable<IIndex> Create()
         {
-            return new []
+            return new[]
             {
                 CreateInternalIndex(),
                 CreateExternalIndex(),
