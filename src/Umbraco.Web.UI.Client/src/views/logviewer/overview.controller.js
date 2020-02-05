@@ -193,11 +193,7 @@
                 const endDate = selectedDates[selectedDates.length - 1].toIsoDateString(); // Take the last date as end
 
                 // Check if date range has changed
-                if (startDate === endDate && startDate === vm.period[0]) {
-                    // Same date
-                    return;
-                }
-                else if (startDate === vm.period[0] && endDate === vm.period[1]) {
+                if (startDate === vm.period[0] && endDate === vm.period[1]) {
                     // Same date range
                     return;
                 }
