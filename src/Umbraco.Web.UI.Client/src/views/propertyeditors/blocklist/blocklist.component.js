@@ -58,7 +58,7 @@
                         tabs: [
                             {
                                 id: 1234,
-                                label: "Group 1",
+                                label: "Content",
                                 properties: [
                                     {
                                         label: "Page Title",
@@ -73,6 +73,120 @@
                                         value: "Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
                                         alias: "pageTitle",
                                         editor: "Umbraco.TextBox",
+                                        isSensitive: false,
+                                        culture: null,
+                                        segment: null
+                                    },
+                                    {
+                                        label: "Image",
+                                        description: "",
+                                        view: "mediapicker",
+                                        config: {multiPicker: false, 
+                                            onlyImages: true, 
+                                            disableFolderSelect: true, 
+                                            startNodeId: "umb://media/1fd2ecaff3714c009306867fa4585e7a", 
+                                            ignoreUserStartNodes: false, 
+                                            idType: "udi"
+                                        },
+                                        hideLabel: false,
+                                        validation: {mandatory: false, mandatoryMessage: "", pattern: null, patternMessage: ""},
+                                        readonly: false,
+                                        id: 495,
+                                        dataTypeKey: "e26a8d91-a9d7-475b-bc3b-2a09f4743754",
+                                        value: "umb://media/fa763e0d0ceb408c8720365d57e06e32",
+                                        alias: "photo",
+                                        editor: "Umbraco.MediaPicker",
+                                        isSensitive: false,
+                                        culture: null,
+                                        segment: null
+                                    }, 
+                                    {
+                                        label: "Image Description",
+                                        description: "The title of the page",
+                                        view: "textbox",
+                                        config: {maxChars: 500},
+                                        hideLabel: false,
+                                        validation: {mandatory: true, mandatoryMessage: "", pattern: null, patternMessage: ""},
+                                        readonly: false,
+                                        id: 442,
+                                        dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
+                                        value: "Let's have a chat",
+                                        alias: "imageDesc",
+                                        editor: "Umbraco.TextBox",
+                                        isSensitive: false,
+                                        culture: null,
+                                        segment: null
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                alias: "pageModule",
+                name: "Inline module",
+                icon: "icon-document",
+                prototype_paste_data: {
+                    elementType: {
+                        alias: 'contentTypeAlias',
+                        icon: "icon-document",
+                        label: "Text"
+                    },
+                    label: "{{pageTitle | truncate:true:36}}",
+                    labelInterpolate: $interpolate("{{pageTitle | truncate:true:36}}"),
+                    key: 1,
+                    editor: "views/blockelements/inlineblock/inlineblock.editor.html",
+                    overlaySize: 'medium',
+                    content: {
+                        variants: [
+                            {
+                                language: {
+                                    isDefault: true
+                                }
+                            }
+                        ],
+                        tabs: [
+                            {
+                                id: 1234,
+                                label: "Group 1",
+                                properties: [
+                                    {
+                                        label: "Image Title",
+                                        description: "The title on top of image",
+                                        view: "textbox",
+                                        config: {maxChars: 500},
+                                        hideLabel: false,
+                                        validation: {mandatory: true, mandatoryMessage: "", pattern: null, patternMessage: ""},
+                                        readonly: false,
+                                        id: 441,
+                                        dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
+                                        value: "The purpose of lorem ipsum is to create a natural looking block of text (sentence, paragraph, page, etc.) that doesn't distract from the layout. A practice not without controversy, laying out pages with meaningless filler text can be very useful when the focus is meant to be on design, not content.",
+                                        alias: "imageTitle",
+                                        editor: "Umbraco.TextBox",
+                                        isSensitive: false,
+                                        culture: null,
+                                        segment: null
+                                    },
+                                    {
+                                        label: "Image",
+                                        description: "",
+                                        view: "mediapicker",
+                                        config: {multiPicker: false, 
+                                            onlyImages: true, 
+                                            disableFolderSelect: true, 
+                                            startNodeId: "umb://media/1fd2ecaff3714c009306867fa4585e7a", 
+                                            ignoreUserStartNodes: false, 
+                                            idType: "udi"
+                                        },
+                                        hideLabel: false,
+                                        validation: {mandatory: false, mandatoryMessage: "", pattern: null, patternMessage: ""},
+                                        readonly: false,
+                                        id: 495,
+                                        dataTypeKey: "e26a8d91-a9d7-475b-bc3b-2a09f4743754",
+                                        value: "umb://media/fa763e0d0ceb408c8720365d57e06e32",
+                                        alias: "photo",
+                                        editor: "Umbraco.MediaPicker",
                                         isSensitive: false,
                                         culture: null,
                                         segment: null
@@ -159,7 +273,30 @@
                                 label: "Group 1",
                                 properties: [
                                     {
-                                        label: "Page Title",
+                                        label: "Image",
+                                        description: "",
+                                        view: "mediapicker",
+                                        config: {multiPicker: false, 
+                                            onlyImages: true, 
+                                            disableFolderSelect: true, 
+                                            startNodeId: "umb://media/1fd2ecaff3714c009306867fa4585e7a", 
+                                            ignoreUserStartNodes: false, 
+                                            idType: "udi"
+                                        },
+                                        hideLabel: false,
+                                        validation: {mandatory: false, mandatoryMessage: "", pattern: null, patternMessage: ""},
+                                        readonly: false,
+                                        id: 495,
+                                        dataTypeKey: "e26a8d91-a9d7-475b-bc3b-2a09f4743754",
+                                        value: "umb://media/fa763e0d0ceb408c8720365d57e06e32",
+                                        alias: "photo",
+                                        editor: "Umbraco.MediaPicker",
+                                        isSensitive: false,
+                                        culture: null,
+                                        segment: null
+                                    }, 
+                                    {
+                                        label: "Image Description",
                                         description: "The title of the page",
                                         view: "textbox",
                                         config: {maxChars: 500},
@@ -169,7 +306,7 @@
                                         id: 441,
                                         dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
                                         value: "Let's have a chat",
-                                        alias: "pageTitle",
+                                        alias: "imageDesc",
                                         editor: "Umbraco.TextBox",
                                         isSensitive: false,
                                         culture: null,
@@ -181,56 +318,6 @@
                         temp_image: "/umbraco/assets/img/login.jpg"
                     }
                 }
-            },
-            {
-                alias: "contentTypeAlias",
-                name: "Inline editing",
-                icon: "icon-picture",
-                prototype_paste_data: {
-                    elementType: {
-                        alias: 'contentTypeAlias',
-                        icon: "icon-document",
-                        label: "Text"
-                    },
-                    label: "Label",
-                    editor: "views/blockelements/imageblock/imageblock.editor.html",
-                    overlaySize: 'medium',
-                    content: {
-                        variants: [
-                            {
-                                language: {
-                                    isDefault: true
-                                }
-                            }
-                        ],
-                        tabs: [
-                            {
-                                id: 1234,
-                                label: "Group 1",
-                                properties: [
-                                    {
-                                        label: "Page Title",
-                                        description: "The title of the page",
-                                        view: "textbox",
-                                        config: {maxChars: 500},
-                                        hideLabel: false,
-                                        validation: {mandatory: true, mandatoryMessage: "", pattern: null, patternMessage: ""},
-                                        readonly: false,
-                                        id: 441,
-                                        dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
-                                        value: "Let's have a chat",
-                                        alias: "pageTitle",
-                                        editor: "Umbraco.TextBox",
-                                        isSensitive: false,
-                                        culture: null,
-                                        segment: null
-                                    }
-                                ]
-                            }
-                        ],
-                        temp_image: "/umbraco/assets/img/demo.png"
-                    }
-                }
             }
         ];
 
@@ -238,52 +325,6 @@
 
         // TODO: get icon, properties etc. from available types?
         vm.blocks = [
-            {
-                elementType: {
-                    alias: 'contentTypeAlias',
-                    icon: "icon-document",
-                    label: "Text"
-                },
-                label: "{{pageTitle | truncate:true:36}}",
-                labelInterpolate: $interpolate("{{pageTitle | truncate:true:36}}"),
-                key: 1,
-                editor: "views/blockelements/inlineblock/inlineblock.editor.html",
-                overlaySize: 'medium',
-                content: {
-                    variants: [
-                        {
-                            language: {
-                                isDefault: true
-                            }
-                        }
-                    ],
-                    tabs: [
-                        {
-                            id: 1234,
-                            label: "Group 1",
-                            properties: [
-                                {
-                                    label: "Page Title",
-                                    description: "The title of the page",
-                                    view: "textbox",
-                                    config: {maxChars: 500},
-                                    hideLabel: false,
-                                    validation: {mandatory: true, mandatoryMessage: "", pattern: null, patternMessage: ""},
-                                    readonly: false,
-                                    id: 441,
-                                    dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
-                                    value: "The purpose of lorem ipsum is to create a natural looking block of text (sentence, paragraph, page, etc.) that doesn't distract from the layout. A practice not without controversy, laying out pages with meaningless filler text can be very useful when the focus is meant to be on design, not content.",
-                                    alias: "pageTitle",
-                                    editor: "Umbraco.TextBox",
-                                    isSensitive: false,
-                                    culture: null,
-                                    segment: null
-                                }
-                            ]
-                        }
-                    ]
-                }
-            },
             {
                 elementType: {
                     alias: 'contentTypeAlias',
@@ -320,6 +361,46 @@
                                     dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
                                     value: "The purpose of lorem ipsum is to create a natural looking block of text (sentence, paragraph, page, etc.) that doesn't distract from the layout. A practice not without controversy, laying out pages with meaningless filler text can be very useful when the focus is meant to be on design, not content.",
                                     alias: "pageTitle",
+                                    editor: "Umbraco.TextBox",
+                                    isSensitive: false,
+                                    culture: null,
+                                    segment: null
+                                },
+                                {
+                                    label: "Image",
+                                    description: "",
+                                    view: "mediapicker",
+                                    config: {multiPicker: false, 
+                                        onlyImages: true, 
+                                        disableFolderSelect: true, 
+                                        startNodeId: "umb://media/1fd2ecaff3714c009306867fa4585e7a", 
+                                        ignoreUserStartNodes: false, 
+                                        idType: "udi"
+                                    },
+                                    hideLabel: false,
+                                    validation: {mandatory: false, mandatoryMessage: "", pattern: null, patternMessage: ""},
+                                    readonly: false,
+                                    id: 495,
+                                    dataTypeKey: "e26a8d91-a9d7-475b-bc3b-2a09f4743754",
+                                    value: "umb://media/fa763e0d0ceb408c8720365d57e06e32",
+                                    alias: "photo",
+                                    editor: "Umbraco.MediaPicker",
+                                    isSensitive: false,
+                                    culture: null,
+                                    segment: null
+                                }, 
+                                {
+                                    label: "Image Description",
+                                    description: "The title of the page",
+                                    view: "textbox",
+                                    config: {maxChars: 500},
+                                    hideLabel: false,
+                                    validation: {mandatory: true, mandatoryMessage: "", pattern: null, patternMessage: ""},
+                                    readonly: false,
+                                    id: 442,
+                                    dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
+                                    value: "Let's have a chat",
+                                    alias: "imageDesc",
                                     editor: "Umbraco.TextBox",
                                     isSensitive: false,
                                     culture: null,
@@ -366,6 +447,46 @@
                                     dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
                                     value: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
                                     alias: "pageTitle",
+                                    editor: "Umbraco.TextBox",
+                                    isSensitive: false,
+                                    culture: null,
+                                    segment: null
+                                },
+                                {
+                                    label: "Image",
+                                    description: "",
+                                    view: "mediapicker",
+                                    config: {multiPicker: false, 
+                                        onlyImages: true, 
+                                        disableFolderSelect: true, 
+                                        startNodeId: "umb://media/1fd2ecaff3714c009306867fa4585e7a", 
+                                        ignoreUserStartNodes: false, 
+                                        idType: "udi"
+                                    },
+                                    hideLabel: false,
+                                    validation: {mandatory: false, mandatoryMessage: "", pattern: null, patternMessage: ""},
+                                    readonly: false,
+                                    id: 495,
+                                    dataTypeKey: "e26a8d91-a9d7-475b-bc3b-2a09f4743754",
+                                    value: "umb://media/fa763e0d0ceb408c8720365d57e06e32",
+                                    alias: "photo",
+                                    editor: "Umbraco.MediaPicker",
+                                    isSensitive: false,
+                                    culture: null,
+                                    segment: null
+                                }, 
+                                {
+                                    label: "Image Description",
+                                    description: "The title of the page",
+                                    view: "textbox",
+                                    config: {maxChars: 500},
+                                    hideLabel: false,
+                                    validation: {mandatory: true, mandatoryMessage: "", pattern: null, patternMessage: ""},
+                                    readonly: false,
+                                    id: 442,
+                                    dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
+                                    value: "Let's have a chat",
+                                    alias: "imageDesc",
                                     editor: "Umbraco.TextBox",
                                     isSensitive: false,
                                     culture: null,
@@ -417,6 +538,46 @@
                                     isSensitive: false,
                                     culture: null,
                                     segment: null
+                                },
+                                {
+                                    label: "Image",
+                                    description: "",
+                                    view: "mediapicker",
+                                    config: {multiPicker: false, 
+                                        onlyImages: true, 
+                                        disableFolderSelect: true, 
+                                        startNodeId: "umb://media/1fd2ecaff3714c009306867fa4585e7a", 
+                                        ignoreUserStartNodes: false, 
+                                        idType: "udi"
+                                    },
+                                    hideLabel: false,
+                                    validation: {mandatory: false, mandatoryMessage: "", pattern: null, patternMessage: ""},
+                                    readonly: false,
+                                    id: 495,
+                                    dataTypeKey: "e26a8d91-a9d7-475b-bc3b-2a09f4743754",
+                                    value: "umb://media/fa763e0d0ceb408c8720365d57e06e32",
+                                    alias: "photo",
+                                    editor: "Umbraco.MediaPicker",
+                                    isSensitive: false,
+                                    culture: null,
+                                    segment: null
+                                }, 
+                                {
+                                    label: "Image Description",
+                                    description: "The title of the page",
+                                    view: "textbox",
+                                    config: {maxChars: 500},
+                                    hideLabel: false,
+                                    validation: {mandatory: true, mandatoryMessage: "", pattern: null, patternMessage: ""},
+                                    readonly: false,
+                                    id: 442,
+                                    dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
+                                    value: "Let's have a chat",
+                                    alias: "imageDesc",
+                                    editor: "Umbraco.TextBox",
+                                    isSensitive: false,
+                                    culture: null,
+                                    segment: null
                                 }
                             ]
                         }
@@ -424,6 +585,10 @@
                 }
             }
         ];
+
+
+
+        
 
         function setDirty() {
             if (vm.propertyForm) {
