@@ -133,8 +133,8 @@
                         icon: "icon-document",
                         label: "Text"
                     },
-                    label: "{{pageTitle | truncate:true:36}}",
-                    labelInterpolate: $interpolate("{{pageTitle | truncate:true:36}}"),
+                    labelTemplate: "{{imageTitle | truncate:true:36}}",
+                    labelInterpolate: $interpolate("{{imageTitle | truncate:true:36}}"),
                     key: 1,
                     editor: "views/blockelements/inlineblock/inlineblock.editor.html",
                     overlaySize: 'medium',
@@ -207,7 +207,8 @@
                         icon: "icon-document",
                         label: "Text"
                     },
-                    label: "Label",
+                    labelTemplate: "Label",
+                    labelInterpolate: $interpolate("Label"),
                     editor: "views/blockelements/textareablock/textareablock.editor.html",
                     overlaySize: 'medium',
                     content: {
@@ -256,7 +257,8 @@
                         icon: "icon-document",
                         label: "Text"
                     },
-                    label: "Label",
+                    labelTemplate: "Label",
+                    labelInterpolate: $interpolate("Label"),
                     editor: "views/blockelements/imageblock/imageblock.editor.html",
                     overlaySize: 'medium',
                     content: {
@@ -331,7 +333,7 @@
                     icon: "icon-document",
                     label: "Text"
                 },
-                label: "{{pageTitle | truncate:true:36}}",
+                labelTemplate: "{{pageTitle | truncate:true:36}}",
                 labelInterpolate: $interpolate("{{pageTitle | truncate:true:36}}"),
                 key: 1,
                 editor: "views/blockelements/labelblock/labelblock.editor.html",
@@ -417,7 +419,7 @@
                     icon: "icon-document",
                     label: "Text"
                 },
-                label: "{{pageTitle | truncate:true:36}}",
+                labelTemplate: "{{pageTitle | truncate:true:36}}",
                 labelInterpolate: $interpolate("{{pageTitle | truncate:true:36}}"),
                 key: 2,
                 editor: "views/blockelements/labelblock/labelblock.editor.html",
@@ -504,7 +506,7 @@
                     icon: "icon-document",
                     label: "Text"
                 },
-                label: "{{pageTitle | truncate:true:36}}",
+                labelTemplate: "{{pageTitle | truncate:true:36}}",
                 labelInterpolate: $interpolate("{{pageTitle | truncate:true:36}}"),
                 key: 3,
                 editor: "views/blockelements/labelblock/labelblock.editor.html",
