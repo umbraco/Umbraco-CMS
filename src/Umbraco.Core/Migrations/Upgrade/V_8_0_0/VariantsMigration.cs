@@ -215,12 +215,12 @@ JOIN {SqlSyntax.GetQuotedTableName(PreTables.ContentVersion)} cverNew ON doc.nod
 WHERE doc.newest=1 AND doc.published=1 AND cverNew.{SqlSyntax.GetQuotedColumnName("current")} = 1");
 
             Database.Execute($@"
-INSERT INTO {SqlSyntax.GetQuotedTableName(PreTables.PropertyData)} (propertytypeid,languageId,segment,textValue,varcharValue,decimalValue,intValue,dateValue,versionId)
+INSERT INTO {SqlSyntax.GetQuotedTableName(PropertyDataDto.TableName)} (propertytypeid,languageId,segment,textValue,varcharValue,decimalValue,intValue,dateValue,versionId)
 SELECT propertytypeid,languageId,segment,textValue,varcharValue,decimalValue,intValue,dateValue,cverNew.id
 FROM {SqlSyntax.GetQuotedTableName(PreTables.Document)} doc
 JOIN {SqlSyntax.GetQuotedTableName(PreTables.ContentVersion)} cver ON doc.nodeId=cver.nodeId AND doc.versionId=cver.versionId
 JOIN {SqlSyntax.GetQuotedTableName(PreTables.ContentVersion)} cverNew ON doc.nodeId = cverNew.nodeId
-JOIN {SqlSyntax.GetQuotedTableName(PreTables.PropertyData)} pd ON pd.versionId=cver.id
+JOIN {SqlSyntax.GetQuotedTableName(PropertyDataDto.TableName)} pd ON pd.versionId=cver.id
 WHERE doc.newest=1 AND doc.published=1 AND cverNew.{SqlSyntax.GetQuotedColumnName("current")} = 1");
 
 
