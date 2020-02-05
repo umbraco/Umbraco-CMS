@@ -132,8 +132,8 @@ label.umb-block-list__block--head {
         right: 0;
         left: 0;
         height: 2px;
-        animation: umb-block-list__block--create-button 800ms ease-in-out infinite;
-        @keyframes umb-block-list__block--create-button {
+        animation: umb-block-list__block--create-button_before 800ms ease-in-out infinite;
+        @keyframes umb-block-list__block--create-button_before {
             0%   { opacity: 0.5; }
             50% { opacity: 1; }
             100% { opacity: 0.5; }
@@ -143,8 +143,8 @@ label.umb-block-list__block--head {
         content: "+";
         margin-left: auto;
         margin-right: auto;
-        margin-top: -16px;
-        margin-bottom: -16px;
+        margin-top: -18px;
+        margin-bottom: -18px;
         width: 28px;
         height: 25px;
         padding-bottom: 3px;
@@ -160,6 +160,12 @@ label.umb-block-list__block--head {
         box-shadow: 0 0 0 2px rgba(255, 255, 255, .96);
         transform: scale(0);
         transition: transform 240ms ease-in;
+        animation: umb-block-list__block--create-button_after 800ms ease-in-out infinite;
+        @keyframes umb-block-list__block--create-button_after {
+            0%   { color: rgba(@ui-outline, 0.8); }
+            50% { color: rgba(@ui-outline, 1); }
+            100% { color: rgba(@ui-outline, 0.8); }
+        }
     }
     &:focus {
         &::after {
