@@ -48,6 +48,31 @@
                     editor: "views/blockelements/labelblock/labelblock.editor.html",
                     overlaySize: 'medium',
                     content: {
+                        apps: [
+                            {
+                                name: "Content",
+                                alias: "umbContent",
+                                weight: -100,
+                                icon: "icon-document",
+                                view: "views/content/apps/content/content.html",
+                                viewModel: 0,
+                                active: true,
+                                badge: null,
+                                anchors: [],
+                                hasError: false
+                            },
+                            {
+                                name: "Info",
+                                alias: "umbInfo",
+                                weight: 100,
+                                icon: "icon-info",
+                                view: "views/content/apps/info/info.html",
+                                viewModel: null,
+                                active: false,
+                                badge: null,
+                                hasError: false
+                            }
+                        ],
                         variants: [
                             {
                                 language: {
@@ -139,6 +164,31 @@
                     editor: "views/blockelements/inlineblock/inlineblock.editor.html",
                     overlaySize: 'medium',
                     content: {
+                        apps: [
+                            {
+                                name: "Content",
+                                alias: "umbContent",
+                                weight: -100,
+                                icon: "icon-document",
+                                view: "views/content/apps/content/content.html",
+                                viewModel: 0,
+                                active: true,
+                                badge: null,
+                                anchors: [],
+                                hasError: false
+                            },
+                            {
+                                name: "Info",
+                                alias: "umbInfo",
+                                weight: 100,
+                                icon: "icon-info",
+                                view: "views/content/apps/info/info.html",
+                                viewModel: null,
+                                active: false,
+                                badge: null,
+                                hasError: false
+                            }
+                        ],
                         variants: [
                             {
                                 language: {
@@ -212,6 +262,31 @@
                     editor: "views/blockelements/textareablock/textareablock.editor.html",
                     overlaySize: 'medium',
                     content: {
+                        apps: [
+                            {
+                                name: "Content",
+                                alias: "umbContent",
+                                weight: -100,
+                                icon: "icon-document",
+                                view: "views/content/apps/content/content.html",
+                                viewModel: 0,
+                                active: true,
+                                badge: null,
+                                anchors: [],
+                                hasError: false
+                            },
+                            {
+                                name: "Info",
+                                alias: "umbInfo",
+                                weight: 100,
+                                icon: "icon-info",
+                                view: "views/content/apps/info/info.html",
+                                viewModel: null,
+                                active: false,
+                                badge: null,
+                                hasError: false
+                            }
+                        ],
                         variants: [
                             {
                                 language: {
@@ -262,6 +337,31 @@
                     editor: "views/blockelements/imageblock/imageblock.editor.html",
                     overlaySize: 'medium',
                     content: {
+                        apps: [
+                            {
+                                name: "Content",
+                                alias: "umbContent",
+                                weight: -100,
+                                icon: "icon-document",
+                                view: "views/content/apps/content/content.html",
+                                viewModel: 0,
+                                active: true,
+                                badge: null,
+                                anchors: [],
+                                hasError: false
+                            },
+                            {
+                                name: "Info",
+                                alias: "umbInfo",
+                                weight: 100,
+                                icon: "icon-info",
+                                view: "views/content/apps/info/info.html",
+                                viewModel: null,
+                                active: false,
+                                badge: null,
+                                hasError: false
+                            }
+                        ],
                         variants: [
                             {
                                 language: {
@@ -339,6 +439,31 @@
                 editor: "views/blockelements/labelblock/labelblock.editor.html",
                 overlaySize: 'medium',
                 content: {
+                    apps: [
+                        {
+                            name: "Content",
+                            alias: "umbContent",
+                            weight: -100,
+                            icon: "icon-document",
+                            view: "views/content/apps/content/content.html",
+                            viewModel: 0,
+                            active: true,
+                            badge: null,
+                            anchors: [],
+                            hasError: false
+                        },
+                        {
+                            name: "Info",
+                            alias: "umbInfo",
+                            weight: 100,
+                            icon: "icon-info",
+                            view: "views/content/apps/info/info.html",
+                            viewModel: null,
+                            active: false,
+                            badge: null,
+                            hasError: false
+                        }
+                    ],
                     variants: [
                         {
                             language: {
@@ -425,6 +550,31 @@
                 editor: "views/blockelements/labelblock/labelblock.editor.html",
                 overlaySize: 'medium',
                 content: {
+                    apps: [
+                        {
+                            name: "Content",
+                            alias: "umbContent",
+                            weight: -100,
+                            icon: "icon-document",
+                            view: "views/content/apps/content/content.html",
+                            viewModel: 0,
+                            active: true,
+                            badge: null,
+                            anchors: [],
+                            hasError: false
+                        },
+                        {
+                            name: "Info",
+                            alias: "umbInfo",
+                            weight: 100,
+                            icon: "icon-info",
+                            view: "views/content/apps/info/info.html",
+                            viewModel: null,
+                            active: false,
+                            badge: null,
+                            hasError: false
+                        }
+                    ],
                     variants: [
                         {
                             language: {
@@ -512,6 +662,31 @@
                 editor: "views/blockelements/labelblock/labelblock.editor.html",
                 overlaySize: 'medium',
                 content: {
+                    apps: [
+                        {
+                            name: "Content",
+                            alias: "umbContent",
+                            weight: -100,
+                            icon: "icon-document",
+                            view: "views/content/apps/content/content.html",
+                            viewModel: 0,
+                            active: true,
+                            badge: null,
+                            anchors: [],
+                            hasError: false
+                        },
+                        {
+                            name: "Info",
+                            alias: "umbInfo",
+                            weight: 100,
+                            icon: "icon-info",
+                            view: "views/content/apps/info/info.html",
+                            viewModel: null,
+                            active: false,
+                            badge: null,
+                            hasError: false
+                        }
+                    ],
                     variants: [
                         {
                             language: {
