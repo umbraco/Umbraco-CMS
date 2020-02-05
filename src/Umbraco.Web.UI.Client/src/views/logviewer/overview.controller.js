@@ -13,6 +13,15 @@
         vm.commonLogMessagesCount = 10;
         vm.dateRangeLabel = "";
 
+        vm.config = {
+            enableTime: false,
+            dateFormat: "Y-m-d",
+            time_24hr: false,
+            mode: "range",
+            maxDate: "today",
+            conjunction: " to "
+        };
+
         // ChartJS Options - for count/overview of log distribution
         vm.logTypeLabels = ["Debug", "Info", "Warning", "Error", "Fatal"];
         vm.logTypeData = [0, 0, 0, 0, 0];
@@ -52,8 +61,9 @@
         vm.findMessageTemplate = findMessageTemplate;
         vm.searchErrors = searchErrors;
         vm.showMore = showMore;
+        vm.dateRangeChange = dateRangeChange;
 
-        function preFlightCheck(){
+        function preFlightCheck() {
             vm.loading = true;
             //Do our pre-flight check (to see if we can view logs)
             //IE the log file is NOT too big such as 1GB & crash the site
@@ -147,6 +157,8 @@
             });
         }
 
+        preFlightCheck();
+
         function searchLogQuery(logQuery) {
             $location.path("/settings/logViewer/search").search({
                 lq: logQuery,
@@ -164,25 +176,12 @@
             return "Log Overview for " + suffix;
         }
       
-        function searchErrors(){
+        function searchErrors() {
             var logQuery = "@Level='Fatal' or @Level='Error' or Has(@Exception)";
             searchLogQuery(logQuery);
         }
 
-        preFlightCheck();
-
-        /////////////////////
-
-        vm.config = {
-            enableTime: false,
-            dateFormat: "Y-m-d",
-            time_24hr: false,
-            mode: "range",
-            maxDate: "today",
-            conjunction: " to "
-        };
-
-        vm.dateRangeChange = function (selectedDates, dateStr, instance) {
+        function dateRangeChange(selectedDates, dateStr, instance) {
 
             if (selectedDates.length > 0) {
 
