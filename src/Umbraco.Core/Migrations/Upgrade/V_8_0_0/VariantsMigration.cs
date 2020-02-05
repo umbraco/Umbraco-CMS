@@ -84,7 +84,9 @@ HAVING COUNT(v2.id) <> 1").Any())
                 }
                 else
                 {
-                    Database.Execute($"UPDATE {PreTables.PropertyData} SET versionId2={PreTables.ContentVersion}.id FROM {PreTables.ContentVersion} INNER JOIN {PreTables.PropertyData} ON {PreTables.ContentVersion}.versionId = {PreTables.PropertyData}.versionId");
+                    Database.Execute($@"UPDATE {PreTables.PropertyData} SET versionId2={PreTables.ContentVersion}.id
+FROM {PreTables.ContentVersion}
+INNER JOIN {PreTables.PropertyData} ON {PreTables.ContentVersion}.versionId = {PreTables.PropertyData}.versionId");
                 }
 
                 Delete.Column("versionId").FromTable(PreTables.PropertyData).Do();
