@@ -38,8 +38,6 @@ namespace Umbraco.Core
                     return Constants.UdiEntityType.MemberType;
                 case UmbracoObjectTypes.MemberGroup:
                     return Constants.UdiEntityType.MemberGroup;
-                case UmbracoObjectTypes.Stylesheet:
-                    return Constants.UdiEntityType.Stylesheet;
                 case UmbracoObjectTypes.RelationType:
                     return Constants.UdiEntityType.RelationType;
                 case UmbracoObjectTypes.FormsForm:
@@ -86,8 +84,6 @@ namespace Umbraco.Core
                     return UmbracoObjectTypes.MemberType;
                 case Constants.UdiEntityType.MemberGroup:
                     return UmbracoObjectTypes.MemberGroup;
-                case Constants.UdiEntityType.Stylesheet:
-                    return UmbracoObjectTypes.Stylesheet;
                 case Constants.UdiEntityType.RelationType:
                     return UmbracoObjectTypes.RelationType;
                 case Constants.UdiEntityType.FormsForm:
