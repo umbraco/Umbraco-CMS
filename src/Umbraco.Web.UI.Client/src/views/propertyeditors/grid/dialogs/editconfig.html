@@ -16,20 +16,21 @@
                 <umb-box>
                     <umb-box-content>
 
-                        <ng-form name="gridConfigEditor">
+                        <ng-form name="vm.gridConfigEditor">
 
                             <h4>{{model.name}}</h4>
                             <p>Settings will only save if the entered json configuration is valid</p>
 
                             <!-- Code Editor -->
                             <umb-code-editor
+                                class="grid-json"
                                 config="vm.codeEditorOptions"
                                 on-init="vm.onInit"
                                 on-load="vm.onLoad"
                                 data-element="code-editor">
                             </umb-code-editor>
 
-                            <div class="alert alert-error" ng-show="gridConfigEditor.$invalid === true">
+                            <div class="alert alert-error" ng-show="vm.gridConfigEditor.$invalid === true">
                                 This configuration is not valid json, and will not be saved.
                             </div>
 
@@ -50,6 +51,7 @@
                     </umb-button>
                     <umb-button
                         type="button"
+                        disabled="vm.invalidJson"
                         button-style="success"
                         label-key="general_submit"
                         action="vm.submit()">

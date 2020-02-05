@@ -6,6 +6,8 @@ function EditConfigController($scope) {
     vm.submit = submit;
     vm.close = close;
 
+    vm.invalidJson = false;
+
     vm.codeEditorOptions = {
         language: "json",
         formatOnType:true
@@ -151,21 +153,32 @@ function EditConfigController($scope) {
         });
     }
 
+
     vm.onLoad = function(monaco, editor){
         // We use a model that contains the language & unique key
         // For the JSON schema to apply
         editor.setModel(jsonModel);
 
         // Will give us a list of errors & warnings
-        // TODO: We can prevent saving if we have one or more errors
+        // We can prevent saving if we have one or more errors
         editor.onDidChangeModelDecorations(() => {
 
             const modelOwner = jsonModel.getModeId();
             const markers = monaco.editor.getModelMarkers({owner: modelOwner});
-            console.table(markers);
 
-            // If count greater than 0 - mark as invalid
-            // else set the form back to being valid so the JSON can be saved
+            if(markers.length > 0){
+                // Set form to invalid - will make the message bar SHOW
+                vm.gridConfigEditor.$setValidity('json', false);
+
+                // Set button to disabled
+                vm.invalidJson = true;
+            } else {
+                // Set form to valid - will make the message bar HIDE
+                vm.gridConfigEditor.$setValidity('json', true);
+
+                // Set button to active
+                vm.invalidJson = false;
+            }
         });
 
     }
@@ -176,9 +189,14 @@ function EditConfigController($scope) {
             // Lets check & verify its valid JSON
             const jsonCode = jsonModel.getValue();
 
+            // Still need this as the events for onDidChangeModelDecorations can be slow at times
             if(isValidJson(jsonCode) === false) {
-                // TODO: Show some UI to wanr user
-                alert('INVALID TRY AGAIN!');
+
+                // Set form to invalid - will make the message bar SHOW
+                vm.gridConfigEditor.$setValidity('json', false);
+
+                // Let's not close & submit
+                return;
             } else {
                 // We need to dispose the model - as if we re-open
                 // VSCode errors with 'ModelService: Cannot add model because it already exists!'
