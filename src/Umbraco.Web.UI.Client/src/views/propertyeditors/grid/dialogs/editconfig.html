@@ -23,22 +23,16 @@
 
                             <!-- Code Editor -->
                             <umb-code-editor
-                                editor-config="vm.codeEditorOptions"
-                                editor-on-init="vm.onInit"
-                                editor-on-load="vm.onLoad"
+                                config="vm.codeEditorOptions"
+                                on-init="vm.onInit"
+                                on-load="vm.onLoad"
                                 data-element="code-editor">
                             </umb-code-editor>
-
-                            <!--
-                            <textarea name="configSource"
-                                validate-on="'blur'"
-                                rows="20" class="umb-property-editor umb-textarea"
-                                umb-raw-model="model.config"></textarea>
 
                             <div class="alert alert-error" ng-show="gridConfigEditor.$invalid === true">
                                 This configuration is not valid json, and will not be saved.
                             </div>
-                            -->
+
                         </ng-form>
 
                     </umb-box-content>

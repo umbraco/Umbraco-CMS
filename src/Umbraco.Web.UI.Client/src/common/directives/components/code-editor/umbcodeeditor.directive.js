@@ -20,15 +20,15 @@
 
                     // An onInit function that could be used to setup & configure custom lang stuff
                     // we pass the top level 'monaco' object/api which allows monaco.languages.json ...
-                    if (angular.isFunction(scope.editorOnInit)) {
-                        scope.editorOnInit(monaco);
+                    if (angular.isFunction(scope.onInit)) {
+                        scope.onInit(monaco);
                     }
 
                     // element in a directive is not raw DOM element but wrapped in jQLite
                     const domEl = el[0];
 
                     // default options for VSCode editor that makes sense to us
-                    // these can be overwritten by setting them on the directive code-editor-config="" atribute
+                    // these can be overwritten by setting them on the directive config="" atribute
                     const defaults = {
                         lineNumbers: "on",
                         fontSize: 16,
@@ -39,7 +39,7 @@
                         }
                     };
 
-                    let options = scope.editorConfig;
+                    let options = scope.config;
 
                     // overwrite the defaults if there are any specified
                     angular.extend(defaults, options);
@@ -50,17 +50,17 @@
                     // Init & configure VS Code with options
                     const editor = monaco.editor.create(domEl, options);
 
-                    // Value bind - contents of code editor to set from scope.editorContents
-                    if(scope.editorContents) {
-                        editor.setValue(scope.editorContents);
+                    // Value bind - contents of code editor to set from scope.contents
+                    if(scope.contents) {
+                        editor.setValue(scope.contents);
                     }
 
                     // Editor has loaded with contents
                     // An onLoad function that could be used to setup & configure custom lang stuff
                     // we pass the top level 'monaco' object/api which allows monaco.languages.json ...
                     // along with the editor itself we have created
-                    if (angular.isFunction(scope.editorOnLoad)) {
-                        scope.editorOnLoad(monaco, editor);
+                    if (angular.isFunction(scope.onLoad)) {
+                        scope.onLoad(monaco, editor);
                     }
 
                     // When content changes in code editor
@@ -69,13 +69,13 @@
                     editor.onDidChangeModelContent((e) => {
                         const editorContents = editor.getValue();
 
-                        // We MAY NOT have a scope.editorContents set
+                        // We MAY NOT have a scope.contents set
                         // As we could have a VS Code 'Model' that contains, lang, code and an Identifier
-                        if(scope.editorContents !== undefined){
+                        if(scope.contents !== undefined){
                             // TODO: Loads of events firing
                             // Will it hammer perf - should it debounce/delay updating?!
                             angularHelper.safeApply(scope, function () {
-                                scope.editorContents = editorContents;
+                                scope.contents = editorContents;
                             });
                         }
                     });
@@ -99,8 +99,8 @@
                         // When Angular is removing the DOM element
                         // Otherwise VSCode/Monaco re-registers &
                         // we get duplicate completion items
-                        if (angular.isFunction(scope.editorOnDispose)) {
-                            scope.editorOnDispose();
+                        if (angular.isFunction(scope.onDispose)) {
+                            scope.onDispose();
                         }
 
                         // Disposes the VSCode Editor
@@ -113,11 +113,11 @@
         var directive = {
             restrict: 'E',
             scope: {
-                "editorContents": "=",
-                "editorConfig": "=",
-                "editorOnInit": "=",
-                "editorOnLoad": "=",
-                "editorOnDispose": "="
+                "contents": "=",
+                "config": "=",
+                "onInit": "=",
+                "onLoad": "=",
+                "onDispose": "="
             },
             link: link
         };
