@@ -11,6 +11,7 @@ using Moq;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Security;
@@ -101,7 +102,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
 
             var backofficeIdentity = (UmbracoBackOfficeIdentity) owinContext.Authentication.User.Identity;
 
-            var webSecurity = new Mock<WebSecurity>(null, null, globalSettings);
+            var webSecurity = new Mock<WebSecurity>(null, null, globalSettings, TestHelper.IOHelper);
 
             //mock CurrentUser
             var groups = new List<ReadOnlyUserGroup>();

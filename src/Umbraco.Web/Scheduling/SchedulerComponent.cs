@@ -7,6 +7,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Hosting;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
@@ -34,6 +35,7 @@ namespace Umbraco.Web.Scheduling
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly IHealthChecks _healthChecksConfig;
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+        private readonly IIOHelper _ioHelper;
 
         private BackgroundTaskRunner<IBackgroundTask> _keepAliveRunner;
         private BackgroundTaskRunner<IBackgroundTask> _publishingRunner;
@@ -51,7 +53,7 @@ namespace Umbraco.Web.Scheduling
             HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
             IScopeProvider scopeProvider, IUmbracoContextFactory umbracoContextFactory, IProfilingLogger logger,
             IHostingEnvironment hostingEnvironment, IHealthChecks healthChecksConfig,
-            IUmbracoSettingsSection umbracoSettingsSection)
+            IUmbracoSettingsSection umbracoSettingsSection, IIOHelper ioHelper)
         {
             _runtime = runtime;
             _contentService = contentService;
@@ -65,6 +67,7 @@ namespace Umbraco.Web.Scheduling
             _notifications = notifications;
             _healthChecksConfig = healthChecksConfig ?? throw new ArgumentNullException(nameof(healthChecksConfig));
             _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
+            _ioHelper = ioHelper;
         }
 
         public void Initialize()
@@ -182,7 +185,7 @@ namespace Umbraco.Web.Scheduling
             // temp file cleanup, will run on all servers - even though file upload should only be handled on the master, this will
             // ensure that in the case it happes on replicas that they are cleaned up.
             var task = new TempFileCleanup(_fileCleanupRunner, DefaultDelayMilliseconds, OneHourMilliseconds,
-                new[] { new DirectoryInfo(Current.IOHelper.MapPath(Constants.SystemDirectories.TempFileUploads)) },
+                new[] { new DirectoryInfo(_ioHelper.MapPath(Constants.SystemDirectories.TempFileUploads)) },
                 TimeSpan.FromDays(1), //files that are over a day old
                 _runtime, _logger);
             _scrubberRunner.TryAdd(task);

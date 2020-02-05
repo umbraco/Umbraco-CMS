@@ -89,7 +89,9 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IMediaFileSystem>(),
                     ShortStringHelper,
                     Factory.GetInstance<UmbracoMapper>(),
-                    Factory.GetInstance<IUmbracoSettingsSection>());
+                    Factory.GetInstance<IUmbracoSettingsSection>(),
+                    Factory.GetInstance<IIOHelper>()
+                );
                 return usersController;
             }
 
@@ -157,7 +159,9 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IMediaFileSystem>(),
                     ShortStringHelper,
                     Factory.GetInstance<UmbracoMapper>(),
-                    Factory.GetInstance<IUmbracoSettingsSection>());
+                    Factory.GetInstance<IUmbracoSettingsSection>(),
+                    Factory.GetInstance<IIOHelper>()
+                    );
                 return usersController;
             }
 
@@ -196,7 +200,9 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IMediaFileSystem>(),
                     ShortStringHelper,
                     Factory.GetInstance<UmbracoMapper>(),
-                    Factory.GetInstance<IUmbracoSettingsSection>());
+                    Factory.GetInstance<IUmbracoSettingsSection>(),
+                    Factory.GetInstance<IIOHelper>()
+                );
                 return usersController;
             }
 
@@ -270,7 +276,9 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IMediaFileSystem>(),
                     ShortStringHelper,
                     Factory.GetInstance<UmbracoMapper>(),
-                    Factory.GetInstance<IUmbracoSettingsSection>());
+                    Factory.GetInstance<IUmbracoSettingsSection>(),
+                    Factory.GetInstance<IIOHelper>()
+                );
                 return usersController;
             }
 

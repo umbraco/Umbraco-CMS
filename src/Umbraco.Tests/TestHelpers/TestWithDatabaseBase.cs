@@ -381,7 +381,7 @@ namespace Umbraco.Tests.TestHelpers
                 httpContext,
                 service,
                 new WebSecurity(httpContext, Factory.GetInstance<IUserService>(),
-                    Factory.GetInstance<IGlobalSettings>()),
+                    Factory.GetInstance<IGlobalSettings>(), IOHelper),
                 umbracoSettings ?? Factory.GetInstance<IUmbracoSettingsSection>(),
                 urlProviders ?? Enumerable.Empty<IUrlProvider>(),
                 mediaUrlProviders ?? Enumerable.Empty<IMediaUrlProvider>(),

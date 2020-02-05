@@ -33,6 +33,7 @@ namespace Umbraco.Web.Editors
     {
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+        private readonly IIOHelper _ioHelper;
 
         public CurrentUserController(
             IGlobalSettings globalSettings,
@@ -46,11 +47,13 @@ namespace Umbraco.Web.Editors
             IMediaFileSystem mediaFileSystem,
             IShortStringHelper shortStringHelper,
             UmbracoMapper umbracoMapper,
-            IUmbracoSettingsSection umbracoSettingsSection)
+            IUmbracoSettingsSection umbracoSettingsSection,
+            IIOHelper ioHelper)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
         {
             _mediaFileSystem = mediaFileSystem;
             _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
+            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
         }
 
         /// <summary>
@@ -184,7 +187,7 @@ namespace Umbraco.Web.Editors
         public async Task<HttpResponseMessage> PostSetAvatar()
         {
             //borrow the logic from the user controller
-            return await UsersController.PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache,  _mediaFileSystem, ShortStringHelper, _umbracoSettingsSection, Security.GetUserId().ResultOr(0));
+            return await UsersController.PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache,  _mediaFileSystem, ShortStringHelper, _umbracoSettingsSection, _ioHelper, Security.GetUserId().ResultOr(0));
         }
 
         /// <summary>

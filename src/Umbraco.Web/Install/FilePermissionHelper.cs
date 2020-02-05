@@ -20,10 +20,12 @@ namespace Umbraco.Web.Install
         // ensure Umbraco can write to these files (the directories must exist)
         private readonly string[] _permissionFiles = { };
         private readonly IGlobalSettings _globalSettings;
+        private readonly IIOHelper _ioHelper;
 
-        public FilePermissionHelper(IGlobalSettings globalSettings)
+        public FilePermissionHelper(IGlobalSettings globalSettings, IIOHelper ioHelper)
         {
             _globalSettings = globalSettings;
+            _ioHelper = ioHelper;
             _permissionDirs = new[] { _globalSettings.UmbracoCssPath, Constants.SystemDirectories.Config, Constants.SystemDirectories.Data, _globalSettings.UmbracoMediaPath, Constants.SystemDirectories.Preview };
             _packagesPermissionsDirs = new[] { Constants.SystemDirectories.Bin, _globalSettings.UmbracoPath, Constants.SystemDirectories.Packages };
         }
@@ -138,7 +140,7 @@ namespace Umbraco.Web.Install
         {
             try
             {
-                var path = Current.IOHelper.MapPath(dir + "/" + CreateRandomName());
+                var path = _ioHelper.MapPath(dir + "/" + CreateRandomName());
                 Directory.CreateDirectory(path);
                 Directory.Delete(path);
                 return true;
@@ -156,7 +158,7 @@ namespace Umbraco.Web.Install
         {
             try
             {
-                var dirPath = Current.IOHelper.MapPath(dir);
+                var dirPath = _ioHelper.MapPath(dir);
 
                 if (Directory.Exists(dirPath) == false)
                     Directory.CreateDirectory(dirPath);
@@ -184,7 +186,7 @@ namespace Umbraco.Web.Install
         {
             try
             {
-                var dirPath = Current.IOHelper.MapPath(dir);
+                var dirPath = _ioHelper.MapPath(dir);
 
                 if (Directory.Exists(dirPath) == false)
                     return true;
@@ -249,7 +251,7 @@ namespace Umbraco.Web.Install
         {
             try
             {
-                var path = Current.IOHelper.MapPath(file);
+                var path = _ioHelper.MapPath(file);
                 File.AppendText(path).Close();
                 return true;
             }

@@ -13,7 +13,6 @@ using Microsoft.AspNet.Identity.Owin;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
@@ -24,11 +23,11 @@ using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
-using Umbraco.Web.Composing;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 using Umbraco.Core.Mapping;
 using Umbraco.Web.Models.Identity;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Editors
 {
@@ -44,13 +43,17 @@ namespace Umbraco.Web.Editors
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
         private readonly IUserPasswordConfiguration _passwordConfiguration;
+        private readonly IRuntimeState _runtimeState;
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+        private readonly IIOHelper _ioHelper;
 
-        public AuthenticationController(IUserPasswordConfiguration passwordConfiguration, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, UmbracoMapper umbracoMapper, IUmbracoSettingsSection umbracoSettingsSection)
+        public AuthenticationController(IUserPasswordConfiguration passwordConfiguration, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, UmbracoMapper umbracoMapper, IUmbracoSettingsSection umbracoSettingsSection, IIOHelper ioHelper)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper)
         {
             _passwordConfiguration = passwordConfiguration ?? throw new ArgumentNullException(nameof(passwordConfiguration));
+            _runtimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
             _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
+            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
         }
 
         protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager => _userManager
@@ -518,13 +521,13 @@ namespace Umbraco.Web.Editors
             var action = urlHelper.Action("ValidatePasswordResetCode", "BackOffice",
                 new
                 {
-                    area = GlobalSettings.GetUmbracoMvcArea(Current.IOHelper),
+                    area = GlobalSettings.GetUmbracoMvcArea(_ioHelper),
                     u = userId,
                     r = code
                 });
 
             // Construct full URL using configured application URL (which will fall back to request)
-            var applicationUri = Current.RuntimeState.ApplicationUrl;
+            var applicationUri = _runtimeState.ApplicationUrl;
             var callbackUri = new Uri(applicationUri, action);
             return callbackUri.ToString();
         }
