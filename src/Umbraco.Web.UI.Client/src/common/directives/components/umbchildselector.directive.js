@@ -191,6 +191,7 @@ Use this directive to render a ui component for selecting child items to a paren
             // sortable options for allowed child content types
             scope.sortableOptions = {
                 axis: "y",
+                cancel: ".unsortable",
                 containment: "parent",
                 distance: 10,
                 opacity: 0.7,
@@ -199,7 +200,7 @@ Use this directive to render a ui component for selecting child items to a paren
                 zIndex: 6000,
                 update: function (e, ui) {
                     if(scope.onSort) {
-                        scope.onSort();
+                       scope.onSort();
                     }
                 }
             };
