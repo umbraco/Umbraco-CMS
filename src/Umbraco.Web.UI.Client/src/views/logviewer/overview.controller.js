@@ -32,6 +32,13 @@
                 position: 'left'
             }
         };
+
+        // Functions
+        vm.searchLogQuery = searchLogQuery;
+        vm.findMessageTemplate = findMessageTemplate;
+        vm.searchErrors = searchErrors;
+        vm.showMore = showMore;
+        vm.dateRangeChange = dateRangeChange;
         
         let querystring = $location.search();
         if (querystring.startDate) {
@@ -56,23 +63,16 @@
 
         vm.period = [vm.startDate, vm.endDate];
 
-        //functions
-        vm.searchLogQuery = searchLogQuery;
-        vm.findMessageTemplate = findMessageTemplate;
-        vm.searchErrors = searchErrors;
-        vm.showMore = showMore;
-        vm.dateRangeChange = dateRangeChange;
-
         function preFlightCheck() {
             vm.loading = true;
-            //Do our pre-flight check (to see if we can view logs)
-            //IE the log file is NOT too big such as 1GB & crash the site
+            // Do our pre-flight check (to see if we can view logs)
+            // IE the log file is NOT too big such as 1GB & crash the site
             logViewerResource.canViewLogs(vm.startDate, vm.endDate).then(function (result) {
                 vm.loading = false;
                 vm.canLoadLogs = result;
 
                 if (result) {
-                    //Can view logs - so initalise
+                    // Can view logs - so initialize
                     init();
                 }
             });
@@ -89,7 +89,7 @@
             var savedSearches = logViewerResource.getSavedSearches().then(function (data) {
                     vm.searches = data;
                 },
-                // fallback to some defaults if error from API response
+                // Fallback to some defaults if error from API response
                 function () {
                     vm.searches = [
                         {
@@ -144,7 +144,7 @@
                 vm.logLevelColor = index > -1 ? vm.logTypeColors[index] : '#000';
             });
 
-            //Set loading indicator to false when these 3 queries complete
+            // Set loading indicator to false when these 3 queries complete
             $q.all([savedSearches, numOfErrors, logCounts, commonMsgs, logLevel]).then(function () {
                 vm.loading = false;
             });
