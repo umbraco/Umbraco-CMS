@@ -3,7 +3,7 @@
     class ContentPickerPreValueMigrator : DefaultPreValueMigrator
     {
         public override bool CanMigrate(string editorAlias)
-            => editorAlias == "Umbraco.ContentPicker2";
+            => editorAlias == Constants.PropertyEditors.Legacy.Aliases.ContentPicker2;
 
         public override string GetNewAlias(string editorAlias)
             => null;

@@ -53,11 +53,13 @@ namespace Umbraco.Web.Editors
         /// be looked up via the db, they need to be passed in.
         /// </param>
         /// <param name="contentTypeId"></param>
+        /// <param name="isElement">Wether the composite content types should be applicable for an element type</param>
         /// <returns></returns>
         protected IEnumerable<Tuple<EntityBasic, bool>> PerformGetAvailableCompositeContentTypes(int contentTypeId,
             UmbracoObjectTypes type,
             string[] filterContentTypes,
-            string[] filterPropertyTypes)
+            string[] filterPropertyTypes,
+            bool isElement)
         {
             IContentTypeComposition source = null;
 
@@ -98,7 +100,7 @@ namespace Umbraco.Web.Editors
                     throw new ArgumentOutOfRangeException("The entity type was not a content type");
             }
 
-            var availableCompositions = Services.ContentTypeService.GetAvailableCompositeContentTypes(source, allContentTypes, filterContentTypes, filterPropertyTypes);
+            var availableCompositions = Services.ContentTypeService.GetAvailableCompositeContentTypes(source, allContentTypes, filterContentTypes, filterPropertyTypes, isElement);
 
 
 

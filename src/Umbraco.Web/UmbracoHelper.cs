@@ -146,7 +146,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IHtmlString RenderMacro(string alias)
         {
-            return ComponentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, new { });
+            return ComponentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, null);
         }
 
         /// <summary>
@@ -157,7 +157,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IHtmlString RenderMacro(string alias, object parameters)
         {
-            return ComponentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, parameters.ToDictionary<object>());
+            return ComponentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, parameters?.ToDictionary<object>());
         }
 
         /// <summary>
@@ -820,7 +820,7 @@ namespace Umbraco.Web
             {
                 decryptedString = ufprt.DecryptWithMachineKey();
             }
-            catch (FormatException)
+            catch (Exception ex) when (ex is FormatException || ex is ArgumentException)
             {
                 Current.Logger.Warn(typeof(UmbracoHelper), "A value was detected in the ufprt parameter but Umbraco could not decrypt the string");
                 parts = null;

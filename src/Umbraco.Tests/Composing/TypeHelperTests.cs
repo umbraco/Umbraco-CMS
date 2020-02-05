@@ -165,7 +165,7 @@ namespace Umbraco.Tests.Composing
             Assert.IsTrue(TypeHelper.MatchType(typeof(int?), typeof(Nullable<>)));
 
 
-            Assert.IsTrue(TypeHelper.MatchType(typeof(Derived<int>), typeof(Object)));
+            Assert.IsTrue(TypeHelper.MatchType(typeof(Derived<int>), typeof(object)));
             Assert.IsFalse(TypeHelper.MatchType(typeof(Derived<int>), typeof(List<>)));
             Assert.IsFalse(TypeHelper.MatchType(typeof(Derived<int>), typeof(IEnumerable<>)));
             Assert.IsTrue(TypeHelper.MatchType(typeof(Derived<int>), typeof(Base<int>)));

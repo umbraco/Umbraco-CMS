@@ -25,7 +25,7 @@ namespace Umbraco.Web.Media.EmbedProviders
             var imageHeight = GetXmlProperty(xmlDocument, "/oembed/height");
             var imageTitle = GetXmlProperty(xmlDocument, "/oembed/title");
 
-            return string.Format("<img src=\"{0}\" width\"{1}\" height=\"{2}\" alt=\"{3}\" />", imageUrl, imageWidth, imageHeight, HttpUtility.HtmlEncode(imageTitle));
+            return string.Format("<img src=\"{0}\" width=\"{1}\" height=\"{2}\" alt=\"{3}\" />", imageUrl, imageWidth, imageHeight, HttpUtility.HtmlEncode(imageTitle));
         }        
     }
 }

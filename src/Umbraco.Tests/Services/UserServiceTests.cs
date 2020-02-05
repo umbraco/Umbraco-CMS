@@ -865,7 +865,7 @@ namespace Umbraco.Tests.Services
             var userService = ServiceContext.UserService;
 
             // Act & Assert
-            Assert.Throws<ArgumentNullOrEmptyException>(() => userService.CreateUserWithIdentity(string.Empty, "john@umbraco.io"));
+            Assert.Throws<ArgumentException>(() => userService.CreateUserWithIdentity(string.Empty, "john@umbraco.io"));
         }
 
         [Test]

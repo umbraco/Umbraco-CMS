@@ -7,7 +7,13 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Represents a markdown editor.
     /// </summary>
-    [DataEditor(Constants.PropertyEditors.Aliases.MarkdownEditor, "Markdown editor", "markdowneditor", ValueType = ValueTypes.Text, Icon="icon-code", Group="rich content")]
+    [DataEditor(
+        Constants.PropertyEditors.Aliases.MarkdownEditor,
+        "Markdown editor",
+        "markdowneditor",
+        ValueType = ValueTypes.Text,
+        Group = Constants.PropertyEditors.Groups.RichContent,
+        Icon = "icon-code")]
     public class MarkdownPropertyEditor : DataEditor
     {
         /// <summary>

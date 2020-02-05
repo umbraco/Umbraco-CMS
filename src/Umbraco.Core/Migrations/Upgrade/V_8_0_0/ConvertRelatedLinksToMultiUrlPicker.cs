@@ -19,8 +19,8 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             var sqlDataTypes = Sql()
                 .Select<DataTypeDto>()
                 .From<DataTypeDto>()
-                .Where<DataTypeDto>(x => x.EditorAlias == "Umbraco.RelatedLinks"
-                                         || x.EditorAlias == "Umbraco.RelatedLinks2");
+                .Where<DataTypeDto>(x => x.EditorAlias == Constants.PropertyEditors.Legacy.Aliases.RelatedLinks
+                                         || x.EditorAlias == Constants.PropertyEditors.Legacy.Aliases.RelatedLinks2);
 
             var dataTypes = Database.Fetch<DataTypeDto>(sqlDataTypes);
             var dataTypeIds = dataTypes.Select(x => x.NodeId).ToList();
@@ -50,10 +50,10 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             var properties = Database.Fetch<PropertyDataDto>(sqlPropertyData);
 
             // Create a Multi URL Picker datatype for the converted RelatedLinks data
-            
+
             foreach (var property in properties)
             {
-                var value = property.Value.ToString();
+                var value = property.Value?.ToString();
                 if (string.IsNullOrWhiteSpace(value))
                     continue;
 
@@ -72,6 +72,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                             {
                                 var sqlNodeData = Sql()
                                     .Select<NodeDto>()
+                                    .From<NodeDto>()
                                     .Where<NodeDto>(x => x.NodeId == intId);
 
                                 var node = Database.Fetch<NodeDto>(sqlNodeData).FirstOrDefault();
@@ -89,7 +90,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                         Name = relatedLink.Caption,
                         Target = relatedLink.NewWindow ? "_blank" : null,
                         Udi = udi,
-                        // Should only have a URL if it's an external link otherwise it wil be a UDI 
+                        // Should only have a URL if it's an external link otherwise it wil be a UDI
                         Url = relatedLink.IsInternal == false ? relatedLink.Link : null
                     };
 
@@ -103,7 +104,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 Database.Update(property);
             }
 
-            
+
         }
     }
 

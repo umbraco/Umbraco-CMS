@@ -60,9 +60,9 @@
                         </ul>
                     </div>
 
-                    <div ng-if="vm.availableGroups.length > 0">
+                    <div class="umb-control-group -no-border" ng-if="vm.availableGroups.length > 0">
                         <ul class="umb-checkbox-list" ng-repeat="group in vm.availableGroups | filter:searchTerm">
-                            <li style="font-weight: bold" ng-show="vm.availableGroups.length > 1">
+                            <li ng-show="vm.availableGroups.length > 1">
                                 <i class="icon-folder umb-checkbox-list__item-icon"></i>
                                 {{group.containerPath}}
                             </li>
@@ -77,7 +77,8 @@
                                            checklist-model="model.compositeContentTypes"
                                            checklist-value="compositeContentType.contentType.alias"
                                            ng-change="model.selectCompositeContentType(compositeContentType.contentType)"
-                                           ng-disabled="compositeContentType.allowed===false || compositeContentType.inherited" />
+                                           ng-disabled="compositeContentType.allowed===false || compositeContentType.inherited" />                                  
+
                                 </div>
 
                                 <label for="umb-overlay-comp-{{compositeContentType.contentType.key}}" class="umb-checkbox-list__item-text" ng-class="{'-faded': compositeContentType.allowed===false}">
@@ -92,16 +93,6 @@
 
                 </umb-box-content>
             </umb-box>
-
-            <div ng-if="vm.compositionRemoved" class="umb-editor-confirm">
-                <h5 class="red"><i class="icon-alert"></i>Warning</h5>
-                <p>Removing a composition will delete all the associated property data. Once you save the document type there's no way back, are you sure?</p>
-                <label class="checkbox no-indent">
-                    <input type="checkbox" ng-model="vm.allowSubmit" />
-                    <strong>I know what I'm doing</strong>
-                </label>
-            </div>
-
         </umb-editor-container>
 
         <umb-editor-footer>

@@ -18,6 +18,9 @@ namespace Umbraco.Core.PropertyEditors
         [JsonProperty("name", Required = Required.Always)]
         public string Name { get; set; }
 
+        [JsonProperty("nameTemplate")]
+        public string NameTemplate { get; set; }
+
         [JsonProperty("alias", Required = Required.Always)]
         public string Alias { get; set; }
 

@@ -146,5 +146,17 @@ namespace Umbraco.Web.JavaScript {
                 return ResourceManager.GetString("ServerVariables", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to [
+        ///    &apos;../lib/tinymce/tinymce.min.js&apos;,
+        ///]
+        ///.
+        /// </summary>
+        internal static string TinyMceInitialize {
+            get {
+                return ResourceManager.GetString("TinyMceInitialize", resourceCulture);
+            }
+        }
     }
 }

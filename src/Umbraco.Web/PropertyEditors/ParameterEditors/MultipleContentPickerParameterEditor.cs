@@ -7,7 +7,11 @@ namespace Umbraco.Web.PropertyEditors.ParameterEditors
     /// <summary>
     /// Represents a parameter editor of some sort.
     /// </summary>
-    [DataEditor(Constants.PropertyEditors.Aliases.MultiNodeTreePicker, EditorType.MacroParameter, "Multiple Content Picker", "contentpicker")]
+    [DataEditor(
+        Constants.PropertyEditors.Aliases.MultiNodeTreePicker,
+        EditorType.MacroParameter,
+        "Multiple Content Picker",
+        "contentpicker")]
     public class MultipleContentPickerParameterEditor : DataEditor
     {
         /// <summary>

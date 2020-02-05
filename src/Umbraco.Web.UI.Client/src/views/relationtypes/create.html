@@ -14,13 +14,13 @@
                 <ul class="unstyled">
                     <li>
                         <label class="radio">
-                            <input type="radio" name="relationType-direction" ng-model="vm.relationType.isBidirectional" ng-value="false">
+                            <umb-radiobutton name="relationType-direction" value="false" model="vm.relationType.isBidirectional" />
                             <localize key="relationType_parentToChild">Parent to child</localize>
                         </label>
                     </li>
                     <li>
                         <label class="radio">
-                            <input type="radio" name="relationType-direction" ng-model="vm.relationType.isBidirectional" ng-value="true">
+                            <umb-radiobutton name="relationType-direction" value="true" model="vm.relationType.isBidirectional" />
                             <localize key="relationType_bidirectional">Bidirectional</localize>
                         </label>
                     </li>
@@ -31,8 +31,7 @@
             <umb-control-group label="@relationType_parent">
                 <select name="relationType-parent"
                         ng-model="vm.relationType.parentObjectType"
-                        class="umb-property-editor umb-dropdown"
-                        required>
+                        class="umb-property-editor umb-dropdown">
                     <option ng-repeat="objectType in vm.objectTypes" value="{{objectType.id}}">{{objectType.name}}</option>
                 </select>
             </umb-control-group>
@@ -41,8 +40,7 @@
             <umb-control-group label="@relationType_child">
                 <select name="relationType-child"
                         ng-model="vm.relationType.childObjectType"
-                        class="umb-property-editor umb-dropdown"
-                        required>
+                        class="umb-property-editor umb-dropdown">
                     <option ng-repeat="objectType in vm.objectTypes" value="{{objectType.id}}">{{objectType.name}}</option>
                 </select>
             </umb-control-group>

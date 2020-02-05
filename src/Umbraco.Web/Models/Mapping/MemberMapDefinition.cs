@@ -76,6 +76,7 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll -Trashed -IsContainer -VariesByCulture
         private void Map(IMember source, MemberDisplay target, MapperContext context)
         {
+            target.ContentApps = _commonMapper.GetContentApps(source);
             target.ContentTypeId = source.ContentType.Id;
             target.ContentTypeAlias = source.ContentType.Alias;
             target.ContentTypeName = source.ContentType.Name;
@@ -144,7 +145,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Id = source.Id;
             target.Key = source.Key;
             target.Name = source.Name;
-            target.Path = "-1" + source.Id;
+            target.Path = $"-1,{source.Id}";
             target.Udi = Udi.Create(Constants.UdiEntityType.MemberGroup, source.Key);
         }
 

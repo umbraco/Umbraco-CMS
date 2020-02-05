@@ -17,13 +17,13 @@ namespace Umbraco.Examine
     /// <summary>
     /// An indexer for Umbraco content and media
     /// </summary>
-    public class UmbracoContentIndex : UmbracoExamineIndex
+    public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex
     {
         public const string VariesByCultureFieldName = SpecialFieldPrefix + "VariesByCulture";
         protected ILocalizationService LanguageService { get; }
 
         #region Constructors
-        
+
         /// <summary>
         /// Create an index at runtime
         /// </summary>
@@ -141,6 +141,6 @@ namespace Umbraco.Examine
 
             base.PerformDeleteFromIndex(idsAsList, onComplete);
         }
-        
+
     }
 }

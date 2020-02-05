@@ -175,7 +175,6 @@
     <key alias="linkinternal">קישור פנימי:</key>
     <key alias="linklocaltip">בעת שימוש בקישוריים פנימיים, הוסף "#" בתחילת הקישור</key>
     <key alias="linknewwindow">לפתוח בחלון חדש?</key>
-    <key alias="macroContainerSettings">הגדרות מאקרו</key>
     <key alias="macroDoesNotHaveProperties">המאקרו לא מכיל מאפיינים שניתן לערוך</key>
     <key alias="paste">הדבק</key>
     <key alias="permissionsEdit">ערוך הרשאות עבור</key>

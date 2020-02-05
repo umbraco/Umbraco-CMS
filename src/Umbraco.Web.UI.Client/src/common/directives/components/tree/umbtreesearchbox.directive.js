@@ -73,6 +73,9 @@ function treeSearchBox(localizationService, searchService, $q) {
                         canceler = null;
                     });
                 }
+                else {
+                    scope.hideSearch();
+                }
             }
 
             scope.$watch("term", _.debounce(function(newVal, oldVal) {

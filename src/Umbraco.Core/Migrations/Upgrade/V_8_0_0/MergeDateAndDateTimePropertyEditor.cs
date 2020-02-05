@@ -16,7 +16,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
         public override void Migrate()
         {
-            var dataTypes = GetDataTypes("Umbraco.Date");
+            var dataTypes = GetDataTypes(Constants.PropertyEditors.Legacy.Aliases.Date);
 
             foreach (var dataType in dataTypes)
             {
@@ -25,6 +25,14 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 {
                     config = (DateTimeConfiguration) new CustomDateTimeConfigurationEditor().FromDatabase(
                         dataType.Configuration);
+
+                    // If the Umbraco.Date type is the default from V7 and it has never been updated, then the
+                    // configuration is empty, and the format stuff is handled by in JS by moment.js. - We can't do that
+                    // after the migration, so we force the format to the default from V7.
+                    if (string.IsNullOrEmpty(dataType.Configuration))
+                    {
+                        config.Format = "YYYY-MM-DD";
+                    };
                 }
                 catch (Exception ex)
                 {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core.Composing;
@@ -17,6 +18,18 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
         private readonly PreValueMigratorCollection _preValueMigrators;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly ILogger _logger;
+
+        private static readonly ISet<string> LegacyAliases = new HashSet<string>()
+        {
+            Constants.PropertyEditors.Legacy.Aliases.Date,
+            Constants.PropertyEditors.Legacy.Aliases.Textbox,
+            Constants.PropertyEditors.Legacy.Aliases.ContentPicker2,
+            Constants.PropertyEditors.Legacy.Aliases.MediaPicker2,
+            Constants.PropertyEditors.Legacy.Aliases.MemberPicker2,
+            Constants.PropertyEditors.Legacy.Aliases.RelatedLinks2,
+            Constants.PropertyEditors.Legacy.Aliases.TextboxMultiple,
+            Constants.PropertyEditors.Legacy.Aliases.MultiNodeTreePicker2,
+        };
 
         public DataTypeMigration(IMigrationContext context, PreValueMigratorCollection preValueMigrators, PropertyEditorCollection propertyEditors, ILogger logger)
             : base(context)
@@ -61,25 +74,41 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                     .From<DataTypeDto>()
                     .Where<DataTypeDto>(x => x.NodeId == group.Key)).First();
 
+                // check for duplicate aliases
+                var aliases = group.Select(x => x.Alias).Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
+                if (aliases.Distinct().Count() != aliases.Length)
+                    throw new InvalidOperationException($"Cannot migrate prevalues for datatype id={dataType.NodeId}, editor={dataType.EditorAlias}: duplicate alias.");
+
+                // handle null/empty aliases
+                int index = 0;
+                var dictionary = group.ToDictionary(x => string.IsNullOrWhiteSpace(x.Alias) ? index++.ToString() : x.Alias);
+
                 // migrate the preValues to configuration
                 var migrator = _preValueMigrators.GetMigrator(dataType.EditorAlias) ?? new DefaultPreValueMigrator();
-                var config = migrator.GetConfiguration(dataType.NodeId, dataType.EditorAlias, group.ToDictionary(x => x.Alias, x => x));
+                var config = migrator.GetConfiguration(dataType.NodeId, dataType.EditorAlias, dictionary);
                 var json = JsonConvert.SerializeObject(config);
 
                 // validate - and kill the migration if it fails
                 var newAlias = migrator.GetNewAlias(dataType.EditorAlias);
                 if (newAlias == null)
                 {
-                    _logger.Warn<DataTypeMigration>("Skipping validation of configuration for data type {NodeId} : {EditorAlias}."
-                                                    + " Please ensure that the configuration is valid. The site may fail to start and / or load data types and run.",
-                                                    dataType.NodeId, dataType.EditorAlias);
+                    if (!LegacyAliases.Contains(dataType.EditorAlias))
+                    {
+                        _logger.Warn<DataTypeMigration>(
+                            "Skipping validation of configuration for data type {NodeId} : {EditorAlias}."
+                            + " Please ensure that the configuration is valid. The site may fail to start and / or load data types and run.",
+                            dataType.NodeId, dataType.EditorAlias);
+                    }
                 }
                 else if (!_propertyEditors.TryGet(newAlias, out var propertyEditor))
                 {
-                    _logger.Warn<DataTypeMigration>("Skipping validation of configuration for data type {NodeId} : {NewEditorAlias} (was: {EditorAlias})"
-                                                    + " because no property editor with that alias was found."
-                                                    + " Please ensure that the configuration is valid. The site may fail to start and / or load data types and run.",
-                                                    dataType.NodeId, newAlias, dataType.EditorAlias);
+                    if (!LegacyAliases.Contains(newAlias))
+                    {
+                        _logger.Warn<DataTypeMigration>("Skipping validation of configuration for data type {NodeId} : {NewEditorAlias} (was: {EditorAlias})"
+                                                        + " because no property editor with that alias was found."
+                                                        + " Please ensure that the configuration is valid. The site may fail to start and / or load data types and run.",
+                            dataType.NodeId, newAlias, dataType.EditorAlias);
+                    }
                 }
                 else
                 {

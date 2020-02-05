@@ -99,6 +99,7 @@ namespace Umbraco.Web.Cache
             return new[]
                 {
                     CacheKeys.MacroContentCacheKey, // macro render cache
+                    CacheKeys.MacroFromAliasCacheKey, // lookup macro by alias
                 };
         }
 

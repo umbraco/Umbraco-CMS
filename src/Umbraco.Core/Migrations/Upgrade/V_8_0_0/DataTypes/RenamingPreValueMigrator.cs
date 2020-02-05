@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes
 {
@@ -20,7 +21,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes
                 case "Umbraco.NoEdit":
                     return Constants.PropertyEditors.Aliases.Label;
                 default:
-                    throw new Exception("panic");
+                    throw new PanicException($"The alias {editorAlias} is not supported");
             }
         }
     }

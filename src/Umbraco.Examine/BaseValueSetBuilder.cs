@@ -45,7 +45,7 @@ namespace Umbraco.Examine
                             continue;
                         case string strVal:
                             {
-                                if (strVal.IsNullOrWhiteSpace()) return;
+                                if (strVal.IsNullOrWhiteSpace()) continue;
                                 var key = $"{keyVal.Key}{cultureSuffix}";
                                 if (values.TryGetValue(key, out var v))
                                     values[key] = new List<object>(v) { val }.ToArray();

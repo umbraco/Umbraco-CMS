@@ -15,6 +15,8 @@ namespace Umbraco.Core.IO
 
         public static string TempFileUploads => TempData + "/FileUploads";
 
+        public static string TempImageUploads => TempFileUploads + "/rte";
+
         public static string Install => "~/install";
 
         public static string AppCode => "~/App_Code";

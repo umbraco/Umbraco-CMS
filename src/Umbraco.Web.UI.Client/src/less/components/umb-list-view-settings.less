@@ -1,54 +1,76 @@
 .umb-list-view-settings__box {
-  background: @gray-10;
-  border: 1px solid @gray-7;
-  display: flex;
-  animation: fadeIn 0.5s;
-  padding: 15px;
-  position: relative;
+    background: @gray-10;
+    display: flex;
+    flex: 1;
+    padding: 15px;
+    position: relative;
+    border-radius: @baseBorderRadius;
+
+    .btn-link {
+        font-size: 13px;
+        padding: 0;
+    }
 }
 
 .umb-list-view-settings__trigger {
-  margin-bottom: 20px;
-}
-
-.umb-list-view-settings__box.-open {
-  border-bottom: transparent;
-}
-
-.umb-list-view-settings__content {
-  display: flex;
+    margin-bottom: 20px;
 }
 
 .umb-list-view-settings__list-view-icon {
-  font-size: 20px;
-  color: @gray-7;
-  margin-right: 10px;
+    font-size: 20px;
+    color: @gray-7;
+    margin-right: 10px;
 }
 
 .umb-list-view-settings__name {
-  margin-right: 5px;
-  font-size: 14px;
-  font-weight: bold;
-  float: left;
+    font-size: 14px;
+    font-weight: bold;
 }
 
 .umb-list-view-settings__create-new {
-  font-size: 13px;
-  color: @ui-action-type;
-}
-
-.umb-list-view-settings__create-new:hover {
-  color: @ui-action-type-hover;
-  border-color: @ui-action-type-hover;
+    color: @ui-action-type;
 }
 
 .umb-list-view-settings__remove-new {
-  font-size: 13px;
-  color: @red;
+    color: @red;
 }
 
-.umb-list-view-settings__settings {
-  border: 1px dashed @gray-7;
-  border-top: none;
-  padding: 20px;
+// display `columns displayed` table as a list-view layout
+.umb-list-view-settings__overlay {
+
+    .btn {
+        vertical-align: top;
+    }
+
+    .btn-icon {
+        padding: 0;
+    }
+
+    table {
+        width: 100%;
+    }
+
+    tbody tr {
+        background: @gray-10;
+        border-bottom: 1px solid @white;
+    }
+
+    th {
+        text-align: left;
+    }
+
+    td {
+        padding: 10px 15px 10px 0;
+
+        &:first-child {
+            padding-left: 15px;
+        }
+
+        .ui-sortable-handle {
+            min-height: 37px;
+            display: flex;
+            width:0;
+            align-items: center;
+        }
+    }
 }

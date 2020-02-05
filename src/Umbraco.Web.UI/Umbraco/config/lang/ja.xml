@@ -240,7 +240,6 @@
     <key alias="linkinternal">内部リンク:</key>
     <key alias="linklocaltip">内部リンクを使うときは、リンクの前に "#" を挿入してください。</key>
     <key alias="linknewwindow">新規ウィンドウで開きますか?</key>
-    <key alias="macroContainerSettings">マクロの設定</key>
     <key alias="macroDoesNotHaveProperties">このマクロは編集できるプロパティがありません</key>
     <key alias="paste">貼り付け</key>
     <key alias="permissionsEdit">許可の編集</key>

@@ -72,16 +72,15 @@ namespace Umbraco.Tests.Scoping
 
         protected override IPublishedSnapshotService CreatePublishedSnapshotService()
         {
-            var options = new PublishedSnapshotService.Options { IgnoreLocalDb = true };
+            var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
             var publishedSnapshotAccessor = new UmbracoContextPublishedSnapshotAccessor(Umbraco.Web.Composing.Current.UmbracoContextAccessor);
             var runtimeStateMock = new Mock<IRuntimeState>();
             runtimeStateMock.Setup(x => x.Level).Returns(() => RuntimeLevel.Run);
 
-            var contentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), Mock.Of<IDataTypeService>());
+            var contentTypeFactory = Factory.GetInstance<IPublishedContentTypeFactory>();
             var documentRepository = Mock.Of<IDocumentRepository>();
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
-            var contentTypeServiceBaseFactory = Current.Services.ContentTypeBaseServices;
 
             return new PublishedSnapshotService(
                 options,
@@ -92,7 +91,7 @@ namespace Umbraco.Tests.Scoping
                 null,
                 publishedSnapshotAccessor,
                 Mock.Of<IVariationContextAccessor>(),
-                Logger,
+                ProfilingLogger,
                 ScopeProvider,
                 documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,

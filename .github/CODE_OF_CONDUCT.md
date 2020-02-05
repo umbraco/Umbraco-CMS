@@ -29,4 +29,4 @@ Don't rest on your laurels and never accept the status quo. Contribute and give 
 
 ## Friendly
 
-Don’t judge upon mistakes made but rather upon the speed and quality with which mistakes are corrected. Friendly posts and contributions generate smiles and builds long lasting relationships.
+Don’t judge upon mistakes made but rather upon the speed and quality with which mistakes are corrected. Friendly posts and contributions generate smiles and build long lasting relationships.

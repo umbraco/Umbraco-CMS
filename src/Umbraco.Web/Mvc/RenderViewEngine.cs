@@ -89,7 +89,7 @@ namespace Umbraco.Web.Mvc
             var umbracoToken = controllerContext.GetDataTokenInViewContextHierarchy(Core.Constants.Web.UmbracoDataToken);
 
             // first check if we're rendering a partial view for the back office, or surface controller, etc...
-            // anything that is not IUmbracoRenderModel as this should only pertain to Umbraco views.
+            // anything that is not ContentModel as this should only pertain to Umbraco views.
             if (isPartial && !(umbracoToken is ContentModel))
                 return true;
 
