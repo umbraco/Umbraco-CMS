@@ -117,8 +117,8 @@
       <Name>Umbraco.Abstractions</Name>
     </ProjectReference>
     <ProjectReference Include="..\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj">
+      <Project>{0fad7d2a-d7dd-45b1-91fd-488bb6cdacea}</Project>
       <Name>Umbraco.Examine.Lucene</Name>
-      <Project>{07FBC26B-2927-4A22-8D96-D644C667FECC}</Project>
     </ProjectReference>
     <ProjectReference Include="..\Umbraco.ModelsBuilder.Embedded\Umbraco.ModelsBuilder.Embedded.csproj">
       <Project>{52ac0ba8-a60e-4e36-897b-e8b97a54ed1c}</Project>
