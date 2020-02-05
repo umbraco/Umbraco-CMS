@@ -56,9 +56,9 @@ namespace Umbraco.Core.Composing.LightInject
             // it is an index property. which means that eg protected or internal setters are OK.
             //Container.EnableAnnotatedPropertyInjection();
 
-            // ensure that we do *not* scan assemblies
+            // ensure that we do *not* scan assemblies unless our users explicitly ask the container to do so
             // we explicitly RegisterFrom our own composition roots and don't want them scanned
-            container.AssemblyScanner = new AssemblyScanner(/*container.AssemblyScanner*/);
+            container.AssemblyScanner = new AssemblyScanner(container.AssemblyScanner);
 
             // see notes in MixedLightInjectScopeManagerProvider
             container.ScopeManagerProvider = new MixedLightInjectScopeManagerProvider();
@@ -253,11 +253,30 @@ namespace Umbraco.Core.Composing.LightInject
 
         private class AssemblyScanner : IAssemblyScanner
         {
-            public void Scan(Assembly assembly, IServiceRegistry serviceRegistry, Func<ILifetime> lifetime, Func<Type, Type, bool> shouldRegister, Func<Type, Type, string> serviceNameProvider)
+            private readonly IAssemblyScanner _inner;
+
+            public AssemblyScanner(IAssemblyScanner inner)
             {
-                // nothing - we don't want LightInject to scan
+                _inner = inner ?? throw new ArgumentNullException(nameof(inner));
             }
 
+            /// <remarks>
+            /// This method is called when one explicitly calls (amongst other signatures)
+            /// <see cref="ServiceContainer.RegisterAssembly(Assembly)"/>
+            /// the user is sure they want to register by convention so lets let them.
+            /// </remarks>
+            public void Scan(Assembly assembly, IServiceRegistry serviceRegistry, Func<ILifetime> lifetime, Func<Type, Type, bool> shouldRegister, Func<Type, Type, string> serviceNameProvider)
+            {
+               _inner.Scan(assembly, serviceRegistry, lifetime, shouldRegister, serviceNameProvider);
+            }
+
+            /// <remarks>
+            /// This method is called by <see cref="ServiceContainer.GetEmitMethod"/>
+            /// It will attempt to execute composition roots found within the assembly containing
+            /// the requested type.
+            ///
+            /// But we (Umbraco) explicitly register all composition roots, so lets no-op
+            /// </remarks>
             public void Scan(Assembly assembly, IServiceRegistry serviceRegistry)
             {
                 // nothing - we don't want LightInject to scan
