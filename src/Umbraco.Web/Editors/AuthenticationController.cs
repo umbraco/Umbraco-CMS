@@ -215,69 +215,7 @@ namespace Umbraco.Web.Editors
         [SetAngularAntiForgeryTokens]
         public async Task<HttpResponseMessage> PostLogin(LoginModel loginModel)
         {
-            var http = EnsureHttpContext();
-            var owinContext = TryGetOwinContext().Result;
-
-            // Sign the user in with username/password, this also gives a chance for developers to
-            // custom verify the credentials and auto-link user accounts with a custom IBackOfficePasswordChecker
-            var result = await SignInManager.PasswordSignInAsync(
-                loginModel.Username, loginModel.Password, isPersistent: true, shouldLockout: true);
-
-            switch (result)
-            {
-                case SignInStatus.Success:
-
-                    // get the user
-                    var user = Services.UserService.GetByUsername(loginModel.Username);
-                    UserManager.RaiseLoginSuccessEvent(user.Id);
-
-                    return SetPrincipalAndReturnUserDetail(user, owinContext.Request.User);
-                case SignInStatus.RequiresVerification:
-
-                    var twofactorOptions = UserManager as IUmbracoBackOfficeTwoFactorOptions;
-                    if (twofactorOptions == null)
-                    {
-                        throw new HttpResponseException(
-                            Request.CreateErrorResponse(
-                                HttpStatusCode.BadRequest,
-                                "UserManager does not implement " + typeof(IUmbracoBackOfficeTwoFactorOptions)));
-                    }
-
-                    var twofactorView = twofactorOptions.GetTwoFactorView(
-                        owinContext,
-                        UmbracoContext,
-                        loginModel.Username);
-
-                    if (twofactorView.IsNullOrWhiteSpace())
-                    {
-                        throw new HttpResponseException(
-                            Request.CreateErrorResponse(
-                                HttpStatusCode.BadRequest,
-                                typeof(IUmbracoBackOfficeTwoFactorOptions) + ".GetTwoFactorView returned an empty string"));
-                    }
-
-                    var attemptedUser = Services.UserService.GetByUsername(loginModel.Username);
-
-                    // create a with information to display a custom two factor send code view
-                    var verifyResponse = Request.CreateResponse(HttpStatusCode.PaymentRequired, new
-                    {
-                        twoFactorView = twofactorView,
-                        userId = attemptedUser.Id
-                    });
-
-                    UserManager.RaiseLoginRequiresVerificationEvent(attemptedUser.Id);
-
-                    return verifyResponse;
-
-                case SignInStatus.LockedOut:
-                case SignInStatus.Failure:
-                default:
-                    // return BadRequest (400), we don't want to return a 401 because that get's intercepted
-                    // by our angular helper because it thinks that we need to re-perform the request once we are
-                    // authorized and we don't want to return a 403 because angular will show a warning message indicating
-                    // that the user doesn't have access to perform this function, we just want to return a normal invalid message.
-                    throw new HttpResponseException(HttpStatusCode.BadRequest);
-            }
+            throw new HttpResponseException(HttpStatusCode.BadRequest);
         }
 
         /// <summary>
