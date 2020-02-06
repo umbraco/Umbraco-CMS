@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using LightInject;
+using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.Composing.LightInject
 {
@@ -56,9 +57,24 @@ namespace Umbraco.Core.Composing.LightInject
             // it is an index property. which means that eg protected or internal setters are OK.
             //Container.EnableAnnotatedPropertyInjection();
 
-            // ensure that we do *not* scan assemblies unless our users explicitly ask the container to do so
-            // we explicitly RegisterFrom our own composition roots and don't want them scanned
-            container.AssemblyScanner = new AssemblyScanner(container.AssemblyScanner);
+            // ensure that we do *not* scan our assemblies
+            // but do not prevent users from doing so if they so desire.
+            bool PreventScanForUmbracoCompositionRootsPredicate(Type type, string s)
+            {
+                // Tests expect the other registered fallback to run, see RegisterAuto below.
+                if (!type.IsInterface)
+                    return false;
+
+                // The fallback factory method only applies to types in Umbraco namespaces
+                return type.FullName?.StartsWith("Umbraco", StringComparison.OrdinalIgnoreCase) ?? false;
+            }
+
+            // Explicitly registering a fallback factory method prevents ServiceContainer.GetEmitMethod
+            // from scanning the Umbraco assemblies for composition roots.
+            container.RegisterFallback(
+                PreventScanForUmbracoCompositionRootsPredicate,
+                request => throw new ResolveUnregisteredDependencyException(request.ServiceType)
+            );
 
             // see notes in MixedLightInjectScopeManagerProvider
             container.ScopeManagerProvider = new MixedLightInjectScopeManagerProvider();
@@ -250,39 +266,7 @@ namespace Umbraco.Core.Composing.LightInject
                 throw new Exception("Container.ScopeManagerProvider is not MixedLightInjectScopeManagerProvider.");
             smp.EnablePerWebRequestScope();
         }
-
-        private class AssemblyScanner : IAssemblyScanner
-        {
-            private readonly IAssemblyScanner _inner;
-
-            public AssemblyScanner(IAssemblyScanner inner)
-            {
-                _inner = inner ?? throw new ArgumentNullException(nameof(inner));
-            }
-
-            /// <remarks>
-            /// This method is called when one explicitly calls (amongst other signatures)
-            /// <see cref="ServiceContainer.RegisterAssembly(Assembly)"/>
-            /// the user is sure they want to register by convention so lets let them.
-            /// </remarks>
-            public void Scan(Assembly assembly, IServiceRegistry serviceRegistry, Func<ILifetime> lifetime, Func<Type, Type, bool> shouldRegister, Func<Type, Type, string> serviceNameProvider)
-            {
-               _inner.Scan(assembly, serviceRegistry, lifetime, shouldRegister, serviceNameProvider);
-            }
-
-            /// <remarks>
-            /// This method is called by <see cref="ServiceContainer.GetEmitMethod"/>
-            /// It will attempt to execute composition roots found within the assembly containing
-            /// the requested type.
-            ///
-            /// But we (Umbraco) explicitly register all composition roots, so lets no-op
-            /// </remarks>
-            public void Scan(Assembly assembly, IServiceRegistry serviceRegistry)
-            {
-                // nothing - we don't want LightInject to scan
-            }
-        }
-
+        
         #endregion
     }
 }
