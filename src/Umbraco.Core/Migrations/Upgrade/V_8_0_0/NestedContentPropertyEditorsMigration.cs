@@ -223,6 +223,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                         {
                             var sqlNodeData = Sql()
                                 .Select<NodeDto>()
+                                .From<NodeDto>()
                                 .Where<NodeDto>(x => x.NodeId == intId);
 
                             var node = Database.Fetch<NodeDto>(sqlNodeData).FirstOrDefault();
