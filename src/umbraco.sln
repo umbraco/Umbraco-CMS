@@ -107,7 +107,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Infrastructure", "U
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Configuration", "Umbraco.Configuration\Umbraco.Configuration.csproj", "{FBE7C065-DAC0-4025-A78B-63B24D3AB00B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Infrastrucure.Persistance.SqlCe", "Umbraco.Infrastrucure.Persistance.SqlCe\Umbraco.Infrastrucure.Persistance.SqlCe.csproj", "{33085570-9BF2-4065-A9B0-A29D920D13BA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Persistance.SqlCe", "Umbraco.Persistance.SqlCe\Umbraco.Persistance.SqlCe.csproj", "{33085570-9BF2-4065-A9B0-A29D920D13BA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.TestData", "Umbraco.TestData\Umbraco.TestData.csproj", "{FB5676ED-7A69-492C-B802-E7B24144C0FC}"
 EndProject
