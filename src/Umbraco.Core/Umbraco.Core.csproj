@@ -133,7 +133,6 @@
     <Compile Include="Models\Blocks\BlockListLayoutReference.cs" />
     <Compile Include="Models\Blocks\BlockListModel.cs" />
     <Compile Include="Models\Blocks\IBlockElement.cs" />
-    <Compile Include="PropertyEditors\BlockListEditor.cs" />
     <Compile Include="Runtime\IMainDomLock.cs" />
     <Compile Include="Runtime\MainDomSemaphoreLock.cs" />
     <Compile Include="Runtime\SqlMainDomLock.cs" />
