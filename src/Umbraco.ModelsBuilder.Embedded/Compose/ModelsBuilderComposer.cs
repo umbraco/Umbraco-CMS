@@ -3,19 +3,16 @@ using System.Reflection;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Composing;
-using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Embedded.Building;
 using Umbraco.ModelsBuilder.Embedded.Configuration;
 using Umbraco.Web;
-using Umbraco.Web.PublishedCache.NuCache;
-using Umbraco.Web.Features;
 
 namespace Umbraco.ModelsBuilder.Embedded.Compose
 {
 
 
-    [ComposeBefore(typeof(NuCacheComposer))]
+    [ComposeBefore(typeof(IPublishedCacheComposer))]
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public sealed class ModelsBuilderComposer : ICoreComposer
     {

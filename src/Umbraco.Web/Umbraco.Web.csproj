@@ -116,10 +116,6 @@
       <Project>{f9b7fe05-0f93-4d0d-9c10-690b33ecbbd8}</Project>
       <Name>Umbraco.Examine</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Umbraco.Infrastructure.PublishedCache\Umbraco.Infrastructure.PublishedCache.csproj">
-      <Project>{f6de8da0-07cc-4ef2-8a59-2bc81dbb3830}</Project>
-      <Name>Umbraco.Infrastructure.PublishedCache</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj">
       <Project>{3ae7bf57-966b-45a5-910a-954d7c554441}</Project>
       <Name>Umbraco.Infrastructure</Name>
