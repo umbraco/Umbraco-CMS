@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.PublishedContent;
 
@@ -22,6 +23,17 @@ namespace Umbraco.Core.Models.Blocks
         [DataMember(Name = "layout")]
         public IEnumerable<BlockListLayoutReference> Layout { get; }
 
-        
+        /// <summary>
+        /// Returns the data item associated with the layout udi reference
+        /// </summary>
+        /// <param name="udi"></param>
+        /// <returns></returns>
+        public IPublishedElement GetData(Udi udi)
+        {
+            if (!(udi is GuidUdi guidUdi))
+                return null;
+            return Data.FirstOrDefault(x => x.Key == guidUdi.Guid);
+        }
+
     }
 }

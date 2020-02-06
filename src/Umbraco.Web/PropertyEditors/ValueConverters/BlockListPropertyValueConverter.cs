@@ -108,7 +108,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     if (!elements.TryGetValue(guidUdi.Guid, out var data))
                         continue;
 
-                    var layoutRef = new BlockListLayoutReference(udi, data, element);
+                    var layoutRef = new BlockListLayoutReference(udi, element);
                     layout.Add(layoutRef);
                 }
 
