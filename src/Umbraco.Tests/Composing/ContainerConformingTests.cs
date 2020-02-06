@@ -4,6 +4,7 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Tests.Composing
 {
@@ -66,7 +67,7 @@ namespace Umbraco.Tests.Composing
 
             var factory = register.CreateFactory();
 
-            Assert.IsNull(factory.TryGetInstance<IThing>());
+            Assert.Throws<ResolveUnregisteredDependencyException>(() => factory.TryGetInstance<IThing>());
         }
 
         [Test]
@@ -140,7 +141,7 @@ namespace Umbraco.Tests.Composing
             var things = factory.GetInstance<IEnumerable<IThing>>();
             Assert.AreEqual(2, things.Count());
 
-            Assert.IsNull(factory.TryGetInstance<IThing>());
+            Assert.Throws<ResolveUnregisteredDependencyException>(() => factory.TryGetInstance<IThing>());
         }
 
         [Test]
@@ -185,7 +186,7 @@ namespace Umbraco.Tests.Composing
             var things = factory.GetInstance<IEnumerable<IThing>>();
             Assert.AreEqual(2, things.Count());
 
-            Assert.IsNull(factory.TryGetInstance<IThing>());
+            Assert.Throws<ResolveUnregisteredDependencyException>(() => factory.TryGetInstance<IThing>());
         }
 
         [Test]
@@ -203,7 +204,7 @@ namespace Umbraco.Tests.Composing
             //Assert.AreEqual(2, things.Count());
             Assert.AreEqual(1, things.Count()); // well, yes they are unique?
 
-            Assert.IsNull(factory.TryGetInstance<IThing>());
+            Assert.Throws<ResolveUnregisteredDependencyException>(() => factory.TryGetInstance<IThing>());
         }
 
         [Test]

@@ -11,8 +11,10 @@ using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Tests.Components;
 
 namespace Umbraco.Tests.Scoping
@@ -38,7 +40,7 @@ namespace Umbraco.Tests.Scoping
 
             composition.RegisterUnique(factory => new FileSystems(factory, factory.TryGetInstance<ILogger>()));
             composition.WithCollectionBuilder<MapperCollectionBuilder>();
-
+            composition.RegisterUnique<IShortStringHelper>(f => new DefaultShortStringHelper(f.GetInstance<IUmbracoSettingsSection>()));
             composition.Configs.Add(SettingsForTests.GetDefaultGlobalSettings);
             composition.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
 

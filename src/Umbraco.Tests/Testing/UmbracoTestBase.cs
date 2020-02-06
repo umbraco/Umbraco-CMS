@@ -36,6 +36,7 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Trees;
 using Umbraco.Core.Composing.CompositionExtensions;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Mapping;
 using Umbraco.Web.Composing.CompositionExtensions;
 using Umbraco.Web.Sections;
@@ -143,6 +144,8 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique(profiler);
             Composition.RegisterUnique<IProfilingLogger>(proflogger);
             Composition.RegisterUnique(appCaches);
+
+            Composition.RegisterUnique<IShortStringHelper>(f => new DefaultShortStringHelper(f.GetInstance<IUmbracoSettingsSection>()));
 
             TestObjects = new TestObjects(register);
             Compose();
@@ -418,15 +421,25 @@ namespace Umbraco.Tests.Testing
             // reset and dispose scopes
             // ensures we don't leak an opened database connection
             // which would lock eg SqlCe .sdf files
-            if (Factory?.TryGetInstance<IScopeProvider>() is ScopeProvider scopeProvider)
+
+            try
             {
-                Scope scope;
-                while ((scope = scopeProvider.AmbientScope) != null)
+                var instance = Factory?.TryGetInstance<IScopeProvider>();
+                if (instance is ScopeProvider scopeProvider)
                 {
-                    scope.Reset();
-                    scope.Dispose();
+                    Scope scope;
+                    while ((scope = scopeProvider.AmbientScope) != null)
+                    {
+                        scope.Reset();
+                        scope.Dispose();
+                    }
                 }
             }
+            catch (ResolveUnregisteredDependencyException)
+            {
+                // This occurs in some of the TearDown methods that attempt to resolve things after factory cleared.
+            }
+        
 
             Current.Reset(); // disposes the factory
 

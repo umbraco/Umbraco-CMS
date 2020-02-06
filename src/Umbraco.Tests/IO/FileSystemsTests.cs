@@ -13,6 +13,7 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.Components;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Core.Composing.CompositionExtensions;
+using Umbraco.Core.Strings;
 using FileSystems = Umbraco.Core.IO.FileSystems;
 
 namespace Umbraco.Tests.IO
@@ -34,6 +35,7 @@ namespace Umbraco.Tests.IO
             composition.Register(_ => Mock.Of<IDataTypeService>());
             composition.Register(_ => Mock.Of<IContentSection>());
             composition.RegisterUnique<IMediaPathScheme, UniqueMediaPathScheme>();
+            composition.RegisterUnique<IShortStringHelper>(f => new DefaultShortStringHelper(f.GetInstance<IUmbracoSettingsSection>()));
 
             composition.Configs.Add(SettingsForTests.GetDefaultGlobalSettings);
             composition.Configs.Add(SettingsForTests.GetDefaultUmbracoSettings);
