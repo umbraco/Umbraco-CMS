@@ -322,8 +322,8 @@ angular.module("umbraco.install").factory('installerService', function ($rootSco
 			service.status.feedback = null;
 			service.status.fact = null;
 
-			if(factTimer){
-				clearInterval(factTimer);
+			if (factTimer) {
+			    clearInterval(factTimer);
 			}
 		},
 
@@ -334,8 +334,8 @@ angular.module("umbraco.install").factory('installerService', function ($rootSco
 			service.status.feedback = "Redirecting you to Umbraco, please wait";
 			service.status.loading = false;
 
-			if(factTimer){
-				clearInterval(factTimer);
+			if (factTimer) {
+			    clearInterval(factTimer);
 			}
 
 			$timeout(function(){
