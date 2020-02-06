@@ -18,9 +18,10 @@
 
         function link(scope, element, attrs, ctrl) {
 
-            scope.close = function() {
-                if(scope.onClose) {
-                    scope.onClose();
+
+            scope.close = function () {
+                if (scope.onClose) {
+                   scope.onClose();
                 }
             }
 
