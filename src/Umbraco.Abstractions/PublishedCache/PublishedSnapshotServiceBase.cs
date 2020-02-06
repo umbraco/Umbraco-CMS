@@ -5,7 +5,7 @@ using Umbraco.Web.Cache;
 
 namespace Umbraco.Web.PublishedCache
 {
-    abstract class PublishedSnapshotServiceBase : IPublishedSnapshotService
+    public abstract class PublishedSnapshotServiceBase : IPublishedSnapshotService
     {
         protected PublishedSnapshotServiceBase(IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor)
         {

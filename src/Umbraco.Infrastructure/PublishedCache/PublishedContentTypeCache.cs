@@ -25,7 +25,7 @@ namespace Umbraco.Web.PublishedCache
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 
         // default ctor
-        internal PublishedContentTypeCache(IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService, IPublishedContentTypeFactory publishedContentTypeFactory, ILogger logger)
+        public PublishedContentTypeCache(IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService, IPublishedContentTypeFactory publishedContentTypeFactory, ILogger logger)
         {
             _contentTypeService = contentTypeService;
             _mediaTypeService = mediaTypeService;

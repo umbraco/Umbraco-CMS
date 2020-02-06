@@ -26,7 +26,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
     /// This class's logic is based on the <see cref="SnapDictionary{TKey, TValue}"/> class but has been slightly modified to suit these purposes.
     /// </para>
     /// </remarks>
-    internal class ContentStore
+    public class ContentStore
     {
         // this class is an extended version of SnapDictionary
         // most of the snapshots management code, etc is an exact copy
