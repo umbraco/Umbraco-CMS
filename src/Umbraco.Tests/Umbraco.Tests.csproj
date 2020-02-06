@@ -104,7 +104,7 @@
     <PackageReference Include="NPoco" Version="4.0.2" />
     <PackageReference Include="NUnit" Version="3.11.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.12.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Owin" Version="1.0" />
     <PackageReference Include="Selenium.WebDriver" Version="3.141.0" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.6.0" />
@@ -564,6 +564,10 @@
       <Project>{fbe7c065-dac0-4025-a78b-63b24d3ab00b}</Project>
       <Name>Umbraco.Configuration</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj">
+      <Project>{0fad7d2a-d7dd-45b1-91fd-488bb6cdacea}</Project>
+      <Name>Umbraco.Examine.Lucene</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Examine\Umbraco.Examine.csproj">
       <Project>{f9b7fe05-0f93-4d0d-9c10-690b33ecbbd8}</Project>
       <Name>Umbraco.Examine</Name>
@@ -583,10 +587,6 @@
     <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
       <Project>{651E1350-91B6-44B7-BD60-7207006D7003}</Project>
       <Name>Umbraco.Web</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj">
-      <Project>{07fbc26b-2927-4a22-8d96-d644c667fecc}</Project>
-      <Name>Umbraco.Examine.Lucene</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
