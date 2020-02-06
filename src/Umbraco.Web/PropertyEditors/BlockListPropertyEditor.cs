@@ -15,7 +15,7 @@ namespace Umbraco.Web.PropertyEditors
         ValueType = ValueTypes.Json,
         Group = Constants.PropertyEditors.Groups.Lists,
         Icon = "icon-thumbnail-list")]
-    public class BlockListPropertyEditor : DataEditor
+    public class BlockListPropertyEditor : BlockEditorPropertyEditor
     {
         public BlockListPropertyEditor(ILogger logger)
             : base(logger)

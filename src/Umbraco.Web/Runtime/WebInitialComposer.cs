@@ -108,6 +108,7 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<HtmlUrlParser>();
             composition.RegisterUnique<HtmlImageSourceParser>();
             composition.RegisterUnique<RichTextEditorPastedImages>();
+            composition.RegisterUnique<PropertyEditors.ValueConverters.BlockEditorConverter>();
 
             // register the umbraco helper - this is Transient! very important!
             // also, if not level.Run, we cannot really use the helper (during upgrade...)
