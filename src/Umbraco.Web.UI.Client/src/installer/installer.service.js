@@ -10,7 +10,7 @@ angular.module("umbraco.install").factory('installerService', function ($rootSco
 
 	var factTimer;
 	var _installerModel = {
-	    installId: null,
+        installId: null,
         instructions: {}
 	};
 
