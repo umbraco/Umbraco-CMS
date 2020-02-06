@@ -6,7 +6,7 @@ namespace Umbraco.Core.Collections
     public class TopoGraph
     {
         internal const string CycleDependencyError = "Cyclic dependency.";
-        internal const string MissingDependencyError = "Missing dependency.";
+        internal const string MissingDependencyError = "Missing dependency for type {0}, with key {1}";
 
         public class Node<TKey, TItem>
         {
@@ -126,7 +126,7 @@ namespace Umbraco.Core.Collections
                 if (_items.TryGetValue(key, out value))
                     yield return value;
                 else if (throwOnMissing)
-                    throw new Exception(MissingDependencyError);
+                    throw new Exception(String.Format(MissingDependencyError,typeof(TItem).Name,key));
             }
         }
     }
