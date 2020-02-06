@@ -6,7 +6,7 @@ namespace Umbraco.Core.Collections
     public class TopoGraph
     {
         internal const string CycleDependencyError = "Cyclic dependency.";
-        internal const string MissingDependencyError = "Missing dependency for type {0}, with key {1}.";
+        internal const string MissingDependencyError = "Missing dependency.";
 
         public class Node<TKey, TItem>
         {
