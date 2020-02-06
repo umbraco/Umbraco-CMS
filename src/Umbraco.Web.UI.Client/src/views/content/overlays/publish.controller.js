@@ -39,7 +39,7 @@
             var published = !(variant.state === "NotCreated" || variant.state === "Draft");
             
             // is this variant mandatory:
-            if (variant.language.isMandatory && !published && !variant.publish) {
+            if (variant.language && variant.language.isMandatory && !published && !variant.publish) {
                 //if a mandatory variant isn't published or set to be published
                 //then we cannot continue
                 
