@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Reflection;
+using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Composing.LightInject;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 
@@ -50,5 +54,138 @@ namespace Umbraco.Tests.Composing
             Assert.IsNotNull(resolved);
             Assert.AreSame(factory, resolved);
         }
+
+        [Test]
+        public void Users_Can_Resolve_Instances_Registered_By_Convention()
+        {
+            var mockedProfilingLogger = Mock.Of<IProfilingLogger>();
+            var mockedRuntimeState = Mock.Of<IRuntimeState>();
+
+            Mock.Get(mockedRuntimeState).Setup(x => x.Level)
+                .Returns(RuntimeLevel.Run);
+
+            var composition = new Composition(
+                LightInjectContainer.Create(),
+                null, // This is not used.
+                mockedProfilingLogger,
+                mockedRuntimeState);
+
+            var composers = new Composers(
+                composition,
+                new [] {typeof(StubUserComposer)},
+                new Attribute[0],
+                mockedProfilingLogger);
+
+            composers.Compose();
+
+            var factory = composition.CreateFactory();
+            var instance = factory.GetInstance<IConventionRegisteredAndResolvable>();
+
+            Assert.NotNull(instance);
+            Assert.IsInstanceOf<ConventionRegisteredAndResolvable>(instance);
+        }
+
+        [Test]
+        public void Container_Will_Scan_When_Explicitly_Told_To_Do_So()
+        {
+            var mockedProfilingLogger = Mock.Of<IProfilingLogger>();
+            var mockedRuntimeState = Mock.Of<IRuntimeState>();
+            var mockedAssemblyScanner = Mock.Of<IAssemblyScanner>();
+
+            Mock.Get(mockedRuntimeState).Setup(x => x.Level)
+                .Returns(RuntimeLevel.Run);
+
+            var outer = LightInjectContainer.Create();
+            var container = (ServiceContainer)outer.Concrete;
+
+            container.AssemblyScanner = mockedAssemblyScanner;
+
+            var composition = new Composition(
+                outer,
+                null, // This is not used.
+                mockedProfilingLogger,
+                mockedRuntimeState);
+
+            var composers = new Composers(
+                composition,
+                new[] { typeof(StubUserComposer) },
+                new Attribute[0],
+                mockedProfilingLogger);
+
+            composers.Compose();
+
+            Mock.Get(mockedAssemblyScanner)
+                .Verify(scanner => scanner.Scan(
+                    It.IsAny<Assembly>(),
+                    It.IsAny<IServiceRegistry>(),
+                    It.IsAny<Func<ILifetime>>(),
+                    It.IsAny<Func<Type, Type, bool>>(),
+                    It.IsAny<Func<Type, Type, string>>()
+                ), Times.Once);
+        }
+
+        [Test]
+        public void Container_Does_Not_Scan_For_Composition_Roots_When_Resolving_Unregistered_Types()
+        {
+            var mockedProfilingLogger = Mock.Of<IProfilingLogger>();
+            var mockedRuntimeState = Mock.Of<IRuntimeState>();
+            var mockedAssemblyScanner = Mock.Of<IAssemblyScanner>();
+
+            var outer = LightInjectContainer.Create();
+            var container = (ServiceContainer) outer.Concrete;
+
+            container.AssemblyScanner = mockedAssemblyScanner;
+
+            var composition = new Composition(
+                outer,
+                null, // This is not used.
+                mockedProfilingLogger,
+                mockedRuntimeState);
+
+            var composers = new Composers(
+                composition,
+                new Type[0],
+                new Attribute[0],
+                mockedProfilingLogger);
+
+            composers.Compose();
+
+            var factory = composition.CreateFactory();
+
+            Assert.Throws<ResolveUnregisteredDependencyException>(
+                () => factory.GetInstance<INeverGotRegistered>()
+            );
+
+            Mock.Get(mockedAssemblyScanner)
+                .Verify(scanner => scanner.Scan(
+                    It.IsAny<Assembly>(),
+                    It.IsAny<IServiceRegistry>()
+                ), Times.Never);
+
+            Mock.Get(mockedAssemblyScanner)
+                .Verify(scanner => scanner.Scan(
+                    It.IsAny<Assembly>(),
+                    It.IsAny<IServiceRegistry>(),
+                    It.IsAny<Func<ILifetime>>(),
+                    It.IsAny<Func<Type, Type, bool>>(),
+                    It.IsAny<Func<Type, Type, string>>()
+                ), Times.Never);
+        }
+
+        public class StubUserComposer : IUserComposer
+        {
+            public void Compose(Composition composition)
+            {
+                var container = (ServiceContainer)composition.Concrete;
+
+                container.RegisterAssembly(typeof(IConventionRegisteredAndResolvable).Assembly);
+            }
+        }
+
+        public interface IConventionRegisteredAndResolvable { }
+        public class ConventionRegisteredAndResolvable : IConventionRegisteredAndResolvable { }
+
+        public interface INeverGotRegistered { }
+        public class NeverGotRegistered : INeverGotRegistered { }
     }
 }
