@@ -324,31 +324,17 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
         });
     };
 
-    var searchListView = _.debounce(function () {
-        $scope.$apply(function () {
-            makeSearch();
-        });
-    }, 500);
+    
 
-    $scope.forceSearch = function (ev) {
-        //13: enter
-        switch (ev.keyCode) {
-            case 13:
-                makeSearch();
-                break;
-        }
-    };
-
-    $scope.enterSearch = function () {
-        $scope.viewLoaded = false;
-        searchListView();
-    };
-
-    function makeSearch() {
+    $scope.makeSearch = function() {
         if ($scope.options.filter !== null && $scope.options.filter !== undefined) {
             $scope.options.pageNumber = 1;
             $scope.reloadView($scope.contentId);
         }
+    }
+
+    $scope.onSearchStartTyping = function() {
+        $scope.viewLoaded = false;
     }
 
     $scope.selectedItemsCount = function () {
@@ -634,7 +620,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             currentNode: $scope.contentId,
             submit: function (model) {
                 if (model.target) {
-                    performCopy(model.target, model.relateToOriginal);
+                    performCopy(model.target, model.relateToOriginal, model.includeDescendants);
                 }
                 editorService.close();
             },
@@ -645,9 +631,9 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
         editorService.copy(copyEditor);
     };
 
-    function performCopy(target, relateToOriginal) {
+    function performCopy(target, relateToOriginal, includeDescendants) {
         applySelected(
-            function (selected, index) { return contentResource.copy({ parentId: target.id, id: getIdCallback(selected[index]), relateToOriginal: relateToOriginal }); },
+            function (selected, index) { return contentResource.copy({ parentId: target.id, id: getIdCallback(selected[index]), relateToOriginal: relateToOriginal, recursive: includeDescendants }); },
             function (count, total) {
                 var key = (total === 1 ? "bulk_copiedItemOfItem" : "bulk_copiedItemOfItems");
                 return localizationService.localize(key, [count, total]);

@@ -918,6 +918,14 @@ namespace Umbraco.Tests.PublishedContent
             var snapshot = _snapshotService.CreatePublishedSnapshot(previewToken: null);
             _snapshotAccessor.PublishedSnapshot = snapshot;
 
+            var snapshotService = (PublishedSnapshotService)_snapshotService;
+            var contentStore = snapshotService.GetContentStore();
+
+            var parentNodes = contentStore.Test.GetValues(1);
+            var parentNode = parentNodes[0];
+            AssertLinkedNode(parentNode.contentNode, -1, -1, 2, 4, 6);
+            Assert.AreEqual(1, parentNode.gen);
+
             var documents = snapshot.Content.GetAtRoot().ToArray();
             AssertDocuments(documents, "N1", "N2", "N3");
 
@@ -934,6 +942,15 @@ namespace Umbraco.Tests.PublishedContent
                 new ContentCacheRefresher.JsonPayload(2, Guid.Empty, TreeChangeTypes.RefreshNode),
             }, out _, out _);
 
+            parentNodes = contentStore.Test.GetValues(1);
+            Assert.AreEqual(2, parentNodes.Length);
+            parentNode = parentNodes[1]; // get the first gen
+            AssertLinkedNode(parentNode.contentNode, -1, -1, 2, 4, 6); // the structure should have remained the same
+            Assert.AreEqual(1, parentNode.gen);
+            parentNode = parentNodes[0]; // get the latest gen
+            AssertLinkedNode(parentNode.contentNode, -1, -1, 2, 4, 6); // the structure should have remained the same
+            Assert.AreEqual(2, parentNode.gen);
+
             documents = snapshot.Content.GetAtRoot().ToArray();
             AssertDocuments(documents, "N1", "N2", "N3");
 
@@ -942,6 +959,8 @@ namespace Umbraco.Tests.PublishedContent
 
             documents = snapshot.Content.GetById(2).Children().ToArray();
             AssertDocuments(documents, "N9", "N8", "N7");
+
+            
         }
 
         [Test]

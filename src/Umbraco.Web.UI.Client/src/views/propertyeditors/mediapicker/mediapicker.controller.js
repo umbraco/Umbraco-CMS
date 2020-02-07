@@ -99,6 +99,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
 
         function sync() {
             $scope.model.value = $scope.ids.join();
+            removeAllEntriesAction.isDisabled = $scope.ids.length === 0;
         };
 
         function setDirty() {
@@ -204,7 +205,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                 multiPicker: multiPicker,
                 onlyImages: onlyImages,
                 disableFolderSelect: disableFolderSelect,
-                allowMediaEdit: true,
+
                 submit: function (model) {
 
                     editorService.close();
@@ -245,6 +246,31 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                 }
             }
             return true;
+        }
+
+        function removeAllEntries() {
+            $scope.mediaItems.length = 0;// AngularJS way to empty the array.
+            $scope.ids.length = 0;// AngularJS way to empty the array.
+            sync();
+            setDirty();
+        }
+
+        var removeAllEntriesAction = {
+            labelKey: 'clipboard_labelForRemoveAllEntries',
+            labelTokens: [],
+            icon: 'trash',
+            method: removeAllEntries,
+            isDisabled: true
+        };
+        
+        if (multiPicker === true) {
+            var propertyActions = [
+                removeAllEntriesAction
+            ];
+
+            if ($scope.umbProperty) {
+                $scope.umbProperty.setPropertyActions(propertyActions);
+            }
         }
 
         $scope.sortableOptions = {

@@ -95,7 +95,7 @@
                                    </div>
 
                                     <div class="cell-tools-remove row-tool">
-                                        <i class="icon-trash" ng-click="togglePrompt(row)" localize="title" title="@delete"></i>
+                                        <button class="icon-trash btn-reset" ng-click="togglePrompt(row)" type="button"></button>
                                         <umb-confirm-action
                                             ng-if="row.deletePrompt"
                                             direction="left"
@@ -161,12 +161,12 @@
                                                       <div class="umb-cell-inner" ui-sortable="sortableOptionsCell" umb-grid-hack-scope ng-model="area.controls">
 
                                                           <!-- Control placeholder -->
-                                                          <div class="umb-cell-placeholder" ng-if="area.controls.length === 0" ng-click="openEditorOverlay($event, area, 0, area.$uniqueId);">
+                                                          <button class="umb-cell-placeholder btn-reset" type="button" ng-if="area.controls.length === 0" ng-click="openEditorOverlay($event, area, 0, area.$uniqueId);">
                                                                <div class="cell-tools-add -center">
                                                                    <localize ng-if="!sortMode" key="grid_addElement" />
                                                                    <localize ng-if="sortMode" key="grid_dropElement" />
                                                                </div>
-                                                          </div>
+                                                          </button>
 
                                                           <!-- for each control in areas -->
                                                           <div class="umb-control"
@@ -196,11 +196,11 @@
                                                                       <div class="umb-tools" ng-if="control === active">
 
                                                                           <div class="umb-control-tool" ng-if="control.editor.config.settings">
-                                                                              <i class="umb-control-tool-icon icon-settings" ng-click="editGridItemSettings(control, 'control')"></i>
+                                                                              <button class="umb-control-tool-icon icon-settings btn-reset" ng-click="editGridItemSettings(control, 'control')" type="button"></button>
                                                                           </div>
 
                                                                           <div class="umb-control-tool">
-                                                                              <i class="umb-control-tool-icon icon-trash" ng-click="togglePrompt(control)" localize="title" title="@delete"></i>
+                                                                              <button class="umb-control-tool-icon icon-trash btn-reset" ng-click="togglePrompt(control)" type="button"></button>
                                                                               <umb-confirm-action ng-if="control.deletePrompt"
                                                                                                   direction="left"
                                                                                                   on-confirm="removeControl(area, $index)"
@@ -226,7 +226,7 @@
 
                                                       <!-- if area is empty tools -->
                                                       <div class="umb-grid-add-more-content" ng-if="area.controls.length > 0 && !sortMode && (area.maxItems == undefined || area.maxItems == '' || area.maxItems == 0 || area.maxItems > area.controls.length)">
-                                                          <div class="cell-tools-add -bar newbtn" ng-click="openEditorOverlay($event, area, 0, area.$uniqueId);"><localize key="grid_addElement" /></div>
+                                                          <button class="cell-tools-add -bar newbtn btn-reset" type="button" ng-click="openEditorOverlay($event, area, 0, area.$uniqueId);"><localize key="grid_addElement" /></button>
                                                       </div>
 
                                                  </div>
@@ -249,14 +249,16 @@
 
                     <div class="umb-add-row" ng-if="!sortMode">
 
-                       <a href=""
-                          class="iconBox"
+                       <button
+                          class="iconBox btn-reset"
                           ng-click="toggleAddRow()"
                           ng-if="!showRowConfigurations">
 
-                          <i class=" icon icon-add" title="@general_add" localize="title"></i>
-
-                       </a>
+                          <i class="icon icon-add" ></i>
+                          <span class="sr-only">
+                            <localize key="visuallyHiddenTexts_addNewRow">Add new role</localize>
+                          </span>
+                        </button>
 
                     </div>
 
@@ -264,10 +266,11 @@
 
                         <p ng-hide="section.rows.length > 0"><strong><localize key="grid_addRows" /></strong></p>
 
-                        <div class="preview-rows columns"
+                        <button class="preview-rows columns btn-reset"
                              ng-repeat="layout in  section.$allowedLayouts"
                              ng-show="layout.areas.length > 0"
-                             ng-click="addRow(section, layout)">
+                             ng-click="addRow(section, layout)"
+                             type="button">
 
                             <div class="preview-row">
 
@@ -285,7 +288,7 @@
 
                             <small>{{layout.label || layout.name}}</small>
 
-                        </div> <!-- .templates-preview-rows -->
+                        </button> <!-- .templates-preview-rows -->
 
                     </div> <!-- .templates-preview -->
                     <!-- column tools end -->

@@ -108,6 +108,7 @@
 //@blueLight:               #4f89de;
 @blue:                  #2E8AEA;
 @blueMid:               #2152A3;// updated 2019
+@blueMidLight:          rgb(99, 174, 236);
 @blueDark:              #3544b1;// updated 2019
 @blueExtraDark:         #1b264f;// added 2019
 @blueLight:             #ADD8E6;
@@ -139,6 +140,9 @@
 @ui-option-disabled-type-hover:  @gray-5;
 @ui-option-disabled-hover:       @sand-7;
 
+@ui-disabled-type:        @gray-6;
+@ui-disabled-border:        @gray-6;
+
 //@ui-active:           #346ab3;
 @ui-active:             @pinkLight;
 @ui-active-blur:        @brownLight;
@@ -149,8 +153,8 @@
 @ui-selected-hover:     ligthen(@sand-5, 10);
 @ui-selected-type:           @blueExtraDark;
 @ui-selected-type-hover:     @blueMid;
-@ui-selected-border:           @pinkLight;
-@ui-selected-border-hover:     darken(@pinkLight, 10);
+@ui-selected-border:           @blueDark;
+@ui-selected-border-hover:     darken(@blueDark, 10);
 
 @ui-light-border:           @pinkLight;
 @ui-light-type:             @gray-4;
@@ -174,6 +178,8 @@
 @ui-action-discreet-type-hover:   @blueMid;
 @ui-action-discreet-border:         @gray-7;
 @ui-action-discreet-border-hover:   @blueMid;
+
+@ui-outline:                      @blueMidLight;
 
 @type-white:                      @white;
 @type-black:                      @blueNight;
@@ -255,7 +261,7 @@
 // Buttons
 // -------------------------
 @btnBackground:                     @gray-9;
-@btnBackgroundHighlight:            @gray-9;
+@btnBackgroundHighlight:            @gray-10;
 @btnBorder:                         @gray-9;
 
 @btnPrimaryBackground:              @ui-btn-positive;
@@ -293,7 +299,7 @@
 @inputBackground:               @white;
 @inputBorder:                   @gray-8;
 @inputBorderFocus:              @gray-7;
-@inputBorderTabFocus:           @blueExtraDark;
+@inputBorderTabFocus:           @ui-outline;
 @inputBorderRadius:             0;
 @inputDisabledBackground:       @gray-10;
 @formActionsBackground:         @gray-9;
@@ -448,7 +454,7 @@
 @successBorder:           transparent;
 
 @infoText:                @white;
-@infoBackground:          @turquoise-d1;
+@infoBackground:          @blueDark;
 @infoBorder:              transparent;
 
 @alertBorderRadius:       0;

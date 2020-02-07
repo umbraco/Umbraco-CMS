@@ -1,5 +1,5 @@
 angular.module('umbraco.services')
-    .factory('userService', function ($rootScope, eventsService, $q, $location, requestRetryQueue, authResource, $timeout, angularHelper) {
+    .factory('userService', function ($rootScope, eventsService, $q, $location, requestRetryQueue, authResource, emailMarketingResource, $timeout, angularHelper) {
 
         var currentUser = null;
         var lastUserId = null;
@@ -262,6 +262,11 @@ angular.module('umbraco.services')
             /** Called whenever a server request is made that contains a x-umb-user-seconds response header for which we can update the user's remaining timeout seconds */
             setUserTimeout: function (newTimeout) {
                 setUserTimeoutInternal(newTimeout);
+            },
+
+            /** Calls out to a Remote Azure Function to deal with email marketing service */
+            addUserToEmailMarketing: (user) => {
+                return emailMarketingResource.postAddUserToEmailMarketing(user);
             }
         };
 
