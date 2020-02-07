@@ -21,6 +21,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Models;
 using Umbraco.Web;
 using Umbraco.Web.PropertyEditors;
+using System.Text;
 
 namespace Umbraco.Tests.PropertyEditors
 {
@@ -110,7 +111,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void GetCropUrl_CropAliasTest()
         {
-            var urlString = MediaPath.GetCropUrl(imageCropperValue: CropperJson1, cropAlias: "Thumb", useCropDimensions: true);
+            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, cropAlias: "Thumb", useCropDimensions: true);
             Assert.AreEqual(MediaPath + "?crop=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&cropmode=percentage&width=100&height=100", urlString);
         }
 
@@ -120,28 +121,28 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void GetCropUrl_CropAliasIgnoreWidthHeightTest()
         {
-            var urlString = MediaPath.GetCropUrl(imageCropperValue: CropperJson1, cropAlias: "Thumb", useCropDimensions: true, width: 50, height: 50);
+            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, cropAlias: "Thumb", useCropDimensions: true, width: 50, height: 50);
             Assert.AreEqual(MediaPath + "?crop=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&cropmode=percentage&width=100&height=100", urlString);
         }
 
         [Test]
         public void GetCropUrl_WidthHeightTest()
         {
-            var urlString = MediaPath.GetCropUrl(imageCropperValue: CropperJson1, width: 200, height: 300);
+            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 200, height: 300);
             Assert.AreEqual(MediaPath + "?center=0.80827067669172936,0.96&mode=crop&width=200&height=300", urlString);
         }
 
         [Test]
         public void GetCropUrl_FocalPointTest()
         {
-            var urlString = MediaPath.GetCropUrl(imageCropperValue: CropperJson1, cropAlias: "thumb", preferFocalPoint: true, useCropDimensions: true);
+            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, cropAlias: "thumb", preferFocalPoint: true, useCropDimensions: true);
             Assert.AreEqual(MediaPath + "?center=0.80827067669172936,0.96&mode=crop&width=100&height=100", urlString);
         }
 
         [Test]
         public void GetCropUrlFurtherOptionsTest()
         {
-            var urlString = MediaPath.GetCropUrl(imageCropperValue: CropperJson1, width: 200, height: 300, furtherOptions: "&filter=comic&roundedcorners=radius-26|bgcolor-fff");
+            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 200, height: 300, furtherOptions: "&filter=comic&roundedcorners=radius-26|bgcolor-fff");
             Assert.AreEqual(MediaPath + "?center=0.80827067669172936,0.96&mode=crop&width=200&height=300&filter=comic&roundedcorners=radius-26|bgcolor-fff", urlString);
         }
 
@@ -151,7 +152,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void GetCropUrlNullTest()
         {
-            var urlString = MediaPath.GetCropUrl(imageCropperValue: CropperJson1, cropAlias: "Banner", useCropDimensions: true);
+            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, cropAlias: "Banner", useCropDimensions: true);
             Assert.AreEqual(null, urlString);
         }
 
@@ -162,7 +163,7 @@ namespace Umbraco.Tests.PropertyEditors
         public void GetBaseCropUrlFromModelTest()
         {
             var cropDataSet = CropperJson1.DeserializeImageCropperValue();
-            var urlString = cropDataSet.GetCropUrl("thumb");
+            var urlString = cropDataSet.GetCropUrl("thumb", new TestImageUrlGenerator());
             Assert.AreEqual("?crop=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&cropmode=percentage&width=100&height=100", urlString);
         }
 
@@ -172,7 +173,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void GetCropUrl_CropAliasHeightRatioModeTest()
         {
-            var urlString = MediaPath.GetCropUrl(imageCropperValue: CropperJson1, cropAlias: "Thumb", useCropDimensions: true, ratioMode:ImageCropRatioMode.Height);
+            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, cropAlias: "Thumb", useCropDimensions: true, ratioMode:ImageCropRatioMode.Height);
             Assert.AreEqual(MediaPath + "?crop=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&cropmode=percentage&width=100&heightratio=1", urlString);
         }
 
@@ -182,7 +183,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void GetCropUrl_WidthHeightRatioModeTest()
         {
-            var urlString = MediaPath.GetCropUrl(imageCropperValue: CropperJson1, width: 300, height: 150, ratioMode:ImageCropRatioMode.Height);
+            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 300, height: 150, ratioMode:ImageCropRatioMode.Height);
             Assert.AreEqual(MediaPath + "?center=0.80827067669172936,0.96&mode=crop&width=300&heightratio=0.5", urlString);
         }
 
@@ -192,7 +193,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void GetCropUrl_HeightWidthRatioModeTest()
         {
-            var urlString = MediaPath.GetCropUrl(imageCropperValue: CropperJson1, width: 300, height: 150, ratioMode: ImageCropRatioMode.Width);
+            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 300, height: 150, ratioMode: ImageCropRatioMode.Width);
             Assert.AreEqual(MediaPath + "?center=0.80827067669172936,0.96&mode=crop&height=150&widthratio=2", urlString);
         }
 
@@ -202,11 +203,11 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void GetCropUrl_SpecifiedCropModeTest()
         {
-            var urlStringMin = MediaPath.GetCropUrl(imageCropperValue: CropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.Min);
-            var urlStringBoxPad = MediaPath.GetCropUrl(imageCropperValue: CropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.BoxPad);
-            var urlStringPad = MediaPath.GetCropUrl(imageCropperValue: CropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.Pad);
-            var urlString = MediaPath.GetCropUrl(imageCropperValue: CropperJson1, width: 300, height: 150, imageCropMode:ImageCropMode.Max);
-            var urlStringStretch = MediaPath.GetCropUrl(imageCropperValue: CropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.Stretch);
+            var urlStringMin = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.Min);
+            var urlStringBoxPad = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.BoxPad);
+            var urlStringPad = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.Pad);
+            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 300, height: 150, imageCropMode:ImageCropMode.Max);
+            var urlStringStretch = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 300, height: 150, imageCropMode: ImageCropMode.Stretch);
 
             Assert.AreEqual(MediaPath + "?mode=min&width=300&height=150", urlStringMin);
             Assert.AreEqual(MediaPath + "?mode=boxpad&width=300&height=150", urlStringBoxPad);
@@ -221,7 +222,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void GetCropUrl_UploadTypeTest()
         {
-            var urlString = MediaPath.GetCropUrl(width: 100, height: 270, imageCropMode: ImageCropMode.Crop, imageCropAnchor: ImageCropAnchor.Center);
+            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), width: 100, height: 270, imageCropMode: ImageCropMode.Crop, imageCropAnchor: ImageCropAnchor.Center);
             Assert.AreEqual(MediaPath + "?mode=crop&anchor=center&width=100&height=270", urlString);
         }
 
@@ -233,7 +234,7 @@ namespace Umbraco.Tests.PropertyEditors
         {
             const string cropperJson = "{\"focalPoint\": {\"left\": 0.5,\"top\": 0.5},\"src\": \"/media/1005/img_0671.jpg\",\"crops\": [{\"alias\":\"thumb\",\"width\": 100,\"height\": 100,\"coordinates\": {\"x1\": 0.58729977382575338,\"y1\": 0.055768992440203169,\"x2\": 0,\"y2\": 0.32457553600198386}}]}";
 
-            var urlString = MediaPath.GetCropUrl(imageCropperValue: cropperJson, width: 300, height: 150, preferFocalPoint:true);
+            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: cropperJson, width: 300, height: 150, preferFocalPoint:true);
             Assert.AreEqual(MediaPath + "?anchor=center&mode=crop&width=300&height=150", urlString);
         }
 
@@ -245,7 +246,7 @@ namespace Umbraco.Tests.PropertyEditors
         {
             const string cropperJson = "{\"focalPoint\": {\"left\": 0.5,\"top\": 0.5},\"src\": \"/media/1005/img_0671.jpg\",\"crops\": [{\"alias\": \"home\",\"width\": 270,\"height\": 161}]}";
 
-            var urlString = MediaPath.GetCropUrl(imageCropperValue: cropperJson, cropAlias: "home", width: 200);
+            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: cropperJson, cropAlias: "home", width: 200);
             Assert.AreEqual(MediaPath + "?anchor=center&mode=crop&heightratio=0.5962962962962962962962962963&width=200", urlString);
         }
 
@@ -257,7 +258,7 @@ namespace Umbraco.Tests.PropertyEditors
         {
             const string cropperJson = "{\"focalPoint\": {\"left\": 0.4275,\"top\": 0.41},\"src\": \"/media/1005/img_0671.jpg\",\"crops\": [{\"alias\": \"home\",\"width\": 270,\"height\": 161}]}";
 
-            var urlString = MediaPath.GetCropUrl(imageCropperValue: cropperJson, cropAlias: "home", width: 200);
+            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: cropperJson, cropAlias: "home", width: 200);
             Assert.AreEqual(MediaPath + "?center=0.41,0.4275&mode=crop&heightratio=0.5962962962962962962962962963&width=200", urlString);
         }
 
@@ -269,7 +270,7 @@ namespace Umbraco.Tests.PropertyEditors
         {
             const string cropperJson = "{\"focalPoint\": {\"left\": 0.4275,\"top\": 0.41},\"src\": \"/media/1005/img_0671.jpg\",\"crops\": [{\"alias\": \"home\",\"width\": 270,\"height\": 161}]}";
 
-            var urlString = MediaPath.GetCropUrl(imageCropperValue: cropperJson, cropAlias: "home", width: 200, useCropDimensions: true);
+            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: cropperJson, cropAlias: "home", width: 200, useCropDimensions: true);
             Assert.AreEqual(MediaPath + "?center=0.41,0.4275&mode=crop&width=270&height=161", urlString);
         }
 
@@ -281,7 +282,7 @@ namespace Umbraco.Tests.PropertyEditors
         {
             const string cropperJson = "{\"focalPoint\": {\"left\": 0.5,\"top\": 0.5},\"src\": \"/media/1005/img_0671.jpg\",\"crops\": [{\"alias\": \"home\",\"width\": 270,\"height\": 161}]}";
 
-            var urlString = MediaPath.GetCropUrl(imageCropperValue: cropperJson, cropAlias: "home", height: 200);
+            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: cropperJson, cropAlias: "home", height: 200);
             Assert.AreEqual(MediaPath + "?anchor=center&mode=crop&widthratio=1.6770186335403726708074534161&height=200", urlString);
         }
 
@@ -293,7 +294,7 @@ namespace Umbraco.Tests.PropertyEditors
         {
             const string cropperJson = "{\"focalPoint\": {\"left\": 0.5,\"top\": 0.5},\"src\": \"/media/1005/img_0671.jpg\",\"crops\": [{\"alias\": \"home\",\"width\": 270,\"height\": 161}]}";
 
-            var urlString = MediaPath.GetCropUrl(imageCropperValue: cropperJson, width: 200);
+            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: cropperJson, width: 200);
             Assert.AreEqual(MediaPath + "?anchor=center&mode=crop&width=200", urlString);
         }
 
@@ -305,7 +306,7 @@ namespace Umbraco.Tests.PropertyEditors
         {
             const string cropperJson = "{\"focalPoint\": {\"left\": 0.5,\"top\": 0.5},\"src\": \"/media/1005/img_0671.jpg\",\"crops\": [{\"alias\": \"home\",\"width\": 270,\"height\": 161}]}";
 
-            var urlString = MediaPath.GetCropUrl(imageCropperValue: cropperJson, height: 200);
+            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: cropperJson, height: 200);
             Assert.AreEqual(MediaPath + "?anchor=center&mode=crop&height=200", urlString);
         }
 
@@ -317,8 +318,57 @@ namespace Umbraco.Tests.PropertyEditors
         {
             var cropperJson = "{\"focalPoint\": {\"left\": 0.5,\"top\": 0.5},\"src\": \"" + MediaPath + "\",\"crops\": [{\"alias\": \"home\",\"width\": 270,\"height\": 161}]}";
 
-            var urlString = MediaPath.GetCropUrl(400, 400, cropperJson, imageCropMode: ImageCropMode.Pad, furtherOptions: "&bgcolor=fff");
+            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), 400, 400, cropperJson, imageCropMode: ImageCropMode.Pad, furtherOptions: "&bgcolor=fff");
             Assert.AreEqual(MediaPath + "?mode=pad&width=400&height=400&bgcolor=fff", urlString);
+        }
+
+        private class TestImageUrlGenerator : IImageUrlGenerator
+        {
+            public string GetImageUrl(ImageUrlGenerationOptions options)
+            {
+                var imageProcessorUrl = new StringBuilder(options.ImageUrl ?? string.Empty);
+
+                if (options.FocalPoint != null)
+                {
+                    imageProcessorUrl.Append("?center=");
+                    imageProcessorUrl.Append(options.FocalPoint.Top.ToString(CultureInfo.InvariantCulture));
+                    imageProcessorUrl.Append(",");
+                    imageProcessorUrl.Append(options.FocalPoint.Left.ToString(CultureInfo.InvariantCulture));
+                    imageProcessorUrl.Append("&mode=crop");
+                }
+                else if (options.Crop != null)
+                {
+                    imageProcessorUrl.Append("?crop=");
+                    imageProcessorUrl.Append(options.Crop.X1.ToString(CultureInfo.InvariantCulture)).Append(",");
+                    imageProcessorUrl.Append(options.Crop.Y1.ToString(CultureInfo.InvariantCulture)).Append(",");
+                    imageProcessorUrl.Append(options.Crop.X2.ToString(CultureInfo.InvariantCulture)).Append(",");
+                    imageProcessorUrl.Append(options.Crop.Y2.ToString(CultureInfo.InvariantCulture));
+                    imageProcessorUrl.Append("&cropmode=percentage");
+                }
+                else if (options.DefaultCrop)
+                {
+                    imageProcessorUrl.Append("?anchor=center&mode=crop");
+                }
+                else
+                {
+                    imageProcessorUrl.Append("?mode=" + options.ImageCropMode.ToString().ToLower());
+                    if (options.ImageCropAnchor != null)imageProcessorUrl.Append("&anchor=" + options.ImageCropAnchor.ToString().ToLower());
+                }
+
+                var hasFormat = options.FurtherOptions != null && options.FurtherOptions.InvariantContains("&format=");
+                if (options.Quality != null && hasFormat == false) imageProcessorUrl.Append("&quality=" + options.Quality);
+                if (options.HeightRatio != null) imageProcessorUrl.Append("&heightratio=" + options.HeightRatio.Value.ToString(CultureInfo.InvariantCulture));
+                if (options.WidthRatio != null) imageProcessorUrl.Append("&widthratio=" + options.WidthRatio.Value.ToString(CultureInfo.InvariantCulture));
+                if (options.Width != null) imageProcessorUrl.Append("&width=" + options.Width);
+                if (options.Height != null) imageProcessorUrl.Append("&height=" + options.Height);
+                if (options.UpScale == false) imageProcessorUrl.Append("&upscale=false");
+                if (options.AnimationProcessMode != null) imageProcessorUrl.Append("&animationprocessmode=" + options.AnimationProcessMode);
+                if (options.FurtherOptions != null) imageProcessorUrl.Append(options.FurtherOptions);
+                if (options.Quality != null && hasFormat) imageProcessorUrl.Append("&quality=" + options.Quality);
+                if (options.CacheBusterValue != null) imageProcessorUrl.Append("&rnd=").Append(options.CacheBusterValue);
+
+                return imageProcessorUrl.ToString();
+            }
         }
     }
 }

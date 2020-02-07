@@ -155,6 +155,7 @@
     <Compile Include="Editors\MacrosController.cs" />
     <Compile Include="Editors\RelationTypeController.cs" />
     <Compile Include="Editors\TinyMceController.cs" />
+    <Compile Include="ImageCropperTemplateCoreExtensions.cs" />
     <Compile Include="IUmbracoContextFactory.cs" />
     <Compile Include="Install\ChangesMonitor.cs" />
     <Compile Include="Logging\WebProfiler.cs" />
@@ -223,6 +224,7 @@
     <Compile Include="Models\ContentEditing\MacroDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroParameterDisplay.cs" />
     <Compile Include="Models\ContentEditing\UrlAndAnchors.cs" />
+    <Compile Include="Models\ImageProcessorImageUrlGenerator.cs" />
     <Compile Include="Models\Mapping\CommonMapper.cs" />
     <Compile Include="Models\Mapping\MapperContextExtensions.cs" />
     <Compile Include="Models\PublishedContent\HybridVariationContextAccessor.cs" />
