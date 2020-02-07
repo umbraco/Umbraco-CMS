@@ -32,10 +32,10 @@
 
                                 <div class="form-search__toggle">
                                     <umb-checkbox
-                                        model="showChilds"
+                                        model="filterOptions.excludeSubFolders"
                                         on-change="vm.toggle()"
                                         text="Include subfolders in search"
-                                        label-key="general_includeFromsubFolders">
+                                        label-key="general_excludeFromSubFolders">
                                     </umb-checkbox>
                                 </div>
                             </div>
@@ -112,9 +112,8 @@
                             disable-folder-select={{disableFolderSelect}}
                             only-images={{onlyImages}}
                             only-folders={{onlyFolders}}
-                            include-sub-folders={{showChilds}}
-                            current-folder-id="{{currentFolder.id}}"
-                            allow-open-folder="!disableFolderSelect">
+                            include-sub-folders={{!filterOptions.excludeSubFolders}}
+                            current-folder-id="{{currentFolder.id}}">
                     </umb-media-grid>
 
 
