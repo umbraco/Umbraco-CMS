@@ -49,24 +49,25 @@
 
                         </div>
 
-                        <div
-                            auto-scale="85"
-                            umb-ace-editor="vm.aceOption"
-                            model="vm.partialView.content">
-                        </div>
+                        <!-- Code Editor -->
+                        <umb-code-editor
+                            class="template-editor"
+                            on-load="vm.codeEditorLoad"
+                            contents="vm.partialView.content"
+                            config="vm.codeEditorOptions"
+                            data-element="code-editor">
+                        </umb-code-editor>
 
                     </umb-box-content>
                 </umb-box>
-                
+
             </umb-editor-container>
 
             <umb-editor-footer>
 
                 <umb-editor-footer-content-left>
                     <umb-keyboard-shortcuts-overview
-                        model="vm.page.keyboardShortcutsOverview"
-                        show-overlay="vm.showKeyboardShortcut"
-                        on-close="vm.showKeyboardShortcut = false;">
+                        model="vm.page.keyboardShortcutsOverview">
                     </umb-keyboard-shortcuts-overview>
                 </umb-editor-footer-content-left>
 
@@ -79,7 +80,7 @@
                                 shortcut="esc"
                                 action="vm.close()">
                     </umb-button>
-                        
+
                     <umb-button type="submit"
                                 button-style="success"
                                 state="vm.page.saveButtonState"
