@@ -15,7 +15,10 @@
         vm.submit = submit;
         vm.close = close;
 
-        //////////
+        var dialogOptions = $scope.model;
+
+        $scope.multiPicker = (dialogOptions.multiPicker && dialogOptions.multiPicker !== "0") ? true : false;
+        console.log("multiPicker", $scope.multiPicker);
 
         function onInit() {
 
@@ -35,7 +38,6 @@
 
             // get users
             getUsers();
-            
         }
 
         function preSelect(selection, users) {
@@ -50,22 +52,35 @@
 
         function selectUser(user) {
 
-            if(!user.selected) {
-                
+            if (!user.selected) {
                 user.selected = true;
                 $scope.model.selection.push(user);
-
             } else {
 
-                angular.forEach($scope.model.selection, function(selectedUser, index){
-                    if(selectedUser.id === user.id) {
-                        user.selected = false;
-                        $scope.model.selection.splice(index, 1);
+                if (user.selected) {
+                    angular.forEach($scope.model.selection, function (selectedUser, index) {
+                        if (selectedUser.id === user.id) {
+                            user.selected = false;
+                            $scope.model.selection.splice(index, 1);
+                        }
+                    });
+                } else {
+                    if (!$scope.multiPicker) {
+                        deselectAllUsers($scope.model.selection);
                     }
-                });
-
+                    //eventsService.emit("dialogs.mediaPicker.select", media);
+                    user.selected = true;
+                    $scope.model.selection.push(user);
+                }
             }
+        }
 
+        function deselectAllUsers(users) {
+            for (var i = 0; i < users.length; i++) {
+                var user = users[i];
+                user.selected = false;
+            }
+            users.length = 0;
         }
 
         var search = _.debounce(function () {
@@ -95,7 +110,6 @@
                 preSelect($scope.model.selection, vm.users);
 
                 vm.loading = false;
-
             });
         }
 
