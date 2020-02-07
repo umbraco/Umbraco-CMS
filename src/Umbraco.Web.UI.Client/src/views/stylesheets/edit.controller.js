@@ -169,8 +169,6 @@
                 language: "css"
             }
 
-            //monaco.languages.registerCompletionItemProvider().dispose();
-
             let cssCompletionProvider;
 
             // When VS Code editor has loaded...
