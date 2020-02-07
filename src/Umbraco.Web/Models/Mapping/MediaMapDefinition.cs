@@ -62,7 +62,7 @@ namespace Umbraco.Web.Models.Mapping
             target.CreateDate = source.CreateDate;
             target.Icon = source.ContentType.Icon;
             target.Id = source.Id;
-            target.IsChildOfListView = DermineIsChildOfListView(source);
+            target.IsChildOfListView = DetermineIsChildOfListView(source);
             target.Key = source.Key;
             target.MediaLink = string.Join(",", source.GetUrls(_umbracoSettingsSection.Content, _logger, _propertyEditorCollection));
             target.Name = source.Name;
@@ -101,7 +101,7 @@ namespace Umbraco.Web.Models.Mapping
             target.VariesByCulture = source.ContentType.VariesByCulture();
         }
 
-        private bool DermineIsChildOfListView(IMedia source)
+        private bool DetermineIsChildOfListView(IMedia source)
         {
             // map the IsChildOfListView (this is actually if it is a descendant of a list view!)
             var parent = _mediaService.GetParent(source);
