@@ -137,6 +137,24 @@
                     }
                 }
             );
+
+            $scope.propertyEditorDisabled = function (property) {
+                if (property.unlockInvariantValue) {
+                    return false;
+                }
+                
+                var contentLanguage = $scope.content.language;
+
+                var canEditCulture = !contentLanguage ||
+                    // If the property culture equals the content culture it can be edited
+                    property.culture === contentLanguage.culture ||
+                    // A culture-invariant property can only be edited by the default language variant
+                    (property.culture == null && contentLanguage.isDefault);                
+
+                var canEditSegment = property.segment === $scope.content.segment;
+
+                return !canEditCulture || !canEditSegment;
+            }
         }
 
         var directive = {

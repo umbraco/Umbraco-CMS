@@ -11,13 +11,13 @@
                     data-element="property-{{property.alias}}"
                     ng-repeat="property in group.properties track by property.alias"
                     property="property"
-                    show-inherit="variantNodeModel.variants.length > 1 && ((content.language && !content.language.isDefault && !property.culture) || (content.segment && !property.segment)) && !property.unlockInvariantValue"
+                    show-inherit="propertyEditorDisabled(property)"
                     inherits-from="defaultVariant.language.name">
 
-                    <div ng-class="{'o-40 cursor-not-allowed': variantNodeModel.variants.length > 1 && ((content.language && !content.language.isDefault && !property.culture) || (content.segment && !property.segment)) && !property.unlockInvariantValue}">
+                    <div ng-class="{'o-40 cursor-not-allowed': propertyEditorDisabled(property) }">
                         <umb-property-editor
                             model="property"
-                            preview="variantNodeModel.variants.length > 1 && ((content.language && !content.language.isDefault && !property.culture) || (content.segment && !property.segment)) && !property.unlockInvariantValue">
+                            preview="propertyEditorDisabled(property)">
                         </umb-property-editor>
                     </div>
 
