@@ -8,8 +8,15 @@ using Umbraco.Core.Xml;
 
 namespace Umbraco.Web.PublishedCache
 {
-    abstract class PublishedCacheBase : IPublishedCache
+    public abstract class PublishedCacheBase : IPublishedCache
     {
+        private readonly IVariationContextAccessor _variationContextAccessor;
+
+        public PublishedCacheBase(IVariationContextAccessor variationContextAccessor)
+        {
+            _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
+
+        }
         public bool PreviewDefault { get; }
 
         protected PublishedCacheBase(bool previewDefault)
@@ -97,7 +104,7 @@ namespace Umbraco.Web.PublishedCache
             // this is probably not super-efficient, but works
             // some cache implementation may want to override it, though
             return GetAtRoot()
-                .SelectMany(x => x.DescendantsOrSelf())
+                .SelectMany(x => x.DescendantsOrSelf(_variationContextAccessor))
                 .Where(x => x.ContentType.Id == contentType.Id);
         }
     }

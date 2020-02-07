@@ -584,6 +584,10 @@
       <Project>{33085570-9bf2-4065-a9b0-a29d920d13ba}</Project>
       <Name>Umbraco.Persistance.SqlCe</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj">
+      <Project>{f6de8da0-07cc-4ef2-8a59-2bc81dbb3830}</Project>
+      <Name>Umbraco.PublishedCache.NuCache</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
       <Project>{651E1350-91B6-44B7-BD60-7207006D7003}</Project>
       <Name>Umbraco.Web</Name>

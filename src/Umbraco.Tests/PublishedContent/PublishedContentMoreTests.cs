@@ -35,7 +35,6 @@ namespace Umbraco.Tests.PublishedContent
                 UrlSegment = "content-1",
                 Path = "/1",
                 Level = 1,
-                Url = "/content-1",
                 ParentId = -1,
                 ChildIds = new int[] { },
                 Properties = new Collection<IPublishedProperty>
@@ -59,7 +58,6 @@ namespace Umbraco.Tests.PublishedContent
                 UrlSegment = "content-2",
                 Path = "/2",
                 Level = 1,
-                Url = "/content-2",
                 ParentId = -1,
                 ChildIds = new int[] { },
                 Properties = new Collection<IPublishedProperty>
@@ -83,7 +81,6 @@ namespace Umbraco.Tests.PublishedContent
                 UrlSegment = "content-2sub",
                 Path = "/3",
                 Level = 1,
-                Url = "/content-2sub",
                 ParentId = -1,
                 ChildIds = new int[] { },
                 Properties = new Collection<IPublishedProperty>

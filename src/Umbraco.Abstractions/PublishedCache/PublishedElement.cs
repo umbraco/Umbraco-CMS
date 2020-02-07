@@ -14,7 +14,7 @@ namespace Umbraco.Web.PublishedCache
     // an entirely new models factory + not even sure it makes sense at all since
     // sets are created manually todo yes it does! - what does this all mean?
     //
-    internal class PublishedElement : IPublishedElement
+    public class PublishedElement : IPublishedElement
     {
         // initializes a new instance of the PublishedElement class
         // within the context of a published snapshot service (eg a published content property value)

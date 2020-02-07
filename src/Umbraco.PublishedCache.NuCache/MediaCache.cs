@@ -11,7 +11,7 @@ using Umbraco.Web.PublishedCache.NuCache.Navigable;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
-    internal class MediaCache : PublishedCacheBase, IPublishedMediaCache, INavigableData, IDisposable
+    public class MediaCache : PublishedCacheBase, IPublishedMediaCache, INavigableData, IDisposable
     {
         private readonly ContentStore.Snapshot _snapshot;
         private readonly IVariationContextAccessor _variationContextAccessor;

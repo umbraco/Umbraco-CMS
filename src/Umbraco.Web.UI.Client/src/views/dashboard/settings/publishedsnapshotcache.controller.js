@@ -1,4 +1,4 @@
-﻿function nuCacheController($scope, $http, umbRequestHelper, localizationService, overlayService) {
+﻿function publishedSnapshotCacheController($scope, $http, umbRequestHelper, localizationService, overlayService) {
 
     var vm = this;
 
@@ -35,7 +35,7 @@
         if (vm.working) return;
         vm.working = true;
         umbRequestHelper.resourcePromise(
-                $http.get(umbRequestHelper.getApiUrl("nuCacheStatusBaseUrl", "Collect")),
+            $http.get(umbRequestHelper.getApiUrl("publishedSnapshotCacheStatusBaseUrl", "Collect")),
                     'Failed to verify the cache.')
             .then(function (result) {
                 vm.working = false;
@@ -47,7 +47,7 @@
         if (vm.working) return;
         vm.working = true;
         umbRequestHelper.resourcePromise(
-                $http.get(umbRequestHelper.getApiUrl("nuCacheStatusBaseUrl", "GetStatus")),
+            $http.get(umbRequestHelper.getApiUrl("publishedSnapshotCacheStatusBaseUrl", "GetStatus")),
                     'Failed to verify the cache.')
             .then(function (result) {
                 vm.working = false;
@@ -83,7 +83,7 @@
         vm.working = true;
 
         umbRequestHelper.resourcePromise(
-            $http.post(umbRequestHelper.getApiUrl("nuCacheStatusBaseUrl", "ReloadCache")),
+            $http.post(umbRequestHelper.getApiUrl("publishedSnapshotCacheStatusBaseUrl", "ReloadCache")),
             'Failed to trigger a cache reload')
             .then(function (result) {
                 vm.working = false;
@@ -94,7 +94,7 @@
         vm.working = true;
 
         umbRequestHelper.resourcePromise(
-            $http.post(umbRequestHelper.getApiUrl("nuCacheStatusBaseUrl", "RebuildDbCache")),
+            $http.post(umbRequestHelper.getApiUrl("publishedSnapshotCacheStatusBaseUrl", "RebuildDbCache")),
             'Failed to rebuild the cache.')
             .then(function (result) {
                 vm.working = false;
@@ -109,4 +109,4 @@
 
     init();
 }
-angular.module("umbraco").controller("Umbraco.Dashboard.NuCacheController", nuCacheController);
+angular.module("umbraco").controller("Umbraco.Dashboard.PublishedSnapshotCacheController", publishedSnapshotCacheController);

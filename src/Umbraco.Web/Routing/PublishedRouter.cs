@@ -28,6 +28,7 @@ namespace Umbraco.Web.Routing
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly ILogger _logger;
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+        private readonly IUserService _userService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedRouter"/> class.
@@ -39,7 +40,8 @@ namespace Umbraco.Web.Routing
             IVariationContextAccessor variationContextAccessor,
             ServiceContext services,
             IProfilingLogger proflog,
-            IUmbracoSettingsSection umbracoSettingsSection)
+            IUmbracoSettingsSection umbracoSettingsSection,
+            IUserService userService)
         {
             _webRoutingSection = webRoutingSection ?? throw new ArgumentNullException(nameof(webRoutingSection));
             _contentFinders = contentFinders ?? throw new ArgumentNullException(nameof(contentFinders));
@@ -49,6 +51,7 @@ namespace Umbraco.Web.Routing
             _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
             _logger = proflog;
             _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
         /// <inheritdoc />
@@ -194,7 +197,7 @@ namespace Umbraco.Web.Routing
 
             // assign the legacy page back to the request
             // handlers like default.aspx will want it and most macros currently need it
-            frequest.LegacyContentHashTable = new PublishedContentHashtableConverter(frequest);
+            frequest.LegacyContentHashTable = new PublishedContentHashtableConverter(frequest, _userService);
 
             return true;
         }
@@ -234,8 +237,7 @@ namespace Umbraco.Web.Routing
 
             // assign the legacy page back to the docrequest
             // handlers like default.aspx will want it and most macros currently need it
-            request.LegacyContentHashTable = new PublishedContentHashtableConverter(request);
-
+            request.LegacyContentHashTable = new PublishedContentHashtableConverter(request, _userService);
         }
 
         #endregion

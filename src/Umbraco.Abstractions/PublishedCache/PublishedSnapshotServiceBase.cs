@@ -5,7 +5,7 @@ using Umbraco.Web.Cache;
 
 namespace Umbraco.Web.PublishedCache
 {
-    abstract class PublishedSnapshotServiceBase : IPublishedSnapshotService
+    public abstract class PublishedSnapshotServiceBase : IPublishedSnapshotService
     {
         protected PublishedSnapshotServiceBase(IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor)
         {
@@ -38,5 +38,13 @@ namespace Umbraco.Web.PublishedCache
 
         public virtual void Dispose()
         { }
+
+        public abstract string GetStatus();
+
+        public virtual string StatusUrl => "views/dashboard/settings/publishedsnapshotcache.html";
+
+        public virtual void Collect()
+        {
+        }
     }
 }

@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
-    internal class PropertyData
+    public class PropertyData
     {
         private string _culture;
         private string _segment;

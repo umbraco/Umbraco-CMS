@@ -3,11 +3,12 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
+using Umbraco.Infrastructure.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
-    public class NuCacheComposer : ComponentComposer<NuCacheComponent>, ICoreComposer
+    public class NuCacheComposer : ComponentComposer<NuCacheComponent>, IPublishedCacheComposer
     {
         public override void Compose(Composition composition)
         {
@@ -31,7 +32,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 {
                     idkSvc.SetMapper(UmbracoObjectTypes.Document, id => publishedSnapshotService.GetDocumentUid(id), uid => publishedSnapshotService.GetDocumentId(uid));
                     idkSvc.SetMapper(UmbracoObjectTypes.Media, id => publishedSnapshotService.GetMediaUid(id), uid => publishedSnapshotService.GetMediaId(uid));
-                }                
+                }
                 return idkSvc;
             });
 

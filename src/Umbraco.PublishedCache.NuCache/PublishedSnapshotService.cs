@@ -26,11 +26,9 @@ using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Cache;
-using Umbraco.Web.Install;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 using Umbraco.Web.Routing;
 using File = System.IO.File;
-using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
@@ -172,8 +170,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         internal int GetMediaId(Guid udi) => GetId(_mediaStore, udi);
         internal Guid GetDocumentUid(int id) => GetUid(_contentStore, id);
         internal Guid GetMediaUid(int id) => GetUid(_mediaStore, id);
-        private int GetId(ContentStore store, Guid uid) => store.LiveSnapshot.Get(uid)?.Id ?? default;
-        private Guid GetUid(ContentStore store, int id) => store.LiveSnapshot.Get(id)?.Uid ?? default;
+        private int GetId(ContentStore store, Guid uid) => store.LiveSnapshot.Get(uid)?.Id ?? 0;
+        private Guid GetUid(ContentStore store, int id) => store.LiveSnapshot.Get(id)?.Uid ?? Guid.Empty;
 
         #endregion
 
@@ -1767,7 +1765,7 @@ AND cmsContentNu.nodeId IS NULL
 
         #region Instrument
 
-        public string GetStatus()
+        public override string GetStatus()
         {
             var dbCacheIsOk = VerifyContentDbCache()
                 && VerifyMediaDbCache()
@@ -1790,7 +1788,7 @@ AND cmsContentNu.nodeId IS NULL
                 " and " + ms + " snapshot" + (ms > 1 ? "s" : "") + ".";
         }
 
-        public void Collect()
+        public override void Collect()
         {
             var contentCollect = _contentStore.CollectAsync();
             var mediaCollect = _mediaStore.CollectAsync();

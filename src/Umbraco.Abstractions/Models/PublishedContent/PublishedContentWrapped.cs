@@ -79,22 +79,13 @@ namespace Umbraco.Core.Models.PublishedContent
         public virtual int CreatorId => _content.CreatorId;
 
         /// <inheritdoc />
-        public virtual string CreatorName => _content.CreatorName;
-
-        /// <inheritdoc />
         public virtual DateTime CreateDate => _content.CreateDate;
 
         /// <inheritdoc />
         public virtual int WriterId => _content.WriterId;
 
         /// <inheritdoc />
-        public virtual string WriterName => _content.WriterName;
-
-        /// <inheritdoc />
         public virtual DateTime UpdateDate => _content.UpdateDate;
-
-        /// <inheritdoc />
-        public virtual string Url => _content.Url;
 
         /// <inheritdoc />
         public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => _content.Cultures;
