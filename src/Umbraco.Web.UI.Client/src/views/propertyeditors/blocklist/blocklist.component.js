@@ -143,6 +143,29 @@
                                         segment: null
                                     }
                                 ]
+                            },
+                            {
+                                id: 1234,
+                                label: "Styling",
+                                properties: [
+                                    {
+                                        label: "Background color",
+                                        description: "",
+                                        view: "textbox",
+                                        config: {maxChars: 500},
+                                        hideLabel: false,
+                                        validation: {mandatory: true, mandatoryMessage: "", pattern: null, patternMessage: ""},
+                                        readonly: false,
+                                        id: 441,
+                                        dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
+                                        value: "The purpose of lorem ipsum is to create a natural looking block of text (sentence, paragraph, page, etc.) that doesn't distract from the layout. A practice not without controversy, laying out pages with meaningless filler text can be very useful when the focus is meant to be on design, not content.",
+                                        alias: "pageTitle",
+                                        editor: "Umbraco.TextBox",
+                                        isSensitive: false,
+                                        culture: null,
+                                        segment: null
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -199,7 +222,7 @@
                         tabs: [
                             {
                                 id: 1234,
-                                label: "Group 1",
+                                label: "Content",
                                 properties: [
                                     {
                                         label: "Image Title",
@@ -297,7 +320,7 @@
                         tabs: [
                             {
                                 id: 1234,
-                                label: "Group 1",
+                                label: "Content",
                                 properties: [
                                     {
                                         label: "Page Title",
@@ -372,7 +395,7 @@
                         tabs: [
                             {
                                 id: 1234,
-                                label: "Group 1",
+                                label: "Content",
                                 properties: [
                                     {
                                         label: "Image",
@@ -474,7 +497,7 @@
                     tabs: [
                         {
                             id: 1234,
-                            label: "Group 1",
+                            label: "Content",
                             properties: [
                                 {
                                     label: "Page Title",
@@ -534,6 +557,29 @@
                                     segment: null
                                 }
                             ]
+                        },
+                        {
+                            id: 1234,
+                            label: "Styling",
+                            properties: [
+                                {
+                                    label: "Background color",
+                                    description: "",
+                                    view: "textbox",
+                                    config: {maxChars: 500},
+                                    hideLabel: false,
+                                    validation: {mandatory: true, mandatoryMessage: "", pattern: null, patternMessage: ""},
+                                    readonly: false,
+                                    id: 441,
+                                    dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
+                                    value: "The purpose of lorem ipsum is to create a natural looking block of text (sentence, paragraph, page, etc.) that doesn't distract from the layout. A practice not without controversy, laying out pages with meaningless filler text can be very useful when the focus is meant to be on design, not content.",
+                                    alias: "pageTitle",
+                                    editor: "Umbraco.TextBox",
+                                    isSensitive: false,
+                                    culture: null,
+                                    segment: null
+                                }
+                            ]
                         }
                     ]
                 }
@@ -585,7 +631,7 @@
                     tabs: [
                         {
                             id: 1234,
-                            label: "Group 1",
+                            label: "Content",
                             properties: [
                                 {
                                     label: "Page Title",
@@ -645,6 +691,29 @@
                                     segment: null
                                 }
                             ]
+                        },
+                        {
+                            id: 1234,
+                            label: "Styling",
+                            properties: [
+                                {
+                                    label: "Background color",
+                                    description: "",
+                                    view: "textbox",
+                                    config: {maxChars: 500},
+                                    hideLabel: false,
+                                    validation: {mandatory: true, mandatoryMessage: "", pattern: null, patternMessage: ""},
+                                    readonly: false,
+                                    id: 441,
+                                    dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
+                                    value: "The purpose of lorem ipsum is to create a natural looking block of text (sentence, paragraph, page, etc.) that doesn't distract from the layout. A practice not without controversy, laying out pages with meaningless filler text can be very useful when the focus is meant to be on design, not content.",
+                                    alias: "pageTitle",
+                                    editor: "Umbraco.TextBox",
+                                    isSensitive: false,
+                                    culture: null,
+                                    segment: null
+                                }
+                            ]
                         }
                     ]
                 }
@@ -697,7 +766,7 @@
                     tabs: [
                         {
                             id: 1234,
-                            label: "Group 1",
+                            label: "Content",
                             properties: [
                                 {
                                     label: "Page Title",
@@ -751,6 +820,29 @@
                                     dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
                                     value: "Let's have a chat",
                                     alias: "imageDesc",
+                                    editor: "Umbraco.TextBox",
+                                    isSensitive: false,
+                                    culture: null,
+                                    segment: null
+                                }
+                            ]
+                        },
+                        {
+                            id: 1234,
+                            label: "Styling",
+                            properties: [
+                                {
+                                    label: "Background color",
+                                    description: "",
+                                    view: "textbox",
+                                    config: {maxChars: 500},
+                                    hideLabel: false,
+                                    validation: {mandatory: true, mandatoryMessage: "", pattern: null, patternMessage: ""},
+                                    readonly: false,
+                                    id: 441,
+                                    dataTypeKey: "0cc0eba1-9960-42c9-bf9b-60e150b429ae",
+                                    value: "The purpose of lorem ipsum is to create a natural looking block of text (sentence, paragraph, page, etc.) that doesn't distract from the layout. A practice not without controversy, laying out pages with meaningless filler text can be very useful when the focus is meant to be on design, not content.",
+                                    alias: "pageTitle",
                                     editor: "Umbraco.TextBox",
                                     isSensitive: false,
                                     culture: null,
