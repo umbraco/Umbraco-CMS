@@ -308,82 +308,71 @@ namespace Umbraco.Web
             ImageCropRatioMode? ratioMode = null,
             bool upScale = true)
         {
-            if (string.IsNullOrEmpty(imageUrl) == false)
+            if (string.IsNullOrEmpty(imageUrl)) return string.Empty;
+
+            ImageUrlGenerationOptions options;
+
+            if (cropDataSet != null && (imageCropMode == ImageCropMode.Crop || imageCropMode == null))
             {
-                ImageUrlGenerationOptions options;
+                var crop = cropDataSet.GetCrop(cropAlias);
 
-                if (cropDataSet != null && (imageCropMode == ImageCropMode.Crop || imageCropMode == null))
+                // if a crop was specified, but not found, return null
+                if (crop == null && !string.IsNullOrWhiteSpace(cropAlias))
+                    return null;
+
+                options = cropDataSet.GetCropBaseOptions(imageUrl, crop, string.IsNullOrWhiteSpace(cropAlias), preferFocalPoint);
+
+                if (crop != null & useCropDimensions)
                 {
-                    var crop = cropDataSet.GetCrop(cropAlias);
-
-                    // if a crop was specified, but not found, return null
-                    if (crop == null && !string.IsNullOrWhiteSpace(cropAlias))
-                        return null;
-
-                    options = cropDataSet.GetCropBaseOptions(imageUrl, crop, string.IsNullOrWhiteSpace(cropAlias), preferFocalPoint);
-
-                    if (crop != null & useCropDimensions)
-                    {
-                        width = crop.Width;
-                        height = crop.Height;
-                    }
-
-                    // If a predefined crop has been specified & there are no coordinates & no ratio mode, but a width parameter has been passed we can get the crop ratio for the height
-                    if (crop != null && string.IsNullOrEmpty(cropAlias) == false && crop.Coordinates == null && ratioMode == null && width != null && height == null)
-                    {
-                        options.HeightRatio = (decimal)crop.Height / crop.Width;
-                    }
-
-                    // If a predefined crop has been specified & there are no coordinates & no ratio mode, but a height parameter has been passed we can get the crop ratio for the width
-                    if (crop != null && string.IsNullOrEmpty(cropAlias) == false && crop.Coordinates == null && ratioMode == null && width == null && height != null)
-                    {
-                        options.WidthRatio = (decimal)crop.Width / crop.Height;
-                    }
-                }
-                else
-                {
-                    options = new ImageUrlGenerationOptions
-                    {
-                        ImageUrl = imageUrl,
-                        ImageCropMode = (imageCropMode ?? ImageCropMode.Pad).ToString().ToLowerInvariant(),
-                        ImageCropAnchor = imageCropAnchor?.ToString().ToLowerInvariant()
-                    };
+                    width = crop.Width;
+                    height = crop.Height;
                 }
 
-                options.Quality = quality;
-                options.Width = ratioMode != null && ratioMode.Value == ImageCropRatioMode.Width ? null : width;
-                options.Height = ratioMode != null && ratioMode.Value == ImageCropRatioMode.Height ? null : height;
-
-                if (ratioMode == ImageCropRatioMode.Width && height != null)
+                // If a predefined crop has been specified & there are no coordinates & no ratio mode, but a width parameter has been passed we can get the crop ratio for the height
+                if (crop != null && string.IsNullOrEmpty(cropAlias) == false && crop.Coordinates == null && ratioMode == null && width != null && height == null)
                 {
-                    // if only height specified then assume a square
-                    if (width == null)
-                    {
-                        width = height;
-                    }
-
-                    options.WidthRatio = (decimal)width / (decimal)height;
+                    options.HeightRatio = (decimal)crop.Height / crop.Width;
                 }
 
-                if (ratioMode == ImageCropRatioMode.Height && width != null)
+                // If a predefined crop has been specified & there are no coordinates & no ratio mode, but a height parameter has been passed we can get the crop ratio for the width
+                if (crop != null && string.IsNullOrEmpty(cropAlias) == false && crop.Coordinates == null && ratioMode == null && width == null && height != null)
                 {
-                    // if only width specified then assume a square
-                    if (height == null)
-                    {
-                        height = width;
-                    }
-
-                    options.HeightRatio = (decimal)height / (decimal)width;
+                    options.WidthRatio = (decimal)crop.Width / crop.Height;
                 }
-
-                options.UpScale = upScale;
-                options.FurtherOptions = furtherOptions;
-                options.CacheBusterValue = cacheBusterValue;
-
-                return imageUrlGenerator.GetImageUrl(options);
+            }
+            else
+            {
+                options = new ImageUrlGenerationOptions
+                {
+                    ImageUrl = imageUrl,
+                    ImageCropMode = (imageCropMode ?? ImageCropMode.Pad).ToString().ToLowerInvariant(),
+                    ImageCropAnchor = imageCropAnchor?.ToString().ToLowerInvariant()
+                };
             }
 
-            return string.Empty;
+            options.Quality = quality;
+            options.Width = ratioMode != null && ratioMode.Value == ImageCropRatioMode.Width ? null : width;
+            options.Height = ratioMode != null && ratioMode.Value == ImageCropRatioMode.Height ? null : height;
+
+            if (ratioMode == ImageCropRatioMode.Width && height != null)
+            {
+                // if only height specified then assume a square
+                if (width == null) width = height;
+                options.WidthRatio = (decimal)width / (decimal)height;
+            }
+
+            if (ratioMode == ImageCropRatioMode.Height && width != null)
+            {
+                // if only width specified then assume a square
+                if (height == null) height = width;
+                options.HeightRatio = (decimal)height / (decimal)width;
+            }
+
+            options.UpScale = upScale;
+            options.FurtherOptions = furtherOptions;
+            options.CacheBusterValue = cacheBusterValue;
+
+            return imageUrlGenerator.GetImageUrl(options);
         }
     }
 }
