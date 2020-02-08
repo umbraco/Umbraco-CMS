@@ -13,18 +13,15 @@ function userPickerController($scope, usersResource , iconHelper, editorService)
     $scope.openUserPicker = function () {
 
         var currentSelection = [];
-        //angular.copy(vm.userGroup.users, currentSelection);
         var userPicker = {
             multiPicker: multiPicker,
             selection: currentSelection,
             submit: function (model) {
-
                 if (model.selection) {
                     _.each(model.selection, function (item, i) {
                         $scope.add(item);
                     });
                 }
-                //vm.userGroup.users = model.selection;
                 editorService.close();
             },
             close: function () {
