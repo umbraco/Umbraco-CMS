@@ -15,10 +15,7 @@
         vm.submit = submit;
         vm.close = close;
 
-        var dialogOptions = $scope.model;
-
-        console.log("multiPicker", $scope.multiPicker);
-        vm.multiPicker = (dialogOptions.multiPicker && dialogOptions.multiPicker !== "0") ? true : false;
+        vm.multiPicker = $scope.model.multiPicker === false ? false : true;
 
         function onInit() {
 
@@ -73,6 +70,10 @@
                     $scope.model.selection.push(user);
                 }
             }
+
+            if (!vm.multiPicker) {
+                submit($scope.model);
+            }
         }
 
         function deselectAllUsers(users) {
@@ -119,14 +120,14 @@
         }
 
         function submit(model) {
-            if($scope.model.submit) {
+            if ($scope.model.submit) {
                 $scope.model.submit(model);
             }
         }
 
         function close() {
-            if($scope.model.close) {
-                $scope.model.close();
+            if ($scope.model.close) {
+               $scope.model.close();
             }
         }
 
