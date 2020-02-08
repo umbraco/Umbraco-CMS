@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserPickerController($scope, usersResource, localizationService) {
+    function UserPickerController($scope, usersResource, localizationService, eventsService) {
         
         var vm = this;
 
@@ -68,7 +68,7 @@
                     if (!vm.multiPicker) {
                         deselectAllUsers($scope.model.selection);
                     }
-                    //eventsService.emit("dialogs.mediaPicker.select", media);
+                    eventsService.emit("dialogs.userPicker.select", user);
                     user.selected = true;
                     $scope.model.selection.push(user);
                 }
