@@ -15,13 +15,14 @@ using Umbraco.Core.Strings;
 using Umbraco.Tests.Components;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Tests.Published
 {
     [TestFixture]
-    public class ConvertersTests
+    public class ConvertersTests : UmbracoTestBase
     {
         #region SimpleConverter1
 
