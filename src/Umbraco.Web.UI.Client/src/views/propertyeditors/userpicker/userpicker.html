@@ -1,13 +1,13 @@
 <div ng-controller="Umbraco.PropertyEditors.UserPickerController" class="umb-property-editor umb-userpicker">
 
 	<div>
-		<umb-node-preview
-			ng-repeat="node in renderModel"
-			icon="node.icon"
-			name="node.name"
-			allow-remove="allowRemove"
-			on-remove="remove($index)">
-		</umb-node-preview>
+        <umb-user-preview
+            ng-repeat="user in renderModel"
+            name="user.name"
+            avatars="user.avatars"
+            allow-remove="allowRemove"
+            on-remove="remove($index)">
+        </umb-user-preview>
 	</div>
 
 	<button type="button" ng-show="model.config.multiPicker === true || renderModel.length === 0" 

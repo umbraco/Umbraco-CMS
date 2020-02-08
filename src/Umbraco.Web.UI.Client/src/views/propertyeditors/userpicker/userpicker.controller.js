@@ -56,7 +56,7 @@ function userPickerController($scope, entityResource, iconHelper, angularHelper,
 
         if (currIds.indexOf(itemId) < 0) {
             item.icon = item.icon ? iconHelper.convertFromLegacyIcon(item.icon) : "icon-user";
-            $scope.renderModel.push({ name: item.name, id: item.id, udi: item.udi, icon: item.icon });
+            $scope.renderModel.push({ name: item.name, id: item.id, udi: item.udi, icon: item.icon, avatars: item.avatars });
 
             console.log("$scope.renderModel", $scope.renderModel);
         }
