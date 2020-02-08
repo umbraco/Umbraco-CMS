@@ -478,6 +478,7 @@
     <key alias="selectMemberType">Select member type</key>
     <key alias="selectNode">Select node</key>
     <key alias="selectSections">Select sections</key>
+    <key alias="selectUser">Select user</key>
     <key alias="selectUsers">Select users</key>
     <key alias="noIconsFound">No icons were found</key>
     <key alias="noMacroParams">There are no parameters for this macro</key>

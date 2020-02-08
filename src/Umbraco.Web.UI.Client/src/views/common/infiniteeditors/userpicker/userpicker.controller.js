@@ -22,8 +22,11 @@
             vm.loading = true;
 
             // set default title
-            if(!$scope.model.title) {
-                localizationService.localize("defaultdialogs_selectUsers").then(function(value){
+            if (!$scope.model.title) {
+
+                var labelKey = vm.multiPicker ? "defaultdialogs_selectUsers" : "defaultdialogs_selectUser";
+
+                localizationService.localize(labelKey).then(function(value){
                     $scope.model.title = value;
                 });
             }
