@@ -31,24 +31,8 @@ function userPickerController($scope, entityResource, iconHelper, angularHelper,
                 editorService.close();
             }
         };
-        console.log("userPicker", userPicker);
 
         editorService.userPicker(userPicker);
-
-        //var userPicker = dialogOptions;
-
-        //userPicker.submit = function (model) {
-        //    if (model.selection) {
-        //        _.each(model.selection, function (item, i) {
-        //            $scope.add(item);
-        //        });
-        //    }
-        //    editorService.close();
-        //};
-
-        //userPicker.close = function () {
-        //    editorService.close();
-        //};
     };
 
     $scope.remove =function(index){
