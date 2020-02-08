@@ -17,8 +17,8 @@
 
         var dialogOptions = $scope.model;
 
-        $scope.multiPicker = (dialogOptions.multiPicker && dialogOptions.multiPicker !== "0") ? true : false;
         console.log("multiPicker", $scope.multiPicker);
+        vm.multiPicker = (dialogOptions.multiPicker && dialogOptions.multiPicker !== "0") ? true : false;
 
         function onInit() {
 
@@ -65,7 +65,7 @@
                         }
                     });
                 } else {
-                    if (!$scope.multiPicker) {
+                    if (!vm.multiPicker) {
                         deselectAllUsers($scope.model.selection);
                     }
                     //eventsService.emit("dialogs.mediaPicker.select", media);

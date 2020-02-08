@@ -78,6 +78,7 @@
                     action="vm.close()">
                 </umb-button>
                 <umb-button
+                    ng-if="vm.multiPicker"
                     type="button"
                     disabled="model.selection.length === 0"
                     button-style="success"
