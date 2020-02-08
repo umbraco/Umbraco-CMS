@@ -51,14 +51,9 @@ function userPickerController($scope, usersResource , iconHelper, editorService)
 
         var itemId = $scope.model.config.idType === "udi" ? item.udi : item.id;
 
-        console.log("itemId", itemId);
-        console.log("currIds", currIds);
-
         if (currIds.indexOf(itemId) < 0) {
             item.icon = item.icon ? iconHelper.convertFromLegacyIcon(item.icon) : "icon-user";
             $scope.renderModel.push({ name: item.name, id: item.id, udi: item.udi, icon: item.icon, avatars: item.avatars });
-
-            console.log("$scope.renderModel", $scope.renderModel);
         }
     };
 
@@ -88,7 +83,6 @@ function userPickerController($scope, usersResource , iconHelper, editorService)
 
     // entityResource.getByIds doesn't support "User" and we would like to show avatars in umb-user-preview as well.
     usersResource.getUsers(modelIds).then(function (data) {
-        console.log("user data", data);
         _.each(data, function (item, i) {
             // set default icon if it's missing
             item.icon = item.icon ? iconHelper.convertFromLegacyIcon(item.icon) : "icon-user";
