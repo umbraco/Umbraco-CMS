@@ -174,7 +174,7 @@ namespace Umbraco.Tests.PropertyEditors
         public void GetCropUrl_CropAliasHeightRatioModeTest()
         {
             var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, cropAlias: "Thumb", useCropDimensions: true, ratioMode:ImageCropRatioMode.Height);
-            Assert.AreEqual(MediaPath + "?crop=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&cropmode=percentage&width=100&heightratio=1", urlString);
+            Assert.AreEqual(MediaPath + "?crop=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&cropmode=percentage&heightratio=1&width=100", urlString);
         }
 
         /// <summary>
@@ -184,7 +184,7 @@ namespace Umbraco.Tests.PropertyEditors
         public void GetCropUrl_WidthHeightRatioModeTest()
         {
             var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 300, height: 150, ratioMode:ImageCropRatioMode.Height);
-            Assert.AreEqual(MediaPath + "?center=0.80827067669172936,0.96&mode=crop&width=300&heightratio=0.5", urlString);
+            Assert.AreEqual(MediaPath + "?center=0.80827067669172936,0.96&mode=crop&heightratio=0.5&width=300", urlString);
         }
 
         /// <summary>
@@ -194,7 +194,7 @@ namespace Umbraco.Tests.PropertyEditors
         public void GetCropUrl_HeightWidthRatioModeTest()
         {
             var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 300, height: 150, ratioMode: ImageCropRatioMode.Width);
-            Assert.AreEqual(MediaPath + "?center=0.80827067669172936,0.96&mode=crop&height=150&widthratio=2", urlString);
+            Assert.AreEqual(MediaPath + "?center=0.80827067669172936,0.96&mode=crop&widthratio=2&height=150", urlString);
         }
 
         /// <summary>
