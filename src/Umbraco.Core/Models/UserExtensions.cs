@@ -109,11 +109,11 @@ namespace Umbraco.Core.Models
             var urlGenerator = Current.ImageUrlGenerator;
             return new[]
             {
-                urlGenerator.GetImageUrl(new ImageUrlGenerationOptions { ImageUrl = avatarUrl, ImageCropMode = "crop", Width = 30, Height = 30 }),
-                urlGenerator.GetImageUrl(new ImageUrlGenerationOptions { ImageUrl = avatarUrl, ImageCropMode = "crop", Width = 60, Height = 60 }),
-                urlGenerator.GetImageUrl(new ImageUrlGenerationOptions { ImageUrl = avatarUrl, ImageCropMode = "crop", Width = 90, Height = 90 }),
-                urlGenerator.GetImageUrl(new ImageUrlGenerationOptions { ImageUrl = avatarUrl, ImageCropMode = "crop", Width = 150, Height = 150 }),
-                urlGenerator.GetImageUrl(new ImageUrlGenerationOptions { ImageUrl = avatarUrl, ImageCropMode = "crop", Width = 300, Height = 300 })
+                urlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = "crop", Width = 30, Height = 30 }),
+                urlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = "crop", Width = 60, Height = 60 }),
+                urlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = "crop", Width = 90, Height = 90 }),
+                urlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = "crop", Width = 150, Height = 150 }),
+                urlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = "crop", Width = 300, Height = 300 })
             };
 
         }

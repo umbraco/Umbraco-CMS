@@ -109,7 +109,7 @@ namespace Umbraco.Web.PropertyEditors
 
                 if (width != int.MinValue && height != int.MinValue)
                 {
-                    location = imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions { ImageUrl = location, ImageCropMode = "max", Width = width, Height = height });
+                    location = imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(location) { ImageCropMode = "max", Width = width, Height = height });
                 }
 
                 img.SetAttributeValue("src", location);

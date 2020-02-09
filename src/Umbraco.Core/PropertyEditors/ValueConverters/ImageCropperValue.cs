@@ -67,15 +67,15 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 || crop != null && crop.Coordinates == null && HasFocalPoint()
                 || defaultCrop && HasFocalPoint())
             {
-                return new ImageUrlGenerationOptions { ImageUrl = url, FocalPoint = new ImageUrlGenerationOptions.FocalPointPosition { Left = FocalPoint.Left, Top = FocalPoint.Top } };
+                return new ImageUrlGenerationOptions(url) { FocalPoint = new ImageUrlGenerationOptions.FocalPointPosition(FocalPoint.Top, FocalPoint.Left) };
             }
             else if (crop != null && crop.Coordinates != null && preferFocalPoint == false)
             {
-                return new ImageUrlGenerationOptions { ImageUrl = url, Crop = new ImageUrlGenerationOptions.CropCoordinates { X1 = crop.Coordinates.X1, X2 = crop.Coordinates.X2, Y1 = crop.Coordinates.Y1, Y2 = crop.Coordinates.Y2 } };
+                return new ImageUrlGenerationOptions(url) { Crop = new ImageUrlGenerationOptions.CropCoordinates(crop.Coordinates.X1, crop.Coordinates.Y1, crop.Coordinates.X2, crop.Coordinates.Y2) };
             }
             else
             {
-                return new ImageUrlGenerationOptions { ImageUrl = url, DefaultCrop = true };
+                return new ImageUrlGenerationOptions(url) { DefaultCrop = true };
             }
         }
 

@@ -13,26 +13,9 @@ namespace Umbraco.Web.Models
 
             var imageProcessorUrl = new StringBuilder(options.ImageUrl ?? string.Empty);
 
-            if (options.FocalPoint != null)
-            {
-                imageProcessorUrl.Append("?center=");
-                imageProcessorUrl.Append(options.FocalPoint.Top.ToString(CultureInfo.InvariantCulture)).Append(",");
-                imageProcessorUrl.Append(options.FocalPoint.Left.ToString(CultureInfo.InvariantCulture));
-                imageProcessorUrl.Append("&mode=crop");
-            }
-            else if (options.Crop != null)
-            {
-                imageProcessorUrl.Append("?crop=");
-                imageProcessorUrl.Append(options.Crop.X1.ToString(CultureInfo.InvariantCulture)).Append(",");
-                imageProcessorUrl.Append(options.Crop.Y1.ToString(CultureInfo.InvariantCulture)).Append(",");
-                imageProcessorUrl.Append(options.Crop.X2.ToString(CultureInfo.InvariantCulture)).Append(",");
-                imageProcessorUrl.Append(options.Crop.Y2.ToString(CultureInfo.InvariantCulture));
-                imageProcessorUrl.Append("&cropmode=percentage");
-            }
-            else if (options.DefaultCrop)
-            {
-                imageProcessorUrl.Append("?anchor=center&mode=crop");
-            }
+            if (options.FocalPoint != null) AppendFocalPoint(imageProcessorUrl, options);
+            else if (options.Crop != null) AppendCrop(imageProcessorUrl, options);
+            else if (options.DefaultCrop) imageProcessorUrl.Append("?anchor=center&mode=crop");
             else
             {
                 imageProcessorUrl.Append("?mode=").Append((options.ImageCropMode ?? "crop").ToLower());
@@ -58,6 +41,24 @@ namespace Umbraco.Web.Models
             if (options.CacheBusterValue != null) imageProcessorUrl.Append("&rnd=").Append(options.CacheBusterValue);
 
             return imageProcessorUrl.ToString();
+        }
+
+        private void AppendFocalPoint(StringBuilder imageProcessorUrl, ImageUrlGenerationOptions options)
+        {
+            imageProcessorUrl.Append("?center=");
+            imageProcessorUrl.Append(options.FocalPoint.Top.ToString(CultureInfo.InvariantCulture)).Append(",");
+            imageProcessorUrl.Append(options.FocalPoint.Left.ToString(CultureInfo.InvariantCulture));
+            imageProcessorUrl.Append("&mode=crop");
+        }
+
+        private void AppendCrop(StringBuilder imageProcessorUrl, ImageUrlGenerationOptions options)
+        {
+            imageProcessorUrl.Append("?crop=");
+            imageProcessorUrl.Append(options.Crop.X1.ToString(CultureInfo.InvariantCulture)).Append(",");
+            imageProcessorUrl.Append(options.Crop.Y1.ToString(CultureInfo.InvariantCulture)).Append(",");
+            imageProcessorUrl.Append(options.Crop.X2.ToString(CultureInfo.InvariantCulture)).Append(",");
+            imageProcessorUrl.Append(options.Crop.Y2.ToString(CultureInfo.InvariantCulture));
+            imageProcessorUrl.Append("&cropmode=percentage");
         }
     }
 }

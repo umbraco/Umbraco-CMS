@@ -343,9 +343,8 @@ namespace Umbraco.Web
             }
             else
             {
-                options = new ImageUrlGenerationOptions
+                options = new ImageUrlGenerationOptions (imageUrl)
                 {
-                    ImageUrl = imageUrl,
                     ImageCropMode = (imageCropMode ?? ImageCropMode.Pad).ToString().ToLowerInvariant(),
                     ImageCropAnchor = imageCropAnchor?.ToString().ToLowerInvariant()
                 };

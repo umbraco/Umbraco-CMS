@@ -16,12 +16,11 @@ namespace Umbraco.Web.Editors
     /// <para>
     /// This controller allows for retrieving URLs for processed images, such as resized, cropped,
     /// or otherwise altered.  These can be different based on the IImageUrlGenerator
-    /// implementation in use, and so back-office could should not rely on hard-coded string
+    /// implementation in use, and so the BackOffice could should not rely on hard-coded string
     /// building to generate correct URLs
     /// </para>
     /// </remarks>
-    [PluginController("UmbracoApi")]
-    public class ImageUrlGeneratorController
+    public class ImageUrlGeneratorController : UmbracoAuthorizedJsonController
     {
         private readonly IImageUrlGenerator _imageUrlGenerator;
 

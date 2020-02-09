@@ -84,7 +84,7 @@ namespace Umbraco.Web.Editors
             }
 
             var rnd = imageLastModified.HasValue ? $"&rnd={imageLastModified:yyyyMMddHHmmss}" : null;
-            var imageUrl = _imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions { ImageUrl = imagePath, UpScale = false, Width = width, AnimationProcessMode = "first", ImageCropMode = "max", CacheBusterValue = rnd });
+            var imageUrl = _imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(imagePath) { UpScale = false, Width = width, AnimationProcessMode = "first", ImageCropMode = "max", CacheBusterValue = rnd });
 
             response.Headers.Location = new Uri(imageUrl, UriKind.RelativeOrAbsolute);
             return response;
