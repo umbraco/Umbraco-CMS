@@ -101,7 +101,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
 
             var backofficeIdentity = (UmbracoBackOfficeIdentity) owinContext.Authentication.User.Identity;
 
-            var webSecurity = new Mock<WebSecurity>(null, null, globalSettings);
+            var webSecurity = new Mock<IWebSecurity>();
 
             //mock CurrentUser
             var groups = new List<ReadOnlyUserGroup>();

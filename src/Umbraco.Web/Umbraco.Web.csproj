@@ -597,7 +597,6 @@
     <Compile Include="Mvc\IRenderMvcController.cs" />
     <Compile Include="Mvc\SurfaceRouteHandler.cs" />
     <Compile Include="Search\ExamineIndexModel.cs" />
-    <Compile Include="Security\ValidateRequestAttempt.cs" />
     <Compile Include="Security\WebSecurity.cs" />
     <Compile Include="JavaScript\Resources.Designer.cs">
       <AutoGen>True</AutoGen>

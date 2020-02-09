@@ -24,7 +24,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the WebSecurity class
         /// </summary>
-        WebSecurity Security { get; }
+        IWebSecurity Security { get; }
 
         /// <summary>
         /// Gets the uri that is handled by ASP.NET after server-side rewriting took place.

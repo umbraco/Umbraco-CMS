@@ -19,7 +19,7 @@ namespace Umbraco.Web.Security
     /// <summary>
     /// A utility class used for dealing with USER security in Umbraco
     /// </summary>
-    public class WebSecurity
+    public class WebSecurity : IWebSecurity
     {
         private readonly HttpContextBase _httpContext;
         private readonly IUserService _userService;
@@ -215,7 +215,7 @@ namespace Umbraco.Web.Security
         /// </summary>
         /// <param name="throwExceptions">set to true if you want exceptions to be thrown if failed</param>
         /// <returns></returns>
-        internal ValidateRequestAttempt AuthorizeRequest(bool throwExceptions = false)
+        public ValidateRequestAttempt AuthorizeRequest(bool throwExceptions = false)
         {
             // check for secure connection
             if (_globalSettings.UseHttps && _httpContext.Request.IsSecureConnection == false)
@@ -232,7 +232,7 @@ namespace Umbraco.Web.Security
         /// <param name="section"></param>
         /// <param name="user"></param>
         /// <returns></returns>
-        internal virtual bool UserHasSectionAccess(string section, IUser user)
+        public virtual bool UserHasSectionAccess(string section, IUser user)
         {
             return user.HasSectionAccess(section);
         }
@@ -243,7 +243,7 @@ namespace Umbraco.Web.Security
         /// <param name="section"></param>
         /// <param name="username"></param>
         /// <returns></returns>
-        internal bool UserHasSectionAccess(string section, string username)
+        public bool UserHasSectionAccess(string section, string username)
         {
             var user = _userService.GetByUsername(username);
             if (user == null)

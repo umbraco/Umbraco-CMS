@@ -30,7 +30,7 @@ namespace Umbraco.Web
         // warn: does *not* manage setting any IUmbracoContextAccessor
         internal UmbracoContext(HttpContextBase httpContext,
             IPublishedSnapshotService publishedSnapshotService,
-            WebSecurity webSecurity,
+            IWebSecurity webSecurity,
             IUmbracoSettingsSection umbracoSettings,
             IEnumerable<IUrlProvider> urlProviders,
             IEnumerable<IMediaUrlProvider> mediaUrlProviders,
@@ -93,7 +93,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the WebSecurity class
         /// </summary>
-        public WebSecurity Security { get; }
+        public IWebSecurity Security { get; }
 
         /// <summary>
         /// Gets the uri that is handled by ASP.NET after server-side rewriting took place.
