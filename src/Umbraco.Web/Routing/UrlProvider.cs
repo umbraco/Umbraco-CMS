@@ -8,15 +8,16 @@ using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Routing
 {
+
     /// <summary>
     /// Provides urls.
     /// </summary>
-    public class UrlProvider
+    public class UrlProvider : IPublishedUrlProvider
     {
         #region Ctor and configuration
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="UrlProvider"/> class with an Umbraco context and a list of url providers.
+        /// InitialiIUrlProviderzes a new instance of the <see cref="UrlProvider"/> class with an Umbraco context and a list of url providers.
         /// </summary>
         /// <param name="umbracoContext">The Umbraco context.</param>
         /// <param name="routingSettings">Routing settings.</param>
@@ -72,10 +73,10 @@ namespace Umbraco.Web.Routing
 
         #region GetUrl
 
-        private UrlMode GetMode(bool absolute) => absolute ? UrlMode.Absolute : Mode;
-        private IPublishedContent GetDocument(int id) => _umbracoContext.Content.GetById(id);
-        private IPublishedContent GetDocument(Guid id) => _umbracoContext.Content.GetById(id);
-        private IPublishedContent GetMedia(Guid id) => _umbracoContext.Media.GetById(id);
+        public UrlMode GetMode(bool absolute) => absolute ? UrlMode.Absolute : Mode;
+        public IPublishedContent GetDocument(int id) => _umbracoContext.Content.GetById(id);
+        public IPublishedContent GetDocument(Guid id) => _umbracoContext.Content.GetById(id);
+        public IPublishedContent GetMedia(Guid id) => _umbracoContext.Media.GetById(id);
 
         /// <summary>
         /// Gets the url of a published content.
@@ -138,7 +139,7 @@ namespace Umbraco.Web.Routing
             return url?.Text ?? "#"; // legacy wants this
         }
 
-        internal string GetUrlFromRoute(int id, string route, string culture)
+        public string GetUrlFromRoute(int id, string route, string culture)
         {
             var provider = _urlProviders.OfType<DefaultUrlProvider>().FirstOrDefault();
             var url = provider == null

@@ -65,7 +65,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the url provider.
         /// </summary>
-        UrlProvider UrlProvider { get; }
+        IPublishedUrlProvider UrlProvider { get; }
 
         /// <summary>
         /// Gets/sets the PublishedRequest object
