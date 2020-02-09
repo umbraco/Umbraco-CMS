@@ -306,7 +306,8 @@ namespace Umbraco.Web
             string cacheBusterValue = null,
             string furtherOptions = null,
             ImageCropRatioMode? ratioMode = null,
-            bool upScale = true)
+            bool upScale = true,
+            string animationProcessMode = null)
         {
             if (string.IsNullOrEmpty(imageUrl)) return string.Empty;
 
@@ -353,6 +354,7 @@ namespace Umbraco.Web
             options.Quality = quality;
             options.Width = ratioMode != null && ratioMode.Value == ImageCropRatioMode.Width ? null : width;
             options.Height = ratioMode != null && ratioMode.Value == ImageCropRatioMode.Height ? null : height;
+            options.AnimationProcessMode = animationProcessMode;
 
             if (ratioMode == ImageCropRatioMode.Width && height != null)
             {
