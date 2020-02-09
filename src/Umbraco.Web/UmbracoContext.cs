@@ -1,27 +1,22 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Web;
-using System.Web.Routing;
 using Umbraco.Core;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web;
+using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web
 {
-
     /// <summary>
     /// Class that encapsulates Umbraco information of a specific HTTP request
     /// </summary>
-    public class UmbracoContext : DisposableObjectSlim, IDisposeOnRequestEnd
+    public class UmbracoContext : DisposableObjectSlim, IDisposeOnRequestEnd, IUmbracoContext
     {
         private readonly IGlobalSettings _globalSettings;
         private readonly IIOHelper _ioHelper;
@@ -88,12 +83,12 @@ namespace Umbraco.Web
         /// object is instantiated which in the web site is created during the BeginRequest phase.
         /// We can then determine complete rendering time from that.
         /// </summary>
-        internal DateTime ObjectCreated { get; }
+        public DateTime ObjectCreated { get; }
 
         /// <summary>
         /// This is used internally for debugging and also used to define anything required to distinguish this request from another.
         /// </summary>
-        internal Guid UmbracoRequestId { get; }
+        public Guid UmbracoRequestId { get; }
 
         /// <summary>
         /// Gets the WebSecurity class
@@ -103,13 +98,13 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the uri that is handled by ASP.NET after server-side rewriting took place.
         /// </summary>
-        internal Uri OriginalRequestUrl { get; }
+        public Uri OriginalRequestUrl { get; }
 
         /// <summary>
         /// Gets the cleaned up url that is handled by Umbraco.
         /// </summary>
         /// <remarks>That is, lowercase, no trailing slash after path, no .aspx...</remarks>
-        internal Uri CleanedUmbracoUrl { get; }
+        public Uri CleanedUmbracoUrl { get; }
 
         /// <summary>
         /// Gets the published snapshot.
@@ -167,10 +162,10 @@ namespace Umbraco.Web
                 var request = GetRequestFromContext();
                 //NOTE: the request can be null during app startup!
                 return Current.RuntimeState.Debug
-                    && request != null
-                    && (string.IsNullOrEmpty(request["umbdebugshowtrace"]) == false
-                        || string.IsNullOrEmpty(request["umbdebug"]) == false
-                        || string.IsNullOrEmpty(request.Cookies["UMB-DEBUG"]?.Value) == false);
+                       && request != null
+                       && (string.IsNullOrEmpty(request["umbdebugshowtrace"]) == false
+                           || string.IsNullOrEmpty(request["umbdebug"]) == false
+                           || string.IsNullOrEmpty(request.Cookies["UMB-DEBUG"]?.Value) == false);
             }
         }
 
@@ -237,7 +232,7 @@ namespace Umbraco.Web
 
         #endregion
 
-        private string PreviewToken
+        public string PreviewToken
         {
             get
             {
@@ -263,7 +258,7 @@ namespace Umbraco.Web
         // say we render a macro or RTE in a give 'preview' mode that might not be the 'current' one,
         // then due to the way it all works at the moment, the 'current' published snapshot need to be in the proper
         // default 'preview' mode - somehow we have to force it. and that could be recursive.
-        internal IDisposable ForcedPreview(bool preview)
+        public IDisposable ForcedPreview(bool preview)
         {
             InPreviewMode = preview;
             return PublishedSnapshot.ForcedPreview(preview, orig => InPreviewMode = orig);

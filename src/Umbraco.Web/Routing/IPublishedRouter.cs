@@ -17,7 +17,7 @@ namespace Umbraco.Web.Routing
         /// <param name="umbracoContext">The current Umbraco context.</param>
         /// <param name="uri">The (optional) request Uri.</param>
         /// <returns>A published request.</returns>
-        PublishedRequest CreateRequest(UmbracoContext umbracoContext, Uri uri = null);
+        PublishedRequest CreateRequest(IUmbracoContext umbracoContext, Uri uri = null);
 
         /// <summary>
         /// Prepares a request for rendering.

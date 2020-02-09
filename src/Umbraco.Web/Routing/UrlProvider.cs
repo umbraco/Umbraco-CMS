@@ -23,7 +23,7 @@ namespace Umbraco.Web.Routing
         /// <param name="urlProviders">The list of url providers.</param>
         /// <param name="mediaUrlProviders">The list of media url providers.</param>
         /// <param name="variationContextAccessor">The current variation accessor.</param>
-        public UrlProvider(UmbracoContext umbracoContext, IWebRoutingSection routingSettings, IEnumerable<IUrlProvider> urlProviders, IEnumerable<IMediaUrlProvider> mediaUrlProviders, IVariationContextAccessor variationContextAccessor)
+        public UrlProvider(IUmbracoContext umbracoContext, IWebRoutingSection routingSettings, IEnumerable<IUrlProvider> urlProviders, IEnumerable<IMediaUrlProvider> mediaUrlProviders, IVariationContextAccessor variationContextAccessor)
         {
             if (routingSettings == null) throw new ArgumentNullException(nameof(routingSettings));
 
@@ -48,7 +48,7 @@ namespace Umbraco.Web.Routing
         /// <param name="mediaUrlProviders">The list of media url providers</param>
         /// <param name="variationContextAccessor">The current variation accessor.</param>
         /// <param name="mode">An optional provider mode.</param>
-        public UrlProvider(UmbracoContext umbracoContext, IEnumerable<IUrlProvider> urlProviders, IEnumerable<IMediaUrlProvider> mediaUrlProviders, IVariationContextAccessor variationContextAccessor, UrlMode mode = UrlMode.Auto)
+        public UrlProvider(IUmbracoContext umbracoContext, IEnumerable<IUrlProvider> urlProviders, IEnumerable<IMediaUrlProvider> mediaUrlProviders, IVariationContextAccessor variationContextAccessor, UrlMode mode = UrlMode.Auto)
         {
             _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
             _urlProviders = urlProviders;
@@ -58,7 +58,7 @@ namespace Umbraco.Web.Routing
             Mode = mode;
         }
 
-        private readonly UmbracoContext _umbracoContext;
+        private readonly IUmbracoContext _umbracoContext;
         private readonly IEnumerable<IUrlProvider> _urlProviders;
         private readonly IEnumerable<IMediaUrlProvider> _mediaUrlProviders;
         private readonly IVariationContextAccessor _variationContextAccessor;

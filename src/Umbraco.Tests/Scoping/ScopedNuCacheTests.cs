@@ -111,7 +111,7 @@ namespace Umbraco.Tests.Scoping
                 filePermissionHelper);
         }
 
-        protected UmbracoContext GetUmbracoContextNu(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null)
+        protected IUmbracoContext GetUmbracoContextNu(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null)
         {
             // ensure we have a PublishedSnapshotService
             var service = PublishedSnapshotService as PublishedSnapshotService;

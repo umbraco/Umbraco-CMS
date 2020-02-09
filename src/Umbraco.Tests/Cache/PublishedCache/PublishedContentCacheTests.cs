@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
     public class PublishContentCacheTests : BaseWebTest
     {
         private FakeHttpContextFactory _httpContextFactory;
-        private UmbracoContext _umbracoContext;
+        private IUmbracoContext _umbracoContext;
         private IPublishedContentCache _cache;
         private XmlDocument _xml;
 

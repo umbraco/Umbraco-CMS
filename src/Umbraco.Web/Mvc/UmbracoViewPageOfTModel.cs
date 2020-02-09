@@ -25,7 +25,7 @@ namespace Umbraco.Web.Mvc
         private readonly IGlobalSettings _globalSettings;
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
 
-        private UmbracoContext _umbracoContext;
+        private IUmbracoContext _umbracoContext;
         private UmbracoHelper _helper;
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets the Umbraco context.
         /// </summary>
-        public UmbracoContext UmbracoContext => _umbracoContext
+        public IUmbracoContext UmbracoContext => _umbracoContext
             ?? (_umbracoContext = ViewContext.GetUmbracoContext() ?? Current.UmbracoContext);
 
         /// <summary>

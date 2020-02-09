@@ -20,19 +20,19 @@ namespace Umbraco.Web.WebApi
         internal static bool Enable = true;
 
         // TODO: inject!
-        private readonly UmbracoContext _umbracoContext;
+        private readonly IUmbracoContext _umbracoContext;
         private readonly IRuntimeState _runtimeState;
 
         private IRuntimeState RuntimeState => _runtimeState ?? Current.RuntimeState;
 
-        private UmbracoContext UmbracoContext => _umbracoContext ?? Current.UmbracoContext;
+        private IUmbracoContext UmbracoContext => _umbracoContext ?? Current.UmbracoContext;
 
         /// <summary>
         /// THIS SHOULD BE ONLY USED FOR UNIT TESTS
         /// </summary>
         /// <param name="umbracoContext"></param>
         /// <param name="runtimeState"></param>
-        public UmbracoAuthorizeAttribute(UmbracoContext umbracoContext, IRuntimeState runtimeState)
+        public UmbracoAuthorizeAttribute(IUmbracoContext umbracoContext, IRuntimeState runtimeState)
         {
             if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
             if (runtimeState == null) throw new ArgumentNullException(nameof(runtimeState));

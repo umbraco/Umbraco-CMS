@@ -14,7 +14,7 @@ namespace Umbraco.Web.Editors
             Model = (T)baseArgs.Model;
         }
 
-        public EditorModelEventArgs(T model, UmbracoContext umbracoContext)
+        public EditorModelEventArgs(T model, IUmbracoContext umbracoContext)
             : base(model, umbracoContext)
         {
             Model = model;
@@ -34,13 +34,13 @@ namespace Umbraco.Web.Editors
 
     public class EditorModelEventArgs : EventArgs
     {
-        public EditorModelEventArgs(object model, UmbracoContext umbracoContext)
+        public EditorModelEventArgs(object model, IUmbracoContext umbracoContext)
         {
             Model = model;
             UmbracoContext = umbracoContext;
         }
 
         public object Model { get; set; }
-        public UmbracoContext UmbracoContext { get; }
+        public IUmbracoContext UmbracoContext { get; }
     }
 }

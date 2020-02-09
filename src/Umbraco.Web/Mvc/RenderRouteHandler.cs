@@ -29,7 +29,7 @@ namespace Umbraco.Web.Mvc
         private readonly IControllerFactory _controllerFactory;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly UmbracoContext _umbracoContext;
+        private readonly IUmbracoContext _umbracoContext;
 
         public RenderRouteHandler(IUmbracoContextAccessor umbracoContextAccessor, IControllerFactory controllerFactory, IShortStringHelper shortStringHelper)
         {
@@ -38,14 +38,14 @@ namespace Umbraco.Web.Mvc
             _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
         }
 
-        public RenderRouteHandler(UmbracoContext umbracoContext, IControllerFactory controllerFactory, IShortStringHelper shortStringHelper)
+        public RenderRouteHandler(IUmbracoContext umbracoContext, IControllerFactory controllerFactory, IShortStringHelper shortStringHelper)
         {
             _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
             _controllerFactory = controllerFactory ?? throw new ArgumentNullException(nameof(controllerFactory));
             _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
         }
 
-        private UmbracoContext UmbracoContext => _umbracoContext ?? _umbracoContextAccessor.UmbracoContext;
+        private IUmbracoContext UmbracoContext => _umbracoContext ?? _umbracoContextAccessor.UmbracoContext;
 
         private UmbracoFeatures Features => Current.Factory.GetInstance<UmbracoFeatures>(); // TODO: inject
 

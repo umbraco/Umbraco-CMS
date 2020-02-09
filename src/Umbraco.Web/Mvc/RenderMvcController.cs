@@ -34,7 +34,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets the Umbraco context.
         /// </summary>
-        public override UmbracoContext UmbracoContext => PublishedRequest.UmbracoContext; //TODO: Why?
+        public override IUmbracoContext UmbracoContext => PublishedRequest.UmbracoContext; //TODO: Why?
 
         /// <summary>
         /// Gets the current content item.

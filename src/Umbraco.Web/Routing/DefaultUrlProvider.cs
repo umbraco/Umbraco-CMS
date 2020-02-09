@@ -29,7 +29,7 @@ namespace Umbraco.Web.Routing
         #region GetUrl
 
         /// <inheritdoc />
-        public virtual UrlInfo GetUrl(UmbracoContext umbracoContext, IPublishedContent content, UrlMode mode, string culture, Uri current)
+        public virtual UrlInfo GetUrl(IUmbracoContext umbracoContext, IPublishedContent content, UrlMode mode, string culture, Uri current)
         {
             if (!current.IsAbsoluteUri) throw new ArgumentException("Current url must be absolute.", nameof(current));
 
@@ -39,7 +39,7 @@ namespace Umbraco.Web.Routing
             return GetUrlFromRoute(route, umbracoContext, content.Id, current, mode, culture);
         }
 
-        internal UrlInfo GetUrlFromRoute(string route, UmbracoContext umbracoContext, int id, Uri current, UrlMode mode, string culture)
+        internal UrlInfo GetUrlFromRoute(string route, IUmbracoContext umbracoContext, int id, Uri current, UrlMode mode, string culture)
         {
             if (string.IsNullOrWhiteSpace(route))
             {
@@ -76,7 +76,7 @@ namespace Umbraco.Web.Routing
         /// <para>Other urls are those that <c>GetUrl</c> would not return in the current context, but would be valid
         /// urls for the node in other contexts (different domain for current request, umbracoUrlAlias...).</para>
         /// </remarks>
-        public virtual IEnumerable<UrlInfo> GetOtherUrls(UmbracoContext umbracoContext, int id, Uri current)
+        public virtual IEnumerable<UrlInfo> GetOtherUrls(IUmbracoContext umbracoContext, int id, Uri current)
         {
             var node = umbracoContext.Content.GetById(id);
             if (node == null)

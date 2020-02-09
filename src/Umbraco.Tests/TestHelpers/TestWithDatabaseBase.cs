@@ -357,7 +357,7 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-        protected UmbracoContext GetUmbracoContext(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null, IEnumerable<IMediaUrlProvider> mediaUrlProviders = null, IGlobalSettings globalSettings = null, IPublishedSnapshotService snapshotService = null)
+        protected IUmbracoContext GetUmbracoContext(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null, IEnumerable<IMediaUrlProvider> mediaUrlProviders = null, IGlobalSettings globalSettings = null, IPublishedSnapshotService snapshotService = null)
         {
             // ensure we have a PublishedCachesService
             var service = snapshotService ?? PublishedSnapshotService as XmlPublishedSnapshotService;

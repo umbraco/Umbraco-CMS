@@ -16,7 +16,7 @@ namespace Umbraco.Web.Macros
     public class PartialViewMacroEngine
     {
         private readonly Func<HttpContextBase> _getHttpContext;
-        private readonly Func<UmbracoContext> _getUmbracoContext;
+        private readonly Func<IUmbracoContext> _getUmbracoContext;
 
         public PartialViewMacroEngine()
         {
@@ -40,7 +40,7 @@ namespace Umbraco.Web.Macros
         /// </summary>
         /// <param name="httpContext"></param>
         /// <param name="umbracoContext"> </param>
-        internal PartialViewMacroEngine(HttpContextBase httpContext, UmbracoContext umbracoContext)
+        internal PartialViewMacroEngine(HttpContextBase httpContext, IUmbracoContext umbracoContext)
         {
             _getHttpContext = () => httpContext;
             _getUmbracoContext = () => umbracoContext;

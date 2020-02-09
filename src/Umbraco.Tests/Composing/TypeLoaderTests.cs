@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Composing
                     //typeof(TabPage).Assembly,
                     typeof(System.Web.Mvc.ActionResult).Assembly,
                     typeof(TypeFinder).Assembly,
-                    typeof(UmbracoContext).Assembly,
+                    typeof(IUmbracoContext).Assembly,
                     typeof(CheckBoxListPropertyEditor).Assembly
                 });
 
@@ -196,7 +196,7 @@ AnotherContentFinder
         [Test]
         public void Create_Cached_Plugin_File()
         {
-            var types = new[] { typeof(TypeLoader), typeof(TypeLoaderTests), typeof(UmbracoContext) };
+            var types = new[] { typeof(TypeLoader), typeof(TypeLoaderTests), typeof(IUmbracoContext) };
 
             var typeList1 = new TypeLoader.TypeList(typeof(object), null);
             foreach (var type in types) typeList1.Add(type);

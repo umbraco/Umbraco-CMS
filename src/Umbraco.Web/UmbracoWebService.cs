@@ -49,7 +49,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the Umbraco context.
         /// </summary>
-        public UmbracoContext UmbracoContext => UmbracoContextAccessor.UmbracoContext;
+        public IUmbracoContext UmbracoContext => UmbracoContextAccessor.UmbracoContext;
 
         /// <summary>
         /// Gets the Umbraco context accessor.

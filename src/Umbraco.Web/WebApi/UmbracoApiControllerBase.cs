@@ -75,7 +75,7 @@ namespace Umbraco.Web.WebApi
         /// <summary>
         /// Gets the Umbraco context.
         /// </summary>
-        public virtual UmbracoContext UmbracoContext => UmbracoContextAccessor.UmbracoContext;
+        public virtual IUmbracoContext UmbracoContext => UmbracoContextAccessor.UmbracoContext;
 
         /// <summary>
         /// Gets the Umbraco context accessor.

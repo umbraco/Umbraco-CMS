@@ -56,7 +56,7 @@ namespace Umbraco.Tests.PublishedContent
                     .ToList());
         }
 
-        private UmbracoContext GetUmbracoContext()
+        private IUmbracoContext GetUmbracoContext()
         {
             RouteData routeData = null;
 

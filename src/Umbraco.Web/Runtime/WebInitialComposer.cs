@@ -81,7 +81,7 @@ namespace Umbraco.Web.Runtime
             composition.Register(factory => MembershipProviderExtensions.GetMembersMembershipProvider());
             composition.Register(factory => Roles.Enabled ? Roles.Provider : new MembersRoleProvider(factory.GetInstance<IMemberService>()));
             composition.Register<MembershipHelper>(Lifetime.Request);
-            composition.Register<IPublishedMemberCache>(factory => factory.GetInstance<UmbracoContext>().PublishedSnapshot.Members);
+            composition.Register<IPublishedMemberCache>(factory => factory.GetInstance<IUmbracoContext>().PublishedSnapshot.Members);
 
             // register accessors for cultures
             composition.RegisterUnique<IDefaultCultureAccessor, DefaultCultureAccessor>();
@@ -131,7 +131,7 @@ namespace Umbraco.Web.Runtime
             if (composition.RuntimeState.Level == RuntimeLevel.Run)
                 composition.Register<UmbracoHelper>(factory =>
                 {
-                    var umbCtx = factory.GetInstance<UmbracoContext>();
+                    var umbCtx = factory.GetInstance<IUmbracoContext>();
                     return new UmbracoHelper(umbCtx.IsFrontEndUmbracoRequest ? umbCtx.PublishedRequest?.PublishedContent : null,
                         factory.GetInstance<ITagQuery>(), factory.GetInstance<ICultureDictionaryFactory>(),
                         factory.GetInstance<IUmbracoComponentRenderer>(), factory.GetInstance<IPublishedContentQuery>(),

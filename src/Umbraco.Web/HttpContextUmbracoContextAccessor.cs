@@ -12,13 +12,13 @@ namespace Umbraco.Web
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public UmbracoContext UmbracoContext
+        public IUmbracoContext UmbracoContext
         {
             get
             {
                 var httpContext = _httpContextAccessor.HttpContext;
                 if (httpContext == null) throw new Exception("oops:httpContext");
-                return (UmbracoContext) httpContext.Items[HttpContextItemKey];
+                return (IUmbracoContext) httpContext.Items[HttpContextItemKey];
             }
 
             set

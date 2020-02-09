@@ -55,7 +55,7 @@ namespace Umbraco.Web.Routing
         }
 
         /// <inheritdoc />
-        public PublishedRequest CreateRequest(UmbracoContext umbracoContext, Uri uri = null)
+        public PublishedRequest CreateRequest(IUmbracoContext umbracoContext, Uri uri = null)
         {
             return new PublishedRequest(this, umbracoContext, _umbracoSettingsSection, uri ?? umbracoContext.CleanedUmbracoUrl);
         }

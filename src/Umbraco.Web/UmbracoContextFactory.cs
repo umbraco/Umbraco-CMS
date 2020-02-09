@@ -16,7 +16,7 @@ using Umbraco.Web.Security;
 namespace Umbraco.Web
 {
     /// <summary>
-    /// Creates and manages <see cref="UmbracoContext"/> instances.
+    /// Creates and manages <see cref="IUmbracoContext"/> instances.
     /// </summary>
     public class UmbracoContextFactory : IUmbracoContextFactory
     {
@@ -52,7 +52,7 @@ namespace Umbraco.Web
             _ioHelper = ioHelper;
         }
 
-        private UmbracoContext CreateUmbracoContext(HttpContextBase httpContext)
+        private IUmbracoContext CreateUmbracoContext(HttpContextBase httpContext)
         {
             // make sure we have a variation context
             if (_variationContextAccessor.VariationContext == null)
