@@ -366,10 +366,6 @@
     <Compile Include="Routing\IContentLastChanceFinder.cs" />
     <Compile Include="Routing\UrlProviderCollection.cs" />
     <Compile Include="Routing\UrlProviderCollectionBuilder.cs" />
-    <Compile Include="Search\SearchableApplicationTree.cs" />
-    <Compile Include="Search\SearchableTreeAttribute.cs" />
-    <Compile Include="Search\SearchableTreeCollection.cs" />
-    <Compile Include="Search\SearchableTreeCollectionBuilder.cs" />
     <Compile Include="Search\UmbracoTreeSearcher.cs" />
     <Compile Include="Security\AuthenticationExtensions.cs" />
     <Compile Include="Security\UmbracoSecureDataFormat.cs" />
