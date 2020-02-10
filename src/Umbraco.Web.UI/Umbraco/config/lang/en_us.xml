@@ -676,7 +676,7 @@
     <key alias="icon">Icon</key>
     <key alias="id">Id</key>
     <key alias="import">Import</key>
-    <key alias="includeFromsubFolders">Include subfolders in search</key>
+    <key alias="excludeFromSubFolders">Search only this folder</key>
     <key alias="info">Info</key>
     <key alias="innerMargin">Inner margin</key>
     <key alias="insert">Insert</key>
@@ -1316,11 +1316,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="externalLinkPlaceholder">Enter the link</key>
   </area>
   <area alias="imagecropper">
-        <key alias="reset">Reset crop</key>
+    <key alias="reset">Reset crop</key>
     <key alias="saveCrop">Save crop</key>
     <key alias="addCrop">Add new crop</key>
-        <key alias="updateEditCrop">Done</key>
-        <key alias="undoEditCrop">Undo edits</key>
+    <key alias="updateEditCrop">Done</key>
+    <key alias="undoEditCrop">Undo edits</key>
+    <key alias="customCrop">User defined</key>
   </area>
   <area alias="rollback">
     <key alias="headline">Select a version to compare with the current version</key>

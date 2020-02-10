@@ -61,11 +61,6 @@ namespace Umbraco.Core.Models.PublishedContent
         int CreatorId { get; }
 
         /// <summary>
-        /// Gets the name of the user who created the content item.
-        /// </summary>
-        string CreatorName { get; }
-
-        /// <summary>
         /// Gets the date the content item was created.
         /// </summary>
         DateTime CreateDate { get; }
@@ -76,11 +71,6 @@ namespace Umbraco.Core.Models.PublishedContent
         int WriterId { get; }
 
         /// <summary>
-        /// Gets the name of the user who last updated the content item.
-        /// </summary>
-        string WriterName { get; }
-
-        /// <summary>
         /// Gets the date the content item was last updated.
         /// </summary>
         /// <remarks>
@@ -89,15 +79,6 @@ namespace Umbraco.Core.Models.PublishedContent
         /// date each culture was published.</para>
         /// </remarks>
         DateTime UpdateDate { get; }
-
-        /// <summary>
-        /// Gets the url of the content item for the current culture.
-        /// </summary>
-        /// <remarks>
-        /// <para>The value of this property is contextual. It depends on the 'current' request uri,
-        /// if any.</para>
-        /// </remarks>
-        string Url { get; }
 
         /// <summary>
         /// Gets available culture infos.

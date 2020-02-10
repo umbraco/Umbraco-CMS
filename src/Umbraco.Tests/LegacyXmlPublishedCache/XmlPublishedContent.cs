@@ -61,8 +61,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private string _name;
         private string _docTypeAlias;
         private int _docTypeId;
-        private string _writerName;
-        private string _creatorName;
         private int _writerId;
         private int _creatorId;
         private string _urlName;
@@ -157,24 +155,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         }
 
         public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => _cultures ?? (_cultures = GetCultures());
-
-        public override string WriterName
-        {
-            get
-            {
-				EnsureNodeInitialized();
-                return _writerName;
-            }
-        }
-
-        public override string CreatorName
-        {
-            get
-            {
-				EnsureNodeInitialized();
-                return _creatorName;
-            }
-        }
 
         public override int WriterId
         {
@@ -301,8 +281,8 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private void InitializeNode()
         {
             InitializeNode(this, _xmlNode, _isPreviewing,
-                out _id, out _key, out _template, out _sortOrder, out _name, out _writerName,
-                out _urlName, out _creatorName, out _creatorId, out _writerId, out _docTypeAlias, out _docTypeId, out _path,
+                out _id, out _key, out _template, out _sortOrder, out _name,
+                out _urlName, out _creatorId, out _writerId, out _docTypeAlias, out _docTypeId, out _path,
                 out _createDate, out _updateDate, out _level, out _isDraft, out _contentType, out _properties,
                 _contentTypeCache.Get);
 
@@ -311,18 +291,17 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         // internal for some benchmarks
         internal static void InitializeNode(XmlPublishedContent node, XmlNode xmlNode, bool isPreviewing,
-            out int id, out Guid key, out int template, out int sortOrder, out string name, out string writerName, out string urlName,
-            out string creatorName, out int creatorId, out int writerId, out string docTypeAlias, out int docTypeId, out string path,
+            out int id, out Guid key, out int template, out int sortOrder, out string name, out string urlName,
+            out int creatorId, out int writerId, out string docTypeAlias, out int docTypeId, out string path,
             out DateTime createDate, out DateTime updateDate, out int level, out bool isDraft,
             out IPublishedContentType contentType, out Dictionary<string, IPublishedProperty> properties,
             Func<PublishedItemType, string, IPublishedContentType> getPublishedContentType)
         {
             //initialize the out params with defaults:
-            writerName = null;
             docTypeAlias = null;
             id = template = sortOrder = template = creatorId = writerId = docTypeId = level = default(int);
             key = default(Guid);
-            name = writerName = urlName = creatorName = docTypeAlias = path = null;
+            name = docTypeAlias = urlName = path = null;
             createDate = updateDate = default(DateTime);
             isDraft = false;
             contentType = null;
@@ -341,12 +320,8 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                     sortOrder = int.Parse(xmlNode.Attributes.GetNamedItem("sortOrder").Value);
                 if (xmlNode.Attributes.GetNamedItem("nodeName") != null)
                     name = xmlNode.Attributes.GetNamedItem("nodeName").Value;
-                if (xmlNode.Attributes.GetNamedItem("writerName") != null)
-                    writerName = xmlNode.Attributes.GetNamedItem("writerName").Value;
                 if (xmlNode.Attributes.GetNamedItem("urlName") != null)
                     urlName = xmlNode.Attributes.GetNamedItem("urlName").Value;
-                if (xmlNode.Attributes.GetNamedItem("creatorName") != null)
-                    creatorName = xmlNode.Attributes.GetNamedItem("creatorName").Value;
 
                 //Added the actual userID, as a user cannot be looked up via full name only...
                 if (xmlNode.Attributes.GetNamedItem("creatorID") != null)

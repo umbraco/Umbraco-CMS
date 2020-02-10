@@ -100,7 +100,7 @@ namespace Umbraco.Tests.Scoping
                 ScopeProvider,
                 documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,
-                new DatabaseDataSource(),
+                new DatabaseDataSource(Mock.Of<ILogger>()),
                 Factory.GetInstance<IGlobalSettings>(),
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 new NoopPublishedModelFactory(),

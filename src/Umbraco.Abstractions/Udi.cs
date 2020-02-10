@@ -11,8 +11,8 @@ namespace Umbraco.Core
     /// <remarks>An Udi can be fully qualified or "closed" eg umb://document/{guid} or "open" eg umb://document.</remarks>
     [TypeConverter(typeof(UdiTypeConverter))]
     public abstract class Udi : IComparable<Udi>
-    {           
-        public Uri UriValue { get; } 
+    {
+        public Uri UriValue { get; }
 
         /// <summary>
         /// Initializes a new instance of the Udi class.
@@ -35,7 +35,7 @@ namespace Umbraco.Core
             UriValue = uriValue;
         }
 
-        
+
 
         /// <summary>
         /// Gets the entity type part of the identifier.
@@ -54,7 +54,7 @@ namespace Umbraco.Core
             return UriValue.AbsoluteUri;
         }
 
-        
+
 
         /// <summary>
         /// Creates a root Udi for an entity type.
@@ -114,7 +114,7 @@ namespace Umbraco.Core
 
             if (udiType == UdiType.GuidUdi)
                 return new GuidUdi(uri);
-            if (udiType == UdiType.GuidUdi)
+            if (udiType == UdiType.StringUdi)
                 return new StringUdi(uri);
 
             throw new ArgumentException(string.Format("Uri \"{0}\" is not a valid udi.", uri));
@@ -166,6 +166,6 @@ namespace Umbraco.Core
             return (udi1 == udi2) == false;
         }
 
-        
+
     }
 }

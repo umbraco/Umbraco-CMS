@@ -268,5 +268,10 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         }
 
         #endregion
+
+        public override string GetStatus()
+        {
+            return "Test status";
+        }
     }
 }

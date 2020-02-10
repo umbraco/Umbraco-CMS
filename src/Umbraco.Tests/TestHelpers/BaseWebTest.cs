@@ -101,7 +101,8 @@ namespace Umbraco.Tests.TestHelpers
                 new TestVariationContextAccessor(),
                 container?.TryGetInstance<ServiceContext>() ?? ServiceContext.CreatePartial(),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()),
-                container?.TryGetInstance<IUmbracoSettingsSection>() ?? Current.Factory.GetInstance<IUmbracoSettingsSection>());
+                container?.TryGetInstance<IUmbracoSettingsSection>() ?? Current.Factory.GetInstance<IUmbracoSettingsSection>(),
+                Mock.Of<IUserService>());
         }
     }
 }

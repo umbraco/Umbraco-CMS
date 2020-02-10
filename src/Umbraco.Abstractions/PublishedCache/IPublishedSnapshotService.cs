@@ -160,5 +160,15 @@ namespace Umbraco.Web.PublishedCache
         void Notify(DomainCacheRefresher.JsonPayload[] payloads);
 
         #endregion
+
+        #region Status
+
+        string GetStatus();
+
+        string StatusUrl { get; }
+
+        #endregion        
+
+        void Collect();
     }
 }

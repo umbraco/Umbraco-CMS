@@ -52,8 +52,8 @@ namespace Umbraco.Tests.PublishedContent
                             {"NodeTypeAlias", "NodeTypeAlias"},
                             {"CreateDate", "CreateDate"},
                             {"UpdateDate", "UpdateDate"},
-                            {"CreatorName", "CreatorName"},
-                            {"WriterName", "WriterName"},
+                            {"CreatorId", "CreatorId"},
+                            {"WriterId", "WriterId"},
                             {"Url", "Url"}
                         };
                     foreach (var f in userFields.Where(f => !allFields.ContainsKey(f.Key)))
@@ -135,7 +135,6 @@ namespace Umbraco.Tests.PublishedContent
                 {
                     CreateDate = DateTime.Now,
                     CreatorId = 1,
-                    CreatorName = "Shannon",
                     Id = 3,
                     SortOrder = 4,
                     TemplateId = 5,
@@ -145,7 +144,6 @@ namespace Umbraco.Tests.PublishedContent
                     Name = "Page" + Guid.NewGuid(),
                     Version = Guid.NewGuid(),
                     WriterId = 1,
-                    WriterName = "Shannon",
                     Parent = null,
                     Level = 1,
                     Children = new List<IPublishedContent>()

@@ -13,14 +13,10 @@ namespace Umbraco.Web.Templates
             this._getMediaUrl = getMediaUrl;
         }
 
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         public HtmlImageSourceParser(IUmbracoContextAccessor umbracoContextAccessor)
         {
-            if (umbracoContextAccessor?.UmbracoContext?.UrlProvider == null)
-            {
-                return;
-            }
-
-            _getMediaUrl = (guid) => umbracoContextAccessor.UmbracoContext.UrlProvider.GetMediaUrl(guid);
+            _umbracoContextAccessor = umbracoContextAccessor;
         }
 
         private static readonly Regex ResolveImgPattern = new Regex(@"(<img[^>]*src="")([^""\?]*)((?:\?[^""]*)?""[^>]*data-udi="")([^""]*)(""[^>]*>)",
@@ -29,7 +25,7 @@ namespace Umbraco.Web.Templates
         private static readonly Regex DataUdiAttributeRegex = new Regex(@"data-udi=\\?(?:""|')(?<udi>umb://[A-z0-9\-]+/[A-z0-9]+)\\?(?:""|')",
             RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
 
-        private readonly Func<Guid, string> _getMediaUrl;
+        private Func<Guid, string> _getMediaUrl;
 
         /// <summary>
         /// Parses out media UDIs from an html string based on 'data-udi' html attributes
@@ -57,12 +53,8 @@ namespace Umbraco.Web.Templates
         /// <remarks>Umbraco image tags are identified by their data-udi attributes</remarks>
         public string EnsureImageSources(string text)
         {
-            // no point in doing any processing if we don't have
-            // a function to retrieve Urls
-            if (_getMediaUrl == null)
-            {
-                return text;
-            }
+            if(_getMediaUrl == null)
+                _getMediaUrl = (guid) => _umbracoContextAccessor.UmbracoContext.UrlProvider.GetMediaUrl(guid);
 
             return ResolveImgPattern.Replace(text, match =>
             {

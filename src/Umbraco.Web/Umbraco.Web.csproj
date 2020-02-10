@@ -61,7 +61,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ClientDependency" Version="1.9.8" />
-    <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
     <PackageReference Include="Examine.Core">
       <Version>2.0.0-alpha.20200128.15</Version>
     </PackageReference>
@@ -86,15 +85,15 @@
     <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.0.1" />
     <PackageReference Include="Microsoft.Owin.Security.OAuth" Version="4.0.1" />
     <PackageReference Include="Microsoft.SourceLink.GitHub">
-      <Version>1.0.0-beta2-19554-01</Version>
+      <Version>1.0.0</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="MiniProfiler" Version="4.0.138" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="NPoco" Version="4.0.2" />
     <PackageReference Include="SecurityCodeScan">
-      <Version>3.3.0</Version>
+      <Version>3.4.0</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -120,9 +119,9 @@
       <Project>{3ae7bf57-966b-45a5-910a-954d7c554441}</Project>
       <Name>Umbraco.Infrastructure</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Umbraco.Infrastrucure.Persistance.SqlCe\Umbraco.Infrastrucure.Persistance.SqlCe.csproj">
+    <ProjectReference Include="..\Umbraco.Persistance.SqlCe\Umbraco.Persistance.SqlCe.csproj">
       <Project>{33085570-9bf2-4065-a9b0-a29d920d13ba}</Project>
-      <Name>Umbraco.Infrastrucure.Persistance.SqlCe</Name>
+      <Name>Umbraco.Persistance.SqlCe</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -214,10 +213,7 @@
     <Compile Include="Net\AspNetSessionIdResolver.cs" />
     <Compile Include="Profiling\WebProfilingController.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
-    <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />
-    <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
-    <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />
-    <Compile Include="PublishedCache\NuCache\Snap\LinkedNode.cs" />
+    <Compile Include="PublishedCache\UmbracoContextPublishedSnapshotAccessor.cs" />
     <Compile Include="RoutableDocumentFilter.cs" />
     <Compile Include="Routing\DefaultMediaUrlProvider.cs" />
     <Compile Include="Routing\IMediaUrlProvider.cs" />
@@ -262,7 +258,6 @@
     <Compile Include="PropertyEditors\ValueConverters\MultiUrlPickerValueConverter.cs" />
     <Compile Include="Templates\ITemplateRenderer.cs" />
     <Compile Include="PropertyEditors\GridPropertyIndexValueFactory.cs" />
-    <Compile Include="PublishedCache\NuCache\NuCacheComposer.cs" />
     <Compile Include="Routing\RedirectTrackingComposer.cs" />
     <Compile Include="Runtime\WebInitialComposer.cs" />
     <Compile Include="Scheduling\SchedulerComposer.cs" />
@@ -361,48 +356,7 @@
     <Compile Include="PropertyEditors\ValueConverters\MediaPickerValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MemberPickerValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MultiNodeTreePickerValueConverter.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\BTree.ContentDataSerializer.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\BTree.ContentNodeKitSerializer.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\BTree.DictionaryOfCultureVariationSerializer.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\BTree.DictionaryOfPropertyDataSerializer.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\ContentNestedData.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\CultureVariation.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\IDataSource.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\PropertyData.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\SerializerBase.cs" />
-    <Compile Include="PublishedCache\NuCache\NuCacheComponent.cs" />
-    <Compile Include="PublishedCache\NuCache\PublishedSnapshot.cs" />
-    <Compile Include="PublishedCache\PublishedElement.cs" />
-    <Compile Include="PublishedCache\PublishedElementPropertyBase.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ContentPickerValueConverter.cs" />
-    <Compile Include="PublishedCache\PublishedSnapshotServiceBase.cs" />
-    <Compile Include="PublishedCache\NuCache\CacheKeys.cs" />
-    <Compile Include="PublishedCache\NuCache\ContentCache.cs" />
-    <Compile Include="PublishedCache\NuCache\ContentNode.cs" />
-    <Compile Include="PublishedCache\NuCache\ContentNodeKit.cs" />
-    <Compile Include="PublishedCache\NuCache\ContentStore.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\BTree.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\ContentData.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\ContentSourceDto.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\DatabaseDataSource.cs" />
-    <Compile Include="PublishedCache\NuCache\DomainCache.cs" />
-    <Compile Include="PublishedCache\NuCache\PublishedSnapshotService.cs" />
-    <Compile Include="PublishedCache\NuCache\MediaCache.cs" />
-    <Compile Include="PublishedCache\NuCache\MemberCache.cs" />
-    <Compile Include="PublishedCache\NuCache\Navigable\INavigableData.cs" />
-    <Compile Include="PublishedCache\NuCache\Navigable\NavigableContent.cs" />
-    <Compile Include="PublishedCache\NuCache\Navigable\NavigableContentType.cs" />
-    <Compile Include="PublishedCache\NuCache\Navigable\NavigablePropertyType.cs" />
-    <Compile Include="PublishedCache\NuCache\Navigable\RootContent.cs" />
-    <Compile Include="PublishedCache\NuCache\Navigable\Source.cs" />
-    <Compile Include="PublishedCache\NuCache\Property.cs" />
-    <Compile Include="PublishedCache\NuCache\PublishedContent.cs" />
-    <Compile Include="PublishedCache\NuCache\PublishedMember.cs" />
-    <Compile Include="PublishedCache\NuCache\SnapDictionary.cs" />
-    <Compile Include="PublishedCache\PublishedCacheBase.cs" />
-    <Compile Include="PublishedCache\PublishedContentTypeCache.cs" />
-    <Compile Include="PublishedCache\DefaultCultureAccessor.cs" />
-    <Compile Include="PublishedCache\UmbracoContextPublishedSnapshotAccessor.cs" />
     <Compile Include="PublishedElementExtensions.cs" />
     <Compile Include="PublishedModels\DummyClassSoThatPublishedModelsNamespaceExists.cs" />
     <Compile Include="Routing\ContentFinderByUrl.cs" />
@@ -412,10 +366,6 @@
     <Compile Include="Routing\IContentLastChanceFinder.cs" />
     <Compile Include="Routing\UrlProviderCollection.cs" />
     <Compile Include="Routing\UrlProviderCollectionBuilder.cs" />
-    <Compile Include="Search\SearchableApplicationTree.cs" />
-    <Compile Include="Search\SearchableTreeAttribute.cs" />
-    <Compile Include="Search\SearchableTreeCollection.cs" />
-    <Compile Include="Search\SearchableTreeCollectionBuilder.cs" />
     <Compile Include="Search\UmbracoTreeSearcher.cs" />
     <Compile Include="Security\AuthenticationExtensions.cs" />
     <Compile Include="Security\UmbracoSecureDataFormat.cs" />
@@ -447,7 +397,7 @@
     <Compile Include="WebApi\UnhandledExceptionLogger.cs" />
     <Compile Include="Runtime\WebInitialComponent.cs" />
     <Compile Include="Editors\PublishedStatusController.cs" />
-    <Compile Include="Editors\NuCacheStatusController.cs" />
+    <Compile Include="Editors\PublishedSnapshotCacheStatusController.cs" />
     <Compile Include="Trees\TreeAttribute.cs" />
     <Compile Include="Routing\NotFoundHandlerHelper.cs" />
     <Compile Include="Models\LocalPackageInstallModel.cs" />
@@ -536,7 +486,6 @@
     <Compile Include="PropertyEditors\GridPropertyEditor.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeByIdRouteHandler.cs" />
     <Compile Include="PropertyEditors\TagsDataController.cs" />
-    <Compile Include="PublishedCache\PublishedMember.cs" />
     <Compile Include="Mvc\JsonNetResult.cs" />
     <Compile Include="Mvc\MinifyJavaScriptResultAttribute.cs" />
     <Compile Include="Mvc\EnsurePublishedContentRequestAttribute.cs" />
@@ -639,7 +588,6 @@
     <Compile Include="Macros\PartialViewMacroController.cs" />
     <Compile Include="Macros\PartialViewMacroEngine.cs" />
     <Compile Include="Macros\PartialViewMacroPage.cs" />
-    <Compile Include="Models\PublishedContentBase.cs" />
     <Compile Include="Mvc\AreaRegistrationExtensions.cs" />
     <Compile Include="Mvc\QueryStringFilterAttribute.cs" />
     <Compile Include="Mvc\MemberAuthorizeAttribute.cs" />
@@ -691,9 +639,6 @@
     <Compile Include="Mvc\UmbracoViewPageOfTModel.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="ExamineExtensions.cs" />
-    <Compile Include="FormlessPage.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="HtmlHelperRenderExtensions.cs" />
     <Compile Include="Scheduling\SchedulerComponent.cs" />
     <Compile Include="ModelStateExtensions.cs" />
@@ -808,7 +753,6 @@
     <EmbeddedResource Include="JavaScript\PreviewInitialize.js" />
     <None Include="JavaScript\TinyMceInitialize.js" />
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
-    <None Include="PublishedCache\NuCache\readme.md" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Web References\org.umbraco.update\checkforupgrade.disco" />

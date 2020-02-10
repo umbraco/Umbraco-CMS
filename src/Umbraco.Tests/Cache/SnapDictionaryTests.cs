@@ -5,7 +5,6 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Scoping;
 using Umbraco.Web.PublishedCache.NuCache;
-using Umbraco.Web.PublishedCache.NuCache.Snap;
 
 namespace Umbraco.Tests.Cache
 {
@@ -223,7 +222,7 @@ namespace Umbraco.Tests.Cache
         {
             var d = new SnapDictionary<int, string>();
             d.Test.CollectAuto = false;
-            
+
             // gen 1
             d.Set(1, "one");
             Assert.AreEqual(1, d.Test.GetValues(1).Length);
@@ -321,7 +320,7 @@ namespace Umbraco.Tests.Cache
         {
             var d = new SnapDictionary<int, string>();
             d.Test.CollectAuto = false;
-            
+
             Assert.AreEqual(0, d.Test.GetValues(1).Length);
 
             // gen 1
@@ -416,7 +415,7 @@ namespace Umbraco.Tests.Cache
         {
             var d = new SnapDictionary<int, string>();
             d.Test.CollectAuto = false;
-            
+
             // gen 1
             d.Set(1, "one");
             Assert.AreEqual(1, d.Test.GetValues(1).Length);
@@ -578,7 +577,7 @@ namespace Umbraco.Tests.Cache
         {
             var d = new SnapDictionary<int, string>();
             d.Test.CollectAuto = false;
-            
+
             d.Set(1, "one");
             d.Set(2, "two");
 
@@ -875,7 +874,7 @@ namespace Umbraco.Tests.Cache
         {
             var d = new SnapDictionary<int, string>();
             d.Test.CollectAuto = false;
-            
+
 
             // gen 1
             d.Set(1, "one");
@@ -960,7 +959,7 @@ namespace Umbraco.Tests.Cache
             var d = new SnapDictionary<int, string>();
             var t = d.Test;
             t.CollectAuto = false;
-            
+
             // gen 1
             d.Set(1, "one");
             var s1 = d.CreateSnapshot();

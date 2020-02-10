@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
-using CSharpTest.Net.Interfaces;
 using Umbraco.Core.Composing;
 using Umbraco.Web.Composing;
 
