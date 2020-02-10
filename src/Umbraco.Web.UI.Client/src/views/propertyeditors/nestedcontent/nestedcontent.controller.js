@@ -221,6 +221,7 @@
             if (vm.overlayMenu.availableItems.length === 1 && vm.overlayMenu.pasteItems.length === 0) {
                 // only one scaffold type - no need to display the picker
                 addNode(vm.scaffolds[0].contentTypeAlias);
+                vm.overlayMenu = null;
                 return;
             }
 
