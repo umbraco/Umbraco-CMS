@@ -17,6 +17,9 @@ namespace Umbraco.Web.PropertyEditors
             : base(logger)
         { }
 
-        protected override IConfigurationEditor CreateConfigurationEditor() => new MemberPickerConfiguration();
+        protected override IConfigurationEditor CreateConfigurationEditor() => new MemberPickerConfigurationEditor();
+
+        //protected override IDataValueEditor CreateValueEditor() => new MemberPickerPropertyValueEditor(Attribute);
+
     }
 }

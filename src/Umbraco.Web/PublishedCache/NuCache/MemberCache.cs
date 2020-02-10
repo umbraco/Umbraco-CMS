@@ -69,6 +69,18 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 });
         }
 
+        public IPublishedContent /*IPublishedMember*/ GetById(Guid memberId)
+        {
+            return GetCacheItem(CacheKeys.MemberCacheMember("ById", _previewDefault, memberId), () =>
+            {
+                EnsureProvider();
+                var member = _memberService.GetByKey(memberId);
+                return member == null
+                    ? null
+                    : PublishedMember.Create(member, GetContentType(member.ContentTypeId), _previewDefault, _publishedSnapshotAccessor, VariationContextAccessor);
+            });
+        }
+
         private IPublishedContent /*IPublishedMember*/ GetById(IMember member, bool previewing)
         {
             return GetCacheItem(CacheKeys.MemberCacheMember("ById", _previewDefault, member.Id), () =>
