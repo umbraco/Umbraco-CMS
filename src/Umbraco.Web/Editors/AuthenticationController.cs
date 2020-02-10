@@ -301,7 +301,7 @@ namespace Umbraco.Web.Editors
                 if (user != null)
                 {
                     var code = await UserManager.GeneratePasswordResetTokenAsync(identityUser.Id);
-                    var callbackUrl = ConstructCallbackUrl(identityUser.Id, code);
+                    var callbackUrl = ConstructCallbackUrl(identityUser.Id, code, identityUser.SecurityStamp.GenerateHash());
 
                     var message = Services.TextService.Localize("resetPasswordEmailCopyFormat",
                         // Ensure the culture of the found user is used for the email!
@@ -506,7 +506,7 @@ namespace Umbraco.Web.Editors
             return response;
         }
 
-        private string ConstructCallbackUrl(int userId, string code)
+        private string ConstructCallbackUrl(int userId, string code, string userSecurityStamp)
         {
             // Get an mvc helper to get the url
             var http = EnsureHttpContext();
@@ -516,7 +516,8 @@ namespace Umbraco.Web.Editors
                 {
                     area = GlobalSettings.GetUmbracoMvcArea(),
                     u = userId,
-                    r = code
+                    r = code,
+                    s = userSecurityStamp
                 });
 
             // Construct full URL using configured application URL (which will fall back to request)

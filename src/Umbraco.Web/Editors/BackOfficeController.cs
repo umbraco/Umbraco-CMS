@@ -296,11 +296,21 @@ namespace Umbraco.Web.Editors
         }
 
         [HttpGet]
-        public async Task<ActionResult> ValidatePasswordResetCode([Bind(Prefix = "u")]int userId, [Bind(Prefix = "r")]string resetCode)
+        public async Task<ActionResult> ValidatePasswordResetCode([Bind(Prefix = "u")]int userId, [Bind(Prefix = "r")]string resetCode, [Bind(Prefix = "s")]string stampHash)
         {
             var user = UserManager.FindById(userId);
             if (user != null)
             {
+                // Check security stamp that has been generated in forgotten password email link is the same we have stored for user
+                // ie the user has not been marked inactive or password changed by an admin etc
+                if(user.SecurityStamp.GenerateHash() != stampHash)
+                {
+                    // Password, email or something changed to the user since the password reset email requested
+                    // Add error and redirect for it to be displayed
+                    TempData[ViewDataExtensions.TokenPasswordResetCode] = new[] { Services.TextService.Localize("login/resetCodeExpired") };
+                    return RedirectToLocal(Url.Action("Default", "BackOffice"));
+                }
+
                 var result = await UserManager.UserTokenProvider.ValidateAsync("ResetPassword", resetCode, UserManager, user);
                 if (result)
                 {
