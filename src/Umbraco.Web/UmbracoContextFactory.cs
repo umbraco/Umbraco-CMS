@@ -95,11 +95,8 @@ namespace Umbraco.Web
                 return httpContext ?? new HttpContextWrapper(HttpContext.Current ??
                                                              new HttpContext(new SimpleWorkerRequest("", "", "null.aspx", "", NullWriterInstance)));
             }
-            else
-            {
-                return httpContext ?? new HttpContextWrapper(HttpContext.Current ??
-                                                             new HttpContext(new SimpleWorkerRequest("null.aspx", "", NullWriterInstance)));
-            }
+            return httpContext ?? new HttpContextWrapper(HttpContext.Current ??
+                                                         new HttpContext(new SimpleWorkerRequest("null.aspx", "", NullWriterInstance)));
         }
 
 
