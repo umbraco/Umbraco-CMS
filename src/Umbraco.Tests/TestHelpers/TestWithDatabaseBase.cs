@@ -31,6 +31,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.Testing.Objects.Accessors;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -80,6 +81,9 @@ namespace Umbraco.Tests.TestHelpers
             Composition.WithCollectionBuilder<DataEditorCollectionBuilder>()
                 .Clear()
                 .Add(() => Composition.TypeLoader.GetDataEditors());
+
+            Composition.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
+                .Add(Composition.TypeLoader.GetUmbracoApiControllers());
 
             Composition.RegisterUnique(f =>
             {

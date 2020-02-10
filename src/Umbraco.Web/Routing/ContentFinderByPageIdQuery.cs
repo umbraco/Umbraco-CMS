@@ -9,10 +9,17 @@
     /// </remarks>
     public class ContentFinderByPageIdQuery : IContentFinder
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public ContentFinderByPageIdQuery(IHttpContextAccessor httpContextAccessor)
+        {
+            _httpContextAccessor = httpContextAccessor;
+        }
+
         public bool TryFindContent(PublishedRequest frequest)
         {
             int pageId;
-            if (int.TryParse(frequest.UmbracoContext.HttpContext.Request["umbPageID"], out pageId))
+            if (int.TryParse(_httpContextAccessor.HttpContext.Request["umbPageID"], out pageId))
             {
                 var doc = frequest.UmbracoContext.Content.GetById(pageId);
 

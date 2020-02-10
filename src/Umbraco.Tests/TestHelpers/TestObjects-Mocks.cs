@@ -337,5 +337,16 @@ namespace Umbraco.Tests.TestHelpers
         }
 
         #endregion
+
+        public IHttpContextAccessor GetHttpContextAccessor(HttpContextBase httpContextBase = null)
+        {
+            var mock = new Mock<IHttpContextAccessor>();
+
+            var httpContext = UmbracoContextFactory.EnsureHttpContext(httpContextBase);
+
+            mock.Setup(x => x.HttpContext).Returns(httpContext);
+
+            return mock.Object;
+        }
     }
 }

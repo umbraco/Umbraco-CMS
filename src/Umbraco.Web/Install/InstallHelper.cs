@@ -18,7 +18,7 @@ namespace Umbraco.Web.Install
     {
         private static HttpClient _httpClient;
         private readonly DatabaseBuilder _databaseBuilder;
-        private readonly HttpContext _httpContext;
+        private readonly HttpContextBase _httpContext;
         private readonly ILogger _logger;
         private readonly IGlobalSettings _globalSettings;
         private readonly IUmbracoVersion _umbracoVersion;

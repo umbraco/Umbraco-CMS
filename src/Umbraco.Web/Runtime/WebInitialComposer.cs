@@ -98,7 +98,7 @@ namespace Umbraco.Web.Runtime
 
             // register a per-request HttpContextBase object
             // is per-request so only one wrapper is created per request
-            composition.Register<HttpContextBase>(factory => new HttpContextWrapper(factory.GetInstance<IHttpContextAccessor>().HttpContext), Lifetime.Request);
+            composition.Register<HttpContextBase>(factory => factory.GetInstance<IHttpContextAccessor>().HttpContext, Lifetime.Request);
 
             // register the published snapshot accessor - the "current" published snapshot is in the umbraco context
             composition.RegisterUnique<IPublishedSnapshotAccessor, UmbracoContextPublishedSnapshotAccessor>();

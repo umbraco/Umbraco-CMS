@@ -127,7 +127,7 @@ namespace Umbraco.Web.Templates
             //var queryString = _umbracoContext.HttpContext.Request.QueryString.AllKeys
             //    .ToDictionary(key => key, key => context.Request.QueryString[key]);
 
-            var requestContext = new RequestContext(new HttpContextWrapper(_httpContextAccessor.HttpContext), new RouteData()
+            var requestContext = new RequestContext(_httpContextAccessor.HttpContext, new RouteData()
             {
                 Route = RouteTable.Routes["Umbraco_default"]
             });

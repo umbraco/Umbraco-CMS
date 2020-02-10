@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Web;
 using System.Web.Hosting;
 using Umbraco.Core.Configuration;
@@ -79,13 +80,28 @@ namespace Umbraco.Web
                 return new UmbracoContextReference(currentUmbracoContext, false, _umbracoContextAccessor);
 
 
-            httpContext = httpContext ?? new HttpContextWrapper(HttpContext.Current ?? new HttpContext(new SimpleWorkerRequest("null.aspx", "", NullWriterInstance)));
+            httpContext = EnsureHttpContext(httpContext);
 
             var umbracoContext = CreateUmbracoContext(httpContext);
             _umbracoContextAccessor.UmbracoContext = umbracoContext;
 
             return new UmbracoContextReference(umbracoContext, true, _umbracoContextAccessor);
         }
+
+        public static HttpContextBase EnsureHttpContext(HttpContextBase httpContext = null)
+        {
+            if (Thread.GetDomain().GetData(".appPath") is null || Thread.GetDomain().GetData(".appVPath") is null)
+            {
+                return httpContext ?? new HttpContextWrapper(HttpContext.Current ??
+                                                             new HttpContext(new SimpleWorkerRequest("", "", "null.aspx", "", NullWriterInstance)));
+            }
+            else
+            {
+                return httpContext ?? new HttpContextWrapper(HttpContext.Current ??
+                                                             new HttpContext(new SimpleWorkerRequest("null.aspx", "", NullWriterInstance)));
+            }
+        }
+
 
         // dummy TextWriter that does not write
         private class NullWriter : TextWriter

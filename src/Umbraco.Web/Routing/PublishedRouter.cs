@@ -29,6 +29,7 @@ namespace Umbraco.Web.Routing
         private readonly ILogger _logger;
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
         private readonly IUserService _userService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedRouter"/> class.
@@ -41,7 +42,8 @@ namespace Umbraco.Web.Routing
             ServiceContext services,
             IProfilingLogger proflog,
             IUmbracoSettingsSection umbracoSettingsSection,
-            IUserService userService)
+            IUserService userService,
+            IHttpContextAccessor httpContextAccessor)
         {
             _webRoutingSection = webRoutingSection ?? throw new ArgumentNullException(nameof(webRoutingSection));
             _contentFinders = contentFinders ?? throw new ArgumentNullException(nameof(contentFinders));
@@ -52,6 +54,7 @@ namespace Umbraco.Web.Routing
             _logger = proflog;
             _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _httpContextAccessor = httpContextAccessor;
         }
 
         /// <inheritdoc />
@@ -651,7 +654,7 @@ namespace Umbraco.Web.Routing
             var useAltTemplate = request.IsInitialPublishedContent
                 || (_webRoutingSection.InternalRedirectPreservesTemplate && request.IsInternalRedirectPublishedContent);
             var altTemplate = useAltTemplate
-                ? request.UmbracoContext.HttpContext.Request[Constants.Conventions.Url.AltTemplate]
+                ? _httpContextAccessor.HttpContext.Request[Constants.Conventions.Url.AltTemplate]
                 : null;
 
             if (string.IsNullOrWhiteSpace(altTemplate))

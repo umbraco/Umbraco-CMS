@@ -73,11 +73,6 @@ namespace Umbraco.Web
         PublishedRequest PublishedRequest { get; set; }
 
         /// <summary>
-        /// Exposes the HttpContext for the current request
-        /// </summary>
-        HttpContextBase HttpContext { get; }
-
-        /// <summary>
         /// Gets the variation context accessor.
         /// </summary>
         IVariationContextAccessor VariationContextAccessor { get; }
