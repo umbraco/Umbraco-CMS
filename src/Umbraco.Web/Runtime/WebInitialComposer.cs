@@ -149,9 +149,7 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<IEventMessagesFactory, DefaultEventMessagesFactory>();
             composition.RegisterUnique<IEventMessagesAccessor, HybridEventMessagesAccessor>();
             composition.RegisterUnique<ITreeService, TreeService>();
-            composition.RegisterUnique<ISectionService, SectionService>();            
-
-            composition.RegisterUnique<IDashboardService, DashboardService>();
+            composition.RegisterUnique<ISectionService, SectionService>();
 
             composition.RegisterUnique<IExamineManager, ExamineManager>();
 
@@ -256,10 +254,6 @@ namespace Umbraco.Web.Runtime
                 .Append<MembersSection>()
                 .Append<FormsSection>()
                 .Append<TranslationSection>();
-
-            // register core CMS dashboards and 3rd party types - will be ordered by weight attribute & merged with package.manifest dashboards
-            composition.Dashboards()
-                .Add(composition.TypeLoader.GetTypes<IDashboard>());
 
             // register back office trees
             // the collection builder only accepts types inheriting from TreeControllerBase
