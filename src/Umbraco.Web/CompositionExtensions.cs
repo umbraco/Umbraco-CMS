@@ -105,13 +105,6 @@ namespace Umbraco.Web
             => composition.WithCollectionBuilder<SectionCollectionBuilder>();
 
         /// <summary>
-        /// Gets the backoffice dashboards collection builder.
-        /// </summary>
-        /// <param name="composition">The composition.</param>
-        public static DashboardCollectionBuilder Dashboards(this Composition composition)
-            => composition.WithCollectionBuilder<DashboardCollectionBuilder>();
-
-        /// <summary>
         /// Gets the backoffice OEmbed Providers collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
