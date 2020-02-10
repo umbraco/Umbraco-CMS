@@ -480,10 +480,12 @@
                 }
 
                 // Enforce min items if we only have one scaffold type
+                var modelWasChanged = false;
                 if (vm.nodes.length < vm.minItems && vm.scaffolds.length === 1) {
                     for (var i = vm.nodes.length; i < model.config.minItems; i++) {
                         addNode(vm.scaffolds[0].contentTypeAlias);
                     }
+                    modelWasChanged = true;
                 }
 
                 // If there is only one item, set it as current node
@@ -494,6 +496,10 @@
                 validate();
 
                 vm.inited = true;
+
+                if (modelWasChanged) {
+                    updateModel();
+                }
 
                 updatePropertyActionStates();
                 checkAbilityToPasteContent();
