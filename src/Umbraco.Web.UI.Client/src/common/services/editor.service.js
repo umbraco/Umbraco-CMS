@@ -525,7 +525,7 @@ When building a custom infinite editor view you can use the same components as a
 
         function rollback(editor) {
             editor.view = "views/common/infiniteeditors/rollback/rollback.html";
-            if (!editor.size) editor.size = "small";
+            if (!editor.size) editor.size = "medium";
             open(editor);
         }
 
