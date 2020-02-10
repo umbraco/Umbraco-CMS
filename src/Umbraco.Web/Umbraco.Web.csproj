@@ -145,17 +145,6 @@
     <Compile Include="Composing\CompositionExtensions\Installer.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="Compose\BackOfficeUserAuditEventsComponent.cs" />
-    <Compile Include="Dashboards\ContentDashboard.cs" />
-    <Compile Include="Dashboards\DashboardCollectionBuilder.cs" />
-    <Compile Include="Dashboards\ExamineDashboard.cs" />
-    <Compile Include="Dashboards\FormsDashboard.cs" />
-    <Compile Include="Dashboards\HealthCheckDashboard.cs" />
-    <Compile Include="Dashboards\MediaDashboard.cs" />
-    <Compile Include="Dashboards\MembersDashboard.cs" />
-    <Compile Include="Dashboards\ProfilerDashboard.cs" />
-    <Compile Include="Dashboards\PublishedStatusDashboard.cs" />
-    <Compile Include="Dashboards\RedirectUrlDashboard.cs" />
-    <Compile Include="Dashboards\SettingsDashboards.cs" />
     <Compile Include="Editors\BackOfficePreviewModel.cs" />
     <Compile Include="Editors\Filters\ContentSaveModelValidator.cs" />
     <Compile Include="Editors\Filters\MediaSaveModelValidator.cs" />
