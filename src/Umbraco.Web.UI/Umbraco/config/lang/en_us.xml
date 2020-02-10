@@ -797,6 +797,7 @@
     <key alias="generalHeader">General</key>
     <key alias="editorHeader">Editor</key>
     <key alias="toggleAllowCultureVariants">Toggle allow culture variants</key>
+    <key alias="toggleAllowSegmentVariants">Toggle allow segmentation</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Background color</key>
@@ -1656,9 +1657,16 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="tabHasNoSortOrder">tab has no sort order</key>
     <key alias="compositionUsageHeading">Where is this composition used?</key>
     <key alias="compositionUsageSpecification">This composition is currently used in the composition of the following content types:</key>
-    <key alias="variantsHeading">Allow varying by culture</key>
+    <key alias="variantsHeading">Allow variations</key>
+    <key alias="cultureVariantHeading">Allow vary by culture</key>
+    <key alias="segmentVariantHeading">Allow segmentation</key>
+    <key alias="cultureVariantLabel">Vary by culture</key>
+    <key alias="segmentVariantLabel">Vary by segments</key>
     <key alias="variantsDescription">Allow editors to create content of this type in different languages.</key>
+    <key alias="cultureVariantDescription">Allow editors to create content of different languages.</key>
+    <key alias="segmentVariantDescription">Allow editors to create segments of this content.</key>
     <key alias="allowVaryByCulture">Allow varying by culture</key>
+    <key alias="allowVaryBySegment">Allow segmentation</key>
     <key alias="elementType">Element type</key>
     <key alias="elementHeading">Is an element type</key>
     <key alias="elementDescription">An element type is meant to be used for instance in Nested Content, and not in the tree.</key>
@@ -2400,7 +2408,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   <area alias="startupDashboard">
     <key alias="fallbackHeadline">Welcome to The Friendly CMS</key>
     <key alias="fallbackDescription">Thank you for choosing Umbraco - we think this could be the beginning of something beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast as possible.</key>
-  </area>  
+  </area>
   <area alias="formsDashboard">
     <key alias="formsHeadline">Umbraco Forms</key>
     <key alias="formsDescription">Create forms using an intuitive drag and drop interface. From simple contact forms that sends e-mails to advanced questionaires that integrate with CRM systems. Your clients will love it!</key>
