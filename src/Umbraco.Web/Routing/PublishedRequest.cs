@@ -30,7 +30,6 @@ namespace Umbraco.Web.Routing
         private CultureInfo _culture;
         private IPublishedContent _publishedContent;
         private IPublishedContent _initialPublishedContent; // found by finders before 404, redirects, etc
-        private PublishedContentHashtableConverter _umbracoPage; // legacy
 
         /// <summary>
         /// Initializes a new instance of the <see cref="IPublishedRequest"/> class.
@@ -478,24 +477,6 @@ namespace Umbraco.Web.Routing
         /// Gets or sets a dictionary of Headers to append to the Response object.
         /// </summary>
         public Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
-
-        #endregion
-
-        #region Legacy
-
-        // for legacy/webforms/macro code -
-        // TODO: get rid of it eventually
-        public PublishedContentHashtableConverter LegacyContentHashTable
-        {
-            get
-            {
-                if (_umbracoPage == null)
-                    throw new InvalidOperationException("The UmbracoPage object has not been initialized yet.");
-
-                return _umbracoPage;
-            }
-            set => _umbracoPage = value;
-        }
 
         #endregion
     }

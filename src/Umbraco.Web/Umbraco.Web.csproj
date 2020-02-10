@@ -165,6 +165,7 @@
     <Compile Include="Logging\WebProfilerComposer.cs" />
     <Compile Include="Logging\WebProfilerProvider.cs" />
     <Compile Include="Macros\IMacroRenderer.cs" />
+    <Compile Include="Macros\PublishedContentHashtableConverter.cs" />
     <Compile Include="Migrations\PostMigrations\PublishedSnapshotRebuilder.cs" />
     <Compile Include="Models\ContentEditing\UserInvite.cs" />
     <Compile Include="Models\Identity\BackOfficeIdentityUser.cs" />
@@ -695,9 +696,6 @@
     <Compile Include="Routing\PublishedRequest.cs" />
     <Compile Include="Routing\IContentFinder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Macros\PublishedContentHashtableConverter.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="UmbracoApplication.cs" />

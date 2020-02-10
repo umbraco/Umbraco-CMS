@@ -11,8 +11,13 @@ using System.Web.SessionState;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
@@ -30,18 +35,39 @@ namespace Umbraco.Web.Editors
     public class MacroRenderingController : UmbracoAuthorizedJsonController, IRequiresSessionState
     {
         private readonly IMacroService _macroService;
-        private readonly IContentService _contentService;
-        private readonly IShortStringHelper _shortStringHelper;
         private readonly IUmbracoComponentRenderer _componentRenderer;
         private readonly IVariationContextAccessor _variationContextAccessor;
 
-        public MacroRenderingController(IUmbracoComponentRenderer componentRenderer, IVariationContextAccessor variationContextAccessor, IMacroService macroService, IContentService contentService, IShortStringHelper shortStringHelper)
+
+        public MacroRenderingController(
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoHelper umbracoHelper,
+            IShortStringHelper shortStringHelper,
+            UmbracoMapper umbracoMapper,
+            IUmbracoComponentRenderer componentRenderer,
+            IVariationContextAccessor variationContextAccessor,
+            IMacroService macroService)
+            : base(
+                globalSettings,
+                umbracoContextAccessor,
+                sqlContext,
+                services,
+                appCaches,
+                logger,
+                runtimeState,
+                umbracoHelper,
+                shortStringHelper,
+                umbracoMapper)
         {
             _componentRenderer = componentRenderer;
             _variationContextAccessor = variationContextAccessor;
             _macroService = macroService;
-            _contentService = contentService;
-            _shortStringHelper = shortStringHelper;
         }
 
         /// <summary>
@@ -162,7 +188,7 @@ namespace Umbraco.Web.Editors
 
             var macroName = model.Filename.TrimEnd(".cshtml");
 
-            var macro = new Macro(_shortStringHelper)
+            var macro = new Macro(ShortStringHelper)
             {
                 Alias = macroName.ToSafeAlias(ShortStringHelper),
                 Name = macroName,
