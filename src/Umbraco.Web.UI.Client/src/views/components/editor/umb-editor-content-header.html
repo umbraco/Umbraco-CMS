@@ -60,7 +60,7 @@
                                 <i class="icon icon-navigation-right" ng-if="!entry.open"></i>
                             </button>
                             <button type="button" class="umb-variant-switcher__name-wrapper umb-outline" ng-click="selectVariant($event, entry.variant)" prevent-default>
-                                <span class="umb-variant-switcher__name" ng-bind="entry.variant.language ? entry.variant.language.name : entry.variant.segment"></span>
+                                <span class="umb-variant-switcher__name" ng-bind="getVariantDisplayName(entry.variant)"></span>
                                 <umb-variant-state variant="entry.variant" class="umb-variant-switcher__state"></umb-variant-state>
                             </button>
                             <div ng-if="splitViewOpen !== true && !entry.variant.active" class="umb-variant-switcher__split-view" ng-click="openInSplitView($event, entry.variant)">Open in split view</div>
