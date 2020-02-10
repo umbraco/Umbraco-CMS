@@ -7,11 +7,14 @@ function memberPickerController($scope, entityResource, iconHelper, angularHelpe
         return str.replace(rgxtrim, '');
     }
 
+    //check the pre-values for multi-picker
+    var multiPicker = $scope.model.config.multiPicker && $scope.model.config.multiPicker !== '0' ? true : false;
+
     $scope.renderModel = [];
     $scope.allowRemove = true;
 
     var dialogOptions = {
-        multiPicker: false,
+        multiPicker: multiPicker,
         entityType: "Member",
         section: "member",
         treeAlias: "member",
