@@ -209,6 +209,8 @@
                 language: "razor"
             }
 
+            let modelPropCompletionProvider;
+
             // When VS Code editor has loaded...
             vm.codeEditorLoad = function(monaco, editor) {
 
@@ -330,12 +332,68 @@
                     }
                 });
 
+
+                // Code completion for Model. in views
+                modelPropCompletionProvider  = monaco.languages.registerCompletionItemProvider("razor", {
+                    provideCompletionItems: function(model, position) {
+                        console.log('COMPLETION: model', model);
+                        console.log('COMPLETION: position', position);
+
+                        console.log('COMPLETION: getWordUntilPosition()', model.getWordUntilPosition(position));
+                        console.log('COMPLETION: getWordAtPosition()', model.getWordAtPosition(position));
+
+                        // Do WebAPI request to get the ModelsBuilder
+                        // properties from the Inherits in the Razor view
+
+                        // The service should cache the result of the request
+                        // As this function fires often...
+
+                        return {
+                            suggestions: [ {
+                                label: "ContactForm",
+                                kind: monaco.languages.CompletionItemKind.Property,
+                                insertText: "HELLO THERE",
+                                documentation: "This adds a snippet for adding CSS items to the Rich Text Editor",
+                                detail: "WARREN THING"
+                            }]
+                        }
+
+                    }
+                });
+
+                // // Hover provider when you hover over Model.
+                // monaco.languages.registerHoverProvider("razor", {
+                //     provideHover: function(model, position) {
+
+                //         console.log('HOVER: getWordAtPosition()', model.getWordAtPosition(position));
+
+                //         return {
+                //             contents: [
+                //                 { value: "**DESCRIPTION**" },
+                //                 { value: 'This could come from Umbraco doctype prop' },
+
+                //                 { value: "**PROPERTY EDITOR**" },
+                //                 { value: 'Media Picker' }
+                //             ]
+                //         }
+
+                //     }
+                // });
+
+
                 // Use the event listener to notify & set the formstate to dirty
                 // So if you navigate away without saving your prompted
                 editor.onDidChangeModelContent(function(e){
                     vm.setDirty();
                 });
 
+            }
+
+            vm.codeEditorDispose = function(){
+                // Dispose the completion provider
+                // When Angular is removing/destroying the component
+                // If we don't do this then we get dupe's added
+                modelPropCompletionProvider.dispose();
             }
         };
 
