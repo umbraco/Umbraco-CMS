@@ -837,6 +837,8 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
 
         public XmlDocument BuildPreviewXmlCache()
         {
+            
+
             var xmlDoc = new XmlDocument();
             var doctype = xmlDoc.CreateDocumentType("root", null, null,
                 ApplicationContext.Current.Services.ContentTypeService.GetContentTypesDtd());
@@ -851,42 +853,61 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
             var sql = string.Format(@"select umbracoNode.id, umbracoNode.parentID, umbracoNode.sortOrder, cmsPreviewXml.{0}, umbracoNode.{1} from umbracoNode
 inner join cmsPreviewXml on cmsPreviewXml.nodeId = umbracoNode.id and umbracoNode.nodeObjectType = @type
 inner join cmsDocument on cmsPreviewXml.versionId = cmsDocument.versionId and cmsDocument.newest=1
-where umbracoNode.trashed = 0
-order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
+where (umbracoNode.trashed = 0)
+order by (umbracoNode.{2}), (umbracoNode.parentID), (umbracoNode.sortOrder)",
                 SqlSyntax.GetQuotedColumnName("xml"),
                 SqlSyntax.GetQuotedColumnName("level"),
                 SqlSyntax.GetQuotedColumnName("level"));
+            var args = new object[] { new { type = NodeObjectTypeId } };
 
             XmlElement last = null;
 
-            //NOTE: Query creates a reader - does not load all into memory
-            foreach (var row in Database.Query<dynamic>(sql, new { type = NodeObjectTypeId }))
+            long pageSize = 500;
+            int? itemCount = null;
+            long currPage = 0;
+            do
             {
-                string parentId = ((int)row.parentID).ToInvariantString();
-                string xml = row.xml;
-                int sortOrder = row.sortOrder;
 
-                //if the parentid is changing
-                if (last != null && last.GetAttribute("parentID") != parentId)
+                // Get the paged queries
+                Database.BuildPageQueries<dynamic>(currPage, pageSize, sql, ref args, out var sqlCount, out var sqlPage);
+
+                // get the item count once
+                if (itemCount == null)
                 {
-                    parent = xmlDoc.GetElementById(parentId);
-                    if (parent == null)
+                    itemCount = Database.ExecuteScalar<int>(sqlCount, args);
+                }
+                currPage++;
+
+                // iterate over rows without allocating all items to memory (Query vs Fetch)
+                foreach (var row in Database.Query<dynamic>(sqlPage, args))
+                {
+                    string parentId = ((int)row.parentID).ToInvariantString();
+                    string xml = row.xml;
+                    int sortOrder = row.sortOrder;
+
+                    //if the parentid is changing
+                    if (last != null && last.GetAttribute("parentID") != parentId)
                     {
-                        //Need to short circuit here, if the parent is not there it means that the parent is unpublished
-                        // and therefore the child is not published either so cannot be included in the xml cache
-                        continue;
+                        parent = xmlDoc.GetElementById(parentId);
+                        if (parent == null)
+                        {
+                            //Need to short circuit here, if the parent is not there it means that the parent is unpublished
+                            // and therefore the child is not published either so cannot be included in the xml cache
+                            continue;
+                        }
                     }
+
+                    var xmlDocFragment = xmlDoc.CreateDocumentFragment();
+                    xmlDocFragment.InnerXml = xml;
+
+                    last = (XmlElement)parent.AppendChild(xmlDocFragment);
+
+                    // fix sortOrder - see notes in UpdateSortOrder
+                    last.Attributes["sortOrder"].Value = sortOrder.ToInvariantString();
                 }
 
-                var xmlDocFragment = xmlDoc.CreateDocumentFragment();
-                xmlDocFragment.InnerXml = xml;
-
-                last = (XmlElement)parent.AppendChild(xmlDocFragment);
-
-                // fix sortOrder - see notes in UpdateSortOrder
-                last.Attributes["sortOrder"].Value = sortOrder.ToInvariantString();
-            }
-
+            } while (itemCount == pageSize);
+            
             return xmlDoc;
 
         }
