@@ -228,6 +228,7 @@ namespace Umbraco.Web.Models.Mapping
             target.ValidationRegExp = source.Validation.Pattern;
             target.ValidationRegExpMessage = source.Validation.PatternMessage;
             target.SetVariesBy(ContentVariation.Culture, source.AllowCultureVariant);
+            target.SetVariesBy(ContentVariation.Segment, source.AllowSegmentVariant);
 
             if (source.Id > 0)
                 target.Id = source.Id;
