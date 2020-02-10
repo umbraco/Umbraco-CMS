@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
-using Umbraco.Web.Composing;
+using Umbraco.Core.IO;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
@@ -12,6 +12,13 @@ namespace Umbraco.Web.Install.InstallSteps
         "StarterKitCleanup", 32, "Almost done")]
     internal class StarterKitCleanupStep : InstallSetupStep<object>
     {
+        private readonly IIOHelper _ioHelper;
+
+        public StarterKitCleanupStep(IIOHelper ioHelper)
+        {
+            _ioHelper = ioHelper;
+        }
+
         public override Task<InstallSetupResult> ExecuteAsync(object model)
         {
             var installSteps = InstallStatusTracker.GetStatus().ToArray();
@@ -26,7 +33,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
         private void CleanupInstallation(int packageId, string packageFile)
         {
-            var zipFile = new FileInfo(Path.Combine(Current.IOHelper.MapPath(Core.Constants.SystemDirectories.Packages), HttpUtility.UrlDecode(packageFile)));
+            var zipFile = new FileInfo(Path.Combine(_ioHelper.MapPath(Core.Constants.SystemDirectories.Packages), HttpUtility.UrlDecode(packageFile)));
 
             if (zipFile.Exists)
                 zipFile.Delete();

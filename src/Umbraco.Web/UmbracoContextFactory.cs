@@ -66,7 +66,7 @@ namespace Umbraco.Web
             }
 
 
-            var webSecurity = new WebSecurity(httpContext, _userService, _globalSettings);
+            var webSecurity = new WebSecurity(httpContext, _userService, _globalSettings, _ioHelper);
 
             return new UmbracoContext(httpContext, _publishedSnapshotService, webSecurity, _umbracoSettings, _urlProviders, _mediaUrlProviders, _globalSettings, _variationContextAccessor, _ioHelper);
         }

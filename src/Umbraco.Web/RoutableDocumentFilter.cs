@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Collections.Concurrent;
 using Umbraco.Core.Collections;
+using Umbraco.Core.IO;
 using Umbraco.Web.Composing;
 
 namespace Umbraco.Web
@@ -21,13 +22,15 @@ namespace Umbraco.Web
     /// </remarks>
     public sealed class RoutableDocumentFilter
     {
-        public RoutableDocumentFilter(IGlobalSettings globalSettings)
+        public RoutableDocumentFilter(IGlobalSettings globalSettings, IIOHelper ioHelper)
         {
             _globalSettings = globalSettings;
+            _ioHelper = ioHelper;
         }
 
         private static readonly ConcurrentDictionary<string, bool> RouteChecks = new ConcurrentDictionary<string, bool>();
         private readonly IGlobalSettings _globalSettings;
+        private readonly IIOHelper _ioHelper;
         private object _locker = new object();
         private bool _isInit = false;
         private int? _routeCount;
@@ -103,7 +106,7 @@ namespace Umbraco.Web
                     .Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)
                     .Select(x => x.Trim().ToLowerInvariant())
                     .Where(x => x.IsNullOrWhiteSpace() == false)
-                    .Select(reservedUrl => Current.IOHelper.ResolveUrl(reservedUrl).Trim().EnsureStartsWith("/"))
+                    .Select(reservedUrl => _ioHelper.ResolveUrl(reservedUrl).Trim().EnsureStartsWith("/"))
                     .Where(reservedUrlTrimmed => reservedUrlTrimmed.IsNullOrWhiteSpace() == false))
                 {
                     newReservedList.Add(reservedUrlTrimmed);
@@ -141,7 +144,7 @@ namespace Umbraco.Web
             return paths
                 .Select(x => x.Trim().ToLowerInvariant())
                 .Where(x => x.IsNullOrWhiteSpace() == false)
-                .Select(reservedPath => Current.IOHelper.ResolveUrl(reservedPath).Trim().EnsureStartsWith("/").EnsureEndsWith("/"))
+                .Select(reservedPath => _ioHelper.ResolveUrl(reservedPath).Trim().EnsureStartsWith("/").EnsureEndsWith("/"))
                 .Where(reservedPathTrimmed => reservedPathTrimmed.IsNullOrWhiteSpace() == false);
         }
 

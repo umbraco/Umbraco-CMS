@@ -77,7 +77,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
             _umbracoContext = new UmbracoContext(
                 _httpContextFactory.HttpContext,
                 publishedSnapshotService.Object,
-                new WebSecurity(_httpContextFactory.HttpContext, Mock.Of<IUserService>(), globalSettings),
+                new WebSecurity(_httpContextFactory.HttpContext, Mock.Of<IUserService>(), globalSettings, IOHelper),
                 umbracoSettings,
                 Enumerable.Empty<IUrlProvider>(),
                 Enumerable.Empty<IMediaUrlProvider>(),

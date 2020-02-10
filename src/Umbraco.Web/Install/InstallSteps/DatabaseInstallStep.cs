@@ -4,9 +4,9 @@ using System.Configuration;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
@@ -18,12 +18,14 @@ namespace Umbraco.Web.Install.InstallSteps
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly IRuntimeState _runtime;
         private readonly ILogger _logger;
+        private readonly IIOHelper _ioHelper;
 
-        public DatabaseInstallStep(DatabaseBuilder databaseBuilder, IRuntimeState runtime, ILogger logger)
+        public DatabaseInstallStep(DatabaseBuilder databaseBuilder, IRuntimeState runtime, ILogger logger, IIOHelper ioHelper)
         {
             _databaseBuilder = databaseBuilder;
             _runtime = runtime;
             _logger = logger;
+            _ioHelper = ioHelper;
         }
 
         public override Task<InstallSetupResult> ExecuteAsync(object model)
@@ -40,7 +42,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             if (result.RequiresUpgrade == false)
             {
-                HandleConnectionStrings(_logger);
+                HandleConnectionStrings(_logger, _ioHelper);
                 return Task.FromResult<InstallSetupResult>(null);
             }
 
@@ -51,12 +53,12 @@ namespace Umbraco.Web.Install.InstallSteps
             }));
         }
 
-        internal static void HandleConnectionStrings(ILogger logger)
+        internal static void HandleConnectionStrings(ILogger logger, IIOHelper ioHelper)
         {
             // Remove legacy umbracoDbDsn configuration setting if it exists and connectionstring also exists
             if (ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName] != null)
             {
-                GlobalSettings.RemoveSetting(Constants.System.UmbracoConnectionName, Current.IOHelper);
+                GlobalSettings.RemoveSetting(Constants.System.UmbracoConnectionName, ioHelper);
             }
             else
             {

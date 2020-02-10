@@ -3,6 +3,7 @@ using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Web.JavaScript;
 using Umbraco.Web.Mvc;
@@ -25,8 +26,9 @@ namespace Umbraco.Web.Install.Controllers
         private readonly ILogger _logger;
         private readonly IGlobalSettings _globalSettings;
         private readonly IUmbracoVersion _umbracoVersion;
+        private readonly IIOHelper _ioHelper;
 
-        public InstallController(IUmbracoContextAccessor umbracoContextAccessor, InstallHelper installHelper, IRuntimeState runtime, ILogger logger, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion)
+        public InstallController(IUmbracoContextAccessor umbracoContextAccessor, InstallHelper installHelper, IRuntimeState runtime, ILogger logger, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IIOHelper ioHelper)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _installHelper = installHelper;
@@ -34,6 +36,7 @@ namespace Umbraco.Web.Install.Controllers
             _logger = logger;
             _globalSettings = globalSettings;
             _umbracoVersion = umbracoVersion;
+            _ioHelper = ioHelper;
         }
 
         [HttpGet]
@@ -46,7 +49,7 @@ namespace Umbraco.Web.Install.Controllers
             if (_runtime.Level == RuntimeLevel.Upgrade)
             {
                 // Update ClientDependency version
-                var clientDependencyConfig = new ClientDependencyConfiguration(_logger);
+                var clientDependencyConfig = new ClientDependencyConfiguration(_logger, _ioHelper);
                 var clientDependencyUpdated = clientDependencyConfig.UpdateVersionNumber(
                     _umbracoVersion.SemanticVersion, DateTime.UtcNow, "yyyyMMdd");
                 // Delete ClientDependency temp directories to make sure we get fresh caches
@@ -66,7 +69,7 @@ namespace Umbraco.Web.Install.Controllers
             ViewData.SetInstallApiBaseUrl(Url.GetUmbracoApiService("GetSetup", "InstallApi", "UmbracoInstall").TrimEnd("GetSetup"));
 
             // get the base umbraco folder
-            ViewData.SetUmbracoBaseFolder(Current.IOHelper.ResolveUrl(_globalSettings.UmbracoPath));
+            ViewData.SetUmbracoBaseFolder(_ioHelper.ResolveUrl(_globalSettings.UmbracoPath));
 
             _installHelper.InstallStatus(false, "");
 

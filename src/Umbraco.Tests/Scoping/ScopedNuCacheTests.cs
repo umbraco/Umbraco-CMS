@@ -122,7 +122,7 @@ namespace Umbraco.Tests.Scoping
             var umbracoContext = new UmbracoContext(
                 httpContext,
                 service,
-                new WebSecurity(httpContext, Current.Services.UserService, globalSettings),
+                new WebSecurity(httpContext, Current.Services.UserService, globalSettings, IOHelper),
                 umbracoSettings ?? SettingsForTests.GetDefaultUmbracoSettings(),
                 urlProviders ?? Enumerable.Empty<IUrlProvider>(),
                 Enumerable.Empty<IMediaUrlProvider>(),

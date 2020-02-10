@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Routing
         public void Is_Reserved_Path_Or_Url(string url)
         {
             var globalSettings = TestObjects.GetGlobalSettings();
-            var routableDocFilter = new RoutableDocumentFilter(globalSettings);
+            var routableDocFilter = new RoutableDocumentFilter(globalSettings, IOHelper);
             Assert.IsTrue(routableDocFilter.IsReservedPathOrUrl(url));
         }
 
@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Routing
         public void Is_Not_Reserved_Path_Or_Url(string url)
         {
             var globalSettings = TestObjects.GetGlobalSettings();
-            var routableDocFilter = new RoutableDocumentFilter(globalSettings);
+            var routableDocFilter = new RoutableDocumentFilter(globalSettings, IOHelper);
             Assert.IsFalse(routableDocFilter.IsReservedPathOrUrl(url));
         }
 
@@ -55,7 +55,7 @@ namespace Umbraco.Tests.Routing
             globalSettingsMock.Setup(x => x.ReservedPaths).Returns("");
             globalSettingsMock.Setup(x => x.ReservedUrls).Returns("");
 
-            var routableDocFilter = new RoutableDocumentFilter(globalSettingsMock.Object);
+            var routableDocFilter = new RoutableDocumentFilter(globalSettingsMock.Object, IOHelper);
 
             var routes = new RouteCollection();
 

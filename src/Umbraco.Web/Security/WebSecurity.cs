@@ -8,6 +8,7 @@ using Umbraco.Core.Models.Membership;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Web.Models.Identity;
@@ -24,12 +25,14 @@ namespace Umbraco.Web.Security
         private readonly HttpContextBase _httpContext;
         private readonly IUserService _userService;
         private readonly IGlobalSettings _globalSettings;
+        private readonly IIOHelper _ioHelper;
 
-        public WebSecurity(HttpContextBase httpContext, IUserService userService, IGlobalSettings globalSettings)
+        public WebSecurity(HttpContextBase httpContext, IUserService userService, IGlobalSettings globalSettings, IIOHelper ioHelper)
         {
             _httpContext = httpContext;
             _userService = userService;
             _globalSettings = globalSettings;
+            _ioHelper = ioHelper;
         }
 
         private IUser _currentUser;
@@ -196,7 +199,7 @@ namespace Umbraco.Web.Security
             var user = CurrentUser;
 
             // Check for console access
-            if (user == null || (requiresApproval && user.IsApproved == false) || (user.IsLockedOut && RequestIsInUmbracoApplication(_httpContext, _globalSettings)))
+            if (user == null || (requiresApproval && user.IsApproved == false) || (user.IsLockedOut && RequestIsInUmbracoApplication(_httpContext, _globalSettings, _ioHelper)))
             {
                 if (throwExceptions) throw new ArgumentException("You have no privileges to the umbraco console. Please contact your administrator");
                 return ValidateRequestAttempt.FailedNoPrivileges;
@@ -205,9 +208,9 @@ namespace Umbraco.Web.Security
 
         }
 
-        private static bool RequestIsInUmbracoApplication(HttpContextBase context, IGlobalSettings globalSettings)
+        private static bool RequestIsInUmbracoApplication(HttpContextBase context, IGlobalSettings globalSettings, IIOHelper ioHelper)
         {
-            return context.Request.Path.ToLower().IndexOf(Current.IOHelper.ResolveUrl(globalSettings.UmbracoPath).ToLower(), StringComparison.Ordinal) > -1;
+            return context.Request.Path.ToLower().IndexOf(ioHelper.ResolveUrl(globalSettings.UmbracoPath).ToLower(), StringComparison.Ordinal) > -1;
         }
 
         /// <summary>

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using System.Web.Configuration;
 using System.Xml.Linq;
-using Umbraco.Web.Composing;
+using Umbraco.Core.IO;
 using Umbraco.Core.Security;
 using Umbraco.Web.Install.Models;
 
@@ -14,6 +14,13 @@ namespace Umbraco.Web.Install.InstallSteps
         PerformsAppRestart = true)]
     internal class ConfigureMachineKey : InstallSetupStep<bool?>
     {
+        private readonly IIOHelper _ioHelper;
+
+        public ConfigureMachineKey(IIOHelper ioHelper)
+        {
+            _ioHelper = ioHelper;
+        }
+
         public override string View => HasMachineKey() == false ? base.View : "";
 
         /// <summary>
@@ -36,7 +43,7 @@ namespace Umbraco.Web.Install.InstallSteps
             if (model.HasValue && model.Value == false) return Task.FromResult<InstallSetupResult>(null);
 
             //install the machine key
-            var fileName = Current.IOHelper.MapPath($"{Current.IOHelper.Root}/web.config");
+            var fileName = _ioHelper.MapPath($"{_ioHelper.Root}/web.config");
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
 
             // we only want to get the element that is under the root, (there may be more under <location> tags we don't want them)

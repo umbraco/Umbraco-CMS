@@ -33,6 +33,7 @@ using Umbraco.Web.Features;
 using Umbraco.Web.Models.ContentEditing;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Tests.Web.Controllers
 {
@@ -87,7 +88,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<IRuntimeState>(),
                     helper,
                     Factory.GetInstance<UmbracoMapper>(),
-                    Factory.GetInstance<IUmbracoSettingsSection>());
+                    Factory.GetInstance<IUmbracoSettingsSection>(),
+                    Factory.GetInstance<IIOHelper>());
                 return usersController;
             }
 
