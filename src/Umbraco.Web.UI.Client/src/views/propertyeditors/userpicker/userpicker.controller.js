@@ -32,7 +32,7 @@ function userPickerController($scope, usersResource , iconHelper, editorService)
         editorService.userPicker(userPicker);
     };
 
-    $scope.remove =function(index){
+    $scope.remove = function (index) {
         $scope.renderModel.splice(index, 1);
     };
 

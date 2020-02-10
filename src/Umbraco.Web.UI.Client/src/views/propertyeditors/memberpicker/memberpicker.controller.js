@@ -59,7 +59,7 @@ function memberPickerController($scope, entityResource, iconHelper, angularHelpe
 
     };
 
-    $scope.remove =function(index){
+    $scope.remove = function (index) {
         $scope.renderModel.splice(index, 1);
     };
 
