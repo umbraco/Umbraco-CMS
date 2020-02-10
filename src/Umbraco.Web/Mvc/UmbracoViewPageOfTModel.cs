@@ -221,7 +221,7 @@ namespace Umbraco.Web.Mvc
                             markupToInject =
                                 string.Format(_umbracoSettingsSection.Content.PreviewBadge,
                                     Current.IOHelper.ResolveUrl(_globalSettings.UmbracoPath),
-                                    Server.UrlEncode(Current.UmbracoContext.HttpContext.Request.Url?.PathAndQuery),
+                                    Server.UrlEncode(HttpContext.Current.Request.Url?.PathAndQuery),
                                     Current.UmbracoContext.PublishedRequest.PublishedContent.Id);
                         }
                         else

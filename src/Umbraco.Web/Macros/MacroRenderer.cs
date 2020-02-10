@@ -27,8 +27,9 @@ namespace Umbraco.Web.Macros
         private readonly AppCaches _appCaches;
         private readonly IMacroService _macroService;
         private readonly IUserService _userService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public MacroRenderer(IProfilingLogger plogger, IUmbracoContextAccessor umbracoContextAccessor, IContentSection contentSection, ILocalizedTextService textService, AppCaches appCaches, IMacroService macroService, IUserService userService)
+        public MacroRenderer(IProfilingLogger plogger, IUmbracoContextAccessor umbracoContextAccessor, IContentSection contentSection, ILocalizedTextService textService, AppCaches appCaches, IMacroService macroService, IUserService userService, IHttpContextAccessor httpContextAccessor)
         {
             _plogger = plogger ?? throw new ArgumentNullException(nameof(plogger));
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
@@ -37,6 +38,7 @@ namespace Umbraco.Web.Macros
             _appCaches = appCaches ?? throw new ArgumentNullException(nameof(appCaches));
             _macroService = macroService ?? throw new ArgumentNullException(nameof(macroService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _httpContextAccessor = httpContextAccessor;
         }
 
         #region MacroContent cache
@@ -56,7 +58,7 @@ namespace Umbraco.Web.Macros
             {
                 object key = 0;
 
-                if (_umbracoContextAccessor.UmbracoContext.HttpContext?.User?.Identity?.IsAuthenticated ?? false)
+                if (_httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated ?? false)
                 {
                     //ugh, membershipproviders :(
                     var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
@@ -391,7 +393,7 @@ namespace Umbraco.Web.Macros
                 return attributeValue;
             }
 
-            var context = _umbracoContextAccessor.UmbracoContext.HttpContext;
+            var context = _httpContextAccessor.HttpContext;
 
             foreach (var token in tokens)
             {

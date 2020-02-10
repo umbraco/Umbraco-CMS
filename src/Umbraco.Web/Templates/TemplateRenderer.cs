@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -28,8 +29,9 @@ namespace Umbraco.Web.Templates
         private readonly ILocalizationService _languageService;
         private readonly IWebRoutingSection _webRoutingSection;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public TemplateRenderer(IUmbracoContextAccessor umbracoContextAccessor, IPublishedRouter publishedRouter, IFileService fileService, ILocalizationService textService, IWebRoutingSection webRoutingSection, IShortStringHelper shortStringHelper)
+        public TemplateRenderer(IUmbracoContextAccessor umbracoContextAccessor, IPublishedRouter publishedRouter, IFileService fileService, ILocalizationService textService, IWebRoutingSection webRoutingSection, IShortStringHelper shortStringHelper, IHttpContextAccessor httpContextAccessor)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _publishedRouter = publishedRouter ?? throw new ArgumentNullException(nameof(publishedRouter));
@@ -37,6 +39,7 @@ namespace Umbraco.Web.Templates
             _languageService = textService ?? throw new ArgumentNullException(nameof(textService));
             _webRoutingSection = webRoutingSection ?? throw new ArgumentNullException(nameof(webRoutingSection));
             _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public void Render(int pageId, int? altTemplateId, StringWriter writer)
@@ -124,7 +127,7 @@ namespace Umbraco.Web.Templates
             //var queryString = _umbracoContext.HttpContext.Request.QueryString.AllKeys
             //    .ToDictionary(key => key, key => context.Request.QueryString[key]);
 
-            var requestContext = new RequestContext(_umbracoContextAccessor.UmbracoContext.HttpContext, new RouteData()
+            var requestContext = new RequestContext(new HttpContextWrapper(_httpContextAccessor.HttpContext), new RouteData()
             {
                 Route = RouteTable.Routes["Umbraco_default"]
             });
@@ -172,7 +175,7 @@ namespace Umbraco.Web.Templates
         private void SetNewItemsOnContextObjects(PublishedRequest request)
         {
             //now, set the new ones for this page execution
-            _umbracoContextAccessor.UmbracoContext.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate] = null;
+            _httpContextAccessor.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate] = null;
             _umbracoContextAccessor.UmbracoContext.PublishedRequest = request;
         }
 
@@ -184,7 +187,7 @@ namespace Umbraco.Web.Templates
             //Many objects require that these legacy items are in the http context items... before we render this template we need to first
             //save the values in them so that we can re-set them after we render so the rest of the execution works as per normal
             oldPublishedRequest = _umbracoContextAccessor.UmbracoContext.PublishedRequest;
-            oldAltTemplate = _umbracoContextAccessor.UmbracoContext.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate];
+            oldAltTemplate = _httpContextAccessor.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate];
         }
 
         /// <summary>
@@ -193,7 +196,7 @@ namespace Umbraco.Web.Templates
         private void RestoreItems(PublishedRequest oldPublishedRequest, object oldAltTemplate)
         {
             _umbracoContextAccessor.UmbracoContext.PublishedRequest = oldPublishedRequest;
-            _umbracoContextAccessor.UmbracoContext.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate] = oldAltTemplate;
+            _httpContextAccessor.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate] = oldAltTemplate;
         }
     }
 }
