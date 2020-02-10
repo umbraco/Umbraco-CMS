@@ -273,7 +273,7 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="context"></param>
         /// <param name="pcr"> </param>
-        private void RewriteToUmbracoHandler(HttpContextBase context, PublishedRequest pcr)
+        private void RewriteToUmbracoHandler(HttpContextBase context, IPublishedRequest pcr)
         {
             // NOTE: we do not want to use TransferRequest even though many docs say it is better with IIS7, turns out this is
             // not what we need. The purpose of TransferRequest is to ensure that .net processes all of the rules for the newly

@@ -99,7 +99,7 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         /// <param name="request"></param>
         /// <param name="filterContext"></param>
-        protected virtual void ConfigurePublishedContentRequest(PublishedRequest request, ActionExecutedContext filterContext)
+        protected virtual void ConfigurePublishedContentRequest(IPublishedRequest request, ActionExecutedContext filterContext)
         {
             if (_contentId.HasValue)
             {

@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Composing
                     //typeof(TabPage).Assembly,
                     typeof(System.Web.Mvc.ActionResult).Assembly,
                     typeof(TypeFinder).Assembly,
-                    typeof(IUmbracoContext).Assembly,
+                    typeof(UmbracoContext).Assembly,
                     typeof(CheckBoxListPropertyEditor).Assembly
                 });
 

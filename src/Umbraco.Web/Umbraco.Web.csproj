@@ -654,10 +654,8 @@
     <Compile Include="Routing\AliasUrlProvider.cs" />
     <Compile Include="Routing\ContentFinderByConfigured404.cs" />
     <Compile Include="Routing\ContentFinderByPageIdQuery.cs" />
-    <Compile Include="Routing\ISiteDomainHelper.cs" />
     <Compile Include="Routing\RoutableAttemptEventArgs.cs" />
     <Compile Include="Routing\DefaultUrlProvider.cs" />
-    <Compile Include="Routing\DomainAndUri.cs" />
     <Compile Include="Routing\IUrlProvider.cs" />
     <Compile Include="Routing\SiteDomainHelper.cs" />
     <Compile Include="Routing\EnsureRoutableOutcome.cs" />
@@ -694,7 +692,6 @@
     <Compile Include="Routing\ContentFinderByUrlAlias.cs" />
     <Compile Include="Routing\ContentFinderByIdPath.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />
-    <Compile Include="Routing\DomainUtilities.cs" />
     <Compile Include="Routing\PublishedRequest.cs" />
     <Compile Include="Routing\IContentFinder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -704,7 +701,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="UmbracoApplication.cs" />
-    <Compile Include="IUmbracoContext.cs" />
     <Compile Include="UmbracoInjectedModule.cs" />
     <Compile Include="UriUtility.cs" />
     <Compile Include="Web References\org.umbraco.update\Reference.cs">

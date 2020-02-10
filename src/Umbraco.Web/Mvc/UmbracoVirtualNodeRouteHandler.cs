@@ -90,7 +90,7 @@ namespace Umbraco.Web.Mvc
 
         protected abstract IPublishedContent FindContent(RequestContext requestContext, IUmbracoContext umbracoContext);
 
-        protected virtual void PreparePublishedContentRequest(PublishedRequest request)
+        protected virtual void PreparePublishedContentRequest(IPublishedRequest request)
         {
             PublishedRouter.PrepareRequest(request);
         }

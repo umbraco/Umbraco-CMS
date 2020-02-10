@@ -18,7 +18,7 @@ namespace Umbraco.Web.Mvc
     [ModelBindingExceptionFilter]
     public class RenderMvcController : UmbracoController, IRenderMvcController
     {
-        private PublishedRequest _publishedRequest;
+        private IPublishedRequest _publishedRequest;
 
         public RenderMvcController()
         {
@@ -44,7 +44,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets the current published content request.
         /// </summary>
-        protected internal virtual PublishedRequest PublishedRequest
+        protected internal virtual IPublishedRequest PublishedRequest
         {
             get
             {
@@ -54,7 +54,7 @@ namespace Umbraco.Web.Mvc
                 {
                     throw new InvalidOperationException("DataTokens must contain an 'umbraco-doc-request' key with a PublishedRequest object");
                 }
-                _publishedRequest = (PublishedRequest)RouteData.DataTokens[Core.Constants.Web.PublishedDocumentRequestDataToken];
+                _publishedRequest = (IPublishedRequest)RouteData.DataTokens[Core.Constants.Web.PublishedDocumentRequestDataToken];
                 return _publishedRequest;
             }
         }

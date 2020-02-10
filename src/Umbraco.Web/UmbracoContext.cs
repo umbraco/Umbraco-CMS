@@ -139,7 +139,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets/sets the PublishedRequest object
         /// </summary>
-        public PublishedRequest PublishedRequest { get; set; }
+        public IPublishedRequest PublishedRequest { get; set; }
 
         /// <summary>
         /// Exposes the HttpContext for the current request

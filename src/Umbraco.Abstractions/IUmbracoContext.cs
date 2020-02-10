@@ -70,7 +70,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets/sets the PublishedRequest object
         /// </summary>
-        PublishedRequest PublishedRequest { get; set; }
+        IPublishedRequest PublishedRequest { get; set; }
 
         /// <summary>
         /// Gets the variation context accessor.

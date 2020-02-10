@@ -39,21 +39,6 @@ namespace Umbraco.Tests.PublishedContent
 
             Assert.IsFalse(result);
         }
-
-        [Test]
-        public void ConfigureRequest_Sets_UmbracoPage_When_Published_Content_Assigned()
-        {
-            var umbracoContext = GetUmbracoContext("/test");
-            var publishedRouter = CreatePublishedRouter();
-            var request = publishedRouter.CreateRequest(umbracoContext);
-            var content = GetPublishedContentMock();
-            request.Culture = new CultureInfo("en-AU");
-            request.PublishedContent = content.Object;
-            publishedRouter.ConfigureRequest(request);
-
-            Assert.IsNotNull(request.LegacyContentHashTable);
-        }
-
         private Mock<IPublishedContent> GetPublishedContentMock()
         {
             var pc = new Mock<IPublishedContent>();

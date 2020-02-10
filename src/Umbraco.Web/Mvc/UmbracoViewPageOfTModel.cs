@@ -56,7 +56,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets the public content request.
         /// </summary>
-        internal PublishedRequest PublishedRequest
+        internal IPublishedRequest PublishedRequest
         {
             get
             {
@@ -67,11 +67,11 @@ namespace Umbraco.Web.Mvc
 
                 // try view context
                 if (ViewContext.RouteData.DataTokens.ContainsKey(token))
-                    return (PublishedRequest) ViewContext.RouteData.DataTokens.GetRequiredObject(token);
+                    return (IPublishedRequest) ViewContext.RouteData.DataTokens.GetRequiredObject(token);
 
                 // child action, try parent view context
                 if (ViewContext.IsChildAction && ViewContext.ParentActionViewContext.RouteData.DataTokens.ContainsKey(token))
-                    return (PublishedRequest) ViewContext.ParentActionViewContext.RouteData.DataTokens.GetRequiredObject(token);
+                    return (IPublishedRequest) ViewContext.ParentActionViewContext.RouteData.DataTokens.GetRequiredObject(token);
 
                 // fallback to UmbracoContext
                 return UmbracoContext.PublishedRequest;

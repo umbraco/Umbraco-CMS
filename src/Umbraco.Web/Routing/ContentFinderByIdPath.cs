@@ -31,7 +31,7 @@ namespace Umbraco.Web.Routing
         /// </summary>
         /// <param name="frequest">The <c>PublishedRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-        public bool TryFindContent(PublishedRequest frequest)
+        public bool TryFindContent(IPublishedRequest frequest)
         {
 
             if (frequest.UmbracoContext != null && frequest.UmbracoContext.InPreviewMode == false

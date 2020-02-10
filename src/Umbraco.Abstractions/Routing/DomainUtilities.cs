@@ -295,7 +295,7 @@ namespace Umbraco.Web.Routing
                 ? currentUri.GetLeftPart(UriPartial.Authority) + domainName
                 : domainName;
             var scheme = currentUri?.Scheme ?? Uri.UriSchemeHttp;
-            return new Uri(UriUtility.TrimPathEndSlash(UriUtility.StartWithScheme(name, scheme)));
+            return new Uri(UriUtilityCore.TrimPathEndSlash(UriUtilityCore.StartWithScheme(name, scheme)));
         }
 
         #endregion

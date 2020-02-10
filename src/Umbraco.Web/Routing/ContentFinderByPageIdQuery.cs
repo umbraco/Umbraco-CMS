@@ -16,7 +16,7 @@
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public bool TryFindContent(PublishedRequest frequest)
+        public bool TryFindContent(IPublishedRequest frequest)
         {
             int pageId;
             if (int.TryParse(_httpContextAccessor.HttpContext.Request["umbPageID"], out pageId))

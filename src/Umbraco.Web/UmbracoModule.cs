@@ -45,7 +45,7 @@ namespace Umbraco.Web
         // returns a value indicating whether redirection took place and the request has
         // been completed - because we don't want to Response.End() here to terminate
         // everything properly.
-        internal static bool HandleHttpResponseStatus(HttpContextBase context, PublishedRequest pcr, ILogger logger)
+        internal static bool HandleHttpResponseStatus(HttpContextBase context, IPublishedRequest pcr, ILogger logger)
         {
             var end = false;
             var response = context.Response;
@@ -55,8 +55,8 @@ namespace Umbraco.Web
                 pcr.Is404 ? "true" : "false",
                 pcr.ResponseStatusCode);
 
-            if(pcr.Cacheability != default)
-                response.Cache.SetCacheability(pcr.Cacheability);
+            if(pcr.CacheabilityNoCache)
+                response.Cache.SetCacheability(System.Web.HttpCacheability.NoCache);
 
             foreach (var cacheExtension in pcr.CacheExtensions)
                 response.Cache.AppendCacheExtension(cacheExtension);

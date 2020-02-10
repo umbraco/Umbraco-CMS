@@ -117,7 +117,7 @@ namespace Umbraco.Web.Templates
 
         }
 
-        private void ExecuteTemplateRendering(TextWriter sw, PublishedRequest request)
+        private void ExecuteTemplateRendering(TextWriter sw, IPublishedRequest request)
         {
             //NOTE: Before we used to build up the query strings here but this is not necessary because when we do a
             // Server.Execute in the TemplateRenderer, we pass in a 'true' to 'preserveForm' which automatically preserves all current
@@ -172,7 +172,7 @@ namespace Umbraco.Web.Templates
             return newWriter.ToString();
         }
 
-        private void SetNewItemsOnContextObjects(PublishedRequest request)
+        private void SetNewItemsOnContextObjects(IPublishedRequest request)
         {
             //now, set the new ones for this page execution
             _httpContextAccessor.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate] = null;
@@ -182,7 +182,7 @@ namespace Umbraco.Web.Templates
         /// <summary>
         /// Save all items that we know are used for rendering execution to variables so we can restore after rendering
         /// </summary>
-        private void SaveExistingItems(out PublishedRequest oldPublishedRequest, out object oldAltTemplate)
+        private void SaveExistingItems(out IPublishedRequest oldPublishedRequest, out object oldAltTemplate)
         {
             //Many objects require that these legacy items are in the http context items... before we render this template we need to first
             //save the values in them so that we can re-set them after we render so the rest of the execution works as per normal
@@ -193,7 +193,7 @@ namespace Umbraco.Web.Templates
         /// <summary>
         /// Restores all items back to their context's to continue normal page rendering execution
         /// </summary>
-        private void RestoreItems(PublishedRequest oldPublishedRequest, object oldAltTemplate)
+        private void RestoreItems(IPublishedRequest oldPublishedRequest, object oldAltTemplate)
         {
             _umbracoContextAccessor.UmbracoContext.PublishedRequest = oldPublishedRequest;
             _httpContextAccessor.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate] = oldAltTemplate;
