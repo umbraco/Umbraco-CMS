@@ -63,7 +63,7 @@
                                 <span class="umb-variant-switcher__name" ng-bind="getVariantDisplayName(entry.variant)"></span>
                                 <umb-variant-state variant="entry.variant" class="umb-variant-switcher__state"></umb-variant-state>
                             </button>
-                            <div ng-if="splitViewOpen !== true && !entry.variant.active" class="umb-variant-switcher__split-view" ng-click="openInSplitView($event, entry.variant)">Open in split view</div>
+                            <div ng-if="splitViewOpen !== true && !entry.variant.active" class="umb-variant-switcher__split-view umb-outline" ng-click="openInSplitView($event, entry.variant)">Open in split view</div>
                         </umb-dropdown-item>
                         <div
                             ng-repeat-end
@@ -79,7 +79,7 @@
                                     <span class="umb-variant-switcher__name" ng-bind="subVariant.segment"></span>
                                     <umb-variant-state variant="subVariant" class="umb-variant-switcher__state"></umb-variant-state>
                                 </button>
-                                <div ng-if="splitViewOpen !== true && !subVariant.active" class="umb-variant-switcher__split-view" ng-click="openInSplitView($event, subVariant)">Open in split view</div>
+                                <div ng-if="splitViewOpen !== true && !subVariant.active" class="umb-variant-switcher__split-view umb-outline" ng-click="openInSplitView($event, subVariant)">Open in split view</div>
                             </umb-dropdown-item>
                         </div>
                     </umb-dropdown>
