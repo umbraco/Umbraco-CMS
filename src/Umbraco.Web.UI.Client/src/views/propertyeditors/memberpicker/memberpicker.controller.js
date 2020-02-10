@@ -56,7 +56,6 @@ function memberPickerController($scope, entityResource, iconHelper, angularHelpe
         };
 
         editorService.treePicker(memberPicker);
-
     };
 
     $scope.remove = function (index) {
