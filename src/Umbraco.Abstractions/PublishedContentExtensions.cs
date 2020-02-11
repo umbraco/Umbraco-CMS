@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Composing;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Core
 {
@@ -854,6 +857,76 @@ namespace Umbraco.Core
         public static IPublishedContent Root(this IPublishedContent content)
         {
             return content.AncestorOrSelf(1);
+        }
+
+        #endregion
+
+
+        /// <summary>
+        /// Gets the url of the content item.
+        /// </summary>
+        /// <remarks>
+        /// <para>If the content item is a document, then this method returns the url of the
+        /// document. If it is a media, then this methods return the media url for the
+        /// 'umbracoFile' property. Use the MediaUrl() method to get the media url for other
+        /// properties.</para>
+        /// <para>The value of this property is contextual. It depends on the 'current' request uri,
+        /// if any. In addition, when the content type is multi-lingual, this is the url for the
+        /// specified culture. Otherwise, it is the invariant url.</para>
+        /// </remarks>
+        public static string Url(this IPublishedContent content, IPublishedUrlProvider publishedUrlProvider, string culture = null, UrlMode mode = UrlMode.Default)
+        {
+            if (publishedUrlProvider == null)
+                throw new InvalidOperationException("Cannot resolve a Url when Current.UmbracoContext.UrlProvider is null.");
+
+            switch (content.ContentType.ItemType)
+            {
+                case PublishedItemType.Content:
+                    return publishedUrlProvider.GetUrl(content, mode, culture);
+
+                case PublishedItemType.Media:
+                    return publishedUrlProvider.GetMediaUrl(content, mode, culture, Constants.Conventions.Media.File);
+
+                default:
+                    throw new NotSupportedException();
+            }
+        }
+
+         #region Template
+
+        /// <summary>
+        /// Returns the current template Alias
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns>Empty string if none is set.</returns>
+        public static string GetTemplateAlias(this IPublishedContent content, IFileService fileService)
+        {
+            if(content.TemplateId.HasValue == false)
+            {
+                return string.Empty;
+            }
+
+            var template = fileService.GetTemplate(content.TemplateId.Value);
+            return template == null ? string.Empty : template.Alias;
+        }
+        public static bool IsAllowedTemplate(this IPublishedContent content, int templateId, IUmbracoSettingsSection umbracoSettingsSection, IContentTypeService contentTypeService)
+        {
+            if (umbracoSettingsSection.WebRouting.DisableAlternativeTemplates)
+                return content.TemplateId == templateId;
+
+            if (content.TemplateId == templateId || !umbracoSettingsSection.WebRouting.ValidateAlternativeTemplates)
+                return true;
+
+            var publishedContentContentType = contentTypeService.Get(content.ContentType.Id);
+            if (publishedContentContentType == null)
+                throw new NullReferenceException("No content type returned for published content (contentType='" + content.ContentType.Id + "')");
+
+            return publishedContentContentType.IsAllowedTemplate(templateId);
+        }
+        public static bool IsAllowedTemplate(this IPublishedContent content, string templateAlias,  IUmbracoSettingsSection umbracoSettingsSection, IContentTypeService contentTypeService, IFileService fileService)
+        {
+            var template = fileService.GetTemplate(templateAlias);
+            return template != null && content.IsAllowedTemplate(template.Id, umbracoSettingsSection, contentTypeService);
         }
 
         #endregion

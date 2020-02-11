@@ -8,7 +8,7 @@ namespace Umbraco.Web
     {
         public string GetCurrentRequestIpAddress()
         {
-            var httpContext = HttpContext.Current == null ? (HttpContextBase) null : new HttpContextWrapper(HttpContext.Current);
+            var httpContext = HttpContext.Current is null ? null : new HttpContextWrapper(HttpContext.Current);
             var ip = httpContext.GetCurrentRequestIpAddress();
             if (ip.ToLowerInvariant().StartsWith("unknown")) ip = "";
             return ip;

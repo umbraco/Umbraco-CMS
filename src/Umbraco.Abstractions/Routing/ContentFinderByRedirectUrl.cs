@@ -17,11 +17,13 @@ namespace Umbraco.Web.Routing
     {
         private readonly IRedirectUrlService _redirectUrlService;
         private readonly ILogger _logger;
+        private readonly IPublishedUrlProvider _publishedUrlProvider;
 
-        public ContentFinderByRedirectUrl(IRedirectUrlService redirectUrlService, ILogger logger)
+        public ContentFinderByRedirectUrl(IRedirectUrlService redirectUrlService, ILogger logger, IPublishedUrlProvider publishedUrlProvider)
         {
             _redirectUrlService = redirectUrlService;
             _logger = logger;
+            _publishedUrlProvider = publishedUrlProvider;
         }
 
         /// <summary>
@@ -45,7 +47,7 @@ namespace Umbraco.Web.Routing
             }
 
             var content = frequest.UmbracoContext.Content.GetById(redirectUrl.ContentId);
-            var url = content == null ? "#" : content.Url(redirectUrl.Culture);
+            var url = content == null ? "#" : content.Url(_publishedUrlProvider, redirectUrl.Culture);
             if (url.StartsWith("#"))
             {
                 _logger.Debug<ContentFinderByRedirectUrl>("Route {Route} matches content {ContentId} which has no url.", route, redirectUrl.ContentId);
