@@ -145,7 +145,8 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 Enumerable.Empty<IMediaUrlProvider>(),
                 globalSettings,
                 new TestVariationContextAccessor(),
-                TestHelper.IOHelper);
+                TestHelper.IOHelper,
+                TestHelper.UriUtility);
 
             //replace it
             umbracoContextAccessor.UmbracoContext = umbCtx;

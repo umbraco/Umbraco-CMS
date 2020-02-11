@@ -16,12 +16,14 @@ namespace Umbraco.Web.Routing
         private readonly IGlobalSettings _globalSettings;
         private readonly IRequestHandlerSection _requestConfig;
         private readonly ISiteDomainHelper _siteDomainHelper;
+        private readonly UriUtility _uriUtility;
 
-        public AliasUrlProvider(IGlobalSettings globalSettings, IRequestHandlerSection requestConfig, ISiteDomainHelper siteDomainHelper)
+        public AliasUrlProvider(IGlobalSettings globalSettings, IRequestHandlerSection requestConfig, ISiteDomainHelper siteDomainHelper, UriUtility uriUtility)
         {
             _globalSettings = globalSettings;
             _requestConfig = requestConfig;
             _siteDomainHelper = siteDomainHelper;
+            _uriUtility = uriUtility;
         }
 
         // note - at the moment we seem to accept pretty much anything as an alias
@@ -93,7 +95,7 @@ namespace Umbraco.Web.Routing
                 {
                     var path = "/" + alias;
                     var uri = new Uri(path, UriKind.Relative);
-                    yield return UrlInfo.Url(UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString());
+                    yield return UrlInfo.Url(_uriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString());
                 }
             }
             else
@@ -120,7 +122,7 @@ namespace Umbraco.Web.Routing
                     {
                         var path = "/" + alias;
                         var uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path));
-                        yield return UrlInfo.Url(UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString(), domainUri.Culture.Name);
+                        yield return UrlInfo.Url(_uriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString(), domainUri.Culture.Name);
                     }
                 }
             }

@@ -20,6 +20,7 @@ namespace Umbraco.Web
     {
         private readonly IGlobalSettings _globalSettings;
         private readonly IIOHelper _ioHelper;
+        private readonly UriUtility _uriUtility;
         private readonly Lazy<IPublishedSnapshot> _publishedSnapshot;
         private string _previewToken;
         private bool? _previewing;
@@ -36,7 +37,8 @@ namespace Umbraco.Web
             IEnumerable<IMediaUrlProvider> mediaUrlProviders,
             IGlobalSettings globalSettings,
             IVariationContextAccessor variationContextAccessor,
-            IIOHelper ioHelper)
+            IIOHelper ioHelper,
+            UriUtility uriUtility)
         {
             if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
             if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
@@ -47,6 +49,7 @@ namespace Umbraco.Web
             VariationContextAccessor = variationContextAccessor ??  throw new ArgumentNullException(nameof(variationContextAccessor));
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
+            _uriUtility = uriUtility;
 
             // ensure that this instance is disposed when the request terminates, though we *also* ensure
             // this happens in the Umbraco module since the UmbracoCOntext is added to the HttpContext items.
@@ -74,7 +77,7 @@ namespace Umbraco.Web
             // see: http://issues.umbraco.org/issue/U4-1890
             //
             OriginalRequestUrl = GetRequestFromContext()?.Url ?? new Uri("http://localhost");
-            CleanedUmbracoUrl = UriUtility.UriToUmbraco(OriginalRequestUrl);
+            CleanedUmbracoUrl = _uriUtility.UriToUmbraco(OriginalRequestUrl);
             UrlProvider = new UrlProvider(this, umbracoSettings.WebRouting, urlProviders, mediaUrlProviders, variationContextAccessor);
         }
 

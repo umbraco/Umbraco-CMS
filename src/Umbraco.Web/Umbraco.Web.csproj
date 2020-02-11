@@ -206,8 +206,6 @@
     <Compile Include="PublishedCache\UmbracoContextPublishedSnapshotAccessor.cs" />
     <Compile Include="RoutableDocumentFilter.cs" />
     <Compile Include="Routing\ContentFinderByUrlAlias.cs" />
-    <Compile Include="Routing\DefaultMediaUrlProvider.cs" />
-    <Compile Include="Routing\DefaultUrlProvider.cs" />
     <Compile Include="Runtime\AspNetUmbracoBootPermissionChecker.cs" />
     <Compile Include="Search\BackgroundIndexRebuilder.cs" />
     <Compile Include="Search\ExamineFinalComponent.cs" />
@@ -409,7 +407,6 @@
     <Compile Include="Security\WebAuthExtensions.cs" />
     <Compile Include="JavaScript\UmbracoClientDependencyLoader.cs" />
     <Compile Include="UmbracoDefaultOwinStartup.cs" />
-    <Compile Include="IUmbracoContextAccessor.cs" />
     <Compile Include="HtmlStringUtilities.cs" />
     <Compile Include="IUmbracoComponentRenderer.cs" />
     <Compile Include="Mvc\ProfilingView.cs" />
@@ -684,7 +681,6 @@
     </Compile>
     <Compile Include="UmbracoApplication.cs" />
     <Compile Include="UmbracoInjectedModule.cs" />
-    <Compile Include="UriUtility.cs" />
     <Compile Include="Web References\org.umbraco.update\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

@@ -137,7 +137,8 @@ namespace Umbraco.Tests.TestHelpers
                 urlProviders,
                 mediaUrlProviders,
                 Mock.Of<IUserService>(),
-                TestHelper.IOHelper);
+                TestHelper.IOHelper,
+                TestHelper.UriUtility);
 
             return umbracoContextFactory.EnsureUmbracoContext(httpContext).UmbracoContext;
         }

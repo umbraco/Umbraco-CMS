@@ -446,7 +446,8 @@ namespace Umbraco.Tests.Web.Mvc
                 Enumerable.Empty<IMediaUrlProvider>(),
                 globalSettings,
                 new TestVariationContextAccessor(),
-                IOHelper);
+                IOHelper,
+                UriUtility);
 
             //if (setSingleton)
             //{

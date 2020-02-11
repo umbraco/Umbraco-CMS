@@ -25,7 +25,8 @@ namespace Umbraco.Web.Routing
             ILocalizedTextService textService,
             IContentService contentService,
             IVariationContextAccessor variationContextAccessor,
-            ILogger logger)
+            ILogger logger,
+            UriUtility uriUtility)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (publishedRouter == null) throw new ArgumentNullException(nameof(publishedRouter));
@@ -34,6 +35,7 @@ namespace Umbraco.Web.Routing
             if (textService == null) throw new ArgumentNullException(nameof(textService));
             if (contentService == null) throw new ArgumentNullException(nameof(contentService));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
+            if (uriUtility == null) throw new ArgumentNullException(nameof(uriUtility));
             if (variationContextAccessor == null) throw new ArgumentNullException(nameof(variationContextAccessor));
 
             if (content.Published == false)
@@ -59,7 +61,7 @@ namespace Umbraco.Web.Routing
 
             //get all URLs for all cultures
             //in a HashSet, so de-duplicates too
-            foreach (var cultureUrl in GetContentUrlsByCulture(content, cultures, publishedRouter, umbracoContext, contentService, textService, variationContextAccessor, logger))
+            foreach (var cultureUrl in GetContentUrlsByCulture(content, cultures, publishedRouter, umbracoContext, contentService, textService, variationContextAccessor, logger, uriUtility))
             {
                 urls.Add(cultureUrl);
             }
@@ -100,7 +102,8 @@ namespace Umbraco.Web.Routing
             IContentService contentService,
             ILocalizedTextService textService,
             IVariationContextAccessor variationContextAccessor,
-            ILogger logger)
+            ILogger logger,
+            UriUtility uriUtility)
         {
             foreach (var culture in cultures)
             {
@@ -135,7 +138,7 @@ namespace Umbraco.Web.Routing
 
                     // got a url, deal with collisions, add url
                     default:
-                        if (DetectCollision(content, url, culture, umbracoContext, publishedRouter, textService, variationContextAccessor, out var urlInfo)) // detect collisions, etc
+                        if (DetectCollision(content, url, culture, umbracoContext, publishedRouter, textService, variationContextAccessor, uriUtility, out var urlInfo)) // detect collisions, etc
                             yield return urlInfo;
                         else
                             yield return UrlInfo.Url(url, culture);
@@ -165,12 +168,12 @@ namespace Umbraco.Web.Routing
                 return UrlInfo.Message(textService.Localize("content/parentCultureNotPublished", new[] {parent.Name}), culture);
         }
 
-        private static bool DetectCollision(IContent content, string url, string culture, IUmbracoContext umbracoContext, IPublishedRouter publishedRouter, ILocalizedTextService textService, IVariationContextAccessor variationContextAccessor, out UrlInfo urlInfo)
+        private static bool DetectCollision(IContent content, string url, string culture, IUmbracoContext umbracoContext, IPublishedRouter publishedRouter, ILocalizedTextService textService, IVariationContextAccessor variationContextAccessor, UriUtility uriUtility, out UrlInfo urlInfo)
         {
             // test for collisions on the 'main' url
             var uri = new Uri(url.TrimEnd('/'), UriKind.RelativeOrAbsolute);
             if (uri.IsAbsoluteUri == false) uri = uri.MakeAbsolute(umbracoContext.CleanedUmbracoUrl);
-            uri = UriUtility.UriToUmbraco(uri);
+            uri = uriUtility.UriToUmbraco(uri);
             var pcr = publishedRouter.CreateRequest(umbracoContext, uri);
             publishedRouter.TryRouteRequest(pcr);
 

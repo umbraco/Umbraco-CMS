@@ -391,7 +391,8 @@ namespace Umbraco.Tests.TestHelpers
                 mediaUrlProviders ?? Enumerable.Empty<IMediaUrlProvider>(),
                 globalSettings ?? Factory.GetInstance<IGlobalSettings>(),
                 new TestVariationContextAccessor(),
-                IOHelper);
+                IOHelper,
+                UriUtility);
 
             if (setSingleton)
                 Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;
