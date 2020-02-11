@@ -33,6 +33,7 @@ namespace Umbraco.Web.PropertyEditors
         private readonly HtmlLocalLinkParser _localLinkParser;
         private readonly RichTextEditorPastedImages _pastedImages;
         private readonly IIOHelper _ioHelper;
+        private readonly IImageUrlGenerator _imageUrlGenerator;
 
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
@@ -49,7 +50,8 @@ namespace Umbraco.Web.PropertyEditors
             RichTextEditorPastedImages pastedImages,
             IShortStringHelper shortStringHelper,
             IIOHelper ioHelper,
-            ILocalizedTextService localizedTextService)
+            ILocalizedTextService localizedTextService,
+            IImageUrlGenerator imageUrlGenerator)
             : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
@@ -57,13 +59,14 @@ namespace Umbraco.Web.PropertyEditors
             _localLinkParser = localLinkParser;
             _pastedImages = pastedImages;
             _ioHelper = ioHelper;
+            _imageUrlGenerator = imageUrlGenerator;
         }
 
         /// <summary>
         /// Create a custom value editor
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute, _umbracoContextAccessor, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, _imageSourceParser, _localLinkParser, _pastedImages);
+        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute, _umbracoContextAccessor, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, _imageSourceParser, _localLinkParser, _pastedImages, _imageUrlGenerator);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new RichTextConfigurationEditor(_ioHelper);
 
@@ -78,6 +81,7 @@ namespace Umbraco.Web.PropertyEditors
             private readonly HtmlImageSourceParser _imageSourceParser;
             private readonly HtmlLocalLinkParser _localLinkParser;
             private readonly RichTextEditorPastedImages _pastedImages;
+            private readonly IImageUrlGenerator _imageUrlGenerator;
 
             public RichTextPropertyValueEditor(
                 DataEditorAttribute attribute,
@@ -88,13 +92,15 @@ namespace Umbraco.Web.PropertyEditors
                 IShortStringHelper shortStringHelper,
                 HtmlImageSourceParser imageSourceParser,
                 HtmlLocalLinkParser localLinkParser,
-                RichTextEditorPastedImages pastedImages)
+                RichTextEditorPastedImages pastedImages,
+                IImageUrlGenerator imageUrlGenerator)
                 : base(dataTypeService, localizationService,localizedTextService, shortStringHelper, attribute)
             {
                 _umbracoContextAccessor = umbracoContextAccessor;
                 _imageSourceParser = imageSourceParser;
                 _localLinkParser = localLinkParser;
                 _pastedImages = pastedImages;
+                _imageUrlGenerator = imageUrlGenerator;
             }
 
             /// <inheritdoc />
@@ -148,7 +154,7 @@ namespace Umbraco.Web.PropertyEditors
                 var mediaParent = config?.MediaParentId;
                 var mediaParentId = mediaParent == null ? Guid.Empty : mediaParent.Guid;
 
-                var parseAndSavedTempImages = _pastedImages.FindAndPersistPastedTempImages(editorValue.Value.ToString(), mediaParentId, userId);
+                var parseAndSavedTempImages = _pastedImages.FindAndPersistPastedTempImages(editorValue.Value.ToString(), mediaParentId, userId, _imageUrlGenerator);
                 var editorValueWithMediaUrlsRemoved = _imageSourceParser.RemoveImageSources(parseAndSavedTempImages);
                 var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValueWithMediaUrlsRemoved);
 

@@ -148,6 +148,7 @@
     <Compile Include="Editors\BackOfficePreviewModel.cs" />
     <Compile Include="Editors\Filters\ContentSaveModelValidator.cs" />
     <Compile Include="Editors\Filters\MediaSaveModelValidator.cs" />
+    <Compile Include="Editors\ImageUrlGeneratorController.cs" />
     <Compile Include="Editors\PackageController.cs" />
     <Compile Include="Editors\KeepAliveController.cs" />
     <Compile Include="Editors\MacrosController.cs" />
@@ -156,6 +157,7 @@
     <Compile Include="FrameworkMarchal.cs" />
     <Compile Include="Hosting\AspNetHostingEnvironment.cs" />
     <Compile Include="HttpContextExtensions.cs" />
+    <Compile Include="ImageCropperTemplateCoreExtensions.cs" />
     <Compile Include="IUmbracoContextFactory.cs" />
     <Compile Include="Install\ChangesMonitor.cs" />
     <Compile Include="Logging\OwinLogger.cs" />
@@ -171,6 +173,7 @@
     <Compile Include="Models\Identity\IdentityMapDefinition.cs" />
     <Compile Include="Models\Identity\IdentityUser.cs" />
     <Compile Include="Models\Identity\UserLoginInfoWrapper.cs" />
+    <Compile Include="Models\ImageProcessorImageUrlGenerator.cs" />
     <Compile Include="Models\Mapping\CommonMapper.cs" />
     <Compile Include="Models\Mapping\ContentMapDefinition.cs" />
     <Compile Include="Models\Mapping\ContentPropertyBasicMapper.cs" />

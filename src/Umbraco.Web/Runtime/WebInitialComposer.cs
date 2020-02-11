@@ -47,6 +47,8 @@ using Umbraco.Web.WebApi;
 using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Examine;
+using Umbraco.Core.Models;
+using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Runtime
 {
@@ -203,6 +205,8 @@ namespace Umbraco.Web.Runtime
 
             composition.MediaUrlProviders()
                 .Append<DefaultMediaUrlProvider>();
+
+            composition.RegisterUnique<IImageUrlGenerator, ImageProcessorImageUrlGenerator>();
 
             composition.RegisterUnique<IContentLastChanceFinder, ContentFinderByConfigured404>();
 

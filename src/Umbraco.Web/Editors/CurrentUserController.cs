@@ -22,6 +22,7 @@ using Umbraco.Web.Security;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Editors
 {
@@ -34,6 +35,7 @@ namespace Umbraco.Web.Editors
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
         private readonly IIOHelper _ioHelper;
+        private readonly IImageUrlGenerator _imageUrlGenerator;
 
         public CurrentUserController(
             IGlobalSettings globalSettings,
@@ -48,12 +50,14 @@ namespace Umbraco.Web.Editors
             IShortStringHelper shortStringHelper,
             UmbracoMapper umbracoMapper,
             IUmbracoSettingsSection umbracoSettingsSection,
-            IIOHelper ioHelper)
+            IIOHelper ioHelper,
+            IImageUrlGenerator imageUrlGenerator)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
         {
             _mediaFileSystem = mediaFileSystem;
             _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
+            _imageUrlGenerator = imageUrlGenerator;
         }
 
         /// <summary>
@@ -187,7 +191,7 @@ namespace Umbraco.Web.Editors
         public async Task<HttpResponseMessage> PostSetAvatar()
         {
             //borrow the logic from the user controller
-            return await UsersController.PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache,  _mediaFileSystem, ShortStringHelper, _umbracoSettingsSection, _ioHelper, Security.GetUserId().ResultOr(0));
+            return await UsersController.PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache,  _mediaFileSystem, ShortStringHelper, _umbracoSettingsSection, _ioHelper, _imageUrlGenerator, Security.GetUserId().ResultOr(0));
         }
 
         /// <summary>

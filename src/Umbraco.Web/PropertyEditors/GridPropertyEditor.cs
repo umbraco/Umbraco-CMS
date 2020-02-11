@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Web.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -38,6 +39,7 @@ namespace Umbraco.Web.PropertyEditors
         private readonly HtmlImageSourceParser _imageSourceParser;
         private readonly RichTextEditorPastedImages _pastedImages;
         private readonly HtmlLocalLinkParser _localLinkParser;
+        private readonly IImageUrlGenerator _imageUrlGenerator;
 
         public GridPropertyEditor(
             ILogger logger,
@@ -51,7 +53,8 @@ namespace Umbraco.Web.PropertyEditors
             RichTextEditorPastedImages pastedImages,
             HtmlLocalLinkParser localLinkParser,
             IIOHelper ioHelper,
-            IShortStringHelper shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IImageUrlGenerator imageUrlGenerator)
             : base(logger, dataTypeService, localizationService, localizedTextService, shortStringHelper)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
@@ -64,6 +67,7 @@ namespace Umbraco.Web.PropertyEditors
             _imageSourceParser = imageSourceParser;
             _pastedImages = pastedImages;
             _localLinkParser = localLinkParser;
+            _imageUrlGenerator = imageUrlGenerator;
         }
 
         public override IPropertyIndexValueFactory PropertyIndexValueFactory => new GridPropertyIndexValueFactory();
@@ -72,7 +76,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Overridden to ensure that the value is validated
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider, _umbracoContextAccessor, _logger, DataTypeService, LocalizationService, LocalizedTextService, _imageSourceParser, _pastedImages, _localLinkParser, ShortStringHelper);
+        protected override IDataValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute, _mediaService, _contentTypeBaseServiceProvider, _umbracoContextAccessor, _logger, DataTypeService, LocalizationService, LocalizedTextService, _imageSourceParser, _pastedImages, _localLinkParser, ShortStringHelper, _imageUrlGenerator);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new GridConfigurationEditor(_ioHelper);
 
@@ -83,6 +87,7 @@ namespace Umbraco.Web.PropertyEditors
             private readonly RichTextEditorPastedImages _pastedImages;
             private readonly RichTextPropertyEditor.RichTextPropertyValueEditor _richTextPropertyValueEditor;
             private readonly MediaPickerPropertyEditor.MediaPickerPropertyValueEditor _mediaPickerPropertyValueEditor;
+            private readonly IImageUrlGenerator _imageUrlGenerator;
 
             public GridPropertyValueEditor(
                 DataEditorAttribute attribute,
@@ -96,14 +101,16 @@ namespace Umbraco.Web.PropertyEditors
                 HtmlImageSourceParser imageSourceParser,
                 RichTextEditorPastedImages pastedImages,
                 HtmlLocalLinkParser localLinkParser,
-                IShortStringHelper shortStringHelper)
+                IShortStringHelper shortStringHelper,
+                IImageUrlGenerator imageUrlGenerator)
                 : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, attribute)
             {
                 _umbracoContextAccessor = umbracoContextAccessor;
                 _imageSourceParser = imageSourceParser;
                 _pastedImages = pastedImages;
-                _richTextPropertyValueEditor = new RichTextPropertyEditor.RichTextPropertyValueEditor(attribute, umbracoContextAccessor, dataTypeService, localizationService, localizedTextService, shortStringHelper, imageSourceParser, localLinkParser, pastedImages);
+                _richTextPropertyValueEditor = new RichTextPropertyEditor.RichTextPropertyValueEditor(attribute, umbracoContextAccessor, dataTypeService, localizationService, localizedTextService, shortStringHelper, imageSourceParser, localLinkParser, pastedImages, imageUrlGenerator);
                 _mediaPickerPropertyValueEditor = new MediaPickerPropertyEditor.MediaPickerPropertyValueEditor(dataTypeService, localizationService, localizedTextService, shortStringHelper, attribute);
+                _imageUrlGenerator = imageUrlGenerator;
             }
 
             /// <summary>
@@ -138,7 +145,7 @@ namespace Umbraco.Web.PropertyEditors
                     // Parse the HTML
                     var html = rte.Value?.ToString();
 
-                    var parseAndSavedTempImages = _pastedImages.FindAndPersistPastedTempImages(html, mediaParentId, userId);
+                    var parseAndSavedTempImages = _pastedImages.FindAndPersistPastedTempImages(html, mediaParentId, userId, _imageUrlGenerator);
                     var editorValueWithMediaUrlsRemoved = _imageSourceParser.RemoveImageSources(parseAndSavedTempImages);
 
                     rte.Value = editorValueWithMediaUrlsRemoved;

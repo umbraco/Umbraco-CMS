@@ -14,6 +14,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web;
 using Umbraco.Web.Templates;
+using Umbraco.Web.Models;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -60,7 +61,8 @@ namespace Umbraco.Tests.PublishedContent
                     pastedImages,
                     ShortStringHelper,
                     IOHelper,
-                    LocalizedTextService)) { Id = 1 });
+                    LocalizedTextService,
+                    Mock.Of<IImageUrlGenerator>())) { Id = 1 });
 
 
             var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeService);
