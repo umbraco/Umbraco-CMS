@@ -36,7 +36,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <param name="mediaParentFolder"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        internal string FindAndPersistPastedTempImages(string html, Guid mediaParentFolder, int userId)
+        internal string FindAndPersistPastedTempImages(string html, Guid mediaParentFolder, int userId, IImageUrlGenerator imageUrlGenerator)
         {
             // Find all img's that has data-tmpimg attribute
             // Use HTML Agility Pack - https://html-agility-pack.net
@@ -109,7 +109,7 @@ namespace Umbraco.Web.PropertyEditors
 
                 if (width != int.MinValue && height != int.MinValue)
                 {
-                    location = $"{location}?width={width}&height={height}&mode=max";
+                    location = imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(location) { ImageCropMode = "max", Width = width, Height = height });
                 }
 
                 img.SetAttributeValue("src", location);

@@ -106,13 +106,14 @@ namespace Umbraco.Core.Models
 
             //use the custom avatar
             var avatarUrl = Current.MediaFileSystem.GetUrl(user.Avatar);
+            var urlGenerator = Current.ImageUrlGenerator;
             return new[]
             {
-                avatarUrl  + "?width=30&height=30&mode=crop",
-                avatarUrl  + "?width=60&height=60&mode=crop",
-                avatarUrl  + "?width=90&height=90&mode=crop",
-                avatarUrl  + "?width=150&height=150&mode=crop",
-                avatarUrl  + "?width=300&height=300&mode=crop"
+                urlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = "crop", Width = 30, Height = 30 }),
+                urlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = "crop", Width = 60, Height = 60 }),
+                urlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = "crop", Width = 90, Height = 90 }),
+                urlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = "crop", Width = 150, Height = 150 }),
+                urlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = "crop", Width = 300, Height = 300 })
             };
 
         }
