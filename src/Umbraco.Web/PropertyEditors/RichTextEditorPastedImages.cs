@@ -101,7 +101,7 @@ namespace Umbraco.Web.PropertyEditors
                 if (mediaTyped == null)
                     throw new PanicException($"Could not find media by id {udi.Guid} or there was no UmbracoContext available.");
 
-                var location = mediaTyped.Url;
+                var location = mediaTyped.Url();
 
                 // Find the width & height attributes as we need to set the imageprocessor QueryString
                 var width = img.GetAttributeValue("width", int.MinValue);

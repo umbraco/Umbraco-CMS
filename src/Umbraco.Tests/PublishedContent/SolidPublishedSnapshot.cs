@@ -199,6 +199,7 @@ namespace Umbraco.Tests.PublishedContent
         public DateTime UpdateDate { get; set; }
         public Guid Version { get; set; }
         public int Level { get; set; }
+        [Obsolete("Use the Url() extension instead")]
         public string Url { get; set; }
 
         public PublishedItemType ItemType => PublishedItemType.Content;

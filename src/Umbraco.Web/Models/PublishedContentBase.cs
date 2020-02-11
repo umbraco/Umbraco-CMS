@@ -71,6 +71,7 @@ namespace Umbraco.Web.Models
         public abstract DateTime UpdateDate { get; }
 
         /// <inheritdoc />
+        [Obsolete("Use the Url() extension instead")]
         public virtual string Url => this.Url();
 
         /// <inheritdoc />
