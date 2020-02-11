@@ -14,7 +14,7 @@
         vm.userStates = [];
         vm.selection = [];
         vm.newUser = {};
-        vm.usersOptions = {filter:null};
+        vm.usersOptions = {};
         vm.userSortData = [
             { label: "Name (A-Z)", key: "Name", direction: "Ascending" },
             { label: "Name (Z-A)", key: "Name", direction: "Descending" },
@@ -112,6 +112,7 @@
         vm.selectAll = selectAll;
         vm.areAllSelected = areAllSelected;
         vm.searchUsers = searchUsers;
+        vm.onBlurSearch = onBlurSearch;
         vm.getFilterName = getFilterName;
         vm.setUserStatesFilter = setUserStatesFilter;
         vm.setUserGroupFilter = setUserGroupFilter;
@@ -150,10 +151,12 @@
         function initViewOptions() {
 
             // Start with default view options.
+            vm.usersOptions.filter = "";
             vm.usersOptions.orderBy = "Name";
             vm.usersOptions.orderDirection = "Ascending";
 
             // Update from querystring if available.
+            initViewOptionFromQueryString("filter");
             initViewOptionFromQueryString("orderBy");
             initViewOptionFromQueryString("orderDirection");
             initViewOptionFromQueryString("pageNumber");
@@ -451,12 +454,17 @@
 
         var search = _.debounce(function () {
             $scope.$apply(function () {
-                changePageNumber(1);
+                vm.usersOptions.pageNumber = 1;
+                getUsers();
             });
         }, 500);
 
         function searchUsers() {
             search();
+        }
+
+        function onBlurSearch() {
+            updateLocation("filter", vm.usersOptions.filter);
         }
 
         function getFilterName(array) {
@@ -547,6 +555,7 @@
         }
 
         function updateLocation(key, value) {
+            $location.search("filter", vm.usersOptions.filter);// update filter, but first when something else requests a url update.
             $location.search(key, value);
         }
 
@@ -657,7 +666,8 @@
         function usersOptionsAsQueryString() {
             var qs = "?orderBy=" + vm.usersOptions.orderBy +
                 "&orderDirection=" + vm.usersOptions.orderDirection +
-                "&pageNumber=" + vm.usersOptions.pageNumber;
+                "&pageNumber=" + vm.usersOptions.pageNumber +
+                "&filter=" + vm.usersOptions.filter;
 
             qs += addUsersOptionsFilterCollectionToQueryString("userStates", vm.usersOptions.userStates);
             qs += addUsersOptionsFilterCollectionToQueryString("userGroups", vm.usersOptions.userGroups);
