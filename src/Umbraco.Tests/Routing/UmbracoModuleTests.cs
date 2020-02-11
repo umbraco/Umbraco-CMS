@@ -42,7 +42,7 @@ namespace Umbraco.Tests.Routing
                 logger,
                 null, // FIXME: PublishedRouter complexities...
                 Mock.Of<IUmbracoContextFactory>(),
-                new RoutableDocumentFilter(globalSettings)
+                new RoutableDocumentFilter(globalSettings, IOHelper)
             );
 
             runtime.Level = RuntimeLevel.Run;

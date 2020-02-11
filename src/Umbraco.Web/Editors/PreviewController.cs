@@ -6,6 +6,7 @@ using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Features;
@@ -13,6 +14,7 @@ using Umbraco.Web.JavaScript;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
+using Umbraco.Web.Trees;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
@@ -27,6 +29,8 @@ namespace Umbraco.Web.Editors
         private readonly ILocalizationService _localizationService;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+        private readonly IIOHelper _ioHelper;
+        private readonly TreeCollection _treeCollection;
 
         public PreviewController(
             UmbracoFeatures features,
@@ -35,7 +39,9 @@ namespace Umbraco.Web.Editors
             IUmbracoContextAccessor umbracoContextAccessor,
             ILocalizationService localizationService,
             IUmbracoVersion umbracoVersion,
-            IUmbracoSettingsSection umbracoSettingsSection)
+            IUmbracoSettingsSection umbracoSettingsSection,
+            IIOHelper ioHelper,
+            TreeCollection treeCollection)
         {
             _features = features;
             _globalSettings = globalSettings;
@@ -44,6 +50,8 @@ namespace Umbraco.Web.Editors
             _localizationService = localizationService;
             _umbracoVersion = umbracoVersion;
             _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
+            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
+            _treeCollection = treeCollection;
         }
 
         [UmbracoAuthorize(redirectToUmbracoLogin: true)]
@@ -52,7 +60,7 @@ namespace Umbraco.Web.Editors
         {
             var availableLanguages = _localizationService.GetAllLanguages();
 
-            var model = new BackOfficePreviewModel(_features, _globalSettings, _umbracoVersion, availableLanguages, _umbracoSettingsSection);
+            var model = new BackOfficePreviewModel(_features, _globalSettings, _umbracoVersion, availableLanguages, _umbracoSettingsSection, _ioHelper, _treeCollection);
 
             if (model.PreviewExtendedHeaderView.IsNullOrWhiteSpace() == false)
             {
@@ -75,7 +83,7 @@ namespace Umbraco.Web.Editors
         public JavaScriptResult Application()
         {
             var files = JsInitialization.OptimizeScriptFiles(HttpContext, JsInitialization.GetPreviewInitialization());
-            var result = JsInitialization.GetJavascriptInitialization(HttpContext, files, "umbraco.preview", _globalSettings);
+            var result = JsInitialization.GetJavascriptInitialization(HttpContext, files, "umbraco.preview", _globalSettings, _ioHelper);
 
             return JavaScript(result);
         }

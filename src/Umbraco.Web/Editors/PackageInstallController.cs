@@ -8,8 +8,8 @@ using System.Web.Http;
 using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.Editors;
@@ -37,13 +37,25 @@ namespace Umbraco.Web.Editors
     {
 
         private readonly IUmbracoVersion _umbracoVersion;
-        public PackageInstallController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor,
-            ISqlContext sqlContext, ServiceContext services, AppCaches appCaches,
-            IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IShortStringHelper shortStringHelper, IUmbracoVersion umbracoVersion, UmbracoMapper umbracoMapper)
+        private readonly IIOHelper _ioHelper;
+
+        public PackageInstallController(
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoHelper umbracoHelper,
+            IShortStringHelper shortStringHelper,
+            IUmbracoVersion umbracoVersion,
+            UmbracoMapper umbracoMapper,
+            IIOHelper ioHelper)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
         {
             _umbracoVersion = umbracoVersion;
-
+            _ioHelper = ioHelper;
         }
 
         /// <summary>
@@ -94,7 +106,7 @@ namespace Umbraco.Web.Editors
 
         private void PopulateFromPackageData(LocalPackageInstallModel model)
         {
-            var zipFile = new FileInfo(Path.Combine(Current.IOHelper.MapPath(Core.Constants.SystemDirectories.Packages), model.ZipFileName));
+            var zipFile = new FileInfo(Path.Combine(_ioHelper.MapPath(Core.Constants.SystemDirectories.Packages), model.ZipFileName));
 
             var ins = Services.PackagingService.GetCompiledPackageInfo(zipFile);
 
@@ -136,7 +148,7 @@ namespace Umbraco.Web.Editors
             if (Request.Content.IsMimeMultipartContent() == false)
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
 
-            var root = Current.IOHelper.MapPath(Core.Constants.SystemDirectories.TempFileUploads);
+            var root = _ioHelper.MapPath(Core.Constants.SystemDirectories.TempFileUploads);
             //ensure it exists
             Directory.CreateDirectory(root);
             var provider = new MultipartFormDataStreamProvider(root);
@@ -163,7 +175,7 @@ namespace Umbraco.Web.Editors
                 {
                     //we always save package files to /App_Data/packages/package-guid.umb for processing as a standard so lets copy.
 
-                    var packagesFolder = Current.IOHelper.MapPath(Core.Constants.SystemDirectories.Packages);
+                    var packagesFolder = _ioHelper.MapPath(Core.Constants.SystemDirectories.Packages);
                     Directory.CreateDirectory(packagesFolder);
                     var packageFile = Path.Combine(packagesFolder, model.PackageGuid + ".umb");
                     File.Copy(file.LocalFileName, packageFile);
@@ -215,7 +227,7 @@ namespace Umbraco.Web.Editors
         {
             //Default path
             string fileName = packageGuid + ".umb";
-            if (File.Exists(Path.Combine(Current.IOHelper.MapPath(Core.Constants.SystemDirectories.Packages), fileName)) == false)
+            if (File.Exists(Path.Combine(_ioHelper.MapPath(Core.Constants.SystemDirectories.Packages), fileName)) == false)
             {
                 var packageFile = await Services.PackagingService.FetchPackageFileAsync(
                     Guid.Parse(packageGuid),
@@ -255,7 +267,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public PackageInstallModel Import(PackageInstallModel model)
         {
-            var zipFile = new FileInfo(Path.Combine(Current.IOHelper.MapPath(Core.Constants.SystemDirectories.Packages), model.ZipFileName));
+            var zipFile = new FileInfo(Path.Combine(_ioHelper.MapPath(Core.Constants.SystemDirectories.Packages), model.ZipFileName));
 
             var packageInfo = Services.PackagingService.GetCompiledPackageInfo(zipFile);
 
@@ -368,7 +380,7 @@ namespace Umbraco.Web.Editors
             zipFile.Delete();
 
             //bump cdf to be safe
-            var clientDependencyConfig = new ClientDependencyConfiguration(Logger);
+            var clientDependencyConfig = new ClientDependencyConfiguration(Logger, _ioHelper);
             var clientDependencyUpdated = clientDependencyConfig.UpdateVersionNumber(
                 _umbracoVersion.SemanticVersion, DateTime.UtcNow, "yyyyMMdd");
 

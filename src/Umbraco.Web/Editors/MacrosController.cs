@@ -13,7 +13,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Strings;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -21,6 +20,8 @@ using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Mapping;
 using System.Web.Http.Controllers;
+using Umbraco.Core.IO;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.Editors
 {
@@ -33,11 +34,27 @@ namespace Umbraco.Web.Editors
     [MacrosControllerConfiguration]
     public class MacrosController : BackOfficeNotificationsController
     {
+        private readonly ParameterEditorCollection _parameterEditorCollection;
+        private readonly IIOHelper _ioHelper;
         private readonly IMacroService _macroService;
 
-        public MacrosController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, IShortStringHelper shortStringHelper, UmbracoMapper umbracoMapper)
+        public MacrosController(
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoHelper umbracoHelper,
+            IShortStringHelper shortStringHelper,
+            UmbracoMapper umbracoMapper,
+            ParameterEditorCollection parameterEditorCollection,
+            IIOHelper ioHelper)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
         {
+            _parameterEditorCollection = parameterEditorCollection;
+            _ioHelper = ioHelper;
             _macroService = Services.MacroService;
         }
 
@@ -246,7 +263,7 @@ namespace Umbraco.Web.Editors
         /// </returns>
         public HttpResponseMessage GetParameterEditors()
         {
-            return this.Request.CreateResponse(HttpStatusCode.OK, Current.ParameterEditors);
+            return this.Request.CreateResponse(HttpStatusCode.OK, _parameterEditorCollection);
         }
 
         /// <summary>
@@ -257,7 +274,7 @@ namespace Umbraco.Web.Editors
         /// </returns>
         public HttpResponseMessage GetGroupedParameterEditors()
         {
-            var parameterEditors = Current.ParameterEditors.ToArray();
+            var parameterEditors = _parameterEditorCollection.ToArray();
 
             var grouped = parameterEditors
                 .GroupBy(x => x.Group.IsNullOrWhiteSpace() ? "" : x.Group.ToLower())
@@ -275,7 +292,7 @@ namespace Umbraco.Web.Editors
         /// </returns>
         public HttpResponseMessage GetParameterEditorByAlias(string alias)
         {
-            var parameterEditors = Current.ParameterEditors.ToArray();
+            var parameterEditors = _parameterEditorCollection.ToArray();
 
             var parameterEditor = parameterEditors.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
 
@@ -331,7 +348,7 @@ namespace Umbraco.Web.Editors
         /// </returns>
         private IEnumerable<string> FindPartialViewFilesInViewsFolder()
         {
-            var partialsDir = Current.IOHelper.MapPath(Constants.SystemDirectories.MacroPartials);
+            var partialsDir = _ioHelper.MapPath(Constants.SystemDirectories.MacroPartials);
 
             return this.FindPartialViewFilesInFolder(
                  partialsDir,
@@ -348,7 +365,7 @@ namespace Umbraco.Web.Editors
         {
             var files = new List<string>();
 
-            var appPluginsFolder = new DirectoryInfo(Current.IOHelper.MapPath(Constants.SystemDirectories.AppPlugins));
+            var appPluginsFolder = new DirectoryInfo(_ioHelper.MapPath(Constants.SystemDirectories.AppPlugins));
 
             if (!appPluginsFolder.Exists)
             {

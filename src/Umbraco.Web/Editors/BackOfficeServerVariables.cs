@@ -11,7 +11,6 @@ using ClientDependency.Core.Config;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Umbraco.Core;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
@@ -22,6 +21,7 @@ using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Trees;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Editors
 {
@@ -38,8 +38,10 @@ namespace Umbraco.Web.Editors
         private readonly IOwinContext _owinContext;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+        private readonly IIOHelper _ioHelper;
+        private readonly TreeCollection _treeCollection;
 
-        internal BackOfficeServerVariables(UrlHelper urlHelper, IRuntimeState runtimeState, UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IUmbracoSettingsSection umbracoSettingsSection)
+        internal BackOfficeServerVariables(UrlHelper urlHelper, IRuntimeState runtimeState, UmbracoFeatures features, IGlobalSettings globalSettings, IUmbracoVersion umbracoVersion, IUmbracoSettingsSection umbracoSettingsSection, IIOHelper ioHelper, TreeCollection treeCollection)
         {
             _urlHelper = urlHelper;
             _runtimeState = runtimeState;
@@ -49,6 +51,8 @@ namespace Umbraco.Web.Editors
             _owinContext = _httpContext.GetOwinContext();
             _umbracoVersion = umbracoVersion;
             _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
+            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
+            _treeCollection = treeCollection ?? throw new ArgumentNullException(nameof(treeCollection));
         }
 
         /// <summary>
@@ -323,8 +327,8 @@ namespace Umbraco.Web.Editors
                     "umbracoSettings", new Dictionary<string, object>
                     {
                         {"umbracoPath", _globalSettings.Path},
-                        {"mediaPath", Current.IOHelper.ResolveUrl(globalSettings.UmbracoMediaPath).TrimEnd('/')},
-                        {"appPluginsPath", Current.IOHelper.ResolveUrl(Constants.SystemDirectories.AppPlugins).TrimEnd('/')},
+                        {"mediaPath", _ioHelper.ResolveUrl(globalSettings.UmbracoMediaPath).TrimEnd('/')},
+                        {"appPluginsPath", _ioHelper.ResolveUrl(Constants.SystemDirectories.AppPlugins).TrimEnd('/')},
                         {
                             "imageFileTypes",
                             string.Join(",", _umbracoSettingsSection.Content.ImageFileTypes)
@@ -343,7 +347,7 @@ namespace Umbraco.Web.Editors
                         },
                         {"keepUserLoggedIn", _umbracoSettingsSection.Security.KeepUserLoggedIn},
                         {"usernameIsEmail", _umbracoSettingsSection.Security.UsernameIsEmail},
-                        {"cssPath", Current.IOHelper.ResolveUrl(globalSettings.UmbracoCssPath).TrimEnd('/')},
+                        {"cssPath", _ioHelper.ResolveUrl(globalSettings.UmbracoCssPath).TrimEnd('/')},
                         {"allowPasswordReset", _umbracoSettingsSection.Security.AllowPasswordReset},
                         {"loginBackgroundImage",  _umbracoSettingsSection.Content.LoginBackgroundImage},
                         {"showUserInvite", EmailSender.CanSendRequiredEmail(globalSettings)},
@@ -416,9 +420,8 @@ namespace Umbraco.Web.Editors
             //
             // do this instead
             // inheriting from TreeControllerBase and marked with TreeAttribute
-            var trees = Current.Factory.GetInstance<TreeCollection>();
 
-            foreach (var tree in trees)
+            foreach (var tree in _treeCollection)
             {
                 var treeType = tree.TreeControllerType;
 

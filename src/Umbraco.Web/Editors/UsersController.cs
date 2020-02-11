@@ -13,13 +13,11 @@ using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
-using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Security;
@@ -48,6 +46,8 @@ namespace Umbraco.Web.Editors
     {
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+        private readonly IIOHelper _ioHelper;
+        private readonly ISqlContext _sqlContext;
 
         public UsersController(
             IGlobalSettings globalSettings,
@@ -61,11 +61,14 @@ namespace Umbraco.Web.Editors
             IMediaFileSystem mediaFileSystem,
             IShortStringHelper shortStringHelper,
             UmbracoMapper umbracoMapper,
-            IUmbracoSettingsSection umbracoSettingsSection)
+            IUmbracoSettingsSection umbracoSettingsSection,
+            IIOHelper ioHelper)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
         {
             _mediaFileSystem = mediaFileSystem;
             _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
+            _ioHelper = ioHelper;
+            _sqlContext = sqlContext;
         }
 
         /// <summary>
@@ -86,17 +89,17 @@ namespace Umbraco.Web.Editors
         [AdminUsersAuthorize]
         public async Task<HttpResponseMessage> PostSetAvatar(int id)
         {
-            return await PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache, _mediaFileSystem, ShortStringHelper, _umbracoSettingsSection, id);
+            return await PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache, _mediaFileSystem, ShortStringHelper, _umbracoSettingsSection, _ioHelper, id);
         }
 
-        internal static async Task<HttpResponseMessage> PostSetAvatarInternal(HttpRequestMessage request, IUserService userService, IAppCache cache, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, IUmbracoSettingsSection umbracoSettingsSection, int id)
+        internal static async Task<HttpResponseMessage> PostSetAvatarInternal(HttpRequestMessage request, IUserService userService, IAppCache cache, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, IUmbracoSettingsSection umbracoSettingsSection, IIOHelper ioHelper, int id)
         {
             if (request.Content.IsMimeMultipartContent() == false)
             {
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
-            var root = Current.IOHelper.MapPath(Constants.SystemDirectories.TempFileUploads);
+            var root = ioHelper.MapPath(Constants.SystemDirectories.TempFileUploads);
             //ensure it exists
             Directory.CreateDirectory(root);
             var provider = new MultipartFormDataStreamProvider(root);
@@ -131,7 +134,7 @@ namespace Umbraco.Web.Editors
 
                 using (var fs = System.IO.File.OpenRead(file.LocalFileName))
                 {
-                    Current.MediaFileSystem.AddFile(user.Avatar, fs, true);
+                    mediaFileSystem.AddFile(user.Avatar, fs, true);
                 }
 
                 userService.Save(user);
@@ -173,8 +176,8 @@ namespace Umbraco.Web.Editors
 
             if (filePath.IsNullOrWhiteSpace() == false)
             {
-                if (Current.MediaFileSystem.FileExists(filePath))
-                    Current.MediaFileSystem.DeleteFile(filePath);
+                if (_mediaFileSystem.FileExists(filePath))
+                    _mediaFileSystem.DeleteFile(filePath);
             }
 
             return Request.CreateResponse(HttpStatusCode.OK, found.GetUserAvatarUrls(AppCaches.RuntimeCache, _mediaFileSystem));
@@ -232,7 +235,7 @@ namespace Umbraco.Web.Editors
                 excludeUserGroups = new[] {Constants.Security.AdminGroupAlias};
             }
 
-            var filterQuery = Current.SqlContext.Query<IUser>();
+            var filterQuery = _sqlContext.Query<IUser>();
 
             if (!Security.CurrentUser.IsSuper())
             {
@@ -477,7 +480,7 @@ namespace Umbraco.Web.Editors
             var action = urlHelper.Action("VerifyInvite", "BackOffice",
                 new
                 {
-                    area = GlobalSettings.GetUmbracoMvcArea(Current.IOHelper),
+                    area = GlobalSettings.GetUmbracoMvcArea(_ioHelper),
                     invite = inviteToken
                 });
 

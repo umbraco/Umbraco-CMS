@@ -19,35 +19,23 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
-using System.Linq;
-using System.Web.Http.Controllers;
 using Umbraco.Core.Cache;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Dictionary;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Validation;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.ContentApps;
 using Umbraco.Web.Editors.Binders;
 using Umbraco.Web.Editors.Filters;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Mvc;
-using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
-using Umbraco.Core.Strings;
 using Umbraco.Core.Mapping;
 
 namespace Umbraco.Web.Editors
@@ -62,6 +50,7 @@ namespace Umbraco.Web.Editors
     public class MediaController : ContentControllerBase
     {
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+        private readonly IIOHelper _ioHelper;
 
         public MediaController(
             ICultureDictionary cultureDictionary,
@@ -77,12 +66,14 @@ namespace Umbraco.Web.Editors
             IMediaFileSystem mediaFileSystem,
             IShortStringHelper shortStringHelper,
             UmbracoMapper umbracoMapper,
-            IUmbracoSettingsSection umbracoSettingsSection)
+            IUmbracoSettingsSection umbracoSettingsSection,
+            IIOHelper ioHelper)
             : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _mediaFileSystem = mediaFileSystem;
             _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
+            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
         }
 
         /// <summary>
@@ -653,7 +644,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
-            var root = Current.IOHelper.MapPath(Constants.SystemDirectories.TempFileUploads);
+            var root = _ioHelper.MapPath(Constants.SystemDirectories.TempFileUploads);
             //ensure it exists
             Directory.CreateDirectory(root);
             var provider = new MultipartFormDataStreamProvider(root);

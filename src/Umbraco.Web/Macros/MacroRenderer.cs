@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Macros;
 using Umbraco.Core.Models;
@@ -26,10 +26,11 @@ namespace Umbraco.Web.Macros
         private readonly ILocalizedTextService _textService;
         private readonly AppCaches _appCaches;
         private readonly IMacroService _macroService;
+        private readonly IIOHelper _ioHelper;
         private readonly IUserService _userService;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public MacroRenderer(IProfilingLogger plogger, IUmbracoContextAccessor umbracoContextAccessor, IContentSection contentSection, ILocalizedTextService textService, AppCaches appCaches, IMacroService macroService, IUserService userService, IHttpContextAccessor httpContextAccessor)
+        public MacroRenderer(IProfilingLogger plogger, IUmbracoContextAccessor umbracoContextAccessor, IContentSection contentSection, ILocalizedTextService textService, AppCaches appCaches, IMacroService macroService, IUserService userService, IHttpContextAccessor httpContextAccessor, IIOHelper ioHelper)
         {
             _plogger = plogger ?? throw new ArgumentNullException(nameof(plogger));
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
@@ -37,6 +38,7 @@ namespace Umbraco.Web.Macros
             _textService = textService;
             _appCaches = appCaches ?? throw new ArgumentNullException(nameof(appCaches));
             _macroService = macroService ?? throw new ArgumentNullException(nameof(macroService));
+            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _httpContextAccessor = httpContextAccessor;
         }
@@ -171,12 +173,12 @@ namespace Umbraco.Web.Macros
 
         // gets the macro source file
         // null if macro is not file-based
-        private static FileInfo GetMacroFile(MacroModel model)
+        private FileInfo GetMacroFile(MacroModel model)
         {
             var filename = GetMacroFileName(model);
             if (filename == null) return null;
 
-            var mapped = Current.IOHelper.MapPath(filename);
+            var mapped = _ioHelper.MapPath(filename);
             if (mapped == null) return null;
 
             var file = new FileInfo(mapped);
