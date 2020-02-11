@@ -120,7 +120,7 @@ namespace Umbraco.Web
             var isRoutableAttempt = EnsureUmbracoRoutablePage(umbracoContext, httpContext);
 
             // raise event here
-            UmbracoModule.OnRouteAttempt(this, new RoutableAttemptEventArgs(isRoutableAttempt.Result, umbracoContext, httpContext));
+            UmbracoModule.OnRouteAttempt(this, new RoutableAttemptEventArgs(isRoutableAttempt.Result, umbracoContext));
             if (isRoutableAttempt.Success == false) return;
 
             httpContext.Trace.Write("UmbracoModule", "Umbraco request confirmed");
@@ -429,7 +429,7 @@ namespace Umbraco.Web
                     _logger.Verbose<UmbracoModule>("End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)", httpRequestId, httpContext.Request.Url, DateTime.Now.Subtract(Current.UmbracoContext.ObjectCreated).TotalMilliseconds);
                 }
 
-                UmbracoModule.OnEndRequest(this, new UmbracoRequestEventArgs(Current.UmbracoContext, new HttpContextWrapper(httpContext)));
+                UmbracoModule.OnEndRequest(this, new UmbracoRequestEventArgs(Current.UmbracoContext));
 
                 DisposeHttpContextItems(httpContext);
             };

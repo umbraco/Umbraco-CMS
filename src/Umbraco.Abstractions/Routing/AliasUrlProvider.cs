@@ -17,13 +17,15 @@ namespace Umbraco.Web.Routing
         private readonly IRequestHandlerSection _requestConfig;
         private readonly ISiteDomainHelper _siteDomainHelper;
         private readonly UriUtility _uriUtility;
+        private readonly IPublishedValueFallback _publishedValueFallback;
 
-        public AliasUrlProvider(IGlobalSettings globalSettings, IRequestHandlerSection requestConfig, ISiteDomainHelper siteDomainHelper, UriUtility uriUtility)
+        public AliasUrlProvider(IGlobalSettings globalSettings, IRequestHandlerSection requestConfig, ISiteDomainHelper siteDomainHelper, UriUtility uriUtility, IPublishedValueFallback publishedValueFallback)
         {
             _globalSettings = globalSettings;
             _requestConfig = requestConfig;
             _siteDomainHelper = siteDomainHelper;
             _uriUtility = uriUtility;
+            _publishedValueFallback = publishedValueFallback;
         }
 
         // note - at the moment we seem to accept pretty much anything as an alias
@@ -85,7 +87,7 @@ namespace Umbraco.Web.Routing
                 if (varies)
                     yield break;
 
-                var umbracoUrlName = node.Value<string>(Constants.Conventions.Content.UrlAlias);
+                var umbracoUrlName = node.Value<string>(_publishedValueFallback, Constants.Conventions.Content.UrlAlias);
                 var aliases = umbracoUrlName?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
                 if (aliases == null || aliases.Any() == false)
@@ -110,8 +112,8 @@ namespace Umbraco.Web.Routing
                     if (varies && !node.HasCulture(domainUri.Culture.Name)) continue;
 
                     var umbracoUrlName = varies
-                        ? node.Value<string>(Constants.Conventions.Content.UrlAlias, culture: domainUri.Culture.Name)
-                        : node.Value<string>(Constants.Conventions.Content.UrlAlias);
+                        ? node.Value<string>(_publishedValueFallback,Constants.Conventions.Content.UrlAlias, culture: domainUri.Culture.Name)
+                        : node.Value<string>(_publishedValueFallback, Constants.Conventions.Content.UrlAlias);
 
                     var aliases = umbracoUrlName?.Split(new [] {','}, StringSplitOptions.RemoveEmptyEntries);
 

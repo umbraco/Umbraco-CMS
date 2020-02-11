@@ -9,12 +9,10 @@ namespace Umbraco.Web.Routing
     public class UmbracoRequestEventArgs : EventArgs
     {
         public IUmbracoContext UmbracoContext { get; private set; }
-        public HttpContextBase HttpContext { get; private set; }
 
-        public UmbracoRequestEventArgs(IUmbracoContext umbracoContext, HttpContextBase httpContext)
+        public UmbracoRequestEventArgs(IUmbracoContext umbracoContext)
         {
             UmbracoContext = umbracoContext;
-            HttpContext = httpContext;
         }
     }
 }
