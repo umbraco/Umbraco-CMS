@@ -73,7 +73,7 @@ namespace Umbraco.Web
             ConfigureUmbracoAuthentication(app);
 
             app
-                .UseSignalR(GlobalSettings)
+                .UseSignalR(GlobalSettings, IOHelper)
                 .FinalizeMiddlewareConfiguration();
         }
 

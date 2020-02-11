@@ -191,17 +191,6 @@ namespace Umbraco.Web.Routing
             // can't go beyond that point without a PublishedContent to render
             // it's ok not to have a template, in order to give MVC a chance to hijack routes
 
-            // note - the page() ctor below will cause the "page" to get the value of all its
-            // "elements" ie of all the IPublishedContent property. If we use the object value,
-            // that will trigger macro execution - which can't happen because macro execution
-            // requires that _pcr.UmbracoPage is already initialized = catch-22. The "legacy"
-            // pipeline did _not_ evaluate the macros, ie it is using the data value, and we
-            // have to keep doing it because of that catch-22.
-
-            // assign the legacy page back to the request
-            // handlers like default.aspx will want it and most macros currently need it
-         //   frequest.LegacyContentHashTable = new PublishedContentHashtableConverter(frequest, _userService);
-
             return true;
         }
 
@@ -235,12 +224,6 @@ namespace Umbraco.Web.Routing
                 // to Mvc since Mvc can't do much either
                 return;
             }
-
-            // see note in PrepareRequest()
-
-            // assign the legacy page back to the docrequest
-            // handlers like default.aspx will want it and most macros currently need it
-          //  request.LegacyContentHashTable = new PublishedContentHashtableConverter(request, _userService);
         }
 
         #endregion

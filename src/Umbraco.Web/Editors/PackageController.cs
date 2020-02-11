@@ -8,8 +8,16 @@ using System.Text;
 using System.Web;
 using System.Web.Http;
 using Semver;
-using Umbraco.Web.Composing;
+using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.Packaging;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
@@ -24,6 +32,25 @@ namespace Umbraco.Web.Editors
     [UmbracoApplicationAuthorize(Core.Constants.Applications.Packages)]
     public class PackageController : UmbracoAuthorizedJsonController
     {
+        private readonly IIOHelper _ioHelper;
+
+        public PackageController(
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoHelper umbracoHelper,
+            IShortStringHelper shortStringHelper,
+            UmbracoMapper umbracoMapper,
+            IIOHelper ioHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
+        {
+            _ioHelper = ioHelper;
+        }
+
         public IEnumerable<PackageDefinition> GetCreatedPackages()
         {
             return Services.PackagingService.GetAllCreatedPackages();
@@ -88,7 +115,7 @@ namespace Umbraco.Web.Editors
             if (package == null)
                 return Request.CreateResponse(HttpStatusCode.NotFound);
 
-            var fullPath = Current.IOHelper.MapPath(package.PackagePath);
+            var fullPath = _ioHelper.MapPath(package.PackagePath);
             if (!File.Exists(fullPath))
                 return Request.CreateNotificationValidationErrorResponse("No file found for path " + package.PackagePath);
 

@@ -3,6 +3,7 @@ using Microsoft.AspNet.SignalR;
 using Microsoft.Owin.Logging;
 using Owin;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Logging;
 
@@ -43,9 +44,10 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="app">The app builder.</param>
         /// <param name="globalSettings"></param>
-        public static IAppBuilder UseSignalR(this IAppBuilder app, IGlobalSettings globalSettings)
+        /// <param name="ioHelper"></param>
+        public static IAppBuilder UseSignalR(this IAppBuilder app, IGlobalSettings globalSettings, IIOHelper ioHelper)
         {
-            var umbracoPath = globalSettings.GetUmbracoMvcArea(Current.IOHelper);
+            var umbracoPath = globalSettings.GetUmbracoMvcArea(ioHelper);
             var signalrPath = HttpRuntime.AppDomainAppVirtualPath + umbracoPath + "/BackOffice/signalr";
             return app.MapSignalR(signalrPath, new HubConfiguration { EnableDetailedErrors = true });
         }

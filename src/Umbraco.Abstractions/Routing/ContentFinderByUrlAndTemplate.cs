@@ -75,7 +75,7 @@ namespace Umbraco.Web.Routing
             }
 
             // IsAllowedTemplate deals both with DisableAlternativeTemplates and ValidateAlternativeTemplates settings
-            if (!node.IsAllowedTemplate(template.Id, _umbracoSettingsSection, _contentTypeService))
+            if (!node.IsAllowedTemplate(_contentTypeService, _umbracoSettingsSection, template.Id))
             {
                 Logger.Warn<ContentFinderByUrlAndTemplate>("Alternative template '{TemplateAlias}' is not allowed on node {NodeId}.", template.Alias, node.Id);
                 frequest.PublishedContent = null; // clear

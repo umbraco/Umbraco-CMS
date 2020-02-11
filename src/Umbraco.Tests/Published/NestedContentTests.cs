@@ -17,16 +17,15 @@ using Umbraco.Web;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.PropertyEditors.ValueConverters;
 using Umbraco.Web.PublishedCache;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Published
 {
     [TestFixture]
-    public class NestedContentTests
+    public class NestedContentTests : UmbracoTestBase
     {
         private (IPublishedContentType, IPublishedContentType) CreateContentTypes()
         {
-            Current.Reset();
-
             var logger = Mock.Of<ILogger>();
             var profiler = Mock.Of<IProfiler>();
             var proflog = new ProfilingLogger(logger, profiler);

@@ -11,9 +11,9 @@ using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Web.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
@@ -50,6 +50,7 @@ namespace Umbraco.Web.Editors
         private readonly IGlobalSettings _globalSettings;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IScopeProvider _scopeProvider;
+        private readonly IIOHelper _ioHelper;
 
         public ContentTypeController(IEntityXmlSerializer serializer,
             ICultureDictionary cultureDictionary,
@@ -59,13 +60,14 @@ namespace Umbraco.Web.Editors
             ServiceContext services, AppCaches appCaches,
             IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper,
             IScopeProvider scopeProvider,
-            IShortStringHelper shortStringHelper, UmbracoMapper umbracoMapper)
+            IShortStringHelper shortStringHelper, UmbracoMapper umbracoMapper, IIOHelper ioHelper)
             : base(cultureDictionary, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
         {
             _serializer = serializer;
             _globalSettings = globalSettings;
             _propertyEditors = propertyEditors;
             _scopeProvider = scopeProvider;
+            _ioHelper = ioHelper;
         }
 
         public int GetCount()
@@ -524,7 +526,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public HttpResponseMessage Import(string file)
         {
-            var filePath = Path.Combine(Current.IOHelper.MapPath(Core.Constants.SystemDirectories.Data), file);
+            var filePath = Path.Combine(_ioHelper.MapPath(Core.Constants.SystemDirectories.Data), file);
             if (string.IsNullOrEmpty(file) || !System.IO.File.Exists(filePath))
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -562,7 +564,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
-            var root = Current.IOHelper.MapPath(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "FileUploads");
+            var root = _ioHelper.MapPath(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "FileUploads");
             //ensure it exists
             Directory.CreateDirectory(root);
             var provider = new MultipartFormDataStreamProvider(root);

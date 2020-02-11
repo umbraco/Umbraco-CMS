@@ -6,11 +6,15 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Mapping;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
@@ -25,18 +29,30 @@ namespace Umbraco.Web.Editors
         Constants.Applications.Members)]
     public class TinyMceController : UmbracoAuthorizedApiController
     {
-        private readonly IMediaService _mediaService;
-        private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+        private readonly IIOHelper _ioHelper;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
 
-        public TinyMceController(IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IShortStringHelper shortStringHelper, IUmbracoSettingsSection umbracoSettingsSection)
+        public TinyMceController(
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoHelper umbracoHelper,
+            UmbracoMapper umbracoMapper,
+            IShortStringHelper shortStringHelper,
+            IUmbracoSettingsSection umbracoSettingsSection,
+            IIOHelper ioHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper)
         {
-            _mediaService = mediaService;
-            _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
-            _shortStringHelper = shortStringHelper;
+            _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
             _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
+            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
         }
+
 
         [HttpPost]
         public async Task<HttpResponseMessage> UploadImage()
@@ -47,10 +63,10 @@ namespace Umbraco.Web.Editors
             }
 
             // Create an unique folder path to help with concurrent users to avoid filename clash
-            var imageTempPath = Current.IOHelper.MapPath(Constants.SystemDirectories.TempImageUploads + "/" + Guid.NewGuid().ToString());
+            var imageTempPath = _ioHelper.MapPath(Constants.SystemDirectories.TempImageUploads + "/" + Guid.NewGuid().ToString());
 
             // Temp folderpath (Files come in as bodypart & will need to move/saved into imgTempPath
-            var folderPath = Current.IOHelper.MapPath(Constants.SystemDirectories.TempFileUploads);
+            var folderPath = _ioHelper.MapPath(Constants.SystemDirectories.TempFileUploads);
 
             // Ensure image temp path exists
             if(Directory.Exists(imageTempPath) == false)
@@ -88,8 +104,8 @@ namespace Umbraco.Web.Editors
 
             //var mediaItemName = fileName.ToFriendlyName();
             var currentFile = file.LocalFileName;
-            var newFilePath = imageTempPath +  Current.IOHelper.DirSepChar + safeFileName;
-            var relativeNewFilePath = Current.IOHelper.GetRelativePath(newFilePath);
+            var newFilePath = imageTempPath +  _ioHelper.DirSepChar + safeFileName;
+            var relativeNewFilePath = _ioHelper.GetRelativePath(newFilePath);
 
             try
             {

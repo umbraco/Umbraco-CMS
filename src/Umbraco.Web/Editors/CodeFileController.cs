@@ -16,7 +16,6 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Strings.Css;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -35,6 +34,9 @@ namespace Umbraco.Web.Editors
     [UmbracoApplicationAuthorize(Core.Constants.Applications.Settings)]
     public class CodeFileController : BackOfficeNotificationsController
     {
+        private readonly IIOHelper _ioHelper;
+        private readonly IFileSystems _fileSystems;
+
         public CodeFileController(
             IGlobalSettings globalSettings,
             IUmbracoContextAccessor umbracoContextAccessor,
@@ -45,9 +47,13 @@ namespace Umbraco.Web.Editors
             IRuntimeState runtimeState,
             UmbracoHelper umbracoHelper,
             IShortStringHelper shortStringHelper,
-            UmbracoMapper umbracoMapper)
+            UmbracoMapper umbracoMapper,
+            IIOHelper ioHelper,
+            IFileSystems fileSystems)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
         {
+            _ioHelper = ioHelper;
+            _fileSystems = fileSystems;
         }
 
         /// <summary>
@@ -517,7 +523,7 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         private IScript CreateOrUpdateScript(CodeFileDisplay display)
         {
-            return CreateOrUpdateFile(display, ".js", Current.FileSystems.ScriptsFileSystem,
+            return CreateOrUpdateFile(display, ".js", _fileSystems.ScriptsFileSystem,
                 name => Services.FileService.GetScriptByName(name),
                 (script, userId) => Services.FileService.SaveScript(script, userId),
                 name => new Script(name));
@@ -525,7 +531,7 @@ namespace Umbraco.Web.Editors
 
         private IStylesheet CreateOrUpdateStylesheet(CodeFileDisplay display)
         {
-            return CreateOrUpdateFile(display, ".css", Current.FileSystems.StylesheetsFileSystem,
+            return CreateOrUpdateFile(display, ".css", _fileSystems.StylesheetsFileSystem,
                 name => Services.FileService.GetStylesheetByName(name),
                 (stylesheet, userId) => Services.FileService.SaveStylesheet(stylesheet, userId),
                 name => new Stylesheet(name)
@@ -647,7 +653,7 @@ namespace Umbraco.Web.Editors
 
         private bool IsDirectory(string virtualPath, string systemDirectory)
         {
-            var path = Current.IOHelper.MapPath(systemDirectory + "/" + virtualPath);
+            var path = _ioHelper.MapPath(systemDirectory + "/" + virtualPath);
             var dirInfo = new DirectoryInfo(path);
             return dirInfo.Attributes == FileAttributes.Directory;
         }

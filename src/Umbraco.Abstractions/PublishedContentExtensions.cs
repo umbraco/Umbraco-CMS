@@ -12,6 +12,56 @@ namespace Umbraco.Core
 {
     public static class PublishedContentExtensions
     {
+        #region Name
+
+        /// <summary>
+        /// Gets the name of the content item.
+        /// </summary>
+        /// <param name="content">The content item.</param>
+        /// <param name="variationContextAccessor"></param>
+        /// <param name="culture">The specific culture to get the name for. If null is used the current culture is used (Default is null).</param>
+        public static string Name(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string culture = null)
+        {
+            // invariant has invariant value (whatever the requested culture)
+            if (!content.ContentType.VariesByCulture())
+                return content.Cultures.TryGetValue("", out var invariantInfos) ? invariantInfos.Name : null;
+
+            // handle context culture for variant
+            if (culture == null)
+                culture = variationContextAccessor?.VariationContext?.Culture ?? "";
+
+            // get
+            return culture != "" && content.Cultures.TryGetValue(culture, out var infos) ? infos.Name : null;
+        }
+
+        #endregion
+
+        #region Url segment
+
+        /// <summary>
+        /// Gets the url segment of the content item.
+        /// </summary>
+        /// <param name="content">The content item.</param>
+        /// <param name="variationContextAccessor"></param>
+        /// <param name="culture">The specific culture to get the url segment for. If null is used the current culture is used (Default is null).</param>
+        public static string UrlSegment(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string culture = null)
+        {
+            // invariant has invariant value (whatever the requested culture)
+            if (!content.ContentType.VariesByCulture())
+                return content.Cultures.TryGetValue("", out var invariantInfos) ? invariantInfos.UrlSegment : null;
+
+            // handle context culture for variant
+            if (culture == null)
+                culture = variationContextAccessor?.VariationContext?.Culture ?? "";
+
+            // get
+            return culture != "" && content.Cultures.TryGetValue(culture, out var infos) ? infos.UrlSegment : null;
+        }
+
+        #endregion
+
+        #region Culture
+
         /// <summary>
         /// Determines whether the content has a culture.
         /// </summary>
@@ -44,47 +94,6 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// Gets the name of the content item.
-        /// </summary>
-        /// <param name="content">The content item.</param>
-        /// <param name="variationContextAccessor"></param>
-        /// <param name="culture">The specific culture to get the name for. If null is used the current culture is used (Default is null).</param>
-        public static string Name(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string culture = null)
-        {
-            // invariant has invariant value (whatever the requested culture)
-            if (!content.ContentType.VariesByCulture())
-                return content.Cultures.TryGetValue("", out var invariantInfos) ? invariantInfos.Name : null;
-
-            // handle context culture for variant
-            if (culture == null)
-                culture = variationContextAccessor?.VariationContext?.Culture ?? "";
-
-            // get
-            return culture != "" && content.Cultures.TryGetValue(culture, out var infos) ? infos.Name : null;
-        }
-
-
-        /// <summary>
-        /// Gets the url segment of the content item.
-        /// </summary>
-        /// <param name="content">The content item.</param>
-        /// <param name="variationContextAccessor"></param>
-        /// <param name="culture">The specific culture to get the url segment for. If null is used the current culture is used (Default is null).</param>
-        public static string UrlSegment(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string culture = null)
-        {
-            // invariant has invariant value (whatever the requested culture)
-            if (!content.ContentType.VariesByCulture())
-                return content.Cultures.TryGetValue("", out var invariantInfos) ? invariantInfos.UrlSegment : null;
-
-            // handle context culture for variant
-            if (culture == null)
-                culture = variationContextAccessor?.VariationContext?.Culture ?? "";
-
-            // get
-            return culture != "" && content.Cultures.TryGetValue(culture, out var infos) ? infos.UrlSegment : null;
-        }
-
-        /// <summary>
         /// Gets the culture date of the content item.
         /// </summary>
         /// <param name="content">The content item.</param>
@@ -104,53 +113,219 @@ namespace Umbraco.Core
             return culture != "" && content.Cultures.TryGetValue(culture, out var infos) ? infos.Date : DateTime.MinValue;
         }
 
+        #endregion
+
+        #region IsComposedOf
+
         /// <summary>
-        /// Gets the children of the content item.
+        /// Gets a value indicating whether the content is of a content type composed of the given alias
         /// </summary>
-        /// <param name="content">The content item.</param>
-        /// <param name="variationContextAccessor"></param>
-        /// <param name="culture">
-        /// The specific culture to get the url children for. Default is null which will use the current culture in <see cref="VariationContext"/>
-        /// </param>
-        /// <remarks>
-        /// <para>Gets children that are available for the specified culture.</para>
-        /// <para>Children are sorted by their sortOrder.</para>
-        /// <para>
-        /// For culture,
-        /// if null is used the current culture is used.
-        /// If an empty string is used only invariant children are returned.
-        /// If "*" is used all children are returned.
-        /// </para>
-        /// <para>
-        /// If a variant culture is specified or there is a current culture in the <see cref="VariationContext"/> then the Children returned
-        /// will include both the variant children matching the culture AND the invariant children because the invariant children flow with the current culture.
-        /// However, if an empty string is specified only invariant children are returned.
-        /// </para>
-        /// </remarks>
-        public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string culture = null)
+        /// <param name="content">The content.</param>
+        /// <param name="alias">The content type alias.</param>
+        /// <returns>A value indicating whether the content is of a content type composed of a content type identified by the alias.</returns>
+        public static bool IsComposedOf(this IPublishedContent content, string alias)
         {
-            // handle context culture for variant
-            if (culture == null)
-                culture = variationContextAccessor?.VariationContext?.Culture ?? "";
-
-            var children = content.ChildrenForAllCultures;
-            return culture == "*"
-                ? children
-                : children.Where(x => x.IsInvariantOrHasCulture(culture));
+            return content.ContentType.CompositionAliases.InvariantContains(alias);
         }
 
-        #region Writer and creator
+        #endregion
 
-        public static string GetCreatorName(this IPublishedContent content, IUserService userService)
+        #region Template
+
+        /// <summary>
+        /// Returns the current template Alias
+        /// </summary>
+        /// <returns>Empty string if none is set.</returns>
+        public static string GetTemplateAlias(this IPublishedContent content, IFileService fileService)
         {
-            var user = userService.GetProfileById(content.CreatorId);
-            return user?.Name;
+            if (content.TemplateId.HasValue == false)
+            {
+                return string.Empty;
+            }
+
+            var template = fileService.GetTemplate(content.TemplateId.Value);
+            return template == null ? string.Empty : template.Alias;
         }
 
-        public static string GetWriterName(this IPublishedContent content, IUserService userService)
+        public static bool IsAllowedTemplate(this IPublishedContent content, IContentTypeService contentTypeService,
+            IUmbracoSettingsSection umbracoSettingsSection, int templateId)
         {
-            var user = userService.GetProfileById(content.WriterId);
-            return user?.Name;
+            return content.IsAllowedTemplate(contentTypeService,
+                umbracoSettingsSection.WebRouting.DisableAlternativeTemplates,
+                umbracoSettingsSection.WebRouting.ValidateAlternativeTemplates, templateId);
+        }
+
+        public static bool IsAllowedTemplate(this IPublishedContent content, IContentTypeService contentTypeService, bool disableAlternativeTemplates, bool validateAlternativeTemplates, int templateId)
+        {
+            if (disableAlternativeTemplates)
+                return content.TemplateId == templateId;
+
+            if (content.TemplateId == templateId || !validateAlternativeTemplates)
+                return true;
+
+            var publishedContentContentType = contentTypeService.Get(content.ContentType.Id);
+            if (publishedContentContentType == null)
+                throw new NullReferenceException("No content type returned for published content (contentType='" + content.ContentType.Id + "')");
+
+            return publishedContentContentType.IsAllowedTemplate(templateId);
+
+        }
+        public static bool IsAllowedTemplate(this IPublishedContent content, IFileService fileService, IContentTypeService contentTypeService, bool disableAlternativeTemplates, bool validateAlternativeTemplates, string templateAlias)
+        {
+            var template = fileService.GetTemplate(templateAlias);
+            return template != null && content.IsAllowedTemplate(contentTypeService, disableAlternativeTemplates, validateAlternativeTemplates, template.Id);
+        }
+
+        #endregion
+
+        #region HasValue, Value, Value<T>
+
+        /// <summary>
+        /// Gets a value indicating whether the content has a value for a property identified by its alias.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="publishedValueFallback">The published value fallback implementation.</param>
+        /// <param name="alias">The property alias.</param>
+        /// <param name="culture">The variation language.</param>
+        /// <param name="segment">The variation segment.</param>
+        /// <param name="fallback">Optional fallback strategy.</param>
+        /// <returns>A value indicating whether the content has a value for the property identified by the alias.</returns>
+        /// <remarks>Returns true if HasValue is true, or a fallback strategy can provide a value.</remarks>
+        public static bool HasValue(this IPublishedContent content, IPublishedValueFallback publishedValueFallback, string alias, string culture = null, string segment = null, Fallback fallback = default)
+        {
+            var property = content.GetProperty(alias);
+
+            // if we have a property, and it has a value, return that value
+            if (property != null && property.HasValue(culture, segment))
+                return true;
+
+            // else let fallback try to get a value
+            return publishedValueFallback.TryGetValue(content, alias, culture, segment, fallback, null, out _, out _);
+        }
+
+        /// <summary>
+        /// Gets the value of a content's property identified by its alias, if it exists, otherwise a default value.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="publishedValueFallback">The published value fallback implementation.</param>
+        /// <param name="alias">The property alias.</param>
+        /// <param name="culture">The variation language.</param>
+        /// <param name="segment">The variation segment.</param>
+        /// <param name="fallback">Optional fallback strategy.</param>
+        /// <param name="defaultValue">The default value.</param>
+        /// <returns>The value of the content's property identified by the alias, if it exists, otherwise a default value.</returns>
+        public static object Value(this IPublishedContent content, IPublishedValueFallback publishedValueFallback, string alias, string culture = null, string segment = null, Fallback fallback = default, object defaultValue = default)
+        {
+            var property = content.GetProperty(alias);
+
+            // if we have a property, and it has a value, return that value
+            if (property != null && property.HasValue(culture, segment))
+                return property.GetValue(culture, segment);
+
+            // else let fallback try to get a value
+            if (publishedValueFallback.TryGetValue(content, alias, culture, segment, fallback, defaultValue, out var value, out property))
+                return value;
+
+            // else... if we have a property, at least let the converter return its own
+            // vision of 'no value' (could be an empty enumerable)
+            return property?.GetValue(culture, segment);
+        }
+
+        /// <summary>
+        /// Gets the value of a content's property identified by its alias, converted to a specified type.
+        /// </summary>
+        /// <typeparam name="T">The target property type.</typeparam>
+        /// <param name="content">The content.</param>
+        /// <param name="publishedValueFallback">The published value fallback implementation.</param>
+        /// <param name="alias">The property alias.</param>
+        /// <param name="culture">The variation language.</param>
+        /// <param name="segment">The variation segment.</param>
+        /// <param name="fallback">Optional fallback strategy.</param>
+        /// <param name="defaultValue">The default value.</param>
+        /// <returns>The value of the content's property identified by the alias, converted to the specified type.</returns>
+        public static T Value<T>(this IPublishedContent content, IPublishedValueFallback publishedValueFallback, string alias, string culture = null, string segment = null, Fallback fallback = default, T defaultValue = default)
+        {
+            var property = content.GetProperty(alias);
+
+            // if we have a property, and it has a value, return that value
+            if (property != null && property.HasValue(culture, segment))
+                return property.Value<T>(publishedValueFallback, culture, segment);
+
+            // else let fallback try to get a value
+            if (publishedValueFallback.TryGetValue(content, alias, culture, segment, fallback, defaultValue, out var value, out property))
+                return value;
+
+            // else... if we have a property, at least let the converter return its own
+            // vision of 'no value' (could be an empty enumerable) - otherwise, default
+            return property == null ? default : property.Value<T>(publishedValueFallback, culture, segment);
+        }
+
+        #endregion
+
+        #region IsSomething: misc.
+
+        /// <summary>
+        /// Determines whether the specified content is a specified content type.
+        /// </summary>
+        /// <param name="content">The content to determine content type of.</param>
+        /// <param name="docTypeAlias">The alias of the content type to test against.</param>
+        /// <returns>True if the content is of the specified content type; otherwise false.</returns>
+        public static bool IsDocumentType(this IPublishedContent content, string docTypeAlias)
+        {
+            return content.ContentType.Alias.InvariantEquals(docTypeAlias);
+        }
+
+        /// <summary>
+        /// Determines whether the specified content is a specified content type or it's derived types.
+        /// </summary>
+        /// <param name="content">The content to determine content type of.</param>
+        /// <param name="docTypeAlias">The alias of the content type to test against.</param>
+        /// <param name="recursive">When true, recurses up the content type tree to check inheritance; when false just calls IsDocumentType(this IPublishedContent content, string docTypeAlias).</param>
+        /// <returns>True if the content is of the specified content type or a derived content type; otherwise false.</returns>
+        public static bool IsDocumentType(this IPublishedContent content, string docTypeAlias, bool recursive)
+        {
+            if (content.IsDocumentType(docTypeAlias))
+                return true;
+
+            return recursive && content.IsComposedOf(docTypeAlias);
+        }
+
+        #endregion
+
+        #region IsSomething: equality
+
+        public static bool IsEqual(this IPublishedContent content, IPublishedContent other)
+        {
+            return content.Id == other.Id;
+        }
+
+        public static bool IsNotEqual(this IPublishedContent content, IPublishedContent other)
+        {
+            return content.IsEqual(other) == false;
+        }
+
+        #endregion
+
+        #region IsSomething: ancestors and descendants
+
+        public static bool IsDescendant(this IPublishedContent content, IPublishedContent other)
+        {
+            return other.Level < content.Level && content.Path.InvariantStartsWith(other.Path.EnsureEndsWith(','));
+        }
+
+        public static bool IsDescendantOrSelf(this IPublishedContent content, IPublishedContent other)
+        {
+            return content.Path.InvariantEquals(other.Path) || content.IsDescendant(other);
+        }
+
+        public static bool IsAncestor(this IPublishedContent content, IPublishedContent other)
+        {
+            return content.Level < other.Level && other.Path.InvariantStartsWith(content.Path.EnsureEndsWith(','));
+        }
+
+        public static bool IsAncestorOrSelf(this IPublishedContent content, IPublishedContent other)
+        {
+            return other.Path.InvariantEquals(content.Path) || content.IsAncestor(other);
         }
 
         #endregion
@@ -643,6 +818,41 @@ namespace Umbraco.Core
         #region Axes: children
 
         /// <summary>
+        /// Gets the children of the content item.
+        /// </summary>
+        /// <param name="content">The content item.</param>
+        /// <param name="variationContextAccessor"></param>
+        /// <param name="culture">
+        /// The specific culture to get the url children for. Default is null which will use the current culture in <see cref="VariationContext"/>
+        /// </param>
+        /// <remarks>
+        /// <para>Gets children that are available for the specified culture.</para>
+        /// <para>Children are sorted by their sortOrder.</para>
+        /// <para>
+        /// For culture,
+        /// if null is used the current culture is used.
+        /// If an empty string is used only invariant children are returned.
+        /// If "*" is used all children are returned.
+        /// </para>
+        /// <para>
+        /// If a variant culture is specified or there is a current culture in the <see cref="VariationContext"/> then the Children returned
+        /// will include both the variant children matching the culture AND the invariant children because the invariant children flow with the current culture.
+        /// However, if an empty string is specified only invariant children are returned.
+        /// </para>
+        /// </remarks>
+        public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string culture = null)
+        {
+            // handle context culture for variant
+            if (culture == null)
+                culture = variationContextAccessor?.VariationContext?.Culture ?? "";
+
+            var children = content.ChildrenForAllCultures;
+            return culture == "*"
+                ? children
+                : children.Where(x => x.IsInvariantOrHasCulture(culture));
+        }
+
+        /// <summary>
         /// Gets the children of the content, filtered by a predicate.
         /// </summary>
         /// <param name="content">The content.</param>
@@ -744,7 +954,7 @@ namespace Umbraco.Core
 
         #endregion
 
-        #region Axes: Siblings
+        #region Axes: siblings
 
         /// <summary>
         /// Gets the siblings of the content.
@@ -861,6 +1071,21 @@ namespace Umbraco.Core
 
         #endregion
 
+        #region Writer and creator
+
+        public static string GetCreatorName(this IPublishedContent content, IUserService userService)
+        {
+            var user = userService.GetProfileById(content.CreatorId);
+            return user?.Name;
+        }
+
+        public static string GetWriterName(this IPublishedContent content, IUserService userService)
+        {
+            var user = userService.GetProfileById(content.WriterId);
+            return user?.Name;
+        }
+
+        #endregion
 
         /// <summary>
         /// Gets the url of the content item.
@@ -892,43 +1117,5 @@ namespace Umbraco.Core
             }
         }
 
-         #region Template
-
-        /// <summary>
-        /// Returns the current template Alias
-        /// </summary>
-        /// <param name="content"></param>
-        /// <returns>Empty string if none is set.</returns>
-        public static string GetTemplateAlias(this IPublishedContent content, IFileService fileService)
-        {
-            if(content.TemplateId.HasValue == false)
-            {
-                return string.Empty;
-            }
-
-            var template = fileService.GetTemplate(content.TemplateId.Value);
-            return template == null ? string.Empty : template.Alias;
-        }
-        public static bool IsAllowedTemplate(this IPublishedContent content, int templateId, IUmbracoSettingsSection umbracoSettingsSection, IContentTypeService contentTypeService)
-        {
-            if (umbracoSettingsSection.WebRouting.DisableAlternativeTemplates)
-                return content.TemplateId == templateId;
-
-            if (content.TemplateId == templateId || !umbracoSettingsSection.WebRouting.ValidateAlternativeTemplates)
-                return true;
-
-            var publishedContentContentType = contentTypeService.Get(content.ContentType.Id);
-            if (publishedContentContentType == null)
-                throw new NullReferenceException("No content type returned for published content (contentType='" + content.ContentType.Id + "')");
-
-            return publishedContentContentType.IsAllowedTemplate(templateId);
-        }
-        public static bool IsAllowedTemplate(this IPublishedContent content, string templateAlias,  IUmbracoSettingsSection umbracoSettingsSection, IContentTypeService contentTypeService, IFileService fileService)
-        {
-            var template = fileService.GetTemplate(templateAlias);
-            return template != null && content.IsAllowedTemplate(template.Id, umbracoSettingsSection, contentTypeService);
-        }
-
-        #endregion
     }
 }

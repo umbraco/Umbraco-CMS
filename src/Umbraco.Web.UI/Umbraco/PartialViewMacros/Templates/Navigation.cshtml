@@ -16,7 +16,7 @@
         @foreach (var item in selection)
         {
             <li class="@(item.IsAncestorOrSelf(Model.Content) ? "current" : null)">
-                <a href="@item.Url">@item.Name</a>
+                <a href="@item.Url()">@item.Name</a>
             </li>
         }
     </ul>

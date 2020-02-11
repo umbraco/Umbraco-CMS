@@ -4,8 +4,15 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Web.Composing;
+using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Mapping;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Tour;
@@ -17,11 +24,27 @@ namespace Umbraco.Web.Editors
     {
         private readonly TourFilterCollection _filters;
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+        private readonly IIOHelper _ioHelper;
 
-        public TourController(TourFilterCollection filters, IUmbracoSettingsSection umbracoSettingsSection)
+        public TourController(
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoHelper umbracoHelper,
+            IShortStringHelper shortStringHelper,
+            UmbracoMapper umbracoMapper,
+            TourFilterCollection filters,
+            IUmbracoSettingsSection umbracoSettingsSection,
+            IIOHelper ioHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
         {
             _filters = filters;
             _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
+            _ioHelper = ioHelper;
         }
 
         public IEnumerable<BackOfficeTourFile> GetTours()
@@ -42,7 +65,7 @@ namespace Umbraco.Web.Editors
             var nonPluginFilters = _filters.Where(x => x.PluginName == null).ToList();
 
             //add core tour files
-            var coreToursPath = Path.Combine(Current.IOHelper.MapPath(Core.Constants.SystemDirectories.Config), "BackOfficeTours");
+            var coreToursPath = Path.Combine(_ioHelper.MapPath(Core.Constants.SystemDirectories.Config), "BackOfficeTours");
             if (Directory.Exists(coreToursPath))
             {
                 foreach (var tourFile in Directory.EnumerateFiles(coreToursPath, "*.json"))
@@ -52,7 +75,7 @@ namespace Umbraco.Web.Editors
             }
 
             //collect all tour files in packages
-            var appPlugins = Current.IOHelper.MapPath(Core.Constants.SystemDirectories.AppPlugins);
+            var appPlugins = _ioHelper.MapPath(Core.Constants.SystemDirectories.AppPlugins);
             if (Directory.Exists(appPlugins))
             {
                 foreach (var plugin in Directory.EnumerateDirectories(appPlugins))

@@ -2,6 +2,7 @@
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Web.Cache;
@@ -22,19 +23,21 @@ namespace Umbraco.Web.Install.InstallSteps
         private readonly IGlobalSettings _globalSettings;
         private readonly IUserService _userService;
         private readonly IUmbracoVersion _umbracoVersion;
+        private readonly IIOHelper _ioHelper;
 
-        public SetUmbracoVersionStep(HttpContextBase httpContext, InstallHelper installHelper, IGlobalSettings globalSettings, IUserService userService, IUmbracoVersion umbracoVersion)
+        public SetUmbracoVersionStep(HttpContextBase httpContext, InstallHelper installHelper, IGlobalSettings globalSettings, IUserService userService, IUmbracoVersion umbracoVersion, IIOHelper ioHelper)
         {
             _httpContext = httpContext;
             _installHelper = installHelper;
             _globalSettings = globalSettings;
             _userService = userService;
             _umbracoVersion = umbracoVersion;
+            _ioHelper = ioHelper;
         }
 
         public override Task<InstallSetupResult> ExecuteAsync(object model)
         {
-            var security = new WebSecurity(_httpContext, _userService, _globalSettings);
+            var security = new WebSecurity(_httpContext, _userService, _globalSettings, _ioHelper);
 
             if (security.IsAuthenticated() == false && _globalSettings.ConfigurationStatus.IsNullOrWhiteSpace())
             {

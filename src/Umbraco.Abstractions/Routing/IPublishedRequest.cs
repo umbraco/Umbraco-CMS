@@ -143,8 +143,6 @@ namespace Umbraco.Web.Routing
 
         bool CacheabilityNoCache { get; set; }
 
-        //    PublishedContentHashtableConverter LegacyContentHashTable { get; set; }
-
         /// <summary>
         /// Prepares the request.
         /// </summary>
