@@ -31,21 +31,6 @@ namespace Umbraco.Web
         private static IExamineManager ExamineManager => Current.Factory.GetInstance<IExamineManager>();
         private static IUserService UserService => Current.Services.UserService;
 
-        #region IsComposedOf
-
-        /// <summary>
-        /// Gets a value indicating whether the content is of a content type composed of the given alias
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <param name="alias">The content type alias.</param>
-        /// <returns>A value indicating whether the content is of a content type composed of a content type identified by the alias.</returns>
-        public static bool IsComposedOf(this IPublishedContent content, string alias)
-        {
-            return content.ContentType.CompositionAliases.InvariantContains(alias);
-        }
-
-        #endregion
-
         #region Template
 
         /// <summary>
@@ -55,34 +40,26 @@ namespace Umbraco.Web
         /// <returns>Empty string if none is set.</returns>
         public static string GetTemplateAlias(this IPublishedContent content)
         {
-            if(content.TemplateId.HasValue == false)
-            {
-                return string.Empty;
-            }
-
-            var template = Current.Services.FileService.GetTemplate(content.TemplateId.Value);
-            return template == null ? string.Empty : template.Alias;
+            return content.GetTemplateAlias(Current.Services.FileService);
         }
 
         public static bool IsAllowedTemplate(this IPublishedContent content, int templateId)
         {
-            if (Current.Configs.Settings().WebRouting.DisableAlternativeTemplates)
-                return content.TemplateId == templateId;
-
-            if (content.TemplateId == templateId || !Current.Configs.Settings().WebRouting.ValidateAlternativeTemplates)
-                return true;
-
-            var publishedContentContentType = Current.Services.ContentTypeService.Get(content.ContentType.Id);
-            if (publishedContentContentType == null)
-                throw new NullReferenceException("No content type returned for published content (contentType='" + content.ContentType.Id + "')");
-
-            return publishedContentContentType.IsAllowedTemplate(templateId);
+            return content.IsAllowedTemplate(
+                Current.Services.ContentTypeService,
+                Current.Configs.Settings().WebRouting.DisableAlternativeTemplates,
+                Current.Configs.Settings().WebRouting.ValidateAlternativeTemplates,
+                templateId);
 
         }
         public static bool IsAllowedTemplate(this IPublishedContent content, string templateAlias)
         {
-            var template = Current.Services.FileService.GetTemplate(templateAlias);
-            return template != null && content.IsAllowedTemplate(template.Id);
+            return content.IsAllowedTemplate(
+                Current.Services.FileService,
+                Current.Services.ContentTypeService,
+                Current.Configs.Settings().WebRouting.DisableAlternativeTemplates,
+                Current.Configs.Settings().WebRouting.ValidateAlternativeTemplates,
+                templateAlias);
         }
 
         #endregion
@@ -101,14 +78,7 @@ namespace Umbraco.Web
         /// <remarks>Returns true if HasValue is true, or a fallback strategy can provide a value.</remarks>
         public static bool HasValue(this IPublishedContent content, string alias, string culture = null, string segment = null, Fallback fallback = default)
         {
-            var property = content.GetProperty(alias);
-
-            // if we have a property, and it has a value, return that value
-            if (property != null && property.HasValue(culture, segment))
-                return true;
-
-            // else let fallback try to get a value
-            return PublishedValueFallback.TryGetValue(content, alias, culture, segment, fallback, null, out _, out _);
+            return content.HasValue(PublishedValueFallback, alias, culture, segment, fallback);
         }
 
         /// <summary>
@@ -123,19 +93,7 @@ namespace Umbraco.Web
         /// <returns>The value of the content's property identified by the alias, if it exists, otherwise a default value.</returns>
         public static object Value(this IPublishedContent content, string alias, string culture = null, string segment = null, Fallback fallback = default, object defaultValue = default)
         {
-            var property = content.GetProperty(alias);
-
-            // if we have a property, and it has a value, return that value
-            if (property != null && property.HasValue(culture, segment))
-                return property.GetValue(culture, segment);
-
-            // else let fallback try to get a value
-            if (PublishedValueFallback.TryGetValue(content, alias, culture, segment, fallback, defaultValue, out var value, out property))
-                return value;
-
-            // else... if we have a property, at least let the converter return its own
-            // vision of 'no value' (could be an empty enumerable)
-            return property?.GetValue(culture, segment);
+            return content.Value(PublishedValueFallback, alias, culture, segment, fallback, defaultValue);
         }
 
         /// <summary>
@@ -151,19 +109,7 @@ namespace Umbraco.Web
         /// <returns>The value of the content's property identified by the alias, converted to the specified type.</returns>
         public static T Value<T>(this IPublishedContent content, string alias, string culture = null, string segment = null, Fallback fallback = default, T defaultValue = default)
         {
-            var property = content.GetProperty(alias);
-
-            // if we have a property, and it has a value, return that value
-            if (property != null && property.HasValue(culture, segment))
-                return property.Value<T>(culture, segment);
-
-            // else let fallback try to get a value
-            if (PublishedValueFallback.TryGetValue(content, alias, culture, segment, fallback, defaultValue, out var value, out property))
-                return value;
-
-            // else... if we have a property, at least let the converter return its own
-            // vision of 'no value' (could be an empty enumerable) - otherwise, default
-            return property == null ? default : property.Value<T>(culture, segment);
+            return content.Value<T>(PublishedValueFallback, alias, culture, segment, fallback, defaultValue);
         }
 
         #endregion
@@ -239,42 +185,7 @@ namespace Umbraco.Web
 
         #endregion
 
-        #region IsSomething: misc.
-
-        /// <summary>
-        /// Determines whether the specified content is a specified content type.
-        /// </summary>
-        /// <param name="content">The content to determine content type of.</param>
-        /// <param name="docTypeAlias">The alias of the content type to test against.</param>
-        /// <returns>True if the content is of the specified content type; otherwise false.</returns>
-        public static bool IsDocumentType(this IPublishedContent content, string docTypeAlias)
-        {
-            return content.ContentType.Alias.InvariantEquals(docTypeAlias);
-        }
-
-        /// <summary>
-        /// Determines whether the specified content is a specified content type or it's derived types.
-        /// </summary>
-        /// <param name="content">The content to determine content type of.</param>
-        /// <param name="docTypeAlias">The alias of the content type to test against.</param>
-        /// <param name="recursive">When true, recurses up the content type tree to check inheritance; when false just calls IsDocumentType(this IPublishedContent content, string docTypeAlias).</param>
-        /// <returns>True if the content is of the specified content type or a derived content type; otherwise false.</returns>
-        public static bool IsDocumentType(this IPublishedContent content, string docTypeAlias, bool recursive)
-        {
-            if (content.IsDocumentType(docTypeAlias))
-                return true;
-
-            return recursive && content.IsComposedOf(docTypeAlias);
-        }
-
-        #endregion
-
-        #region IsSomething: equality
-
-        public static bool IsEqual(this IPublishedContent content, IPublishedContent other)
-        {
-            return content.Id == other.Id;
-        }
+         #region IsSomething: equality
 
         public static HtmlString IsEqual(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
         {
@@ -284,11 +195,6 @@ namespace Umbraco.Web
         public static HtmlString IsEqual(this IPublishedContent content, IPublishedContent other, string valueIfTrue, string valueIfFalse)
         {
             return new HtmlString(content.IsEqual(other) ? valueIfTrue : valueIfFalse);
-        }
-
-        public static bool IsNotEqual(this IPublishedContent content, IPublishedContent other)
-        {
-            return content.IsEqual(other) == false;
         }
 
         public static HtmlString IsNotEqual(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
@@ -305,11 +211,6 @@ namespace Umbraco.Web
 
         #region IsSomething: ancestors and descendants
 
-        public static bool IsDescendant(this IPublishedContent content, IPublishedContent other)
-        {
-            return other.Level < content.Level && content.Path.InvariantStartsWith(other.Path.EnsureEndsWith(','));
-        }
-
         public static HtmlString IsDescendant(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
         {
             return content.IsDescendant(other, valueIfTrue, string.Empty);
@@ -318,11 +219,6 @@ namespace Umbraco.Web
         public static HtmlString IsDescendant(this IPublishedContent content, IPublishedContent other, string valueIfTrue, string valueIfFalse)
         {
             return new HtmlString(content.IsDescendant(other) ? valueIfTrue : valueIfFalse);
-        }
-
-        public static bool IsDescendantOrSelf(this IPublishedContent content, IPublishedContent other)
-        {
-            return content.Path.InvariantEquals(other.Path) || content.IsDescendant(other);
         }
 
         public static HtmlString IsDescendantOrSelf(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
@@ -335,11 +231,6 @@ namespace Umbraco.Web
             return new HtmlString(content.IsDescendantOrSelf(other) ? valueIfTrue : valueIfFalse);
         }
 
-        public static bool IsAncestor(this IPublishedContent content, IPublishedContent other)
-        {
-            return content.Level < other.Level && other.Path.InvariantStartsWith(content.Path.EnsureEndsWith(','));
-        }
-
         public static HtmlString IsAncestor(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
         {
             return content.IsAncestor(other, valueIfTrue, string.Empty);
@@ -348,11 +239,6 @@ namespace Umbraco.Web
         public static HtmlString IsAncestor(this IPublishedContent content, IPublishedContent other, string valueIfTrue, string valueIfFalse)
         {
             return new HtmlString(content.IsAncestor(other) ? valueIfTrue : valueIfFalse);
-        }
-
-        public static bool IsAncestorOrSelf(this IPublishedContent content, IPublishedContent other)
-        {
-            return other.Path.InvariantEquals(content.Path) || content.IsAncestor(other);
         }
 
         public static HtmlString IsAncestorOrSelf(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
@@ -664,7 +550,7 @@ namespace Umbraco.Web
 
         #endregion
 
-        #region Axes: Siblings
+        #region Axes: siblings
 
         /// <summary>
         /// Gets the siblings of the content.
