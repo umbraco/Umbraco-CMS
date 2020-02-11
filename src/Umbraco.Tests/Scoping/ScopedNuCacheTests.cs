@@ -122,7 +122,7 @@ namespace Umbraco.Tests.Scoping
             var umbracoContext = new UmbracoContext(
                 httpContext,
                 service,
-                new WebSecurity(httpContext, Current.Services.UserService, globalSettings, IOHelper),
+                new WebSecurity(httpContext, ServiceContext.UserService, globalSettings, IOHelper),
                 umbracoSettings ?? SettingsForTests.GetDefaultUmbracoSettings(),
                 urlProviders ?? Enumerable.Empty<IUrlProvider>(),
                 Enumerable.Empty<IMediaUrlProvider>(),
@@ -148,7 +148,7 @@ namespace Umbraco.Tests.Scoping
 
             // create document type, document
             var contentType = new ContentType(ShortStringHelper, -1) { Alias = "CustomDocument", Name = "Custom Document" };
-            Current.Services.ContentTypeService.Save(contentType);
+            ServiceContext.ContentTypeService.Save(contentType);
             var item = new Content("name", -1, contentType);
 
             // event handler
@@ -166,7 +166,7 @@ namespace Umbraco.Tests.Scoping
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                Current.Services.ContentService.SaveAndPublish(item);
+                ServiceContext.ContentService.SaveAndPublish(item);
                 scope.Complete();
             }
 
@@ -180,7 +180,7 @@ namespace Umbraco.Tests.Scoping
             using (var scope = ScopeProvider.CreateScope())
             {
                 item.Name = "changed";
-                Current.Services.ContentService.SaveAndPublish(item);
+                ServiceContext.ContentService.SaveAndPublish(item);
 
                 if (complete)
                     scope.Complete();

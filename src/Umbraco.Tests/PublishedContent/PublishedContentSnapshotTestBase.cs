@@ -71,7 +71,7 @@ namespace Umbraco.Tests.PublishedContent
             var umbracoContext = new UmbracoContext(
                 httpContext,
                 publishedSnapshotService.Object,
-                new WebSecurity(httpContext, Current.Services.UserService, globalSettings, IOHelper),
+                new WebSecurity(httpContext, ServiceContext.UserService, globalSettings, IOHelper),
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
                 Enumerable.Empty<IMediaUrlProvider>(),

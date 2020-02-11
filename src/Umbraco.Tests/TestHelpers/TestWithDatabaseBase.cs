@@ -53,8 +53,6 @@ namespace Umbraco.Tests.TestHelpers
         protected PublishedContentTypeCache ContentTypesCache { get; private set; }
 
         protected override ISqlSyntaxProvider SqlSyntax => GetSyntaxProvider();
-
-        protected ServiceContext ServiceContext => Current.Services;
         protected IVariationContextAccessor VariationContextAccessor => new TestVariationContextAccessor();
 
         internal ScopeProvider ScopeProvider => Current.ScopeProvider as ScopeProvider;
