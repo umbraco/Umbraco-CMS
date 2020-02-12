@@ -1,10 +1,6 @@
 ﻿NuCache Documentation
 ======================
 
-NOTE - RENAMING
-Facade = PublishedSnapshot
-and everything needs to be renamed accordingly
-
 HOW IT WORKS
 -------------
 
@@ -22,12 +18,12 @@ When reading the cache, we read views up the chain until we find a value (which 
 null) for the given id, and finally we read the store itself.
 
 
-The FacadeService manages a ContentStore for content, and another for media.
-When a Facade is created, the FacadeService gets ContentView objects from the stores.
+The PublishedSnapshotService manages a ContentStore for content, and another for media.
+When a PublishedSnapshot is created, the PublishedSnapshotService gets ContentView objects from the stores.
 Views provide an immutable snapshot of the content and media.
 
-When the FacadeService is notified of changes, it notifies the stores.
-Then it resync the current Facade, so that it requires new views, etc.
+When the PublishedSnapshotService is notified of changes, it notifies the stores.
+Then it resync the current PublishedSnapshot, so that it requires new views, etc.
 
 Whenever a content, media or member is modified or removed, the cmsContentNu table
 is updated with a json dictionary of alias => property value, so that a content,
@@ -50,32 +46,32 @@ Each ContentStore has a _freezeLock object used to protect the 'Frozen'
 state of the store. It's a disposable object that releases the lock when disposed,
 so usage would be: using (store.Frozen) { ... }.
 
-The FacadeService has a _storesLock object used to guarantee atomic access to the
+The PublishedSnapshotService has a _storesLock object used to guarantee atomic access to the
 set of content, media stores.
 
 
 CACHE
 ------
 
-For each set of views, the FacadeService creates a SnapshotCache. So a SnapshotCache
+For each set of views, the PublishedSnapshotService creates a SnapshotCache. So a SnapshotCache
 is valid until anything changes in the content or media trees. In other words, things
 that go in the SnapshotCache stay until a content or media is modified.
 
-For each Facade, the FacadeService creates a FacadeCache. So a FacadeCache is valid
-for the duration of the Facade (usually, the request). In other words, things that go
-in the FacadeCache stay (and are visible to) for the duration of the request only.
+For each PublishedSnapshot, the PublishedSnapshotService creates a PublishedSnapshotCache. So a PublishedSnapshotCache is valid
+for the duration of the PublishedSnapshot (usually, the request). In other words, things that go
+in the PublishedSnapshotCache stay (and are visible to) for the duration of the request only.
 
-The FacadeService defines a static constant FullCacheWhenPreviewing, that defines
+The PublishedSnapshotService defines a static constant FullCacheWhenPreviewing, that defines
 how caches operate when previewing:
 - when true, the caches in preview mode work normally.
-- when false, everything that would go to the SnapshotCache goes to the FacadeCache.
+- when false, everything that would go to the SnapshotCache goes to the PublishedSnapshotCache.
 At the moment it is true in the code, which means that eg converted values for
 previewed content will go in the SnapshotCache. Makes for faster preview, but uses
 more memory on the long term... would need some benchmarking to figure out what is
 best.
 
-Members only live for the duration of the Facade. So, for members SnapshotCache is
-never used, and everything goes to the FacadeCache.
+Members only live for the duration of the PublishedSnapshot. So, for members SnapshotCache is
+never used, and everything goes to the PublishedSnapshotCache.
 
 All cache keys are computed in the CacheKeys static class.
 
@@ -85,15 +81,15 @@ TESTS
 
 For testing purposes the following mechanisms exist:
 
-The Facade type has a static Current property that is used to obtain the 'current'
-facade in many places, going through the PublishedCachesServiceResolver to get the
-current service, and asking the current service for the current facade, which by
+The PublishedSnapshot type has a static Current property that is used to obtain the 'current'
+PublishedSnapshot in many places, going through the PublishedCachesServiceResolver to get the
+current service, and asking the current service for the current PublishedSnapshot, which by
 default relies on UmbracoContext. For test purposes, it is possible to override the
-entire mechanism by defining Facade.GetCurrentFacadeFunc which should return a facade.
+entire mechanism by defining PublishedSnapshot.GetCurrentPublishedSnapshotFunc which should return a PublishedSnapshot.
 
 A PublishedContent keeps only id-references to its parent and children, and needs a
 way to retrieve the actual objects from the cache - which depends on the current
-facade. It is possible to override the entire mechanism by defining PublishedContent.
+PublishedSnapshot. It is possible to override the entire mechanism by defining PublishedContent.
 GetContentByIdFunc or .GetMediaByIdFunc.
 
 Setting these functions must be done before Resolution is frozen.
@@ -110,7 +106,7 @@ possible to support detached contents & properties, even those that do not have 
 int id, but again this should be refactored entirely anyway.
 
 Not doing any row-version checks (see XmlStore) when reloading from database, though it
-is maintained in the database. Two FIXME in FacadeService. Should we do it?
+is maintained in the database. Two FIXME in PublishedSnapshotService. Should we do it?
 
 There is no on-disk cache at all so everything is reloaded from the cmsContentNu table
 when the site restarts. This is pretty fast, but we should experiment with solutions to

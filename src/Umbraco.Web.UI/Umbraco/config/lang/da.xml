@@ -661,7 +661,7 @@
     <key alias="icon">Ikon</key>
     <key alias="id">Id</key>
     <key alias="import">Importer</key>
-    <key alias="includeFromsubFolders">Inkludér undermapper i søgning</key>
+    <key alias="excludeFromSubFolders">Søg kun i denne mappe</key>
     <key alias="info">Info</key>
     <key alias="innerMargin">Indre margen</key>
     <key alias="insert">Indsæt</key>
@@ -1086,6 +1086,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="addCrop">Tilføj ny beskæring</key>
     <key alias="updateEditCrop">Acceptér</key>
     <key alias="undoEditCrop">Fortryd</key>
+    <key alias="customCrop">Brugerdefineret</key>
   </area>
   <area alias="rollback">
     <key alias="headline">Vælg en version at sammenligne med den nuværende version</key>

@@ -188,6 +188,10 @@ namespace Umbraco.Core.Migrations.Upgrade
             To<AddNewRelationTypes>("{0BC866BC-0665-487A-9913-0290BD0169AD}");
             To<AddPropertyTypeValidationMessageColumns>("{3D67D2C8-5E65-47D0-A9E1-DC2EE0779D6B}");
             To<MissingContentVersionsIndexes>("{EE288A91-531B-4995-8179-1D62D9AA3E2E}");
+            To<AddMainDomLock>("{2AB29964-02A1-474D-BD6B-72148D2A53A2}");
+
+
+            To<MissingDictionaryIndex>("{a78e3369-8ea3-40ec-ad3f-5f76929d2b20}");
 
             //FINAL
         }

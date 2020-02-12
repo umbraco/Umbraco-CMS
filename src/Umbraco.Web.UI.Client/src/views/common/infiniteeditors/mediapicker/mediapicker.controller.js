@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Editors.MediaPickerController",
-        function ($scope, $timeout, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService) {
+    function ($scope, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService, umbSessionStorage) {
 
             var vm = this;
             
@@ -23,6 +23,7 @@ angular.module("umbraco")
             vm.clickHandler = clickHandler;
             vm.clickItemName = clickItemName;
             vm.gotoFolder = gotoFolder;
+            vm.shouldShowUrl = shouldShowUrl;
 
             var dialogOptions = $scope.model;
             
@@ -36,6 +37,11 @@ angular.module("umbraco")
             $scope.cropSize = dialogOptions.cropSize;
             $scope.lastOpenedNode = localStorageService.get("umbLastOpenedMediaNodeId");
             $scope.lockedFolder = true;
+            $scope.allowMediaEdit = dialogOptions.allowMediaEdit ? dialogOptions.allowMediaEdit : false;
+
+            $scope.filterOptions = {
+                excludeSubFolders: umbSessionStorage.get("mediaPickerExcludeSubFolders") || false
+            };
 
             var userStartNodes = [];
 
@@ -391,6 +397,7 @@ angular.module("umbraco")
             }
 
             function toggle() {
+                umbSessionStorage.set("mediaPickerExcludeSubFolders", $scope.filterOptions.excludeSubFolders);
                 // Make sure to activate the changeSearch function everytime the toggle is clicked
                 changeSearch();
             }
@@ -403,7 +410,7 @@ angular.module("umbraco")
 
             function searchMedia() {
                 vm.loading = true;
-                entityResource.getPagedDescendants($scope.currentFolder.id, "Media", vm.searchOptions)
+                entityResource.getPagedDescendants($scope.filterOptions.excludeSubFolders ? $scope.currentFolder.id : $scope.startNodeId, "Media", vm.searchOptions)
                     .then(function (data) {
                         // update image data to work with image grid
                         angular.forEach(data.items, function (mediaItem) {
@@ -529,6 +536,19 @@ angular.module("umbraco")
                 if ($scope.model.updatedMediaNodes.indexOf(item.udi) === -1) {
                     $scope.model.updatedMediaNodes.push(item.udi);
                 }
+            }
+
+            function shouldShowUrl() {
+                if (!$scope.target) {
+                    return false;
+                }
+                if ($scope.target.id) {
+                    return false;
+                }
+                if ($scope.target.url && $scope.target.url.toLower().indexOf("blob:") === 0) {
+                    return false;
+                }
+                return true;
             }
 
             function submit() {
