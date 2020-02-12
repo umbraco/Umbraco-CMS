@@ -14,9 +14,7 @@ namespace Umbraco.Web.Editors
     //              initialized with all IEditorValidator instances
     //
     // validation is used exclusively in ContentTypeControllerBase
-    // the whole thing is internal at the moment, never released
-    // and, there are no IEditorValidator implementation in Core
-    // so... this all mechanism is basically useless
+    // currently the only implementations are for Models Builder.
 
     /// <summary>
     /// Provides a general object validator.

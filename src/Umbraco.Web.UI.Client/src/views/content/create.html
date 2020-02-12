@@ -36,7 +36,7 @@
 
             <ul class="umb-actions umb-actions-child" ng-if="selectContentType && allowedTypes.length > 0" aria-labelledby="selectContentType">
 
-                <li class="umb-action" data-element="action-create-{{docType.alias}}" ng-repeat="docType in allowedTypes | orderBy:'name':false">
+                <li class="umb-action" data-element="action-create-{{docType.alias}}" ng-repeat="docType in allowedTypes">
                     <button class="umb-action-link umb-outline btn-reset" ng-click="createOrSelectBlueprintIfAny(docType)" umb-auto-focus ng-if="$index === 0">
                         <i class="large icon {{docType.icon}}"></i>
                         <span class="menu-label">

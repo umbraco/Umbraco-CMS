@@ -28,6 +28,20 @@ namespace Umbraco.Web
         private static UmbracoContext UmbracoContext => Current.UmbracoContext;
         private static ISiteDomainHelper SiteDomainHelper => Current.Factory.GetInstance<ISiteDomainHelper>();
 
+        #region Creator/Writer Names
+
+        public static string CreatorName(this IPublishedContent content, IUserService userService)
+        {
+            return userService.GetProfileById(content.CreatorId)?.Name;
+        }
+
+        public static string WriterName(this IPublishedContent content, IUserService userService)
+        {
+            return userService.GetProfileById(content.WriterId)?.Name;
+        }
+
+        #endregion
+
         #region IsComposedOf
 
         /// <summary>
@@ -1193,7 +1207,7 @@ namespace Umbraco.Web
         /// if any. In addition, when the content type is multi-lingual, this is the url for the
         /// specified culture. Otherwise, it is the invariant url.</para>
         /// </remarks>
-        public static string Url(this IPublishedContent content, string culture = null, UrlMode mode = UrlMode.Auto)
+        public static string Url(this IPublishedContent content, string culture = null, UrlMode mode = UrlMode.Default)
         {
             var umbracoContext = Composing.Current.UmbracoContext;
 

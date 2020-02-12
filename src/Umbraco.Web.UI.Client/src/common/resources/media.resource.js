@@ -552,6 +552,36 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                         "Search",
                         args)),
                 'Failed to retrieve media items for search: ' + query);
+        },
+
+        getPagedReferences: function (id, options) {
+
+            var defaults = {
+                pageSize: 25,
+                pageNumber: 1,
+                entityType: "DOCUMENT"
+            };
+            if (options === undefined) {
+                options = {};
+            }
+            //overwrite the defaults if there are any specified
+            angular.extend(defaults, options);
+            //now copy back to the options we will use
+            options = defaults;
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "mediaApiBaseUrl",
+                        "GetPagedReferences",
+                        {
+                            id: id,
+                            entityType: options.entityType,
+                            pageNumber: options.pageNumber,
+                            pageSize: options.pageSize
+                        }
+                    )),
+                "Failed to retrieve usages for media of id " + id);
         }
 
     };

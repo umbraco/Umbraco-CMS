@@ -41,10 +41,9 @@
                                         </umb-node-preview>
 
                                         <button type="button"
-                                            style="max-width: 100%;"
-                                            class="umb-node-preview-add"
-                                            ng-click="vm.openSectionPicker()"
-                                            prevent-default>
+                                                class="umb-node-preview-add"
+                                                style="max-width: 100%;"
+                                                ng-click="vm.openSectionPicker()">
                                             <localize key="general_add">Add</localize>
                                         </button>
                                     </umb-control-group>
@@ -61,11 +60,12 @@
                                             on-remove="vm.clearStartNode('content')">
                                         </umb-node-preview>
 
-                                        <button type="button" ng-if="!vm.userGroup.contentStartNode"
-                                                style="max-width: 100%;"
+
+                                        <button type="button"
+                                                ng-if="!vm.userGroup.contentStartNode"
                                                 class="umb-node-preview-add"
-                                                ng-click="vm.openContentPicker()"
-                                                prevent-default>
+                                                style="max-width: 100%;"
+                                                ng-click="vm.openContentPicker()">
                                             <localize key="general_add">Add</localize>
                                         </button>
 
@@ -84,11 +84,12 @@
                                             on-remove="vm.clearStartNode('media')">
                                         </umb-node-preview>
 
-                                        <button type="button" ng-if="!vm.userGroup.mediaStartNode"
-                                                style="max-width: 100%;"
+
+                                        <button type="button"
+                                                ng-if="!vm.userGroup.mediaStartNode"
                                                 class="umb-node-preview-add"
-                                                ng-click="vm.openMediaPicker()"
-                                                prevent-default>
+                                                style="max-width: 100%;"
+                                                ng-click="vm.openMediaPicker()">
                                             <localize key="general_add">Add</localize>
                                         </button>
 
@@ -125,10 +126,10 @@
                                             on-edit="vm.setPermissionsForNode(node)">
                                         </umb-node-preview>
 
-                                        <button type="button" style="max-width: 100%;"
+                                        <button type="button"
                                                 class="umb-node-preview-add"
-                                                ng-click="vm.openGranularPermissionsPicker()"
-                                                prevent-default>
+                                                style="max-width: 100%;"
+                                                ng-click="vm.openGranularPermissionsPicker()">
                                             <localize key="general_add">Add</localize>
                                         </button>
                                     </umb-control-group>
@@ -152,10 +153,9 @@
                                         on-remove="vm.removeSelectedItem($index, vm.userGroup.users)">
                                     </umb-user-preview>
 
-                                    <button type="button" style="max-width: 100%;"
+                                    <button type="button"
                                             class="umb-node-preview-add"
-                                            ng-click="vm.openUserPicker()"
-                                            prevent-default>
+                                            ng-click="vm.openUserPicker()">
                                         <localize key="general_add">Add</localize>
                                     </button>
 

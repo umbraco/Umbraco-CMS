@@ -80,7 +80,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Icon = source.ContentType.Icon;
             target.Id = source.Id;
             target.IsBlueprint = source.Blueprint;
-            target.IsChildOfListView = DermineIsChildOfListView(source);
+            target.IsChildOfListView = DetermineIsChildOfListView(source);
             target.IsContainer = source.ContentType.IsContainer;
             target.IsElement = source.ContentType.IsElement;
             target.Key = source.Key;
@@ -211,7 +211,7 @@ namespace Umbraco.Web.Models.Mapping
             return source.CultureInfos.TryGetValue(culture, out var name) && !name.Name.IsNullOrWhiteSpace() ? name.Name : $"({source.Name})";
         }
 
-        private bool DermineIsChildOfListView(IContent source)
+        private bool DetermineIsChildOfListView(IContent source)
         {
             // map the IsChildOfListView (this is actually if it is a descendant of a list view!)
             var parent = _contentService.GetParent(source);

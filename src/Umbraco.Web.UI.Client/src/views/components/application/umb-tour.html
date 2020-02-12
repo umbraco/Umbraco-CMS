@@ -4,7 +4,7 @@
 
     <div class="umb-tour__pulse"></div>
 
-    <div class="umb-tour__popover shadow-depth-2" ng-class="{'umb-tour__popover--l': model.currentStep.type === 'intro' || model.currentStepIndex === model.steps.length}">
+    <div class="umb-tour__popover shadow-depth-2" ng-class="{'umb-tour__popover--l': model.currentStep.type === 'intro' || model.currentStepIndex === model.steps.length, 'umb-tour__popover--promotion': model.currentStep.type === 'promotion'}">
 
         <div ng-if="!configuredView && !elementNotFound">
 
@@ -70,7 +70,7 @@
 
         <!-- Dom element not found error -->
         <div ng-if="elementNotFound && !loadingStep">
-            <umb-tour-step class="tc">
+            <umb-tour-step class="tc" on-close="model.endTour()">
                 <umb-tour-step-header>
                     <h4 class="bold color-red">Oh, we got lost!</h4>
                 </umb-tour-step-header>
