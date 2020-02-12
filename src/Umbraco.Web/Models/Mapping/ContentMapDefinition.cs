@@ -5,6 +5,7 @@ using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Routing;
@@ -80,7 +81,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Icon = source.ContentType.Icon;
             target.Id = source.Id;
             target.IsBlueprint = source.Blueprint;
-            target.IsChildOfListView = DermineIsChildOfListView(source);
+            target.IsChildOfListView = DetermineIsChildOfListView(source, context);
             target.IsContainer = source.ContentType.IsContainer;
             target.IsElement = source.ContentType.IsElement;
             target.Key = source.Key;
@@ -211,8 +212,33 @@ namespace Umbraco.Web.Models.Mapping
             return source.CultureInfos.TryGetValue(culture, out var name) && !name.Name.IsNullOrWhiteSpace() ? name.Name : $"({source.Name})";
         }
 
-        private bool DermineIsChildOfListView(IContent source)
+        /// <summary>
+        /// Checks if the content item is a descendant of a list view
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="context"></param>
+        /// <returns>
+        /// Returns true if the content item is a descendant of a list view and where the content is
+        /// not a current user's start node.
+        /// </returns>
+        /// <remarks>
+        /// We must check if it's the current user's start node because in that case we will actually be
+        /// rendering the tree node underneath the list view to visually show context. In this case we return
+        /// false because the item is technically not being rendered as part of a list view but instead as a
+        /// real tree node. If we didn't perform this check then tree syncing wouldn't work correctly.
+        /// </remarks>
+        private bool DetermineIsChildOfListView(IContent source, MapperContext context)
         {
+            // In cases where a user's start node is below a list view, we will actually render
+            // out the tree to that start node and in that case for that start node, we want to return
+            // false here.
+            if (context.HasItems && context.Items.TryGetValue("CurrentUser", out var usr) && usr is IUser currentUser)
+            {
+                if (currentUser.StartContentIds.Contains(source.Id))
+                    return false;
+            }
+
+
             // map the IsChildOfListView (this is actually if it is a descendant of a list view!)
             var parent = _contentService.GetParent(source);
             return parent != null && (parent.ContentType.IsContainer || _contentTypeService.HasContainerInPath(parent.Path));
