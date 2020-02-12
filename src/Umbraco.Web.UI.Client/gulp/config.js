@@ -3,10 +3,12 @@
 module.exports = {
     compile: {
         build: {
-            sourcemaps: false
+            sourcemaps: false,
+            embedtemplates: true
         },
         dev: {
-            sourcemaps: true
+            sourcemaps: true,
+            embedtemplates: false
         }
     },
     sources: {
