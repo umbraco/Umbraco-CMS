@@ -4,7 +4,6 @@ using System.Linq;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Routing
 {
@@ -144,7 +143,7 @@ namespace Umbraco.Web.Routing
             var provider = _urlProviders.OfType<DefaultUrlProvider>().FirstOrDefault();
             var url = provider == null
                 ? route // what else?
-                : provider.GetUrlFromRoute(route, Current.UmbracoContext, id, _umbracoContext.CleanedUmbracoUrl, Mode, culture)?.Text;
+                : provider.GetUrlFromRoute(route, _umbracoContext, id, _umbracoContext.CleanedUmbracoUrl, Mode, culture)?.Text;
             return url ?? "#";
         }
 
