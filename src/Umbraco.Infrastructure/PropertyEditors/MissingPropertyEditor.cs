@@ -8,7 +8,7 @@ namespace Umbraco.Core.PropertyEditors
     /// </summary>
     public class MissingPropertyEditor : IDataEditor
     {
-        public string Alias => "missing";
+        public string Alias => "Umbraco.Missing";
 
         public EditorType Type => EditorType.Nothing;
 
