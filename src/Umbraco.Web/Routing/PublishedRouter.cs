@@ -20,7 +20,6 @@ namespace Umbraco.Web.Routing
     /// </summary>
     public class PublishedRouter : IPublishedRouter
     {
-        private readonly IWebRoutingSection _webRoutingSection;
         private readonly ContentFinderCollection _contentFinders;
         private readonly IContentLastChanceFinder _contentLastChanceFinder;
         private readonly ServiceContext _services;
@@ -34,7 +33,6 @@ namespace Umbraco.Web.Routing
         /// Initializes a new instance of the <see cref="PublishedRouter"/> class.
         /// </summary>
         public PublishedRouter(
-            IWebRoutingSection webRoutingSection,
             ContentFinderCollection contentFinders,
             IContentLastChanceFinder contentLastChanceFinder,
             IVariationContextAccessor variationContextAccessor,
@@ -43,7 +41,6 @@ namespace Umbraco.Web.Routing
             IUmbracoSettingsSection umbracoSettingsSection,
             IUserService userService)
         {
-            _webRoutingSection = webRoutingSection ?? throw new ArgumentNullException(nameof(webRoutingSection));
             _contentFinders = contentFinders ?? throw new ArgumentNullException(nameof(contentFinders));
             _contentLastChanceFinder = contentLastChanceFinder ?? throw new ArgumentNullException(nameof(contentLastChanceFinder));
             _services = services ?? throw new ArgumentNullException(nameof(services));
@@ -644,74 +641,14 @@ namespace Umbraco.Web.Routing
                 return;
             }
 
-            // read the alternate template alias, from querystring, form, cookie or server vars,
-            // only if the published content is the initial once, else the alternate template
-            // does not apply
-            // + optionally, apply the alternate template on internal redirects
-            var useAltTemplate = request.IsInitialPublishedContent
-                || (_webRoutingSection.InternalRedirectPreservesTemplate && request.IsInternalRedirectPublishedContent);
-            var altTemplate = useAltTemplate
-                ? request.UmbracoContext.HttpContext.Request[Constants.Conventions.Url.AltTemplate]
-                : null;
-
-            if (string.IsNullOrWhiteSpace(altTemplate))
+            if (request.HasTemplate)
             {
-                // we don't have an alternate template specified. use the current one if there's one already,
-                // which can happen if a content lookup also set the template (LookupByNiceUrlAndTemplate...),
-                // else lookup the template id on the document then lookup the template with that id.
-
-                if (request.HasTemplate)
-                {
-                    _logger.Debug<PublishedRequest>("FindTemplate: Has a template already, and no alternate template.");
-                    return;
-                }
-
-                // TODO: When we remove the need for a database for templates, then this id should be irrelevant,
-                // not sure how were going to do this nicely.
-
-                // TODO: We need to limit altTemplate to only allow templates that are assigned to the current document type!
-                // if the template isn't assigned to the document type we should log a warning and return 404
-
-                var templateId = request.PublishedContent.TemplateId;
-                request.TemplateModel = GetTemplateModel(templateId);
+                _logger.Debug<PublishedRequest>("FindTemplate: Has a template already, and no alternate template.");
+                return;
             }
-            else
-            {
-                // we have an alternate template specified. lookup the template with that alias
-                // this means the we override any template that a content lookup might have set
-                // so /path/to/page/template1?altTemplate=template2 will use template2
 
-                // ignore if the alias does not match - just trace
-
-                if (request.HasTemplate)
-                    _logger.Debug<PublishedRouter>("FindTemplate: Has a template already, but also an alternative template.");
-                _logger.Debug<PublishedRouter>("FindTemplate: Look for alternative template alias={AltTemplate}", altTemplate);
-
-                // IsAllowedTemplate deals both with DisableAlternativeTemplates and ValidateAlternativeTemplates settings
-                if (request.PublishedContent.IsAllowedTemplate(altTemplate))
-                {
-                    // allowed, use
-                    var template = _services.FileService.GetTemplate(altTemplate);
-
-                    if (template != null)
-                    {
-                        request.TemplateModel = template;
-                        _logger.Debug<PublishedRouter>("FindTemplate: Got alternative template id={TemplateId} alias={TemplateAlias}", template.Id, template.Alias);
-                    }
-                    else
-                    {
-                        _logger.Debug<PublishedRouter>("FindTemplate: The alternative template with alias={AltTemplate} does not exist, ignoring.", altTemplate);
-                    }
-                }
-                else
-                {
-                    _logger.Warn<PublishedRouter>("FindTemplate: Alternative template {TemplateAlias} is not allowed on node {NodeId}, ignoring.", altTemplate, request.PublishedContent.Id);
-
-                    // no allowed, back to default
-                    var templateId = request.PublishedContent.TemplateId;
-                    request.TemplateModel = GetTemplateModel(templateId);
-                }
-            }
+            var templateId = request.PublishedContent.TemplateId;
+            request.TemplateModel = GetTemplateModel(templateId);
 
             if (request.HasTemplate == false)
             {

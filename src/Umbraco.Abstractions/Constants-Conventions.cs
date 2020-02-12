@@ -137,7 +137,7 @@ namespace Umbraco.Core
                 public static readonly string UmbracoMemberProviderName = "UmbracoMembershipProvider";
 
                 public static readonly string UmbracoRoleProviderName = "UmbracoRoleProvider";
-                
+
                 /// <summary>
                 /// Property alias for the Comments on a Member
                 /// </summary>
@@ -206,17 +206,6 @@ namespace Umbraco.Core
                 public const string SystemDefaultProtectType = "_umbracoSystemDefaultProtectType";
 
                 public const string AllMembersListId = "all-members";
-            }
-
-            /// <summary>
-            /// Constants for Umbraco URLs/Querystrings.
-            /// </summary>
-            public static class Url
-            {
-                /// <summary>
-                /// Querystring parameter name used for Umbraco's alternative template functionality.
-                /// </summary>
-                public const string AltTemplate = "altTemplate";
             }
 
             /// <summary>
