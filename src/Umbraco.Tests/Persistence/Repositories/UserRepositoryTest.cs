@@ -407,6 +407,35 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
+        [Test]
+        public void Can_Invalidate_SecurityStamp_On_Username_Change()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
+            {
+                var repository = CreateRepository(provider);
+                var userGroupRepository = CreateUserGroupRepository(provider);
+
+                var user = CreateAndCommitUserWithGroup(repository, userGroupRepository);
+                var originalSecurityStamp = user.SecurityStamp;
+
+                // Ensure when user generated a security stamp is present
+                Assert.That(user.SecurityStamp, Is.Not.Null);
+                Assert.That(user.SecurityStamp, Is.Not.Empty);
+
+                // Update username
+                user.Username = user.Username + "UPDATED";
+                repository.Save(user);
+
+                // Get the user
+                var updatedUser = repository.Get(user.Id);
+
+                // Ensure the Security Stamp is invalidated & no longer the same
+                Assert.AreNotEqual(originalSecurityStamp, updatedUser.SecurityStamp);
+            }
+        }
+
         private void AssertPropertyValues(IUser updatedItem, IUser originalUser)
         {
             Assert.That(updatedItem.Id, Is.EqualTo(originalUser.Id));
