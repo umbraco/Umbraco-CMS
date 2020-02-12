@@ -40,10 +40,6 @@ namespace Umbraco.Tests.TestHelpers
             // need to specify a custom callback for unit tests
             // AutoPublishedContentTypes generates properties automatically
 
-            var dataTypeService = new TestObjects.TestDataTypeService(
-                new DataType(new VoidEditor(Mock.Of<ILogger>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>())) { Id = 1 });
-
-            var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
             var type = new AutoPublishedContentType(0, "anything", new PublishedPropertyType[] { });
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => GetPublishedContentTypeByAlias(alias) ?? type;
         }
@@ -87,15 +83,9 @@ namespace Umbraco.Tests.TestHelpers
 </root>";
         }
 
-        internal PublishedRouter CreatePublishedRouter(IFactory container = null, ContentFinderCollection contentFinders = null)
-        {
-            return CreatePublishedRouter(TestObjects.GetUmbracoSettings().WebRouting, container ?? Factory, contentFinders);
-        }
-
-        internal static PublishedRouter CreatePublishedRouter(IWebRoutingSection webRoutingSection, IFactory container = null, ContentFinderCollection contentFinders = null)
+        internal static PublishedRouter CreatePublishedRouter(IFactory container = null, ContentFinderCollection contentFinders = null)
         {
             return new PublishedRouter(
-                webRoutingSection,
                 contentFinders ?? new ContentFinderCollection(Enumerable.Empty<IContentFinder>()),
                 new TestLastChanceFinder(),
                 new TestVariationContextAccessor(),
