@@ -21,17 +21,20 @@ namespace Umbraco.Web.Editors
             // Umbraco.Web.PublishedModels
             // Umbraco.Web.PublishedModels.Products
 
-            // Models Builder one has a custom attribute (As the name of the assembly is some weird guid at times)
-            // But DLL & AppCode both have this attribute, so we can identify this the assembly we want to get types from
-            // assembly.customAttributes[0].AttributeType.FullName == "Umbraco.ModelsBuilder.Embedded.ModelsBuilderAssemblyAttribute"
-            var modelsBuilderAssembly = AppDomain.CurrentDomain.GetAssemblies()
-                .SingleOrDefault(asmb => asmb.CustomAttributes
-                .Any(attr => attr.AttributeType.FullName == "Umbraco.ModelsBuilder.Embedded.ModelsBuilderAssemblyAttribute"));
+            // TODO: Use TypeFinder or TypeLoader
 
-            if (modelsBuilderAssembly == null)
+
+            // Find only the types/classes that have the ModelsBuilder attribute of
+            // [Umbraco.Core.Models.PublishedContent.PublishedModelAttribute]
+            var modelsBuilderTypes = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(t => t.GetTypes())
+                .Where(x => x.GetCustomAttributes()
+                .Any(attr => attr.GetType().Equals(typeof(PublishedModelAttribute))));
+
+            if(modelsBuilderTypes.Count() == 0)
             {
                 // No ModelsBuilder stuff found
-                return null;
+                return completions;
             }
 
             // Filter/select the type that contains/partial matches from modelName passed in
@@ -39,11 +42,11 @@ namespace Umbraco.Web.Editors
             // Name: Contact
             // Namespace: Umbraco.Web.PublishedModels
 
-            var modelType = modelsBuilderAssembly.GetTypes().SingleOrDefault(x => x.Name.ToLowerInvariant() == modelName.ToLowerInvariant());
+            var modelType = modelsBuilderTypes.SingleOrDefault(x => x.Name.ToLowerInvariant() == modelName.ToLowerInvariant());
             if (modelType == null)
             {
                 // No Type/Class that matches on the requested model to this WebAPI
-                return null;
+                return completions;
             }
 
             // [PublishedModel(ContentTypeAlias="contact")]
