@@ -669,7 +669,6 @@
     <Compile Include="Mvc\ControllerExtensions.cs" />
     <Compile Include="Routing\ContentFinderByIdPath.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />
-    <Compile Include="Routing\PublishedRequest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
