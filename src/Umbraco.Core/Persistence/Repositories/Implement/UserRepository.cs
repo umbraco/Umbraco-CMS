@@ -557,6 +557,16 @@ ORDER BY colName";
                 }
             }
 
+            // If userlogin or the email has changed then need to reset security stamp
+            if (changedCols.Contains("userLogin") || changedCols.Contains("userEmail"))
+            {
+                userDto.EmailConfirmedDate = null;
+                userDto.SecurityStampToken = entity.SecurityStamp = Guid.NewGuid().ToString();
+                
+                changedCols.Add("emailConfirmedDate");
+                changedCols.Add("securityStampToken");  
+            }
+
             //only update the changed cols
             if (changedCols.Count > 0)
             {
