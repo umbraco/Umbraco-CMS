@@ -9,16 +9,35 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     public class BlockListConfiguration
     {
-        [ConfigurationField("elementTypes", "Element Types", "views/propertyeditors/blocklist/blocklist.elementtypepicker.html", Description = "Select the Element Types to use as models for the items.")]
+
+        // TODO: rename this to blockDefinitions, cause its not elementTypes, its a dictionary of objects that define blocks, part of a block is the elementType used as content model.
+        [ConfigurationField("elementTypes", "Available Blocks", "views/propertyeditors/blocklist/prevalue/blocklist.elementtypepicker.html", Description = "Define the available blocks.")]
         public ElementType[] ElementTypes { get; set; }
 
-        // TODO: Fill me in
+        [ConfigurationField("minNumber", "Minimum amount", "number")]
+        public int MinNumber { get; set; }
+
+        [ConfigurationField("maxNumber", "Maximum amount", "number")]
+        public int MaxNumber { get; set; }
 
         public class ElementType
         {
+            // TODO: rename this to contentElementTypeAlias, I would like this to be specific, since we have the settings.
             [JsonProperty("elementTypeAlias")]
             public string Alias { get; set; }
+
+            [JsonProperty("settingsElementTypeAlias")]
+            public string SettingsElementTypeAlias { get; set; }
+
+            [JsonProperty("view")]
+            public string View { get; set; }
+
+            [JsonProperty("labelTemplate")]
+            public string Template { get; set; }
         }
+
+        [ConfigurationField("useAccordionsAsDefault", "Inline editing mode", "boolean", Description = "Use the inline editor as the default block view")]
+        public bool useInlineEditingAsDefault { get; set; }
 
     }
 }

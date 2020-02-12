@@ -22,7 +22,8 @@ namespace Umbraco.Web.PropertyEditors
         { }
 
         #region Pre Value Editor
-        //protected override IConfigurationEditor CreateConfigurationEditor() => new BlockEditorListConfigurationEditor();
+
+        protected override IConfigurationEditor CreateConfigurationEditor() => new BlockListConfigurationEditor();
 
         #endregion
 

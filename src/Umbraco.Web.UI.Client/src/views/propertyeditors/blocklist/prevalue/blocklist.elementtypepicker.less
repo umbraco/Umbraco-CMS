@@ -1,0 +1,114 @@
+.umb-block-list-element-type-picker {
+
+    .block-entry {
+        cursor: grab;
+        background-color: white;
+        border-radius: @baseBorderRadius;
+    }
+
+    .umb-table-head {
+        button {
+            margin-left: 5px;
+            color: @ui-action-discreet-type;
+            &:hover {
+                color: @ui-action-discreet-type-hover;
+            }
+        }
+    }
+
+    .umb-table-cell {
+        padding-left: 10px;
+        padding-right: 0;
+        &.action-cell {
+            padding-right: 15px;
+        }
+    }
+
+    .action-cell {
+        flex: 0 0 30px;
+    }
+
+    .text-input {
+        width: 100%;
+    }
+
+    .umb-node-preview {
+        flex-grow: 1;
+    }
+
+    .cell-btn {
+        position: relative;
+        opacity: 0;
+        color: @ui-action-discreet-type;
+        height: 30px;
+        width: 26px;
+        margin-top: 1px;
+        &:hover {
+            color: @ui-action-discreet-type-hover;
+        }
+        &:last-of-type {
+            margin-right: 7px;
+        }
+    }
+    .umb-table-cell:hover,
+    .umb-table-cell:focus,
+    .umb-table-cell:focus-within {
+        .cell-btn {
+            opacity: 1;
+        }
+    }
+
+    .settings-input {
+        position: relative;
+        padding: 5px 8px;
+        color: @ui-action-discreet-type;
+        border: 1px dashed @ui-action-discreet-border;
+        width: 100%;
+        font-weight: bold;
+        display: flex;
+        flex-flow: row nowrap;
+
+        localize {
+            width: 100%;
+        }
+
+        .umb-node-preview {
+            padding: 3px 0;
+            margin-left: 5px;
+        }
+
+        &.--noValue {
+            text-align: center;
+            border-radius: @baseBorderRadius;
+            &:hover {
+                color: @ui-action-discreet-type-hover;
+                border-color: @ui-action-discreet-border-hover;
+            }
+        }
+
+        &.--hasValue {
+            border: 1px solid @inputBorder;
+            padding: 0;
+        }
+    }
+
+    .add-button {
+        width:100%;
+        color: @ui-action-discreet-type;
+        border: 1px dashed @ui-action-discreet-border;
+        border-radius: @baseBorderRadius;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px 15px;
+        box-sizing: border-box;
+        margin: 10px 0;
+        font-weight: bold;
+    }
+    
+    .add-button:hover {
+        color: @ui-action-discreet-type-hover;
+        border-color: @ui-action-discreet-border-hover;
+    }
+
+}

@@ -235,6 +235,7 @@
     <Compile Include="Profiling\WebProfilingController.cs" />
     <Compile Include="PropertyEditors\BlockEditorPropertyEditor.cs" />
     <Compile Include="PropertyEditors\BlockListConfiguration.cs" />
+    <Compile Include="PropertyEditors\BlockListConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\BlockListPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
