@@ -209,6 +209,17 @@ namespace Umbraco.Core
             }
 
             /// <summary>
+            /// Constants for Umbraco URLs/Querystrings.
+            /// </summary>
+            public static class Url
+            {
+                /// <summary>
+                /// Querystring parameter name used for Umbraco's alternative template functionality.
+                /// </summary>
+                public const string AltTemplate = "altTemplate";
+            }
+
+            /// <summary>
             /// Defines the alias identifiers for built-in Umbraco relation types.
             /// </summary>
             public static class RelationTypes
@@ -274,6 +285,7 @@ namespace Umbraco.Core
 
                 //TODO: return a list of built in types so we can use that to prevent deletion in the uI
             }
+
         }
     }
 }
