@@ -173,7 +173,6 @@
     <Compile Include="Models\Identity\IdentityMapDefinition.cs" />
     <Compile Include="Models\Identity\IdentityUser.cs" />
     <Compile Include="Models\Identity\UserLoginInfoWrapper.cs" />
-    <Compile Include="Models\ImageProcessorImageUrlGenerator.cs" />
     <Compile Include="Models\Mapping\CommonMapper.cs" />
     <Compile Include="Models\Mapping\ContentMapDefinition.cs" />
     <Compile Include="Models\Mapping\ContentPropertyBasicMapper.cs" />
@@ -190,9 +189,11 @@
     <Compile Include="Models\Mapping\TabsAndPropertiesMapper.cs" />
     <Compile Include="Models\Mapping\UserMapDefinition.cs" />
     <Compile Include="Models\Membership\UmbracoMembershipMember.cs" />
-    <Compile Include="Models\PublishedContent\HybridVariationContextAccessor.cs" />
     <Compile Include="Models\Trees\MenuItemCollection.cs" />
     <Compile Include="Models\Trees\MenuItemList.cs" />
+    <Compile Include="Models\Trees\TreeNodeCollection.cs" />
+    <Compile Include="Models\Trees\TreeNodeExtensions.cs" />
+    <Compile Include="Models\Trees\TreeRootNode.cs" />
     <Compile Include="Mvc\HttpUmbracoFormRouteStringException.cs" />
     <Compile Include="Mvc\ModelBindingExceptionFilter.cs" />
     <Compile Include="Mvc\StatusCodeFilterAttribute.cs" />
@@ -308,10 +309,8 @@
     <Compile Include="Features\DisabledFeatures.cs" />
     <Compile Include="Features\EnabledFeatures.cs" />
     <Compile Include="Features\UmbracoFeatures.cs" />
-    <Compile Include="HybridAccessorBase.cs" />
     <Compile Include="HybridUmbracoContextAccessor.cs" />
     <Compile Include="HttpContextUmbracoContextAccessor.cs" />
-    <Compile Include="HybridEventMessagesAccessor.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Composing\CompositionExtensions\WebMappingProfiles.cs" />
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
@@ -329,10 +328,6 @@
     <Compile Include="Editors\IEditorValidator.cs" />
     <Compile Include="Editors\EditorModelEventManager.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
-    <Compile Include="Models\ContentTypeImportModel.cs" />
-    <Compile Include="Models\PublishedContent\HttpContextVariationContextAccessor.cs" />
-    <Compile Include="Models\PublishedContent\PublishedValueFallback.cs" />
-    <Compile Include="Models\Trees\ExportMember.cs" />
     <Compile Include="Composing\ModuleInjector.cs" />
     <Compile Include="Mvc\FilteredControllerFactoryCollection.cs" />
     <Compile Include="Mvc\FilteredControllerFactoryCollectionBuilder.cs" />
@@ -381,7 +376,6 @@
     <Compile Include="Editors\PublishedSnapshotCacheStatusController.cs" />
     <Compile Include="Trees\TreeAttribute.cs" />
     <Compile Include="Routing\NotFoundHandlerHelper.cs" />
-    <Compile Include="Models\LocalPackageInstallModel.cs" />
     <Compile Include="Mvc\ControllerContextExtensions.cs" />
     <Compile Include="Mvc\DisableBrowserCacheAttribute.cs" />
     <Compile Include="Mvc\EnsurePartialViewMacroViewContextFilterAttribute.cs" />
@@ -496,7 +490,6 @@
     <Compile Include="Trees\LanguageTreeController.cs" />
     <Compile Include="Trees\MemberTreeController.cs" />
     <Compile Include="Trees\MenuRenderingEventArgs.cs" />
-    <Compile Include="Models\Trees\CreateChildEntity.cs" />
     <Compile Include="Trees\TemplatesTreeController.cs" />
     <Compile Include="Trees\TreeControllerBase.cs" />
     <Compile Include="JavaScript\AssetInitialization.cs" />
@@ -538,10 +531,7 @@
     <Compile Include="FormDataCollectionExtensions.cs" />
     <Compile Include="Trees\MediaTreeController.cs" />
     <Compile Include="Trees\ContentTreeControllerBase.cs" />
-    <Compile Include="Models\Trees\TreeRootNode.cs" />
     <Compile Include="Trees\TreeController.cs" />
-    <Compile Include="Models\Trees\TreeNodeCollection.cs" />
-    <Compile Include="Models\Trees\TreeNodeExtensions.cs" />
     <Compile Include="Trees\TreeNodeRenderingEventArgs.cs" />
     <Compile Include="Trees\TreeNodesRenderingEventArgs.cs" />
     <Compile Include="Trees\TreeQueryStringParameters.cs" />

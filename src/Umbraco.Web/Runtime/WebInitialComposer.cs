@@ -72,7 +72,7 @@ namespace Umbraco.Web.Runtime
             composition.Register<IFilePermissionHelper, FilePermissionHelper>(Lifetime.Singleton);
 
             composition.RegisterUnique<IHttpContextAccessor, AspNetHttpContextAccessor>(); // required for hybrid accessors
-            composition.RegisterUnique<ICookieManager, AspNetCookieManager>(); 
+            composition.RegisterUnique<ICookieManager, AspNetCookieManager>();
 
             composition.ComposeWebMappingProfiles();
 
@@ -89,7 +89,7 @@ namespace Umbraco.Web.Runtime
 
             // register accessors for cultures
             composition.RegisterUnique<IDefaultCultureAccessor, DefaultCultureAccessor>();
-            composition.RegisterUnique<IVariationContextAccessor, HybridVariationContextAccessor>();
+
 
             // register the http context and umbraco context accessors
             // we *should* use the HttpContextUmbracoContextAccessor, however there are cases when

@@ -2,6 +2,8 @@
 using System.Web.UI;
 using ClientDependency.Core;
 using ClientDependency.Core.CompositeFiles;
+using Umbraco.Composing;
+using Umbraco.Core.Hosting;
 
 namespace Umbraco.Web.Mvc
 {
@@ -13,6 +15,18 @@ namespace Umbraco.Web.Mvc
     /// </remarks>
     public class MinifyJavaScriptResultAttribute : ActionFilterAttribute
     {
+        private readonly IHostingEnvironment _hostingEnvironment;
+
+        public MinifyJavaScriptResultAttribute()
+        {
+            _hostingEnvironment = Current.HostingEnvironment;
+        }
+
+        public MinifyJavaScriptResultAttribute(IHostingEnvironment hostingEnvironment)
+        {
+            _hostingEnvironment = hostingEnvironment;
+        }
+
         /// <summary>
         /// Minify the result if in release mode
         /// </summary>
@@ -24,7 +38,7 @@ namespace Umbraco.Web.Mvc
             if (filterContext.Result == null) return;
             var jsResult = filterContext.Result as JavaScriptResult;
             if (jsResult == null) return;
-            if (filterContext.HttpContext.IsDebuggingEnabled) return;
+            if (_hostingEnvironment.IsDebugMode) return;
 
             //minify the result
             var result = jsResult.Script;

@@ -33,7 +33,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets or sets the Umbraco context accessor.
         /// </summary>
-        public virtual IUmbracoContextAccessor UmbracoContextAccessor { get; set; }
+        public IUmbracoContextAccessor UmbracoContextAccessor { get; set; }
 
         /// <summary>
         /// Gets or sets the services context.

@@ -170,18 +170,6 @@ namespace Umbraco.Web.Security
         }
 
         /// <summary>
-        /// This will force ticket renewal in the OWIN pipeline
-        /// </summary>
-        /// <param name="http"></param>
-        /// <returns></returns>
-        internal static bool RenewUmbracoAuthTicket(this HttpContext http)
-        {
-            if (http == null) throw new ArgumentNullException("http");
-            http.Items[Constants.Security.ForceReAuthFlag] = true;
-            return true;
-        }
-
-        /// <summary>
         /// returns the number of seconds the user has until their auth session times out
         /// </summary>
         /// <param name="http"></param>

@@ -439,11 +439,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             return (IPublishedContent) appCache.Get(key, () => (new XmlPublishedContent(node, isPreviewing, appCache, contentTypeCache, variationContextAccessor)).CreateModel(Current.PublishedModelFactory));
         }
 
-        public static void ClearRequest()
-        {
-            Current.AppCaches.RequestCache.ClearByKey(CacheKeyPrefix);
-        }
-
         private const string CacheKeyPrefix = "CONTENTCACHE_XMLPUBLISHEDCONTENT_";
     }
 }

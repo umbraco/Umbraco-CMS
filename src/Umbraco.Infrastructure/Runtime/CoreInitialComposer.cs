@@ -20,6 +20,7 @@ using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
+using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.PublishedCache;
 using IntegerValidator = Umbraco.Core.PropertyEditors.Validators.IntegerValidator;
 
@@ -141,6 +142,8 @@ namespace Umbraco.Core.Runtime
 
             // register the published snapshot accessor - the "current" published snapshot is in the umbraco context
             composition.RegisterUnique<IPublishedSnapshotAccessor, UmbracoContextPublishedSnapshotAccessor>();
+
+            composition.RegisterUnique<IVariationContextAccessor, HybridVariationContextAccessor>();
         }
     }
 }

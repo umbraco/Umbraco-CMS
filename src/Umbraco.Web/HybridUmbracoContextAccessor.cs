@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Web
+﻿using Umbraco.Core.Cache;
+
+namespace Umbraco.Web
 {
     /// <summary>
     /// Implements a hybrid <see cref="IUmbracoContextAccessor"/>.
@@ -8,8 +10,8 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="HybridUmbracoContextAccessor"/> class.
         /// </summary>
-        public HybridUmbracoContextAccessor(IHttpContextAccessor httpContextAccessor)
-            : base(httpContextAccessor)
+        public HybridUmbracoContextAccessor(IRequestCache requestCache)
+            : base(requestCache)
         { }
 
         /// <inheritdoc />

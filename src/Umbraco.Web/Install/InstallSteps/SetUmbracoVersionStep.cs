@@ -18,16 +18,16 @@ namespace Umbraco.Web.Install.InstallSteps
         PerformsAppRestart = true)]
     internal class SetUmbracoVersionStep : InstallSetupStep<object>
     {
-        private readonly HttpContextBase _httpContext;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly InstallHelper _installHelper;
         private readonly IGlobalSettings _globalSettings;
         private readonly IUserService _userService;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IIOHelper _ioHelper;
 
-        public SetUmbracoVersionStep(HttpContextBase httpContext, InstallHelper installHelper, IGlobalSettings globalSettings, IUserService userService, IUmbracoVersion umbracoVersion, IIOHelper ioHelper)
+        public SetUmbracoVersionStep(IHttpContextAccessor httpContextAccessor, InstallHelper installHelper, IGlobalSettings globalSettings, IUserService userService, IUmbracoVersion umbracoVersion, IIOHelper ioHelper)
         {
-            _httpContext = httpContext;
+            _httpContextAccessor = httpContextAccessor;
             _installHelper = installHelper;
             _globalSettings = globalSettings;
             _userService = userService;
@@ -37,7 +37,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public override Task<InstallSetupResult> ExecuteAsync(object model)
         {
-            var security = new WebSecurity(_httpContext, _userService, _globalSettings, _ioHelper);
+            var security = new WebSecurity(_httpContextAccessor.HttpContext, _userService, _globalSettings, _ioHelper);
 
             if (security.IsAuthenticated() == false && _globalSettings.ConfigurationStatus.IsNullOrWhiteSpace())
             {
