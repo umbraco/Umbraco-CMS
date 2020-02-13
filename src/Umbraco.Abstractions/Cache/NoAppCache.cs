@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -84,5 +85,9 @@ namespace Umbraco.Core.Cache
         /// <inheritdoc />
         public virtual void ClearByRegex(string regex)
         { }
+
+        public IEnumerator<KeyValuePair<string, object>> GetEnumerator() => new Dictionary<string, object>().GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

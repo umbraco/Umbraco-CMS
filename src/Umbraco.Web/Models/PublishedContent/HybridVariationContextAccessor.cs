@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Models.PublishedContent;
+﻿using Umbraco.Core.Cache;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Models.PublishedContent
 {
@@ -7,8 +8,8 @@ namespace Umbraco.Web.Models.PublishedContent
     /// </summary>
     internal class HybridVariationContextAccessor : HybridAccessorBase<VariationContext>, IVariationContextAccessor
     {
-        public HybridVariationContextAccessor(IHttpContextAccessor httpContextAccessor)
-            : base(httpContextAccessor)
+        public HybridVariationContextAccessor(IRequestCache requestCache)
+            : base(requestCache)
         { }
 
         /// <inheritdoc />
