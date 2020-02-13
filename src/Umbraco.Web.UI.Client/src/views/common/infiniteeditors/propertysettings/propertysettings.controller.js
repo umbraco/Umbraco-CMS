@@ -30,6 +30,7 @@
         vm.close = close;
 
         vm.toggleAllowCultureVariants = toggleAllowCultureVariants;
+        vm.toggleAllowSegmentVariants = toggleAllowSegmentVariants;
         vm.toggleValidation = toggleValidation;
         vm.toggleShowOnMemberProfile = toggleShowOnMemberProfile;
         vm.toggleMemberCanEdit = toggleMemberCanEdit;
@@ -244,6 +245,10 @@
 
         function toggleAllowCultureVariants() {            
             $scope.model.property.allowCultureVariant = toggleValue($scope.model.property.allowCultureVariant);
+        }
+
+        function toggleAllowSegmentVariants() {            
+            $scope.model.property.allowSegmentVariant = toggleValue($scope.model.property.allowSegmentVariant);
         }
 
         function toggleValidation() {

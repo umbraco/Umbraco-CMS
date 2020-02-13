@@ -121,6 +121,7 @@ namespace Umbraco.Web.Models.Mapping
             MapTypeToDisplayBase<DocumentTypeDisplay, PropertyTypeDisplay>(source, target);
 
             target.AllowCultureVariant = source.VariesByCulture();
+            target.AllowSegmentVariant = source.VariesBySegment();
 
             //sync templates
             target.AllowedTemplates = context.MapEnumerable<ITemplate, EntityBasic>(source.AllowedTemplates);
@@ -227,7 +228,8 @@ namespace Umbraco.Web.Models.Mapping
             target.ValidationRegExp = source.Validation.Pattern;
             target.ValidationRegExpMessage = source.Validation.PatternMessage;
             target.SetVariesBy(ContentVariation.Culture, source.AllowCultureVariant);
-            
+            target.SetVariesBy(ContentVariation.Segment, source.AllowSegmentVariant);
+
             if (source.Id > 0)
                 target.Id = source.Id;
 
@@ -338,6 +340,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             target.Alias = source.Alias;
             target.AllowCultureVariant = source.AllowCultureVariant;
+            target.AllowSegmentVariant = source.AllowSegmentVariant;
             target.DataTypeId = source.DataTypeId;
             target.DataTypeKey = source.DataTypeKey;
             target.Description = source.Description;
@@ -354,6 +357,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             target.Alias = source.Alias;
             target.AllowCultureVariant = source.AllowCultureVariant;
+            target.AllowSegmentVariant = source.AllowSegmentVariant;
             target.DataTypeId = source.DataTypeId;
             target.DataTypeKey = source.DataTypeKey;
             target.Description = source.Description;

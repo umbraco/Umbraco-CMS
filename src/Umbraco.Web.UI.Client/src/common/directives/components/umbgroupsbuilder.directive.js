@@ -522,6 +522,7 @@
             oldPropertyModel.allowCultureVariant = scope.model.allowCultureVariant;
             oldPropertyModel.alias = "";
           }
+          // SEGMENTS_TODO: test if we need to do the same for the segments ^^
           var propertyModel = angular.copy(property);
 
           var propertySettings = {
@@ -530,6 +531,7 @@
             contentType: scope.contentType,
             contentTypeName: scope.model.name,
             contentTypeAllowCultureVariant: scope.model.allowCultureVariant,
+            contentTypeAllowSegmentVariant: scope.model.allowSegmentVariant,
             view: "views/common/infiniteeditors/propertysettings/propertysettings.html",
             size: "small",
             submit: function(model) {
@@ -557,6 +559,7 @@
               property.isSensitiveData = propertyModel.isSensitiveData;
               property.isSensitiveValue = propertyModel.isSensitiveValue;
               property.allowCultureVariant = propertyModel.allowCultureVariant;
+              property.allowSegmentVariant = propertyModel.allowSegmentVariant;
 
               // update existing data types
               if(model.updateSameDataTypes) {
