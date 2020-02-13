@@ -26,10 +26,12 @@ namespace Umbraco.Tests.Web
         [Test]
         public void RouteDataExtensions_GetUmbracoContext()
         {
+            var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
+
             var umbCtx = new UmbracoContext(
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IPublishedSnapshotService>(),
-                new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService, TestObjects.GetGlobalSettings(), IOHelper),
+                new WebSecurity(httpContextAccessor, Current.Services.UserService, TestObjects.GetGlobalSettings(), IOHelper),
                 TestObjects.GetUmbracoSettings(),
                 new List<IUrlProvider>(),
                 Enumerable.Empty<IMediaUrlProvider>(),
@@ -46,10 +48,12 @@ namespace Umbraco.Tests.Web
         [Test]
         public void ControllerContextExtensions_GetUmbracoContext_From_RouteValues()
         {
+            var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
+
             var umbCtx = new UmbracoContext(
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IPublishedSnapshotService>(),
-                new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService, TestObjects.GetGlobalSettings(), IOHelper),
+                new WebSecurity(httpContextAccessor, Current.Services.UserService, TestObjects.GetGlobalSettings(), IOHelper),
                 TestObjects.GetUmbracoSettings(),
                 new List<IUrlProvider>(),
                 Enumerable.Empty<IMediaUrlProvider>(),
@@ -76,10 +80,12 @@ namespace Umbraco.Tests.Web
         [Test]
         public void ControllerContextExtensions_GetUmbracoContext_From_Current()
         {
+            var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
+
             var umbCtx = new UmbracoContext(
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IPublishedSnapshotService>(),
-                new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService, TestObjects.GetGlobalSettings(), IOHelper),
+                new WebSecurity(httpContextAccessor, Current.Services.UserService, TestObjects.GetGlobalSettings(), IOHelper),
                 TestObjects.GetUmbracoSettings(),
                 new List<IUrlProvider>(),
                 Enumerable.Empty<IMediaUrlProvider>(),

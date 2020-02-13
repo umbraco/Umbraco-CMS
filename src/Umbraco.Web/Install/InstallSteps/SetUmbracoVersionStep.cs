@@ -37,7 +37,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public override Task<InstallSetupResult> ExecuteAsync(object model)
         {
-            var security = new WebSecurity(_httpContextAccessor.HttpContext, _userService, _globalSettings, _ioHelper);
+            var security = new WebSecurity(_httpContextAccessor, _userService, _globalSettings, _ioHelper);
 
             if (security.IsAuthenticated() == false && _globalSettings.ConfigurationStatus.IsNullOrWhiteSpace())
             {

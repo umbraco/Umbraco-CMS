@@ -39,6 +39,7 @@ namespace Umbraco.Tests.Web.Mvc
         public void Can_Construct_And_Get_Result()
         {
             var globalSettings = TestObjects.GetGlobalSettings();
+            var httpContextAccessor = TestObjects.GetHttpContextAccessor();
 
             var umbracoContextFactory = new UmbracoContextFactory(
                 Current.UmbracoContextAccessor,
@@ -50,7 +51,8 @@ namespace Umbraco.Tests.Web.Mvc
                 new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                 new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
                 Mock.Of<IUserService>(),
-                IOHelper);
+                IOHelper,
+                httpContextAccessor);
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());
             var umbracoContext = umbracoContextReference.UmbracoContext;
@@ -68,6 +70,7 @@ namespace Umbraco.Tests.Web.Mvc
         public void Umbraco_Context_Not_Null()
         {
             var globalSettings = TestObjects.GetGlobalSettings();
+            var httpContextAccessor = TestObjects.GetHttpContextAccessor();
 
             var umbracoContextFactory = new UmbracoContextFactory(
                 Current.UmbracoContextAccessor,
@@ -79,7 +82,8 @@ namespace Umbraco.Tests.Web.Mvc
                 new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                 new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
                 Mock.Of<IUserService>(),
-                IOHelper);
+                IOHelper,
+                httpContextAccessor);
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());
             var umbCtx = umbracoContextReference.UmbracoContext;
@@ -100,6 +104,7 @@ namespace Umbraco.Tests.Web.Mvc
             content.Setup(x => x.Id).Returns(2);
             var publishedSnapshotService = new Mock<IPublishedSnapshotService>();
             var globalSettings = TestObjects.GetGlobalSettings();
+            var httpContextAccessor = TestObjects.GetHttpContextAccessor();
 
             var umbracoContextFactory = new UmbracoContextFactory(
                 Current.UmbracoContextAccessor,
@@ -111,7 +116,8 @@ namespace Umbraco.Tests.Web.Mvc
                 new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                 new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
                 Mock.Of<IUserService>(),
-                IOHelper);
+                IOHelper,
+                httpContextAccessor);
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());
             var umbracoContext = umbracoContextReference.UmbracoContext;
@@ -139,6 +145,7 @@ namespace Umbraco.Tests.Web.Mvc
         {
             var webRoutingSettings = Mock.Of<IWebRoutingSection>(section => section.UrlProviderMode == "Auto");
             var globalSettings = TestObjects.GetGlobalSettings();
+            var httpContextAccessor = TestObjects.GetHttpContextAccessor();
 
             var umbracoContextFactory = new UmbracoContextFactory(
                 Current.UmbracoContextAccessor,
@@ -150,7 +157,8 @@ namespace Umbraco.Tests.Web.Mvc
                 new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                 new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
                 Mock.Of<IUserService>(),
-                IOHelper);
+                IOHelper,
+                httpContextAccessor);
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>());
             var umbracoContext = umbracoContextReference.UmbracoContext;

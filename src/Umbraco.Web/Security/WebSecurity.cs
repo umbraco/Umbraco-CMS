@@ -22,14 +22,14 @@ namespace Umbraco.Web.Security
     /// </summary>
     public class WebSecurity : IWebSecurity
     {
-        private readonly HttpContextBase _httpContext;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IUserService _userService;
         private readonly IGlobalSettings _globalSettings;
         private readonly IIOHelper _ioHelper;
 
-        public WebSecurity(HttpContextBase httpContext, IUserService userService, IGlobalSettings globalSettings, IIOHelper ioHelper)
+        public WebSecurity(IHttpContextAccessor httpContextAccessor, IUserService userService, IGlobalSettings globalSettings, IIOHelper ioHelper)
         {
-            _httpContext = httpContext;
+            _httpContextAccessor = httpContextAccessor;
             _userService = userService;
             _globalSettings = globalSettings;
             _ioHelper = ioHelper;
@@ -63,7 +63,7 @@ namespace Umbraco.Web.Security
             {
                 if (_signInManager == null)
                 {
-                    var mgr = _httpContext.GetOwinContext().Get<BackOfficeSignInManager>();
+                    var mgr = _httpContextAccessor.HttpContext.GetOwinContext().Get<BackOfficeSignInManager>();
                     if (mgr == null)
                     {
                         throw new NullReferenceException("Could not resolve an instance of " + typeof(BackOfficeSignInManager) + " from the " + typeof(IOwinContext));
@@ -76,7 +76,7 @@ namespace Umbraco.Web.Security
 
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager
-            => _userManager ?? (_userManager = _httpContext.GetOwinContext().GetBackOfficeUserManager());
+            => _userManager ?? (_userManager = _httpContextAccessor.HttpContext.GetOwinContext().GetBackOfficeUserManager());
 
         /// <summary>
         /// Logs a user in.
@@ -85,7 +85,7 @@ namespace Umbraco.Web.Security
         /// <returns>returns the number of seconds until their session times out</returns>
         public virtual double PerformLogin(int userId)
         {
-            var owinCtx = _httpContext.GetOwinContext();
+            var owinCtx = _httpContextAccessor.HttpContext.GetOwinContext();
             //ensure it's done for owin too
             owinCtx.Authentication.SignOut(Constants.Security.BackOfficeExternalAuthenticationType);
 
@@ -93,7 +93,7 @@ namespace Umbraco.Web.Security
 
             SignInManager.SignInAsync(user, isPersistent: true, rememberBrowser: false).Wait();
 
-            _httpContext.SetPrincipalForRequest(owinCtx.Request.User);
+            _httpContextAccessor.HttpContext.SetPrincipalForRequest(owinCtx.Request.User);
 
             return TimeSpan.FromMinutes(_globalSettings.TimeOutInMinutes).TotalSeconds;
         }
@@ -103,8 +103,8 @@ namespace Umbraco.Web.Security
         /// </summary>
         public virtual void ClearCurrentLogin()
         {
-            _httpContext.UmbracoLogout();
-            _httpContext.GetOwinContext().Authentication.SignOut(
+            _httpContextAccessor.HttpContext.UmbracoLogout();
+            _httpContextAccessor.HttpContext.GetOwinContext().Authentication.SignOut(
                 Core.Constants.Security.BackOfficeAuthenticationType,
                 Core.Constants.Security.BackOfficeExternalAuthenticationType);
         }
@@ -114,7 +114,7 @@ namespace Umbraco.Web.Security
         /// </summary>
         public virtual void RenewLoginTimeout()
         {
-            _httpContext.RenewUmbracoAuthTicket();
+            _httpContextAccessor.HttpContext.RenewUmbracoAuthTicket();
         }
 
         /// <summary>
@@ -154,7 +154,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public virtual Attempt<int> GetUserId()
         {
-            var identity = _httpContext.GetCurrentIdentity(false);
+            var identity = _httpContextAccessor.HttpContext.GetCurrentIdentity(false);
             return identity == null ? Attempt.Fail<int>() : Attempt.Succeed(Convert.ToInt32(identity.Id));
         }
 
@@ -164,7 +164,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public virtual string GetSessionId()
         {
-            var identity = _httpContext.GetCurrentIdentity(false);
+            var identity = _httpContextAccessor.HttpContext.GetCurrentIdentity(false);
             return identity?.SessionId;
         }
 
@@ -199,7 +199,7 @@ namespace Umbraco.Web.Security
             var user = CurrentUser;
 
             // Check for console access
-            if (user == null || (requiresApproval && user.IsApproved == false) || (user.IsLockedOut && RequestIsInUmbracoApplication(_httpContext, _globalSettings, _ioHelper)))
+            if (user == null || (requiresApproval && user.IsApproved == false) || (user.IsLockedOut && RequestIsInUmbracoApplication(_httpContextAccessor.HttpContext, _globalSettings, _ioHelper)))
             {
                 if (throwExceptions) throw new ArgumentException("You have no privileges to the umbraco console. Please contact your administrator");
                 return ValidateRequestAttempt.FailedNoPrivileges;
@@ -221,7 +221,7 @@ namespace Umbraco.Web.Security
         public ValidateRequestAttempt AuthorizeRequest(bool throwExceptions = false)
         {
             // check for secure connection
-            if (_globalSettings.UseHttps && _httpContext.Request.IsSecureConnection == false)
+            if (_globalSettings.UseHttps && _httpContextAccessor.HttpContext.Request.IsSecureConnection == false)
             {
                 if (throwExceptions) throw new SecurityException("This installation requires a secure connection (via SSL). Please update the URL to include https://");
                 return ValidateRequestAttempt.FailedNoSsl;
@@ -262,7 +262,8 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public bool IsAuthenticated()
         {
-            return _httpContext.User != null && _httpContext.User.Identity.IsAuthenticated && _httpContext.GetCurrentIdentity(false) != null;
+            var httpContext = _httpContextAccessor.HttpContext;
+            return httpContext.User != null && httpContext.User.Identity.IsAuthenticated && httpContext.GetCurrentIdentity(false) != null;
         }
 
     }

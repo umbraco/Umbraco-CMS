@@ -117,12 +117,12 @@ namespace Umbraco.Tests.Scoping
             var service = PublishedSnapshotService as PublishedSnapshotService;
 
             var httpContext = GetHttpContextFactory(url, routeData).HttpContext;
-
+            var httpContextAccessor = TestObjects.GetHttpContextAccessor(httpContext);
             var globalSettings = TestObjects.GetGlobalSettings();
             var umbracoContext = new UmbracoContext(
                 httpContext,
                 service,
-                new WebSecurity(httpContext, Current.Services.UserService, globalSettings, IOHelper),
+                new WebSecurity(httpContextAccessor, Current.Services.UserService, globalSettings, IOHelper),
                 umbracoSettings ?? SettingsForTests.GetDefaultUmbracoSettings(),
                 urlProviders ?? Enumerable.Empty<IUrlProvider>(),
                 Enumerable.Empty<IMediaUrlProvider>(),

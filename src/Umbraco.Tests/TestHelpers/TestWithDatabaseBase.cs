@@ -380,11 +380,11 @@ namespace Umbraco.Tests.TestHelpers
             }
 
             var httpContext = GetHttpContextFactory(url, routeData).HttpContext;
-
+            var httpContextAccessor = TestObjects.GetHttpContextAccessor(httpContext);
             var umbracoContext = new UmbracoContext(
                 httpContext,
                 service,
-                new WebSecurity(httpContext, Factory.GetInstance<IUserService>(),
+                new WebSecurity(httpContextAccessor, Factory.GetInstance<IUserService>(),
                     Factory.GetInstance<IGlobalSettings>(), IOHelper),
                 umbracoSettings ?? Factory.GetInstance<IUmbracoSettingsSection>(),
                 urlProviders ?? Enumerable.Empty<IUrlProvider>(),

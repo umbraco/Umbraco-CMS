@@ -127,6 +127,8 @@ namespace Umbraco.Tests.TestHelpers
 
             if (accessor == null) accessor = new TestUmbracoContextAccessor();
 
+            var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
+
             var umbracoContextFactory = new UmbracoContextFactory(
                 accessor,
                 publishedSnapshotService,
@@ -137,7 +139,8 @@ namespace Umbraco.Tests.TestHelpers
                 urlProviders,
                 mediaUrlProviders,
                 Mock.Of<IUserService>(),
-                TestHelper.IOHelper);
+                TestHelper.IOHelper,
+                httpContextAccessor);
 
             return umbracoContextFactory.EnsureUmbracoContext(httpContext).UmbracoContext;
         }

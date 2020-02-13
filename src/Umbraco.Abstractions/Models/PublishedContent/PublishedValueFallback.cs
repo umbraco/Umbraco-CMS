@@ -14,16 +14,14 @@ namespace Umbraco.Web.Models.PublishedContent
     {
         private readonly ILocalizationService _localizationService;
         private readonly IVariationContextAccessor _variationContextAccessor;
-        private readonly IPublishedValueFallback _publishedValueFallback;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedValueFallback"/> class.
         /// </summary>
-        public PublishedValueFallback(ServiceContext serviceContext, IVariationContextAccessor variationContextAccessor, IPublishedValueFallback publishedValueFallback)
+        public PublishedValueFallback(ServiceContext serviceContext, IVariationContextAccessor variationContextAccessor)
         {
             _localizationService = serviceContext.LocalizationService;
             _variationContextAccessor = variationContextAccessor;
-            _publishedValueFallback = publishedValueFallback;
         }
 
         /// <inheritdoc />
@@ -184,7 +182,7 @@ namespace Umbraco.Web.Models.PublishedContent
             // if we found a content with the property having a value, return that property value
             if (property != null && property.HasValue(culture, segment))
             {
-                value = property.Value<T>(_publishedValueFallback, culture, segment);
+                value = property.Value<T>(this, culture, segment);
                 return true;
             }
 
@@ -218,7 +216,7 @@ namespace Umbraco.Web.Models.PublishedContent
 
                 if (property.HasValue(culture2, segment))
                 {
-                    value = property.Value<T>(_publishedValueFallback, culture2, segment);
+                    value = property.Value<T>(this, culture2, segment);
                     return true;
                 }
 
@@ -252,7 +250,7 @@ namespace Umbraco.Web.Models.PublishedContent
 
                 if (content.HasValue(alias, culture2, segment))
                 {
-                    value = content.Value<T>(_publishedValueFallback, alias, culture2, segment);
+                    value = content.Value<T>(this, alias, culture2, segment);
                     return true;
                 }
 
@@ -289,7 +287,7 @@ namespace Umbraco.Web.Models.PublishedContent
 
                 if (content.HasValue(alias, culture2, segment))
                 {
-                    value = content.Value<T>(_publishedValueFallback, alias, culture2, segment);
+                    value = content.Value<T>(this, alias, culture2, segment);
                     return true;
                 }
 

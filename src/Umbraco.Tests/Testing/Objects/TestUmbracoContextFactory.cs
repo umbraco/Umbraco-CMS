@@ -33,6 +33,8 @@ namespace Umbraco.Tests.Testing.Objects
             var snapshotService = new Mock<IPublishedSnapshotService>();
             snapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(snapshot.Object);
 
+            var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
+
             var umbracoContextFactory = new UmbracoContextFactory(
                 umbracoContextAccessor,
                 snapshotService.Object,
@@ -43,7 +45,8 @@ namespace Umbraco.Tests.Testing.Objects
                 new UrlProviderCollection(new[] { urlProvider }),
                 new MediaUrlProviderCollection(new[] { mediaUrlProvider }),
                 Mock.Of<IUserService>(),
-                TestHelper.IOHelper);
+                TestHelper.IOHelper,
+                httpContextAccessor);
 
             return umbracoContextFactory;
         }
