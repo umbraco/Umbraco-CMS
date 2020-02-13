@@ -1,5 +1,3 @@
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +5,7 @@ using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Serialization;
 using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache;
 
@@ -16,11 +15,15 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     {
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly IProfilingLogger _proflog;
+        private readonly IJsonSerializer _jsonSerializer;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
-        public MultiUrlPickerValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor, IProfilingLogger proflog)
+        public MultiUrlPickerValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor, IProfilingLogger proflog, IJsonSerializer jsonSerializer, IUmbracoContextAccessor umbracoContextAccessor)
         {
             _publishedSnapshotAccessor = publishedSnapshotAccessor ?? throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
             _proflog = proflog ?? throw new ArgumentNullException(nameof(proflog));
+            _jsonSerializer = jsonSerializer;
+            _umbracoContextAccessor = umbracoContextAccessor;
         }
 
         public override bool IsConverter(IPublishedPropertyType propertyType) => Constants.PropertyEditors.Aliases.MultiUrlPicker.Equals(propertyType.EditorAlias);
@@ -48,7 +51,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 }
 
                 var links = new List<Link>();
-                var dtos = JsonConvert.DeserializeObject<IEnumerable<MultiUrlPickerValueEditor.LinkDto>>(inter.ToString());
+                var dtos = _jsonSerializer.Deserialize<IEnumerable<MultiUrlPickerValueEditor.LinkDto>>(inter.ToString());
 
                 foreach (var dto in dtos)
                 {
@@ -69,7 +72,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                         {
                             continue;
                         }
-                        url = content.Url();
+                        url = content.Url(_umbracoContextAccessor.UmbracoContext.UrlProvider);
                     }
 
                     links.Add(

@@ -10,6 +10,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
+using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
@@ -25,6 +26,7 @@ namespace Umbraco.Web.Editors
         private readonly TourFilterCollection _filters;
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
         private readonly IIOHelper _ioHelper;
+        private readonly ICurrentUserAccessor _currentUserAccessor;
 
         public TourController(
             IGlobalSettings globalSettings,
@@ -39,12 +41,14 @@ namespace Umbraco.Web.Editors
             UmbracoMapper umbracoMapper,
             TourFilterCollection filters,
             IUmbracoSettingsSection umbracoSettingsSection,
-            IIOHelper ioHelper)
+            IIOHelper ioHelper,
+            ICurrentUserAccessor currentUserAccessor)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
         {
             _filters = filters;
             _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));
             _ioHelper = ioHelper;
+            _currentUserAccessor = currentUserAccessor;
         }
 
         public IEnumerable<BackOfficeTourFile> GetTours()
@@ -54,7 +58,7 @@ namespace Umbraco.Web.Editors
             if (_umbracoSettingsSection.BackOffice.Tours.EnableTours == false)
                 return result;
 
-            var user = Composing.Current.UmbracoContext.Security.CurrentUser;
+            var user = _currentUserAccessor.TryGetCurrentUser();
             if (user == null)
                 return result;
 

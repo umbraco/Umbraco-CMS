@@ -77,7 +77,7 @@ namespace Umbraco.Web
         {
             var currentUmbracoContext = _umbracoContextAccessor.UmbracoContext;
             if (currentUmbracoContext != null)
-                return new UmbracoContextReference(currentUmbracoContext, false, _umbracoContextAccessor);
+                return new UmbracoContextReference(false, _umbracoContextAccessor);
 
 
             httpContext = EnsureHttpContext(httpContext);
@@ -85,7 +85,7 @@ namespace Umbraco.Web
             var umbracoContext = CreateUmbracoContext(httpContext);
             _umbracoContextAccessor.UmbracoContext = umbracoContext;
 
-            return new UmbracoContextReference(umbracoContext, true, _umbracoContextAccessor);
+            return new UmbracoContextReference(true, _umbracoContextAccessor);
         }
 
         public static HttpContextBase EnsureHttpContext(HttpContextBase httpContext = null)

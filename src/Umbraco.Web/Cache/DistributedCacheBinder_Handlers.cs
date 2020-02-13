@@ -154,6 +154,7 @@ namespace Umbraco.Web.Cache
 
         private void PublicAccessService_Saved(IPublicAccessService sender, SaveEventArgs<PublicAccessEntry> e)
         {
+
             _distributedCache.RefreshPublicAccess();
         }
 

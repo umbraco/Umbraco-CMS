@@ -1,5 +1,4 @@
 ﻿using System;
-
 namespace Umbraco.Web.PublishedCache
 {
     public class UmbracoContextPublishedSnapshotAccessor : IPublishedSnapshotAccessor

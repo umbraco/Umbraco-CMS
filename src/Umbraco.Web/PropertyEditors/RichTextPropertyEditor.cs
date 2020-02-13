@@ -75,7 +75,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// A custom value editor to ensure that macro syntax is parsed when being persisted and formatted correctly for display in the editor
         /// </summary>
-        internal class RichTextPropertyValueEditor : DataValueEditor, IDataValueReference
+        public class RichTextPropertyValueEditor : DataValueEditor, IDataValueReference
         {
             private IUmbracoContextAccessor _umbracoContextAccessor;
             private readonly HtmlImageSourceParser _imageSourceParser;

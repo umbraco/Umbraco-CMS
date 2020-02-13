@@ -6,6 +6,7 @@ using Microsoft.AspNet.SignalR;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Cookie;
 using Umbraco.Core.Dashboards;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
@@ -71,6 +72,7 @@ namespace Umbraco.Web.Runtime
             composition.Register<IFilePermissionHelper, FilePermissionHelper>(Lifetime.Singleton);
 
             composition.RegisterUnique<IHttpContextAccessor, AspNetHttpContextAccessor>(); // required for hybrid accessors
+            composition.RegisterUnique<ICookieManager, AspNetCookieManager>(); 
 
             composition.ComposeWebMappingProfiles();
 
@@ -101,9 +103,6 @@ namespace Umbraco.Web.Runtime
             // register a per-request HttpContextBase object
             // is per-request so only one wrapper is created per request
             composition.Register<HttpContextBase>(factory => factory.GetInstance<IHttpContextAccessor>().HttpContext, Lifetime.Request);
-
-            // register the published snapshot accessor - the "current" published snapshot is in the umbraco context
-            composition.RegisterUnique<IPublishedSnapshotAccessor, UmbracoContextPublishedSnapshotAccessor>();
 
             // we should stop injecting UmbracoContext and always inject IUmbracoContextAccessor, however at the moment
             // there are tons of places (controllers...) which require UmbracoContext in their ctor - so let's register

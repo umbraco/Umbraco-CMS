@@ -284,7 +284,7 @@ namespace Umbraco.Web
         {
             return parentNodes.DescendantsOrSelf<T>(VariationContextAccessor, culture);
         }
-        
+
         public static IEnumerable<IPublishedContent> Descendants(this IPublishedContent content, string culture = null)
         {
             return content.Descendants(VariationContextAccessor, culture);
@@ -713,24 +713,12 @@ namespace Umbraco.Web
         /// </remarks>
         public static string Url(this IPublishedContent content, string culture = null, UrlMode mode = UrlMode.Default)
         {
-            var umbracoContext = Composing.Current.UmbracoContext;
+            var umbracoContext = Current.UmbracoContext;
 
             if (umbracoContext == null)
                 throw new InvalidOperationException("Cannot resolve a Url when Current.UmbracoContext is null.");
-            if (umbracoContext.UrlProvider == null)
-                throw new InvalidOperationException("Cannot resolve a Url when Current.UmbracoContext.UrlProvider is null.");
 
-            switch (content.ContentType.ItemType)
-            {
-                case PublishedItemType.Content:
-                    return umbracoContext.UrlProvider.GetUrl(content, mode, culture);
-
-                case PublishedItemType.Media:
-                    return umbracoContext.UrlProvider.GetMediaUrl(content, mode, culture, Constants.Conventions.Media.File);
-
-                default:
-                    throw new NotSupportedException();
-            }
+            return content.Url(Current.UmbracoContext.UrlProvider, culture, mode);
         }
 
         #endregion

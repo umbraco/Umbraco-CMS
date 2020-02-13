@@ -3,13 +3,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
-using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
@@ -22,6 +19,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase
     {
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
         private static readonly List<string> PropertiesToExclude = new List<string>
         {
@@ -29,9 +27,10 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             Constants.Conventions.Content.Redirect.ToLower(CultureInfo.InvariantCulture)
         };
 
-        public MultiNodeTreePickerValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor)
+        public MultiNodeTreePickerValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor, IUmbracoContextAccessor umbracoContextAccessor)
         {
             _publishedSnapshotAccessor = publishedSnapshotAccessor ?? throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
+            _umbracoContextAccessor = umbracoContextAccessor;
         }
 
         public override bool IsConverter(IPublishedPropertyType propertyType)
@@ -70,7 +69,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             }
 
             // TODO: Inject an UmbracoHelper and create a GetUmbracoHelper method based on either injected or singleton
-            if (Current.UmbracoContext != null)
+            if (_umbracoContextAccessor.UmbracoContext != null)
             {
                 if (propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MultiNodeTreePicker))
                 {

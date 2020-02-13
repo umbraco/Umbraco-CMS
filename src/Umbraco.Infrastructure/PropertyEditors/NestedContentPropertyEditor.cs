@@ -6,7 +6,6 @@ using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
-using Umbraco.Web.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -316,14 +315,14 @@ namespace Umbraco.Web.PropertyEditors
                                                       ? $"'{row.PropType.Name}' cannot be null"
                                                       : row.PropType.MandatoryMessage;
                             validationResults.Add(new ValidationResult($"Item {(row.RowIndex + 1)}: {message}", new[] { row.PropKey }));
-                        }                            
+                        }
                         else if (row.JsonRowValue[row.PropKey].ToString().IsNullOrWhiteSpace() || (row.JsonRowValue[row.PropKey].Type == JTokenType.Array && !row.JsonRowValue[row.PropKey].HasValues))
                         {
                             var message = string.IsNullOrWhiteSpace(row.PropType.MandatoryMessage)
                                                       ? $"'{row.PropType.Name}' cannot be empty"
                                                       : row.PropType.MandatoryMessage;
                             validationResults.Add(new ValidationResult($"Item {(row.RowIndex + 1)}: {message}", new[] { row.PropKey }));
-                        }   
+                        }
                     }
 
                     // Check regex

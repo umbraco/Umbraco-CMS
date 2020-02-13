@@ -168,7 +168,6 @@
     <Compile Include="Logging\WebProfilerProvider.cs" />
     <Compile Include="Macros\IMacroRenderer.cs" />
     <Compile Include="Macros\PublishedContentHashtableConverter.cs" />
-    <Compile Include="Migrations\PostMigrations\PublishedSnapshotRebuilder.cs" />
     <Compile Include="Models\ContentEditing\UserInvite.cs" />
     <Compile Include="Models\Identity\BackOfficeIdentityUser.cs" />
     <Compile Include="Models\Identity\IdentityMapDefinition.cs" />
@@ -200,6 +199,7 @@
     <Compile Include="Mvc\SurfaceControllerTypeCollectionBuilder.cs" />
     <Compile Include="Mvc\ValidateUmbracoFormRouteStringAttribute.cs" />
     <Compile Include="Net\AspNetBackOfficeInfo.cs" />
+    <Compile Include="Net\AspNetCookieManager.cs" />
     <Compile Include="Net\AspNetHttpContextAccessor.cs" />
     <Compile Include="Net\AspNetIpResolver.cs" />
     <Compile Include="Net\AspNetPasswordHasher.cs" />
@@ -207,7 +207,8 @@
     <Compile Include="Profiling\WebProfilingController.cs" />
     <Compile Include="PropertyEditors\GridPropertyEditor.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
-    <Compile Include="PublishedCache\UmbracoContextPublishedSnapshotAccessor.cs" />
+    <Compile Include="PropertyEditors\RichTextPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\RteMacroRenderingValueConverter.cs" />
     <Compile Include="RoutableDocumentFilter.cs" />
     <Compile Include="Routing\DefaultMediaUrlProvider.cs" />
     <Compile Include="Routing\IMediaUrlProvider.cs" />
@@ -235,22 +236,15 @@
     <Compile Include="Security\UserAwarePasswordHasher.cs" />
     <Compile Include="Search\UmbracoTreeSearcherFields.cs" />
     <Compile Include="StringExtensions.cs" />
-    <Compile Include="Templates\HtmlLocalLinkParser.cs" />
-    <Compile Include="Templates\HtmlImageSourceParser.cs" />
-    <Compile Include="Templates\HtmlUrlParser.cs" />
     <Compile Include="Trees\TreeCollectionBuilder.cs" />
     <Compile Include="Trees\TreeNode.cs" />
     <Compile Include="UmbracoContext.cs" />
     <Compile Include="UmbracoContextFactory.cs" />
-    <Compile Include="UmbracoContextReference.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeByUdiRouteHandler.cs" />
     <Compile Include="UmbracoDbProviderFactoryCreator.cs" />
     <Compile Include="ViewDataExtensions.cs" />
     <Compile Include="WebApi\Filters\AdminUsersAuthorizeAttribute.cs" />
     <Compile Include="WebApi\Filters\OnlyLocalRequestsAttribute.cs" />
-    <Compile Include="PropertyEditors\MultiUrlPickerPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\MultiUrlPickerValueEditor.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\MultiUrlPickerValueConverter.cs" />
     <Compile Include="Templates\ITemplateRenderer.cs" />
     <Compile Include="PropertyEditors\GridPropertyIndexValueFactory.cs" />
     <Compile Include="Routing\RedirectTrackingComposer.cs" />
@@ -344,14 +338,6 @@
     <Compile Include="Mvc\FilteredControllerFactoryCollectionBuilder.cs" />
     <Compile Include="Mvc\SurfaceControllerTypeCollection.cs" />
     <Compile Include="PropertyEditors\NestedContentController.cs" />
-    <Compile Include="PropertyEditors\NestedContentPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\NestedContentManyValueConverter.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\NestedContentValueConverterBase.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\NestedContentSingleValueConverter.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\MediaPickerValueConverter.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\MemberPickerValueConverter.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\MultiNodeTreePickerValueConverter.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\ContentPickerValueConverter.cs" />
     <Compile Include="PublishedElementExtensions.cs" />
     <Compile Include="PublishedModels\DummyClassSoThatPublishedModelsNamespaceExists.cs" />
     <Compile Include="Routing\ContentFinderByUrl.cs" />
@@ -429,7 +415,6 @@
     <Compile Include="Mvc\ProfilingViewEngine.cs" />
     <Compile Include="BatchedDatabaseServerMessenger.cs" />
     <Compile Include="CacheHelperExtensions.cs" />
-    <Compile Include="Cache\DistributedCacheExtensions.cs" />
     <Compile Include="Editors\AuthenticationController.cs" />
     <Compile Include="Controllers\UmbProfileController.cs" />
     <Compile Include="Editors\ContentController.cs" />
@@ -505,7 +490,6 @@
     <Compile Include="Security\AuthenticationManagerExtensions.cs" />
     <Compile Include="Security\BackOfficeCookieManager.cs" />
     <Compile Include="Security\UmbracoBackOfficeCookieAuthOptions.cs" />
-    <Compile Include="Migrations\PostMigrations\ClearCsrfCookies.cs" />
     <Compile Include="TagQuery.cs" />
     <Compile Include="Trees\DataTypeTreeController.cs" />
     <Compile Include="Trees\FileSystemTreeController.cs" />
@@ -541,8 +525,6 @@
     <Compile Include="Controllers\UmbRegisterController.cs" />
     <Compile Include="Models\ProfileModel.cs" />
     <Compile Include="Models\LoginStatusModel.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\MarkdownEditorValueConverter.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\TextStringValueConverter.cs" />
     <Compile Include="PublishedPropertyExtension.cs" />
     <Compile Include="Mvc\MergeParentContextViewDataAttribute.cs" />
     <Compile Include="Mvc\ViewDataDictionaryExtensions.cs" />
@@ -554,7 +536,6 @@
     <Compile Include="Editors\UmbracoAuthorizedJsonController.cs" />
     <Compile Include="HttpCookieExtensions.cs" />
     <Compile Include="FormDataCollectionExtensions.cs" />
-    <Compile Include="PropertyEditors\RichTextPropertyEditor.cs" />
     <Compile Include="Trees\MediaTreeController.cs" />
     <Compile Include="Trees\ContentTreeControllerBase.cs" />
     <Compile Include="Models\Trees\TreeRootNode.cs" />
@@ -652,7 +633,6 @@
     <Compile Include="Mvc\PluginControllerAttribute.cs" />
     <Compile Include="Mvc\PluginControllerMetadata.cs" />
     <Compile Include="Mvc\UmbracoPageResult.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\RteMacroRenderingValueConverter.cs" />
     <Compile Include="RouteCollectionExtensions.cs" />
     <Compile Include="Routing\AliasUrlProvider.cs" />
     <Compile Include="Routing\ContentFinderByConfigured404.cs" />

@@ -20,6 +20,7 @@ using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
+using Umbraco.Web.PublishedCache;
 using IntegerValidator = Umbraco.Core.PropertyEditors.Validators.IntegerValidator;
 
 namespace Umbraco.Core.Runtime
@@ -133,10 +134,13 @@ namespace Umbraco.Core.Runtime
             composition.RegisterUnique<IPublishedModelFactory, NoopPublishedModelFactory>();
 
             // by default, register a noop rebuilder
-            composition.RegisterUnique<IPublishedSnapshotRebuilder, PublishedSnapshotRebuilder>();
+            composition.RegisterUnique<IPublishedSnapshotRebuilder, NoopPublishedSnapshotRebuilder>();
 
             composition.SetCultureDictionaryFactory<DefaultCultureDictionaryFactory>();
             composition.Register(f => f.GetInstance<ICultureDictionaryFactory>().CreateDictionary(), Lifetime.Singleton);
+
+            // register the published snapshot accessor - the "current" published snapshot is in the umbraco context
+            composition.RegisterUnique<IPublishedSnapshotAccessor, UmbracoContextPublishedSnapshotAccessor>();
         }
     }
 }

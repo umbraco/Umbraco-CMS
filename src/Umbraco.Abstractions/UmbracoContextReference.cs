@@ -20,9 +20,8 @@ namespace Umbraco.Web
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoContextReference"/> class.
         /// </summary>
-        internal UmbracoContextReference(IUmbracoContext umbracoContext, bool isRoot, IUmbracoContextAccessor umbracoContextAccessor)
+        internal UmbracoContextReference(bool isRoot, IUmbracoContextAccessor umbracoContextAccessor)
         {
-            UmbracoContext = umbracoContext;
             IsRoot = isRoot;
 
             _umbracoContextAccessor = umbracoContextAccessor;
@@ -31,7 +30,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the <see cref="UmbracoContext"/>.
         /// </summary>
-        public IUmbracoContext UmbracoContext { get; }
+        public IUmbracoContext UmbracoContext => _umbracoContextAccessor.UmbracoContext;
 
         /// <summary>
         /// Gets a value indicating whether the reference is a root reference.
