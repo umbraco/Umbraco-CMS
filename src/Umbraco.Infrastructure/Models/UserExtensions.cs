@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
@@ -26,7 +23,7 @@ namespace Umbraco.Core.Models
         /// <returns>
         /// A list of 5 different sized avatar URLs
         /// </returns>
-        public static string[] GetUserAvatarUrls(this IUser user, IAppCache cache, IMediaFileSystem mediaFileSystem)
+        public static string[] GetUserAvatarUrls(this IUser user, IAppCache cache, IMediaFileSystem mediaFileSystem, IImageUrlGenerator imageUrlGenerator)
         {
             // If FIPS is required, never check the Gravatar service as it only supports MD5 hashing.
             // Unfortunately, if the FIPS setting is enabled on Windows, using MD5 will throw an exception
@@ -80,11 +77,11 @@ namespace Umbraco.Core.Models
             var avatarUrl = mediaFileSystem.GetUrl(user.Avatar);
             return new[]
             {
-                avatarUrl  + "?width=30&height=30&mode=crop",
-                avatarUrl  + "?width=60&height=60&mode=crop",
-                avatarUrl  + "?width=90&height=90&mode=crop",
-                avatarUrl  + "?width=150&height=150&mode=crop",
-                avatarUrl  + "?width=300&height=300&mode=crop"
+                imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = "crop", Width = 30, Height = 30 }),
+                imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = "crop", Width = 60, Height = 60 }),
+                imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = "crop", Width = 90, Height = 90 }),
+                imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = "crop", Width = 150, Height = 150 }),
+                imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = "crop", Width = 300, Height = 300 })
             };
 
         }

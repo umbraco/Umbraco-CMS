@@ -24,6 +24,7 @@ namespace Umbraco.Web.Editors
     public class LogController : UmbracoAuthorizedJsonController
     {
         private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly IImageUrlGenerator _imageUrlGenerator;
 
         public LogController(
             IGlobalSettings globalSettings,
@@ -36,10 +37,12 @@ namespace Umbraco.Web.Editors
             UmbracoHelper umbracoHelper,
             IMediaFileSystem mediaFileSystem,
             IShortStringHelper shortStringHelper,
-            UmbracoMapper umbracoMapper)
+            UmbracoMapper umbracoMapper,
+            IImageUrlGenerator imageUrlGenerator)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
         {
             _mediaFileSystem = mediaFileSystem;
+            _imageUrlGenerator = imageUrlGenerator;
         }
 
         [UmbracoApplicationAuthorize(Core.Constants.Applications.Content, Core.Constants.Applications.Media)]
@@ -94,7 +97,7 @@ namespace Umbraco.Web.Editors
             var mappedItems = items.ToList();
             var userIds = mappedItems.Select(x => x.UserId).ToArray();
             var userAvatars = Services.UserService.GetUsersById(userIds)
-                .ToDictionary(x => x.Id, x => x.GetUserAvatarUrls(AppCaches.RuntimeCache, _mediaFileSystem));
+                .ToDictionary(x => x.Id, x => x.GetUserAvatarUrls(AppCaches.RuntimeCache, _mediaFileSystem, _imageUrlGenerator));
             var userNames = Services.UserService.GetUsersById(userIds).ToDictionary(x => x.Id, x => x.Name);
             foreach (var item in mappedItems)
             {

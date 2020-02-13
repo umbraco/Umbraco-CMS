@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
 using Newtonsoft.Json;
+using Umbraco.Core.Models;
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Strings;
 
@@ -59,38 +58,28 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 : Crops.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
         }
 
-        public void AppendCropBaseUrl(StringBuilder url, ImageCropperCrop crop, bool defaultCrop, bool preferFocalPoint)
+        public ImageUrlGenerationOptions GetCropBaseOptions(string url, ImageCropperCrop crop, bool defaultCrop, bool preferFocalPoint)
         {
             if (preferFocalPoint && HasFocalPoint()
                 || crop != null && crop.Coordinates == null && HasFocalPoint()
                 || defaultCrop && HasFocalPoint())
             {
-                url.Append("?center=");
-                url.Append(FocalPoint.Top.ToString(CultureInfo.InvariantCulture));
-                url.Append(",");
-                url.Append(FocalPoint.Left.ToString(CultureInfo.InvariantCulture));
-                url.Append("&mode=crop");
+                return new ImageUrlGenerationOptions(url) { FocalPoint = new ImageUrlGenerationOptions.FocalPointPosition(FocalPoint.Top, FocalPoint.Left) };
             }
             else if (crop != null && crop.Coordinates != null && preferFocalPoint == false)
             {
-                url.Append("?crop=");
-                url.Append(crop.Coordinates.X1.ToString(CultureInfo.InvariantCulture)).Append(",");
-                url.Append(crop.Coordinates.Y1.ToString(CultureInfo.InvariantCulture)).Append(",");
-                url.Append(crop.Coordinates.X2.ToString(CultureInfo.InvariantCulture)).Append(",");
-                url.Append(crop.Coordinates.Y2.ToString(CultureInfo.InvariantCulture));
-                url.Append("&cropmode=percentage");
+                return new ImageUrlGenerationOptions(url) { Crop = new ImageUrlGenerationOptions.CropCoordinates(crop.Coordinates.X1, crop.Coordinates.Y1, crop.Coordinates.X2, crop.Coordinates.Y2) };
             }
             else
             {
-                url.Append("?anchor=center");
-                url.Append("&mode=crop");
+                return new ImageUrlGenerationOptions(url) { DefaultCrop = true };
             }
         }
 
         /// <summary>
         /// Gets the value image url for a specified crop.
         /// </summary>
-        public string GetCropUrl(string alias, bool useCropDimensions = true, bool useFocalPoint = false, string cacheBusterValue = null)
+        public string GetCropUrl(string alias, IImageUrlGenerator imageUrlGenerator, bool useCropDimensions = true, bool useFocalPoint = false, string cacheBusterValue = null)
         {
             var crop = GetCrop(alias);
 
@@ -98,38 +87,31 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             if (crop == null && !string.IsNullOrWhiteSpace(alias))
                 return null;
 
-            var url = new StringBuilder();
-
-            AppendCropBaseUrl(url, crop, string.IsNullOrWhiteSpace(alias), useFocalPoint);
+            var options = GetCropBaseOptions(string.Empty, crop, string.IsNullOrWhiteSpace(alias), useFocalPoint);
 
             if (crop != null && useCropDimensions)
             {
-                url.Append("&width=").Append(crop.Width);
-                url.Append("&height=").Append(crop.Height);
+                options.Width = crop.Width;
+                options.Height = crop.Height;
             }
 
-            if (cacheBusterValue != null)
-                url.Append("&rnd=").Append(cacheBusterValue);
+            options.CacheBusterValue = cacheBusterValue;
 
-            return url.ToString();
+            return imageUrlGenerator.GetImageUrl(options);
         }
 
         /// <summary>
         /// Gets the value image url for a specific width and height.
         /// </summary>
-        public string GetCropUrl(int width, int height, bool useFocalPoint = false, string cacheBusterValue = null)
+        public string GetCropUrl(int width, int height, IImageUrlGenerator imageUrlGenerator, bool useFocalPoint = false, string cacheBusterValue = null)
         {
-            var url = new StringBuilder();
+            var options = GetCropBaseOptions(string.Empty, null, true, useFocalPoint);
 
-            AppendCropBaseUrl(url, null, true, useFocalPoint);
+            options.Width = width;
+            options.Height = height;
+            options.CacheBusterValue = cacheBusterValue;
 
-            url.Append("&width=").Append(width);
-            url.Append("&height=").Append(height);
-
-            if (cacheBusterValue != null)
-                url.Append("&rnd=").Append(cacheBusterValue);
-
-            return url.ToString();
+            return imageUrlGenerator.GetImageUrl(options);
         }
 
         /// <summary>
