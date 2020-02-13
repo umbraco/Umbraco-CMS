@@ -337,25 +337,60 @@
                 // Code completion for Model. in views
                 modelPropCompletionProvider  = monaco.languages.registerCompletionItemProvider("razor", {
                     provideCompletionItems: function(model, position) {
-                        console.log('COMPLETION: position', position);
-                        console.log('COMPLETION: getWordUntilPosition()', model.getWordUntilPosition(position));
-                        console.log('COMPLETION: getWordAtPosition()', model.getWordAtPosition(position));
 
                         // What have we just typed ?
                         const currentLineContent = model.getLineContent(position.lineNumber);
-                        console.log('lINE CONTENT', currentLineContent);
 
                         // We only want to fire/lookup Model properties when
                         // The current line/cursor ends with Model
                         if(currentLineContent.endsWith("Model") || currentLineContent.endsWith("Model.")){
 
-                            return codeEditorResource.getModel("contact").then(function(completionItems) {
-                                let suggestion = {
-                                    suggestions: []
-                                };
-                                suggestion.suggestions = completionItems;
-                                return suggestion;
+                            // Get all contents of file upto the current position of the cursor
+                            const textUntilPosition = model.getValueInRange({
+                                startLineNumber: 1,
+                                startColumn: 1,
+                                endLineNumber: position.lineNumber,
+                                endColumn: position.column
                             });
+
+                            const regex = /@inherits [^\s]*UmbracoViewPage<([^\s]+)>[;]*[\r]*\n/gm;
+                            const regexResults = regex.exec(textUntilPosition);
+                            let foundModel;
+
+                            if(regexResults){
+                                // We found a match - YAY
+                                foundModel = regexResults[1];
+                            }
+
+                            // Only do an API call if we found a model
+                            // Some text is in there :)
+                            if(foundModel.length > 0){
+
+                                // The model found in the @inhertis .... UmbracoViewPage<>
+                                // Could be namespaced such as ContentModels.MyNewDocType
+                                // We simply want MyNewDocType
+                                const foundModelParts = foundModel.split('.');
+
+                                // Split creates an array of parts
+                                // If nothing is found to split, one item in array is returned
+                                const foundModelPartsLength = foundModelParts.length;
+
+                                if(foundModelPartsLength > 1){
+                                    // Get last item in the array
+                                    foundModel = foundModelParts[foundModelPartsLength - 1];
+                                } else {
+                                    foundModel = foundModelParts[0];
+                                }
+
+                                // Go and call the WebAPI with the found model from that regex lookup
+                                return codeEditorResource.getModel(foundModel).then(function(completionItems) {
+                                    let suggestion = {
+                                        suggestions: []
+                                    };
+                                    suggestion.suggestions = completionItems;
+                                    return suggestion;
+                                });
+                            }
                         }
                     }
                 });

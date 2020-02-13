@@ -42,6 +42,7 @@ namespace Umbraco.Web.Editors
             }
 
             // Filter/select the type that contains/partial matches from modelName passed in
+            // Can't use namespace to help find types, as it can be configured for ModelsBuilder
             // FullName Umbraco.Web.PublishedModels.Contact
             // Name: Contact
             // Namespace: Umbraco.Web.PublishedModels
