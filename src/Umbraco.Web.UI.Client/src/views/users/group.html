@@ -60,6 +60,7 @@
                                             on-remove="vm.clearStartNode('content')">
                                         </umb-node-preview>
 
+
                                         <button type="button"
                                                 ng-if="!vm.userGroup.contentStartNode"
                                                 class="umb-node-preview-add"
@@ -67,6 +68,7 @@
                                                 ng-click="vm.openContentPicker()">
                                             <localize key="general_add">Add</localize>
                                         </button>
+
                                     </umb-control-group>
 
                                     <umb-control-group label="@user_mediastartnode" description="@user_mediastartnodehelp">
@@ -81,6 +83,7 @@
                                             on-edit="vm.openMediaPicker()"
                                             on-remove="vm.clearStartNode('media')">
                                         </umb-node-preview>
+
 
                                         <button type="button"
                                                 ng-if="!vm.userGroup.mediaStartNode"
