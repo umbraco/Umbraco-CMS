@@ -169,6 +169,7 @@ When building a custom infinite editor view you can use the same components as a
         let editorsKeyboardShorcuts = [];
         var editors = [];
         var isEnabled = true;
+        var lastElementInFocus = null;
         
         
         // events for backdrop
@@ -261,6 +262,12 @@ When building a custom infinite editor view you can use the same components as a
             */
             unbindKeyboardShortcuts();
 
+            // if this is the first editor layer, save the currently focused element
+            // so we can re-apply focus to it once all the editor layers are closed 
+            if (editors.length === 0) {
+                lastElementInFocus = document.activeElement;
+            }
+
             // set flag so we know when the editor is open in "infinite mode"
             editor.infiniteMode = true;
 
@@ -301,6 +308,10 @@ When building a custom infinite editor view you can use the same components as a
             $timeout(function() {
                 // rebind keyboard shortcuts for the new editor in focus
                 rebindKeyboardShortcuts();
+
+                if (editors.length === 0 && lastElementInFocus) {
+                    lastElementInFocus.focus();
+                }
             }, 0);
 
         }
