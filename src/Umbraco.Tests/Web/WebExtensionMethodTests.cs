@@ -7,6 +7,7 @@ using System.Web.Routing;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Services;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
 using Umbraco.Tests.Testing.Objects.Accessors;
@@ -26,10 +27,10 @@ namespace Umbraco.Tests.Web
         [Test]
         public void RouteDataExtensions_GetUmbracoContext()
         {
-            var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
+            var httpContextAccessor = TestHelper.GetHttpContextAccessor();
 
             var umbCtx = new UmbracoContext(
-                Mock.Of<HttpContextBase>(),
+                httpContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),
                 new WebSecurity(httpContextAccessor, Current.Services.UserService, TestObjects.GetGlobalSettings(), IOHelper),
                 TestObjects.GetUmbracoSettings(),
@@ -48,10 +49,10 @@ namespace Umbraco.Tests.Web
         [Test]
         public void ControllerContextExtensions_GetUmbracoContext_From_RouteValues()
         {
-            var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
+            var httpContextAccessor = TestHelper.GetHttpContextAccessor();
 
             var umbCtx = new UmbracoContext(
-                Mock.Of<HttpContextBase>(),
+                httpContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),
                 new WebSecurity(httpContextAccessor, Current.Services.UserService, TestObjects.GetGlobalSettings(), IOHelper),
                 TestObjects.GetUmbracoSettings(),
@@ -80,10 +81,10 @@ namespace Umbraco.Tests.Web
         [Test]
         public void ControllerContextExtensions_GetUmbracoContext_From_Current()
         {
-            var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
+            var httpContextAccessor = TestHelper.GetHttpContextAccessor();
 
             var umbCtx = new UmbracoContext(
-                Mock.Of<HttpContextBase>(),
+                httpContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),
                 new WebSecurity(httpContextAccessor, Current.Services.UserService, TestObjects.GetGlobalSettings(), IOHelper),
                 TestObjects.GetUmbracoSettings(),

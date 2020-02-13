@@ -18,12 +18,14 @@ namespace Umbraco.Tests.Testing.Objects
     {
         public static IUmbracoContextFactory Create(IGlobalSettings globalSettings = null, IUrlProvider urlProvider = null,
             IMediaUrlProvider mediaUrlProvider = null,
-            IUmbracoContextAccessor umbracoContextAccessor = null)
+            IUmbracoContextAccessor umbracoContextAccessor = null,
+            IHttpContextAccessor httpContextAccessor = null)
         {
             if (globalSettings == null) globalSettings = SettingsForTests.GenerateMockGlobalSettings();
             if (urlProvider == null) urlProvider = Mock.Of<IUrlProvider>();
             if (mediaUrlProvider == null) mediaUrlProvider = Mock.Of<IMediaUrlProvider>();
             if (umbracoContextAccessor == null) umbracoContextAccessor = new TestUmbracoContextAccessor();
+            if (httpContextAccessor == null) httpContextAccessor = TestHelper.GetHttpContextAccessor();
 
             var contentCache = new Mock<IPublishedContentCache>();
             var mediaCache = new Mock<IPublishedMediaCache>();
@@ -33,7 +35,7 @@ namespace Umbraco.Tests.Testing.Objects
             var snapshotService = new Mock<IPublishedSnapshotService>();
             snapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(snapshot.Object);
 
-            var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
+
 
             var umbracoContextFactory = new UmbracoContextFactory(
                 umbracoContextAccessor,

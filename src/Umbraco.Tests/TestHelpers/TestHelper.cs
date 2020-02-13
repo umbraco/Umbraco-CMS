@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Web;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -342,6 +343,25 @@ namespace Umbraco.Tests.TestHelpers
         public static IRequestCache GetRequestCache()
         {
             return new DictionaryAppCache();
+        }
+
+        public static IHttpContextAccessor GetHttpContextAccessor(HttpContextBase httpContextBase = null)
+        {
+            if (httpContextBase is null)
+            {
+                var httpContextMock = new Mock<HttpContextBase>();
+
+                httpContextMock.Setup(x => x.DisposeOnPipelineCompleted(It.IsAny<IDisposable>()))
+                    .Returns(Mock.Of<ISubscriptionToken>());
+                
+                httpContextBase = httpContextMock.Object;
+            }
+
+            var mock = new Mock<IHttpContextAccessor>();
+
+            mock.Setup(x => x.HttpContext).Returns(httpContextBase);
+
+            return mock.Object;
         }
     }
 }

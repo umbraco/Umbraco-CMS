@@ -159,14 +159,7 @@ namespace Umbraco.Tests.TestHelpers
             return @"Datasource=|DataDirectory|UmbracoNPocoTests.sdf;Flush Interval=1;";
         }
 
-        protected FakeHttpContextFactory GetHttpContextFactory(string url, RouteData routeData = null)
-        {
-            var factory = routeData != null
-                            ? new FakeHttpContextFactory(url, routeData)
-                            : new FakeHttpContextFactory(url);
 
-            return factory;
-        }
 
         /// <summary>
         /// Creates the SqlCe database if required
@@ -380,9 +373,9 @@ namespace Umbraco.Tests.TestHelpers
             }
 
             var httpContext = GetHttpContextFactory(url, routeData).HttpContext;
-            var httpContextAccessor = TestObjects.GetHttpContextAccessor(httpContext);
+            var httpContextAccessor = TestHelper.GetHttpContextAccessor(httpContext);
             var umbracoContext = new UmbracoContext(
-                httpContext,
+                httpContextAccessor,
                 service,
                 new WebSecurity(httpContextAccessor, Factory.GetInstance<IUserService>(),
                     Factory.GetInstance<IGlobalSettings>(), IOHelper),

@@ -193,10 +193,8 @@ namespace Umbraco.Tests.Runtimes
             Assert.AreEqual("test", content.Name);
 
             // need an UmbracoCOntext to access the cache
-            // FIXME: not exactly pretty, should not depend on HttpContext
-            var httpContext = Mock.Of<HttpContextBase>();
             var umbracoContextFactory = factory.GetInstance<IUmbracoContextFactory>();
-            var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext(httpContext);
+            var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
             var umbracoContext = umbracoContextReference.UmbracoContext;
 
             // assert that there is no published document

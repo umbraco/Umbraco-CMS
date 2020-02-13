@@ -69,9 +69,9 @@ namespace Umbraco.Tests.PublishedContent
 
             var httpContext = GetHttpContextFactory("http://umbraco.local/", routeData).HttpContext;
 
-            var httpContextAccessor = TestObjects.GetHttpContextAccessor(httpContext);
+            var httpContextAccessor = TestHelper.GetHttpContextAccessor(httpContext);
             var umbracoContext = new UmbracoContext(
-                httpContext,
+                httpContextAccessor,
                 publishedSnapshotService.Object,
                 new WebSecurity(httpContextAccessor, Current.Services.UserService, globalSettings, IOHelper),
                 TestObjects.GetUmbracoSettings(),

@@ -111,7 +111,6 @@ namespace Umbraco.Tests.TestHelpers
         /// <remarks>This should be the minimum Umbraco context.</remarks>
         public IUmbracoContext GetUmbracoContextMock(IUmbracoContextAccessor accessor = null)
         {
-            var httpContext = Mock.Of<HttpContextBase>();
 
             var publishedSnapshotMock = new Mock<IPublishedSnapshot>();
             publishedSnapshotMock.Setup(x => x.Members).Returns(Mock.Of<IPublishedMemberCache>());
@@ -127,7 +126,7 @@ namespace Umbraco.Tests.TestHelpers
 
             if (accessor == null) accessor = new TestUmbracoContextAccessor();
 
-            var httpContextAccessor = Mock.Of<IHttpContextAccessor>();
+            var httpContextAccessor = TestHelper.GetHttpContextAccessor();
 
             var umbracoContextFactory = new UmbracoContextFactory(
                 accessor,
@@ -142,7 +141,7 @@ namespace Umbraco.Tests.TestHelpers
                 TestHelper.IOHelper,
                 httpContextAccessor);
 
-            return umbracoContextFactory.EnsureUmbracoContext(httpContext).UmbracoContext;
+            return umbracoContextFactory.EnsureUmbracoContext().UmbracoContext;
         }
 
         public IUmbracoSettingsSection GetUmbracoSettings()
@@ -341,15 +340,6 @@ namespace Umbraco.Tests.TestHelpers
 
         #endregion
 
-        public IHttpContextAccessor GetHttpContextAccessor(HttpContextBase httpContextBase = null)
-        {
-            var mock = new Mock<IHttpContextAccessor>();
 
-            var httpContext = UmbracoContextFactory.EnsureHttpContext(httpContextBase);
-
-            mock.Setup(x => x.HttpContext).Returns(httpContext);
-
-            return mock.Object;
-        }
     }
 }

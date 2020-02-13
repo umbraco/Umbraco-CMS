@@ -55,7 +55,7 @@ namespace Umbraco.Web
             _httpContextAccessor = httpContextAccessor;
         }
 
-        private IUmbracoContext CreateUmbracoContext(HttpContextBase httpContext)
+        private IUmbracoContext CreateUmbracoContext()
         {
             // make sure we have a variation context
             if (_variationContextAccessor.VariationContext == null)
@@ -71,36 +71,22 @@ namespace Umbraco.Web
 
             var webSecurity = new WebSecurity(_httpContextAccessor, _userService, _globalSettings, _ioHelper);
 
-            return new UmbracoContext(httpContext, _publishedSnapshotService, webSecurity, _umbracoSettings, _urlProviders, _mediaUrlProviders, _globalSettings, _variationContextAccessor, _ioHelper);
+            return new UmbracoContext(_httpContextAccessor, _publishedSnapshotService, webSecurity, _umbracoSettings, _urlProviders, _mediaUrlProviders, _globalSettings, _variationContextAccessor, _ioHelper);
         }
 
         /// <inheritdoc />
-        public UmbracoContextReference EnsureUmbracoContext(HttpContextBase httpContext = null)
+        public UmbracoContextReference EnsureUmbracoContext()
         {
             var currentUmbracoContext = _umbracoContextAccessor.UmbracoContext;
             if (currentUmbracoContext != null)
                 return new UmbracoContextReference(false, _umbracoContextAccessor);
 
 
-            httpContext = EnsureHttpContext(httpContext);
-
-            var umbracoContext = CreateUmbracoContext(httpContext);
+            var umbracoContext = CreateUmbracoContext();
             _umbracoContextAccessor.UmbracoContext = umbracoContext;
 
             return new UmbracoContextReference(true, _umbracoContextAccessor);
         }
-
-        public static HttpContextBase EnsureHttpContext(HttpContextBase httpContext = null)
-        {
-            if (Thread.GetDomain().GetData(".appPath") is null || Thread.GetDomain().GetData(".appVPath") is null)
-            {
-                return httpContext ?? new HttpContextWrapper(HttpContext.Current ??
-                                                             new HttpContext(new SimpleWorkerRequest("", "", "null.aspx", "", NullWriterInstance)));
-            }
-            return httpContext ?? new HttpContextWrapper(HttpContext.Current ??
-                                                         new HttpContext(new SimpleWorkerRequest("null.aspx", "", NullWriterInstance)));
-        }
-
 
         // dummy TextWriter that does not write
         private class NullWriter : TextWriter

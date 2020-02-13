@@ -57,8 +57,6 @@ namespace Umbraco.Tests.Testing.TestingTests
         [Test]
         public void Can_Mock_Umbraco_Helper()
         {
-            var umbracoContext = TestObjects.GetUmbracoContextMock();
-
             // unless we can inject them in MembershipHelper, we need need this
             Composition.Register(_ => Mock.Of<IMemberService>());
             Composition.Register(_ => Mock.Of<IMemberTypeService>());
@@ -98,8 +96,6 @@ namespace Umbraco.Tests.Testing.TestingTests
         [Test]
         public void Can_Mock_UmbracoApiController_Dependencies_With_Injected_UmbracoMapper()
         {
-            var umbracoContext = TestObjects.GetUmbracoContextMock();
-
             var logger = Mock.Of<IProfilingLogger>();
             var memberService = Mock.Of<IMemberService>();
             var memberTypeService = Mock.Of<IMemberTypeService>();

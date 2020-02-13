@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Web.Routing;
 using System.Xml.Linq;
 using Examine;
 using Moq;
@@ -447,10 +448,19 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique<ParameterEditorCollection>();
 
 
-            Composition.RegisterUnique<IHttpContextAccessor>(TestObjects.GetHttpContextAccessor());
+            Composition.RegisterUnique<IHttpContextAccessor>(TestHelper.GetHttpContextAccessor(GetHttpContextFactory("/").HttpContext));
         }
 
         #endregion
+
+        protected FakeHttpContextFactory GetHttpContextFactory(string url, RouteData routeData = null)
+        {
+            var factory = routeData != null
+                ? new FakeHttpContextFactory(url, routeData)
+                : new FakeHttpContextFactory(url);
+
+            return factory;
+        }
 
         #region Initialize
 

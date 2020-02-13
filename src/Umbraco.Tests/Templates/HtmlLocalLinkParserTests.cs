@@ -73,7 +73,7 @@ namespace Umbraco.Tests.Templates
                 mediaUrlProvider: mediaUrlProvider.Object,
                 umbracoContextAccessor: umbracoContextAccessor);
 
-            using (var reference = umbracoContextFactory.EnsureUmbracoContext(Mock.Of<HttpContextBase>()))
+            using (var reference = umbracoContextFactory.EnsureUmbracoContext())
             {
                 var contentCache = Mock.Get(reference.UmbracoContext.Content);
                 contentCache.Setup(x => x.GetById(It.IsAny<int>())).Returns(publishedContent.Object);

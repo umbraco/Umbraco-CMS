@@ -7,6 +7,7 @@ using Microsoft.Owin;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Composing;
 using Umbraco.Tests.Testing;
 using Umbraco.Tests.Testing.Objects.Accessors;
@@ -28,10 +29,10 @@ namespace Umbraco.Tests.Security
             //should force app ctx to show not-configured
             ConfigurationManager.AppSettings.Set(Constants.AppSettings.ConfigurationStatus, "");
 
-            var httpContextAccessor = TestObjects.GetHttpContextAccessor();
+            var httpContextAccessor = TestHelper.GetHttpContextAccessor();
             var globalSettings = TestObjects.GetGlobalSettings();
             var umbracoContext = new UmbracoContext(
-                Mock.Of<HttpContextBase>(),
+                httpContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),
                 new WebSecurity(httpContextAccessor, Current.Services.UserService, globalSettings, IOHelper),
                 TestObjects.GetUmbracoSettings(), new List<IUrlProvider>(), Enumerable.Empty<IMediaUrlProvider>(), globalSettings,
@@ -49,10 +50,10 @@ namespace Umbraco.Tests.Security
         [Test]
         public void ShouldAuthenticateRequest_When_Configured()
         {
-            var httpContextAccessor = TestObjects.GetHttpContextAccessor();
+            var httpContextAccessor = TestHelper.GetHttpContextAccessor();
             var globalSettings = TestObjects.GetGlobalSettings();
             var umbCtx = new UmbracoContext(
-                Mock.Of<HttpContextBase>(),
+                httpContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),
                 new WebSecurity(httpContextAccessor, Current.Services.UserService, globalSettings, IOHelper),
                 TestObjects.GetUmbracoSettings(), new List<IUrlProvider>(), Enumerable.Empty<IMediaUrlProvider>(), globalSettings,

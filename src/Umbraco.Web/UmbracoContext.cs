@@ -18,6 +18,7 @@ namespace Umbraco.Web
     /// </summary>
     public class UmbracoContext : DisposableObjectSlim, IDisposeOnRequestEnd, IUmbracoContext
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IGlobalSettings _globalSettings;
         private readonly IIOHelper _ioHelper;
         private readonly Lazy<IPublishedSnapshot> _publishedSnapshot;
@@ -28,7 +29,7 @@ namespace Umbraco.Web
         // internal for unit tests
         // otherwise it's used by EnsureContext above
         // warn: does *not* manage setting any IUmbracoContextAccessor
-        internal UmbracoContext(HttpContextBase httpContext,
+        internal UmbracoContext(IHttpContextAccessor httpContextAccessor,
             IPublishedSnapshotService publishedSnapshotService,
             IWebSecurity webSecurity,
             IUmbracoSettingsSection umbracoSettings,
@@ -38,13 +39,14 @@ namespace Umbraco.Web
             IVariationContextAccessor variationContextAccessor,
             IIOHelper ioHelper)
         {
-            if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
+            if (httpContextAccessor == null) throw new ArgumentNullException(nameof(httpContextAccessor));
             if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
             if (webSecurity == null) throw new ArgumentNullException(nameof(webSecurity));
             if (umbracoSettings == null) throw new ArgumentNullException(nameof(umbracoSettings));
             if (urlProviders == null) throw new ArgumentNullException(nameof(urlProviders));
             if (mediaUrlProviders == null) throw new ArgumentNullException(nameof(mediaUrlProviders));
             VariationContextAccessor = variationContextAccessor ??  throw new ArgumentNullException(nameof(variationContextAccessor));
+            _httpContextAccessor = httpContextAccessor;
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
 
@@ -56,11 +58,10 @@ namespace Umbraco.Web
             //
             // all in all, this context may be disposed more than once, but DisposableObject ensures that
             // it is ok and it will be actually disposed only once.
-            httpContext.DisposeOnPipelineCompleted(this);
+            httpContextAccessor.HttpContext.DisposeOnPipelineCompleted(this);
 
             ObjectCreated = DateTime.Now;
             UmbracoRequestId = Guid.NewGuid();
-            HttpContext = httpContext;
             Security = webSecurity;
 
             // beware - we cannot expect a current user here, so detecting preview mode must be a lazy thing
@@ -140,11 +141,6 @@ namespace Umbraco.Web
         /// Gets/sets the PublishedRequest object
         /// </summary>
         public IPublishedRequest PublishedRequest { get; set; }
-
-        /// <summary>
-        /// Exposes the HttpContext for the current request
-        /// </summary>
-        public HttpContextBase HttpContext { get; }
 
         /// <summary>
         /// Gets the variation context accessor.
@@ -268,7 +264,7 @@ namespace Umbraco.Web
         {
             try
             {
-                return HttpContext.Request;
+                return _httpContextAccessor.HttpContext.Request;
             }
             catch (HttpException)
             {
