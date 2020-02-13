@@ -988,7 +988,7 @@
 
             vm.blockTypePicker = {
                 show: true,
-                size: vm.availableBlockTypes.length > 6 ? "medium" : "small",
+                size: vm.availableBlockTypes.length < 7 ? "small" : "medium",
                 filter: vm.availableBlockTypes.length > 12 ? true : false,
                 orderBy: "$index",
                 view: "itempicker",
