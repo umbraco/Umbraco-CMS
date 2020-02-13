@@ -6,6 +6,10 @@
         border-radius: @baseBorderRadius;
     }
 
+    .umb-table {
+        border:1px solid @gray-11;
+    }
+
     .umb-table-head {
         button {
             margin-left: 5px;
@@ -80,7 +84,9 @@
         &.--noValue {
             text-align: center;
             border-radius: @baseBorderRadius;
-            &:hover {
+            color: white;
+            transition: color 120ms;
+            &:hover, &:focus {
                 color: @ui-action-discreet-type-hover;
                 border-color: @ui-action-discreet-border-hover;
             }
@@ -102,7 +108,7 @@
         justify-content: center;
         padding: 5px 15px;
         box-sizing: border-box;
-        margin: 10px 0;
+        margin: 20px 0;
         font-weight: bold;
     }
     
