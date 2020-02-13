@@ -167,6 +167,18 @@
             
         }
 
+        $scope.$on("editors.content.splitViewRequest", requestSplitView);
+        function requestSplitView(event, args) {
+            var culture = args.culture;
+            var segment = args.segment;
+            _.each(vm.content.variants, function (v) {
+                if ((!v.language || v.language.culture === culture) && v.segment === segment) {
+                    openSplitView(v);
+                    return;
+                }
+            });
+        }
+
         /** Closes the split view */
         function closeSplitView(editorIndex) {
             // TODO: hacking animation states - these should hopefully be easier to do when we upgrade angular
