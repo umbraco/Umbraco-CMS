@@ -113,11 +113,25 @@ namespace Umbraco.Web.Models.Mapping
         /// </summary>
         /// <param name="content"></param>
         /// <returns>
-        /// Returns all segments assigned to the content including 'null' values
+        /// Returns all segments assigned to the content including the default `null` segment.
         /// </returns>
         private IEnumerable<string> GetSegments(IContent content)
         {
-            return content.Properties.SelectMany(p => p.Values.Select(v => v.Segment)).Distinct();
+            // The current segments of a content item are determined
+            // entirely on the current property values of the content.            
+            var segments = content.Properties
+                .SelectMany(p => p.Values.Select(v => v.Segment))
+                .Distinct()
+                .ToList();
+
+            if(segments.Count == 0)
+            {
+                // The default segment is always there,
+                // even when there is no property data at all yet
+                segments.Add(null);
+            }
+
+            return segments;            
         }
 
         private ContentVariantDisplay CreateVariantDisplay(MapperContext context, IContent content, Language language, string segment)
