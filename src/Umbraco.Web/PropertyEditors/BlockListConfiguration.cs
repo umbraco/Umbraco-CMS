@@ -14,11 +14,18 @@ namespace Umbraco.Web.PropertyEditors
         [ConfigurationField("elementTypes", "Available Blocks", "views/propertyeditors/blocklist/prevalue/blocklist.elementtypepicker.html", Description = "Define the available blocks.")]
         public ElementType[] ElementTypes { get; set; }
 
-        [ConfigurationField("minNumber", "Minimum amount", "number")]
-        public int MinNumber { get; set; }
 
-        [ConfigurationField("maxNumber", "Maximum amount", "number")]
-        public int MaxNumber { get; set; }
+        [ConfigurationField("range", "Amount", "numberrange", Description = "Set a required range of blocks")]
+        public NumberRange Range { get; set; } = new NumberRange();
+
+        public class NumberRange
+        {
+            [JsonProperty("min")]
+            public int? Min { get; set; }
+
+            [JsonProperty("max")]
+            public int? Max { get; set; }
+        }
 
         public class ElementType
         {
