@@ -391,7 +391,7 @@ namespace Umbraco.Tests.Web.Mvc
                 logger, settings,
                 "/dang", 0);
 
-            var publishedRouter = BaseWebTest.CreatePublishedRouter();
+            var publishedRouter = BaseWebTest.CreatePublishedRouter(TestObjects.GetUmbracoSettings().WebRouting);
             var frequest = publishedRouter.CreateRequest(umbracoContext,  new Uri("http://localhost/dang"));
 
             frequest.Culture = CultureInfo.InvariantCulture;

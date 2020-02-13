@@ -83,9 +83,15 @@ namespace Umbraco.Tests.TestHelpers
 </root>";
         }
 
-        internal static PublishedRouter CreatePublishedRouter(IFactory container = null, ContentFinderCollection contentFinders = null)
+        internal PublishedRouter CreatePublishedRouter(IFactory container = null, ContentFinderCollection contentFinders = null)
+        {
+            return CreatePublishedRouter(TestObjects.GetUmbracoSettings().WebRouting, container ?? Factory, contentFinders);
+        }
+
+        internal static PublishedRouter CreatePublishedRouter(IWebRoutingSection webRoutingSection, IFactory container = null, ContentFinderCollection contentFinders = null)
         {
             return new PublishedRouter(
+                webRoutingSection,
                 contentFinders ?? new ContentFinderCollection(Enumerable.Empty<IContentFinder>()),
                 new TestLastChanceFinder(),
                 new TestVariationContextAccessor(),
