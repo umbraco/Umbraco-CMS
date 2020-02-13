@@ -420,10 +420,39 @@ namespace Umbraco.Tests.TestHelpers.Entities
 
             var contentCollection = new PropertyTypeCollection(false);
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.UploadField, ValueStorageType.Nvarchar) { Alias = Constants.Conventions.Media.File, Name = "File", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -90 });
-            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.Label, ValueStorageType.Integer) { Alias = Constants.Conventions.Media.Width, Name = "Width", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = -90 });
-            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.Label, ValueStorageType.Integer) { Alias = Constants.Conventions.Media.Height, Name = "Height", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = -90 });
-            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.Label, ValueStorageType.Integer) { Alias = Constants.Conventions.Media.Bytes, Name = "Bytes", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = -90 });
-            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.Label, ValueStorageType.Nvarchar) { Alias = Constants.Conventions.Media.Extension, Name = "File Extension", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = -90 });
+            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.Label, ValueStorageType.Integer) { Alias = Constants.Conventions.Media.Width, Name = "Width", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = Constants.System.DefaultLabelDataTypeId });
+            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.Label, ValueStorageType.Integer) { Alias = Constants.Conventions.Media.Height, Name = "Height", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = Constants.System.DefaultLabelDataTypeId });
+            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.Label, ValueStorageType.Integer) { Alias = Constants.Conventions.Media.Bytes, Name = "Bytes", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = Constants.System.DefaultLabelDataTypeId });
+            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.Label, ValueStorageType.Nvarchar) { Alias = Constants.Conventions.Media.Extension, Name = "File Extension", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = Constants.System.DefaultLabelDataTypeId });
+
+            mediaType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Media", SortOrder = 1 });
+
+            //ensure that nothing is marked as dirty
+            mediaType.ResetDirtyProperties(false);
+
+            return mediaType;
+        }
+
+        public static MediaType CreateImageMediaTypeWithCrop(string alias = Constants.Conventions.MediaTypes.Image)
+        {
+            var mediaType = new MediaType(-1)
+            {
+                Alias = alias,
+                Name = "Image",
+                Description = "ContentType used for images",
+                Icon = ".sprTreeDoc3",
+                Thumbnail = "doc.png",
+                SortOrder = 1,
+                CreatorId = 0,
+                Trashed = false
+            };
+
+            var contentCollection = new PropertyTypeCollection(false);
+            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.ImageCropper, ValueStorageType.Ntext) { Alias = Constants.Conventions.Media.File, Name = "File", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = 1043 });
+            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.Label, ValueStorageType.Integer) { Alias = Constants.Conventions.Media.Width, Name = "Width", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = Constants.System.DefaultLabelDataTypeId });
+            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.Label, ValueStorageType.Integer) { Alias = Constants.Conventions.Media.Height, Name = "Height", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = Constants.System.DefaultLabelDataTypeId });
+            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.Label, ValueStorageType.Integer) { Alias = Constants.Conventions.Media.Bytes, Name = "Bytes", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = Constants.System.DefaultLabelDataTypeId });
+            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.Label, ValueStorageType.Nvarchar) { Alias = Constants.Conventions.Media.Extension, Name = "File Extension", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = Constants.System.DefaultLabelDataTypeId });
 
             mediaType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Media", SortOrder = 1 });
 
