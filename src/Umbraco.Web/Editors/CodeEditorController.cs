@@ -2,14 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
+using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Editors
 {
+
     [PluginController("UmbracoApi")]
-    public class CodeEditorController : UmbracoApiController
+    [UmbracoApplicationAuthorize(Core.Constants.Applications.Settings)]
+    public class CodeEditorController : UmbracoAuthorizedApiController
     {
         public List<CodeEditorCompletion> GetModel(string modelName)
         {
@@ -90,32 +94,32 @@ namespace Umbraco.Web.Editors
 
                 var completion = new CodeEditorCompletion
                 {
-                    Label = $"{modelProp.Name} <{modelPropType}>",
+                    Label = modelProp.Name,
                     InsertText = modelProp.Name,
-                    Documentation = docTypePropDesc
+                    Documentation = docTypePropDesc,
+                    Detail = modelPropType
                 };
 
                 completions.Add(completion);
             }
 
-
-            //{
-            //    label: "BodyText <IHtmlString>",
-            //    kind: monaco.languages.CompletionItemKind.Property,
-            //    documentation: "The xxx to put you main content",
-            //    insertText: "BodyText",
-            //}
-
             return completions;
         }
     }
 
+    [DataContract]
     public class CodeEditorCompletion
     {
+        [DataMember(Name = "label")]
         public string Label { get; set; }
 
+        [DataMember(Name = "documentation")]
         public string Documentation { get; set; }
 
+        [DataMember(Name = "insertText")]
         public string InsertText { get; set; }
+
+        [DataMember(Name = "detail")]
+        public string Detail { get; set; }
     }
 }
