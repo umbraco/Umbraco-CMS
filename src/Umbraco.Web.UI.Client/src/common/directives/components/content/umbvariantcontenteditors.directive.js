@@ -167,8 +167,9 @@
             
         }
 
-        $scope.$on("editors.content.splitViewRequest", requestSplitView);
-        function requestSplitView(event, args) {
+        $scope.$on("editors.content.splitViewRequest", function(event, args) {requestSplitView(args);});
+        vm.requestSplitView = requestSplitView;
+        function requestSplitView(args) {
             var culture = args.culture;
             var segment = args.segment;
             _.each(vm.content.variants, function (v) {
