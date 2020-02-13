@@ -1,81 +1,77 @@
 <div id="{{model.alias}}" class="umb-block-list-element-type-picker" ng-controller="Umbraco.PropertyEditors.BlockList.ElementTypePickerController as vm">
-    <div>
-        <div class="umb-table">
-            <div class="umb-table-head">
-                <div class="umb-table-row">
-                    <div class="umb-table-cell not-fixed umb-table__name">
-                        <localize key="blockEditor_labelContentElementType">Custom view</localize>
-                    </div>
-                    <div class="umb-table-cell">
-                        <localize key="blockEditor_labelLabelTemplate">Label</localize>
-                        <button type="button" class="btn-reset">
-                            <i class="icon icon-help-alt"></i>
-                        </button>
-                    </div>
-                    <div class="umb-table-cell">
-                        <localize key="blockEditor_labelCustomView">Custom view</localize>
-                    </div>
-                    <div class="umb-table-cell">
-                        <localize key="blockEditor_labelSettingsElementType">Custom view</localize>
-                    </div>
-                    <div class="umb-table-cell action-cell">
-                    </div>
+    <div class="umb-table">
+        <div class="umb-table-head">
+            <div class="umb-table-row">
+                <div class="umb-table-cell not-fixed umb-table__name">
+                    <localize key="blockEditor_labelContentElementType">Custom view</localize>
+                </div>
+                <div class="umb-table-cell">
+                    <localize key="blockEditor_labelLabelTemplate">Label</localize>
+                    <button type="button" class="btn-reset">
+                        <i class="icon icon-help-alt"></i>
+                    </button>
+                </div>
+                <div class="umb-table-cell">
+                    <localize key="blockEditor_labelCustomView">Custom view</localize>
+                </div>
+                <div class="umb-table-cell">
+                    <localize key="blockEditor_labelSettingsElementType">Custom view</localize>
+                </div>
+                <div class="umb-table-cell action-cell">
                 </div>
             </div>
-            <div class="umb-table-body" ui-sortable="vm.sortableOptions" ng-model="model.value">
-                <div class="umb-table-row block-entry" ng-repeat="entry in model.value">
-                    <div class="umb-table-cell not-fixed umb-table__name">
-                        {{ contentPreview = vm.getElementTypeByAlias(entry.elementTypeAlias); "" }}
-                        <umb-node-preview icon="contentPreview.icon" name="contentPreview.name"></umb-node-preview>
-                        <button type="button" class="btn-reset cell-btn --open umb-outline" ng-click="vm.openElementType(entry.elementTypeAlias)">
+        </div>
+        <div class="umb-table-body" ui-sortable="vm.sortableOptions" ng-model="model.value">
+            <div class="umb-table-row block-entry" ng-repeat="entry in model.value">
+                <div class="umb-table-cell not-fixed umb-table__name">
+                    {{ contentPreview = vm.getElementTypeByAlias(entry.elementTypeAlias); "" }}
+                    <umb-node-preview icon="contentPreview.icon" name="contentPreview.name"></umb-node-preview>
+                    <button type="button" class="btn-reset cell-btn --open umb-outline" ng-click="vm.openElementType(entry.elementTypeAlias)">
+                        <i class="icon icon-edit"></i>
+                    </button>
+                </div>
+                <div class="umb-table-cell">
+                    <input type="text" ng-model="entry.labelTemplate" class="text-input"/>
+                </div>
+                <div class="umb-table-cell">
+                    <div class="settings-input --hasValue" ng-if="entry.view !== null" >
+
+                        <umb-node-preview icon="'icon-document'" name="entry.view"></umb-node-preview>
+
+                        <button type="button" class="btn-reset cell-btn --remove umb-outline" ng-click="vm.removeViewForEntry(entry)">
+                            <i class="icon icon-wrong"></i>
+                        </button>
+                    </div>
+                    <button type="button" class="btn-reset settings-input --noValue umb-outline" ng-if="entry.view === null" ng-click="vm.addViewForEntry(entry)">
+                        <localize key="blockEditor_addCustomView">Add custom view</localize>
+                    </button>
+                </div>
+                <div class="umb-table-cell">
+                    <div class="settings-input --hasValue" ng-if="entry.settingsElementTypeAlias !== null" >
+                        {{ settingsPreview = vm.getElementTypeByAlias(entry.settingsElementTypeAlias); "" }}
+                        <umb-node-preview icon="settingsPreview.icon" name="settingsPreview.name"></umb-node-preview>
+
+                        <button type="button" class="btn-reset cell-btn --open umb-outline" ng-click="vm.openElementType(entry.settingsElementTypeAlias)">
                             <i class="icon icon-edit"></i>
                         </button>
-                    </div>
-                    <div class="umb-table-cell">
-                        <input type="text" ng-model="entry.labelTemplate" class="text-input"/>
-                    </div>
-                    <div class="umb-table-cell">
-                        <div class="settings-input --hasValue" ng-if="entry.view !== null" >
-
-                            <umb-node-preview icon="'icon-document'" name="entry.view"></umb-node-preview>
-
-                            <button type="button" class="btn-reset cell-btn --remove umb-outline" ng-click="vm.removeViewForEntry(entry)">
-                                <i class="icon icon-wrong"></i>
-                            </button>
-                        </div>
-                        <button type="button" class="btn-reset settings-input --noValue umb-outline" ng-if="entry.view === null" ng-click="vm.addViewForEntry(entry)">
-                            <localize key="blockEditor_addCustomView">Add custom view</localize>
+                        <button type="button" class="btn-reset cell-btn --remove umb-outline" ng-click="vm.removeSettingsForEntry(entry)">
+                            <i class="icon icon-wrong"></i>
                         </button>
                     </div>
-                    <div class="umb-table-cell">
-                        <div class="settings-input --hasValue" ng-if="entry.settingsElementTypeAlias !== null" >
-                            {{ settingsPreview = vm.getElementTypeByAlias(entry.settingsElementTypeAlias); "" }}
-                            <umb-node-preview icon="settingsPreview.icon" name="settingsPreview.name"></umb-node-preview>
-
-                            <button type="button" class="btn-reset cell-btn --open umb-outline" ng-click="vm.openElementType(entry.settingsElementTypeAlias)">
-                                <i class="icon icon-edit"></i>
-                            </button>
-                            <button type="button" class="btn-reset cell-btn --remove umb-outline" ng-click="vm.removeSettingsForEntry(entry)">
-                                <i class="icon icon-wrong"></i>
-                            </button>
-                        </div>
-                        <button type="button" class="btn-reset settings-input --noValue umb-outline" ng-if="entry.settingsElementTypeAlias === null" ng-click="vm.openPickSettingsDialog($event, entry)">
-                            <localize key="blockEditor_addSettingsElementType">Add settings</localize>
-                        </button>
-                    </div>
-                    <div class="umb-table-cell action-cell --noOverflow">
-                        <button type="button" class="btn-icon umb-outline" ng-click="vm.removeEntryByIndex($index)">
-                            <i class="icon icon-trash" aria-hidden="true"></i>
-                            <localize key="general_delete" class="sr-only">Delete</localize>
-                        </button>
-                    </div>
+                    <button type="button" class="btn-reset settings-input --noValue umb-outline" ng-if="entry.settingsElementTypeAlias === null" ng-click="vm.openPickSettingsDialog($event, entry)">
+                        <localize key="blockEditor_addSettingsElementType">Add settings</localize>
+                    </button>
+                </div>
+                <div class="umb-table-cell action-cell --noOverflow">
+                    <button type="button" class="btn-icon umb-outline" ng-click="vm.removeEntryByIndex($index)">
+                        <i class="icon icon-trash" aria-hidden="true"></i>
+                        <localize key="general_delete" class="sr-only">Delete</localize>
+                    </button>
                 </div>
             </div>
         </div>
-        <div>
-            <button type="button" class="btn-reset add-button" ng-click="vm.openAddDialog($event)" ng-disabled="!vm.enableAddEntry">
-                <localize key="general_add">Add</localize>
-            </button>
-        </div>
     </div>
+    <button type="button" class="btn-reset add-button" ng-click="vm.openAddDialog($event)" ng-disabled="!vm.enableAddEntry">
+        <localize key="general_add">Add</localize>
+    </button>
 </div>
