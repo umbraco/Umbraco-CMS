@@ -2,7 +2,8 @@
 (function () {
     "use strict";
 
-    function TemplatesEditController($scope, $routeParams, $timeout, templateResource, notificationsService, editorState, navigationService, appState, macroService, treeService, contentEditingHelper, localizationService, angularHelper, templateHelper, editorService) {
+    function TemplatesEditController($scope, $routeParams, $timeout, templateResource, notificationsService, editorState,
+        navigationService, appState, macroService, treeService, contentEditingHelper, localizationService, angularHelper, templateHelper, editorService, codeEditorResource) {
 
         var vm = this;
         var oldMasterTemplateAlias = null;
@@ -336,49 +337,28 @@
                 // Code completion for Model. in views
                 modelPropCompletionProvider  = monaco.languages.registerCompletionItemProvider("razor", {
                     provideCompletionItems: function(model, position) {
-                        console.log('COMPLETION: model', model);
                         console.log('COMPLETION: position', position);
-
                         console.log('COMPLETION: getWordUntilPosition()', model.getWordUntilPosition(position));
                         console.log('COMPLETION: getWordAtPosition()', model.getWordAtPosition(position));
 
-                        // Do WebAPI request to get the ModelsBuilder
-                        // properties from the Inherits in the Razor view
+                        // What have we just typed ?
+                        const currentLineContent = model.getLineContent(position.lineNumber);
+                        console.log('lINE CONTENT', currentLineContent);
 
-                        // The service should cache the result of the request
-                        // As this function fires often...
+                        // We only want to fire/lookup Model properties when
+                        // The current line/cursor ends with Model
+                        if(currentLineContent.endsWith("Model") || currentLineContent.endsWith("Model.")){
 
-                        return {
-                            suggestions: [ {
-                                label: "ContactForm",
-                                kind: monaco.languages.CompletionItemKind.Property,
-                                insertText: "HELLO THERE",
-                                documentation: "This adds a snippet for adding CSS items to the Rich Text Editor",
-                                detail: "WARREN THING"
-                            }]
+                            return codeEditorResource.getModel("contact").then(function(completionItems) {
+                                let suggestion = {
+                                    suggestions: []
+                                };
+                                suggestion.suggestions = completionItems;
+                                return suggestion;
+                            });
                         }
-
                     }
                 });
-
-                // // Hover provider when you hover over Model.
-                // monaco.languages.registerHoverProvider("razor", {
-                //     provideHover: function(model, position) {
-
-                //         console.log('HOVER: getWordAtPosition()', model.getWordAtPosition(position));
-
-                //         return {
-                //             contents: [
-                //                 { value: "**DESCRIPTION**" },
-                //                 { value: 'This could come from Umbraco doctype prop' },
-
-                //                 { value: "**PROPERTY EDITOR**" },
-                //                 { value: 'Media Picker' }
-                //             ]
-                //         }
-
-                //     }
-                // });
 
 
                 // Use the event listener to notify & set the formstate to dirty
@@ -388,6 +368,7 @@
                 });
 
             }
+
 
             vm.codeEditorDispose = function(){
                 // Dispose the completion provider
