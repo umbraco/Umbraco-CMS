@@ -117,21 +117,15 @@ namespace Umbraco.Web.Models.Mapping
         /// </returns>
         private IEnumerable<string> GetSegments(IContent content)
         {
-            // The current segments of a content item are determined
-            // entirely on the current property values of the content.            
-            var segments = content.Properties
-                .SelectMany(p => p.Values.Select(v => v.Segment))
-                .Distinct()
-                .ToList();
+            // The default segment (null) is always there,
+            // even when there is no property data at all yet
+            var segments = new List<string> { null };
 
-            if(segments.Count == 0)
-            {
-                // The default segment is always there,
-                // even when there is no property data at all yet
-                segments.Add(null);
-            }
+            // Add actual segments based on the property values
+            segments.AddRange(content.Properties.SelectMany(p => p.Values.Select(v => v.Segment)));
 
-            return segments;            
+            // Do not return a segment more than once
+            return segments.Distinct();
         }
 
         private ContentVariantDisplay CreateVariantDisplay(MapperContext context, IContent content, Language language, string segment)
