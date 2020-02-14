@@ -15,6 +15,8 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
+using Umbraco.Tests.Testing.Objects.Accessors;
+using Umbraco.Web;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Routing;
 
@@ -41,7 +43,7 @@ namespace Umbraco.Tests.Routing
                 new FileUploadPropertyEditor(logger, mediaFileSystemMock, contentSection, dataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, umbracoSettingsSection),
                 new ImageCropperPropertyEditor(logger, mediaFileSystemMock, contentSection, dataTypeService, LocalizationService, IOHelper, ShortStringHelper, LocalizedTextService, umbracoSettingsSection),
             }));
-            _mediaUrlProvider = new DefaultMediaUrlProvider(propertyEditors);
+            _mediaUrlProvider = new DefaultMediaUrlProvider(new Lazy<PropertyEditorCollection>(() => propertyEditors));
         }
 
         public override void TearDown()
@@ -56,10 +58,10 @@ namespace Umbraco.Tests.Routing
         {
             const string expected = "/media/rfeiw584/test.jpg";
 
-            var umbracoContext = GetUmbracoContext("/", mediaUrlProviders: new[] { _mediaUrlProvider });
+            var umbracoContext = GetUmbracoContext("/");
             var publishedContent = CreatePublishedContent(Constants.PropertyEditors.Aliases.UploadField, expected, null);
 
-            var resolvedUrl = umbracoContext.UrlProvider.GetMediaUrl(publishedContent, UrlMode.Auto);
+            var resolvedUrl = GetPublishedUrlProvider(umbracoContext).GetMediaUrl(publishedContent, UrlMode.Auto);
 
             Assert.AreEqual(expected, resolvedUrl);
         }
@@ -75,10 +77,10 @@ namespace Umbraco.Tests.Routing
                 Src = expected
             });
 
-            var umbracoContext = GetUmbracoContext("/", mediaUrlProviders: new[] { _mediaUrlProvider });
+            var umbracoContext = GetUmbracoContext("/");
             var publishedContent = CreatePublishedContent(Constants.PropertyEditors.Aliases.ImageCropper, imageCropperValue, configuration);
 
-            var resolvedUrl = umbracoContext.UrlProvider.GetMediaUrl(publishedContent, UrlMode.Auto);
+            var resolvedUrl = GetPublishedUrlProvider(umbracoContext).GetMediaUrl(publishedContent, UrlMode.Auto);
 
             Assert.AreEqual(expected, resolvedUrl);
         }
@@ -89,10 +91,10 @@ namespace Umbraco.Tests.Routing
             const string mediaUrl = "/media/rfeiw584/test.jpg";
             var expected = $"http://localhost{mediaUrl}";
 
-            var umbracoContext = GetUmbracoContext("http://localhost", mediaUrlProviders: new[] { _mediaUrlProvider });
+            var umbracoContext = GetUmbracoContext("http://localhost");
             var publishedContent = CreatePublishedContent(Constants.PropertyEditors.Aliases.UploadField, mediaUrl, null);
 
-            var resolvedUrl = umbracoContext.UrlProvider.GetMediaUrl(publishedContent, UrlMode.Absolute);
+            var resolvedUrl = GetPublishedUrlProvider(umbracoContext).GetMediaUrl(publishedContent, UrlMode.Absolute);
 
             Assert.AreEqual(expected, resolvedUrl);
         }
@@ -102,10 +104,10 @@ namespace Umbraco.Tests.Routing
         {
             const string expected = "http://localhost/media/rfeiw584/test.jpg";
 
-            var umbracoContext = GetUmbracoContext("http://localhost", mediaUrlProviders: new[] { _mediaUrlProvider });
+            var umbracoContext = GetUmbracoContext("http://localhost");
             var publishedContent = CreatePublishedContent(Constants.PropertyEditors.Aliases.UploadField, expected, null);
 
-            var resolvedUrl = umbracoContext.UrlProvider.GetMediaUrl(publishedContent, UrlMode.Relative);
+            var resolvedUrl = GetPublishedUrlProvider(umbracoContext).GetMediaUrl(publishedContent, UrlMode.Relative);
 
             Assert.AreEqual(expected, resolvedUrl);
         }
@@ -113,10 +115,10 @@ namespace Umbraco.Tests.Routing
         [Test]
         public void Get_Media_Url_Returns_Empty_String_When_PropertyType_Is_Not_Supported()
         {
-            var umbracoContext = GetUmbracoContext("/", mediaUrlProviders: new[] { _mediaUrlProvider });
+            var umbracoContext = GetUmbracoContext("/");
             var publishedContent = CreatePublishedContent(Constants.PropertyEditors.Aliases.Boolean, "0", null);
 
-            var resolvedUrl = umbracoContext.UrlProvider.GetMediaUrl(publishedContent, UrlMode.Absolute, propertyAlias: "test");
+            var resolvedUrl = GetPublishedUrlProvider(umbracoContext).GetMediaUrl(publishedContent, UrlMode.Absolute, propertyAlias: "test");
 
             Assert.AreEqual(string.Empty, resolvedUrl);
         }
@@ -124,7 +126,7 @@ namespace Umbraco.Tests.Routing
         [Test]
         public void Get_Media_Url_Can_Resolve_Variant_Property_Url()
         {
-            var umbracoContext = GetUmbracoContext("http://localhost", mediaUrlProviders: new[] { _mediaUrlProvider });
+            var umbracoContext = GetUmbracoContext("http://localhost");
 
             var umbracoFilePropertyType = CreatePropertyType(Constants.PropertyEditors.Aliases.UploadField, null, ContentVariation.Culture);
 
@@ -143,8 +145,19 @@ namespace Umbraco.Tests.Routing
             var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), new [] { umbracoFilePropertyType }, ContentVariation.Culture);
             var publishedContent = new SolidPublishedContent(contentType) {Properties = new[] {property}};
 
-            var resolvedUrl = umbracoContext.UrlProvider.GetMediaUrl(publishedContent, UrlMode.Auto, "da");
+            var resolvedUrl = GetPublishedUrlProvider(umbracoContext).GetMediaUrl(publishedContent, UrlMode.Auto, "da");
             Assert.AreEqual(daMediaUrl, resolvedUrl);
+        }
+
+        private IPublishedUrlProvider GetPublishedUrlProvider(IUmbracoContext umbracoContext)
+        {
+            return new UrlProvider(
+                new Lazy<IUmbracoContextAccessor>(() => new TestUmbracoContextAccessor(umbracoContext)),
+                TestHelper.WebRoutingSection,
+                new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
+                new MediaUrlProviderCollection(new []{_mediaUrlProvider}),
+                Mock.Of<IVariationContextAccessor>()
+            );
         }
 
         private static IPublishedContent CreatePublishedContent(string propertyEditorAlias, string propertyValue, object dataTypeConfiguration)

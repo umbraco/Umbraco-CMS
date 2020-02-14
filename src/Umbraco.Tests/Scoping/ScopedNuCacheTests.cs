@@ -123,12 +123,10 @@ namespace Umbraco.Tests.Scoping
                 httpContextAccessor,
                 service,
                 new WebSecurity(httpContextAccessor, Current.Services.UserService, globalSettings, IOHelper),
-                umbracoSettings ?? SettingsForTests.GetDefaultUmbracoSettings(),
-                urlProviders ?? Enumerable.Empty<IUrlProvider>(),
-                Enumerable.Empty<IMediaUrlProvider>(),
                 globalSettings,
                 new TestVariationContextAccessor(),
-                IOHelper);
+                IOHelper,
+                PublishedUrlProvider);
 
             if (setSingleton)
                 Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;

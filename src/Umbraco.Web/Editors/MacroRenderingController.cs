@@ -20,6 +20,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Editors
 {
@@ -52,7 +53,8 @@ namespace Umbraco.Web.Editors
             UmbracoMapper umbracoMapper,
             IUmbracoComponentRenderer componentRenderer,
             IVariationContextAccessor variationContextAccessor,
-            IMacroService macroService)
+            IMacroService macroService,
+            IPublishedUrlProvider publishedUrlProvider)
             : base(
                 globalSettings,
                 umbracoContextAccessor,
@@ -63,7 +65,8 @@ namespace Umbraco.Web.Editors
                 runtimeState,
                 umbracoHelper,
                 shortStringHelper,
-                umbracoMapper)
+                umbracoMapper,
+                publishedUrlProvider)
         {
             _componentRenderer = componentRenderer;
             _variationContextAccessor = variationContextAccessor;

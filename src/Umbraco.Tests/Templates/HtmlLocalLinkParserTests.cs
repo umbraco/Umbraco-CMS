@@ -6,6 +6,7 @@ using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing.Objects;
 using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
@@ -30,7 +31,7 @@ namespace Umbraco.Tests.Templates
 </p>";
 
             var umbracoContextAccessor = new TestUmbracoContextAccessor();
-            var parser = new HtmlLocalLinkParser(umbracoContextAccessor);
+            var parser = new HtmlLocalLinkParser(umbracoContextAccessor, Mock.Of<IPublishedUrlProvider>());
 
             var result = parser.FindUdisFromLocalLinks(input).ToList();
 
@@ -52,7 +53,7 @@ namespace Umbraco.Tests.Templates
             //setup a mock url provider which we'll use for testing
             var contentUrlProvider = new Mock<IUrlProvider>();
             contentUrlProvider
-                .Setup(x => x.GetUrl(It.IsAny<IUmbracoContext>(), It.IsAny<IPublishedContent>(), It.IsAny<UrlMode>(), It.IsAny<string>(), It.IsAny<Uri>()))
+                .Setup(x => x.GetUrl( It.IsAny<IPublishedContent>(), It.IsAny<UrlMode>(), It.IsAny<string>(), It.IsAny<Uri>()))
                 .Returns(UrlInfo.Url("/my-test-url"));
             var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing);
             var publishedContent = new Mock<IPublishedContent>();
@@ -63,16 +64,20 @@ namespace Umbraco.Tests.Templates
             var media = new Mock<IPublishedContent>();
             media.Setup(x => x.ContentType).Returns(mediaType);
             var mediaUrlProvider = new Mock<IMediaUrlProvider>();
-            mediaUrlProvider.Setup(x => x.GetMediaUrl(It.IsAny<IUmbracoContext>(), It.IsAny<IPublishedContent>(), It.IsAny<string>(), It.IsAny<UrlMode>(), It.IsAny<string>(), It.IsAny<Uri>()))
+            mediaUrlProvider.Setup(x => x.GetMediaUrl(It.IsAny<IPublishedContent>(), It.IsAny<string>(), It.IsAny<UrlMode>(), It.IsAny<string>(), It.IsAny<Uri>()))
                 .Returns(UrlInfo.Url("/media/1001/my-image.jpg"));
 
             var umbracoContextAccessor = new TestUmbracoContextAccessor();
 
             var umbracoContextFactory = TestUmbracoContextFactory.Create(
-                urlProvider: contentUrlProvider.Object,
-                mediaUrlProvider: mediaUrlProvider.Object,
                 umbracoContextAccessor: umbracoContextAccessor);
 
+            var publishedUrlProvider = new UrlProvider(new Lazy<IUmbracoContextAccessor>(() => umbracoContextAccessor),
+                TestHelper.WebRoutingSection,
+                new UrlProviderCollection(new []{contentUrlProvider.Object}),
+                new MediaUrlProviderCollection(new []{mediaUrlProvider.Object}),
+                Mock.Of<IVariationContextAccessor>()
+                );
             using (var reference = umbracoContextFactory.EnsureUmbracoContext())
             {
                 var contentCache = Mock.Get(reference.UmbracoContext.Content);
@@ -83,7 +88,7 @@ namespace Umbraco.Tests.Templates
                 mediaCache.Setup(x => x.GetById(It.IsAny<int>())).Returns(media.Object);
                 mediaCache.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(media.Object);
 
-                var linkParser = new HtmlLocalLinkParser(umbracoContextAccessor);
+                var linkParser = new HtmlLocalLinkParser(umbracoContextAccessor, publishedUrlProvider);
 
                 var output = linkParser.EnsureInternalLinks(input);
 

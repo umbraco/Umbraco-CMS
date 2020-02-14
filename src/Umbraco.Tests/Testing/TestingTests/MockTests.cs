@@ -79,12 +79,18 @@ namespace Umbraco.Tests.Testing.TestingTests
         {
             var umbracoContext = TestObjects.GetUmbracoContextMock();
 
+
             var urlProviderMock = new Mock<IUrlProvider>();
-            urlProviderMock.Setup(provider => provider.GetUrl(It.IsAny<IUmbracoContext>(), It.IsAny<IPublishedContent>(), It.IsAny<UrlMode>(), It.IsAny<string>(), It.IsAny<Uri>()))
+            urlProviderMock.Setup(provider => provider.GetUrl(It.IsAny<IPublishedContent>(), It.IsAny<UrlMode>(), It.IsAny<string>(), It.IsAny<Uri>()))
                 .Returns(UrlInfo.Url("/hello/world/1234"));
             var urlProvider = urlProviderMock.Object;
 
-            var theUrlProvider = new UrlProvider(umbracoContext, new [] { urlProvider }, Enumerable.Empty<IMediaUrlProvider>(), umbracoContext.VariationContextAccessor);
+            var theUrlProvider = new UrlProvider(
+                new Lazy<IUmbracoContextAccessor>(() => new TestUmbracoContextAccessor(umbracoContext)),
+                TestHelper.WebRoutingSection,
+                new UrlProviderCollection(new [] { urlProvider }),
+                new MediaUrlProviderCollection( Enumerable.Empty<IMediaUrlProvider>())
+                , umbracoContext.VariationContextAccessor);
 
             var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing);
             var publishedContent = Mock.Of<IPublishedContent>();
@@ -104,7 +110,7 @@ namespace Umbraco.Tests.Testing.TestingTests
             var umbracoHelper = new UmbracoHelper(Mock.Of<IPublishedContent>(), Mock.Of<ITagQuery>(), Mock.Of<ICultureDictionaryFactory>(), Mock.Of<IUmbracoComponentRenderer>(), Mock.Of<IPublishedContentQuery>(), membershipHelper);
             var umbracoMapper = new UmbracoMapper(new MapDefinitionCollection(new[] { Mock.Of<IMapDefinition>() }));
 
-            var umbracoApiController = new FakeUmbracoApiController(Mock.Of<IGlobalSettings>(), Mock.Of<IUmbracoContextAccessor>(), Mock.Of<ISqlContext>(), ServiceContext.CreatePartial(), AppCaches.NoCache, logger, Mock.Of<IRuntimeState>(), umbracoHelper, umbracoMapper);
+            var umbracoApiController = new FakeUmbracoApiController(Mock.Of<IGlobalSettings>(), Mock.Of<IUmbracoContextAccessor>(), Mock.Of<ISqlContext>(), ServiceContext.CreatePartial(), AppCaches.NoCache, logger, Mock.Of<IRuntimeState>(), umbracoHelper, umbracoMapper, Mock.Of<IPublishedUrlProvider>());
 
             Assert.Pass();
         }
@@ -112,6 +118,7 @@ namespace Umbraco.Tests.Testing.TestingTests
 
     internal class FakeUmbracoApiController : UmbracoApiController
     {
-        public FakeUmbracoApiController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, UmbracoMapper umbracoMapper) : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper) { }
+        public FakeUmbracoApiController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, UmbracoMapper umbracoMapper, IPublishedUrlProvider publishedUrlProvider)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, umbracoMapper, publishedUrlProvider) { }
     }
 }

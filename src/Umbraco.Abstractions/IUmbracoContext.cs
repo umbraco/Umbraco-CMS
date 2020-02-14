@@ -63,11 +63,6 @@ namespace Umbraco.Web
         bool IsFrontEndUmbracoRequest { get; }
 
         /// <summary>
-        /// Gets the url provider.
-        /// </summary>
-        IPublishedUrlProvider UrlProvider { get; }
-
-        /// <summary>
         /// Gets/sets the PublishedRequest object
         /// </summary>
         IPublishedRequest PublishedRequest { get; set; }

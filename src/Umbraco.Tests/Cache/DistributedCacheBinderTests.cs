@@ -161,13 +161,11 @@ namespace Umbraco.Tests.Cache
                 Mock.Of<IPublishedSnapshotService>(),
                 new TestVariationContextAccessor(),
                 new TestDefaultCultureAccessor(),
-                TestObjects.GetUmbracoSettings(),
                 TestObjects.GetGlobalSettings(),
-                new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
-                new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
                 Mock.Of<IUserService>(),
                 IOHelper,
-                httpContextAccessor);
+                httpContextAccessor,
+                PublishedUrlProvider);
 
             // just assert it does not throw
             var refreshers = new DistributedCacheBinder(null, umbracoContextFactory, null);

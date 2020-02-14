@@ -21,6 +21,7 @@ namespace Umbraco.Web
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IGlobalSettings _globalSettings;
         private readonly IIOHelper _ioHelper;
+        private readonly IPublishedUrlProvider _publishedUrlProvider;
         private readonly Lazy<IPublishedSnapshot> _publishedSnapshot;
         private string _previewToken;
         private bool? _previewing;
@@ -32,23 +33,19 @@ namespace Umbraco.Web
         internal UmbracoContext(IHttpContextAccessor httpContextAccessor,
             IPublishedSnapshotService publishedSnapshotService,
             IWebSecurity webSecurity,
-            IUmbracoSettingsSection umbracoSettings,
-            IEnumerable<IUrlProvider> urlProviders,
-            IEnumerable<IMediaUrlProvider> mediaUrlProviders,
             IGlobalSettings globalSettings,
             IVariationContextAccessor variationContextAccessor,
-            IIOHelper ioHelper)
+            IIOHelper ioHelper,
+            IPublishedUrlProvider publishedUrlProvider)
         {
             if (httpContextAccessor == null) throw new ArgumentNullException(nameof(httpContextAccessor));
             if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
             if (webSecurity == null) throw new ArgumentNullException(nameof(webSecurity));
-            if (umbracoSettings == null) throw new ArgumentNullException(nameof(umbracoSettings));
-            if (urlProviders == null) throw new ArgumentNullException(nameof(urlProviders));
-            if (mediaUrlProviders == null) throw new ArgumentNullException(nameof(mediaUrlProviders));
             VariationContextAccessor = variationContextAccessor ??  throw new ArgumentNullException(nameof(variationContextAccessor));
             _httpContextAccessor = httpContextAccessor;
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
+            _publishedUrlProvider = publishedUrlProvider;
 
             // ensure that this instance is disposed when the request terminates, though we *also* ensure
             // this happens in the Umbraco module since the UmbracoCOntext is added to the HttpContext items.
@@ -76,7 +73,6 @@ namespace Umbraco.Web
             //
             OriginalRequestUrl = GetRequestFromContext()?.Url ?? new Uri("http://localhost");
             CleanedUmbracoUrl = UriUtility.UriToUmbraco(OriginalRequestUrl);
-            UrlProvider = new UrlProvider(this, umbracoSettings.WebRouting, urlProviders, mediaUrlProviders, variationContextAccessor);
         }
 
         /// <summary>
@@ -133,11 +129,6 @@ namespace Umbraco.Web
         public bool IsFrontEndUmbracoRequest => PublishedRequest != null;
 
         /// <summary>
-        /// Gets the url provider.
-        /// </summary>
-        public IPublishedUrlProvider UrlProvider { get; }
-
-        /// <summary>
         /// Gets/sets the PublishedRequest object
         /// </summary>
         public IPublishedRequest PublishedRequest { get; set; }
@@ -188,7 +179,7 @@ namespace Umbraco.Web
         /// <returns>The url for the content.</returns>
         public string Url(int contentId, string culture = null)
         {
-            return UrlProvider.GetUrl(contentId, culture: culture);
+            return _publishedUrlProvider.GetUrl(contentId, culture: culture);
         }
 
         /// <summary>
@@ -199,7 +190,7 @@ namespace Umbraco.Web
         /// <returns>The url for the content.</returns>
         public string Url(Guid contentId, string culture = null)
         {
-            return UrlProvider.GetUrl(contentId, culture: culture);
+            return _publishedUrlProvider.GetUrl(contentId, culture: culture);
         }
 
         /// <summary>
@@ -211,7 +202,7 @@ namespace Umbraco.Web
         /// <returns>The url for the content.</returns>
         public string Url(int contentId, UrlMode mode, string culture = null)
         {
-            return UrlProvider.GetUrl(contentId, mode, culture);
+            return _publishedUrlProvider.GetUrl(contentId, mode, culture);
         }
 
         /// <summary>
@@ -223,7 +214,7 @@ namespace Umbraco.Web
         /// <returns>The url for the content.</returns>
         public string Url(Guid contentId, UrlMode mode, string culture = null)
         {
-            return UrlProvider.GetUrl(contentId, mode, culture);
+            return _publishedUrlProvider.GetUrl(contentId, mode, culture);
         }
 
         #endregion

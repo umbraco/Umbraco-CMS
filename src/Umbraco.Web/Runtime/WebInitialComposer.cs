@@ -99,6 +99,7 @@ namespace Umbraco.Web.Runtime
 
             // register the umbraco context factory
             composition.RegisterUnique<IUmbracoContextFactory, UmbracoContextFactory>();
+            composition.RegisterUnique<IPublishedUrlProvider, UrlProvider>();
 
             // register a per-request HttpContextBase object
             // is per-request so only one wrapper is created per request

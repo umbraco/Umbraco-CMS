@@ -718,7 +718,7 @@ namespace Umbraco.Web
             if (umbracoContext == null)
                 throw new InvalidOperationException("Cannot resolve a Url when Current.UmbracoContext is null.");
 
-            return content.Url(Current.UmbracoContext.UrlProvider, culture, mode);
+            return content.Url(Current.PublishedUrlProvider, culture, mode);
         }
 
         #endregion

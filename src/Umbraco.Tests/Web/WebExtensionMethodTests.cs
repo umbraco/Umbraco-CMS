@@ -33,12 +33,10 @@ namespace Umbraco.Tests.Web
                 httpContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),
                 new WebSecurity(httpContextAccessor, Current.Services.UserService, TestObjects.GetGlobalSettings(), IOHelper),
-                TestObjects.GetUmbracoSettings(),
-                new List<IUrlProvider>(),
-                Enumerable.Empty<IMediaUrlProvider>(),
                 TestObjects.GetGlobalSettings(),
                 new TestVariationContextAccessor(),
-                IOHelper);
+                IOHelper,
+                PublishedUrlProvider);
             var r1 = new RouteData();
             r1.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx);
 
@@ -55,12 +53,10 @@ namespace Umbraco.Tests.Web
                 httpContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),
                 new WebSecurity(httpContextAccessor, Current.Services.UserService, TestObjects.GetGlobalSettings(), IOHelper),
-                TestObjects.GetUmbracoSettings(),
-                new List<IUrlProvider>(),
-                Enumerable.Empty<IMediaUrlProvider>(),
                 TestObjects.GetGlobalSettings(),
                 new TestVariationContextAccessor(),
-                IOHelper);
+                IOHelper,
+                PublishedUrlProvider);
 
             var r1 = new RouteData();
             r1.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx);
@@ -87,12 +83,10 @@ namespace Umbraco.Tests.Web
                 httpContextAccessor,
                 Mock.Of<IPublishedSnapshotService>(),
                 new WebSecurity(httpContextAccessor, Current.Services.UserService, TestObjects.GetGlobalSettings(), IOHelper),
-                TestObjects.GetUmbracoSettings(),
-                new List<IUrlProvider>(),
-                Enumerable.Empty<IMediaUrlProvider>(),
                 TestObjects.GetGlobalSettings(),
                 new TestVariationContextAccessor(),
-                IOHelper);
+                IOHelper,
+                PublishedUrlProvider);
 
             var httpContext = Mock.Of<HttpContextBase>();
 

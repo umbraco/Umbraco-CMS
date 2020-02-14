@@ -259,6 +259,7 @@ namespace Umbraco.Web.Composing
         public static IHostingEnvironment HostingEnvironment => Factory.GetInstance<IHostingEnvironment>();
         public static IIpResolver IpResolver => Factory.GetInstance<IIpResolver>();
         public static IUmbracoVersion UmbracoVersion => Factory.GetInstance<IUmbracoVersion>();
+        public static IPublishedUrlProvider PublishedUrlProvider => Factory.GetInstance<IPublishedUrlProvider>();
 
         #endregion
     }

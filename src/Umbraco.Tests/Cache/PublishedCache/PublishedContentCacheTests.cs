@@ -80,12 +80,10 @@ namespace Umbraco.Tests.Cache.PublishedCache
                 httpContextAccessor,
                 publishedSnapshotService.Object,
                 new WebSecurity(httpContextAccessor, Mock.Of<IUserService>(), globalSettings, IOHelper),
-                umbracoSettings,
-                Enumerable.Empty<IUrlProvider>(),
-                Enumerable.Empty<IMediaUrlProvider>(),
                 globalSettings,
                 new TestVariationContextAccessor(),
-                IOHelper);
+                IOHelper,
+                PublishedUrlProvider);
 
             _cache = _umbracoContext.Content;
         }

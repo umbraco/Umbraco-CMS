@@ -16,12 +16,14 @@ namespace Umbraco.Web.Routing
         private readonly IGlobalSettings _globalSettings;
         private readonly IRequestHandlerSection _requestConfig;
         private readonly ISiteDomainHelper _siteDomainHelper;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
-        public AliasUrlProvider(IGlobalSettings globalSettings, IRequestHandlerSection requestConfig, ISiteDomainHelper siteDomainHelper)
+        public AliasUrlProvider(IGlobalSettings globalSettings, IRequestHandlerSection requestConfig, ISiteDomainHelper siteDomainHelper, IUmbracoContextAccessor umbracoContextAccessor)
         {
             _globalSettings = globalSettings;
             _requestConfig = requestConfig;
             _siteDomainHelper = siteDomainHelper;
+            _umbracoContextAccessor = umbracoContextAccessor;
         }
 
         // note - at the moment we seem to accept pretty much anything as an alias
@@ -31,7 +33,7 @@ namespace Umbraco.Web.Routing
         #region GetUrl
 
         /// <inheritdoc />
-        public UrlInfo GetUrl(IUmbracoContext umbracoContext, IPublishedContent content, UrlMode mode, string culture, Uri current)
+        public UrlInfo GetUrl(IPublishedContent content, UrlMode mode, string culture, Uri current)
         {
             return null; // we have nothing to say
         }
@@ -51,8 +53,9 @@ namespace Umbraco.Web.Routing
         /// <para>Other urls are those that <c>GetUrl</c> would not return in the current context, but would be valid
         /// urls for the node in other contexts (different domain for current request, umbracoUrlAlias...).</para>
         /// </remarks>
-        public IEnumerable<UrlInfo> GetOtherUrls(IUmbracoContext umbracoContext, int id, Uri current)
+        public IEnumerable<UrlInfo> GetOtherUrls(int id, Uri current)
         {
+            var umbracoContext = _umbracoContextAccessor.UmbracoContext;
             var node = umbracoContext.Content.GetById(id);
             if (node == null)
                 yield break;

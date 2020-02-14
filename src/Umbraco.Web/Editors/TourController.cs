@@ -16,6 +16,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Routing;
 using Umbraco.Web.Tour;
 
 namespace Umbraco.Web.Editors
@@ -42,8 +43,9 @@ namespace Umbraco.Web.Editors
             TourFilterCollection filters,
             IUmbracoSettingsSection umbracoSettingsSection,
             IIOHelper ioHelper,
-            ICurrentUserAccessor currentUserAccessor)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper)
+            ICurrentUserAccessor currentUserAccessor,
+            IPublishedUrlProvider publishedUrlProvider)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, shortStringHelper, umbracoMapper, publishedUrlProvider)
         {
             _filters = filters;
             _umbracoSettingsSection = umbracoSettingsSection ?? throw new ArgumentNullException(nameof(umbracoSettingsSection));

@@ -141,18 +141,16 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             var umbCtx = new UmbracoContext(httpContextAccessor,
                 publishedSnapshotService.Object,
                 webSecurity.Object,
-                Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "Auto")),
-                Enumerable.Empty<IUrlProvider>(),
-                Enumerable.Empty<IMediaUrlProvider>(),
                 globalSettings,
                 new TestVariationContextAccessor(),
-                TestHelper.IOHelper);
+                TestHelper.IOHelper,
+                Mock.Of<IPublishedUrlProvider>());
 
             //replace it
             umbracoContextAccessor.UmbracoContext = umbCtx;
 
             var urlHelper = new Mock<IUrlProvider>();
-            urlHelper.Setup(provider => provider.GetUrl(It.IsAny<IUmbracoContext>(), It.IsAny<IPublishedContent>(), It.IsAny<UrlMode>(), It.IsAny<string>(), It.IsAny<Uri>()))
+            urlHelper.Setup(provider => provider.GetUrl(It.IsAny<IPublishedContent>(), It.IsAny<UrlMode>(), It.IsAny<string>(), It.IsAny<Uri>()))
                 .Returns(UrlInfo.Url("/hello/world/1234"));
 
             var membershipHelper = new MembershipHelper(httpContext, Mock.Of<IPublishedMemberCache>(), Mock.Of<MembersMembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IPublicAccessService>(), AppCaches.Disabled, Mock.Of<ILogger>(), new MockShortStringHelper(), Mock.Of<IEntityService>());

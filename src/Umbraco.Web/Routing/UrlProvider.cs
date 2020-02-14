@@ -4,7 +4,6 @@ using System.Linq;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Routing
 {
@@ -17,18 +16,18 @@ namespace Umbraco.Web.Routing
         #region Ctor and configuration
 
         /// <summary>
-        /// InitialiIUrlProviderzes a new instance of the <see cref="UrlProvider"/> class with an Umbraco context and a list of url providers.
+        /// Initializes a new instance of the <see cref="UrlProvider"/> class with an Umbraco context and a list of url providers.
         /// </summary>
-        /// <param name="umbracoContext">The Umbraco context.</param>
+        /// <param name="umbracoContextAccessor">The Umbraco context accessor.</param>
         /// <param name="routingSettings">Routing settings.</param>
         /// <param name="urlProviders">The list of url providers.</param>
         /// <param name="mediaUrlProviders">The list of media url providers.</param>
         /// <param name="variationContextAccessor">The current variation accessor.</param>
-        public UrlProvider(IUmbracoContext umbracoContext, IWebRoutingSection routingSettings, IEnumerable<IUrlProvider> urlProviders, IEnumerable<IMediaUrlProvider> mediaUrlProviders, IVariationContextAccessor variationContextAccessor)
+        public UrlProvider(Lazy<IUmbracoContextAccessor> umbracoContextAccessor, IWebRoutingSection routingSettings, UrlProviderCollection urlProviders, MediaUrlProviderCollection mediaUrlProviders, IVariationContextAccessor variationContextAccessor)
         {
             if (routingSettings == null) throw new ArgumentNullException(nameof(routingSettings));
 
-            _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
+            _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _urlProviders = urlProviders;
             _mediaUrlProviders = mediaUrlProviders;
             _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
@@ -41,25 +40,8 @@ namespace Umbraco.Web.Routing
             }
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UrlProvider"/> class with an Umbraco context and a list of url providers.
-        /// </summary>
-        /// <param name="umbracoContext">The Umbraco context.</param>
-        /// <param name="urlProviders">The list of url providers.</param>
-        /// <param name="mediaUrlProviders">The list of media url providers</param>
-        /// <param name="variationContextAccessor">The current variation accessor.</param>
-        /// <param name="mode">An optional provider mode.</param>
-        public UrlProvider(IUmbracoContext umbracoContext, IEnumerable<IUrlProvider> urlProviders, IEnumerable<IMediaUrlProvider> mediaUrlProviders, IVariationContextAccessor variationContextAccessor, UrlMode mode = UrlMode.Auto)
-        {
-            _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
-            _urlProviders = urlProviders;
-            _mediaUrlProviders = mediaUrlProviders;
-            _variationContextAccessor = variationContextAccessor;
 
-            Mode = mode;
-        }
-
-        private readonly IUmbracoContext _umbracoContext;
+        private readonly Lazy<IUmbracoContextAccessor> _umbracoContextAccessor;
         private readonly IEnumerable<IUrlProvider> _urlProviders;
         private readonly IEnumerable<IMediaUrlProvider> _mediaUrlProviders;
         private readonly IVariationContextAccessor _variationContextAccessor;
@@ -73,9 +55,9 @@ namespace Umbraco.Web.Routing
 
         #region GetUrl
 
-        private IPublishedContent GetDocument(int id) => _umbracoContext.Content.GetById(id);
-        private IPublishedContent GetDocument(Guid id) => _umbracoContext.Content.GetById(id);
-        private IPublishedContent GetMedia(Guid id) => _umbracoContext.Media.GetById(id);
+        private IPublishedContent GetDocument(int id) => _umbracoContextAccessor.Value.UmbracoContext.Content.GetById(id);
+        private IPublishedContent GetDocument(Guid id) => _umbracoContextAccessor.Value.UmbracoContext.Content.GetById(id);
+        private IPublishedContent GetMedia(Guid id) => _umbracoContextAccessor.Value.UmbracoContext.Media.GetById(id);
 
         /// <summary>
         /// Gets the url of a published content.
@@ -131,9 +113,9 @@ namespace Umbraco.Web.Routing
             }
 
             if (current == null)
-                current = _umbracoContext.CleanedUmbracoUrl;
+                current = _umbracoContextAccessor.Value.UmbracoContext.CleanedUmbracoUrl;
 
-            var url = _urlProviders.Select(provider => provider.GetUrl(_umbracoContext, content, mode, culture, current))
+            var url = _urlProviders.Select(provider => provider.GetUrl(content, mode, culture, current))
                 .FirstOrDefault(u => u != null);
             return url?.Text ?? "#"; // legacy wants this
         }
@@ -143,7 +125,7 @@ namespace Umbraco.Web.Routing
             var provider = _urlProviders.OfType<DefaultUrlProvider>().FirstOrDefault();
             var url = provider == null
                 ? route // what else?
-                : provider.GetUrlFromRoute(route, Current.UmbracoContext, id, _umbracoContext.CleanedUmbracoUrl, Mode, culture)?.Text;
+                : provider.GetUrlFromRoute(route, _umbracoContextAccessor.Value.UmbracoContext, id, _umbracoContextAccessor.Value.UmbracoContext.CleanedUmbracoUrl, Mode, culture)?.Text;
             return url ?? "#";
         }
 
@@ -163,7 +145,7 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public IEnumerable<UrlInfo> GetOtherUrls(int id)
         {
-            return GetOtherUrls(id, _umbracoContext.CleanedUmbracoUrl);
+            return GetOtherUrls(id, _umbracoContextAccessor.Value.UmbracoContext.CleanedUmbracoUrl);
         }
 
         /// <summary>
@@ -178,7 +160,7 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public IEnumerable<UrlInfo> GetOtherUrls(int id, Uri current)
         {
-            return _urlProviders.SelectMany(provider => provider.GetOtherUrls(_umbracoContext, id, current) ?? Enumerable.Empty<UrlInfo>());
+            return _urlProviders.SelectMany(provider => provider.GetOtherUrls(id, current) ?? Enumerable.Empty<UrlInfo>());
         }
 
         #endregion
@@ -232,10 +214,10 @@ namespace Umbraco.Web.Routing
             }
 
             if (current == null)
-                current = _umbracoContext.CleanedUmbracoUrl;
+                current = _umbracoContextAccessor.Value.UmbracoContext.CleanedUmbracoUrl;
 
             var url = _mediaUrlProviders.Select(provider =>
-                    provider.GetMediaUrl(_umbracoContext, content, propertyAlias, mode, culture, current))
+                    provider.GetMediaUrl(content, propertyAlias, mode, culture, current))
                 .FirstOrDefault(u => u != null);
 
             return url?.Text ?? "";

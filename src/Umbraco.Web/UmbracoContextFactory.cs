@@ -28,31 +28,26 @@ namespace Umbraco.Web
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
 
-        private readonly IUmbracoSettingsSection _umbracoSettings;
         private readonly IGlobalSettings _globalSettings;
-        private readonly UrlProviderCollection _urlProviders;
-        private readonly MediaUrlProviderCollection _mediaUrlProviders;
         private readonly IUserService _userService;
         private readonly IIOHelper _ioHelper;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IPublishedUrlProvider _publishedUrlProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoContextFactory"/> class.
         /// </summary>
-        public UmbracoContextFactory(IUmbracoContextAccessor umbracoContextAccessor, IPublishedSnapshotService publishedSnapshotService, IVariationContextAccessor variationContextAccessor, IDefaultCultureAccessor defaultCultureAccessor, IUmbracoSettingsSection umbracoSettings, IGlobalSettings globalSettings, UrlProviderCollection urlProviders, MediaUrlProviderCollection mediaUrlProviders, IUserService userService, IIOHelper ioHelper, IHttpContextAccessor httpContextAccessor)
+        public UmbracoContextFactory(IUmbracoContextAccessor umbracoContextAccessor, IPublishedSnapshotService publishedSnapshotService, IVariationContextAccessor variationContextAccessor, IDefaultCultureAccessor defaultCultureAccessor, IGlobalSettings globalSettings, IUserService userService, IIOHelper ioHelper, IHttpContextAccessor httpContextAccessor, IPublishedUrlProvider publishedUrlProvider)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _publishedSnapshotService = publishedSnapshotService ?? throw new ArgumentNullException(nameof(publishedSnapshotService));
             _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
             _defaultCultureAccessor = defaultCultureAccessor ?? throw new ArgumentNullException(nameof(defaultCultureAccessor));
-
-            _umbracoSettings = umbracoSettings ?? throw new ArgumentNullException(nameof(umbracoSettings));
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
-            _urlProviders = urlProviders ?? throw new ArgumentNullException(nameof(urlProviders));
-            _mediaUrlProviders = mediaUrlProviders ?? throw new ArgumentNullException(nameof(mediaUrlProviders));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _ioHelper = ioHelper;
             _httpContextAccessor = httpContextAccessor;
+            _publishedUrlProvider = publishedUrlProvider;
         }
 
         private IUmbracoContext CreateUmbracoContext()
@@ -71,7 +66,7 @@ namespace Umbraco.Web
 
             var webSecurity = new WebSecurity(_httpContextAccessor, _userService, _globalSettings, _ioHelper);
 
-            return new UmbracoContext(_httpContextAccessor, _publishedSnapshotService, webSecurity, _umbracoSettings, _urlProviders, _mediaUrlProviders, _globalSettings, _variationContextAccessor, _ioHelper);
+            return new UmbracoContext(_httpContextAccessor, _publishedSnapshotService, webSecurity, _globalSettings, _variationContextAccessor, _ioHelper, _publishedUrlProvider);
         }
 
         /// <inheritdoc />

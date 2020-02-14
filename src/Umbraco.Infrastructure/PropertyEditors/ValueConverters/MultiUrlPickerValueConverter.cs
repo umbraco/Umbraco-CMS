@@ -8,6 +8,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
 using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
@@ -17,13 +18,15 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         private readonly IProfilingLogger _proflog;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IPublishedUrlProvider _publishedUrlProvider;
 
-        public MultiUrlPickerValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor, IProfilingLogger proflog, IJsonSerializer jsonSerializer, IUmbracoContextAccessor umbracoContextAccessor)
+        public MultiUrlPickerValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor, IProfilingLogger proflog, IJsonSerializer jsonSerializer, IUmbracoContextAccessor umbracoContextAccessor, IPublishedUrlProvider publishedUrlProvider)
         {
             _publishedSnapshotAccessor = publishedSnapshotAccessor ?? throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
             _proflog = proflog ?? throw new ArgumentNullException(nameof(proflog));
             _jsonSerializer = jsonSerializer;
             _umbracoContextAccessor = umbracoContextAccessor;
+            _publishedUrlProvider = publishedUrlProvider;
         }
 
         public override bool IsConverter(IPublishedPropertyType propertyType) => Constants.PropertyEditors.Aliases.MultiUrlPicker.Equals(propertyType.EditorAlias);
@@ -72,7 +75,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                         {
                             continue;
                         }
-                        url = content.Url(_umbracoContextAccessor.UmbracoContext.UrlProvider);
+                        url = content.Url(_publishedUrlProvider);
                     }
 
                     links.Add(

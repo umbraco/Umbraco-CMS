@@ -14,6 +14,8 @@ using Umbraco.Core.Strings;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Core;
+using Umbraco.Web.Routing;
+
 namespace Umbraco.Web.PropertyEditors
 {
     public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
@@ -21,15 +23,17 @@ namespace Umbraco.Web.PropertyEditors
         private readonly IEntityService _entityService;
         private readonly ILogger _logger;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IPublishedUrlProvider _publishedUrlProvider;
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
-        public MultiUrlPickerValueEditor(IEntityService entityService, IPublishedSnapshotAccessor publishedSnapshotAccessor, ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute, IUmbracoContextAccessor umbracoContextAccessor)
+        public MultiUrlPickerValueEditor(IEntityService entityService, IPublishedSnapshotAccessor publishedSnapshotAccessor, ILogger logger, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, DataEditorAttribute attribute, IUmbracoContextAccessor umbracoContextAccessor, IPublishedUrlProvider publishedUrlProvider)
             : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, attribute)
         {
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
             _publishedSnapshotAccessor = publishedSnapshotAccessor ?? throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
+            _publishedUrlProvider = publishedUrlProvider;
         }
 
         public override object ToEditor(IProperty property, string culture = null, string segment = null)
@@ -85,7 +89,7 @@ namespace Umbraco.Web.PropertyEditors
                             icon = documentEntity.ContentTypeIcon;
                             published = culture == null ? documentEntity.Published : documentEntity.PublishedCultures.Contains(culture);
                             udi = new GuidUdi(Constants.UdiEntityType.Document, documentEntity.Key);
-                            url = _publishedSnapshotAccessor.PublishedSnapshot.Content.GetById(entity.Key)?.Url(_umbracoContextAccessor.UmbracoContext.UrlProvider) ?? "#";
+                            url = _publishedSnapshotAccessor.PublishedSnapshot.Content.GetById(entity.Key)?.Url(_publishedUrlProvider) ?? "#";
                             trashed = documentEntity.Trashed;
                         }
                         else if(entity is IContentEntitySlim contentEntity)
@@ -93,7 +97,7 @@ namespace Umbraco.Web.PropertyEditors
                             icon = contentEntity.ContentTypeIcon;
                             published = !contentEntity.Trashed;
                             udi = new GuidUdi(Constants.UdiEntityType.Media, contentEntity.Key);
-                            url = _publishedSnapshotAccessor.PublishedSnapshot.Media.GetById(entity.Key)?.Url(_umbracoContextAccessor.UmbracoContext.UrlProvider) ?? "#";
+                            url = _publishedSnapshotAccessor.PublishedSnapshot.Media.GetById(entity.Key)?.Url(_publishedUrlProvider) ?? "#";
                             trashed = contentEntity.Trashed;
                         }
                         else

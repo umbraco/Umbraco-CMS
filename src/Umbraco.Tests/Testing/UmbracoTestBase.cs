@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Web.Routing;
 using System.Xml.Linq;
@@ -114,6 +115,7 @@ namespace Umbraco.Tests.Testing
         protected IJsonSerializer JsonNetSerializer { get; } = new JsonNetSerializer();
 
         protected IIOHelper IOHelper { get; private set; }
+        protected IPublishedUrlProvider PublishedUrlProvider => Factory.GetInstance<IPublishedUrlProvider>();
         protected IDataTypeService DataTypeService => Factory.GetInstance<IDataTypeService>();
         protected IPasswordHasher PasswordHasher => Factory.GetInstance<IPasswordHasher>();
         protected Lazy<PropertyEditorCollection> PropertyEditorCollection => new Lazy<PropertyEditorCollection>(() => Factory.GetInstance<PropertyEditorCollection>());
@@ -298,6 +300,18 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique<HtmlImageSourceParser>();
             Composition.RegisterUnique<RichTextEditorPastedImages>();
             Composition.RegisterUnique<IPublishedValueFallback, NoopPublishedValueFallback>();
+            Composition.RegisterUnique<IPublishedUrlProvider>(factory =>
+                new UrlProvider(
+                    new Lazy<IUmbracoContextAccessor>(() => factory.GetInstance<IUmbracoContextAccessor>()),
+                    TestObjects.GetUmbracoSettings().WebRouting,
+                    new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
+                    new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
+                    factory.GetInstance<IVariationContextAccessor>()
+
+                    ));
+
+
+
         }
 
         protected virtual void ComposeMisc()

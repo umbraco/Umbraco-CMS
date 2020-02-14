@@ -442,12 +442,10 @@ namespace Umbraco.Tests.Web.Mvc
                 httpContextAccessor,
                 _service,
                 new WebSecurity(httpContextAccessor, Current.Services.UserService, globalSettings, IOHelper),
-                TestObjects.GetUmbracoSettings(),
-                Enumerable.Empty<IUrlProvider>(),
-                Enumerable.Empty<IMediaUrlProvider>(),
                 globalSettings,
                 new TestVariationContextAccessor(),
-                IOHelper);
+                IOHelper,
+                PublishedUrlProvider);
 
             //if (setSingleton)
             //{

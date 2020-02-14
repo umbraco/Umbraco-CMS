@@ -12,7 +12,6 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Gets the url of a published content.
         /// </summary>
-        /// <param name="umbracoContext">The Umbraco context.</param>
         /// <param name="content">The published content.</param>
         /// <param name="mode">The url mode.</param>
         /// <param name="culture">A culture.</param>
@@ -24,12 +23,11 @@ namespace Umbraco.Web.Routing
         /// when no culture is specified, the current culture.</para>
         /// <para>If the provider is unable to provide a url, it should return <c>null</c>.</para>
         /// </remarks>
-        UrlInfo GetUrl(IUmbracoContext umbracoContext, IPublishedContent content, UrlMode mode, string culture, Uri current);
+        UrlInfo GetUrl(IPublishedContent content, UrlMode mode, string culture, Uri current);
 
         /// <summary>
         /// Gets the other urls of a published content.
         /// </summary>
-        /// <param name="umbracoContext">The Umbraco context.</param>
         /// <param name="id">The published content id.</param>
         /// <param name="current">The current absolute url.</param>
         /// <returns>The other urls for the published content.</returns>
@@ -37,6 +35,6 @@ namespace Umbraco.Web.Routing
         /// <para>Other urls are those that <c>GetUrl</c> would not return in the current context, but would be valid
         /// urls for the node in other contexts (different domain for current request, umbracoUrlAlias...).</para>
         /// </remarks>
-        IEnumerable<UrlInfo> GetOtherUrls(IUmbracoContext umbracoContext, int id, Uri current);
+        IEnumerable<UrlInfo> GetOtherUrls(int id, Uri current);
     }
 }
