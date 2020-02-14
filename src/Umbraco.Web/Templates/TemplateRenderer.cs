@@ -99,7 +99,7 @@ namespace Umbraco.Web.Templates
 
             //First, save all of the items locally that we know are used in the chain of execution, we'll need to restore these
             //after this page has rendered.
-            SaveExistingItems(out var oldPublishedRequest, out var oldAltTemplate);
+            SaveExistingItems(out var oldPublishedRequest);
 
             try
             {
@@ -112,7 +112,7 @@ namespace Umbraco.Web.Templates
             finally
             {
                 //restore items on context objects to continuing rendering the parent template
-                RestoreItems(oldPublishedRequest, oldAltTemplate);
+                RestoreItems(oldPublishedRequest);
             }
 
         }
@@ -175,28 +175,25 @@ namespace Umbraco.Web.Templates
         private void SetNewItemsOnContextObjects(IPublishedRequest request)
         {
             //now, set the new ones for this page execution
-            _httpContextAccessor.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate] = null;
             _umbracoContextAccessor.UmbracoContext.PublishedRequest = request;
         }
 
         /// <summary>
         /// Save all items that we know are used for rendering execution to variables so we can restore after rendering
         /// </summary>
-        private void SaveExistingItems(out IPublishedRequest oldPublishedRequest, out object oldAltTemplate)
+        private void SaveExistingItems(out PublishedRequest oldPublishedRequest)
         {
             //Many objects require that these legacy items are in the http context items... before we render this template we need to first
             //save the values in them so that we can re-set them after we render so the rest of the execution works as per normal
             oldPublishedRequest = _umbracoContextAccessor.UmbracoContext.PublishedRequest;
-            oldAltTemplate = _httpContextAccessor.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate];
         }
 
         /// <summary>
         /// Restores all items back to their context's to continue normal page rendering execution
         /// </summary>
-        private void RestoreItems(IPublishedRequest oldPublishedRequest, object oldAltTemplate)
+        private void RestoreItems(PublishedRequest oldPublishedRequest)
         {
             _umbracoContextAccessor.UmbracoContext.PublishedRequest = oldPublishedRequest;
-            _httpContextAccessor.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate] = oldAltTemplate;
         }
     }
 }
