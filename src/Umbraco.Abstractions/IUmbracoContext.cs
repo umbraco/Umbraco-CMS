@@ -17,11 +17,6 @@ namespace Umbraco.Web
         DateTime ObjectCreated { get; }
 
         /// <summary>
-        /// This is used internally for debugging and also used to define anything required to distinguish this request from another.
-        /// </summary>
-        Guid UmbracoRequestId { get; }
-
-        /// <summary>
         /// Gets the WebSecurity class
         /// </summary>
         IWebSecurity Security { get; }
@@ -82,40 +77,6 @@ namespace Umbraco.Web
         /// Determines whether the current user is in a preview mode and browsing the site (ie. not in the admin UI)
         /// </summary>
         bool InPreviewMode { get; }
-
-        /// <summary>
-        /// Gets the url of a content identified by its identifier.
-        /// </summary>
-        /// <param name="contentId">The content identifier.</param>
-        /// <param name="culture"></param>
-        /// <returns>The url for the content.</returns>
-        string Url(int contentId, string culture = null);
-
-        /// <summary>
-        /// Gets the url of a content identified by its identifier.
-        /// </summary>
-        /// <param name="contentId">The content identifier.</param>
-        /// <param name="culture"></param>
-        /// <returns>The url for the content.</returns>
-        string Url(Guid contentId, string culture = null);
-
-        /// <summary>
-        /// Gets the url of a content identified by its identifier, in a specified mode.
-        /// </summary>
-        /// <param name="contentId">The content identifier.</param>
-        /// <param name="mode">The mode.</param>
-        /// <param name="culture"></param>
-        /// <returns>The url for the content.</returns>
-        string Url(int contentId, UrlMode mode, string culture = null);
-
-        /// <summary>
-        /// Gets the url of a content identified by its identifier, in a specified mode.
-        /// </summary>
-        /// <param name="contentId">The content identifier.</param>
-        /// <param name="mode">The mode.</param>
-        /// <param name="culture"></param>
-        /// <returns>The url for the content.</returns>
-        string Url(Guid contentId, UrlMode mode, string culture = null);
 
         IDisposable ForcedPreview(bool preview);
         void Dispose();

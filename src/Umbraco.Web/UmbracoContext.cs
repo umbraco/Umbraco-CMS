@@ -169,56 +169,6 @@ namespace Umbraco.Web
             private set => _previewing = value;
         }
 
-        #region Urls
-
-        /// <summary>
-        /// Gets the url of a content identified by its identifier.
-        /// </summary>
-        /// <param name="contentId">The content identifier.</param>
-        /// <param name="culture"></param>
-        /// <returns>The url for the content.</returns>
-        public string Url(int contentId, string culture = null)
-        {
-            return _publishedUrlProvider.GetUrl(contentId, culture: culture);
-        }
-
-        /// <summary>
-        /// Gets the url of a content identified by its identifier.
-        /// </summary>
-        /// <param name="contentId">The content identifier.</param>
-        /// <param name="culture"></param>
-        /// <returns>The url for the content.</returns>
-        public string Url(Guid contentId, string culture = null)
-        {
-            return _publishedUrlProvider.GetUrl(contentId, culture: culture);
-        }
-
-        /// <summary>
-        /// Gets the url of a content identified by its identifier, in a specified mode.
-        /// </summary>
-        /// <param name="contentId">The content identifier.</param>
-        /// <param name="mode">The mode.</param>
-        /// <param name="culture"></param>
-        /// <returns>The url for the content.</returns>
-        public string Url(int contentId, UrlMode mode, string culture = null)
-        {
-            return _publishedUrlProvider.GetUrl(contentId, mode, culture);
-        }
-
-        /// <summary>
-        /// Gets the url of a content identified by its identifier, in a specified mode.
-        /// </summary>
-        /// <param name="contentId">The content identifier.</param>
-        /// <param name="mode">The mode.</param>
-        /// <param name="culture"></param>
-        /// <returns>The url for the content.</returns>
-        public string Url(Guid contentId, UrlMode mode, string culture = null)
-        {
-            return _publishedUrlProvider.GetUrl(contentId, mode, culture);
-        }
-
-        #endregion
-
         public string PreviewToken
         {
             get

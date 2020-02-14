@@ -268,7 +268,7 @@ namespace Umbraco.Web.Editors
 
             if (type == UmbracoEntityTypes.Document)
             {
-                var foundUrl = UmbracoContext.Url(id, culture);
+                var foundUrl = PublishedUrlProvider.GetUrl(id, culture: culture);
                 if (string.IsNullOrEmpty(foundUrl) == false && foundUrl != "#")
                 {
                     returnUrl = foundUrl;
