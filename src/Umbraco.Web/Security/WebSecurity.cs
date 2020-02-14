@@ -10,9 +10,7 @@ using Microsoft.Owin;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Identity;
 using Umbraco.Web.Models.Identity;
-using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Security
 {
@@ -41,7 +39,7 @@ namespace Umbraco.Web.Security
         /// Gets the current user.
         /// </summary>
         /// <value>The current user.</value>
-        public virtual IUser CurrentUser
+        public IUser CurrentUser
         {
             get
             {
@@ -78,12 +76,8 @@ namespace Umbraco.Web.Security
         protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager
             => _userManager ?? (_userManager = _httpContextAccessor.HttpContext.GetOwinContext().GetBackOfficeUserManager());
 
-        /// <summary>
-        /// Logs a user in.
-        /// </summary>
-        /// <param name="userId">The user Id</param>
-        /// <returns>returns the number of seconds until their session times out</returns>
-        public virtual double PerformLogin(int userId)
+        [Obsolete("This needs to be removed, ASP.NET Identity should always be used for this operation, this is currently only used in the installer which needs to be updated")]
+        public double PerformLogin(int userId)
         {
             var owinCtx = _httpContextAccessor.HttpContext.GetOwinContext();
             //ensure it's done for owin too
@@ -98,10 +92,8 @@ namespace Umbraco.Web.Security
             return TimeSpan.FromMinutes(_globalSettings.TimeOutInMinutes).TotalSeconds;
         }
 
-        /// <summary>
-        /// Clears the current login for the currently logged in user
-        /// </summary>
-        public virtual void ClearCurrentLogin()
+        [Obsolete("This needs to be removed, ASP.NET Identity should always be used for this operation, this is currently only used in the installer which needs to be updated")]
+        public void ClearCurrentLogin()
         {
             _httpContextAccessor.HttpContext.UmbracoLogout();
             _httpContextAccessor.HttpContext.GetOwinContext().Authentication.SignOut(
@@ -112,67 +104,26 @@ namespace Umbraco.Web.Security
         /// <summary>
         /// Renews the user's login ticket
         /// </summary>
-        public virtual void RenewLoginTimeout()
+        public void RenewLoginTimeout()
         {
             _httpContextAccessor.HttpContext.RenewUmbracoAuthTicket();
-        }
-
-        /// <summary>
-        /// Validates credentials for a back office user
-        /// </summary>
-        /// <param name="username"></param>
-        /// <param name="password"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// This uses ASP.NET Identity to perform the validation
-        /// </remarks>
-        public virtual bool ValidateBackOfficeCredentials(string username, string password)
-        {
-            //find the user by username
-            var user = UserManager.FindByNameAsync(username).Result;
-            return user != null && UserManager.CheckPasswordAsync(user, password).Result;
-        }
-
-        /// <summary>
-        /// Validates the current user to see if they have access to the specified app
-        /// </summary>
-        /// <param name="app"></param>
-        /// <returns></returns>
-        internal bool ValidateUserApp(string app)
-        {
-            //if it is empty, don't validate
-            if (app.IsNullOrWhiteSpace())
-            {
-                return true;
-            }
-            return CurrentUser.AllowedSections.Any(uApp => uApp.InvariantEquals(app));
         }
 
         /// <summary>
         /// Gets the current user's id.
         /// </summary>
         /// <returns></returns>
-        public virtual Attempt<int> GetUserId()
+        public Attempt<int> GetUserId()
         {
             var identity = _httpContextAccessor.HttpContext.GetCurrentIdentity(false);
             return identity == null ? Attempt.Fail<int>() : Attempt.Succeed(Convert.ToInt32(identity.Id));
         }
 
         /// <summary>
-        /// Returns the current user's unique session id - used to mitigate csrf attacks or any other reason to validate a request
-        /// </summary>
-        /// <returns></returns>
-        public virtual string GetSessionId()
-        {
-            var identity = _httpContextAccessor.HttpContext.GetCurrentIdentity(false);
-            return identity?.SessionId;
-        }
-
-        /// <summary>
         /// Validates the currently logged in user and ensures they are not timed out
         /// </summary>
         /// <returns></returns>
-        public virtual bool ValidateCurrentUser()
+        public bool ValidateCurrentUser()
         {
             return ValidateCurrentUser(false, true) == ValidateRequestAttempt.Success;
         }
@@ -183,7 +134,7 @@ namespace Umbraco.Web.Security
         /// <param name="throwExceptions">set to true if you want exceptions to be thrown if failed</param>
         /// <param name="requiresApproval">If true requires that the user is approved to be validated</param>
         /// <returns></returns>
-        public virtual ValidateRequestAttempt ValidateCurrentUser(bool throwExceptions, bool requiresApproval = true)
+        public ValidateRequestAttempt ValidateCurrentUser(bool throwExceptions, bool requiresApproval = true)
         {
             //This will first check if the current user is already authenticated - which should be the case in nearly all circumstances
             // since the authentication happens in the Module, that authentication also checks the ticket expiry. We don't
@@ -235,24 +186,8 @@ namespace Umbraco.Web.Security
         /// <param name="section"></param>
         /// <param name="user"></param>
         /// <returns></returns>
-        public virtual bool UserHasSectionAccess(string section, IUser user)
+        public bool UserHasSectionAccess(string section, IUser user)
         {
-            return user.HasSectionAccess(section);
-        }
-
-        /// <summary>
-        /// Checks if the specified user by username as access to the app
-        /// </summary>
-        /// <param name="section"></param>
-        /// <param name="username"></param>
-        /// <returns></returns>
-        public bool UserHasSectionAccess(string section, string username)
-        {
-            var user = _userService.GetByUsername(username);
-            if (user == null)
-            {
-                return false;
-            }
             return user.HasSectionAccess(section);
         }
 
