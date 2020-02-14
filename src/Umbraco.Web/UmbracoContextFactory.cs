@@ -90,7 +90,8 @@ namespace Umbraco.Web
 
         public static HttpContextBase EnsureHttpContext(HttpContextBase httpContext = null)
         {
-            if (Thread.GetDomain().GetData(".appPath") is null || Thread.GetDomain().GetData(".appVPath") is null)
+            var domain = Thread.GetDomain();
+            if (domain.GetData(".appPath") is null || domain.GetData(".appVPath") is null)
             {
                 return httpContext ?? new HttpContextWrapper(HttpContext.Current ??
                                                              new HttpContext(new SimpleWorkerRequest("", "", "null.aspx", "", NullWriterInstance)));

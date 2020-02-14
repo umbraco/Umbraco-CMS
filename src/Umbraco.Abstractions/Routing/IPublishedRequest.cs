@@ -124,14 +124,6 @@ namespace Umbraco.Web.Routing
         string ResponseStatusDescription { get; }
 
         /// <summary>
-        /// Gets or sets the <c>System.Web.HttpCacheability</c>
-        /// </summary>
-// Note: we used to set a default value here but that would then be the default
-// for ALL requests, we shouldn't overwrite it though if people are using [OutputCache] for example
-// see: https://our.umbraco.com/forum/using-umbraco-and-getting-started/79715-output-cache-in-umbraco-752
-        //HttpCacheability Cacheability { get; set; }
-
-        /// <summary>
         /// Gets or sets a list of Extensions to append to the Response.Cache object.
         /// </summary>
         List<string> CacheExtensions { get; set; }
