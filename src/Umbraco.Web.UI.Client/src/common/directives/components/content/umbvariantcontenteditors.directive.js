@@ -172,12 +172,14 @@
         function requestSplitView(args) {
             var culture = args.culture;
             var segment = args.segment;
-            _.each(vm.content.variants, function (v) {
-                if ((!v.language || v.language.culture === culture) && v.segment === segment) {
-                    openSplitView(v);
-                    return;
-                }
+
+            var variant = _.find(vm.content.variants, function (v) {
+                return (!v.language || v.language.culture === culture) && v.segment === segment;
             });
+
+            if (variant != null) {
+                openSplitView(variant);
+            }
         }
 
         /** Closes the split view */
