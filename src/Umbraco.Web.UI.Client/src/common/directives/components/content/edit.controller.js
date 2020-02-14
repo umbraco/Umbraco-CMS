@@ -287,6 +287,8 @@
                 $scope.page.showSaveButton = true;
                 // add ellipsis to the save button if it opens the variant overlay
                 $scope.page.saveButtonEllipsis = content.variants && content.variants.length > 1 ? "true" : "false";
+            } else {
+                $scope.page.showSaveButton = false;
             }
 
             // create the pubish combo button
