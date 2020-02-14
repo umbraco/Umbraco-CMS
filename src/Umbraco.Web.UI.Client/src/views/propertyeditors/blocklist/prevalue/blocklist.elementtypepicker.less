@@ -40,9 +40,26 @@
         flex-grow: 1;
     }
 
-    .cell-btn {
-        position: relative;
+    .cell-actions {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        top:0;
+        bottom: 0;
+        right: 0;
+        background-color: rgba(255, 255, 255, 0.8);
         opacity: 0;
+        transition: opacity 120ms;
+    }
+    .umb-table-cell:hover,
+    .umb-table-cell:focus,
+    .umb-table-cell:focus-within {
+        .cell-actions {
+            opacity: 1;
+        }
+    }
+    .cell-actions-btn {
+        position: relative;
         color: @ui-action-discreet-type;
         height: 30px;
         width: 26px;
@@ -54,12 +71,9 @@
             margin-right: 7px;
         }
     }
-    .umb-table-cell:hover,
-    .umb-table-cell:focus,
-    .umb-table-cell:focus-within {
-        .cell-btn {
-            opacity: 1;
-        }
+    
+    .umb-node-preview {
+        border-bottom: none;
     }
 
     .settings-input {

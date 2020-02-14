@@ -41,8 +41,25 @@
         function loadElementTypes() {
             return elementTypeResource.getAll().then(function (elementTypes) {
                 vm.elementTypes = elementTypes;
-                console.log("vm.elementTypes:", vm.elementTypes)
                 evaluateStatus();
+            });
+        }
+
+        vm.requestRemoveEntryByIndex = function (index) {
+            localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockMessage", "blockEditor_confirmDeleteBlockNotice"]).then(function (data) {
+                var contentElementType = vm.getElementTypeByAlias($scope.model.value[index].elementTypeAlias);
+                overlayService.confirmDelete({
+                    title: data[0],
+                    content: localizationService.tokenReplace(data[1], [contentElementType.name]),
+                    confirmMessage: data[2],
+                    close: function () {
+                        overlayService.close();
+                    },
+                    submit: function () {
+                        vm.removeEntryByIndex(index);
+                        overlayService.close();
+                    }
+                });
             });
         }
 
@@ -141,11 +158,29 @@
             $scope.model.value.push(entry);
         };
 
+        vm.requestRemoveSettingsForEntry = function(entry) {
+            localizationService.localizeMany(["general_remove", "defaultdialogs_confirmremoveusageof"]).then(function (data) {
+
+                var settingsElementType = vm.getElementTypeByAlias(entry.settingsElementTypeAlias);
+
+                overlayService.confirmRemove({
+                    title: data[0],
+                    content: localizationService.tokenReplace(data[1], [settingsElementType.name]),
+                    close: function () {
+                        overlayService.close();
+                    },
+                    submit: function () {
+                        vm.removeSettingsForEntry(entry);
+                        overlayService.close();
+                    }
+                });
+            });
+        };
         vm.removeSettingsForEntry = function(entry) {
             entry.settingsElementTypeAlias = null;
         };
 
-        vm.openPickSettingsDialog = function ($event, entry) {
+        vm.addSettingsForEntry = function ($event, entry) {
 
             var elemTypeSelectorOverlay = {
                 view: "itempicker",
@@ -194,6 +229,21 @@
             editorService.documentTypeEditor(editor);
         }
 
+        vm.requestRemoveViewForEntry = function(entry) {
+            localizationService.localizeMany(["general_remove", "defaultdialogs_confirmremoveusageof"]).then(function (data) {
+                overlayService.confirmRemove({
+                    title: data[0],
+                    content: localizationService.tokenReplace(data[1], [entry.view]),
+                    close: function () {
+                        overlayService.close();
+                    },
+                    submit: function () {
+                        vm.removeViewForEntry(entry);
+                        overlayService.close();
+                    }
+                });
+            });
+        };
         vm.removeViewForEntry = function(entry) {
             entry.view = null;
         };
@@ -201,8 +251,8 @@
             const viewPicker = {
                 title: "Pick view (TODO need translation)",
                 section: "settings",
-                treeAlias: "partialView",
-                entityType: "partialView",
+                treeAlias: "templates",
+                entityType: "template",
                 onlyInitialized: false,
                 filter: function (i) {
                     if (i.name.indexOf(".cshtml") === -1 && i.name.indexOf(".vbhtml") === -1) {
