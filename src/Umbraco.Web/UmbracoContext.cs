@@ -1,9 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Composing;
@@ -21,7 +19,6 @@ namespace Umbraco.Web
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IGlobalSettings _globalSettings;
         private readonly IIOHelper _ioHelper;
-        private readonly IPublishedUrlProvider _publishedUrlProvider;
         private readonly Lazy<IPublishedSnapshot> _publishedSnapshot;
         private string _previewToken;
         private bool? _previewing;
@@ -35,8 +32,7 @@ namespace Umbraco.Web
             IWebSecurity webSecurity,
             IGlobalSettings globalSettings,
             IVariationContextAccessor variationContextAccessor,
-            IIOHelper ioHelper,
-            IPublishedUrlProvider publishedUrlProvider)
+            IIOHelper ioHelper)
         {
             if (httpContextAccessor == null) throw new ArgumentNullException(nameof(httpContextAccessor));
             if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
@@ -45,7 +41,6 @@ namespace Umbraco.Web
             _httpContextAccessor = httpContextAccessor;
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
-            _publishedUrlProvider = publishedUrlProvider;
 
             // ensure that this instance is disposed when the request terminates, though we *also* ensure
             // this happens in the Umbraco module since the UmbracoCOntext is added to the HttpContext items.

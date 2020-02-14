@@ -32,12 +32,11 @@ namespace Umbraco.Web
         private readonly IUserService _userService;
         private readonly IIOHelper _ioHelper;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IPublishedUrlProvider _publishedUrlProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoContextFactory"/> class.
         /// </summary>
-        public UmbracoContextFactory(IUmbracoContextAccessor umbracoContextAccessor, IPublishedSnapshotService publishedSnapshotService, IVariationContextAccessor variationContextAccessor, IDefaultCultureAccessor defaultCultureAccessor, IGlobalSettings globalSettings, IUserService userService, IIOHelper ioHelper, IHttpContextAccessor httpContextAccessor, IPublishedUrlProvider publishedUrlProvider)
+        public UmbracoContextFactory(IUmbracoContextAccessor umbracoContextAccessor, IPublishedSnapshotService publishedSnapshotService, IVariationContextAccessor variationContextAccessor, IDefaultCultureAccessor defaultCultureAccessor, IGlobalSettings globalSettings, IUserService userService, IIOHelper ioHelper, IHttpContextAccessor httpContextAccessor)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _publishedSnapshotService = publishedSnapshotService ?? throw new ArgumentNullException(nameof(publishedSnapshotService));
@@ -47,7 +46,6 @@ namespace Umbraco.Web
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _ioHelper = ioHelper;
             _httpContextAccessor = httpContextAccessor;
-            _publishedUrlProvider = publishedUrlProvider;
         }
 
         private IUmbracoContext CreateUmbracoContext()
@@ -66,7 +64,7 @@ namespace Umbraco.Web
 
             var webSecurity = new WebSecurity(_httpContextAccessor, _userService, _globalSettings, _ioHelper);
 
-            return new UmbracoContext(_httpContextAccessor, _publishedSnapshotService, webSecurity, _globalSettings, _variationContextAccessor, _ioHelper, _publishedUrlProvider);
+            return new UmbracoContext(_httpContextAccessor, _publishedSnapshotService, webSecurity, _globalSettings, _variationContextAccessor, _ioHelper);
         }
 
         /// <inheritdoc />

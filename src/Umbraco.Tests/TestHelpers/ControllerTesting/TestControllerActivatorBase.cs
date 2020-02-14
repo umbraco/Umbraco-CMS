@@ -143,8 +143,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 webSecurity.Object,
                 globalSettings,
                 new TestVariationContextAccessor(),
-                TestHelper.IOHelper,
-                Mock.Of<IPublishedUrlProvider>());
+                TestHelper.IOHelper);
 
             //replace it
             umbracoContextAccessor.UmbracoContext = umbCtx;

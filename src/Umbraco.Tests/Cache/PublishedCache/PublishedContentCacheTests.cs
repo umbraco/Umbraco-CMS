@@ -82,8 +82,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
                 new WebSecurity(httpContextAccessor, Mock.Of<IUserService>(), globalSettings, IOHelper),
                 globalSettings,
                 new TestVariationContextAccessor(),
-                IOHelper,
-                PublishedUrlProvider);
+                IOHelper);
 
             _cache = _umbracoContext.Content;
         }

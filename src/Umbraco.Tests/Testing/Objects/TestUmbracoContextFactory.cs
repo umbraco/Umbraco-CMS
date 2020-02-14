@@ -44,8 +44,7 @@ namespace Umbraco.Tests.Testing.Objects
                 globalSettings,
                 Mock.Of<IUserService>(),
                 TestHelper.IOHelper,
-                httpContextAccessor,
-                publishedUrlProvider);
+                httpContextAccessor);
 
             return umbracoContextFactory;
         }

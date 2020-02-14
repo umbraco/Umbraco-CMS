@@ -125,8 +125,7 @@ namespace Umbraco.Tests.Scoping
                 new WebSecurity(httpContextAccessor, Current.Services.UserService, globalSettings, IOHelper),
                 globalSettings,
                 new TestVariationContextAccessor(),
-                IOHelper,
-                PublishedUrlProvider);
+                IOHelper);
 
             if (setSingleton)
                 Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;

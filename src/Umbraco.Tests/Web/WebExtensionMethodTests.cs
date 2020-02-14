@@ -35,8 +35,7 @@ namespace Umbraco.Tests.Web
                 new WebSecurity(httpContextAccessor, Current.Services.UserService, TestObjects.GetGlobalSettings(), IOHelper),
                 TestObjects.GetGlobalSettings(),
                 new TestVariationContextAccessor(),
-                IOHelper,
-                PublishedUrlProvider);
+                IOHelper);
             var r1 = new RouteData();
             r1.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx);
 
@@ -55,8 +54,7 @@ namespace Umbraco.Tests.Web
                 new WebSecurity(httpContextAccessor, Current.Services.UserService, TestObjects.GetGlobalSettings(), IOHelper),
                 TestObjects.GetGlobalSettings(),
                 new TestVariationContextAccessor(),
-                IOHelper,
-                PublishedUrlProvider);
+                IOHelper);
 
             var r1 = new RouteData();
             r1.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx);
@@ -85,8 +83,7 @@ namespace Umbraco.Tests.Web
                 new WebSecurity(httpContextAccessor, Current.Services.UserService, TestObjects.GetGlobalSettings(), IOHelper),
                 TestObjects.GetGlobalSettings(),
                 new TestVariationContextAccessor(),
-                IOHelper,
-                PublishedUrlProvider);
+                IOHelper);
 
             var httpContext = Mock.Of<HttpContextBase>();
 

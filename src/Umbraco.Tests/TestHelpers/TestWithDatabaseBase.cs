@@ -381,8 +381,7 @@ namespace Umbraco.Tests.TestHelpers
                     Factory.GetInstance<IGlobalSettings>(), IOHelper),
                 globalSettings ?? Factory.GetInstance<IGlobalSettings>(),
                 new TestVariationContextAccessor(),
-                IOHelper,
-                PublishedUrlProvider);
+                IOHelper);
 
             if (setSingleton)
                 Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;

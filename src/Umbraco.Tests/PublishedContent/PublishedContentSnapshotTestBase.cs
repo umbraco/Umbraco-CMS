@@ -76,8 +76,7 @@ namespace Umbraco.Tests.PublishedContent
                 new WebSecurity(httpContextAccessor, Current.Services.UserService, globalSettings, IOHelper),
                 globalSettings,
                 new TestVariationContextAccessor(),
-                IOHelper,
-                PublishedUrlProvider);
+                IOHelper);
 
             return umbracoContext;
         }

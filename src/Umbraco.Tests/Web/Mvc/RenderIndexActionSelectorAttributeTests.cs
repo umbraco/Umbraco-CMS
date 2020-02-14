@@ -73,8 +73,7 @@ namespace Umbraco.Tests.Web.Mvc
                 globalSettings,
                 Mock.Of<IUserService>(),
                 TestHelper.IOHelper,
-                httpContextAccessor,
-                Mock.Of<IPublishedUrlProvider>());
+                httpContextAccessor);
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
             var umbCtx = umbracoContextReference.UmbracoContext;
@@ -104,8 +103,7 @@ namespace Umbraco.Tests.Web.Mvc
                 globalSettings,
                 Mock.Of<IUserService>(),
                 TestHelper.IOHelper,
-                httpContextAccessor,
-                Mock.Of<IPublishedUrlProvider>());
+                httpContextAccessor);
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
             var umbCtx = umbracoContextReference.UmbracoContext;
@@ -135,8 +133,7 @@ namespace Umbraco.Tests.Web.Mvc
                 globalSettings,
                 Mock.Of<IUserService>(),
                 TestHelper.IOHelper,
-                httpContextAccessor,
-                Mock.Of<IPublishedUrlProvider>());
+                httpContextAccessor);
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
             var umbCtx = umbracoContextReference.UmbracoContext;
@@ -166,8 +163,7 @@ namespace Umbraco.Tests.Web.Mvc
                 globalSettings,
                 Mock.Of<IUserService>(),
                 TestHelper.IOHelper,
-                httpContextAccessor,
-                Mock.Of<IPublishedUrlProvider>());
+                httpContextAccessor);
 
             var umbracoContextReference = umbracoContextFactory.EnsureUmbracoContext();
             var umbCtx = umbracoContextReference.UmbracoContext;
