@@ -248,28 +248,27 @@
             entry.view = null;
         };
         vm.addViewForEntry = function(entry) {
-            const viewPicker = {
-                title: "Pick view (TODO need translation)",
+            const filePicker = {
+                title: "Select view (TODO need translation)",
                 section: "settings",
-                treeAlias: "templates",
-                entityType: "template",
-                onlyInitialized: false,
+                treeAlias: "files",
+                entityType: "file",
+                isDialog: true,
                 filter: function (i) {
-                    if (i.name.indexOf(".cshtml") === -1 && i.name.indexOf(".vbhtml") === -1) {
+                    if (i.name.indexOf(".html") !== -1) {
                         return true;
                     }
                 },
-                filterCssClass: "not-allowed",
-                select: function (node) {
-                    console.log(node);
-                    //entry.view = node.name;
+                select: function (file) {
+                    console.log(file);
+                    entry.view = file.name;
                     editorService.close();
                 },
                 close: function () {
                     editorService.close();
                 }
             };
-            editorService.treePicker(viewPicker);
+            editorService.treePicker(filePicker);
         }
 
         
