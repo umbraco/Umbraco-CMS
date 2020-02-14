@@ -4,12 +4,14 @@
                type="number"
                ng-model="model.value.min"
                placeholder="0"
+               ng-max="model.value.max"
                fix-number />
         <span class="__enDash">–</span>
         <input name="numberFieldMax" class="__max-input"
                type="number"
                ng-model="model.value.max"
                placeholder="∞"
+               ng-min="model.value.min"
                fix-number />
 
         <span ng-messages="prevalueNumberRangeForm.numberFieldMin.$error" show-validation-on-submit >
