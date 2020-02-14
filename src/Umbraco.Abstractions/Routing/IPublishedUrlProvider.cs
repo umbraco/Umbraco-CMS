@@ -12,11 +12,6 @@ namespace Umbraco.Web.Routing
         /// </summary>
         UrlMode Mode { get; set; }
 
-        UrlMode GetMode(bool absolute);
-        IPublishedContent GetDocument(int id);
-        IPublishedContent GetDocument(Guid id);
-        IPublishedContent GetMedia(Guid id);
-
         /// <summary>
         /// Gets the url of a published content.
         /// </summary>
