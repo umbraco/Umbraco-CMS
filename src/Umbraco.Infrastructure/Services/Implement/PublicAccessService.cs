@@ -125,7 +125,6 @@ namespace Umbraco.Core.Services.Implement
                 else
                 {
                     //If they are both the same already then there's nothing to update, exit
-                    //If they are both the same already then there's nothing to update, exit
                     return OperationResult.Attempt.Succeed(evtMsgs, entry);
                 }
 

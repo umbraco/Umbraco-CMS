@@ -341,7 +341,6 @@ namespace Umbraco.Core.Services.Implement
                     _userRepository.Save(user);
 
                     //Now we have to check for backwards compat hacks
-                    //Now we have to check for backwards compat hacks
                     var explicitUser = user as User;
                     if (explicitUser != null && explicitUser.GroupsToSave.Count > 0)
                     {
@@ -358,7 +357,6 @@ namespace Umbraco.Core.Services.Implement
                     scope.Events.Dispatch(SavedUser, this, saveEventArgs);
                 }
 
-                //commit the whole lot in one go
                 //commit the whole lot in one go
                 scope.Complete();
             }
