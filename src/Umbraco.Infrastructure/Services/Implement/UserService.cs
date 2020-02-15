@@ -109,9 +109,9 @@ namespace Umbraco.Core.Services.Implement
             User user;
             using (var scope = ScopeProvider.CreateScope())
             {
-                var loginExists = scope.Database.ExecuteScalar<int>("SELECT COUNT(id) FROM umbracoUser WHERE userLogin = @Login", new { Login = username }) != 0;
+                var loginExists = _userRepository.ExistsByLogin(username);
                 if (loginExists)
-                    throw new ArgumentException("Login already exists"); // causes rollback // causes rollback
+                    throw new ArgumentException("Login already exists"); // causes rollback
 
                 user = new User(_globalSettings)
                 {
