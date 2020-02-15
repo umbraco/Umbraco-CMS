@@ -9,7 +9,7 @@ using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Services.Implement;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Sync;
 
 namespace Umbraco.Core
@@ -263,7 +263,7 @@ namespace Umbraco.Core
             // no scope, no service - just directly accessing the database
             using (var database = databaseFactory.CreateDatabase())
             {
-                CurrentMigrationState = KeyValueService.GetValue(database, stateValueKey);
+                CurrentMigrationState = KeyValueRepository.GetValue(database, stateValueKey);
                 FinalMigrationState = upgrader.Plan.FinalState;
             }
 
