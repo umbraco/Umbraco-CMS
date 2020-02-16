@@ -38,7 +38,7 @@ namespace Umbraco.Web.Mvc
         /// ]]>
         /// </example>
         /// </remarks>
-        protected virtual UmbracoContext GetUmbracoContext(RequestContext requestContext)
+        protected virtual IUmbracoContext GetUmbracoContext(RequestContext requestContext)
         {
             return Composing.Current.UmbracoContext;
         }
@@ -88,9 +88,9 @@ namespace Umbraco.Web.Mvc
             return new MvcHandler(requestContext);
         }
 
-        protected abstract IPublishedContent FindContent(RequestContext requestContext, UmbracoContext umbracoContext);
+        protected abstract IPublishedContent FindContent(RequestContext requestContext, IUmbracoContext umbracoContext);
 
-        protected virtual void PreparePublishedContentRequest(PublishedRequest request)
+        protected virtual void PreparePublishedContentRequest(IPublishedRequest request)
         {
             PublishedRouter.PrepareRequest(request);
         }

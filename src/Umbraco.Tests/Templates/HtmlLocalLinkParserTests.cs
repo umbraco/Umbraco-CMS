@@ -52,7 +52,7 @@ namespace Umbraco.Tests.Templates
             //setup a mock url provider which we'll use for testing
             var contentUrlProvider = new Mock<IUrlProvider>();
             contentUrlProvider
-                .Setup(x => x.GetUrl(It.IsAny<UmbracoContext>(), It.IsAny<IPublishedContent>(), It.IsAny<UrlMode>(), It.IsAny<string>(), It.IsAny<Uri>()))
+                .Setup(x => x.GetUrl(It.IsAny<IUmbracoContext>(), It.IsAny<IPublishedContent>(), It.IsAny<UrlMode>(), It.IsAny<string>(), It.IsAny<Uri>()))
                 .Returns(UrlInfo.Url("/my-test-url"));
             var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing);
             var publishedContent = new Mock<IPublishedContent>();
@@ -63,7 +63,7 @@ namespace Umbraco.Tests.Templates
             var media = new Mock<IPublishedContent>();
             media.Setup(x => x.ContentType).Returns(mediaType);
             var mediaUrlProvider = new Mock<IMediaUrlProvider>();
-            mediaUrlProvider.Setup(x => x.GetMediaUrl(It.IsAny<UmbracoContext>(), It.IsAny<IPublishedContent>(), It.IsAny<string>(), It.IsAny<UrlMode>(), It.IsAny<string>(), It.IsAny<Uri>()))
+            mediaUrlProvider.Setup(x => x.GetMediaUrl(It.IsAny<IUmbracoContext>(), It.IsAny<IPublishedContent>(), It.IsAny<string>(), It.IsAny<UrlMode>(), It.IsAny<string>(), It.IsAny<Uri>()))
                 .Returns(UrlInfo.Url("/media/1001/my-image.jpg"));
 
             var umbracoContextAccessor = new TestUmbracoContextAccessor();

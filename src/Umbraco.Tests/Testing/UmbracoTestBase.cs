@@ -137,6 +137,7 @@ namespace Umbraco.Tests.Testing
         protected IMapperCollection Mappers => Factory.GetInstance<IMapperCollection>();
 
         protected UmbracoMapper Mapper => Factory.GetInstance<UmbracoMapper>();
+        protected IHttpContextAccessor HttpContextAccessor => Factory.GetInstance<IHttpContextAccessor>();
         protected IRuntimeState RuntimeState => ComponentTests.MockRuntimeState(RuntimeLevel.Run);
 
         #endregion
@@ -444,6 +445,9 @@ namespace Umbraco.Tests.Testing
             Composition.WithCollectionBuilder<DataEditorCollectionBuilder>();
             Composition.RegisterUnique<PropertyEditorCollection>();
             Composition.RegisterUnique<ParameterEditorCollection>();
+
+
+            Composition.RegisterUnique<IHttpContextAccessor>(TestObjects.GetHttpContextAccessor());
         }
 
         #endregion

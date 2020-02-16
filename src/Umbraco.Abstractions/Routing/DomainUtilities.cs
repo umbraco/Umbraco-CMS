@@ -27,7 +27,7 @@ namespace Umbraco.Web.Routing
         /// one document per culture), and domains, withing the context of a current Uri, assign
         /// a culture to that document.</para>
         /// </remarks>
-        internal static string GetCultureFromDomains(int contentId, string contentPath, Uri current, UmbracoContext umbracoContext, ISiteDomainHelper siteDomainHelper)
+        internal static string GetCultureFromDomains(int contentId, string contentPath, Uri current, IUmbracoContext umbracoContext, ISiteDomainHelper siteDomainHelper)
         {
             if (umbracoContext == null)
                 throw new InvalidOperationException("A current UmbracoContext is required.");
@@ -295,7 +295,7 @@ namespace Umbraco.Web.Routing
                 ? currentUri.GetLeftPart(UriPartial.Authority) + domainName
                 : domainName;
             var scheme = currentUri?.Scheme ?? Uri.UriSchemeHttp;
-            return new Uri(UriUtility.TrimPathEndSlash(UriUtility.StartWithScheme(name, scheme)));
+            return new Uri(UriUtilityCore.TrimPathEndSlash(UriUtilityCore.StartWithScheme(name, scheme)));
         }
 
         #endregion

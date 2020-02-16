@@ -15,6 +15,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing.Objects.Accessors;
+using Umbraco.Web;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.Routing;
@@ -98,7 +99,8 @@ namespace Umbraco.Tests.TestHelpers
                 container?.TryGetInstance<ServiceContext>() ?? ServiceContext.CreatePartial(),
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()),
                 container?.TryGetInstance<IUmbracoSettingsSection>() ?? Current.Factory.GetInstance<IUmbracoSettingsSection>(),
-                Mock.Of<IUserService>());
+                Mock.Of<IUserService>(),
+                Mock.Of<IHttpContextAccessor>());
         }
     }
 }

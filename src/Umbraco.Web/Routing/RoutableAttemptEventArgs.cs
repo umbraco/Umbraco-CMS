@@ -9,7 +9,7 @@ namespace Umbraco.Web.Routing
     {
         public EnsureRoutableOutcome Outcome { get; private set; }
 
-        public RoutableAttemptEventArgs(EnsureRoutableOutcome reason, UmbracoContext umbracoContext, HttpContextBase httpContext)
+        public RoutableAttemptEventArgs(EnsureRoutableOutcome reason, IUmbracoContext umbracoContext, HttpContextBase httpContext)
             : base(umbracoContext, httpContext)
         {
             Outcome = reason;

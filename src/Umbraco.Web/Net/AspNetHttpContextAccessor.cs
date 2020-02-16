@@ -5,11 +5,12 @@ namespace Umbraco.Web
 {
     internal class AspNetHttpContextAccessor : IHttpContextAccessor
     {
-        public HttpContext HttpContext
+        public HttpContextBase HttpContext
         {
             get
             {
-                return HttpContext.Current;
+                var httpContext = System.Web.HttpContext.Current;
+                return httpContext is null ? null : new HttpContextWrapper(httpContext);
             }
             set
             {

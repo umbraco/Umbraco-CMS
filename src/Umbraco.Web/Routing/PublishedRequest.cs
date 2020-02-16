@@ -12,11 +12,12 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Web.Routing
 {
+
     /// <summary>
     /// Represents a request for one specified Umbraco IPublishedContent to be rendered
     /// by one specified template, using one specified Culture and RenderingEngine.
     /// </summary>
-    public class PublishedRequest
+    public class PublishedRequest : IPublishedRequest
     {
         private readonly IPublishedRouter _publishedRouter;
         private readonly IUmbracoSettingsSection _umbracoSettingsSection;
@@ -29,15 +30,14 @@ namespace Umbraco.Web.Routing
         private CultureInfo _culture;
         private IPublishedContent _publishedContent;
         private IPublishedContent _initialPublishedContent; // found by finders before 404, redirects, etc
-        private PublishedContentHashtableConverter _umbracoPage; // legacy
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PublishedRequest"/> class.
+        /// Initializes a new instance of the <see cref="IPublishedRequest"/> class.
         /// </summary>
         /// <param name="publishedRouter">The published router.</param>
         /// <param name="umbracoContext">The Umbraco context.</param>
         /// <param name="uri">The request <c>Uri</c>.</param>
-        internal PublishedRequest(IPublishedRouter publishedRouter, UmbracoContext umbracoContext, IUmbracoSettingsSection umbracoSettingsSection, Uri uri = null)
+        internal PublishedRequest(IPublishedRouter publishedRouter, IUmbracoContext umbracoContext, IUmbracoSettingsSection umbracoSettingsSection, Uri uri = null)
         {
             UmbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
             _publishedRouter = publishedRouter ?? throw new ArgumentNullException(nameof(publishedRouter));
@@ -48,7 +48,7 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Gets the UmbracoContext.
         /// </summary>
-        public UmbracoContext UmbracoContext { get; }
+        public IUmbracoContext UmbracoContext { get; }
 
         /// <summary>
         /// Gets or sets the cleaned up Uri used for routing.
@@ -66,11 +66,13 @@ namespace Umbraco.Web.Routing
         }
 
         // utility for ensuring it is ok to set some properties
-        private void EnsureWriteable()
+        public void EnsureWriteable()
         {
             if (_readonly)
                 throw new InvalidOperationException("Cannot modify a PublishedRequest once it is read-only.");
         }
+
+        public bool CacheabilityNoCache { get; set; }
 
         /// <summary>
         /// Prepares the request.
@@ -106,7 +108,7 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Triggers the Preparing event.
         /// </summary>
-        internal void OnPreparing()
+        public void OnPreparing()
         {
             Preparing?.Invoke(this, EventArgs.Empty);
             _readonlyUri = true;
@@ -115,7 +117,7 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Triggers the Prepared event.
         /// </summary>
-        internal void OnPrepared()
+        public void OnPrepared()
         {
             Prepared?.Invoke(this, EventArgs.Empty);
 
@@ -231,7 +233,7 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Gets or sets the template model to use to display the requested content.
         /// </summary>
-        internal ITemplate TemplateModel { get; set; }
+        public ITemplate TemplateModel { get; set; }
 
         /// <summary>
         /// Gets the alias of the template to use to display the requested content.
@@ -293,7 +295,7 @@ namespace Umbraco.Web.Routing
         /// </summary>
         public bool HasTemplate => TemplateModel != null;
 
-        internal void UpdateToNotFound()
+        public void UpdateToNotFound()
         {
             var __readonly = _readonly;
             _readonly = false;
@@ -464,7 +466,7 @@ namespace Umbraco.Web.Routing
         // Note: we used to set a default value here but that would then be the default
         // for ALL requests, we shouldn't overwrite it though if people are using [OutputCache] for example
         // see: https://our.umbraco.com/forum/using-umbraco-and-getting-started/79715-output-cache-in-umbraco-752
-        public HttpCacheability Cacheability { get; set; }
+        //public HttpCacheability Cacheability { get; set; }
 
         /// <summary>
         /// Gets or sets a list of Extensions to append to the Response.Cache object.
@@ -475,24 +477,6 @@ namespace Umbraco.Web.Routing
         /// Gets or sets a dictionary of Headers to append to the Response object.
         /// </summary>
         public Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
-
-        #endregion
-
-        #region Legacy
-
-        // for legacy/webforms/macro code -
-        // TODO: get rid of it eventually
-        internal PublishedContentHashtableConverter LegacyContentHashTable
-        {
-            get
-            {
-                if (_umbracoPage == null)
-                    throw new InvalidOperationException("The UmbracoPage object has not been initialized yet.");
-
-                return _umbracoPage;
-            }
-            set => _umbracoPage = value;
-        }
 
         #endregion
     }

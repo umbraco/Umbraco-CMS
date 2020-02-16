@@ -266,7 +266,7 @@ namespace Umbraco.Web.Routing
             return _qualifiedSites[current.Scheme] = _sites
                 .ToDictionary(
                     kvp => kvp.Key,
-                    kvp => kvp.Value.Select(d => new Uri(UriUtility.StartWithScheme(d, current.Scheme)).GetLeftPart(UriPartial.Authority)).ToArray()
+                    kvp => kvp.Value.Select(d => new Uri(UriUtilityCore.StartWithScheme(d, current.Scheme)).GetLeftPart(UriPartial.Authority)).ToArray()
                 );
 
             // .ToDictionary will evaluate and create the dictionary immediately

@@ -25,7 +25,7 @@ namespace Umbraco.Web
         //
         private static IPublishedValueFallback PublishedValueFallback => Current.PublishedValueFallback;
         private static IPublishedSnapshot PublishedSnapshot => Current.PublishedSnapshot;
-        private static UmbracoContext UmbracoContext => Current.UmbracoContext;
+        private static IUmbracoContext UmbracoContext => Current.UmbracoContext;
         private static ISiteDomainHelper SiteDomainHelper => Current.Factory.GetInstance<ISiteDomainHelper>();
         private static IVariationContextAccessor VariationContextAccessor => Current.VariationContextAccessor;
         private static IExamineManager ExamineManager => Current.Factory.GetInstance<IExamineManager>();

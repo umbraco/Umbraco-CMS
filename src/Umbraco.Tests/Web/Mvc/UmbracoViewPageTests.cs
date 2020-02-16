@@ -404,7 +404,7 @@ namespace Umbraco.Tests.Web.Mvc
             return context;
         }
 
-        protected UmbracoContext GetUmbracoContext(ILogger logger, IUmbracoSettingsSection umbracoSettings, string url, int templateId, RouteData routeData = null, bool setSingleton = false)
+        protected IUmbracoContext GetUmbracoContext(ILogger logger, IUmbracoSettingsSection umbracoSettings, string url, int templateId, RouteData routeData = null, bool setSingleton = false)
         {
             var svcCtx = GetServiceContext();
 

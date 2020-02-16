@@ -13,7 +13,7 @@ namespace Umbraco.Tests.PublishedContent
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
     public class PublishedContentExtensionTests : PublishedContentTestBase
     {
-        private UmbracoContext _ctx;
+        private IUmbracoContext _ctx;
         private string _xmlContent = "";
         private bool _createContentTypes = true;
         private Dictionary<string, PublishedContentType> _contentTypes;

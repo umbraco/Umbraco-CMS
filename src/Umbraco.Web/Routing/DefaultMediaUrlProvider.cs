@@ -18,7 +18,7 @@ namespace Umbraco.Web.Routing
         }
 
         /// <inheritdoc />
-        public virtual UrlInfo GetMediaUrl(UmbracoContext umbracoContext, IPublishedContent content,
+        public virtual UrlInfo GetMediaUrl(IUmbracoContext umbracoContext, IPublishedContent content,
             string propertyAlias, UrlMode mode, string culture, Uri current)
         {
             var prop = content.GetProperty(propertyAlias);

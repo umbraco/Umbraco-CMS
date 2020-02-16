@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Web;
 using System.Web.Helpers;
@@ -8,6 +9,9 @@ using System.Web.Mvc;
 using System.Web.Mvc.Html;
 using System.Web.Routing;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Security;
 using Current = Umbraco.Web.Composing.Current;
@@ -56,14 +60,14 @@ namespace Umbraco.Web
         /// <remarks>
         /// See: http://issues.umbraco.org/issue/U4-1614
         /// </remarks>
-        public static MvcHtmlString PreviewBadge(this HtmlHelper helper)
+        public static MvcHtmlString PreviewBadge(this HtmlHelper helper, IHttpContextAccessor httpContextAccessor, IGlobalSettings globalSettings, IIOHelper ioHelper, IUmbracoSettingsSection umbracoSettingsSection)
         {
             if (Current.UmbracoContext.InPreviewMode)
             {
                 var htmlBadge =
-                    String.Format(Current.Configs.Settings().Content.PreviewBadge,
-                                  Current.IOHelper.ResolveUrl(Current.Configs.Global().UmbracoPath),
-                                  Current.UmbracoContext.HttpContext.Server.UrlEncode(Current.UmbracoContext.HttpContext.Request.Path),
+                    String.Format(umbracoSettingsSection.Content.PreviewBadge,
+                                ioHelper.ResolveUrl(globalSettings.UmbracoPath),
+                                  WebUtility.UrlEncode(httpContextAccessor.HttpContext.Request.Path),
                                   Current.UmbracoContext.PublishedRequest.PublishedContent.Id);
                 return new MvcHtmlString(htmlBadge);
             }

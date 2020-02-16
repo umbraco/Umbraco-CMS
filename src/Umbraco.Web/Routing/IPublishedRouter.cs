@@ -17,21 +17,21 @@ namespace Umbraco.Web.Routing
         /// <param name="umbracoContext">The current Umbraco context.</param>
         /// <param name="uri">The (optional) request Uri.</param>
         /// <returns>A published request.</returns>
-        PublishedRequest CreateRequest(UmbracoContext umbracoContext, Uri uri = null);
+        IPublishedRequest CreateRequest(IUmbracoContext umbracoContext, Uri uri = null);
 
         /// <summary>
         /// Prepares a request for rendering.
         /// </summary>
         /// <param name="request">The request.</param>
         /// <returns>A value indicating whether the request was successfully prepared and can be rendered.</returns>
-        bool PrepareRequest(PublishedRequest request);
+        bool PrepareRequest(IPublishedRequest request);
 
         /// <summary>
         /// Tries to route a request.
         /// </summary>
         /// <param name="request">The request.</param>
         /// <returns>A value indicating whether the request can be routed to a document.</returns>
-        bool TryRouteRequest(PublishedRequest request);
+        bool TryRouteRequest(IPublishedRequest request);
 
         /// <summary>
         /// Gets a template.
@@ -49,6 +49,6 @@ namespace Umbraco.Web.Routing
         /// the request, for whatever reason, and wants to force it to be re-routed
         /// and rendered as if no document were found (404).</para>
         /// </remarks>
-        void UpdateRequestToNotFound(PublishedRequest request);
+        void UpdateRequestToNotFound(IPublishedRequest request);
     }
 }

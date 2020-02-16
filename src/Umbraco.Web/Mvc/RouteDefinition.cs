@@ -21,7 +21,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Everything related to the current content request including the requested content
         /// </summary>
-        public PublishedRequest PublishedRequest { get; set; }
+        public IPublishedRequest PublishedRequest { get; set; }
 
         /// <summary>
         /// Gets/sets whether the current request has a hijacked route/user controller routed for it

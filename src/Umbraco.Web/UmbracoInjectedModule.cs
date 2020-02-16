@@ -155,7 +155,7 @@ namespace Umbraco.Web
         /// <param name="context"></param>
         /// <param name="httpContext"></param>
         /// <returns></returns>
-        internal Attempt<EnsureRoutableOutcome> EnsureUmbracoRoutablePage(UmbracoContext context, HttpContextBase httpContext)
+        internal Attempt<EnsureRoutableOutcome> EnsureUmbracoRoutablePage(IUmbracoContext context, HttpContextBase httpContext)
         {
             var uri = context.OriginalRequestUrl;
 
@@ -230,7 +230,7 @@ namespace Umbraco.Web
         // ensures Umbraco has at least one published node
         // if not, rewrites to splash and return false
         // if yes, return true
-        private bool EnsureHasContent(UmbracoContext context, HttpContextBase httpContext)
+        private bool EnsureHasContent(IUmbracoContext context, HttpContextBase httpContext)
         {
             if (context.Content.HasContent())
                 return true;
@@ -273,7 +273,7 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="context"></param>
         /// <param name="pcr"> </param>
-        private void RewriteToUmbracoHandler(HttpContextBase context, PublishedRequest pcr)
+        private void RewriteToUmbracoHandler(HttpContextBase context, IPublishedRequest pcr)
         {
             // NOTE: we do not want to use TransferRequest even though many docs say it is better with IIS7, turns out this is
             // not what we need. The purpose of TransferRequest is to ensure that .net processes all of the rules for the newly

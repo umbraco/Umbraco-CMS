@@ -5,6 +5,6 @@
     /// </summary>
     public interface IUmbracoContextAccessor
     {
-        UmbracoContext UmbracoContext { get; set;  }
+        IUmbracoContext UmbracoContext { get; set;  }
     }
 }

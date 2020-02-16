@@ -13,13 +13,13 @@ namespace Umbraco.Web.Mvc
     /// </remarks>
     public class RedirectToUmbracoUrlResult : ActionResult
     {
-        private readonly UmbracoContext _umbracoContext;
+        private readonly IUmbracoContext _umbracoContext;
 
         /// <summary>
         /// Creates a new RedirectToUmbracoResult
         /// </summary>
         /// <param name="umbracoContext"></param>
-        public RedirectToUmbracoUrlResult(UmbracoContext umbracoContext)
+        public RedirectToUmbracoUrlResult(IUmbracoContext umbracoContext)
         {
             _umbracoContext = umbracoContext;
         }

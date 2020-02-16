@@ -69,7 +69,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Exposes the UmbracoContext
         /// </summary>
-        protected UmbracoContext UmbracoContext => _umbracoContextAccessor?.UmbracoContext ?? Current.UmbracoContext;
+        protected IUmbracoContext UmbracoContext => _umbracoContextAccessor?.UmbracoContext ?? Current.UmbracoContext;
 
         // TODO: try lazy property injection?
         private IPublishedRouter PublishedRouter => Current.Factory.GetInstance<IPublishedRouter>();
@@ -99,7 +99,7 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         /// <param name="request"></param>
         /// <param name="filterContext"></param>
-        protected virtual void ConfigurePublishedContentRequest(PublishedRequest request, ActionExecutedContext filterContext)
+        protected virtual void ConfigurePublishedContentRequest(IPublishedRequest request, ActionExecutedContext filterContext)
         {
             if (_contentId.HasValue)
             {

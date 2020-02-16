@@ -24,7 +24,7 @@ namespace Umbraco.Web.Routing
         /// </summary>
         /// <param name="frequest">The <c>PublishedRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-        public virtual bool TryFindContent(PublishedRequest frequest)
+        public virtual bool TryFindContent(IPublishedRequest frequest)
         {
             string route;
             if (frequest.HasDomain)
@@ -42,7 +42,7 @@ namespace Umbraco.Web.Routing
         /// <param name="docreq">The document request.</param>
         /// <param name="route">The route.</param>
         /// <returns>The document node, or null.</returns>
-        protected IPublishedContent FindContent(PublishedRequest docreq, string route)
+        protected IPublishedContent FindContent(IPublishedRequest docreq, string route)
         {
             if (docreq == null) throw new System.ArgumentNullException(nameof(docreq));
 

@@ -20,7 +20,7 @@ namespace Umbraco.Web.Search
     /// </summary>
     public class UmbracoTreeSearcher
     {
-        private readonly UmbracoContext _umbracoContext;
+        private readonly IUmbracoContext _umbracoContext;
         private readonly ILocalizationService _languageService;
         private readonly IEntityService _entityService;
         private readonly UmbracoMapper _mapper;
@@ -28,7 +28,7 @@ namespace Umbraco.Web.Search
         private readonly IBackOfficeExamineSearcher _backOfficeExamineSearcher;
 
 
-        public UmbracoTreeSearcher(UmbracoContext umbracoContext,
+        public UmbracoTreeSearcher(IUmbracoContext umbracoContext,
             ILocalizationService languageService,
             IEntityService entityService,
             UmbracoMapper mapper,

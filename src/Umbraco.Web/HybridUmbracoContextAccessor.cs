@@ -3,7 +3,7 @@
     /// <summary>
     /// Implements a hybrid <see cref="IUmbracoContextAccessor"/>.
     /// </summary>
-    internal class HybridUmbracoContextAccessor : HybridAccessorBase<UmbracoContext>, IUmbracoContextAccessor
+    internal class HybridUmbracoContextAccessor : HybridAccessorBase<IUmbracoContext>, IUmbracoContextAccessor
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="HybridUmbracoContextAccessor"/> class.
@@ -18,7 +18,7 @@
         /// <summary>
         /// Gets or sets the <see cref="UmbracoContext"/> object.
         /// </summary>
-        public UmbracoContext UmbracoContext
+        public IUmbracoContext UmbracoContext
         {
             get => Value;
             set => Value = value;

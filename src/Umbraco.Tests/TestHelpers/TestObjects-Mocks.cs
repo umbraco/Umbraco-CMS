@@ -109,7 +109,7 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         /// <returns>An Umbraco context.</returns>
         /// <remarks>This should be the minimum Umbraco context.</remarks>
-        public UmbracoContext GetUmbracoContextMock(IUmbracoContextAccessor accessor = null)
+        public IUmbracoContext GetUmbracoContextMock(IUmbracoContextAccessor accessor = null)
         {
             var httpContext = Mock.Of<HttpContextBase>();
 
@@ -337,5 +337,16 @@ namespace Umbraco.Tests.TestHelpers
         }
 
         #endregion
+
+        public IHttpContextAccessor GetHttpContextAccessor(HttpContextBase httpContextBase = null)
+        {
+            var mock = new Mock<IHttpContextAccessor>();
+
+            var httpContext = UmbracoContextFactory.EnsureHttpContext(httpContextBase);
+
+            mock.Setup(x => x.HttpContext).Returns(httpContext);
+
+            return mock.Object;
+        }
     }
 }
