@@ -82,7 +82,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbContext);
             var urlProvider = new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper(), umbracoContextAccessor);
             var publishedUrlProvider = new UrlProvider(
-                new Lazy<IUmbracoContextAccessor>(() => umbracoContextAccessor),
+                umbracoContextAccessor,
                 TestHelper.WebRoutingSection,
                 new UrlProviderCollection(new []{urlProvider}),
                 new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
@@ -126,7 +126,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbContext);
             var urlProvider = new DefaultUrlProvider(umbracoSettings.RequestHandler, Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper(), umbracoContextAccessor);
             var publishedUrlProvider = new UrlProvider(
-                new Lazy<IUmbracoContextAccessor>(() => umbracoContextAccessor),
+                umbracoContextAccessor,
                 TestHelper.WebRoutingSection,
                 new UrlProviderCollection(new []{urlProvider}),
                 new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),

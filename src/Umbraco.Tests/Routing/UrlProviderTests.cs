@@ -102,7 +102,7 @@ namespace Umbraco.Tests.Routing
         private IPublishedUrlProvider GetPublishedUrlProvider(IUmbracoContext umbracoContext, DefaultUrlProvider urlProvider)
         {
             return new UrlProvider(
-                new Lazy<IUmbracoContextAccessor>(() => new TestUmbracoContextAccessor(umbracoContext)),
+                new TestUmbracoContextAccessor(umbracoContext),
                 TestHelper.WebRoutingSection,
                 new UrlProviderCollection(new []{urlProvider}),
                 new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),

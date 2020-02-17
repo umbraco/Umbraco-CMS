@@ -86,7 +86,7 @@ namespace Umbraco.Tests.Testing.TestingTests
             var urlProvider = urlProviderMock.Object;
 
             var theUrlProvider = new UrlProvider(
-                new Lazy<IUmbracoContextAccessor>(() => new TestUmbracoContextAccessor(umbracoContext)),
+                new TestUmbracoContextAccessor(umbracoContext),
                 TestHelper.WebRoutingSection,
                 new UrlProviderCollection(new [] { urlProvider }),
                 new MediaUrlProviderCollection( Enumerable.Empty<IMediaUrlProvider>())

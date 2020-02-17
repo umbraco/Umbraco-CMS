@@ -302,7 +302,7 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique<IPublishedValueFallback, NoopPublishedValueFallback>();
             Composition.RegisterUnique<IPublishedUrlProvider>(factory =>
                 new UrlProvider(
-                    new Lazy<IUmbracoContextAccessor>(() => factory.GetInstance<IUmbracoContextAccessor>()),
+                    factory.GetInstance<IUmbracoContextAccessor>(),
                     TestObjects.GetUmbracoSettings().WebRouting,
                     new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                     new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
