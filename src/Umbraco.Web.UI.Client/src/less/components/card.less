@@ -144,9 +144,12 @@
 }
 
 .umb-card-grid .umb-card-grid-item.--creator {
-    border: 1px dashed @ui-action-discreet-border;
-    &:hover {
-        border-color: @ui-action-discreet-border-hover;
+    > span {
+        border: 2px dashed @ui-action-discreet-border;
+        border-radius: @baseBorderRadius;
+        &:hover {
+            border-color: @ui-action-discreet-border-hover;
+        }
     }
 }
 
